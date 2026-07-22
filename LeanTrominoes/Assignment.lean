@@ -1,4 +1,6 @@
 import LeanTrominoes.Tiling
+import Mathlib.Data.Finset.Prod
+import Mathlib.Tactic.Ring
 
 /-!
 # Local assignments of tromino placements
@@ -18,6 +20,48 @@ abbrev TrominoAssignment := Cell → Option SquareSymmetry
 
 namespace TrominoAssignment
 
+/-- All placements of `tromino` that could cover `cell`. There are only
+finitely many: choose an orientation and which prototile cell maps to `cell`. -/
+def coveringPlacements (tromino : Tromino) (cell : Cell) :
+    Finset (Placement Unit) :=
+  (Finset.univ.product tromino.cells).image fun candidate =>
+    { kind := ()
+      symmetry := candidate.1
+      offset := Cell.sub cell (candidate.1.act candidate.2) }
+
+/-- The finite candidate enumeration contains exactly the placements that
+cover the specified cell. -/
+theorem mem_coveringPlacements_iff (tromino : Tromino) (cell : Cell)
+    (placement : Placement Unit) :
+    placement ∈ coveringPlacements tromino cell ↔
+      cell ∈ placement.cells fun _ : Unit => tromino.cells := by
+  constructor
+  · rw [coveringPlacements, Finset.mem_image]
+    rintro ⟨⟨symmetry, source⟩, candidate_mem, rfl⟩
+    rw [Placement.mem_cells_iff]
+    refine ⟨source, (Finset.mem_product.mp candidate_mem).2, ?_⟩
+    simp only [Cell.add, Cell.sub]
+    apply Prod.ext <;> simp
+  · intro covers
+    rw [coveringPlacements, Finset.mem_image]
+    rw [Placement.mem_cells_iff] at covers
+    obtain ⟨source, source_mem, equality⟩ := covers
+    refine ⟨(placement.symmetry, source), by simp [source_mem], ?_⟩
+    apply Placement.ext
+    · exact Subsingleton.elim _ _
+    · rfl
+    · apply Prod.ext
+      · have x_equality := congrArg Prod.fst equality
+        simp only [Cell.add] at x_equality
+        simp only [Cell.sub]
+        rw [← x_equality]
+        ring
+      · have y_equality := congrArg Prod.snd equality
+        simp only [Cell.add] at y_equality
+        simp only [Cell.sub]
+        rw [← y_equality]
+        ring
+
 /-- The set of placements selected by an assignment. -/
 def placements (assignment : TrominoAssignment) : Set (Placement Unit) :=
   { placement | assignment placement.offset = some placement.symmetry }
@@ -26,6 +70,66 @@ def placements (assignment : TrominoAssignment) : Set (Placement Unit) :=
 def IsTiling (tromino : Tromino) (region : Set Cell)
     (assignment : TrominoAssignment) : Prop :=
   LeanTrominoes.IsTiling (fun _ : Unit => tromino.cells) region assignment.placements
+
+/-- The local constraint form of a tromino tiling. A selected tile stays
+inside the region, and every region cell has exactly one active candidate
+placement from its finite candidate list. -/
+def IsLocallyValid (tromino : Tromino) (region : Set Cell)
+    (assignment : TrominoAssignment) : Prop :=
+  (∀ offset symmetry, assignment offset = some symmetry →
+      ∀ cell ∈ (Placement.mk () symmetry offset).cells (fun _ : Unit => tromino.cells),
+        cell ∈ region) ∧
+    ∀ cell ∈ region,
+      ((coveringPlacements tromino cell).filter fun placement =>
+        assignment placement.offset = some placement.symmetry).card = 1
+
+/-- Local assignment constraints are exactly the semantic tiling condition. -/
+theorem isLocallyValid_iff_isTiling (tromino : Tromino) (region : Set Cell)
+    (assignment : TrominoAssignment) :
+    assignment.IsLocallyValid tromino region ↔ assignment.IsTiling tromino region := by
+  constructor
+  · rintro ⟨inside, covered⟩
+    constructor
+    · intro placement placement_mem cell cell_mem
+      exact inside placement.offset placement.symmetry placement_mem cell cell_mem
+    · intro cell cell_mem
+      obtain ⟨placement, filtered_eq⟩ :=
+        Finset.card_eq_one.mp (covered cell cell_mem)
+      have placement_filtered :
+          placement ∈ (coveringPlacements tromino cell).filter fun candidate =>
+            assignment candidate.offset = some candidate.symmetry := by
+        rw [filtered_eq]
+        simp
+      have placement_data := Finset.mem_filter.mp placement_filtered
+      refine ⟨placement, ⟨placement_data.2,
+        (mem_coveringPlacements_iff tromino cell placement).mp placement_data.1⟩, ?_⟩
+      intro other other_data
+      have other_filtered :
+          other ∈ (coveringPlacements tromino cell).filter fun candidate =>
+            assignment candidate.offset = some candidate.symmetry :=
+        Finset.mem_filter.mpr ⟨
+          (mem_coveringPlacements_iff tromino cell other).mpr other_data.2,
+          other_data.1⟩
+      rw [filtered_eq] at other_filtered
+      simpa using other_filtered
+  · intro tiling
+    constructor
+    · intro offset symmetry selected cell cell_mem
+      exact tiling.tilesInside (Placement.mk () symmetry offset) selected cell cell_mem
+    · intro cell cell_mem
+      obtain ⟨placement, ⟨selected, covers⟩, unique⟩ :=
+        tiling.uniqueCover cell cell_mem
+      apply Finset.card_eq_one.mpr
+      refine ⟨placement, Finset.ext ?_⟩
+      intro other
+      simp only [Finset.mem_filter, Finset.mem_singleton]
+      constructor
+      · rintro ⟨candidate, active⟩
+        exact unique other ⟨active,
+          (mem_coveringPlacements_iff tromino cell other).mp candidate⟩
+      · intro other_eq
+        subst other
+        exact ⟨(mem_coveringPlacements_iff tromino cell placement).mpr covers, selected⟩
 
 /-- Two selected placements at the same offset are equal. The shared offset
 cell would otherwise be covered twice. -/

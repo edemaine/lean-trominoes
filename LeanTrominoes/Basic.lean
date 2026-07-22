@@ -21,6 +21,10 @@ namespace Cell
 def add (first second : Cell) : Cell :=
   (first.1 + second.1, first.2 + second.2)
 
+/-- Coordinatewise subtraction of lattice cells/vectors. -/
+def sub (first second : Cell) : Cell :=
+  (first.1 - second.1, first.2 - second.2)
+
 /-- Integer scaling of a lattice vector. -/
 def scale (coefficient : Int) (vector : Cell) : Cell :=
   (coefficient * vector.1, coefficient * vector.2)
