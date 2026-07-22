@@ -391,4 +391,164 @@ theorem int_divides_primrec : PrimrecRel ((· ∣ ·) : Int → Int → Prop) :=
     (Primrec.encode.comp₂ Primrec₂.left)
     (Primrec.encode.comp₂ Primrec₂.right)).of_eq intCodeDivides_correct
 
+/-- Integer subtraction is primitive recursive. -/
+theorem int_subtract_primrec : Primrec₂ ((· - ·) : Int → Int → Int) := by
+  simpa only [sub_eq_add_neg] using
+    int_add_primrec.comp₂ Primrec₂.left
+      (int_negate_primrec.comp₂ Primrec₂.right)
+
+/-- Coordinatewise subtraction of cells is primitive recursive. -/
+theorem cell_sub_primrec : Primrec₂ Cell.sub := by
+  unfold Cell.sub
+  exact Primrec₂.pair.comp₂
+    (int_subtract_primrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.left)
+      (Primrec.fst.comp₂ Primrec₂.right))
+    (int_subtract_primrec.comp₂
+      (Primrec.snd.comp₂ Primrec₂.left)
+      (Primrec.snd.comp₂ Primrec₂.right))
+
+/-- The product representation defining `PeriodicRegion`'s encoding is
+primitive recursive. -/
+theorem periodicRegion_equivData_primrec :
+    Primrec PeriodicRegion.equivData := by
+  exact Primrec.of_equiv
+
+theorem periodicRegion_motif_primrec :
+    Primrec PeriodicRegion.motif := by
+  exact (Primrec.fst.comp periodicRegion_equivData_primrec).of_eq
+    (fun _ => rfl)
+
+theorem periodicRegion_period₁_primrec :
+    Primrec PeriodicRegion.period₁ := by
+  exact (Primrec.fst.comp
+    (Primrec.snd.comp periodicRegion_equivData_primrec)).of_eq
+      (fun _ => rfl)
+
+theorem periodicRegion_period₂_primrec :
+    Primrec PeriodicRegion.period₂ := by
+  exact (Primrec.snd.comp
+    (Primrec.snd.comp periodicRegion_equivData_primrec)).of_eq
+      (fun _ => rfl)
+
+theorem periodicRegion_determinant_primrec :
+    Primrec PeriodicRegion.determinant := by
+  unfold PeriodicRegion.determinant
+  exact int_subtract_primrec.comp
+    (int_multiply_primrec.comp
+      (Primrec.fst.comp periodicRegion_period₁_primrec)
+      (Primrec.snd.comp periodicRegion_period₂_primrec))
+    (int_multiply_primrec.comp
+      (Primrec.snd.comp periodicRegion_period₁_primrec)
+      (Primrec.fst.comp periodicRegion_period₂_primrec))
+
+theorem periodicRegion_firstNumerator_primrec :
+    Primrec₂ PeriodicRegion.firstNumerator := by
+  unfold PeriodicRegion.firstNumerator
+  exact int_subtract_primrec.comp₂
+    (int_multiply_primrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.right)
+      ((Primrec.snd.comp periodicRegion_period₂_primrec).comp₂
+        Primrec₂.left))
+    (int_multiply_primrec.comp₂
+      (Primrec.snd.comp₂ Primrec₂.right)
+      ((Primrec.fst.comp periodicRegion_period₂_primrec).comp₂
+        Primrec₂.left))
+
+theorem periodicRegion_secondNumerator_primrec :
+    Primrec₂ PeriodicRegion.secondNumerator := by
+  unfold PeriodicRegion.secondNumerator
+  exact int_subtract_primrec.comp₂
+    (int_multiply_primrec.comp₂
+      ((Primrec.fst.comp periodicRegion_period₁_primrec).comp₂
+        Primrec₂.left)
+      (Primrec.snd.comp₂ Primrec₂.right))
+    (int_multiply_primrec.comp₂
+      ((Primrec.snd.comp periodicRegion_period₁_primrec).comp₂
+        Primrec₂.left)
+      (Primrec.fst.comp₂ Primrec₂.right))
+
+/-- The Cramer-divisibility test underlying lattice membership is a
+primitive-recursive relation. -/
+theorem periodicRegion_latticeArithmetic_primrec :
+    PrimrecRel fun (periodicRegion : PeriodicRegion) (cell : Cell) =>
+      periodicRegion.determinant ∣ periodicRegion.firstNumerator cell ∧
+        periodicRegion.determinant ∣ periodicRegion.secondNumerator cell := by
+  exact (int_divides_primrec.comp₂
+    (periodicRegion_determinant_primrec.comp₂ Primrec₂.left)
+    periodicRegion_firstNumerator_primrec).and
+      (int_divides_primrec.comp₂
+        (periodicRegion_determinant_primrec.comp₂ Primrec₂.left)
+        periodicRegion_secondNumerator_primrec)
+
+/-- Finite arithmetic form of membership in a periodic region. -/
+def PeriodicRegionArithmeticContains
+    (periodicRegion : PeriodicRegion) (cell : Cell) : Prop :=
+  ∃ base ∈ periodicRegion.motif,
+    periodicRegion.determinant ∣
+        periodicRegion.firstNumerator (Cell.sub cell base) ∧
+      periodicRegion.determinant ∣
+        periodicRegion.secondNumerator (Cell.sub cell base)
+
+theorem periodicRegion_arithmeticContains_primrec :
+    PrimrecRel PeriodicRegionArithmeticContains := by
+  let baseRelation : PrimrecRel fun base (input : PeriodicRegion × Cell) =>
+      input.1.determinant ∣
+          input.1.firstNumerator (Cell.sub input.2 base) ∧
+        input.1.determinant ∣
+          input.1.secondNumerator (Cell.sub input.2 base) :=
+    periodicRegion_latticeArithmetic_primrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.right)
+      (cell_sub_primrec.comp₂
+        (Primrec.snd.comp₂ Primrec₂.right) Primrec₂.left)
+  exact ((baseRelation.exists_mem_list.comp
+    (periodicRegion_motif_primrec.comp Primrec.fst)
+    Primrec.id).primrecRel).of_eq (fun _ _ => Iff.rfl)
+
+theorem periodicRegion_arithmeticContains_iff_contains
+    (periodicRegion : PeriodicRegion) (cell : Cell) :
+    PeriodicRegionArithmeticContains periodicRegion cell ↔
+      periodicRegion.contains cell = true := by
+  simp [PeriodicRegionArithmeticContains, PeriodicRegion.contains,
+    PeriodicRegion.latticeContains, Cell.sub]
+
+theorem periodicRegion_isFullRank_primrec :
+    PrimrecPred PeriodicRegion.IsFullRank := by
+  unfold PeriodicRegion.IsFullRank
+  exact (Primrec.eq.comp periodicRegion_determinant_primrec
+    (Primrec.const 0)).not
+
+/-- Valid membership in the represented 2D periodic region is a
+primitive-recursive relation. -/
+theorem periodicRegion_validMembership_primrec :
+    PrimrecRel fun (periodicRegion : PeriodicRegion) (cell : Cell) =>
+      periodicRegion.IsFullRank ∧ cell ∈ periodicRegion.carrier := by
+  have fullRankRelation : PrimrecRel fun (periodicRegion : PeriodicRegion)
+      (_ : Cell) =>
+      periodicRegion.IsFullRank :=
+    (periodicRegion_isFullRank_primrec.comp Primrec.fst).primrecRel
+  have conjunctionRelation : PrimrecRel fun periodicRegion cell =>
+      periodicRegion.IsFullRank ∧
+        PeriodicRegionArithmeticContains periodicRegion cell :=
+    fullRankRelation.and periodicRegion_arithmeticContains_primrec
+  apply PrimrecRel.of_eq conjunctionRelation
+  intro periodicRegion cell
+  rw [periodicRegion_arithmeticContains_iff_contains]
+  constructor
+  · rintro ⟨fullRank, contains⟩
+    exact ⟨fullRank,
+      (periodicRegion.contains_eq_true_iff fullRank cell).mp contains⟩
+  · rintro ⟨fullRank, member⟩
+    exact ⟨fullRank,
+      (periodicRegion.contains_eq_true_iff fullRank cell).mpr member⟩
+
+/-- The executable valid-membership checker is primitive recursive. -/
+theorem periodicRegion_validContains_primrec :
+    Primrec₂ PeriodicRegion.validContains := by
+  apply (PrimrecRel.decide periodicRegion_validMembership_primrec).of_eq
+  intro periodicRegion cell
+  apply Bool.eq_iff_iff.mpr
+  rw [decide_eq_true_eq,
+    periodicRegion.validContains_eq_true_iff]
+
 end LeanTrominoes.Computability
