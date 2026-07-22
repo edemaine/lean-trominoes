@@ -1,5 +1,6 @@
 import LeanTrominoes.Tiling
 import Mathlib.Computability.Primrec.List
+import Mathlib.Tactic.Ring
 
 /-!
 # Finite presentations of periodic regions
@@ -84,11 +85,31 @@ def InFundamentalDomain (periodicStrip : PeriodicStrip) (cell : Cell) : Prop :=
   0 ≤ cell.1 ∧ cell.1 < (periodicStrip.period : Int) ∧
     0 ≤ cell.2 ∧ cell.2 < (periodicStrip.width : Int)
 
+instance (periodicStrip : PeriodicStrip) (cell : Cell) :
+    Decidable (periodicStrip.InFundamentalDomain cell) := by
+  unfold InFundamentalDomain
+  infer_instance
+
 /-- A well-formed strip has positive width and period, and stores its
 motif inside the selected fundamental domain. -/
 def IsWellFormed (periodicStrip : PeriodicStrip) : Prop :=
   0 < periodicStrip.width ∧ 0 < periodicStrip.period ∧
     ∀ cell ∈ periodicStrip.motif, periodicStrip.InFundamentalDomain cell
+
+/-- Executable well-formedness check for a strip presentation. -/
+def wellFormed (periodicStrip : PeriodicStrip) : Bool :=
+  decide (0 < periodicStrip.width) &&
+    decide (0 < periodicStrip.period) &&
+    periodicStrip.motif.all fun cell =>
+      decide (periodicStrip.InFundamentalDomain cell)
+
+theorem wellFormed_eq_true_iff (periodicStrip : PeriodicStrip) :
+    periodicStrip.wellFormed = true ↔ periodicStrip.IsWellFormed := by
+  simp [wellFormed, IsWellFormed, and_assoc]
+
+instance (periodicStrip : PeriodicStrip) : Decidable periodicStrip.IsWellFormed :=
+  decidable_of_iff (periodicStrip.wellFormed = true)
+    periodicStrip.wellFormed_eq_true_iff
 
 /-- The infinite periodic subset represented by `periodicStrip`. -/
 def carrier (periodicStrip : PeriodicStrip) : Set Cell :=
@@ -96,6 +117,56 @@ def carrier (periodicStrip : PeriodicStrip) : Set Cell :=
       ∃ base ∈ periodicStrip.motif, ∃ i : Int,
         cell = Cell.add base
           (Cell.scale i (((periodicStrip.period : Int), 0) : Cell)) }
+
+/-- Arithmetic characterization of membership in a periodic strip. -/
+theorem mem_carrier_iff (periodicStrip : PeriodicStrip) (cell : Cell) :
+    cell ∈ periodicStrip.carrier ↔
+      0 ≤ cell.2 ∧ cell.2 < (periodicStrip.width : Int) ∧
+        ∃ base ∈ periodicStrip.motif,
+          base.2 = cell.2 ∧
+            (periodicStrip.period : Int) ∣ cell.1 - base.1 := by
+  constructor
+  · rintro ⟨nonnegative, below_width, base, base_mem, i, equality⟩
+    refine ⟨nonnegative, below_width, base, base_mem, ?_, ?_⟩
+    · have y_equality := congrArg Prod.snd equality
+      simpa [Cell.add, Cell.scale] using y_equality.symm
+    · refine ⟨i, ?_⟩
+      have x_equality := congrArg Prod.fst equality
+      simp only [Cell.add, Cell.scale] at x_equality
+      calc
+        cell.1 - base.1 =
+            (base.1 + i * (periodicStrip.period : Int)) - base.1 := by
+              rw [x_equality]
+        _ = (periodicStrip.period : Int) * i := by ring
+  · rintro ⟨nonnegative, below_width, base, base_mem, y_equality, i, x_equality⟩
+    refine ⟨nonnegative, below_width, base, base_mem, i, ?_⟩
+    apply Prod.ext
+    · simp only [Cell.add, Cell.scale]
+      calc
+        cell.1 = base.1 + (cell.1 - base.1) := by ring
+        _ = base.1 + (periodicStrip.period : Int) * i := by rw [x_equality]
+        _ = base.1 + i * (periodicStrip.period : Int) := by ring
+    · simp only [Cell.add, Cell.scale, mul_zero, add_zero]
+      exact y_equality.symm
+
+/-- Executable membership check for the infinite carrier of a strip
+presentation. -/
+def contains (periodicStrip : PeriodicStrip) (cell : Cell) : Bool :=
+  decide (0 ≤ cell.2) &&
+    decide (cell.2 < (periodicStrip.width : Int)) &&
+    periodicStrip.motif.any fun base =>
+      decide (base.2 = cell.2) &&
+        decide ((periodicStrip.period : Int) ∣ cell.1 - base.1)
+
+theorem contains_eq_true_iff (periodicStrip : PeriodicStrip) (cell : Cell) :
+    periodicStrip.contains cell = true ↔ cell ∈ periodicStrip.carrier := by
+  rw [periodicStrip.mem_carrier_iff]
+  simp [contains, and_assoc]
+
+instance (periodicStrip : PeriodicStrip) (cell : Cell) :
+    Decidable (cell ∈ periodicStrip.carrier) :=
+  decidable_of_iff (periodicStrip.contains cell = true)
+    (periodicStrip.contains_eq_true_iff cell)
 
 end PeriodicStrip
 
