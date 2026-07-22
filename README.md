@@ -22,12 +22,14 @@ build; an imported proof counts when its statement matches the paper.
 
 ### 1. Tiling foundations
 
-- [ ] Define integer-lattice polyominoes and polycubes, allowed rigid motions,
-  and exact tilings by one or more prototiles.
-- [ ] Define partial placements, completion, subspace tiling, periodic finite
-  presentations, and translation-only tiling.
-- [ ] Define the finite, 1.5-dimensional, 2-dimensional, and general
-  $d$-dimensional decision-problem encodings used in the paper.
+- [x] Define 2D integer-lattice cells and polyominoes, all square-grid rigid
+  motions, placements, and exact tilings by one or more prototiles.
+- [x] Define the periodic-subset tiling inputs and predicates needed in 2D and
+  1.5D for Theorem 5.2.
+- [ ] Define partial placements, completion, finite-region tiling, and
+  translation-only tiling.
+- [ ] Generalize the geometric and input definitions to polycubes and arbitrary
+  dimension.
 - [x] **Theorem 3.1 (Berger):** Wang tiling is co-r.e.-complete.  This is
   supplied by the imported `LeanWang.Final` interface.
 
@@ -130,9 +132,32 @@ the exact fetched dependency revision in the committed `lake-manifest.json`.
 
 ## Status
 
-The Lake project and dependency are initialized.  No tromino theorem has been
-formalized yet; [`LeanTrominoes/Basic.lean`](LeanTrominoes/Basic.lean) is the
-starting point for the common definitions.
+The definition layer needed to state Theorem 5.2 is complete.  No part of the
+theorem has been proved yet.  Its proof-free formal target is
+`LeanTrominoes.Theorem52.statement`, the conjunction of:
+
+- `planeStatement`: co-r.e.-completeness in 2D for each of the I and L
+  trominoes; and
+- `stripStatement`: PSPACE-completeness in 1.5D for each tromino.
+
+The representation choices for this target are:
+
+- [`LeanTrominoes/Basic.lean`](LeanTrominoes/Basic.lean) defines polyominoes,
+  the eight square-grid symmetries, placements, and the I and L trominoes.
+- [`LeanTrominoes/Tiling.lean`](LeanTrominoes/Tiling.lean) defines a tiling by
+  requiring every placed tile to lie in the region and every region cell to
+  have a unique covering placement.
+- [`LeanTrominoes/Periodic.lean`](LeanTrominoes/Periodic.lean) represents a 2D
+  periodic region by a finite motif and two full-rank period vectors.  Its 1.5D
+  analogue uses a finite motif in
+  $\mathbb Z \times \{0,\ldots,W-1\}$ and one positive horizontal period.
+  Malformed finite presentations are no-instances of the decision predicates.
+- [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
+  missing PSPACE interface on top of Mathlib's finite multi-stack Turing
+  machines.  Space is the total number of occupied stack cells, and hardness
+  uses polynomial-time many-one reductions.
+- [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
+  these definitions with `LeanWang.CoREComplete` into the formal target.
 
 ## Build
 
