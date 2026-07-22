@@ -13,6 +13,10 @@ namespace LeanTrominoes.Computability
 
 open Encodable
 
+noncomputable instance : Primcodable SquareSymmetry :=
+  Primcodable.ofEquiv (Fin (Fintype.card SquareSymmetry))
+    (Fintype.equivFin SquareSymmetry)
+
 @[simp]
 theorem encode_int_ofNat (n : Nat) : encode (Int.ofNat n) = 2 * n := by
   rfl
@@ -391,6 +395,12 @@ theorem int_divides_primrec : PrimrecRel ((· ∣ ·) : Int → Int → Prop) :=
     (Primrec.encode.comp₂ Primrec₂.left)
     (Primrec.encode.comp₂ Primrec₂.right)).of_eq intCodeDivides_correct
 
+/-- Coercion of naturals to integers is primitive recursive. -/
+theorem int_ofNat_primrec : Primrec (Int.ofNat : Nat → Int) := by
+  apply Primrec.encode_iff.mp
+  exact (Primrec.nat_mul.comp (Primrec.const 2) Primrec.id).of_eq
+    encode_int_ofNat
+
 /-- Integer subtraction is primitive recursive. -/
 theorem int_subtract_primrec : Primrec₂ ((· - ·) : Int → Int → Int) := by
   simpa only [sub_eq_add_neg] using
@@ -407,6 +417,73 @@ theorem cell_sub_primrec : Primrec₂ Cell.sub := by
     (int_subtract_primrec.comp₂
       (Primrec.snd.comp₂ Primrec₂.left)
       (Primrec.snd.comp₂ Primrec₂.right))
+
+/-- Coordinatewise addition of cells is primitive recursive. -/
+theorem cell_add_primrec : Primrec₂ Cell.add := by
+  unfold Cell.add
+  exact Primrec₂.pair.comp₂
+    (int_add_primrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.left)
+      (Primrec.fst.comp₂ Primrec₂.right))
+    (int_add_primrec.comp₂
+      (Primrec.snd.comp₂ Primrec₂.left)
+      (Primrec.snd.comp₂ Primrec₂.right))
+
+/-- Integer scaling of cells is primitive recursive. -/
+theorem cell_scale_primrec : Primrec₂ Cell.scale := by
+  unfold Cell.scale
+  exact Primrec₂.pair.comp₂
+    (int_multiply_primrec.comp₂ Primrec₂.left
+      (Primrec.fst.comp₂ Primrec₂.right))
+    (int_multiply_primrec.comp₂ Primrec₂.left
+      (Primrec.snd.comp₂ Primrec₂.right))
+
+/-- The action of every square-grid symmetry on cells is primitive recursive. -/
+theorem squareSymmetry_act_primrec : Primrec₂ SquareSymmetry.act := by
+  change Primrec fun input : SquareSymmetry × Cell =>
+    SquareSymmetry.act input.1 input.2
+  let x : Primrec (fun input : SquareSymmetry × Cell => input.2.1) :=
+    Primrec.fst.comp Primrec.snd
+  let y : Primrec (fun input : SquareSymmetry × Cell => input.2.2) :=
+    Primrec.snd.comp Primrec.snd
+  let negX := int_negate_primrec.comp x
+  let negY := int_negate_primrec.comp y
+  let is (symmetry : SquareSymmetry) : PrimrecPred (fun input :
+      SquareSymmetry × Cell => input.1 = symmetry) :=
+    Primrec.eq.comp Primrec.fst (Primrec.const symmetry)
+  exact (Primrec.ite (is .identity) (Primrec.pair x y)
+    (Primrec.ite (is .rotate90) (Primrec.pair negY x)
+    (Primrec.ite (is .rotate180) (Primrec.pair negX negY)
+    (Primrec.ite (is .rotate270) (Primrec.pair y negX)
+    (Primrec.ite (is .reflectX) (Primrec.pair x negY)
+    (Primrec.ite (is .reflectDiagonal) (Primrec.pair y x)
+    (Primrec.ite (is .reflectY) (Primrec.pair negX y)
+      (Primrec.pair negY negX)))))))).of_eq fun input => by
+        rcases input with ⟨symmetry, cell⟩
+        cases symmetry <;> rfl
+
+/-- Nonnegativity of integers is primitive recursive. -/
+theorem int_nonnegative_primrec : PrimrecPred fun integer : Int => 0 ≤ integer := by
+  apply Primrec.primrecPred
+  apply (Primrec.not.comp
+    (intCodeNegative_primrec.comp Primrec.encode)).of_eq
+  intro integer
+  apply Bool.eq_iff_iff.mpr
+  cases integer with
+  | ofNat n => rw [intCodeNegative_encode_ofNat]; simp
+  | negSucc n => rw [intCodeNegative_encode_negSucc]; simp
+
+/-- Integer order is a primitive-recursive relation. -/
+theorem int_le_primrec : PrimrecRel ((· ≤ ·) : Int → Int → Prop) := by
+  have nonnegativeDifference : PrimrecRel fun left right : Int =>
+      0 ≤ right - left :=
+    (int_nonnegative_primrec.comp
+      (int_subtract_primrec.comp Primrec.snd Primrec.fst)).primrecRel
+  exact nonnegativeDifference.of_eq fun _ _ => by omega
+
+/-- Strict integer order is a primitive-recursive relation. -/
+theorem int_lt_primrec : PrimrecRel ((· < ·) : Int → Int → Prop) := by
+  exact int_le_primrec.swap.not.of_eq fun _ _ => not_le
 
 /-- The product representation defining `PeriodicRegion`'s encoding is
 primitive recursive. -/
@@ -550,5 +627,134 @@ theorem periodicRegion_validContains_primrec :
   apply Bool.eq_iff_iff.mpr
   rw [decide_eq_true_eq,
     periodicRegion.validContains_eq_true_iff]
+
+/-- The product representation defining `PeriodicStrip`'s encoding is
+primitive recursive. -/
+theorem periodicStrip_equivData_primrec :
+    Primrec PeriodicStrip.equivData := by
+  exact Primrec.of_equiv
+
+theorem periodicStrip_width_primrec : Primrec PeriodicStrip.width := by
+  exact (Primrec.fst.comp periodicStrip_equivData_primrec).of_eq
+    (fun _ => rfl)
+
+theorem periodicStrip_period_primrec : Primrec PeriodicStrip.period := by
+  exact (Primrec.fst.comp
+    (Primrec.snd.comp periodicStrip_equivData_primrec)).of_eq
+      (fun _ => rfl)
+
+theorem periodicStrip_motif_primrec : Primrec PeriodicStrip.motif := by
+  exact (Primrec.snd.comp
+    (Primrec.snd.comp periodicStrip_equivData_primrec)).of_eq
+      (fun _ => rfl)
+
+/-- Membership in a strip's chosen fundamental domain is a
+primitive-recursive relation. -/
+theorem periodicStrip_inFundamentalDomain_primrec :
+    PrimrecRel PeriodicStrip.InFundamentalDomain := by
+  have xNonnegative : PrimrecRel fun (_ : PeriodicStrip) (cell : Cell) =>
+      0 ≤ cell.1 :=
+    (int_nonnegative_primrec.comp
+      (Primrec.fst.comp Primrec.snd)).primrecRel
+  have xBelowPeriod : PrimrecRel fun (periodicStrip : PeriodicStrip)
+      (cell : Cell) => cell.1 < (periodicStrip.period : Int) :=
+    int_lt_primrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.right)
+      ((int_ofNat_primrec.comp periodicStrip_period_primrec).comp₂
+        Primrec₂.left)
+  have yNonnegative : PrimrecRel fun (_ : PeriodicStrip) (cell : Cell) =>
+      0 ≤ cell.2 :=
+    (int_nonnegative_primrec.comp
+      (Primrec.snd.comp Primrec.snd)).primrecRel
+  have yBelowWidth : PrimrecRel fun (periodicStrip : PeriodicStrip)
+      (cell : Cell) => cell.2 < (periodicStrip.width : Int) :=
+    int_lt_primrec.comp₂
+      (Primrec.snd.comp₂ Primrec₂.right)
+      ((int_ofNat_primrec.comp periodicStrip_width_primrec).comp₂
+        Primrec₂.left)
+  have constraints : PrimrecRel fun (periodicStrip : PeriodicStrip)
+      (cell : Cell) =>
+      0 ≤ cell.1 ∧ cell.1 < (periodicStrip.period : Int) ∧
+        0 ≤ cell.2 ∧ cell.2 < (periodicStrip.width : Int) :=
+    xNonnegative.and (xBelowPeriod.and (yNonnegative.and yBelowWidth))
+  exact PrimrecRel.of_eq constraints fun _ _ => Iff.rfl
+
+/-- Well-formedness of a periodic-strip presentation is primitive recursive. -/
+theorem periodicStrip_isWellFormed_primrec :
+    PrimrecPred PeriodicStrip.IsWellFormed := by
+  have widthPositive : PrimrecPred fun periodicStrip : PeriodicStrip =>
+      0 < periodicStrip.width :=
+    Primrec.nat_lt.comp (Primrec.const 0) periodicStrip_width_primrec
+  have periodPositive : PrimrecPred fun periodicStrip : PeriodicStrip =>
+      0 < periodicStrip.period :=
+    Primrec.nat_lt.comp (Primrec.const 0) periodicStrip_period_primrec
+  have motifInDomain : PrimrecPred fun periodicStrip : PeriodicStrip =>
+      ∀ cell ∈ periodicStrip.motif,
+        periodicStrip.InFundamentalDomain cell :=
+    periodicStrip_inFundamentalDomain_primrec.swap.forall_mem_list.comp
+      periodicStrip_motif_primrec Primrec.id
+  exact (widthPositive.and (periodPositive.and motifInDomain)).of_eq
+    (fun _ => by simp [PeriodicStrip.IsWellFormed])
+
+/-- The executable well-formedness checker is primitive recursive. -/
+theorem periodicStrip_wellFormed_primrec :
+    Primrec PeriodicStrip.wellFormed := by
+  apply (PrimrecPred.decide periodicStrip_isWellFormed_primrec).of_eq
+  intro periodicStrip
+  apply Bool.eq_iff_iff.mpr
+  rw [decide_eq_true_eq, periodicStrip.wellFormed_eq_true_iff]
+
+/-- Membership in the infinite carrier represented by a periodic strip is a
+primitive-recursive relation. -/
+theorem periodicStrip_membership_primrec :
+    PrimrecRel fun (periodicStrip : PeriodicStrip) (cell : Cell) =>
+      cell ∈ periodicStrip.carrier := by
+  have yNonnegative : PrimrecRel fun (_ : PeriodicStrip) (cell : Cell) =>
+      0 ≤ cell.2 :=
+    (int_nonnegative_primrec.comp
+      (Primrec.snd.comp Primrec.snd)).primrecRel
+  have yBelowWidth : PrimrecRel fun (periodicStrip : PeriodicStrip)
+      (cell : Cell) => cell.2 < (periodicStrip.width : Int) :=
+    int_lt_primrec.comp₂
+      (Primrec.snd.comp₂ Primrec₂.right)
+      ((int_ofNat_primrec.comp periodicStrip_width_primrec).comp₂
+        Primrec₂.left)
+  let baseRelation : PrimrecRel fun (base : Cell)
+      (input : PeriodicStrip × Cell) =>
+      base.2 = input.2.2 ∧
+        (input.1.period : Int) ∣ input.2.1 - base.1 :=
+    (Primrec.eq.comp₂
+      (Primrec.snd.comp₂ Primrec₂.left)
+      ((Primrec.snd.comp Primrec.snd).comp₂ Primrec₂.right)).and
+    (int_divides_primrec.comp₂
+      ((int_ofNat_primrec.comp periodicStrip_period_primrec).comp₂
+        (Primrec.fst.comp₂ Primrec₂.right))
+      (int_subtract_primrec.comp₂
+        ((Primrec.fst.comp Primrec.snd).comp₂ Primrec₂.right)
+        (Primrec.fst.comp₂ Primrec₂.left)))
+  have motifWitness : PrimrecRel fun (periodicStrip : PeriodicStrip)
+      (cell : Cell) => ∃ base ∈ periodicStrip.motif,
+        base.2 = cell.2 ∧
+          (periodicStrip.period : Int) ∣ cell.1 - base.1 :=
+    ((baseRelation.exists_mem_list.comp
+      (periodicStrip_motif_primrec.comp Primrec.fst)
+      Primrec.id).primrecRel).of_eq (fun _ _ => Iff.rfl)
+  have arithmeticMembership : PrimrecRel fun
+      (periodicStrip : PeriodicStrip) (cell : Cell) =>
+      0 ≤ cell.2 ∧ cell.2 < (periodicStrip.width : Int) ∧
+        ∃ base ∈ periodicStrip.motif,
+          base.2 = cell.2 ∧
+            (periodicStrip.period : Int) ∣ cell.1 - base.1 :=
+    yNonnegative.and (yBelowWidth.and motifWitness)
+  exact arithmeticMembership.of_eq fun periodicStrip cell =>
+    (periodicStrip.mem_carrier_iff cell).symm
+
+/-- The executable periodic-strip membership checker is primitive recursive. -/
+theorem periodicStrip_contains_primrec :
+    Primrec₂ PeriodicStrip.contains := by
+  apply (PrimrecRel.decide periodicStrip_membership_primrec).of_eq
+  intro periodicStrip cell
+  apply Bool.eq_iff_iff.mpr
+  rw [decide_eq_true_eq, periodicStrip.contains_eq_true_iff]
 
 end LeanTrominoes.Computability
