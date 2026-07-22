@@ -19,7 +19,7 @@ def planeStatement : Prop :=
 def stripStatement : Prop :=
   ∀ tromino : Tromino,
     Complexity.PSPACEComplete
-      (Complexity.primcodableFinEncoding PeriodicStripSpec)
+      (Complexity.primcodableFinEncoding PeriodicStrip)
       (PeriodicStripTrominoTiling tromino)
 
 /-- The complete formal target corresponding to Theorem 5.2. -/

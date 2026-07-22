@@ -148,8 +148,8 @@ The representation choices for this target are:
   requiring every placed tile to lie in the region and every region cell to
   have a unique covering placement.
 - [`LeanTrominoes/Periodic.lean`](LeanTrominoes/Periodic.lean) represents a 2D
-  periodic region by a finite motif and two full-rank period vectors.  Its 1.5D
-  analogue uses a finite motif in
+  `PeriodicRegion` by a finite motif and two full-rank period vectors.  Its
+  1.5D analogue, `PeriodicStrip`, uses a finite motif in
   $\mathbb Z \times \{0,\ldots,W-1\}$ and one positive horizontal period.
   Malformed finite presentations are no-instances of the decision predicates.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
