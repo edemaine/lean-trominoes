@@ -84,6 +84,10 @@ build; an imported proof counts when its statement matches the paper.
   polynomial-bounding-box prototiles, and in PSPACE in 1.5D.
 - [ ] **Theorem 5.2:** Tiling a periodic subset of $\mathbb Z^2$ by either
   single tromino is co-r.e.-complete; the 1.5D problem is PSPACE-complete.
+  - [x] Prove co-r.e. membership of the 2D problem for each tromino.
+  - [ ] Prove co-r.e.-hardness of the 2D problem for each tromino.
+  - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
+  - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -132,9 +136,10 @@ the exact fetched dependency revision in the committed `lake-manifest.json`.
 
 ## Status
 
-The definition layer needed to state Theorem 5.2 is complete.  No part of the
-theorem has been proved yet.  Its proof-free formal target is
-`LeanTrominoes.Theorem52.statement`, the conjunction of:
+The definition layer needed to state Theorem 5.2 is complete.  Its 2D
+co-r.e. upper bound is now proved by `periodicTrominoTiling_coRE`, using a
+primitive-recursive exhaustive search for a finite obstruction.  The complete
+formal target remains `LeanTrominoes.Theorem52.statement`, the conjunction of:
 
 - `planeStatement`: co-r.e.-completeness in 2D for each of the I and L
   trominoes; and
