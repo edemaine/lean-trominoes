@@ -1,3 +1,4 @@
+import LeanTrominoes.Assignment
 import LeanTrominoes.Theorem52
 
 /-!

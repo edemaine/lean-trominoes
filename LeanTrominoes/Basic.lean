@@ -108,6 +108,15 @@ structure Placement (ι : Type*) where
 
 namespace Placement
 
+@[ext]
+theorem ext {kind : Type*} {first second : Placement kind}
+    (kind_eq : first.kind = second.kind)
+    (symmetry_eq : first.symmetry = second.symmetry)
+    (offset_eq : first.offset = second.offset) : first = second := by
+  cases first
+  cases second
+  simp_all
+
 /-- The map from a prototile cell to its position in a placement is injective. -/
 theorem cellMap_injective {kind : Type*} (placement : Placement kind) :
     Function.Injective fun cell =>
@@ -160,6 +169,15 @@ theorem card_cells (tromino : Tromino) : tromino.cells.card = 3 := by
 theorem card_placement_cells (tromino : Tromino) (placement : Placement Unit) :
     (placement.cells fun _ => tromino.cells).card = 3 := by
   rw [Placement.card_cells, card_cells]
+
+/-- Because the canonical representatives contain the origin, every placed
+tromino contains its offset cell. -/
+theorem offset_mem_placement_cells (tromino : Tromino) (placement : Placement Unit) :
+    placement.offset ∈ placement.cells fun _ => tromino.cells := by
+  rw [Placement.mem_cells_iff]
+  refine ⟨(0, 0), ?_, ?_⟩
+  · cases tromino <;> simp [cells]
+  · cases placement.symmetry <;> simp [SquareSymmetry.act, Cell.add]
 
 end Tromino
 
