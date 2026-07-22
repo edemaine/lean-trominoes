@@ -1,5 +1,6 @@
 import LeanTrominoes.Assignment
 import LeanTrominoes.Theorem52
+import LeanTrominoes.TilingCompactness
 
 /-!
 # LeanTrominoes
