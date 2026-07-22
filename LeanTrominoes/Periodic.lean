@@ -47,11 +47,151 @@ period vectors are linearly independent. -/
 def IsFullRank (periodicRegion : PeriodicRegion) : Prop :=
   periodicRegion.determinant ≠ 0
 
+instance (periodicRegion : PeriodicRegion) : Decidable periodicRegion.IsFullRank := by
+  unfold IsFullRank
+  infer_instance
+
+/-- Numerator of the first coordinate in Cramer's rule for the period basis. -/
+def firstNumerator (periodicRegion : PeriodicRegion) (cell : Cell) : Int :=
+  cell.1 * periodicRegion.period₂.2 - cell.2 * periodicRegion.period₂.1
+
+/-- Numerator of the second coordinate in Cramer's rule for the period basis. -/
+def secondNumerator (periodicRegion : PeriodicRegion) (cell : Cell) : Int :=
+  periodicRegion.period₁.1 * cell.2 - periodicRegion.period₁.2 * cell.1
+
+/-- Executable test for membership in the integer span of the two period
+vectors. It characterizes that span when the presentation has full rank. -/
+def latticeContains (periodicRegion : PeriodicRegion) (cell : Cell) : Bool :=
+  decide (periodicRegion.determinant ∣ periodicRegion.firstNumerator cell) &&
+    decide (periodicRegion.determinant ∣ periodicRegion.secondNumerator cell)
+
+theorem latticeContains_eq_true_iff (periodicRegion : PeriodicRegion)
+    (full_rank : periodicRegion.IsFullRank) (cell : Cell) :
+    periodicRegion.latticeContains cell = true ↔
+      ∃ i j : Int,
+        cell = Cell.add (Cell.scale i periodicRegion.period₁)
+          (Cell.scale j periodicRegion.period₂) := by
+  constructor
+  · intro contains
+    simp only [latticeContains, Bool.and_eq_true, decide_eq_true_eq] at contains
+    obtain ⟨⟨i, first_eq⟩, ⟨j, second_eq⟩⟩ := contains
+    refine ⟨i, j, ?_⟩
+    apply Prod.ext
+    · simp only [Cell.add, Cell.scale]
+      apply mul_left_cancel₀ full_rank
+      calc
+        periodicRegion.determinant * cell.1 =
+            periodicRegion.firstNumerator cell * periodicRegion.period₁.1 +
+              periodicRegion.secondNumerator cell * periodicRegion.period₂.1 := by
+                simp only [determinant, firstNumerator, secondNumerator]
+                ring
+        _ = (periodicRegion.determinant * i) * periodicRegion.period₁.1 +
+              (periodicRegion.determinant * j) * periodicRegion.period₂.1 := by
+                rw [first_eq, second_eq]
+        _ = periodicRegion.determinant *
+              (i * periodicRegion.period₁.1 + j * periodicRegion.period₂.1) := by
+                ring
+    · simp only [Cell.add, Cell.scale]
+      apply mul_left_cancel₀ full_rank
+      calc
+        periodicRegion.determinant * cell.2 =
+            periodicRegion.firstNumerator cell * periodicRegion.period₁.2 +
+              periodicRegion.secondNumerator cell * periodicRegion.period₂.2 := by
+                simp only [determinant, firstNumerator, secondNumerator]
+                ring
+        _ = (periodicRegion.determinant * i) * periodicRegion.period₁.2 +
+              (periodicRegion.determinant * j) * periodicRegion.period₂.2 := by
+                rw [first_eq, second_eq]
+        _ = periodicRegion.determinant *
+              (i * periodicRegion.period₁.2 + j * periodicRegion.period₂.2) := by
+                ring
+  · rintro ⟨i, j, rfl⟩
+    simp only [latticeContains, Bool.and_eq_true, decide_eq_true_eq]
+    constructor
+    · refine ⟨i, ?_⟩
+      simp only [determinant, firstNumerator, Cell.add, Cell.scale]
+      ring
+    · refine ⟨j, ?_⟩
+      simp only [determinant, secondNumerator, Cell.add, Cell.scale]
+      ring
+
 /-- The infinite subset represented by the finite motif and its two periods. -/
 def carrier (periodicRegion : PeriodicRegion) : Set Cell :=
   { cell | ∃ base ∈ periodicRegion.motif, ∃ i j : Int,
       cell = Cell.add (Cell.add base (Cell.scale i periodicRegion.period₁))
         (Cell.scale j periodicRegion.period₂) }
+
+/-- Executable membership check for a full-rank two-dimensional periodic
+presentation. -/
+def contains (periodicRegion : PeriodicRegion) (cell : Cell) : Bool :=
+  periodicRegion.motif.any fun base =>
+    periodicRegion.latticeContains (cell.1 - base.1, cell.2 - base.2)
+
+theorem contains_eq_true_iff (periodicRegion : PeriodicRegion)
+    (full_rank : periodicRegion.IsFullRank) (cell : Cell) :
+    periodicRegion.contains cell = true ↔ cell ∈ periodicRegion.carrier := by
+  constructor
+  · intro contains_true
+    simp only [PeriodicRegion.contains, List.any_eq_true] at contains_true
+    obtain ⟨base, base_mem, lattice_mem⟩ := contains_true
+    obtain ⟨i, j, displacement⟩ :=
+      (periodicRegion.latticeContains_eq_true_iff full_rank _).mp lattice_mem
+    refine ⟨base, base_mem, i, j, ?_⟩
+    apply Prod.ext
+    · have x_displacement := congrArg Prod.fst displacement
+      simp only [Cell.add, Cell.scale] at x_displacement ⊢
+      calc
+        cell.1 = base.1 + (cell.1 - base.1) := by ring
+        _ = base.1 +
+            (i * periodicRegion.period₁.1 + j * periodicRegion.period₂.1) := by
+              rw [x_displacement]
+        _ = base.1 + i * periodicRegion.period₁.1 +
+            j * periodicRegion.period₂.1 := by ring
+    · have y_displacement := congrArg Prod.snd displacement
+      simp only [Cell.add, Cell.scale] at y_displacement ⊢
+      calc
+        cell.2 = base.2 + (cell.2 - base.2) := by ring
+        _ = base.2 +
+            (i * periodicRegion.period₁.2 + j * periodicRegion.period₂.2) := by
+              rw [y_displacement]
+        _ = base.2 + i * periodicRegion.period₁.2 +
+            j * periodicRegion.period₂.2 := by ring
+  · rintro ⟨base, base_mem, i, j, equality⟩
+    simp only [PeriodicRegion.contains, List.any_eq_true]
+    refine ⟨base, base_mem, ?_⟩
+    apply (periodicRegion.latticeContains_eq_true_iff full_rank _).mpr
+    refine ⟨i, j, ?_⟩
+    apply Prod.ext
+    · have x_equality := congrArg Prod.fst equality
+      simp only [Cell.add, Cell.scale] at x_equality ⊢
+      rw [x_equality]
+      ring
+    · have y_equality := congrArg Prod.snd equality
+      simp only [Cell.add, Cell.scale] at y_equality ⊢
+      rw [y_equality]
+      ring
+
+/-- Executable test that rejects a dependent period presentation and otherwise
+tests carrier membership. -/
+def validContains (periodicRegion : PeriodicRegion) (cell : Cell) : Bool :=
+  decide periodicRegion.IsFullRank && periodicRegion.contains cell
+
+theorem validContains_eq_true_iff (periodicRegion : PeriodicRegion) (cell : Cell) :
+    periodicRegion.validContains cell = true ↔
+      periodicRegion.IsFullRank ∧ cell ∈ periodicRegion.carrier := by
+  rw [validContains, Bool.and_eq_true, decide_eq_true_eq]
+  constructor
+  · rintro ⟨full_rank, contains_true⟩
+    exact ⟨full_rank,
+      (periodicRegion.contains_eq_true_iff full_rank cell).mp contains_true⟩
+  · rintro ⟨full_rank, cell_mem⟩
+    exact ⟨full_rank,
+      (periodicRegion.contains_eq_true_iff full_rank cell).mpr cell_mem⟩
+
+instance (periodicRegion : PeriodicRegion) (cell : Cell) :
+    Decidable (periodicRegion.IsFullRank ∧ cell ∈ periodicRegion.carrier) :=
+  decidable_of_iff (periodicRegion.validContains cell = true)
+    (periodicRegion.validContains_eq_true_iff cell)
 
 end PeriodicRegion
 
