@@ -1,0 +1,16 @@
+name = "lean_trominoes"
+version = "0.1.0"
+keywords = ["math", "tiling", "computability"]
+defaultTargets = ["LeanTrominoes"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+
+[[require]]
+name = "lean_wang"
+git = "https://github.com/edemaine/lean-wang"
+rev = "main"
+
+[[lean_lib]]
+name = "LeanTrominoes"

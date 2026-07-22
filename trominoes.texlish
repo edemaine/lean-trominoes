@@ -1,0 +1,2453 @@
+::version >= 0.2.0
+%\title: Tiling Completion with a Tromino Tile is Undecidable
+\title: Undecidability of Tiling with a Tromino
+\author:
+  MIT--ULB CompGeom Group\thanks:
+    Artificial first author to highlight that the other authors (in
+    alphabetical order) worked as an equal group. Please include all
+    authors (including this one) in your bibliography, and refer to the
+    authors as “MIT--ULB CompGeom Group” (without “et al.”).
+  \and
+  Zachary Abel[^MIT-EECS]
+  \and
+  Hugo Akitaya[^UMass-Lowell]
+  \and
+  Lily Chung[^MIT-CSAIL]
+  \and
+  Erik D. Demaine[^MIT-CSAIL]
+  \and
+  Jenny Diomidova[^MIT-CSAIL]
+  \and
+  Della Hendrickson[^MIT-CSAIL]
+  \and
+  Stefan Langerman[^ULB]
+  \and
+  Jayson Lynch[^MIT-CSAIL]
+  [^MIT-EECS]:
+    Department of Electrical Engineering and Computer Science,
+    Massachusetts Institute of Technology, Cambridge, MA, USA,
+    <zabel@mit.edu>
+  [^UMass-Lowell]:
+    Miner School of Computer and Information Sciences,
+    University of Massachusetts, Lowell, MA, USA,
+    <hugoakitaya@gmail.com>
+  [^MIT-CSAIL]:
+    Computer Science and Artificial Intelligence Laboratory,
+    Massachusetts Institute of Technology, Cambridge, MA, USA,
+    <{lkdc,edemaine,diomidova,della,jaysonl}@mit.edu>
+  [^ULB]:
+    Computer Science Department, Universit\'e libre de Bruxelles, Belgium,
+    <stefan.langerman@ulb.ac.be>. S. Langerman is Directeur de Recherche du F.R.S.-FNRS.
+
+\date{}
+
+::use
+  amsfonts
+  amsmath
+  amsthm
+  amssymb
+  booktabs
+  csquotes: style=english
+  enumitem
+  geometry: margin=1in
+  graphicx
+  needspace
+  subcaption
+  tabularx
+  xcolor: table
+  tikz
+  url
+  xspace
+  hyperref
+  arydshln
+\MakeOuterQuote: "
+\usetikzlibrary: calc,arrows.meta,positioning
+\urlstyle: same
+\newcolumntype{L}{>{\raggedright\arraybackslash}p}
+
+\definecolor:
+  - bgred
+  - HTML
+  - F6C1C1    % light red   (~62% luminance)
+\definecolor:
+  - bgyellow
+  - HTML
+  - FFF5C4 % light yellow(~91% luminance)
+\definecolor:
+  - bggreen
+  - HTML
+  - CDEECF  % light green (~79% luminance)
+\definecolor:
+  - bgblue
+  - HTML
+  - C1C1F6    % light blue   (~62% luminance)
+
+\newtheorem:
+  - theorem
+  - Theorem
+  ~ section
+\newtheorem:
+  - lemma
+  ~ theorem
+  - Lemma
+\newtheorem:
+  - corollary
+  ~ theorem
+  - Corollary
+\newtheorem:
+  - problem
+  - Problem
+
+\def\defn#1{\textbf{\textit{\boldmath #1}}}
+
+% Complex \xxx for making notes of things to do.  Use \xxx{...} for general
+% notes, and \xxx[who]{...} if you want to blame someone in particular.
+% Puts text in brackets and in bold font, and normally adds a marginpar
+% with the text ``xxx'' so that it is easy to find.  On the other hand, if
+% the comment is in a minipage, figure, or caption, the xxx goes in the text,
+% because marginpars are not possible in these situations.
+{\makeatletter
+ \gdef\xxxmark:
+   \expandafter\ifx\csname {@}mpargs\endcsname\relax % in minipage?
+     \expandafter\ifx\csname {@}captype\endcsname\relax % in figure/caption?
+       \marginpar{xxx}% not in a caption or minipage, can use marginpar
+     \else
+       xxx % notice trailing space
+     \fi
+   \else
+     xxx % notice trailing space
+   \fi
+ \gdef\xxx{\@ifnextchar[\xxx@lab\xxx@nolab}
+ \long\gdef\xxx@lab[#1]#2{\textbf{[\xxxmark #2 ---{\sc #1}]}}
+ \long\gdef\xxx@nolab#1{\textbf{[\xxxmark #1]}}
+ % This turns them off:
+ %\long\gdef\xxx@lab[#1]#2{}\long\gdef\xxx@nolab#1{}%
+}
+
+% Force \boldmath in \section etc. titles without upsetting hyperref.
+% Warning: Redefines all instances of \bfseries to turn on \boldmath too.
+\let\realbfseries=\bfseries
+\def\bfseries: \realbfseries\boldmath
+
+\newcommand:
+  - \PER
+  ~ 1
+  - \mathord:
+      : tikzpicture[baseline=(X.base),scale=0.2]
+        % Horizontal lines
+        \draw (-1.5,1) -- (1.5,1);
+        \draw (-1.5,-1) -- (1.5,-1);
+        % Vertical lines
+        \draw (-1,1.5) -- (-1,-1.5);
+        \draw (1,1.5) -- (1,-1.5);
+        \node (X) at (0,0) {$#1$};
+
+%\newbox\tinyboxx: \vbox to 0.1em{\hbox to 0.1em{\hss}\vss}
+%\newcommand\tinybox{\copy\tinyboxx}
+%\newcommand:
+%  - \PER
+%  ~ 1
+%  - {
+%    \arraycolsep=0.1em
+%    \renewcommand\arraystretch: 0.1
+%    : array: c|c|c
+%      & &
+%      \\ \hline
+%      & \rule[0.1em]{0pt}{2ex}\raisebox{0.1em}{#1} &
+%      \\ \hline
+%      & &
+%    }
+
+%\def\L{\hspace{0.1em}\includegraphics[height=1.75ex]{figs/tromino_L}\hbox{\hspace{0.1em}}}
+\def\u{_}
+\def\L{\raisebox{-0.1ex}{\includegraphics[height=1.75ex]{figs/tromino_L}}\xspace}
+\def\I{\raisebox{-0.1ex}{\includegraphics[height=1ex]{figs/tromino_I}}\xspace}
+\def\Ir{\raisebox{-0.1ex}{\includegraphics[height=2.5ex]{figs/tromino\u I\u rot}}\xspace}
+\def\D{\raisebox{-0.1ex}{\includegraphics[height=1.75ex]{figs/domino}}\xspace}
+\def\hide#1{}
+
+\let\epsilon=\varepsilon
+
+: abstract
+  %We prove co-RE-completeness (and hence undecidability) of several tiling problems:
+  Given a periodic placement of copies of a tromino (either \L or \I),
+  we prove co-RE-completeness (and hence undecidability) of
+  deciding whether the placement can be completed to a plane tiling.
+  By contrast, the problem becomes decidable if the initial placement is
+  finite, or if the tile is a domino \D instead of a tromino (in any dimension).
+  As a consequence, tiling a given periodic subset of the plane
+  with a given tromino (\L or \I) is co-RE-complete.
+
+  We also prove co-RE-completeness of tiling the entire plane
+  with two polyominoes
+  (one of which is disconnected and the other of which is connected and has constant size),
+  and of tiling 3D space with two connected polycubes
+  (one of which has constant size).
+  If we restrict to tiling by translation only (no rotation),
+  then we obtain co-RE-completeness with one more tile:
+  two trominoes for a periodic subset of 2D,
+  three polyominoes for the 2D plane, and
+  three connected polycubes for 3D space.
+
+  Along the way, we prove several new complexity and algorithmic results about periodic (infinite) graphs.
+  Notably, we prove that Periodic Planar (1-in-)3SAT-3, 3DM, and
+  Graph Orientation are co-RE-complete in 2D and PSPACE-complete in 1D;
+  we extend basic results in graph drawing to 2D periodic graphs; and
+  we give a polynomial-time algorithm for perfect matching in
+  bipartite periodic graphs.
+  These theoretical computer science results form the basis of our techniques
+  for tiling, which are notably different from past approaches to tiling.
+
+# Introduction
+
+Given one or more ***prototiles*** (shapes) and a target ***space***
+(e.g., the plane), a ***tiling*** [[Gruenbaum-Shephard]]
+is a covering of the space with
+nonoverlapping copies of the prototiles, called ***tiles***,
+without gaps or overlaps.
+By default, we allow the copies to translate, rotate, and reflect,
+though reflections do not affect our (or most) results,
+and we will also consider translation-only tiling.
+In this paper, we study three fundamental computational problems about tilings:
+
+: problem [$d$D Tiling] @=prob:tiling
+  Given one or more prototiles, can they tile $d$-dimensional Euclidean space?
+: problem [$d$D Tiling Completion] @=prob:completion
+  Given one or more prototiles, and given some already placed tiles,
+  can this partial placement be extended to a tiling of
+  $d$-dimensional Euclidean space?
+: problem [$d$D Subspace Tiling] @=prob:subspace
+  Given one or more prototiles, and given a subset of $d$-dimensional
+  Euclidean space, can the prototiles tile that space?
+
+Problem~@prob:tiling is a special case of Problem~@prob:completion
+(with no preplaced tiles), and
+Problem~@prob:completion is a special case of Problem~@prob:subspace
+(where the preplaced tiles form the excluded subspace).
+In Problems~@prob:completion and~@prob:subspace, there are multiple ways to
+specify the preplaced tiles or subspace respectively:
+
+1. **Finite**: There are finitely many preplaced tiles,
+   or finitely many excluded regions from $d$-dimensional space,
+   and we encode each explicitly.
+2. **Periodic**: The preplaced tiles or excluded regions are periodic
+   in $d' \leq d$ dimensions, and we encode a fundamental domain
+   and the $d'$ translation vectors that repeat it.
+   (Our results use $d'=d$.)
+3. **Eventually periodic**:
+   The preplaced tiles or excluded regions are periodic outside
+   a finite region, so we use a hybrid: a periodic encoding,
+   plus an explicit finite list of exceptions
+   (excluded/included preplaced tiles or excluded regions).
+   (Our results do not use this form of the problems,
+   but we mention it for completeness.)
+
+All three problems have been shown ***undecidable***
+(solved by no finite algorithm) in a variety of settings,
+starting with Wang tiling [[Wang1961,Berger1966]].
+Such undecidability proofs generally simulate a Turing machine,
+where finding an (infinite) tiling corresponds to the machine running forever,
+which shows ***co-RE-hardness***.
+Recently, Demaine and Langerman [[Demaine-Langerman-2025]]
+proved that these problems are in co-RE in very general settings,
+and thus co-RE-hardness in fact establishes ***co-RE-completeness***.
+
+Table~@tab:history summarizes the history of many such results,
+focusing on Problem~@prob:tiling,
+but also capturing Problem~@prob:subspace in the form of a periodic "piece".
+In general, we aim for undecidability under the following objectives:
+
+1. Minimize the target dimension~$d$.
+   In addition to integer $d$, we define $d=i+\frac12$ to consist of
+   $i$ infinite real dimensions plus one bounded dimension
+   given by a real interval.
+   For example, 2.5D means $\mathbb R^2 \times [a,b]$
+   for some $a, b \in \mathbb R$.
+2. Minimize the number of distinct prototiles required.
+3. Simplify the prototile shapes:
+  1. Prefer smaller families of shapes (e.g., polyominoes or polycubes)
+     over general shapes (polygons or polyhedra).
+  2. Prefer connected over disconnected shapes.
+  3. Prefer shapes of smaller size/complexity
+     (e.g., trominoes over pentominoes).
+4. Minimize the preplaced tiles or excluded subspace:
+   zero is better than finite, which is better than periodic,
+   which is better than eventually periodic.
+
+: table
+  \small
+  \def\NEW: \textsc{new}
+  \def\halfdown#1{\raisebox{-1ex}{#1}}
+  \centering
+  : tabular: l L{1.6in} L{1.6in} L{1.5in} l
+    \toprule
+    \multicolumn{1}{l}{\halfdown{Dim.}} & \multicolumn{2}{c}{Number/types of pieces\qquad} & \multicolumn{1}{c}{\halfdown{Result\qquad}} & \multicolumn{1}{l}{\halfdown{Date}} \\
+    \cline{2-3}
+         & Tiling by translation & by rotation${}+{}$translation &  & \\
+    \midrule
+    $d$D & \textbf{1 disconnected polycube + periodic} & n/a & undecidable [[greenfeld2025undecidability]] & 2023-09 \\
+    4D & 4 connected polycubes & n/a & undecidable [[yang2024undecidabilitytranslationaltiling4dimensional]] & 2024-09 \\
+    4D & 3 connected polycubes & n/a & undecidable [[yang2024undecidabilitytranslationaltilingtiles]] & 2024-12 \\
+    3D & 6 connected polycubes & n/a & undecidable [[Yang_2025_sixpolycubes]] & 2024-08 \\
+    3D & 3 connected polycubes & n/a & undecidable [[yang2025undecidabilitytiling3dimensionalspace]] & 2025-07* \\
+    3D & \textbf{2 connected polycubes} & n/a & undecidable [[kim2025undecidabilitytranslationaltiling2]] & 2025-08* \\
+    \rowcolor{bgblue}\cellcolor{white}%
+    2.5D & \textbf{3 connected polycubes} & \textbf{2 connected polycubes} & {undecidable (Cor.~{@cor:threepolycube-translation}~\&~@cor:twopolycube)} & \NEW \\
+    %2.5D & \textbf{2 tromino + periodic connected} & \textbf{1 tromino + periodic connected} & undecidable (Thm.~@xxx) & \NEW \\
+    \midrule
+    2D & $n$ connected polyominoes & $n$ connected polyominoes & undecidable [[Golomb1970]] & 1970 \\
+    2D & 11 connected polyominoes & 5 connected polyominoes & undecidable [[Ollinger09]] & 2009-04 \\
+    2D & 10 connected polyominoes & n/a & undecidable [[Yang2023-10polyominoes]] & 2023-02 \\
+    2D & 9 connected polyominoes & n/a & undecidable [[Yang2025-9polyominoes]] & 2024 \\
+    2D & 8 connected polyominoes & n/a & undecidable [[Yang-Zhang-2024-8polyominoes]] & 2024-03 \\
+    2D & 7 polyominoes & n/a & undecidable [[Yang-Zhang-2024-7polyominoes]] & 2024-12 \\
+    2D & 7 orthoconvex polyominoes & n/a & undecidable [[Yang-Zhang-2025-7orthoconvexpolyominoes]] & 2025-06* \\
+    2D & 4 disconnected polyominoes & n/a & undecidable [[Yang-Zhang-2025-4polyominoes]] & 2025-06* \\
+    2D & n/a & 3 polygons, or 2~polygons~+ periodic & undecidable, co-RE-complete [[Demaine-Langerman-2025]] & 2024-09 \\
+    2D & 4 polyhexes & \textbf{2 polyhexes} or \textbf{3~connected polyominoes} & undecidable [[Stade2025-2tiling]] & 2025-06* \\
+    2D & \textbf{5 connected polyominoes} & \textbf{3 connected polyominoes} & undecidable [[kim2025undecidabilitytilingplaneset]] & 2025-08* \\
+    \rowcolor{bgblue}\cellcolor{white}%
+    2D & \textbf{3 polyominoes: 2~connected + 1~disconnected} & \textbf{2 polyominoes: 1~connected + 1~disconnected} & undecidable (Cor.~{@cor:threepolyomino-translation}~\&~Thm.~@thm:twopolyomino) & \NEW \\
+    \noalign: \vskip 1pt
+    \rowcolor{bgblue}\cellcolor{white}%
+    2D & \textbf{2 trominoes + periodic} & \textbf{1 tromino + periodic} & undecidable ({Cor.~@cor:periodicsubsettranslation}~\&~Thm.~@thm:periodicsubset) & \NEW \\
+    \hdashline
+    \rowcolor{bgyellow}%
+    2D & 2 polyominoes & 1 polyomino & OPEN & --- \\
+    \hdashline
+    \rowcolor{bgblue}\cellcolor{white}%
+    $d$D & domino + periodic & domino + periodic & polynomial (Cor.~@cor:domino-periodic-polytime) & \NEW\\
+    2D & 1 connected polyomino & n/a & decidable, $O(n)$ [[winslow2015translated_polyomino]] & 2015 \\
+    2D & 1 disconnected polyomino & n/a & decidable, periodic [[B20-R2-periodicity]] & 2016-02 \\
+    \rowcolor{bgblue}\cellcolor{white}%
+    1.5D & \textbf{2 trominoes + periodic} & \textbf{1 tromino + periodic} & PSPACE-complete ({Cor.~@cor:periodicsubsettranslation}~\&~Thm.~@thm:periodicsubset) & \NEW \\
+    \noalign: \vskip 1pt
+    \rowcolor{bgblue}\cellcolor{white}%
+    1.5D & \textbf{3 polyominoes: 2~connected + 1~disconnected} & \textbf{2 polyominoes: 1~connected + 1~disconnected} & PSPACE-complete ({Cor.~@cor:threepolyomino-translation}~\&~Thm.~@thm:twopolyomino) & \NEW \\
+    \midrule
+    1D & $n$ polyominoes & $n$ polyominoes & decidable [[Greenfeld-Tao-2023]] & 2023 \\
+    \bottomrule
+  \caption: Past and new (un)decidability results for tiling Euclidean space,
+    in various dimensions,
+    and tiling by translation (left) or by rotation/translation (right).
+    Bold indicates current hardness record holders.
+    Dates are year-month, and "*" indicates recent independent work.
+    Dashed lines separate undecidable from decidable. Our results are highlighted in blue.
+  @=tab:history
+
+In this paper, we improve the state-of-the-art for all three problems,
+by introducing a suite of new techniques based on periodic graph
+algorithms and complexity.
+All our results pertain to polyominoes or poly(hyper)cubes and we restrict attention to ***discrete tilings***, i.e., tilings where the unit squares or hypercubes of the tiles are aligned with the integer grid.
+In 2D at least, this is not restrictive: a set of polyominoes admits a tiling of the plane if and only if it admits a discrete tiling of the plane [[Ollinger09]].
+
+## Our Results: Tiling Completion
+
+We obtain particularly tight results for tiling completion
+with a single prototile (see Section~@sec:completion):
+
+1. Given a periodic preplacement of copies of a single tromino (\L or \I) in 2D,
+   tiling completion is co-RE-complete (Theorem~@thm:periodic-completion),
+   and hence undecidable.
+   As a consequence, there are periodic preplacements that can be completed but only aperiodically (Corollary~@cor:aperiodic-completion).
+   This undecidability result is tight by the following contrasting results:
+2. Given a periodic preplacement of copies of a single tromino (\L or \I) in *1.5D*,
+   tiling completion is PSPACE-complete (Theorem~@thm:periodic-completion),
+   and hence decidable.
+3. Given a *finite* preplacement of copies of a single tromino (\L or \I) in 2D,
+   tiling completion is decidable,
+   and NP-complete when the preplacement has a polynomial-size bounding box
+   (Theorem~@thm:finite-completion).
+4. Given a periodic preplacement of *dominoes* \D in $d$D for any $d \geq 1$,
+   tiling completion can be solved in polynomial time
+   (Corollary~@cor:domino-periodic-polytime).
+   This is a consequence of the mathematical property that,
+   if a periodic preplacement of dominoes \D in $d$D can be completed
+   to a tiling, then it can be completed periodically
+   with at most double the original period
+   (Corollary~@cor:domino-completion-periodic).
+
+Our results are the first to prove undecidability of tiling completion
+with a *single prototile*.
+The earliest undecidability result for tiling completion was by
+Robinson [[Robinson1971]], who used 36 Wang tiles
+(which can be implemented by 36 polyominoes [[Golomb1970]])
+and required only finite preplacement.
+Yang [[Yang-2013-thesis]] showed how Rule 110 can be simulated using 6 Wang tiles, and thus 6 polyominoes; together with Cook's undecidability of Rule 110 for an eventually periodic initial configuration [[cook2004universality]], this implies undecidability of tiling completion with 6 polyominoes and eventually periodic preplacement [[Demaine-Langerman-2025]], using only translations.
+More recently, this bound was lowered for fixed general polygons
+to 3 using finite preplacement [[Demaine-Langerman-2025]].
+In addition to reducing to 1 shape and simplifying the shape to a polyomino,
+we characterize the exact size of polyomino (3) and dimension (2)
+required for undecidability,
+while (necessarily) requiring periodic preplacement.
+With finite preplacement, our results give co-RE-completeness
+for two fixed polyominoes (Corollary~@cor:twopolyomino-fixed-completion).
+
+## Our Results: Subspace Tiling
+
+Our hardness results for tiling completion immediately apply to
+the more general Problem~@prob:subspace.
+In fact, all four results generalize (see Section~@sec:subspace):
+
+1. Tiling a given periodic polyomino subset of 2D
+   with copies of a single tromino (\L or \I) is co-RE-complete (Theorem~@thm:periodicsubset).
+   This result is tight by the following contrasting results:
+2. Tiling a given periodic polyomino subset of *1.5D*
+   with copies of a single tromino (\L or \I) is PSPACE-complete (Theorem~@thm:periodicsubset).
+3. Tiling a given *finite* polyomino subset of 2D
+   with copies of a single tromino (\L or \I) is NP-complete (Corollary~@cor:finite-periodicsubset).
+   This result was already known for both \I
+   [[Beauquier-Nivat-Remila-Robson-1995,Horiyama-Ito-Nakatsuka-Suzuki-Uehara-2017]] and
+   \L [[Moore-Robson-2001,Horiyama-Ito-Nakatsuka-Suzuki-Uehara-2017]],
+   but we give a simpler proof based on Planar 3DM.
+   %(For contrast, if the polyomino subset has no holes,
+   %then tiling with \I trominoes is known to be polynomial
+   %[[Kenyon-Kenyon-1992]].)
+4. Tiling a given periodic polyomino subset of $d$D
+   with a *domino* \D is polynomial (Corollary~@cor:domino-periodic-polytime),
+   and when possible, can be done periodically
+   with at most double the original period
+   (Theorem~@thm:domino-periodic), for any $d \geq 1$.
+
+The main point of comparison is a recent result of
+Greenfeld and Tao [[greenfeld2025undecidability]]:
+tiling a given periodic subset of $d$D space, where $d$ is part of the input,
+with a single disconnected polyhypercube by translation is co-RE-complete.
+Our result improves the number of dimensions from unbounded
+(depending on the Turing machine being simulated) to the optimal~$2$,
+improves the shape to be connected, and optimizes the complexity of the shape.
+However, while Greenfeld and Tao's result is translation-only,
+our result requires rotations.
+For translation-only, our results need two trominoes:
+
+: enumerate[start=5]
+  \item Tiling a given periodic polyomino subset of 2D by translation
+    with the two \I trominoes (\I and \Ir) is co-RE-complete (Corollary~@cor:periodicsubsettranslation).
+  \item Tiling a given periodic polyomino subset of *1.5D* by translation
+    with the two \I trominoes (\I and \Ir) is PSPACE-complete (Corollary~@cor:periodicsubsettranslation).
+
+The only previous result exploiting rotations is that tiling a given
+periodic polygonal subset of 2D with two polygons is co-RE-complete
+[[Demaine-Langerman-2025]].
+Our results improve the number of shapes by~$1$,
+improve the shape to be polyomino,
+and optimize the complexity of the polyomino to the optimal~$3$.
+
+## Our Results: Tiling
+
+With a little work (see Section~@sec:two-polyomino),
+we can convert the complement of the periodic subspace
+% to be tiled
+into a second prototile which is a disconnected polyomino,
+while expanding the tromino prototiles to constant-size connected polyominoes.
+As a result, we obtain several new results for the most specific
+Problem~@prob:tiling:
+
+1. Tiling 2D with two polyomino prototiles, one of which is disconnected
+   and the other of which is connected and has constant size,
+   is co-RE-complete (Theorem~@thm:twopolyomino).
+2. Tiling 2.5D or 3D with two connected polycube prototiles,
+   one of which has constant size, is co-RE-complete (Corollary~@cor:twopolycube).
+   The 2.5D result needs just two layers.
+3. Tiling 1.5D with two polyomino prototiles, one of which is disconnected
+   and the other of which is connected and has constant size,
+   is PSPACE-hard (Theorem~@thm:twopolyomino).
+   Tiling 1.5D with any collection of polyomino prototiles is decidable, and
+   is in PSPACE if every prototile has a polynomial-size bounding box
+   (implied e.g.\ by being connected).
+
+Until recently, the only previous polyomino tiling results were the
+original by Golomb [[Golomb1970]], which required arbitrarily many polyominoes
+(depending on the Turing machine being simulated),
+and Ollinger's improvement to just five polyominoes [[Ollinger09]].
+If we allow general polygon shapes, three suffice for undecidability
+[[Demaine-Langerman-2025]].
+Very recently (and independent of our work),
+Stade [[Stade2025-2tiling]] showed undecidability of tiling
+with two *polyhexes* or three polyominoes,
+while mentioning that it seems difficult to modify his construction
+to two polyominoes.
+An independent proof of the three-polyomino result was given by Kim [[kim2025undecidabilitytilingplaneset]].
+
+%Even so, by allowing one polyomino to be disconnected or lifting to 3D,
+%we improve the bound to just two polyominoes/polycubes.
+
+Our result achieves undecidability with just two polyominoes,
+%by very different techniques, and
+by either allowing one polyomino to be disconnected or lifting to 2.5D.
+
+Table~@tab:tiling summarizes the current state-of-the-art
+for tiling space, allowing rotation.
+
+: table
+  \centering
+  : tabular: c c c c c c
+    \toprule
+    pieces & 1D & 2D & 3D & $d$D \\
+    \midrule
+    \rowcolor{bgyellow}
+    \cellcolor{white}1 & \cellcolor{bggreen}R ($\downarrow$) & OPEN & OPEN & OPEN \\
+    \rowcolor{bgred}
+    \cellcolor{white}2 & \cellcolor{bggreen}R ($\downarrow$) & co-RE-c (Thm.~@thm:twopolyomino) & co-RE-c ($\leftarrow$, Cor.~@cor:twopolycube) & co-RE-c ($\leftarrow$) \\
+    \rowcolor{bgred}
+    \cellcolor{white}3 & \cellcolor{bggreen}R ($\downarrow$) & co-RE-c [[kim2025undecidabilitytilingplaneset]] & co-RE-c ($\leftarrow$) & co-RE-c ($\leftarrow$) \\
+    \rowcolor{bgred}
+    \cellcolor{white}$n$ & \cellcolor{bggreen}R [[greenfeld2025undecidability]] & co-RE-c ($\uparrow$) & co-RE-c ($\uparrow$) & co-RE-c ($\uparrow$) \\
+    \bottomrule
+  \caption: Current records for complexity of tiling space (allowing rotation) with possibly disconnected polycubes.
+    "R" denotes decidability, and "co-RE-c" denotes co-RE-completeness.
+    Arrows indicate that a result is implied by an adjacent result (which the arrow points toward).
+  @=tab:tiling
+
+For translation-only tiling, our results need three polyominoes
+(to represent the two rotations of the \I tromino):
+
+: enumerate[start=4]
+  \item Tiling 2D by translation with three polyomino tiles,
+    one of which is disconnected
+    and the other two of which are connected and have constant size,
+    is co-RE-complete (Corollary~@cor:threepolyomino-translation).
+  \item Tiling 2.5D or 3D by translation with three connected polycube tiles,
+    two of which have constant size, is co-RE-complete (Corollary~@cor:threepolycube-translation).
+    The 2.5D result needs just two layers.
+  \item Tiling 1.5D by translation with three polyomino tiles,
+    one of which is disconnected
+    and the other two of which are connected and have constant size,
+    is PSPACE-complete (Corollary~@cor:threepolyomino-translation).
+
+For comparison, when tiling by translation,
+Ollinger's construction [[Ollinger09]] needs 11 connected polyominoes.
+This bound was reduced to 10 [[Yang2023-10polyominoes]], then 9 [[Yang2025-9polyominoes]],
+then 8 [[Yang-Zhang-2024-8polyominoes]], then 7 [[Yang-Zhang-2024-7polyominoes]],
+and then 4 disconnected polyominoes [[Yang-Zhang-2025-4polyominoes]].
+Very recently (and independent of our work),
+Kim [[kim2025undecidabilitytilingplaneset]]
+proved undecidability of translation-only tiling with
+just 5 connected polyominoes.
+Our results improve these results to 3 polyominoes,
+by either allowing one polyomino to be disconnected or lifting to 3D.
+But very recently (and independently),
+Kim [[kim2025undecidabilitytranslationaltiling2]]
+improved the 3D result to just 2 connected polycubes.
+(In 2.5D, our 3 connected polycubes still hold the record.)
+
+Table~@tab:tiling-translation summarizes the current state-of-the-art
+for tiling space by translation only.
+
+: table
+  \centering
+  : tabular: c c c c c c
+    \toprule
+    pieces & 1D & 2D & 3D & $d$D \\
+    \midrule
+    \rowcolor{bgyellow}
+    \cellcolor{white}1 & \cellcolor{bggreen}R ($\downarrow$) & \cellcolor{bggreen}R [[B20-R2-periodicity,Beauquier-1991]] & OPEN & OPEN \\
+    \rowcolor{bgred}
+    \cellcolor{white}2 & \cellcolor{bggreen}R ($\downarrow$)& \cellcolor{bgyellow}OPEN & co-RE-c [[kim2025undecidabilitytranslationaltiling2]] & co-RE-c ($\leftarrow$) \\
+    \rowcolor{bgred}
+    \cellcolor{white}3 & \cellcolor{bggreen}R ($\downarrow$)& co-RE-c (Cor.~{@cor:threepolyomino-translation}) & co-RE-c ($\leftarrow$, Cor.~@cor:threepolycube-translation) & co-RE-c ($\leftarrow$) \\
+    \rowcolor{bgred}
+    \cellcolor{white}$n$ & \cellcolor{bggreen}R [[greenfeld2025undecidability]] & co-RE-c ($\uparrow$) & co-RE-c ($\uparrow$) & co-RE-c ($\uparrow$) \\
+    \bottomrule
+  \caption: Current records for complexity of tiling space by translation only with possibly disconnected polycubes.
+    "R" denotes decidability, and "co-RE-c" denotes co-RE-completeness.
+    Arrows indicate that a result is implied by an adjacent result (which the arrow points toward).
+  @=tab:tiling-translation
+
+## Our Results: Periodic Graphs
+
+: figure
+  \centering
+  \includegraphics[width=0.5\textwidth]{figs/Graph/periodic-g}
+  \caption: A periodic planar orthogonal drawing of a local 2D periodic graph,
+    with 6 protovertices and 9 protoedges.
+  @=fig:periodicgraph-example
+
+%\xxx[Jayson]{It seems slighly weird that the boarder is not contained in a tile. This means there are things not in the tile, tiles overalp, or presumably we just take the top and right to be contained. This wasn't confusing until I tried to write things down carefully.}
+%\xxx[Jayson]{might be worth formally spesifying the figure. I think it is:
+%Protoverticies: (0,4),(2,2),(3,5),(6,1),(6,6),(7,3)
+%Internal Protoedges: (0,4)-(2,2),(0,4)-(3,5),(6,1)-(2,2), (6,1)-(7,3), (6,6)-(2,2), (6,6)-(7,3)
+%External Protoedges: here is where I'm not sure if we want to give them in absolute coordinates (0,4)-(-2,3) or with a modifer to the lattice, like $(0,4)-[-1,0]\times(7,3)$ or something...} 
+%\xxx[Jayson]{nvm, you have formal notation in section 2, might be worth adding a forward pointer to it, and still might be worth writing out this graph explicity in that notation.}
+%\xxx[Erik]{Added another forward pointer.}
+
+Our improvements to the state-of-the-art for tiling problems are built on
+a new foundation of techniques in theoretical computer science,
+differing from all past tiling results.
+Specifically, our tiling results are based on new results about periodic
+(infinite) graphs, developed in Sections~@sec:periodicgraphs,
+@sec:periodic-reductions, and @sec:periodic-algs.
+To our knowledge, our results are the first to apply results about
+periodic graphs to another area (tiling), which required solving
+previously unexplored aspects of periodic graphs, both algorithmic
+(matching beyond 1D) and complexity-theoretic
+(hardness reduction infrastructure including planar problems).
+
+Conceptually, a $d$D periodic graph is defined by a fundamental domain,
+which gets repeated by translation in $d$ directions;
+see Figure~@fig:periodicgraph-example.
+More precisely (and abstractly), a ***$d$D periodic graph*** is defined
+by a set of ***protovertices***, where each protovertex gets repeated
+for every point in the $d$D integer lattice,
+and a set of ***protoedges***, which specify not only which two protovertices
+to connect but also the distance vector in the integer lattice
+of the actual vertices to connect (again periodically).
+%We call the graph ***local*** if each edge has a distance vector of $L_1$ norm
+%at most~$1$; this concept matters only if 
+In most cases, we assume the graph is ***local***,
+meaning that the distance vector of each protoedge has $L_1$ norm at most~$1$,
+i.e., it connects protovertices in the same or neighboring lattice points.
+(See Section~@sec:periodicgraphs for more precise definitions.)
+
+Such graphs were originally studied by Orlin in the 1D case
+[[Orlin1981_STOC, orlin1983matchingI, orlin1983matchingII, Orlin1984]]
+and then by others in 2D and higher.
+(In some cases, periodic graphs are called "dynamic graphs"
+[[Iwano1987,IwanoSteiglitz1987,IwanoSteiglitz1988planarity]].)
+Table~@tab:graphs summarizes the history of these results.
+Notably useful for our work is that Periodic SAT is
+PSPACE-complete in 1D periodic graphs [[Orlin1981_STOC]] and
+undecidable in 2D periodic graphs [[Freedman1998ksat,MaratheHuntRosenkrantzStearns1998]].
+We give careful proofs of these prior results
+so that this paper can stand alone as
+an introduction to periodic graphs.
+
+: table
+  \def\complete{c\xspace}
+  \def\PseudoPolynomial{pseudo-P\xspace}
+  \def\Polynomial{P\xspace}
+  \def\Linear{linear $\Rightarrow$ P\xspace}
+  \centering
+  : tabular: >{\hangindent=1.5em} L{2.2in} L{1.25in} L{1.2in} L{1.2in}
+    \toprule
+    Problem & 1D & 2D & $d$D\\
+    \midrule
+    2SAT & \Polynomial [[MaratheHuntStearnsRosenkrantz1995]] & decidable [[Freedman1998ksat]] & \cellcolor{bgblue}\Polynomial (Thm.~@thm:periodic-2sat) \\
+    (Dual) Horn SAT & \Polynomial ($\rightarrow$) & \Polynomial [[MaratheHuntRosenkrantzStearns1998]] & \cellcolor{bgblue}\Linear (Thm.~@thm:periodic-horn) \\
+    3SAT & PSPACE-\complete [[Orlin1981_STOC]] & undecidable [[Freedman1998ksat,MaratheHuntRosenkrantzStearns1998]] & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:periodic-3sat) \\
+    3SAT, wide & EXPSPACE-\complete [[MaratheHuntRosenkrantzStearns1998]] & undecidable [[Freedman1998ksat]] & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:periodic-3sat) \\
+    Planar 3SAT & PSPACE-\complete [[MaratheHuntStearnsRosenkrantz1995]] & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-3sat) & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-3sat) \\
+    Planar 3SAT-3 & \cellcolor{bgblue}PSPACE-\complete (Thm.~@thm:planar-3sat) & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-3sat) & n/a \\
+    Planar 1-in-3SAT-3 & \cellcolor{bgblue}PSPACE-\complete (Thm.~@thm:planar-1-in-3sat) & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-1-in-3sat) & n/a \\
+    3DM (3D Matching) & PSPACE-\complete [[Orlin1981_STOC]] & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-3dm) & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-3dm) \\
+    Planar 3DM & \cellcolor{bgblue}PSPACE-\complete (Thm.~@thm:planar-3dm) & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-3dm) & n/a \\
+    \midrule
+    Planar trichromatic graph orientation & \cellcolor{bgblue}PSPACE-\complete (Thm.~@thm:planar-graph-orientation) & \cellcolor{bgblue}co-RE-\complete (Thm.~@thm:planar-graph-orientation) & n/a \\
+    Independent set & PSPACE-\complete [[Orlin1981_STOC]] & PSPACE-\complete ($\leftarrow$) & PSPACE-\complete ($\leftarrow$) \\
+    Hamiltonian cycle & PSPACE-\complete [[Orlin1981_STOC]] & PSPACE-\complete ($\leftarrow$) & PSPACE-\complete ($\leftarrow$) \\
+    Bipartiteness, wide & \Polynomial [[Orlin1984]] & \Polynomial [[Iwano1987]] & \Polynomial [[CohenMegiddo1991]] \\
+    3-coloring & PSPACE-\complete [[Orlin1981_STOC]] & undecidable [[Freedman1998ksat]] & undecidable ($\leftarrow$) \\
+    Cycle detection, wide & NC $\Rightarrow$ \Polynomial [[CohenMeggido1993]] & NC $\Rightarrow$ \Polynomial [[CohenMeggido1993]] & NC $\Rightarrow$ \Polynomial [[CohenMeggido1993]] \\
+    %Cycle detection & NC [[CohenMeggido1993]], \Polynomial [[IwanoSteiglitz1987]] & NC [[CohenMeggido1993]], \Polynomial [[IwanoSteiglitz1987]] & NC [[CohenMeggido1993]], \Polynomial [[IwanoSteiglitz1987]] \\
+    Connected components, wide & \Polynomial [[Orlin1984]] & \Polynomial [[Iwano1987]] & \Polynomial [[CohenMegiddo1991]] \\
+    Strongly connected components, wide & \Polynomial [[Orlin1984]] & \Polynomial [[CohenMeggido1993,KodialamOrlin1991]] & \Polynomial [[CohenMeggido1993,KodialamOrlin1991]] \\
+    Reachability & \Polynomial [[HoftingWanke1993]] & \Polynomial [[HoftingWanke1993]] & \Polynomial [[HoftingWanke1993]] \\
+    Reachability, wide & NP-\complete [[Orlin1984]] & NP-\complete [[HoftingWanke1993]] & NP-\complete [[HoftingWanke1993]] \\
+    Shortest paths & \Polynomial [[HoftingWanke1993]] & \Polynomial [[HoftingWanke1993]] & \Polynomial [[HoftingWanke1993]] \\
+    Shortest paths, wide & NP-\complete [[Orlin1984]] & NP-\complete [[HoftingWanke1993]] & NP-\complete [[HoftingWanke1993]] \\
+    %Shortest paths, wide & \PseudoPolynomial [[HoftingWanke1993]] & \PseudoPolynomial [[HoftingWanke1993]] & \PseudoPolynomial [[HoftingWanke1993]] \\
+    Eulerian path & \Polynomial [[Orlin1984]] & \Polynomial [[Iwano1987]] \\
+    Minimum spanning tree, wide & \Polynomial [[Orlin1984]] & \Polynomial [[CohenMegiddo1991]] & \Polynomial [[CohenMegiddo1991]] \\
+    Planarity testing \small (avoiding accumulation points) & \Polynomial [[IwanoSteiglitz1988planarity]] & \Polynomial [[IwanoSteiglitz1988planarity]] \\
+    Weighted matching & \Polynomial [[orlin1983matchingI,orlin1983matchingII]] \\
+    Bipartite perfect matching, wide & \Polynomial ($\uparrow$, Thm.~@thm:matchingalgorithm) & \cellcolor{bgblue}\Polynomial (Thm.~@thm:matchingalgorithm) & \cellcolor{bgblue}\Polynomial (Thm.~@thm:matchingalgorithm) \\
+    \bottomrule
+  \caption: Past and new results about $d$D periodic SAT and graphs,
+    for fixed $d$.
+    These results generally assume locality (or polynomial locality),
+    except for problems marked "wide". Our results are highlighted in blue.
+    %pseudopolynomial (pseudo-P) and weak NP-hardness
+    %(weakly NP-\complete) results which are relative to locality
+    %being polynomial or exponential respectively.
+  @=tab:graphs
+
+More interestingly, we prove the following new results about periodic graphs
+and related periodic satisfiability problems:
+
+\paragraph{Complexity Results}
+\Needspace: 5\baselineskip
+1. We characterize the complexity of 2D (and higher-dimensional) periodic SAT
+   as ***co-RE-complete***, not just undecidable (Theorem~@thm:periodic-cnf-sat).
+   Our proof of membership in co-RE uses a weak form of compactness that
+   holds under standard ZF axioms (without the Axiom of Choice).
+2. Many *planar* problems are hard on periodic graphs
+   (PSPACE-complete in 1D and co-RE-complete in 2D):
+   Planar 3SAT-3, Planar 1-in-3SAT-3, Planar 3DM, and a new problem we introduce
+   called Planar Trichromatic Graph Orientation;
+   see Section~@sec:periodic-reductions.
+
+\paragraph{Algorithmic Results}
+\Needspace: 5\baselineskip
+: enumerate[start=3]
+ \item These planar hardness results are built on generalizations of classic results
+   in graph drawing to periodic graphs:
+   1. Every periodic graph has a periodic "nice" drawing in the plane,
+      where edges do not pass through vertices except their endpoints,
+      and edges cross orthogonally and only in pairs (Theorem~@thm:orthocrossing-drawing).
+      This result enables planarizing any problem
+      given an (orthogonal) crossover gadget.
+   2. Every local periodic crossing-free drawing of a maximum-degree-4 periodic graph
+      has an orthogonal crossing-free drawing (Theorem~@thm:orthodraw).
+      This result allows us to draw intermediate reductions as general graphs,
+      while still guaranteeing an orthogonal result
+      (as needed by polyomino tiling).
+ \item Contrasting with the 3SAT hardness results,
+   we show that both 2SAT and Horn SAT can be solved in polynomial time on $d$D periodic graphs (Sections~@sec:2sat and~{@sec:horn}).
+ \item Deciding whether a given $d$D periodic bipartite graph has a *perfect matching* can be
+   solved in polynomial time (Theorem~@thm:matchingalgorithm), and in positive instances,
+   there is always a periodic perfect matching with the same period (Theorem~@thm:periodicmatching).
+   This problem generalizes tiling with dominoes \D
+   in a periodic polycube subspace of $d$D.
+   The core approach is the following:
+   1. We show the existence of *finite* augmenting paths,
+      at least when the graph has a perfect matching.
+      This follows from a packing argument.
+   2. We show further that the *shortest* augmenting path
+      does not repeat a vertex, which allows us to augment the path
+      while preserving periodicity of the matching.
+      Effectively, we show how to simplify crossings between
+      translates of the augmenting path.
+
+%We also give careful proofs of several prior results about periodic graphs ---
+%such as the basic co-RE-completeness of 3SAT in 2D and higher,
+%and PSPACE-completeness in 1D --- so that this paper can stand alone as
+%an introduction to periodic graphs.
+
+%## Outline
+%
+%* Periodic graphs
+%  * Graph drawing: generalizing classic finite results to periodic results)
+%    * Every periodic graph has a periodic drawing
+%    * Converting planar drawing to orthogonal planar drawing
+%  * Planar 3SAT, planar 3DM, trichromatic graph orientation
+%  * Perfect matching
+%  * Careful proofs of many prior results
+%* Tiling completion
+%  * Known: Robinson 36, we did 3 polygons (with rotation)
+%  * Tiling completion for any one tromino (with rotation) is undecidable
+%  * Tiling completion for domino is polynomial
+%  * Tiling completion from finite seed is decidable
+%* Tiling a periodic subset
+%  * Known: One tile with translation in unbounded dimension,
+%    two tiles with rotation in 2D (our previous paper)
+%  * One tile (either tromino!) with translation+rotation in 2D
+%  * Or two tiles with translation (I trominoes) in 2D
+%* Tiling Euclidean space with rotations
+%  * Known: 3 polygons, 2 connected polyhexes (new, unpublished, independent), 3 connected polyominoes (new, unpublished, independent)
+%  * 2 polyomino tiles, one of which is disconnected in 2D
+%  * 2 polycube tiles in 3D
+%* Tiling Euclidean space with translation only
+%  * Known: 5 connected polyomino 2D (new, unpublished, independent), 4 disconnected polyomino 2D, 3 connected polycube 3D
+%  * 3 polyomino tiles, one of which is disconnected in 2D
+%  * 3 polycube tiles in 3D (same as known, but now only 2 layers)
+
+\hide: 
+  ## References on periodic graphs:
+  - "The complexity of dynamic languages and dynamic optimization problems" by James Orlin STOC 1981 [[Orlin1981_STOC]]. https://dl.acm.org/doi/10.1145/800076.802475 looks at 1D periodic graphs. He proves that 1D satisfiability, coloring, 3DM are all PSPACE complete, essentially the same proof we give here in more details. Also defines "narrow" for both graphs and SAT.
+  - Dynamic matchings and quasidynamic fractional matchings. I, 1983 [[orlin1983matchingI]], James B. Orlin https://doi.org/10.1002/net.3230130407 and  Dynamic matchings and quasidynamic fractional matchings. II 1983 [[orlin1983matchingII]] James B. Orlin https://doi.org/10.1002/net.3230130408 prove that (fractional) matching on a 1D periodic graph can be solved in polynomial time.
+  - "Some Problems on Dynamic/Periodic Graphs" by James B. Orlin 1984 [[Orlin1984]] https://doi.org/10.1016/B978-0-12-566780-7.50022-2 looks at 1D periodic graphs. He shows number of connected components is in P but reachability is NP-complete. He also studies other properties of graphs like Eulerian paths and bipartiteness. 
+  - "Some Problems on Doubly Periodic Infinite Graphs" by Kazuo Iwano, 1987, https://www.cs.princeton.edu/techreports/1987/078.pdf [[Iwano1987]] presents polynomial time algorithms for connectivity, Eulerian paths and bipartiteness for 2D periodic graphs.
+  - "Planarity testing of doubly periodic infinite graphs" by Kazuo Iwano, Kenneth Steiglitz, 1988 [[IwanoSteiglitz1988planarity]], https://doi.org/10.1002/net.3230180307 . Includes some nice figures of example periodic graphs. Main result [Theorem 6.1] is that (after dealing with disconnected or nonplanar cells) the finite graph given by 3x3 of cells is planar if and only if the infinite periodic graph is VAP-free (no accumulation points of vertices) planar, so testable in linear time. Does this imply periodic drawings with some period?? (probably not obviously)
+  - "Recognizing Properties of Periodic Graphs" by Edith Cohen and Nimrod Megiddo, 1991 [[CohenMegiddo1991]] https://theory.stanford.edu/~megiddo/pdf/RecognizingX.pdf considers $d$D periodic graphs. Has a good survey of previous results. They show a polynomial time algorithm for connectivity (and connected components) in $d$D, as well as for Bipartiteness, and minimum average weight spanning tree.
+  - "Strongly Polynomial-Time and NC Algorithms for Detecting Cycles in Periodic Graphs" by Edith Cohen and Nimrod Megiddo, 1993 https://dl.acm.org/doi/pdf/10.1145/153724.153727
+  - "Paths and cycles in finite periodic graphs" by Egon Wanke [[Wanke-2005]]  MFCS 1993 shows that reachability is in PSPACE in $d$D, PSPACE-complete in 2D, and NP-complete in 1D.
+  - "Theory of Periodically Specified Problems: Complexity and Approximability" CCC 1998 [[MaratheHuntRosenkrantzStearns1998]] shows a bunch of 1D and 2D complexity results for variants of 3SAT, including undecidability for local 2D. They note that local substitutions of gadgets for reductions work.
+  - "$k$-{SAT} on Groups and Undecidability" [[Freedman1998ksat]] by Freedman, STOC 1998, proves undecidability of 2D periodic SAT and 2D periodic 3-coloring, using Wang tiles like us.
+  - "Periodic colorings and orientations in infinite graphs" by Tara Abrishami, Louis Esperet, Ugo Giocanti, Matthias Hamann, Paul Knappe, Rögnvaldur G. Möller https://arxiv.org/abs/2411.01951 looks at infinite graphs with symmetries, not necessarily periodic graphs in our sense. We would solve some of their open problems if we add the coloring results. 
+
+# Periodic Graphs @=sec:periodicgraphs
+
+In this section, we formally define periodic graphs
+(similar to past work such as [[Orlin1984,CohenMegiddo1991,HoftingWanke1993,MaratheHuntRosenkrantzStearns1998]]),
+while introducing our own notation which we view as slightly cleaner.
+We also define periodic drawings, and prove basic results about graph drawing.
+
+A ***$d$-dimensional periodic graph*** is an infinite graph
+$\PER{G} = (\PER{V}, \PER{E})$
+induced by a finite set $V$ of ***protovertices***
+and a finite set $E$ of ***protoedges***.%
+\footnote: We pronounce $\PER{X}$ as "periodic $X$". Note that we assume $V$ is finite, which we might call "finite period". We do not allow, for example, $V$ to be the unit square $[0,1]^2$ for a periodic graph over the Euclidean plane. %Wanke [[Wanke-2005]] uses the term "finite periodic graph", but their definition is only 1-dimensional. (XXX: Not really. Check.)
+\ 
+Each protovertex $v \in V$ induces a countably infinite grid of vertices,
+$v^{\vec x} \in \PER{V}$ for each lattice point $\vec x \in \mathbb Z^d$:
+%Here, a finite set $V$ of ***protovertices*** induces an infinite set of vertices
+$$\PER{V}= \{v^{\vec x} \mid v\in V, \vec x \in \mathbb Z^d\}.$$
+%
+Each protoedge $(u^{\vec x},v^{\vec y}) \in E$ is between two vertices
+(not protovertices), and induces a countably infinite set of edges
+$(u^{\vec x + \vec \Delta}, v^{\vec y + \vec \Delta})$
+for all offset vectors $\vec \Delta \in \mathbb Z^d$:
+%
+$$
+  \PER{E} = \left\{
+    (u^{\vec x + \vec \Delta}, v^{\vec y + \vec \Delta})
+    \,\middle|\,
+    (u^{\vec x},v^{\vec y}) \in E,
+    \vec \Delta \in \mathbb Z^d
+  \right\}.
+$$
+
+%A finite collection of ***protoedges*** $E \subseteq {\PER{V} \choose 2}$ induces an infinite set of edges $\PER{E} \subseteq {\PER{V} \choose 2}$
+
+A ***labeling*** of the vertices $\PER{V}$ of the periodic graph $\PER{G}$ is a mapping $\lambda : \PER{V} \rightarrow L$ from the vertices to some label set $L$, such as integers, colors, or strings.
+Such a labeling is ***$k$-periodic*** if $\lambda(v^{\vec x}) = \lambda(v^{\vec x + k\vec\Delta})$ for all $v^{\vec x}\in\PER{V}$ and $\vec\Delta\in\mathbb Z^d$.
+Likewise, a ***labeling*** $\lambda : \PER{E} \rightarrow L$ of the edges $\PER{E}$ is ***$k$-periodic*** if $\lambda((u^{\vec x},v^{\vec y})) = \lambda((u^{\vec x + k\vec\Delta},v^{\vec y + k\vec\Delta}))$ for all $(u^{\vec x},v^{\vec y})\in\PER{E}$ and $\vec\Delta\in\mathbb Z^d$.
+%By extension, we use the terms *periodic* or *k-periodic* for any object that can be represented by a labeling, such as
+A 1-periodic labeling of vertices or edges of $\PER{G}$ is equivalent to a labeling of the protovertices or protoedges (with identical labels on all copies).
+%, that is, their labels are copied in their respective vertices or edges.
+Labelings provide the formalism to talk about structures on top of graphs,
+such as colorings, weights, and subsets (where the labeling indicates membership
+in the subset) of vertices or edges (e.g., matchings).
+
+The periodic graph is ***local*** if every protoedge $(u^{\vec x},v^{\vec y}) \in E$ spans an $L_1$ distance $\|\vec x - \vec y\|_1$ of at most $1$.
+More generally, a graph is ***$k$-local*** if every protoedge $(u^{\vec x},v^{\vec y}) \in E$ has $\|\vec x - \vec y\|_1 \leq k$.
+
+If a periodic graph is $k$-local, then there is an equivalent ($1$-)local graph by expanding the prototile to $k \times k$ original prototiles.
+So algorithmically, the only difference between local and $k$-local is when $k$ is larger than a polynomial.
+Then, for example, reachability becomes weakly NP-hard [[HoftingWanke1993]] and SAT becomes EXPSPACE-hard [[MaratheHuntRosenkrantzStearns1998]].
+Prior works (e.g., [[Orlin1981_STOC,MaratheHuntRosenkrantzStearns1998]]) use the term ***narrow*** for local or polynomially local periodic graphs, and ***wide*** when the locality is not bounded by a polynomial.
+
+%\xxx: Relate to existing notions of "narrow" (polynomial locality) and "wide" (exponential locality)
+
+## Periodic Drawings and Planarity
+
+A ***periodic drawing*** of a 1D or 2D periodic graph is defined by a mapping from each protovertex $v \in V$ to a distinct point $\vec p_v$ in the open unit square $(0,1)^2$ (excluding the boundary), and a mapping from each protoedge $(u^{\vec x},v^{\vec y}) \in E$ to a simple curve that connects point $\vec p_u + \vec x$ to point $\vec p_v + \vec y$ without visiting any other points $\vec p_w + \vec z$ corresponding to a vertex $w^{\vec z} \in \PER{V}$.
+Then, for $\vec \Delta \in\mathbb Z^2$ (padding with a zero $y$ coordinate for a 1D graph), the vertex $v^{\vec \Delta} \in \PER{V}$ has coordinates $\vec p_v + \vec \Delta$, and the edge $(u^{\vec x + \vec\Delta},v^{\vec y + \vec\Delta}) \in \PER{E}$ is mapped to the curve representing protoedge $(u^{\vec x},v^{\vec y})$ translated by $\vec\Delta$.
+A periodic drawing is ***local*** if the curve representing each edge $(u^{\vec x},v^{\vec y})$ is contained in the union of the unit grid squares containing $\vec p_u$ and $\vec p_v$ (and their shared boundary if the squares are distinct);
+this property implies that the periodic graph is local.
+
+In this paper, all edges will be drawn as polygonal chains (or straight line segments).
+A periodic drawing is ***orthogonal*** if every edge is drawn as a polygonal chain composed of horizontal and vertical segments.
+%A periodic drawing is ***normal*** if no edge passes through a vertex other than its endpoints, whenever two edges touch they properly cross, and no three edges cross at a common point.
+%A normal periodic drawing is ***orthocrossing*** if any crossing between two edges is between a horizontal and vertical segment of the respective edges.
+A periodic drawing is ***orthocrossing*** if,
+whenever two drawn edges meet at a common point other than a shared endpoint,
+it is a (proper) crossing between a horizontal and vertical segment
+of the respective edges.
+In particular, this notion forbids edges from touching without crossing,
+and forbids three edges meeting at a point other than a shared endpoint.
+%A periodic drawing is ***good*** [[Guy-1972]] if no edge passes through a vertex other than its endpoints, and any pair of edges meet in at most one point (including possibly a common endpoint).
+%% (Good prevents nonsimple graphs, so we're scrapping it. Also not sure we can get incident edge to not cross.)
+%\xxx[Hugo]: These are called right angle crossing drawings (RAC drawings) in the graph drawing literature.
+%\xxx[Stefan]{in RAC drawings, edges are straight line segments, and intersect at right angles, but are not orthogonal.}
+
+When all points defining the drawing (graph vertices and corners of the polygonal chains representing edges, and for orthocrossing drawings, all orthogonal crossing points) have rational coordinates, the ***grid size*** of the periodic drawing is the size of the grid on which those points lie. That is, assuming all coordinates are of the form $z/M$ where $z$ and $M$ are integers, and using the same denominator $M$ for all points, the grid size is $M$.
+
+: theorem @=thm:orthocrossing-drawing
+  Every 1D or 2D local periodic graph has an orthocrossing local periodic drawing of grid size $O(|V|+|E|)$.
+  Furthermore, if the graph has maximum degree $4$, then the drawing can be orthogonal.
+
+Biedl and Kant [[Biedl-Kant-1998]] proved a finite analog of the second claim.
+
+% https://cocreate.csail.mit.edu/r/n9HhBP2aHZvaWhvFP#WPHxRSHecs6zQkiFq
+
+: proof
+  Let $d(v)$ be the degree of protovertex $v$ in the periodic graph $\PER{G}$, which is the total number of occurrences of protovertex $v$ as either endpoint of an edge in $E$ (counting twice when the edge involves $v$ in both endpoints).
+  We will draw each vertex $v$ as well as $d(v)$ ***ports*** for connecting
+  to the incident edges; see Figure~@fig:ports.
+
+  : figure[bt]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figs/ports.pdf}
+    \caption: A vertex with degree $5$ connected to its $5$ ports, and a vertex of degree $4$ connected to its $4$ ports orthogonally.
+    @=fig:ports 
+
+  : figure
+    \centering
+    \includegraphics[width=0.5\textwidth]{figs/orthocrossing.pdf}
+    \caption: An orthocrossing local periodic drawing of a local periodic graph.
+    @=fig:orthocrossing
+
+  * Let $M=5\,|V|+2\,|E|$.
+  * Initialize $a$ to $1$.
+  * For each protovertex $v \in V$:
+    * Increment $a$ by $1$.
+    * Place protovertex $v$ at coordinates $((a+1)/M, 2/M)$.
+    * For each occurrence of $v$ in an edge $e$:
+      * Place port $p$ for that occurrence of $v$ in $e$ at coordinates $(a/M, 3/M)$.
+      * Draw an edge from $v$ to $p$. If the graph is of maximum degree 4, route orthogonally, as in Figure~@fig:ports; otherwise, use a straight line segment.
+      * Increment $a$ by $1$.
+  * Initialize $b$ to $4$.
+  * For each protoedge $e = (u^{\vec x},v^{\vec y}) \in E$:
+    * Increment $b$ by $2$.
+    * Let $p$ and $q$ be the ports for these occurrences of $u$ and $v$ in $e$, respectively.
+    * If $\vec x = \vec y$, then draw $e$ by drawing vertical segments upward from $p$ and from $q$ to height $b/M$, and connecting these points horizontally.
+    * If $\vec y = \vec x \pm (1,0)$, then draw vertical segments upward from $p$ and from $q$ to height $b/M$, and connect these points horizontally, to draw $e$. But there are two possible horizontal connections, and we choose to go from the rightmost of $p$ and $q$ rightward (into the next unit square) to the leftmost of $p$ and $q$. This choice prevents this polygonal path from crossing translated copies of itself.
+    * If $\vec y = \vec x \pm (0,1)$, then
+      * Assume $\vec y = \vec x + (0,1)$ (or swap the vertices).
+      * Increment $a$ by $1$.
+      * Place a ***gate*** $g$ at coordinates $(a/M, 1)$ (at the top of the unit square, which has a translated copy $(a/M,0)$ at the bottom of the unit square).
+      * Draw $e$ by drawing vertical segments upward from $p$ and from $q$ to heights $b/M$ and $(b+1)/M$ respectively, connecting these points horizontally to $x$ coordinate $a/M$, and then connecting these points vertically through gate $g$. But there are two possible vertical connections, and we choose to go from height $(b+1)/M$ up to height $b/M$. This choice prevents this polygonal path from crossing translated copies of itself.
+  
+  Figure~@fig:orthocrossing shows an example including each of the three cases. By construction, the result is an orthocrossing local periodic drawing of grid size $M$.
+  In particular, assigning each protovertex occurrence to its own $x$ coordinate and each protoedge to its own pair of $y$ coordinates guarantees that edges only cross orthogonally and hence no three edges cross at a common point.
+
+A periodic drawing is ***planar*** if edges do not intersect except at shared endpoints.
+For local periodic drawings with edges embedded as polygonal chains or segments, this noncrossing property can be checked
+in polynomial time by checking for intersections
+within the origin square $[0,1]^2$,
+which must come from edges whose endpoints $v^{\vec x}$
+have $\|\vec x\|_1 \leq 1$.
+(More generally, for $k$-local graphs,
+it suffices to consider vertices $v^{\vec x}$ where $\|\vec x\|_1 \leq k$.)
+If there are no crossings within $[0,1]^2$, then by periodicity,
+there are no crossings anywhere.
+
+A periodic graph is ***planar*** if it has a periodic planar drawing.
+This property can be checked in polynomial time [[IwanoSteiglitz1988planarity]].
+
+## Orthogonal Planar Drawings of Periodic Graphs
+
+Although Theorem~@thm:orthocrossing-drawing gives an orthogonal drawing for
+max-degree-4 graphs, it may have crossings.
+Next we show that any *planar* drawing of a max-degree-4 graph
+can be made *orthogonal and planar*, with cubic blowup on the grid size.
+This lets us use planar drawings (e.g., for gadgets in reductions),
+while guaranteeing that they can be made orthogonal.
+
+: theorem @=thm:orthodraw
+  For a periodic graph of maximum degree $4$, every planar local periodic graph drawing of grid size $M$ can be converted into a planar orthogonal local periodic drawing, preserving the position of the graph vertices, of grid size $O(M^3)$.
+
+For finite planar graphs of maximum degree $4$,
+efficient planar orthogonal graph drawings are known
+[[Tamassia-1987,Liu-Morgana-Simeone-1998,Biedl-Kant-1998]].
+These algorithms draw from scratch instead of using existing vertex placements,
+at best preserving only the combinatorial embedding [[Tamassia-1987]],
+which makes preserving periodicity more difficult.
+
+: proof
+  First, assume all edges in the drawing are straight line segments. For drawings with polygonal chains, we can temporarily add a vertex at each bend of every chain, apply the transformation to the resulting graph, and merge back the resulting orthogonal chains, removing the extra degree-2 vertices.
+
+  We work modulo integer translations, viewing opposite sides of the $[0,1]^2$ square as identified.
+  There are at most $M^2$ vertices on the $M\times M$ grid,
+  and because they have degree at most $4$, there are $O(M^2)$ edges.
+  Because the drawing is local, fix an integer $K=O(M^2)$ that bounds the number of edges intersecting any vertical line or slab, counting modulo translations.
+  Let $\epsilon = 1/(30M(K+1))$.
+
+  Associate each protovertex $v$ with the point within the $[0,1]^2$ square where it is currently drawn, which will not change in our transformation.
+  Surround every vertex $v$ with a $5\epsilon \times 10\epsilon$ rectangle centered at $v$.
+  These rectangles do not intersect each other and do not intersect any edges as currently drawn.
+  We route the edges incident to $v$ through one of 10 anchor points on the boundary of the rectangle: 4 on the left, 4 on the right, 1 on the top, and 1 on the bottom.
+  We assign anchor points to edges incident to $v$ as follows: edges connecting $v$ to other vertices with the same $x$ coordinate and smaller or larger $y$ coordinate connect through the bottom and top anchor points, respectively; and edges connecting $v$ to other vertices with smaller or larger $x$ coordinates connect through the left and right anchor points, respectively.
+  For edges connecting to vertices with larger $x$ coordinates, the edges connect through the anchor points along the right side of the rectangle, by decreasing order of slope, starting at the top anchor point and continuing downward.
+  For edges connecting to vertices with smaller $x$ coordinates, the edges connect through the anchor points along the left side of the rectangle, by decreasing order of slope, starting at the bottom anchor point and continuing upward.
+
+  Let $\ell_1,\ldots,\ell_n$ be the distinct vertical lines through vertices, in cyclic order modulo horizontal translation, and let $x_i$ be the $x$ coordinate of~$\ell_i$.
+  For each vertical slab between $\ell_i$ and $\ell_{i+1}$, let $E_i$ be the edges intersecting the interior of the slab, counted modulo vertical translation.
+  Choose the vertical translate of each edge whose intersection with $\ell_i$ has $y$ coordinate in $[0,1)$, and label these translates $e_1,\ldots,e_k$ in increasing order of that coordinate.
+  When a vertex $v$ of the graph lies on line $\ell_i$, order the edges of $E_i$ incident to $v$ by increasing slope (matching the bottom-to-top order of their anchor points).
+  Likewise, for any vertex $v$ on $\ell_{i+1}$, order the edges of $E_{i+1}$ incident to $v$ by decreasing slope.
+
+  Let $E^+_i\subseteq E_i$ be the set of edges properly crossing $\ell_i$, i.e., edges that are not incident to a vertex lying on $\ell_i$.
+  In order to keep the grid size of the drawing small, we move the intersection of those edges with $\ell_i$ to $y$ coordinate $e'_j(x_i)$ in the new drawing.
+  Order the intersections along $\ell_i$ cyclically modulo vertical translation, and let $y^-$ and $y^+$ be the consecutive vertex $y$ coordinates that bracket $e_j$ in this order, choosing representatives so that $y^-<y^+$.
+  Let $r$ be the rank of $e_j$ among the edges crossing $\ell_i$ between $y^-$ and $y^+$, and set
+  $e'_j(x_i):= y^- + r(y^+-y^-)/(K+1)$.
+  Because $r \leq K$, this preserves the order of the crossings and keeps them outside the vertex rectangles.
+  For edges not in $E^+_i$, use the position of their assigned anchor point.
+
+  Because the original edges are noncrossing, the $y$ coordinates $e_1(x_{i+1}),\ldots,e_k(x_{i+1})$ of the intersections of these edges with $\ell_{i+1}$ have the same order as along $\ell_{i}$.
+
+  We now reroute the edges in $E_i$ between the anchor points on the left and right sides of the slab.
+  For each edge $e_j \in E_i$, if $e'_j(x_i) \geq e'_j(x_{i+1})$, then we draw a horizontal edge from the anchor point to the point $(x_i + 10 j \epsilon, e'_j(x_i))$, then a vertical edge to $(x_i + 10 j \epsilon, e'_j(x_{i+1}))$, and finally a horizontal edge to the anchor point on the right side of the slab.
+  If $e'_j(x_i) < e'_j(x_{i+1})$, then we draw a horizontal edge from the anchor point on the left side of the slab to the point $(x_{i+1} - 10 j \epsilon, e'_j(x_i))$, then a vertical edge to $(x_{i+1} - 10 j \epsilon, e'_j(x_{i+1}))$, and finally a horizontal edge to the anchor point on the right side of the slab.
+  Because $j \leq K$ and every slab has width at least $1/M$, these tracks lie inside the slab; their order and the order of their endpoints ensure that they do not intersect.
+
+  Finally, we connect the vertices to their used anchor points; see Figure~@fig:connectors.
+  The construction is periodic and preserves the cells traversed by each edge, so the resulting drawing remains local.
+  All coordinates lie on a grid of size $O(M(K+1))=O(M^3)$.
+
+: figure
+  \centering
+  \input{connectors}
+  \caption: Connecting the vertices to their anchor points. 
+  @=fig:connectors
+
+To simplify our reductions, we may assume that degree-3 vertices do not have an incident edge pointing down.
+
+: lemma @=lem:degree3
+  A periodic planar orthogonal graph drawing of grid size $M$ and maximum degree 3 can be transformed so that all vertices of degree 3 have the first segment of their incident edges going left, up, and right.
+  Furthermore, each vertex can specify which incident edge should start by going left.
+  The new grid size is $O(M)$.
+: proof
+  To achieve the first property, we refine the grid size by a factor 6, and replace the $6\times 6$ square around each vertex according to the diagram in Figure~@fig:degree3.
+  : figure
+    \centering
+    % =============================================================
+    %  omit U  → connect Left, Right, Bottom
+    % =============================================================
+    \begin{tikzpicture}[scale=0.4, line cap=round]
+      \draw[thick] (0,0) rectangle (6,6);
+      % mid-points
+      \fill[gray] (3,6) circle (2pt);   % top omitted
+      \fill (6,3) circle (3pt);         % right
+      \fill (3,0) circle (3pt);         % bottom
+      \fill (0,3) circle (3pt);         % left
+      \fill (3,3) circle (3pt);         % centre
+      % paths
+      \draw[blue , line width=1pt] (3,3) -- (4,3) -- (5,3) -- (6,3);
+      \draw[green, line width=1pt] (3,3) -- (2,3) -- (2,2) -- (3,2) -- (3,1) -- (3,0);
+      \draw[red  , line width=1pt] (3,3) -- (3,4) -- (2,4) -- (1,4) -- (1,3) -- (0,3);
+    \end{tikzpicture}
+    % =============================================================
+    %  omit R  → connect Top, Left, Bottom
+    % =============================================================
+    \begin{tikzpicture}[scale=0.4, line cap=round]
+      \draw[thick] (0,0) rectangle (6,6);
+      \fill (3,6) circle (3pt);         % top
+      \fill[gray] (6,3) circle (2pt);   % right omitted
+      \fill (0,3) circle (3pt);         % left
+      \fill (3,0) circle (3pt);         % bottom
+      \fill (3,3) circle (3pt);         % centre
+      \draw[blue , line width=1pt] (3,3) -- (3,4) -- (3,5) -- (3,6);
+      \draw[green, line width=1pt] (3,3) -- (2,3) -- (1,3) -- (0,3);
+      \draw[red  , line width=1pt] (3,3) -- (4,3) -- (4,2) -- (3,2) -- (3,1) -- (3,0);
+    \end{tikzpicture}
+    % =============================================================
+    %  omit D  → connect Top, Left, Right
+    % =============================================================
+    \begin{tikzpicture}[scale=0.4, line cap=round]
+      \draw[thick] (0,0) rectangle (6,6);
+      \fill (3,6) circle (3pt);         % top
+      \fill (6,3) circle (3pt);         % right
+      \fill (0,3) circle (3pt);         % left
+      \fill[gray] (3,0) circle (2pt);   % bottom omitted
+      \fill (3,3) circle (3pt);         % centre
+      \draw[blue , line width=1pt] (3,3) -- (3,4) -- (3,5) -- (3,6);
+      \draw[green, line width=1pt] (3,3) -- (4,3) -- (5,3) -- (6,3);
+      \draw[red  , line width=1pt] (3,3) -- (2,3) -- (1,3) -- (0,3);
+    \end{tikzpicture}
+    % =============================================================
+    %  omit L  → connect Top, Right, Bottom
+    % =============================================================
+    \begin{tikzpicture}[scale=0.4, line cap=round]
+      \draw[thick] (0,0) rectangle (6,6);
+      \fill (3,6) circle (3pt);         % top
+      \fill (6,3) circle (3pt);         % right
+      \fill[gray] (0,3) circle (2pt);   % left omitted
+      \fill (3,0) circle (3pt);         % bottom
+      \fill (3,3) circle (3pt);         % centre
+      \draw[blue , line width=1pt] (3,3) -- (3,4) -- (3,5) -- (3,6);
+      \draw[green, line width=1pt] (3,3) -- (4,3) -- (5,3) -- (6,3);
+      \draw[red  , line width=1pt] (3,3) -- (2,3) -- (2,2) -- (3,2) -- (3,1) -- (3,0);
+    \end{tikzpicture}
+    \caption: Replacing the $6\times 6$ square around a degree-3 vertex.
+    @=fig:degree3
+  %
+  To achieve the second property, the edges incident to a vertex can be cyclically rotated as shown in Figure~@fig:rotation.
+  : figure
+    \centering
+    \begin{tikzpicture}[scale=0.4, line cap=round]
+      \draw[thick] (0,0) rectangle (6,6);
+    
+      \draw[blue, line width=1pt] (6,3) -- (5,3) -- (5,2) -- (4,2) -- (3,2) -- (2,2) -- (2,3) -- (3,3);
+      \draw[green, line width=1pt] (0,3) -- (1,3) -- (1,4) -- (2,4) -- (3,4) -- (3,3);
+      \draw[red, line width=1pt] (3,6) -- (3,5) -- (4,5) -- (4,4) -- (4,3) -- (3,3);
+      \fill (3,3) circle (3pt);  % center
+      \fill (6,3) circle (3pt);  % right input
+      \fill (0,3) circle (3pt);  % left input
+      \fill (3,6) circle (3pt);  % top input
+    \end{tikzpicture}
+    \caption: Rotating edges clockwise.
+    @=fig:rotation  
+
+# Periodic Problems and Reductions @=sec:periodic-reductions
+
+In this section, we give a chain of reductions to periodic problems
+%that preserve periodicity and
+that establish PSPACE-completeness in 1D and
+co-RE-completeness in 2D and higher.
+
+## Wang Tiling
+
+For 1D periodic problems, our reduction chain starts from
+the canonical PSPACE problem, polynomial-space Turing machine acceptance.
+For 2D and higher periodic problems,
+our reduction chain starts from a known co-RE-complete problem,
+Wang's "domino problem".
+An (unsigned) ***Wang tile*** is a square with a ***glue*** label on each edge. Given a finite set of Wang tiles, the ***domino problem*** is to decide whether there exists a tiling of the plane with these tiles such that adjacent tiles have matching glues on their touching edges.
+In 1966, Berger proved Wang tiling undecidable:
+
+: theorem [{[[Berger1966]]}] @=thm:wang
+  Given a finite set of Wang tiles, it is co-RE-complete to determine
+  whether they tile the plane, by translation only,
+  with matching edge glues.
+
+## Periodic CNF SAT
+
+The ***$d$D Periodic CNF SAT*** problem is a $d$-dimensional infinite periodic version of Satisfiability.
+The input consists of
+1. a finite set of ***protovariables*** $v_1,\ldots,v_n$, which get copied into a countable infinity of ***variables*** $v_i^{\vec x}$ for $i \in \{1,\dots,n\}$ and $\vec x \in \mathbb Z^d$; and
+2. a finite collection of ***protoclauses***, each a finite disjunction of ***literals*** (a variable or its negation), of the form
+   $$ \sigma_1 v_{i_1}^{\vec x_1} \lor \sigma_2 v_{i_2}^{\vec x_2} \lor \cdots \lor \sigma_c v_{i_c}^{\vec x_c},$$
+   where $\sigma_i$ is the sign of the $i$th literal, which gets copied into a countable infinity of ***clauses***
+   $$ \sigma_1 v_{i_1}^{\vec x_1+\vec \Delta} \lor \sigma_2 v_{i_2}^{\vec x_2+\vec \Delta} \lor \cdots \lor \sigma_c v_{i_c}^{\vec x_c+\vec \Delta}, \forall \vec \Delta\in \mathbb Z^d.$$
+As usual, the decision question is whether (infinitely many) variables can be assigned to satisfy all of the (infinitely many) clauses.
+We call the instance ***local*** if all the $\vec x_i$ in a protoclause pairwise differ by at most $1$ in $L_1$ distance,
+and define ***local $d$D Periodic CNF SAT*** to be the restriction of $d$D Periodic CNF SAT to local instances.
+
+Equivalently,
+a (local) periodic SAT instance can be represented by a (local) bipartite periodic graph of the same dimension: represent each protovariable $v_i$ by a protovertex, and for each clause
+%
+$$ \sigma_1 v_{i_1}^{\vec x_1} \lor \sigma_2 v_{i_2}^{\vec x_2} \lor \cdots \lor \sigma_c v_{i_c}^{\vec x_c},$$
+%
+create a protovertex $c$ to represent it, and add edges 
+$(v_{i_j}^{\vec x_j}, c^{\vec 0})$ labeled $\sigma_j$ for all $j=1,\ldots,c$.
+
+: theorem @=thm:periodic-cnf-sat
+  For local Periodic CNF SAT,
+  the 1D problem is PSPACE-complete and
+  the 2D problem (and all higher dimensions, local or nonlocal) is co-RE-complete.
+
+% 1D: https://coauthor.csail.mit.edu/6.5440-2023/m/PqzgxzqAMyQjfjhbf
+
+% https://coauthor.csail.mit.edu/6.5440-2023/m/YnqSLcST7xDwpMkSh
+
+: proof
+  **2D co-RE hardness** [[Freedman1998ksat]] follows by reduction from the Wang tile problem of Theorem~@thm:wang, as in [[Freedman1998ksat]].
+  For each color $i=1,\ldots,C$, create protovariables $s_i$ and $w_i$ representing whether the west and south edges of a tile are colored $i$.
+  For each tile $i=1, \ldots, T$, create a protovariable $t_i$ where variable $t_i^{\vec x}$ represents whether tile $i$ is used at position $\vec x$, for each point $\vec x \in \mathbb Z^d$. As the colors of adjacent Wang tiles must match, the colors along the north and east edges of the tile at $\vec x$ are encoded in $s_{i}^{\vec x+(0,1)}$ and $w_{i}^{\vec x+(1,0)}$, respectively.
+  The following protoclauses ensure each tile uses only one color along each border:
+  : align*
+    \neg s_{i}^{(0,0)} \lor \neg s_{j}^{(0,0)} \quad \text{for } i,j \in \{1,\ldots,C\} \text{ where } i \neq j,
+    \\
+    \neg w_{i}^{(0,0)} \lor \neg w_{j}^{(0,0)} \quad \text{for } i,j \in \{1,\ldots,C\} \text{ where } i \neq j.
+  The following clause ensures that each position chooses at least one tile:
+  $$ \bigvee_{i=1}^T t_{i}^{(0,0)}.$$
+  Finally, each tile $i$ with colors $a_i,b_i,c_i,d_i$ along the south, west, north, and east edges, respectively, defines implications that ensure the colors match:
+  : align*
+    & \neg t_{i}^{(0,0)} \lor s_{a_i}^{(0,0)}; &
+    & \neg t_{i}^{(0,0)} \lor w_{b_i}^{(0,0)}; &
+    & \neg t_{i}^{(0,0)} \lor s_{c_i}^{(0,1)}; &
+    & \neg t_{i}^{(0,0)} \lor w_{d_i}^{(1,0)}.
+  Thus, the Periodic CNF SAT problem is satisfiable if and only if there exists a tiling of the plane with the given Wang tiles, and so the local (and thus nonlocal) 2D Periodic CNF SAT is co-RE-hard.
+
+  **$d$D co-RE membership**: 
+  We use a standard compactness argument.
+  Define an order on the SAT variables by increasing distance from the origin:
+  order vertex $v^{\vec x}$ by increasing $L_1$ norm $\|\vec x\|_1$,
+  then lexicographically by $\vec x$, then by~$v$
+  (according to a fixed order of the finite protovertex set~$V$).
+  Define the potentially infinite binary tree of valid partial assignments,
+  where a left branch at depth $i$ corresponds to assigning the $i$th variable to false, and a right branch corresponds to assigning it to true,
+  and we omit nodes whenever the partial assignment violates a clause.
+  We can construct this tree level by level, and detect whether it is infinite in co-RE.
+  If the algorithm discovers that the tree is finite, then the SAT instance is unsatisfiable, and we return false.
+  If the algorithm runs forever, then the tree is infinite.
+  By the Weak K\"onig's Lemma (equivalent to the compactness of Cantor space $2^\omega$), an infinite binary tree contains an infinite path, which corresponds to an infinite assignment to all variables that satisfies the entire formula.
+  (Unlike K\"onig's Lemma for arbitrary trees, the Weak K\"onig's Lemma is provable in ZF: for $i=1,2,\dots$, assign the $i$th variable so that the remaining rooted subtree is infinite. See, e.g., [[Bauer-2006]].)
+
+  **1D PSPACE membership** [[Orlin1981_STOC]]:
+  We give an NPSPACE algorithm for local 1D Periodic CNF SAT, which implies PSPACE membership by Savitch's Theorem [[Savitch-1970]].
+  Suppose the 1D periodic CNF SAT problem is satisfiable, with variable values $v_i^z = \alpha_i^z$.
+  By the Pigeonhole Principle, there are two values $x,y \in\mathbb Z$ such that $|y-x| \leq 2^{n}$ and $\alpha_i^x=\alpha_i^y$ for all $i \in \{1,\ldots,n\}$.
+  By repeating the sequence of variable assignments between $x$ and $y$, we can obtain another satisfying assignment $v_i^z=\beta_i^z$ which is periodic and of period $|y-x| \leq 2^n$.
+
+  To build an NPSPACE algorithm for satisfiability, guess the assignment of variables at position $0$: $v_i^0 = \beta_i^0$ for all $i$. Then, for each step $z=1,2,\ldots,2^{|V|}$, guess the next assignment $v_i^z = \beta_i^z$ for all $i$, check that all clauses involving variables at positions $z$ and $z-1$ are satisfied, and then forget the assignment at position $z-1$. Because the CNF SAT instance is local, all clauses will be checked by this process. If the first position's assignment $\beta_i^0$ ever gets repeated at a later $\beta_i^z$, then the instance is satisfiable.
+
+  **1D PSPACE-hardness** [[Orlin1981_STOC]]:
+  Our reduction is based on a proof by Lance Fortnow described by Scott Aaronson about time-travel computing \cite[Section~8]{Aaronson-2005}.
+  Consider any language $L$ in PSPACE.
+  Let $M$ be a Turing machine that accepts $L$ and runs in space $s(n)$ where $n$ is the input size and $s(n)$ is a polynomial in $n$, and assume $s(n)\geq n$ by rounding up.
+  %The number of states of the machine is $|Q| \cdot s(n) \cdot \sigma^{s(n)}$
+  Given an input $x$ of size $n$, we define a 1D periodic CNF SAT instance where the variables at position $i\in\mathbb Z$ represent:
+  * A step counter $c$ which represents the step of the Turing machine $M$ being simulated at position $i$. Because $\text{PSPACE} \subseteq \text{EXPTIME}$, $c$ can be represented in $\gamma \, s(n)$ bits for a constant $\gamma = \gamma(M)$, or $\gamma \, s(n)$ boolean protovariables $c_0,\ldots,c_{\gamma s(n)-1}$.
+  * The tape of $M$ at step $c$ using protovariables $t_{j,k}$ expressing that the symbol at position $j$ on the tape is $k$, for $j\in[1,s(n)]$.
+  * The head position of the Turing machine $M$ at step $c$ using protovariables $h_j$ for the position $j\in[1,s(n)]$ on the tape.
+  * The state of the Turing machine $M$ at step $c$ using protovariables $q_k$ for the state $k\in[1,|Q|]$ where $Q$ is the set of states of $M$.
+  As in Garey and Johnson's proof of Cook's Theorem \cite[Theorem~2.1, p.~39]{Garey-Johnson-1979},
+  we can construct a set of clauses using variables $t_j^i$, $h_j^i$, $q_k^i$, $t_j^{i+1}$, $h_j^{i+1}$, $q_k^{i+1}$ to ensure that the Turing machine $M$ simulates correctly.
+  To this we add clauses expressing that the counter $c$ increments at each non-accepting step, without overflow (i.e., failing to increment $c$ when it is all $1$s).
+  For any accepting state at position $i$,
+  * $c_j^{i+1}$ is false (i.e., $c$ goes back to 0);
+  * $t_j^{i+1}$ is set to the input instance $x$;
+  * the head position $h_1^{i+1}$ is true, and $h_j^{i+1}$ is false for all $j> 1$; and
+  * $q_0^{i+1}$ is true and $q_j^{i+1}$ is false for all $j> 1$.
+  That is, the Turing machine at position $i+1$ is set to its initial state.
+  This ensures that, if $M$ accepts input $x$, then there exists a periodic CNF SAT assignment that satisfies the clauses at all positions $i\in\mathbb Z$.
+  On the other hand, any satisfying assignment of the periodic CNF SAT instance must contain a position $i$ where the Turing machine $M$ is in an accepting state because the counter $c$ cannot overflow, and the clauses ensure that the Turing machine at position $i+1$ is set to its initial state, and then the clauses simulate the Turing machine and reach another accepting state (because again the counter $c$ cannot overflow), which in turn implies that $x$ is in the language~$L$.
+
+## Periodic 3SAT
+
+The ***Periodic 3SAT*** problem is a special case of Periodic CNF SAT, where each clause has at most three literals.
+
+: theorem @=thm:periodic-3sat
+  Local Periodic 3SAT is co-RE-complete in 2D and PSPACE-complete in 1D.
+: proof
+  We use the usual reduction from CNF SAT to 3SAT [[Cook-1971]],
+  but applied to local Periodic CNF SAT from Theorem~@thm:periodic-cnf-sat.
+  For each clause of the SAT instance with more than three literals,
+  $$ \sigma_1 v_{i_1}^{\vec x_1} \lor \sigma_2 v_{i_2}^{\vec x_2} \lor \sigma_3 v_{i_3}^{\vec x_3} \lor \cdots \lor \sigma_c v_{i_c}^{\vec x_c},$$
+  create a new protovariable $z$ and replace the clause with
+  $$ z^{\vec x_1} \lor \sigma_1 v_{i_1}^{\vec x_1} \lor \sigma_2 v_{i_2}^{\vec x_2},$$
+  and
+  $$\neg z^{\vec x_1} \lor \sigma_3 v_{i_3}^{\vec x_3} \lor \cdots \lor \sigma_c v_{i_c}^{\vec x_c}.$$
+  Continue iteratively until no clause with more than three literals remains.
+  The resulting instance is satisfiable if and only if the original instance is.
+  If the original instance is local, then so is the modified instance.
+
+## Periodic 3SAT-3
+The ***Periodic 3SAT-3*** problem is a special case of Periodic 3SAT, where each variable occurs in at most three clauses.
+
+: theorem @=thm:periodic-3sat-3
+  Local Periodic 3SAT-3 is co-RE-complete in 2D and PSPACE-complete in 1D.
+: proof
+  We apply the standard cycle reduction from 3SAT to 3SAT-3 [[tovey1984simplified]],
+  but reducing from local Periodic 3SAT of Theorem~@thm:periodic-3sat.
+  For each variable $x$ that occurs $d$ times,
+  we replace $x$ by $d$ new variables $x_1, x_2, \dots, x_d$,
+  and add $d$ clauses $\neg x_i \lor x_{i+1}$
+  where indices are modulo~$d$.
+  These clauses are equivalent to the implication chain
+  $x_1 \to x_2 \to \cdots \to x_d \to x_1$,
+  which forces all $x_i$ to have the same truth value.
+  Figure~@fig:3sat-3 shows the case $d=8$.
+  : figure
+    \centering
+    $
+    \vcenter: \hbox:
+      \includegraphics:
+        ~ scale=0.35,page=1
+        - figs/3sat-3
+    \quad \to \quad
+    \vcenter: \hbox:
+      \includegraphics:
+        ~ scale=0.35,page=2
+        - figs/3sat-3
+    $
+    \caption: Reduction from 3SAT to 3SAT-3: splitting a $d$-occurrence variable into $d$ 3-occurrence variables. (Here, $d=8$.) Circles represent variables and squares represent clauses; edge color denotes sign.
+    @=fig:3sat-3
+
+## Periodic Planar 3SAT
+
+The ***Periodic Planar 3SAT*** problem is a special case of Periodic 3SAT,
+where the periodic graph is guaranteed to be planar.
+
+: theorem @=thm:planar-3sat
+  Local Periodic Planar 3SAT is co-RE-complete in 2D and PSPACE-complete in 1D, even when restricting the grid size of the drawing to be polynomial.
+  The same is true of local Periodic Planar 3SAT-3.
+: proof
+  We reduce from local Periodic 3SAT-3 from Theorem~@thm:periodic-3sat-3.
+  Applying Theorem~@thm:orthocrossing-drawing to the graph representing the SAT instance, which has maximum degree 3, we obtain an orthogonal orthocrossing local periodic drawing of grid size $O(|V|+|E|)$.
+  We view this drawing within a single $[0,1]^2$ square; because the drawing is local, this involves at most two translations of each edge.
+
+  Decompose every edge into a sequence of horizontal and vertical unit segments, and add a variable vertex at the midpoint of each segment. 
+  Then each original gridpoint is either
+  1. a clause vertex with up to three incident edges;
+  2. a variable vertex with up to three incident edges;
+  3. a straight or bent path connecting two variable vertices; or
+  4. an orthocrossing between two edges.
+  In each case, we replace the gridpoint and its connections to neighboring half-grid variables with a gadget.
+  In the first case, we leave the connections from clause to variables as they are.
+  In the second case, we use the gadget in Figure~@fig:3sat-duplicator (or a subset for lower degree), which adds up to three duplicators ($a \to b$ and $b \to a$ to force $a=b$) to connect the variables together while forcing their value to be equal.
+  In the third case, we use a subset of Figure~@fig:3sat-duplicator with only two of the incident edges (and no original variable in the center).
+  In the fourth case, we use the crossover gadget 
+  in Figure~@fig:3sat-crossover, which is exactly the gadget of Lichtenstein [[Lichtenstein-1982]] but drawn on a grid.
+  %Figure~@fig:3sat-crossover illustrates a connection to a clause on the left and top sides, which occurs for the first crossing of a clause--variable connection, but all other crossings will involve a variable connection (like on the bottom and right sides of the figure) on both sides.
+  As argued by Lichtenstein [[Lichtenstein-1982]], this gadget preserves satisfiability while removing crossings.
+
+  : figure
+    \centering
+    : subfigure: \textwidth
+      \centering
+      \def\u{_} % workaround underscore bug
+      $
+      \vcenter: \hbox:
+        \includegraphics:
+          ~ scale=0.25,page=1
+          - figs/3sat\u duplicator
+      \quad \to \quad
+      \vcenter: \hbox:
+        \includegraphics:
+          ~ scale=0.25,page=2
+          - figs/3sat\u duplicator
+      $
+      \caption: Variable gadget. Subsets of this gadget also implement straight and turn gridpoints.
+      @=fig:3sat-duplicator
+    
+    \medskip
+    
+    % https://courses.csail.mit.edu/6.5440/fall23/lectures/L05.html
+    : subfigure: \textwidth
+      \centering
+      \def\u{_} % workaround underscore bug
+      $
+      \vcenter: \hbox:
+        \includegraphics:
+          ~ scale=0.2,page=1
+          - figs/3sat\u crossover
+      \quad \to \quad
+      \vcenter: \hbox:
+        \includegraphics:
+          ~ scale=0.35,page=2
+          - figs/3sat\u crossover
+      $
+      \caption: Crossover gadget, based on \cite[Figs.~4 and 5]{Lichtenstein-1982}.
+      @=fig:3sat-crossover
+    \caption: Reduction from 3SAT-3 to Planar 3SAT.
+
+  As shown by the figures, the gadgets can be drawn in a grid of constant size, so the grid size of the resulting drawing is $O(|V|+|E|)$.
+  (Specifically, Figure~@fig:3sat-duplicator refines by a factor of $4$, and Figure~@fig:3sat-crossover refines by a factor of $10$, so we use the least common multiple of~$20$.)
+
+  The gadgets of Figures~@fig:3sat-duplicator and @fig:3sat-crossover
+  introduce variable vertices of degree larger than~$3$.
+  We can reduce to Periodic Planar 3SAT-3 by using
+  the cycle construction of Theorem~@thm:periodic-3sat-3,
+  while taking care to use a constant factor of additional grid size.
+  Specifically, all variable vertices have incident edges at angles that are integer multiples of $45^\circ$, and Figure~@fig:3sat-3 shows how to solve this case while refining the grid by a factor of~$4$.
+
+## Periodic Planar 1-in-3SAT
+
+The ***Periodic Planar 1-in-3SAT*** problem is a modification of Periodic Planar 3SAT, where for each clause, exactly one literal must be true.
+
+: theorem @=thm:planar-1-in-3sat
+  Local Periodic Planar 1-in-3SAT is co-RE-complete in 2D and PSPACE-complete in 1D, even when restricting the grid size of the drawing to be polynomial.
+  The same is true of local Periodic Planar 1-in-3SAT-3.
+: proof
+  Membership follows by expressing each 1-in-3 clause as four CNF clauses and applying Theorem~@thm:periodic-cnf-sat.
+  For hardness, we follow the proof of Dyer and Frieze [[Dyer-Frieze-1986]] that 1-in-3SAT is NP-hard, but reduce from local Periodic Planar 3SAT-3 of Theorem~@thm:planar-3sat.
+  Given a local Periodic Planar 3SAT-3 instance, we replace each clause with the gadget of Figure~@fig:3sat-to-1in3sat, which ensures that exactly one of the three literals is true.
+  Each occurrence of an original variable is replaced by one occurrence, while each new variable occurs at most twice, so every variable still occurs at most three times.
+  The gadget is drawn on a grid of constant size, so the grid size of the resulting drawing is only a constant factor larger.
+
+: figure
+  \centering
+  \def\u{_} % workaround underscore bug
+  $
+  \vcenter: \hbox:
+    \includegraphics:
+      ~ scale=0.4,page=1
+      - figs/3sat\u to\u 1in3sat
+  \quad \to \quad
+  \vcenter: \hbox:
+    \includegraphics:
+      ~ scale=0.4,page=2
+      - figs/3sat\u to\u 1in3sat
+  $
+  \caption: Reduction from 3SAT to 1-in-3SAT.
+    Based on \cite[Figure 1]{Dyer-Frieze-1986}.
+  @=fig:3sat-to-1in3sat
+
+%This version allows negations.  We could probably avoid them using other proofs.
+% https://courses.csail.mit.edu/6.5440/fall23/lectures/L05.html?notes=4&images=8
+% Laroche 1993 / Mulzer & Rote 2008
+
+## Periodic Planar 3DM
+
+In ***3DM (3-Dimensional Matching)***, we are given three disjoint sets $R,G,B$ (representing colors Red, Green, and Blue) and a set $T \subseteq R \times G \times B$ of trichromatic triples. A (perfect) ***3D matching*** is a subset $M \subseteq T$ of trichromatic triples that cover every element $x \in R \cup G \cup B$ exactly once, i.e., exactly one $m \in M$ contains $x$.
+
+A 3DM instance can be represented by a bipartite graph, where the elements of $R$, $G$, and $B$ are vertices colored red, green, and blue; and every trichromatic triple $t=(r,g,b)\in T$ is a blank vertex $t$ with an edge to vertices $r$, $g$, and $b$. The problem is then to determine whether a subset $M \subseteq T$ of the blank vertices can be selected such that each colored vertex has exactly one blank neighbor in the set.
+
+The (local) ***Periodic 3DM*** problem is the generalization of 3DM to periodic input bipartite graphs, and ***Periodic Planar 3DM*** further restricts the periodic bipartite graph to be planar.
+
+: theorem @=thm:planar-3dm
+  Local Periodic Planar 3DM is co-RE-complete in 2D and PSPACE-complete in 1D, even when every colored vertex has degree 2 or 3.
+: proof
+  Membership follows by encoding the choice of triples as a local Periodic CNF SAT instance and applying Theorem~@thm:periodic-cnf-sat.
+  We follow Dyer and Frieze's NP-hardness reduction
+  from (finite) Planar 1-in-3SAT to (finite) Planar 3DM [[Dyer-Frieze-1986]].
+  Figure~@fig:3dm-gadgets gives the gadgets that locally replace each variable and clause, which are drawn on a constant-size grid.
+  In the resulting instances, every element belongs to two or three triples.
+
+: figure
+  \centering
+  % https://courses.csail.mit.edu/6.5440/fall23/lectures/L05.html?notes=4&images=14
+  % https://cocreate.csail.mit.edu/r/n9HhBP2aHZvaWhvFP#F6fN9XoLPBQHK54mQ
+  \subcaptionbox:
+    - Variable gadget.
+    - \includegraphics[scale=0.25]{figs/3DM-var}
+  \hfil
+  \subcaptionbox:
+    - Clause gadget.
+    - \includegraphics[scale=0.25]{figs/3DM-clause}
+  \caption:
+    Gadgets from Dyer and Frieze's reduction from Planar 1-in-3SAT to Planar 3DM.  Based on \cite[Figures 3, 4, and 5]{Dyer-Frieze-1986}.
+  @=fig:3dm-gadgets
+
+%maybe we should just reduce from 1-in-E3SAT-E3
+% https://pubmed.ncbi.nlm.nih.gov/19204804/
+
+## Periodic Planar Trichromatic Graph Orientation
+
+In ***Planar Trichromatic Graph Orientation***, we are given a 3-regular undirected graph with vertex set $V = T \cup Z$, where edges are colored red, green, or blue.
+Vertices in $T$ have exactly one incident edge of each color (trichromatic), and vertices in $Z$ are incident to edges of exactly one color (monochromatic).
+The goal of the problem is to orient (direct) the edges so that the vertices in $T$ have indegree 0 or 3, and vertices in $Z$ have indegree exactly~1.
+Thus we call vertices in $T$ ***0-or-3-in-3*** and vertices in $Z$ ***1-in-3***.
+This problem is a restricted version of the 1-in-3 Graph Orientation problem of Horiyama et al.~[[Horiyama-Ito-Nakatsuka-Suzuki-Uehara-2017]]
+and the planar version in [[planar-graph-orientation]].
+(Our trichromatic constraints are new.)
+
+The ***Periodic Planar Trichromatic Graph Orientation*** problem is one for which the underlying graph is infinite, periodic, and planar.
+
+: theorem @=thm:planar-graph-orientation
+  Local Periodic Planar Trichromatic Graph Orientation is co-RE-complete in 2D and PSPACE-complete in 1D.
+  Finite Planar Trichromatic Graph Orientation is NP-complete.
+
+: proof
+  Membership follows by encoding the orientation constraints as a local Periodic CNF SAT instance and applying Theorem~@thm:periodic-cnf-sat.
+  We reduce from local Periodic Planar 3DM of Theorem~@thm:planar-3dm,
+  or for the finite case, from finite Planar 3DM [[Dyer-Frieze-1986]].
+  Given a planar drawing of a planar [periodic] 3DM instance, we transform it into a planar [periodic] trichromatic graph instance.
+  First take the same graph and drawing, but forget the vertex colors.
+  Vertices in $T$ in the 3DM instance become the vertices in $T$ in the trichromatic graph orientation instance, and vertices in $Z$ are the vertices in $R \cup G \cup B$ in the 3DM instance.
+  Edges incident to $R$ in 3DM are colored red, edges incident to $G$ are colored green, and edges incident to $B$ are colored blue.
+  Because all edges connect a colored vertex to a blank vertex in 3DM, the edge colors are well-defined in the trichromatic graph orientation instance.
+
+  It remains to make the graph 3-regular.
+  Every vertex in $T$ has degree 3, and by Theorem~@thm:planar-3dm,
+  every vertex in $Z$ has degree 2 or~3.
+  Contract every degree-2 vertex $v$ in $Z$ into one of its neighbors, concatenating its two incident edges in the drawing.
+  The two edges have the same color because $v$ is monochromatic,
+  so we can assign this color to the contracted edge and
+  every vertex in $T$ remains incident to one edge of each color.
+  An orientation of the contracted edge corresponds to a unique orientation of the original two-edge path in which one edge enters $v$ and the other leaves~$v$, so this transformation preserves solutions.
+  Contraction preserves planarity and makes the graph at most 2-local; expanding the prototile by a factor of 2 makes it local again.
+
+  Given a perfect 3D matching $M$, we can solve trichromatic graph orientation
+  by orienting the three edges incident to each $t\in M$ away from it, orienting the edges incident to each $t\in T\setminus M$ towards it,
+  and then performing the contractions described above.
+  Every vertex in $T$ has indegree 0 or 3 by construction,
+  and every colored vertex has indegree 1 because it is covered by exactly one triple in~$M$;
+  contraction preserves these properties.
+
+  Conversely, given a solution to the trichromatic graph orientation instance, we can extract a perfect matching for the 3DM instance as follows:
+  split every contracted edge by restoring its degree-2 vertex in $Z$, and put in $M$ all vertices $t \in T$ of indegree~$0$.
+  The indegree-$1$ condition for vertices in $Z$ ensures that every colored vertex is covered exactly once, so these vertices form a perfect matching $M$ for the 3DM instance.
+
+# Periodic Graph Algorithms @=sec:periodic-algs
+
+In this section, we give polynomial-time algorithms
+for some $d$D periodic graph problems:
+tractable cases of SAT
+(Sections~@sec:2sat and~@sec:horn)
+and bipartite perfect matching
+(Section~@sec:matching).
+
+## 2SAT and Reachability @=sec:2sat
+
+The ***Periodic 2SAT*** problem is the special case of Periodic CNF SAT where each clause has at most two literals.  The 1-dimensional version of this problem was shown to be solvable in polynomial time by [[MaratheHuntStearnsRosenkrantz1995]], while the 2-dimensional version was shown to be decidable by [[Freedman1998ksat]].
+
+Here we observe that existing results [[Freedman1998ksat, HoftingWanke1993]]
+imply that $d$-dimensional local Periodic 2SAT can be solved in polynomial time:
+
+: theorem @=thm:periodic-2sat
+  Local Periodic 2SAT can be solved in polynomial time in $d$D.
+: proof
+  Freedman [[Freedman1998ksat]] reduces this problem to the ***Periodic Reachability*** problem: given a directed periodic graph $\PER{G} = (\PER{V}, \PER{E})$ and two vertices $u, v \in \PER{V}$,
+  determine whether there exists a path from $u$ to $v$.
+  %
+  Their reduction is as follows.
+  Given a $d$-dimensional local Periodic 2SAT instance, construct a directed periodic graph which has a vertex for each literal, and edges $\overline{x} \to y$ and $\overline{y} \to x$ for each width-2 clause $x \lor y$, where $\overline{x}$ denotes the negation of the literal $x$.
+  Treat each width-1 clause $x$ as the clause $x \lor x$, which adds the edge $\overline{x} \to x$.
+  Then a solution to the $d$-dimensional Periodic 2SAT instance exists if and only if there is no variable $x$ with both a path from $x$ to $\overline{x}$ and a path from $\overline{x}$ to $x$.
+  Since the instance is periodic, this condition needs only to be checked once for each protovariable.
+
+  Hofting and Wanke [[HoftingWanke1993]] give a polynomial-time algorithm for Periodic Reachability in $d$-dimensional directed local periodic graphs.
+  It follows that $d$-dimensional local Periodic 2SAT can be solved in polynomial time as well.
+
+## (Dual) Horn SAT @=sec:horn
+
+The ***Periodic Horn SAT*** problem is the special case of Periodic CNF SAT where every clause has at most one positive literal.
+The ***Periodic Dual Horn SAT*** problem is the opposite case where every clause has at most one negative literal.
+Marathe et al.~[[MaratheHuntRosenkrantzStearns1998]] gave a polynomial-time algorithm for the 1D and 2D versions of these problems.
+Here we observe that this algorithm works independent of the number of dimensions and can be made to run in linear time.
+
+: theorem @=thm:periodic-horn
+  Periodic Horn SAT and Periodic Dual Horn SAT
+  can be solved in linear time in $d$D.
+  Furthermore, all satisfiable instances have periodic solutions with period 1.
+
+: proof
+  Given an instance of Periodic Horn SAT, we can construct a finite Horn SAT instance by identifying all the variables corresponding to the same protovariable.
+  A solution to this Horn SAT instance is equivalent to a 1-periodic solution to the original Periodic Horn SAT problem.
+  Because Horn SAT can be solved in linear time [[DowlingGallier1984]], it remains only to show that a solution to the Periodic Horn SAT instance exists if and only if a 1-periodic solution exists.
+
+  A Horn clause with a positive literal, such as $x \lor \neg y \lor \neg z$, can be viewed as an inference rule
+  "Given $y$ and $z$, derive $x$".
+  (In the base case, a positive unit clause $x$ gives the inference rule "derive $x$".)
+  Similarly, a Horn clause with only negative literals, such as $\neg y \lor \neg z$, can be viewed as the rule "Given $y$ and $z$, derive $\bot$".
+  Call a variable ***derivable*** if it can be obtained by finitely many applications of these rules.
+  A solution to a (possibly infinite) Horn SAT instance exists if and only if $\bot$ is not derivable,
+  and one such solution is obtained by setting the derivable variables to true and all other variables to false.
+  For Periodic Horn SAT, if a variable $v_i^{\vec x}$ is derivable, then so are all variables $v_i^{\vec y}$ corresponding to the same protovariable $v_i$;
+  in other words, the set of derivable variables is 1-periodic.
+  To see this, take the derivation of $v_i^{\vec x}$ and translate it by $\vec \Delta = \vec y - \vec x$;
+  because the instance contains every translate of every Horn rule, this translated sequence is again a valid derivation, of $v_i^{\vec x+\vec\Delta} = v_i^{\vec y}$.
+  Thus a solution to a Periodic Horn SAT instance exists if and only if a 1-periodic solution exists.
+
+  The same applies to Periodic Dual Horn SAT by negation of all variables.
+
+## Periodic Perfect Matching @=sec:matching
+A ***matching*** in an undirected graph $G=(V,E)$ is a set $M\subseteq E$ of edges that are disjoint. A matching is ***perfect*** if every vertex of $V$ belongs to an edge in $M$.
+For a $d$-dimensional periodic graph $\PER{G}=(\PER{V},\PER{E})$, a matching $M\subseteq\PER{E}$ is ***periodic*** if there are $d$ independent vectors $\vec \Delta_1,\ldots, \vec \Delta_d \in\mathbb Z^d$ such that an edge $(u^{\vec x},v^{\vec y})\in M$ if and only if $(u^{\vec x+\vec\Delta_i},v^{\vec y+\vec\Delta_i})\in M$ for all $i \in \{1,\ldots,d\}$, or equivalently, if the subgraph $\PER{G}_M = (\PER{V},M)$ is a periodic graph (possibly with a different period than $\PER{G}$). If the period of $\PER{G}$ and $\PER{G}_M$ is the same, i.e., $\vec\Delta_i$ is the unit vector along the $i$th axis, then we say the matching is ***1-periodic***.
+
+For a (non-perfect) matching $M$, a vertex of $\PER{V}$ is ***free*** if it is not in any edge of $M$. An ***alternating walk*** is a walk in $\PER{G}$ alternating between edges not in $M$ and edges in $M$. In the discussion below, we allow alternating walks to be non-simple, i.e., to visit edges and vertices several times. When the walk is simple, we call it an ***alternating path***.
+If an alternating path $P$ joins two free vertices, then the matching $M$ can be augmented by taking the symmetric difference $M\oplus P$ between $M$ and $P$. In that case, $P$ is called an ***augmenting path***.
+Note that two alternating walks $P$ and $Q$ can never properly intersect: If they meet at some internal vertex $v$, then because exactly one of the edges incident to $v$ is in $M$, that edge must be in both $P$ and $Q$ and so $P$ and $Q$ share some subpath containing $v$.
+The ***diameter*** of a path or walk is the smallest $D$ such that for all $u^{\vec x}$ and $v^{\vec y}$ in $P$, $\|\vec x - \vec y\|_\infty \leq D$.
+
+: lemma @=lem:shortaugmenting
+  Let $\PER{G}=(\PER{V},\PER{E})$ be a $d$-dimensional local periodic graph, and let $M$ be a 1-periodic matching. If $\PER{G}$ admits a perfect matching, then either $M$ is perfect, or there exists an augmenting path of diameter $2d|E|$ starting from every free vertex.
+: proof
+  Let $M^{*}$ be a perfect matching for $\PER{G}$, not necessarily periodic. Consider the symmetric difference $M \oplus M^{*}$.
+  This is a collection of vertex-disjoint cycles and paths (possibly infinite), where every path endpoint is a free vertex with respect to $M$, every free vertex is the endpoint of a path (because $M^{*}$ is perfect), and each path is alternating with respect to $M$. Let $\cal P$ be this collection of alternating paths.
+  Consider the hypercube $H:=\{1,\ldots,K\}^d$, and define $\PER{V}_H$ to be the set of vertices $v^{\vec x}$ with $\vec x \in H$.
+  By symmetry, if $M$ is not perfect, then there is at least one free vertex in $\PER{G}$, and thus there are $K^d$ copies of that free vertex in $\PER{V}_H$, and each is the endpoint of an alternating path in $\cal P$. Let $\cal P'\subseteq \cal P$ be the paths of $\cal P$ with an endpoint at a copy of that free vertex in $\PER{V}_H$.
+  Suppose that none of the paths in $\cal P'$ are fully contained in $\PER{V}_H$.
+  Because the paths are vertex-disjoint, all $K^d$ paths exit $\PER{V}_H$.
+  The boundary of $H$ is connected to $2dK^{d-1}$ lattice points outside of $H$. Each path in $\cal P'$ must exit $\PER{V}_H$ into one of them. By the Pigeonhole Principle, one of them is entered by at least $\frac{K^d}{2dK^{d-1}} = K/2d$ edges. As $\PER{G}$ is local, we have
+  $K/2d \leq |E|$, or $K \leq 2d|E|$.
+  Therefore, if $K = 2d|E|+1$, then one of the paths in $\cal P'$ must be contained in $\PER{V}_H$, that is, its diameter is at most $2d|E|$.
+
+We define a ***bipartite periodic graph*** $\PER{G}=(\PER{V},\PER{E})$ to satisfy $V=R\cup B$ and every edge $(u^{\vec x},v^{\vec y}) \in \PER{E}$ has one protovertex (say, $u$) in $R$ and the other protovertex (say, $v$) in $B$.
+That is, the 2-coloring of the bipartite graph is preserved by the periodicity.
+By the following lemma, every connected periodic graph that is bipartite can be made bipartite periodic by doubling the period in each dimension.
+
+: lemma
+  If a periodic graph $\PER{G}$ is bipartite and connected, then its bipartition is 2-periodic.
+: proof
+  Consider the 2-coloring induced by the bipartition of $\PER{G}$, which is unique up to renaming of color classes, as the graph $\PER{G}$ is connected.
+  For any vertex $v^{\vec x}$ and $\vec{\Delta}\in\mathbb Z^d$, consider a path $P$ between $v^{\vec x}$ and $v^{\vec x + \vec\Delta}$, and construct a path $P'$ from $v^{\vec x}$ to $v^{\vec x + 2\vec\Delta}$ by concatenating $P$ and $P+\vec\Delta$, its translation by $\vec\Delta$. By construction, $P'$ is of even length, and thus $v^{\vec x+2\vec\Delta}$ and $v^{\vec x}$ are in the same color class.
+
+Note that this lemma does not hold if the graph is not connected. For example, take a 1D periodic graph with one protovertex $v$ and one protoedge $(v^{0}, v^{p})$ with $p$ prime, the periodicity of any 2-coloring of this graph is at least $2p$. Locality does not help either as each edge can be split into $p$ local edges. For instance, let $V=\{v_0,\ldots,v_{p-1}\}$ and $E=\{(v_i^{0},v_{i+1}^{1})\mid i=0,\ldots,p-2\}\cup\{(v_{p-1}^0,v_0^1)\}$, with $p$ prime. The local 1D periodic graph $\PER{G}=(\PER{V},\PER{E})$ is bipartite, but the periodicity of any 2-coloring of this graph is again at least $2p$.
+
+
+: lemma @=lem:bipartiteaugmenting
+  Let $\PER{G}=(\PER{V},\PER{E})$ be a $d$-dimensional bipartite periodic graph, and let $M$ be a 1-periodic matching.
+  If $\PER{G}$ admits a perfect matching, then either $M$ is perfect, or there exists an augmenting path of length less than $|V|$, where each protovertex appears at most once.
+
+: proof
+  Because $E$ is finite, $\PER{G}$ has finite locality,
+  so we can expand $\PER{G}$ into an equivalent local graph $\PER{G'}$.
+  By Lemma~@lem:shortaugmenting, if $\PER{G'}$ admits a perfect matching and $M$ is imperfect, then there is a finite augmenting path, that is, a finite simple alternating walk joining two free vertices.
+  This path exists in both $\PER{G'}$ and $\PER{G}$ because they represent the same infinite graph.
+  Take a *shortest* alternating walk $P=(v_{i_1}^{\vec x_1},v_{i_2}^{\vec x_2},\ldots,v_{i_k}^{\vec x_k})$
+  that joins two free vertices in $\PER{G}$
+  but where we allow vertices and edges to repeat (so it may not be augmenting).
+  Because finite alternating walks have odd length and $\PER{G}$ is bipartite periodic,
+  one endpoint must be in $\PER{R}$ and the other endpoint must be in $\PER{B}$.
+  Assume without loss of generality that $v_{i_1}\in B$ and $v_{i_k}\in R$.
+  Suppose for contradiction that some protovertex appears more than once in $P$.
+  Then we claim we can construct a shorter alternating walk, contradicting that $P$ was shortest.
+  Let $j$ be the smallest integer for which protovertex $v_{i_j}$ appears more than once in $P$, and let $j' > j$ be the index of the second appearance $v_{i_{j'}}^{\vec x_{j'}}$ of the same protovertex $v_{i_j} = v_{i_{j'}}$. Then the walk $P$ and its translation $P+{\vec \Delta}$ by $\vec \Delta := \vec x_{j}-\vec x_{j'}$ intersect at $v_{i_j}^{\vec x_j} = v_{i_{j'}}^{\vec x_{j'}+\vec\Delta}$.
+  Because $P$ starts and ends at free vertices, and $M$ is periodic so vertex freedom is preserved under translations by $\vec \Delta$, we must have $1 < j < k$.
+  Thus vertex $v_{i_j}^{\vec x_j}$ must be incident to an edge in~$M$ that is both in $P$ and in $P+\vec \Delta$; it cannot be $(v_{i_{j-1}}^{\vec x_{j-1}}, v_{i_j}^{\vec x_j})$
+  or else that edge would be in both $P$ and $P+\vec \Delta$, so $v_{i_{j-1}} = v_{i_{j'-1}}$, contradicting that $j$ is smallest.
+  Hence, the edge $(v_{i_j}^{\vec x_j}, v_{i_{j+1}}^{\vec x_{j+1}})$ is in $M$, and is common to both $P$ and $P+\vec \Delta$.
+  Because $\PER{G}$ is bipartite periodic, both $P$ and $P+\vec \Delta$ start at a vertex in $\PER{B}$, so this edge is oriented the same in both walks, and thus
+  $(v_{i_j}^{\vec x_j}, v_{i_{j+1}}^{\vec x_{j+1}}) =
+  (v_{i_{j'}}^{\vec x_{j'}+\vec \Delta}, v_{i_{j'+1}}^{\vec x_{j'+1}+\vec \Delta})$.
+  We can now construct a shorter alternating walk $P'=(v_{i_1}^{\vec x_1},v_{i_2}^{\vec x_2},\ldots,v_{i_j}^{\vec x_j},v_{i_{j'+1}}^{\vec x_{j'+1}+\vec \Delta},\ldots,v_{i_k}^{\vec x_k+\vec \Delta})$, skipping $j'-j > 0$ vertices strictly between $v_{i_j}^{\vec x_j}$ and $v_{i_{j'+1}}^{\vec x_{j'+1}}$.
+  Its endpoints are translates of the original free endpoints, so this walk also connects two free vertices with the same protovertices.
+  This walk may repeat vertices and edges, which is why we needed to allow repetitions when defining $P$. But in the end, we show that the walk cannot repeat a protovertex, so it cannot actually repeat a vertex, and thus it is a valid augmenting path.
+  It contains at most $|V|$ vertices, so its length is less than~$|V|$.
+
+: theorem @=thm:periodicmatching
+  If a $d$-dimensional bipartite periodic graph $\PER{G}$ admits a perfect matching, then it admits a 1-periodic perfect matching.
+
+: proof
+  %First make $\PER{G}$ local, which blows up the graph size by a factor of $k^d$ if the locality is initially~$k$.
+  Suppose $\PER{G}=(\PER{V},\PER{E})$ admits a perfect matching $M^{*}$.
+  We build a periodic perfect matching $\PER{M}$ incrementally by finding augmenting paths using Lemma~{@lem:bipartiteaugmenting}.
+  As we maintain that the matching $\PER{M}$ is 1-periodic, it suffices to keep track of the set $M$ of protoedges in the matching, and initially $M=\emptyset$. A protovertex is ***free*** if none of its vertices is incident to an edge in $\PER{M}$.
+  We can reduce the number of free protovertices to zero as follows:
+  1. Take an augmenting path $P$ without any repeating protovertices, which is known to exist by Lemma~{@lem:bipartiteaugmenting}.
+  2. Take all translations of $P$ by vectors in $\mathbb Z^d$.
+  3. As each protovertex appears only once in $P$, all translations of $P$ are disjoint. Then augment $\PER{M}$ by the union of all translations of $P$, thereby reducing the number of free vertices. This can be done in linear time by just updating $M$.
+  4. Repeat until no free protovertices remain. \qedhere
+
+Here again, the validity of this theorem relies on the periodic graph being bipartite periodic. Being bipartite alone would not suffice, as can be seen by taking the same example graph as earlier with one protovertex $v$ and one protoedge $(v^{0}, v^{p})$ with $p$ prime. This graph admits a perfect matching but its periodicity is at least $2p$. The same holds for the local 1D periodic graph shown earlier.
+
+: theorem @=thm:matchingalgorithm
+  Given a $d$-dimensional bipartite periodic graph $\PER{G}=(\PER{V},\PER{E})$, we can compute a perfect matching for $\PER{G}$, or determine that none exists, in
+  $O(|E| \sqrt{|V|})$. The returned perfect matching is 1-periodic.
+  
+: proof 
+  Given $V$ and $E$, we construct a graph $G'=(V,E')$ mapping the periodic graph onto a $d$-dimensional torus. For this, project each protoedge $(u^{\vec x},v^{\vec y})\in E$ onto an edge $(u,v)\in E'$. Duplicates can be removed. 
+  If $\PER{G}$ admits a 1-periodic perfect matching $M$, then its projection $M'$ is a perfect matching in $G'$. Conversely, any perfect matching $M'$ in $G'$ can be lifted to a 1-periodic perfect matching $M$ in $\PER{G}$, by picking for each edge in $M'$, any edge that projects to it (and all its translations).
+  Now we can use any finite perfect matching algorithm on $G'$, such as the $O(|E| \sqrt{|V|})$ Hopcroft–Karp algorithm \cite{hopcroft1973n}.
+%Just as for the previous problems, the Periodic Perfect Matching problem is in co-RE by a standard compactness argument.
+
+# Tiling Hardness
+
+We model (discrete) tiling of $d$-dimensional (sub)spaces by polycubes
+as tiling in the integer lattice~$\mathbb Z^d$.
+Specifically, a ***prototile*** $P$ is a finite subset $P\subset \mathbb Z^d$,
+and $P$ ***tiles*** a subset $E\subseteq \mathbb Z^d$ ***by translations*** $A\subseteq \mathbb Z^d$ if
+1. the set $E$ is covered without overlap, that is, for every $e\in E$, there is exactly one translation $a\in A$ and one $p\in P$ such that $e=a+p$; and
+2. for every translation $a\in A$, the translated tile is within $E$, that is, $a+P\subseteq E$.
+More generally, for tiling with multiple prototiles $P_1,\ldots,P_k$,
+we specify a set $A_i \subseteq \mathbb Z^d$ of translations
+for each prototile~$P_i$,
+and the translated tiles must jointly cover $E$ without overlap.
+Unless we explicitly say "tiling by translation",
+when we talk about tiling by one or more prototiles,
+we implicitly add all rotations (and optionally reflections)
+of the prototiles to the prototile set.
+
+In ***$d$D periodic subspace tiling***,
+the target subset $E\subseteq\mathbb Z^d$ is
+required to be ***periodic*** meaning that it is invariant under
+$d$ independent translations, that is, there are $d$ linearly independent
+vectors $\vec v_1,\ldots,\vec v_d\in\mathbb Z^d$ such that
+$E + \vec v_i = E$ for all $i=1,\ldots,d$.
+In $(d+\frac12)$D, the ambient space is $\mathbb Z^d \times \{1,\ldots,W\}$,
+but $E$ is still required to have only $d$ translation vectors.
+Although periodic subsets are infinite, they can be described finitely as
+a subset $E'$ of a finite fundamental domain $D$ that tiles the ambient space
+under the $d$ given translation vectors;
+this is the input to the periodic subspace tiling problem.
+***Periodic tiling completion*** is the special case where the
+finite target pattern $E'$ consists of the points in $D$ not covered by
+a given non-overlapping periodic placement of tiles, specified up to the
+same translations.
+We start with a general membership result:
+
+: lemma @=lem:15d-tiling-pspace
+  Periodic subspace tiling, and hence periodic tiling completion,
+  is in co-RE when all prototiles have polynomial-size bounding boxes.[^1]
+  [^1]:
+    For connected prototiles, this condition
+    is equivalent to having polynomial size.
+  In 1.5D, the same problems are in PSPACE.
+
+: proof
+  We reduce periodic subspace tiling to Periodic CNF SAT,
+  which is in co-RE by Theorem~@thm:periodic-cnf-sat.
+  Suppose we are given a finite fundamental domain $D$,
+  a subset $E'\subseteq D$,
+  and $d$ translation vectors $\vec v_1,\ldots,\vec v_d$
+  defining the periodic target subset
+  $E=\{e+\tau(\vec z) \mid e\in E',\ \vec z\in\mathbb Z^d\}$,
+  where $\tau(\vec z) = \sum_{j=1}^d z_j\vec v_j$.
+  Any point $x$ in the ambient space can be
+  written $x=a_x+\tau(\vec z_x)$ for a unique $a_x\in D$.
+
+  For each prototile $P_i$,
+  and for each translation representative $a\in D$,
+  introduce a protovariable $X_{i,a}$.
+  Variable $X_{i,a}^{\vec z}$ represents whether a placed copy of $P_i$
+  is translated by $a + \tau(\vec z)$.
+  We add the following finite set of protoclauses, each of which represents all of its periodic translates.
+  For every target point $q\in E'$, add a protoclause saying that at least one tile placement covers $q$: $\bigvee_{i,p\in P_i} X_{i,a_{q-p}}^{\vec z_{q-p}}$.
+  For every pair of distinct overlapping placements, add a protoclause forbidding both placements: $\neg X_{i,a}^{\vec 0} \lor \neg X_{i',a'}^{\vec r}$ whenever $(a+P_i)\cap(a'+\tau(\vec r)+P_{i'})\neq\emptyset$.
+  Here $\vec r$ is polynomially bounded because
+  every prototile has a polynomial-size bounding box,
+  and two placements can overlap only if their bounding boxes overlap.
+  Thus, for fixed dimension, there are only polynomially many such overlap protoclauses.
+  Finally,
+  for every placement that would cover a point outside the target subset,
+  add a protoclause forbidding that placement:
+  $\neg X_{i,a}^{\vec 0}$ whenever $a+P_i\not\subseteq E$.
+  The satisfying assignments are exactly the tilings of the target subset~$E$.
+  The construction has polynomial size (in fixed dimension)
+  and polynomial locality
+  because every prototile has a polynomial-size bounding box.
+
+  In 1.5D, the same construction gives a 1D Periodic CNF SAT instance
+  (with the bounded coordinate encoded in the protovariables),
+  so PSPACE membership follows from Theorem~@thm:periodic-cnf-sat.
+
+  Periodic tiling completion reduces to subspace tiling as follows.
+  Reduce every point of every preplaced tile modulo the given translations
+  to its representative in~$D$.
+  If any representative occurs twice, then the periodic placement overlaps;
+  otherwise, take $E'$ to be the points of $D$ whose representatives do not occur.
+
+## Tromino + Periodic @=sec:subspace
+% https://coauthor.csail.mit.edu/6.890/m/tbFNJMup5k5WDPCqy
+% https://cocreate.csail.mit.edu/r/qJhBEstF7aYvwbhjM
+% https://coauthor.csail.mit.edu/6.890/m/tbFNJMup5k5WDPCqy
+
+%We now turn to the problem of tiling the plane with polyominoes. 
+We begin by proving hardness of subspace tiling (Problem~@prob:subspace)
+with trominoes, which has a relatively short proof given the reduction
+infrastructure we built in Section~@sec:periodic-reductions.
+Later (Theorem~@thm:periodic-completion) we will strengthen this result to
+tiling completion, but the proof is more complicated.
+
+A ***tromino*** is a (connected) polyomino of size 3, i.e., a connected size-3 subset of $\mathbb Z^2$.
+There are two trominoes up to rotations: the \L (L) tromino and the \I (I) tromino.
+
+: theorem @=thm:periodicsubset
+  Tiling a given periodic subset $E\subseteq \mathbb Z^2$ with copies of a single tromino (\L or \I) is co-RE-complete and thus undecidable. In 1.5D, the problem is PSPACE-complete.
+
+: proof
+  Membership follows from Lemma~@lem:15d-tiling-pspace.
+  Hardness is by reduction from local Periodic Planar Trichromatic Graph Orientation from Theorem~@thm:planar-graph-orientation.
+  Given a local periodic planar drawing of the graph instance, construct a local planar orthogonal periodic drawing of polynomial grid size, using Theorem~@thm:orthodraw.
+  Apply Lemma~@lem:degree3 to further refine so that all degree-3 vertices connect locally left, up, and right;
+  and all trichromatic vertices appear in the orientation blue-red-green or green-red-blue (rotating via Figure~@fig:rotation).
+  %all other orientations can be rotated into that one using the rotation gadget
+
+  Let $M$ be the grid size of the resulting periodic drawing.
+  Overlay the $M\times M$ grid graph with our drawing and consider the dual grid graph whose faces are $1/M \times 1/M$ squares. Each square intersects the drawing in a few possible ways:
+  1. ***Wire***: a horizontal or vertical edge portion (red, green or blue).
+  2. ***Wire bend***: an edge bend (red, green or blue) in one of 4 orientations.
+  3. ***Monochromatic vertex***: a monochromatic 1-in-3 degree-3 vertex (red, green or blue), in one orientation (left, up, right).
+  4. ***Trichromatic vertex***: a trichromatic 0-or-3-in-3 vertex, of degree 3, in one of two orientations (blue-red-green or green-red-blue).
+  5. The square face does not intersect the drawing.
+
+  We transform the graph drawing into a periodic set $E\subseteq \mathbb Z^2$ with translation vectors $(0,6M)$ and $(6M,0)$. We only need to specify the elements in $E$ within the $[1,6M]^2$ square. Subdivide that square into $M\times M$ subsquares, each $6 \times 6$ corresponding to one of the square faces of the dual graph above, and within each of these subsquares, include elements in $E$ depending on the intersection type, as specified in Figure~@fig:Lgadgets for \L trominoes and Figure~@fig:Igadgets for \I trominoes, where $E$ consists of all ***pixels*** that are not dark gray.
+  Figure~@fig:reductionexample gives complete examples of the reductions.
+
+  Figures~@fig:Lgadgets and~@fig:Igadgets show the only possible tilings for each gadget:
+  1. Wire and wire bend: There are only two ways to tile the gadget. The edge orientation is encoded by the vector from the (\I or \L) tromino center to the pixel matching the color of the edge.
+  2. Monochromatic vertex: There are three solutions, determined by the edge covering the center pixel.
+  3. Trichromatic vertex: There are two solutions, and the presence of a tromino in the center of the gadget determines if all edges are oriented inwards or outwards.
+
+  Thus, the periodic subset $E$ can be tiled by trominoes if and only if the local Periodic Planar Trichromatic Graph Orientation instance has a solution.
+
+: figure
+  \centering
+  \subcaptionbox:
+    - 4-coloring of the square grid
+    - \includegraphics[scale=0.8]{figs/L/coloring}
+  \hfil
+  \subcaptionbox:
+    - Red wire gadget and its two solutions
+    - \includegraphics[scale=0.8]{figs/L/wire/gadget}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/wire/solution1}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/wire/solution2}
+  %\par
+  %\subcaptionbox:
+  %  - Combining (red) wire gadgets to flip and turn
+  %  - \includegraphics: figs/L/wire/flip
+  %    \ 
+  %    \includegraphics: figs/L/wire/turn
+  \par
+  \subcaptionbox:
+    - Red wires and turns
+    - \includegraphics[scale=0.8]{figs/L/wire/gadget}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/wire-NS-R}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-SW-R}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-NW-R}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-SE-R}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-NE-R}
+  \par
+  \subcaptionbox:
+    - Green wires and turns
+    - \includegraphics[scale=0.8]{figs/L/wire/gadgetG}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/wire-NS-G}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-SW-G}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-NW-G}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-SE-G}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-NE-G}
+  \par
+  \subcaptionbox:
+    - Blue wires and turns
+    - \includegraphics[scale=0.8]{figs/L/wire/gadgetB}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/wire-NS-B}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-SW-B}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-NW-B}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-SE-B}
+      \
+      \includegraphics[scale=0.8]{figs/L/wire/turn-NE-B}
+  \par
+  \subcaptionbox:
+    - Red 1-in-3 gadget and its three solutions, Green and Blue 1-in-3
+    - \includegraphics[scale=0.8]{figs/L/1-in-3/gadget}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/1-in-3/solution1}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/1-in-3/solution2}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/1-in-3/solution3}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/1-in-3/gadgetG}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/1-in-3/gadgetB}
+  \par
+  \subcaptionbox:
+    - 0-or-3-in-3 Blue-Red-Green gadget and its two solutions, and Green-Red-Blue version
+    - \includegraphics[scale=0.8]{figs/L/0-or-3-in-3/gadget}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/0-or-3-in-3/solution1}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/0-or-3-in-3/solution2}
+      \ 
+      \includegraphics[scale=0.8]{figs/L/0-or-3-in-3/reflect}
+  %\par
+  %\subcaptionbox:
+  %  - Reflected 0-or-3-in-3 gadget (RBG instead of RGB)
+  %  - \includegraphics: figs/L/0-or-3-in-3/reflect
+  \caption: Reduction from Planar Trichromatic Graph Orientation to tiling with \L trominoes.
+  @=fig:Lgadgets
+
+: figure
+  \centering
+  \subcaptionbox:
+    - 4-coloring of the square grid
+    - \includegraphics[scale=0.8]{figs/I/coloring}
+  \hfil
+  \subcaptionbox:
+    - Red wire gadget and its two solutions
+    - \includegraphics[scale=0.8]{figs/I/wire/wire-WE-R}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/wire/wire-WE-R-sol1}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/wire/wire-WE-R-sol2}
+  %\par
+  %\subcaptionbox:
+  %  - Combining (red) wire gadgets to flip and turn
+  %  - \includegraphics: figs/L/wire/flip
+  %    \ 
+  %    \includegraphics: figs/L/wire/turn
+  \par
+  \subcaptionbox:
+    - Red wires and turns
+    - \includegraphics[scale=0.8]{figs/I/wire/wire-WE-R}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/wire-NS-R}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-SW-R}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-NW-R}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-SE-R}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-NE-R}
+  \par
+  \subcaptionbox:
+    - Green wires and turns
+    - \includegraphics[scale=0.8]{figs/I/wire/wire-WE-G}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/wire-NS-G}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-SW-G}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-NW-G}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-SE-G}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-NE-G}
+  \par
+  \subcaptionbox:
+    - Blue wires and turns
+    - \includegraphics[scale=0.8]{figs/I/wire/wire-WE-B}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/wire-NS-B}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-SW-B}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-NW-B}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-SE-B}
+      \
+      \includegraphics[scale=0.8]{figs/I/wire/turn-NE-B}
+  \par
+  \subcaptionbox:
+    - Red 1-in-3 gadget and its three solutions, Green and Blue 1-in-3
+    - \includegraphics[scale=0.8]{figs/I/1-in-3/gadgetR}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/1-in-3/gadgetR-solE}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/1-in-3/gadgetR-solN}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/1-in-3/gadgetR-solW}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/1-in-3/gadgetG}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/1-in-3/gadgetB}
+  \par
+  \subcaptionbox:
+    - 0-or-3-in-3 Blue-Red-Green gadget and its two solutions, and Green-Red-Blue version
+    - \includegraphics[scale=0.8]{figs/I/0-or-3-in-3/gadgetBRG}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/0-or-3-in-3/gadgetBRG-sol0}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/0-or-3-in-3/gadgetBRG-sol3}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/0-or-3-in-3/gadgetGRB}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/0-or-3-in-3/gadgetGRB-sol0}
+      \ 
+      \includegraphics[scale=0.8]{figs/I/0-or-3-in-3/gadgetGRB-sol3}
+  %\par
+  %\subcaptionbox:
+  %  - Reflected 0-or-3-in-3 gadget (RBG instead of RGB)
+  %  - \includegraphics: figs/L/0-or-3-in-3/reflect
+  \caption: Reduction from Planar Trichromatic Graph Orientation to tiling with \I trominoes.
+  @=fig:Igadgets
+
+: figure
+  \centering
+  \subcaptionbox:
+    - Graph overlaid with the $M\times M$ grid
+    ~ .45\linewidth
+    - \includegraphics[width=\linewidth]{figs/Graph/example-compact-graph}
+  \hfill
+  \subcaptionbox:
+    - Graph overlaid with the dual grid
+    ~ .45\linewidth
+    - \includegraphics[width=\linewidth]{figs/Graph/example-compact-cell}
+  \par\vspace{\baselineskip}
+  \subcaptionbox:
+    - Substitution of \L-tromino gadgets
+    ~ .45\linewidth
+    - \includegraphics[width=\linewidth]{figs/Graph/example-compact-L}
+  \hfill
+  \subcaptionbox:
+    - Substitution of \I-tromino gadgets
+    ~ .45\linewidth
+    - \includegraphics[width=\linewidth]{figs/Graph/example-compact-I}
+  \caption: Reduction example from a periodic orthogonal graph drawing to a periodic subset to be tiled.
+  @=fig:reductionexample
+
+: corollary @=cor:periodicsubsettranslation
+  Tiling a given periodic subset $E\subseteq \mathbb Z^2$ with translations of two polyominoes (the I trominoes \I and \Ir) is co-RE-complete and thus undecidable. In 1.5D, the problem is PSPACE-complete.
+
+The same techniques give a simpler proof of NP-hardness for the finite case,
+as previously shown for \I by
+[[Beauquier-Nivat-Remila-Robson-1995,Horiyama-Ito-Nakatsuka-Suzuki-Uehara-2017]]
+and for \L by [[Moore-Robson-2001,Horiyama-Ito-Nakatsuka-Suzuki-Uehara-2017]].
+Indeed, this proof can be seen as a direct simplification of
+[[Horiyama-Ito-Nakatsuka-Suzuki-Uehara-2017]].
+
+: corollary @=cor:finite-periodicsubset
+  Tiling a given finite subset $E\subseteq \mathbb Z^2$
+  with copies of a single tromino (\L or \I) is NP-complete.
+
+: proof
+  Apply the same reduction as in Theorem~@thm:periodicsubset, but starting from finite Planar Trichromatic Graph Orientation of Theorem~@thm:planar-graph-orientation.
+  The drawing step becomes simpler: a polynomial-grid orthogonal drawing follows from [[Biedl-Kant-1998]] (or by applying the finite analog of Theorem~@thm:orthodraw).
+  Then, as before, apply the local refinement of Lemma~@lem:degree3
+  and substitute the same $6\times 6$ gadgets within the bounding box of the finite drawing.
+  The result is a finite subset $E$ that is tilable if and only if the graph-orientation instance has a solution.
+  Membership in NP follows because a tiling of finite $E$ consists of $|E|/3$ trominoes.
+
+## $O(1)$-omino + Disconnected Polyomino @=sec:two-polyomino
+
+Next we show how to simulate the periodic target subset of $\mathbb Z^2$
+with a single (disconnected) polyomino, while blowing up the tromino
+by a constant factor to prevent it from tiling the plane on its own.
+
+: theorem @=thm:twopolyomino
+  Tiling with two polyominoes, one of which is connected and of constant size, and the other disconnected with polynomial-size bounding box, is co-RE-complete and thus undecidable. In 1.5D, the problem is PSPACE-complete.
+
+: proof
+  Membership follows from Lemma~@lem:15d-tiling-pspace.
+  For hardness, we proceed as in the previous section by reducing from local Periodic Planar Trichromatic Graph Orientation and transforming the instance into a periodic set $E$ with translation vectors $(6M,0)$ and $(0,6M)$. Let $E_0 := E \cap [1,6M]^2$. This is the pattern that is repeated by translation to produce the periodic set to be tiled.
+  Now consider the complement $\bar E_0 :=[1,6M]^2 \setminus E_0$. If the graph orientation problem has a solution, then $E_0$ and the \I tromino tile the plane as shown in the previous section. However, the \I tromino can tile the plane on its own, so we need to modify both tiles so that neither tiles the plane on its own, and so that the pattern $E_0$ combines with copies of itself in a unique way to produce the complement of $E$.
+
+  To prevent the first (connected) polyomino from tiling the plane on its own, we refine the integer lattice, replacing every pixel by a $3\times 3$ square of 9 pixels. The \I tromino is replaced with the shape shown in Figure~@fig:bumpytromino which is produced by replacing each of the three tromino pixels by 5 sub-pixels forming a $+$ pattern, producing a 15-omino $P$.
+  Likewise, we refine $E_0$ into $E_0' \subseteq [1,18M]^2$ by replacing each pixel by the same pattern, and $E'$ by translating $E'_0$ with vectors $(18M,0)$ and $(0,18M)$. See Figure~@fig:0-or-3-plus for the substitution applied to the trichromatic gadget.
+  Any tiling of the refinement is strictly equivalent to a tiling of the original set $E$ with the \I tromino.
+
+  : figure
+    \centering
+    \includegraphics[scale=0.8]{figs/polyominoes/I+}
+    \caption: The 15-omino $P$ obtained by refining the \I tromino.
+    @=fig:bumpytromino
+
+  : figure
+    \centering
+    \includegraphics[width=0.3\linewidth]{figs/I/0-or-3-in-3/gadgetGRB-plus}
+    \hfill
+    \includegraphics[width=0.3\linewidth]{figs/I/0-or-3-in-3/gadgetGRB-sol0-plus}
+    \hfill
+    \includegraphics[width=0.3\linewidth]{figs/I/0-or-3-in-3/gadgetGRB-sol3-plus}
+    \caption: Refinement of the trichromatic gadget and its two solutions.
+    @=fig:0-or-3-plus
+
+  To see that $P$ does not tile the plane, fix a copy of $P$ and orient it horizontally as in Figure~@fig:bumpytromino.
+  Consider the pocket of two adjacent uncovered pixels immediately above the long bar between two consecutive bumps.
+  To avoid overlapping this copy, any copy of $P$ covering either pocket pixel must do so with the tip of a $+$, leaving the other pocket pixel completely surrounded and thus uncoverable.
+
+  By construction of the orthogonal drawing, the $6\times 6$ squares at the four corners of $[1,6M]^2$ do not intersect the drawing and therefore do not intersect $E$, so these squares are totally filled in $\bar E_0$. In the refinement $\bar E'_0$, the corresponding $18\times 18$ squares are totally filled as well. We construct the second, disconnected polyomino $Q$ by taking $\bar E'_0$ and replacing the $18\times 18$ squares at the corners by the key/lock patterns shown in Figure~@fig:keycorners. These patterns are designed with complementary parts that can only match each other so that any tiling with $Q$ must glue other $Q$'s in a grid pattern.
+
+  : figure
+    \centering
+    \includegraphics[scale=0.4]{figs/polyominoes/keycorners}
+    \caption: The four corner key/lock patterns used to construct polyomino $Q$.
+    @=fig:keycorners
+
+  Because $P$ does not tile on its own, there must be at least one copy of $Q$ in the tiling, and every such copy must combine with other copies of $Q$ to form a grid pattern. Together, they form exactly the complement of $E'$, which in turn can be tiled with $P$ if and only if the graph orientation problem has a solution.
+
+The previous proof uses only translations of $Q$. Also, $P$ has 2-fold rotational symmetry, so all its copies in the tiling are translations of two polyominoes (without rotation). Thus we obtain the following corollary:
+
+: corollary @=cor:threepolyomino-translation
+  Tiling with three polyominoes by translation, two of which are connected and of constant size, and the third disconnected with polynomial-size bounding box, is co-RE-complete and thus undecidable. In 1.5D, the problem is PSPACE-complete.
+
+By standard universal Turing machine arguments, we obtain hardness
+for tiling completion with a fixed set of (constant-size) prototiles:
+
+: corollary @=cor:twopolyomino-fixed-completion
+  Tiling completion is co-RE-complete with two fixed polyominoes,
+  starting from a finite preplacement.
+
+Prototile $Q$ would be connected if its complement (the scaled shape
+being tiled by trominoes) had holes only in the four corners of each cell.
+Unfortunately, interior holes seem necessary, at least for \I trominoes:
+tiling a finite hole-free polyomino with a given rectangular prototile
+can be solved in polynomial time [[Kenyon-Kenyon-1992]].
+
+## Two Connected Polycubes
+
+With one additional layer, we can make the disconnected polyomino connected:
+
+: corollary @=cor:twopolycube
+  Tiling 3D with two connected polycubes, one of which is of constant size,
+  is co-RE-complete and thus undecidable.
+  The same result holds for tiling a height-$Z$ 2.5D slab for every fixed $Z>1$.
+
+: proof
+  We start with the height-$Z$ 2.5D slab, for a fixed $Z > 1$.
+  Call the finite $Z$ direction "vertical" and the two infinite directions "horizontal".
+  Let $P,Q$ be the polyominoes in the previous proof, and let $B=[1,18M]^2$.
+  By increasing $M$ if necessary, assume that $18M > Z$.
+  Define the two polycubes as follows:
+  $\hat P := P\times\{1,2,\ldots,Z-1\}$ extrudes $P$ vertically by height $Z-1$,
+  and $\hat Q := (Q\times\{1,2,\ldots,Z-1\})\cup(B\times\{Z\})$
+  extrudes $Q$ vertically by height $Z-1$ and adds a full $18M\times18M$ layer on top.
+  Both polycubes $\hat P$ and $\hat Q$ are connected.
+  In its horizontal orientation, $\hat P$ has dimensions $9\times3\times(Z-1)$,
+  so every nonhorizontal orientation has vertical span $3$ or~$9$.
+
+  Next we argue that tilings of the slab with $\hat P$ and $\hat Q$ that use at least one copy of $\hat Q$ are equivalent to 2D tilings with $P$ and $Q$.
+  Because $\hat Q$ contains the full $18M\times18M$ layer $B\times\{Z\}$,
+  it cannot be turned perpendicular to the slab.
+  The key/lock patterns of $Q$ force the copies of $\hat Q$ into the same grid pattern.
+  Neighboring copies of $\hat Q$ cannot have opposite vertical orientations: in one outer layer, a key protrusion of one copy would meet the full layer of the other copy, causing overlap.
+  Thus all copies of $\hat Q$ have the same vertical orientation, up to reflecting the entire tiling vertically.
+  The remaining space is $Z-1$ identical layers of the original periodic set $E'$.
+  When $Z=2$, no copy of $\hat P$ can be turned perpendicular to the slab.
+  When $Z>2$, the refinement $E'$ contains no $2\times2$ square, whereas every nonhorizontal orientation of $\hat P$ has a horizontal cross-section containing a $2\times2$ square.
+  Thus every copy of $\hat P$ in the remaining space is oriented horizontally, with its extrusion vertical, so this space is tiled by $\hat P$ exactly when $E'$ is tiled by $P$.
+
+  It remains to check that $\hat P$ cannot tile the slab by itself.
+  For $Z=2$, every copy must lie parallel to the slab, so this follows from the planar pocket argument in the proof of Theorem~@thm:twopolyomino.
+  For $Z=3$, a nonhorizontal copy spans all three layers and leaves a slot of height~$1$ between two consecutive bumps on a boundary of the slab.
+  Any copy of $\hat P$ covering a voxel in this slot also covers the voxel immediately inward, which is already covered by the long bar.
+  Thus no nonhorizontal copy of $\hat P$ can occur, and the planar pocket argument applies again.
+  For $Z\geq4$, the extrusion has thickness at least~$3$.
+  Fix a copy of $\hat P$ and consider the two pocket voxels in an interior layer of its extrusion.
+  Any copy of $\hat P$ covering one of these voxels must be horizontal,
+  or else it would overlap either the long bar or a bounding bump;
+  thus the planar pocket argument leaves the other voxel uncoverable.
+
+  For full 3D, define $\hat P := P\times\{2,3,4\}$ and start with
+  $\hat Q := (B\times\{1,5\})\cup(Q\times\{2,3,4\})$,
+  extruding $P$ and $Q$ through three simulation layers,
+  and sandwiching the extrusion of $Q$ between two full $18M\times18M$ layers.
+  Carve locks into the bottom full layer of $\hat Q$ and add matching keys protruding into layer~$6$ above its top full layer.
+  These complementary keys force copies of $\hat Q$ into successive horizontal grids with vertical displacement~$5$, while the two full layers keep the keys disjoint from the simulation layers.
+  The thickness-$3$ pocket argument from the 2.5D case with $Z \geq 4$ prevents $\hat P$ from tiling 3D by itself, so the same equivalence applies.
+  %Membership in co-RE is standard by compactness.
+
+: corollary @=cor:threepolycube-translation
+  Tiling 2.5D or 3D with three connected polycubes by translation, two of which are of constant size, is co-RE-complete and thus undecidable. 
+
+## Tromino Completion @=sec:completion
+
+Next we strengthen Theorem~@thm:periodicsubset to tiling completion,
+which requires a more complicated reduction:
+
+: theorem @=thm:periodic-completion
+  Given an infinite periodic partial tiling of the plane with one type of tromino (\L or \I), deciding whether it can be completed to a full tiling is co-RE-complete and thus undecidable. In 1.5D, the problem is PSPACE-complete.
+: proof
+  Membership follows from Lemma~@lem:15d-tiling-pspace.
+  For hardness, this time we reduce from local Periodic Planar 3SAT-3 of Theorem~@thm:planar-3sat.
+  As in the previous section, we start with the local planar graph representation of the SAT instance, and transform it into a local planar orthogonal periodic drawing of polynomial grid size, using Theorem~@thm:orthodraw, and further refine it so all degree-3 vertices connect locally left, up, and right, by Lemma~@lem:degree3.
+  Rotate the graph by 45 degrees counterclockwise, and overlay the rotated square grid with a ***brick*** pattern, as shown in Figure~@fig:completionexample{(b)}. The pattern is built by bisecting horizontal rows of the rotated grid with horizontal lines, and within each row, bisecting successive vertices of the grid with vertical segments.
+  To complete the reduction, we need to show how to implement 
+  1. straight wires (2 directions),
+  2. wire bends (all 4 rotations),
+  3. 3SAT gadgets (1 orientation only),
+  4. variable gadgets, and
+  5. full bricks (to fill grid vertices not touched by edges of the graph),
+  each by partially prefilling a brick with trominoes.
+  Each brick has $\leq 4$ ***connectors***, two on its top side and two on its bottom side, each representing a boolean value. 
+
+  In order to preserve parity in the gadgets, we represent a connector by a pair of pixels $p$ and $q$ (left-to-right) on the brick boundary, where one pixel is covered by a tromino from above, and the other from below. The value is true if $p$ is covered from below (meaning that all other pixels of the tile containing pixel $p$ are contained in the brick below $p$), and false if $q$ is covered from below.
+
+  We decompose each brick into 5 ***subbricks***: A full-width ***major subbrick*** $K$ with $\leq 4$ connectors again, and four half-width ***minor subbricks*** $A$, $B$, $C$, and $D$, each with one connector on the top and one on the bottom. To form a brick, we place subbricks $A$ and $B$ on top of $K$, and $C$ and $D$ at the bottom of $K$.
+
+  The $A$, $B$, $C$, and $D$ subbricks implement one of four gadgets; see Figure~@fig:Lminor for \L trominoes and Figure~@fig:Iminor for \I trominoes:
+  1. An ***equal*** gadget, ensuring the value of its top connector equals the value of its bottom connector.
+  2. A ***not*** gadget ensuring the value of its top connector is the negation of the value of its bottom connector.
+  3. A ***plug*** gadget, with only one connector (top or bottom) of any value.
+  4. A ***filler*** gadget with no connector.
+  : figure
+    \centering
+    \subcaptionbox:
+      - Equal
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/eq}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/eq-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/eq-F}
+    \hfil
+    \subcaptionbox:
+      - Not
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/neg}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/neg-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/neg-F}
+    \hfil
+    \subcaptionbox:
+      - Top plug
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/plug-top}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/plug-top-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/plug-top-F}
+    \hfil
+    \subcaptionbox:
+      - Bottom plug
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/plug-bot}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/plug-bot-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Lcomp/plug-bot-F}
+    \hfil
+    \subcaptionbox:
+      - Filler
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/fill}
+    \caption: Minor subbricks for \L trominoes and their solutions.
+    @=fig:Lminor
+
+  : figure
+    \centering
+    \subcaptionbox:
+      - Equal
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/eq}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/eq-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/eq-F}
+    \hfill
+    \subcaptionbox:
+      - Not
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/neg}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/neg-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/neg-F}
+    \hfill
+    \subcaptionbox:
+      - Top plug
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/plug-top}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/plug-top-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/plug-top-F}
+    \hfill
+    \subcaptionbox:
+      - Bottom plug
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/plug-bot}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/plug-bot-T}
+        \par\medskip
+        \includegraphics[width=\linewidth]{figs/Icomp/plug-bot-F}
+    \hfill
+    \subcaptionbox:
+      - Filler
+      ~ .18\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/fill}
+    \caption: Minor subbricks for \I trominoes and their solutions.
+    @=fig:Iminor
+
+  The $K$ subbrick implements one of three gadgets:
+  1. A ***filler*** (with zero connectors), by gluing 4 of the smaller filler bricks.
+  2. A ***4-way duplicator*** which ensures that the boolean value of all four connectors is equal. It is built by combining two half wires and two upside-down plugs; see Figure~@fig:duplicator. In order to ensure the complementarity of the connectors, the 4 subbricks $A$, $B$, $C$, and $D$ surrounding the 4-way duplicator must be either plugs or nots.
+  3. A ***monotone 3SAT clause***, with two connectors on the top and one on the bottom left, and which ensures that at least one of its 3 connectors has a true value. For \L-trominoes, the gadget is shown in Figure~@fig:L3SAT. The gadget is thinner than the normal $K$ brick so it is thickened by adding equal gadgets. For \I-trominoes, the gadget is shown in Figure~@fig:I3SAT. We first design a TFT-SAT gadget which is only tilable if the 3 connectors are True, False, and True, respectively. We then glue an equal and a not gadget to the two top connectors to obtain the monotone 3SAT gadget.
+  : figure
+    \centering
+    \includegraphics[width=0.35\linewidth]{figs/Lcomp/dup}
+    \hfil
+    \includegraphics[width=0.35\linewidth]{figs/Icomp/dup}
+    \caption: 4-way duplicator for \L and \I trominoes.
+    @=fig:duplicator
+
+  : figure
+    \centering
+    \subcaptionbox:
+      - 3SAT --- mini
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT}
+    \hfill
+    \subcaptionbox:
+      - True-True-True
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT-TTT}
+    \hfill
+    \subcaptionbox:
+      - True-True-False
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT-TTF}
+    \hfill
+    \subcaptionbox:
+      - True-False-True
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT-TFT}
+    \par\medskip
+    \subcaptionbox:
+      - True-False-False
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT-TFF}
+    \hfill
+    \subcaptionbox:
+      - False-True-True
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT-FTT}
+    \hfill
+    \subcaptionbox:
+      - False-True-False
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT-FTF}
+    \hfill
+    \subcaptionbox:
+      - False-False-True
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT-FFT}
+    \par\medskip
+    \subcaptionbox:
+      - 3SAT --- full size
+      ~ .24\linewidth
+      - \includegraphics[width=\linewidth]{figs/Lcomp/3SAT3}
+    \caption: 3SAT for \L trominoes.
+    @=fig:L3SAT
+
+  : figure
+    \centering
+    \subcaptionbox:
+      - True-False-True-SAT
+      ~ .40\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/TFTSAT}
+    \hfil
+    \subcaptionbox:
+      - False-False-False
+      ~ .40\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/TFTSAT-FFF}
+    \par\medskip
+    \subcaptionbox:
+      - True-X-False
+      ~ .40\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/TFTSAT-TXF}
+    \hfil
+    \subcaptionbox:
+      - True-X-True
+      ~ .40\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/TFTSAT-TXT}
+    \par\medskip
+    \subcaptionbox:
+      - 3SAT
+      ~ .40\linewidth
+      - \includegraphics[width=\linewidth]{figs/Icomp/3SAT3}
+    \caption: 3SAT for \I trominoes.
+    @=fig:I3SAT
+
+  The subbricks are combined to obtain all required bricks:
+  1. Combining the 4-way duplicator with two plugs and two equals (or equivalently two nots), we obtain all straight wires and wire bends through the gridpoint of the brick.
+  2. Combining the 4-way duplicator with 3 equals (or 3 nots) and one plug, we obtain a variable gadget.
+  3. Combining the monotone 3SAT with equals or nots on its three connectors, and the filler on the bottom right, we obtain all signed 3SAT clauses.
+
+  Figure~@fig:completionexample shows complete examples of the reductions.
+  The subbrick designs were found and verified through computer search.
+  %
+  : figure
+    \centering
+    \subcaptionbox:
+      - 3SAT graph overlaid with the $M\times M$ grid. Squares are clauses, dots are variables, red edges are negated literals, and blue edges are positive literals.
+      ~ .48\linewidth
+      - \includegraphics[width=0.7\linewidth]{figs/Graph/sat-compact-graph}
+    \hfill
+    \subcaptionbox:
+      - Graph rotated and overlaid with the brick pattern.
+      ~ .48\linewidth
+      - \includegraphics[width=0.7\linewidth]{figs/Graph/sat-compact-graph-rotate}
+    \par\vspace{\baselineskip}
+    \subcaptionbox:
+      - Substitution of \L-tromino gadgets.
+      ~ .48\linewidth
+      - \includegraphics[width=0.9\linewidth]{figs/Graph/sat-compact-Lcomp}
+    \hfill
+    \subcaptionbox:
+      - Substitution of \I-tromino gadgets.
+      ~ .48\linewidth
+      - \includegraphics[width=0.9\linewidth]{figs/Graph/sat-compact-Icomp}
+    \caption: Reduction example from a periodic orthogonal 3SAT-3 graph drawing to a partial periodic tromino tiling.
+    @=fig:completionexample
+
+\hide:
+  : figure
+    \centering
+    \begin{tikzpicture}
+      % Lattice and brick parameters
+      \def\cliprange{5}
+      \def\drawrange{7}
+      \def\brickw{1.4142}  % = sqrt(2)
+      \def\brickh{0.7071}  % = sqrt(2)/2
+      % Clip everything to a square
+      \clip (-\cliprange,-\cliprange) rectangle (\cliprange,\cliprange);
+      % --- Draw black rotated square lattice ---
+      \begin{scope}[rotate=45]
+        \foreach \x in {-7,...,7} {
+          \draw[black] (\x,-\drawrange) -- (\x,\drawrange);
+        }
+        \foreach \y in {-7,...,7} {
+          \draw[black] (-\drawrange,\y) -- (\drawrange,\y);
+        }
+      \end{scope}
+      % --- Draw red brick pattern (unrotated) ---
+      \foreach \i in {-10,...,10} {
+        % Horizontal brick line between rows
+        \pgfmathsetmacro{\y}{(\i + 0.5) * \brickh}
+        \draw[red] (-10,\y) -- (10,\y);
+        % Determine horizontal offset (aligned with row above)
+        \ifodd\i
+          \def\xshift{0.5}
+        \else
+          \def\xshift{0.0}
+        \fi
+        % Draw vertical segments aligned with row above
+        \foreach \j in {-10,...,10} {
+          \pgfmathsetmacro{\x}{(\j + \xshift) * \brickw}
+          \pgfmathsetmacro{\ytop}{(\i + 1 + 0.5) * \brickh}  % next brick line
+          \pgfmathsetmacro{\ybot}{(\i + 0.5) * \brickh}      % current brick line
+          \draw[red] (\x,\ybot) -- (\x,\ytop);
+        }
+      }
+    \end{tikzpicture}
+    \caption: A rotated (black) square lattice with a (red) brick pattern.
+    @=fig:brickpattern
+
+: corollary @=cor:aperiodic-completion
+  There exists a partial periodic covering of the plane by \L trominoes (respectively \I trominoes) that can be completed to a full tiling of the plane by \L trominoes (respectively \I trominoes), but all such completions are aperiodic.
+
+Our result starts from an infinite seed of preplaced tiles.
+This is necessary: tiling completion from a finite seed of trominoes
+is decidable.
+
+: theorem @=thm:finite-completion
+  For either the \L or \I tromino,
+  it is decidable whether a finite set of preplaced trominoes can be completed
+  to a plane tiling with those trominoes.
+  The problem is NP-complete when the preplacement has a polynomial-size bounding box.
+
+: proof
+  NP-hardness follows from our reductions in Theorem~@thm:periodic-completion, but starting from 3SAT instead of Periodic 3SAT. Then the construction fits in a polynomial-size rectangle, and the exterior is always tilable, so the problem reduces to whether the interior can be tiled, which is NP-hard.
+
+  To prove the upper bounds, suppose a tiling exists.
+  Let $B$ be the bounding box of the preplaced trominoes.
+  The witness is the set of additional tiles that intersect $B$.
+  This witness has polynomial size whenever $B$ does.
+  Together with the preplaced trominoes, verify that this tiles all of $B$ and that all tiles intersect~$B$.
+  We claim this is a witness, i.e., it implies the existence of a plane tiling completion.
+
+  First, for \L trominoes:
+  1. We can grow an edge of $B$ by $1$ by proceeding from one end to the other.
+  2. If the next gap is $>1$, put an \L so that you fill two pixels, and one pixel in the next layer. Leave a gap that's 2 smaller.
+  3. If the next gap is exactly $1$, put an \L so that you fill that one pixel, and two pixels in the next layer, pointing in the direction where you haven't filled anything yet so no collisions.
+  4. Repeat on all sides to tile the plane.
+
+  Second, for \I trominoes:
+  1. Extend each column by stacking vertical {\I}s.
+  2. Extend each row by stacking horizontal {\I}s.
+  3. This leaves quarter-planes; pack those with horizontal {\I}s, say.
+     \qedhere
+
+The NP membership proof above is specific to the two trominoes:
+it establishes the property that
+covering the bounding box of preplaced tiles
+guarantees that the remainder can always be tiled.
+This property fails already for the L-shaped tetromino;
+see Figure~@fig:tetromino-corner.
+An intriguing open problem is whether finite-preplacement tiling completion
+is decidable for a fixed (constant-size) single polyomino~$P$.
+The best undecidability results for finite-preplacement tiling completion
+for a fixed set of (constant-size) prototiles require
+%36 polyominoes [[Robinson1971,Golomb1970]]
+3 connected polygons [[Demaine-Langerman-2025]],
+3 connected polyominoes
+[[Stade2025-2tiling,kim2025undecidabilitytilingplaneset]],
+or 1 connected and 1 disconnected polyomino
+(Corollary~@cor:twopolyomino-fixed-completion).
+
+: figure[htbp]
+  \centering
+  \includegraphics[scale=1.2]{figs/finite-completion/tetromino-corner}
+  \caption:
+    In this example, the tetrominoes cover the bounding box (dotted)
+    of the preplaced green tetromino,
+    but the remainder cannot be tiled by tetrominoes,
+    because of the isolated cell marked with a red $\times$.
+  @=fig:tetromino-corner
+
+## Domino Tiling and Completion
+
+Finally, we describe our positive results for tiling by dominoes \D,
+which follow from our bipartite perfect matching results
+in Section~@sec:matching.
+The relationship between domino tilings and perfect matchings was previously established in [[Beauquier-Nivat-Remila-Robson-1995]].
+
+: theorem @=thm:domino-periodic
+  If a periodic polycube subset of $\mathbb R^d$ can be tiled by dominoes,
+  then it can be tiled by dominoes periodically
+  with at most double the original period.
+: proof
+  Consider the dual graph of the hypercubic lattice, and the subgraph $\PER{G}$ induced by the cells in the periodic subset to be tiled.
+  The dual of the lattice, and thus $\PER{G}$, is bipartite with bipartition given by the parity of the sum of a cell's coordinates.
+  Double each translation vector that does not preserve this parity,
+  so that the representation of $\PER{G}$ is bipartite periodic.
+  Any valid domino placement corresponds to an edge of $\PER{G}$; a tiling of the periodic subset corresponds to a perfect matching; and any perfect matching corresponds to a tiling of the periodic subset.
+  By Theorem~@thm:periodicmatching, if $\PER{G}$ has a perfect matching, then it has one that is periodic with respect to the possibly doubled translation vectors.
+
+: corollary @=cor:domino-completion-periodic
+  Any periodic partial tiling of $\mathbb R^d$ by dominoes that can be completed
+  can be completed periodically with at most double the original period.
+
+Applying Theorem~@thm:matchingalgorithm, we obtain the following.
+
+: corollary @=cor:domino-periodic-polytime
+  Tiling a periodic polycube subset of $d$D with dominoes can be decided in polynomial time, in any dimension $d$.
+
+
+#* Acknowledgments
+
+This work grew out of two research groups: the MIT Hardness Group
+and the MIT CompGeom Group.
+We thank the other members of these groups --- in particular,
+Josh Brunner,
+Craig Kaplan,
+Hayashi Layers,
+Anna Lubiw,
+Joseph O'Rourke,
+Mikhail Rudoy,
+and
+Frederick Stock
+--- for helpful discussions.
+Most figures are drawn with SVG Tiler
+[<https://github.com/edemaine/svgtiler/>].
+This paper was typeset using Texlish: Better \LaTeX\
+[<https://texlish.org/>].
+
+\bibliography: tiling,trominoes
+\bibliographystyle: alpha-key
