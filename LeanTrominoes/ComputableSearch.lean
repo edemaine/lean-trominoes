@@ -13,6 +13,21 @@ are designed both for execution and for primitive-recursion proofs.
 namespace LeanTrominoes
 namespace TrominoAssignment
 
+open LeanTrominoes.Computability
+
+/-- Product representation used to encode unit-kind placements. -/
+def placementUnitEquiv : Placement Unit ≃ Unit × SquareSymmetry × Cell where
+  toFun placement := (placement.kind, placement.symmetry, placement.offset)
+  invFun data :=
+    { kind := data.1
+      symmetry := data.2.1
+      offset := data.2.2 }
+  left_inv placement := by cases placement; rfl
+  right_inv data := by rcases data with ⟨kind, symmetry, offset⟩; rfl
+
+noncomputable instance : Primcodable (Placement Unit) :=
+  Primcodable.ofEquiv (Unit × SquareSymmetry × Cell) placementUnitEquiv
+
 /-- The integers from `-radius` through `radius`, in increasing order. -/
 def centeredIntegerList (radius : Nat) : List Int :=
   (List.range (2 * radius + 1)).map fun (index : Nat) =>
@@ -208,11 +223,31 @@ theorem mem_assignmentStateList (state : Option SquareSymmetry) :
 
 /-- Associate every listed offset with the state stored at its first
 occurrence. -/
+def firstIndex (offsets : List Cell) (offset : Cell) : Nat :=
+  offsets.findIdx fun candidate => decide (candidate = offset)
+
+theorem firstIndex_eq_idxOf (offsets : List Cell) (offset : Cell) :
+    firstIndex offsets offset = offsets.idxOf offset := by
+  induction offsets with
+  | nil => rfl
+  | cons head tail induction =>
+      rw [firstIndex]
+      simp only [List.findIdx_cons, List.idxOf_cons]
+      by_cases equality : head = offset
+      · subst head
+        simp
+      · have decisionFalse : decide (head = offset) = false := by
+          simp [equality]
+        have beqFalse : (head == offset) = false := by
+          simp [equality]
+        rw [decisionFalse, beqFalse]
+        exact congrArg Nat.succ induction
+
 def assignmentGraph (offsets : List Cell)
     (states : List (Option SquareSymmetry)) :
     List (Cell × Option SquareSymmetry) :=
   offsets.map fun offset =>
-    (offset, states.getD (offsets.idxOf offset) none)
+    (offset, states.getD (firstIndex offsets offset) none)
 
 /-- Global assignment represented by a finite state word. Unlisted offsets
 have state `none`. -/
@@ -224,7 +259,7 @@ theorem listAssignment_eq_getD_of_mem {offsets : List Cell}
     {states : List (Option SquareSymmetry)} {offset : Cell}
     (member : offset ∈ offsets) :
     listAssignment offsets states offset =
-      states.getD (offsets.idxOf offset) none := by
+      states.getD (firstIndex offsets offset) none := by
   simp [listAssignment, assignmentGraph, List.lookup_graph _ member]
 
 theorem listAssignment_eq_none_of_not_mem {offsets : List Cell}
@@ -247,6 +282,209 @@ theorem listAssignment_eq_none_of_not_mem {offsets : List Cell}
     simp [keyNotEqual]
   rw [listAssignment, lookupNone]
   rfl
+
+theorem listAssignment_map_eq_of_mem {offsets : List Cell}
+    (assignment : TrominoAssignment) {offset : Cell}
+    (member : offset ∈ offsets) :
+    listAssignment offsets (offsets.map assignment) offset = assignment offset := by
+  rw [listAssignment_eq_getD_of_mem member,
+    firstIndex_eq_idxOf,
+    List.getD_eq_getElem?_getD, List.getElem?_map,
+    List.getElem?_idxOf member]
+  rfl
+
+/-- Encoding the extension of a finite box assignment as a state word and
+decoding it again recovers the extension everywhere. -/
+theorem listAssignment_map_extend {tromino : Tromino} {radius : Nat}
+    (assignment : FiniteBoxAssignment tromino radius) :
+    listAssignment (inspectedOffsetList tromino radius)
+        ((inspectedOffsetList tromino radius).map assignment.extend) =
+      assignment.extend := by
+  funext offset
+  by_cases member : offset ∈ inspectedOffsetList tromino radius
+  · exact listAssignment_map_eq_of_mem assignment.extend member
+  · rw [listAssignment_eq_none_of_not_mem member]
+    unfold FiniteBoxAssignment.extend
+    rw [dif_neg]
+    exact fun finsetMember => member
+      ((mem_inspectedOffsetList_iff tromino radius offset).mpr finsetMember)
+
+/-- Membership characterization for the generic exhaustive word generator. -/
+theorem mem_words_iff {alphabet : List α} {length : Nat} {word : List α} :
+    word ∈ LeanWang.words alphabet length ↔
+      word.length = length ∧ ∀ state ∈ word, state ∈ alphabet := by
+  induction length generalizing word with
+  | zero => cases word <;> simp [LeanWang.words]
+  | succ length induction =>
+      cases word <;>
+        simp [LeanWang.words, induction, and_left_comm, and_assoc, and_comm]
+
+/-- All state words long enough to assign every inspected offset. -/
+def assignmentWords (tromino : Tromino) (radius : Nat) :
+    List (List (Option SquareSymmetry)) :=
+  LeanWang.words assignmentStateList
+    (inspectedOffsetList tromino radius).length
+
+/-- A state word satisfies the semantic constraints in the centered box. -/
+def IsListValid (tromino : Tromino) (region : Set Cell) (radius : Nat)
+    (states : List (Option SquareSymmetry)) : Prop :=
+  (listAssignment (inspectedOffsetList tromino radius) states).IsValidInBox
+    tromino region radius
+
+/-- Finite box satisfiability expressed as an exhaustive list search. -/
+def IsListBoxSatisfiable (tromino : Tromino) (region : Set Cell)
+    (radius : Nat) : Prop :=
+  ∃ states ∈ assignmentWords tromino radius,
+    IsListValid tromino region radius states
+
+theorem isListBoxSatisfiable_iff_isBoxSatisfiable (tromino : Tromino)
+    (region : Set Cell) (radius : Nat) :
+    IsListBoxSatisfiable tromino region radius ↔
+      IsBoxSatisfiable tromino region radius := by
+  constructor
+  · rintro ⟨states, _, valid⟩
+    apply (isBoxSatisfiable_iff_exists_isValidInBox
+      tromino region radius).mpr
+    exact ⟨listAssignment (inspectedOffsetList tromino radius) states, valid⟩
+  · rintro ⟨assignment, valid⟩
+    let offsets := inspectedOffsetList tromino radius
+    let states := offsets.map assignment.extend
+    refine ⟨states, ?_, ?_⟩
+    · unfold assignmentWords
+      rw [mem_words_iff]
+      exact ⟨by simp [states, offsets], fun state state_mem =>
+        mem_assignmentStateList state⟩
+    · unfold IsListValid
+      rw [show listAssignment offsets states = assignment.extend by
+        simpa only [offsets, states] using listAssignment_map_extend assignment]
+      exact (isFiniteValid_iff_extend_isValidInBox
+        tromino region radius assignment).mp valid
+
+/-! ## Primitive-recursive list generators -/
+
+theorem centeredIntegerList_primrec : Primrec centeredIntegerList := by
+  unfold centeredIntegerList
+  exact Primrec.list_map
+    (Primrec.list_range.comp
+      (Primrec.nat_add.comp
+        (Primrec.nat_mul.comp (Primrec.const 2) Primrec.id)
+        (Primrec.const 1)))
+    (int_subtract_primrec.comp₂
+      (int_ofNat_primrec.comp₂ Primrec₂.right)
+      (int_ofNat_primrec.comp₂ Primrec₂.left))
+
+theorem boxCellList_primrec : Primrec boxCellList := by
+  have rows : Primrec₂ fun (radius : Nat) (x : Int) =>
+      (centeredIntegerList radius).map fun y => (x, y) := by
+    exact Primrec.list_map
+      (centeredIntegerList_primrec.comp Primrec.fst)
+      (Primrec₂.pair.comp₂
+        (Primrec.snd.comp₂ Primrec₂.left) Primrec₂.right)
+  exact Primrec.list_flatMap centeredIntegerList_primrec rows
+
+theorem placementUnitEquiv_primrec : Primrec placementUnitEquiv := by
+  exact Primrec.of_equiv
+
+theorem placement_symmetry_primrec :
+    Primrec (Placement.symmetry : Placement Unit → SquareSymmetry) := by
+  exact (Primrec.fst.comp
+    (Primrec.snd.comp placementUnitEquiv_primrec)).of_eq (fun _ => rfl)
+
+theorem placement_offset_primrec :
+    Primrec (Placement.offset : Placement Unit → Cell) := by
+  exact (Primrec.snd.comp
+    (Primrec.snd.comp placementUnitEquiv_primrec)).of_eq (fun _ => rfl)
+
+theorem placementOfCandidate_primrec : Primrec₂ fun (cell : Cell)
+    (candidate : SquareSymmetry × Cell) =>
+    (Placement.mk () candidate.1
+      (Cell.sub cell (candidate.1.act candidate.2)) : Placement Unit) := by
+  have inversePrimrec : Primrec placementUnitEquiv.symm :=
+    Primrec.of_equiv_symm
+  have tuplePrimrec : Primrec₂ fun (cell : Cell)
+      (candidate : SquareSymmetry × Cell) =>
+      ((), candidate.1,
+        Cell.sub cell (candidate.1.act candidate.2)) :=
+    Primrec₂.pair.comp₂ (Primrec₂.const ())
+      (Primrec₂.pair.comp₂
+        (Primrec.fst.comp₂ Primrec₂.right)
+        (cell_sub_primrec.comp₂ Primrec₂.left
+          (squareSymmetry_act_primrec.comp₂
+            (Primrec.fst.comp₂ Primrec₂.right)
+            (Primrec.snd.comp₂ Primrec₂.right))))
+  exact (inversePrimrec.comp₂ tuplePrimrec).of_eq fun _ _ => rfl
+
+theorem coveringPlacementList_primrec (tromino : Tromino) :
+    Primrec (coveringPlacementList tromino) := by
+  unfold coveringPlacementList
+  exact Primrec.list_map
+    (Primrec.const
+      (squareSymmetryList.product (trominoCellList tromino)))
+    placementOfCandidate_primrec
+
+theorem inspectedOffsetList_primrec (tromino : Tromino) :
+    Primrec (inspectedOffsetList tromino) := by
+  have candidateOffsets : Primrec₂ fun (_radius : Nat) (cell : Cell) =>
+      (coveringPlacementList tromino cell).map Placement.offset := by
+    exact Primrec.list_map
+      (coveringPlacementList_primrec tromino |>.comp Primrec.snd)
+      (placement_offset_primrec.comp₂ Primrec₂.right)
+  unfold inspectedOffsetList
+  exact Primrec.list_append.comp boxCellList_primrec
+    (Primrec.list_flatMap boxCellList_primrec candidateOffsets)
+
+theorem assignmentGraph_primrec : Primrec₂ assignmentGraph := by
+  change Primrec fun input : List Cell × List (Option SquareSymmetry) =>
+    assignmentGraph input.1 input.2
+  unfold assignmentGraph
+  have firstIndexPrimrec : Primrec₂ firstIndex := by
+    change Primrec fun input : List Cell × Cell =>
+      firstIndex input.1 input.2
+    unfold firstIndex
+    exact Primrec.list_findIdx Primrec.fst
+      (Primrec.eq.decide.comp₂ Primrec₂.right
+        (Primrec.snd.comp₂ Primrec₂.left))
+  have indexPrimrec : Primrec₂ fun
+      (input : List Cell × List (Option SquareSymmetry)) (offset : Cell) =>
+      firstIndex input.1 offset :=
+    firstIndexPrimrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.left) Primrec₂.right
+  exact Primrec.list_map Primrec.fst
+    (Primrec₂.pair.comp₂ Primrec₂.right
+      (Primrec.list_getD (none : Option SquareSymmetry) |>.comp₂
+        (Primrec.snd.comp₂ Primrec₂.left)
+        indexPrimrec))
+
+theorem assignmentWordsCore_primrec :
+    Primrec₂ (LeanWang.words : List (Option SquareSymmetry) → Nat →
+      List (List (Option SquareSymmetry))) := by
+  let step : List (Option SquareSymmetry) →
+      Nat × List (List (Option SquareSymmetry)) →
+        List (List (Option SquareSymmetry)) :=
+    fun alphabet state => state.2.flatMap fun tail =>
+      alphabet.map fun head => head :: tail
+  have mapHeads : Primrec₂ fun
+      (input : List (Option SquareSymmetry) ×
+        (Nat × List (List (Option SquareSymmetry))))
+      (tail : List (Option SquareSymmetry)) =>
+      input.1.map fun head => head :: tail := by
+    exact Primrec.list_map (Primrec.fst.comp Primrec.fst)
+      (Primrec.list_cons.comp Primrec.snd
+        (Primrec.snd.comp Primrec.fst))
+  have stepPrimrec : Primrec₂ step := by
+    exact Primrec.list_flatMap (Primrec.snd.comp Primrec.snd) mapHeads
+  exact (Primrec.nat_rec
+    (Primrec.const ([[]] : List (List (Option SquareSymmetry))))
+    stepPrimrec).of_eq (by
+      intro alphabet length
+      induction length <;> simp [LeanWang.words, step, *])
+
+theorem assignmentWords_primrec (tromino : Tromino) :
+    Primrec (assignmentWords tromino) := by
+  unfold assignmentWords
+  exact assignmentWordsCore_primrec.comp
+    (Primrec.const assignmentStateList)
+    (Primrec.list_length.comp (inspectedOffsetList_primrec tromino))
 
 end TrominoAssignment
 end LeanTrominoes
