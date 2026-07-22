@@ -1,4 +1,5 @@
 import LeanTrominoes.Assignment
+import LeanTrominoes.Computability
 import LeanTrominoes.FiniteSearch
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
