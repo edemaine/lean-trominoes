@@ -16,27 +16,100 @@ co-r.e.-complete and therefore undecidable.  The project will also cover the
 paper's contrasting decidability results and the periodic-graph theory used by
 the reductions.
 
-The formalization is planned in four layers:
+The formalization is planned in four layers.  A box is checked only when the
+corresponding definitions and proof are available through this project's Lean
+build; an imported proof counts when its statement matches the paper.
 
-1. **Tiling foundations.** Define integer-lattice polyominoes and polycubes,
-   their allowed rigid motions, exact tilings, partial placements, periodic
-   subsets, periodic completion, translation-only tiling, and the finite,
-   1.5-dimensional, 2-dimensional, and higher-dimensional problem encodings.
-2. **Periodic graphs and drawings.** Formalize finite presentations of
-   infinite periodic graphs, locality and periodic labelings, together with
-   the orthocrossing and orthogonal drawing constructions and their grid-size
-   bounds (Theorems 2.1--2.2 and Lemma 2.3).
-3. **Complexity and algorithms.** Verify the periodic reductions through CNF
-   SAT, 3SAT-3, planar 1-in-3SAT, planar 3-dimensional matching, and
-   trichromatic graph orientation (Theorems 3.2--3.8), plus the algorithms for
-   periodic 2SAT, Horn SAT, and bipartite perfect matching
-   (Theorems 4.1--4.7).
-4. **Tiling consequences.** Formalize the reductions to tromino subspace
-   tiling and completion; the two-polyomino and connected-polycube results;
-   the translation-only variants; finite-completion decidability; the
-   existence of completable periodic placements having only aperiodic
-   completions; and the polynomial-time periodic-domino results
-   (Lemma 5.1 and Theorems/Corollaries 5.2--5.15).
+### 1. Tiling foundations
+
+- [ ] Define integer-lattice polyominoes and polycubes, allowed rigid motions,
+  and exact tilings by one or more prototiles.
+- [ ] Define partial placements, completion, subspace tiling, periodic finite
+  presentations, and translation-only tiling.
+- [ ] Define the finite, 1.5-dimensional, 2-dimensional, and general
+  $d$-dimensional decision-problem encodings used in the paper.
+- [x] **Theorem 3.1 (Berger):** Wang tiling is co-r.e.-complete.  This is
+  supplied by the imported `LeanWang.Final` interface.
+
+### 2. Periodic graphs and drawings
+
+- [ ] Define finite presentations of infinite periodic graphs, protovertices,
+  protoedges, locality, and periodic labelings and drawings.
+- [ ] **Theorem 2.1:** Every local 1D or 2D periodic graph has a linear-grid
+  orthocrossing drawing, orthogonal when its maximum degree is at most four.
+- [ ] **Theorem 2.2:** A planar local periodic drawing of maximum degree four
+  can be made planar and orthogonal on an $O(M^3)$ grid while preserving its
+  vertex positions.
+- [ ] **Lemma 2.3:** Normalize degree-three vertices in a periodic planar
+  orthogonal drawing, including a chosen left edge, with linear grid blowup.
+
+### 3. Complexity and algorithms
+
+- [ ] **Theorem 3.2:** Local Periodic CNF SAT is PSPACE-complete in 1D and
+  co-r.e.-complete in 2D and higher dimensions (including nonlocal instances
+  in dimensions above two).
+- [ ] **Theorem 3.3:** Local Periodic 3SAT is PSPACE-complete in 1D and
+  co-r.e.-complete in 2D.
+- [ ] **Theorem 3.4:** The same bounds hold for Local Periodic 3SAT-3.
+- [ ] **Theorem 3.5:** The same bounds hold for Local Periodic Planar 3SAT and
+  3SAT-3, even with polynomial drawing-grid size.
+- [ ] **Theorem 3.6:** The same bounds hold for Local Periodic Planar
+  1-in-3SAT and 1-in-3SAT-3, even with polynomial drawing-grid size.
+- [ ] **Theorem 3.7:** Local Periodic Planar 3DM has the same bounds, even when
+  every colored vertex has degree two or three.
+- [ ] **Theorem 3.8:** Local Periodic Planar Trichromatic Graph Orientation is
+  PSPACE-complete in 1D and co-r.e.-complete in 2D; its finite form is
+  NP-complete.
+- [ ] **Theorem 4.1:** Local Periodic 2SAT is solvable in polynomial time in
+  every dimension.
+- [ ] **Theorem 4.2:** Periodic Horn and Dual Horn SAT are solvable in linear
+  time, and every satisfiable instance has a 1-periodic solution.
+- [ ] **Lemma 4.3:** If a local periodic graph admits a perfect matching, an
+  imperfect 1-periodic matching has an augmenting path of diameter
+  $2d|E|$ from every free vertex.
+- [ ] **Lemma 4.4:** The bipartition of a connected bipartite periodic graph is
+  2-periodic.
+- [ ] **Lemma 4.5:** A bipartite periodic graph with a perfect matching has an
+  augmenting path of length less than $|V|$ with no repeated protovertex.
+- [ ] **Theorem 4.6:** A bipartite periodic graph with a perfect matching has a
+  1-periodic perfect matching.
+- [ ] **Theorem 4.7:** Periodic bipartite perfect matching is solvable in
+  $O(|E|\sqrt{|V|})$ time and returns a 1-periodic matching.
+
+### 4. Tiling consequences
+
+- [ ] **Lemma 5.1:** Periodic subspace tiling and completion are in co-r.e. for
+  polynomial-bounding-box prototiles, and in PSPACE in 1.5D.
+- [ ] **Theorem 5.2:** Tiling a periodic subset of $\mathbb Z^2$ by either
+  single tromino is co-r.e.-complete; the 1.5D problem is PSPACE-complete.
+- [ ] **Corollary 5.3:** The translation-only variant with the two orientations
+  of the I tromino has the same complexity bounds.
+- [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
+  single tromino is NP-complete.
+- [ ] **Theorem 5.5:** Tiling with one constant-size connected polyomino and
+  one polynomial-bounding-box disconnected polyomino is co-r.e.-complete, and
+  PSPACE-complete in 1.5D.
+- [ ] **Corollary 5.6:** Translation-only tiling with two constant-size
+  connected polyominoes and one disconnected polyomino has the same bounds.
+- [ ] **Corollary 5.7:** Completion from a finite preplacement is
+  co-r.e.-complete for two fixed polyominoes.
+- [ ] **Corollary 5.8:** Tiling 3D, or any fixed-height 2.5D slab of height
+  greater than one, is co-r.e.-complete for two connected polycubes, one of
+  constant size.
+- [ ] **Corollary 5.9:** Translation-only tiling of 2.5D or 3D is
+  co-r.e.-complete for three connected polycubes, two of constant size.
+- [ ] **Theorem 5.10:** Completion of an infinite periodic partial tiling by
+  either single tromino is co-r.e.-complete in 2D and PSPACE-complete in 1.5D.
+- [ ] **Corollary 5.11:** For each tromino, some completable periodic partial
+  tiling has only aperiodic completions.
+- [ ] **Theorem 5.12:** Completion from a finite tromino preplacement is
+  decidable, and is NP-complete for polynomial-size bounding boxes.
+- [ ] **Theorem 5.13:** Every tileable periodic polycube subset has a periodic
+  domino tiling with at most twice the original period.
+- [ ] **Corollary 5.14:** Every completable periodic partial domino tiling has
+  such an at-most-double-period completion.
+- [ ] **Corollary 5.15:** Periodic-subset domino tiling is decidable in
+  polynomial time in every dimension.
 
 The intended endpoint includes both halves of each completeness claim:
 computable hardness reductions and membership in the stated complexity class,
