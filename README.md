@@ -332,9 +332,18 @@ The representation choices for this target are:
   assembly.  For each tromino, `orientationReductionRegion` maps every
   well-formed vertex-separated source drawing to its substituted periodic
   region and maps malformed presentations to a dependent-period no-instance.
-  The resulting end-to-end equivalence is proved for both trominoes; proving
-  the map computable and importing the normalized source problem's hardness
-  remain the two complexity-theoretic steps.
+  The resulting end-to-end equivalence is proved for both trominoes.
+- [`LeanTrominoes/GadgetReductionComputability.lean`](LeanTrominoes/GadgetReductionComputability.lean)
+  gives the block substitution an extensionally equal natural-range
+  implementation and proves it primitive recursive under the canonical
+  encodings.  `NormalizedOrientationReduction` packages the exact source
+  certificate needed from the paper's earlier reductions: a computable
+  well-formed, vertex-separated drawing with orientation equivalence.
+  Such certificates compose with either gadget library to give computable
+  many-one reductions, and `theorem52_planeStatement_of_normalizedOrientation`
+  proves the entire 2D conjunct conditionally on the isolated
+  `NormalizedOrientationCoREHard` interface.  Establishing that source
+  interface remains the 2D hardness gap.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the
