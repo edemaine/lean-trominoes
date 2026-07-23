@@ -5,6 +5,7 @@ import LeanTrominoes.FiniteSearch
 import LeanTrominoes.Gadget
 import LeanTrominoes.GadgetColoring
 import LeanTrominoes.GadgetLibrary
+import LeanTrominoes.GadgetOrientation
 import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.Theorem52

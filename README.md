@@ -180,6 +180,9 @@ The representation choices for this target are:
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a
   placed tromino contains at most one pixel of each marker color.
+- [`LeanTrominoes/GadgetOrientation.lean`](LeanTrominoes/GadgetOrientation.lean)
+  extracts those vectors from local exact tilings and proves that every target
+  pixel receives a unique center-to-pixel vector.
 - [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
   these definitions with `LeanWang.CoREComplete` into the formal target.
 
