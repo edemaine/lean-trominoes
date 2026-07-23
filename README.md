@@ -327,6 +327,14 @@ The representation choices for this target are:
   combine the four incident choices at each cell.  It proves that every valid
   orientation has a coherent L-port refinement and therefore discharges the
   full Figure 11 theorem `lOrientationBehaviorCorrect`.
+- [`LeanTrominoes/GadgetReduction.lean`](LeanTrominoes/GadgetReduction.lean)
+  composes the full Figure 11/12 orientation theorems with exact geometric
+  assembly.  For each tromino, `orientationReductionRegion` maps every
+  well-formed vertex-separated source drawing to its substituted periodic
+  region and maps malformed presentations to a dependent-period no-instance.
+  The resulting end-to-end equivalence is proved for both trominoes; proving
+  the map computable and importing the normalized source problem's hardness
+  remain the two complexity-theoretic steps.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the

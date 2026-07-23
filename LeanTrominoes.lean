@@ -23,6 +23,7 @@ import LeanTrominoes.GadgetIPhaseTable
 import LeanTrominoes.GadgetIPhaseLift
 import LeanTrominoes.GadgetPortRefinement
 import LeanTrominoes.GadgetPorts
+import LeanTrominoes.GadgetReduction
 import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.OrthogonalDrawing
