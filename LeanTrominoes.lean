@@ -3,6 +3,7 @@ import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
 import LeanTrominoes.FiniteSearch
 import LeanTrominoes.Gadget
+import LeanTrominoes.GadgetWire
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
 
