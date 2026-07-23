@@ -222,6 +222,14 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetOrientation.lean`](LeanTrominoes/GadgetOrientation.lean)
   extracts those vectors from local exact tilings and proves that every target
   pixel receives a unique center-to-pixel vector.
+- [`LeanTrominoes/GadgetOrientationBehavior.lean`](LeanTrominoes/GadgetOrientationBehavior.lean)
+  support-prunes the complete four-port state table and mechanically certifies
+  the local Figure 11 behavior for L trominoes.  Every supported state obeys
+  its wire/vertex orientation rule, every legal local orientation is
+  represented, and equal ports on opposite sides encode complementary values.
+  The corresponding I-tromino table needs a context-sensitive phase argument:
+  unlike the L table, its supported port states do not admit one universal
+  Boolean labeling.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the

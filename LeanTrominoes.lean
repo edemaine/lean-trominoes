@@ -9,6 +9,7 @@ import LeanTrominoes.GadgetBehavior
 import LeanTrominoes.GadgetColoring
 import LeanTrominoes.GadgetLibrary
 import LeanTrominoes.GadgetOrientation
+import LeanTrominoes.GadgetOrientationBehavior
 import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetWire
