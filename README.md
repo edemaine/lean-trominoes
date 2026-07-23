@@ -176,6 +176,11 @@ The representation choices for this target are:
   verifies the Savitch recurrence used for polynomial-space cycle search:
   recursion depth `d` decides walks of length at most $2^d$, so depth one
   above the base-two logarithm of the state count covers the finite graph.
+- [`LeanTrominoes/FiniteStateCycleSearch.lean`](LeanTrominoes/FiniteStateCycleSearch.lean)
+  turns that reachability procedure into an executable Boolean cycle search:
+  it chooses one edge and checks bounded reachability back to its source, and
+  proves this succeeds exactly when the finite graph contains a directed
+  cycle.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
