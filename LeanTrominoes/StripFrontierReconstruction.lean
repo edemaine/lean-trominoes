@@ -1,3 +1,4 @@
+import LeanTrominoes.FiniteStateSearch
 import LeanTrominoes.StripFrontierCorrectness
 
 /-!
@@ -426,5 +427,30 @@ theorem periodicStripTrominoTiling_iff_hasCycle
   · rintro ⟨wellFormed, cycle⟩
     exact ⟨wellFormed,
       (tileable_iff_hasCycle tromino wellFormed).mpr cycle⟩
+
+/-- Equivalently, a certificate never needs more states than the finite
+frontier graph itself contains. -/
+theorem periodicStripTrominoTiling_iff_hasBoundedCycle
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    PeriodicStripTrominoTiling tromino periodicStrip ↔
+      periodicStrip.IsWellFormed ∧
+        FiniteState.HasBoundedCycle
+          (Transition tromino :
+            WindowState periodicStrip → WindowState periodicStrip → Prop) := by
+  rw [periodicStripTrominoTiling_iff_hasCycle,
+    FiniteState.hasCycle_iff_hasBoundedCycle]
+
+/-- Periodic strip tromino tiling is decidable by bounded finite-state cycle
+search.  The stronger polynomial-space cost bound is proved separately. -/
+instance periodicStripTrominoTilingDecidable
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    Decidable (PeriodicStripTrominoTiling tromino periodicStrip) :=
+  decidable_of_iff
+    (periodicStrip.IsWellFormed ∧
+      FiniteState.HasBoundedCycle
+        (Transition tromino :
+          WindowState periodicStrip → WindowState periodicStrip → Prop))
+    (periodicStripTrominoTiling_iff_hasBoundedCycle
+      tromino periodicStrip).symm
 
 end LeanTrominoes.PeriodicStrip.WindowState

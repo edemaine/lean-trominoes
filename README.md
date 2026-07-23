@@ -169,6 +169,9 @@ The representation choices for this target are:
   pumping fact underlying the 1.5D upper bound: a finite transition system has
   a bi-infinite path exactly when it has a nonempty directed cycle.  The strip
   argument will instantiate its states with bounded tiling frontiers.
+- [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
+  shortens every such cycle to at most the number of states and packages this
+  bounded witness as a decidable finite-search predicate.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
@@ -183,7 +186,8 @@ The representation choices for this target are:
   proves the converse, including alignment of an arbitrary path's cyclic
   phase with actual strip coordinates.  Thus a well-formed periodic strip is
   tileable exactly when its finite sparse-frontier graph has a directed
-  cycle.  Turning this cycle search into the explicit polynomial-space Turing
+  cycle of length at most the number of frontier states.  This already proves
+  decidability; turning the search into the explicit polynomial-space Turing
   machine required by `Complexity.InPSPACE` remains the upper-bound task.
 - [`LeanTrominoes/Gadget.lean`](LeanTrominoes/Gadget.lean) and
   [`LeanTrominoes/ExactCover.lean`](LeanTrominoes/ExactCover.lean) define
