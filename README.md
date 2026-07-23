@@ -282,6 +282,13 @@ The representation choices for this target are:
   The corresponding I-tromino table needs a context-sensitive phase argument:
   unlike the L table, its supported port states do not admit one universal
   Boolean labeling.
+- [`LeanTrominoes/GadgetPortRefinement.lean`](LeanTrominoes/GadgetPortRefinement.lean)
+  retains the geometric phase forgotten by the Boolean L-port value.  It
+  proves that a compatible local L-tromino assignment is exactly a valid
+  orientation together with a globally coherent selection from the supported
+  port table, and conversely lifts any such coherent selection back to exact
+  local tilings.  This isolates the remaining L completeness obligation as a
+  finite port-phase lifting theorem.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the

@@ -15,6 +15,7 @@ import LeanTrominoes.GadgetColoring
 import LeanTrominoes.GadgetLibrary
 import LeanTrominoes.GadgetOrientation
 import LeanTrominoes.GadgetOrientationBehavior
+import LeanTrominoes.GadgetPortRefinement
 import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetWire
