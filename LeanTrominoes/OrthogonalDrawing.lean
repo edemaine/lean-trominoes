@@ -1,4 +1,5 @@
 import LeanTrominoes.GadgetPorts
+import Mathlib.Computability.Primrec.List
 import Mathlib.Data.ZMod.Basic
 
 /-!
@@ -13,6 +14,28 @@ implementation of each local cell.
 
 namespace LeanTrominoes
 namespace Gadget
+
+open Encodable
+
+noncomputable instance : Primcodable WireColor :=
+  Primcodable.ofEquiv (Fin (Fintype.card WireColor))
+    (Fintype.equivFin WireColor)
+
+noncomputable instance : Primcodable WireAxis :=
+  Primcodable.ofEquiv (Fin (Fintype.card WireAxis))
+    (Fintype.equivFin WireAxis)
+
+noncomputable instance : Primcodable WireBend :=
+  Primcodable.ofEquiv (Fin (Fintype.card WireBend))
+    (Fintype.equivFin WireBend)
+
+noncomputable instance : Primcodable TrichromaticOrder :=
+  Primcodable.ofEquiv (Fin (Fintype.card TrichromaticOrder))
+    (Fintype.equivFin TrichromaticOrder)
+
+noncomputable instance : Primcodable OrthogonalCellType :=
+  Primcodable.ofEquiv (Fin (Fintype.card OrthogonalCellType))
+    (Fintype.equivFin OrthogonalCellType)
 
 /-- The side opposite a cardinal side. -/
 def Side.opposite : Side → Side
@@ -61,10 +84,25 @@ by construction. -/
 structure PeriodicOrthogonalDrawing where
   horizontalPeriodPred : Nat
   verticalPeriodPred : Nat
-  cellType : Fin (horizontalPeriodPred + 1) →
-    Fin (verticalPeriodPred + 1) → OrthogonalCellType
+  cellTypes : List OrthogonalCellType
 
 namespace PeriodicOrthogonalDrawing
+
+/-- Product representation used by the standard computability encoding. -/
+def equivData : PeriodicOrthogonalDrawing ≃
+    Nat × Nat × List OrthogonalCellType where
+  toFun drawing :=
+    (drawing.horizontalPeriodPred, drawing.verticalPeriodPred,
+      drawing.cellTypes)
+  invFun data :=
+    { horizontalPeriodPred := data.1
+      verticalPeriodPred := data.2.1
+      cellTypes := data.2.2 }
+  left_inv drawing := by cases drawing; rfl
+  right_inv data := by rcases data with ⟨horizontal, vertical, cells⟩; rfl
+
+noncomputable instance : Primcodable PeriodicOrthogonalDrawing :=
+  Primcodable.ofEquiv (Nat × Nat × List OrthogonalCellType) equivData
 
 /-- A grid position in the drawing's finite toroidal fundamental domain. -/
 abbrev Position (drawing : PeriodicOrthogonalDrawing) :=
@@ -74,7 +112,9 @@ abbrev Position (drawing : PeriodicOrthogonalDrawing) :=
 /-- The local cell type at a torus position. -/
 def get (drawing : PeriodicOrthogonalDrawing) (position : drawing.Position) :
     OrthogonalCellType :=
-  drawing.cellType position.1 position.2
+  drawing.cellTypes.getD
+    (position.2.val * (drawing.horizontalPeriodPred + 1) + position.1.val)
+    .blank
 
 /-- Move one unit across the toroidal drawing grid. -/
 def neighbor (drawing : PeriodicOrthogonalDrawing)
@@ -93,9 +133,11 @@ theorem neighbor_opposite (drawing : PeriodicOrthogonalDrawing)
 /-- Every colored half-edge meets a half-edge of the same color in the
 neighboring cell; unused sides likewise meet unused sides. -/
 def IsWellFormed (drawing : PeriodicOrthogonalDrawing) : Prop :=
-  ∀ position side,
-    (drawing.get position).portColor side =
-      (drawing.get (drawing.neighbor position side)).portColor side.opposite
+  drawing.cellTypes.length =
+      (drawing.horizontalPeriodPred + 1) * (drawing.verticalPeriodPred + 1) ∧
+    ∀ position side,
+      (drawing.get position).portColor side =
+        (drawing.get (drawing.neighbor position side)).portColor side.opposite
 
 instance (drawing : PeriodicOrthogonalDrawing) :
     Decidable drawing.IsWellFormed := by

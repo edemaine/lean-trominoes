@@ -20,13 +20,13 @@ inductive WireColor
   | red
   | green
   | blue
-  deriving DecidableEq, Repr
+  deriving DecidableEq, Repr, Fintype
 
 /-- The axis of a straight wire segment. -/
 inductive WireAxis
   | horizontal
   | vertical
-  deriving DecidableEq, Repr
+  deriving DecidableEq, Repr, Fintype
 
 /-- The two incident sides of a wire bend. -/
 inductive WireBend
@@ -34,13 +34,13 @@ inductive WireBend
   | northwest
   | southeast
   | southwest
-  deriving DecidableEq, Repr
+  deriving DecidableEq, Repr, Fintype
 
 /-- The two normalized cyclic orders of a trichromatic vertex. -/
 inductive TrichromaticOrder
   | blueRedGreen
   | greenRedBlue
-  deriving DecidableEq, Repr
+  deriving DecidableEq, Repr, Fintype
 
 /-- Regard a list of paper pixels as a `6 × 6` gadget. -/
 def paperGadget (cells : List Cell) : Gadget where
@@ -279,6 +279,30 @@ inductive OrthogonalCellType
   | monochromaticVertex (color : WireColor)
   | trichromaticVertex (order : TrichromaticOrder)
   deriving DecidableEq, Repr
+
+instance : Fintype OrthogonalCellType :=
+  Fintype.ofList
+    [.blank,
+      .wire .horizontal .red, .wire .horizontal .green,
+      .wire .horizontal .blue, .wire .vertical .red,
+      .wire .vertical .green, .wire .vertical .blue,
+      .bend .northeast .red, .bend .northeast .green,
+      .bend .northeast .blue, .bend .northwest .red,
+      .bend .northwest .green, .bend .northwest .blue,
+      .bend .southeast .red, .bend .southeast .green,
+      .bend .southeast .blue, .bend .southwest .red,
+      .bend .southwest .green, .bend .southwest .blue,
+      .monochromaticVertex .red, .monochromaticVertex .green,
+      .monochromaticVertex .blue,
+      .trichromaticVertex .blueRedGreen,
+      .trichromaticVertex .greenRedBlue] (by
+        intro cellType
+        cases cellType with
+        | blank => simp
+        | wire axis color => cases axis <;> cases color <;> simp
+        | bend bend color => cases bend <;> cases color <;> simp
+        | monochromaticVertex color => cases color <;> simp
+        | trichromaticVertex order => cases order <;> simp)
 
 /-- The paper pixels selected by a local drawing cell. -/
 def orthogonalCellPixels (tromino : Tromino) : OrthogonalCellType → List Cell

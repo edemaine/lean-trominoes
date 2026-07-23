@@ -7,6 +7,7 @@ import LeanTrominoes.GadgetColoring
 import LeanTrominoes.GadgetLibrary
 import LeanTrominoes.GadgetOrientation
 import LeanTrominoes.GadgetPorts
+import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.Theorem52
