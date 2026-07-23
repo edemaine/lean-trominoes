@@ -169,6 +169,11 @@ The representation choices for this target are:
   pumping fact underlying the 1.5D upper bound: a finite transition system has
   a bi-infinite path exactly when it has a nonempty directed cycle.  The strip
   argument will instantiate its states with bounded tiling frontiers.
+- [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
+  defines that finite system using overlapping five-column windows.  Its
+  states store assignments only at cells from the finite motif, so sparse
+  presentations do not incur space proportional to the binary-encoded strip
+  width; the transition predicate is decidable.
 - [`LeanTrominoes/Gadget.lean`](LeanTrominoes/Gadget.lean) and
   [`LeanTrominoes/ExactCover.lean`](LeanTrominoes/ExactCover.lean) define
   open gadget windows and a verified exact-cover enumerator for their local

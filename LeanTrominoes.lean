@@ -15,6 +15,7 @@ import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.OrthogonalDrawing
+import LeanTrominoes.StripFrontier
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
 
