@@ -165,6 +165,11 @@ The representation choices for this target are:
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Space is the total number of occupied stack cells, and hardness
   uses polynomial-time many-one reductions.
+- [`LeanTrominoes/EncodingBounds.lean`](LeanTrominoes/EncodingBounds.lean)
+  proves size bounds for the actual pairing-based `PeriodicStrip` input
+  encoding.  Both `⌈log₂ period⌉` and motif length are at most the binary
+  input length; combined with the sparse state count, the Savitch recursion
+  depth is at most `21 × input length + 1`.
 - [`LeanTrominoes/FiniteState.lean`](LeanTrominoes/FiniteState.lean) proves the
   pumping fact underlying the 1.5D upper bound: a finite transition system has
   a bi-infinite path exactly when it has a nonempty directed cycle.  The strip

@@ -1,6 +1,7 @@
 import LeanTrominoes.Assignment
 import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
+import LeanTrominoes.EncodingBounds
 import LeanTrominoes.FiniteSearch
 import LeanTrominoes.FiniteState
 import LeanTrominoes.FiniteStateCycleSearch
