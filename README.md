@@ -173,6 +173,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetWire.lean`](LeanTrominoes/GadgetWire.lean) computes
   and prunes local transfer relations; in particular, each pictured red
   horizontal wire has exactly two states that extend bi-infinitely.
+- [`LeanTrominoes/GadgetPorts.lean`](LeanTrominoes/GadgetPorts.lean) normalizes
+  north, east, south, and west boundary footprints so adjacent gadget windows
+  can be composed by equality of finite port states.
 - [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
   these definitions with `LeanWang.CoREComplete` into the formal target.
 
