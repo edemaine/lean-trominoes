@@ -287,13 +287,18 @@ The representation choices for this target are:
   proves that a compatible local L-tromino assignment is exactly a valid
   orientation together with a globally coherent selection from the supported
   port table, and conversely lifts any such coherent selection back to exact
-  local tilings.  This isolates the remaining L completeness obligation as a
-  finite port-phase lifting theorem.
+  local tilings.  This isolates L completeness as a finite port-phase lifting
+  theorem.
 - [`LeanTrominoes/GadgetLPhaseTable.lean`](LeanTrominoes/GadgetLPhaseTable.lean)
   exhaustively certifies the geometric phase laws needed for that lift:
   phases can be recombined across degree-two routes, one side can be spliced
   independently into another supported state, and adjacent complementary
   same-color half-edges always admit exactly matching ports.
+- [`LeanTrominoes/GadgetLPhaseLift.lean`](LeanTrominoes/GadgetLPhaseLift.lean)
+  chooses a matching phase on every drawing edge and uses the splice law to
+  combine the four incident choices at each cell.  It proves that every valid
+  orientation has a coherent L-port refinement and therefore discharges the
+  full Figure 11 theorem `lOrientationBehaviorCorrect`.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the

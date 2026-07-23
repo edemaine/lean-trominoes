@@ -24,6 +24,7 @@ def HasLPortRefinement (drawing : PeriodicOrthogonalDrawing)
       (drawing.getAt location, configurations location) ∈
         supportedCellPortTable .L) ∧
     (∀ location side,
+      ((drawing.getAt location).portColor side).isSome →
       lConfigurationInward (drawing.getAt location)
         (configurations location) side = orientation location side) ∧
     ∀ location side,
@@ -77,7 +78,7 @@ theorem hasLPortRefinement_of_compatibleAssignment
   · intro location
     exact selectedPortEntry_mem_supported .L drawing wellFormed assignment
       locallyTiled compatible lGlobalCellPortTable_unused location
-  · intro location side
+  · intro location side _
     rfl
   · intro location side
     exact selectedPortConfiguration_neighbor .L drawing assignment
