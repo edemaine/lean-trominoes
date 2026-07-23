@@ -3,6 +3,7 @@ import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
 import LeanTrominoes.FiniteSearch
 import LeanTrominoes.FiniteState
+import LeanTrominoes.FiniteStateReachability
 import LeanTrominoes.FiniteStateSearch
 import LeanTrominoes.FootprintTiling
 import LeanTrominoes.Gadget

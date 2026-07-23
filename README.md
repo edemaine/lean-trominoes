@@ -172,6 +172,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
+- [`LeanTrominoes/FiniteStateReachability.lean`](LeanTrominoes/FiniteStateReachability.lean)
+  verifies the Savitch recurrence used for polynomial-space cycle search:
+  recursion depth `d` decides walks of length at most $2^d$, so depth one
+  above the base-two logarithm of the state count covers the finite graph.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
