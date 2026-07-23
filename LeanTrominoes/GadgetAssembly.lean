@@ -137,6 +137,129 @@ theorem portConfiguration_eq_footprintPortConfiguration (tromino : Tromino)
   rw [portConfiguration, footprintPortConfiguration,
     boundarySignature_eq_footprintBoundary]
 
+/-! ## Translation invariance -/
+
+/-- Translate a placement without changing its prototile kind or symmetry. -/
+def translatePlacement (offset : Cell) (placement : Placement Unit) :
+    Placement Unit :=
+  { placement with offset := Cell.add offset placement.offset }
+
+/-- Translating a placement translates exactly its geometric footprint. -/
+theorem translatePlacement_cells (tromino : Tromino) (offset : Cell)
+    (placement : Placement Unit) :
+    (translatePlacement offset placement).cells
+        (fun _ : Unit => tromino.cells) =
+      translateFootprint offset
+        (placement.cells (fun _ : Unit => tromino.cells)) := by
+  ext cell
+  simp only [Placement.cells, translatePlacement, translateFootprint,
+    Finset.mem_image]
+  constructor
+  · rintro ⟨source, sourceMember, rfl⟩
+    refine ⟨Cell.add placement.offset (placement.symmetry.act source),
+      ⟨source, sourceMember, rfl⟩, ?_⟩
+    simp only [Cell.add, Prod.mk.injEq]
+    omega
+  · rintro ⟨translatedSource, ⟨source, sourceMember, sourceEquality⟩,
+      translatedEquality⟩
+    refine ⟨source, sourceMember, ?_⟩
+    subst translatedSource
+    rw [← translatedEquality]
+    simp only [Cell.add, Prod.mk.injEq]
+    omega
+
+/-- Membership in a translated footprint, evaluated at the corresponding
+translated cell. -/
+theorem add_mem_translateFootprint_iff (offset cell : Cell)
+    (footprint : Finset Cell) :
+    Cell.add offset cell ∈ translateFootprint offset footprint ↔
+      cell ∈ footprint := by
+  simp only [translateFootprint, Finset.mem_image]
+  constructor
+  · rintro ⟨source, sourceMember, equality⟩
+    exact (Cell.add_left_injective offset equality) ▸ sourceMember
+  · intro cellMember
+    exact ⟨cell, cellMember, rfl⟩
+
+/-- Translation acts injectively on finite geometric footprints. -/
+theorem translateFootprint_injective (offset : Cell) :
+    Function.Injective (translateFootprint offset) := by
+  intro first second equality
+  ext cell
+  rw [← add_mem_translateFootprint_iff offset cell first,
+    equality, add_mem_translateFootprint_iff]
+
+/-- Translate every footprint in a finite local cover. -/
+def translateFootprints (offset : Cell)
+    (footprints : Finset (Finset Cell)) : Finset (Finset Cell) :=
+  footprints.image (translateFootprint offset)
+
+/-- Exact geometric window covers are invariant under a common translation
+of the window, target region, and selected footprints. -/
+theorem IsWindowFootprintTiling.translate {tromino : Tromino}
+    {window region : Finset Cell} {footprints : Finset (Finset Cell)}
+    (tiling : IsWindowFootprintTiling tromino window region footprints)
+    (offset : Cell) :
+    IsWindowFootprintTiling tromino
+      (translateFootprint offset window)
+      (translateFootprint offset region)
+      (translateFootprints offset footprints) := by
+  constructor
+  · intro translated translatedMember
+    obtain ⟨footprint, footprintMember, rfl⟩ :=
+      Finset.mem_image.mp translatedMember
+    obtain ⟨placement, placementEquality⟩ :=
+      tiling.isFootprint footprint footprintMember
+    refine ⟨translatePlacement offset placement, ?_⟩
+    rw [translatePlacement_cells, placementEquality]
+  · intro translated translatedMember
+    obtain ⟨footprint, footprintMember, rfl⟩ :=
+      Finset.mem_image.mp translatedMember
+    obtain ⟨cell, cellInWindow, cellInFootprint⟩ :=
+      tiling.meetsWindow footprint footprintMember
+    exact ⟨Cell.add offset cell,
+      (add_mem_translateFootprint_iff offset cell window).mpr cellInWindow,
+      (add_mem_translateFootprint_iff offset cell footprint).mpr
+        cellInFootprint⟩
+  · intro translated translatedMember cell cellMember
+    obtain ⟨footprint, footprintMember, rfl⟩ :=
+      Finset.mem_image.mp translatedMember
+    obtain ⟨cellInFootprint, cellInWindow⟩ :=
+      Finset.mem_inter.mp cellMember
+    obtain ⟨footprintCell, footprintCellMember, footprintCellEquality⟩ :=
+      Finset.mem_image.mp cellInFootprint
+    obtain ⟨windowCell, windowCellMember, windowCellEquality⟩ :=
+      Finset.mem_image.mp cellInWindow
+    have sourceEquality : footprintCell = windowCell :=
+      Cell.add_left_injective offset
+        (footprintCellEquality.trans windowCellEquality.symm)
+    subst windowCell
+    have regionMember := tiling.visibleInside footprint footprintMember
+      (Finset.mem_inter.mpr ⟨footprintCellMember, windowCellMember⟩)
+    exact Finset.mem_image.mpr
+      ⟨footprintCell, regionMember, footprintCellEquality⟩
+  · intro cell cellMember
+    obtain ⟨sourceCell, sourceCellMember, sourceCellEquality⟩ :=
+      Finset.mem_image.mp cellMember
+    obtain ⟨footprint, footprintCovers, unique⟩ :=
+      tiling.uniqueCover sourceCell sourceCellMember
+    refine ⟨translateFootprint offset footprint,
+      ⟨Finset.mem_image.mpr ⟨footprint, footprintCovers.1, rfl⟩, ?_⟩, ?_⟩
+    · rw [← sourceCellEquality]
+      exact (add_mem_translateFootprint_iff offset sourceCell footprint).mpr
+        footprintCovers.2
+    · intro otherTranslated otherCovers
+      obtain ⟨otherFootprint, otherFootprintMember, otherEquality⟩ :=
+        Finset.mem_image.mp otherCovers.1
+      have sourceCovered : sourceCell ∈ otherFootprint := by
+        apply (add_mem_translateFootprint_iff offset sourceCell
+          otherFootprint).mp
+        rw [sourceCellEquality, otherEquality]
+        exact otherCovers.2
+      have footprintEquality := unique otherFootprint
+        ⟨otherFootprintMember, sourceCovered⟩
+      simpa only [footprintEquality] using otherEquality.symm
+
 /-! ## Abstract local-to-global gluing -/
 
 /-- A plane-covering family of finite windows equipped with mutually
