@@ -161,6 +161,18 @@ The representation choices for this target are:
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Space is the total number of occupied stack cells, and hardness
   uses polynomial-time many-one reductions.
+- [`LeanTrominoes/Gadget.lean`](LeanTrominoes/Gadget.lean) and
+  [`LeanTrominoes/ExactCover.lean`](LeanTrominoes/ExactCover.lean) define
+  open gadget windows and a verified exact-cover enumerator for their local
+  tilings and geometric boundary states.
+- [`LeanTrominoes/GadgetLibrary.lean`](LeanTrominoes/GadgetLibrary.lean)
+  records all 46 nonblank `6 × 6` pixel masks from Figures 11 and 12, plus the
+  blank local drawing cell, in a typed gadget library.  Every mask is
+  mechanically certified to have no duplicate pixels and to lie in its
+  window.
+- [`LeanTrominoes/GadgetWire.lean`](LeanTrominoes/GadgetWire.lean) computes
+  and prunes local transfer relations; in particular, each pictured red
+  horizontal wire has exactly two states that extend bi-infinitely.
 - [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
   these definitions with `LeanWang.CoREComplete` into the formal target.
 
