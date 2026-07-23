@@ -193,7 +193,9 @@ The representation choices for this target are:
   correctness goals separating finite-state behavior from geometric gluing.
   The forward gluing theorem is already proved under its precise geometric
   coherence condition, including equality between the infinite block atlas
-  and the carrier of the compiled finite `PeriodicRegion`.
+  and the carrier of the compiled finite `PeriodicRegion`.  Equality of
+  adjacent ports is proved to propagate every shared footprint across each of
+  the four corresponding neighboring block boundaries.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a

@@ -189,6 +189,23 @@ theorem translateFootprint_injective (offset : Cell) :
   rw [← add_mem_translateFootprint_iff offset cell first,
     equality, add_mem_translateFootprint_iff]
 
+/-- Successive footprint translations compose by adding their offsets. -/
+theorem translateFootprint_translate (first second : Cell)
+    (footprint : Finset Cell) :
+    translateFootprint first (translateFootprint second footprint) =
+      translateFootprint (Cell.add first second) footprint := by
+  rw [translateFootprint, translateFootprint, translateFootprint,
+    Finset.image_image]
+  apply Finset.image_congr
+  intro cell cellMember
+  apply Prod.ext <;> simp only [Function.comp_apply, Cell.add] <;> omega
+
+@[simp]
+theorem translateFootprint_zero (footprint : Finset Cell) :
+    translateFootprint (0, 0) footprint = footprint := by
+  ext cell
+  simp [translateFootprint, Cell.add]
+
 /-- Translate every footprint in a finite local cover. -/
 def translateFootprints (offset : Cell)
     (footprints : Finset (Finset Cell)) : Finset (Finset Cell) :=
