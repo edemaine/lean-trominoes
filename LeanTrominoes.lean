@@ -17,6 +17,7 @@ import LeanTrominoes.GadgetWire
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
+import LeanTrominoes.StripFrontierReconstruction
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
 

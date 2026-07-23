@@ -179,6 +179,12 @@ The representation choices for this target are:
   assignment cuts into a bi-infinite path of normalized, overlapping sparse
   frontier states, preserving the center-column placement and coverage
   constraints exactly.
+- [`LeanTrominoes/StripFrontierReconstruction.lean`](LeanTrominoes/StripFrontierReconstruction.lean)
+  proves the converse, including alignment of an arbitrary path's cyclic
+  phase with actual strip coordinates.  Thus a well-formed periodic strip is
+  tileable exactly when its finite sparse-frontier graph has a directed
+  cycle.  Turning this cycle search into the explicit polynomial-space Turing
+  machine required by `Complexity.InPSPACE` remains the upper-bound task.
 - [`LeanTrominoes/Gadget.lean`](LeanTrominoes/Gadget.lean) and
   [`LeanTrominoes/ExactCover.lean`](LeanTrominoes/ExactCover.lean) define
   open gadget windows and a verified exact-cover enumerator for their local
