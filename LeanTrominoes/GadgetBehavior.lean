@@ -1734,10 +1734,13 @@ theorem hasCompatibleGadgetTiling_iff_periodicRegion_tileable
   ⟨periodicRegion_tileable_of_hasCompatibleGadgetTiling tromino drawing,
     hasCompatibleGadgetTiling_of_periodicRegion_tileable tromino drawing⟩
 
-/-- The finite-state correctness goal for Figures 11 and 12. -/
+/-- The finite-state correctness goal for Figures 11 and 12.  Well-formedness
+is repeated on the gadget side because malformed drawing cells can have
+matching empty geometric ports despite disagreeing edge colors. -/
 def OrientationBehaviorCorrect (tromino : Tromino) : Prop :=
   ∀ drawing : PeriodicOrthogonalDrawing,
-    drawing.HasOrientation ↔ HasCompatibleGadgetTiling tromino drawing
+    drawing.HasOrientation ↔
+      drawing.IsWellFormed ∧ HasCompatibleGadgetTiling tromino drawing
 
 /-- The geometric assembly correctness goal for the `6 × 6` substitution. -/
 def SubstitutionAssemblyCorrect (tromino : Tromino) : Prop :=

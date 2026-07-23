@@ -192,7 +192,9 @@ The representation choices for this target are:
   defines the intermediate infinite finite-state system: every lifted drawing
   cell selects a verified exact-cover state, and neighboring selections agree
   on their normalized geometric ports.  It records the two central gadget
-  correctness goals separating finite-state behavior from geometric gluing.
+  correctness goals separating finite-state behavior from geometric gluing;
+  the orientation goal explicitly restricts the gadget side to well-formed
+  drawings, whose adjacent half-edge colors agree.
   The forward gluing theorem is already proved under its precise geometric
   coherence condition, including equality between the infinite block atlas
   and the carrier of the compiled finite `PeriodicRegion`.  Equality of
