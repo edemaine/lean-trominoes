@@ -195,8 +195,10 @@ The representation choices for this target are:
   pixel receives a unique center-to-pixel vector.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
-  matching, and their global 1-in-3 / 0-or-3 orientation predicate.  Its cell
-  list has a standard primitive-recursive encoding for later reductions.
+  matching, and their global 1-in-3 / 0-or-3 orientation predicate on the
+  full infinite periodic lift.  Orientations are not required to share the
+  input periods.  The finite cell list has a standard primitive-recursive
+  encoding for later reductions.
 - [`LeanTrominoes/GadgetSubstitution.lean`](LeanTrominoes/GadgetSubstitution.lean)
   replaces each drawing cell by its `6 × 6` paper mask and packages the
   resulting motif as a full-rank `PeriodicRegion`; its carrier is proved equal

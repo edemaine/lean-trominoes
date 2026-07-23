@@ -144,10 +144,41 @@ instance (drawing : PeriodicOrthogonalDrawing) :
   unfold IsWellFormed
   infer_instance
 
-/-- A half-edge value is `true` exactly when that half-edge points into its
-current local cell. -/
-abbrev Orientation (drawing : PeriodicOrthogonalDrawing) :=
-  drawing.Position → Side → Bool
+/-- The residue class of an integer coordinate in one positive drawing
+period, represented as a finite index. -/
+def residue (coordinate : Int) (periodPred : Nat) : Fin (periodPred + 1) :=
+  ⟨(coordinate : ZMod (periodPred + 1)).val, ZMod.val_lt _⟩
+
+/-- Project an arbitrary cell of the infinite periodic lift to the stored
+finite toroidal fundamental domain. -/
+def positionAt (drawing : PeriodicOrthogonalDrawing) (location : Cell) :
+    drawing.Position :=
+  (residue location.1 drawing.horizontalPeriodPred,
+    residue location.2 drawing.verticalPeriodPred)
+
+/-- The normalized drawing-cell type at an arbitrary location in its infinite
+periodic lift. -/
+def getAt (drawing : PeriodicOrthogonalDrawing) (location : Cell) :
+    OrthogonalCellType :=
+  drawing.get (drawing.positionAt location)
+
+/-- Move one unit in the infinite square grid. -/
+def latticeNeighbor (location : Cell) : Side → Cell
+  | .north => (location.1, location.2 - 1)
+  | .east => (location.1 + 1, location.2)
+  | .south => (location.1, location.2 + 1)
+  | .west => (location.1 - 1, location.2)
+
+@[simp]
+theorem latticeNeighbor_opposite (location : Cell) (side : Side) :
+    latticeNeighbor (latticeNeighbor location side) side.opposite = location := by
+  cases side <;> simp [latticeNeighbor, Side.opposite]
+
+/-- A half-edge value on the infinite periodic lift is `true` exactly when
+that half-edge points into its current drawing cell. Solutions are not assumed
+to share the input periods. -/
+abbrev Orientation (_drawing : PeriodicOrthogonalDrawing) :=
+  Cell → Side → Bool
 
 /-- The local orientation constraint of one normalized drawing cell. -/
 def satisfiesOrientation (cellType : OrthogonalCellType)
@@ -174,28 +205,17 @@ instance (cellType : OrthogonalCellType) (inward : Side → Bool) :
 and assigns opposite inward values to the two ends of every colored edge. -/
 def IsOrientation (drawing : PeriodicOrthogonalDrawing)
   (orientation : drawing.Orientation) : Prop :=
-  (∀ position,
-    satisfiesOrientation (drawing.get position) (orientation position)) ∧
-  ∀ position side,
-    ((drawing.get position).portColor side).isSome →
-      orientation position side =
-        !(orientation (drawing.neighbor position side) side.opposite)
-
-instance (drawing : PeriodicOrthogonalDrawing)
-    (orientation : drawing.Orientation) :
-    Decidable (drawing.IsOrientation orientation) := by
-  unfold IsOrientation
-  infer_instance
+  (∀ location,
+    satisfiesOrientation (drawing.getAt location) (orientation location)) ∧
+  ∀ location side,
+    ((drawing.getAt location).portColor side).isSome →
+      orientation location side =
+        !(orientation (latticeNeighbor location side) side.opposite)
 
 /-- The normalized periodic drawing has a valid trichromatic graph
 orientation. -/
 def HasOrientation (drawing : PeriodicOrthogonalDrawing) : Prop :=
   drawing.IsWellFormed ∧ ∃ orientation, drawing.IsOrientation orientation
-
-instance (drawing : PeriodicOrthogonalDrawing) :
-    Decidable drawing.HasOrientation := by
-  unfold HasOrientation
-  infer_instance
 
 end PeriodicOrthogonalDrawing
 end Gadget
