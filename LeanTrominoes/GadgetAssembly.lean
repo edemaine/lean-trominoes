@@ -343,6 +343,100 @@ theorem add_mem_translateFootprint_iff (offset cell : Cell)
   · intro cellMember
     exact ⟨cell, cellMember, rfl⟩
 
+/-- Translate every placement in a finite local selection. -/
+def translatePlacements (offset : Cell)
+    (placements : Finset (Placement Unit)) : Finset (Placement Unit) :=
+  placements.image (translatePlacement offset)
+
+/-- Translating placements by a fixed offset is injective. -/
+theorem translatePlacement_injective (offset : Cell) :
+    Function.Injective (translatePlacement offset) := by
+  intro first second equality
+  refine Placement.ext ?_ ?_ ?_
+  · exact congrArg (fun placement => placement.kind) equality
+  · exact congrArg (fun placement => placement.symmetry) equality
+  · have offsetEquality := congrArg Placement.offset equality
+    apply Cell.add_left_injective offset
+    simpa only [translatePlacement] using offsetEquality
+
+/-- Exact open-window placement tilings are invariant under a common
+translation of the window, region, and placement selection. -/
+theorem IsWindowTiling.translate {tromino : Tromino}
+    {window region : Finset Cell} {placements : Finset (Placement Unit)}
+    (tiling : IsWindowTiling tromino window region placements)
+    (offset : Cell) :
+    IsWindowTiling tromino
+      (translateFootprint offset window)
+      (translateFootprint offset region)
+      (translatePlacements offset placements) := by
+  constructor
+  · intro translatedPlacement translatedMember
+    obtain ⟨placement, placementMember, rfl⟩ :=
+      Finset.mem_image.mp translatedMember
+    have admissible := (mem_admissibleCandidates_iff tromino window region
+      placement).mp (tiling.1 placementMember)
+    apply (mem_admissibleCandidates_iff tromino
+      (translateFootprint offset window) (translateFootprint offset region)
+      (translatePlacement offset placement)).mpr
+    constructor
+    · obtain ⟨cell, cellInWindow, cellInPlacement⟩ := admissible.1
+      refine ⟨Cell.add offset cell,
+        (add_mem_translateFootprint_iff offset cell window).mpr cellInWindow,
+        ?_⟩
+      rw [translatePlacement_cells]
+      exact (add_mem_translateFootprint_iff offset cell
+        (placement.cells fun _ : Unit => tromino.cells)).mpr cellInPlacement
+    · intro cell cellMember
+      obtain ⟨cellInPlacement, cellInWindow⟩ := Finset.mem_inter.mp cellMember
+      rw [translatePlacement_cells] at cellInPlacement
+      obtain ⟨placementCell, placementCellMember, placementCellEquality⟩ :=
+        Finset.mem_image.mp cellInPlacement
+      obtain ⟨windowCell, windowCellMember, windowCellEquality⟩ :=
+        Finset.mem_image.mp cellInWindow
+      have sourceEquality : placementCell = windowCell :=
+        Cell.add_left_injective offset
+          (placementCellEquality.trans windowCellEquality.symm)
+      subst windowCell
+      have sourceRegionMember := admissible.2
+        (Finset.mem_inter.mpr ⟨placementCellMember, windowCellMember⟩)
+      exact Finset.mem_image.mpr
+        ⟨placementCell, sourceRegionMember, placementCellEquality⟩
+  · intro cell cellMember
+    obtain ⟨sourceCell, sourceCellMember, sourceCellEquality⟩ :=
+      Finset.mem_image.mp cellMember
+    obtain ⟨placement, placementCovers, unique⟩ :=
+      tiling.uniqueCover sourceCellMember
+    apply Finset.card_eq_one.mpr
+    refine ⟨translatePlacement offset placement, Finset.ext ?_⟩
+    intro other
+    simp only [Finset.mem_filter, Finset.mem_singleton]
+    constructor
+    · rintro ⟨otherMember, otherCovers⟩
+      obtain ⟨sourcePlacement, sourcePlacementMember,
+        sourcePlacementEquality⟩ := Finset.mem_image.mp otherMember
+      have sourceCovers :
+          sourceCell ∈ sourcePlacement.cells (fun _ : Unit => tromino.cells) := by
+        have translatedCovers :
+            Cell.add offset sourceCell ∈
+              (translatePlacement offset sourcePlacement).cells
+                (fun _ : Unit => tromino.cells) := by
+          rw [sourceCellEquality, sourcePlacementEquality]
+          exact otherCovers
+        rw [translatePlacement_cells] at translatedCovers
+        exact (add_mem_translateFootprint_iff offset sourceCell
+          (sourcePlacement.cells fun _ : Unit => tromino.cells)).mp
+            translatedCovers
+      have placementEquality := unique sourcePlacement
+        ⟨sourcePlacementMember, sourceCovers⟩
+      simpa only [placementEquality] using sourcePlacementEquality.symm
+    · intro otherEquality
+      subst other
+      constructor
+      · exact Finset.mem_image.mpr ⟨placement, placementCovers.1, rfl⟩
+      · rw [← sourceCellEquality, translatePlacement_cells]
+        exact (add_mem_translateFootprint_iff offset sourceCell
+          (placement.cells fun _ : Unit => tromino.cells)).mpr
+            placementCovers.2
 /-- Translation acts injectively on finite geometric footprints. -/
 theorem translateFootprint_injective (offset : Cell) :
     Function.Injective (translateFootprint offset) := by
@@ -477,6 +571,30 @@ theorem latticeBlockWindows_cover (cell : Cell) :
       omega
     · simp only [latticeBlockOrigin, location, localCell, Cell.add]
       omega
+
+/-- Distinct lattice-block windows are disjoint; equivalently, every integer
+cell belongs to exactly one block. -/
+theorem latticeBlockWindow_unique {cell first second : Cell}
+    (firstMember : cell ∈ latticeBlockWindow first)
+    (secondMember : cell ∈ latticeBlockWindow second) :
+    first = second := by
+  rcases first with ⟨firstHorizontal, firstVertical⟩
+  rcases second with ⟨secondHorizontal, secondVertical⟩
+  obtain ⟨firstLocal, firstLocalMember, firstEquality⟩ :=
+    Finset.mem_image.mp firstMember
+  obtain ⟨secondLocal, secondLocalMember, secondEquality⟩ :=
+    Finset.mem_image.mp secondMember
+  have firstBounds := (mem_rectangleCells_iff 6 6 firstLocal).mp firstLocalMember
+  have secondBounds := (mem_rectangleCells_iff 6 6 secondLocal).mp secondLocalMember
+  have firstX := congrArg Prod.fst firstEquality
+  have firstY := congrArg Prod.snd firstEquality
+  have secondX := congrArg Prod.fst secondEquality
+  have secondY := congrArg Prod.snd secondEquality
+  apply Prod.ext
+  · simp only [latticeBlockOrigin, Cell.add] at firstX secondX
+    omega
+  · simp only [latticeBlockOrigin, Cell.add] at firstY secondY
+    omega
 
 /-- Translating a local region contained in the paper window preserves that
 containment in its lattice block. -/

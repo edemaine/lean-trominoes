@@ -202,6 +202,10 @@ The representation choices for this target are:
   meet only its selected block and the eight immediately neighboring blocks.
   Consequently, every locally exact, port-compatible infinite gadget
   assignment is proved to glue into a tiling of the compiled periodic region.
+  In the converse direction, every global tiling of that region is now proved
+  to restrict and translate to a verified exact-cover state in each local
+  `6 × 6` gadget window; compatibility of those extracted states remains to
+  be established.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a

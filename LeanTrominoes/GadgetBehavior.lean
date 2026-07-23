@@ -753,6 +753,33 @@ def liftedGadgetCarrier (tromino : Tromino)
     (drawing : PeriodicOrthogonalDrawing) : Set Cell :=
   { cell | ∃ location, cell ∈ drawingBlockRegion tromino drawing location }
 
+/-- Every translated paper mask stays inside its own lattice-block window. -/
+theorem drawingBlockRegion_subset_window (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing) (location : Cell) :
+    drawingBlockRegion tromino drawing location ⊆ latticeBlockWindow location := by
+  apply latticeBlockRegion_subset
+  simpa only [Gadget.IsWellFormed, orthogonalCellGadget, paperGadget,
+    Gadget.window] using
+      orthogonalCellGadget_wellFormed tromino (drawing.getAt location)
+
+/-- Inside one lattice-block window, the infinite lifted carrier is exactly
+that block's translated paper mask. -/
+theorem mem_liftedGadgetCarrier_iff_of_mem_window (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing) (location cell : Cell)
+    (cellInWindow : cell ∈ latticeBlockWindow location) :
+    cell ∈ liftedGadgetCarrier tromino drawing ↔
+      cell ∈ drawingBlockRegion tromino drawing location := by
+  constructor
+  · rintro ⟨other, cellInOtherRegion⟩
+    have cellInOtherWindow := drawingBlockRegion_subset_window tromino drawing
+      other cellInOtherRegion
+    have locationEquality := latticeBlockWindow_unique cellInOtherWindow
+      cellInWindow
+    subst other
+    exact cellInOtherRegion
+  · intro cellInRegion
+    exact ⟨location, cellInRegion⟩
+
 /-- The block-atlas carrier is exactly the infinite carrier specified by the
 finite periodic-region compilation. -/
 theorem liftedGadgetCarrier_eq_expandedCarrier (tromino : Tromino)
@@ -821,9 +848,91 @@ theorem liftedGadgetCarrier_eq_expandedCarrier (tromino : Tromino)
       · simp only [Cell.add, Cell.scale, latticeBlockOrigin,
           PeriodicOrthogonalDrawing.blockOrigin, location] at horizontalEquality ⊢
         nlinarith
+
       · simp only [Cell.add, Cell.scale, latticeBlockOrigin,
           PeriodicOrthogonalDrawing.blockOrigin, location] at verticalEquality ⊢
         nlinarith
+
+/-- The same block-locality characterization for the carrier of the compiled
+finite periodic presentation. -/
+theorem mem_periodicRegion_carrier_iff_of_mem_blockWindow
+    (tromino : Tromino) (drawing : PeriodicOrthogonalDrawing)
+    (location cell : Cell) (cellInWindow : cell ∈ latticeBlockWindow location) :
+    cell ∈ (drawing.periodicRegion tromino).carrier ↔
+      cell ∈ drawingBlockRegion tromino drawing location := by
+  rw [PeriodicOrthogonalDrawing.periodicRegion_carrier_eq,
+    ← liftedGadgetCarrier_eq_expandedCarrier]
+  exact mem_liftedGadgetCarrier_iff_of_mem_window tromino drawing location cell
+    cellInWindow
+
+/-! ## Restricting a global tiling back to local gadget states -/
+
+/-- Translation taking one global lattice block back to paper-local
+coordinates. -/
+def inverseLatticeBlockOrigin (location : Cell) : Cell :=
+  (-6 * location.1, -6 * location.2)
+
+@[simp]
+theorem inverseLatticeBlockOrigin_add_latticeBlockOrigin (location : Cell) :
+    Cell.add (inverseLatticeBlockOrigin location)
+      (latticeBlockOrigin location) = (0, 0) := by
+  rcases location with ⟨horizontal, vertical⟩
+  apply Prod.ext <;>
+    simp only [inverseLatticeBlockOrigin, latticeBlockOrigin, Cell.add] <;>
+    ring
+
+@[simp]
+theorem translate_inverse_latticeBlockWindow (location : Cell) :
+    translateFootprint (inverseLatticeBlockOrigin location)
+      (latticeBlockWindow location) = rectangleCells 6 6 := by
+  rw [latticeBlockWindow, translateFootprint_translate,
+    inverseLatticeBlockOrigin_add_latticeBlockOrigin,
+    translateFootprint_zero]
+
+@[simp]
+theorem translate_inverse_latticeBlockRegion (location : Cell)
+    (region : Finset Cell) :
+    translateFootprint (inverseLatticeBlockOrigin location)
+      (latticeBlockRegion location region) = region := by
+  rw [latticeBlockRegion, translateFootprint_translate,
+    inverseLatticeBlockOrigin_add_latticeBlockOrigin,
+    translateFootprint_zero]
+
+/-- Restrict a global placement set to one block, then translate those
+placements back to local `6 × 6` coordinates. -/
+noncomputable def localPlacementsFromGlobal (tromino : Tromino)
+    (placements : Set (Placement Unit)) (location : Cell) :
+    Finset (Placement Unit) :=
+  translatePlacements (inverseLatticeBlockOrigin location)
+    (globalWindowPlacements tromino (latticeBlockWindow location) placements)
+
+/-- A global tiling of the compiled carrier restricts to a semantic local
+tiling of every Figure 11/12 gadget. -/
+theorem localPlacementsFromGlobal_isWindowTiling (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (placements : Set (Placement Unit))
+    (tiling : LeanTrominoes.IsTiling (fun _ : Unit => tromino.cells)
+      (drawing.periodicRegion tromino).carrier placements)
+    (location : Cell) :
+    IsWindowTiling tromino
+      (orthogonalCellGadget tromino (drawing.getAt location)).window
+      (orthogonalCellGadget tromino (drawing.getAt location)).region
+      (localPlacementsFromGlobal tromino placements location) := by
+  have restricted := LeanTrominoes.Gadget.IsTiling.isWindowTiling tiling
+    (latticeBlockWindow location)
+    (drawingBlockRegion tromino drawing location)
+    (drawingBlockRegion_subset_window tromino drawing location)
+    (fun cell cellInWindow =>
+      mem_periodicRegion_carrier_iff_of_mem_blockWindow tromino drawing
+        location cell cellInWindow)
+  have translated := restricted.translate (inverseLatticeBlockOrigin location)
+  change IsWindowTiling tromino (rectangleCells 6 6)
+    (orthogonalCellPixels tromino (drawing.getAt location)).toFinset
+    (translatePlacements (inverseLatticeBlockOrigin location)
+      (globalWindowPlacements tromino (latticeBlockWindow location)
+        placements))
+  simpa only [drawingBlockRegion, translate_inverse_latticeBlockWindow,
+    translate_inverse_latticeBlockRegion] using translated
 
 /-- A locally exact and geometrically coherent assignment instantiates the
 abstract footprint atlas. -/
