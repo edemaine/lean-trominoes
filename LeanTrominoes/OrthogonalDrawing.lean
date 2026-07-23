@@ -78,6 +78,12 @@ def OrthogonalCellType.portColor : OrthogonalCellType → Side → Option WireCo
   | .trichromaticVertex .greenRedBlue, .east => some .blue
   | .trichromaticVertex _, .south => none
 
+/-- Degree-three drawing cells.  The orthogonal normalization used by the
+gadget reduction separates these cells by degree-two routing cells. -/
+def OrthogonalCellType.isVertex : OrthogonalCellType → Bool
+  | .monochromaticVertex _ | .trichromaticVertex _ => true
+  | _ => false
+
 /-- A finite fundamental domain for a normalized periodic orthogonal drawing.
 The stored dimensions are predecessors, making both actual periods positive
 by construction. -/
@@ -137,11 +143,23 @@ def IsWellFormed (drawing : PeriodicOrthogonalDrawing) : Prop :=
       (drawing.horizontalPeriodPred + 1) * (drawing.verticalPeriodPred + 1) ∧
     ∀ position side,
       (drawing.get position).portColor side =
-        (drawing.get (drawing.neighbor position side)).portColor side.opposite
+      (drawing.get (drawing.neighbor position side)).portColor side.opposite
 
 instance (drawing : PeriodicOrthogonalDrawing) :
     Decidable drawing.IsWellFormed := by
   unfold IsWellFormed
+  infer_instance
+
+/-- The normalized drawing has at least one routing cell between every pair
+of degree-three vertices. -/
+def VerticesSeparated (drawing : PeriodicOrthogonalDrawing) : Prop :=
+  ∀ position side,
+    (drawing.get position).isVertex = true →
+      (drawing.get (drawing.neighbor position side)).isVertex = false
+
+instance (drawing : PeriodicOrthogonalDrawing) :
+    Decidable drawing.VerticesSeparated := by
+  unfold VerticesSeparated
   infer_instance
 
 /-- The residue class of an integer coordinate in one positive drawing
@@ -271,6 +289,18 @@ theorem portColor_latticeNeighbor_eq (drawing : PeriodicOrthogonalDrawing)
       (drawing.getAt (latticeNeighbor location side)).portColor side.opposite := by
   rw [getAt, getAt, positionAt_latticeNeighbor]
   exact wellFormed.2 (drawing.positionAt location) side
+
+/-- Finite vertex separation lifts to every adjacent pair in the infinite
+periodic drawing. -/
+theorem verticesSeparatedAt (drawing : PeriodicOrthogonalDrawing)
+    (separated : drawing.VerticesSeparated) (location : Cell) (side : Side)
+    (isVertex : (drawing.getAt location).isVertex = true) :
+    (drawing.getAt (latticeNeighbor location side)).isVertex = false := by
+  change (drawing.get
+    (drawing.positionAt (latticeNeighbor location side))).isVertex = false
+  change (drawing.get (drawing.positionAt location)).isVertex = true at isVertex
+  rw [positionAt_latticeNeighbor]
+  exact separated (drawing.positionAt location) side isVertex
 
 @[simp]
 theorem latticeNeighbor_opposite (location : Cell) (side : Side) :

@@ -17,6 +17,7 @@ import LeanTrominoes.GadgetLPhaseLift
 import LeanTrominoes.GadgetLPhaseTable
 import LeanTrominoes.GadgetOrientation
 import LeanTrominoes.GadgetOrientationBehavior
+import LeanTrominoes.GadgetIOrientationBehavior
 import LeanTrominoes.GadgetPortRefinement
 import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetSubstitution

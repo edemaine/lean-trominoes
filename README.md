@@ -279,9 +279,21 @@ The representation choices for this target are:
   `lHasOrientation_of_hasCompatibleGadgetTiling` proves that every compatible
   Figure 11 assignment over a well-formed normalized drawing induces a valid
   graph orientation.
-  The corresponding I-tromino table needs a context-sensitive phase argument:
-  unlike the L table, its supported port states do not admit one universal
-  Boolean labeling.
+- [`LeanTrominoes/GadgetIOrientationBehavior.lean`](LeanTrominoes/GadgetIOrientationBehavior.lean)
+  recovers the richer Figure 12 phase carried by an I-tromino footprint: its
+  center, the marker pixel of the edge color, and their direction vector.
+  Neutral phases are completed against the full local cell constraint, with
+  the trichromatic gadget read from its single central 0-or-3 phase.  The raw
+  open-window table contains extra vertex states that can connect only
+  directly to another degree-three vertex; the orthogonal normalization never
+  permits such an interface.  The formal table therefore retains exactly the
+  states whose active vertex arms all have nonvertex support.  Exhaustive
+  certificates prove local soundness and completeness and complementary
+  values across matching viable ports.  These facts are lifted to the
+  infinite assignment in
+  `iHasOrientation_of_hasCompatibleGadgetTiling`: every compatible Figure 12
+  assignment over a well-formed vertex-separated drawing induces a valid
+  graph orientation.
 - [`LeanTrominoes/GadgetPortRefinement.lean`](LeanTrominoes/GadgetPortRefinement.lean)
   retains the geometric phase forgotten by the Boolean L-port value.  It
   proves that a compatible local L-tromino assignment is exactly a valid
@@ -304,7 +316,9 @@ The representation choices for this target are:
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the
   full infinite periodic lift.  Orientations are not required to share the
   input periods.  The finite cell list has a standard primitive-recursive
-  encoding for later reductions.
+  encoding for later reductions.  It also records the normalization invariant
+  that degree-three vertices are separated by routing cells and proves its
+  lift to every adjacent pair in the infinite drawing.
 - [`LeanTrominoes/GadgetSubstitution.lean`](LeanTrominoes/GadgetSubstitution.lean)
   replaces each drawing cell by its `6 × 6` paper mask and packages the
   resulting motif as a full-rank `PeriodicRegion`; its carrier is proved equal

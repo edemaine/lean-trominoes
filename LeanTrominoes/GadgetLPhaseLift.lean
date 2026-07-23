@@ -275,7 +275,9 @@ theorem lHasCompatibleGadgetTiling_of_isOrientation
 /-- Full finite-state correctness of the Figure 11 L-tromino gadget
 library. -/
 theorem lOrientationBehaviorCorrect : OrientationBehaviorCorrect .L := by
+  unfold OrientationBehaviorCorrect
   intro drawing
+  intro _separated
   constructor
   · rintro ⟨wellFormed, orientation, valid⟩
     exact ⟨wellFormed,
