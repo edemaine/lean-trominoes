@@ -3,6 +3,7 @@ import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
 import LeanTrominoes.FiniteSearch
 import LeanTrominoes.Gadget
+import LeanTrominoes.GadgetColoring
 import LeanTrominoes.GadgetLibrary
 import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetWire

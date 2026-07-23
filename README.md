@@ -176,6 +176,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetPorts.lean`](LeanTrominoes/GadgetPorts.lean) normalizes
   north, east, south, and west boundary footprints so adjacent gadget windows
   can be composed by equality of finite port states.
+- [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
+  formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
+  center-to-colored-pixel orientation vectors, and the invariant that a
+  placed tromino contains at most one pixel of each marker color.
 - [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
   these definitions with `LeanWang.CoREComplete` into the formal target.
 
