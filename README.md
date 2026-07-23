@@ -192,8 +192,10 @@ The representation choices for this target are:
   certified finite reachable-label set and bundled as the `FinTM2` required
   by the PSPACE interface.  Erasing label-membership proofs is proved to
   preserve individual steps, complete finite executions, stack contents, and
-  stack-space usage.  This is the first compiler layer needed to package the
-  verified strip decider as an explicit polynomial-space machine.
+  stack-space usage; conversely, every supported ambient execution lifts
+  uniquely to the restricted machine.  This is the first compiler layer
+  needed to package the verified strip decider as an explicit
+  polynomial-space machine.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

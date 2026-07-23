@@ -116,6 +116,151 @@ theorem eraseRestrictedCfg_restrictProgram_step
               (program label.1) (supported.2 label.1 label.2)
               state stackContents)
 
+/-- Attach finite-support membership proofs to every live label of an ambient
+configuration known to stay within the support. -/
+def restrictCfg {K : Type*} {Γ : K → Type*} {Λ σ : Type*}
+    (labels : Finset Λ) (configuration : Cfg Γ Λ σ)
+    (within : configuration.l ∈ Finset.insertNone labels) :
+    Cfg Γ { label // label ∈ labels } σ where
+  l :=
+    match labelEq : configuration.l with
+    | none => none
+    | some label =>
+        some ⟨label, by
+          apply Finset.some_mem_insertNone.mp
+          rw [← labelEq]
+          exact within⟩
+  var := configuration.var
+  stk := configuration.stk
+
+@[simp]
+theorem eraseRestrictedCfg_restrictCfg
+    {K : Type*} {Γ : K → Type*} {Λ σ : Type*}
+    (labels : Finset Λ) (configuration : Cfg Γ Λ σ)
+    (within : configuration.l ∈ Finset.insertNone labels) :
+    eraseRestrictedCfg (restrictCfg labels configuration within) =
+      configuration := by
+  cases configuration with
+  | mk label state stackContents =>
+      cases label <;> rfl
+
+theorem eraseRestrictedCfg_label_mem
+    {K : Type*} {Γ : K → Type*} {Λ σ : Type*}
+    {labels : Finset Λ}
+    (configuration : Cfg Γ { label // label ∈ labels } σ) :
+    (eraseRestrictedCfg configuration).l ∈
+      Finset.insertNone labels := by
+  cases configuration with
+  | mk label state stackContents =>
+      cases label with
+      | none =>
+          exact Finset.none_mem_insertNone
+      | some label =>
+          exact Finset.some_mem_insertNone.mpr label.2
+
+@[simp]
+theorem restrictCfg_eraseRestrictedCfg
+    {K : Type*} {Γ : K → Type*} {Λ σ : Type*}
+    {labels : Finset Λ}
+    (configuration : Cfg Γ { label // label ∈ labels } σ) :
+    restrictCfg labels (eraseRestrictedCfg configuration)
+        (eraseRestrictedCfg_label_mem configuration) =
+      configuration := by
+  cases configuration with
+  | mk label state stackContents =>
+      cases label <;> rfl
+
+theorem eraseRestrictedCfg_injective
+    {K : Type*} {Γ : K → Type*} {Λ σ : Type*}
+    {labels : Finset Λ} :
+    Function.Injective
+      (eraseRestrictedCfg :
+        Cfg Γ { label // label ∈ labels } σ → Cfg Γ Λ σ) := by
+  rintro ⟨firstLabel, firstState, firstStacks⟩
+    ⟨secondLabel, secondState, secondStacks⟩ equality
+  cases firstLabel with
+  | none =>
+      cases secondLabel with
+      | none =>
+          simp [eraseRestrictedCfg] at equality
+          rcases equality with ⟨stateEq, stacksEq⟩
+          subst secondState
+          subst secondStacks
+          rfl
+      | some secondLabel =>
+          simp [eraseRestrictedCfg] at equality
+  | some firstLabel =>
+      cases secondLabel with
+      | none =>
+          simp [eraseRestrictedCfg] at equality
+      | some secondLabel =>
+          simp [eraseRestrictedCfg] at equality
+          rcases equality with ⟨labelEq, stateEq, stacksEq⟩
+          subst secondLabel
+          subst secondState
+          subst secondStacks
+          rfl
+
+/-- Every supported ambient step lifts uniquely to the finite restricted
+program. -/
+theorem restrictCfg_step
+    {K : Type*} [DecidableEq K] {Γ : K → Type*} {Λ σ : Type*}
+    [Inhabited Λ] (program : Λ → Stmt Γ Λ σ) (labels : Finset Λ)
+    (supported : Supports program labels)
+    {before after : Cfg Γ Λ σ}
+    (beforeWithin : before.l ∈ Finset.insertNone labels)
+    (stepTo : after ∈ step program before) :
+    let afterWithin :=
+      step_supports program supported stepTo beforeWithin
+    restrictCfg labels after afterWithin ∈
+      step (restrictProgram program labels supported)
+        (restrictCfg labels before beforeWithin) := by
+  let afterWithin :=
+    step_supports program supported stepTo beforeWithin
+  have erasedStep :=
+    eraseRestrictedCfg_restrictProgram_step program labels supported
+      (restrictCfg labels before beforeWithin)
+  rw [eraseRestrictedCfg_restrictCfg] at erasedStep
+  simp only [Option.mem_def] at stepTo ⊢
+  rw [stepTo] at erasedStep
+  cases restrictedStep :
+      step (restrictProgram program labels supported)
+        (restrictCfg labels before beforeWithin) with
+  | none =>
+      simp [restrictedStep] at erasedStep
+  | some result =>
+      rw [restrictedStep] at erasedStep
+      simp only [Option.map_some, Option.some.injEq] at erasedStep
+      congr 1
+      apply eraseRestrictedCfg_injective
+      rw [erasedStep, eraseRestrictedCfg_restrictCfg]
+
+/-- Every supported ambient execution lifts to the finite restricted
+program. -/
+theorem restrictCfg_reaches
+    {K : Type*} [DecidableEq K] {Γ : K → Type*} {Λ σ : Type*}
+    [Inhabited Λ] (program : Λ → Stmt Γ Λ σ) (labels : Finset Λ)
+    (supported : Supports program labels)
+    {first last : Cfg Γ Λ σ}
+    (firstWithin : first.l ∈ Finset.insertNone labels)
+    (reaches : ReflTransGen
+      (fun before after => after ∈ step program before) first last) :
+    ∃ lastWithin : last.l ∈ Finset.insertNone labels,
+      ReflTransGen
+        (fun before after =>
+          after ∈ step (restrictProgram program labels supported) before)
+        (restrictCfg labels first firstWithin)
+        (restrictCfg labels last lastWithin) := by
+  induction reaches with
+  | refl =>
+      exact ⟨firstWithin, ReflTransGen.refl⟩
+  | tail reaches stepTo ih =>
+      obtain ⟨middleWithin, restrictedReaches⟩ := ih
+      let lastWithin :=
+        step_supports program supported stepTo middleWithin
+      exact ⟨lastWithin, restrictedReaches.tail
+        (restrictCfg_step program labels supported middleWithin stepTo)⟩
+
 /-- Erasure maps every finite restricted execution to an execution of the
 ambient program. -/
 theorem eraseRestrictedCfg_reaches
