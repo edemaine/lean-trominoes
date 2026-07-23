@@ -174,6 +174,11 @@ The representation choices for this target are:
   states store assignments only at cells from the finite motif, so sparse
   presentations do not incur space proportional to the binary-encoded strip
   width; the transition predicate is decidable.
+- [`LeanTrominoes/StripFrontierCorrectness.lean`](LeanTrominoes/StripFrontierCorrectness.lean)
+  proves the forward correctness direction: a globally locally valid strip
+  assignment cuts into a bi-infinite path of normalized, overlapping sparse
+  frontier states, preserving the center-column placement and coverage
+  constraints exactly.
 - [`LeanTrominoes/Gadget.lean`](LeanTrominoes/Gadget.lean) and
   [`LeanTrominoes/ExactCover.lean`](LeanTrominoes/ExactCover.lean) define
   open gadget windows and a verified exact-cover enumerator for their local
