@@ -137,5 +137,79 @@ theorem portConfiguration_eq_footprintPortConfiguration (tromino : Tromino)
   rw [portConfiguration, footprintPortConfiguration,
     boundarySignature_eq_footprintBoundary]
 
+/-! ## Abstract local-to-global gluing -/
+
+/-- A plane-covering family of finite windows equipped with mutually
+consistent exact local footprint covers. The coherence field says that a
+selected footprint is recorded in every window that it meets. -/
+structure FootprintAtlas (tromino : Tromino) {index : Type*}
+    (windows regions : index → Finset Cell) where
+  footprints : index → Finset (Finset Cell)
+  regionInside : ∀ location, regions location ⊆ windows location
+  windowsCover : ∀ cell, ∃ location, cell ∈ windows location
+  localTiling : ∀ location,
+    IsWindowFootprintTiling tromino (windows location) (regions location)
+      (footprints location)
+  coherent : ∀ first second footprint,
+    footprint ∈ footprints first →
+      (∃ cell ∈ windows second, cell ∈ footprint) →
+        footprint ∈ footprints second
+
+namespace FootprintAtlas
+
+/-- The union of all target regions in an atlas. -/
+def carrier {tromino : Tromino} {index : Type*}
+    {windows regions : index → Finset Cell}
+    (_atlas : FootprintAtlas tromino windows regions) : Set Cell :=
+  { cell | ∃ location, cell ∈ regions location }
+
+/-- The union of all selected geometric tromino footprints in an atlas. -/
+def selected {tromino : Tromino} {index : Type*}
+    {windows regions : index → Finset Cell}
+    (atlas : FootprintAtlas tromino windows regions) : Set (Finset Cell) :=
+  { footprint | ∃ location, footprint ∈ atlas.footprints location }
+
+/-- Mutually coherent exact local covers glue to an exact global geometric
+tromino tiling of the union of their target regions. -/
+theorem isFootprintTiling {tromino : Tromino} {index : Type*}
+    {windows regions : index → Finset Cell}
+    (atlas : FootprintAtlas tromino windows regions) :
+    Tromino.IsFootprintTiling tromino atlas.carrier atlas.selected := by
+  constructor
+  · intro footprint footprintMember
+    obtain ⟨first, firstMember⟩ := footprintMember
+    refine ⟨(atlas.localTiling first).isFootprint footprint firstMember, ?_⟩
+    intro cell cellMember
+    obtain ⟨second, cellInWindow⟩ := atlas.windowsCover cell
+    have secondMember := atlas.coherent first second footprint firstMember
+      ⟨cell, cellInWindow, cellMember⟩
+    have visibleMember : cell ∈ footprint ∩ windows second :=
+      Finset.mem_inter.mpr ⟨cellMember, cellInWindow⟩
+    exact ⟨second,
+      (atlas.localTiling second).visibleInside footprint secondMember
+        visibleMember⟩
+  · intro cell cellMember
+    obtain ⟨location, cellInRegion⟩ := cellMember
+    obtain ⟨footprint, footprintCovers, unique⟩ :=
+      (atlas.localTiling location).uniqueCover cell cellInRegion
+    refine ⟨footprint, ⟨⟨location, footprintCovers.1⟩,
+      footprintCovers.2⟩, ?_⟩
+    intro otherFootprint otherCovers
+    obtain ⟨otherLocation, otherMember⟩ := otherCovers.1
+    have cellInWindow := atlas.regionInside location cellInRegion
+    have otherLocalMember := atlas.coherent otherLocation location
+      otherFootprint otherMember ⟨cell, cellInWindow, otherCovers.2⟩
+    exact unique otherFootprint ⟨otherLocalMember, otherCovers.2⟩
+
+/-- The placement-based tileability consequence of the atlas gluing theorem. -/
+theorem tileable {tromino : Tromino} {index : Type*}
+    {windows regions : index → Finset Cell}
+    (atlas : FootprintAtlas tromino windows regions) :
+    tromino.Tileable atlas.carrier :=
+  (tromino.tileable_iff_exists_footprintTiling atlas.carrier).mpr
+    ⟨atlas.selected, atlas.isFootprintTiling⟩
+
+end FootprintAtlas
+
 end Gadget
 end LeanTrominoes

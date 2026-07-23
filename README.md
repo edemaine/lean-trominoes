@@ -183,7 +183,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetAssembly.lean`](LeanTrominoes/GadgetAssembly.lean)
   proves that every verified open-window tiling induces a unique local cover
   by geometric tromino footprints and that its four ports depend only on this
-  cover, not on redundant placement encodings.
+  cover, not on redundant placement encodings.  It also proves an abstract
+  gluing theorem: coherent exact covers on a plane-covering family of windows
+  form one global tromino tiling.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a
