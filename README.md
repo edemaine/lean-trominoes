@@ -289,6 +289,11 @@ The representation choices for this target are:
   port table, and conversely lifts any such coherent selection back to exact
   local tilings.  This isolates the remaining L completeness obligation as a
   finite port-phase lifting theorem.
+- [`LeanTrominoes/GadgetLPhaseTable.lean`](LeanTrominoes/GadgetLPhaseTable.lean)
+  exhaustively certifies the geometric phase laws needed for that lift:
+  phases can be recombined across degree-two routes, one side can be spliced
+  independently into another supported state, and adjacent complementary
+  same-color half-edges always admit exactly matching ports.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the

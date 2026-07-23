@@ -13,6 +13,7 @@ import LeanTrominoes.GadgetAssembly
 import LeanTrominoes.GadgetBehavior
 import LeanTrominoes.GadgetColoring
 import LeanTrominoes.GadgetLibrary
+import LeanTrominoes.GadgetLPhaseTable
 import LeanTrominoes.GadgetOrientation
 import LeanTrominoes.GadgetOrientationBehavior
 import LeanTrominoes.GadgetPortRefinement
