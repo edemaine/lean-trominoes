@@ -152,6 +152,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/Tiling.lean`](LeanTrominoes/Tiling.lean) defines a tiling by
   requiring every placed tile to lie in the region and every region cell to
   have a unique covering placement.
+- [`LeanTrominoes/FootprintTiling.lean`](LeanTrominoes/FootprintTiling.lean)
+  proves that tromino tilings can equivalently be represented by their
+  geometric three-cell footprints, matching the boundary data used to compose
+  adjacent gadgets.
 - [`LeanTrominoes/Periodic.lean`](LeanTrominoes/Periodic.lean) represents a 2D
   `PeriodicRegion` by a finite motif and two full-rank period vectors.  Its
   1.5D analogue, `PeriodicStrip`, uses a finite motif in
