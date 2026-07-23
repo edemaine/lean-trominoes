@@ -19,6 +19,13 @@ def windowFootprints (tromino : Tromino)
   placements.image fun placement =>
     placement.cells (fun _ : Unit => tromino.cells)
 
+theorem mem_windowFootprints_iff (tromino : Tromino)
+    (placements : Finset (Placement Unit)) (footprint : Finset Cell) :
+    footprint ∈ windowFootprints tromino placements ↔
+      ∃ placement ∈ placements,
+        placement.cells (fun _ : Unit => tromino.cells) = footprint := by
+  exact Finset.mem_image
+
 /-- The geometric content of a valid open-window tiling. Every selected
 footprint is a tromino meeting the window, its visible cells are allowed, and
 the target region is covered exactly once. -/
@@ -42,6 +49,52 @@ noncomputable def globalWindowPlacements (tromino : Tromino)
   classical
   exact (windowCandidates tromino window).filter fun placement =>
     placement ∈ placements
+
+/-- A placement occurs in a finite global restriction exactly when it is
+globally selected and its footprint meets the window. -/
+theorem mem_globalWindowPlacements_iff (tromino : Tromino)
+    (window : Finset Cell) (placements : Set (Placement Unit))
+    (placement : Placement Unit) :
+    placement ∈ globalWindowPlacements tromino window placements ↔
+      placement ∈ placements ∧
+        ∃ cell ∈ window,
+          cell ∈ placement.cells (fun _ : Unit => tromino.cells) := by
+  classical
+  rw [globalWindowPlacements, Finset.mem_filter,
+    mem_windowCandidates_iff]
+  tauto
+
+/-- The footprints in a finite global restriction are exactly the globally
+selected placement footprints that meet the window. -/
+theorem mem_globalWindowFootprints_iff (tromino : Tromino)
+    (window : Finset Cell) (placements : Set (Placement Unit))
+    (footprint : Finset Cell) :
+    footprint ∈
+        windowFootprints tromino
+          (globalWindowPlacements tromino window placements) ↔
+      ∃ placement ∈ placements,
+        placement.cells (fun _ : Unit => tromino.cells) = footprint ∧
+          ∃ cell ∈ window, cell ∈ footprint := by
+  constructor
+  · intro footprintMember
+    obtain ⟨placement, placementMember, placementEquality⟩ :=
+      (mem_windowFootprints_iff tromino
+        (globalWindowPlacements tromino window placements) footprint).mp
+          footprintMember
+    have globalData := (mem_globalWindowPlacements_iff tromino window
+      placements placement).mp placementMember
+    refine ⟨placement, globalData.1, placementEquality, ?_⟩
+    obtain ⟨cell, cellInWindow, cellInPlacement⟩ := globalData.2
+    exact ⟨cell, cellInWindow, placementEquality ▸ cellInPlacement⟩
+  · rintro ⟨placement, placementSelected, placementEquality,
+      cell, cellInWindow, cellInFootprint⟩
+    apply (mem_windowFootprints_iff tromino
+      (globalWindowPlacements tromino window placements) footprint).mpr
+    refine ⟨placement, ?_, placementEquality⟩
+    apply (mem_globalWindowPlacements_iff tromino window placements
+      placement).mpr
+    exact ⟨placementSelected, cell, cellInWindow,
+      placementEquality.symm ▸ cellInFootprint⟩
 
 /-- Restricting a global tiling to a finite window gives an exact open-window
 tiling, provided the local target is exactly the global region inside that
@@ -466,6 +519,41 @@ theorem translateFootprint_zero (footprint : Finset Cell) :
 def translateFootprints (offset : Cell)
     (footprints : Finset (Finset Cell)) : Finset (Finset Cell) :=
   footprints.image (translateFootprint offset)
+
+/-- Forgetting placement representation commutes with translation. -/
+theorem windowFootprints_translatePlacements (tromino : Tromino)
+    (offset : Cell) (placements : Finset (Placement Unit)) :
+    windowFootprints tromino (translatePlacements offset placements) =
+      translateFootprints offset (windowFootprints tromino placements) := by
+  rw [windowFootprints, translatePlacements, Finset.image_image,
+    translateFootprints, windowFootprints, Finset.image_image]
+  apply Finset.image_congr
+  intro placement placementMember
+  simp only [Function.comp_apply, translatePlacement_cells]
+
+/-- Successive translations of a finite footprint family compose. -/
+theorem translateFootprints_translate (first second : Cell)
+    (footprints : Finset (Finset Cell)) :
+    translateFootprints first (translateFootprints second footprints) =
+      translateFootprints (Cell.add first second) footprints := by
+  rw [translateFootprints, translateFootprints, translateFootprints,
+    Finset.image_image]
+  apply Finset.image_congr
+  intro footprint footprintMember
+  exact translateFootprint_translate first second footprint
+
+@[simp]
+theorem translateFootprints_zero (footprints : Finset (Finset Cell)) :
+    translateFootprints (0, 0) footprints = footprints := by
+  ext footprint
+  simp only [translateFootprints, Finset.mem_image]
+  constructor
+  · rintro ⟨source, sourceMember, equality⟩
+    have sourceEquality : source = footprint := by
+      simpa only [translateFootprint_zero] using equality
+    exact sourceEquality ▸ sourceMember
+  · intro footprintMember
+    exact ⟨footprint, footprintMember, translateFootprint_zero footprint⟩
 
 /-- Exact geometric window covers are invariant under a common translation
 of the window, target region, and selected footprints. -/

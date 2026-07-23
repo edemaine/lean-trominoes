@@ -204,7 +204,10 @@ The representation choices for this target are:
   assignment is proved to glue into a tiling of the compiled periodic region.
   In the converse direction, every global tiling of that region is now proved
   to restrict and translate to a verified exact-cover state in each local
-  `6 × 6` gadget window; compatibility of those extracted states remains to
+  `6 × 6` gadget window.  The translated footprints of each extracted state
+  are characterized exactly as the globally selected footprints meeting that
+  block, which supplies geometric coherence independently of placement
+  representation.  Port compatibility of those extracted states remains to
   be established.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the

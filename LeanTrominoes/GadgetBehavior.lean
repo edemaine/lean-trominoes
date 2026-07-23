@@ -882,6 +882,15 @@ theorem inverseLatticeBlockOrigin_add_latticeBlockOrigin (location : Cell) :
     ring
 
 @[simp]
+theorem latticeBlockOrigin_add_inverseLatticeBlockOrigin (location : Cell) :
+    Cell.add (latticeBlockOrigin location)
+      (inverseLatticeBlockOrigin location) = (0, 0) := by
+  rcases location with ⟨horizontal, vertical⟩
+  apply Prod.ext <;>
+    simp only [inverseLatticeBlockOrigin, latticeBlockOrigin, Cell.add] <;>
+    ring
+
+@[simp]
 theorem translate_inverse_latticeBlockWindow (location : Cell) :
     translateFootprint (inverseLatticeBlockOrigin location)
       (latticeBlockWindow location) = rectangleCells 6 6 := by
@@ -933,6 +942,78 @@ theorem localPlacementsFromGlobal_isWindowTiling (tromino : Tromino)
         placements))
   simpa only [drawingBlockRegion, translate_inverse_latticeBlockWindow,
     translate_inverse_latticeBlockRegion] using translated
+
+/-- The local-state assignment obtained by restricting one global placement
+set to every lattice block. -/
+noncomputable def localAssignmentFromGlobal (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (placements : Set (Placement Unit)) :
+    LocalTilingAssignment tromino drawing :=
+  localPlacementsFromGlobal tromino placements
+
+/-- Translating an extracted local footprint back to its block coordinates
+recovers exactly the globally selected footprints meeting that block. -/
+theorem drawingBlockFootprints_localAssignmentFromGlobal (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (placements : Set (Placement Unit)) (location : Cell) :
+    drawingBlockFootprints tromino drawing
+        (localAssignmentFromGlobal tromino drawing placements) location =
+      windowFootprints tromino
+        (globalWindowPlacements tromino (latticeBlockWindow location)
+          placements) := by
+  rw [drawingBlockFootprints, localAssignmentFromGlobal,
+    localPlacementsFromGlobal, windowFootprints_translatePlacements,
+    translateFootprints_translate,
+    latticeBlockOrigin_add_inverseLatticeBlockOrigin,
+    translateFootprints_zero]
+
+/-- Membership in the extracted global-coordinate footprint set has the
+expected representation-free characterization. -/
+theorem mem_drawingBlockFootprints_localAssignmentFromGlobal_iff
+    (tromino : Tromino) (drawing : PeriodicOrthogonalDrawing)
+    (placements : Set (Placement Unit)) (location : Cell)
+    (footprint : Finset Cell) :
+    footprint ∈ drawingBlockFootprints tromino drawing
+        (localAssignmentFromGlobal tromino drawing placements) location ↔
+      ∃ placement ∈ placements,
+        placement.cells (fun _ : Unit => tromino.cells) = footprint ∧
+          ∃ cell ∈ latticeBlockWindow location, cell ∈ footprint := by
+  rw [drawingBlockFootprints_localAssignmentFromGlobal]
+  exact mem_globalWindowFootprints_iff tromino (latticeBlockWindow location)
+    placements footprint
+
+/-- Any block footprint family characterized by a common selected placement
+set and intersection with the block windows is geometrically coherent. -/
+theorem isGeometricallyCoherent_of_mem_iff (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (placements : Set (Placement Unit))
+    (membership : ∀ location footprint,
+      footprint ∈ drawingBlockFootprints tromino drawing assignment location ↔
+        ∃ placement ∈ placements,
+          placement.cells (fun _ : Unit => tromino.cells) = footprint ∧
+            ∃ cell ∈ latticeBlockWindow location, cell ∈ footprint) :
+    IsGeometricallyCoherent tromino drawing assignment := by
+  intro first second footprint footprintMember meetsSecond
+  obtain ⟨placement, placementSelected, placementEquality, meetsFirst⟩ :=
+    (membership first footprint).mp footprintMember
+  exact (membership second footprint).mpr
+      ⟨placement, placementSelected, placementEquality, meetsSecond⟩
+
+/-- A global tiling makes all of its extracted local states members of the
+verified exact-cover tables. -/
+theorem localAssignmentFromGlobal_isLocallyTiled (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (placements : Set (Placement Unit))
+    (tiling : LeanTrominoes.IsTiling (fun _ : Unit => tromino.cells)
+      (drawing.periodicRegion tromino).carrier placements) :
+    IsLocallyTiled tromino drawing
+      (localAssignmentFromGlobal tromino drawing placements) := by
+  intro location
+  apply (mem_exactCellTilings_iff tromino (drawing.getAt location)
+    (localAssignmentFromGlobal tromino drawing placements location)).mpr
+  exact localPlacementsFromGlobal_isWindowTiling tromino drawing placements
+    tiling location
 
 /-- A locally exact and geometrically coherent assignment instantiates the
 abstract footprint atlas. -/
