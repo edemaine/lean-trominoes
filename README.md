@@ -294,6 +294,22 @@ The representation choices for this target are:
   `iHasOrientation_of_hasCompatibleGadgetTiling`: every compatible Figure 12
   assignment over a well-formed vertex-separated drawing induces a valid
   graph orientation.
+- [`LeanTrominoes/GadgetIPortRefinement.lean`](LeanTrominoes/GadgetIPortRefinement.lean)
+  retains the exact Figure 12 boundary footprints forgotten by the Boolean
+  orientation and proves that every coherent selection of viable I-port
+  states lifts to compatible exact local I-tromino tilings.
+- [`LeanTrominoes/GadgetIPhaseTable.lean`](LeanTrominoes/GadgetIPhaseTable.lean)
+  isolates the only remaining local ambiguity: straight vertical I wires
+  admit an optional neutral phase in addition to their visibly directed
+  phase.  Removing that redundant phase preserves every legal local
+  orientation.  An exhaustive certificate proves that preferred states with
+  complementary directions have exactly equal geometric ports.
+- [`LeanTrominoes/GadgetIPhaseLift.lean`](LeanTrominoes/GadgetIPhaseLift.lean)
+  selects a preferred state at every drawing cell; the certified port law
+  makes these arbitrary local choices globally coherent.  It proves
+  completeness and combines it with soundness to discharge the full Figure
+  12 theorem `iOrientationBehaviorCorrect` on normalized vertex-separated
+  drawings.
 - [`LeanTrominoes/GadgetPortRefinement.lean`](LeanTrominoes/GadgetPortRefinement.lean)
   retains the geometric phase forgotten by the Boolean L-port value.  It
   proves that a compatible local L-tromino assignment is exactly a valid
