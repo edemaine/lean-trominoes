@@ -8,6 +8,7 @@ import LeanTrominoes.GadgetLibrary
 import LeanTrominoes.GadgetOrientation
 import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetWire
+import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
 

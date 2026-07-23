@@ -183,6 +183,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetOrientation.lean`](LeanTrominoes/GadgetOrientation.lean)
   extracts those vectors from local exact tilings and proves that every target
   pixel receives a unique center-to-pixel vector.
+- [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
+  defines the finite toroidal normalized source drawings, colored port
+  matching, and their global 1-in-3 / 0-or-3 orientation predicate.
 - [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
   these definitions with `LeanWang.CoREComplete` into the formal target.
 
