@@ -125,6 +125,24 @@ def IsGeometricallyCoherent (tromino : Tromino)
       (∃ cell ∈ latticeBlockWindow second, cell ∈ footprint) →
         footprint ∈ drawingBlockFootprints tromino drawing assignment second
 
+/-- Any block footprint family characterized by a common selected placement
+set and intersection with the block windows is geometrically coherent. -/
+theorem isGeometricallyCoherent_of_mem_iff (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (placements : Set (Placement Unit))
+    (membership : ∀ location footprint,
+      footprint ∈ drawingBlockFootprints tromino drawing assignment location ↔
+        ∃ placement ∈ placements,
+          placement.cells (fun _ : Unit => tromino.cells) = footprint ∧
+            ∃ cell ∈ latticeBlockWindow location, cell ∈ footprint) :
+    IsGeometricallyCoherent tromino drawing assignment := by
+  intro first second footprint footprintMember meetsSecond
+  obtain ⟨placement, placementSelected, placementEquality, meetsFirst⟩ :=
+    (membership first footprint).mp footprintMember
+  exact (membership second footprint).mpr
+      ⟨placement, placementSelected, placementEquality, meetsSecond⟩
+
 /-- Every selected global-coordinate block footprint is a genuine tromino and
 meets the block in which it was selected. -/
 theorem drawingBlockFootprint_shape_and_meets (tromino : Tromino)
@@ -150,6 +168,611 @@ theorem drawingBlockFootprint_shape_and_meets (tromino : Tromino)
   simpa only [orthogonalCellGadget, paperGadget, Gadget.window,
     latticeBlockWindow] using
       translatedTiling.meetsWindow footprint translatedMember
+
+/-- A selected local footprint is a tromino meeting the paper window and it
+cannot occupy any window corner, because every Figure 11/12 mask omits them. -/
+theorem localFootprint_geometry (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (location : Cell) (footprint : Finset Cell)
+    (footprintMember : footprint ∈
+      windowFootprints tromino (assignment location)) :
+    tromino.IsFootprint footprint ∧
+      (∃ cell ∈ rectangleCells 6 6, cell ∈ footprint) ∧
+      (0, 0) ∉ footprint ∧ (5, 0) ∉ footprint ∧
+      (0, 5) ∉ footprint ∧ (5, 5) ∉ footprint := by
+  have placementTiling :=
+    (mem_exactCellTilings_iff tromino (drawing.getAt location)
+      (assignment location)).mp (locallyTiled location)
+  have footprintTiling := placementTiling.isWindowFootprintTiling
+  have cornerMask :=
+    orthogonalCellPixels_corners_absent tromino (drawing.getAt location)
+  have cornerAbsent (corner : Cell)
+      (cornerInWindow : corner ∈
+        (orthogonalCellGadget tromino (drawing.getAt location)).window)
+      (cornerNotInRegion : corner ∉
+        (orthogonalCellGadget tromino (drawing.getAt location)).region) :
+      corner ∉ footprint := by
+    intro cornerMember
+    apply cornerNotInRegion
+    exact footprintTiling.visibleInside footprint footprintMember
+      (Finset.mem_inter.mpr ⟨cornerMember, cornerInWindow⟩)
+  have topLeftWindow : (0, 0) ∈
+      (orthogonalCellGadget tromino (drawing.getAt location)).window := by
+    simp [orthogonalCellGadget, paperGadget, Gadget.window,
+      mem_rectangleCells_iff]
+  have topRightWindow : (5, 0) ∈
+      (orthogonalCellGadget tromino (drawing.getAt location)).window := by
+    simp [orthogonalCellGadget, paperGadget, Gadget.window,
+      mem_rectangleCells_iff]
+  have bottomLeftWindow : (0, 5) ∈
+      (orthogonalCellGadget tromino (drawing.getAt location)).window := by
+    simp [orthogonalCellGadget, paperGadget, Gadget.window,
+      mem_rectangleCells_iff]
+  have bottomRightWindow : (5, 5) ∈
+      (orthogonalCellGadget tromino (drawing.getAt location)).window := by
+    simp [orthogonalCellGadget, paperGadget, Gadget.window,
+      mem_rectangleCells_iff]
+  refine ⟨footprintTiling.isFootprint footprint footprintMember,
+    ?_, ?_, ?_, ?_, ?_⟩
+  · simpa only [orthogonalCellGadget, paperGadget, Gadget.window] using
+      footprintTiling.meetsWindow footprint footprintMember
+  · apply cornerAbsent (0, 0) topLeftWindow
+    simpa only [orthogonalCellGadget, paperGadget, Gadget.region] using
+      cornerMask.1
+  · apply cornerAbsent (5, 0) topRightWindow
+    simpa only [orthogonalCellGadget, paperGadget, Gadget.region] using
+      cornerMask.2.1
+  · apply cornerAbsent (0, 5) bottomLeftWindow
+    simpa only [orthogonalCellGadget, paperGadget, Gadget.region] using
+      cornerMask.2.2.1
+  · apply cornerAbsent (5, 5) bottomRightWindow
+    simpa only [orthogonalCellGadget, paperGadget, Gadget.region] using
+      cornerMask.2.2.2
+
+@[simp]
+theorem translate_east_neighbor_window (location : Cell) :
+    translateFootprint (latticeBlockOrigin location)
+        (translateFootprint (6, 0) (rectangleCells 6 6)) =
+      latticeBlockWindow
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .east) := by
+  rw [translateFootprint_translate, latticeBlockWindow]
+  congr 1
+  apply Prod.ext <;>
+    simp [latticeBlockOrigin, PeriodicOrthogonalDrawing.latticeNeighbor,
+      Cell.add] ;
+    ring
+
+@[simp]
+theorem translate_west_neighbor_window (location : Cell) :
+    translateFootprint (latticeBlockOrigin location)
+        (translateFootprint (-6, 0) (rectangleCells 6 6)) =
+      latticeBlockWindow
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .west) := by
+  rw [translateFootprint_translate, latticeBlockWindow]
+  congr 1
+  apply Prod.ext <;>
+    simp [latticeBlockOrigin, PeriodicOrthogonalDrawing.latticeNeighbor,
+      Cell.add] ;
+    ring
+
+@[simp]
+theorem translate_south_neighbor_window (location : Cell) :
+    translateFootprint (latticeBlockOrigin location)
+        (translateFootprint (0, 6) (rectangleCells 6 6)) =
+      latticeBlockWindow
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .south) := by
+  rw [translateFootprint_translate, latticeBlockWindow]
+  congr 1
+  apply Prod.ext <;>
+    simp [latticeBlockOrigin, PeriodicOrthogonalDrawing.latticeNeighbor,
+      Cell.add] ;
+    ring
+
+@[simp]
+theorem translate_north_neighbor_window (location : Cell) :
+    translateFootprint (latticeBlockOrigin location)
+        (translateFootprint (0, -6) (rectangleCells 6 6)) =
+      latticeBlockWindow
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .north) := by
+  rw [translateFootprint_translate, latticeBlockWindow]
+  congr 1
+  apply Prod.ext <;>
+    simp [latticeBlockOrigin, PeriodicOrthogonalDrawing.latticeNeighbor,
+      Cell.add] ;
+    ring
+
+/-! ## Adjacent footprint propagation from geometric coherence -/
+
+/-- Coherence propagates an east-crossing local footprint to the eastern
+neighbor's local coordinates. -/
+theorem east_footprint_mem_of_coherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (coherent : IsGeometricallyCoherent tromino drawing assignment)
+    (location : Cell) (footprint : Finset Cell)
+    (footprintMember : footprint ∈
+      windowFootprints tromino (assignment location))
+    (crosses : crossesRight 6 footprint) :
+    translateFootprint (-6, 0) footprint ∈ windowFootprints tromino
+      (assignment
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .east)) := by
+  have geometry := localFootprint_geometry tromino drawing assignment
+    locallyTiled location footprint footprintMember
+  have meetsLocalEast :=
+    Tromino.IsFootprint.meets_east_neighbor_of_corners_absent geometry.1
+      geometry.2.1 geometry.2.2.2.1 geometry.2.2.2.2.2 crosses
+  let globalFootprint :=
+    translateFootprint (latticeBlockOrigin location) footprint
+  have globalMember : globalFootprint ∈
+      drawingBlockFootprints tromino drawing assignment location := by
+    exact Finset.mem_image.mpr ⟨footprint, footprintMember, rfl⟩
+  have meetsGlobalEast : ∃ cell ∈ latticeBlockWindow
+      (PeriodicOrthogonalDrawing.latticeNeighbor location .east),
+      cell ∈ globalFootprint := by
+    obtain ⟨cell, cellInEastWindow, cellInFootprint⟩ := meetsLocalEast
+    refine ⟨Cell.add (latticeBlockOrigin location) cell, ?_, ?_⟩
+    · rw [← translate_east_neighbor_window location]
+      exact (add_mem_translateFootprint_iff (latticeBlockOrigin location) cell
+        (translateFootprint (6, 0) (rectangleCells 6 6))).mpr
+          cellInEastWindow
+    · exact (add_mem_translateFootprint_iff (latticeBlockOrigin location)
+        cell footprint).mpr cellInFootprint
+  have globalEast := coherent location
+    (PeriodicOrthogonalDrawing.latticeNeighbor location .east)
+    globalFootprint globalMember meetsGlobalEast
+  obtain ⟨eastFootprint, eastMember, eastEquality⟩ :=
+    Finset.mem_image.mp globalEast
+  have expectedEquality :
+      translateFootprint
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .east))
+          (translateFootprint (-6, 0) footprint) = globalFootprint := by
+    rw [translateFootprint_translate]
+    have offsetEquality :
+        Cell.add
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .east))
+          (-6, 0) = latticeBlockOrigin location := by
+      apply Prod.ext <;>
+        simp [latticeBlockOrigin,
+          PeriodicOrthogonalDrawing.latticeNeighbor, Cell.add] ;
+        ring
+    rw [offsetEquality]
+  have eastFootprintEquality :
+      eastFootprint = translateFootprint (-6, 0) footprint := by
+    apply translateFootprint_injective
+      (latticeBlockOrigin
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .east))
+    exact eastEquality.trans expectedEquality.symm
+  exact eastFootprintEquality ▸ eastMember
+
+/-- Coherence propagates a west-crossing local footprint to the western
+neighbor's local coordinates. -/
+theorem west_footprint_mem_of_coherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (coherent : IsGeometricallyCoherent tromino drawing assignment)
+    (location : Cell) (footprint : Finset Cell)
+    (footprintMember : footprint ∈
+      windowFootprints tromino (assignment location))
+    (crosses : crossesLeft footprint) :
+    translateFootprint (6, 0) footprint ∈ windowFootprints tromino
+      (assignment
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .west)) := by
+  have geometry := localFootprint_geometry tromino drawing assignment
+    locallyTiled location footprint footprintMember
+  have meetsLocalWest :=
+    Tromino.IsFootprint.meets_west_neighbor_of_corners_absent geometry.1
+      geometry.2.1 geometry.2.2.1 geometry.2.2.2.2.1 crosses
+  let globalFootprint :=
+    translateFootprint (latticeBlockOrigin location) footprint
+  have globalMember : globalFootprint ∈
+      drawingBlockFootprints tromino drawing assignment location := by
+    exact Finset.mem_image.mpr ⟨footprint, footprintMember, rfl⟩
+  have meetsGlobalWest : ∃ cell ∈ latticeBlockWindow
+      (PeriodicOrthogonalDrawing.latticeNeighbor location .west),
+      cell ∈ globalFootprint := by
+    obtain ⟨cell, cellInWestWindow, cellInFootprint⟩ := meetsLocalWest
+    refine ⟨Cell.add (latticeBlockOrigin location) cell, ?_, ?_⟩
+    · rw [← translate_west_neighbor_window location]
+      exact (add_mem_translateFootprint_iff (latticeBlockOrigin location) cell
+        (translateFootprint (-6, 0) (rectangleCells 6 6))).mpr
+          cellInWestWindow
+    · exact (add_mem_translateFootprint_iff (latticeBlockOrigin location)
+        cell footprint).mpr cellInFootprint
+  have globalWest := coherent location
+    (PeriodicOrthogonalDrawing.latticeNeighbor location .west)
+    globalFootprint globalMember meetsGlobalWest
+  obtain ⟨westFootprint, westMember, westEquality⟩ :=
+    Finset.mem_image.mp globalWest
+  have expectedEquality :
+      translateFootprint
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .west))
+          (translateFootprint (6, 0) footprint) = globalFootprint := by
+    rw [translateFootprint_translate]
+    have offsetEquality :
+        Cell.add
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .west))
+          (6, 0) = latticeBlockOrigin location := by
+      apply Prod.ext <;>
+        simp [latticeBlockOrigin,
+          PeriodicOrthogonalDrawing.latticeNeighbor, Cell.add] ;
+        ring
+    rw [offsetEquality]
+  have westFootprintEquality :
+      westFootprint = translateFootprint (6, 0) footprint := by
+    apply translateFootprint_injective
+      (latticeBlockOrigin
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .west))
+    exact westEquality.trans expectedEquality.symm
+  exact westFootprintEquality ▸ westMember
+
+/-- Coherence propagates a south-crossing local footprint to the southern
+neighbor's local coordinates. -/
+theorem south_footprint_mem_of_coherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (coherent : IsGeometricallyCoherent tromino drawing assignment)
+    (location : Cell) (footprint : Finset Cell)
+    (footprintMember : footprint ∈
+      windowFootprints tromino (assignment location))
+    (crosses : crossesSouth 6 footprint) :
+    translateFootprint (0, -6) footprint ∈ windowFootprints tromino
+      (assignment
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .south)) := by
+  have geometry := localFootprint_geometry tromino drawing assignment
+    locallyTiled location footprint footprintMember
+  have meetsLocalSouth :=
+    Tromino.IsFootprint.meets_south_neighbor_of_corners_absent geometry.1
+      geometry.2.1 geometry.2.2.2.2.1 geometry.2.2.2.2.2 crosses
+  let globalFootprint :=
+    translateFootprint (latticeBlockOrigin location) footprint
+  have globalMember : globalFootprint ∈
+      drawingBlockFootprints tromino drawing assignment location := by
+    exact Finset.mem_image.mpr ⟨footprint, footprintMember, rfl⟩
+  have meetsGlobalSouth : ∃ cell ∈ latticeBlockWindow
+      (PeriodicOrthogonalDrawing.latticeNeighbor location .south),
+      cell ∈ globalFootprint := by
+    obtain ⟨cell, cellInSouthWindow, cellInFootprint⟩ := meetsLocalSouth
+    refine ⟨Cell.add (latticeBlockOrigin location) cell, ?_, ?_⟩
+    · rw [← translate_south_neighbor_window location]
+      exact (add_mem_translateFootprint_iff (latticeBlockOrigin location) cell
+        (translateFootprint (0, 6) (rectangleCells 6 6))).mpr
+          cellInSouthWindow
+    · exact (add_mem_translateFootprint_iff (latticeBlockOrigin location)
+        cell footprint).mpr cellInFootprint
+  have globalSouth := coherent location
+    (PeriodicOrthogonalDrawing.latticeNeighbor location .south)
+    globalFootprint globalMember meetsGlobalSouth
+  obtain ⟨southFootprint, southMember, southEquality⟩ :=
+    Finset.mem_image.mp globalSouth
+  have expectedEquality :
+      translateFootprint
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .south))
+          (translateFootprint (0, -6) footprint) = globalFootprint := by
+    rw [translateFootprint_translate]
+    have offsetEquality :
+        Cell.add
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .south))
+          (0, -6) = latticeBlockOrigin location := by
+      apply Prod.ext <;>
+        simp [latticeBlockOrigin,
+          PeriodicOrthogonalDrawing.latticeNeighbor, Cell.add] ;
+        ring
+    rw [offsetEquality]
+  have southFootprintEquality :
+      southFootprint = translateFootprint (0, -6) footprint := by
+    apply translateFootprint_injective
+      (latticeBlockOrigin
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .south))
+    exact southEquality.trans expectedEquality.symm
+  exact southFootprintEquality ▸ southMember
+
+/-- Coherence propagates a north-crossing local footprint to the northern
+neighbor's local coordinates. -/
+theorem north_footprint_mem_of_coherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (coherent : IsGeometricallyCoherent tromino drawing assignment)
+    (location : Cell) (footprint : Finset Cell)
+    (footprintMember : footprint ∈
+      windowFootprints tromino (assignment location))
+    (crosses : crossesNorth footprint) :
+    translateFootprint (0, 6) footprint ∈ windowFootprints tromino
+      (assignment
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .north)) := by
+  have geometry := localFootprint_geometry tromino drawing assignment
+    locallyTiled location footprint footprintMember
+  have meetsLocalNorth :=
+    Tromino.IsFootprint.meets_north_neighbor_of_corners_absent geometry.1
+      geometry.2.1 geometry.2.2.1 geometry.2.2.2.1 crosses
+  let globalFootprint :=
+    translateFootprint (latticeBlockOrigin location) footprint
+  have globalMember : globalFootprint ∈
+      drawingBlockFootprints tromino drawing assignment location := by
+    exact Finset.mem_image.mpr ⟨footprint, footprintMember, rfl⟩
+  have meetsGlobalNorth : ∃ cell ∈ latticeBlockWindow
+      (PeriodicOrthogonalDrawing.latticeNeighbor location .north),
+      cell ∈ globalFootprint := by
+    obtain ⟨cell, cellInNorthWindow, cellInFootprint⟩ := meetsLocalNorth
+    refine ⟨Cell.add (latticeBlockOrigin location) cell, ?_, ?_⟩
+    · rw [← translate_north_neighbor_window location]
+      exact (add_mem_translateFootprint_iff (latticeBlockOrigin location) cell
+        (translateFootprint (0, -6) (rectangleCells 6 6))).mpr
+          cellInNorthWindow
+    · exact (add_mem_translateFootprint_iff (latticeBlockOrigin location)
+        cell footprint).mpr cellInFootprint
+  have globalNorth := coherent location
+    (PeriodicOrthogonalDrawing.latticeNeighbor location .north)
+    globalFootprint globalMember meetsGlobalNorth
+  obtain ⟨northFootprint, northMember, northEquality⟩ :=
+    Finset.mem_image.mp globalNorth
+  have expectedEquality :
+      translateFootprint
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .north))
+          (translateFootprint (0, 6) footprint) = globalFootprint := by
+    rw [translateFootprint_translate]
+    have offsetEquality :
+        Cell.add
+          (latticeBlockOrigin
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .north))
+          (0, 6) = latticeBlockOrigin location := by
+      apply Prod.ext <;>
+        simp [latticeBlockOrigin,
+          PeriodicOrthogonalDrawing.latticeNeighbor, Cell.add] ;
+        ring
+    rw [offsetEquality]
+  have northFootprintEquality :
+      northFootprint = translateFootprint (0, 6) footprint := by
+    apply translateFootprint_injective
+      (latticeBlockOrigin
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .north))
+    exact northEquality.trans expectedEquality.symm
+  exact northFootprintEquality ▸ northMember
+
+/-- Locally exact, geometrically coherent states have equal east/west ports. -/
+theorem horizontallyCompatible_of_coherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (coherent : IsGeometricallyCoherent tromino drawing assignment)
+    (location : Cell) :
+    HorizontallyCompatible
+      (portConfiguration tromino
+        (orthogonalCellGadget tromino (drawing.getAt location))
+        (assignment location))
+      (portConfiguration tromino
+        (orthogonalCellGadget tromino
+          (drawing.getAt
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .east)))
+        (assignment
+          (PeriodicOrthogonalDrawing.latticeNeighbor location .east))) := by
+  unfold HorizontallyCompatible
+  rw [portConfiguration_eq_footprintPortConfiguration,
+    portConfiguration_eq_footprintPortConfiguration]
+  change rightPortState 6
+      (footprintBoundary (rectangleCells 6 6)
+        (windowFootprints tromino (assignment location))) =
+    leftPortState
+      (footprintBoundary (rectangleCells 6 6)
+        (windowFootprints tromino
+          (assignment
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .east))))
+  ext normalized
+  simp only [rightPortState, leftPortState, footprintBoundary,
+    Finset.mem_image, Finset.mem_filter]
+  constructor
+  · rintro ⟨source, ⟨⟨sourceMember, sourceOutside⟩, sourceCrosses⟩,
+      sourceEquality⟩
+    have shiftedMember := east_footprint_mem_of_coherent tromino drawing
+      assignment locallyTiled coherent location source sourceMember sourceCrosses
+    have shiftedEquality :
+        translateFootprint (-6, 0) source = normalized := by
+      norm_num at sourceEquality ⊢
+      exact sourceEquality
+    rw [shiftedEquality] at shiftedMember
+    have sourceGeometry := localFootprint_geometry tromino drawing assignment
+      locallyTiled location source sourceMember
+    obtain ⟨inside, insideInWindow, insideMember⟩ := sourceGeometry.2.1
+    have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+    have shiftedInside : Cell.add (-6, 0) inside ∈ normalized := by
+      rw [← sourceEquality]
+      exact (add_mem_translateFootprint_iff (-6, 0) inside source).mpr
+        insideMember
+    have normalizedCrosses : crossesLeft normalized := by
+      exact ⟨Cell.add (-6, 0) inside, shiftedInside, by
+        simp only [Cell.add]
+        omega⟩
+    have normalizedOutside : ¬ normalized ⊆ rectangleCells 6 6 := by
+      intro subset
+      have insideShiftedWindow := subset shiftedInside
+      have shiftedBounds :=
+        (mem_rectangleCells_iff 6 6 (Cell.add (-6, 0) inside)).mp
+          insideShiftedWindow
+      simp only [Cell.add] at shiftedBounds
+      omega
+    exact ⟨⟨shiftedMember, normalizedOutside⟩, normalizedCrosses⟩
+  · rintro ⟨⟨normalizedMember, normalizedOutside⟩, normalizedCrosses⟩
+    let east := PeriodicOrthogonalDrawing.latticeNeighbor location .east
+    have shiftedMember := west_footprint_mem_of_coherent tromino drawing
+      assignment locallyTiled coherent east normalized normalizedMember
+        normalizedCrosses
+    have shiftedMemberAtLocation : translateFootprint (6, 0) normalized ∈
+        windowFootprints tromino (assignment location) := by
+      have neighborEquality :
+          PeriodicOrthogonalDrawing.latticeNeighbor east .west = location := by
+        simpa only [east, Side.opposite] using
+          PeriodicOrthogonalDrawing.latticeNeighbor_opposite location .east
+      rw [neighborEquality] at shiftedMember
+      exact shiftedMember
+    have normalizedGeometry := localFootprint_geometry tromino drawing assignment
+      locallyTiled east normalized normalizedMember
+    obtain ⟨inside, insideInWindow, insideMember⟩ := normalizedGeometry.2.1
+    have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+    have shiftedInside : Cell.add (6, 0) inside ∈
+        translateFootprint (6, 0) normalized :=
+      (add_mem_translateFootprint_iff (6, 0) inside normalized).mpr insideMember
+    have shiftedCrosses :
+        crossesRight 6 (translateFootprint (6, 0) normalized) := by
+      exact ⟨Cell.add (6, 0) inside, shiftedInside, by
+        simp only [Cell.add]
+        omega⟩
+    have shiftedOutside :
+        ¬ translateFootprint (6, 0) normalized ⊆ rectangleCells 6 6 := by
+      intro subset
+      have shiftedInWindow := subset shiftedInside
+      have shiftedBounds :=
+        (mem_rectangleCells_iff 6 6 (Cell.add (6, 0) inside)).mp
+          shiftedInWindow
+      simp only [Cell.add] at shiftedBounds
+      omega
+    refine ⟨translateFootprint (6, 0) normalized,
+      ⟨⟨shiftedMemberAtLocation, shiftedOutside⟩, shiftedCrosses⟩, ?_⟩
+    rw [translateFootprint_translate]
+    simp [Cell.add]
+
+/-- Locally exact, geometrically coherent states have equal south/north ports. -/
+theorem verticallyCompatible_of_coherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (coherent : IsGeometricallyCoherent tromino drawing assignment)
+    (location : Cell) :
+    VerticallyCompatible
+      (portConfiguration tromino
+        (orthogonalCellGadget tromino (drawing.getAt location))
+        (assignment location))
+      (portConfiguration tromino
+        (orthogonalCellGadget tromino
+          (drawing.getAt
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .south)))
+        (assignment
+          (PeriodicOrthogonalDrawing.latticeNeighbor location .south))) := by
+  unfold VerticallyCompatible
+  rw [portConfiguration_eq_footprintPortConfiguration,
+    portConfiguration_eq_footprintPortConfiguration]
+  change southPortState 6
+      (footprintBoundary (rectangleCells 6 6)
+        (windowFootprints tromino (assignment location))) =
+    northPortState
+      (footprintBoundary (rectangleCells 6 6)
+        (windowFootprints tromino
+          (assignment
+            (PeriodicOrthogonalDrawing.latticeNeighbor location .south))))
+  ext normalized
+  simp only [southPortState, northPortState, footprintBoundary,
+    Finset.mem_image, Finset.mem_filter]
+  constructor
+  · rintro ⟨source, ⟨⟨sourceMember, sourceOutside⟩, sourceCrosses⟩,
+      sourceEquality⟩
+    have shiftedMember := south_footprint_mem_of_coherent tromino drawing
+      assignment locallyTiled coherent location source sourceMember sourceCrosses
+    have shiftedEquality :
+        translateFootprint (0, -6) source = normalized := by
+      norm_num at sourceEquality ⊢
+      exact sourceEquality
+    rw [shiftedEquality] at shiftedMember
+    have sourceGeometry := localFootprint_geometry tromino drawing assignment
+      locallyTiled location source sourceMember
+    obtain ⟨inside, insideInWindow, insideMember⟩ := sourceGeometry.2.1
+    have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+    have shiftedInside : Cell.add (0, -6) inside ∈ normalized := by
+      rw [← shiftedEquality]
+      exact (add_mem_translateFootprint_iff (0, -6) inside source).mpr
+        insideMember
+    have normalizedCrosses : crossesNorth normalized := by
+      exact ⟨Cell.add (0, -6) inside, shiftedInside, by
+        simp only [Cell.add]
+        omega⟩
+    have normalizedOutside : ¬ normalized ⊆ rectangleCells 6 6 := by
+      intro subset
+      have shiftedInWindow := subset shiftedInside
+      have shiftedBounds :=
+        (mem_rectangleCells_iff 6 6 (Cell.add (0, -6) inside)).mp
+          shiftedInWindow
+      simp only [Cell.add] at shiftedBounds
+      omega
+    exact ⟨⟨shiftedMember, normalizedOutside⟩, normalizedCrosses⟩
+  · rintro ⟨⟨normalizedMember, normalizedOutside⟩, normalizedCrosses⟩
+    let south := PeriodicOrthogonalDrawing.latticeNeighbor location .south
+    have shiftedMember := north_footprint_mem_of_coherent tromino drawing
+      assignment locallyTiled coherent south normalized normalizedMember
+        normalizedCrosses
+    have shiftedMemberAtLocation : translateFootprint (0, 6) normalized ∈
+        windowFootprints tromino (assignment location) := by
+      have neighborEquality :
+          PeriodicOrthogonalDrawing.latticeNeighbor south .north = location := by
+        simpa only [south, Side.opposite] using
+          PeriodicOrthogonalDrawing.latticeNeighbor_opposite location .south
+      rw [neighborEquality] at shiftedMember
+      exact shiftedMember
+    have normalizedGeometry := localFootprint_geometry tromino drawing assignment
+      locallyTiled south normalized normalizedMember
+    obtain ⟨inside, insideInWindow, insideMember⟩ := normalizedGeometry.2.1
+    have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+    have shiftedInside : Cell.add (0, 6) inside ∈
+        translateFootprint (0, 6) normalized :=
+      (add_mem_translateFootprint_iff (0, 6) inside normalized).mpr insideMember
+    have shiftedCrosses :
+        crossesSouth 6 (translateFootprint (0, 6) normalized) := by
+      exact ⟨Cell.add (0, 6) inside, shiftedInside, by
+        simp only [Cell.add]
+        omega⟩
+    have shiftedOutside :
+        ¬ translateFootprint (0, 6) normalized ⊆ rectangleCells 6 6 := by
+      intro subset
+      have shiftedInWindow := subset shiftedInside
+      have shiftedBounds :=
+        (mem_rectangleCells_iff 6 6 (Cell.add (0, 6) inside)).mp
+          shiftedInWindow
+      simp only [Cell.add] at shiftedBounds
+      omega
+    refine ⟨translateFootprint (0, 6) normalized,
+      ⟨⟨shiftedMemberAtLocation, shiftedOutside⟩, shiftedCrosses⟩, ?_⟩
+    rw [translateFootprint_translate]
+    simp [Cell.add]
+
+/-- Geometric coherence and exact local covers are equivalent to the port
+matching condition in the direction needed to restrict global tilings. -/
+theorem isPortCompatible_of_geometricallyCoherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (coherent : IsGeometricallyCoherent tromino drawing assignment) :
+    IsPortCompatible tromino drawing assignment :=
+  ⟨horizontallyCompatible_of_coherent tromino drawing assignment
+      locallyTiled coherent,
+    verticallyCompatible_of_coherent tromino drawing assignment
+      locallyTiled coherent⟩
+
+/-- A common selected-placement characterization is a convenient sufficient
+condition for port compatibility. -/
+theorem isPortCompatible_of_mem_iff (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (placements : Set (Placement Unit))
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (membership : ∀ location footprint,
+      footprint ∈ drawingBlockFootprints tromino drawing assignment location ↔
+        ∃ placement ∈ placements,
+          placement.cells (fun _ : Unit => tromino.cells) = footprint ∧
+            ∃ cell ∈ latticeBlockWindow location, cell ∈ footprint) :
+    IsPortCompatible tromino drawing assignment :=
+  isPortCompatible_of_geometricallyCoherent tromino drawing assignment
+    locallyTiled
+    (isGeometricallyCoherent_of_mem_iff tromino drawing assignment placements
+      membership)
 
 /-! ## Adjacent footprint propagation from port equality -/
 
@@ -982,24 +1605,6 @@ theorem mem_drawingBlockFootprints_localAssignmentFromGlobal_iff
   exact mem_globalWindowFootprints_iff tromino (latticeBlockWindow location)
     placements footprint
 
-/-- Any block footprint family characterized by a common selected placement
-set and intersection with the block windows is geometrically coherent. -/
-theorem isGeometricallyCoherent_of_mem_iff (tromino : Tromino)
-    (drawing : PeriodicOrthogonalDrawing)
-    (assignment : LocalTilingAssignment tromino drawing)
-    (placements : Set (Placement Unit))
-    (membership : ∀ location footprint,
-      footprint ∈ drawingBlockFootprints tromino drawing assignment location ↔
-        ∃ placement ∈ placements,
-          placement.cells (fun _ : Unit => tromino.cells) = footprint ∧
-            ∃ cell ∈ latticeBlockWindow location, cell ∈ footprint) :
-    IsGeometricallyCoherent tromino drawing assignment := by
-  intro first second footprint footprintMember meetsSecond
-  obtain ⟨placement, placementSelected, placementEquality, meetsFirst⟩ :=
-    (membership first footprint).mp footprintMember
-  exact (membership second footprint).mpr
-      ⟨placement, placementSelected, placementEquality, meetsSecond⟩
-
 /-- A global tiling makes all of its extracted local states members of the
 verified exact-cover tables. -/
 theorem localAssignmentFromGlobal_isLocallyTiled (tromino : Tromino)
@@ -1014,6 +1619,20 @@ theorem localAssignmentFromGlobal_isLocallyTiled (tromino : Tromino)
     (localAssignmentFromGlobal tromino drawing placements location)).mpr
   exact localPlacementsFromGlobal_isWindowTiling tromino drawing placements
     tiling location
+
+/-- The states extracted from one global tiling have matching adjacent ports. -/
+theorem localAssignmentFromGlobal_isPortCompatible (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (placements : Set (Placement Unit))
+    (tiling : LeanTrominoes.IsTiling (fun _ : Unit => tromino.cells)
+      (drawing.periodicRegion tromino).carrier placements) :
+    IsPortCompatible tromino drawing
+      (localAssignmentFromGlobal tromino drawing placements) := by
+  exact isPortCompatible_of_mem_iff tromino drawing
+    (localAssignmentFromGlobal tromino drawing placements) placements
+    (localAssignmentFromGlobal_isLocallyTiled tromino drawing placements tiling)
+    (mem_drawingBlockFootprints_localAssignmentFromGlobal_iff tromino drawing
+      placements)
 
 /-- A locally exact and geometrically coherent assignment instantiates the
 abstract footprint atlas. -/
@@ -1092,6 +1711,29 @@ theorem periodicRegion_tileable_of_hasCompatibleGadgetTiling
   exact periodicRegion_tileable_of_portCompatible tromino drawing assignment
     locallyTiled compatible
 
+/-- Conversely, a tiling of the compiled region restricts to a compatible
+verified local state at every drawing cell. -/
+theorem hasCompatibleGadgetTiling_of_periodicRegion_tileable
+    (tromino : Tromino) (drawing : PeriodicOrthogonalDrawing)
+    (tileable : tromino.Tileable (drawing.periodicRegion tromino).carrier) :
+    HasCompatibleGadgetTiling tromino drawing := by
+  change ∃ placements : Set (Placement Unit),
+    LeanTrominoes.IsTiling (fun _ : Unit => tromino.cells)
+      (drawing.periodicRegion tromino).carrier placements at tileable
+  obtain ⟨placements, tiling⟩ := tileable
+  exact ⟨localAssignmentFromGlobal tromino drawing placements,
+    localAssignmentFromGlobal_isLocallyTiled tromino drawing placements tiling,
+    localAssignmentFromGlobal_isPortCompatible tromino drawing placements
+      tiling⟩
+
+/-- Exact geometric correctness of the Figure 11/12 block substitution. -/
+theorem hasCompatibleGadgetTiling_iff_periodicRegion_tileable
+    (tromino : Tromino) (drawing : PeriodicOrthogonalDrawing) :
+    HasCompatibleGadgetTiling tromino drawing ↔
+      tromino.Tileable (drawing.periodicRegion tromino).carrier :=
+  ⟨periodicRegion_tileable_of_hasCompatibleGadgetTiling tromino drawing,
+    hasCompatibleGadgetTiling_of_periodicRegion_tileable tromino drawing⟩
+
 /-- The finite-state correctness goal for Figures 11 and 12. -/
 def OrientationBehaviorCorrect (tromino : Tromino) : Prop :=
   ∀ drawing : PeriodicOrthogonalDrawing,
@@ -1102,6 +1744,12 @@ def SubstitutionAssemblyCorrect (tromino : Tromino) : Prop :=
   ∀ drawing : PeriodicOrthogonalDrawing,
     HasCompatibleGadgetTiling tromino drawing ↔
       tromino.Tileable (drawing.periodicRegion tromino).carrier
+
+/-- The geometric assembly correctness goal is fully discharged for both
+trominoes. -/
+theorem substitutionAssemblyCorrect (tromino : Tromino) :
+    SubstitutionAssemblyCorrect tromino :=
+  hasCompatibleGadgetTiling_iff_periodicRegion_tileable tromino
 
 end Gadget
 end LeanTrominoes

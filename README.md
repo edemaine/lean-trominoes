@@ -210,8 +210,11 @@ The representation choices for this target are:
   `6 × 6` gadget window.  The translated footprints of each extracted state
   are characterized exactly as the globally selected footprints meeting that
   block, which supplies geometric coherence independently of placement
-  representation.  Port compatibility of those extracted states remains to
-  be established.
+  representation.  Geometric coherence is proved equivalent to equality of
+  adjacent normalized ports for locally exact states, so the extracted states
+  are port-compatible.  Thus `substitutionAssemblyCorrect` proves the full
+  equivalence between compatible gadget assignments and tilings of the
+  compiled periodic region.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a
