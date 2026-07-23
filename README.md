@@ -165,6 +165,10 @@ The representation choices for this target are:
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Space is the total number of occupied stack cells, and hardness
   uses polynomial-time many-one reductions.
+- [`LeanTrominoes/FiniteState.lean`](LeanTrominoes/FiniteState.lean) proves the
+  pumping fact underlying the 1.5D upper bound: a finite transition system has
+  a bi-infinite path exactly when it has a nonempty directed cycle.  The strip
+  argument will instantiate its states with bounded tiling frontiers.
 - [`LeanTrominoes/Gadget.lean`](LeanTrominoes/Gadget.lean) and
   [`LeanTrominoes/ExactCover.lean`](LeanTrominoes/ExactCover.lean) define
   open gadget windows and a verified exact-cover enumerator for their local

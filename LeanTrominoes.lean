@@ -2,6 +2,7 @@ import LeanTrominoes.Assignment
 import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
 import LeanTrominoes.FiniteSearch
+import LeanTrominoes.FiniteState
 import LeanTrominoes.FootprintTiling
 import LeanTrominoes.Gadget
 import LeanTrominoes.GadgetAssembly
