@@ -139,6 +139,70 @@ theorem portConfiguration_eq_footprintPortConfiguration (tromino : Tromino)
 
 /-! ## Elementary tromino-footprint geometry -/
 
+/-- Two cells coincide or share one grid edge. -/
+def Cell.NeighborOrEqual (first second : Cell) : Prop :=
+  first = second ∨
+    second = (first.1 + 1, first.2) ∨
+    second = (first.1 - 1, first.2) ∨
+    second = (first.1, first.2 + 1) ∨
+    second = (first.1, first.2 - 1)
+
+/-- Every tromino has a distinguished middle cell within one grid step of
+each of its cells: the middle segment of I, or the elbow of L. -/
+theorem Tromino.IsFootprint.exists_middle {tromino : Tromino}
+    {footprint : Finset Cell} (shape : tromino.IsFootprint footprint)
+    {first second : Cell} (firstMember : first ∈ footprint)
+    (secondMember : second ∈ footprint) :
+    ∃ middle ∈ footprint,
+      Cell.NeighborOrEqual first middle ∧
+        Cell.NeighborOrEqual middle second := by
+  obtain ⟨placement, rfl⟩ := shape
+  rcases placement with ⟨kind, symmetry, offset⟩
+  rcases kind with ⟨⟩
+  rw [Placement.mem_cells_iff] at firstMember secondMember
+  obtain ⟨firstSource, firstSourceMember, firstEquality⟩ := firstMember
+  obtain ⟨secondSource, secondSourceMember, secondEquality⟩ := secondMember
+  cases tromino with
+  | I =>
+      let middle := Cell.add offset (symmetry.act (1, 0))
+      have middleMember : middle ∈
+          (Placement.mk () symmetry offset).cells
+            (fun _ : Unit => Tromino.I.cells) := by
+        rw [Placement.mem_cells_iff]
+        exact ⟨(1, 0), by simp [Tromino.cells], rfl⟩
+      refine ⟨middle, middleMember, ?_, ?_⟩
+      · rw [← firstEquality]
+        simp [Tromino.cells] at firstSourceMember
+        rcases firstSourceMember with (rfl | rfl | rfl) <;>
+          cases symmetry <;>
+          simp [middle, Cell.NeighborOrEqual, SquareSymmetry.act, Cell.add] <;>
+          omega
+      · rw [← secondEquality]
+        simp [Tromino.cells] at secondSourceMember
+        rcases secondSourceMember with (rfl | rfl | rfl) <;>
+          cases symmetry <;>
+          simp [middle, Cell.NeighborOrEqual, SquareSymmetry.act, Cell.add] <;>
+          omega
+  | L =>
+      let middle := Cell.add offset (symmetry.act (0, 0))
+      have middleMember : middle ∈
+          (Placement.mk () symmetry offset).cells
+            (fun _ : Unit => Tromino.L.cells) := by
+        rw [Placement.mem_cells_iff]
+        exact ⟨(0, 0), by simp [Tromino.cells], rfl⟩
+      refine ⟨middle, middleMember, ?_, ?_⟩
+      · rw [← firstEquality]
+        simp [Tromino.cells] at firstSourceMember
+        rcases firstSourceMember with (rfl | rfl | rfl) <;>
+          cases symmetry <;>
+          simp [middle, Cell.NeighborOrEqual, SquareSymmetry.act, Cell.add]
+      · rw [← secondEquality]
+        simp [Tromino.cells] at secondSourceMember
+        rcases secondSourceMember with (rfl | rfl | rfl) <;>
+          cases symmetry <;>
+          simp [middle, Cell.NeighborOrEqual, SquareSymmetry.act, Cell.add] <;>
+          omega
+
 /-- Any two cells of one I- or L-tromino footprint differ by at most two in
 each coordinate. -/
 theorem Tromino.IsFootprint.coordinate_bounds {tromino : Tromino}
@@ -388,6 +452,58 @@ theorem Tromino.IsFootprint.latticeBlock_bounds {tromino : Tromino}
   have secondVertical := congrArg Prod.snd secondEquality
   simp only [latticeBlockOrigin, Cell.add] at firstHorizontal firstVertical secondHorizontal secondVertical
   omega
+
+/-- Equal or edge-neighboring cells lie in equal or edge-neighboring lattice
+blocks. -/
+theorem latticeBlocks_neighborOrEqual {firstBlock secondBlock : Cell}
+    {firstCell secondCell : Cell}
+    (firstCellInWindow : firstCell ∈ latticeBlockWindow firstBlock)
+    (secondCellInWindow : secondCell ∈ latticeBlockWindow secondBlock)
+    (near : Cell.NeighborOrEqual firstCell secondCell) :
+    Cell.NeighborOrEqual firstBlock secondBlock := by
+  rcases firstBlock with ⟨firstHorizontalIndex, firstVerticalIndex⟩
+  rcases secondBlock with ⟨secondHorizontalIndex, secondVerticalIndex⟩
+  obtain ⟨firstLocal, firstLocalMember, firstEquality⟩ :=
+    Finset.mem_image.mp firstCellInWindow
+  obtain ⟨secondLocal, secondLocalMember, secondEquality⟩ :=
+    Finset.mem_image.mp secondCellInWindow
+  have firstBounds := (mem_rectangleCells_iff 6 6 firstLocal).mp firstLocalMember
+  have secondBounds := (mem_rectangleCells_iff 6 6 secondLocal).mp secondLocalMember
+  have firstHorizontal := congrArg Prod.fst firstEquality
+  have firstVertical := congrArg Prod.snd firstEquality
+  have secondHorizontal := congrArg Prod.fst secondEquality
+  have secondVertical := congrArg Prod.snd secondEquality
+  simp only [latticeBlockOrigin, Cell.add] at firstHorizontal firstVertical secondHorizontal secondVertical
+  rcases near with (equality | east | west | south | north)
+  · have nearHorizontal := congrArg Prod.fst equality
+    have nearVertical := congrArg Prod.snd equality
+    unfold Cell.NeighborOrEqual
+    simp only [Prod.mk.injEq]
+    omega
+  · have nearHorizontal := congrArg Prod.fst east
+    have nearVertical := congrArg Prod.snd east
+    simp only at nearHorizontal nearVertical
+    unfold Cell.NeighborOrEqual
+    simp only [Prod.mk.injEq]
+    omega
+  · have nearHorizontal := congrArg Prod.fst west
+    have nearVertical := congrArg Prod.snd west
+    simp only at nearHorizontal nearVertical
+    unfold Cell.NeighborOrEqual
+    simp only [Prod.mk.injEq]
+    omega
+  · have nearHorizontal := congrArg Prod.fst south
+    have nearVertical := congrArg Prod.snd south
+    simp only at nearHorizontal nearVertical
+    unfold Cell.NeighborOrEqual
+    simp only [Prod.mk.injEq]
+    omega
+  · have nearHorizontal := congrArg Prod.fst north
+    have nearVertical := congrArg Prod.snd north
+    simp only at nearHorizontal nearVertical
+    unfold Cell.NeighborOrEqual
+    simp only [Prod.mk.injEq]
+    omega
 
 /-! ## Abstract local-to-global gluing -/
 

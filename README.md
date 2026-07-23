@@ -198,6 +198,8 @@ The representation choices for this target are:
   the four corresponding neighboring block boundaries.  The footprint
   geometry is bounded mechanically from the two prototiles: a tromino can
   meet only its selected block and the eight immediately neighboring blocks.
+  Consequently, every locally exact, port-compatible infinite gadget
+  assignment is proved to glue into a tiling of the compiled periodic region.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a

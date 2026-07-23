@@ -115,6 +115,16 @@ def drawingBlockFootprints (tromino : Tromino)
   translateFootprints (latticeBlockOrigin location)
     (windowFootprints tromino (assignment location))
 
+/-- Every selected tromino footprint occurs in every lattice block that it
+meets. -/
+def IsGeometricallyCoherent (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing) : Prop :=
+  ∀ first second footprint,
+    footprint ∈ drawingBlockFootprints tromino drawing assignment first →
+      (∃ cell ∈ latticeBlockWindow second, cell ∈ footprint) →
+        footprint ∈ drawingBlockFootprints tromino drawing assignment second
+
 /-- Every selected global-coordinate block footprint is a genuine tromino and
 meets the block in which it was selected. -/
 theorem drawingBlockFootprint_shape_and_meets (tromino : Tromino)
@@ -663,6 +673,72 @@ theorem drawingBlockFootprint_mem_north (tromino : Tromino)
       ring
   rw [offsetEquality, globalEquality]
 
+/-- The four directional propagation lemmas packaged for a block that is
+equal to or edge-neighboring the current block. -/
+theorem drawingBlockFootprint_mem_neighborOrEqual (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (compatible : IsPortCompatible tromino drawing assignment)
+    (first second : Cell) (footprint : Finset Cell)
+    (footprintMember :
+      footprint ∈ drawingBlockFootprints tromino drawing assignment first)
+    (near : Cell.NeighborOrEqual first second)
+    (meetsSecond : ∃ cell ∈ latticeBlockWindow second, cell ∈ footprint) :
+    footprint ∈ drawingBlockFootprints tromino drawing assignment second := by
+  rcases near with (same | east | west | south | north)
+  · subst second
+    exact footprintMember
+  · subst second
+    simpa [PeriodicOrthogonalDrawing.latticeNeighbor] using
+      drawingBlockFootprint_mem_east tromino drawing assignment compatible
+        first footprint footprintMember meetsSecond
+  · subst second
+    simpa [PeriodicOrthogonalDrawing.latticeNeighbor] using
+      drawingBlockFootprint_mem_west tromino drawing assignment compatible
+        first footprint footprintMember meetsSecond
+  · subst second
+    simpa [PeriodicOrthogonalDrawing.latticeNeighbor] using
+      drawingBlockFootprint_mem_south tromino drawing assignment compatible
+        first footprint footprintMember meetsSecond
+  · subst second
+    simpa [PeriodicOrthogonalDrawing.latticeNeighbor] using
+      drawingBlockFootprint_mem_north tromino drawing assignment compatible
+        first footprint footprintMember meetsSecond
+
+/-- Pairwise port compatibility implies the full geometric footprint
+coherence required by the atlas gluing theorem. -/
+theorem isGeometricallyCoherent_of_portCompatible (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (compatible : IsPortCompatible tromino drawing assignment) :
+    IsGeometricallyCoherent tromino drawing assignment := by
+  intro first second footprint footprintMember meetsSecond
+  obtain ⟨shape, meetsFirst⟩ :=
+    drawingBlockFootprint_shape_and_meets tromino drawing assignment
+      locallyTiled first footprint footprintMember
+  obtain ⟨firstCell, firstCellInWindow, firstCellMember⟩ := meetsFirst
+  obtain ⟨secondCell, secondCellInWindow, secondCellMember⟩ := meetsSecond
+  obtain ⟨middle, middleMember, firstNearMiddle, middleNearSecond⟩ :=
+    Tromino.IsFootprint.exists_middle shape firstCellMember secondCellMember
+  obtain ⟨middleBlock, middleCellInWindow⟩ :=
+    latticeBlockWindows_cover middle
+  have firstBlockNearMiddle : Cell.NeighborOrEqual first middleBlock :=
+    latticeBlocks_neighborOrEqual firstCellInWindow middleCellInWindow
+      firstNearMiddle
+  have middleMemberSelected :
+      footprint ∈ drawingBlockFootprints tromino drawing assignment
+        middleBlock :=
+    drawingBlockFootprint_mem_neighborOrEqual tromino drawing assignment
+      compatible first middleBlock footprint footprintMember
+      firstBlockNearMiddle ⟨middle, middleCellInWindow, middleMember⟩
+  have middleBlockNearSecond : Cell.NeighborOrEqual middleBlock second :=
+    latticeBlocks_neighborOrEqual middleCellInWindow secondCellInWindow
+      middleNearSecond
+  exact drawingBlockFootprint_mem_neighborOrEqual tromino drawing assignment
+    compatible middleBlock second footprint middleMemberSelected
+    middleBlockNearSecond ⟨secondCell, secondCellInWindow, secondCellMember⟩
+
 /-! ## Geometric realization on the lattice-block atlas -/
 
 /-- The paper mask translated into the `6 × 6` block at one cell of the
@@ -671,16 +747,6 @@ def drawingBlockRegion (tromino : Tromino)
     (drawing : PeriodicOrthogonalDrawing) (location : Cell) : Finset Cell :=
   latticeBlockRegion location
     (orthogonalCellPixels tromino (drawing.getAt location)).toFinset
-
-/-- Port agreement must ultimately imply this geometric condition: every
-selected tromino footprint occurs in every lattice block that it meets. -/
-def IsGeometricallyCoherent (tromino : Tromino)
-    (drawing : PeriodicOrthogonalDrawing)
-    (assignment : LocalTilingAssignment tromino drawing) : Prop :=
-  ∀ first second footprint,
-    footprint ∈ drawingBlockFootprints tromino drawing assignment first →
-      (∃ cell ∈ latticeBlockWindow second, cell ∈ footprint) →
-        footprint ∈ drawingBlockFootprints tromino drawing assignment second
 
 /-- The infinite union of all translated Figure 11/12 pixel masks. -/
 def liftedGadgetCarrier (tromino : Tromino)
@@ -814,6 +880,27 @@ theorem periodicRegion_tileable_of_coherent (tromino : Tromino)
   rw [liftedGadgetCarrier_eq_expandedCarrier,
     ← PeriodicOrthogonalDrawing.periodicRegion_carrier_eq] at tiling
   exact tiling
+
+/-- Locally exact states with matching adjacent ports tile the compiled
+periodic region. -/
+theorem periodicRegion_tileable_of_portCompatible (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (compatible : IsPortCompatible tromino drawing assignment) :
+    tromino.Tileable (drawing.periodicRegion tromino).carrier :=
+  periodicRegion_tileable_of_coherent tromino drawing assignment locallyTiled
+    (isGeometricallyCoherent_of_portCompatible tromino drawing assignment
+      locallyTiled compatible)
+
+/-- Forward geometric correctness of the infinite compatible gadget system. -/
+theorem periodicRegion_tileable_of_hasCompatibleGadgetTiling
+    (tromino : Tromino) (drawing : PeriodicOrthogonalDrawing)
+    (compatibleTiling : HasCompatibleGadgetTiling tromino drawing) :
+    tromino.Tileable (drawing.periodicRegion tromino).carrier := by
+  obtain ⟨assignment, locallyTiled, compatible⟩ := compatibleTiling
+  exact periodicRegion_tileable_of_portCompatible tromino drawing assignment
+    locallyTiled compatible
 
 /-- The finite-state correctness goal for Figures 11 and 12. -/
 def OrientationBehaviorCorrect (tromino : Tromino) : Prop :=
