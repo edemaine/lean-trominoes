@@ -195,9 +195,12 @@ The representation choices for this target are:
   proves the converse, including alignment of an arbitrary path's cyclic
   phase with actual strip coordinates.  Thus a well-formed periodic strip is
   tileable exactly when its finite sparse-frontier graph has a directed
-  cycle of length at most the number of frontier states.  This already proves
-  decidability; turning the search into the explicit polynomial-space Turing
-  machine required by `Complexity.InPSPACE` remains the upper-bound task.
+  cycle of length at most the number of frontier states.  Its executable
+  decision procedure now uses the verified logarithmic-depth cycle search,
+  rather than enumerating and retaining a full cycle.  Turning this algorithm
+  and the sparse state-count estimate into the explicit polynomial-space
+  Turing machine required by `Complexity.InPSPACE` remains the upper-bound
+  task.
 - [`LeanTrominoes/Gadget.lean`](LeanTrominoes/Gadget.lean) and
   [`LeanTrominoes/ExactCover.lean`](LeanTrominoes/ExactCover.lean) define
   open gadget windows and a verified exact-cover enumerator for their local

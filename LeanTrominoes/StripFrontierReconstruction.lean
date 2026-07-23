@@ -1,4 +1,4 @@
-import LeanTrominoes.FiniteStateSearch
+import LeanTrominoes.FiniteStateCycleSearch
 import LeanTrominoes.StripFrontierCorrectness
 
 /-!
@@ -440,17 +440,34 @@ theorem periodicStripTrominoTiling_iff_hasBoundedCycle
   rw [periodicStripTrominoTiling_iff_hasCycle,
     FiniteState.hasCycle_iff_hasBoundedCycle]
 
-/-- Periodic strip tromino tiling is decidable by bounded finite-state cycle
-search.  The stronger polynomial-space cost bound is proved separately. -/
+/-- Executable sparse-frontier decision procedure for periodic strip
+tromino tiling.  Its cycle test uses logarithmic-depth reachability rather
+than storing an entire cycle certificate. -/
+def periodicStripTrominoTilingBool
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) : Bool :=
+  periodicStrip.wellFormed &&
+    FiniteState.cycleSearchBool
+      (Transition tromino :
+        WindowState periodicStrip → WindowState periodicStrip → Prop)
+
+theorem periodicStripTrominoTilingBool_eq_true_iff
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    periodicStripTrominoTilingBool tromino periodicStrip = true ↔
+      PeriodicStripTrominoTiling tromino periodicStrip := by
+  rw [periodicStripTrominoTilingBool, Bool.and_eq_true,
+    periodicStrip.wellFormed_eq_true_iff,
+    FiniteState.cycleSearchBool_eq_true_iff,
+    periodicStripTrominoTiling_iff_hasCycle]
+
+/-- Periodic strip tromino tiling is decidable by the verified
+logarithmic-depth sparse-frontier cycle search.  The stronger
+polynomial-space machine bound is proved separately. -/
 instance periodicStripTrominoTilingDecidable
     (tromino : Tromino) (periodicStrip : PeriodicStrip) :
     Decidable (PeriodicStripTrominoTiling tromino periodicStrip) :=
   decidable_of_iff
-    (periodicStrip.IsWellFormed ∧
-      FiniteState.HasBoundedCycle
-        (Transition tromino :
-          WindowState periodicStrip → WindowState periodicStrip → Prop))
-    (periodicStripTrominoTiling_iff_hasBoundedCycle
-      tromino periodicStrip).symm
+    (periodicStripTrominoTilingBool tromino periodicStrip = true)
+    (periodicStripTrominoTilingBool_eq_true_iff
+      tromino periodicStrip)
 
 end LeanTrominoes.PeriodicStrip.WindowState
