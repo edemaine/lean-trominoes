@@ -26,6 +26,72 @@ def globalCellPortTable (tromino : Tromino) :
     (exactCellPortConfigurations tromino cellType).image fun configuration =>
       (cellType, configuration)
 
+/-- The four geometric ports selected by one local assignment state. -/
+def selectedPortConfiguration (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (location : Cell) : PortConfiguration :=
+  portConfiguration tromino
+    (orthogonalCellGadget tromino (drawing.getAt location))
+    (assignment location)
+
+/-- A locally exact assignment state contributes an entry to the complete
+finite port table. -/
+theorem selectedPortEntry_mem_global (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (location : Cell) :
+    (drawing.getAt location, selectedPortConfiguration tromino drawing
+      assignment location) ∈ globalCellPortTable tromino := by
+  apply Finset.mem_biUnion.mpr
+  refine ⟨drawing.getAt location, Finset.mem_univ _, ?_⟩
+  apply Finset.mem_image.mpr
+  refine ⟨selectedPortConfiguration tromino drawing assignment location,
+    ?_, rfl⟩
+  apply (mem_exactCellPortConfigurations_iff tromino
+    (drawing.getAt location) _).mpr
+  refine ⟨assignment location, ?_, rfl⟩
+  exact (mem_exactCellTilings_iff tromino (drawing.getAt location)
+    (assignment location)).mp (locallyTiled location)
+
+/-- Port compatibility gives equality on any requested side, including west
+and north by applying the stored east/south condition at the neighbor. -/
+theorem selectedPortConfiguration_neighbor (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (compatible : IsPortCompatible tromino drawing assignment)
+    (location : Cell) (side : Side) :
+    (selectedPortConfiguration tromino drawing assignment location).get side =
+      (selectedPortConfiguration tromino drawing assignment
+        (PeriodicOrthogonalDrawing.latticeNeighbor location side)).get
+          side.opposite := by
+  cases side with
+  | east => exact compatible.1 location
+  | south => exact compatible.2 location
+  | west =>
+      have neighborCompatibility := compatible.1
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .west)
+      have back : PeriodicOrthogonalDrawing.latticeNeighbor
+          (PeriodicOrthogonalDrawing.latticeNeighbor location .west) .east =
+          location := by
+        simp [PeriodicOrthogonalDrawing.latticeNeighbor]
+      rw [back] at neighborCompatibility
+      simpa [selectedPortConfiguration, HorizontallyCompatible,
+        PortConfiguration.get, Side.opposite] using
+        neighborCompatibility.symm
+  | north =>
+      have neighborCompatibility := compatible.2
+        (PeriodicOrthogonalDrawing.latticeNeighbor location .north)
+      have back : PeriodicOrthogonalDrawing.latticeNeighbor
+          (PeriodicOrthogonalDrawing.latticeNeighbor location .north) .south =
+          location := by
+        simp [PeriodicOrthogonalDrawing.latticeNeighbor]
+      rw [back] at neighborCompatibility
+      simpa [selectedPortConfiguration, VerticallyCompatible,
+        PortConfiguration.get, Side.opposite] using
+        neighborCompatibility.symm
+
 /-- One side of a local state has a potential matching neighbor in the
 current table, or is empty when the drawing cell has no edge on that side. -/
 def CellPortEntrySupported
@@ -152,6 +218,70 @@ instance (table : Finset (OrthogonalCellType × PortConfiguration)) :
   unfold TableUnusedPortsEmpty
   infer_instance
 
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 1000000 in
+/-- Every unused side in the complete raw Figure 11 table has an empty
+geometric port. -/
+theorem lGlobalCellPortTable_unused :
+    TableUnusedPortsEmpty (globalCellPortTable .L) := by
+  native_decide
+
+/-- Actual neighboring states witness one-step support for every side of a
+locally exact, port-compatible assignment. -/
+theorem selectedPortEntry_supported (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (wellFormed : drawing.IsWellFormed)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (compatible : IsPortCompatible tromino drawing assignment)
+    (rawUnused : TableUnusedPortsEmpty (globalCellPortTable tromino))
+    (location : Cell) (side : Side) :
+    CellPortEntrySupported (globalCellPortTable tromino)
+      (drawing.getAt location,
+        selectedPortConfiguration tromino drawing assignment location) side := by
+  cases colorMatch : (drawing.getAt location).portColor side with
+  | none =>
+      unfold CellPortEntrySupported
+      rw [colorMatch]
+      exact rawUnused
+        ⟨_, selectedPortEntry_mem_global tromino drawing assignment
+          locallyTiled location⟩ side colorMatch
+  | some color =>
+      unfold CellPortEntrySupported
+      rw [colorMatch]
+      let neighborLocation :=
+        PeriodicOrthogonalDrawing.latticeNeighbor location side
+      let neighborEntry : OrthogonalCellType × PortConfiguration :=
+        (drawing.getAt neighborLocation,
+          selectedPortConfiguration tromino drawing assignment neighborLocation)
+      refine ⟨⟨neighborEntry, ?_⟩, ?_, ?_⟩
+      · exact selectedPortEntry_mem_global tromino drawing assignment
+          locallyTiled neighborLocation
+      · have colors := drawing.portColor_latticeNeighbor_eq
+          wellFormed location side
+        rw [colorMatch] at colors
+        exact colors.symm
+      · exact selectedPortConfiguration_neighbor tromino drawing assignment
+          compatible location side
+
+/-- Every state used by an actual well-formed compatible assignment belongs
+to the supported finite core. -/
+theorem selectedPortEntry_mem_supported (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (wellFormed : drawing.IsWellFormed)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (compatible : IsPortCompatible tromino drawing assignment)
+    (rawUnused : TableUnusedPortsEmpty (globalCellPortTable tromino))
+    (location : Cell) :
+    (drawing.getAt location, selectedPortConfiguration tromino drawing
+      assignment location) ∈ supportedCellPortTable tromino := by
+  apply Finset.mem_filter.mpr
+  exact ⟨selectedPortEntry_mem_global tromino drawing assignment
+      locallyTiled location,
+    selectedPortEntry_supported tromino drawing wellFormed assignment
+      locallyTiled compatible rawUnused location⟩
+
 /-- The finite local properties needed from the Figure 11 L-tromino gadget
 library. -/
 def LLocalOrientationTableCorrect : Prop :=
@@ -169,6 +299,54 @@ set_option maxHeartbeats 1000000 in
 /-- Exhaustive certificate for all Figure 11 local states. -/
 theorem lLocalOrientationTableCorrect : LLocalOrientationTableCorrect := by
   native_decide
+
+/-- The orientation read from every local state of an L-gadget assignment. -/
+def lOrientationFromAssignment (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment .L drawing) : drawing.Orientation :=
+  fun location => lConfigurationInward (drawing.getAt location)
+    (selectedPortConfiguration .L drawing assignment location)
+
+/-- A compatible Figure 11 assignment over a well-formed drawing induces a
+valid trichromatic graph orientation. -/
+theorem lIsOrientation_of_compatibleAssignment
+    (drawing : PeriodicOrthogonalDrawing)
+    (wellFormed : drawing.IsWellFormed)
+    (assignment : LocalTilingAssignment .L drawing)
+    (locallyTiled : IsLocallyTiled .L drawing assignment)
+    (compatible : IsPortCompatible .L drawing assignment) :
+    drawing.IsOrientation (lOrientationFromAssignment drawing assignment) := by
+  constructor
+  · intro location
+    have sound : LTableOrientationSound (supportedCellPortTable .L) :=
+      lLocalOrientationTableCorrect.1
+    exact sound ⟨_, selectedPortEntry_mem_supported .L drawing
+      wellFormed assignment locallyTiled compatible
+      lGlobalCellPortTable_unused location⟩
+  · intro location side active
+    cases colorMatch : (drawing.getAt location).portColor side with
+    | none => simp [colorMatch] at active
+    | some color =>
+        have neighborColor := drawing.portColor_latticeNeighbor_eq
+          wellFormed location side
+        rw [colorMatch] at neighborColor
+        have ports := selectedPortConfiguration_neighbor .L drawing
+          assignment compatible location side
+        simp only [lOrientationFromAssignment, lConfigurationInward,
+          colorMatch, neighborColor.symm]
+        rw [← ports]
+        exact lPortInward_opposite color side _
+
+/-- Soundness half of Figure 11 gadget behavior: on well-formed normalized
+drawings, compatible local L-tromino states imply an orientation. -/
+theorem lHasOrientation_of_hasCompatibleGadgetTiling
+    (drawing : PeriodicOrthogonalDrawing)
+    (wellFormed : drawing.IsWellFormed)
+    (compatibleTiling : HasCompatibleGadgetTiling .L drawing) :
+    drawing.HasOrientation := by
+  obtain ⟨assignment, locallyTiled, compatible⟩ := compatibleTiling
+  exact ⟨wellFormed, assignment |> lOrientationFromAssignment drawing,
+    lIsOrientation_of_compatibleAssignment drawing wellFormed assignment
+      locallyTiled compatible⟩
 
 end Gadget
 end LeanTrominoes

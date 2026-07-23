@@ -180,6 +180,45 @@ theorem residue_add_period {periodPred : Nat}
   rw [modulo]
   simp
 
+/-- Residue projection commutes with adding one in the finite cyclic index. -/
+@[simp]
+theorem residue_add_one (coordinate : Int) (periodPred : Nat) :
+    residue (coordinate + 1) periodPred = residue coordinate periodPred + 1 := by
+  let modulus : Int := periodPred + 1
+  have modulusPos : 0 < modulus := by simp [modulus]
+  have modulusToNat : modulus.toNat = periodPred + 1 := by simp [modulus]
+  have remainderNonnegative : 0 ≤ coordinate % modulus :=
+    Int.emod_nonneg coordinate (by omega)
+  have remainderBelow : (coordinate % modulus).toNat < periodPred + 1 := by
+    rw [Int.toNat_lt (Int.emod_nonneg coordinate (by omega))]
+    exact Int.emod_lt_of_pos coordinate modulusPos
+  have oneRemainder : (1 % modulus).toNat = 1 % (periodPred + 1) := by
+    rw [Int.toNat_emod (by omega) (le_of_lt modulusPos)]
+    simp [modulus]
+  apply Fin.ext
+  simp only [residue, Fin.add_def, Fin.val_mk]
+  rw [Int.add_emod]
+  change ((coordinate % modulus + 1 % modulus) % modulus).toNat = _
+  rw [Int.toNat_emod]
+  · rw [Int.toNat_add remainderNonnegative
+        (Int.emod_nonneg 1 (by omega)), oneRemainder]
+    rw [Nat.add_mod]
+    rw [modulusToNat, Nat.mod_eq_of_lt remainderBelow]
+    simp [modulus]
+  · exact Int.add_nonneg remainderNonnegative
+      (Int.emod_nonneg 1 (by omega))
+  · omega
+
+/-- Residue projection commutes with subtracting one in the finite cyclic
+index. -/
+@[simp]
+theorem residue_sub_one (coordinate : Int) (periodPred : Nat) :
+    residue (coordinate - 1) periodPred = residue coordinate periodPred - 1 := by
+  have addOne := residue_add_one (coordinate - 1) periodPred
+  simp only [sub_add_cancel] at addOne
+  rw [addOne]
+  simp
+
 /-- Project an arbitrary cell of the infinite periodic lift to the stored
 finite toroidal fundamental domain. -/
 def positionAt (drawing : PeriodicOrthogonalDrawing) (location : Cell) :
@@ -213,6 +252,25 @@ def latticeNeighbor (location : Cell) : Side → Cell
   | .east => (location.1 + 1, location.2)
   | .south => (location.1, location.2 + 1)
   | .west => (location.1 - 1, location.2)
+
+/-- Moving in the infinite lift commutes with projection to the finite
+toroidal fundamental domain. -/
+@[simp]
+theorem positionAt_latticeNeighbor (drawing : PeriodicOrthogonalDrawing)
+    (location : Cell) (side : Side) :
+    drawing.positionAt (latticeNeighbor location side) =
+      drawing.neighbor (drawing.positionAt location) side := by
+  cases side <;> apply Prod.ext <;>
+    simp [positionAt, latticeNeighbor, neighbor]
+
+/-- Finite well-formedness gives matching port colors at every adjacent pair
+in the infinite periodic lift. -/
+theorem portColor_latticeNeighbor_eq (drawing : PeriodicOrthogonalDrawing)
+    (wellFormed : drawing.IsWellFormed) (location : Cell) (side : Side) :
+    (drawing.getAt location).portColor side =
+      (drawing.getAt (latticeNeighbor location side)).portColor side.opposite := by
+  rw [getAt, getAt, positionAt_latticeNeighbor]
+  exact wellFormed.2 (drawing.positionAt location) side
 
 @[simp]
 theorem latticeNeighbor_opposite (location : Cell) (side : Side) :

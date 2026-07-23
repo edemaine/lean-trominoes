@@ -227,6 +227,10 @@ The representation choices for this target are:
   the local Figure 11 behavior for L trominoes.  Every supported state obeys
   its wire/vertex orientation rule, every legal local orientation is
   represented, and equal ports on opposite sides encode complementary values.
+  These certificates are lifted to the full infinite assignment:
+  `lHasOrientation_of_hasCompatibleGadgetTiling` proves that every compatible
+  Figure 11 assignment over a well-formed normalized drawing induces a valid
+  graph orientation.
   The corresponding I-tromino table needs a context-sensitive phase argument:
   unlike the L table, its supported port states do not admit one universal
   Boolean labeling.
