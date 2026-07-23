@@ -329,6 +329,23 @@ theorem orthogonalCellPixels_nodup (tromino : Tromino)
   | trichromaticVertex order =>
       exact trichromaticVertexCells_nodup tromino order
 
+/-- Every Figure 11/12 mask leaves all four corners of its `6 × 6` window
+empty.  This prevents a boundary tromino from passing only diagonally between
+blocks without also meeting the intervening cardinal neighbor. -/
+theorem orthogonalCellPixels_corners_absent (tromino : Tromino)
+    (cellType : OrthogonalCellType) :
+    (0, 0) ∉ (orthogonalCellPixels tromino cellType).toFinset ∧
+      (5, 0) ∉ (orthogonalCellPixels tromino cellType).toFinset ∧
+      (0, 5) ∉ (orthogonalCellPixels tromino cellType).toFinset ∧
+      (5, 5) ∉ (orthogonalCellPixels tromino cellType).toFinset := by
+  cases tromino <;>
+    cases cellType with
+    | blank => native_decide
+    | wire axis color => cases axis <;> cases color <;> native_decide
+    | bend bend color => cases bend <;> cases color <;> native_decide
+    | monochromaticVertex color => cases color <;> native_decide
+    | trichromaticVertex order => cases order <;> native_decide
+
 theorem orthogonalCellGadget_wellFormed (tromino : Tromino)
     (cellType : OrthogonalCellType) :
     (orthogonalCellGadget tromino cellType).IsWellFormed := by

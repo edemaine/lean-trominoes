@@ -200,6 +200,9 @@ The representation choices for this target are:
   the four corresponding neighboring block boundaries.  The footprint
   geometry is bounded mechanically from the two prototiles: a tromino can
   meet only its selected block and the eight immediately neighboring blocks.
+  Every Figure 11/12 mask is also certified to omit all four window corners;
+  together with tromino connectivity, this proves that any footprint crossing
+  a side actually meets the corresponding cardinal-neighbor block.
   Consequently, every locally exact, port-compatible infinite gadget
   assignment is proved to glue into a tiling of the compiled periodic region.
   In the converse direction, every global tiling of that region is now proved

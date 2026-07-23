@@ -352,6 +352,290 @@ theorem Tromino.IsFootprint.coordinate_bounds {tromino : Tromino}
         simp [SquareSymmetry.act, Cell.add] at firstHorizontal firstVertical secondHorizontal secondVertical <;>
         omega
 
+/-- A footprint crossing the east side of the paper window meets the east
+neighbor unless it occupies one of the two intervening corners. -/
+theorem Tromino.IsFootprint.meets_east_neighbor_of_corners_absent
+    {tromino : Tromino} {footprint : Finset Cell}
+    (shape : tromino.IsFootprint footprint)
+    (meetsWindow : ∃ cell ∈ rectangleCells 6 6, cell ∈ footprint)
+    (topCornerAbsent : (5, 0) ∉ footprint)
+    (bottomCornerAbsent : (5, 5) ∉ footprint)
+    (crosses : crossesRight 6 footprint) :
+    ∃ cell ∈ translateFootprint (6, 0) (rectangleCells 6 6),
+      cell ∈ footprint := by
+  obtain ⟨inside, insideInWindow, insideMember⟩ := meetsWindow
+  obtain ⟨beyond, beyondMember, beyondHorizontal⟩ := crosses
+  have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+  have footprintBounds := Tromino.IsFootprint.coordinate_bounds shape
+    beyondMember insideMember
+  have eastWindowMember (cell : Cell) (horizontalLower : 6 ≤ cell.1)
+      (horizontalUpper : cell.1 < 12) (verticalLower : 0 ≤ cell.2)
+      (verticalUpper : cell.2 < 6) :
+      cell ∈ translateFootprint (6, 0) (rectangleCells 6 6) := by
+    apply Finset.mem_image.mpr
+    refine ⟨(cell.1 - 6, cell.2), ?_, ?_⟩
+    · rw [mem_rectangleCells_iff]
+      simp only
+      omega
+    · apply Prod.ext <;> simp only [Cell.add] <;> omega
+  by_cases beyondVertical : 0 ≤ beyond.2 ∧ beyond.2 < 6
+  · exact ⟨beyond,
+      eastWindowMember beyond beyondHorizontal (by omega)
+        beyondVertical.1 beyondVertical.2,
+      beyondMember⟩
+  obtain ⟨middle, middleMember, insideNearMiddle, middleNearBeyond⟩ :=
+    Tromino.IsFootprint.exists_middle shape insideMember beyondMember
+  by_cases middleInEast : 6 ≤ middle.1 ∧ 0 ≤ middle.2 ∧ middle.2 < 6
+  · exact ⟨middle,
+      eastWindowMember middle middleInEast.1 (by
+        have middleBounds := Tromino.IsFootprint.coordinate_bounds shape
+          middleMember insideMember
+        omega) middleInEast.2.1 middleInEast.2.2,
+      middleMember⟩
+  have beyondVerticalOutside : beyond.2 < 0 ∨ 6 ≤ beyond.2 := by omega
+  have middleOutside : middle.1 < 6 ∨ middle.2 < 0 ∨ 6 ≤ middle.2 := by
+    by_cases horizontal : middle.1 < 6
+    · exact Or.inl horizontal
+    by_cases vertical : middle.2 < 0
+    · exact Or.inr (Or.inl vertical)
+    exact Or.inr (Or.inr (by omega))
+  rcases insideNearMiddle with (firstEquality | firstEquality |
+      firstEquality | firstEquality | firstEquality) <;>
+    rcases middleNearBeyond with (secondEquality | secondEquality |
+      secondEquality | secondEquality | secondEquality) <;>
+    rcases middleOutside with (middleLeft | middleAbove | middleBelow) <;>
+    rcases beyondVerticalOutside with (beyondAbove | beyondBelow) <;>
+    exfalso
+  all_goals
+    have firstHorizontal := congrArg Prod.fst firstEquality
+    have firstVertical := congrArg Prod.snd firstEquality
+    have secondHorizontal := congrArg Prod.fst secondEquality
+    have secondVertical := congrArg Prod.snd secondEquality
+  all_goals
+    first
+    | omega
+    | apply topCornerAbsent
+      have cornerEquality : inside = (5, 0) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+    | apply bottomCornerAbsent
+      have cornerEquality : inside = (5, 5) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+
+/-- The corresponding west-side boundary fact. -/
+theorem Tromino.IsFootprint.meets_west_neighbor_of_corners_absent
+    {tromino : Tromino} {footprint : Finset Cell}
+    (shape : tromino.IsFootprint footprint)
+    (meetsWindow : ∃ cell ∈ rectangleCells 6 6, cell ∈ footprint)
+    (topCornerAbsent : (0, 0) ∉ footprint)
+    (bottomCornerAbsent : (0, 5) ∉ footprint)
+    (crosses : crossesLeft footprint) :
+    ∃ cell ∈ translateFootprint (-6, 0) (rectangleCells 6 6),
+      cell ∈ footprint := by
+  obtain ⟨inside, insideInWindow, insideMember⟩ := meetsWindow
+  obtain ⟨beyond, beyondMember, beyondHorizontal⟩ := crosses
+  have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+  have footprintBounds := Tromino.IsFootprint.coordinate_bounds shape
+    beyondMember insideMember
+  have westWindowMember (cell : Cell) (horizontalLower : -6 ≤ cell.1)
+      (horizontalUpper : cell.1 < 0) (verticalLower : 0 ≤ cell.2)
+      (verticalUpper : cell.2 < 6) :
+      cell ∈ translateFootprint (-6, 0) (rectangleCells 6 6) := by
+    apply Finset.mem_image.mpr
+    refine ⟨(cell.1 + 6, cell.2), ?_, ?_⟩
+    · rw [mem_rectangleCells_iff]
+      simp only
+      omega
+    · apply Prod.ext <;> simp only [Cell.add] <;> omega
+  by_cases beyondVertical : 0 ≤ beyond.2 ∧ beyond.2 < 6
+  · exact ⟨beyond,
+      westWindowMember beyond (by omega) beyondHorizontal
+        beyondVertical.1 beyondVertical.2,
+      beyondMember⟩
+  obtain ⟨middle, middleMember, insideNearMiddle, middleNearBeyond⟩ :=
+    Tromino.IsFootprint.exists_middle shape insideMember beyondMember
+  by_cases middleInWest : middle.1 < 0 ∧ 0 ≤ middle.2 ∧ middle.2 < 6
+  · exact ⟨middle,
+      westWindowMember middle (by
+        have middleBounds := Tromino.IsFootprint.coordinate_bounds shape
+          middleMember insideMember
+        omega) middleInWest.1 middleInWest.2.1 middleInWest.2.2,
+      middleMember⟩
+  have beyondVerticalOutside : beyond.2 < 0 ∨ 6 ≤ beyond.2 := by omega
+  have middleOutside : 0 ≤ middle.1 ∨ middle.2 < 0 ∨ 6 ≤ middle.2 := by
+    by_cases horizontal : 0 ≤ middle.1
+    · exact Or.inl horizontal
+    by_cases vertical : middle.2 < 0
+    · exact Or.inr (Or.inl vertical)
+    exact Or.inr (Or.inr (by omega))
+  rcases insideNearMiddle with (firstEquality | firstEquality |
+      firstEquality | firstEquality | firstEquality) <;>
+    rcases middleNearBeyond with (secondEquality | secondEquality |
+      secondEquality | secondEquality | secondEquality) <;>
+    rcases middleOutside with (middleRight | middleAbove | middleBelow) <;>
+    rcases beyondVerticalOutside with (beyondAbove | beyondBelow) <;>
+    exfalso
+  all_goals
+    have firstHorizontal := congrArg Prod.fst firstEquality
+    have firstVertical := congrArg Prod.snd firstEquality
+    have secondHorizontal := congrArg Prod.fst secondEquality
+    have secondVertical := congrArg Prod.snd secondEquality
+  all_goals
+    first
+    | omega
+    | apply topCornerAbsent
+      have cornerEquality : inside = (0, 0) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+    | apply bottomCornerAbsent
+      have cornerEquality : inside = (0, 5) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+
+/-- The corresponding south-side boundary fact. -/
+theorem Tromino.IsFootprint.meets_south_neighbor_of_corners_absent
+    {tromino : Tromino} {footprint : Finset Cell}
+    (shape : tromino.IsFootprint footprint)
+    (meetsWindow : ∃ cell ∈ rectangleCells 6 6, cell ∈ footprint)
+    (leftCornerAbsent : (0, 5) ∉ footprint)
+    (rightCornerAbsent : (5, 5) ∉ footprint)
+    (crosses : crossesSouth 6 footprint) :
+    ∃ cell ∈ translateFootprint (0, 6) (rectangleCells 6 6),
+      cell ∈ footprint := by
+  obtain ⟨inside, insideInWindow, insideMember⟩ := meetsWindow
+  obtain ⟨beyond, beyondMember, beyondVertical⟩ := crosses
+  have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+  have footprintBounds := Tromino.IsFootprint.coordinate_bounds shape
+    beyondMember insideMember
+  have southWindowMember (cell : Cell) (horizontalLower : 0 ≤ cell.1)
+      (horizontalUpper : cell.1 < 6) (verticalLower : 6 ≤ cell.2)
+      (verticalUpper : cell.2 < 12) :
+      cell ∈ translateFootprint (0, 6) (rectangleCells 6 6) := by
+    apply Finset.mem_image.mpr
+    refine ⟨(cell.1, cell.2 - 6), ?_, ?_⟩
+    · rw [mem_rectangleCells_iff]
+      simp only
+      omega
+    · apply Prod.ext <;> simp only [Cell.add] <;> omega
+  by_cases beyondHorizontal : 0 ≤ beyond.1 ∧ beyond.1 < 6
+  · exact ⟨beyond,
+      southWindowMember beyond beyondHorizontal.1 beyondHorizontal.2
+        beyondVertical (by omega),
+      beyondMember⟩
+  obtain ⟨middle, middleMember, insideNearMiddle, middleNearBeyond⟩ :=
+    Tromino.IsFootprint.exists_middle shape insideMember beyondMember
+  by_cases middleInSouth :
+      0 ≤ middle.1 ∧ middle.1 < 6 ∧ 6 ≤ middle.2
+  · exact ⟨middle,
+      southWindowMember middle middleInSouth.1 middleInSouth.2.1
+        middleInSouth.2.2 (by
+          have middleBounds := Tromino.IsFootprint.coordinate_bounds shape
+            middleMember insideMember
+          omega),
+      middleMember⟩
+  have beyondHorizontalOutside : beyond.1 < 0 ∨ 6 ≤ beyond.1 := by omega
+  have middleOutside : middle.1 < 0 ∨ 6 ≤ middle.1 ∨ middle.2 < 6 := by
+    by_cases left : middle.1 < 0
+    · exact Or.inl left
+    by_cases right : 6 ≤ middle.1
+    · exact Or.inr (Or.inl right)
+    exact Or.inr (Or.inr (by omega))
+  rcases insideNearMiddle with (firstEquality | firstEquality |
+      firstEquality | firstEquality | firstEquality) <;>
+    rcases middleNearBeyond with (secondEquality | secondEquality |
+      secondEquality | secondEquality | secondEquality) <;>
+    rcases middleOutside with (middleLeft | middleRight | middleAbove) <;>
+    rcases beyondHorizontalOutside with (beyondLeft | beyondRight) <;>
+    exfalso
+  all_goals
+    have firstHorizontal := congrArg Prod.fst firstEquality
+    have firstVertical := congrArg Prod.snd firstEquality
+    have secondHorizontal := congrArg Prod.fst secondEquality
+    have secondVertical := congrArg Prod.snd secondEquality
+  all_goals
+    first
+    | omega
+    | apply leftCornerAbsent
+      have cornerEquality : inside = (0, 5) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+    | apply rightCornerAbsent
+      have cornerEquality : inside = (5, 5) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+
+/-- The corresponding north-side boundary fact. -/
+theorem Tromino.IsFootprint.meets_north_neighbor_of_corners_absent
+    {tromino : Tromino} {footprint : Finset Cell}
+    (shape : tromino.IsFootprint footprint)
+    (meetsWindow : ∃ cell ∈ rectangleCells 6 6, cell ∈ footprint)
+    (leftCornerAbsent : (0, 0) ∉ footprint)
+    (rightCornerAbsent : (5, 0) ∉ footprint)
+    (crosses : crossesNorth footprint) :
+    ∃ cell ∈ translateFootprint (0, -6) (rectangleCells 6 6),
+      cell ∈ footprint := by
+  obtain ⟨inside, insideInWindow, insideMember⟩ := meetsWindow
+  obtain ⟨beyond, beyondMember, beyondVertical⟩ := crosses
+  have insideBounds := (mem_rectangleCells_iff 6 6 inside).mp insideInWindow
+  have footprintBounds := Tromino.IsFootprint.coordinate_bounds shape
+    beyondMember insideMember
+  have northWindowMember (cell : Cell) (horizontalLower : 0 ≤ cell.1)
+      (horizontalUpper : cell.1 < 6) (verticalLower : -6 ≤ cell.2)
+      (verticalUpper : cell.2 < 0) :
+      cell ∈ translateFootprint (0, -6) (rectangleCells 6 6) := by
+    apply Finset.mem_image.mpr
+    refine ⟨(cell.1, cell.2 + 6), ?_, ?_⟩
+    · rw [mem_rectangleCells_iff]
+      simp only
+      omega
+    · apply Prod.ext <;> simp only [Cell.add] <;> omega
+  by_cases beyondHorizontal : 0 ≤ beyond.1 ∧ beyond.1 < 6
+  · exact ⟨beyond,
+      northWindowMember beyond beyondHorizontal.1 beyondHorizontal.2
+        (by omega) beyondVertical,
+      beyondMember⟩
+  obtain ⟨middle, middleMember, insideNearMiddle, middleNearBeyond⟩ :=
+    Tromino.IsFootprint.exists_middle shape insideMember beyondMember
+  by_cases middleInNorth :
+      0 ≤ middle.1 ∧ middle.1 < 6 ∧ middle.2 < 0
+  · exact ⟨middle,
+      northWindowMember middle middleInNorth.1 middleInNorth.2.1 (by
+        have middleBounds := Tromino.IsFootprint.coordinate_bounds shape
+          middleMember insideMember
+        omega) middleInNorth.2.2,
+      middleMember⟩
+  have beyondHorizontalOutside : beyond.1 < 0 ∨ 6 ≤ beyond.1 := by omega
+  have middleOutside : middle.1 < 0 ∨ 6 ≤ middle.1 ∨ 0 ≤ middle.2 := by
+    by_cases left : middle.1 < 0
+    · exact Or.inl left
+    by_cases right : 6 ≤ middle.1
+    · exact Or.inr (Or.inl right)
+    exact Or.inr (Or.inr (by omega))
+  rcases insideNearMiddle with (firstEquality | firstEquality |
+      firstEquality | firstEquality | firstEquality) <;>
+    rcases middleNearBeyond with (secondEquality | secondEquality |
+      secondEquality | secondEquality | secondEquality) <;>
+    rcases middleOutside with (middleLeft | middleRight | middleBelow) <;>
+    rcases beyondHorizontalOutside with (beyondLeft | beyondRight) <;>
+    exfalso
+  all_goals
+    have firstHorizontal := congrArg Prod.fst firstEquality
+    have firstVertical := congrArg Prod.snd firstEquality
+    have secondHorizontal := congrArg Prod.fst secondEquality
+    have secondVertical := congrArg Prod.snd secondEquality
+  all_goals
+    first
+    | omega
+    | apply leftCornerAbsent
+      have cornerEquality : inside = (0, 0) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+    | apply rightCornerAbsent
+      have cornerEquality : inside = (5, 0) := by
+        apply Prod.ext <;> omega
+      exact cornerEquality ▸ insideMember
+
 /-! ## Translation invariance -/
 
 /-- Translate a placement without changing its prototile kind or symmetry. -/
