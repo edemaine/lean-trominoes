@@ -180,6 +180,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetPorts.lean`](LeanTrominoes/GadgetPorts.lean) normalizes
   north, east, south, and west boundary footprints so adjacent gadget windows
   can be composed by equality of finite port states.
+- [`LeanTrominoes/GadgetAssembly.lean`](LeanTrominoes/GadgetAssembly.lean)
+  proves that every verified open-window tiling induces a unique local cover
+  by geometric tromino footprints and that its four ports depend only on this
+  cover, not on redundant placement encodings.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a
