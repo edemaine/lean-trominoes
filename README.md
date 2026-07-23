@@ -186,6 +186,11 @@ The representation choices for this target are:
   states store assignments only at cells from the finite motif, so sparse
   presentations do not incur space proportional to the binary-encoded strip
   width; the transition predicate is decidable.
+- [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
+  computes the exact frontier-state count as
+  `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
+  at most `⌈log₂ period⌉ + 20 × distinct motif cells + 1`, the quantitative
+  sparse bound needed for polynomial space.
 - [`LeanTrominoes/StripFrontierCorrectness.lean`](LeanTrominoes/StripFrontierCorrectness.lean)
   proves the forward correctness direction: a globally locally valid strip
   assignment cuts into a bi-infinite path of normalized, overlapping sparse
