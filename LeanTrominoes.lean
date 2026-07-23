@@ -5,6 +5,7 @@ import LeanTrominoes.FiniteSearch
 import LeanTrominoes.FootprintTiling
 import LeanTrominoes.Gadget
 import LeanTrominoes.GadgetAssembly
+import LeanTrominoes.GadgetBehavior
 import LeanTrominoes.GadgetColoring
 import LeanTrominoes.GadgetLibrary
 import LeanTrominoes.GadgetOrientation

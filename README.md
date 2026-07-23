@@ -186,6 +186,11 @@ The representation choices for this target are:
   cover, not on redundant placement encodings.  It also proves an abstract
   gluing theorem: coherent exact covers on a plane-covering family of windows
   form one global tromino tiling.
+- [`LeanTrominoes/GadgetBehavior.lean`](LeanTrominoes/GadgetBehavior.lean)
+  defines the intermediate infinite finite-state system: every lifted drawing
+  cell selects a verified exact-cover state, and neighboring selections agree
+  on their normalized geometric ports.  It records the two central gadget
+  correctness goals separating finite-state behavior from geometric gluing.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a
