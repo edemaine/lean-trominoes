@@ -186,6 +186,14 @@ The representation choices for this target are:
   it chooses one edge and checks bounded reachability back to its source, and
   proves this succeeds exactly when the finite graph contains a directed
   cycle.
+- [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
+  fills a machine-level gap in Mathlib's computability stack.  A TM2 program
+  described over an infinite ambient label type can be restricted to a
+  certified finite reachable-label set and bundled as the `FinTM2` required
+  by the PSPACE interface.  Erasing label-membership proofs is proved to
+  preserve individual steps, complete finite executions, stack contents, and
+  stack-space usage.  This is the first compiler layer needed to package the
+  verified strip decider as an explicit polynomial-space machine.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

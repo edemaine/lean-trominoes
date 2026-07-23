@@ -7,6 +7,7 @@ import LeanTrominoes.FiniteState
 import LeanTrominoes.FiniteStateCycleSearch
 import LeanTrominoes.FiniteStateReachability
 import LeanTrominoes.FiniteStateSearch
+import LeanTrominoes.FiniteTMCompiler
 import LeanTrominoes.FootprintTiling
 import LeanTrominoes.Gadget
 import LeanTrominoes.GadgetAssembly
