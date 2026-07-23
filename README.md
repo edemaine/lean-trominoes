@@ -185,7 +185,9 @@ The representation choices for this target are:
   by geometric tromino footprints and that its four ports depend only on this
   cover, not on redundant placement encodings.  It also proves an abstract
   gluing theorem: coherent exact covers on a plane-covering family of windows
-  form one global tromino tiling.
+  form one global tromino tiling.  Conversely, restricting any global tiling
+  to a finite window is proved to give the corresponding exact open-window
+  tiling whenever the local mask is the global carrier inside that window.
 - [`LeanTrominoes/GadgetBehavior.lean`](LeanTrominoes/GadgetBehavior.lean)
   defines the intermediate infinite finite-state system: every lifted drawing
   cell selects a verified exact-cover state, and neighboring selections agree

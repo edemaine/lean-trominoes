@@ -34,6 +34,67 @@ structure IsWindowFootprintTiling (tromino : Tromino)
     ∀ cell ∈ region,
       ∃! footprint : Finset Cell, footprint ∈ footprints ∧ cell ∈ footprint
 
+/-- Restrict a possibly infinite global placement set to the finite candidates
+that meet one window. -/
+noncomputable def globalWindowPlacements (tromino : Tromino)
+    (window : Finset Cell) (placements : Set (Placement Unit)) :
+    Finset (Placement Unit) := by
+  classical
+  exact (windowCandidates tromino window).filter fun placement =>
+    placement ∈ placements
+
+/-- Restricting a global tiling to a finite window gives an exact open-window
+tiling, provided the local target is exactly the global region inside that
+window. -/
+theorem IsTiling.isWindowTiling {tromino : Tromino} {region : Set Cell}
+    {placements : Set (Placement Unit)}
+    (tiling : LeanTrominoes.IsTiling
+      (fun _ : Unit => tromino.cells) region placements)
+    (window localRegion : Finset Cell)
+    (localInside : localRegion ⊆ window)
+    (regionInWindow : ∀ cell ∈ window,
+      cell ∈ region ↔ cell ∈ localRegion) :
+    IsWindowTiling tromino window localRegion
+      (globalWindowPlacements tromino window placements) := by
+  classical
+  constructor
+  · intro placement placementMember
+    change placement ∈ (windowCandidates tromino window).filter
+      (fun candidate => candidate ∈ placements) at placementMember
+    have memberData := Finset.mem_filter.mp placementMember
+    apply (mem_admissibleCandidates_iff tromino window localRegion placement).mpr
+    refine ⟨(mem_windowCandidates_iff tromino window placement).mp memberData.1,
+      ?_⟩
+    intro cell cellMember
+    obtain ⟨cellInPlacement, cellInWindow⟩ := Finset.mem_inter.mp cellMember
+    have cellInRegion := tiling.tilesInside placement memberData.2 cell
+      cellInPlacement
+    exact (regionInWindow cell cellInWindow).mp cellInRegion
+  · intro cell cellInLocalRegion
+    have cellInWindow := localInside cellInLocalRegion
+    have cellInRegion := (regionInWindow cell cellInWindow).mpr cellInLocalRegion
+    obtain ⟨placement, ⟨placementMember, placementCovers⟩, unique⟩ :=
+      tiling.uniqueCover cell cellInRegion
+    apply Finset.card_eq_one.mpr
+    refine ⟨placement, Finset.ext ?_⟩
+    intro other
+    simp only [Finset.mem_filter, Finset.mem_singleton]
+    constructor
+    · rintro ⟨otherMember, otherCovers⟩
+      change other ∈ (windowCandidates tromino window).filter
+        (fun candidate => candidate ∈ placements) at otherMember
+      have otherSelected := (Finset.mem_filter.mp otherMember).2
+      exact unique other ⟨otherSelected, otherCovers⟩
+    · intro otherEquality
+      subst other
+      refine ⟨?_, placementCovers⟩
+      change placement ∈ (windowCandidates tromino window).filter
+        (fun candidate => candidate ∈ placements)
+      apply Finset.mem_filter.mpr
+      refine ⟨?_, placementMember⟩
+      exact (mem_windowCandidates_iff tromino window placement).mpr
+        ⟨cell, cellInWindow, placementCovers⟩
+
 /-- The card-one clause in an open-window tiling provides its usual unique
 cover formulation. -/
 theorem IsWindowTiling.uniqueCover {tromino : Tromino}
