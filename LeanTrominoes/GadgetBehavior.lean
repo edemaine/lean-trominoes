@@ -115,6 +115,32 @@ def drawingBlockFootprints (tromino : Tromino)
   translateFootprints (latticeBlockOrigin location)
     (windowFootprints tromino (assignment location))
 
+/-- Every selected global-coordinate block footprint is a genuine tromino and
+meets the block in which it was selected. -/
+theorem drawingBlockFootprint_shape_and_meets (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing)
+    (assignment : LocalTilingAssignment tromino drawing)
+    (locallyTiled : IsLocallyTiled tromino drawing assignment)
+    (location : Cell) (footprint : Finset Cell)
+    (footprintMember :
+      footprint ∈ drawingBlockFootprints tromino drawing assignment location) :
+    tromino.IsFootprint footprint ∧
+      ∃ cell ∈ latticeBlockWindow location, cell ∈ footprint := by
+  have localPlacementTiling :=
+    (mem_exactCellTilings_iff tromino (drawing.getAt location)
+      (assignment location)).mp (locallyTiled location)
+  have translatedTiling :=
+    localPlacementTiling.isWindowFootprintTiling.translate
+      (latticeBlockOrigin location)
+  have translatedMember :
+      footprint ∈ translateFootprints (latticeBlockOrigin location)
+        (windowFootprints tromino (assignment location)) := by
+    exact footprintMember
+  refine ⟨translatedTiling.isFootprint footprint translatedMember, ?_⟩
+  simpa only [orthogonalCellGadget, paperGadget, Gadget.window,
+    latticeBlockWindow] using
+      translatedTiling.meetsWindow footprint translatedMember
+
 /-! ## Adjacent footprint propagation from port equality -/
 
 /-- Equality of east/west ports propagates every right-crossing geometric

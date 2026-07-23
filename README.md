@@ -195,7 +195,9 @@ The representation choices for this target are:
   coherence condition, including equality between the infinite block atlas
   and the carrier of the compiled finite `PeriodicRegion`.  Equality of
   adjacent ports is proved to propagate every shared footprint across each of
-  the four corresponding neighboring block boundaries.
+  the four corresponding neighboring block boundaries.  The footprint
+  geometry is bounded mechanically from the two prototiles: a tromino can
+  meet only its selected block and the eight immediately neighboring blocks.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a

@@ -137,6 +137,43 @@ theorem portConfiguration_eq_footprintPortConfiguration (tromino : Tromino)
   rw [portConfiguration, footprintPortConfiguration,
     boundarySignature_eq_footprintBoundary]
 
+/-! ## Elementary tromino-footprint geometry -/
+
+/-- Any two cells of one I- or L-tromino footprint differ by at most two in
+each coordinate. -/
+theorem Tromino.IsFootprint.coordinate_bounds {tromino : Tromino}
+    {footprint : Finset Cell} (shape : tromino.IsFootprint footprint)
+    {first second : Cell} (firstMember : first ∈ footprint)
+    (secondMember : second ∈ footprint) :
+    -2 ≤ first.1 - second.1 ∧ first.1 - second.1 ≤ 2 ∧
+      -2 ≤ first.2 - second.2 ∧ first.2 - second.2 ≤ 2 := by
+  obtain ⟨placement, rfl⟩ := shape
+  rcases placement with ⟨kind, symmetry, offset⟩
+  rcases kind with ⟨⟩
+  rw [Placement.mem_cells_iff] at firstMember secondMember
+  obtain ⟨firstSource, firstSourceMember, firstEquality⟩ := firstMember
+  obtain ⟨secondSource, secondSourceMember, secondEquality⟩ := secondMember
+  have firstHorizontal := congrArg Prod.fst firstEquality
+  have firstVertical := congrArg Prod.snd firstEquality
+  have secondHorizontal := congrArg Prod.fst secondEquality
+  have secondVertical := congrArg Prod.snd secondEquality
+  cases tromino with
+  | I =>
+      simp [Tromino.cells] at firstSourceMember secondSourceMember
+      rcases firstSourceMember with (rfl | rfl | rfl) <;>
+        rcases secondSourceMember with (rfl | rfl | rfl) <;>
+        cases symmetry <;>
+        simp [SquareSymmetry.act, Cell.add] at firstHorizontal firstVertical secondHorizontal secondVertical <;>
+        omega
+
+  | L =>
+      simp [Tromino.cells] at firstSourceMember secondSourceMember
+      rcases firstSourceMember with (rfl | rfl | rfl) <;>
+        rcases secondSourceMember with (rfl | rfl | rfl) <;>
+        cases symmetry <;>
+        simp [SquareSymmetry.act, Cell.add] at firstHorizontal firstVertical secondHorizontal secondVertical <;>
+        omega
+
 /-! ## Translation invariance -/
 
 /-- Translate a placement without changing its prototile kind or symmetry. -/
@@ -325,6 +362,32 @@ theorem latticeBlockRegion_subset (location : Cell)
   obtain ⟨source, sourceMember, sourceEquality⟩ :=
     Finset.mem_image.mp cellMember
   exact Finset.mem_image.mpr ⟨source, inside sourceMember, sourceEquality⟩
+
+/-- A tromino footprint can meet only its current `6 × 6` block and the eight
+immediately neighboring blocks. -/
+theorem Tromino.IsFootprint.latticeBlock_bounds {tromino : Tromino}
+    {footprint : Finset Cell} (shape : tromino.IsFootprint footprint)
+    {first second : Cell}
+    (meetsFirst : ∃ cell ∈ latticeBlockWindow first, cell ∈ footprint)
+    (meetsSecond : ∃ cell ∈ latticeBlockWindow second, cell ∈ footprint) :
+    -1 ≤ second.1 - first.1 ∧ second.1 - first.1 ≤ 1 ∧
+      -1 ≤ second.2 - first.2 ∧ second.2 - first.2 ≤ 1 := by
+  obtain ⟨firstCell, firstCellInWindow, firstCellMember⟩ := meetsFirst
+  obtain ⟨secondCell, secondCellInWindow, secondCellMember⟩ := meetsSecond
+  obtain ⟨firstLocal, firstLocalMember, firstEquality⟩ :=
+    Finset.mem_image.mp firstCellInWindow
+  obtain ⟨secondLocal, secondLocalMember, secondEquality⟩ :=
+    Finset.mem_image.mp secondCellInWindow
+  have firstBounds := (mem_rectangleCells_iff 6 6 firstLocal).mp firstLocalMember
+  have secondBounds := (mem_rectangleCells_iff 6 6 secondLocal).mp secondLocalMember
+  have footprintBounds := Tromino.IsFootprint.coordinate_bounds shape
+    firstCellMember secondCellMember
+  have firstHorizontal := congrArg Prod.fst firstEquality
+  have firstVertical := congrArg Prod.snd firstEquality
+  have secondHorizontal := congrArg Prod.fst secondEquality
+  have secondVertical := congrArg Prod.snd secondEquality
+  simp only [latticeBlockOrigin, Cell.add] at firstHorizontal firstVertical secondHorizontal secondVertical
+  omega
 
 /-! ## Abstract local-to-global gluing -/
 
