@@ -260,6 +260,55 @@ theorem IsWindowFootprintTiling.translate {tromino : Tromino}
         ⟨otherFootprintMember, sourceCovered⟩
       simpa only [footprintEquality] using otherEquality.symm
 
+/-! ## The `6 × 6` lattice-block atlas -/
+
+/-- Origin of the gadget block indexed by an arbitrary cell of the infinite
+normalized drawing. -/
+def latticeBlockOrigin (location : Cell) : Cell :=
+  (6 * location.1, 6 * location.2)
+
+/-- The translated `6 × 6` window at one infinite drawing location. -/
+def latticeBlockWindow (location : Cell) : Finset Cell :=
+  translateFootprint (latticeBlockOrigin location) (rectangleCells 6 6)
+
+/-- Translate a local paper-pixel mask into one infinite drawing block. -/
+def latticeBlockRegion (location : Cell) (localRegion : Finset Cell) :
+    Finset Cell :=
+  translateFootprint (latticeBlockOrigin location) localRegion
+
+/-- The integer plane is covered by the `6 × 6` windows indexed by the
+Euclidean quotients of its coordinates. -/
+theorem latticeBlockWindows_cover (cell : Cell) :
+    ∃ location, cell ∈ latticeBlockWindow location := by
+  let location : Cell := (cell.1 / 6, cell.2 / 6)
+  let localCell : Cell := (cell.1 % 6, cell.2 % 6)
+  refine ⟨location, Finset.mem_image.mpr ⟨localCell, ?_, ?_⟩⟩
+  · rw [mem_rectangleCells_iff]
+    constructor
+    · exact Int.emod_nonneg cell.1 (by omega)
+    constructor
+    · exact Int.emod_lt_of_pos cell.1 (by omega)
+    constructor
+    · exact Int.emod_nonneg cell.2 (by omega)
+    · exact Int.emod_lt_of_pos cell.2 (by omega)
+  · have horizontal := Int.emod_add_mul_ediv cell.1 6
+    have vertical := Int.emod_add_mul_ediv cell.2 6
+    apply Prod.ext
+    · simp only [latticeBlockOrigin, location, localCell, Cell.add]
+      omega
+    · simp only [latticeBlockOrigin, location, localCell, Cell.add]
+      omega
+
+/-- Translating a local region contained in the paper window preserves that
+containment in its lattice block. -/
+theorem latticeBlockRegion_subset (location : Cell)
+    {localRegion : Finset Cell} (inside : localRegion ⊆ rectangleCells 6 6) :
+    latticeBlockRegion location localRegion ⊆ latticeBlockWindow location := by
+  intro cell cellMember
+  obtain ⟨source, sourceMember, sourceEquality⟩ :=
+    Finset.mem_image.mp cellMember
+  exact Finset.mem_image.mpr ⟨source, inside sourceMember, sourceEquality⟩
+
 /-! ## Abstract local-to-global gluing -/
 
 /-- A plane-covering family of finite windows equipped with mutually

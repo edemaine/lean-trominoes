@@ -147,7 +147,38 @@ instance (drawing : PeriodicOrthogonalDrawing) :
 /-- The residue class of an integer coordinate in one positive drawing
 period, represented as a finite index. -/
 def residue (coordinate : Int) (periodPred : Nat) : Fin (periodPred + 1) :=
-  ⟨(coordinate : ZMod (periodPred + 1)).val, ZMod.val_lt _⟩
+  ⟨(coordinate % (periodPred + 1)).toNat, by
+    rw [Int.toNat_lt (Int.emod_nonneg coordinate (by omega))]
+    exact Int.emod_lt_of_pos coordinate (by omega)⟩
+
+/-- The finite residue index coerces back to the Euclidean remainder. -/
+theorem residue_val_int (coordinate : Int) (periodPred : Nat) :
+    ((residue coordinate periodPred).val : Int) =
+      coordinate % (periodPred + 1) := by
+  rw [residue, Int.toNat_of_nonneg]
+  exact Int.emod_nonneg coordinate (by omega)
+
+/-- Adding an integer multiple of the positive period does not change the
+finite residue index. -/
+@[simp]
+theorem residue_add_period {periodPred : Nat}
+    (position : Fin (periodPred + 1))
+    (multiple : Int) :
+    residue ((position.val : Int) + multiple * (periodPred + 1)) periodPred =
+      position := by
+  apply Fin.ext
+  simp only [residue]
+  have nonnegative : (0 : Int) ≤ (position.val : Int) := by positivity
+  have below : (position.val : Int) < (periodPred + 1 : Nat) := by
+    exact_mod_cast position.isLt
+  have modulo :
+      ((position.val : Int) + multiple * (periodPred + 1)) %
+          (periodPred + 1) = position.val := by
+    rw [Int.add_emod]
+    simp
+    exact Int.emod_eq_of_lt nonnegative below
+  rw [modulo]
+  simp
 
 /-- Project an arbitrary cell of the infinite periodic lift to the stored
 finite toroidal fundamental domain. -/
@@ -155,6 +186,20 @@ def positionAt (drawing : PeriodicOrthogonalDrawing) (location : Cell) :
     drawing.Position :=
   (residue location.1 drawing.horizontalPeriodPred,
     residue location.2 drawing.verticalPeriodPred)
+
+/-- Explicit period translates of a fundamental-domain position project back
+to that position. -/
+@[simp]
+theorem positionAt_add_periods (drawing : PeriodicOrthogonalDrawing)
+    (position : drawing.Position) (horizontal vertical : Int) :
+    drawing.positionAt
+      ((position.1.val : Int) +
+          horizontal * (drawing.horizontalPeriodPred + 1),
+        (position.2.val : Int) +
+          vertical * (drawing.verticalPeriodPred + 1)) = position := by
+  apply Prod.ext
+  · exact residue_add_period position.1 horizontal
+  · exact residue_add_period position.2 vertical
 
 /-- The normalized drawing-cell type at an arbitrary location in its infinite
 periodic lift. -/

@@ -191,6 +191,9 @@ The representation choices for this target are:
   cell selects a verified exact-cover state, and neighboring selections agree
   on their normalized geometric ports.  It records the two central gadget
   correctness goals separating finite-state behavior from geometric gluing.
+  The forward gluing theorem is already proved under its precise geometric
+  coherence condition, including equality between the infinite block atlas
+  and the carrier of the compiled finite `PeriodicRegion`.
 - [`LeanTrominoes/GadgetColoring.lean`](LeanTrominoes/GadgetColoring.lean)
   formalizes the periodic marker colorings in Figures 11(a) and 12(a), the
   center-to-colored-pixel orientation vectors, and the invariant that a
