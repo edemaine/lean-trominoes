@@ -68,6 +68,52 @@ theorem periodicRegion_fullRank (tromino : Tromino)
     simp [verticalPeriod]
   positivity
 
+/-- The set-theoretic infinite expansion: choose a block in the finite torus,
+then translate its local mask by arbitrary whole drawing periods. -/
+def expandedCarrier (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing) : Set Cell :=
+  { cell | ∃ position : drawing.Position,
+      ∃ pixel ∈ orthogonalCellPixels tromino (drawing.get position),
+        ∃ horizontal vertical : Int,
+          cell = Cell.add
+            (Cell.add
+              (Cell.add
+                (blockOrigin position.1.val position.2.val) pixel)
+              (Cell.scale horizontal
+                ((6 * (drawing.horizontalPeriod : Int), 0) : Cell)))
+            (Cell.scale vertical
+              ((0, 6 * (drawing.verticalPeriod : Int)) : Cell)) }
+
+/-- The carrier of the compiled finite presentation is exactly the infinite
+periodic union of its substituted gadget blocks. -/
+theorem periodicRegion_carrier_eq (tromino : Tromino)
+    (drawing : PeriodicOrthogonalDrawing) :
+    (drawing.periodicRegion tromino).carrier =
+      drawing.expandedCarrier tromino := by
+  ext cell
+  constructor
+  · rintro ⟨base, baseMember, horizontal, vertical, equality⟩
+    change base ∈ expandedMotif tromino drawing at baseMember
+    simp only [periodicRegion] at equality
+    simp only [expandedMotif, List.mem_flatMap] at baseMember
+    obtain ⟨horizontalIndex, _, verticalIndex, _, baseMember⟩ := baseMember
+    simp only [expandedBlockPixels, List.mem_map] at baseMember
+    obtain ⟨pixel, pixelMember, pixelEquality⟩ := baseMember
+    subst base
+    exact ⟨(horizontalIndex, verticalIndex), pixel, pixelMember,
+      horizontal, vertical, equality⟩
+  · rintro ⟨⟨horizontalIndex, verticalIndex⟩, pixel, pixelMember,
+      horizontal, vertical, equality⟩
+    refine ⟨Cell.add
+        (blockOrigin horizontalIndex.val verticalIndex.val) pixel, ?_,
+      horizontal, vertical, ?_⟩
+    · simp only [periodicRegion, expandedMotif, List.mem_flatMap]
+      refine ⟨horizontalIndex, List.mem_finRange horizontalIndex,
+        verticalIndex, List.mem_finRange verticalIndex, ?_⟩
+      simp only [expandedBlockPixels, List.mem_map]
+      exact ⟨pixel, pixelMember, rfl⟩
+    · simpa only [periodicRegion] using equality
+
 end PeriodicOrthogonalDrawing
 end Gadget
 end LeanTrominoes

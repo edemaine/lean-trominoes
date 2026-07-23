@@ -189,7 +189,8 @@ The representation choices for this target are:
   list has a standard primitive-recursive encoding for later reductions.
 - [`LeanTrominoes/GadgetSubstitution.lean`](LeanTrominoes/GadgetSubstitution.lean)
   replaces each drawing cell by its `6 × 6` paper mask and packages the
-  resulting motif as a full-rank `PeriodicRegion`.
+  resulting motif as a full-rank `PeriodicRegion`; its carrier is proved equal
+  to the infinite periodic union of the translated gadget blocks.
 - [`LeanTrominoes/Theorem52.lean`](LeanTrominoes/Theorem52.lean) assembles
   these definitions with `LeanWang.CoREComplete` into the formal target.
 
