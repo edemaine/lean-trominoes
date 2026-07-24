@@ -289,7 +289,10 @@ The representation choices for this target are:
   bounded by its input footprint because the consumed outer-list delimiter
   pays for the inserted natural-number delimiter.  Its binary-successor
   certificate bounds carry propagation at every bit and allows one extra
-  cell precisely for a newly created high bit.
+  cell precisely for a newly created high bit.  The matching binary
+  predecessor certificate covers borrow propagation plus the evaluator's
+  empty-list and zero-head case branches without increasing the input
+  footprint.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

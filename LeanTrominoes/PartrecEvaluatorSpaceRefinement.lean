@@ -1190,5 +1190,354 @@ noncomputable def succ_ok_inSpace {q s n} {c d : List Γ'} :
               some Γ'.bit0, ⟨rfl⟩, by
                 simpa [afterSucc, trPosNum] using run⟩
 
+/-- Binary predecessor never increases the total stack footprint.  The
+certificate also covers the empty-list and zero-head branches used by the
+partial-recursive evaluator's case instruction. -/
+noncomputable def pred_ok_inSpace (q₁ q₂ s v)
+    (c d : List Γ') :
+    Σ finalState,
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        ((trList v).length + c.length + d.length)
+        ⟨some (Λ'.pred q₁ q₂), s,
+          K'.elim (trList v) [] c d⟩
+        (v.headI.rec
+          ⟨some q₁, finalState,
+            K'.elim (trList v.tail) [] c d⟩
+          fun n _ =>
+            ⟨some q₂, finalState,
+              K'.elim (trList (n :: v.tail)) [] c d⟩) := by
+  rcases v with (_ | ⟨_ | n, tail⟩)
+  · refine ⟨none, EvalsToInSpace.single ?_ ?_ ?_⟩
+    · simp
+    · rw [stackSpace_elim]
+      simp
+    · change
+        TM2.stackSpace
+            ⟨some q₁, none, K'.elim [] [] c d⟩ ≤
+          (trList []).length + c.length + d.length
+      rw [stackSpace_elim]
+      simp
+  · refine
+      ⟨some Γ'.cons,
+        EvalsToInSpace.single ?_ ?_ ?_⟩
+    · simp
+    · rw [stackSpace_elim]
+      simp
+    · simp only [List.headI_cons, Nat.rec_zero,
+        List.tail_cons]
+      rw [stackSpace_elim]
+      simp
+  · simp only [trList, trNat.eq_1, trNum, Nat.cast_succ,
+      Num.add_one, Num.succ, List.tail_cons, List.headI_cons]
+    cases number : (n : Num) with
+    | zero =>
+        have inputZero : n = 0 := by
+          have converted :=
+            congrArg (fun value : Num => (value : Nat)) number
+          simpa using converted
+        subst n
+        clear number
+        let afterPred : Cfg' :=
+          ⟨some (unrev q₂), some Γ'.cons,
+            K'.elim (Γ'.cons :: trList tail) [] c d⟩
+        have predStep :
+            TM2.step tr
+                ⟨some (Λ'.pred q₁ q₂), s,
+                  K'.elim
+                    ([Γ'.bit1, Γ'.cons] ++ trList tail)
+                    [] c d⟩ =
+              some afterPred := by
+          simp [afterPred, TM2.step, tr.eq_def]
+          rfl
+        have first :
+            EvalsToInSpace (TM2.step tr) TM2.stackSpace
+              (([Γ'.bit1, Γ'.cons] ++
+                  trList tail).length +
+                c.length + d.length)
+              ⟨some (Λ'.pred q₁ q₂), s,
+                K'.elim
+                  ([Γ'.bit1, Γ'.cons] ++ trList tail)
+                  [] c d⟩
+              afterPred := by
+          apply EvalsToInSpace.single predStep
+          · rw [stackSpace_elim]
+            simp
+          · rw [stackSpace_elim]
+            simp
+        have unreverseRaw :=
+          unrev_ok_inSpace
+            (q := q₂) (s := some Γ'.cons)
+            (tapeStacks :=
+              K'.elim (Γ'.cons :: trList tail) [] c d)
+        have unreverse :
+            EvalsToInSpace (TM2.step tr) TM2.stackSpace
+              (([Γ'.bit1, Γ'.cons] ++
+                  trList tail).length +
+                c.length + d.length)
+              afterPred
+              ⟨some q₂, none,
+                K'.elim (Γ'.cons :: trList tail) [] c d⟩ := by
+          convert unreverseRaw.mono first.last_le using 1
+          all_goals simp
+        exact ⟨none, by
+          simpa [Num.succ', trPosNum, Nat.add_assoc,
+            Nat.add_left_comm, Nat.add_comm] using
+              first.trans unreverse⟩
+    | pos positive =>
+        have inputPositive : n = (positive : Nat) := by
+          have converted :=
+            congrArg (fun value : Num => (value : Nat)) number
+          simpa using converted
+        subst n
+        clear number
+        suffices
+            ∀ reversePrefix,
+              Σ finalReverse finalMain finalState,
+                PLift
+                  (List.reverseAux reversePrefix
+                      (trPosNum positive) =
+                    List.reverseAux finalReverse finalMain) ×
+                EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                  ((trPosNum positive.succ).length + 1 +
+                    (trList tail).length +
+                    reversePrefix.length + c.length + d.length)
+                  ⟨some (Λ'.pred q₁ q₂), s,
+                    K'.elim
+                      (trPosNum positive.succ ++
+                        Γ'.cons :: trList tail)
+                      reversePrefix c d⟩
+                  ⟨some (unrev q₂), finalState,
+                    K'.elim
+                      (finalMain ++ Γ'.cons :: trList tail)
+                      finalReverse c d⟩ by
+          obtain ⟨finalReverse, finalMain, finalState,
+            representationLift, decrement⟩ := this []
+          have representation := representationLift.down
+          have decrement' :
+              EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                ((trPosNum positive.succ).length + 1 +
+                  (trList tail).length + c.length + d.length)
+                ⟨some (Λ'.pred q₁ q₂), s,
+                  K'.elim
+                    (trPosNum positive.succ ++
+                      Γ'.cons :: trList tail)
+                    [] c d⟩
+                ⟨some (unrev q₂), finalState,
+                  K'.elim
+                    (finalMain ++ Γ'.cons :: trList tail)
+                    finalReverse c d⟩ := by
+            simpa using decrement
+          have unreverseRaw :=
+            unrev_ok_inSpace
+              (q := q₂) (s := finalState)
+              (tapeStacks :=
+                K'.elim
+                  (finalMain ++ Γ'.cons :: trList tail)
+                  finalReverse c d)
+          have outputEq :
+              List.reverseAux finalReverse
+                  (finalMain ++ Γ'.cons :: trList tail) =
+                trPosNum positive ++
+                  Γ'.cons :: trList tail := by
+            simp only [List.reverseAux_eq, List.reverse_nil,
+              List.nil_append] at representation
+            rw [List.reverseAux_eq, ← List.append_assoc,
+              ← representation]
+          have outputEq' :
+              finalReverse.reverse ++
+                  (finalMain ++ Γ'.cons :: trList tail) =
+                trPosNum positive ++
+                  Γ'.cons :: trList tail := by
+            simpa [List.reverseAux_eq] using outputEq
+          have unreverse :
+              EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                ((trPosNum positive.succ).length + 1 +
+                  (trList tail).length + c.length + d.length)
+                ⟨some (unrev q₂), finalState,
+                  K'.elim
+                    (finalMain ++ Γ'.cons :: trList tail)
+                    finalReverse c d⟩
+                ⟨some q₂, none,
+                  K'.elim
+                    (trPosNum positive ++
+                      Γ'.cons :: trList tail)
+                    [] c d⟩ := by
+            convert
+              unreverseRaw.mono decrement'.last_le using 1
+            all_goals simp [outputEq']
+          exact ⟨none, by
+            simpa [trNum, Num.succ, Num.succ',
+              Nat.add_assoc, Nat.add_left_comm, Nat.add_comm] using
+              decrement'.trans unreverse⟩
+        induction positive generalizing s with
+        | one =>
+            intro reversePrefix
+            let middle : Cfg' :=
+              ⟨some (Λ'.pred q₁ q₂), some Γ'.bit0,
+                K'.elim
+                  (Γ'.bit1 :: Γ'.cons :: trList tail)
+                  (Γ'.bit1 :: reversePrefix) c d⟩
+            let afterPred : Cfg' :=
+              ⟨some (unrev q₂), some Γ'.cons,
+                K'.elim (Γ'.cons :: trList tail)
+                  (Γ'.bit1 :: reversePrefix) c d⟩
+            have firstStep :
+                TM2.step tr
+                    ⟨some (Λ'.pred q₁ q₂), s,
+                      K'.elim
+                        (trPosNum PosNum.one.succ ++
+                          Γ'.cons :: trList tail)
+                        reversePrefix c d⟩ =
+                  some middle := by
+              simp [middle, TM2.step, tr.eq_def]
+              rfl
+            have first :
+                EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                  ((trPosNum PosNum.one.succ).length + 1 +
+                    (trList tail).length +
+                    reversePrefix.length + c.length + d.length)
+                  ⟨some (Λ'.pred q₁ q₂), s,
+                    K'.elim
+                      (trPosNum PosNum.one.succ ++
+                        Γ'.cons :: trList tail)
+                      reversePrefix c d⟩
+                  middle := by
+              apply EvalsToInSpace.single firstStep
+              · rw [stackSpace_elim]
+                simp [PosNum.succ, trPosNum]
+                omega
+              · rw [stackSpace_elim]
+                simp [PosNum.succ, trPosNum]
+                omega
+            have secondStep :
+                TM2.step tr middle = some afterPred := by
+              simp [middle, afterPred, TM2.step, tr.eq_def]
+              rfl
+            have second :
+                EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                  ((trPosNum PosNum.one.succ).length + 1 +
+                    (trList tail).length +
+                    reversePrefix.length + c.length + d.length)
+                  middle afterPred := by
+              apply EvalsToInSpace.single secondStep
+              · exact first.last_le
+              · rw [stackSpace_elim]
+                simp [PosNum.succ, trPosNum]
+                omega
+            exact
+              ⟨Γ'.bit1 :: reversePrefix, [],
+                some Γ'.cons, ⟨rfl⟩, first.trans second⟩
+        | bit1 smaller induction =>
+            intro reversePrefix
+            let middle : Cfg' :=
+              ⟨some (Λ'.pred q₁ q₂), some Γ'.bit0,
+                K'.elim
+                  (trPosNum smaller.succ ++
+                    Γ'.cons :: trList tail)
+                  (Γ'.bit1 :: reversePrefix) c d⟩
+            have firstStep :
+                TM2.step tr
+                    ⟨some (Λ'.pred q₁ q₂), s,
+                      K'.elim
+                        (trPosNum (PosNum.bit1 smaller).succ ++
+                          Γ'.cons :: trList tail)
+                        reversePrefix c d⟩ =
+                  some middle := by
+              simp [middle, trPosNum, PosNum.succ,
+                TM2.step, tr.eq_def]
+              rfl
+            have first :
+                EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                  ((trPosNum (PosNum.bit1 smaller).succ).length +
+                    1 + (trList tail).length +
+                    reversePrefix.length + c.length + d.length)
+                  ⟨some (Λ'.pred q₁ q₂), s,
+                    K'.elim
+                      (trPosNum (PosNum.bit1 smaller).succ ++
+                        Γ'.cons :: trList tail)
+                      reversePrefix c d⟩
+                  middle := by
+              apply EvalsToInSpace.single firstStep
+              · rw [stackSpace_elim]
+                simp [trPosNum, PosNum.succ]
+                omega
+              · rw [stackSpace_elim]
+                simp [trPosNum, PosNum.succ]
+                omega
+            obtain ⟨finalReverse, finalMain, finalState,
+              representation, rest⟩ :=
+                induction (s := some Γ'.bit0)
+                  (Γ'.bit1 :: reversePrefix)
+            have rest' :
+                EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                  ((trPosNum (PosNum.bit1 smaller).succ).length +
+                    1 + (trList tail).length +
+                    reversePrefix.length + c.length + d.length)
+                  middle
+                  ⟨some (unrev q₂), finalState,
+                    K'.elim
+                      (finalMain ++ Γ'.cons :: trList tail)
+                      finalReverse c d⟩ := by
+              simpa [middle, trPosNum, PosNum.succ,
+                Nat.add_assoc, Nat.add_left_comm, Nat.add_comm]
+                using rest
+            exact
+              ⟨finalReverse, finalMain, finalState,
+                representation, first.trans rest'⟩
+        | bit0 smaller induction =>
+            intro reversePrefix
+            obtain ⟨headSymbol, remaining, encodingLift,
+              notDelimiterLift⟩ :
+                Σ headSymbol remaining,
+                  PLift
+                    (trPosNum smaller =
+                      headSymbol :: remaining) ×
+                  PLift (natEnd headSymbol = false) := by
+              cases smaller <;>
+                exact ⟨_, _, ⟨rfl⟩, ⟨rfl⟩⟩
+            have encoding := encodingLift.down
+            have notDelimiter := notDelimiterLift.down
+            let afterPred : Cfg' :=
+              ⟨some (unrev q₂), some headSymbol,
+                K'.elim
+                  (trPosNum smaller ++
+                    Γ'.cons :: trList tail)
+                  (Γ'.bit0 :: reversePrefix) c d⟩
+            have predStep :
+                TM2.step tr
+                    ⟨some (Λ'.pred q₁ q₂), s,
+                      K'.elim
+                        (trPosNum (PosNum.bit0 smaller).succ ++
+                          Γ'.cons :: trList tail)
+                        reversePrefix c d⟩ =
+                  some afterPred := by
+              simp [afterPred, trPosNum, PosNum.succ,
+                encoding, notDelimiter,
+                show some Γ'.bit1 ≠ some Γ'.bit0 by decide,
+                Option.getD, -natEnd, TM2.step, tr.eq_def]
+              rfl
+            have run :
+                EvalsToInSpace (TM2.step tr) TM2.stackSpace
+                  ((trPosNum (PosNum.bit0 smaller).succ).length +
+                    1 + (trList tail).length +
+                    reversePrefix.length + c.length + d.length)
+                  ⟨some (Λ'.pred q₁ q₂), s,
+                    K'.elim
+                      (trPosNum (PosNum.bit0 smaller).succ ++
+                        Γ'.cons :: trList tail)
+                      reversePrefix c d⟩
+                  afterPred := by
+              apply EvalsToInSpace.single predStep
+              · rw [stackSpace_elim]
+                simp [trPosNum, PosNum.succ]
+                omega
+              · rw [stackSpace_elim]
+                simp [trPosNum, PosNum.succ]
+                omega
+            exact
+              ⟨Γ'.bit0 :: reversePrefix, trPosNum smaller,
+                some headSymbol, ⟨rfl⟩, by
+                  simpa [afterPred, trPosNum] using run⟩
+
 end PartrecToTM2
 end Turing
