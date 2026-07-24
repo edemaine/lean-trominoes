@@ -315,7 +315,11 @@ The representation choices for this target are:
   (`normalSimulationSpace`, `retSimulationSpace`, and
   `cfgSimulationSpace`) are proved equivalent to the corresponding logical
   obligations, leaving ordinary natural-number inequalities for
-  program-specific space proofs.
+  program-specific space proofs.  `EvaluatorExecutionFits` and
+  `EvaluatorCallFits` additionally support a backward,
+  continuation-passing proof style: a finite fitted call automatically
+  bounds every high-level state reachable during that call and yields an
+  `EvaluatorRunFits` certificate at the halting continuation.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

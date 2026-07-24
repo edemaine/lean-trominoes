@@ -2776,6 +2776,112 @@ theorem cfgSimulationFits_iff
       simp [cfgSimulationFits, cfgSimulationSpace,
         retSimulationFits_iff]
 
+/-- A finite evaluator execution whose every return (and final halt) has a
+numeric simulation requirement within `bound`.  This continuation-passing
+certificate is convenient for composing nested program calls backward from
+their final result. -/
+inductive EvaluatorExecutionFits (bound : Nat) :
+    ToPartrec.Cfg → Prop
+  | halt (values : List Nat)
+      (space : encodedListSpace values ≤ bound) :
+      EvaluatorExecutionFits bound (.halt values)
+  | ret (continuation : ToPartrec.Cont) (values : List Nat)
+      (space : retSimulationSpace continuation values ≤ bound)
+      (next :
+        EvaluatorExecutionFits bound
+          (ToPartrec.stepRet continuation values)) :
+      EvaluatorExecutionFits bound (.ret continuation values)
+
+namespace EvaluatorExecutionFits
+
+/-- The current configuration of a finite fitted execution satisfies its
+numeric simulation requirement. -/
+theorem current_space
+    {bound : Nat} {configuration : ToPartrec.Cfg}
+    (execution : EvaluatorExecutionFits bound configuration) :
+    cfgSimulationSpace configuration ≤ bound := by
+  cases execution with
+  | halt values space =>
+      exact space
+  | ret continuation values space next =>
+      exact space
+
+/-- Advance a fitted execution by one high-level evaluator step. -/
+theorem next
+    {bound : Nat} {first next : ToPartrec.Cfg}
+    (execution : EvaluatorExecutionFits bound first)
+    (step : ToPartrec.step first = some next) :
+    EvaluatorExecutionFits bound next := by
+  cases execution with
+  | halt values space =>
+      simp [ToPartrec.step] at step
+  | ret continuation values space after =>
+      simp only [ToPartrec.step, Option.some.injEq] at step
+      subst next
+      exact after
+
+/-- Advance a fitted execution along any finite high-level reachability
+derivation. -/
+theorem after_reaches
+    {bound : Nat} {first last : ToPartrec.Cfg}
+    (execution : EvaluatorExecutionFits bound first)
+    (reachable : Reaches ToPartrec.step first last) :
+    EvaluatorExecutionFits bound last := by
+  induction reachable with
+  | refl =>
+      exact execution
+  | @tail before after reachable edge induction =>
+      apply induction.next
+      simpa only [Option.mem_def] using edge
+
+/-- Every high-level configuration reached along a fitted finite execution
+satisfies its numeric simulation requirement. -/
+theorem space_of_reaches
+    {bound : Nat} {first last : ToPartrec.Cfg}
+    (execution : EvaluatorExecutionFits bound first)
+    (reachable : Reaches ToPartrec.step first last) :
+    cfgSimulationSpace last ≤ bound :=
+  (execution.after_reaches reachable).current_space
+
+/-- Enlarge the common budget of a fitted finite execution. -/
+theorem mono
+    {small large : Nat} {configuration : ToPartrec.Cfg}
+    (execution : EvaluatorExecutionFits small configuration)
+    (budget : small ≤ large) :
+    EvaluatorExecutionFits large configuration := by
+  induction execution with
+  | halt values space =>
+      exact .halt values (space.trans budget)
+  | ret continuation values space next induction =>
+      exact .ret continuation values (space.trans budget) induction
+
+end EvaluatorExecutionFits
+
+/-- A structurally normalized code call followed by a finite fitted
+continuation execution. -/
+structure EvaluatorCallFits
+    (code : ToPartrec.Code) (continuation : ToPartrec.Cont)
+    (values : List Nat) (bound : Nat) : Prop where
+  normal :
+    normalSimulationSpace code continuation values ≤ bound
+  execution :
+    EvaluatorExecutionFits bound
+      (ToPartrec.stepNormal code continuation values)
+
+namespace EvaluatorCallFits
+
+/-- Enlarge the common budget of a fitted code call. -/
+theorem mono
+    {code : ToPartrec.Code} {continuation : ToPartrec.Cont}
+    {values : List Nat} {small large : Nat}
+    (call : EvaluatorCallFits code continuation values small)
+    (budget : small ≤ large) :
+    EvaluatorCallFits code continuation values large where
+  normal := call.normal.trans budget
+  execution := call.execution.mono budget
+
+end EvaluatorCallFits
+
 /-- A configuration's simulation obligation bounds the corresponding
 high-level milestone space. -/
 theorem cfgSimulationFits_space
@@ -2839,6 +2945,17 @@ theorem of_space_le
     intro current reachable
     exact (cfgSimulationFits_iff current bound).2
       (configuration current reachable)
+
+/-- A fitted call under the halting continuation supplies the complete
+run-level certificate. -/
+theorem of_call
+    {code : ToPartrec.Code} {values : List Nat} {bound : Nat}
+    (call :
+      EvaluatorCallFits code ToPartrec.Cont.halt values bound) :
+    EvaluatorRunFits code values bound :=
+  of_space_le call.normal
+    (fun _ reachable =>
+      call.execution.space_of_reaches reachable)
 
 /-- A step-preserved predicate that supplies the local simulation
 obligation is sufficient to certify all reachable evaluator milestones. -/
