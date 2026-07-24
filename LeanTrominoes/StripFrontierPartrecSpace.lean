@@ -1,5 +1,6 @@
 import LeanTrominoes.StripFrontierCyclePartrec
 import LeanTrominoes.StripFrontierIndexedSearchSpace
+import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 
 /-!
 # Space bounds for compiled strip-search payloads
@@ -347,6 +348,60 @@ theorem stripOuterPayload_encodedListSpace_le
   simp only [stripLoopPayloadSpaceBound]
   simp only [inputLength] at remainingBits countBits firstBits depthBits ⊢
   omega
+
+/-- One common polynomial envelope for the two kinds of semantic payload
+appearing in the compiled strip search, together with its typed input and
+constant-size Boolean output. -/
+def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
+  stripReachPayloadSpaceBound inputLength +
+    stripLoopPayloadSpaceBound inputLength + inputLength + 2
+
+/-- Polynomial packaging of `stripEvaluatorSpaceBound`. -/
+noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
+  stripReachPayloadSpacePolynomial +
+    stripLoopPayloadSpacePolynomial + Polynomial.X + 2
+
+@[simp]
+theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
+    stripEvaluatorSpacePolynomial.eval inputLength =
+      stripEvaluatorSpaceBound inputLength := by
+  simp [stripEvaluatorSpacePolynomial, stripEvaluatorSpaceBound]
+
+theorem stripReachPayloadSpaceBound_le_evaluator
+    (inputLength : Nat) :
+    stripReachPayloadSpaceBound inputLength ≤
+      stripEvaluatorSpaceBound inputLength := by
+  simp only [stripEvaluatorSpaceBound]
+  omega
+
+theorem stripLoopPayloadSpaceBound_le_evaluator
+    (inputLength : Nat) :
+    stripLoopPayloadSpaceBound inputLength ≤
+      stripEvaluatorSpaceBound inputLength := by
+  simp only [stripEvaluatorSpaceBound]
+  omega
+
+theorem stripInputLength_le_evaluator (inputLength : Nat) :
+    inputLength ≤ stripEvaluatorSpaceBound inputLength := by
+  simp only [stripEvaluatorSpaceBound]
+  omega
+
+/-- The native evaluator representation of a typed strip input has exactly
+the project's binary input length. -/
+theorem stripInput_encodedListSpace
+    (periodicStrip : PeriodicStrip) :
+    encodedListSpace [Encodable.encode periodicStrip] =
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length := by
+  simpa only [Turing.PartrecToTM2.stackSpace_init] using
+    Turing.PartrecToTM2.stackSpace_typed_init
+      (periodicStripTrominoTilingCode Tromino.I) periodicStrip
+
+/-- A Boolean result occupies at most two cells in the evaluator's
+delimited-binary list representation. -/
+theorem stripResult_encodedListSpace_le (result : Bool) :
+    encodedListSpace [Encodable.encode result] ≤ 2 := by
+  cases result <;> decide
 
 end RawWindowState
 end PeriodicStrip

@@ -356,7 +356,9 @@ The representation choices for this target are:
   graph-size and stack-length counters, and every semantic loop milestone.
   The surrounding first- and second-endpoint countdown payloads have a
   separate explicit linear bound, including all loop counters and their
-  Boolean accumulator.
+  Boolean accumulator.  `stripEvaluatorSpacePolynomial` combines both bounds
+  with the exact typed-input size and constant Boolean-output size into one
+  polynomial envelope for the evaluator proof.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
