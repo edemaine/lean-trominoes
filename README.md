@@ -281,7 +281,9 @@ The representation choices for this target are:
   data-duplicating primitive and proves that every intermediate
   configuration is bounded by the final two-copy footprint.  The generic
   move, reverse-move, and clear loops are also certified to preserve or
-  decrease total stack space at every step.
+  decrease total stack space at every step.  This includes the evaluator's
+  stable two-pass move, with its temporarily removed and restored delimiter,
+  which is used to shuffle continuation data among the four stacks.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

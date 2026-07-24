@@ -319,6 +319,140 @@ def unrev_ok_inSpace {q s} {tapeStacks : K' → List Γ'} :
             (tapeStacks .main))⟩ := by
   exact move_ok_inSpace (by decide) (splitAtPred_false _)
 
+private theorem splitAtPred_length {α : Type*} (predicate : α → Bool) :
+    ∀ values first found rest,
+      splitAtPred predicate values = (first, found, rest) →
+        values.length =
+          first.length + found.toList.length + rest.length := by
+  intro values
+  induction values with
+  | nil =>
+      intro first found rest split
+      simp only [splitAtPred] at split
+      cases split
+      rfl
+  | cons value values induction =>
+      intro first found rest split
+      rw [splitAtPred] at split
+      cases predicateValue : predicate value
+      · rcases recursiveSplit :
+          splitAtPred predicate values with
+          ⟨recursiveFirst, recursivePair⟩
+        rcases recursivePair with ⟨recursiveFound, recursiveRest⟩
+        simp only [predicateValue, cond_false, recursiveSplit] at split
+        cases split
+        have recursiveLength :=
+          induction recursiveFirst found rest
+            recursiveSplit
+        simp only [List.length_cons]
+        omega
+      · simp only [predicateValue, cond_true] at split
+        cases split
+        simp
+        omega
+
+/-- The two-pass stable move used by continuation shuffling preserves total
+space throughout, including the optional delimiter restored between passes. -/
+def move₂_ok_inSpace {p k₁ k₂ q s L₁ o L₂}
+    {tapeStacks : K' → List Γ'}
+    (different : k₁ ≠ .rev ∧ k₂ ≠ .rev ∧ k₁ ≠ k₂)
+    (reverseEmpty : tapeStacks .rev = [])
+    (split :
+      splitAtPred p (tapeStacks k₁) = (L₁, o, L₂)) :
+    EvalsToInSpace (TM2.step tr) TM2.stackSpace
+      (TM2.stackSpace
+        ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩)
+      ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩
+      ⟨some q, none,
+        Function.update
+          (Function.update tapeStacks k₁
+            (o.elim id List.cons L₂))
+          k₂ (L₁ ++ tapeStacks k₂)⟩ := by
+  let afterFirstStacks :=
+    Function.update
+      (Function.update tapeStacks k₁ L₂) .rev
+      (L₁.reverseAux (tapeStacks .rev))
+  let afterFirst : Cfg' :=
+    ⟨some (Λ'.push k₁ id
+      (Λ'.move (fun _ => false) .rev k₂ q)),
+      o, afterFirstStacks⟩
+  have firstRaw :=
+    move_ok_inSpace
+      (q := Λ'.push k₁ id
+        (Λ'.move (fun _ => false) .rev k₂ q))
+      (s := s) different.1 split
+  have first :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        (TM2.stackSpace
+          ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩)
+        ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩
+        afterFirst := by
+    simpa [move₂, moveExcl, afterFirst, afterFirstStacks] using firstRaw
+  let restored := o.elim id List.cons L₂
+  let afterPushStacks :=
+    Function.update afterFirstStacks k₁ restored
+  let afterPush : Cfg' :=
+    ⟨some (Λ'.move (fun _ => false) .rev k₂ q),
+      o, afterPushStacks⟩
+  have pushStep :
+      TM2.step tr afterFirst = some afterPush := by
+    cases o <;>
+      simp [afterFirst, afterPush, afterPushStacks, restored,
+        TM2.step, tr.eq_def, afterFirstStacks,
+        Function.update_comm, Function.update_idem,
+        different.1, different.1.symm]
+    all_goals rfl
+  have splitLength := splitAtPred_length p _ _ _ _ split
+  have pushSpace :
+      TM2.stackSpace afterPush =
+        TM2.stackSpace
+          ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩ := by
+    rw [stackSpace_fields, stackSpace_fields]
+    cases k₁ <;> cases o <;>
+      simp_all [afterPush, afterPushStacks, afterFirstStacks,
+        restored, Function.update,
+        List.reverseAux_eq] <;> omega
+  have push :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        (TM2.stackSpace
+          ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩)
+        afterFirst afterPush := by
+    apply EvalsToInSpace.single pushStep
+    · exact first.last_le
+    · exact pushSpace.le
+  have reverseNow :
+      afterPushStacks .rev = L₁.reverse := by
+    simp [afterPushStacks, afterFirstStacks,
+      different.1.symm, reverseEmpty, List.reverseAux_eq]
+  have secondRaw :=
+    move_ok_inSpace (q := q) (s := o)
+      (tapeStacks := afterPushStacks) different.2.1.symm
+      (splitAtPred_false (afterPushStacks .rev))
+  have second :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        (TM2.stackSpace
+          ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩)
+        afterPush
+        ⟨some q, none,
+          Function.update
+            (Function.update tapeStacks k₁ restored)
+            k₂ (L₁ ++ tapeStacks k₂)⟩ := by
+    have secondBound :
+        TM2.stackSpace afterPush ≤
+          TM2.stackSpace
+            ⟨some (move₂ p k₁ k₂ q), s, tapeStacks⟩ :=
+      pushSpace.le
+    convert secondRaw.mono secondBound using 1
+    all_goals
+      simp [afterPushStacks, afterFirstStacks,
+        reverseEmpty, restored, Function.update_comm,
+        different.1, different.2.2, List.reverseAux_eq]
+    ext stackIndex
+    cases k₁ <;> cases k₂ <;> cases stackIndex <;>
+      simp_all [afterPushStacks, afterFirstStacks, restored,
+        Function.update, List.reverseAux_eq]
+  exact (first.trans push).trans second
+
 /-- The evaluator's `copy` loop duplicates the reverse stack into the main
 and continuation stacks.  At every intermediate point, its total space is at
 most the final size: the original main and continuation data, the auxiliary
