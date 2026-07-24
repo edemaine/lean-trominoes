@@ -434,6 +434,13 @@ The representation choices for this target are:
   `[quotient, lowBit]`.  This low bit is the sign tag in Mathlib's standard
   integer encoding, while the quotient is the coordinate magnitude needed
   by motif predicates.
+- [`LeanTrominoes/PartrecCellDecode.lean`](LeanTrominoes/PartrecCellDecode.lean)
+  and
+  [`LeanTrominoes/PartrecCellDecodeSpace.lean`](LeanTrominoes/PartrecCellDecodeSpace.lean)
+  combine quotient/parity with standard unpairing to decode an encoded lattice
+  cell into `[xMagnitude, xSign, yMagnitude, ySign]`.  Correctness is tied
+  directly to Mathlib's even/odd encoding of nonnegative and negative
+  integers, and every component has a fitted evaluator certificate.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
