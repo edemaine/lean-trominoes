@@ -895,6 +895,11 @@ The representation choices for this target are:
   protoclauses into clauses of width at most three.  Auxiliary variables are
   anchored at the first source-literal offset, and the output is proved to
   preserve the paper's locality condition.
+- [`LeanTrominoes/PeriodicThreeCNFCorrectness.lean`](LeanTrominoes/PeriodicThreeCNFCorrectness.lean)
+  proves the split equisatisfiable in both directions.  The canonical
+  extension makes each chain bit describe whether its unconsumed suffix has a
+  true literal; conversely, a verified chain with a true incoming bit must
+  expose a true source literal.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible

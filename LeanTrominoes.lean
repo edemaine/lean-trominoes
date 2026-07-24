@@ -40,6 +40,7 @@ import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PeriodicCNF
 import LeanTrominoes.PeriodicThreeCNF
+import LeanTrominoes.PeriodicThreeCNFCorrectness
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecEncodedListDecode
