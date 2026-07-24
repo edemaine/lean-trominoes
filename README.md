@@ -304,7 +304,9 @@ The representation choices for this target are:
   bounded run from the concrete evaluator input to its unique halt
   configuration.  Determinism then bounds every low-level configuration
   reachable from that input, which is the quantitative premise needed by
-  `PolySpaceDecider`.
+  `PolySpaceDecider`.  `inPSPACE_of_evaluatorRunFits` packages such
+  input-indexed run certificates all the way through the finite-machine
+  compiler to the project's proposition-level PSPACE interface.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

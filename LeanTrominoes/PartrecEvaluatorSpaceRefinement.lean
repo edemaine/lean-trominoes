@@ -2707,5 +2707,59 @@ theorem evaluator_reachable_space_le
       _ reachable
   simp [halt, TM2.step]
 
+/-- Package run-level evaluator certificates directly as the ambient
+polynomial-space decider expected by the finite-machine compiler. -/
+noncomputable def PolySpaceDecider.ofEvaluatorRunFits
+    {α : Type} [Primcodable α] {language : α → Prop}
+    (code : ToPartrec.Code) (result : α → Bool)
+    (correct : ∀ input, result input = true ↔ language input)
+    (evaluates : ∀ input,
+      [Encodable.encode (result input)] ∈
+        code.eval [Encodable.encode input])
+    (space : Polynomial Nat)
+    (fits : ∀ input,
+      EvaluatorRunFits code [Encodable.encode input]
+        (space.eval
+          ((LeanTrominoes.Complexity.primcodableFinEncoding α).encode
+            input).length)) :
+    PolySpaceDecider language where
+  code := code
+  result := result
+  correct := correct
+  evaluates := evaluates
+  space := space
+  space_le := by
+    intro input configuration reachable
+    exact
+      evaluator_reachable_space_le code
+        [Encodable.encode input]
+        [Encodable.encode (result input)]
+        (space.eval
+          ((LeanTrominoes.Complexity.primcodableFinEncoding α).encode
+            input).length)
+        (fits input) (evaluates input) reachable
+
+/-- Proposition-level PSPACE membership from run-level evaluator
+certificates. -/
+theorem inPSPACE_of_evaluatorRunFits
+    {α : Type} [Primcodable α] {language : α → Prop}
+    (code : ToPartrec.Code) (result : α → Bool)
+    (correct : ∀ input, result input = true ↔ language input)
+    (evaluates : ∀ input,
+      [Encodable.encode (result input)] ∈
+        code.eval [Encodable.encode input])
+    (space : Polynomial Nat)
+    (fits : ∀ input,
+      EvaluatorRunFits code [Encodable.encode input]
+        (space.eval
+          ((LeanTrominoes.Complexity.primcodableFinEncoding α).encode
+            input).length)) :
+    LeanTrominoes.Complexity.InPSPACE
+      (LeanTrominoes.Complexity.primcodableFinEncoding α)
+      language :=
+  inPSPACE_of_partrec
+    (PolySpaceDecider.ofEvaluatorRunFits code result correct evaluates
+      space fits)
+
 end PartrecToTM2
 end Turing
