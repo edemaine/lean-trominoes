@@ -275,6 +275,11 @@ The representation choices for this target are:
   prefix, compose across macro steps, and show that a bounded run to a
   terminal configuration controls every low-level configuration reachable
   from the same start.
+- [`LeanTrominoes/PartrecEvaluatorSpaceRefinement.lean`](LeanTrominoes/PartrecEvaluatorSpaceRefinement.lean)
+  begins the corresponding quantitative refinement of Mathlib's four-stack
+  evaluator.  Its `copy` certificate covers the evaluator's only
+  data-duplicating primitive and proves that every intermediate
+  configuration is bounded by the final two-copy footprint.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;
