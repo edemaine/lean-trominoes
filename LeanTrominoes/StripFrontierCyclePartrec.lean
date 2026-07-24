@@ -1,5 +1,6 @@
 import LeanTrominoes.StripFrontierPartrec
 import LeanTrominoes.PartrecBinaryLength
+import LeanTrominoes.PartrecFuel
 
 /-!
 # Flat partial-recursive strip cycle search
@@ -30,32 +31,14 @@ private theorem comp_eval_pure (outer inner : Code)
     (outer.comp inner).eval input = outer.eval output := by
   simp [innerCorrect, Part.bind_eq_bind]
 
-private def divideEvalFuelVector (values : List.Vector Nat 2) : Nat :=
-  divideEvalFuel values.head values.tail.head
-
-private theorem divideEvalFuelVector_primrec :
-    Primrec divideEvalFuelVector := by
-  unfold divideEvalFuelVector
-  exact divideEvalFuel_primrec.comp
-    Primrec.vector_head
-    (Primrec.vector_head.comp Primrec.vector_tail)
-
 /-- Two-argument code computing the exact fuel of one Savitch query. -/
-noncomputable def divideEvalFuelCode : Code :=
-  codeOfVectorPrimrec divideEvalFuelVector
-    divideEvalFuelVector_primrec
+def divideEvalFuelCode : Code :=
+  Code.divideEvalFuelCode
 
 theorem divideEvalFuelCode_eval (stateCount depth : Nat) :
     divideEvalFuelCode.eval [stateCount, depth] =
       pure [divideEvalFuel stateCount depth] := by
-  let input : List.Vector Nat 2 :=
-    ⟨[stateCount, depth], rfl⟩
-  have correctness :=
-    codeOfVectorPrimrec_eval divideEvalFuelVector
-      divideEvalFuelVector_primrec input
-  change divideEvalFuelCode.eval [stateCount, depth] =
-    pure [divideEvalFuel stateCount depth] at correctness
-  exact correctness
+  simp [divideEvalFuelCode]
 
 private def fuelArguments : Code :=
   Code.prepend (Code.get 1) <|
