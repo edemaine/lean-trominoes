@@ -1,5 +1,4 @@
 import LeanTrominoes.PeriodicThreeCNF
-import Mathlib.Tactic.Order
 
 /-!
 # Correctness of periodic CNF clause splitting
@@ -14,8 +13,8 @@ noncomputable section
 namespace LeanTrominoes
 namespace PeriodicThreeCNF
 
-/-- Extend an original assignment by making chain bit `i` true exactly when
-some literal in the unconsumed suffix `drop (i + 2)` is true. -/
+/-- Extend an original assignment by making a chain bit true exactly when
+some literal in the suffix naming that bit is true. -/
 noncomputable def extendAssignment {Variable : Type*}
     (assignment : Variable → Cell → Bool) :
     ThreeCNFVariable Variable → Cell → Bool := by
@@ -23,8 +22,8 @@ noncomputable def extendAssignment {Variable : Type*}
   intro atomOrAux cell
   rcases atomOrAux with atom | data
   · exact assignment atom cell
-  · rcases data with ⟨source, index⟩
-    exact decide (∃ literal ∈ source.drop (index + 2),
+  · rcases data with ⟨source, suffix⟩
+    exact decide (∃ literal ∈ suffix,
       literal.Holds assignment (Cell.sub cell (anchor source)))
 
 /-- Forget auxiliary atoms in an assignment. -/
@@ -52,19 +51,17 @@ theorem liftLiteral_holds_extend {Variable : Type*}
 @[simp]
 theorem auxiliary_true_holds_extend {Variable : Type*}
     (assignment : Variable → Cell → Bool)
-    (translate : Cell) (source : PeriodicClause Variable) (index : Nat) :
-    (auxiliary source index true).Holds (extendAssignment assignment) translate ↔
-      ∃ literal ∈ source.drop (index + 2),
-        literal.Holds assignment translate := by
+    (translate : Cell) (source suffix : PeriodicClause Variable) :
+    (auxiliary source suffix true).Holds (extendAssignment assignment) translate ↔
+      ∃ literal ∈ suffix, literal.Holds assignment translate := by
   simp [PeriodicLiteral.Holds, auxiliary, extendAssignment, Cell.add, Cell.sub]
 
 @[simp]
 theorem auxiliary_false_holds_extend {Variable : Type*}
     (assignment : Variable → Cell → Bool)
-    (translate : Cell) (source : PeriodicClause Variable) (index : Nat) :
-    (auxiliary source index false).Holds (extendAssignment assignment) translate ↔
-      ¬ ∃ literal ∈ source.drop (index + 2),
-        literal.Holds assignment translate := by
+    (translate : Cell) (source suffix : PeriodicClause Variable) :
+    (auxiliary source suffix false).Holds (extendAssignment assignment) translate ↔
+      ¬ ∃ literal ∈ suffix, literal.Holds assignment translate := by
   simp [PeriodicLiteral.Holds, auxiliary, extendAssignment, Cell.add, Cell.sub]
 
 /-- The suffix-based auxiliary assignment satisfies every continuation
@@ -72,18 +69,17 @@ clause. -/
 theorem continuation_complete {Variable : Type*}
     (assignment : Variable → Cell → Bool)
     (translate : Cell) (source : PeriodicClause Variable)
-    (index : Nat) (remaining : PeriodicClause Variable)
-    (remaining_eq : remaining = source.drop (index + 2)) :
-    ∀ clause ∈ continuation source index remaining,
+    (remaining : PeriodicClause Variable) :
+    ∀ clause ∈ continuation source remaining,
       clause.Holds (extendAssignment assignment) translate := by
-  induction remaining generalizing index with
+  induction remaining with
   | nil =>
       intro clause clause_mem
       simp only [continuation, List.mem_singleton] at clause_mem
       subst clause
-      refine ⟨auxiliary source index false, by simp, ?_⟩
+      refine ⟨auxiliary source [] false, by simp, ?_⟩
       rw [auxiliary_false_holds_extend]
-      simpa [← remaining_eq]
+      simp
   | cons first rest ih =>
       cases rest with
       | nil =>
@@ -93,9 +89,9 @@ theorem continuation_complete {Variable : Type*}
           by_cases first_holds : first.Holds assignment translate
           · exact ⟨liftLiteral first, by simp,
               (liftLiteral_holds_extend assignment translate first).2 first_holds⟩
-          · refine ⟨auxiliary source index false, by simp, ?_⟩
+          · refine ⟨auxiliary source [first] false, by simp, ?_⟩
             rw [auxiliary_false_holds_extend]
-            simpa [← remaining_eq, first_holds]
+            simpa [first_holds]
       | cons second rest =>
           cases rest with
           | nil =>
@@ -110,20 +106,10 @@ theorem continuation_complete {Variable : Type*}
                 · exact ⟨liftLiteral second, by simp,
                     (liftLiteral_holds_extend assignment translate second).2
                       second_holds⟩
-                · refine ⟨auxiliary source index false, by simp, ?_⟩
+                · refine ⟨auxiliary source [first, second] false, by simp, ?_⟩
                   rw [auxiliary_false_holds_extend]
-                  simpa [← remaining_eq, first_holds, second_holds]
+                  simpa [first_holds, second_holds]
           | cons third rest =>
-              have next_eq :
-                  second :: third :: rest =
-                    source.drop ((index + 1) + 2) := by
-                calc
-                  second :: third :: rest =
-                      (first :: second :: third :: rest).drop 1 := rfl
-                  _ = (source.drop (index + 2)).drop 1 := by
-                    rw [← remaining_eq]
-                  _ = source.drop ((index + 1) + 2) := by
-                    rw [List.drop_drop]
               intro clause clause_mem
               simp only [continuation, List.mem_cons] at clause_mem
               rcases clause_mem with rfl | clause_mem
@@ -134,13 +120,15 @@ theorem continuation_complete {Variable : Type*}
                 · by_cases tail_holds :
                       ∃ literal ∈ second :: third :: rest,
                         literal.Holds assignment translate
-                  · refine ⟨auxiliary source (index + 1) true, by simp, ?_⟩
-                    rw [auxiliary_true_holds_extend, ← next_eq]
+                  · refine ⟨auxiliary source (second :: third :: rest) true,
+                      by simp, ?_⟩
+                    rw [auxiliary_true_holds_extend]
                     exact tail_holds
-                  · refine ⟨auxiliary source index false, by simp, ?_⟩
-                    rw [auxiliary_false_holds_extend, ← remaining_eq]
+                  · refine ⟨auxiliary source
+                        (first :: second :: third :: rest) false, by simp, ?_⟩
+                    rw [auxiliary_false_holds_extend]
                     simpa [first_holds] using tail_holds
-              · exact ih (index + 1) next_eq clause clause_mem
+              · exact ih clause clause_mem
 
 /-- Completeness of the split of one clause under the canonical suffix
 assignment. -/
@@ -208,20 +196,21 @@ theorem clauseClauses_complete {Variable : Type*}
                       (liftLiteral_holds_extend assignment translate second).2
                         (by simpa [second_eq] using literal_holds)⟩
                   · refine ⟨auxiliary
-                        (first :: second :: third :: fourth :: rest) 0 true,
+                        (first :: second :: third :: fourth :: rest)
+                        (third :: fourth :: rest) true,
                       by simp, ?_⟩
                     rw [auxiliary_true_holds_extend]
                     exact ⟨literal, by simpa using literal_mem, literal_holds⟩
                 · exact continuation_complete assignment translate
-                    (first :: second :: third :: fourth :: rest) 0
-                    (third :: fourth :: rest) (by simp)
+                    (first :: second :: third :: fourth :: rest)
+                    (third :: fourth :: rest)
                     clause clause_mem
 
 theorem auxiliary_false_not_holds_of_true {Variable : Type*}
     (assignment : ThreeCNFVariable Variable → Cell → Bool)
-    (translate : Cell) (source : PeriodicClause Variable) (index : Nat)
-    (incoming : (auxiliary source index true).Holds assignment translate) :
-    ¬ (auxiliary source index false).Holds assignment translate := by
+    (translate : Cell) (source suffix : PeriodicClause Variable)
+    (incoming : (auxiliary source suffix true).Holds assignment translate) :
+    ¬ (auxiliary source suffix false).Holds assignment translate := by
   intro outgoing
   simp only [PeriodicLiteral.Holds, auxiliary] at incoming outgoing
   rw [incoming] at outgoing
@@ -232,58 +221,60 @@ remaining original literal to hold. -/
 theorem continuation_sound {Variable : Type*}
     (assignment : ThreeCNFVariable Variable → Cell → Bool)
     (translate : Cell) (source : PeriodicClause Variable)
-    (index : Nat) (remaining : PeriodicClause Variable)
+    (remaining : PeriodicClause Variable)
     (satisfies :
-      ∀ clause ∈ continuation source index remaining,
+      ∀ clause ∈ continuation source remaining,
         clause.Holds assignment translate)
-    (incoming : (auxiliary source index true).Holds assignment translate) :
+    (incoming : (auxiliary source remaining true).Holds assignment translate) :
     ∃ literal ∈ remaining, (liftLiteral literal).Holds assignment translate := by
-  induction remaining generalizing index with
+  induction remaining with
   | nil =>
-      have clause_holds := satisfies [auxiliary source index false] (by
+      have clause_holds := satisfies [auxiliary source [] false] (by
         simp [continuation])
       rcases clause_holds with ⟨literal, literal_mem, literal_holds⟩
       simp only [List.mem_singleton] at literal_mem
       subst literal
-      exact (auxiliary_false_not_holds_of_true assignment translate source index
+      exact (auxiliary_false_not_holds_of_true assignment translate source []
         incoming literal_holds).elim
   | cons first rest ih =>
       cases rest with
       | nil =>
           have clause_holds := satisfies
-            [auxiliary source index false, liftLiteral first] (by
+            [auxiliary source [first] false, liftLiteral first] (by
               simp [continuation])
           rcases clause_holds with ⟨literal, literal_mem, literal_holds⟩
           simp only [List.mem_cons, List.not_mem_nil, or_false] at literal_mem
           rcases literal_mem with rfl | rfl
           · exact (auxiliary_false_not_holds_of_true assignment translate
-              source index incoming literal_holds).elim
+              source [first] incoming literal_holds).elim
           · exact ⟨first, by simp, literal_holds⟩
       | cons second rest =>
           cases rest with
           | nil =>
               have clause_holds := satisfies
-                [auxiliary source index false, liftLiteral first,
+                [auxiliary source [first, second] false, liftLiteral first,
                   liftLiteral second] (by simp [continuation])
               rcases clause_holds with ⟨literal, literal_mem, literal_holds⟩
               simp only [List.mem_cons, List.not_mem_nil, or_false] at literal_mem
               rcases literal_mem with rfl | rfl | rfl
               · exact (auxiliary_false_not_holds_of_true assignment translate
-                  source index incoming literal_holds).elim
+                  source [first, second] incoming literal_holds).elim
               · exact ⟨first, by simp, literal_holds⟩
               · exact ⟨second, by simp, literal_holds⟩
           | cons third rest =>
               have head_holds := satisfies
-                [auxiliary source index false, liftLiteral first,
-                  auxiliary source (index + 1) true] (by
+                [auxiliary source (first :: second :: third :: rest) false,
+                  liftLiteral first,
+                  auxiliary source (second :: third :: rest) true] (by
                     simp [continuation])
               rcases head_holds with ⟨literal, literal_mem, literal_holds⟩
               simp only [List.mem_cons, List.not_mem_nil, or_false] at literal_mem
               rcases literal_mem with rfl | rfl | rfl
               · exact (auxiliary_false_not_holds_of_true assignment translate
-                  source index incoming literal_holds).elim
+                  source (first :: second :: third :: rest)
+                  incoming literal_holds).elim
               · exact ⟨first, by simp, literal_holds⟩
-              · rcases ih (index + 1)
+              · rcases ih
                     (fun clause clause_mem =>
                       satisfies clause (by
                         simp only [continuation, List.mem_cons]
@@ -322,7 +313,8 @@ theorem clauseClauses_sound {Variable : Type*}
                 have head_holds := satisfies
                   [liftLiteral first, liftLiteral second,
                     auxiliary
-                      (first :: second :: third :: fourth :: rest) 0 true] (by
+                      (first :: second :: third :: fourth :: rest)
+                      (third :: fourth :: rest) true] (by
                         simp [clauseClauses])
                 rcases head_holds with ⟨literal, literal_mem, literal_holds⟩
                 simp only [List.mem_cons, List.not_mem_nil, or_false] at literal_mem
@@ -330,7 +322,7 @@ theorem clauseClauses_sound {Variable : Type*}
                 · exact ⟨first, by simp, literal_holds⟩
                 · exact ⟨second, by simp, literal_holds⟩
                 · rcases continuation_sound assignment translate
-                      (first :: second :: third :: fourth :: rest) 0
+                      (first :: second :: third :: fourth :: rest)
                       (third :: fourth :: rest)
                       (fun clause clause_mem =>
                         satisfies clause (by

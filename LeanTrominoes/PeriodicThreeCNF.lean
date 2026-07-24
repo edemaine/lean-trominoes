@@ -12,10 +12,11 @@ original clause, so the conversion can preserve locality.
 namespace LeanTrominoes
 
 /-- Original variables or a chain variable identified by its source clause
-and its position in that clause's split.  Identical duplicate protoclauses may
-share auxiliaries harmlessly because they generate identical constraints. -/
+and the remaining suffix at that point in the split.  Identical duplicate
+protoclauses may share auxiliaries harmlessly because they generate identical
+constraints. -/
 abbrev ThreeCNFVariable (Variable : Type*) :=
-  Sum Variable (PeriodicClause Variable × Nat)
+  Sum Variable (PeriodicClause Variable × PeriodicClause Variable)
 
 namespace PeriodicThreeCNF
 
@@ -30,25 +31,27 @@ def liftLiteral {Variable : Type*} (literal : PeriodicLiteral Variable) :
 
 /-- One literal of the auxiliary implication chain. -/
 def auxiliary {Variable : Type*} (source : PeriodicClause Variable)
-    (index : Nat) (value : Bool) :
+    (suffix : PeriodicClause Variable) (value : Bool) :
     PeriodicLiteral (ThreeCNFVariable Variable) :=
-  ⟨Sum.inr (source, index), anchor source, value⟩
+  ⟨Sum.inr (source, suffix), anchor source, value⟩
 
 /-- Finish a split clause after the first two original literals.  The incoming
 auxiliary is true precisely when the already-consumed prefix was false. -/
 def continuation {Variable : Type*} (source : PeriodicClause Variable) :
-    Nat → PeriodicClause Variable →
+    PeriodicClause Variable →
       List (PeriodicClause (ThreeCNFVariable Variable))
-  | index, [] =>
-      [[auxiliary source index false]]
-  | index, [first] =>
-      [[auxiliary source index false, liftLiteral first]]
-  | index, [first, second] =>
-      [[auxiliary source index false, liftLiteral first, liftLiteral second]]
-  | index, first :: second :: third :: rest =>
-      [auxiliary source index false, liftLiteral first,
-        auxiliary source (index + 1) true] ::
-      continuation source (index + 1) (second :: third :: rest)
+  | [] =>
+      [[auxiliary source [] false]]
+  | [first] =>
+      [[auxiliary source [first] false, liftLiteral first]]
+  | [first, second] =>
+      [[auxiliary source [first, second] false, liftLiteral first,
+        liftLiteral second]]
+  | first :: second :: third :: rest =>
+      [auxiliary source (first :: second :: third :: rest) false,
+        liftLiteral first,
+        auxiliary source (second :: third :: rest) true] ::
+      continuation source (second :: third :: rest)
 
 /-- Replace one arbitrary-width protoclauses by an equisatisfiable list of
 clauses of width at most three. -/
@@ -61,8 +64,9 @@ def clauseClauses {Variable : Type*} (source : PeriodicClause Variable) :
   | [first, second, third] =>
       [[liftLiteral first, liftLiteral second, liftLiteral third]]
   | first :: second :: third :: fourth :: rest =>
-      [liftLiteral first, liftLiteral second, auxiliary source 0 true] ::
-        continuation source 0 (third :: fourth :: rest)
+      [liftLiteral first, liftLiteral second,
+        auxiliary source (third :: fourth :: rest) true] ::
+        continuation source (third :: fourth :: rest)
 
 /-- Apply the standard clause split to every protoclauses. -/
 def formula {Variable : Type*} (source : PeriodicCNF Variable) :
@@ -74,7 +78,7 @@ literals or auxiliaries anchored to that source clause. -/
 def Supported {Variable : Type*} (source : PeriodicClause Variable)
     (literal : PeriodicLiteral (ThreeCNFVariable Variable)) : Prop :=
   (∃ original ∈ source, literal = liftLiteral original) ∨
-    ∃ index value, literal = auxiliary source index value
+    ∃ suffix value, literal = auxiliary source suffix value
 
 theorem supported_offsetDistance_le_one {Variable : Type*}
     {source : PeriodicClause Variable} (source_local : source.IsLocal)
@@ -83,9 +87,9 @@ theorem supported_offsetDistance_le_one {Variable : Type*}
     (second_supported : Supported source second) :
     PeriodicClause.offsetDistance first second ≤ 1 := by
   rcases first_supported with
-      ⟨originalFirst, first_mem, rfl⟩ | ⟨firstIndex, firstValue, rfl⟩ <;>
+      ⟨originalFirst, first_mem, rfl⟩ | ⟨firstSuffix, firstValue, rfl⟩ <;>
     rcases second_supported with
-      ⟨originalSecond, second_mem, rfl⟩ | ⟨secondIndex, secondValue, rfl⟩
+      ⟨originalSecond, second_mem, rfl⟩ | ⟨secondSuffix, secondValue, rfl⟩
   · simpa [PeriodicClause.offsetDistance, liftLiteral] using
       source_local originalFirst first_mem originalSecond second_mem
   · cases source with
@@ -110,18 +114,18 @@ theorem isLocal_of_supported {Variable : Type*}
     (supported first first_mem) (supported second second_mem)
 
 theorem continuation_supported {Variable : Type*}
-    (source remaining : PeriodicClause Variable) (index : Nat)
+    (source remaining : PeriodicClause Variable)
     (remaining_mem : ∀ literal ∈ remaining, literal ∈ source) :
-    ∀ clause ∈ continuation source index remaining,
+    ∀ clause ∈ continuation source remaining,
       ∀ literal ∈ clause, Supported source literal := by
-  induction remaining generalizing index with
+  induction remaining with
   | nil =>
       intro clause clause_mem literal literal_mem
       simp only [continuation, List.mem_singleton] at clause_mem
       subst clause
       simp only [List.mem_singleton] at literal_mem
       subst literal
-      exact Or.inr ⟨index, false, rfl⟩
+      exact Or.inr ⟨[], false, rfl⟩
   | cons first rest ih =>
       cases rest with
       | nil =>
@@ -130,7 +134,7 @@ theorem continuation_supported {Variable : Type*}
           subst clause
           simp only [List.mem_cons, List.not_mem_nil, or_false] at literal_mem
           rcases literal_mem with rfl | rfl
-          · exact Or.inr ⟨index, false, rfl⟩
+          · exact Or.inr ⟨[first], false, rfl⟩
           · exact Or.inl ⟨first, remaining_mem first (by simp), rfl⟩
       | cons second rest =>
           cases rest with
@@ -140,7 +144,7 @@ theorem continuation_supported {Variable : Type*}
               subst clause
               simp only [List.mem_cons, List.not_mem_nil, or_false] at literal_mem
               rcases literal_mem with rfl | rfl | rfl
-              · exact Or.inr ⟨index, false, rfl⟩
+              · exact Or.inr ⟨[first, second], false, rfl⟩
               · exact Or.inl ⟨first, remaining_mem first (by simp), rfl⟩
               · exact Or.inl ⟨second, remaining_mem second (by simp), rfl⟩
           | cons third rest =>
@@ -149,10 +153,10 @@ theorem continuation_supported {Variable : Type*}
               rcases clause_mem with rfl | clause_mem
               · simp only [List.mem_cons, List.not_mem_nil, or_false] at literal_mem
                 rcases literal_mem with rfl | rfl | rfl
-                · exact Or.inr ⟨index, false, rfl⟩
+                · exact Or.inr ⟨first :: second :: third :: rest, false, rfl⟩
                 · exact Or.inl ⟨first, remaining_mem first (by simp), rfl⟩
-                · exact Or.inr ⟨index + 1, true, rfl⟩
-              · exact ih (index + 1)
+                · exact Or.inr ⟨second :: third :: rest, true, rfl⟩
+              · exact ih
                   (fun literal literal_mem =>
                     remaining_mem literal (by simp [literal_mem]))
                   clause clause_mem literal literal_mem
@@ -200,10 +204,10 @@ theorem clauseClauses_supported {Variable : Type*}
                   rcases literal_mem with rfl | rfl | rfl
                   · exact Or.inl ⟨first, by simp, rfl⟩
                   · exact Or.inl ⟨second, by simp, rfl⟩
-                  · exact Or.inr ⟨0, true, rfl⟩
+                  · exact Or.inr ⟨third :: fourth :: rest, true, rfl⟩
                 · exact continuation_supported
                     (first :: second :: third :: fourth :: rest)
-                    (third :: fourth :: rest) 0
+                    (third :: fourth :: rest)
                     (by intro item item_mem; simp [item_mem])
                     clause clause_mem literal literal_mem
 
@@ -225,11 +229,11 @@ theorem formula_isLocal {Variable : Type*} {source : PeriodicCNF Variable}
     clause clause_mem
 
 theorem continuation_widthAtMostThree {Variable : Type*}
-    (source : PeriodicClause Variable) (index : Nat)
+    (source : PeriodicClause Variable)
     (remaining : PeriodicClause Variable) :
-    ∀ clause ∈ continuation source index remaining,
+    ∀ clause ∈ continuation source remaining,
       clause.WidthAtMost 3 := by
-  induction remaining generalizing index with
+  induction remaining with
   | nil =>
       simp [continuation, PeriodicClause.WidthAtMost]
   | cons first rest ih =>
@@ -245,7 +249,7 @@ theorem continuation_widthAtMostThree {Variable : Type*}
               intro clause clause_mem
               rcases clause_mem with rfl | clause_mem
               · simp [PeriodicClause.WidthAtMost]
-              · exact ih (index + 1) clause clause_mem
+              · exact ih clause clause_mem
 
 theorem clauseClauses_widthAtMostThree {Variable : Type*}
     (source : PeriodicClause Variable) :
@@ -270,7 +274,7 @@ theorem clauseClauses_widthAtMostThree {Variable : Type*}
                 · simp [PeriodicClause.WidthAtMost]
                 · exact continuation_widthAtMostThree
                     (first :: second :: third :: fourth :: rest)
-                    0 (third :: fourth :: rest) clause clause_mem
+                    (third :: fourth :: rest) clause clause_mem
 
 /-- Every output clause has width at most three. -/
 theorem formula_widthAtMostThree {Variable : Type*}

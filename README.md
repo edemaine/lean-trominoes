@@ -900,6 +900,11 @@ The representation choices for this target are:
   extension makes each chain bit describe whether its unconsumed suffix has a
   true literal; conversely, a verified chain with a true incoming bit must
   expose a true source literal.
+- [`LeanTrominoes/PeriodicThreeCNFComputability.lean`](LeanTrominoes/PeriodicThreeCNFComputability.lean)
+  names auxiliary variables by their remaining suffix so that the clause
+  chain is a direct primitive-recursive list traversal.  It proves the entire
+  width-three conversion computable and composes it with the Wang encoding to
+  establish co-r.e.-hardness of local periodic 3CNF satisfiability.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
