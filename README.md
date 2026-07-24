@@ -285,7 +285,9 @@ The representation choices for this target are:
   stable two-pass move, with its temporarily removed and restored delimiter,
   which is used to shuffle continuation data among the four stacks, and
   main-stack head extraction, whose synthesized empty-list zero needs at
-  most one additional delimiter cell.
+  most one additional delimiter cell.  Continuation-stack head extraction is
+  bounded by its input footprint because the consumed outer-list delimiter
+  pays for the inserted natural-number delimiter.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

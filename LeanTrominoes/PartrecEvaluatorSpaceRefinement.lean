@@ -664,5 +664,259 @@ def head_main_ok_inSpace {q s L} {c d : List Γ'} :
       simp [List.reverseAux_eq]
   exact (((move.trans push).trans read).trans clear).trans unreverse
 
+/-- Reading the first natural from the continuation stack never exceeds the
+input footprint.  The outer list delimiter that is consumed from the
+continuation stack pays for the delimiter inserted after the extracted
+natural on the main stack. -/
+def head_stack_ok_inSpace {q s L₁ L₂ L₃} :
+    EvalsToInSpace (TM2.step tr) TM2.stackSpace
+      ((trList L₁).length + (trList L₂).length + L₃.length + 1)
+      ⟨some (head .stack q), s,
+        K'.elim (trList L₁) [] []
+          (trList L₂ ++ Γ'.consₗ :: L₃)⟩
+      ⟨some q, none,
+        K'.elim (trList (L₂.headI :: L₁)) [] [] L₃⟩ := by
+  cases L₂ with
+  | nil =>
+      let afterMove : Cfg' :=
+        ⟨some
+            (Λ'.push .rev (fun _ => some Γ'.cons)
+              (Λ'.read fun state =>
+                (if state = some Γ'.consₗ
+                  then id
+                  else Λ'.clear
+                    (fun symbol => symbol = Γ'.consₗ) .stack)
+                  (unrev q))),
+          some Γ'.consₗ,
+          K'.elim (trList L₁) [] [] L₃⟩
+      have moveRaw :=
+        move_ok_inSpace
+          (p := natEnd) (k₁ := .stack) (k₂ := .rev)
+          (q := Λ'.push .rev (fun _ => some Γ'.cons)
+            (Λ'.read fun state =>
+              (if state = some Γ'.consₗ
+                then id
+                else Λ'.clear
+                  (fun symbol => symbol = Γ'.consₗ) .stack)
+                (unrev q)))
+          (s := s)
+          (tapeStacks :=
+            K'.elim (trList L₁) [] []
+              (trList [] ++ Γ'.consₗ :: L₃))
+          (by decide)
+          (splitAtPred_eq _ _ [] (some Γ'.consₗ) L₃
+            (by rintro _ ⟨⟩) ⟨rfl, rfl⟩)
+      have move :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length + (trList []).length +
+              L₃.length + 1)
+            ⟨some (head .stack q), s,
+              K'.elim (trList L₁) [] []
+                (trList [] ++ Γ'.consₗ :: L₃)⟩
+            afterMove := by
+        convert moveRaw using 1
+        all_goals
+          simp [head, afterMove, stackSpace_elim] <;> omega
+      let afterPush : Cfg' :=
+        ⟨some
+            (Λ'.read fun state =>
+              (if state = some Γ'.consₗ
+                then id
+                else Λ'.clear
+                  (fun symbol => symbol = Γ'.consₗ) .stack)
+                (unrev q)),
+          some Γ'.consₗ,
+          K'.elim (trList L₁) [Γ'.cons] [] L₃⟩
+      have pushStep :
+          TM2.step tr afterMove = some afterPush := by
+        simp [afterMove, afterPush, TM2.step, tr.eq_def]
+        rfl
+      have pushSpace :
+          TM2.stackSpace afterPush ≤
+            (trList L₁).length + (trList []).length +
+              L₃.length + 1 := by
+        rw [stackSpace_elim]
+        simp
+        omega
+      have push :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length + (trList []).length +
+              L₃.length + 1)
+            afterMove afterPush :=
+        EvalsToInSpace.single pushStep move.last_le pushSpace
+      let afterRead : Cfg' :=
+        ⟨some (unrev q), some Γ'.consₗ,
+          K'.elim (trList L₁) [Γ'.cons] [] L₃⟩
+      have readStep :
+          TM2.step tr afterPush = some afterRead := by
+        simp [afterPush, afterRead, TM2.step, tr.eq_def]
+        rfl
+      have read :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length + (trList []).length +
+              L₃.length + 1)
+            afterPush afterRead :=
+        EvalsToInSpace.single readStep pushSpace (by
+          rw [stackSpace_fields]
+          rw [stackSpace_fields] at pushSpace
+          exact pushSpace)
+      have unreverseRaw :=
+        unrev_ok_inSpace
+          (q := q) (s := some Γ'.consₗ)
+          (tapeStacks :=
+            K'.elim (trList L₁) [Γ'.cons] [] L₃)
+      have unreverse :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length + (trList []).length +
+              L₃.length + 1)
+            afterRead
+            ⟨some q, none,
+              K'.elim (trList ([].headI :: L₁)) [] [] L₃⟩ := by
+        convert unreverseRaw.mono read.last_le using 1
+        all_goals
+          simp [List.reverseAux_eq]
+      exact (move.trans push).trans (read.trans unreverse)
+  | cons value tail =>
+      let afterMove : Cfg' :=
+        ⟨some
+            (Λ'.push .rev (fun _ => some Γ'.cons)
+              (Λ'.read fun state =>
+                (if state = some Γ'.consₗ
+                  then id
+                  else Λ'.clear
+                    (fun symbol => symbol = Γ'.consₗ) .stack)
+                  (unrev q))),
+          some Γ'.cons,
+          K'.elim (trList L₁)
+            (List.reverse (trNat value)) []
+            (trList tail ++ Γ'.consₗ :: L₃)⟩
+      have moveRaw :=
+        move_ok_inSpace
+          (p := natEnd) (k₁ := .stack) (k₂ := .rev)
+          (q := Λ'.push .rev (fun _ => some Γ'.cons)
+            (Λ'.read fun state =>
+              (if state = some Γ'.consₗ
+                then id
+                else Λ'.clear
+                  (fun symbol => symbol = Γ'.consₗ) .stack)
+                (unrev q)))
+          (s := s)
+          (tapeStacks :=
+            K'.elim (trList L₁) [] []
+              (trList (value :: tail) ++ Γ'.consₗ :: L₃))
+          (by decide)
+          (splitAtPred_eq _ _
+            (trNat value) (some Γ'.cons)
+            (trList tail ++ Γ'.consₗ :: L₃)
+            (trNat_natEnd _) ⟨rfl, by simp⟩)
+      have move :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length +
+              (trList (value :: tail)).length + L₃.length + 1)
+            ⟨some (head .stack q), s,
+              K'.elim (trList L₁) [] []
+                (trList (value :: tail) ++ Γ'.consₗ :: L₃)⟩
+            afterMove := by
+        convert moveRaw using 1
+        all_goals
+          simp [head, afterMove, stackSpace_elim,
+            List.reverseAux_eq] <;> omega
+      let afterPush : Cfg' :=
+        ⟨some
+            (Λ'.read fun state =>
+              (if state = some Γ'.consₗ
+                then id
+                else Λ'.clear
+                  (fun symbol => symbol = Γ'.consₗ) .stack)
+                (unrev q)),
+          some Γ'.cons,
+          K'.elim (trList L₁)
+            (Γ'.cons :: List.reverse (trNat value)) []
+            (trList tail ++ Γ'.consₗ :: L₃)⟩
+      have pushStep :
+          TM2.step tr afterMove = some afterPush := by
+        simp [afterMove, afterPush, TM2.step, tr.eq_def]
+        rfl
+      have pushSpace :
+          TM2.stackSpace afterPush ≤
+            (trList L₁).length +
+              (trList (value :: tail)).length + L₃.length + 1 := by
+        rw [stackSpace_elim]
+        simp
+        omega
+      have push :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length +
+              (trList (value :: tail)).length + L₃.length + 1)
+            afterMove afterPush :=
+        EvalsToInSpace.single pushStep move.last_le pushSpace
+      let afterRead : Cfg' :=
+        ⟨some
+            (Λ'.clear (fun symbol => symbol = Γ'.consₗ)
+              .stack (unrev q)),
+          some Γ'.cons,
+          K'.elim (trList L₁)
+            (Γ'.cons :: List.reverse (trNat value)) []
+            (trList tail ++ Γ'.consₗ :: L₃)⟩
+      have readStep :
+          TM2.step tr afterPush = some afterRead := by
+        simp [afterPush, afterRead, TM2.step, tr.eq_def]
+        rfl
+      have read :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length +
+              (trList (value :: tail)).length + L₃.length + 1)
+            afterPush afterRead :=
+        EvalsToInSpace.single readStep pushSpace (by
+          rw [stackSpace_fields]
+          rw [stackSpace_fields] at pushSpace
+          exact pushSpace)
+      have clearRaw :=
+        clear_ok_inSpace
+          (p := fun symbol => symbol = Γ'.consₗ)
+          (k := .stack)
+          (L₁ := trList tail) (o := some Γ'.consₗ) (L₂ := L₃)
+          (q := unrev q) (s := some Γ'.cons)
+          (tapeStacks :=
+            K'.elim (trList L₁)
+              (Γ'.cons :: List.reverse (trNat value)) []
+              (trList tail ++ Γ'.consₗ :: L₃))
+          (splitAtPred_eq _ _
+            (trList tail) (some Γ'.consₗ) L₃
+            (fun symbol member =>
+              Bool.decide_false
+                (trList_ne_consₗ _ _ member))
+            ⟨rfl, by simp⟩)
+      let afterClear : Cfg' :=
+        ⟨some (unrev q), some Γ'.consₗ,
+          K'.elim (trList L₁)
+            (Γ'.cons :: List.reverse (trNat value)) [] L₃⟩
+      have clear :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length +
+              (trList (value :: tail)).length + L₃.length + 1)
+            afterRead afterClear := by
+        convert clearRaw.mono read.last_le using 1
+        all_goals simp [afterClear]
+      have unreverseRaw :=
+        unrev_ok_inSpace
+          (q := q) (s := some Γ'.consₗ)
+          (tapeStacks :=
+            K'.elim (trList L₁)
+              (Γ'.cons :: List.reverse (trNat value)) [] L₃)
+      have unreverse :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace
+            ((trList L₁).length +
+              (trList (value :: tail)).length + L₃.length + 1)
+            afterClear
+            ⟨some q, none,
+              K'.elim
+                (trList ((value :: tail).headI :: L₁))
+                [] [] L₃⟩ := by
+        convert unreverseRaw.mono clear.last_le using 1
+        all_goals
+          simp [List.reverseAux_eq]
+      exact (((move.trans push).trans read).trans clear).trans unreverse
+
 end PartrecToTM2
 end Turing
