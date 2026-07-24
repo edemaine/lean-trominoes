@@ -911,6 +911,11 @@ The representation choices for this target are:
   each source variable in a directed implication cycle at a common lattice
   offset, and proves that the resulting clauses remain local and of width at
   most three.
+- [`LeanTrominoes/PeriodicThreeSATThreeCorrectness.lean`](LeanTrominoes/PeriodicThreeSATThreeCorrectness.lean)
+  proves that a satisfied directed cycle forces all occurrence copies to have
+  the same cell-by-cell value.  Extending and restricting assignments then
+  proves that occurrence splitting preserves periodic satisfiability exactly,
+  including presentations with repeated clauses or literals.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
