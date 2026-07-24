@@ -1233,6 +1233,129 @@ theorem packedLookupColumn
     Code.packedLookupColumnResult,
     Code.packedLookupColumnProcess_encode] using result
 
+set_option maxHeartbeats 1600000 in
+theorem packedLookupColumnCodeCost_le_linear
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    packedLookupColumnCodeCost motif target
+        word digit found selected ≤
+      1000000000000000000 *
+        (encodedListSpace
+          [16 * (Encodable.encode motif +
+            Encodable.encode motif + Encodable.encode motif +
+            Encodable.encode target + word + digit + 8) + 100] +
+          1) := by
+  let motifCode := Encodable.encode motif
+  let targetCode := Encodable.encode target
+  let limit :=
+    16 * (motifCode + motifCode + motifCode +
+      targetCode + word + digit + 8) + 100
+  have finalReachable :=
+    packedLookupColumnReachable_iterate
+      motif target word digit found selected
+      0 (Encodable.encode motif) (by simp)
+  obtain ⟨remaining, leading, finalWord, finalDigit, finalFound,
+    resultEq, stepsBound, suffix, finalWordBound,
+    finalDigitBound⟩ := finalReachable
+  rw [Code.packedLookupColumnNativeStep_iterate] at resultEq
+  have remainingBound :
+      Encodable.encode remaining ≤ motifCode := by
+    simpa [motifCode, suffix] using
+      encode_list_suffix_le leading remaining
+  have motifBound : motifCode ≤ limit := by
+    simp only [limit]
+    omega
+  have targetBound : targetCode ≤ limit := by
+    simp only [limit]
+    omega
+  have wordBound : word ≤ limit := by
+    simp only [limit]
+    omega
+  have digitBound : digit ≤ limit := by
+    simp only [limit]
+    omega
+  have remainingLimit :
+      Encodable.encode remaining ≤ limit :=
+    remainingBound.trans motifBound
+  have finalWordLimit : finalWord ≤ limit :=
+    finalWordBound.trans wordBound
+  have finalDigitLimit : finalDigit ≤ limit := by
+    simp only [limit]
+    omega
+  have motifBits := encodeNat_length_mono motifBound
+  have targetBits := encodeNat_length_mono targetBound
+  have wordBits := encodeNat_length_mono wordBound
+  have digitBits := encodeNat_length_mono digitBound
+  have remainingBits := encodeNat_length_mono remainingLimit
+  have finalWordBits := encodeNat_length_mono finalWordLimit
+  have finalDigitBits := encodeNat_length_mono finalDigitLimit
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have targetSuccBits :=
+    encodeNat_length_mono
+      (show targetCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have wordSuccBits :=
+    encodeNat_length_mono
+      (show word + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have digitSuccBits :=
+    encodeNat_length_mono
+      (show digit + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have remainingSuccBits :=
+    encodeNat_length_mono
+      (show Encodable.encode remaining + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have finalWordSuccBits :=
+    encodeNat_length_mono
+      (show finalWord + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have finalDigitSuccBits :=
+    encodeNat_length_mono
+      (show finalDigit + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := rfl
+  have oneLimitBits :=
+    encodeNat_length_mono
+      (show 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have twoLimitBits :=
+    encodeNat_length_mono
+      (show 2 ≤ limit by
+        simp only [limit]
+        omega)
+  cases found <;>
+    cases selected <;>
+    cases finalFound <;>
+    simp [packedLookupColumnCodeCost, resultEq,
+      packedLookupColumnProjectionValuesCost,
+      packedLookupColumnLoopInputCost,
+      packedLookupColumnSpaceBound,
+      prependCost, getCost, dropCost, headCost,
+      idCost, nilCost, tailCost, zeroPrimeCost,
+      succCost,
+      Code.packedLookupColumnState,
+      encodedListSpace_cons, encodedListSpace_nil,
+      motifCode, targetCode, limit,
+      zeroBits, oneBits, twoBits] at * <;>
+    omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

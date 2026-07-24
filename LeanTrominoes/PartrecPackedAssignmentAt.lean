@@ -46,6 +46,29 @@ def packedAssignmentLookupApplyColumn
     (decide (queriedColumn = currentColumn)) motif
     accumulator.1 accumulator.2.1 accumulator.2.2
 
+theorem packedAssignmentLookupApplyColumn_word_le
+    (currentColumn : Nat) (motif : List Cell)
+    (queriedColumn : Nat) (target : Cell)
+    (accumulator : Nat × Nat × Bool) :
+    (packedAssignmentLookupApplyColumn currentColumn motif
+      queriedColumn target accumulator).1 ≤ accumulator.1 := by
+  simpa [packedAssignmentLookupApplyColumn] using
+    packedLookupColumnOutcome_word_le target
+      (decide (queriedColumn = currentColumn)) motif
+      accumulator.1 accumulator.2.1 accumulator.2.2
+
+theorem packedAssignmentLookupApplyColumn_digit_le
+    (currentColumn : Nat) (motif : List Cell)
+    (queriedColumn : Nat) (target : Cell)
+    (accumulator : Nat × Nat × Bool) :
+    (packedAssignmentLookupApplyColumn currentColumn motif
+      queriedColumn target accumulator).2.1 ≤
+        accumulator.2.1 + 8 := by
+  simpa [packedAssignmentLookupApplyColumn] using
+    packedLookupColumnOutcome_digit_le target
+      (decide (queriedColumn = currentColumn)) motif
+      accumulator.1 accumulator.2.1 accumulator.2.2
+
 /-- Arguments `[queriedColumn, currentColumn]` for the stage selector. -/
 def packedAssignmentLookupColumnEqArgumentsCode
     (currentColumn : Nat) : Code :=
@@ -237,6 +260,80 @@ def packedAssignmentLookupOutcome
   let fourth :=
     packedAssignmentLookupApplyColumn 3 motif queriedColumn target third
   packedAssignmentLookupApplyColumn 4 motif queriedColumn target fourth
+
+theorem packedAssignmentLookupOutcome_word_le
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    (packedAssignmentLookupOutcome motif queriedColumn
+      target word).1 ≤ word := by
+  let initial : Nat × Nat × Bool := (word, 0, false)
+  let first :=
+    packedAssignmentLookupApplyColumn 0 motif queriedColumn target initial
+  let second :=
+    packedAssignmentLookupApplyColumn 1 motif queriedColumn target first
+  let third :=
+    packedAssignmentLookupApplyColumn 2 motif queriedColumn target second
+  let fourth :=
+    packedAssignmentLookupApplyColumn 3 motif queriedColumn target third
+  have firstLe :=
+    packedAssignmentLookupApplyColumn_word_le
+      0 motif queriedColumn target initial
+  have secondLe :=
+    packedAssignmentLookupApplyColumn_word_le
+      1 motif queriedColumn target first
+  have thirdLe :=
+    packedAssignmentLookupApplyColumn_word_le
+      2 motif queriedColumn target second
+  have fourthLe :=
+    packedAssignmentLookupApplyColumn_word_le
+      3 motif queriedColumn target third
+  have fifthLe :=
+    packedAssignmentLookupApplyColumn_word_le
+      4 motif queriedColumn target fourth
+  simpa [packedAssignmentLookupOutcome,
+    initial, first, second, third, fourth] using
+    fifthLe.trans (fourthLe.trans
+      (thirdLe.trans (secondLe.trans firstLe)))
+
+theorem packedAssignmentLookupOutcome_digit_le
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    (packedAssignmentLookupOutcome motif queriedColumn
+      target word).2.1 ≤ 40 := by
+  let initial : Nat × Nat × Bool := (word, 0, false)
+  let first :=
+    packedAssignmentLookupApplyColumn 0 motif queriedColumn target initial
+  let second :=
+    packedAssignmentLookupApplyColumn 1 motif queriedColumn target first
+  let third :=
+    packedAssignmentLookupApplyColumn 2 motif queriedColumn target second
+  let fourth :=
+    packedAssignmentLookupApplyColumn 3 motif queriedColumn target third
+  let fifth :=
+    packedAssignmentLookupApplyColumn 4 motif queriedColumn target fourth
+  have firstLe : first.2.1 ≤ initial.2.1 + 8 := by
+    simpa [first] using
+      packedAssignmentLookupApplyColumn_digit_le
+        0 motif queriedColumn target initial
+  have secondLe : second.2.1 ≤ first.2.1 + 8 := by
+    simpa [second] using
+      packedAssignmentLookupApplyColumn_digit_le
+        1 motif queriedColumn target first
+  have thirdLe : third.2.1 ≤ second.2.1 + 8 := by
+    simpa [third] using
+      packedAssignmentLookupApplyColumn_digit_le
+        2 motif queriedColumn target second
+  have fourthLe : fourth.2.1 ≤ third.2.1 + 8 := by
+    simpa [fourth] using
+      packedAssignmentLookupApplyColumn_digit_le
+        3 motif queriedColumn target third
+  have fifthLe : fifth.2.1 ≤ fourth.2.1 + 8 := by
+    simpa [fifth] using
+      packedAssignmentLookupApplyColumn_digit_le
+        4 motif queriedColumn target fourth
+  change fifth.2.1 ≤ 40
+  simp only [initial] at firstLe
+  omega
 
 /-- Explicit composition of the five numbered stages. -/
 def packedAssignmentLookupStagesCode : Code :=

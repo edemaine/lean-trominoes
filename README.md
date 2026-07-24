@@ -507,7 +507,10 @@ The representation choices for this target are:
   fits the five-column construction compositionally: numbered-column
   equality, scan-input assembly, each reuse of the uniform motif loop,
   retained accumulator fields, all five stages, and the final
-  `[digit, found]` projection.
+  `[digit, found]` projection.  The accumulator word is proved never to grow,
+  while its digit offset grows by at most eight per column and hence remains
+  at most forty.  These invariants yield a named input-linear workspace bound
+  for the complete packed assignment lookup.
 - [`LeanTrominoes/PartrecPackedAssignmentPredicates.lean`](LeanTrominoes/PartrecPackedAssignmentPredicates.lean)
   and
   [`LeanTrominoes/PartrecPackedAssignmentPredicatesSpace.lean`](LeanTrominoes/PartrecPackedAssignmentPredicatesSpace.lean)

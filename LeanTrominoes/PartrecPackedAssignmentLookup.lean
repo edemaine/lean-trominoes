@@ -1086,6 +1086,52 @@ theorem packedLookupColumnOutcome_selected_of_mem
           simp [pow_succ, Nat.mul_comm]
         · rw [assignmentDigitAt_div_nine]
 
+theorem packedLookupColumnOutcome_word_le
+    (target : Cell) (selected : Bool)
+    (remaining : List Cell) (word digit : Nat)
+    (found : Bool) :
+    (packedLookupColumnOutcome target selected remaining
+      word digit found).1 ≤ word := by
+  induction remaining generalizing word digit found with
+  | nil =>
+      cases found <;>
+        simp [packedLookupColumnOutcome]
+  | cons cell remaining induction =>
+      cases found with
+      | true =>
+          simp [packedLookupColumnOutcome]
+      | false =>
+          by_cases hit : selected && decide (cell = target)
+          · simp [packedLookupColumnOutcome, hit,
+              Nat.div_le_self]
+          · have tail :=
+              induction (word / 9) digit false
+            rw [packedLookupColumnOutcome, if_neg hit]
+            exact tail.trans (Nat.div_le_self word 9)
+
+theorem packedLookupColumnOutcome_digit_le
+    (target : Cell) (selected : Bool)
+    (remaining : List Cell) (word digit : Nat)
+    (found : Bool) :
+    (packedLookupColumnOutcome target selected remaining
+      word digit found).2.1 ≤ digit + 8 := by
+  induction remaining generalizing word digit found with
+  | nil =>
+      cases found <;>
+        simp [packedLookupColumnOutcome]
+  | cons cell remaining induction =>
+      cases found with
+      | true =>
+          simp [packedLookupColumnOutcome]
+      | false =>
+          by_cases hit : selected && decide (cell = target)
+          · have remainder : word % 9 < 9 :=
+              Nat.mod_lt word (by omega)
+            simp [packedLookupColumnOutcome, hit]
+            omega
+          · simpa [packedLookupColumnOutcome, hit] using
+              induction (word / 9) digit false
+
 theorem packedLookupColumnScanState_outcome_fields
     (original remaining : List Cell) (target : Cell)
     (word digit : Nat) (found selected : Bool) :
