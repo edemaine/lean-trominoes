@@ -1,4 +1,4 @@
-import LeanTrominoes.IndexedSavitchDFSSpace
+import LeanTrominoes.IndexedSavitchDFSListEncoding
 import LeanTrominoes.StripFrontierIndexedSearch
 
 /-!
@@ -31,6 +31,23 @@ theorem stripDFSSpacePolynomial_eval (inputLength : Nat) :
     stripDFSSpacePolynomial.eval inputLength =
       stripDFSSpaceBound inputLength := by
   simp [stripDFSSpacePolynomial, stripDFSSpaceBound]
+
+/-- Quadratic bound in the native delimited-`List Nat` representation used by
+Mathlib's partial-recursive evaluator. -/
+def stripDFSPartrecSpaceBound (inputLength : Nat) : Nat :=
+  3 * (21 * inputLength + 3) +
+    (21 * inputLength + 1) * (4 * (21 * inputLength + 3) + 5) + 3
+
+noncomputable def stripDFSPartrecSpacePolynomial : Polynomial Nat :=
+  3 * (21 * Polynomial.X + 3) +
+    (21 * Polynomial.X + 1) *
+      (4 * (21 * Polynomial.X + 3) + 5) + 3
+
+@[simp]
+theorem stripDFSPartrecSpacePolynomial_eval (inputLength : Nat) :
+    stripDFSPartrecSpacePolynomial.eval inputLength =
+      stripDFSPartrecSpaceBound inputLength := by
+  simp [stripDFSPartrecSpacePolynomial, stripDFSPartrecSpaceBound]
 
 theorem indexCount_le_pow_stripSearchDepth_succ
     (periodicStrip : PeriodicStrip) :
@@ -69,6 +86,31 @@ theorem stripDivideEvalIterate_flatSpace_le
       (indexCount_le_pow_stripSearchDepth_succ periodicStrip)
       (stripSearchDepth_lt_pow_succ periodicStrip)
   simpa [stripSearchDepth, stripDFSSpaceBound] using generic
+
+/-- The serialized configuration obeys a quadratic bound in the evaluator's
+actual four-symbol tape alphabet. -/
+theorem stripDivideEvalIterate_encodedListSpace_le
+    (periodicStrip : PeriodicStrip)
+    (relation : Nat → Nat → Bool)
+    (first last steps : Nat)
+    (firstBelow : first < indexCount periodicStrip)
+    (lastBelow : last < indexCount periodicStrip) :
+    Turing.PartrecToTM2.encodedListSpace
+        (((FiniteState.divideEvalStep (indexCount periodicStrip) relation)^[steps]
+          (FiniteState.divideEvalInitial (stripSearchDepth periodicStrip)
+            first last)).toNatList) ≤
+      stripDFSPartrecSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  have generic :=
+    FiniteState.divideEvalIterate_encodedListSpace_le
+      (indexCount periodicStrip)
+      (stripSearchDepth periodicStrip)
+      (stripSearchDepth periodicStrip + 1)
+      first last steps relation firstBelow lastBelow
+      (indexCount_le_pow_stripSearchDepth_succ periodicStrip)
+      (stripSearchDepth_lt_pow_succ periodicStrip)
+  simpa [stripSearchDepth, stripDFSPartrecSpaceBound] using generic
 
 end RawWindowState
 end PeriodicStrip

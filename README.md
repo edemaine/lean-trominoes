@@ -229,6 +229,12 @@ The representation choices for this target are:
   `3 × (bits + 1) + depth × (4 × (bits + 1) + 3) + 2` cells.  This flat
   measure avoids the artificial exponential growth caused by treating the
   nested generic list encoding as one natural number.
+- [`LeanTrominoes/IndexedSavitchDFSListEncoding.lean`](LeanTrominoes/IndexedSavitchDFSListEncoding.lean)
+  serializes that same state as a genuine flat `List Nat`: four leading
+  answer/query fields followed by six fields per continuation frame.  Parsing
+  is proved to invert serialization, and the native delimited-binary tape
+  length used by Mathlib's partial-recursive evaluator is bounded directly,
+  with only constant overhead for the Boolean tags.
 - [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
   fills a machine-level gap in Mathlib's computability stack.  A TM2 program
   described over an infinite ambient label type can be restricted to a
@@ -331,7 +337,8 @@ The representation choices for this target are:
   bit than the certified search depth bounds both every frontier index and
   the depth counter, and substitution of
   `depth = 21 × binary input length + 1` gives an explicit quadratic
-  polynomial bounding every reachability configuration.
+  polynomial bounding every reachability configuration, both abstractly and
+  in the evaluator backend's actual delimited-`List Nat` tape format.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
