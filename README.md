@@ -319,7 +319,10 @@ The representation choices for this target are:
   `EvaluatorCallFits` additionally support a backward,
   continuation-passing proof style: a finite fitted call automatically
   bounds every high-level state reachable during that call and yields an
-  `EvaluatorRunFits` certificate at the halting continuation.
+  `EvaluatorRunFits` certificate at the halting continuation.  Constructor
+  rules mirror normalization through `cons`, `comp`, `case`, and `fix` and
+  returns through every continuation form, so larger fitted programs can be
+  assembled from fitted subcalls.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

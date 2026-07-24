@@ -2788,9 +2788,20 @@ inductive EvaluatorExecutionFits (bound : Nat) :
   | ret (continuation : ToPartrec.Cont) (values : List Nat)
       (space : retSimulationSpace continuation values ≤ bound)
       (next :
-        EvaluatorExecutionFits bound
+      EvaluatorExecutionFits bound
           (ToPartrec.stepRet continuation values)) :
       EvaluatorExecutionFits bound (.ret continuation values)
+
+/-- A structurally normalized code call followed by a finite fitted
+continuation execution. -/
+structure EvaluatorCallFits
+    (code : ToPartrec.Code) (continuation : ToPartrec.Cont)
+    (values : List Nat) (bound : Nat) : Prop where
+  normal :
+    normalSimulationSpace code continuation values ≤ bound
+  execution :
+    EvaluatorExecutionFits bound
+      (ToPartrec.stepNormal code continuation values)
 
 namespace EvaluatorExecutionFits
 
@@ -2855,20 +2866,222 @@ theorem mono
   | ret continuation values space next induction =>
       exact .ret continuation values (space.trans budget) induction
 
+/-- Finish a return to the halting continuation. -/
+theorem ret_halt
+    {values : List Nat} {bound : Nat}
+    (space : encodedListSpace values ≤ bound) :
+    EvaluatorExecutionFits bound
+      (.ret ToPartrec.Cont.halt values) := by
+  apply EvaluatorExecutionFits.ret ToPartrec.Cont.halt values
+  · simpa [retSimulationSpace] using space
+  · simpa [ToPartrec.stepRet] using
+      EvaluatorExecutionFits.halt values space
+
+/-- Return from the first half of `cons` into the call of its second
+half. -/
+theorem ret_cons₁
+    {rest : ToPartrec.Code} {arguments values : List Nat}
+    {continuation : ToPartrec.Cont} {bound : Nat}
+    (source :
+      encodedListSpace values +
+          continuationSpace
+            (.cons₁ rest arguments continuation) ≤
+        bound)
+    (call :
+      EvaluatorCallFits rest (.cons₂ values continuation)
+        arguments bound) :
+    EvaluatorExecutionFits bound
+      (.ret (.cons₁ rest arguments continuation) values) := by
+  apply EvaluatorExecutionFits.ret
+    (.cons₁ rest arguments continuation) values
+  · simp only [retSimulationSpace]
+    exact max_le source call.normal
+  · simpa [ToPartrec.stepRet] using call.execution
+
+/-- Return from the second half of `cons` into the enclosing
+continuation. -/
+theorem ret_cons₂
+    {saved values : List Nat} {continuation : ToPartrec.Cont}
+    {bound : Nat}
+    (source :
+      encodedListSpace values +
+          continuationSpace (.cons₂ saved continuation) ≤
+        bound)
+    (after :
+      EvaluatorExecutionFits bound
+        (.ret continuation (saved.headI :: values))) :
+    EvaluatorExecutionFits bound
+      (.ret (.cons₂ saved continuation) values) := by
+  have afterSpace :
+      retSimulationSpace continuation (saved.headI :: values) ≤
+        bound := by
+    simpa [cfgSimulationSpace] using after.current_space
+  apply EvaluatorExecutionFits.ret (.cons₂ saved continuation) values
+  · simp only [retSimulationSpace]
+    exact max_le source afterSpace
+  · have nextAfter :=
+      after.next
+        (show ToPartrec.step
+            (.ret continuation (saved.headI :: values)) =
+              some (ToPartrec.stepRet continuation
+                (saved.headI :: values)) by
+          rfl)
+    simpa [ToPartrec.stepRet] using nextAfter
+
+/-- Return from the argument of a composition into its outer call. -/
+theorem ret_comp
+    {first : ToPartrec.Code} {values : List Nat}
+    {continuation : ToPartrec.Cont} {bound : Nat}
+    (source :
+      encodedListSpace values +
+          continuationSpace (.comp first continuation) ≤
+        bound)
+    (call :
+      EvaluatorCallFits first continuation values bound) :
+    EvaluatorExecutionFits bound
+      (.ret (.comp first continuation) values) := by
+  apply EvaluatorExecutionFits.ret (.comp first continuation) values
+  · simp only [retSimulationSpace]
+    exact max_le source call.normal
+  · simpa [ToPartrec.stepRet] using call.execution
+
+/-- Take the terminating branch of a fixed-point return. -/
+theorem ret_fix_zero
+    {body : ToPartrec.Code} {values : List Nat}
+    {continuation : ToPartrec.Cont} {bound : Nat}
+    (zero : values.headI = 0)
+    (source :
+      encodedListSpace values +
+          continuationSpace (.fix body continuation) ≤
+        bound)
+    (after :
+      EvaluatorExecutionFits bound
+        (.ret continuation values.tail)) :
+    EvaluatorExecutionFits bound
+      (.ret (.fix body continuation) values) := by
+  have afterSpace :
+      retSimulationSpace continuation values.tail ≤ bound := by
+    simpa [cfgSimulationSpace] using after.current_space
+  apply EvaluatorExecutionFits.ret (.fix body continuation) values
+  · simp [retSimulationSpace, zero]
+    exact ⟨source, afterSpace⟩
+  · have nextAfter :=
+      after.next
+        (show ToPartrec.step (.ret continuation values.tail) =
+            some (ToPartrec.stepRet continuation values.tail) by
+          rfl)
+    simpa [ToPartrec.stepRet, zero] using nextAfter
+
+/-- Take the recursive branch of a fixed-point return. -/
+theorem ret_fix_succ
+    {body : ToPartrec.Code} {values : List Nat}
+    {continuation : ToPartrec.Cont} {bound : Nat}
+    (nonzero : values.headI ≠ 0)
+    (source :
+      encodedListSpace values +
+          continuationSpace (.fix body continuation) ≤
+        bound)
+    (call :
+      EvaluatorCallFits body (.fix body continuation)
+        values.tail bound) :
+    EvaluatorExecutionFits bound
+      (.ret (.fix body continuation) values) := by
+  apply EvaluatorExecutionFits.ret (.fix body continuation) values
+  · simp [retSimulationSpace, nonzero]
+    exact ⟨source, call.normal⟩
+  · simpa [ToPartrec.stepRet, nonzero] using call.execution
+
 end EvaluatorExecutionFits
 
-/-- A structurally normalized code call followed by a finite fitted
-continuation execution. -/
-structure EvaluatorCallFits
-    (code : ToPartrec.Code) (continuation : ToPartrec.Cont)
-    (values : List Nat) (bound : Nat) : Prop where
-  normal :
-    normalSimulationSpace code continuation values ≤ bound
-  execution :
-    EvaluatorExecutionFits bound
-      (ToPartrec.stepNormal code continuation values)
-
 namespace EvaluatorCallFits
+
+/-- A primitive or otherwise already-normalized call is fitted once its
+normalization requirement and following execution are fitted. -/
+theorem normalized
+    {code : ToPartrec.Code} {continuation : ToPartrec.Cont}
+    {values : List Nat} {bound : Nat}
+    (normal :
+      normalSimulationSpace code continuation values ≤ bound)
+    (execution :
+      EvaluatorExecutionFits bound
+        (ToPartrec.stepNormal code continuation values)) :
+    EvaluatorCallFits code continuation values bound :=
+  ⟨normal, execution⟩
+
+/-- Fitting the selected first subcall fits normalization of `cons`. -/
+theorem cons
+    {first rest : ToPartrec.Code} {continuation : ToPartrec.Cont}
+    {values : List Nat} {bound : Nat}
+    (call :
+      EvaluatorCallFits first
+        (.cons₁ rest values continuation) values bound) :
+    EvaluatorCallFits (.cons first rest) continuation values bound := by
+  exact
+    ⟨by simpa [normalSimulationSpace] using call.normal,
+      by simpa [ToPartrec.stepNormal] using call.execution⟩
+
+/-- Fitting the inner subcall fits normalization of a composition. -/
+theorem comp
+    {first second : ToPartrec.Code}
+    {continuation : ToPartrec.Cont}
+    {values : List Nat} {bound : Nat}
+    (call :
+      EvaluatorCallFits second (.comp first continuation)
+        values bound) :
+    EvaluatorCallFits (.comp first second) continuation values bound := by
+  exact
+    ⟨by simpa [normalSimulationSpace] using call.normal,
+      by simpa [ToPartrec.stepNormal] using call.execution⟩
+
+/-- Fit the zero branch selected during `case` normalization. -/
+theorem case_zero
+    {zeroBranch successorBranch : ToPartrec.Code}
+    {continuation : ToPartrec.Cont}
+    {values : List Nat} {bound : Nat}
+    (zero : values.headI = 0)
+    (source :
+      encodedListSpace values + continuationSpace continuation ≤
+        bound)
+    (call :
+      EvaluatorCallFits zeroBranch continuation values.tail bound) :
+    EvaluatorCallFits (.case zeroBranch successorBranch)
+      continuation values bound := by
+  constructor
+  · simp [normalSimulationSpace, zero]
+    exact ⟨source, call.normal⟩
+  · simpa [ToPartrec.stepNormal, zero] using call.execution
+
+/-- Fit the successor branch selected during `case` normalization. -/
+theorem case_succ
+    {zeroBranch successorBranch : ToPartrec.Code}
+    {continuation : ToPartrec.Cont}
+    {values : List Nat} {bound : Nat}
+    (predecessor : Nat)
+    (head : values.headI = predecessor + 1)
+    (source :
+      encodedListSpace values + continuationSpace continuation ≤
+        bound)
+    (call :
+      EvaluatorCallFits successorBranch continuation
+        (predecessor :: values.tail) bound) :
+    EvaluatorCallFits (.case zeroBranch successorBranch)
+      continuation values bound := by
+  constructor
+  · simp [normalSimulationSpace, head]
+    exact ⟨source, call.normal⟩
+  · simpa [ToPartrec.stepNormal, head] using call.execution
+
+/-- Fitting the body call fits normalization of `fix`. -/
+theorem fix
+    {body : ToPartrec.Code} {continuation : ToPartrec.Cont}
+    {values : List Nat} {bound : Nat}
+    (call :
+      EvaluatorCallFits body (.fix body continuation)
+        values bound) :
+    EvaluatorCallFits (.fix body) continuation values bound := by
+  exact
+    ⟨by simpa [normalSimulationSpace] using call.normal,
+      by simpa [ToPartrec.stepNormal] using call.execution⟩
 
 /-- Enlarge the common budget of a fitted code call. -/
 theorem mono
