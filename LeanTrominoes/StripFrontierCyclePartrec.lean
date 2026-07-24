@@ -20,6 +20,9 @@ open Turing.PartrecToTM2
 
 attribute [local simp] Part.bind_eq_bind
 
+private local instance : Inhabited PeriodicStrip :=
+  ⟨{ width := 0, period := 0, motif := [] }⟩
+
 private theorem comp_eval_pure (outer inner : Code)
     (input output : List Nat)
     (innerCorrect : inner.eval input = pure output) :
@@ -580,6 +583,132 @@ theorem stripCycleSearchCode_eval (tromino : Tromino)
     _ = _ := by
       simp [cycleSearchIndexDFSBoolAtDepth]
       rfl
+
+private noncomputable def stripIndexCountCode : Code :=
+  codeOfPrimrec indexCount indexCount_primrec
+
+private theorem stripIndexCountCode_eval
+    (periodicStrip : PeriodicStrip) :
+    stripIndexCountCode.eval [Encodable.encode periodicStrip] =
+      pure [indexCount periodicStrip] := by
+  apply Part.eq_some_iff.mpr
+  simpa [stripIndexCountCode] using
+    codeOfPrimrec_eval indexCount indexCount_primrec periodicStrip
+
+private noncomputable def stripSearchDepthCode : Code :=
+  codeOfPrimrec stripSearchDepth stripSearchDepth_primrec
+
+private theorem stripSearchDepthCode_eval
+    (periodicStrip : PeriodicStrip) :
+    stripSearchDepthCode.eval [Encodable.encode periodicStrip] =
+      pure [stripSearchDepth periodicStrip] := by
+  apply Part.eq_some_iff.mpr
+  simpa [stripSearchDepthCode] using
+    codeOfPrimrec_eval stripSearchDepth stripSearchDepth_primrec
+      periodicStrip
+
+private theorem encodeBool_eq_divideBoolTag (value : Bool) :
+    Encodable.encode value = divideBoolTag value := by
+  cases value <;> rfl
+
+private noncomputable def stripWellFormedCode : Code :=
+  codeOfPrimrec PeriodicStrip.wellFormed
+    periodicStrip_wellFormed_primrec
+
+private theorem stripWellFormedCode_eval
+    (periodicStrip : PeriodicStrip) :
+    stripWellFormedCode.eval [Encodable.encode periodicStrip] =
+      pure [divideBoolTag periodicStrip.wellFormed] := by
+  apply Part.eq_some_iff.mpr
+  simpa [stripWellFormedCode, encodeBool_eq_divideBoolTag] using
+    codeOfPrimrec_eval PeriodicStrip.wellFormed
+      periodicStrip_wellFormed_primrec periodicStrip
+
+private noncomputable def stripCycleParametersCode : Code :=
+  Code.prepend (Code.get 0) <|
+    Code.prepend stripIndexCountCode <|
+      Code.prepend stripSearchDepthCode Code.nil
+
+private theorem stripCycleParametersCode_eval
+    (periodicStrip : PeriodicStrip) :
+    stripCycleParametersCode.eval [Encodable.encode periodicStrip] =
+      pure [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip] := by
+  simp [stripCycleParametersCode, stripIndexCountCode_eval,
+    stripSearchDepthCode_eval]
+
+private noncomputable def guardedStripCycleCode (tromino : Tromino) : Code :=
+  Code.boolAnd stripWellFormedCode <|
+    (stripCycleSearchCode tromino).comp stripCycleParametersCode
+
+private theorem periodicStripTrominoTilingIndexBool_eq_and
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    periodicStripTrominoTilingIndexBool tromino periodicStrip =
+      (periodicStrip.wellFormed &&
+        cycleSearchIndexDFSBoolAtDepth
+          (indexCount periodicStrip)
+          (stripSearchDepth periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip)) := by
+  by_cases wellFormed : periodicStrip.IsWellFormed
+  · have wellFormedBool : periodicStrip.wellFormed = true :=
+      (periodicStrip.wellFormed_eq_true_iff).mpr wellFormed
+    simp [periodicStripTrominoTilingIndexBool, wellFormed,
+      wellFormedBool]
+    rfl
+  · have wellFormedBool : periodicStrip.wellFormed = false := by
+      apply Bool.eq_false_iff.mpr
+      intro true
+      exact wellFormed
+        ((periodicStrip.wellFormed_eq_true_iff).mp true)
+    simp [periodicStripTrominoTilingIndexBool, wellFormed,
+      wellFormedBool]
+
+/-- Unary evaluator code for the executable strip-tiling decider.  The input
+is the standard natural encoding of `PeriodicStrip`; malformed presentations
+return false before their cycle result can affect the answer. -/
+noncomputable def periodicStripTrominoTilingCode
+    (tromino : Tromino) : Code :=
+  guardedStripCycleCode tromino
+
+theorem periodicStripTrominoTilingCode_eval
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    (periodicStripTrominoTilingCode tromino).eval
+        [Encodable.encode periodicStrip] =
+      pure [Encodable.encode
+        (periodicStripTrominoTilingIndexBool tromino periodicStrip)] := by
+  let cycleResult :=
+    cycleSearchIndexDFSBoolAtDepth
+      (indexCount periodicStrip)
+      (stripSearchDepth periodicStrip)
+      (indexedTransitionRawBool tromino periodicStrip)
+  have cycleArguments :=
+    stripCycleParametersCode_eval periodicStrip
+  have cycleRun :
+      ((stripCycleSearchCode tromino).comp
+        stripCycleParametersCode).eval
+          [Encodable.encode periodicStrip] =
+        pure [divideBoolTag cycleResult] := by
+    calc
+      _ = (stripCycleSearchCode tromino).eval
+          [Encodable.encode periodicStrip, indexCount periodicStrip,
+            stripSearchDepth periodicStrip] :=
+        comp_eval_pure _ _ _ _ cycleArguments
+      _ = _ :=
+        stripCycleSearchCode_eval tromino periodicStrip
+          (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+  have guardedRun :=
+    Code.boolAnd_eval_at stripWellFormedCode
+      ((stripCycleSearchCode tromino).comp
+        stripCycleParametersCode)
+      [Encodable.encode periodicStrip]
+      (divideBoolTag periodicStrip.wellFormed)
+      (divideBoolTag cycleResult)
+      (stripWellFormedCode_eval periodicStrip) cycleRun
+  rw [normalizedAndTag] at guardedRun
+  unfold periodicStripTrominoTilingCode guardedStripCycleCode
+  rw [periodicStripTrominoTilingIndexBool_eq_and,
+    encodeBool_eq_divideBoolTag]
+  exact guardedRun
 
 end RawWindowState
 end PeriodicStrip

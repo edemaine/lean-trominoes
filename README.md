@@ -297,7 +297,10 @@ The representation choices for this target are:
   initializes a reachability query and runs its exact verified fuel; nested
   tail-recursive countdowns then scan both frontier endpoints while retaining
   only loop counters, a Boolean accumulator, and the current flat DFS stack.
-  The final code is proved equal to `cycleSearchIndexDFSBoolAtDepth`.
+  The parameterized driver is proved equal to
+  `cycleSearchIndexDFSBoolAtDepth`; a unary front end computes the strip's
+  state count and certified search depth, rejects malformed presentations,
+  and is proved equal to `periodicStripTrominoTilingIndexBool`.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
