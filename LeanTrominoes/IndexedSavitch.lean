@@ -103,22 +103,24 @@ theorem indexSavitchDepth_eq_fin (stateCount : Nat) :
     indexSavitchDepth stateCount = savitchDepth (Fin stateCount) := by
   simp [indexSavitchDepth, savitchDepth]
 
-/-- Directed-cycle search over arithmetic indices. -/
-def cycleSearchIndexBool (stateCount : Nat)
+/-- Directed-cycle search over arithmetic indices at an explicit Savitch
+recursion depth. -/
+def cycleSearchIndexBoolAtDepth (stateCount depth : Nat)
     (relation : Nat → Nat → Bool) : Bool :=
   boundedAny (fun first =>
     boundedAny (fun second =>
       relation first second &&
         divideReachIndexBool stateCount relation
-          (indexSavitchDepth stateCount) second first)
+          depth second first)
       stateCount)
     stateCount
 
-theorem cycleSearchIndexBool_eq_true_iff
-    (stateCount : Nat) (relation : Nat → Nat → Bool) :
-    cycleSearchIndexBool stateCount relation = true ↔
+theorem cycleSearchIndexBoolAtDepth_eq_true_iff
+    (stateCount depth : Nat) (relation : Nat → Nat → Bool)
+    (depthSufficient : stateCount ≤ 2 ^ depth) :
+    cycleSearchIndexBoolAtDepth stateCount depth relation = true ↔
       HasCycle (IndexedRelation stateCount relation) := by
-  rw [cycleSearchIndexBool, boundedAny_eq_true_iff]
+  rw [cycleSearchIndexBoolAtDepth, boundedAny_eq_true_iff]
   constructor
   · rintro ⟨first, firstBound, secondSearch⟩
     rw [boundedAny_eq_true_iff] at secondSearch
@@ -127,15 +129,15 @@ theorem cycleSearchIndexBool_eq_true_iff
     obtain ⟨edge, returns⟩ := succeeds
     have returnDivide :=
       (divideReachIndexBool_eq_true_iff
-      stateCount relation (indexSavitchDepth stateCount)
+      stateCount relation depth
       second first secondBound firstBound).mp returns
     have returnReach :
         ReachWithin (IndexedRelation stateCount relation)
-          (2 ^ indexSavitchDepth stateCount)
+          (2 ^ depth)
           ⟨second, secondBound⟩ ⟨first, firstBound⟩ :=
       (divideReach_iff_reachWithin_pow
         (IndexedRelation stateCount relation)
-        (indexSavitchDepth stateCount) _ _).mp returnDivide
+        depth _ _).mp returnDivide
     obtain ⟨returnLength, -, returnWalk⟩ := returnReach
     have outgoing :
         ReachIn (IndexedRelation stateCount relation) 1
@@ -156,19 +158,17 @@ theorem cycleSearchIndexBool_eq_true_iff
     rw [Bool.and_eq_true]
     refine ⟨step 0, ?_⟩
     apply (divideReachIndexBool_eq_true_iff
-      stateCount relation (indexSavitchDepth stateCount)
+      stateCount relation depth
       second.val first.val second.isLt first.isLt).mpr
     apply (divideReach_iff_reachWithin_pow
       (IndexedRelation stateCount relation)
-      (indexSavitchDepth stateCount) second first).mpr
+      depth second first).mpr
     refine ⟨periodPred.val, ?_, ?_⟩
     · have periodBound :
           periodPred.val < Fintype.card (Fin stateCount) :=
         periodPred.isLt
-      have depthBound :=
-        card_le_pow_savitchDepth (Fin stateCount)
-      rw [← indexSavitchDepth_eq_fin] at depthBound
-      exact (periodBound.trans_le depthBound).le
+      simpa using
+        (periodBound.trans_le (by simpa using depthSufficient)).le
     · have segment :=
         reachIn_cycleSegment step (0 + 1) periodPred.val
       have wraps :
@@ -179,5 +179,19 @@ theorem cycleSearchIndexBool_eq_true_iff
         simp [Nat.add_comm]
       rw [wraps] at segment
       simpa [first, second] using segment
+
+/-- Directed-cycle search at the canonical logarithmic depth. -/
+def cycleSearchIndexBool (stateCount : Nat)
+    (relation : Nat → Nat → Bool) : Bool :=
+  cycleSearchIndexBoolAtDepth stateCount
+    (indexSavitchDepth stateCount) relation
+
+theorem cycleSearchIndexBool_eq_true_iff
+    (stateCount : Nat) (relation : Nat → Nat → Bool) :
+    cycleSearchIndexBool stateCount relation = true ↔
+      HasCycle (IndexedRelation stateCount relation) := by
+  apply cycleSearchIndexBoolAtDepth_eq_true_iff
+  rw [indexSavitchDepth_eq_fin]
+  simpa using card_le_pow_savitchDepth (Fin stateCount)
 
 end LeanTrominoes.FiniteState

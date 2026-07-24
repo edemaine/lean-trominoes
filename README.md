@@ -259,7 +259,9 @@ The representation choices for this target are:
   in the original `WindowState` graph, in both directions, yielding
   `periodicStripTrominoTilingIndexBool` and a proof that it decides the full
   strip-tiling predicate.  This removes the exponential state enumeration
-  from the executable upper-bound algorithm.
+  from the executable upper-bound algorithm.  The decider uses the already
+  certified sufficient depth `21 × binary input length + 1`, avoiding any
+  need to compute `Nat.log` in the primitive-recursive program.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is

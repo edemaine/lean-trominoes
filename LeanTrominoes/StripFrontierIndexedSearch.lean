@@ -1,4 +1,5 @@
 import LeanTrominoes.IndexedSavitch
+import LeanTrominoes.EncodingBounds
 import LeanTrominoes.StripFrontierIndex
 import LeanTrominoes.StripFrontierReconstruction
 
@@ -113,11 +114,32 @@ theorem indexed_hasCycle_iff_hasCycle (tromino : Tromino)
       periodPositive _ _).mpr
     simpa using step index
 
+theorem indexCount_eq_windowState_card (periodicStrip : PeriodicStrip) :
+    indexCount periodicStrip =
+      Fintype.card (WindowState periodicStrip) := by
+  rw [indexCount_eq, WindowState.windowState_card]
+
+/-- A primitive-recursion-friendly sufficient Savitch depth, linear in the
+actual binary input encoding length. -/
+def stripSearchDepth (periodicStrip : PeriodicStrip) : Nat :=
+  21 * ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+    periodicStrip).length + 1
+
+theorem indexCount_le_pow_stripSearchDepth
+    (periodicStrip : PeriodicStrip) :
+    indexCount periodicStrip ≤ 2 ^ stripSearchDepth periodicStrip := by
+  rw [indexCount_eq_windowState_card]
+  exact (FiniteState.card_le_pow_savitchDepth
+    (WindowState periodicStrip)).trans
+      (Nat.pow_le_pow_right (by omega)
+        (WindowState.savitchDepth_le_encoding_length periodicStrip))
+
 /-- Enumeration-free sparse-frontier decision procedure. -/
 def periodicStripTrominoTilingIndexBool
     (tromino : Tromino) (periodicStrip : PeriodicStrip) : Bool :=
   if wellFormed : periodicStrip.IsWellFormed then
-    FiniteState.cycleSearchIndexBool (indexCount periodicStrip)
+    FiniteState.cycleSearchIndexBoolAtDepth (indexCount periodicStrip)
+      (stripSearchDepth periodicStrip)
       (indexedTransitionBool tromino periodicStrip wellFormed.2.1)
   else
     false
@@ -128,7 +150,8 @@ theorem periodicStripTrominoTilingIndexBool_eq_true_iff
       PeriodicStripTrominoTiling tromino periodicStrip := by
   by_cases wellFormed : periodicStrip.IsWellFormed
   · rw [periodicStripTrominoTilingIndexBool, dif_pos wellFormed,
-      FiniteState.cycleSearchIndexBool_eq_true_iff,
+      FiniteState.cycleSearchIndexBoolAtDepth_eq_true_iff
+        _ _ _ (indexCount_le_pow_stripSearchDepth periodicStrip),
       indexed_hasCycle_iff_hasCycle tromino periodicStrip wellFormed.2.1,
       ← WindowState.tileable_iff_hasCycle tromino wellFormed]
     simp [PeriodicStripTrominoTiling, wellFormed]
