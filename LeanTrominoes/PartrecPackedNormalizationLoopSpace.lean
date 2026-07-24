@@ -465,6 +465,345 @@ theorem packedNormalizationBody
           (predecessor := countdown)
           (by rfl) branch
 
+set_option maxHeartbeats 800000 in
+theorem packedNormalizationBodyCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) (valid : Bool)
+    (remaining : List Cell) :
+    packedNormalizationBodyCost periodicStrip packed column
+        countdown valid remaining ≤
+      1000000000000000000000000000000000 *
+        (encodedListSpace
+          [4096 * (countdown +
+            periodicStrip.period + packed.phase +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode remaining +
+            Encodable.encode remaining +
+            Encodable.encode remaining +
+            column.val + packed.assignmentWord + 100) + 2000] +
+          1) := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let remainingCode := Encodable.encode remaining
+  let limit :=
+    4096 * (countdown +
+      periodicStrip.period + packed.phase +
+      motifCode + motifCode + motifCode +
+      remainingCode + remainingCode + remainingCode +
+      column.val + packed.assignmentWord + 100) + 2000
+  change
+    packedNormalizationBodyCost periodicStrip packed column
+        countdown valid remaining ≤
+      1000000000000000000000000000000000 *
+        (encodedListSpace [limit] + 1)
+  have countdownBound : countdown ≤ limit := by
+    simp only [limit]
+    omega
+  have periodBound : periodicStrip.period ≤ limit := by
+    simp only [limit]
+    omega
+  have phaseBound : packed.phase ≤ limit := by
+    simp only [limit]
+    omega
+  have motifBound : motifCode ≤ limit := by
+    simp only [limit]
+    omega
+  have remainingBound : remainingCode ≤ limit := by
+    simp only [limit]
+    omega
+  have columnBound : column.val ≤ limit := by
+    simp only [limit]
+    omega
+  have wordBound : packed.assignmentWord ≤ limit := by
+    simp only [limit]
+    omega
+  have countdownBits := encodeNat_length_mono countdownBound
+  have countdownPredBits :=
+    encodeNat_length_mono
+      ((Nat.pred_le countdown).trans countdownBound)
+  have periodBits := encodeNat_length_mono periodBound
+  have phaseBits := encodeNat_length_mono phaseBound
+  have motifBits := encodeNat_length_mono motifBound
+  have remainingBits := encodeNat_length_mono remainingBound
+  have columnBits := encodeNat_length_mono columnBound
+  have wordBits := encodeNat_length_mono wordBound
+  have countdownSuccBits :=
+    encodeNat_length_mono
+      (show countdown + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.period + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have phaseSuccBits :=
+    encodeNat_length_mono
+      (show packed.phase + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have remainingSuccBits :=
+    encodeNat_length_mono
+      (show remainingCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have columnSuccBits :=
+    encodeNat_length_mono
+      (show column.val + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have wordSuccBits :=
+    encodeNat_length_mono
+      (show packed.assignmentWord + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := rfl
+  have oneLimitBits :=
+    encodeNat_length_mono
+      (show 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have positiveLimitBits :
+      1 ≤ (Computability.encodeNat limit).length := by
+    simpa [oneBits] using oneLimitBits
+  have validBits :
+      (Computability.encodeNat valid.toNat).length ≤
+        (Computability.encodeNat limit).length := by
+    cases valid
+    · simp [zeroBits]
+    · simpa [oneBits] using positiveLimitBits
+  cases remaining with
+  | nil =>
+      have nextStateSpace :
+          encodedListSpace
+              (Code.packedNormalizationNativeStep periodicStrip packed
+                column
+                (Code.packedNormalizationState periodicStrip packed
+                  column valid [])) ≤
+            10 * ((Computability.encodeNat limit).length + 2) := by
+        rw [Code.packedNormalizationNativeStep_state_nil]
+        cases valid <;>
+          simp [Code.packedNormalizationState,
+            encodedListSpace_cons, encodedListSpace_nil,
+            motifCode, zeroBits, oneBits] at * <;>
+          omega
+      cases countdown <;>
+        cases valid <;>
+        simp [packedNormalizationBodyCost,
+          packedNormalizationStepCost,
+          flatCountdownBodyCost,
+          flatCountdownSuccBranchCost,
+          branchZeroZeroCost, branchZeroTestCost,
+          prependCost, getCost, dropCost, idCost,
+          headCost, nilCost, oneCost, zeroCost,
+          zeroPrimeCost, tailCost, succCost,
+          Code.packedNormalizationState,
+          encodedListSpace_cons, encodedListSpace_nil,
+          motifCode, remainingCode, limit,
+          zeroBits, oneBits, twoBits] at * <;>
+        clear * - countdownBits countdownPredBits
+          periodBits phaseBits motifBits remainingBits
+          columnBits wordBits countdownSuccBits
+          periodSuccBits phaseSuccBits motifSuccBits
+          remainingSuccBits columnSuccBits wordSuccBits
+          nextStateSpace <;>
+        omega
+  | cons cell remaining =>
+      let cellCode := Encodable.encode cell
+      let tailCode := Encodable.encode remaining
+      have cellRemaining :
+          cellCode ≤ Encodable.encode (cell :: remaining) := by
+        simp only [Encodable.encode_list_cons, cellCode]
+        exact
+          (Nat.left_le_pair cellCode tailCode).trans
+            (Nat.le_succ _)
+      have tailRemaining :
+          tailCode ≤ Encodable.encode (cell :: remaining) := by
+        simp only [Encodable.encode_list_cons, tailCode]
+        exact
+          (Nat.right_le_pair cellCode tailCode).trans
+            (Nat.le_succ _)
+      have cellLimit : cellCode ≤ limit :=
+        cellRemaining.trans (by
+          simpa [remainingCode] using remainingBound)
+      have tailLimit : tailCode ≤ limit :=
+        tailRemaining.trans (by
+          simpa [remainingCode] using remainingBound)
+      have cellBits := encodeNat_length_mono cellLimit
+      have tailBits := encodeNat_length_mono tailLimit
+      have constructorBits :=
+        encodeNat_length_mono
+          (show Nat.pair cellCode tailCode ≤ limit by
+            exact (Nat.le_succ _).trans
+              (by simpa [remainingCode] using remainingBound))
+      have cellSuccBits :=
+        encodeNat_length_mono
+          (show cellCode + 1 ≤ limit by
+            simp only [limit]
+            omega)
+      have tailSuccBits :=
+        encodeNat_length_mono
+          (show tailCode + 1 ≤ limit by
+            simp only [limit]
+            omega)
+      have viewBound :=
+        encodedListViewCost_le_linear (cell :: remaining)
+      have viewLimit :
+          encodedListSpace
+              [2 * Encodable.encode (cell :: remaining) + 4] ≤
+            encodedListSpace [limit] := by
+        have numeric :
+            2 * Encodable.encode (cell :: remaining) + 4 ≤
+              limit := by
+          simp only [limit]
+          omega
+        simpa only [encodedListSpace_cons,
+          encodedListSpace_nil, Nat.add_le_add_iff_right] using
+          encodeNat_length_mono numeric
+      have viewGlobal :
+          encodedListViewCost (cell :: remaining) ≤
+            2000000000 *
+              (encodedListSpace [limit] + 1) := by
+        exact viewBound.trans
+          (Nat.mul_le_mul_left 2000000000
+            (Nat.add_le_add_right viewLimit 1))
+      let normalizedLimit :=
+        1024 * (periodicStrip.period + packed.phase +
+          motifCode + motifCode + motifCode +
+          cellCode + column.val + packed.assignmentWord + 100) +
+          1000
+      have normalizedNumeric : normalizedLimit ≤ limit := by
+        simp only [normalizedLimit, limit]
+        omega
+      have normalizedBits :=
+        encodeNat_length_mono normalizedNumeric
+      have normalizedLocal :=
+        packedNormalizedAtCost_le_linear
+          periodicStrip.period packed.phase periodicStrip.motif
+          column.val cell packed.assignmentWord
+      have normalizedGlobal :
+          packedNormalizedAtCost periodicStrip.period packed.phase
+              periodicStrip.motif column.val cell
+              packed.assignmentWord ≤
+            1000000000000000000000000000000 *
+              (encodedListSpace [limit] + 1) := by
+        have aligned :
+            packedNormalizedAtCost periodicStrip.period packed.phase
+                periodicStrip.motif column.val cell
+                packed.assignmentWord ≤
+              1000000000000000000000000000000 *
+                (encodedListSpace [normalizedLimit] + 1) := by
+          simpa [packedNormalizedAtSpaceBound,
+            normalizedLimit, motifCode, cellCode] using
+            normalizedLocal
+        simp only [encodedListSpace_cons,
+          encodedListSpace_nil] at aligned ⊢
+        omega
+      have tailBitsRaw :
+          (Computability.encodeNat
+            (Encodable.encode remaining)).length ≤
+              (Computability.encodeNat limit).length := by
+        simpa [tailCode] using tailBits
+      have motifBitsRaw :
+          (Computability.encodeNat
+            (Encodable.encode periodicStrip.motif)).length ≤
+              (Computability.encodeNat limit).length := by
+        simpa [motifCode] using motifBits
+      have nextStateFieldBits :
+          (Computability.encodeNat
+                (Encodable.encode periodicStrip.motif)).length +
+              (Computability.encodeNat
+                (Encodable.encode remaining)).length +
+              (Computability.encodeNat periodicStrip.period).length +
+              (Computability.encodeNat packed.phase).length +
+              (Computability.encodeNat column.val).length +
+              (Computability.encodeNat
+                packed.assignmentWord).length ≤
+            6 * (Computability.encodeNat limit).length := by
+        clear * - motifBitsRaw tailBitsRaw periodBits phaseBits
+          columnBits wordBits
+        omega
+      have nextStateSpace :
+          encodedListSpace
+              (Code.packedNormalizationNativeStep periodicStrip packed
+                column
+                (Code.packedNormalizationState periodicStrip packed
+                  column valid (cell :: remaining))) ≤
+            10 * ((Computability.encodeNat limit).length + 2) := by
+        rw [Code.packedNormalizationNativeStep_state_cons]
+        cases valid <;>
+          cases normalized :
+            packed.normalizedAtBool periodicStrip column cell <;>
+          simp [Code.packedNormalizationState,
+            encodedListSpace_cons, encodedListSpace_nil,
+            zeroBits, oneBits] <;>
+          clear * - nextStateFieldBits <;>
+          omega
+      cases countdown with
+      | zero =>
+          cases valid <;>
+            simp [packedNormalizationBodyCost,
+              flatCountdownBodyCost, zeroPrimeCost,
+              Code.packedNormalizationState,
+              encodedListSpace_cons, encodedListSpace_nil,
+              motifCode, remainingCode, cellCode, tailCode,
+              limit, zeroBits, oneBits, twoBits] at * <;>
+            clear * - countdownBits countdownPredBits
+              periodBits phaseBits motifBits remainingBits
+              columnBits wordBits countdownSuccBits
+              periodSuccBits phaseSuccBits motifSuccBits
+              remainingSuccBits columnSuccBits wordSuccBits
+              cellBits tailBits constructorBits cellSuccBits
+              tailSuccBits nextStateSpace <;>
+            omega
+      | succ countdown =>
+          cases valid <;>
+            cases normalized :
+              packed.normalizedAtBool periodicStrip column cell <;>
+            simp [packedNormalizationBodyCost,
+              packedNormalizationStepCost,
+              packedNormalizationConsStepCost,
+              packedNormalizationUpdatedValidCost,
+              packedNormalizationHeadValidCost,
+              packedNormalizationAtArgumentsCost,
+              packedNormalizationHeadCost,
+              packedNormalizationTailCost,
+              packedNormalizationViewCost,
+              flatCountdownBodyCost,
+              flatCountdownSuccBranchCost,
+              branchZeroZeroCost, branchZeroSuccCost,
+              branchZeroTestCost, boolAndCost,
+              normalizeBoolCost, prependCost,
+              getCost, dropCost, idCost, headCost,
+              nilCost, oneCost, zeroCost, zeroPrimeCost,
+              tailCost, succCost,
+              Code.packedNormalizationState,
+              encodedListSpace_cons, encodedListSpace_nil,
+              motifCode, remainingCode, cellCode, tailCode,
+              limit, normalized,
+              zeroBits, oneBits, twoBits] at * <;>
+            clear * - countdownBits countdownPredBits
+              periodBits phaseBits motifBits remainingBits
+              columnBits wordBits countdownSuccBits
+              periodSuccBits phaseSuccBits motifSuccBits
+              remainingSuccBits columnSuccBits wordSuccBits
+              cellBits tailBits constructorBits cellSuccBits
+              tailSuccBits viewGlobal normalizedGlobal
+              nextStateSpace <;>
+            omega
+
 def packedNormalizationLoopInputCost
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) (column : WindowColumn) : Nat :=
@@ -569,18 +908,8 @@ theorem packedNormalizationBodyCost_le_suffixSpaceBound
       cases remaining with
       | nil =>
           cases valid
-          · simpa [packedNormalizationSuffixSpaceBound] using
-              (Nat.le_max_left
-                (packedNormalizationBodyCost periodicStrip packed
-                  column countdown false [])
-                (packedNormalizationBodyCost periodicStrip packed
-                  column countdown true []))
-          · simpa [packedNormalizationSuffixSpaceBound] using
-              (Nat.le_max_right
-                (packedNormalizationBodyCost periodicStrip packed
-                  column countdown false [])
-                (packedNormalizationBodyCost periodicStrip packed
-                  column countdown true []))
+          · simp [packedNormalizationSuffixSpaceBound]
+          · simp [packedNormalizationSuffixSpaceBound]
       | cons cell remaining =>
           cases valid
           · exact Nat.le_max_left _ _
@@ -627,21 +956,11 @@ theorem packedNormalizationSuffixSpaceBound_le_upTo
   | succ limit induction =>
       by_cases top : countdown = limit + 1
       · subst countdown
-        simpa [packedNormalizationSpaceBoundUpTo] using
-          (Nat.le_max_left
-            (packedNormalizationSuffixSpaceBound periodicStrip
-              packed column (limit + 1) periodicStrip.motif)
-            (packedNormalizationSpaceBoundUpTo periodicStrip
-              packed column limit))
+        simp [packedNormalizationSpaceBoundUpTo]
       · have below : countdown ≤ limit := by omega
         have previous := induction below
         exact previous.trans (by
-          simpa [packedNormalizationSpaceBoundUpTo] using
-            (Nat.le_max_right
-              (packedNormalizationSuffixSpaceBound periodicStrip
-                packed column (limit + 1) periodicStrip.motif)
-              (packedNormalizationSpaceBoundUpTo periodicStrip
-                packed column limit)))
+          simp [packedNormalizationSpaceBoundUpTo])
 
 /-- One workspace envelope for every typed state reachable during the
 complete normalization scan. -/
@@ -670,6 +989,156 @@ theorem packedNormalizationBodyCost_le_spaceBound
     (packedNormalizationSuffixSpaceBound_le_upTo
       periodicStrip packed column countdown
       (Encodable.encode periodicStrip.motif) countdownBound)
+
+def packedNormalizationPolynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) : Nat :=
+  1000000000000000000000000000000000 *
+    (encodedListSpace
+      [4096 * (periodicStrip.period + packed.phase +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        column.val + packed.assignmentWord + 100) + 2000] +
+      1)
+
+theorem packedNormalizationBodyCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) (valid : Bool)
+    (remaining leading : List Cell)
+    (countdownBound :
+      countdown ≤ Encodable.encode periodicStrip.motif)
+    (suffix : periodicStrip.motif = leading ++ remaining) :
+    packedNormalizationBodyCost periodicStrip packed column
+        countdown valid remaining ≤
+      packedNormalizationPolynomialSpaceBound
+        periodicStrip packed column := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let remainingCode := Encodable.encode remaining
+  let localLimit :=
+    4096 * (countdown +
+      periodicStrip.period + packed.phase +
+      motifCode + motifCode + motifCode +
+      remainingCode + remainingCode + remainingCode +
+      column.val + packed.assignmentWord + 100) + 2000
+  let globalLimit :=
+    4096 * (periodicStrip.period + packed.phase +
+      motifCode + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode +
+      column.val + packed.assignmentWord + 100) + 2000
+  have remainingBound : remainingCode ≤ motifCode := by
+    simp only [remainingCode, motifCode]
+    rw [suffix]
+    exact encode_list_suffix_le leading remaining
+  have numeric : localLimit ≤ globalLimit := by
+    simp only [localLimit, globalLimit]
+    omega
+  have bits := encodeNat_length_mono numeric
+  have body :=
+    packedNormalizationBodyCost_le_linear periodicStrip packed
+      column countdown valid remaining
+  have bodyLocal :
+      packedNormalizationBodyCost periodicStrip packed column
+          countdown valid remaining ≤
+        1000000000000000000000000000000000 *
+          (encodedListSpace [localLimit] + 1) := by
+    simpa [localLimit, motifCode, remainingCode] using body
+  simp only [packedNormalizationPolynomialSpaceBound,
+    encodedListSpace_cons, encodedListSpace_nil]
+  change
+    packedNormalizationBodyCost periodicStrip packed column
+        countdown valid remaining ≤
+      1000000000000000000000000000000000 *
+        ((Computability.encodeNat globalLimit).length + 1 + 1)
+  simp only [encodedListSpace_cons,
+    encodedListSpace_nil] at bodyLocal
+  exact bodyLocal.trans
+    (Nat.mul_le_mul_left
+      1000000000000000000000000000000000
+      (by omega))
+
+theorem packedNormalizationSuffixSpaceBound_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) (remaining leading : List Cell)
+    (countdownBound :
+      countdown ≤ Encodable.encode periodicStrip.motif)
+    (suffix : periodicStrip.motif = leading ++ remaining) :
+    packedNormalizationSuffixSpaceBound periodicStrip packed
+        column countdown remaining ≤
+      packedNormalizationPolynomialSpaceBound
+        periodicStrip packed column := by
+  induction remaining generalizing leading with
+  | nil =>
+      simp only [packedNormalizationSuffixSpaceBound]
+      apply Nat.max_le.mpr
+      constructor
+      · exact
+          packedNormalizationBodyCost_le_polynomialSpaceBound
+            periodicStrip packed column countdown false []
+            leading countdownBound suffix
+      · exact
+          packedNormalizationBodyCost_le_polynomialSpaceBound
+            periodicStrip packed column countdown true []
+            leading countdownBound suffix
+  | cons cell remaining induction =>
+      simp only [packedNormalizationSuffixSpaceBound]
+      apply Nat.max_le.mpr
+      constructor
+      · exact
+          packedNormalizationBodyCost_le_polynomialSpaceBound
+            periodicStrip packed column countdown false
+            (cell :: remaining) leading countdownBound suffix
+      · apply Nat.max_le.mpr
+        constructor
+        · exact
+            packedNormalizationBodyCost_le_polynomialSpaceBound
+              periodicStrip packed column countdown true
+              (cell :: remaining) leading countdownBound suffix
+        · apply induction (leading := leading ++ [cell])
+          simpa [List.append_assoc] using suffix
+
+theorem packedNormalizationSpaceBoundUpTo_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (limit : Nat)
+    (limitBound :
+      limit ≤ Encodable.encode periodicStrip.motif) :
+    packedNormalizationSpaceBoundUpTo periodicStrip packed
+        column limit ≤
+      packedNormalizationPolynomialSpaceBound
+        periodicStrip packed column := by
+  induction limit with
+  | zero =>
+      simpa [packedNormalizationSpaceBoundUpTo] using
+        (packedNormalizationSuffixSpaceBound_le_polynomialSpaceBound
+          periodicStrip packed column 0 periodicStrip.motif []
+          (Nat.zero_le _) (by simp))
+  | succ limit induction =>
+      simp only [packedNormalizationSpaceBoundUpTo]
+      apply Nat.max_le.mpr
+      constructor
+      · exact
+          packedNormalizationSuffixSpaceBound_le_polynomialSpaceBound
+            periodicStrip packed column (limit + 1)
+            periodicStrip.motif [] limitBound (by simp)
+      · exact induction (by omega)
+
+theorem packedNormalizationSpaceBound_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    packedNormalizationSpaceBound periodicStrip packed column ≤
+      packedNormalizationPolynomialSpaceBound
+        periodicStrip packed column := by
+  exact
+    packedNormalizationSpaceBoundUpTo_le_polynomialSpaceBound
+      periodicStrip packed column
+      (Encodable.encode periodicStrip.motif) (Nat.le_refl _)
 
 /-- Typed suffix states reachable while the packed normalization countdown
 is running. -/
@@ -864,6 +1333,255 @@ theorem packedNormalizationColumn
   simpa [Code.packedNormalizationColumnCode,
     packedNormalizationColumnCost, result,
     Code.packedNormalizationState] using projected
+
+theorem packedNormalizationLoopInputCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    packedNormalizationLoopInputCost periodicStrip packed column ≤
+      1000 *
+        (encodedListSpace
+          [4096 * (periodicStrip.period + packed.phase +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            column.val + packed.assignmentWord + 100) + 2000] +
+          1) := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit :=
+    4096 * (periodicStrip.period + packed.phase +
+      motifCode + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode +
+      column.val + packed.assignmentWord + 100) + 2000
+  let unit := encodedListSpace [limit] + 1
+  change
+    packedNormalizationLoopInputCost periodicStrip packed column ≤
+      1000 * unit
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, encodedListSpace_cons,
+      encodedListSpace_nil]
+  have periodBits :=
+    encodeNat_length_mono
+      (show periodicStrip.period ≤ limit by
+        simp only [limit]
+        omega)
+  have phaseBits :=
+    encodeNat_length_mono
+      (show packed.phase ≤ limit by
+        simp only [limit]
+        omega)
+  have motifBits :=
+    encodeNat_length_mono
+      (show motifCode ≤ limit by
+        simp only [limit]
+        omega)
+  have columnBits :=
+    encodeNat_length_mono
+      (show column.val ≤ limit by
+        simp only [limit]
+        omega)
+  have wordBits :=
+    encodeNat_length_mono
+      (show packed.assignmentWord ≤ limit by
+        simp only [limit]
+        omega)
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.period + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have phaseSuccBits :=
+    encodeNat_length_mono
+      (show packed.phase + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have columnSuccBits :=
+    encodeNat_length_mono
+      (show column.val + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have wordSuccBits :=
+    encodeNat_length_mono
+      (show packed.assignmentWord + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have motifBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif)).length ≤
+          (Computability.encodeNat limit).length := by
+    simpa [motifCode] using motifBits
+  have motifSuccBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif + 1)).length ≤
+          (Computability.encodeNat limit).length := by
+    simpa [motifCode] using motifSuccBits
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  simp [packedNormalizationLoopInputCost,
+    prependCost, getCost, dropCost, headCost,
+    idCost, nilCost, oneCost, zeroCost,
+    tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    unitEq, zeroBits, oneBits]
+  clear * - periodBits phaseBits motifBitsRaw columnBits wordBits
+    periodSuccBits phaseSuccBits motifSuccBitsRaw
+    columnSuccBits wordSuccBits unitEq
+  omega
+
+theorem packedNormalizationResultProjectionCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    getCost 6
+        (Code.packedNormalizationState periodicStrip packed column
+          (packed.normalizedColumnBool periodicStrip column) []) ≤
+      100 *
+        (encodedListSpace
+          [4096 * (periodicStrip.period + packed.phase +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            column.val + packed.assignmentWord + 100) + 2000] +
+          1) := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit :=
+    4096 * (periodicStrip.period + packed.phase +
+      motifCode + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode +
+      column.val + packed.assignmentWord + 100) + 2000
+  let unit := encodedListSpace [limit] + 1
+  change
+    getCost 6
+        (Code.packedNormalizationState periodicStrip packed column
+          (packed.normalizedColumnBool periodicStrip column) []) ≤
+      100 * unit
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, encodedListSpace_cons,
+      encodedListSpace_nil]
+  have periodBits :=
+    encodeNat_length_mono
+      (show periodicStrip.period ≤ limit by
+        simp only [limit]
+        omega)
+  have phaseBits :=
+    encodeNat_length_mono
+      (show packed.phase ≤ limit by
+        simp only [limit]
+        omega)
+  have motifBits :=
+    encodeNat_length_mono
+      (show motifCode ≤ limit by
+        simp only [limit]
+        omega)
+  have columnBits :=
+    encodeNat_length_mono
+      (show column.val ≤ limit by
+        simp only [limit]
+        omega)
+  have wordBits :=
+    encodeNat_length_mono
+      (show packed.assignmentWord ≤ limit by
+        simp only [limit]
+        omega)
+  have motifBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif)).length ≤
+          (Computability.encodeNat limit).length := by
+    simpa [motifCode] using motifBits
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := rfl
+  cases normalized :
+      packed.normalizedColumnBool periodicStrip column <;>
+    simp [Code.packedNormalizationState,
+      getCost, dropCost, headCost, idCost,
+      nilCost, tailCost, zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      unitEq, zeroBits, oneBits, twoBits] <;>
+    clear * - periodBits phaseBits motifBitsRaw columnBits wordBits
+      unitEq <;>
+    omega
+
+private theorem packedNormalizationColumnBudget
+    (unit projection space input : Nat)
+    (projectionBound : projection ≤ 100 * unit)
+    (spaceBound :
+      space ≤ 1000000000000000000000000000000000 * unit)
+    (inputBound : input ≤ 1000 * unit) :
+    projection + (space + input) ≤
+      2000000000000000000000000000000000 * unit := by
+  omega
+
+set_option maxHeartbeats 100000 in
+theorem packedNormalizationColumnCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    packedNormalizationColumnCost periodicStrip packed column ≤
+      2000000000000000000000000000000000 *
+        (encodedListSpace
+          [4096 * (periodicStrip.period + packed.phase +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            column.val + packed.assignmentWord + 100) + 2000] +
+          1) := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit :=
+    4096 * (periodicStrip.period + packed.phase +
+      motifCode + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode +
+      column.val + packed.assignmentWord + 100) + 2000
+  let unit := encodedListSpace [limit] + 1
+  change
+    packedNormalizationColumnCost periodicStrip packed column ≤
+      2000000000000000000000000000000000 * unit
+  have spaceGlobal :
+      packedNormalizationSpaceBound periodicStrip packed column ≤
+        1000000000000000000000000000000000 * unit := by
+    simpa [packedNormalizationPolynomialSpaceBound,
+      motifCode, limit, unit] using
+      packedNormalizationSpaceBound_le_polynomialSpaceBound
+        periodicStrip packed column
+  have inputGlobal :
+      packedNormalizationLoopInputCost periodicStrip packed column ≤
+        1000 * unit := by
+    simpa [motifCode, limit, unit] using
+      packedNormalizationLoopInputCost_le_linear
+        periodicStrip packed column
+  have projectionGlobal :
+      getCost 6
+          (Code.packedNormalizationState periodicStrip packed column
+            (packed.normalizedColumnBool periodicStrip column) []) ≤
+        100 * unit := by
+    simpa [motifCode, limit, unit] using
+      packedNormalizationResultProjectionCost_le_linear
+        periodicStrip packed column
+  simp only [packedNormalizationColumnCost]
+  exact
+    packedNormalizationColumnBudget unit _ _ _
+      projectionGlobal spaceGlobal inputGlobal
 
 end EvaluatorCodeFits
 

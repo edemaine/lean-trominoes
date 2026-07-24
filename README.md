@@ -545,8 +545,10 @@ The representation choices for this target are:
   Exact evaluator-space certificates fit every component of one streaming
   step and the surrounding flat-countdown body.  A preserved reachable-state
   invariant restricts those steps to actual motif suffixes, yielding one
-  finite workspace envelope for the complete fitted column program; its
-  polynomial majorant remains to be established.
+  finite workspace envelope for the complete fitted column program.
+  `packedNormalizationColumnCost_le_linear` bounds that entire program by a
+  fixed constant times one encoded arithmetic envelope for the period, phase,
+  motif, column, and packed word.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
