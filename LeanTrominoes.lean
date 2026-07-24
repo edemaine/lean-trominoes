@@ -34,6 +34,7 @@ import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
 import LeanTrominoes.StripFrontierEncoding
+import LeanTrominoes.StripFrontierIndex
 import LeanTrominoes.StripFrontierReconstruction
 import LeanTrominoes.StripFrontierSpace
 import LeanTrominoes.Theorem52

@@ -236,6 +236,15 @@ The representation choices for this target are:
   and the verified fixed-length word generator contains an encoding of every
   semantic frontier state.  This is the storage format for the forthcoming
   space-bounded strip evaluator.
+- [`LeanTrominoes/StripFrontierIndex.lean`](LeanTrominoes/StripFrontierIndex.lean)
+  ranks a raw frontier arithmetically: its assignment word is a base-nine
+  number and its phase is the residue modulo the strip period.  The resulting
+  indices range below exactly
+  `period × 9^(5 × distinct motif cells)`.  Ranking and on-demand decoding
+  are proved inverse on every valid raw state, and every bounded index decodes
+  to a valid state when the period is positive.  Thus later midpoint searches
+  can loop over natural indices without materializing the exponential state
+  list.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
