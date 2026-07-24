@@ -522,6 +522,13 @@ The representation choices for this target are:
   frontier columns.  Three fitted additions, two predecessors, and the
   quotient/remainder primitive implement the semantic phase formula on a
   fixed-width native state.
+- [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
+  and
+  [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
+  decide normalization at one motif occurrence.  The program compares the
+  signed horizontal cell coordinate with its wrapped column phase or accepts
+  an absent packed assignment; the fitted Boolean composition is proved
+  equal to `PackedWindowState.normalizedAtBool`.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

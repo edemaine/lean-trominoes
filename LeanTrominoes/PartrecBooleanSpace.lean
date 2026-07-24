@@ -113,6 +113,46 @@ theorem boolAnd
           (Nat.pos_of_ne_zero leftZero)
           leftFits normalized
 
+def boolOrCost
+    (values : List Nat)
+    (leftValue rightValue leftCost rightCost : Nat) : Nat :=
+  if leftValue = 0 then
+    branchZeroZeroCost values
+      [if rightValue = 0 then 0 else 1]
+      leftValue leftCost
+      (normalizeBoolCost values rightValue rightCost)
+  else
+    branchZeroSuccCost values [1]
+      leftValue leftCost (oneCost values)
+
+theorem boolOr
+    {left right : Code} {values : List Nat}
+    {leftValue rightValue leftCost rightCost : Nat}
+    (leftFits :
+      EvaluatorCodeFits left values [leftValue] leftCost)
+    (rightFits :
+      EvaluatorCodeFits right values [rightValue] rightCost) :
+    EvaluatorCodeFits (Code.boolOr left right) values
+      [if leftValue = 0 ∧ rightValue = 0 then 0 else 1]
+      (boolOrCost values leftValue rightValue
+        leftCost rightCost) := by
+  by_cases leftZero : leftValue = 0
+  · have normalized := normalizeBool rightFits
+    by_cases rightZero : rightValue = 0
+    · rw [if_pos ⟨leftZero, rightZero⟩]
+      simpa [Code.boolOr, boolOrCost,
+        leftZero, rightZero] using
+        branchZero_zero leftZero leftFits normalized
+    · rw [if_neg (fun both => rightZero both.2)]
+      simpa [Code.boolOr, boolOrCost,
+        leftZero, rightZero] using
+        branchZero_zero leftZero leftFits normalized
+  · rw [if_neg (fun both => leftZero both.1)]
+    simpa [Code.boolOr, boolOrCost, leftZero] using
+      branchZero_succ
+        (Nat.pos_of_ne_zero leftZero)
+        leftFits (one values)
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
