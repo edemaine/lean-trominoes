@@ -61,6 +61,58 @@ theorem natLt (left right : Nat) :
   rw [semantic] at normalized
   simpa [Code.natLtCode, natLtCost] using normalized
 
+set_option maxHeartbeats 800000 in
+theorem natLtCost_le_linear (left right : Nat) :
+    natLtCost left right ≤
+      1000000000 *
+        (encodedListSpace [2 * (left + right) + 4] + 1) := by
+  let limit := 2 * (left + right) + 4
+  have leftBound : left ≤ limit := by
+    simp only [limit]
+    omega
+  have rightBound : right ≤ limit := by
+    simp only [limit]
+    omega
+  have differenceBound : right - left ≤ limit :=
+    (Nat.sub_le right left).trans rightBound
+  have leftBits := encodeNat_length_mono leftBound
+  have rightBits := encodeNat_length_mono rightBound
+  have differenceBits :=
+    encodeNat_length_mono differenceBound
+  have differencePredBits :=
+    encodeNat_length_mono
+      ((Nat.pred_le (right - left)).trans differenceBound)
+  have leftSuccBits :=
+    encodeNat_length_mono
+      (show left + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have rightSuccBits :=
+    encodeNat_length_mono
+      (show right + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have differenceSuccBits :=
+    encodeNat_length_mono
+      (show right - left + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  by_cases differenceZero : right - left = 0 <;>
+    simp [natLtCost, natLtDifferenceCost,
+      natLtArgumentsCost, normalizeBoolCost,
+      subtractCost, subtractInputCost, subtractLoopCost,
+      branchZeroZeroCost, branchZeroSuccCost,
+      branchZeroTestCost, prependCost, getCost, dropCost,
+      headCost, idCost, nilCost, zeroCost, oneCost,
+      tailCost, zeroPrimeCost, succCost, differenceZero,
+      encodedListSpace_cons, encodedListSpace_nil,
+      limit, zeroBits, oneBits] at * <;>
+    omega
+
 def natPositiveCost (number : Nat) : Nat :=
   normalizeBoolCost [number] number
     (headCost [number])

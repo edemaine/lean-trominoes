@@ -449,6 +449,15 @@ The representation choices for this target are:
   use fitted truncated subtraction to return a normalized tag for natural
   strict comparison.  These operations express positive strip dimensions
   and coordinate upper bounds.
+- [`LeanTrominoes/PartrecDivision.lean`](LeanTrominoes/PartrecDivision.lean)
+  and
+  [`LeanTrominoes/PartrecDivisionSpace.lean`](LeanTrominoes/PartrecDivisionSpace.lean)
+  implement binary natural quotient and remainder with one flat countdown.
+  The live state stores only its quotient, remainder, and unchanged divisor;
+  a reachable-state invariant bounds both accumulators by the original
+  dividend, yielding a uniform input-linear evaluator-space certificate.
+  This shared primitive supports both period division of frontier indices
+  and repeated base-nine assignment-word decoding.
 - [`LeanTrominoes/PartrecStripCellBounds.lean`](LeanTrominoes/PartrecStripCellBounds.lean)
   and
   [`LeanTrominoes/PartrecStripCellBoundsSpace.lean`](LeanTrominoes/PartrecStripCellBoundsSpace.lean)
