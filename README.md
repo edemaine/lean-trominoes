@@ -292,7 +292,10 @@ The representation choices for this target are:
   cell precisely for a newly created high bit.  The matching binary
   predecessor certificate covers borrow propagation plus the evaluator's
   empty-list and zero-head case branches without increasing the input
-  footprint.
+  footprint.  A structural `normalSimulationFits` invariant now composes
+  these primitives across every `Code` constructor, and
+  `trNormal_respects_inSpace` gives the resulting normalization call one
+  common bound covering all of its low-level configurations.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;
