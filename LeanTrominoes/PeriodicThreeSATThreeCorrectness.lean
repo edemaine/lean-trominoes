@@ -252,7 +252,7 @@ theorem sourceVariables_mem {Variable : Type*}
     (tagged_mem : (literal, clauseIndex, literalIndex) ∈
       taggedLiterals source) :
     literal.atom ∈ sourceVariables source := by
-  simp only [sourceVariables, List.mem_eraseDups, List.mem_map]
+  simp only [sourceVariables, List.mem_dedup, List.mem_map]
   exact ⟨(literal, clauseIndex, literalIndex), tagged_mem, rfl⟩
 
 theorem occurrenceClause_complete {Variable : Type*}

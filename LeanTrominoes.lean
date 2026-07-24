@@ -39,11 +39,13 @@ import LeanTrominoes.IndexedSavitchDFSPartrec
 import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PeriodicCNF
+import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicThreeCNF
 import LeanTrominoes.PeriodicThreeCNFCorrectness
 import LeanTrominoes.PeriodicThreeCNFComputability
 import LeanTrominoes.PeriodicThreeSATThree
 import LeanTrominoes.PeriodicThreeSATThreeCorrectness
+import LeanTrominoes.PeriodicThreeSATThreeOccurrences
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecEncodedListDecode

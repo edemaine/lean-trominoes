@@ -916,6 +916,14 @@ The representation choices for this target are:
   the same cell-by-cell value.  Extending and restricting assignments then
   proves that occurrence splitting preserves periodic satisfiability exactly,
   including presentations with repeated clauses or literals.
+- [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
+  defines the finite-presentation literal count used by the paper's
+  “each variable occurs at most three times” restriction.
+- [`LeanTrominoes/PeriodicThreeSATThreeOccurrences.lean`](LeanTrominoes/PeriodicThreeSATThreeOccurrences.lean)
+  proves that positional occurrence copies are duplicate-free and that every
+  output variable occurs once in the copied source formula and at most twice
+  in its implication cycle.  Thus the cycle construction genuinely produces
+  periodic 3SAT-3 instances.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible

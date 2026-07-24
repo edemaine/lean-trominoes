@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicThreeCNF
+import Mathlib.Data.List.Dedup
 import Mathlib.Data.List.Enum
 
 /-!
@@ -29,11 +30,11 @@ def taggedLiterals {Variable : Type*} (source : PeriodicCNF Variable) :
     clause.zipIdx.map fun (literal, literalIndex) =>
       (literal, clauseIndex, literalIndex)
 
-/-- The original protovariables that actually occur in the presentation, in
-order of first occurrence. -/
+/-- The original protovariables that actually occur in the presentation,
+without duplicates. -/
 def sourceVariables {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable) : List Variable :=
-  (taggedLiterals source).map (fun tagged => tagged.1.atom) |>.eraseDups
+  (taggedLiterals source).map (fun tagged => tagged.1.atom) |>.dedup
 
 /-- The occurrence copies belonging to one original protovariable. -/
 def occurrenceVariables {Variable : Type*} [DecidableEq Variable]
