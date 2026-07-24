@@ -378,6 +378,11 @@ The representation choices for this target are:
   middle loop implements multiplication by the frontier-state count, and the
   outer loop implements the depth recurrence.  Its semantic correctness is
   proved directly, exposing the live states needed by the space certificate.
+- [`LeanTrominoes/PartrecFuelSpace.lean`](LeanTrominoes/PartrecFuelSpace.lean)
+  fits all three fuel countdowns under nested invariants.  Every partial sum
+  is bounded by its enclosing loop's result, and every intermediate fuel is
+  bounded by the final depth's fuel, so the calculation uses space
+  proportional to the binary lengths of its inputs and result.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
@@ -414,12 +419,13 @@ The representation choices for this target are:
   allowance for explicit arithmetic into one polynomial envelope for the
   evaluator proof.  `stripSearchDepthCode_fits` certifies the complete
   binary-length and affine search-depth call within that shared envelope.
-  `StripEvaluatorLeafCallsFit` isolates the five remaining leaf
-  certificates—base relation, raw edge, Savitch fuel, state count, and
-  well-formedness—as continuation-passing fitted-call obligations.  The fuel
-  program is now explicit; the other four still use correctness-only code
-  selection.  This keeps semantic correctness distinct from the space
-  certificate still required for each code.
+  `stripFuelCode_fits` similarly certifies the explicit exact-fuel
+  computation within a quadratic reserve.  `StripEvaluatorLeafCallsFit`
+  isolates the four remaining leaf certificates—base relation, raw edge,
+  state count, and well-formedness—as continuation-passing fitted-call
+  obligations.  These four still use correctness-only code selection, keeping
+  semantic correctness distinct from the space certificate required for each
+  code.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

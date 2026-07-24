@@ -46,6 +46,7 @@ import LeanTrominoes.PartrecCodeSpace
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecFuel
+import LeanTrominoes.PartrecFuelSpace
 import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecListCodeSpace
 import LeanTrominoes.PartrecPolySpace

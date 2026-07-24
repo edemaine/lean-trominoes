@@ -2,6 +2,7 @@ import LeanTrominoes.StripFrontierCyclePartrec
 import LeanTrominoes.StripFrontierIndexedSearchSpace
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecBinaryLengthSpace
+import LeanTrominoes.PartrecFuelSpace
 
 /-!
 # Space bounds for compiled strip-search payloads
@@ -361,24 +362,36 @@ fixed affine arithmetic used to compute the certified search depth. -/
 def stripArithmeticSpaceBound (inputLength : Nat) : Nat :=
   1000000000000000 * (inputLength + 1)
 
+/-- A deliberately loose quadratic allowance for the explicit nested
+countdowns computing the exact Savitch fuel. -/
+def stripFuelComputationSpaceBound (inputLength : Nat) : Nat :=
+  1000000000000000000000000000000000000000000000000000000000000 *
+    (stripFuelBits inputLength + 100 * inputLength + 100)
+
 /-- One common polynomial envelope for search payloads and explicit
-search-depth arithmetic. -/
+search-depth and fuel arithmetic. -/
 def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
   stripEvaluatorCoreSpaceBound inputLength +
-    stripArithmeticSpaceBound inputLength
+    stripArithmeticSpaceBound inputLength +
+      stripFuelComputationSpaceBound inputLength
 
 /-- Polynomial packaging of `stripEvaluatorSpaceBound`. -/
 noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
   stripReachPayloadSpacePolynomial +
     stripLoopPayloadSpacePolynomial + Polynomial.X + 2 +
-      1000000000000000 * (Polynomial.X + 1)
+      1000000000000000 * (Polynomial.X + 1) +
+        1000000000000000000000000000000000000000000000000000000000000 *
+          (((21 * Polynomial.X + 2) *
+            (21 * Polynomial.X + 5) + 1) +
+            100 * Polynomial.X + 100)
 
 @[simp]
 theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
     stripEvaluatorSpacePolynomial.eval inputLength =
       stripEvaluatorSpaceBound inputLength := by
   simp [stripEvaluatorSpacePolynomial, stripEvaluatorSpaceBound,
-    stripEvaluatorCoreSpaceBound, stripArithmeticSpaceBound]
+    stripEvaluatorCoreSpaceBound, stripArithmeticSpaceBound,
+    stripFuelComputationSpaceBound, stripFuelBits]
 
 theorem stripReachPayloadSpaceBound_le_evaluator
     (inputLength : Nat) :
@@ -412,6 +425,125 @@ theorem stripInput_encodedListSpace
   simpa only [Turing.PartrecToTM2.stackSpace_init] using
     Turing.PartrecToTM2.stackSpace_typed_init
       (periodicStripTrominoTilingCode Tromino.I) periodicStrip
+
+/-- The complete explicit fuel computation fits its quadratic arithmetic
+reserve. -/
+theorem stripFuelCodeCost_le
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits.divideEvalFuelCost
+        [indexCount periodicStrip,
+          stripSearchDepth periodicStrip] ≤
+      stripFuelComputationSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let stateCount := indexCount periodicStrip
+  let depth := stripSearchDepth periodicStrip
+  let fuel :=
+    FiniteState.divideEvalFuel stateCount depth
+  have countBits :
+      (Computability.encodeNat stateCount).length ≤
+        21 * inputLength + 3 := by
+    simpa [stateCount, inputLength] using
+      stripCounter_encodeNat_length_le periodicStrip
+        stateCount (Nat.le_refl _)
+  have depthBits :
+      (Computability.encodeNat depth).length ≤
+        21 * inputLength + 2 := by
+    simpa [depth, inputLength] using
+      stripDepth_encodeNat_length_le periodicStrip
+  have fuelBits :
+      (Computability.encodeNat fuel).length ≤
+        stripFuelBits inputLength := by
+    simpa [fuel, stateCount, depth, inputLength] using
+      stripFuel_encodeNat_length_le periodicStrip
+  have countSuccessorBits :=
+    encodeNat_succ_length_le stateCount
+  have countPlusBits :
+      (Computability.encodeNat (stateCount + 1)).length ≤
+        (Computability.encodeNat stateCount).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using countSuccessorBits
+  have depthSuccessorBits :=
+    encodeNat_succ_length_le depth
+  have depthPlusBits :
+      (Computability.encodeNat (depth + 1)).length ≤
+        (Computability.encodeNat depth).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using depthSuccessorBits
+  have fuelSuccessorBits :=
+    encodeNat_succ_length_le fuel
+  have fuelPlusBits :
+      (Computability.encodeNat (fuel + 1)).length ≤
+        (Computability.encodeNat fuel).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using fuelSuccessorBits
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have inputLengthDirect :
+      (Computability.encodeNat
+          (Encodable.encode periodicStrip)).length + 1 =
+        inputLength := by
+    simp [inputLength]
+  have fuelBoundDirect :
+      stripFuelBits
+          ((Computability.encodeNat
+            (Encodable.encode periodicStrip)).length + 1) =
+        stripFuelBits inputLength := by
+    rw [inputLengthDirect]
+  have countDirectBits :
+      (Computability.encodeNat
+        (indexCount periodicStrip)).length =
+        (Computability.encodeNat stateCount).length := by
+    rfl
+  have depthDirectBits :
+      (Computability.encodeNat
+        (stripSearchDepth periodicStrip)).length =
+        (Computability.encodeNat depth).length := by
+    rfl
+  have fuelDirectBits :
+      (Computability.encodeNat
+        (FiniteState.divideEvalFuel
+          (indexCount periodicStrip)
+          (stripSearchDepth periodicStrip))).length =
+        (Computability.encodeNat fuel).length := by
+    rfl
+  have countPlusDirectBits :
+      (Computability.encodeNat
+        (indexCount periodicStrip + 1)).length =
+        (Computability.encodeNat (stateCount + 1)).length := by
+    rfl
+  have depthPlusDirectBits :
+      (Computability.encodeNat
+        (stripSearchDepth periodicStrip + 1)).length =
+        (Computability.encodeNat (depth + 1)).length := by
+    rfl
+  have fuelPlusDirectBits :
+      (Computability.encodeNat
+        (FiniteState.divideEvalFuel
+          (indexCount periodicStrip)
+          (stripSearchDepth periodicStrip) + 1)).length =
+        (Computability.encodeNat (fuel + 1)).length := by
+    rfl
+  simp [EvaluatorCodeFits.divideEvalFuelCost,
+    EvaluatorCodeFits.divideEvalFuelInputCost,
+    EvaluatorCodeFits.fuelOuterLoopCost,
+    stripFuelComputationSpaceBound,
+    EvaluatorCodeFits.prependCost,
+    EvaluatorCodeFits.getCost,
+    EvaluatorCodeFits.dropCost,
+    EvaluatorCodeFits.idCost,
+    EvaluatorCodeFits.headCost,
+    EvaluatorCodeFits.nilCost,
+    EvaluatorCodeFits.oneCost,
+    EvaluatorCodeFits.zeroCost,
+    EvaluatorCodeFits.zeroPrimeCost,
+    EvaluatorCodeFits.tailCost,
+    EvaluatorCodeFits.succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    zeroBits, oneBits]
+  omega
 
 /-- The explicit search-depth program fits the arithmetic part of the strip
 budget whenever the surrounding continuation fits the reserved core. -/
@@ -478,13 +610,71 @@ theorem stripSearchDepthCode_fits
         omega)
       after'
 
+/-- The explicit exact-fuel program fits the fuel-computation part of the
+strip budget whenever the surrounding continuation fits the preceding
+reserves. -/
+theorem stripFuelCode_fits
+    (periodicStrip : PeriodicStrip)
+    (continuation : Turing.ToPartrec.Cont)
+    (continuationBound :
+      continuationSpace continuation ≤
+        stripEvaluatorCoreSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        stripArithmeticSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+    (after :
+      EvaluatorExecutionFits
+        (stripEvaluatorSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+        (.ret continuation
+          [FiniteState.divideEvalFuel
+            (indexCount periodicStrip)
+            (stripSearchDepth periodicStrip)])) :
+    EvaluatorCallFits divideEvalFuelCode continuation
+      [indexCount periodicStrip, stripSearchDepth periodicStrip]
+      (stripEvaluatorSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values :=
+    [indexCount periodicStrip, stripSearchDepth periodicStrip]
+  have fits := EvaluatorCodeFits.divideEvalFuel values
+  have costBound :
+      EvaluatorCodeFits.divideEvalFuelCost values ≤
+        stripFuelComputationSpaceBound inputLength := by
+    simpa [values, inputLength] using
+      stripFuelCodeCost_le periodicStrip
+  have call :=
+    fits.call continuation
+      (stripEvaluatorSpaceBound inputLength)
+      (by
+        simp only [stripEvaluatorSpaceBound]
+        change continuationSpace continuation ≤
+          stripEvaluatorCoreSpaceBound inputLength +
+            stripArithmeticSpaceBound inputLength at continuationBound
+        omega)
+      (by
+        change
+          EvaluatorExecutionFits
+            (stripEvaluatorSpaceBound inputLength)
+            (.ret continuation
+              [FiniteState.divideEvalFuel
+                (values[0]?.getD 0) (values[1]?.getD 0)]) at after
+        exact after)
+  simpa [divideEvalFuelCode, values, inputLength] using call
+
 /-- A Boolean result occupies at most two cells in the evaluator's
 delimited-binary list representation. -/
 theorem stripResult_encodedListSpace_le (result : Bool) :
     encodedListSpace [Encodable.encode result] ≤ 2 := by
   cases result <;> decide
 
-/-- Fitted-call obligations for the five opaque primitive-recursive leaves
+/-- Fitted-call obligations for the four opaque primitive-recursive leaves
 used by the otherwise explicit strip evaluator.  Each field is
 continuation-passing: given a fitted execution after the leaf returns its
 verified result, it supplies a fitted execution of the leaf call itself.
@@ -519,16 +709,6 @@ structure StripEvaluatorLeafCallsFit
       EvaluatorCallFits (stripEdgeVectorCode tromino)
         continuation
         [Encodable.encode periodicStrip, first, last] bound
-  fuel :
-    ∀ continuation,
-      EvaluatorExecutionFits bound
-        (.ret continuation
-          [FiniteState.divideEvalFuel
-            (indexCount periodicStrip)
-            (stripSearchDepth periodicStrip)]) →
-      EvaluatorCallFits divideEvalFuelCode continuation
-        [indexCount periodicStrip, stripSearchDepth periodicStrip]
-        bound
   indexCount :
     ∀ continuation,
       EvaluatorExecutionFits bound
