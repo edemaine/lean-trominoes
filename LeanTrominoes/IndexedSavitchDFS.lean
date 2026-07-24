@@ -171,6 +171,17 @@ def divideReachIndexDFSBool (stateCount : Nat)
   (((divideEvalStep stateCount relation)^[divideEvalFuel stateCount depth])
     (divideEvalInitial depth first last)).answer.getD false
 
+/-- Directed-cycle search using the explicit depth-first reachability
+evaluator. -/
+def cycleSearchIndexDFSBoolAtDepth (stateCount depth : Nat)
+    (relation : Nat → Nat → Bool) : Bool :=
+  boundedAny (fun first =>
+    boundedAny (fun second =>
+      relation first second &&
+        divideReachIndexDFSBool stateCount relation depth second first)
+      stateCount)
+    stateCount
+
 /-- Every saved frame fits below a root-depth budget.  For a stack whose
 innermost frame is at the head, a frame's child depth plus the length of its
 suffix is at most the original root depth. -/

@@ -211,6 +211,10 @@ The representation choices for this target are:
   continuation frame per unfinished query, never the recursive-call tree.
   The formal depth invariant proves that every reachable configuration has
   at most the original Savitch depth many frames.
+- [`LeanTrominoes/IndexedSavitchDFSCorrectness.lean`](LeanTrominoes/IndexedSavitchDFSCorrectness.lean)
+  proves that the evaluator's exact fixed-fuel run returns the original
+  Savitch reachability answer, and hence that the resulting directed-cycle
+  search is extensionally equal to the already verified indexed search.
 - [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
   fills a machine-level gap in Mathlib's computability stack.  A TM2 program
   described over an infinite ambient label type can be restricted to a
