@@ -8,31 +8,39 @@ import LeanTrominoes.StripFrontierRawTransition
 # Enumeration-free indexed search for strip frontiers
 
 This file instantiates the arithmetic Savitch search with sparse tromino
-frontiers.  A bounded index is decoded to one semantic `WindowState`, the
-ordinary transition predicate is checked there, and the state is discarded
-before the next midpoint is tried.
+frontiers.  Every ambient index is decoded modulo the period and into one
+fixed-length base-nine word, then projected to a semantic `WindowState`.
+Canonical indices embed every semantic state, while noncanonical padded
+indices merely add redundant representatives.
 -/
 
 namespace LeanTrominoes
 namespace PeriodicStrip
 namespace RawWindowState
 
-/-- Semantic state decoded from a bounded arithmetic index. -/
+/-- Semantic state decoded from any natural index. -/
+def semanticOfNat (periodicStrip : PeriodicStrip)
+    (periodPositive : 0 < periodicStrip.period)
+    (stateIndex : Nat) :
+    WindowState periodicStrip :=
+  (ofIndex periodicStrip stateIndex).toWindowState periodicStrip
+    (ofIndex_isValid_of_periodPositive periodPositive stateIndex)
+
+/-- Semantic state decoded from a canonical bounded arithmetic index. -/
 def semanticOfIndex (periodicStrip : PeriodicStrip)
     (periodPositive : 0 < periodicStrip.period)
     (stateIndex : Fin (indexCount periodicStrip)) :
     WindowState periodicStrip :=
-  let raw := ofIndex periodicStrip stateIndex.val
-  let valid := ofIndex_isValid periodPositive stateIndex.isLt
-  raw.toWindowState periodicStrip valid
+  semanticOfNat periodicStrip periodPositive stateIndex.val
 
 theorem decode_ofIndex_eq_some (periodicStrip : PeriodicStrip)
     (periodPositive : 0 < periodicStrip.period)
     (stateIndex : Fin (indexCount periodicStrip)) :
     decode periodicStrip (ofIndex periodicStrip stateIndex.val) =
       some (semanticOfIndex periodicStrip periodPositive stateIndex) := by
-  unfold decode semanticOfIndex
-  rw [dif_pos (ofIndex_isValid periodPositive stateIndex.isLt)]
+  unfold decode semanticOfIndex semanticOfNat
+  rw [dif_pos
+    (ofIndex_isValid_of_periodPositive periodPositive stateIndex.val)]
 
 /-- Arithmetic index of a semantic frontier state. -/
 def indexOfWindow {periodicStrip : PeriodicStrip}
@@ -58,34 +66,24 @@ theorem semanticOfIndex_indexOfWindow {periodicStrip : PeriodicStrip}
   rw [ofIndex_index (encode_isValid state), decode_encode] at decoded
   exact Option.some.inj decoded.symm
 
-/-- Proof-free Boolean transition check on natural indices.  Out-of-range
-indices are rejected before decoding. -/
+@[simp]
+theorem semanticOfNat_indexOfWindow {periodicStrip : PeriodicStrip}
+    (periodPositive : 0 < periodicStrip.period)
+    (state : WindowState periodicStrip) :
+    semanticOfNat periodicStrip periodPositive
+        (indexOfWindow state).val =
+      state := by
+  exact semanticOfIndex_indexOfWindow periodPositive state
+
+/-- Proof-free Boolean transition check on natural indices.  Every index is
+decoded to a valid fixed-length raw state; padded indices therefore produce
+redundant semantic representatives instead of requiring an exact range
+check. -/
 def indexedTransitionRawBool (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
     (first last : Nat) : Bool :=
-  if _firstBound : first < indexCount periodicStrip then
-    if _lastBound : last < indexCount periodicStrip then
-      (ofIndex periodicStrip first).transitionBool tromino periodicStrip
-        (ofIndex periodicStrip last)
-    else
-      false
-  else
-    false
-
-theorem indexedTransitionRawBool_eq_true_bounds
-    (tromino : Tromino) (periodicStrip : PeriodicStrip)
-    (first last : Nat)
-    (edge :
-      indexedTransitionRawBool tromino periodicStrip
-        first last = true) :
-    first < indexCount periodicStrip ∧
-      last < indexCount periodicStrip := by
-  by_cases firstBound : first < indexCount periodicStrip
-  · by_cases lastBound : last < indexCount periodicStrip
-    · exact ⟨firstBound, lastBound⟩
-    · simp [indexedTransitionRawBool,
-        firstBound, lastBound] at edge
-  · simp [indexedTransitionRawBool, firstBound] at edge
+  (ofIndex periodicStrip first).transitionBool tromino periodicStrip
+    (ofIndex periodicStrip last)
 
 /-- Indexed transition with the positivity witness expected by the semantic
 correctness interface.  The executable raw test does not inspect the proof. -/
@@ -94,6 +92,21 @@ def indexedTransitionBool (tromino : Tromino)
     (_periodPositive : 0 < periodicStrip.period)
     (first last : Nat) : Bool :=
   indexedTransitionRawBool tromino periodicStrip first last
+
+theorem indexedTransitionRawBool_eq_true_iff_transition
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (periodPositive : 0 < periodicStrip.period)
+    (first last : Nat) :
+    indexedTransitionRawBool tromino periodicStrip first last = true ↔
+      WindowState.Transition tromino
+        (semanticOfNat periodicStrip periodPositive first)
+        (semanticOfNat periodicStrip periodPositive last) := by
+  rw [indexedTransitionRawBool, transitionBool_eq_true_iff,
+    transition_iff_toWindowState tromino periodicStrip
+      (ofIndex periodicStrip first) (ofIndex periodicStrip last)
+      (ofIndex_isValid_of_periodPositive periodPositive first)
+      (ofIndex_isValid_of_periodPositive periodPositive last)]
+  rfl
 
 theorem indexedRelation_iff_transition (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -105,15 +118,8 @@ theorem indexedRelation_iff_transition (tromino : Tromino)
       WindowState.Transition tromino
         (semanticOfIndex periodicStrip periodPositive first)
         (semanticOfIndex periodicStrip periodPositive last) := by
-  rw [FiniteState.IndexedRelation, indexedTransitionBool,
-    indexedTransitionRawBool,
-    dif_pos first.isLt, dif_pos last.isLt,
-    transitionBool_eq_true_iff,
-    transition_iff_toWindowState tromino periodicStrip
-      (ofIndex periodicStrip first.val) (ofIndex periodicStrip last.val)
-      (ofIndex_isValid periodPositive first.isLt)
-      (ofIndex_isValid periodPositive last.isLt)]
-  rfl
+  exact indexedTransitionRawBool_eq_true_iff_transition
+    tromino periodicStrip periodPositive first.val last.val
 
 theorem indexed_hasCycle_iff_hasCycle (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -139,6 +145,42 @@ theorem indexed_hasCycle_iff_hasCycle (tromino : Tromino)
       periodPositive _ _).mpr
     simpa using step index
 
+/-- Enlarging the ambient index range only adds representatives that project
+to existing semantic states.  Conversely, canonical indices embed every
+semantic state below any bound containing `indexCount`. -/
+theorem paddedIndexed_hasCycle_iff_hasCycle (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (periodPositive : 0 < periodicStrip.period)
+    (stateBound : Nat)
+    (canonicalFits : indexCount periodicStrip ≤ stateBound) :
+    FiniteState.HasCycle
+        (FiniteState.IndexedRelation stateBound
+          (indexedTransitionBool tromino periodicStrip periodPositive)) ↔
+      FiniteState.HasCycle
+        (WindowState.Transition tromino :
+          WindowState periodicStrip → WindowState periodicStrip → Prop) := by
+  constructor
+  · rintro ⟨periodPred, states, step⟩
+    refine ⟨periodPred,
+      fun index =>
+        semanticOfNat periodicStrip periodPositive (states index).val,
+      ?_⟩
+    intro index
+    exact
+      (indexedTransitionRawBool_eq_true_iff_transition
+        tromino periodicStrip periodPositive _ _).mp (step index)
+  · rintro ⟨periodPred, states, step⟩
+    refine ⟨periodPred,
+      fun index =>
+        ⟨(indexOfWindow (states index)).val,
+          (indexOfWindow (states index)).isLt.trans_le canonicalFits⟩,
+      ?_⟩
+    intro index
+    apply
+      (indexedTransitionRawBool_eq_true_iff_transition
+        tromino periodicStrip periodPositive _ _).mpr
+    simpa using step index
+
 theorem windowState_card_le_indexCount
     (periodicStrip : PeriodicStrip) :
     Fintype.card (WindowState periodicStrip) ≤
@@ -156,8 +198,8 @@ def stripSearchDepth (periodicStrip : PeriodicStrip) : Nat :=
   21 * ((Complexity.primcodableFinEncoding PeriodicStrip).encode
     periodicStrip).length + 1
 
-/-- A power-of-two ambient state bound.  The raw edge predicate rejects the
-padded indices beyond the exact sparse-frontier range. -/
+/-- A power-of-two ambient state bound.  Padded indices decode to redundant
+representatives of semantic frontier states. -/
 def stripStateBound (periodicStrip : PeriodicStrip) : Nat :=
   2 ^ stripSearchDepth periodicStrip
 
@@ -215,17 +257,14 @@ theorem periodicStripTrominoTilingIndexBool_eq_true_iff
   by_cases wellFormed : periodicStrip.IsWellFormed
   · rw [periodicStripTrominoTilingIndexBool, dif_pos wellFormed,
       FiniteState.cycleSearchIndexDFSBoolAtDepth_eq,
-      FiniteState.cycleSearchIndexBoolAtDepth_pad_eq_true_iff
-        (indexCount periodicStrip)
+      FiniteState.cycleSearchIndexBoolAtDepth_eq_true_iff
         (stripStateBound periodicStrip)
         (stripSearchDepth periodicStrip)
         (indexedTransitionBool tromino periodicStrip wellFormed.2.1)
-        (Nat.le_refl _)
-        (indexCount_le_stripStateBound periodicStrip)
-        (fun first last edge =>
-          indexedTransitionRawBool_eq_true_bounds
-            tromino periodicStrip first last edge),
-      indexed_hasCycle_iff_hasCycle tromino periodicStrip wellFormed.2.1,
+        (by simp [stripStateBound]),
+      paddedIndexed_hasCycle_iff_hasCycle tromino periodicStrip
+        wellFormed.2.1 (stripStateBound periodicStrip)
+        (indexCount_le_stripStateBound periodicStrip),
       ← WindowState.tileable_iff_hasCycle tromino wellFormed]
     simp [PeriodicStripTrominoTiling, wellFormed]
   · rw [periodicStripTrominoTilingIndexBool, dif_neg wellFormed]

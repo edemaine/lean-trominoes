@@ -7,8 +7,9 @@ import LeanTrominoes.IndexedSavitchDFSComputability
 # Computability of indexed strip transitions
 
 This file closes the compiler-facing transition layer: arithmetic state
-indices are range-checked, decoded on demand, and passed to the
-primitive-recursive raw frontier verifier.
+indices are decoded on demand and passed to the primitive-recursive raw
+frontier verifier.  Exact exponential range checks are unnecessary because
+every padded index denotes a redundant semantic frontier representative.
 -/
 
 namespace LeanTrominoes
@@ -26,15 +27,6 @@ theorem indexedTransitionRawBool_primrec (tromino : Tromino) :
     Primrec.fst.comp Primrec.snd
   let last : Primrec fun input : PeriodicStrip × Nat × Nat => input.2.2 :=
     Primrec.snd.comp Primrec.snd
-  let stateCount : Primrec fun input : PeriodicStrip × Nat × Nat =>
-      indexCount input.1 :=
-    indexCount_primrec.comp strip
-  have firstBound : PrimrecPred fun input : PeriodicStrip × Nat × Nat =>
-      input.2.1 < indexCount input.1 :=
-    Primrec.nat_lt.comp first stateCount
-  have lastBound : PrimrecPred fun input : PeriodicStrip × Nat × Nat =>
-      input.2.2 < indexCount input.1 :=
-    Primrec.nat_lt.comp last stateCount
   let firstState : Primrec fun input : PeriodicStrip × Nat × Nat =>
       ofIndex input.1 input.2.1 :=
     ofIndex_primrec.comp strip first
@@ -47,10 +39,7 @@ theorem indexedTransitionRawBool_primrec (tromino : Tromino) :
     (transitionBool_primrec tromino).comp
       (Primrec.pair strip
         (Primrec.pair firstState lastState))
-  unfold indexedTransitionRawBool
-  exact Primrec.ite firstBound
-    (Primrec.ite lastBound transition (Primrec.const false))
-    (Primrec.const false)
+  exact transition
 
 theorem indexedTransitionBool_primrec (tromino : Tromino)
     (periodicStrip : PeriodicStrip)

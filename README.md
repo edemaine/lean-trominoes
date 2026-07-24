@@ -385,9 +385,10 @@ The representation choices for this target are:
   proportional to the binary lengths of its inputs and result.
 - [`LeanTrominoes/PartrecPowerTwo.lean`](LeanTrominoes/PartrecPowerTwo.lean)
   computes `2 ^ depth` by a flat doubling loop, reusing the explicit addition
-  machinery.  This supplies a padded graph bound: a generic cycle-padding
-  theorem proves that the raw edge predicate's out-of-range rejection makes
-  the padded graph cycle-equivalent to the exact sparse-frontier graph.
+  machinery.  This supplies the padded graph bound used by the indexed
+  search.  Every padded index decodes to a valid frontier representative, and
+  semantic projection together with the canonical embedding proves that the
+  padded graph has a cycle exactly when the sparse-frontier graph does.
 - [`LeanTrominoes/PartrecPowerTwoSpace.lean`](LeanTrominoes/PartrecPowerTwoSpace.lean)
   fits the doubling loop under the invariant that its singleton payload is
   `2 ^ processed`.  Every intermediate value is bounded by the final power,
@@ -547,11 +548,12 @@ The representation choices for this target are:
   number and its phase is the residue modulo the strip period.  The resulting
   indices range below exactly
   `period × 9^(5 × motif length)`.  Ranking and on-demand decoding are proved
-  inverse on every valid raw state, and every bounded index decodes to a valid
-  state when the period is positive.  This raw range may contain multiple
-  representatives of one semantic state, but it still surjects onto the
-  semantic frontier graph.  Thus later midpoint searches can loop over
-  natural indices without materializing the exponential state list.
+  inverse on every valid raw state, and every natural index decodes to a valid
+  state when the period is positive.  The canonical range—and padded indices
+  beyond it—may contain multiple representatives of one semantic state, but
+  the canonical range still surjects onto the semantic frontier graph.  Thus
+  later midpoint searches can loop over natural indices without materializing
+  the exponential state list.
 - [`LeanTrominoes/StripFrontierIndexComputability.lean`](LeanTrominoes/StripFrontierIndexComputability.lean)
   begins the compiler-facing proof for that representation.  The decoder is
   expressed as a map over the polynomial word length, with each digit read as
@@ -575,20 +577,22 @@ The representation choices for this target are:
   conjunction.
 - [`LeanTrominoes/StripFrontierIndexedSearch.lean`](LeanTrominoes/StripFrontierIndexedSearch.lean)
   instantiates arithmetic Savitch search with the tromino frontier relation.
-  Each bounded index is decoded to one raw state only when its transition is
+  Each padded index is decoded to one raw state only when its transition is
   checked; no input-dependent state is constructed by the executable test.
-  Cycles in this indexed graph are proved equivalent to cycles in the
-  original `WindowState` graph, in both directions, yielding
+  Every such index projects to a semantic state, while canonical indices
+  embed all semantic states.  Cycles in this padded graph are therefore
+  proved equivalent to cycles in the original `WindowState` graph, in both
+  directions, yielding
   `periodicStripTrominoTilingIndexBool` and a proof that it decides the full
   strip-tiling predicate.  This removes the exponential state enumeration
   from the executable upper-bound algorithm.  The decider uses the already
   certified sufficient depth `21 × binary input length + 1`, avoiding any
   need to compute `Nat.log` in the primitive-recursive program.
 - [`LeanTrominoes/StripFrontierIndexedSearchComputability.lean`](LeanTrominoes/StripFrontierIndexedSearchComputability.lean)
-  composes primitive-recursive range checks, on-demand arithmetic decoding,
-  and the raw transition verifier.  Thus the indexed edge predicate consumed
-  by Savitch search is now primitive recursive without enumerating the state
-  space.  The certified search depth
+  composes on-demand arithmetic decoding directly with the raw transition
+  verifier; no exact exponential range calculation is needed by an edge
+  check.  Thus the indexed edge predicate consumed by Savitch search is
+  primitive recursive without enumerating the state space.  The certified search depth
   `21 × binary input length + 1` is primitive recursive as well, and the
   complete well-formedness-guarded strip tiling decider is now proved
   primitive recursive through the depth-first Savitch driver.

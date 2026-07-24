@@ -162,9 +162,9 @@ theorem index_lt_indexCount {periodicStrip : PeriodicStrip}
             (Nat.succ_le_of_lt codeBound)
   exact phaseStep.trans_le codeStep
 
-/-- Decode one arithmetic state index.  The intended domain is
-`index < indexCount periodicStrip`; outside that range the word need not have
-the canonical length. -/
+/-- Decode one arithmetic state index.  Every index produces a canonical-
+length word; indices below `indexCount` are the canonical representatives
+used to encode semantic states. -/
 def ofIndex (periodicStrip : PeriodicStrip) (stateIndex : Nat) :
     RawWindowState where
   phase := stateIndex % periodicStrip.period
@@ -172,13 +172,19 @@ def ofIndex (periodicStrip : PeriodicStrip) (stateIndex : Nat) :
     decodeAssignment (assignmentKeys periodicStrip).length
       (stateIndex / periodicStrip.period)
 
-theorem ofIndex_isValid {periodicStrip : PeriodicStrip}
-    (periodPositive : 0 < periodicStrip.period) {stateIndex : Nat}
-    (_indexBound : stateIndex < indexCount periodicStrip) :
+theorem ofIndex_isValid_of_periodPositive
+    {periodicStrip : PeriodicStrip}
+    (periodPositive : 0 < periodicStrip.period) (stateIndex : Nat) :
     (ofIndex periodicStrip stateIndex).IsValid periodicStrip := by
   constructor
   · exact Nat.mod_lt _ periodPositive
   · exact length_decodeAssignment _ _
+
+theorem ofIndex_isValid {periodicStrip : PeriodicStrip}
+    (periodPositive : 0 < periodicStrip.period) {stateIndex : Nat}
+    (_indexBound : stateIndex < indexCount periodicStrip) :
+    (ofIndex periodicStrip stateIndex).IsValid periodicStrip :=
+  ofIndex_isValid_of_periodPositive periodPositive stateIndex
 
 @[simp]
 theorem ofIndex_index {periodicStrip : PeriodicStrip}
