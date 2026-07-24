@@ -211,6 +211,14 @@ The representation choices for this target are:
   compiles it all the way to such a finite machine.  Proving the strip decider
   primitive recursive and establishing its polynomial stack-space bound
   remain separate steps.
+- [`LeanTrominoes/PartrecPolySpace.lean`](LeanTrominoes/PartrecPolySpace.lean)
+  isolates the quantitative half of that compilation.  A
+  `PolySpaceDecider` supplies a fixed evaluator code, its Boolean correctness,
+  and a polynomial bound on every reachable ambient four-stack
+  configuration.  `PolySpaceDecider.toFiniteDecider` transfers the execution
+  to the finite supported machine and proves the exact
+  `Complexity.DeciderInPolySpace` certificate, using preservation of all
+  stack contents under label restriction.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

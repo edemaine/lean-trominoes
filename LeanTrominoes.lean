@@ -30,6 +30,7 @@ import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator
+import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
 import LeanTrominoes.StripFrontierReconstruction

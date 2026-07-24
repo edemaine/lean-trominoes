@@ -25,6 +25,54 @@ noncomputable def finiteEvaluator (code : ToPartrec.Code) : FinTM2 := by
   exact FinTM2.ofSupported .main .main (fun _ : K' => Γ')
     none tr (codeSupp code Cont'.halt) (tr_supports code Cont'.halt)
 
+/-- The evaluator's input stack uses its native four-symbol alphabet. -/
+noncomputable def finiteEvaluatorInputAlphabet (code : ToPartrec.Code) :
+    (finiteEvaluator code).Γ (finiteEvaluator code).k₀ ≃ Γ' := by
+  unfold finiteEvaluator FinTM2.ofSupported
+  exact Equiv.refl _
+
+/-- The evaluator halts with its result on the same native-alphabet stack. -/
+noncomputable def finiteEvaluatorOutputAlphabet (code : ToPartrec.Code) :
+    (finiteEvaluator code).Γ (finiteEvaluator code).k₁ ≃ Γ' := by
+  unfold finiteEvaluator FinTM2.ofSupported
+  exact Equiv.refl _
+
+@[simp]
+theorem finiteEvaluatorInputAlphabet_invFun_apply
+    (code : ToPartrec.Code) (symbol : Γ') :
+    (finiteEvaluatorInputAlphabet code).invFun symbol = symbol := by
+  unfold finiteEvaluatorInputAlphabet finiteEvaluator FinTM2.ofSupported
+  rfl
+
+@[simp]
+theorem finiteEvaluatorOutputAlphabet_invFun_apply
+    (code : ToPartrec.Code) (symbol : Γ') :
+    (finiteEvaluatorOutputAlphabet code).invFun symbol = symbol := by
+  unfold finiteEvaluatorOutputAlphabet finiteEvaluator FinTM2.ofSupported
+  rfl
+
+@[simp]
+theorem map_finiteEvaluatorInputAlphabet_symm
+    (code : ToPartrec.Code) (symbols : List Γ') :
+    symbols.map (finiteEvaluatorInputAlphabet code).invFun = symbols := by
+  induction symbols with
+  | nil => rfl
+  | cons head tail ih =>
+      simp only [List.map_cons,
+        finiteEvaluatorInputAlphabet_invFun_apply, ih]
+      rfl
+
+@[simp]
+theorem map_finiteEvaluatorOutputAlphabet_symm
+    (code : ToPartrec.Code) (symbols : List Γ') :
+    symbols.map (finiteEvaluatorOutputAlphabet code).invFun = symbols := by
+  induction symbols with
+  | nil => rfl
+  | cons head tail ih =>
+      simp only [List.map_cons,
+        finiteEvaluatorOutputAlphabet_invFun_apply, ih]
+      rfl
+
 theorem erase_finiteEvaluator_init (code : ToPartrec.Code)
     (input : List Nat) :
     TM2.eraseRestrictedCfg
@@ -118,25 +166,12 @@ noncomputable def finiteEvaluatorComputable
       (LeanTrominoes.Complexity.primcodableFinEncoding β).encode
       function where
   tm := finiteEvaluator code
-  inputAlphabet := by
-    unfold finiteEvaluator FinTM2.ofSupported
-    exact Equiv.refl _
-  outputAlphabet := by
-    unfold finiteEvaluator FinTM2.ofSupported
-    exact Equiv.refl _
+  inputAlphabet := finiteEvaluatorInputAlphabet code
+  outputAlphabet := finiteEvaluatorOutputAlphabet code
   outputsFun input := by
-    unfold finiteEvaluator FinTM2.ofSupported
     simp only [LeanTrominoes.Complexity.primcodableFinEncoding,
-      id_eq]
-    have mapRefl (values : List Γ') :
-        List.map (Equiv.refl Γ').invFun values = values := by
-      induction values with
-      | nil => rfl
-      | cons head tail ih =>
-          change head :: List.map (Equiv.refl Γ').invFun tail =
-            head :: tail
-          rw [ih]
-    rw [mapRefl, mapRefl]
+      map_finiteEvaluatorInputAlphabet_symm,
+      map_finiteEvaluatorOutputAlphabet_symm]
     simpa only [finiteEvaluator, FinTM2.ofSupported] using
       finiteEvaluator_outputs (computes input)
 
