@@ -1,6 +1,7 @@
 import LeanTrominoes.StripFrontierIndexedSearch
 import LeanTrominoes.StripFrontierRawTransitionComputability
 import LeanTrominoes.EncodingLengthComputability
+import LeanTrominoes.IndexedSavitchDFSComputability
 
 /-!
 # Computability of indexed strip transitions
@@ -69,6 +70,33 @@ theorem stripSearchDepth_primrec : Primrec stripSearchDepth := by
       (Primrec.const 21)
       (primcodableFinEncodingLength_primrec PeriodicStrip))
     (Primrec.const 1)
+
+theorem periodicStripTrominoTilingIndexBool_primrec
+    (tromino : Tromino) :
+    Primrec (periodicStripTrominoTilingIndexBool tromino) := by
+  have relation : Primrec fun input : (PeriodicStrip × Nat) × Nat =>
+      indexedTransitionRawBool tromino
+        input.1.1 input.1.2 input.2 :=
+    (indexedTransitionRawBool_primrec tromino).comp
+      (Primrec.pair
+        (Primrec.fst.comp Primrec.fst)
+        (Primrec.pair
+          (Primrec.snd.comp Primrec.fst)
+          Primrec.snd))
+  have search : Primrec fun periodicStrip =>
+      FiniteState.cycleSearchIndexDFSBoolAtDepth
+        (indexCount periodicStrip)
+        (stripSearchDepth periodicStrip)
+        (indexedTransitionRawBool tromino periodicStrip) :=
+    FiniteState.cycleSearchIndexDFSBoolAtDepth_primrec
+      indexCount_primrec stripSearchDepth_primrec relation
+  exact (Primrec.ite periodicStrip_isWellFormed_primrec
+    search (Primrec.const false)).of_eq fun periodicStrip => by
+      by_cases wellFormed : periodicStrip.IsWellFormed
+      · rw [if_pos wellFormed,
+          periodicStripTrominoTilingIndexBool, dif_pos wellFormed]
+        congr
+      · simp [periodicStripTrominoTilingIndexBool, wellFormed]
 
 end RawWindowState
 end PeriodicStrip

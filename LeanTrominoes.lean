@@ -33,6 +33,7 @@ import LeanTrominoes.IndexedSavitch
 import LeanTrominoes.IndexedSavitchComputability
 import LeanTrominoes.IndexedSavitchDFS
 import LeanTrominoes.IndexedSavitchDFSCorrectness
+import LeanTrominoes.IndexedSavitchDFSComputability
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecPolySpace

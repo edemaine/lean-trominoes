@@ -1,4 +1,4 @@
-import LeanTrominoes.IndexedSavitch
+import LeanTrominoes.IndexedSavitchDFSCorrectness
 import LeanTrominoes.EncodingBounds
 import LeanTrominoes.StripFrontierIndex
 import LeanTrominoes.StripFrontierReconstruction
@@ -148,7 +148,7 @@ theorem indexCount_le_pow_stripSearchDepth
 def periodicStripTrominoTilingIndexBool
     (tromino : Tromino) (periodicStrip : PeriodicStrip) : Bool :=
   if wellFormed : periodicStrip.IsWellFormed then
-    FiniteState.cycleSearchIndexBoolAtDepth (indexCount periodicStrip)
+    FiniteState.cycleSearchIndexDFSBoolAtDepth (indexCount periodicStrip)
       (stripSearchDepth periodicStrip)
       (indexedTransitionBool tromino periodicStrip wellFormed.2.1)
   else
@@ -160,6 +160,7 @@ theorem periodicStripTrominoTilingIndexBool_eq_true_iff
       PeriodicStripTrominoTiling tromino periodicStrip := by
   by_cases wellFormed : periodicStrip.IsWellFormed
   · rw [periodicStripTrominoTilingIndexBool, dif_pos wellFormed,
+      FiniteState.cycleSearchIndexDFSBoolAtDepth_eq,
       FiniteState.cycleSearchIndexBoolAtDepth_eq_true_iff
         _ _ _ (indexCount_le_pow_stripSearchDepth periodicStrip),
       indexed_hasCycle_iff_hasCycle tromino periodicStrip wellFormed.2.1,

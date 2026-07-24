@@ -215,6 +215,12 @@ The representation choices for this target are:
   proves that the evaluator's exact fixed-fuel run returns the original
   Savitch reachability answer, and hence that the resulting directed-cycle
   search is extensionally equal to the already verified indexed search.
+- [`LeanTrominoes/IndexedSavitchDFSComputability.lean`](LeanTrominoes/IndexedSavitchDFSComputability.lean)
+  proves the query, frame, and configuration encodings primitive recursive,
+  then compiles the small-step transition, exact fuel recurrence, fixed-fuel
+  iteration, and complete bounded cycle driver.  This supplies an executable
+  primitive-recursive program whose live continuation stack is the one
+  bounded in `IndexedSavitchDFS.lean`.
 - [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
   fills a machine-level gap in Mathlib's computability stack.  A TM2 program
   described over an infinite ambient label type can be restricted to a
@@ -308,7 +314,9 @@ The representation choices for this target are:
   and the raw transition verifier.  Thus the indexed edge predicate consumed
   by Savitch search is now primitive recursive without enumerating the state
   space.  The certified search depth
-  `21 × binary input length + 1` is primitive recursive as well.
+  `21 × binary input length + 1` is primitive recursive as well, and the
+  complete well-formedness-guarded strip tiling decider is now proved
+  primitive recursive through the depth-first Savitch driver.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
