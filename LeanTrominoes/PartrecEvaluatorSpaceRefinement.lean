@@ -2845,6 +2845,40 @@ theorem after_reaches
       apply induction.next
       simpa only [Option.mem_def] using edge
 
+/-- Prepend a bounded finite reachability segment to a fitted execution at
+its endpoint. -/
+theorem before_reaches
+    {bound : Nat} {first last : ToPartrec.Cfg}
+    (reachable : Reaches ToPartrec.step first last)
+    (lastExecution : EvaluatorExecutionFits bound last)
+    (space :
+      ∀ current,
+        Reaches ToPartrec.step first current →
+          cfgSimulationSpace current ≤ bound) :
+    EvaluatorExecutionFits bound first := by
+  revert lastExecution
+  induction reachable with
+  | refl =>
+      intro lastExecution
+      exact lastExecution
+  | @tail middle last reachable edge induction =>
+      intro lastExecution
+      have middleExecution :
+          EvaluatorExecutionFits bound middle := by
+        cases middle with
+        | halt values =>
+            simp [ToPartrec.step] at edge
+        | ret continuation values =>
+            have lastEq :
+                last = ToPartrec.stepRet continuation values := by
+              simpa [ToPartrec.step, Option.mem_def] using edge.symm
+            subst last
+            apply EvaluatorExecutionFits.ret continuation values
+            · simpa [cfgSimulationSpace] using
+                space (.ret continuation values) reachable
+            · exact lastExecution
+      exact induction middleExecution
+
 /-- Every high-level configuration reached along a fitted finite execution
 satisfies its numeric simulation requirement. -/
 theorem space_of_reaches
@@ -3156,6 +3190,154 @@ theorem mono
     EvaluatorCallFits code continuation values large where
   normal := call.normal.trans budget
   execution := call.execution.mono budget
+
+end EvaluatorCallFits
+
+/-- A successful compositional code evaluation reaches the point where its
+result is handed to the supplied continuation.  `stepRet` is the correct
+boundary because simple continuation returns are intentionally collapsed
+into the same high-level evaluator step. -/
+theorem code_reaches_stepRet_of_mem_eval
+    (code : ToPartrec.Code) (continuation : ToPartrec.Cont)
+    {values output : List Nat}
+    (evaluates : output ∈ code.eval values) :
+    Reaches ToPartrec.step
+      (ToPartrec.stepNormal code continuation values)
+      (ToPartrec.stepRet continuation output) := by
+  induction code generalizing continuation values output with
+  | zero' =>
+      simp only [ToPartrec.Code.zero'_eval] at evaluates
+      change output ∈ Part.some (0 :: values) at evaluates
+      have outputEq : output = 0 :: values :=
+        Part.mem_some_iff.mp evaluates
+      subst output
+      apply Relation.ReflTransGen.single
+      simp [ToPartrec.stepNormal, ToPartrec.step,
+        Option.mem_def]
+  | succ =>
+      simp only [ToPartrec.Code.succ_eval] at evaluates
+      change output ∈ Part.some [values.headI.succ] at evaluates
+      have outputEq : output = [values.headI.succ] :=
+        Part.mem_some_iff.mp evaluates
+      subst output
+      apply Relation.ReflTransGen.single
+      simp [ToPartrec.stepNormal, ToPartrec.step,
+        Option.mem_def]
+  | tail =>
+      simp only [ToPartrec.Code.tail_eval] at evaluates
+      change output ∈ Part.some values.tail at evaluates
+      have outputEq : output = values.tail :=
+        Part.mem_some_iff.mp evaluates
+      subst output
+      apply Relation.ReflTransGen.single
+      simp [ToPartrec.stepNormal, ToPartrec.step,
+        Option.mem_def]
+  | cons first rest firstInduction restInduction =>
+      simp only [ToPartrec.Code.cons_eval,
+        Part.bind_eq_bind, Part.mem_bind_iff] at evaluates
+      obtain
+        ⟨firstValues, firstEvaluates, restValues,
+          restEvaluates, outputEvaluates⟩ := evaluates
+      change output ∈
+        Part.some (firstValues.headI :: restValues) at outputEvaluates
+      have outputEq :
+          output = firstValues.headI :: restValues :=
+        Part.mem_some_iff.mp outputEvaluates
+      subst output
+      have firstRun :=
+        firstInduction
+          (.cons₁ rest values continuation) firstEvaluates
+      have restRun :=
+        restInduction
+          (.cons₂ firstValues continuation) restEvaluates
+      rw [ToPartrec.stepRet] at firstRun
+      rw [ToPartrec.stepRet] at restRun
+      exact firstRun.trans restRun
+  | comp first second firstInduction secondInduction =>
+      simp only [ToPartrec.Code.comp_eval,
+        Part.bind_eq_bind, Part.mem_bind_iff] at evaluates
+      obtain ⟨middle, middleEvaluates, outputEvaluates⟩ :=
+        evaluates
+      have secondRun :=
+        secondInduction (.comp first continuation)
+          middleEvaluates
+      have firstRun :=
+        firstInduction continuation outputEvaluates
+      rw [ToPartrec.stepRet] at secondRun
+      exact secondRun.trans firstRun
+  | case zeroBranch successorBranch
+      zeroInduction successorInduction =>
+      cases head : values.headI with
+      | zero =>
+          simp only [ToPartrec.Code.case_eval, head,
+            Nat.rec_zero] at evaluates
+          simpa [ToPartrec.stepNormal, head] using
+            zeroInduction continuation evaluates
+      | succ predecessor =>
+          simp only [ToPartrec.Code.case_eval, head] at evaluates
+          simpa [ToPartrec.stepNormal, head] using
+            successorInduction continuation evaluates
+  | fix body bodyInduction =>
+      rw [ToPartrec.Code.fix_eval] at evaluates
+      refine PFun.fixInduction evaluates ?_
+      intro current currentEvaluates recursive
+      rcases PFun.mem_fix_iff.mp currentEvaluates with
+        stopped | ⟨next, forwarded, nextEvaluates⟩
+      · obtain ⟨bodyOutput, bodyEvaluates, mapped⟩ :=
+          (Part.mem_map_iff _).mp stopped
+        by_cases zero : bodyOutput.headI = 0
+        · simp only [zero, if_pos, Sum.inl.injEq] at mapped
+          subst output
+          have bodyRun :=
+            bodyInduction (.fix body continuation) bodyEvaluates
+          rw [ToPartrec.stepRet, if_pos zero] at bodyRun
+          exact bodyRun
+        · simp [zero] at mapped
+      · obtain ⟨bodyOutput, bodyEvaluates, mapped⟩ :=
+          (Part.mem_map_iff _).mp forwarded
+        by_cases zero : bodyOutput.headI = 0
+        · simp [zero] at mapped
+        · simp only [zero, if_false, Sum.inr.injEq] at mapped
+          subst next
+          have bodyRun :=
+            bodyInduction (.fix body continuation) bodyEvaluates
+          have restRun :=
+            recursive bodyOutput.tail forwarded
+          rw [ToPartrec.stepRet, if_neg zero] at bodyRun
+          exact bodyRun.trans restRun
+
+namespace EvaluatorCallFits
+
+/-- Build a fitted code call from its successful semantic result, a fitted
+execution after returning that result, and a common bound for every
+configuration on the finite call trace. -/
+theorem of_trace
+    {code : ToPartrec.Code} {continuation : ToPartrec.Cont}
+    {values output : List Nat} {bound : Nat}
+    (evaluates : output ∈ code.eval values)
+    (normal :
+      normalSimulationSpace code continuation values ≤ bound)
+    (after :
+      EvaluatorExecutionFits bound
+        (.ret continuation output))
+    (space :
+      ∀ current,
+        Reaches ToPartrec.step
+          (ToPartrec.stepNormal code continuation values) current →
+          cfgSimulationSpace current ≤ bound) :
+    EvaluatorCallFits code continuation values bound := by
+  refine ⟨normal, ?_⟩
+  have boundary :=
+    code_reaches_stepRet_of_mem_eval code continuation evaluates
+  have afterBoundary :=
+    after.next
+      (show
+        ToPartrec.step (.ret continuation output) =
+          some (ToPartrec.stepRet continuation output) by
+        rfl)
+  exact
+    EvaluatorExecutionFits.before_reaches
+      boundary afterBoundary space
 
 end EvaluatorCallFits
 

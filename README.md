@@ -330,7 +330,14 @@ The representation choices for this target are:
   `EvaluatorRunFits` certificate at the halting continuation.  Constructor
   rules mirror normalization through `cons`, `comp`, `case`, and `fix` and
   returns through every continuation form, so larger fitted programs can be
-  assembled from fitted subcalls.
+  assembled from fitted subcalls.  Successful compositional evaluation is
+  now connected to the exact high-level point where its result enters the
+  supplied continuation, including recursive `fix` runs.  A bounded trace
+  can therefore be prepended to an already fitted continuation execution;
+  `EvaluatorCallFits.of_trace` packages this boundary theorem with a numeric
+  invariant over the trace.  This supplies the reusable interface needed to
+  certify a tail-recursive countdown without replaying the continuation
+  plumbing of every derived code combinator.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;
