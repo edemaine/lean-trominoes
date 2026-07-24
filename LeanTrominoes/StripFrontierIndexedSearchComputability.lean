@@ -1,5 +1,6 @@
 import LeanTrominoes.StripFrontierIndexedSearch
 import LeanTrominoes.StripFrontierRawTransitionComputability
+import LeanTrominoes.EncodingLengthComputability
 
 /-!
 # Computability of indexed strip transitions
@@ -12,6 +13,8 @@ primitive-recursive raw frontier verifier.
 namespace LeanTrominoes
 namespace PeriodicStrip
 namespace RawWindowState
+
+open LeanTrominoes.Computability
 
 theorem indexedTransitionRawBool_primrec (tromino : Tromino) :
     Primrec fun input : PeriodicStrip × Nat × Nat =>
@@ -58,6 +61,14 @@ theorem indexedTransitionBool_primrec (tromino : Tromino)
   exact (indexedTransitionRawBool_primrec tromino).comp
     (Primrec.pair (Primrec.const periodicStrip)
       (Primrec.pair Primrec.fst Primrec.snd))
+
+theorem stripSearchDepth_primrec : Primrec stripSearchDepth := by
+  unfold stripSearchDepth
+  exact Primrec.nat_add.comp
+    (Primrec.nat_mul.comp
+      (Primrec.const 21)
+      (primcodableFinEncodingLength_primrec PeriodicStrip))
+    (Primrec.const 1)
 
 end RawWindowState
 end PeriodicStrip

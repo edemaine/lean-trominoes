@@ -173,6 +173,10 @@ The representation choices for this target are:
   encoding.  Both `⌈log₂ period⌉` and motif length are at most the binary
   input length; combined with the sparse state count, the Savitch recursion
   depth is at most `21 × input length + 1`.
+- [`LeanTrominoes/EncodingLengthComputability.lean`](LeanTrominoes/EncodingLengthComputability.lean)
+  computes that exact binary input length with a bounded halving loop.  The
+  loop retains only its current quotient and counter, is primitive recursive,
+  and is proved equal to Mathlib's standard `encodeNat` length.
 - [`LeanTrominoes/FiniteState.lean`](LeanTrominoes/FiniteState.lean) proves the
   pumping fact underlying the 1.5D upper bound: a finite transition system has
   a bi-infinite path exactly when it has a nonempty directed cycle.  The strip
@@ -293,7 +297,8 @@ The representation choices for this target are:
   composes primitive-recursive range checks, on-demand arithmetic decoding,
   and the raw transition verifier.  Thus the indexed edge predicate consumed
   by Savitch search is now primitive recursive without enumerating the state
-  space.
+  space.  The certified search depth
+  `21 × binary input length + 1` is primitive recursive as well.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
