@@ -476,6 +476,13 @@ The representation choices for this target are:
   compositional evaluator-space certificate.  Thus later motif scans can
   stream both frontier assignments without allocating either assignment
   list.
+- [`LeanTrominoes/PartrecPackedAssignmentLookup.lean`](LeanTrominoes/PartrecPackedAssignmentLookup.lean)
+  implements one streaming motif-column lookup over that packed word.  Its
+  fixed-width state peels one base-nine digit per motif cell and freezes at
+  the first matching occurrence, including when the motif contains repeated
+  cells.  The explicit tail loop is proved equal to a closed recursive scan;
+  selected, absent, and skipped-column outcomes are tied to the same
+  `List.idxOf` digit used by the semantic packed frontier.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
