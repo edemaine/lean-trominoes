@@ -256,6 +256,91 @@ theorem encodedListView
             (Encodable.encode value)
             (Encodable.encode remaining))
 
+theorem encodedListViewCost_le_linear
+    {α : Type*} [Encodable α] (values : List α) :
+    encodedListViewCost values ≤
+      2000000000 *
+        (encodedListSpace
+          [2 * Encodable.encode values + 4] + 1) := by
+  cases values with
+  | nil =>
+      have zeroBits :
+          (Computability.encodeNat 0).length = 0 := rfl
+      have oneBits :
+          (Computability.encodeNat 1).length = 1 := rfl
+      have fourBits :
+          (Computability.encodeNat 4).length = 3 := rfl
+      simp [encodedListViewCost,
+        encodedListNilViewCost, encodedListNilTailCost,
+        branchZeroZeroCost, branchZeroTestCost,
+        prependCost, idCost,
+        headCost, nilCost, zeroCost,
+        zeroPrimeCost, tailCost, succCost,
+        encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits, fourBits]
+  | cons value remaining =>
+      let headCode := Encodable.encode value
+      let tailCode := Encodable.encode remaining
+      let constructorCode := Nat.pair headCode tailCode
+      let listCode := Nat.succ constructorCode
+      let limit := 2 * listCode + 4
+      have constructorBound : constructorCode ≤ limit := by
+        simp only [constructorCode, limit, listCode]
+        omega
+      have headBound : headCode ≤ limit :=
+        (Nat.left_le_pair headCode tailCode).trans
+          constructorBound
+      have tailBound : tailCode ≤ limit :=
+        (Nat.right_le_pair headCode tailCode).trans
+          constructorBound
+      have listBound : listCode ≤ limit := by
+        simp only [limit]
+        omega
+      have listSuccBound : listCode + 1 ≤ limit := by
+        simp only [limit]
+        omega
+      have constructorBits :=
+        encodeNat_length_mono constructorBound
+      have headBits := encodeNat_length_mono headBound
+      have tailBits := encodeNat_length_mono tailBound
+      have listBits := encodeNat_length_mono listBound
+      have listSuccBits :=
+        encodeNat_length_mono listSuccBound
+      have unpairBound :=
+        unpairCost_le_linear constructorCode
+      have unpairLimit :
+          encodedListSpace [2 * constructorCode + 4] ≤
+            encodedListSpace [limit] := by
+        have numeric :
+            2 * constructorCode + 4 ≤ limit := by
+          simp only [limit, listCode]
+          omega
+        simpa only [encodedListSpace_cons,
+          encodedListSpace_nil, Nat.add_le_add_iff_right] using
+          encodeNat_length_mono numeric
+      have zeroBits :
+          (Computability.encodeNat 0).length = 0 := rfl
+      have oneBits :
+          (Computability.encodeNat 1).length = 1 := rfl
+      change
+        encodedListViewCost (value :: remaining) ≤
+          2000000000 *
+            (encodedListSpace [limit] + 1)
+      simp [encodedListViewCost,
+        encodedListConsViewCost,
+        encodedListConsViewAtCost,
+        encodedListConsTailAtCost,
+        predCost, branchZeroSuccCost,
+        branchZeroTestCost,
+        prependCost, idCost,
+        headCost, nilCost, oneCost, zeroCost,
+        zeroPrimeCost, tailCost, succCost,
+        Code.subtractStepList,
+        encodedListSpace_cons, encodedListSpace_nil,
+        headCode, tailCode, constructorCode,
+        listCode, limit, zeroBits, oneBits] at *
+      omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

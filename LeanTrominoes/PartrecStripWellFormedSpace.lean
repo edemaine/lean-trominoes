@@ -442,6 +442,415 @@ theorem stripMotifBody
           (predecessor := remaining)
           (by rfl) branch
 
+set_option maxHeartbeats 800000 in
+theorem stripMotifBodyCost_le_linear
+    (steps width period : Nat) (valid : Bool)
+    (motif : List Cell) :
+    stripMotifBodyCost steps width period valid motif ≤
+      500000000000 *
+        (encodedListSpace
+          [2 * (steps + width + period +
+            Encodable.encode motif) + 4] + 1) := by
+  let motifCode := Encodable.encode motif
+  let limit :=
+    2 * (steps + width + period + motifCode) + 4
+  have stepsBound : steps ≤ limit := by
+    simp only [limit]
+    omega
+  have widthBound : width ≤ limit := by
+    simp only [limit]
+    omega
+  have periodBound : period ≤ limit := by
+    simp only [limit]
+    omega
+  have motifBound : motifCode ≤ limit := by
+    simp only [limit]
+    omega
+  have stepsBits := encodeNat_length_mono stepsBound
+  have stepsPredBits :=
+    encodeNat_length_mono
+      ((Nat.pred_le steps).trans stepsBound)
+  have widthBits := encodeNat_length_mono widthBound
+  have periodBits := encodeNat_length_mono periodBound
+  have motifBits := encodeNat_length_mono motifBound
+  have stepsSuccBits :=
+    encodeNat_length_mono
+      (show steps + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have widthSuccBits :=
+    encodeNat_length_mono
+      (show width + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show period + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have viewBound := encodedListViewCost_le_linear motif
+  have viewLimit :
+      encodedListSpace [2 * Encodable.encode motif + 4] ≤
+        encodedListSpace [limit] := by
+    have numeric :
+        2 * Encodable.encode motif + 4 ≤ limit := by
+      simp only [limit, motifCode]
+      omega
+    simpa only [encodedListSpace_cons,
+      encodedListSpace_nil, Nat.add_le_add_iff_right] using
+      encodeNat_length_mono numeric
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := rfl
+  have fourBits :
+      (Computability.encodeNat 4).length = 3 := rfl
+  have fourLimitBits :=
+    encodeNat_length_mono
+      (show 4 ≤ limit by
+        simp only [limit]
+        omega)
+  have validBits :
+      (Computability.encodeNat valid.toNat).length ≤
+        (Computability.encodeNat limit).length := by
+    cases valid with
+    | false =>
+        simp [zeroBits]
+    | true =>
+        simp only [Bool.toNat_true, oneBits]
+        have atLeastThree :
+            3 ≤ (Computability.encodeNat limit).length := by
+          simpa [fourBits] using fourLimitBits
+        omega
+  cases motif with
+  | nil =>
+      cases steps <;>
+        simp [stripMotifBodyCost,
+          stripMotifStepCost, Code.stripMotifState,
+          flatCountdownBodyCost,
+          flatCountdownSuccBranchCost,
+          branchZeroZeroCost, branchZeroTestCost,
+          prependCost, getCost, dropCost, idCost,
+          headCost, nilCost, oneCost, zeroCost,
+          zeroPrimeCost, tailCost, succCost,
+          Code.stripMotifNativeStep,
+          encodedListSpace_cons, encodedListSpace_nil,
+          motifCode, limit, zeroBits, oneBits,
+          twoBits, fourBits] at * <;>
+        omega
+  | cons cell remaining =>
+      let cellCode := Encodable.encode cell
+      let tailCode := Encodable.encode remaining
+      have cellMotif :
+          cellCode ≤ Encodable.encode (cell :: remaining) := by
+        simp only [Encodable.encode_list_cons,
+          cellCode]
+        exact (Nat.left_le_pair cellCode tailCode).trans
+          (Nat.le_succ _)
+      have tailMotif :
+          tailCode ≤ Encodable.encode (cell :: remaining) := by
+        simp only [Encodable.encode_list_cons,
+          tailCode]
+        exact (Nat.right_le_pair cellCode tailCode).trans
+          (Nat.le_succ _)
+      have cellLimit :
+          cellCode ≤ limit :=
+        cellMotif.trans (by simpa [motifCode] using motifBound)
+      have tailLimit :
+          tailCode ≤ limit :=
+        tailMotif.trans (by simpa [motifCode] using motifBound)
+      have cellBits := encodeNat_length_mono cellLimit
+      have tailBits := encodeNat_length_mono tailLimit
+      have constructorBits :=
+        encodeNat_length_mono
+          (show Nat.pair cellCode tailCode ≤ limit by
+            exact (Nat.le_succ _).trans
+              (by simpa [motifCode] using motifBound))
+      have cellSuccBits :=
+        encodeNat_length_mono
+          (show cellCode + 1 ≤ limit by
+            simp only [limit]
+            omega)
+      have tailSuccBits :=
+        encodeNat_length_mono
+          (show tailCode + 1 ≤ limit by
+            simp only [limit]
+            omega)
+      have cellPredicateBound :=
+        stripCellInBoundsCost_le_linear width period cell
+      have cellPredicateLimit :
+          encodedListSpace
+              [2 * (width + period + Encodable.encode cell) + 4] ≤
+            encodedListSpace [limit] := by
+        have numeric :
+            2 * (width + period + Encodable.encode cell) + 4 ≤
+              limit := by
+          simp only [limit, motifCode]
+          omega
+        simpa only [encodedListSpace_cons,
+          encodedListSpace_nil, Nat.add_le_add_iff_right] using
+          encodeNat_length_mono numeric
+      cases steps with
+      | zero =>
+          simp [stripMotifBodyCost,
+            flatCountdownBodyCost, zeroPrimeCost,
+            Code.stripMotifState,
+          encodedListSpace_cons, encodedListSpace_nil,
+          motifCode, limit, zeroBits, oneBits,
+          twoBits, fourBits] at *
+          omega
+      | succ steps =>
+          cases valid <;>
+            by_cases inBounds :
+              cell.InStripBounds width period <;>
+            simp [stripMotifBodyCost,
+              stripMotifStepCost, stripMotifConsStepCost,
+              stripMotifValidAndDimensionsCost,
+              stripMotifUpdatedValidCost,
+              stripMotifHeadInBoundsCost,
+              stripMotifCellArgumentsCost,
+              stripMotifPeriodAndCellCost,
+              stripMotifHeadCellCost,
+              stripMotifTailCost, stripMotifViewCost,
+              stripMotifDimensionsCost,
+              Code.stripMotifState,
+              flatCountdownBodyCost,
+              flatCountdownSuccBranchCost,
+              branchZeroZeroCost, branchZeroSuccCost,
+              branchZeroTestCost, boolAndCost,
+              normalizeBoolCost, prependCost,
+              getCost, dropCost, idCost, headCost,
+              nilCost, oneCost, zeroCost,
+              zeroPrimeCost, tailCost, succCost,
+              Code.stripMotifNativeStep,
+              encodedListSpace_cons, encodedListSpace_nil,
+              motifCode, cellCode, tailCode, limit,
+              inBounds, zeroBits, oneBits,
+              twoBits, fourBits] at * <;>
+            omega
+
+theorem encode_list_suffix_le
+    {α : Type*} [Encodable α]
+    (leading suffix : List α) :
+    Encodable.encode suffix ≤
+      Encodable.encode (leading ++ suffix) := by
+  induction leading with
+  | nil =>
+      simp
+  | cons value leading induction =>
+      simp only [List.cons_append,
+        Encodable.encode_list_cons]
+      exact induction.trans
+        ((Nat.right_le_pair
+          (Encodable.encode value)
+          (Encodable.encode (leading ++ suffix))).trans
+            (Nat.le_succ _))
+
+def stripMotifSpaceBound
+    (encodedStrip : Nat) : Nat :=
+  100000000000000 *
+    (encodedListSpace [encodedStrip] + 1)
+
+theorem stripMotifBodyCost_le_stripInput
+    (periodicStrip : PeriodicStrip)
+    (steps : Nat) (valid : Bool)
+    (motif : List Cell)
+    (stepsBound :
+      steps ≤ Encodable.encode periodicStrip.motif)
+    (suffixBound :
+      Encodable.encode motif ≤
+        Encodable.encode periodicStrip.motif) :
+    stripMotifBodyCost steps periodicStrip.width
+        periodicStrip.period valid motif ≤
+      stripMotifSpaceBound
+        (Encodable.encode periodicStrip) := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  let localLimit :=
+    2 * (steps + periodicStrip.width +
+      periodicStrip.period + Encodable.encode motif) + 4
+  have widthStrip :
+      periodicStrip.width ≤ stripCode := by
+    simp only [stripCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.left_le_pair _ _
+  have periodStrip :
+      periodicStrip.period ≤ stripCode := by
+    simp only [stripCode, PeriodicStrip.encode_eq_pair]
+    exact (Nat.left_le_pair _ _).trans
+      (Nat.right_le_pair _ _)
+  have motifStrip : motifCode ≤ stripCode := by
+    simp only [motifCode, stripCode,
+      PeriodicStrip.encode_eq_pair]
+    exact (Nat.right_le_pair _ _).trans
+      (Nat.right_le_pair _ _)
+  have localNumeric :
+      localLimit ≤ 8 * stripCode + 4 := by
+    simp only [localLimit]
+    omega
+  have localBits :=
+    encodeNat_length_mono localNumeric
+  have scaledBits :=
+    encodeNat_eight_mul_add_four_length_le stripCode
+  have body :=
+    stripMotifBodyCost_le_linear
+      steps periodicStrip.width periodicStrip.period
+      valid motif
+  simp only [stripMotifSpaceBound,
+    encodedListSpace_cons, encodedListSpace_nil] at body ⊢
+  change
+    stripMotifBodyCost steps periodicStrip.width
+        periodicStrip.period valid motif ≤
+      100000000000000 *
+        ((Computability.encodeNat stripCode).length + 1 + 1)
+  change
+    stripMotifBodyCost steps periodicStrip.width
+        periodicStrip.period valid motif ≤
+      100000000000000 *
+        ((Computability.encodeNat stripCode).length + 2)
+  change
+    stripMotifBodyCost steps periodicStrip.width
+        periodicStrip.period valid motif ≤
+      _ at body
+  have localIdentity :
+      2 * (steps + periodicStrip.width +
+          periodicStrip.period + Encodable.encode motif) + 4 =
+        localLimit := rfl
+  rw [localIdentity] at body
+  omega
+
+/-- Typed suffix states reachable while the motif countdown is running. -/
+def StripMotifReachable
+    (periodicStrip : PeriodicStrip)
+    (steps : Nat) (values : List Nat) : Prop :=
+  ∃ valid motif leading,
+    values =
+      Code.stripMotifState periodicStrip.width
+        periodicStrip.period valid motif ∧
+    steps ≤ Encodable.encode periodicStrip.motif ∧
+    periodicStrip.motif = leading ++ motif
+
+theorem stripMotifReachable_initial
+    (periodicStrip : PeriodicStrip) (valid : Bool) :
+    StripMotifReachable periodicStrip
+      (Encodable.encode periodicStrip.motif)
+      (Code.stripMotifState periodicStrip.width
+        periodicStrip.period valid periodicStrip.motif) := by
+  exact ⟨valid, periodicStrip.motif, [],
+    rfl, Nat.le_refl _, by simp⟩
+
+theorem stripMotifReachable_step
+    (periodicStrip : PeriodicStrip)
+    (steps : Nat) (values : List Nat)
+    (reachable :
+      StripMotifReachable periodicStrip (steps + 1) values) :
+    StripMotifReachable periodicStrip steps
+      (Code.stripMotifNativeStep values) := by
+  obtain ⟨valid, motif, leading, rfl,
+    stepsBound, suffix⟩ := reachable
+  cases motif with
+  | nil =>
+      exact ⟨valid, [], leading,
+        Code.stripMotifNativeStep_state_nil
+          periodicStrip.width periodicStrip.period valid,
+        by omega, suffix⟩
+  | cons cell motif =>
+      refine
+        ⟨valid &&
+            decide
+              (cell.InStripBounds periodicStrip.width
+                periodicStrip.period),
+          motif, leading ++ [cell], ?_, by omega, ?_⟩
+      · exact
+          Code.stripMotifNativeStep_state_cons
+            periodicStrip.width periodicStrip.period
+            valid cell motif
+      · simpa [List.append_assoc] using suffix
+
+/-- The motif loop reuses one input-linear workspace allowance at every
+reachable step instead of summing that allowance over the numeric countdown.
+-/
+theorem stripMotifFlatUniform
+    (periodicStrip : PeriodicStrip) (valid : Bool) :
+    EvaluatorCodeFits
+      (Code.flatIterate Code.stripMotifStepCode)
+      (Encodable.encode periodicStrip.motif ::
+        Code.stripMotifState periodicStrip.width
+          periodicStrip.period valid periodicStrip.motif)
+      (Code.stripMotifState periodicStrip.width
+        periodicStrip.period
+        (valid &&
+          motifInStripBounds periodicStrip.width
+            periodicStrip.period periodicStrip.motif) [])
+      (stripMotifSpaceBound
+        (Encodable.encode periodicStrip)) where
+  input_space := by
+    have body :=
+      stripMotifBody
+        (Encodable.encode periodicStrip.motif)
+        periodicStrip.width periodicStrip.period
+        valid periodicStrip.motif
+    exact body.input_space.trans
+      (stripMotifBodyCost_le_stripInput periodicStrip
+        (Encodable.encode periodicStrip.motif)
+        valid periodicStrip.motif
+        (Nat.le_refl _) (Nat.le_refl _))
+  output_space := by
+    let result :=
+      valid &&
+        motifInStripBounds periodicStrip.width
+          periodicStrip.period periodicStrip.motif
+    have body :=
+      stripMotifBody 0 periodicStrip.width
+        periodicStrip.period result []
+    have input := body.input_space
+    have cost :=
+      stripMotifBodyCost_le_stripInput periodicStrip
+        0 result [] (Nat.zero_le _)
+        (by
+          exact (Nat.zero_le _).trans
+            (show
+              Encodable.encode ([] : List Cell) ≤
+                Encodable.encode periodicStrip.motif
+              by simp))
+    simp only [result] at input cost
+    simp only [Code.stripMotifState,
+      encodedListSpace_cons] at input ⊢
+    omega
+  call continuation bound budget after := by
+    apply
+      EvaluatorCallFits.flatIterate_of_reachable_code_fits
+        (step := Code.stripMotifNativeStep)
+        (bodyCost := fun _ _ =>
+          stripMotifSpaceBound
+            (Encodable.encode periodicStrip))
+        (invariant := StripMotifReachable periodicStrip)
+    · intro steps values reachable
+      obtain ⟨reachableValid, reachableMotif, leading,
+        rfl, stepsBound, suffix⟩ := reachable
+      exact
+        (stripMotifBody steps periodicStrip.width
+          periodicStrip.period reachableValid
+          reachableMotif).mono
+          (stripMotifBodyCost_le_stripInput periodicStrip
+            steps reachableValid reachableMotif stepsBound
+            (by
+              rw [suffix]
+              exact encode_list_suffix_le leading reachableMotif))
+    · exact stripMotifReachable_initial periodicStrip valid
+    · exact stripMotifReachable_step periodicStrip
+    · intro steps values reachable
+      exact budget
+    · rw [Code.stripMotifNativeStep_iterate,
+        Code.stripMotifProcess_encode]
+      exact after
+
 /-- Sum of the fitted body costs along the unique typed motif run. -/
 def stripMotifFlatCost
     (width period : Nat) :

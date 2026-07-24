@@ -228,6 +228,115 @@ theorem unpair (number : Nat) :
   simpa [Code.unpairCode, unpairCost,
     root, remainder] using result
 
+theorem unpairCost_le_linear (number : Nat) :
+    unpairCost number ≤
+      1000000000 *
+        (encodedListSpace [2 * number + 4] + 1) := by
+  let root := Nat.sqrt number
+  let distance :=
+    (root + 1) * (root + 1) - number
+  let gap := 2 * root + 1
+  let remainder := number - root * root
+  let limit := 2 * number + 4
+  have rootBound : root ≤ number := by
+    simpa [root] using Nat.sqrt_le_self number
+  have squareBound : root * root ≤ number := by
+    have strict := Nat.sqrt_mul_sqrt_lt_succ number
+    have bounded :
+        Nat.sqrt number * Nat.sqrt number ≤ number := by
+      omega
+    simpa [root] using bounded
+  have squareIdentity :
+      (root + 1) * (root + 1) =
+        root * root + (2 * root + 1) := by
+    ring
+  have distanceBound : distance ≤ limit := by
+    simp only [distance, limit]
+    omega
+  have gapBound : gap ≤ limit := by
+    simp only [gap, limit]
+    omega
+  have remainderBound : remainder ≤ limit := by
+    simp only [remainder, limit]
+    omega
+  have rootLimit : root ≤ limit := by omega
+  have numberLimit : number ≤ limit := by omega
+  have distanceBits :=
+    encodeNat_length_mono distanceBound
+  have gapBits := encodeNat_length_mono gapBound
+  have remainderBits :=
+    encodeNat_length_mono remainderBound
+  have rootBits := encodeNat_length_mono rootLimit
+  have numberBits := encodeNat_length_mono numberLimit
+  have gapSubBits :=
+    encodeNat_length_mono
+      (show gap - distance ≤ limit by omega)
+  have rootSubBits :=
+    encodeNat_length_mono
+      (show root - remainder ≤ limit by omega)
+  have remainderSubBits :=
+    encodeNat_length_mono
+      (show remainder - root ≤ limit by omega)
+  have rootSubPredBits :=
+    encodeNat_length_mono
+      (show root - remainder - 1 ≤ limit by omega)
+  have remainderSuccBits :=
+    encodeNat_length_mono
+      (show remainder + 1 ≤ limit by omega)
+  have rootSuccBits :=
+    encodeNat_length_mono
+      (show root + 1 ≤ limit by omega)
+  have distanceSuccBits :=
+    encodeNat_length_mono
+      (show distance + 1 ≤ limit by
+        simp only [distance, limit]
+        omega)
+  have gapSuccBits :=
+    encodeNat_length_mono
+      (show gap + 1 ≤ limit by omega)
+  have numberSuccBits :=
+    encodeNat_length_mono
+      (show number + 1 ≤ limit by omega)
+  have sqrtLimitBits :=
+    encodeNat_length_mono
+      (show 2 * number + 3 ≤ limit by omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  by_cases upperEdge : remainder < root
+  · simp [unpairCost, unpairFinalCost,
+      unpairStateCost, unpairRemainderStateCost,
+      unpairRemainderCost, unpairRemainderArgumentsCost,
+      unpairTestCost, unpairTestArgumentsCost,
+      sqrtStateCost,
+      sqrtInputCost, sqrtLoopCost, subtractCost,
+      subtractInputCost, subtractLoopCost,
+      branchZeroSuccCost, branchZeroTestCost,
+      prependCost, getCost, dropCost, idCost,
+      headCost, nilCost, oneCost, zeroCost,
+      zeroPrimeCost, tailCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      root, distance, gap, remainder, limit,
+      upperEdge, zeroBits, oneBits] at *
+    omega
+  · simp [unpairCost, unpairFinalCost,
+      unpairStateCost, unpairRemainderStateCost,
+      unpairRemainderCost, unpairRemainderArgumentsCost,
+      unpairTestCost, unpairTestArgumentsCost,
+      unpairLowerCost, unpairRightCost,
+      unpairRightArgumentsCost, sqrtStateCost,
+      sqrtInputCost, sqrtLoopCost, subtractCost,
+      subtractInputCost, subtractLoopCost,
+      branchZeroZeroCost, branchZeroTestCost,
+      prependCost, getCost, dropCost, idCost,
+      headCost, nilCost, oneCost, zeroCost,
+      zeroPrimeCost, tailCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      root, distance, gap, remainder, limit,
+      upperEdge, zeroBits, oneBits] at *
+    omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

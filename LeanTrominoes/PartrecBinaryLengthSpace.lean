@@ -39,6 +39,31 @@ theorem encodeNat_length_mono
     Nat.size_eq_bits_len, Nat.size_eq_bits_len]
   exact Nat.size_le_size bounded
 
+theorem encodeNat_length_le_of_lt_pow
+    (number bits : Nat) (bounded : number < 2 ^ bits) :
+    (Computability.encodeNat number).length ≤ bits := by
+  rw [encodeNat_eq_bits, Nat.size_eq_bits_len, Nat.size_le]
+  exact bounded
+
+theorem encodeNat_eight_mul_add_four_length_le
+    (number : Nat) :
+    (Computability.encodeNat (8 * number + 4)).length ≤
+      (Computability.encodeNat number).length + 3 := by
+  let bits := (Computability.encodeNat number).length
+  have numberPower :
+      number < 2 ^ bits := by
+    dsimp only [bits]
+    rw [encodeNat_eq_bits, Nat.size_eq_bits_len]
+    exact Nat.lt_size_self number
+  have scaled :
+      8 * number + 4 < 2 ^ (bits + 3) := by
+    rw [pow_add]
+    norm_num
+    omega
+  simpa [bits] using
+    encodeNat_length_le_of_lt_pow
+      (8 * number + 4) (bits + 3) scaled
+
 theorem encodeNat_succ_length_le (number : Nat) :
     (Computability.encodeNat number.succ).length ≤
       (Computability.encodeNat number).length + 1 := by

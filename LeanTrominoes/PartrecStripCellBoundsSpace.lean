@@ -307,6 +307,180 @@ theorem stripCellInBounds
       xNonnegativeH, xUpperH,
       yNonnegativeH, yUpperH] using all
 
+set_option maxHeartbeats 800000 in
+theorem stripCellInBoundsCost_le_linear
+    (width period : Nat) (cell : Cell) :
+    stripCellInBoundsCost width period cell ≤
+      100000000000 *
+        (encodedListSpace
+          [2 * (width + period + Encodable.encode cell) + 4] +
+            1) := by
+  let cellCode := Encodable.encode cell
+  let xMagnitude := IntEncoding.magnitude cell.1
+  let xSign := IntEncoding.sign cell.1
+  let yMagnitude := IntEncoding.magnitude cell.2
+  let ySign := IntEncoding.sign cell.2
+  let limit := 2 * (width + period + cellCode) + 4
+  have widthBound : width ≤ limit := by
+    simp only [limit]
+    omega
+  have periodBound : period ≤ limit := by
+    simp only [limit]
+    omega
+  have cellBound : cellCode ≤ limit := by
+    simp only [limit]
+    omega
+  have xMagnitudeCell : xMagnitude ≤ cellCode := by
+    have quotientLe :
+        (Encodable.encode cell.1).div2 ≤
+          Encodable.encode cell.1 := by
+      have identity :=
+        Nat.bodd_add_div2 (Encodable.encode cell.1)
+      omega
+    rw [IntEncoding.encode_div2] at quotientLe
+    exact quotientLe.trans (Nat.left_le_pair _ _)
+  have yMagnitudeCell : yMagnitude ≤ cellCode := by
+    have quotientLe :
+        (Encodable.encode cell.2).div2 ≤
+          Encodable.encode cell.2 := by
+      have identity :=
+        Nat.bodd_add_div2 (Encodable.encode cell.2)
+      omega
+    rw [IntEncoding.encode_div2] at quotientLe
+    exact quotientLe.trans (Nat.right_le_pair _ _)
+  have xMagnitudeBound : xMagnitude ≤ limit :=
+    xMagnitudeCell.trans cellBound
+  have yMagnitudeBound : yMagnitude ≤ limit :=
+    yMagnitudeCell.trans cellBound
+  have xSignBound : xSign ≤ limit := by
+    have tag : xSign ≤ 1 := by
+      rcases cell with ⟨x, y⟩
+      cases x <;> simp [xSign, IntEncoding.sign]
+    simp only [limit]
+    omega
+  have ySignBound : ySign ≤ limit := by
+    have tag : ySign ≤ 1 := by
+      rcases cell with ⟨x, y⟩
+      cases y <;> simp [ySign, IntEncoding.sign]
+    simp only [limit]
+    omega
+  have widthBits := encodeNat_length_mono widthBound
+  have periodBits := encodeNat_length_mono periodBound
+  have cellBits := encodeNat_length_mono cellBound
+  have xMagnitudeBits :=
+    encodeNat_length_mono xMagnitudeBound
+  have yMagnitudeBits :=
+    encodeNat_length_mono yMagnitudeBound
+  have xSignBits := encodeNat_length_mono xSignBound
+  have ySignBits := encodeNat_length_mono ySignBound
+  have widthSuccBits :=
+    encodeNat_length_mono
+      (show width + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show period + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have cellSuccBits :=
+    encodeNat_length_mono
+      (show cellCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have xMagnitudeSuccBits :=
+    encodeNat_length_mono
+      (show xMagnitude + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have yMagnitudeSuccBits :=
+    encodeNat_length_mono
+      (show yMagnitude + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have xSignSuccBits :=
+    encodeNat_length_mono
+      (show xSign + 1 ≤ limit by
+        have tag : xSign ≤ 1 := by
+          rcases cell with ⟨x, y⟩
+          cases x <;> simp [xSign, IntEncoding.sign]
+        simp only [limit]
+        omega)
+  have ySignSuccBits :=
+    encodeNat_length_mono
+      (show ySign + 1 ≤ limit by
+        have tag : ySign ≤ 1 := by
+          rcases cell with ⟨x, y⟩
+          cases y <;> simp [ySign, IntEncoding.sign]
+        simp only [limit]
+        omega)
+  have xSignPredBits :=
+    encodeNat_length_mono
+      (show xSign - 1 ≤ limit by omega)
+  have ySignPredBits :=
+    encodeNat_length_mono
+      (show ySign - 1 ≤ limit by omega)
+  have periodDifferenceBits :=
+    encodeNat_length_mono
+      (show period - xMagnitude ≤ limit by omega)
+  have widthDifferenceBits :=
+    encodeNat_length_mono
+      (show width - yMagnitude ≤ limit by omega)
+  have periodDifferencePredBits :=
+    encodeNat_length_mono
+      (show period - xMagnitude - 1 ≤ limit by omega)
+  have widthDifferencePredBits :=
+    encodeNat_length_mono
+      (show width - yMagnitude - 1 ≤ limit by omega)
+  have cellViewBound := cellViewCost_le_linear cell
+  have cellViewLimit :
+      encodedListSpace [2 * Encodable.encode cell + 4] ≤
+        encodedListSpace [limit] := by
+    have numeric :
+        2 * Encodable.encode cell + 4 ≤ limit := by
+      simp only [limit, cellCode]
+      omega
+    simpa only [encodedListSpace_cons,
+      encodedListSpace_nil, Nat.add_le_add_iff_right] using
+      encodeNat_length_mono numeric
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have xUpperComplement :
+      period ≤ xMagnitude ↔ ¬xMagnitude < period := by
+    omega
+  have yUpperComplement :
+      width ≤ yMagnitude ↔ ¬yMagnitude < width := by
+    omega
+  by_cases xNonnegative : xSign = 0 <;>
+    by_cases xUpper : xMagnitude < period <;>
+    by_cases yNonnegative : ySign = 0 <;>
+    by_cases yUpper : yMagnitude < width <;>
+    simp [stripCellInBoundsCost,
+      stripCellXNonnegativeCost,
+      stripCellXUpperAndYCost, stripCellXUpperCost,
+      stripCellXUpperArgumentsCost,
+      stripCellYBothCost, stripCellYNonnegativeCost,
+      stripCellYUpperCost, stripCellYUpperArgumentsCost,
+      stripCellFieldCost, stripCellViewCost,
+      natLtCost, natLtDifferenceCost,
+      natLtArgumentsCost, subtractCost,
+      subtractInputCost, subtractLoopCost,
+      isZeroCost, normalizeBoolCost, boolAndCost,
+      branchZeroZeroCost, branchZeroSuccCost,
+      branchZeroTestCost, prependCost, getCost,
+      dropCost, idCost, headCost, nilCost,
+      oneCost, zeroCost, zeroPrimeCost, tailCost,
+      succCost, encodedListSpace_cons,
+      encodedListSpace_nil, cellCode, xMagnitude,
+      xSign, yMagnitude, ySign, limit,
+      xNonnegative, xUpper, yNonnegative, yUpper,
+      xUpperComplement, yUpperComplement,
+      Nat.sub_eq_zero_iff_le,
+      zeroBits, oneBits] at * <;>
+    omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
