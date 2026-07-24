@@ -530,10 +530,15 @@ The representation choices for this target are:
   an absent packed assignment; the fitted Boolean composition is proved
   equal to `PackedWindowState.normalizedAtBool`.
 - [`LeanTrominoes/PartrecPackedNormalizationLoop.lean`](LeanTrominoes/PartrecPackedNormalizationLoop.lean)
+  and
+  [`LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean`](LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean)
   streams that predicate through one complete encoded motif column.  Its
   fixed-width state retains the original motif for assignment lookup, a
   decreasing suffix, the packed phase and word, and one validity bit; the
   closed loop is proved equal to `PackedWindowState.normalizedColumnBool`.
+  Exact evaluator-space certificates now fit every component of one
+  streaming step and the surrounding flat-countdown body, ready for the
+  reachable-state uniform bound.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

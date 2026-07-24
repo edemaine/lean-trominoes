@@ -376,6 +376,63 @@ theorem packedNormalizedAt
       (packedNormalizedAtAssignmentIsNone
         period phase motif column cell word)
 
+theorem packedNormalizedAtResult
+    (period phase : Nat) (motif : List Cell)
+    (column : Nat) (cell : Cell) (word : Nat) :
+    EvaluatorCodeFits Code.packedNormalizedAtCode
+      (normalizedValues period phase motif column cell word)
+      [Code.packedNormalizedAtResult
+        period phase motif column cell word]
+      (packedNormalizedAtCost
+        period phase motif column cell word) := by
+  let nonnegative :=
+    if IntEncoding.sign cell.1 = 0 then 1 else 0
+  let equal :=
+    if IntEncoding.magnitude cell.1 =
+        Code.packedColumnPhaseNumerator period phase column % period
+      then 1 else 0
+  let coordinateArithmetic :=
+    if nonnegative = 0 ∨ equal = 0 then 0 else 1
+  let coordinateNative :=
+    (decide
+      (cell.1 =
+        ((Code.packedColumnPhaseNumerator
+          period phase column % period : Nat) : Int))).toNat
+  let assignmentNone :=
+    if (Code.packedAssignmentLookupOutcome
+      motif column cell word).2.1 = 0 then 1 else 0
+  have coordinateEq :
+      coordinateArithmetic = coordinateNative := by
+    simpa [nonnegative, equal,
+      coordinateArithmetic, coordinateNative] using
+    Code.packedNormalizedAtCoordinateTag_eq
+      period phase column cell
+  have outputEq :
+      (if coordinateArithmetic = 0 ∧ assignmentNone = 0
+        then 0 else 1) =
+        Code.packedNormalizedAtResult
+          period phase motif column cell word := by
+    change
+      (if coordinateArithmetic = 0 ∧ assignmentNone = 0
+        then 0 else 1) =
+      if coordinateNative = 0 ∧ assignmentNone = 0
+        then 0 else 1
+    by_cases left :
+        coordinateArithmetic = 0 ∧ assignmentNone = 0
+    · have right :
+          coordinateNative = 0 ∧ assignmentNone = 0 := by
+        exact ⟨by omega, left.2⟩
+      simp [left, right]
+    · have right :
+          ¬(coordinateNative = 0 ∧ assignmentNone = 0) := by
+        intro right
+        exact left ⟨by omega, right.2⟩
+      simp [left, right]
+  have fitted :=
+    packedNormalizedAt period phase motif column cell word
+  simpa only [nonnegative, equal, coordinateArithmetic,
+    assignmentNone, outputEq] using fitted
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

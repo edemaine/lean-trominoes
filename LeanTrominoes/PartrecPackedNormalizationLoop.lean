@@ -159,7 +159,7 @@ theorem packedNormalizationHeadValidCode_eval
     packedNormalizationAtArgumentsCode_eval
       periodicStrip packed column valid cell remaining
   simp [packedNormalizationHeadValidCode, arguments,
-    packedNormalizedAtCode_eval_semantic]
+    packedNormalizedAtResult_eq_semantic]
 
 def packedNormalizationUpdatedValidCode : Code :=
   boolAnd (get 6) packedNormalizationHeadValidCode
@@ -297,6 +297,65 @@ theorem packedNormalizationStepCode_eval_cons
         periodicStrip packed column valid cell remaining)
       (by simp)
 
+/-- Total list semantics used by the evaluator-space loop rule.  Only typed
+suffix states are reachable from the fitted initial state. -/
+def packedNormalizationNativeStep
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (values : List Nat) : List Nat :=
+  match
+      (Encodable.decode (values[1]?.getD 0) :
+        Option (List Cell)) with
+  | none => values
+  | some [] => values
+  | some (cell :: remaining) =>
+      [Encodable.encode periodicStrip.motif,
+        Encodable.encode remaining, periodicStrip.period,
+        packed.phase, column.val, packed.assignmentWord,
+        (decide (values[6]?.getD 0 ≠ 0) &&
+          packed.normalizedAtBool periodicStrip column cell).toNat]
+
+@[simp]
+theorem packedNormalizationNativeStep_state_nil
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (valid : Bool) :
+    packedNormalizationNativeStep periodicStrip packed column
+        (packedNormalizationState periodicStrip packed
+          column valid []) =
+      packedNormalizationState periodicStrip packed
+        column valid [] := by
+  simp [packedNormalizationNativeStep,
+    packedNormalizationState]
+
+@[simp]
+theorem packedNormalizationNativeStep_state_cons
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (valid : Bool) (cell : Cell) (remaining : List Cell) :
+    packedNormalizationNativeStep periodicStrip packed column
+        (packedNormalizationState periodicStrip packed
+          column valid (cell :: remaining)) =
+      packedNormalizationState periodicStrip packed column
+        (valid &&
+          packed.normalizedAtBool periodicStrip column cell)
+        remaining := by
+  unfold packedNormalizationNativeStep
+  rw [show
+    (Encodable.decode
+        ((packedNormalizationState periodicStrip packed column
+          valid (cell :: remaining))[1]?.getD 0) :
+      Option (List Cell)) =
+        some (cell :: remaining) by
+    change
+      Encodable.decode (Encodable.encode (cell :: remaining)) =
+        some (cell :: remaining)
+    exact Encodable.encodek (cell :: remaining)]
+  cases valid <;>
+    cases normalized :
+      packed.normalizedAtBool periodicStrip column cell <;>
+    simp [packedNormalizationState, normalized]
+
 /-- Typed semantics of a fixed number of streaming suffix steps. -/
 def packedNormalizationProcess
     (periodicStrip : PeriodicStrip)
@@ -314,6 +373,34 @@ def packedNormalizationProcess
         (valid &&
           packed.normalizedAtBool periodicStrip column cell)
         remaining
+
+theorem packedNormalizationNativeStep_iterate
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (steps : Nat) (valid : Bool) (remaining : List Cell) :
+    ((packedNormalizationNativeStep
+      periodicStrip packed column)^[steps])
+        (packedNormalizationState periodicStrip packed
+          column valid remaining) =
+      packedNormalizationProcess periodicStrip packed
+        column steps valid remaining := by
+  induction steps generalizing valid remaining with
+  | zero =>
+      rfl
+  | succ steps induction =>
+      rw [Function.iterate_succ_apply]
+      cases remaining with
+      | nil =>
+          rw [packedNormalizationNativeStep_state_nil]
+          simpa [packedNormalizationProcess] using
+            induction valid []
+      | cons cell remaining =>
+          rw [packedNormalizationNativeStep_state_cons]
+          simpa [packedNormalizationProcess] using
+            induction
+              (valid &&
+                packed.normalizedAtBool periodicStrip column cell)
+              remaining
 
 theorem packedNormalizationFlatIterateCode_eval
     (periodicStrip : PeriodicStrip)

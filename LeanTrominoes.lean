@@ -77,6 +77,7 @@ import LeanTrominoes.PartrecPackedColumnPhaseSpace
 import LeanTrominoes.PartrecPackedNormalizedAt
 import LeanTrominoes.PartrecPackedNormalizedAtSpace
 import LeanTrominoes.PartrecPackedNormalizationLoop
+import LeanTrominoes.PartrecPackedNormalizationLoopSpace
 import LeanTrominoes.PartrecPeriodicStripDecode
 import LeanTrominoes.PartrecPeriodicStripDecodeSpace
 import LeanTrominoes.PartrecPolySpace

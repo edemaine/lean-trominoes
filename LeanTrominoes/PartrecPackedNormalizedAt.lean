@@ -115,6 +115,83 @@ theorem int_eq_natCast_iff_encoding
   cases value <;>
     simp [IntEncoding.sign, IntEncoding.magnitude]
 
+theorem packedNormalizedAtCoordinateTag_eq
+    (period phase column : Nat) (cell : Cell) :
+    let nonnegative :=
+      if IntEncoding.sign cell.1 = 0 then 1 else 0
+    let equal :=
+      if IntEncoding.magnitude cell.1 =
+          packedColumnPhaseNumerator period phase column % period
+        then 1 else 0
+    (if nonnegative = 0 ∨ equal = 0 then 0 else 1) =
+      (decide
+        (cell.1 =
+          ((packedColumnPhaseNumerator
+            period phase column % period : Nat) : Int))).toNat := by
+  simp only
+  by_cases nonnegativeH :
+      IntEncoding.sign cell.1 = 0
+  · by_cases equalH :
+        IntEncoding.magnitude cell.1 =
+          packedColumnPhaseNumerator period phase column % period
+    · have coordinateH :=
+        (int_eq_natCast_iff_encoding cell.1
+          (packedColumnPhaseNumerator
+            period phase column % period)).mpr
+          ⟨nonnegativeH, equalH⟩
+      have decision :
+          decide
+              (cell.1 =
+                ((packedColumnPhaseNumerator
+                  period phase column % period : Nat) : Int)) =
+            true := by
+        rw [decide_eq_true_eq]
+        exact coordinateH
+      rw [decision]
+      simp only [nonnegativeH, equalH, if_pos]
+      native_decide
+    · have coordinateH :
+          ¬ cell.1 =
+            ((packedColumnPhaseNumerator
+              period phase column % period : Nat) : Int) :=
+        fun coordinate =>
+          equalH
+            ((int_eq_natCast_iff_encoding _ _).mp
+              coordinate).2
+      have decision :
+          decide
+              (cell.1 =
+                ((packedColumnPhaseNumerator
+                  period phase column % period : Nat) : Int)) =
+            false :=
+        Bool.eq_false_of_not_eq_true (by
+          rw [decide_eq_true_eq]
+          exact coordinateH)
+      rw [decision]
+      simp only [nonnegativeH, equalH, if_pos]
+      native_decide
+  · have coordinateH :
+        ¬ cell.1 =
+          ((packedColumnPhaseNumerator
+            period phase column % period : Nat) : Int) :=
+      fun coordinate =>
+        nonnegativeH
+          ((int_eq_natCast_iff_encoding _ _).mp
+            coordinate).1
+    have decision :
+        decide
+            (cell.1 =
+              ((packedColumnPhaseNumerator
+                period phase column % period : Nat) : Int)) =
+          false :=
+      Bool.eq_false_of_not_eq_true (by
+        rw [decide_eq_true_eq]
+        exact coordinateH)
+    rw [decision]
+    simp only [nonnegativeH, if_false, true_or,
+      if_true, Bool.toNat]
+    native_decide
+
 @[simp]
 theorem packedNormalizedAtCoordinateCode_eval
     (period phase motifCode column word : Nat)
@@ -242,6 +319,55 @@ def packedNormalizedAtCode : Code :=
   boolOr packedNormalizedAtCoordinateCode
     packedNormalizedAtAssignmentIsNoneCode
 
+/-- Native result computed by the one-cell predicate. -/
+def packedNormalizedAtResult
+    (period phase : Nat) (motif : List Cell)
+    (column : Nat) (cell : Cell) (word : Nat) : Nat :=
+  let coordinate :=
+    (decide
+      (cell.1 =
+        ((packedColumnPhaseNumerator
+          period phase column % period : Nat) : Int))).toNat
+  let assignmentNone :=
+    if (packedAssignmentLookupOutcome
+      motif column cell word).2.1 = 0 then 1 else 0
+  if coordinate = 0 ∧ assignmentNone = 0 then 0 else 1
+
+@[simp]
+theorem packedNormalizedAtCode_eval
+    (period phase : Nat) (motif : List Cell)
+    (column : Nat) (cell : Cell) (word : Nat) :
+    packedNormalizedAtCode.eval
+        [period, phase, Encodable.encode motif, column,
+          Encodable.encode cell, word] =
+      pure
+        [packedNormalizedAtResult
+          period phase motif column cell word] := by
+  let values :=
+    [period, phase, Encodable.encode motif, column,
+      Encodable.encode cell, word]
+  let coordinate :=
+    (decide
+      (cell.1 =
+        ((packedColumnPhaseNumerator
+          period phase column % period : Nat) : Int))).toNat
+  let assignmentNone :=
+    if (packedAssignmentLookupOutcome
+      motif column cell word).2.1 = 0 then 1 else 0
+  have combined :=
+    boolOr_eval_at packedNormalizedAtCoordinateCode
+      packedNormalizedAtAssignmentIsNoneCode
+      values coordinate assignmentNone
+      (by simp [values, coordinate])
+      (by
+        simp [values,
+          packedNormalizedAtAssignmentIsNoneCode,
+          packedNormalizedAtAssignmentArgumentsCode,
+          assignmentNone])
+  simpa [packedNormalizedAtCode,
+    packedNormalizedAtResult, coordinate,
+    assignmentNone] using combined
+
 theorem packedNormalizedAtCode_eval_semantic
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState)
@@ -335,5 +461,21 @@ theorem packedNormalizedAtCode_eval_semantic
       native_decide
   rw [tagEq]
   exact combined
+
+theorem packedNormalizedAtResult_eq_semantic
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState)
+    (column : WindowColumn) (cell : Cell) :
+    packedNormalizedAtResult periodicStrip.period packed.phase
+        periodicStrip.motif column.val cell packed.assignmentWord =
+      (packed.normalizedAtBool periodicStrip column cell).toNat := by
+  have native :=
+    packedNormalizedAtCode_eval periodicStrip.period packed.phase
+      periodicStrip.motif column.val cell packed.assignmentWord
+  have semantic :=
+    packedNormalizedAtCode_eval_semantic
+      periodicStrip packed column cell
+  rw [semantic] at native
+  simpa using native.symm
 
 end Turing.ToPartrec.Code
