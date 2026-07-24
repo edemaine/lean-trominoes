@@ -531,7 +531,10 @@ The representation choices for this target are:
   decide normalization at one motif occurrence.  The program compares the
   signed horizontal cell coordinate with its wrapped column phase or accepts
   an absent packed assignment; the fitted Boolean composition is proved
-  equal to `PackedWindowState.normalizedAtBool`.
+  equal to `PackedWindowState.normalizedAtBool`.  Its evaluator cost is
+  bounded explicitly by a fixed constant times the encoded size of one
+  arithmetic envelope containing the period, phase, motif, cell, column,
+  and packed word.
 - [`LeanTrominoes/PartrecPackedNormalizationLoop.lean`](LeanTrominoes/PartrecPackedNormalizationLoop.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean`](LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean)

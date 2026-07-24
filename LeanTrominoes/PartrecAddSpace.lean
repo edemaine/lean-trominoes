@@ -214,6 +214,48 @@ theorem natAdd (left right : Nat) :
     have whole := EvaluatorCallFits.comp inputCall
     simpa [Code.natAddCode, loopContinuation] using whole
 
+set_option maxHeartbeats 800000 in
+theorem natAddCost_le_linear (left right : Nat) :
+    natAddCost left right ≤
+      100000000 *
+        (encodedListSpace [2 * (left + right) + 4] + 1) := by
+  let limit := 2 * (left + right) + 4
+  have leftBound : left ≤ limit := by
+    simp only [limit]
+    omega
+  have rightBound : right ≤ limit := by
+    simp only [limit]
+    omega
+  have sumBound : left + right ≤ limit := by
+    simp only [limit]
+    omega
+  have leftBits := encodeNat_length_mono leftBound
+  have rightBits := encodeNat_length_mono rightBound
+  have sumBits := encodeNat_length_mono sumBound
+  have leftSuccBits :=
+    encodeNat_length_mono
+      (show left + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have rightSuccBits :=
+    encodeNat_length_mono
+      (show right + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have sumSuccBits :=
+    encodeNat_length_mono
+      (show left + right + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [natAddCost, natAddInputCost, natAddLoopCost,
+    prependCost, getCost, dropCost, headCost,
+    idCost, nilCost, tailCost, zeroPrimeCost,
+    succCost, encodedListSpace_cons,
+    encodedListSpace_nil, limit, zeroBits] at *
+  omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

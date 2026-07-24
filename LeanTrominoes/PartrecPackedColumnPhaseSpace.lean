@@ -234,6 +234,215 @@ theorem packedColumnPhase
     comp (get 1 [numerator / period, numerator % period])
       (packedColumnPhaseDivision period phase column)
 
+set_option maxHeartbeats 1600000 in
+theorem packedColumnPhaseCost_le_linear
+    (period phase column : Nat) :
+    packedColumnPhaseCost period phase column ≤
+      10000000000000000 *
+        (encodedListSpace
+          [128 * (period + phase + column + 32) + 200] + 1) := by
+  let doublePeriod := period + period
+  let offset := phase + column
+  let sum := Code.packedColumnPhaseSum period phase column
+  let numerator :=
+    Code.packedColumnPhaseNumerator period phase column
+  let limit := 128 * (period + phase + column + 32) + 200
+  change
+    packedColumnPhaseCost period phase column ≤
+      10000000000000000 *
+        (encodedListSpace [limit] + 1)
+  have sumEq : sum = offset + doublePeriod := by
+    simp [sum, offset, doublePeriod,
+      Code.packedColumnPhaseSum, Nat.add_assoc]
+  have numeratorLe : numerator ≤ sum := by
+    simp only [numerator,
+      Code.packedColumnPhaseNumerator, sum]
+    exact Nat.sub_le _ _
+  have periodBound : period ≤ limit := by
+    simp only [limit]
+    omega
+  have phaseBound : phase ≤ limit := by
+    simp only [limit]
+    omega
+  have columnBound : column ≤ limit := by
+    simp only [limit]
+    omega
+  have doubleBound : doublePeriod ≤ limit := by
+    simp only [doublePeriod, limit]
+    omega
+  have offsetBound : offset ≤ limit := by
+    simp only [offset, limit]
+    omega
+  have sumBound : sum ≤ limit := by
+    simp only [sumEq, offset, doublePeriod, limit]
+    omega
+  have sumPredBound : sum.pred ≤ limit :=
+    (Nat.pred_le sum).trans sumBound
+  have numeratorBound : numerator ≤ limit :=
+    numeratorLe.trans sumBound
+  have quotientBound : numerator / period ≤ limit :=
+    (Nat.div_le_self numerator period).trans numeratorBound
+  have remainderBound : numerator % period ≤ limit :=
+    (Nat.mod_le numerator period).trans numeratorBound
+  have periodBits := encodeNat_length_mono periodBound
+  have phaseBits := encodeNat_length_mono phaseBound
+  have columnBits := encodeNat_length_mono columnBound
+  have doubleBits := encodeNat_length_mono doubleBound
+  have offsetBits := encodeNat_length_mono offsetBound
+  have sumBits := encodeNat_length_mono sumBound
+  have sumPredBits := encodeNat_length_mono sumPredBound
+  have numeratorBits := encodeNat_length_mono numeratorBound
+  have quotientBits := encodeNat_length_mono quotientBound
+  have remainderBits := encodeNat_length_mono remainderBound
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show period + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have phaseSuccBits :=
+    encodeNat_length_mono
+      (show phase + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have columnSuccBits :=
+    encodeNat_length_mono
+      (show column + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have doubleSuccBits :=
+    encodeNat_length_mono
+      (show doublePeriod + 1 ≤ limit by
+        simp only [doublePeriod, limit]
+        omega)
+  have offsetSuccBits :=
+    encodeNat_length_mono
+      (show offset + 1 ≤ limit by
+        simp only [offset, limit]
+        omega)
+  have sumSuccBits :=
+    encodeNat_length_mono
+      (show sum + 1 ≤ limit by
+        simp only [sum, Code.packedColumnPhaseSum, limit]
+        omega)
+  have sumPredSuccBits :=
+    encodeNat_length_mono
+      (show sum.pred + 1 ≤ limit by
+        have predLe := Nat.pred_le sum
+        simp only [sum, Code.packedColumnPhaseSum, limit] at *
+        omega)
+  have numeratorSuccBits :=
+    encodeNat_length_mono
+      (show numerator + 1 ≤ limit by
+        simp only [numerator,
+          Code.packedColumnPhaseNumerator,
+          Code.packedColumnPhaseSum, limit]
+        omega)
+  have quotientSuccBits :=
+    encodeNat_length_mono
+      (show numerator / period + 1 ≤ limit by
+        have quotientLe := Nat.div_le_self numerator period
+        omega)
+  have remainderSuccBits :=
+    encodeNat_length_mono
+      (show numerator % period + 1 ≤ limit by
+        have remainderLe := Nat.mod_le numerator period
+        omega)
+  have addDoubleLocal := natAddCost_le_linear period period
+  have addDoubleArgument :
+      2 * (period + period) + 4 ≤ limit := by
+    simp only [limit]
+    omega
+  have addDoubleArgumentBits :=
+    encodeNat_length_mono addDoubleArgument
+  have addDouble :
+      natAddCost period period ≤
+        100000000 * (encodedListSpace [limit] + 1) := by
+    simp only [encodedListSpace_cons,
+      encodedListSpace_nil] at addDoubleLocal ⊢
+    omega
+  have addOffsetLocal := natAddCost_le_linear phase column
+  have addOffsetArgument :
+      2 * (phase + column) + 4 ≤ limit := by
+    simp only [limit]
+    omega
+  have addOffsetArgumentBits :=
+    encodeNat_length_mono addOffsetArgument
+  have addOffset :
+      natAddCost phase column ≤
+        100000000 * (encodedListSpace [limit] + 1) := by
+    simp only [encodedListSpace_cons,
+      encodedListSpace_nil] at addOffsetLocal ⊢
+    omega
+  have addSumLocal :=
+    natAddCost_le_linear offset doublePeriod
+  have addSumArgument :
+      2 * (offset + doublePeriod) + 4 ≤ limit := by
+    simp only [offset, doublePeriod, limit]
+    omega
+  have addSumArgumentBits :=
+    encodeNat_length_mono addSumArgument
+  have addSum :
+      natAddCost offset doublePeriod ≤
+        100000000 * (encodedListSpace [limit] + 1) := by
+    simp only [encodedListSpace_cons,
+      encodedListSpace_nil] at addSumLocal ⊢
+    omega
+  have predSumLocal := predCost_singleton_le_linear sum
+  have predSumArgument : 2 * sum + 4 ≤ limit := by
+    simp only [sum, Code.packedColumnPhaseSum, limit]
+    omega
+  have predSumArgumentBits :=
+    encodeNat_length_mono predSumArgument
+  have predSum :
+      predCost [sum] ≤
+        1000000 * (encodedListSpace [limit] + 1) := by
+    simp only [encodedListSpace_cons,
+      encodedListSpace_nil] at predSumLocal ⊢
+    omega
+  have predSumPredLocal :=
+    predCost_singleton_le_linear sum.pred
+  have predSumPredArgument :
+      2 * sum.pred + 4 ≤ limit := by
+    have predLe := Nat.pred_le sum
+    simp only [sum, Code.packedColumnPhaseSum, limit] at *
+    omega
+  have predSumPredArgumentBits :=
+    encodeNat_length_mono predSumPredArgument
+  have predSumPred :
+      predCost [sum.pred] ≤
+        1000000 * (encodedListSpace [limit] + 1) := by
+    simp only [encodedListSpace_cons,
+      encodedListSpace_nil] at predSumPredLocal ⊢
+    omega
+  have divisionArgument :
+      8 * (numerator + period) + 16 ≤ limit := by
+    simp only [numerator, Code.packedColumnPhaseNumerator,
+      Code.packedColumnPhaseSum, limit]
+    omega
+  have divisionArgumentBits :=
+    encodeNat_length_mono divisionArgument
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  simp [packedColumnPhaseCost,
+    packedColumnPhaseDivisionCost,
+    packedColumnPhaseDivisionArgumentsCost,
+    packedColumnPhaseNumeratorCost,
+    packedColumnPhaseSumCost,
+    packedColumnPhaseSumArgumentsCost,
+    packedColumnPhaseOffsetCost,
+    packedColumnPhaseOffsetArgumentsCost,
+    packedColumnPhaseDoublePeriodCost,
+    packedColumnPhaseDoublePeriodArgumentsCost,
+    divisionSpaceBound, prependCost, getCost,
+    dropCost, headCost, idCost, nilCost, tailCost,
+    zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    doublePeriod, offset, sum, numerator,
+    zeroBits, oneBits] at *
+  omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

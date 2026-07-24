@@ -54,6 +54,50 @@ theorem pred_named (values : List Nat) :
               (predecessor := predecessor)
               (by simp) (head (predecessor :: values))
 
+set_option maxHeartbeats 800000 in
+theorem predCost_singleton_le_linear (value : Nat) :
+    predCost [value] ≤
+      1000000 *
+        (encodedListSpace [2 * value + 4] + 1) := by
+  let limit := 2 * value + 4
+  have valueBound : value ≤ limit := by
+    simp only [limit]
+    omega
+  have predBound : value.pred ≤ limit :=
+    (Nat.pred_le value).trans valueBound
+  have valueBits := encodeNat_length_mono valueBound
+  have predBits := encodeNat_length_mono predBound
+  have valueSuccBits :=
+    encodeNat_length_mono
+      (show value + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have predSuccBits :=
+    encodeNat_length_mono
+      (show value.pred + 1 ≤ limit by
+        have predLe := Nat.pred_le value
+        simp only [limit]
+        omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  cases value with
+  | zero =>
+      simp [predCost, Code.subtractStepList,
+        zeroCost, nilCost,
+        tailCost, zeroPrimeCost, succCost,
+        encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits]
+      omega
+  | succ predecessor =>
+      simp [predCost, Code.subtractStepList,
+        nilCost, headCost, idCost,
+        tailCost, zeroPrimeCost, succCost,
+        encodedListSpace_cons, encodedListSpace_nil,
+        limit, zeroBits, oneBits] at *
+      omega
+
 def subtractBodyCost
     (remaining : Nat) (payload : List Nat) : Nat :=
   flatCountdownBodyCost Code.subtractStepList

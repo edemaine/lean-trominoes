@@ -153,6 +153,112 @@ theorem boolOr
         (Nat.pos_of_ne_zero leftZero)
         leftFits (one values)
 
+set_option maxHeartbeats 800000 in
+theorem isZeroCost_le_budget
+    (values : List Nat) (result valueCost budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (resultBound : encodedListSpace [result] ≤ budget)
+    (predecessorBound :
+      encodedListSpace [result.pred] ≤ budget)
+    (headBound :
+      (Computability.encodeNat values.headI).length ≤ budget)
+    (headSuccessorBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget)
+    (costBound : valueCost ≤ budget)
+    (_positiveBudget : 1 ≤ budget) :
+    isZeroCost values result valueCost ≤
+      1000 * (budget + 1) := by
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  by_cases zeroResult : result = 0
+  · subst result
+    simp [isZeroCost, branchZeroZeroCost,
+      branchZeroTestCost, prependCost, idCost,
+      nilCost, zeroCost, oneCost, tailCost,
+      zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      zeroBits, oneBits] at *
+    omega
+  · simp [isZeroCost, zeroResult,
+      branchZeroSuccCost, branchZeroTestCost,
+      prependCost, idCost, nilCost,
+      zeroCost, tailCost, zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      zeroBits, oneBits] at *
+    omega
+
+set_option maxHeartbeats 800000 in
+theorem boolAndCost_le_budget
+    (values : List Nat)
+    (leftValue rightValue leftCost rightCost budget : Nat)
+    (leftValueBound : leftValue ≤ 1)
+    (rightValueBound : rightValue ≤ 1)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (headBound :
+      (Computability.encodeNat values.headI).length ≤ budget)
+    (headSuccessorBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget)
+    (leftCostBound : leftCost ≤ budget)
+    (rightCostBound : rightCost ≤ budget)
+    (_positiveBudget : 1 ≤ budget) :
+    boolAndCost values leftValue rightValue leftCost rightCost ≤
+      1000 * (budget + 1) := by
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have leftCases : leftValue = 0 ∨ leftValue = 1 := by
+    omega
+  have rightCases : rightValue = 0 ∨ rightValue = 1 := by
+    omega
+  rcases leftCases with rfl | rfl <;>
+    rcases rightCases with rfl | rfl <;>
+    simp [boolAndCost, normalizeBoolCost,
+      branchZeroZeroCost, branchZeroSuccCost,
+      branchZeroTestCost, prependCost, idCost,
+      nilCost, zeroCost, oneCost, tailCost,
+      zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      zeroBits, oneBits] at * <;>
+    omega
+
+set_option maxHeartbeats 800000 in
+theorem boolOrCost_le_budget
+    (values : List Nat)
+    (leftValue rightValue leftCost rightCost budget : Nat)
+    (leftValueBound : leftValue ≤ 1)
+    (rightValueBound : rightValue ≤ 1)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (headBound :
+      (Computability.encodeNat values.headI).length ≤ budget)
+    (headSuccessorBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget)
+    (leftCostBound : leftCost ≤ budget)
+    (rightCostBound : rightCost ≤ budget)
+    (_positiveBudget : 1 ≤ budget) :
+    boolOrCost values leftValue rightValue leftCost rightCost ≤
+      1000 * (budget + 1) := by
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have leftCases : leftValue = 0 ∨ leftValue = 1 := by
+    omega
+  have rightCases : rightValue = 0 ∨ rightValue = 1 := by
+    omega
+  rcases leftCases with rfl | rfl <;>
+    rcases rightCases with rfl | rfl <;>
+    simp [boolOrCost, normalizeBoolCost,
+      branchZeroZeroCost, branchZeroSuccCost,
+      branchZeroTestCost, prependCost, idCost,
+      nilCost, zeroCost, oneCost, tailCost,
+      zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      zeroBits, oneBits] at * <;>
+    omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
