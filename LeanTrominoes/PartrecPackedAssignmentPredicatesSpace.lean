@@ -69,6 +69,103 @@ theorem packedAssignmentIsNone
     isZero
       (packedAssignmentLookupDigit motif queriedColumn target word)
 
+def packedAssignmentLookupDigitSpaceBound
+    (motifCode queriedColumn targetCode word : Nat) : Nat :=
+  800000000000000000000 *
+    (encodedListSpace
+      [32 * (motifCode + motifCode + motifCode +
+        targetCode + queriedColumn + word + 40 + 32) + 200] + 1)
+
+set_option maxHeartbeats 800000 in
+theorem packedAssignmentLookupDigitCost_le_linear
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    packedAssignmentLookupDigitCost motif queriedColumn target word ≤
+      packedAssignmentLookupDigitSpaceBound
+        (Encodable.encode motif) queriedColumn
+        (Encodable.encode target) word := by
+  let motifCode := Encodable.encode motif
+  let targetCode := Encodable.encode target
+  let outcome :=
+    Code.packedAssignmentLookupOutcome motif queriedColumn target word
+  let digit := outcome.2.1
+  let limit :=
+    32 * (motifCode + motifCode + motifCode +
+      targetCode + queriedColumn + word + 40 + 32) + 200
+  change
+    packedAssignmentLookupDigitCost motif queriedColumn target word ≤
+      800000000000000000000 *
+        (encodedListSpace [limit] + 1)
+  have digitBound : digit ≤ 40 := by
+    simpa [digit, outcome] using
+      Code.packedAssignmentLookupOutcome_digit_le
+        motif queriedColumn target word
+  have motifBound : motifCode ≤ limit := by
+    simp only [limit]
+    omega
+  have targetBound : targetCode ≤ limit := by
+    simp only [limit]
+    omega
+  have queryBound : queriedColumn ≤ limit := by
+    simp only [limit]
+    omega
+  have wordBound : word ≤ limit := by
+    simp only [limit]
+    omega
+  have digitLimit : digit ≤ limit := by
+    simp only [limit]
+    omega
+  have motifBits := encodeNat_length_mono motifBound
+  have targetBits := encodeNat_length_mono targetBound
+  have queryBits := encodeNat_length_mono queryBound
+  have wordBits := encodeNat_length_mono wordBound
+  have digitBits := encodeNat_length_mono digitLimit
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have targetSuccBits :=
+    encodeNat_length_mono
+      (show targetCode + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have querySuccBits :=
+    encodeNat_length_mono
+      (show queriedColumn + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have wordSuccBits :=
+    encodeNat_length_mono
+      (show word + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have digitSuccBits :=
+    encodeNat_length_mono
+      (show digit + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have lookup :=
+    packedAssignmentLookupCodeCost_le_linear
+      motif queriedColumn target word
+  have lookupGlobal :
+      packedAssignmentLookupCodeCost motif queriedColumn target word ≤
+        700000000000000000000 *
+          (encodedListSpace [limit] + 1) := by
+    simpa [packedAssignmentLookupSpaceBound,
+      limit, motifCode, targetCode] using lookup
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  cases found : outcome.2.2 <;>
+    simp [packedAssignmentLookupDigitCost,
+      getCost, dropCost, headCost, idCost, nilCost,
+      tailCost, zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      outcome, digit, found, zeroBits, oneBits] at * <;>
+    omega
+
 def packedAssignmentIsNoneSpaceBound
     (motifCode queriedColumn targetCode word : Nat) : Nat :=
   1000000000000000000000000 *

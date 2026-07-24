@@ -517,7 +517,8 @@ The representation choices for this target are:
   turn that lookup into the first semantic packed-frontier predicate:
   digit zero is proved equivalent to an absent assignment, and the resulting
   `none` test is fitted by composing the lookup, one projection, and one
-  zero test.
+  zero test.  The projected lookup digit also has its own named input-linear
+  evaluator-space bound for reuse by later packed predicates.
 - [`LeanTrominoes/PartrecPackedColumnPhase.lean`](LeanTrominoes/PartrecPackedColumnPhase.lean)
   and
   [`LeanTrominoes/PartrecPackedColumnPhaseSpace.lean`](LeanTrominoes/PartrecPackedColumnPhaseSpace.lean)
@@ -549,6 +550,15 @@ The representation choices for this target are:
   `packedNormalizationColumnCost_le_linear` bounds that entire program by a
   fixed constant times one encoded arithmetic envelope for the period, phase,
   motif, column, and packed word.
+- [`LeanTrominoes/PartrecPackedOverlapAt.lean`](LeanTrominoes/PartrecPackedOverlapAt.lean)
+  and
+  [`LeanTrominoes/PartrecPackedOverlapAtSpace.lean`](LeanTrominoes/PartrecPackedOverlapAtSpace.lean)
+  compare adjacent packed windows at one shared motif occurrence.  Two
+  streamed assignment lookups expose only the relevant base-nine digits;
+  bounded-digit injectivity proves their numeric equality equivalent to the
+  semantic `PackedWindowState.overlapsAtBool` test.  The complete projection,
+  pair assembly, and equality program has a named evaluator-space bound
+  linear in one encoded envelope for both columns and packed words.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
