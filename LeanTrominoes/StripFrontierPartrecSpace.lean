@@ -709,11 +709,11 @@ structure StripEvaluatorLeafCallsFit
       EvaluatorCallFits (stripEdgeVectorCode tromino)
         continuation
         [Encodable.encode periodicStrip, first, last] bound
-  indexCount :
+  stateBound :
     ∀ continuation,
       EvaluatorExecutionFits bound
-        (.ret continuation [RawWindowState.indexCount periodicStrip]) →
-      EvaluatorCallFits stripIndexCountCode continuation
+        (.ret continuation [RawWindowState.stripStateBound periodicStrip]) →
+      EvaluatorCallFits stripStateBoundCode continuation
         [Encodable.encode periodicStrip] bound
   wellFormed :
     ∀ continuation,

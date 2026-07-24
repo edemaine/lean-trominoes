@@ -180,6 +180,53 @@ theorem cycleSearchIndexBoolAtDepth_eq_true_iff
       rw [wraps] at segment
       simpa [first, second] using segment
 
+/-- Enlarging the ambient finite index type does not create or destroy
+cycles when every true edge remains supported on the original prefix. -/
+theorem hasCycle_indexedRelation_pad
+    (small large : Nat) (relation : Nat → Nat → Bool)
+    (smallLe : small ≤ large)
+    (supported :
+      ∀ first last,
+        relation first last = true →
+          first < small ∧ last < small) :
+    HasCycle (IndexedRelation large relation) ↔
+      HasCycle (IndexedRelation small relation) := by
+  constructor
+  · rintro ⟨periodPred, states, step⟩
+    have stateBound :
+        ∀ index, (states index).val < small := by
+      intro index
+      have edge := step index
+      exact (supported _ _ edge).1
+    refine ⟨periodPred,
+      fun index => ⟨(states index).val, stateBound index⟩, ?_⟩
+    intro index
+    exact step index
+  · rintro ⟨periodPred, states, step⟩
+    refine ⟨periodPred,
+      fun index =>
+        ⟨(states index).val,
+          (states index).isLt.trans_le smallLe⟩, ?_⟩
+    intro index
+    exact step index
+
+/-- Cycle search may use any sufficiently large padded state bound, provided
+the Boolean edge relation is supported on the original prefix. -/
+theorem cycleSearchIndexBoolAtDepth_pad_eq_true_iff
+    (small large depth : Nat) (relation : Nat → Nat → Bool)
+    (largeDepth : large ≤ 2 ^ depth)
+    (smallLe : small ≤ large)
+    (supported :
+      ∀ first last,
+        relation first last = true →
+          first < small ∧ last < small) :
+    cycleSearchIndexBoolAtDepth large depth relation = true ↔
+      HasCycle (IndexedRelation small relation) := by
+  rw [cycleSearchIndexBoolAtDepth_eq_true_iff
+    large depth relation largeDepth]
+  exact hasCycle_indexedRelation_pad
+    small large relation smallLe supported
+
 /-- Directed-cycle search at the canonical logarithmic depth. -/
 def cycleSearchIndexBool (stateCount : Nat)
     (relation : Nat → Nat → Bool) : Bool :=

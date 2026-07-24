@@ -383,6 +383,11 @@ The representation choices for this target are:
   is bounded by its enclosing loop's result, and every intermediate fuel is
   bounded by the final depth's fuel, so the calculation uses space
   proportional to the binary lengths of its inputs and result.
+- [`LeanTrominoes/PartrecPowerTwo.lean`](LeanTrominoes/PartrecPowerTwo.lean)
+  computes `2 ^ depth` by a flat doubling loop, reusing the explicit addition
+  machinery.  This supplies a padded graph bound: a generic cycle-padding
+  theorem proves that the raw edge predicate's out-of-range rejection makes
+  the padded graph cycle-equivalent to the exact sparse-frontier graph.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
@@ -402,9 +407,9 @@ The representation choices for this target are:
   only loop counters, a Boolean accumulator, and the current flat DFS stack.
   The parameterized driver is proved equal to
   `cycleSearchIndexDFSBoolAtDepth`; a unary front end computes the strip's
-  state count and certified search depth, rejects malformed presentations,
+  padded state bound and certified search depth, rejects malformed presentations,
   and is proved equal to `periodicStripTrominoTilingIndexBool`.
-  Its state-count, depth, well-formedness, parameter-assembly, and guarded
+  Its state-bound, depth, well-formedness, parameter-assembly, and guarded
   driver codes are named public control points for the evaluator-space proof.
 - [`LeanTrominoes/StripFrontierPartrecSpace.lean`](LeanTrominoes/StripFrontierPartrecSpace.lean)
   bounds the complete serialized payload of each compiled exact-fuel
@@ -422,10 +427,10 @@ The representation choices for this target are:
   `stripFuelCode_fits` similarly certifies the explicit exact-fuel
   computation within a quadratic reserve.  `StripEvaluatorLeafCallsFit`
   isolates the four remaining leaf certificates—base relation, raw edge,
-  state count, and well-formedness—as continuation-passing fitted-call
-  obligations.  These four still use correctness-only code selection, keeping
-  semantic correctness distinct from the space certificate required for each
-  code.
+  padded state bound, and well-formedness—as continuation-passing fitted-call
+  obligations.  The state-bound program is explicit; the other three still
+  use correctness-only code selection, keeping semantic correctness distinct
+  from the space certificate required for each code.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

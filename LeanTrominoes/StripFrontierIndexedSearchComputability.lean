@@ -71,6 +71,11 @@ theorem stripSearchDepth_primrec : Primrec stripSearchDepth := by
       (primcodableFinEncodingLength_primrec PeriodicStrip))
     (Primrec.const 1)
 
+theorem stripStateBound_primrec : Primrec stripStateBound := by
+  unfold stripStateBound
+  exact nat_pow_primrec.comp
+    (Primrec.const 2) stripSearchDepth_primrec
+
 theorem periodicStripTrominoTilingIndexBool_primrec
     (tromino : Tromino) :
     Primrec (periodicStripTrominoTilingIndexBool tromino) := by
@@ -85,11 +90,11 @@ theorem periodicStripTrominoTilingIndexBool_primrec
           Primrec.snd))
   have search : Primrec fun periodicStrip =>
       FiniteState.cycleSearchIndexDFSBoolAtDepth
-        (indexCount periodicStrip)
+        (stripStateBound periodicStrip)
         (stripSearchDepth periodicStrip)
         (indexedTransitionRawBool tromino periodicStrip) :=
     FiniteState.cycleSearchIndexDFSBoolAtDepth_primrec
-      indexCount_primrec stripSearchDepth_primrec relation
+      stripStateBound_primrec stripSearchDepth_primrec relation
   exact (Primrec.ite periodicStrip_isWellFormed_primrec
     search (Primrec.const false)).of_eq fun periodicStrip => by
       by_cases wellFormed : periodicStrip.IsWellFormed

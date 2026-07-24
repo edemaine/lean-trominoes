@@ -1,6 +1,7 @@
 import LeanTrominoes.StripFrontierPartrec
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecFuel
+import LeanTrominoes.PartrecPowerTwo
 
 /-!
 # Flat partial-recursive strip cycle search
@@ -569,18 +570,6 @@ theorem stripCycleSearchCode_eval (tromino : Tromino)
       simp [cycleSearchIndexDFSBoolAtDepth]
       rfl
 
-/-- Unary code computing the exact sparse-frontier state count. -/
-noncomputable def stripIndexCountCode : Code :=
-  codeOfPrimrec indexCount indexCount_primrec
-
-theorem stripIndexCountCode_eval
-    (periodicStrip : PeriodicStrip) :
-    stripIndexCountCode.eval [Encodable.encode periodicStrip] =
-      pure [indexCount periodicStrip] := by
-  apply Part.eq_some_iff.mpr
-  simpa [stripIndexCountCode] using
-    codeOfPrimrec_eval indexCount indexCount_primrec periodicStrip
-
 /-- Unary code computing the certified Savitch search depth. -/
 def stripSearchDepthCode : Code :=
   Code.binaryLengthAffineCode 21 22
@@ -593,6 +582,17 @@ theorem stripSearchDepthCode_eval
     LeanTrominoes.Complexity.primcodableFinEncoding_encode_length,
     binaryEncodingLength_eq]
   ring
+
+/-- Unary explicit code computing the padded power-of-two state bound. -/
+def stripStateBoundCode : Code :=
+  Code.powerTwoCode.comp stripSearchDepthCode
+
+theorem stripStateBoundCode_eval
+    (periodicStrip : PeriodicStrip) :
+    stripStateBoundCode.eval [Encodable.encode periodicStrip] =
+      pure [stripStateBound periodicStrip] := by
+  simp [stripStateBoundCode, stripStateBound,
+    stripSearchDepthCode_eval]
 
 private theorem encodeBool_eq_divideBoolTag (value : Bool) :
     Encodable.encode value = divideBoolTag value := by
@@ -612,19 +612,19 @@ theorem stripWellFormedCode_eval
     codeOfPrimrec_eval PeriodicStrip.wellFormed
       periodicStrip_wellFormed_primrec periodicStrip
 
-/-- Assemble the encoded strip, state count, and search depth consumed by the
+/-- Assemble the encoded strip, padded state bound, and search depth consumed by the
 parameterized cycle search. -/
 noncomputable def stripCycleParametersCode : Code :=
   Code.prepend (Code.get 0) <|
-    Code.prepend stripIndexCountCode <|
+    Code.prepend stripStateBoundCode <|
       Code.prepend stripSearchDepthCode Code.nil
 
 theorem stripCycleParametersCode_eval
     (periodicStrip : PeriodicStrip) :
     stripCycleParametersCode.eval [Encodable.encode periodicStrip] =
-      pure [Encodable.encode periodicStrip, indexCount periodicStrip,
+      pure [Encodable.encode periodicStrip, stripStateBound periodicStrip,
         stripSearchDepth periodicStrip] := by
-  simp [stripCycleParametersCode, stripIndexCountCode_eval,
+  simp [stripCycleParametersCode, stripStateBoundCode_eval,
     stripSearchDepthCode_eval]
 
 /-- Guard the parameterized cycle search by strip well-formedness. -/
@@ -637,7 +637,7 @@ private theorem periodicStripTrominoTilingIndexBool_eq_and
     periodicStripTrominoTilingIndexBool tromino periodicStrip =
       (periodicStrip.wellFormed &&
         cycleSearchIndexDFSBoolAtDepth
-          (indexCount periodicStrip)
+          (stripStateBound periodicStrip)
           (stripSearchDepth periodicStrip)
           (indexedTransitionRawBool tromino periodicStrip)) := by
   by_cases wellFormed : periodicStrip.IsWellFormed
@@ -669,7 +669,7 @@ theorem periodicStripTrominoTilingCode_eval
         (periodicStripTrominoTilingIndexBool tromino periodicStrip)] := by
   let cycleResult :=
     cycleSearchIndexDFSBoolAtDepth
-      (indexCount periodicStrip)
+      (stripStateBound periodicStrip)
       (stripSearchDepth periodicStrip)
       (indexedTransitionRawBool tromino periodicStrip)
   have cycleArguments :=
@@ -681,12 +681,12 @@ theorem periodicStripTrominoTilingCode_eval
         pure [divideBoolTag cycleResult] := by
     calc
       _ = (stripCycleSearchCode tromino).eval
-          [Encodable.encode periodicStrip, indexCount periodicStrip,
+          [Encodable.encode periodicStrip, stripStateBound periodicStrip,
             stripSearchDepth periodicStrip] :=
         comp_eval_pure _ _ _ _ cycleArguments
       _ = _ :=
         stripCycleSearchCode_eval tromino periodicStrip
-          (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+          (stripStateBound periodicStrip) (stripSearchDepth periodicStrip)
   have guardedRun :=
     Code.boolAnd_eval_at stripWellFormedCode
       ((stripCycleSearchCode tromino).comp

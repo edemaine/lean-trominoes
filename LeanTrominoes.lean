@@ -50,6 +50,7 @@ import LeanTrominoes.PartrecFuelSpace
 import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecListCodeSpace
 import LeanTrominoes.PartrecPolySpace
+import LeanTrominoes.PartrecPowerTwo
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
 import LeanTrominoes.StripFrontierCyclePartrec

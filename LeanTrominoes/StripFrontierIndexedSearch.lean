@@ -72,6 +72,21 @@ def indexedTransitionRawBool (tromino : Tromino)
   else
     false
 
+theorem indexedTransitionRawBool_eq_true_bounds
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat)
+    (edge :
+      indexedTransitionRawBool tromino periodicStrip
+        first last = true) :
+    first < indexCount periodicStrip ∧
+      last < indexCount periodicStrip := by
+  by_cases firstBound : first < indexCount periodicStrip
+  · by_cases lastBound : last < indexCount periodicStrip
+    · exact ⟨firstBound, lastBound⟩
+    · simp [indexedTransitionRawBool,
+        firstBound, lastBound] at edge
+  · simp [indexedTransitionRawBool, firstBound] at edge
+
 /-- Indexed transition with the positivity witness expected by the semantic
 correctness interface.  The executable raw test does not inspect the proof. -/
 def indexedTransitionBool (tromino : Tromino)
@@ -135,6 +150,11 @@ def stripSearchDepth (periodicStrip : PeriodicStrip) : Nat :=
   21 * ((Complexity.primcodableFinEncoding PeriodicStrip).encode
     periodicStrip).length + 1
 
+/-- A power-of-two ambient state bound.  The raw edge predicate rejects the
+padded indices beyond the exact sparse-frontier range. -/
+def stripStateBound (periodicStrip : PeriodicStrip) : Nat :=
+  2 ^ stripSearchDepth periodicStrip
+
 theorem indexCount_le_pow_stripSearchDepth
     (periodicStrip : PeriodicStrip) :
     indexCount periodicStrip ≤ 2 ^ stripSearchDepth periodicStrip := by
@@ -144,11 +164,17 @@ theorem indexCount_le_pow_stripSearchDepth
       (Nat.pow_le_pow_right (by omega)
         (WindowState.savitchDepth_le_encoding_length periodicStrip))
 
+theorem indexCount_le_stripStateBound
+    (periodicStrip : PeriodicStrip) :
+    indexCount periodicStrip ≤ stripStateBound periodicStrip := by
+  exact indexCount_le_pow_stripSearchDepth periodicStrip
+
 /-- Enumeration-free sparse-frontier decision procedure. -/
 def periodicStripTrominoTilingIndexBool
     (tromino : Tromino) (periodicStrip : PeriodicStrip) : Bool :=
   if wellFormed : periodicStrip.IsWellFormed then
-    FiniteState.cycleSearchIndexDFSBoolAtDepth (indexCount periodicStrip)
+    FiniteState.cycleSearchIndexDFSBoolAtDepth
+      (stripStateBound periodicStrip)
       (stripSearchDepth periodicStrip)
       (indexedTransitionBool tromino periodicStrip wellFormed.2.1)
   else
@@ -161,8 +187,16 @@ theorem periodicStripTrominoTilingIndexBool_eq_true_iff
   by_cases wellFormed : periodicStrip.IsWellFormed
   · rw [periodicStripTrominoTilingIndexBool, dif_pos wellFormed,
       FiniteState.cycleSearchIndexDFSBoolAtDepth_eq,
-      FiniteState.cycleSearchIndexBoolAtDepth_eq_true_iff
-        _ _ _ (indexCount_le_pow_stripSearchDepth periodicStrip),
+      FiniteState.cycleSearchIndexBoolAtDepth_pad_eq_true_iff
+        (indexCount periodicStrip)
+        (stripStateBound periodicStrip)
+        (stripSearchDepth periodicStrip)
+        (indexedTransitionBool tromino periodicStrip wellFormed.2.1)
+        (Nat.le_refl _)
+        (indexCount_le_stripStateBound periodicStrip)
+        (fun first last edge =>
+          indexedTransitionRawBool_eq_true_bounds
+            tromino periodicStrip first last edge),
       indexed_hasCycle_iff_hasCycle tromino periodicStrip wellFormed.2.1,
       ← WindowState.tileable_iff_hasCycle tromino wellFormed]
     simp [PeriodicStripTrominoTiling, wellFormed]
