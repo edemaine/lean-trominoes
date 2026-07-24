@@ -456,6 +456,12 @@ The representation choices for this target are:
   Given `[width, period, cellCode]`, it returns one exactly when the decoded
   cell is nonnegative in both coordinates and lies below the selected
   `period × width` bounds, equivalently in the strip fundamental domain.
+- [`LeanTrominoes/PartrecStripWellFormed.lean`](LeanTrominoes/PartrecStripWellFormed.lean)
+  lifts the cell predicate over an encoded motif without materializing the
+  list.  Its tail-style state retains only the encoded suffix, one validity
+  bit, and the two dimensions; the original motif code safely bounds the
+  countdown.  Composed with the explicit strip-header decoder, the resulting
+  unary program is proved exactly equal to `PeriodicStrip.wellFormed`.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
