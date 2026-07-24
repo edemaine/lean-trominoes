@@ -286,6 +286,11 @@ The representation choices for this target are:
   explicit frame count, and six natural fields per continuation frame.
   The compiled step is proved equal to the semantic DFS transition, and its
   tail-recursive countdown loop is proved equal to repeated semantic steps.
+- [`LeanTrominoes/StripFrontierPartrec.lean`](LeanTrominoes/StripFrontierPartrec.lean)
+  supplies the evaluator's strip-specific depth-zero program.  It extracts
+  the encoded strip and two queried frontier indices from the flat payload,
+  computes equality or the indexed frontier edge relation, and is connected
+  to both the verified small step and the tail-recursive iterator.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
