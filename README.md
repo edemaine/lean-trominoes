@@ -221,6 +221,14 @@ The representation choices for this target are:
   iteration, and complete bounded cycle driver.  This supplies an executable
   primitive-recursive program whose live continuation stack is the one
   bounded in `IndexedSavitchDFS.lean`.
+- [`LeanTrominoes/IndexedSavitchDFSSpace.lean`](LeanTrominoes/IndexedSavitchDFSSpace.lean)
+  measures the evaluator's storage frame by frame, with binary natural-number
+  fields and constant-size tags.  Every reachable graph index remains below
+  the state count, so if both the state count and root depth fit in `bits`
+  bits, every configuration uses at most
+  `3 × (bits + 1) + depth × (4 × (bits + 1) + 3) + 2` cells.  This flat
+  measure avoids the artificial exponential growth caused by treating the
+  nested generic list encoding as one natural number.
 - [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
   fills a machine-level gap in Mathlib's computability stack.  A TM2 program
   described over an infinite ambient label type can be restricted to a
@@ -240,9 +248,10 @@ The representation choices for this target are:
   any total represented code directly against the project's standard input
   and output encodings.  `primrecFiniteEvaluatorComputable` additionally
   extracts a `ToPartrec.Code` from any typed primitive-recursive function and
-  compiles it all the way to such a finite machine.  Proving the strip decider
-  primitive recursive and establishing its polynomial stack-space bound
-  remain separate steps.
+  compiles it all the way to such a finite machine.  The strip decider is now
+  primitive recursive, but its generic list-as-a-natural encoding does not
+  expose the evaluator's flat stack-space bound; connecting the direct DFS
+  representation to a finite machine remains separate.
 - [`LeanTrominoes/PartrecPolySpace.lean`](LeanTrominoes/PartrecPolySpace.lean)
   isolates the quantitative half of that compilation.  A
   `PolySpaceDecider` supplies a fixed evaluator code, its Boolean correctness,
