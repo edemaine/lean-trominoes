@@ -177,6 +177,12 @@ The representation choices for this target are:
   computes that exact binary input length with a bounded halving loop.  The
   loop retains only its current quotient and counter, is primitive recursive,
   and is proved equal to Mathlib's standard `encodeNat` length.
+- [`LeanTrominoes/PartrecBinaryLength.lean`](LeanTrominoes/PartrecBinaryLength.lean)
+  implements that computation as explicit `ToPartrec.Code` instead of
+  selecting an arbitrary extensionally correct primitive-recursive program.
+  Division by two is a flat quotient/parity countdown, and a second flat loop
+  repeatedly halves the input while incrementing its length; both programs
+  are proved correct.
 - [`LeanTrominoes/FiniteState.lean`](LeanTrominoes/FiniteState.lean) proves the
   pumping fact underlying the 1.5D upper bound: a finite transition system has
   a bi-infinite path exactly when it has a nonempty directed cycle.  The strip

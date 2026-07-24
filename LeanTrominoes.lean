@@ -40,6 +40,7 @@ import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
+import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecPolySpace
