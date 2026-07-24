@@ -311,7 +311,11 @@ The representation choices for this target are:
   chosen budget, so separately derived local bounds can be combined under
   one polynomial.  A generic invariant rule reduces the reachable-state
   obligation to an initial predicate, one-step preservation, and a local
-  simulation bound.
+  simulation bound.  Exact numeric requirements
+  (`normalSimulationSpace`, `retSimulationSpace`, and
+  `cfgSimulationSpace`) are proved equivalent to the corresponding logical
+  obligations, leaving ordinary natural-number inequalities for
+  program-specific space proofs.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

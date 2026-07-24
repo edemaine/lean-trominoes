@@ -1571,6 +1571,78 @@ def normalSimulationFits :
   | .fix body, continuation, values, bound =>
       normalSimulationFits body (.fix body continuation) values bound
 
+/-- The least common budget described by `normalSimulationFits`. -/
+def normalSimulationSpace :
+    ToPartrec.Code → ToPartrec.Cont → List Nat → Nat
+  | .zero', continuation, values =>
+      encodedListSpace values + continuationSpace continuation + 1
+  | .succ, continuation, values =>
+      max
+        (encodedListSpace values + continuationSpace continuation + 1)
+        (encodedListSpace [values.headI] +
+          continuationSpace continuation + 1)
+  | .tail, continuation, values =>
+      encodedListSpace values + continuationSpace continuation
+  | .cons first rest, continuation, values =>
+      normalSimulationSpace first
+        (.cons₁ rest values continuation) values
+  | .comp first second, continuation, values =>
+      normalSimulationSpace second (.comp first continuation) values
+  | .case zeroBranch successorBranch, continuation, values =>
+      max
+        (encodedListSpace values + continuationSpace continuation)
+        (values.headI.rec
+          (normalSimulationSpace zeroBranch continuation values.tail)
+          (fun predecessor _ =>
+            normalSimulationSpace successorBranch continuation
+              (predecessor :: values.tail)))
+  | .fix body, continuation, values =>
+      normalSimulationSpace body (.fix body continuation) values
+
+/-- The predicate form and numeric form of a normal-call space obligation
+agree exactly. -/
+theorem normalSimulationFits_iff
+    (code : ToPartrec.Code) (continuation : ToPartrec.Cont)
+    (values : List Nat) (bound : Nat) :
+    normalSimulationFits code continuation values bound ↔
+      normalSimulationSpace code continuation values ≤ bound := by
+  induction code generalizing continuation values with
+  | zero' =>
+      simp [normalSimulationFits, normalSimulationSpace]
+  | succ =>
+      change
+        (_ ≤ bound ∧ _ ≤ bound) ↔
+          max
+            (encodedListSpace values +
+              continuationSpace continuation + 1)
+            (encodedListSpace [values.headI] +
+              continuationSpace continuation + 1) ≤
+            bound
+      constructor
+      · intro inequalities
+        exact max_le inequalities.1 inequalities.2
+      · intro maximum
+        exact
+          ⟨(le_max_left _ _).trans maximum,
+            (le_max_right _ _).trans maximum⟩
+  | tail =>
+      simp [normalSimulationFits, normalSimulationSpace]
+  | cons first rest firstInduction _ =>
+      exact firstInduction _ _
+  | comp first second _ secondInduction =>
+      exact secondInduction _ _
+  | case zeroBranch successorBranch
+      zeroInduction successorInduction =>
+      cases head : values.headI with
+      | zero =>
+          simp [normalSimulationFits, normalSimulationSpace,
+            head, zeroInduction]
+      | succ predecessor =>
+          simp [normalSimulationFits, normalSimulationSpace,
+            head, successorInduction]
+  | fix body induction =>
+      exact induction _ _
+
 /-- Every admissible normal-call budget bounds its initial evaluator
 milestone. -/
 theorem normalSimulationFits_start
@@ -2032,6 +2104,63 @@ def retSimulationFits :
         else
           normalSimulationFits body (.fix body continuation)
             values.tail bound
+
+/-- The least common budget described by `retSimulationFits`. -/
+def retSimulationSpace :
+    ToPartrec.Cont → List Nat → Nat
+  | .halt, values =>
+      encodedListSpace values
+  | .cons₁ rest arguments continuation, values =>
+      max
+        (encodedListSpace values +
+          continuationSpace (.cons₁ rest arguments continuation))
+        (normalSimulationSpace rest (.cons₂ values continuation)
+          arguments)
+  | .cons₂ saved continuation, values =>
+      max
+        (encodedListSpace values +
+          continuationSpace (.cons₂ saved continuation))
+        (retSimulationSpace continuation (saved.headI :: values))
+  | .comp first continuation, values =>
+      max
+        (encodedListSpace values +
+          continuationSpace (.comp first continuation))
+        (normalSimulationSpace first continuation values)
+  | .fix body continuation, values =>
+      max
+        (encodedListSpace values +
+          continuationSpace (.fix body continuation))
+        (if values.headI = 0 then
+          retSimulationSpace continuation values.tail
+        else
+          normalSimulationSpace body (.fix body continuation)
+            values.tail)
+
+/-- The predicate form and numeric form of a continuation-return space
+obligation agree exactly. -/
+theorem retSimulationFits_iff
+    (continuation : ToPartrec.Cont) (values : List Nat)
+    (bound : Nat) :
+    retSimulationFits continuation values bound ↔
+      retSimulationSpace continuation values ≤ bound := by
+  induction continuation generalizing values with
+  | halt =>
+      simp [retSimulationFits, retSimulationSpace]
+  | cons₁ rest arguments continuation induction =>
+      simp [retSimulationFits, retSimulationSpace,
+        normalSimulationFits_iff]
+  | cons₂ saved continuation induction =>
+      simp [retSimulationFits, retSimulationSpace,
+        induction]
+  | comp first continuation induction =>
+      simp [retSimulationFits, retSimulationSpace,
+        normalSimulationFits_iff]
+  | fix body continuation induction =>
+      by_cases zero : values.headI = 0
+      · simp [retSimulationFits, retSimulationSpace,
+          zero, induction]
+      · simp [retSimulationFits, retSimulationSpace,
+          zero, normalSimulationFits_iff]
 
 /-- Every admissible continuation-return budget bounds its initial evaluator
 milestone. -/
@@ -2626,6 +2755,27 @@ def cfgSimulationFits :
   | .ret continuation values, bound =>
       retSimulationFits continuation values bound
 
+/-- The least common budget needed to simulate one high-level evaluator
+configuration. -/
+def cfgSimulationSpace : ToPartrec.Cfg → Nat
+  | .halt values =>
+      encodedListSpace values
+  | .ret continuation values =>
+      retSimulationSpace continuation values
+
+/-- The predicate form and numeric form of a configuration space obligation
+agree exactly. -/
+theorem cfgSimulationFits_iff
+    (configuration : ToPartrec.Cfg) (bound : Nat) :
+    cfgSimulationFits configuration bound ↔
+      cfgSimulationSpace configuration ≤ bound := by
+  cases configuration with
+  | halt values =>
+      simp [cfgSimulationFits, cfgSimulationSpace]
+  | ret continuation values =>
+      simp [cfgSimulationFits, cfgSimulationSpace,
+        retSimulationFits_iff]
+
 /-- A configuration's simulation obligation bounds the corresponding
 high-level milestone space. -/
 theorem cfgSimulationFits_space
@@ -2669,6 +2819,27 @@ structure EvaluatorRunFits
 
 namespace EvaluatorRunFits
 
+/-- Numeric upper bounds for the initial normal call and every reachable
+configuration suffice for a complete evaluator-run certificate. -/
+theorem of_space_le
+    {code : ToPartrec.Code} {values : List Nat} {bound : Nat}
+    (normal :
+      normalSimulationSpace code ToPartrec.Cont.halt values ≤ bound)
+    (configuration :
+      ∀ current,
+        Reaches ToPartrec.step
+            (ToPartrec.stepNormal code ToPartrec.Cont.halt values)
+            current →
+          cfgSimulationSpace current ≤ bound) :
+    EvaluatorRunFits code values bound where
+  normal :=
+    (normalSimulationFits_iff code ToPartrec.Cont.halt
+      values bound).2 normal
+  configuration := by
+    intro current reachable
+    exact (cfgSimulationFits_iff current bound).2
+      (configuration current reachable)
+
 /-- A step-preserved predicate that supplies the local simulation
 obligation is sufficient to certify all reachable evaluator milestones. -/
 theorem of_invariant
@@ -2698,6 +2869,34 @@ theorem of_invariant
     | @tail before after reachable edge induction =>
         apply preserved before after induction
         simpa only [Option.mem_def] using edge
+
+/-- Numeric local bounds plus a step-preserved invariant give a complete
+evaluator-run certificate. -/
+theorem of_space_invariant
+    {code : ToPartrec.Code} {values : List Nat} {bound : Nat}
+    (invariant : ToPartrec.Cfg → Prop)
+    (normal :
+      normalSimulationSpace code ToPartrec.Cont.halt values ≤ bound)
+    (initial :
+      invariant
+        (ToPartrec.stepNormal code ToPartrec.Cont.halt values))
+    (space :
+      ∀ current, invariant current →
+        cfgSimulationSpace current ≤ bound)
+    (preserved :
+      ∀ current next,
+        invariant current →
+        ToPartrec.step current = some next →
+        invariant next) :
+    EvaluatorRunFits code values bound :=
+  of_invariant invariant
+    ((normalSimulationFits_iff code ToPartrec.Cont.halt
+      values bound).2 normal)
+    initial
+    (fun current holds =>
+      (cfgSimulationFits_iff current bound).2
+        (space current holds))
+    preserved
 
 /-- Enlarge the common budget of a complete evaluator-run certificate. -/
 theorem mono
