@@ -42,6 +42,7 @@ import LeanTrominoes.PeriodicCNF
 import LeanTrominoes.PeriodicThreeCNF
 import LeanTrominoes.PeriodicThreeCNFCorrectness
 import LeanTrominoes.PeriodicThreeCNFComputability
+import LeanTrominoes.PeriodicThreeSATThree
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecEncodedListDecode

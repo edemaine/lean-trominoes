@@ -905,6 +905,12 @@ The representation choices for this target are:
   chain is a direct primitive-recursive list traversal.  It proves the entire
   width-three conversion computable and composes it with the Wang encoding to
   establish co-r.e.-hardness of local periodic 3CNF satisfiability.
+- [`LeanTrominoes/PeriodicThreeSATThree.lean`](LeanTrominoes/PeriodicThreeSATThree.lean)
+  begins the paper's cycle reduction to periodic 3SAT-3.  It gives every
+  syntactic literal occurrence its own variable copy, links the copies of
+  each source variable in a directed implication cycle at a common lattice
+  offset, and proves that the resulting clauses remain local and of width at
+  most three.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
