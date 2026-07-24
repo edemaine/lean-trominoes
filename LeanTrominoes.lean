@@ -67,6 +67,7 @@ import LeanTrominoes.PartrecNatEqualitySpace
 import LeanTrominoes.PartrecPackedAssignmentLookup
 import LeanTrominoes.PartrecPackedAssignmentLookupSpace
 import LeanTrominoes.PartrecPackedAssignmentAt
+import LeanTrominoes.PartrecPackedAssignmentAtSpace
 import LeanTrominoes.PartrecPeriodicStripDecode
 import LeanTrominoes.PartrecPeriodicStripDecodeSpace
 import LeanTrominoes.PartrecPolySpace

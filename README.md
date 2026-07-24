@@ -497,6 +497,11 @@ The representation choices for this target are:
   and its successful digit is proved to occur at exactly the canonical
   `assignmentKeys` index
   `column * motif.length + motif.idxOf target`.
+- [`LeanTrominoes/PartrecPackedAssignmentAtSpace.lean`](LeanTrominoes/PartrecPackedAssignmentAtSpace.lean)
+  fits the five-column construction compositionally: numbered-column
+  equality, scan-input assembly, each reuse of the uniform motif loop,
+  retained accumulator fields, all five stages, and the final
+  `[digit, found]` projection.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
