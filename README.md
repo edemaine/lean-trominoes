@@ -388,6 +388,11 @@ The representation choices for this target are:
   machinery.  This supplies a padded graph bound: a generic cycle-padding
   theorem proves that the raw edge predicate's out-of-range rejection makes
   the padded graph cycle-equivalent to the exact sparse-frontier graph.
+- [`LeanTrominoes/PartrecPowerTwoSpace.lean`](LeanTrominoes/PartrecPowerTwoSpace.lean)
+  fits the doubling loop under the invariant that its singleton payload is
+  `2 ^ processed`.  Every intermediate value is bounded by the final power,
+  yielding a linear-space certificate in the binary lengths of the depth and
+  padded graph bound.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
@@ -424,13 +429,14 @@ The representation choices for this target are:
   allowance for explicit arithmetic into one polynomial envelope for the
   evaluator proof.  `stripSearchDepthCode_fits` certifies the complete
   binary-length and affine search-depth call within that shared envelope.
+  `stripStateBoundCode_fits` composes it with the fitted repeated-doubling
+  calculation of the padded graph bound.
   `stripFuelCode_fits` similarly certifies the explicit exact-fuel
   computation within a quadratic reserve.  `StripEvaluatorLeafCallsFit`
-  isolates the four remaining leaf certificates—base relation, raw edge,
-  padded state bound, and well-formedness—as continuation-passing fitted-call
-  obligations.  The state-bound program is explicit; the other three still
-  use correctness-only code selection, keeping semantic correctness distinct
-  from the space certificate required for each code.
+  isolates the three remaining leaf certificates—base relation, raw edge,
+  and well-formedness—as continuation-passing fitted-call obligations.  These
+  still use correctness-only code selection, keeping semantic correctness
+  distinct from the space certificate required for each code.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
