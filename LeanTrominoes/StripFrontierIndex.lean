@@ -123,7 +123,7 @@ def indexCount (periodicStrip : PeriodicStrip) : Nat :=
 theorem indexCount_eq (periodicStrip : PeriodicStrip) :
     indexCount periodicStrip =
       periodicStrip.period *
-        9 ^ (5 * periodicStrip.motif.toFinset.card) := by
+        9 ^ (5 * periodicStrip.motif.length) := by
   simp [indexCount]
 
 /-- Rank a raw frontier by phase, then by its base-nine assignment word. -/

@@ -534,32 +534,35 @@ The representation choices for this target are:
 - [`LeanTrominoes/StripFrontierEncoding.lean`](LeanTrominoes/StripFrontierEncoding.lean)
   gives those input-dependent, function-valued states a uniform raw
   representation: a natural phase and a list over the nine assignment
-  symbols.  Five columns of the computably deduplicated motif determine a
-  canonical word of length `5 × distinct motif cells`.  Encoding produces a
-  valid raw state, decoding recovers the original semantic state exactly,
-  and the verified fixed-length word generator contains an encoding of every
-  semantic frontier state.  This is the storage format for the forthcoming
+  symbols.  Five columns of the input motif traversal determine a canonical
+  word of length `5 × motif length`; repeated motif cells create harmless
+  redundant coordinates whose first copy determines the semantic assignment.
+  Encoding produces a valid raw state, decoding recovers the original
+  semantic state exactly, and the verified fixed-length word generator
+  contains an encoding of every semantic frontier state.  Avoiding an
+  explicit deduplication pass makes this the streaming storage format for the
   space-bounded strip evaluator.
 - [`LeanTrominoes/StripFrontierIndex.lean`](LeanTrominoes/StripFrontierIndex.lean)
   ranks a raw frontier arithmetically: its assignment word is a base-nine
   number and its phase is the residue modulo the strip period.  The resulting
   indices range below exactly
-  `period × 9^(5 × distinct motif cells)`.  Ranking and on-demand decoding
-  are proved inverse on every valid raw state, and every bounded index decodes
-  to a valid state when the period is positive.  Thus later midpoint searches
-  can loop over natural indices without materializing the exponential state
-  list.
+  `period × 9^(5 × motif length)`.  Ranking and on-demand decoding are proved
+  inverse on every valid raw state, and every bounded index decodes to a valid
+  state when the period is positive.  This raw range may contain multiple
+  representatives of one semantic state, but it still surjects onto the
+  semantic frontier graph.  Thus later midpoint searches can loop over
+  natural indices without materializing the exponential state list.
 - [`LeanTrominoes/StripFrontierIndexComputability.lean`](LeanTrominoes/StripFrontierIndexComputability.lean)
   begins the compiler-facing proof for that representation.  The decoder is
   expressed as a map over the polynomial word length, with each digit read as
   `(code / 9^position) % 9`; digit lookup, exponentiation, and the complete
   assignment-word decoder are all proved primitive recursive.  Computable
-  motif deduplication, the canonical five-column key list, and the exact
-  arithmetic state count are now primitive recursive as well.  Raw-state
-  phase and assignment projections and lookup of a raw assignment at a
-  window cell are primitive recursive too, as is on-demand decoding of a
-  complete state index; semantic decoding is factored through one verified
-  conversion from valid raw states to `WindowState`.
+  motif traversal, the canonical five-column key list, and the exact
+  arithmetic raw-index count are now primitive recursive as well.  Raw-state
+  phase and assignment projections and lookup of a raw assignment at a window
+  cell are primitive recursive too, as is on-demand decoding of a complete
+  state index; semantic decoding is factored through one verified conversion
+  from valid raw states to `WindowState`.
 - [`LeanTrominoes/StripFrontierRawTransition.lean`](LeanTrominoes/StripFrontierRawTransition.lean)
   gives normalization, center-column exact-cover, and four-column overlap
   checks directly on uniform raw states, using only explicit finite lists and
@@ -597,7 +600,7 @@ The representation choices for this target are:
   polynomial bounding every reachability configuration, both abstractly and
   in the evaluator backend's actual delimited-`List Nat` tape format.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
-  computes the exact frontier-state count as
+  computes the exact semantic frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
   at most `⌈log₂ period⌉ + 20 × distinct motif cells + 1`, the quantitative
   sparse bound needed for polynomial space.

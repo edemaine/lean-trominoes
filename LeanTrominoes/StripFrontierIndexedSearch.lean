@@ -139,10 +139,16 @@ theorem indexed_hasCycle_iff_hasCycle (tromino : Tromino)
       periodPositive _ _).mpr
     simpa using step index
 
-theorem indexCount_eq_windowState_card (periodicStrip : PeriodicStrip) :
-    indexCount periodicStrip =
-      Fintype.card (WindowState periodicStrip) := by
+theorem windowState_card_le_indexCount
+    (periodicStrip : PeriodicStrip) :
+    Fintype.card (WindowState periodicStrip) ≤
+      indexCount periodicStrip := by
   rw [indexCount_eq, WindowState.windowState_card]
+  apply Nat.mul_le_mul_left
+  apply Nat.pow_le_pow_right
+  · omega
+  exact Nat.mul_le_mul_left 5
+    periodicStrip.motif.toFinset_card_le
 
 /-- A primitive-recursion-friendly sufficient Savitch depth, linear in the
 actual binary input encoding length. -/
@@ -158,11 +164,33 @@ def stripStateBound (periodicStrip : PeriodicStrip) : Nat :=
 theorem indexCount_le_pow_stripSearchDepth
     (periodicStrip : PeriodicStrip) :
     indexCount periodicStrip ≤ 2 ^ stripSearchDepth periodicStrip := by
-  rw [indexCount_eq_windowState_card]
-  exact (FiniteState.card_le_pow_savitchDepth
-    (WindowState periodicStrip)).trans
-      (Nat.pow_le_pow_right (by omega)
-        (WindowState.savitchDepth_le_encoding_length periodicStrip))
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  rw [indexCount_eq]
+  calc
+    periodicStrip.period *
+          9 ^ (5 * periodicStrip.motif.length) ≤
+        2 ^ Nat.clog 2 periodicStrip.period *
+          (2 ^ 4) ^ (5 * periodicStrip.motif.length) :=
+      Nat.mul_le_mul
+        (Nat.le_pow_clog Nat.one_lt_two periodicStrip.period)
+        (Nat.pow_le_pow_left (by omega) _)
+    _ = 2 ^ (Nat.clog 2 periodicStrip.period +
+        20 * periodicStrip.motif.length) := by
+      rw [← pow_mul, ← pow_add]
+      congr 2
+      omega
+    _ ≤ 2 ^ (21 * inputLength + 1) := by
+      apply Nat.pow_le_pow_right (by omega)
+      have periodBound :=
+        PeriodicStrip.clog_period_le_encoding_length periodicStrip
+      have motifBound :=
+        PeriodicStrip.motif_length_le_encoding_length periodicStrip
+      dsimp only [inputLength] at periodBound motifBound ⊢
+      omega
+    _ = 2 ^ stripSearchDepth periodicStrip := by
+      simp [stripSearchDepth, inputLength]
 
 theorem indexCount_le_stripStateBound
     (periodicStrip : PeriodicStrip) :

@@ -8,13 +8,16 @@ import LeanTrominoes.StripFrontier
 strip frontier, but its type depends on the input strip and its assignment is
 a function.  This file gives the same data a uniform, list-based
 representation.  The five window columns are ordered first, and within each
-column the cells are ordered by the computable list
-`periodicStrip.motif.dedup`.
+column the cells follow the input motif order.  Repeated motif cells therefore
+create redundant raw coordinates; `assignmentAtCell` consistently reads the
+first copy.
 
 The raw representation is what a space-bounded evaluator can store and
 generate on demand.  In particular, its assignment word has exactly
-`5 * periodicStrip.motif.toFinset.card` symbols over the existing nine-symbol
-assignment alphabet.
+`5 * periodicStrip.motif.length` symbols over the existing nine-symbol
+assignment alphabet.  Avoiding a deduplication pass is useful to the
+space-bounded evaluator, while the semantic projection still collapses
+repeated cells to one motif-cell assignment.
 -/
 
 namespace LeanTrominoes
@@ -39,16 +42,15 @@ def equivData :
 noncomputable instance : Primcodable RawWindowState :=
   Primcodable.ofEquiv (Nat × List (Option SquareSymmetry)) equivData
 
-/-- The canonical list of distinct motif cells. -/
+/-- The motif traversal used by the raw encoding. -/
 def motifCells (periodicStrip : PeriodicStrip) : List Cell :=
-  periodicStrip.motif.dedup
+  periodicStrip.motif
 
 @[simp]
 theorem length_motifCells (periodicStrip : PeriodicStrip) :
     (motifCells periodicStrip).length =
-      periodicStrip.motif.toFinset.card := by
-  simpa [motifCells] using
-    (List.card_toFinset periodicStrip.motif).symm
+      periodicStrip.motif.length := by
+  rfl
 
 @[simp]
 theorem mem_motifCells (periodicStrip : PeriodicStrip) (cell : Cell) :
@@ -56,7 +58,7 @@ theorem mem_motifCells (periodicStrip : PeriodicStrip) (cell : Cell) :
       cell ∈ periodicStrip.motif.toFinset := by
   simp [motifCells]
 
-/-- Canonical order of the five copies of the distinct motif cells. -/
+/-- Canonical order of the five copies of the input motif traversal. -/
 def assignmentKeys (periodicStrip : PeriodicStrip) :
     List (WindowColumn × Cell) :=
   (List.finRange 5).flatMap fun column =>
@@ -65,7 +67,7 @@ def assignmentKeys (periodicStrip : PeriodicStrip) :
 @[simp]
 theorem length_assignmentKeys (periodicStrip : PeriodicStrip) :
     (assignmentKeys periodicStrip).length =
-      5 * periodicStrip.motif.toFinset.card := by
+      5 * periodicStrip.motif.length := by
   simp [assignmentKeys]
   omega
 

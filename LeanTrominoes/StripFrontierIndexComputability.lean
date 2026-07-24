@@ -30,54 +30,8 @@ theorem rawWindowState_assignment_primrec :
   exact (Primrec.snd.comp rawWindowState_equivData_primrec).of_eq
     (fun _ => rfl)
 
-private def cellDedup : List Cell → List Cell
-  | [] => []
-  | head :: tail =>
-      let dedupTail := cellDedup tail
-      if head ∈ dedupTail then dedupTail else head :: dedupTail
-
-private theorem cellDedup_eq_dedup (cells : List Cell) :
-    cellDedup cells = cells.dedup := by
-  induction cells with
-  | nil => rfl
-  | cons head tail induction =>
-      simp [cellDedup, induction, List.dedup_cons']
-
-private theorem cellDedup_primrec : Primrec cellDedup := by
-  have listMembership : PrimrecRel fun (cells : List Cell) (cell : Cell) =>
-      cell ∈ cells := by
-    exact (Primrec.eq (α := Cell)).exists_mem_list.of_eq
-      (fun _ _ => by simp)
-  have step : Primrec₂ fun (_cells : List Cell)
-      (data : Cell × List Cell × List Cell) =>
-      if data.1 ∈ data.2.2 then data.2.2
-      else data.1 :: data.2.2 := by
-    change Primrec fun
-      input : List Cell × (Cell × List Cell × List Cell) =>
-        if input.2.1 ∈ input.2.2.2 then input.2.2.2
-        else input.2.1 :: input.2.2.2
-    exact Primrec.ite
-      (listMembership.comp
-        (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))
-        (Primrec.fst.comp Primrec.snd))
-      (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))
-      (Primrec.list_cons.comp
-        (Primrec.fst.comp Primrec.snd)
-        (Primrec.snd.comp (Primrec.snd.comp Primrec.snd)))
-  exact (Primrec.list_rec Primrec.id (Primrec.const []) step).of_eq
-    (fun cells => by
-      induction cells with
-      | nil => rfl
-      | cons head tail induction =>
-          exact congrArg
-            (fun result =>
-              if head ∈ result then result else head :: result)
-            induction)
-
 theorem motifCells_primrec : Primrec motifCells := by
-  exact (cellDedup_primrec.comp periodicStrip_motif_primrec).of_eq
-    (fun periodicStrip => by
-      simp [motifCells, cellDedup_eq_dedup])
+  exact periodicStrip_motif_primrec
 
 theorem assignmentKeys_primrec : Primrec assignmentKeys := by
   have cellsForColumn : Primrec₂ fun
