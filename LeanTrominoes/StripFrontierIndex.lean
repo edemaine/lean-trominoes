@@ -58,10 +58,17 @@ theorem map_assignmentOfDigit_map_assignmentDigit
 def encodeAssignment (assignment : List (Option SquareSymmetry)) : Nat :=
   Nat.ofDigits 9 (assignment.map assignmentDigit)
 
-/-- Decode a base-nine number, padded with trailing zero digits to `length`. -/
+/-- Read one base-nine digit at a little-endian position. -/
+def assignmentDigitAt (code position : Nat) : Nat :=
+  code / 9 ^ position % 9
+
+/-- Decode exactly `length` little-endian base-nine digits.  This explicit
+`List.range` presentation is convenient for primitive-recursion proofs and
+allocates only the one polynomial-length frontier word. -/
 def decodeAssignment (length code : Nat) :
     List (Option SquareSymmetry) :=
-  (Nat.digitsAppend 9 length code).map assignmentOfDigit
+  (List.range length).map fun position =>
+    assignmentOfDigit (assignmentDigitAt code position)
 
 theorem encodeAssignment_lt (assignment : List (Option SquareSymmetry)) :
     encodeAssignment assignment < 9 ^ assignment.length := by
@@ -80,31 +87,33 @@ theorem decodeAssignment_encodeAssignment
     decodeAssignment assignment.length (encodeAssignment assignment) =
       assignment := by
   let digits := assignment.map assignmentDigit
-  have digitData :
-      digits.length = assignment.length ∧
-        ∀ digit ∈ digits, digit < 9 := by
-    constructor
-    · simp [digits]
-    · intro digit digitMem
-      obtain ⟨state, _, rfl⟩ := List.mem_map.mp digitMem
-      exact assignmentDigit_lt state
-  have digitRoundTrip :
-      Nat.digitsAppend 9 assignment.length
-          (Nat.ofDigits 9 digits) = digits :=
-    (Nat.setInvOn_digitsAppend_ofDigits
-      (b := 9) (by omega) assignment.length).1 digitData
-  unfold decodeAssignment encodeAssignment
-  change
-    (Nat.digitsAppend 9 assignment.length
-      (Nat.ofDigits 9 digits)).map assignmentOfDigit = assignment
-  rw [digitRoundTrip]
-  exact map_assignmentOfDigit_map_assignmentDigit assignment
+  have digitBound : ∀ digit ∈ digits, digit < 9 := by
+    intro digit digitMem
+    obtain ⟨state, _, rfl⟩ := List.mem_map.mp digitMem
+    exact assignmentDigit_lt state
+  apply List.ext_get
+  · simp [decodeAssignment]
+  · intro position leftBound rightBound
+    simp [decodeAssignment]
+    change assignmentOfDigit
+      (Nat.ofDigits 9 digits / 9 ^ position % 9) =
+        assignment[position]
+    rw [Nat.ofDigits_div_pow_eq_ofDigits_drop
+      position (by omega) digits digitBound]
+    rw [Nat.ofDigits_mod_eq_head!]
+    have headEq :
+        (digits.drop position).head! =
+          assignmentDigit assignment[position] := by
+      simp [List.head!_eq_head?_getD, List.head?_eq_getElem?,
+        digits, rightBound]
+    rw [headEq, Nat.mod_eq_of_lt
+      (assignmentDigit_lt assignment[position])]
+    exact assignmentOfDigit_assignmentDigit assignment[position]
 
-theorem length_decodeAssignment {length code : Nat}
-    (codeBound : code < 9 ^ length) :
+@[simp]
+theorem length_decodeAssignment (length code : Nat) :
     (decodeAssignment length code).length = length := by
-  simp [decodeAssignment,
-    Nat.length_digitsAppend (b := 9) (by omega) length codeBound]
+  simp [decodeAssignment]
 
 /-- Number of arithmetic indices for a strip's sparse frontier states. -/
 def indexCount (periodicStrip : PeriodicStrip) : Nat :=
@@ -165,13 +174,11 @@ def ofIndex (periodicStrip : PeriodicStrip) (stateIndex : Nat) :
 
 theorem ofIndex_isValid {periodicStrip : PeriodicStrip}
     (periodPositive : 0 < periodicStrip.period) {stateIndex : Nat}
-    (indexBound : stateIndex < indexCount periodicStrip) :
+    (_indexBound : stateIndex < indexCount periodicStrip) :
     (ofIndex periodicStrip stateIndex).IsValid periodicStrip := by
   constructor
   · exact Nat.mod_lt _ periodPositive
-  · apply length_decodeAssignment
-    apply (Nat.div_lt_iff_lt_mul periodPositive).mpr
-    simpa [indexCount, Nat.mul_comm] using indexBound
+  · exact length_decodeAssignment _ _
 
 @[simp]
 theorem ofIndex_index {periodicStrip : PeriodicStrip}

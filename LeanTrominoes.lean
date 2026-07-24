@@ -36,6 +36,7 @@ import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
 import LeanTrominoes.StripFrontierEncoding
 import LeanTrominoes.StripFrontierIndex
+import LeanTrominoes.StripFrontierIndexComputability
 import LeanTrominoes.StripFrontierIndexedSearch
 import LeanTrominoes.StripFrontierReconstruction
 import LeanTrominoes.StripFrontierSpace

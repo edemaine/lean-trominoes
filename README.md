@@ -252,6 +252,11 @@ The representation choices for this target are:
   to a valid state when the period is positive.  Thus later midpoint searches
   can loop over natural indices without materializing the exponential state
   list.
+- [`LeanTrominoes/StripFrontierIndexComputability.lean`](LeanTrominoes/StripFrontierIndexComputability.lean)
+  begins the compiler-facing proof for that representation.  The decoder is
+  expressed as a map over the polynomial word length, with each digit read as
+  `(code / 9^position) % 9`; digit lookup, exponentiation, and the complete
+  assignment-word decoder are all proved primitive recursive.
 - [`LeanTrominoes/StripFrontierIndexedSearch.lean`](LeanTrominoes/StripFrontierIndexedSearch.lean)
   instantiates arithmetic Savitch search with the tromino frontier relation.
   Each bounded index is decoded to one semantic state only when its transition
