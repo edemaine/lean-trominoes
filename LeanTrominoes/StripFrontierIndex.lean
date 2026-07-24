@@ -124,6 +124,25 @@ theorem decodeAssignmentStream_eq_decodeAssignment
       length code position positionBound]
     simp [decodeAssignment]
 
+theorem getD_decodeAssignment
+    (length code position : Nat) :
+    (decodeAssignment length code).getD position none =
+      if position < length then
+        assignmentOfDigit (assignmentDigitAt code position)
+      else
+        none := by
+  by_cases positionBound : position < length
+  · have decodedBound :
+        position < (decodeAssignment length code).length := by
+      simpa [decodeAssignment] using positionBound
+    rw [if_pos positionBound,
+      List.getD_eq_getElem _ _ decodedBound]
+    simp [decodeAssignment]
+  · rw [if_neg positionBound]
+    apply List.getD_eq_default
+    simp [decodeAssignment]
+    omega
+
 theorem encodeAssignment_lt (assignment : List (Option SquareSymmetry)) :
     encodeAssignment assignment < 9 ^ assignment.length := by
   unfold encodeAssignment

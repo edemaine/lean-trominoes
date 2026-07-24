@@ -90,6 +90,7 @@ import LeanTrominoes.StripFrontierIndexedSearchComputability
 import LeanTrominoes.StripFrontierIndexedSearchSpace
 import LeanTrominoes.StripFrontierPartrec
 import LeanTrominoes.StripFrontierPartrecSpace
+import LeanTrominoes.StripFrontierPacked
 import LeanTrominoes.StripFrontierReconstruction
 import LeanTrominoes.StripFrontierRawTransition
 import LeanTrominoes.StripFrontierRawTransitionComputability

@@ -590,6 +590,13 @@ The representation choices for this target are:
   checks directly on uniform raw states, using only explicit finite lists and
   Boolean tests.  On valid raw states, the combined raw transition is proved
   equivalent to the original semantic `WindowState.Transition`.
+- [`LeanTrominoes/StripFrontierPacked.lean`](LeanTrominoes/StripFrontierPacked.lean)
+  replaces each decoded assignment list by one base-nine natural while
+  preserving the same phase, first-occurrence lookup for repeated motif
+  cells, normalization, center validity, overlap, and complete transition
+  Boolean.  Decoding a packed state is proved equal to the existing raw state
+  obtained from an arithmetic index, so the indexed edge predicate can now be
+  implemented against fixed-width packed data without changing its meaning.
 - [`LeanTrominoes/StripFrontierRawTransitionComputability.lean`](LeanTrominoes/StripFrontierRawTransitionComputability.lean)
   proves primitive recursiveness of every layer of that executable
   transition: modular phases, raw and local lookups, active candidates,
