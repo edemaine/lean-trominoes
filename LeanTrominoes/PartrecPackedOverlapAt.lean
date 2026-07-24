@@ -219,4 +219,22 @@ theorem packedOverlapAtCode_eval_semantic
     rw [if_neg digits, tag]
     rfl
 
+theorem packedOverlapAtResult_eq_semantic
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState)
+    (column : Fin 4) (base : Cell) :
+    (if
+        (packedAssignmentLookupOutcome periodicStrip.motif
+            column.succ.val base current.assignmentWord).2.1 =
+          (packedAssignmentLookupOutcome periodicStrip.motif
+            column.castSucc.val base next.assignmentWord).2.1
+      then 1 else 0) =
+      (current.overlapsAtBool periodicStrip next column base).toNat := by
+  have semantic :=
+    packedOverlapAtCode_eval_semantic
+      periodicStrip current next column base
+  rw [packedOverlapAtCode_eval] at semantic
+  have lists := Part.some_inj.mp semantic
+  simpa using lists
+
 end Turing.ToPartrec.Code

@@ -565,6 +565,10 @@ The representation choices for this target are:
   Its closed loop is proved equal to
   `PackedWindowState.overlapsColumnBool`; four explicitly assembled copies
   then compute exactly the shared-column conjunction over `List.finRange 4`.
+  [`LeanTrominoes/PartrecPackedOverlapLoopSpace.lean`](LeanTrominoes/PartrecPackedOverlapLoopSpace.lean)
+  fits every component of one suffix step and the surrounding countdown
+  body, with an explicit input-linear envelope for all reachable field
+  values; the closed-loop uniformization remains to be assembled.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
