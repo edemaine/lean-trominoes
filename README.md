@@ -256,7 +256,9 @@ The representation choices for this target are:
   begins the compiler-facing proof for that representation.  The decoder is
   expressed as a map over the polynomial word length, with each digit read as
   `(code / 9^position) % 9`; digit lookup, exponentiation, and the complete
-  assignment-word decoder are all proved primitive recursive.
+  assignment-word decoder are all proved primitive recursive.  Computable
+  motif deduplication, the canonical five-column key list, and the exact
+  arithmetic state count are now primitive recursive as well.
 - [`LeanTrominoes/StripFrontierIndexedSearch.lean`](LeanTrominoes/StripFrontierIndexedSearch.lean)
   instantiates arithmetic Savitch search with the tromino frontier relation.
   Each bounded index is decoded to one semantic state only when its transition

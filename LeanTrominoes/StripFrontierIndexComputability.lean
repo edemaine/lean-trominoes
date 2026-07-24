@@ -16,6 +16,66 @@ namespace RawWindowState
 
 open LeanTrominoes.Computability
 
+private def cellDedup : List Cell → List Cell
+  | [] => []
+  | head :: tail =>
+      let dedupTail := cellDedup tail
+      if head ∈ dedupTail then dedupTail else head :: dedupTail
+
+private theorem cellDedup_eq_dedup (cells : List Cell) :
+    cellDedup cells = cells.dedup := by
+  induction cells with
+  | nil => rfl
+  | cons head tail induction =>
+      simp [cellDedup, induction, List.dedup_cons']
+
+private theorem cellDedup_primrec : Primrec cellDedup := by
+  have listMembership : PrimrecRel fun (cells : List Cell) (cell : Cell) =>
+      cell ∈ cells := by
+    exact (Primrec.eq (α := Cell)).exists_mem_list.of_eq
+      (fun _ _ => by simp)
+  have step : Primrec₂ fun (_cells : List Cell)
+      (data : Cell × List Cell × List Cell) =>
+      if data.1 ∈ data.2.2 then data.2.2
+      else data.1 :: data.2.2 := by
+    change Primrec fun
+      input : List Cell × (Cell × List Cell × List Cell) =>
+        if input.2.1 ∈ input.2.2.2 then input.2.2.2
+        else input.2.1 :: input.2.2.2
+    exact Primrec.ite
+      (listMembership.comp
+        (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))
+        (Primrec.fst.comp Primrec.snd))
+      (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))
+      (Primrec.list_cons.comp
+        (Primrec.fst.comp Primrec.snd)
+        (Primrec.snd.comp (Primrec.snd.comp Primrec.snd)))
+  exact (Primrec.list_rec Primrec.id (Primrec.const []) step).of_eq
+    (fun cells => by
+      induction cells with
+      | nil => rfl
+      | cons head tail induction =>
+          exact congrArg
+            (fun result =>
+              if head ∈ result then result else head :: result)
+            induction)
+
+theorem motifCells_primrec : Primrec motifCells := by
+  exact (cellDedup_primrec.comp periodicStrip_motif_primrec).of_eq
+    (fun periodicStrip => by
+      simp [motifCells, cellDedup_eq_dedup])
+
+theorem assignmentKeys_primrec : Primrec assignmentKeys := by
+  have cellsForColumn : Primrec₂ fun
+      (periodicStrip : PeriodicStrip) (column : WindowColumn) =>
+      (motifCells periodicStrip).map fun cell => (column, cell) := by
+    exact Primrec.list_map
+      (motifCells_primrec.comp Primrec.fst)
+      (Primrec₂.pair.comp₂
+        (Primrec.snd.comp₂ Primrec₂.left) Primrec₂.right)
+  exact Primrec.list_flatMap
+    (Primrec.const (List.finRange 5)) cellsForColumn
+
 theorem assignmentDigit_primrec : Primrec assignmentDigit :=
   Primrec.dom_finite assignmentDigit
 
@@ -44,6 +104,13 @@ theorem decodeAssignment_primrec : Primrec₂ decodeAssignment := by
       (assignmentDigitAt_primrec.comp₂
         (Primrec.snd.comp₂ Primrec₂.left)
         Primrec₂.right))
+
+theorem indexCount_primrec : Primrec indexCount := by
+  unfold indexCount
+  exact Primrec.nat_mul.comp periodicStrip_period_primrec
+    (nat_pow_primrec.comp
+      (Primrec.const (9 : Nat))
+      (Primrec.list_length.comp assignmentKeys_primrec))
 
 end RawWindowState
 end PeriodicStrip
