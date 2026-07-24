@@ -38,6 +38,7 @@ import LeanTrominoes.IndexedSavitchDFSListEncoding
 import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator
+import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness

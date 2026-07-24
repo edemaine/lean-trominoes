@@ -269,6 +269,12 @@ The representation choices for this target are:
   tape-size formulas for encoded natural lists, retained continuation data,
   initial and halting configurations, and every high-level evaluator
   milestone related by Mathlib's transcription invariant.
+- [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
+  supplies the evaluator-level countdown loop used by the direct machine
+  program.  A state `remaining :: payload` is updated through `Code.fix`;
+  correctness for any total payload-step code is proved by induction.  The
+  recursive call is in tail position, so exponential iteration does not
+  accumulate an exponential continuation stack.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
