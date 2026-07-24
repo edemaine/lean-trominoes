@@ -324,5 +324,111 @@ theorem EvaluatorCallFits.flatIterate_of_code_fits_invariant
               bodyBudget (remaining + 1) payload initial)
           fixedAfter
 
+/-- Reachable-state variant of
+`flatIterate_of_code_fits_invariant`.  Both the body certificate and its
+budget need only be supplied for states satisfying the invariant. -/
+theorem EvaluatorCallFits.flatIterate_of_reachable_code_fits
+    {stepCode : ToPartrec.Code}
+    {step : List Nat → List Nat}
+    {continuation : ToPartrec.Cont}
+    {bound steps : Nat} {payload : List Nat}
+    {bodyCost : Nat → List Nat → Nat}
+    {invariant : Nat → List Nat → Prop}
+    (bodyFits :
+      ∀ remaining values,
+        invariant remaining values →
+          EvaluatorCodeFits
+            (ToPartrec.Code.flatCountdownBody stepCode)
+            (remaining :: values)
+            (flatCountdownOutput step remaining values)
+            (bodyCost remaining values))
+    (initial : invariant steps payload)
+    (preserved :
+      ∀ remaining values,
+        invariant (remaining + 1) values →
+          invariant remaining (step values))
+    (bodyBudget :
+      ∀ remaining values,
+        invariant remaining values →
+          bodyCost remaining values +
+              continuationSpace continuation ≤
+            bound)
+    (after :
+      EvaluatorExecutionFits bound
+        (.ret continuation ((step^[steps]) payload))) :
+    EvaluatorCallFits
+      (ToPartrec.Code.flatIterate stepCode)
+      continuation (steps :: payload) bound := by
+  rw [ToPartrec.Code.flatIterate]
+  apply EvaluatorCallFits.fix
+  induction steps generalizing payload with
+  | zero =>
+      have oneBody := bodyFits 0 payload initial
+      have fixedAfter :
+          EvaluatorExecutionFits bound
+            (.ret
+              (.fix
+                (ToPartrec.Code.flatCountdownBody stepCode)
+                continuation)
+              (flatCountdownOutput step 0 payload)) := by
+        apply EvaluatorExecutionFits.ret_fix_zero
+        · rfl
+        · simp only [continuationSpace_fix]
+          have outputSpace := oneBody.output_space
+          have budget := bodyBudget 0 payload initial
+          omega
+        · simpa [flatCountdownOutput] using after
+      exact
+        oneBody.call
+          (.fix
+            (ToPartrec.Code.flatCountdownBody stepCode)
+            continuation)
+          bound
+          (by
+            simp only [continuationSpace_fix]
+            exact bodyBudget 0 payload initial)
+          fixedAfter
+  | succ remaining induction =>
+      have nextInvariant :
+          invariant remaining (step payload) :=
+        preserved remaining payload initial
+      have recursiveAfter :
+          EvaluatorExecutionFits bound
+            (.ret continuation
+              ((step^[remaining]) (step payload))) := by
+        simpa [Function.iterate_succ_apply] using after
+      have recursiveBody :=
+        induction (payload := step payload)
+          nextInvariant recursiveAfter
+      have oneBody :=
+        bodyFits (remaining + 1) payload initial
+      have fixedAfter :
+          EvaluatorExecutionFits bound
+            (.ret
+              (.fix
+                (ToPartrec.Code.flatCountdownBody stepCode)
+                continuation)
+              (flatCountdownOutput step (remaining + 1)
+                payload)) := by
+        apply EvaluatorExecutionFits.ret_fix_succ
+        · simp [flatCountdownOutput]
+        · simp only [continuationSpace_fix]
+          have outputSpace := oneBody.output_space
+          have budget :=
+            bodyBudget (remaining + 1) payload initial
+          omega
+        · simpa [flatCountdownOutput] using recursiveBody
+      exact
+        oneBody.call
+          (.fix
+            (ToPartrec.Code.flatCountdownBody stepCode)
+            continuation)
+          bound
+          (by
+            simp only [continuationSpace_fix]
+            exact
+              bodyBudget (remaining + 1) payload initial)
+          fixedAfter
+
 end PartrecToTM2
 end Turing

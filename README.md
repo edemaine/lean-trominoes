@@ -462,6 +462,12 @@ The representation choices for this target are:
   bit, and the two dimensions; the original motif code safely bounds the
   countdown.  Composed with the explicit strip-header decoder, the resulting
   unary program is proved exactly equal to `PeriodicStrip.wellFormed`.
+- [`LeanTrominoes/PartrecStripWellFormedSpace.lean`](LeanTrominoes/PartrecStripWellFormedSpace.lean)
+  fits every reachable motif-step component, including encoded-list view,
+  cell bounds, validity accumulation, and preservation of dimensions.
+  `PartrecFlatIterationSpace` now also offers a reachable-state loop rule, so
+  the forthcoming uniform loop bound need not certify impossible malformed
+  payloads.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,

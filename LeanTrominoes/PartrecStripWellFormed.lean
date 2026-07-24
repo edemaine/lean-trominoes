@@ -287,6 +287,70 @@ theorem stripMotifStepCode_eval_cons
         width period valid cell remaining)
       (by simp)
 
+/-- Total native-list semantics used by the reachable-state space rule.
+Only encoded motif states are reachable in the fitted loop. -/
+def decodeCellList (number : Nat) : Option (List Cell) :=
+  Encodable.decode number
+
+@[simp]
+theorem decodeCellList_encode (motif : List Cell) :
+    decodeCellList (Encodable.encode motif) = some motif := by
+  exact Encodable.encodek motif
+
+@[simp]
+theorem decodeCellList_zero :
+    decodeCellList 0 = some [] := by
+  exact decodeCellList_encode []
+
+@[simp]
+theorem decodeCellList_cons
+    (cell : Cell) (remaining : List Cell) :
+    decodeCellList
+        (Nat.succ
+          (Nat.pair (Encodable.encode cell)
+            (Encodable.encode remaining))) =
+      some (cell :: remaining) := by
+  exact decodeCellList_encode (cell :: remaining)
+
+def stripMotifNativeStep (values : List Nat) : List Nat :=
+  match decodeCellList values.headI with
+  | none => values
+  | some [] => values
+  | some (cell :: remaining) =>
+      [Encodable.encode remaining,
+        if values[1]?.getD 0 = 0 ∨
+            ¬cell.InStripBounds
+              (values[2]?.getD 0)
+              (values[3]?.getD 0)
+          then 0 else 1,
+        values[2]?.getD 0,
+        values[3]?.getD 0]
+
+@[simp]
+theorem stripMotifNativeStep_state_nil
+    (width period : Nat) (valid : Bool) :
+    stripMotifNativeStep
+        (stripMotifState width period valid []) =
+      stripMotifState width period valid [] := by
+  simp [stripMotifNativeStep, stripMotifState]
+
+@[simp]
+theorem stripMotifNativeStep_state_cons
+    (width period : Nat) (valid : Bool)
+    (cell : Cell) (remaining : List Cell) :
+    stripMotifNativeStep
+        (stripMotifState width period valid
+          (cell :: remaining)) =
+      stripMotifState width period
+        (valid &&
+          decide (cell.InStripBounds width period))
+        remaining := by
+  cases valid <;>
+    by_cases inBounds :
+      cell.InStripBounds width period <;>
+    simp [stripMotifNativeStep, stripMotifState,
+      inBounds]
+
 /-- Typed semantics of exactly `steps` motif iterations. -/
 def stripMotifProcess
     (width period : Nat) :
@@ -300,6 +364,31 @@ def stripMotifProcess
         (valid &&
           decide (cell.InStripBounds width period))
         remaining
+
+theorem stripMotifNativeStep_iterate
+    (width period steps : Nat) (valid : Bool)
+    (motif : List Cell) :
+    ((stripMotifNativeStep)^[steps])
+        (stripMotifState width period valid motif) =
+      stripMotifProcess width period steps valid motif := by
+  induction steps generalizing valid motif with
+  | zero =>
+      rfl
+  | succ steps induction =>
+      rw [Function.iterate_succ_apply]
+      cases motif with
+      | nil =>
+          rw [stripMotifNativeStep_state_nil]
+          simpa [stripMotifProcess] using
+            induction valid []
+      | cons cell remaining =>
+          rw [stripMotifNativeStep_state_cons]
+          simpa [stripMotifProcess] using
+            induction
+              (valid &&
+                decide
+                  (cell.InStripBounds width period))
+              remaining
 
 theorem stripMotifFlatIterateCode_eval
     (width period steps : Nat) (valid : Bool)
