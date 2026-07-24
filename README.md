@@ -502,6 +502,13 @@ The representation choices for this target are:
   equality, scan-input assembly, each reuse of the uniform motif loop,
   retained accumulator fields, all five stages, and the final
   `[digit, found]` projection.
+- [`LeanTrominoes/PartrecPackedAssignmentPredicates.lean`](LeanTrominoes/PartrecPackedAssignmentPredicates.lean)
+  and
+  [`LeanTrominoes/PartrecPackedAssignmentPredicatesSpace.lean`](LeanTrominoes/PartrecPackedAssignmentPredicatesSpace.lean)
+  turn that lookup into the first semantic packed-frontier predicate:
+  digit zero is proved equivalent to an absent assignment, and the resulting
+  `none` test is fitted by composing the lookup, one projection, and one
+  zero test.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

@@ -1,4 +1,5 @@
 import LeanTrominoes.PartrecPackedAssignmentLookup
+import LeanTrominoes.StripFrontierPacked
 
 /-!
 # Five-column packed frontier lookup
@@ -542,5 +543,60 @@ theorem packedAssignmentLookupCode_eval_assignmentKeys
     periodicStrip.motif target word column member]
   rw [assignmentKeys_idxOf_eq periodicStrip column target member]
   rfl
+
+@[simp]
+theorem assignmentOfDigit_zero :
+    assignmentOfDigit 0 = none := by
+  simp [assignmentOfDigit,
+    TrominoAssignment.assignmentStateList]
+
+/-- The five-column arithmetic lookup decodes to the semantic packed
+assignment, including the absent-cell default. -/
+theorem assignmentOfDigit_packedAssignmentLookupOutcome
+    (periodicStrip : PeriodicStrip)
+    (packed : PeriodicStrip.PackedWindowState)
+    (column : WindowColumn) (target : Cell) :
+    assignmentOfDigit
+        (packedAssignmentLookupOutcome periodicStrip.motif
+          column.val target packed.assignmentWord).2.1 =
+      packed.assignmentAtCell periodicStrip column target := by
+  letI : BEq (WindowColumn × Cell) := instBEqOfDecidableEq
+  by_cases member : target ∈ periodicStrip.motif
+  · have keyMember :
+        (column, target) ∈ assignmentKeys periodicStrip := by
+      simp [assignmentKeys, motifCells, member]
+    have positionBound :
+        @List.idxOf (WindowColumn × Cell) instBEqOfDecidableEq
+            (column, target) (assignmentKeys periodicStrip) <
+          (assignmentKeys periodicStrip).length :=
+      List.idxOf_lt_length_of_mem keyMember
+    rw [packedAssignmentLookupOutcome_digit_of_mem
+      periodicStrip.motif target packed.assignmentWord column member]
+    rw [← assignmentKeys_idxOf_eq
+      periodicStrip column target member]
+    unfold PeriodicStrip.PackedWindowState.assignmentAtCell
+      PeriodicStrip.PackedWindowState.assignmentPosition
+    rw [if_pos positionBound]
+  · have keyAbsent :
+        (column, target) ∉ assignmentKeys periodicStrip := by
+      simp [assignmentKeys, motifCells, member]
+    have positionEq :
+        @List.idxOf (WindowColumn × Cell) instBEqOfDecidableEq
+            (column, target) (assignmentKeys periodicStrip) =
+          (assignmentKeys periodicStrip).length :=
+      List.idxOf_eq_length_iff.mpr keyAbsent
+    have outcome :=
+      packedAssignmentLookupOutcome_of_not_mem
+        periodicStrip.motif column.val target
+        packed.assignmentWord member
+    have digitZero :
+        (packedAssignmentLookupOutcome periodicStrip.motif
+          column.val target packed.assignmentWord).2.1 = 0 := by
+      exact congrArg Prod.fst outcome
+    rw [digitZero, assignmentOfDigit_zero]
+    unfold PeriodicStrip.PackedWindowState.assignmentAtCell
+      PeriodicStrip.PackedWindowState.assignmentPosition
+    rw [positionEq]
+    simp
 
 end Turing.ToPartrec.Code
