@@ -295,7 +295,10 @@ The representation choices for this target are:
   footprint.  A structural `normalSimulationFits` invariant now composes
   these primitives across every `Code` constructor, and
   `trNormal_respects_inSpace` gives the resulting normalization call one
-  common bound covering all of its low-level configurations.
+  common bound covering all of its low-level configurations.  The companion
+  `retSimulationFits` and `tr_ret_respects_inSpace` handle every continuation
+  return, including the three-way stack rotation for `cons`, nested returns,
+  composition, and both branches of `fix`.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

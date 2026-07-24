@@ -1966,5 +1966,588 @@ noncomputable def trNormal_respects_inSpace
             simpa [ToPartrec.stepNormal] using related.down⟩,
           by simpa [trNormal, trCont, trContStack] using run⟩
 
+/-- The data-space obligations needed to execute one continuation return
+within a common low-level budget. -/
+def retSimulationFits :
+    ToPartrec.Cont → List Nat → Nat → Prop
+  | .halt, values, bound =>
+      encodedListSpace values ≤ bound
+  | .cons₁ rest arguments continuation, values, bound =>
+      encodedListSpace values +
+            continuationSpace (.cons₁ rest arguments continuation) ≤
+          bound ∧
+        normalSimulationFits rest (.cons₂ values continuation)
+          arguments bound
+  | .cons₂ saved continuation, values, bound =>
+      encodedListSpace values +
+            continuationSpace (.cons₂ saved continuation) ≤
+          bound ∧
+        retSimulationFits continuation (saved.headI :: values) bound
+  | .comp first continuation, values, bound =>
+      encodedListSpace values +
+            continuationSpace (.comp first continuation) ≤
+          bound ∧
+        normalSimulationFits first continuation values bound
+  | .fix body continuation, values, bound =>
+      encodedListSpace values +
+            continuationSpace (.fix body continuation) ≤
+          bound ∧
+        if values.headI = 0 then
+          retSimulationFits continuation values.tail bound
+        else
+          normalSimulationFits body (.fix body continuation)
+            values.tail bound
+
+/-- Every admissible continuation-return budget bounds its initial evaluator
+milestone. -/
+theorem retSimulationFits_start
+    {continuation : ToPartrec.Cont} {values : List Nat}
+    {bound : Nat}
+    (fits : retSimulationFits continuation values bound) :
+    encodedListSpace values + continuationSpace continuation ≤ bound := by
+  cases continuation <;>
+    simp only [retSimulationFits] at fits
+  · simpa [continuationSpace, trContStack] using fits
+  all_goals exact fits.1
+
+/-- Space-aware refinement of one continuation return. -/
+noncomputable def tr_ret_respects_inSpace
+    (continuation : ToPartrec.Cont) (values : List Nat)
+    (state : Option Γ') (bound : Nat)
+    (fits : retSimulationFits continuation values bound) :
+    Σ target,
+      PLift (TrCfg (ToPartrec.stepRet continuation values) target) ×
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+        ⟨some (Λ'.ret (trCont continuation)), state,
+          K'.elim (trList values) [] []
+            (trContStack continuation)⟩
+        target := by
+  induction continuation generalizing values state with
+  | halt =>
+      simp only [retSimulationFits] at fits
+      let target := halt values
+      have stepEq :
+          TM2.step tr
+              ⟨some (Λ'.ret (trCont ToPartrec.Cont.halt)),
+                state,
+                K'.elim (trList values) [] [] []⟩ =
+            some target := by
+        simp [target, halt, TM2.step, tr.eq_def]
+        rfl
+      have startBound :
+          TM2.stackSpace
+              ⟨some (Λ'.ret (trCont ToPartrec.Cont.halt)),
+                state,
+                K'.elim (trList values) [] [] []⟩ ≤
+            bound := by
+        rw [stackSpace_elim]
+        simpa [encodedListSpace] using fits
+      have targetBound :
+          TM2.stackSpace target ≤ bound := by
+        simpa [target] using fits
+      exact
+        ⟨target, ⟨by exact rfl⟩,
+          EvalsToInSpace.single stepEq startBound targetBound⟩
+  | cons₁ rest arguments continuation induction =>
+      simp only [retSimulationFits] at fits
+      let recursiveContinuation : ToPartrec.Cont :=
+        .cons₂ values continuation
+      let recursiveLabel : Λ' :=
+        trNormal rest (trCont recursiveContinuation)
+      let thirdMove : Λ' :=
+        move₂ (fun _ => false) .aux .stack recursiveLabel
+      let secondMove : Λ' :=
+        move₂ (fun symbol => symbol = Γ'.consₗ)
+          .stack .main thirdMove
+      let firstMove : Λ' :=
+        move₂ (fun _ => false) .main .aux secondMove
+      let afterGoto : Cfg' :=
+        ⟨some firstMove, state,
+          K'.elim (trList values) [] []
+            (trList arguments ++
+              Γ'.consₗ :: trContStack continuation)⟩
+      have gotoStep :
+          TM2.step tr
+              ⟨some
+                  (Λ'.ret
+                    (trCont
+                      (.cons₁ rest arguments continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack
+                    (.cons₁ rest arguments continuation))⟩ =
+            some afterGoto := by
+        simp [afterGoto, firstMove, secondMove, thirdMove,
+          recursiveLabel, recursiveContinuation,
+          trCont, trContStack, TM2.step, tr.eq_def]
+        rfl
+      have sourceBound :
+          TM2.stackSpace
+              ⟨some
+                  (Λ'.ret
+                    (trCont
+                      (.cons₁ rest arguments continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack
+                    (.cons₁ rest arguments continuation))⟩ ≤
+            bound := by
+        rw [stackSpace_elim]
+        simpa [encodedListSpace, continuationSpace] using fits.1
+      have gotoBound :
+          TM2.stackSpace afterGoto ≤ bound := by
+        rw [stackSpace_elim]
+        simpa [afterGoto, encodedListSpace, continuationSpace,
+          trContStack, Nat.add_assoc, Nat.add_left_comm,
+          Nat.add_comm] using fits.1
+      have goto :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            ⟨some
+                (Λ'.ret
+                  (trCont
+                    (.cons₁ rest arguments continuation))),
+              state,
+              K'.elim (trList values) [] []
+                (trContStack
+                  (.cons₁ rest arguments continuation))⟩
+            afterGoto :=
+        EvalsToInSpace.single gotoStep sourceBound gotoBound
+      have firstRaw :=
+        move₂_ok_inSpace
+          (p := fun _ => false)
+          (k₁ := .main) (k₂ := .aux)
+          (q := secondMove) (s := state)
+          (tapeStacks :=
+            K'.elim (trList values) [] []
+              (trList arguments ++
+                Γ'.consₗ :: trContStack continuation))
+          (by decide) rfl (splitAtPred_false _)
+      let afterFirst : Cfg' :=
+        ⟨some secondMove, none,
+          K'.elim [] [] (trList values)
+            (trList arguments ++
+              Γ'.consₗ :: trContStack continuation)⟩
+      have firstMoveRun :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            afterGoto afterFirst := by
+        convert firstRaw.mono gotoBound using 1
+        all_goals
+          simp [afterFirst, secondMove]
+      have stackSplit :
+          splitAtPred
+              (fun symbol => symbol = Γ'.consₗ)
+              (trList arguments ++
+                Γ'.consₗ :: trContStack continuation) =
+            (trList arguments, some Γ'.consₗ,
+              trContStack continuation) := by
+        apply splitAtPred_eq
+        · exact fun symbol member =>
+            Bool.decide_false
+              (trList_ne_consₗ _ _ member)
+        · exact ⟨rfl, by simp⟩
+      have secondRaw :=
+        move₂_ok_inSpace
+          (p := fun symbol => symbol = Γ'.consₗ)
+          (k₁ := .stack) (k₂ := .main)
+          (q := thirdMove) (s := none)
+          (tapeStacks :=
+            K'.elim [] [] (trList values)
+              (trList arguments ++
+                Γ'.consₗ :: trContStack continuation))
+          (by decide) rfl stackSplit
+      let afterSecond : Cfg' :=
+        ⟨some thirdMove, none,
+          K'.elim (trList arguments) []
+            (trList values)
+            (Γ'.consₗ :: trContStack continuation)⟩
+      have secondMoveRun :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            afterFirst afterSecond := by
+        convert secondRaw.mono firstMoveRun.last_le using 1
+        all_goals
+          simp [afterSecond, thirdMove]
+      have thirdRaw :=
+        move₂_ok_inSpace
+          (p := fun _ => false)
+          (k₁ := .aux) (k₂ := .stack)
+          (q := recursiveLabel) (s := none)
+          (tapeStacks :=
+            K'.elim (trList arguments) []
+              (trList values)
+              (Γ'.consₗ :: trContStack continuation))
+          (by decide) rfl (splitAtPred_false _)
+      let afterThird : Cfg' :=
+        ⟨some recursiveLabel, none,
+          K'.elim (trList arguments) [] []
+            (trList values ++
+              Γ'.consₗ :: trContStack continuation)⟩
+      have thirdMoveRun :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            afterSecond afterThird := by
+        convert thirdRaw.mono secondMoveRun.last_le using 1
+        all_goals
+          simp [afterThird, recursiveLabel]
+      obtain ⟨target, related, recursiveRun⟩ :=
+        trNormal_respects_inSpace rest recursiveContinuation
+          arguments none bound fits.2
+      have recursiveRun' :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            afterThird target := by
+        simpa [afterThird, recursiveLabel,
+          recursiveContinuation, trContStack] using recursiveRun
+      exact
+        ⟨target, ⟨by
+            simpa [ToPartrec.stepRet,
+              recursiveContinuation] using related.down⟩,
+          (((goto.trans firstMoveRun).trans secondMoveRun).trans
+            thirdMoveRun).trans recursiveRun'⟩
+  | cons₂ saved continuation induction =>
+      simp only [retSimulationFits] at fits
+      let afterGoto : Cfg' :=
+        ⟨some
+            (head .stack
+              (Λ'.ret (trCont continuation))),
+          state,
+          K'.elim (trList values) [] []
+            (trList saved ++
+              Γ'.consₗ :: trContStack continuation)⟩
+      have gotoStep :
+          TM2.step tr
+              ⟨some
+                  (Λ'.ret
+                    (trCont (.cons₂ saved continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack
+                    (.cons₂ saved continuation))⟩ =
+            some afterGoto := by
+        simp [afterGoto, trCont, trContStack,
+          TM2.step, tr.eq_def]
+        rfl
+      have sourceBound :
+          TM2.stackSpace
+              ⟨some
+                  (Λ'.ret
+                    (trCont (.cons₂ saved continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack
+                    (.cons₂ saved continuation))⟩ ≤
+            bound := by
+        rw [stackSpace_elim]
+        simpa [encodedListSpace, continuationSpace] using fits.1
+      have gotoBound :
+          TM2.stackSpace afterGoto ≤ bound := by
+        rw [stackSpace_elim]
+        simpa [afterGoto, encodedListSpace, continuationSpace,
+          trContStack, Nat.add_assoc, Nat.add_left_comm,
+          Nat.add_comm] using fits.1
+      have goto :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            ⟨some
+                (Λ'.ret
+                  (trCont (.cons₂ saved continuation))),
+              state,
+              K'.elim (trList values) [] []
+                (trContStack
+                  (.cons₂ saved continuation))⟩
+            afterGoto :=
+        EvalsToInSpace.single gotoStep sourceBound gotoBound
+      have headRaw :=
+        head_stack_ok_inSpace
+          (q := Λ'.ret (trCont continuation))
+          (s := state) (L₁ := values)
+          (L₂ := saved) (L₃ := trContStack continuation)
+      have headBudget :
+          (trList values).length + (trList saved).length +
+                (trContStack continuation).length + 1 ≤
+            bound := by
+        simpa [encodedListSpace, continuationSpace,
+          trContStack, Nat.add_assoc, Nat.add_left_comm,
+          Nat.add_comm] using fits.1
+      have headRun :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            afterGoto
+            ⟨some (Λ'.ret (trCont continuation)), none,
+              K'.elim (trList (saved.headI :: values)) [] []
+                (trContStack continuation)⟩ := by
+        simpa [afterGoto] using headRaw.mono headBudget
+      obtain ⟨target, related, recursiveRun⟩ :=
+        induction (saved.headI :: values) none fits.2
+      exact
+        ⟨target, ⟨by
+            simpa [ToPartrec.stepRet] using related.down⟩,
+          (goto.trans headRun).trans recursiveRun⟩
+  | comp first continuation induction =>
+      simp only [retSimulationFits] at fits
+      let afterGoto : Cfg' :=
+        ⟨some (trNormal first (trCont continuation)), state,
+          K'.elim (trList values) [] []
+            (trContStack continuation)⟩
+      have gotoStep :
+          TM2.step tr
+              ⟨some
+                  (Λ'.ret
+                    (trCont (.comp first continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack (.comp first continuation))⟩ =
+            some afterGoto := by
+        simp [afterGoto, trCont, trContStack,
+          TM2.step, tr.eq_def]
+        rfl
+      have sourceBound :
+          TM2.stackSpace
+              ⟨some
+                  (Λ'.ret
+                    (trCont (.comp first continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack (.comp first continuation))⟩ ≤
+            bound := by
+        rw [stackSpace_elim]
+        simpa [encodedListSpace, continuationSpace] using fits.1
+      have gotoBound :
+          TM2.stackSpace afterGoto ≤ bound := by
+        rw [stackSpace_elim]
+        simpa [afterGoto, encodedListSpace, continuationSpace,
+          trContStack] using fits.1
+      have goto :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            ⟨some
+                (Λ'.ret
+                  (trCont (.comp first continuation))),
+              state,
+              K'.elim (trList values) [] []
+                (trContStack (.comp first continuation))⟩
+            afterGoto :=
+        EvalsToInSpace.single gotoStep sourceBound gotoBound
+      obtain ⟨target, related, normalRun⟩ :=
+        trNormal_respects_inSpace first continuation values
+          state bound fits.2
+      have normalRun' :
+          EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            afterGoto target := by
+        simpa [afterGoto] using normalRun
+      exact
+        ⟨target, ⟨by
+            simpa [ToPartrec.stepRet] using related.down⟩,
+          goto.trans normalRun'⟩
+  | fix body continuation induction =>
+      simp only [retSimulationFits] at fits
+      have encodedHead :
+          if values.headI = 0 then
+            natEnd ((trList values).head?.getD default) = true ∧
+              (trList values).tail = trList values.tail
+          else
+            natEnd ((trList values).head?.getD default) = false ∧
+              (trList values).tail =
+                (trNat values.headI).tail ++
+                  Γ'.cons :: trList values.tail := by
+        obtain - | value := values
+        · exact ⟨rfl, rfl⟩
+        rcases value with - | value
+        · simp
+        rw [trList, List.headI, trNat, Nat.cast_succ,
+          Num.add_one, Num.succ, List.tail]
+        cases (value : Num).succ' <;> exact ⟨rfl, rfl⟩
+      by_cases isZero : values.headI = 0
+      · simp only [isZero, if_pos] at fits encodedHead
+        let afterPop : Cfg' :=
+          ⟨some (Λ'.ret (trCont continuation)),
+            (trList values).head?,
+            K'.elim (trList values.tail) [] []
+              (trContStack continuation)⟩
+        have popStep :
+            TM2.step tr
+                ⟨some
+                    (Λ'.ret
+                      (trCont (.fix body continuation))),
+                  state,
+                  K'.elim (trList values) [] []
+                    (trContStack
+                      (.fix body continuation))⟩ =
+              some afterPop := by
+          change
+            some
+                (TM2.stepAux
+                  (tr
+                    (Λ'.ret
+                      (Cont'.fix body
+                        (trCont continuation))))
+                  state
+                  (K'.elim (trList values) [] []
+                    (trContStack
+                      (.fix body continuation)))) =
+              some afterPop
+          rw [tr_ret_fix]
+          simp only [pop', TM2.stepAux, K'.elim_main,
+            encodedHead.1, K'.elim_update_main]
+          simp [afterPop, trContStack, encodedHead.2]
+          rfl
+        have sourceBound :
+            TM2.stackSpace
+                ⟨some
+                    (Λ'.ret
+                      (trCont (.fix body continuation))),
+                  state,
+                  K'.elim (trList values) [] []
+                    (trContStack
+                      (.fix body continuation))⟩ ≤
+              bound := by
+          rw [stackSpace_elim]
+          simpa [encodedListSpace, continuationSpace] using fits.1
+        have popBound :
+            TM2.stackSpace afterPop ≤ bound := by
+          rw [stackSpace_elim]
+          rw [stackSpace_elim] at sourceBound
+          have tailLength :
+              (trList values.tail).length ≤
+                (trList values).length := by
+            rw [← encodedHead.2]
+            cases trList values <;> simp
+          simp only [List.length_nil, add_zero,
+            trContStack, contStack] at sourceBound ⊢
+          omega
+        have pop :
+            EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+              ⟨some
+                  (Λ'.ret
+                    (trCont (.fix body continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack
+                    (.fix body continuation))⟩
+              afterPop :=
+          EvalsToInSpace.single popStep sourceBound popBound
+        obtain ⟨target, related, recursiveRun⟩ :=
+          induction values.tail (trList values).head? fits.2
+        have recursiveRun' :
+            EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+              afterPop target := by
+          simpa [afterPop] using recursiveRun
+        exact
+          ⟨target, ⟨by
+              simpa [ToPartrec.stepRet, isZero] using
+                related.down⟩,
+            pop.trans recursiveRun'⟩
+      · simp only [isZero, if_false] at fits encodedHead
+        let recursiveContinuation : ToPartrec.Cont :=
+          .fix body continuation
+        let recursiveLabel : Λ' :=
+          trNormal body (trCont recursiveContinuation)
+        let afterPop : Cfg' :=
+          ⟨some
+              (Λ'.clear natEnd .main recursiveLabel),
+            (trList values).head?,
+            K'.elim (trList values).tail [] []
+              (trContStack continuation)⟩
+        have popStep :
+            TM2.step tr
+                ⟨some
+                    (Λ'.ret
+                      (trCont
+                        (.fix body continuation))),
+                  state,
+                  K'.elim (trList values) [] []
+                    (trContStack
+                      (.fix body continuation))⟩ =
+              some afterPop := by
+          change
+            some
+                (TM2.stepAux
+                  (tr
+                    (Λ'.ret
+                      (Cont'.fix body
+                        (trCont continuation))))
+                  state
+                  (K'.elim (trList values) [] []
+                    (trContStack
+                      (.fix body continuation)))) =
+              some afterPop
+          rw [tr_ret_fix]
+          simp only [pop', TM2.stepAux, K'.elim_main,
+            encodedHead.1, K'.elim_update_main]
+          simp [afterPop, recursiveLabel,
+            recursiveContinuation, trCont, trContStack]
+          rfl
+        have sourceBound :
+            TM2.stackSpace
+                ⟨some
+                    (Λ'.ret
+                      (trCont
+                        (.fix body continuation))),
+                  state,
+                  K'.elim (trList values) [] []
+                    (trContStack
+                      (.fix body continuation))⟩ ≤
+              bound := by
+          rw [stackSpace_elim]
+          simpa [encodedListSpace, continuationSpace] using fits.1
+        have popBound :
+            TM2.stackSpace afterPop ≤ bound := by
+          rw [stackSpace_elim]
+          rw [stackSpace_elim] at sourceBound
+          have tailLength :
+              (trList values).tail.length ≤
+                (trList values).length := by
+            cases trList values <;> simp
+          simp only [List.length_nil, add_zero,
+            trContStack, contStack] at sourceBound ⊢
+          omega
+        have pop :
+            EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+              ⟨some
+                  (Λ'.ret
+                    (trCont
+                      (.fix body continuation))),
+                state,
+                K'.elim (trList values) [] []
+                  (trContStack
+                    (.fix body continuation))⟩
+              afterPop :=
+          EvalsToInSpace.single popStep sourceBound popBound
+        have split :
+            splitAtPred natEnd (trList values).tail =
+              ((trNat values.headI).tail, some Γ'.cons,
+                trList values.tail) := by
+          apply splitAtPred_eq
+          · exact fun symbol member =>
+              trNat_natEnd _ _
+                (List.tail_subset _ member)
+          · exact ⟨rfl, encodedHead.2⟩
+        have clearRaw :=
+          clear_ok_inSpace
+            (p := natEnd) (k := .main)
+            (q := recursiveLabel)
+            (s := (trList values).head?)
+            (tapeStacks :=
+              K'.elim (trList values).tail [] []
+                (trContStack continuation))
+            split
+        let afterClear : Cfg' :=
+          ⟨some recursiveLabel, some Γ'.cons,
+            K'.elim (trList values.tail) [] []
+              (trContStack continuation)⟩
+        have clear :
+            EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+              afterPop afterClear := by
+          convert clearRaw.mono pop.last_le using 1
+          all_goals
+            simp [afterClear, recursiveLabel]
+        obtain ⟨target, related, normalRun⟩ :=
+          trNormal_respects_inSpace body recursiveContinuation
+            values.tail (some Γ'.cons) bound fits.2
+        have normalRun' :
+            EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+              afterClear target := by
+          simpa [afterClear, recursiveLabel,
+            recursiveContinuation, trContStack] using normalRun
+        exact
+          ⟨target, ⟨by
+              simpa [ToPartrec.stepRet, isZero,
+                recursiveContinuation] using related.down⟩,
+            (pop.trans clear).trans normalRun'⟩
+
 end PartrecToTM2
 end Turing
