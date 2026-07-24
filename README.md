@@ -365,11 +365,13 @@ The representation choices for this target are:
   gives those list combinators compositional evaluator data costs, including
   selected `branchZero` paths and a generic tagged-countdown body rule.
 - [`LeanTrominoes/PartrecBinaryLengthSpace.lean`](LeanTrominoes/PartrecBinaryLengthSpace.lean)
-  starts the matching quantitative proof for explicit binary arithmetic.
-  Division by two is now a fully fitted evaluator call: its quotient/parity
-  loop uses a preserved processed-count invariant, and monotonicity of binary
-  encoding length bounds every live quotient by the original input's bit
-  length under one linear data cost.
+  gives the matching quantitative proof for the explicit binary search-depth
+  computation.  Division by two is a fully fitted evaluator call: its
+  quotient/parity loop uses a preserved processed-count invariant, and
+  monotonicity of binary encoding length bounds every live quotient by the
+  original input's bit length.  The outer binary-length loop preserves the
+  sum of its counter and remaining bit length, after which a fixed fitted
+  countdown computes `21 × length + 22`.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
@@ -402,8 +404,10 @@ The representation choices for this target are:
   The surrounding first- and second-endpoint countdown payloads have a
   separate explicit linear bound, including all loop counters and their
   Boolean accumulator.  `stripEvaluatorSpacePolynomial` combines both bounds
-  with the exact typed-input size and constant Boolean-output size into one
-  polynomial envelope for the evaluator proof.
+  with the exact typed-input size, constant Boolean-output size, and a linear
+  allowance for explicit arithmetic into one polynomial envelope for the
+  evaluator proof.  `stripSearchDepthCode_fits` certifies the complete
+  binary-length and affine search-depth call within that shared envelope.
   `StripEvaluatorLeafCallsFit` isolates the five remaining opaque
   primitive-recursive leaf programs—base relation, raw edge, Savitch fuel,
   state count, and well-formedness—as continuation-passing

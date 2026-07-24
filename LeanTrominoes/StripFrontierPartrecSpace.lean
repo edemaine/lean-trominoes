@@ -1,6 +1,7 @@
 import LeanTrominoes.StripFrontierCyclePartrec
 import LeanTrominoes.StripFrontierIndexedSearchSpace
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
+import LeanTrominoes.PartrecBinaryLengthSpace
 
 /-!
 # Space bounds for compiled strip-search payloads
@@ -349,41 +350,56 @@ theorem stripOuterPayload_encodedListSpace_le
   simp only [inputLength] at remainingBits countBits firstBits depthBits ⊢
   omega
 
-/-- One common polynomial envelope for the two kinds of semantic payload
-appearing in the compiled strip search, together with its typed input and
-constant-size Boolean output. -/
-def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
+/-- Core space reserved for the two kinds of semantic search payload,
+together with the typed input and constant-size Boolean output. -/
+def stripEvaluatorCoreSpaceBound (inputLength : Nat) : Nat :=
   stripReachPayloadSpaceBound inputLength +
     stripLoopPayloadSpaceBound inputLength + inputLength + 2
+
+/-- A deliberately loose linear allowance for the explicit binary-length and
+fixed affine arithmetic used to compute the certified search depth. -/
+def stripArithmeticSpaceBound (inputLength : Nat) : Nat :=
+  1000000000000000 * (inputLength + 1)
+
+/-- One common polynomial envelope for search payloads and explicit
+search-depth arithmetic. -/
+def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
+  stripEvaluatorCoreSpaceBound inputLength +
+    stripArithmeticSpaceBound inputLength
 
 /-- Polynomial packaging of `stripEvaluatorSpaceBound`. -/
 noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
   stripReachPayloadSpacePolynomial +
-    stripLoopPayloadSpacePolynomial + Polynomial.X + 2
+    stripLoopPayloadSpacePolynomial + Polynomial.X + 2 +
+      1000000000000000 * (Polynomial.X + 1)
 
 @[simp]
 theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
     stripEvaluatorSpacePolynomial.eval inputLength =
       stripEvaluatorSpaceBound inputLength := by
-  simp [stripEvaluatorSpacePolynomial, stripEvaluatorSpaceBound]
+  simp [stripEvaluatorSpacePolynomial, stripEvaluatorSpaceBound,
+    stripEvaluatorCoreSpaceBound, stripArithmeticSpaceBound]
 
 theorem stripReachPayloadSpaceBound_le_evaluator
     (inputLength : Nat) :
     stripReachPayloadSpaceBound inputLength ≤
       stripEvaluatorSpaceBound inputLength := by
-  simp only [stripEvaluatorSpaceBound]
+  simp only [stripEvaluatorSpaceBound,
+    stripEvaluatorCoreSpaceBound]
   omega
 
 theorem stripLoopPayloadSpaceBound_le_evaluator
     (inputLength : Nat) :
     stripLoopPayloadSpaceBound inputLength ≤
       stripEvaluatorSpaceBound inputLength := by
-  simp only [stripEvaluatorSpaceBound]
+  simp only [stripEvaluatorSpaceBound,
+    stripEvaluatorCoreSpaceBound]
   omega
 
 theorem stripInputLength_le_evaluator (inputLength : Nat) :
     inputLength ≤ stripEvaluatorSpaceBound inputLength := by
-  simp only [stripEvaluatorSpaceBound]
+  simp only [stripEvaluatorSpaceBound,
+    stripEvaluatorCoreSpaceBound]
   omega
 
 /-- The native evaluator representation of a typed strip input has exactly
@@ -396,6 +412,71 @@ theorem stripInput_encodedListSpace
   simpa only [Turing.PartrecToTM2.stackSpace_init] using
     Turing.PartrecToTM2.stackSpace_typed_init
       (periodicStripTrominoTilingCode Tromino.I) periodicStrip
+
+/-- The explicit search-depth program fits the arithmetic part of the strip
+budget whenever the surrounding continuation fits the reserved core. -/
+theorem stripSearchDepthCode_fits
+    (periodicStrip : PeriodicStrip)
+    (continuation : Turing.ToPartrec.Cont)
+    (continuationBound :
+      continuationSpace continuation ≤
+        stripEvaluatorCoreSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+    (after :
+      EvaluatorExecutionFits
+        (stripEvaluatorSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+        (.ret continuation [stripSearchDepth periodicStrip])) :
+    EvaluatorCallFits stripSearchDepthCode continuation
+      [Encodable.encode periodicStrip]
+      (stripEvaluatorSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) := by
+  let number := Encodable.encode periodicStrip
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  change
+    continuationSpace continuation ≤
+      stripEvaluatorCoreSpaceBound inputLength at continuationBound
+  have fits :=
+    EvaluatorCodeFits.binaryLengthAffine21Code number
+  have inputSpace :
+      encodedListSpace [number] = inputLength := by
+    dsimp [number, inputLength]
+    exact stripInput_encodedListSpace periodicStrip
+  have resultEq :
+      22 + 21 *
+          LeanTrominoes.Computability.binaryEncodingLength number =
+        stripSearchDepth periodicStrip := by
+    simp [number, stripSearchDepth,
+      LeanTrominoes.Computability.binaryEncodingLength_eq,
+      Complexity.primcodableFinEncoding_encode_length]
+    ring
+  have after' :
+      EvaluatorExecutionFits
+        (stripEvaluatorSpaceBound inputLength)
+        (.ret continuation
+          [22 + 21 *
+            LeanTrominoes.Computability.binaryEncodingLength number]) := by
+    rw [resultEq]
+    exact after
+  change
+    EvaluatorCallFits
+      (Turing.ToPartrec.Code.binaryLengthAffineCode 21 22)
+      continuation [number]
+      (stripEvaluatorSpaceBound inputLength)
+  exact
+    fits.call continuation
+      (stripEvaluatorSpaceBound inputLength)
+      (by
+        simp only [EvaluatorCodeFits.binaryLengthAffine21Cost,
+          inputSpace, stripEvaluatorSpaceBound,
+          stripArithmeticSpaceBound]
+        omega)
+      after'
 
 /-- A Boolean result occupies at most two cells in the evaluator's
 delimited-binary list representation. -/
