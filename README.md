@@ -275,6 +275,11 @@ The representation choices for this target are:
   correctness for any total payload-step code is proved by induction.  The
   recursive call is in tail position, so exponential iteration does not
   accumulate an exponential continuation stack.
+- [`LeanTrominoes/PartrecListCode.lean`](LeanTrominoes/PartrecListCode.lean)
+  builds direct `ToPartrec.Code` combinators for fixed-offset fields, preserved
+  zero-branches, and Boolean tags.  Their list semantics are verified without
+  pairing the variable-length payload into one natural; they form the
+  instruction layer for compiling the flat DFS transition.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
