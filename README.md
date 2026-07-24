@@ -279,7 +279,9 @@ The representation choices for this target are:
   begins the corresponding quantitative refinement of Mathlib's four-stack
   evaluator.  Its `copy` certificate covers the evaluator's only
   data-duplicating primitive and proves that every intermediate
-  configuration is bounded by the final two-copy footprint.
+  configuration is bounded by the final two-copy footprint.  The generic
+  move, reverse-move, and clear loops are also certified to preserve or
+  decrease total stack space at every step.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;
