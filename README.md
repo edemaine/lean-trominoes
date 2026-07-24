@@ -465,9 +465,13 @@ The representation choices for this target are:
 - [`LeanTrominoes/PartrecStripWellFormedSpace.lean`](LeanTrominoes/PartrecStripWellFormedSpace.lean)
   fits every reachable motif-step component, including encoded-list view,
   cell bounds, validity accumulation, and preservation of dimensions.
-  `PartrecFlatIterationSpace` now also offers a reachable-state loop rule, so
-  the forthcoming uniform loop bound need not certify impossible malformed
-  payloads.
+  It lifts these certificates through the complete typed countdown, dimension
+  checks, loop-input assembly, header projection, and strip-header decoder,
+  yielding an `EvaluatorCodeFits` certificate for the full explicit unary
+  well-formedness program.  `PartrecFlatIterationSpace` also offers a
+  reachable-state loop rule; the remaining integration step is to give this
+  completed program one uniform polynomial envelope inside the strip
+  evaluator bound.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
