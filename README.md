@@ -269,6 +269,12 @@ The representation choices for this target are:
   tape-size formulas for encoded natural lists, retained continuation data,
   initial and halting configurations, and every high-level evaluator
   milestone related by Mathlib's transcription invariant.
+- [`LeanTrominoes/SpaceRefinement.lean`](LeanTrominoes/SpaceRefinement.lean)
+  restores the intermediate-state information discarded by ordinary
+  deterministic reachability.  Its space-aware executions bound every
+  prefix, compose across macro steps, and show that a bounded run to a
+  terminal configuration controls every low-level configuration reachable
+  from the same start.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

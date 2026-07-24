@@ -57,6 +57,7 @@ import LeanTrominoes.StripFrontierReconstruction
 import LeanTrominoes.StripFrontierRawTransition
 import LeanTrominoes.StripFrontierRawTransitionComputability
 import LeanTrominoes.StripFrontierSpace
+import LeanTrominoes.SpaceRefinement
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
 
