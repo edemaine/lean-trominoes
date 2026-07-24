@@ -509,5 +509,160 @@ def copy_ok_inSpace (q s a b c d) :
         all_goals simp [List.reverseAux] <;> omega
       exact first.trans rest'
 
+/-- Reading the first natural from the main stack uses at most one cell beyond
+the input configuration; this extra cell is the delimiter of the synthesized
+zero when the input list is empty. -/
+def head_main_ok_inSpace {q s L} {c d : List Γ'} :
+    EvalsToInSpace (TM2.step tr) TM2.stackSpace
+      ((trList L).length + c.length + d.length + 1)
+      ⟨some (head .main q), s,
+        K'.elim (trList L) [] c d⟩
+      ⟨some q, none,
+        K'.elim (trList [L.headI]) [] c d⟩ := by
+  let delimiter : Option Γ' :=
+    List.casesOn L none fun _ _ => some Γ'.cons
+  let afterMove : Cfg' :=
+    ⟨some
+        (Λ'.push .rev (fun _ => some Γ'.cons)
+          (Λ'.read fun state =>
+            (if state = some Γ'.consₗ
+              then id
+              else Λ'.clear
+                (fun symbol => symbol = Γ'.consₗ) .main)
+              (unrev q))),
+      delimiter,
+      K'.elim (trList L.tail)
+        (List.reverse (trNat L.headI)) c d⟩
+  have headSplit :
+      splitAtPred natEnd (trList L) =
+        (trNat L.headI, delimiter, trList L.tail) := by
+    apply splitAtPred_eq
+    · exact trNat_natEnd _
+    · cases L <;> simp [delimiter]
+  have moveRaw :=
+    move_ok_inSpace
+      (p := natEnd) (k₁ := .main) (k₂ := .rev)
+      (q := Λ'.push .rev (fun _ => some Γ'.cons)
+        (Λ'.read fun state =>
+          (if state = some Γ'.consₗ
+            then id
+            else Λ'.clear
+              (fun symbol => symbol = Γ'.consₗ) .main)
+            (unrev q)))
+      (s := s)
+      (tapeStacks := K'.elim (trList L) [] c d)
+      (by decide) headSplit
+  have startSpace :
+      TM2.stackSpace
+          ⟨some (head .main q), s,
+            K'.elim (trList L) [] c d⟩ ≤
+        (trList L).length + c.length + d.length + 1 := by
+    rw [stackSpace_elim]
+    simp
+  have move :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        ((trList L).length + c.length + d.length + 1)
+        ⟨some (head .main q), s,
+          K'.elim (trList L) [] c d⟩
+        afterMove := by
+    convert moveRaw.mono startSpace using 1
+    all_goals
+      simp [head, afterMove, delimiter, List.reverseAux_eq]
+  let afterPush : Cfg' :=
+    ⟨some
+        (Λ'.read fun state =>
+          (if state = some Γ'.consₗ
+            then id
+            else Λ'.clear
+              (fun symbol => symbol = Γ'.consₗ) .main)
+            (unrev q)),
+      delimiter,
+      K'.elim (trList L.tail)
+        (Γ'.cons :: List.reverse (trNat L.headI)) c d⟩
+  have pushStep :
+      TM2.step tr afterMove = some afterPush := by
+    simp [afterMove, afterPush, TM2.step, tr.eq_def]
+    rfl
+  have pushSpace :
+      TM2.stackSpace afterPush ≤
+        (trList L).length + c.length + d.length + 1 := by
+    rw [stackSpace_elim]
+    cases L <;>
+      simp [trList] <;> omega
+  have push :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        ((trList L).length + c.length + d.length + 1)
+        afterMove afterPush :=
+    EvalsToInSpace.single pushStep move.last_le pushSpace
+  let afterRead : Cfg' :=
+    ⟨some
+        (Λ'.clear (fun symbol => symbol = Γ'.consₗ)
+          .main (unrev q)),
+      delimiter,
+      K'.elim (trList L.tail)
+        (Γ'.cons :: List.reverse (trNat L.headI)) c d⟩
+  have readStep :
+      TM2.step tr afterPush = some afterRead := by
+    cases L <;>
+      simp [afterPush, afterRead, delimiter, TM2.step, tr.eq_def]
+    all_goals rfl
+  have read :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        ((trList L).length + c.length + d.length + 1)
+        afterPush afterRead :=
+    EvalsToInSpace.single readStep pushSpace (by
+      rw [stackSpace_fields]
+      rw [stackSpace_fields] at pushSpace
+      exact pushSpace)
+  have clearSplit :
+      splitAtPred (fun symbol => symbol = Γ'.consₗ)
+          (trList L.tail) =
+        (trList L.tail, none, []) := by
+    apply splitAtPred_eq
+    · exact fun symbol member =>
+        Bool.decide_false (trList_ne_consₗ _ _ member)
+    · exact ⟨rfl, rfl⟩
+  have clearRaw :=
+    clear_ok_inSpace
+      (p := fun symbol => symbol = Γ'.consₗ)
+      (k := .main)
+      (L₁ := trList L.tail) (o := none) (L₂ := [])
+      (q := unrev q) (s := delimiter)
+      (tapeStacks :=
+        K'.elim (trList L.tail)
+          (Γ'.cons :: List.reverse (trNat L.headI)) c d)
+      clearSplit
+  let afterClear : Cfg' :=
+    ⟨some (unrev q), none,
+      K'.elim [] (Γ'.cons :: List.reverse (trNat L.headI)) c d⟩
+  have clear :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        ((trList L).length + c.length + d.length + 1)
+        afterRead afterClear := by
+    have readSpace :
+        TM2.stackSpace afterRead ≤
+          (trList L).length + c.length + d.length + 1 := by
+      rw [stackSpace_fields]
+      rw [stackSpace_fields] at pushSpace
+      exact pushSpace
+    convert clearRaw.mono readSpace using 1
+    all_goals simp [afterClear]
+  have unreverseRaw :=
+    unrev_ok_inSpace
+      (q := q) (s := none)
+      (tapeStacks :=
+        K'.elim [] (Γ'.cons :: List.reverse (trNat L.headI)) c d)
+  have clearSpace := clear.last_le
+  have unreverse :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace
+        ((trList L).length + c.length + d.length + 1)
+        afterClear
+        ⟨some q, none,
+          K'.elim (trList [L.headI]) [] c d⟩ := by
+    convert unreverseRaw.mono clearSpace using 1
+    all_goals
+      simp [List.reverseAux_eq]
+  exact (((move.trans push).trans read).trans clear).trans unreverse
+
 end PartrecToTM2
 end Turing

@@ -283,7 +283,9 @@ The representation choices for this target are:
   move, reverse-move, and clear loops are also certified to preserve or
   decrease total stack space at every step.  This includes the evaluator's
   stable two-pass move, with its temporarily removed and restored delimiter,
-  which is used to shuffle continuation data among the four stacks.
+  which is used to shuffle continuation data among the four stacks, and
+  main-stack head extraction, whose synthesized empty-list zero needs at
+  most one additional delimiter cell.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;
