@@ -267,11 +267,17 @@ The representation choices for this target are:
   phase and assignment projections and lookup of a raw assignment at a
   window cell are primitive recursive too; semantic decoding is factored
   through one verified conversion from valid raw states to `WindowState`.
+- [`LeanTrominoes/StripFrontierRawTransition.lean`](LeanTrominoes/StripFrontierRawTransition.lean)
+  gives normalization, center-column exact-cover, and four-column overlap
+  checks directly on uniform raw states, using only explicit finite lists and
+  Boolean tests.  On valid raw states, the combined raw transition is proved
+  equivalent to the original semantic `WindowState.Transition`.
 - [`LeanTrominoes/StripFrontierIndexedSearch.lean`](LeanTrominoes/StripFrontierIndexedSearch.lean)
   instantiates arithmetic Savitch search with the tromino frontier relation.
-  Each bounded index is decoded to one semantic state only when its transition
-  is checked.  Cycles in this indexed graph are proved equivalent to cycles
-  in the original `WindowState` graph, in both directions, yielding
+  Each bounded index is decoded to one raw state only when its transition is
+  checked; no input-dependent state is constructed by the executable test.
+  Cycles in this indexed graph are proved equivalent to cycles in the
+  original `WindowState` graph, in both directions, yielding
   `periodicStripTrominoTilingIndexBool` and a proof that it decides the full
   strip-tiling predicate.  This removes the exponential state enumeration
   from the executable upper-bound algorithm.  The decider uses the already

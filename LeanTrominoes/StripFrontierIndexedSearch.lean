@@ -2,6 +2,7 @@ import LeanTrominoes.IndexedSavitch
 import LeanTrominoes.EncodingBounds
 import LeanTrominoes.StripFrontierIndex
 import LeanTrominoes.StripFrontierReconstruction
+import LeanTrominoes.StripFrontierRawTransition
 
 /-!
 # Enumeration-free indexed search for strip frontiers
@@ -61,15 +62,12 @@ theorem semanticOfIndex_indexOfWindow {periodicStrip : PeriodicStrip}
 rejected before decoding. -/
 def indexedTransitionBool (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
-    (periodPositive : 0 < periodicStrip.period)
+    (_periodPositive : 0 < periodicStrip.period)
     (first last : Nat) : Bool :=
-  if firstBound : first < indexCount periodicStrip then
-    if lastBound : last < indexCount periodicStrip then
-      decide (WindowState.Transition tromino
-        (semanticOfIndex periodicStrip periodPositive
-          ⟨first, firstBound⟩)
-        (semanticOfIndex periodicStrip periodPositive
-          ⟨last, lastBound⟩))
+  if _firstBound : first < indexCount periodicStrip then
+    if _lastBound : last < indexCount periodicStrip then
+      (ofIndex periodicStrip first).transitionBool tromino periodicStrip
+        (ofIndex periodicStrip last)
     else
       false
   else
@@ -85,8 +83,14 @@ theorem indexedRelation_iff_transition (tromino : Tromino)
       WindowState.Transition tromino
         (semanticOfIndex periodicStrip periodPositive first)
         (semanticOfIndex periodicStrip periodPositive last) := by
-  simp [FiniteState.IndexedRelation, indexedTransitionBool,
-    decide_eq_true_eq]
+  rw [FiniteState.IndexedRelation, indexedTransitionBool,
+    dif_pos first.isLt, dif_pos last.isLt,
+    transitionBool_eq_true_iff,
+    transition_iff_toWindowState tromino periodicStrip
+      (ofIndex periodicStrip first.val) (ofIndex periodicStrip last.val)
+      (ofIndex_isValid periodPositive first.isLt)
+      (ofIndex_isValid periodPositive last.isLt)]
+  rfl
 
 theorem indexed_hasCycle_iff_hasCycle (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
