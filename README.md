@@ -189,6 +189,13 @@ The representation choices for this target are:
   it chooses one edge and checks bounded reachability back to its source, and
   proves this succeeds exactly when the finite graph contains a directed
   cycle.
+- [`LeanTrominoes/IndexedSavitch.lean`](LeanTrominoes/IndexedSavitch.lean)
+  gives the same verified cycle search an arithmetic interface.  States and
+  midpoints are natural numbers below an explicit count, and bounded
+  existential search is a direct primitive recursion rather than
+  `List.range` followed by `List.any`.  Its result is proved equivalent to
+  the semantic cycle predicate on `Fin stateCount`; neither the state list nor
+  a range of all state indices is constructed.
 - [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
   fills a machine-level gap in Mathlib's computability stack.  A TM2 program
   described over an infinite ambient label type can be restricted to a
