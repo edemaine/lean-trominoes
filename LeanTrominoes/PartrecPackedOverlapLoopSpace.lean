@@ -818,6 +818,521 @@ theorem packedOverlapBodyCost_le_linear
               nextStateSpace <;>
             omega
 
+def packedOverlapLoopInputCost
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) : Nat :=
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      column.val + 1, column.val,
+      current.assignmentWord, next.assignmentWord]
+  let rest7 :=
+    prependCost values [next.assignmentWord] [1]
+      (getCost 4 values) (oneCost values)
+  let rest6 :=
+    prependCost values [current.assignmentWord]
+      [next.assignmentWord, 1]
+      (getCost 3 values) rest7
+  let rest5 :=
+    prependCost values [column.val]
+      [current.assignmentWord, next.assignmentWord, 1]
+      (getCost 2 values) rest6
+  let rest4 :=
+    prependCost values [column.val + 1]
+      [column.val, current.assignmentWord,
+        next.assignmentWord, 1]
+      (getCost 1 values) rest5
+  let rest3 :=
+    prependCost values [Encodable.encode periodicStrip.motif]
+      [column.val + 1, column.val, current.assignmentWord,
+        next.assignmentWord, 1]
+      (getCost 0 values) rest4
+  let rest2 :=
+    prependCost values [Encodable.encode periodicStrip.motif]
+      [Encodable.encode periodicStrip.motif,
+        column.val + 1, column.val, current.assignmentWord,
+        next.assignmentWord, 1]
+      (getCost 0 values) rest3
+  prependCost values [Encodable.encode periodicStrip.motif]
+    [Encodable.encode periodicStrip.motif,
+      Encodable.encode periodicStrip.motif,
+      column.val + 1, column.val, current.assignmentWord,
+      next.assignmentWord, 1]
+    (getCost 0 values) rest2
+
+theorem packedOverlapLoopInput
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    EvaluatorCodeFits Code.packedOverlapLoopInputCode
+      [Encodable.encode periodicStrip.motif,
+        column.val + 1, column.val,
+        current.assignmentWord, next.assignmentWord]
+      (Encodable.encode periodicStrip.motif ::
+        Code.packedOverlapState periodicStrip current next
+          column true periodicStrip.motif)
+      (packedOverlapLoopInputCost
+        periodicStrip current next column) := by
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      column.val + 1, column.val,
+      current.assignmentWord, next.assignmentWord]
+  have rest7 := prepend (get 4 values) (one values)
+  have rest6 := prepend (get 3 values) rest7
+  have rest5 := prepend (get 2 values) rest6
+  have rest4 := prepend (get 1 values) rest5
+  have rest3 := prepend (get 0 values) rest4
+  have rest2 := prepend (get 0 values) rest3
+  have result := prepend (get 0 values) rest2
+  simpa [Code.packedOverlapLoopInputCode,
+    packedOverlapLoopInputCost,
+    Code.packedOverlapState,
+    prependCost, values] using result
+
+def packedOverlapPolynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) : Nat :=
+  1000000000000000000000000000000000 *
+    (encodedListSpace
+      [4096 * (
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        Encodable.encode periodicStrip.motif +
+        column.val + current.assignmentWord +
+        next.assignmentWord + 100) + 2000] + 1)
+
+theorem packedOverlapBodyCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4)
+    (countdown : Nat) (valid : Bool)
+    (remaining leading : List Cell)
+    (countdownBound :
+      countdown ≤ Encodable.encode periodicStrip.motif)
+    (suffix : periodicStrip.motif = leading ++ remaining) :
+    packedOverlapBodyCost periodicStrip current next column
+        countdown valid remaining ≤
+      packedOverlapPolynomialSpaceBound
+        periodicStrip current next column := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let remainingCode := Encodable.encode remaining
+  let localLimit :=
+    4096 * (countdown +
+      motifCode + motifCode + motifCode +
+      remainingCode + remainingCode + remainingCode +
+      column.val + current.assignmentWord +
+      next.assignmentWord + 100) + 2000
+  let globalLimit :=
+    4096 * (motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode +
+      column.val + current.assignmentWord +
+      next.assignmentWord + 100) + 2000
+  have remainingBound : remainingCode ≤ motifCode := by
+    simp only [remainingCode, motifCode]
+    rw [suffix]
+    exact encode_list_suffix_le leading remaining
+  have numeric : localLimit ≤ globalLimit := by
+    simp only [localLimit, globalLimit]
+    omega
+  have bits := encodeNat_length_mono numeric
+  have body :=
+    packedOverlapBodyCost_le_linear periodicStrip current next
+      column countdown valid remaining
+  have bodyLocal :
+      packedOverlapBodyCost periodicStrip current next column
+          countdown valid remaining ≤
+        1000000000000000000000000000000000 *
+          (encodedListSpace [localLimit] + 1) := by
+    simpa [localLimit, motifCode, remainingCode] using body
+  simp only [packedOverlapPolynomialSpaceBound,
+    encodedListSpace_cons, encodedListSpace_nil]
+  change
+    packedOverlapBodyCost periodicStrip current next column
+        countdown valid remaining ≤
+      1000000000000000000000000000000000 *
+        ((Computability.encodeNat globalLimit).length + 1 + 1)
+  simp only [encodedListSpace_cons,
+    encodedListSpace_nil] at bodyLocal
+  exact bodyLocal.trans
+    (Nat.mul_le_mul_left
+      1000000000000000000000000000000000
+      (by omega))
+
+/-- Typed motif-suffix states reachable while one overlap countdown runs. -/
+def PackedOverlapReachable
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4)
+    (countdown : Nat) (values : List Nat) : Prop :=
+  ∃ valid remaining leading,
+    values =
+      Code.packedOverlapState periodicStrip current next
+        column valid remaining ∧
+    countdown ≤ Encodable.encode periodicStrip.motif ∧
+    periodicStrip.motif = leading ++ remaining
+
+theorem packedOverlapReachable_initial
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4)
+    (valid : Bool) :
+    PackedOverlapReachable periodicStrip current next column
+      (Encodable.encode periodicStrip.motif)
+      (Code.packedOverlapState periodicStrip current next
+        column valid periodicStrip.motif) := by
+  exact ⟨valid, periodicStrip.motif, [], rfl,
+    Nat.le_refl _, by simp⟩
+
+theorem packedOverlapReachable_step
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4)
+    (countdown : Nat) (values : List Nat)
+    (reachable :
+      PackedOverlapReachable periodicStrip current next column
+        (countdown + 1) values) :
+    PackedOverlapReachable periodicStrip current next column
+      countdown
+      (Code.packedOverlapNativeStep
+        periodicStrip current next column values) := by
+  obtain ⟨valid, remaining, leading, rfl,
+    countdownBound, suffix⟩ := reachable
+  cases remaining with
+  | nil =>
+      exact ⟨valid, [], leading,
+        Code.packedOverlapNativeStep_state_nil
+          periodicStrip current next column valid,
+        by omega, suffix⟩
+  | cons cell remaining =>
+      refine
+        ⟨valid &&
+            current.overlapsAtBool periodicStrip next column cell,
+          remaining, leading ++ [cell], ?_, by omega, ?_⟩
+      · exact
+          Code.packedOverlapNativeStep_state_cons
+            periodicStrip current next column valid cell remaining
+      · simpa [List.append_assoc] using suffix
+
+/-- The complete motif countdown reuses the polynomial body envelope. -/
+theorem packedOverlapFlatUniform
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    EvaluatorCodeFits
+      (Code.flatIterate Code.packedOverlapStepCode)
+      (Encodable.encode periodicStrip.motif ::
+        Code.packedOverlapState periodicStrip current next
+          column true periodicStrip.motif)
+      (Code.packedOverlapState periodicStrip current next column
+        (current.overlapsColumnBool periodicStrip next column) [])
+      (packedOverlapPolynomialSpaceBound
+        periodicStrip current next column) where
+  input_space := by
+    have body :=
+      packedOverlapBody periodicStrip current next column
+        (Encodable.encode periodicStrip.motif)
+        true periodicStrip.motif
+    exact body.input_space.trans
+      (packedOverlapBodyCost_le_polynomialSpaceBound
+        periodicStrip current next column
+        (Encodable.encode periodicStrip.motif)
+        true periodicStrip.motif []
+        (Nat.le_refl _) (by simp))
+  output_space := by
+    let result :=
+      current.overlapsColumnBool periodicStrip next column
+    have body :=
+      packedOverlapBody periodicStrip current next column
+        0 result []
+    have input := body.input_space
+    have cost :=
+      packedOverlapBodyCost_le_polynomialSpaceBound
+        periodicStrip current next column 0 result []
+        periodicStrip.motif (Nat.zero_le _) (by simp)
+    simp only [result] at input cost
+    simp only [Code.packedOverlapState,
+      encodedListSpace_cons] at input ⊢
+    omega
+  call continuation bound budget after := by
+    apply
+      EvaluatorCallFits.flatIterate_of_reachable_code_fits
+        (step :=
+          Code.packedOverlapNativeStep
+            periodicStrip current next column)
+        (bodyCost := fun _ _ =>
+          packedOverlapPolynomialSpaceBound
+            periodicStrip current next column)
+        (invariant :=
+          PackedOverlapReachable
+            periodicStrip current next column)
+    · intro countdown values reachable
+      obtain ⟨valid, remaining, leading, rfl,
+        countdownBound, suffix⟩ := reachable
+      exact
+        (packedOverlapBody periodicStrip current next column
+          countdown valid remaining).mono
+          (packedOverlapBodyCost_le_polynomialSpaceBound
+            periodicStrip current next column countdown valid
+            remaining leading countdownBound suffix)
+    · exact packedOverlapReachable_initial
+        periodicStrip current next column true
+    · exact packedOverlapReachable_step
+        periodicStrip current next column
+    · intro countdown values reachable
+      exact budget
+    · rw [Code.packedOverlapNativeStep_iterate,
+        Code.packedOverlapProcess_encode]
+      simpa using after
+
+def packedOverlapColumnCost
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) : Nat :=
+  let result :=
+    Code.packedOverlapState periodicStrip current next column
+      (current.overlapsColumnBool periodicStrip next column) []
+  getCost 6 result +
+    (packedOverlapPolynomialSpaceBound
+        periodicStrip current next column +
+      packedOverlapLoopInputCost
+        periodicStrip current next column)
+
+/-- Fitted closed program for one packed shared column. -/
+theorem packedOverlapColumn
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    EvaluatorCodeFits Code.packedOverlapColumnCode
+      [Encodable.encode periodicStrip.motif,
+        column.val + 1, column.val,
+        current.assignmentWord, next.assignmentWord]
+      [(current.overlapsColumnBool periodicStrip
+        next column).toNat]
+      (packedOverlapColumnCost
+        periodicStrip current next column) := by
+  let result :=
+    Code.packedOverlapState periodicStrip current next column
+      (current.overlapsColumnBool periodicStrip next column) []
+  have loop :=
+    comp
+      (packedOverlapFlatUniform
+        periodicStrip current next column)
+      (packedOverlapLoopInput
+        periodicStrip current next column)
+  have projected := comp (get 6 result) loop
+  simpa [Code.packedOverlapColumnCode,
+    packedOverlapColumnCost, result,
+    Code.packedOverlapState] using projected
+
+theorem packedOverlapLoopInputCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    packedOverlapLoopInputCost periodicStrip current next column ≤
+      10000 *
+        (encodedListSpace
+          [4096 * (
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            column.val + current.assignmentWord +
+            next.assignmentWord + 100) + 2000] + 1) := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit :=
+    4096 * (motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode +
+      column.val + current.assignmentWord +
+      next.assignmentWord + 100) + 2000
+  let unit := encodedListSpace [limit] + 1
+  change
+    packedOverlapLoopInputCost periodicStrip current next column ≤
+      10000 * unit
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, encodedListSpace_cons, encodedListSpace_nil]
+  have motifBits :=
+    encodeNat_length_mono
+      (show motifCode ≤ limit by simp only [limit]; omega)
+  have columnBits :=
+    encodeNat_length_mono
+      (show column.val ≤ limit by simp only [limit]; omega)
+  have columnSuccBits :=
+    encodeNat_length_mono
+      (show column.val + 1 ≤ limit by simp only [limit]; omega)
+  have currentWordBits :=
+    encodeNat_length_mono
+      (show current.assignmentWord ≤ limit by
+        simp only [limit]; omega)
+  have nextWordBits :=
+    encodeNat_length_mono
+      (show next.assignmentWord ≤ limit by
+        simp only [limit]; omega)
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ limit by simp only [limit]; omega)
+  have columnTwoSuccBits :=
+    encodeNat_length_mono
+      (show column.val + 1 + 1 ≤ limit by
+        simp only [limit]; omega)
+  have currentWordSuccBits :=
+    encodeNat_length_mono
+      (show current.assignmentWord + 1 ≤ limit by
+        simp only [limit]; omega)
+  have nextWordSuccBits :=
+    encodeNat_length_mono
+      (show next.assignmentWord + 1 ≤ limit by
+        simp only [limit]; omega)
+  have motifBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif)).length ≤
+          (Computability.encodeNat limit).length := by
+    simpa [motifCode] using motifBits
+  have motifSuccBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif + 1)).length ≤
+          (Computability.encodeNat limit).length := by
+    simpa [motifCode] using motifSuccBits
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  simp [packedOverlapLoopInputCost,
+    prependCost, getCost, dropCost, headCost,
+    idCost, nilCost, oneCost, zeroCost,
+    tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    unitEq, zeroBits, oneBits]
+  clear * - motifBitsRaw columnBits columnSuccBits
+    currentWordBits nextWordBits motifSuccBitsRaw
+    columnTwoSuccBits currentWordSuccBits nextWordSuccBits unitEq
+  omega
+
+theorem packedOverlapResultProjectionCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    getCost 6
+        (Code.packedOverlapState periodicStrip current next column
+          (current.overlapsColumnBool periodicStrip next column) []) ≤
+      100 *
+        (encodedListSpace
+          [4096 * (
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            column.val + current.assignmentWord +
+            next.assignmentWord + 100) + 2000] + 1) := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit :=
+    4096 * (motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode +
+      column.val + current.assignmentWord +
+      next.assignmentWord + 100) + 2000
+  let unit := encodedListSpace [limit] + 1
+  change
+    getCost 6
+        (Code.packedOverlapState periodicStrip current next column
+          (current.overlapsColumnBool periodicStrip next column) []) ≤
+      100 * unit
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, encodedListSpace_cons, encodedListSpace_nil]
+  have motifBits :=
+    encodeNat_length_mono
+      (show motifCode ≤ limit by simp only [limit]; omega)
+  have columnBits :=
+    encodeNat_length_mono
+      (show column.val ≤ limit by simp only [limit]; omega)
+  have columnSuccBits :=
+    encodeNat_length_mono
+      (show column.val + 1 ≤ limit by simp only [limit]; omega)
+  have currentWordBits :=
+    encodeNat_length_mono
+      (show current.assignmentWord ≤ limit by
+        simp only [limit]; omega)
+  have nextWordBits :=
+    encodeNat_length_mono
+      (show next.assignmentWord ≤ limit by
+        simp only [limit]; omega)
+  have motifBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif)).length ≤
+          (Computability.encodeNat limit).length := by
+    simpa [motifCode] using motifBits
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := rfl
+  cases overlap :
+      current.overlapsColumnBool periodicStrip next column <;>
+    simp [Code.packedOverlapState,
+      getCost, dropCost, headCost, idCost,
+      nilCost, tailCost, zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      unitEq, zeroBits, oneBits, twoBits] <;>
+    clear * - motifBitsRaw columnBits columnSuccBits
+      currentWordBits nextWordBits unitEq <;>
+    omega
+
+private theorem packedOverlapColumnBudget
+    (unit projection space input : Nat)
+    (projectionBound : projection ≤ 100 * unit)
+    (spaceBound :
+      space ≤ 1000000000000000000000000000000000 * unit)
+    (inputBound : input ≤ 10000 * unit) :
+    projection + (space + input) ≤
+      2000000000000000000000000000000000 * unit := by
+  omega
+
+theorem packedOverlapColumnCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    packedOverlapColumnCost periodicStrip current next column ≤
+      2000000000000000000000000000000000 *
+        (encodedListSpace
+          [4096 * (
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            column.val + current.assignmentWord +
+            next.assignmentWord + 100) + 2000] + 1) := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit :=
+    4096 * (motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode +
+      column.val + current.assignmentWord +
+      next.assignmentWord + 100) + 2000
+  let unit := encodedListSpace [limit] + 1
+  change
+    packedOverlapColumnCost periodicStrip current next column ≤
+      2000000000000000000000000000000000 * unit
+  have inputGlobal :
+      packedOverlapLoopInputCost periodicStrip current next column ≤
+        10000 * unit := by
+    simpa [motifCode, limit, unit] using
+      packedOverlapLoopInputCost_le_linear
+        periodicStrip current next column
+  have projectionGlobal :
+      getCost 6
+          (Code.packedOverlapState periodicStrip current next column
+            (current.overlapsColumnBool periodicStrip next column) []) ≤
+        100 * unit := by
+    simpa [motifCode, limit, unit] using
+      packedOverlapResultProjectionCost_le_linear
+        periodicStrip current next column
+  simp only [packedOverlapColumnCost,
+    packedOverlapPolynomialSpaceBound]
+  exact
+    packedOverlapColumnBudget unit _ _ _
+      projectionGlobal (Nat.le_refl _) inputGlobal
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

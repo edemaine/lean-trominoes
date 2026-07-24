@@ -567,8 +567,10 @@ The representation choices for this target are:
   then compute exactly the shared-column conjunction over `List.finRange 4`.
   [`LeanTrominoes/PartrecPackedOverlapLoopSpace.lean`](LeanTrominoes/PartrecPackedOverlapLoopSpace.lean)
   fits every component of one suffix step and the surrounding countdown
-  body, with an explicit input-linear envelope for all reachable field
-  values; the closed-loop uniformization remains to be assembled.
+  body.  Its motif-suffix invariant lifts the local bound through the
+  complete flat countdown, and the fitted one-column program has an explicit
+  linear envelope in the motif encoding and both packed words; fitting the
+  final four-way conjunction remains.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
