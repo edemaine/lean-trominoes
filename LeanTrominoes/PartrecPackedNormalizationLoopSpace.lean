@@ -533,25 +533,27 @@ theorem packedNormalizationLoopInput
     Code.packedNormalizationState,
     prependCost, values] using result
 
-/-- Sum of the exact body costs over every suffix of one motif, for a fixed
-countdown.  This finite envelope is useful before its eventual polynomial
-majorant is established. -/
+/-- Maximum of the exact body costs over every suffix of one motif, for a
+fixed countdown. -/
 def packedNormalizationSuffixSpaceBound
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) (column : WindowColumn)
     (countdown : Nat) : List Cell → Nat
   | [] =>
-      packedNormalizationBodyCost periodicStrip packed column
-          countdown false [] +
-        packedNormalizationBodyCost periodicStrip packed column
-          countdown true []
+      max
+        (packedNormalizationBodyCost periodicStrip packed column
+          countdown false [])
+        (packedNormalizationBodyCost periodicStrip packed column
+          countdown true [])
   | cell :: remaining =>
-      packedNormalizationBodyCost periodicStrip packed column
-          countdown false (cell :: remaining) +
-        packedNormalizationBodyCost periodicStrip packed column
-          countdown true (cell :: remaining) +
-        packedNormalizationSuffixSpaceBound periodicStrip packed
-          column countdown remaining
+      max
+        (packedNormalizationBodyCost periodicStrip packed column
+          countdown false (cell :: remaining))
+        (max
+          (packedNormalizationBodyCost periodicStrip packed column
+            countdown true (cell :: remaining))
+          (packedNormalizationSuffixSpaceBound periodicStrip packed
+            column countdown remaining))
 
 theorem packedNormalizationBodyCost_le_suffixSpaceBound
     (periodicStrip : PeriodicStrip)
@@ -564,17 +566,36 @@ theorem packedNormalizationBodyCost_le_suffixSpaceBound
         column countdown (leading ++ remaining) := by
   induction leading with
   | nil =>
-      cases remaining <;>
-        cases valid <;>
-        simp [packedNormalizationSuffixSpaceBound] <;>
-        omega
+      cases remaining with
+      | nil =>
+          cases valid
+          · simpa [packedNormalizationSuffixSpaceBound] using
+              (Nat.le_max_left
+                (packedNormalizationBodyCost periodicStrip packed
+                  column countdown false [])
+                (packedNormalizationBodyCost periodicStrip packed
+                  column countdown true []))
+          · simpa [packedNormalizationSuffixSpaceBound] using
+              (Nat.le_max_right
+                (packedNormalizationBodyCost periodicStrip packed
+                  column countdown false [])
+                (packedNormalizationBodyCost periodicStrip packed
+                  column countdown true []))
+      | cons cell remaining =>
+          cases valid
+          · exact Nat.le_max_left _ _
+          · exact
+              (Nat.le_max_left _ _).trans
+                (Nat.le_max_right _ _)
   | cons cell leading induction =>
       have bounded := induction
       simp only [List.cons_append,
         packedNormalizationSuffixSpaceBound]
-      omega
+      exact bounded.trans
+        ((Nat.le_max_right _ _).trans
+          (Nat.le_max_right _ _))
 
-/-- Sum of the suffix envelopes for every countdown up to the supplied
+/-- Maximum of the suffix envelopes for every countdown up to the supplied
 limit. -/
 def packedNormalizationSpaceBoundUpTo
     (periodicStrip : PeriodicStrip)
@@ -584,10 +605,11 @@ def packedNormalizationSpaceBoundUpTo
       packedNormalizationSuffixSpaceBound periodicStrip packed
         column 0 periodicStrip.motif
   | limit + 1 =>
-      packedNormalizationSuffixSpaceBound periodicStrip packed
-          column (limit + 1) periodicStrip.motif +
-        packedNormalizationSpaceBoundUpTo periodicStrip packed
-          column limit
+      max
+        (packedNormalizationSuffixSpaceBound periodicStrip packed
+          column (limit + 1) periodicStrip.motif)
+        (packedNormalizationSpaceBoundUpTo periodicStrip packed
+          column limit)
 
 theorem packedNormalizationSuffixSpaceBound_le_upTo
     (periodicStrip : PeriodicStrip)
@@ -605,11 +627,21 @@ theorem packedNormalizationSuffixSpaceBound_le_upTo
   | succ limit induction =>
       by_cases top : countdown = limit + 1
       · subst countdown
-        simp [packedNormalizationSpaceBoundUpTo]
+        simpa [packedNormalizationSpaceBoundUpTo] using
+          (Nat.le_max_left
+            (packedNormalizationSuffixSpaceBound periodicStrip
+              packed column (limit + 1) periodicStrip.motif)
+            (packedNormalizationSpaceBoundUpTo periodicStrip
+              packed column limit))
       · have below : countdown ≤ limit := by omega
         have previous := induction below
-        simp only [packedNormalizationSpaceBoundUpTo]
-        omega
+        exact previous.trans (by
+          simpa [packedNormalizationSpaceBoundUpTo] using
+            (Nat.le_max_right
+              (packedNormalizationSuffixSpaceBound periodicStrip
+                packed column (limit + 1) periodicStrip.motif)
+              (packedNormalizationSpaceBoundUpTo periodicStrip
+                packed column limit)))
 
 /-- One workspace envelope for every typed state reachable during the
 complete normalization scan. -/
