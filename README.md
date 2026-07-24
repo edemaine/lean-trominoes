@@ -515,6 +515,13 @@ The representation choices for this target are:
   digit zero is proved equivalent to an absent assignment, and the resulting
   `none` test is fitted by composing the lookup, one projection, and one
   zero test.
+- [`LeanTrominoes/PartrecPackedColumnPhase.lean`](LeanTrominoes/PartrecPackedColumnPhase.lean)
+  and
+  [`LeanTrominoes/PartrecPackedColumnPhaseSpace.lean`](LeanTrominoes/PartrecPackedColumnPhaseSpace.lean)
+  compute the wrapped horizontal coordinate of any of the five packed
+  frontier columns.  Three fitted additions, two predecessors, and the
+  quotient/remainder primitive implement the semantic phase formula on a
+  fixed-width native state.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
