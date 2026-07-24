@@ -1333,6 +1333,225 @@ theorem packedOverlapColumnCost_le_linear
     packedOverlapColumnBudget unit _ _ _
       projectionGlobal (Nat.le_refl _) inputGlobal
 
+def packedOverlapColumnArgumentsCost
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) : Nat :=
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      current.assignmentWord, next.assignmentWord]
+  let rest1 :=
+    prependCost values [current.assignmentWord]
+      [next.assignmentWord]
+      (getCost 1 values) (getCost 2 values)
+  let restColumn :=
+    prependCost values [column.val]
+      [current.assignmentWord, next.assignmentWord]
+      (numeralCost column.val values) rest1
+  let restSuccessor :=
+    prependCost values [column.val + 1]
+      [column.val, current.assignmentWord, next.assignmentWord]
+      (numeralCost (column.val + 1) values) restColumn
+  prependCost values [Encodable.encode periodicStrip.motif]
+    [column.val + 1, column.val,
+      current.assignmentWord, next.assignmentWord]
+    (getCost 0 values) restSuccessor
+
+theorem packedOverlapColumnArguments
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    EvaluatorCodeFits
+      (Code.packedOverlapColumnArgumentsCode column)
+      [Encodable.encode periodicStrip.motif,
+        current.assignmentWord, next.assignmentWord]
+      [Encodable.encode periodicStrip.motif,
+        column.val + 1, column.val,
+        current.assignmentWord, next.assignmentWord]
+      (packedOverlapColumnArgumentsCost
+        periodicStrip current next column) := by
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      current.assignmentWord, next.assignmentWord]
+  have rest1 := prepend (get 1 values) (get 2 values)
+  have restColumn := prepend (numeral column.val values) rest1
+  have restSuccessor :=
+    prepend (numeral (column.val + 1) values) restColumn
+  have result := prepend (get 0 values) restSuccessor
+  simpa [Code.packedOverlapColumnArgumentsCode,
+    packedOverlapColumnArgumentsCost, Code.numeral,
+    numeralCost, prependCost, values] using result
+
+def packedOverlapColumnAtCost
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) : Nat :=
+  packedOverlapColumnCost periodicStrip current next column +
+    packedOverlapColumnArgumentsCost
+      periodicStrip current next column
+
+theorem packedOverlapColumnAt
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    EvaluatorCodeFits (Code.packedOverlapColumnAtCode column)
+      [Encodable.encode periodicStrip.motif,
+        current.assignmentWord, next.assignmentWord]
+      [(current.overlapsColumnBool periodicStrip
+        next column).toNat]
+      (packedOverlapColumnAtCost
+        periodicStrip current next column) := by
+  simpa [Code.packedOverlapColumnAtCode,
+    packedOverlapColumnAtCost] using
+    comp
+      (packedOverlapColumn periodicStrip current next column)
+      (packedOverlapColumnArguments
+        periodicStrip current next column)
+
+def packedOverlapLastTwoCost
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      current.assignmentWord, next.assignmentWord]
+  boolAndCost values
+    (current.overlapsColumnBool
+      periodicStrip next (2 : Fin 4)).toNat
+    (current.overlapsColumnBool
+      periodicStrip next (3 : Fin 4)).toNat
+    (packedOverlapColumnAtCost
+      periodicStrip current next (2 : Fin 4))
+    (packedOverlapColumnAtCost
+      periodicStrip current next (3 : Fin 4))
+
+theorem packedOverlapLastTwo
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    EvaluatorCodeFits
+      (Code.boolAnd
+        (Code.packedOverlapColumnAtCode (2 : Fin 4))
+        (Code.packedOverlapColumnAtCode (3 : Fin 4)))
+      [Encodable.encode periodicStrip.motif,
+        current.assignmentWord, next.assignmentWord]
+      [(current.overlapsColumnBool
+          periodicStrip next (2 : Fin 4) &&
+        current.overlapsColumnBool
+          periodicStrip next (3 : Fin 4)).toNat]
+      (packedOverlapLastTwoCost
+        periodicStrip current next) := by
+  have combined :=
+    boolAnd
+      (packedOverlapColumnAt
+        periodicStrip current next (2 : Fin 4))
+      (packedOverlapColumnAt
+        periodicStrip current next (3 : Fin 4))
+  cases second :
+      current.overlapsColumnBool
+        periodicStrip next (2 : Fin 4) <;>
+    cases third :
+      current.overlapsColumnBool
+        periodicStrip next (3 : Fin 4) <;>
+    simpa [packedOverlapLastTwoCost, second, third] using combined
+
+def packedOverlapLastThreeCost
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      current.assignmentWord, next.assignmentWord]
+  let tailTag :=
+    (current.overlapsColumnBool periodicStrip next (2 : Fin 4) &&
+      current.overlapsColumnBool periodicStrip next (3 : Fin 4)).toNat
+  boolAndCost values
+    (current.overlapsColumnBool
+      periodicStrip next (1 : Fin 4)).toNat
+    tailTag
+    (packedOverlapColumnAtCost
+      periodicStrip current next (1 : Fin 4))
+    (packedOverlapLastTwoCost periodicStrip current next)
+
+theorem packedOverlapLastThree
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    EvaluatorCodeFits
+      (Code.boolAnd
+        (Code.packedOverlapColumnAtCode (1 : Fin 4))
+        (Code.boolAnd
+          (Code.packedOverlapColumnAtCode (2 : Fin 4))
+          (Code.packedOverlapColumnAtCode (3 : Fin 4))))
+      [Encodable.encode periodicStrip.motif,
+        current.assignmentWord, next.assignmentWord]
+      [(current.overlapsColumnBool
+          periodicStrip next (1 : Fin 4) &&
+        (current.overlapsColumnBool
+            periodicStrip next (2 : Fin 4) &&
+          current.overlapsColumnBool
+            periodicStrip next (3 : Fin 4))).toNat]
+      (packedOverlapLastThreeCost
+        periodicStrip current next) := by
+  have combined :=
+    boolAnd
+      (packedOverlapColumnAt
+        periodicStrip current next (1 : Fin 4))
+      (packedOverlapLastTwo periodicStrip current next)
+  cases first :
+      current.overlapsColumnBool
+        periodicStrip next (1 : Fin 4) <;>
+    cases second :
+      current.overlapsColumnBool
+        periodicStrip next (2 : Fin 4) <;>
+    cases third :
+      current.overlapsColumnBool
+        periodicStrip next (3 : Fin 4) <;>
+    simpa [packedOverlapLastThreeCost,
+      first, second, third] using combined
+
+def packedOverlapColumnsCost
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      current.assignmentWord, next.assignmentWord]
+  let tailTag :=
+    (current.overlapsColumnBool periodicStrip next (1 : Fin 4) &&
+      (current.overlapsColumnBool periodicStrip next (2 : Fin 4) &&
+        current.overlapsColumnBool
+          periodicStrip next (3 : Fin 4))).toNat
+  boolAndCost values
+    (current.overlapsColumnBool
+      periodicStrip next (0 : Fin 4)).toNat
+    tailTag
+    (packedOverlapColumnAtCost
+      periodicStrip current next (0 : Fin 4))
+    (packedOverlapLastThreeCost periodicStrip current next)
+
+theorem packedOverlapColumns
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    EvaluatorCodeFits Code.packedOverlapColumnsCode
+      [Encodable.encode periodicStrip.motif,
+        current.assignmentWord, next.assignmentWord]
+      [((List.finRange 4).all fun column =>
+        current.overlapsColumnBool periodicStrip next column).toNat]
+      (packedOverlapColumnsCost
+        periodicStrip current next) := by
+  have combined :=
+    boolAnd
+      (packedOverlapColumnAt
+        periodicStrip current next (0 : Fin 4))
+      (packedOverlapLastThree periodicStrip current next)
+  cases zero :
+      current.overlapsColumnBool
+        periodicStrip next (0 : Fin 4) <;>
+    cases one :
+      current.overlapsColumnBool
+        periodicStrip next (1 : Fin 4) <;>
+    cases two :
+      current.overlapsColumnBool
+        periodicStrip next (2 : Fin 4) <;>
+    cases three :
+      current.overlapsColumnBool
+        periodicStrip next (3 : Fin 4) <;>
+    simpa [Code.packedOverlapColumnsCode,
+      packedOverlapColumnsCost, List.finRange_succ,
+      zero, one, two, three] using combined
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
