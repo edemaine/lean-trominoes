@@ -309,7 +309,9 @@ The representation choices for this target are:
   compiler to the project's proposition-level PSPACE interface.  Normal,
   return, configuration, and whole-run certificates are all monotone in the
   chosen budget, so separately derived local bounds can be combined under
-  one polynomial.
+  one polynomial.  A generic invariant rule reduces the reachable-state
+  obligation to an initial predicate, one-step preservation, and a local
+  simulation bound.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

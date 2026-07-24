@@ -2669,6 +2669,36 @@ structure EvaluatorRunFits
 
 namespace EvaluatorRunFits
 
+/-- A step-preserved predicate that supplies the local simulation
+obligation is sufficient to certify all reachable evaluator milestones. -/
+theorem of_invariant
+    {code : ToPartrec.Code} {values : List Nat} {bound : Nat}
+    (invariant : ToPartrec.Cfg → Prop)
+    (normal :
+      normalSimulationFits code ToPartrec.Cont.halt values bound)
+    (initial :
+      invariant
+        (ToPartrec.stepNormal code ToPartrec.Cont.halt values))
+    (fits :
+      ∀ current, invariant current →
+        cfgSimulationFits current bound)
+    (preserved :
+      ∀ current next,
+        invariant current →
+        ToPartrec.step current = some next →
+        invariant next) :
+    EvaluatorRunFits code values bound where
+  normal := normal
+  configuration := by
+    intro current reachable
+    apply fits current
+    induction reachable with
+    | refl =>
+        exact initial
+    | @tail before after reachable edge induction =>
+        apply preserved before after induction
+        simpa only [Option.mem_def] using edge
+
 /-- Enlarge the common budget of a complete evaluator-run certificate. -/
 theorem mono
     {code : ToPartrec.Code} {values : List Nat}
