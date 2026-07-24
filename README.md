@@ -401,6 +401,16 @@ The representation choices for this target are:
   `Nat.sqrt`, while all live fields and evaluator traces use linear space.
   This supplies the square-root operation needed by Mathlib's standard
   pairing decoder `Nat.unpair`.
+- [`LeanTrominoes/PartrecSubtract.lean`](LeanTrominoes/PartrecSubtract.lean),
+  [`LeanTrominoes/PartrecSubtractSpace.lean`](LeanTrominoes/PartrecSubtractSpace.lean),
+  [`LeanTrominoes/PartrecUnpair.lean`](LeanTrominoes/PartrecUnpair.lean), and
+  [`LeanTrominoes/PartrecUnpairSpace.lean`](LeanTrominoes/PartrecUnpairSpace.lean)
+  complete an explicit fitted implementation of `Nat.unpair`.  Truncated
+  subtraction is a decreasing singleton countdown.  The unpair program
+  recovers the offset from the square-root scan's distance and odd gap, then
+  uses two bounded subtractions to select and compute the appropriate
+  coordinate.  Its result is proved exactly equal to Mathlib's pairing
+  decoder.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,

@@ -83,10 +83,9 @@ theorem sqrtInputCode_eval (number : Nat) :
       pure [number, 1, 1, 0] := by
   simp [sqrtInputCode]
 
-/-- Unary explicit code computing `Nat.sqrt`. -/
-def sqrtCode : Code :=
-  (get 2).comp <|
-    (flatIterate sqrtStepCode).comp sqrtInputCode
+/-- Unary code exposing the final `[distance, gap, root]` scan state. -/
+def sqrtStateCode : Code :=
+  (flatIterate sqrtStepCode).comp sqrtInputCode
 
 /-- Semantic invariant after `processed` scan steps. -/
 def SqrtInvariant
@@ -181,10 +180,22 @@ theorem sqrtStepList_iterate (steps : Nat) :
   exact payload
 
 @[simp]
+theorem sqrtStateCode_eval (number : Nat) :
+    sqrtStateCode.eval [number] =
+      pure
+        [((Nat.sqrt number + 1) * (Nat.sqrt number + 1) - number),
+          2 * Nat.sqrt number + 1, Nat.sqrt number] := by
+  simp [sqrtStateCode, flatIterate_eval,
+    sqrtStepList_iterate]
+
+/-- Unary explicit code computing `Nat.sqrt`. -/
+def sqrtCode : Code :=
+  (get 2).comp sqrtStateCode
+
+@[simp]
 theorem sqrtCode_eval (number : Nat) :
     sqrtCode.eval [number] =
       pure [Nat.sqrt number] := by
-  simp [sqrtCode, flatIterate_eval,
-    sqrtStepList_iterate]
+  simp [sqrtCode, sqrtStateCode_eval]
 
 end Turing.ToPartrec.Code

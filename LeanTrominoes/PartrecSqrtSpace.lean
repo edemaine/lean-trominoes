@@ -371,6 +371,105 @@ theorem sqrtBodyCost_le_loop
                 innerPlusTwoDirectBits] at *
               omega
 
+def sqrtStateCost (number : Nat) : Nat :=
+  sqrtInputCost number + sqrtLoopCost number
+
+theorem sqrtState (number : Nat) :
+    EvaluatorCodeFits Code.sqrtStateCode [number]
+      [((Nat.sqrt number + 1) *
+          (Nat.sqrt number + 1) - number),
+        2 * Nat.sqrt number + 1, Nat.sqrt number]
+      (sqrtStateCost number) where
+  input_space := by
+    have inputSpace := (sqrtInput number).input_space
+    simp only [sqrtStateCost]
+    omega
+  output_space := by
+    let finalPayload :=
+      ((Code.sqrtStepList)^[number]) [1, 1, 0]
+    have finalInvariant :
+        Code.SqrtInvariant number 0 finalPayload :=
+      Code.sqrtInvariant_iterate number
+    have bodyOutput :=
+      (sqrtBody 0 finalPayload).output_space
+    have bodyBound :=
+      sqrtBodyCost_le_loop number 0 finalPayload finalInvariant
+    have finalEq :
+        finalPayload =
+          [((Nat.sqrt number + 1) *
+              (Nat.sqrt number + 1) - number),
+            2 * Nat.sqrt number + 1, Nat.sqrt number] := by
+      simpa [finalPayload] using
+        Code.sqrtStepList_iterate number
+    simp [flatCountdownOutput, encodedListSpace_cons] at bodyOutput
+    rw [finalEq] at bodyOutput bodyBound
+    simp only [sqrtStateCost]
+    omega
+  call continuation bound budget after := by
+    let finalPayload :=
+      ((Code.sqrtStepList)^[number]) [1, 1, 0]
+    have finalEq :
+        finalPayload =
+          [((Nat.sqrt number + 1) *
+              (Nat.sqrt number + 1) - number),
+            2 * Nat.sqrt number + 1, Nat.sqrt number] := by
+      simpa [finalPayload] using
+        Code.sqrtStepList_iterate number
+    have afterLoop :
+        EvaluatorExecutionFits bound
+          (.ret continuation finalPayload) := by
+      rw [finalEq]
+      exact after
+    have flatCall :
+        EvaluatorCallFits
+          (Code.flatIterate Code.sqrtStepCode)
+          continuation [number, 1, 1, 0] bound := by
+      apply
+        EvaluatorCallFits.flatIterate_of_code_fits_invariant
+          (bodyCost := sqrtBodyCost)
+          (invariant := Code.SqrtInvariant number)
+      · exact sqrtBody
+      · exact Code.sqrtInvariant_initial number
+      · exact Code.sqrtInvariant_preserved number
+      · intro remaining payload invariant
+        have bodyCost :=
+          sqrtBodyCost_le_loop number remaining payload invariant
+        simp only [sqrtStateCost] at budget
+        omega
+      · simpa [finalPayload] using afterLoop
+    let loopContinuation :=
+      ToPartrec.Cont.comp
+        (Code.flatIterate Code.sqrtStepCode) continuation
+    have initialInvariant :
+        Code.SqrtInvariant number number [1, 1, 0] :=
+      Code.sqrtInvariant_initial number
+    have initialSpace :
+        encodedListSpace [number, 1, 1, 0] ≤
+          sqrtLoopCost number := by
+      have bodyInput :=
+        (sqrtBody number [1, 1, 0]).input_space
+      have bodyBound :=
+        sqrtBodyCost_le_loop number number
+          [1, 1, 0] initialInvariant
+      exact bodyInput.trans bodyBound
+    have afterInput :
+        EvaluatorExecutionFits bound
+          (.ret loopContinuation [number, 1, 1, 0]) := by
+      apply EvaluatorExecutionFits.ret_comp
+      · simp only [continuationSpace_comp]
+        simp only [sqrtStateCost] at budget
+        omega
+      · exact flatCall
+    have inputCall :=
+      (sqrtInput number).call loopContinuation bound
+        (by
+          simp only [loopContinuation,
+            continuationSpace_comp, sqrtStateCost] at *
+          omega)
+        afterInput
+    have whole := EvaluatorCallFits.comp inputCall
+    simpa [Code.sqrtStateCode, loopContinuation] using whole
+
 def sqrtCost (number : Nat) : Nat :=
   let finalPayload :=
     ((Code.sqrtStepList)^[number]) [1, 1, 0]
@@ -500,7 +599,7 @@ theorem sqrt (number : Nat) :
         afterInput
     have loopWithInput := EvaluatorCallFits.comp inputCall
     have whole := EvaluatorCallFits.comp loopWithInput
-    simpa [Code.sqrtCode, loopContinuation,
+    simpa [Code.sqrtCode, Code.sqrtStateCode, loopContinuation,
       getContinuation] using whole
 
 end EvaluatorCodeFits

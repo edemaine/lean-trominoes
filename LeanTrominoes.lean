@@ -54,6 +54,10 @@ import LeanTrominoes.PartrecPowerTwo
 import LeanTrominoes.PartrecPowerTwoSpace
 import LeanTrominoes.PartrecSqrt
 import LeanTrominoes.PartrecSqrtSpace
+import LeanTrominoes.PartrecSubtract
+import LeanTrominoes.PartrecSubtractSpace
+import LeanTrominoes.PartrecUnpair
+import LeanTrominoes.PartrecUnpairSpace
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
 import LeanTrominoes.StripFrontierCyclePartrec
