@@ -41,10 +41,12 @@ import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecBinaryLength
+import LeanTrominoes.PartrecBinaryLengthSpace
 import LeanTrominoes.PartrecCodeSpace
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecListCode
+import LeanTrominoes.PartrecListCodeSpace
 import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness

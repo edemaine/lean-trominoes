@@ -361,6 +361,15 @@ The representation choices for this target are:
   zero-branches, and Boolean tags.  Their list semantics are verified without
   pairing the variable-length payload into one natural; they form the
   instruction layer for compiling the flat DFS transition.
+- [`LeanTrominoes/PartrecListCodeSpace.lean`](LeanTrominoes/PartrecListCodeSpace.lean)
+  gives those list combinators compositional evaluator data costs, including
+  selected `branchZero` paths and a generic tagged-countdown body rule.
+- [`LeanTrominoes/PartrecBinaryLengthSpace.lean`](LeanTrominoes/PartrecBinaryLengthSpace.lean)
+  starts the matching quantitative proof for explicit binary arithmetic.
+  Division by two is now a fully fitted evaluator call: its quotient/parity
+  loop uses a preserved processed-count invariant, and monotonicity of binary
+  encoding length bounds every live quotient by the original input's bit
+  length under one linear data cost.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
