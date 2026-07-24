@@ -43,6 +43,34 @@ theorem normalizeBool
       branchZero_succ (Nat.pos_of_ne_zero zeroResult)
         valueFits (one values)
 
+def isZeroCost
+    (values : List Nat) (result valueCost : Nat) : Nat :=
+  if result = 0 then
+    branchZeroZeroCost values [1] result valueCost
+      (oneCost values)
+  else
+    branchZeroSuccCost values [0] result valueCost
+      (zeroCost values)
+
+theorem isZero
+    {value : Code} {values : List Nat}
+    {result valueCost : Nat}
+    (valueFits :
+      EvaluatorCodeFits value values [result] valueCost) :
+    EvaluatorCodeFits (Code.isZero value) values
+      [if result = 0 then 1 else 0]
+      (isZeroCost values result valueCost) := by
+  by_cases zeroResult : result = 0
+  · rw [if_pos zeroResult]
+    simpa [Code.isZero, isZeroCost,
+      zeroResult] using
+      branchZero_zero zeroResult valueFits (one values)
+  · rw [if_neg zeroResult]
+    simpa [Code.isZero, isZeroCost,
+      zeroResult] using
+      branchZero_succ (Nat.pos_of_ne_zero zeroResult)
+        valueFits (zero values)
+
 def boolAndCost
     (values : List Nat)
     (leftValue rightValue leftCost rightCost : Nat) : Nat :=

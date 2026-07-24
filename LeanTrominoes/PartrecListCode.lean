@@ -175,6 +175,24 @@ theorem normalizeBool_eval_at
     exact branchZero_eval_succ_at value zero one values result correct
       [1] (by simp) (Nat.pos_of_ne_zero zeroResult)
 
+/-- Return one exactly when a computed singleton natural is zero. -/
+def isZero (value : Code) : Code :=
+  branchZero value one zero
+
+theorem isZero_eval_at
+    (value : Code) (values : List Nat) (result : Nat)
+    (correct : value.eval values = pure [result]) :
+    (isZero value).eval values =
+      pure [if result = 0 then 1 else 0] := by
+  by_cases zeroResult : result = 0
+  · rw [if_pos zeroResult]
+    exact branchZero_eval_zero_at value one zero
+      values result correct [1] (by simp) zeroResult
+  · rw [if_neg zeroResult]
+    exact branchZero_eval_succ_at value one zero
+      values result correct [0] (by simp)
+      (Nat.pos_of_ne_zero zeroResult)
+
 /-- Boolean conjunction of two computed natural truth tags. -/
 def boolAnd (left right : Code) : Code :=
   branchZero left zero (normalizeBool right)

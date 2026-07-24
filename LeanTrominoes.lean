@@ -65,6 +65,8 @@ import LeanTrominoes.PartrecPowerTwo
 import LeanTrominoes.PartrecPowerTwoSpace
 import LeanTrominoes.PartrecSqrt
 import LeanTrominoes.PartrecSqrtSpace
+import LeanTrominoes.PartrecStripCellBounds
+import LeanTrominoes.PartrecStripCellBoundsSpace
 import LeanTrominoes.PartrecSubtract
 import LeanTrominoes.PartrecSubtractSpace
 import LeanTrominoes.PartrecUnpair

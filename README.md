@@ -449,6 +449,13 @@ The representation choices for this target are:
   use fitted truncated subtraction to return a normalized tag for natural
   strict comparison.  These operations express positive strip dimensions
   and coordinate upper bounds.
+- [`LeanTrominoes/PartrecStripCellBounds.lean`](LeanTrominoes/PartrecStripCellBounds.lean)
+  and
+  [`LeanTrominoes/PartrecStripCellBoundsSpace.lean`](LeanTrominoes/PartrecStripCellBoundsSpace.lean)
+  assemble those pieces into the first strip-specific fitted predicate.
+  Given `[width, period, cellCode]`, it returns one exactly when the decoded
+  cell is nonnegative in both coordinates and lies below the selected
+  `period × width` bounds, equivalently in the strip fundamental domain.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
