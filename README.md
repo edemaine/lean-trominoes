@@ -559,6 +559,12 @@ The representation choices for this target are:
   semantic `PackedWindowState.overlapsAtBool` test.  The complete projection,
   pair assembly, and equality program has a named evaluator-space bound
   linear in one encoded envelope for both columns and packed words.
+- [`LeanTrominoes/PartrecPackedOverlapLoop.lean`](LeanTrominoes/PartrecPackedOverlapLoop.lean)
+  streams the one-occurrence comparison through an encoded motif suffix,
+  retaining only the two packed assignment words and one validity bit.
+  Its closed loop is proved equal to
+  `PackedWindowState.overlapsColumnBool`; four explicitly assembled copies
+  then compute exactly the shared-column conjunction over `List.finRange 4`.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

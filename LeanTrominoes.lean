@@ -80,6 +80,7 @@ import LeanTrominoes.PartrecPackedNormalizationLoop
 import LeanTrominoes.PartrecPackedNormalizationLoopSpace
 import LeanTrominoes.PartrecPackedOverlapAt
 import LeanTrominoes.PartrecPackedOverlapAtSpace
+import LeanTrominoes.PartrecPackedOverlapLoop
 import LeanTrominoes.PartrecPeriodicStripDecode
 import LeanTrominoes.PartrecPeriodicStripDecodeSpace
 import LeanTrominoes.PartrecPolySpace
