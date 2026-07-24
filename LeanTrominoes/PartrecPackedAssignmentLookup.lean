@@ -540,6 +540,41 @@ def packedLookupColumnProcess
         packedLookupColumnProcess original target steps remaining
           (word / 9) digit false selected
 
+theorem packedLookupColumnNativeStep_iterate
+    (original remaining : List Cell) (target : Cell)
+    (steps word digit : Nat) (found selected : Bool) :
+    ((packedLookupColumnNativeStep)^[steps])
+        (packedLookupColumnState original remaining target
+          word digit found selected) =
+      packedLookupColumnProcess original target steps remaining
+        word digit found selected := by
+  induction steps generalizing remaining word digit found with
+  | zero =>
+      rfl
+  | succ steps induction =>
+      rw [Function.iterate_succ_apply]
+      cases found with
+      | true =>
+          rw [packedLookupColumnNativeStep_state_found]
+          simpa [packedLookupColumnProcess] using
+            induction remaining word digit true
+      | false =>
+          cases remaining with
+          | nil =>
+              rw [packedLookupColumnNativeStep_state_nil]
+              simpa [packedLookupColumnProcess] using
+                induction [] word digit false
+          | cons cell remaining =>
+              rw [packedLookupColumnNativeStep_state_cons]
+              by_cases hit :
+                  selected && decide (cell = target)
+              · rw [if_pos hit]
+                simpa [packedLookupColumnProcess, hit] using
+                  induction remaining (word / 9) (word % 9) true
+              · rw [if_neg hit]
+                simpa [packedLookupColumnProcess, hit] using
+                  induction remaining (word / 9) digit false
+
 theorem packedLookupColumnFlatIterateCode_eval
     (original remaining : List Cell) (target : Cell)
     (steps word digit : Nat) (found selected : Bool) :

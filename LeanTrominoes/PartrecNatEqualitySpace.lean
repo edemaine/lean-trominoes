@@ -93,6 +93,71 @@ theorem natEq (left right : Nat) :
       simpa [Code.natEqCode, natEqCost,
         equal, forward] using combined
 
+set_option maxHeartbeats 800000 in
+theorem natEqCost_le_linear (left right : Nat) :
+    natEqCost left right ≤
+      10000000000 *
+        (encodedListSpace [2 * (left + right) + 4] + 1) := by
+  let limit := 2 * (left + right) + 4
+  have leftBound : left ≤ limit := by
+    simp only [limit]
+    omega
+  have rightBound : right ≤ limit := by
+    simp only [limit]
+    omega
+  have forwardBound : left - right ≤ limit :=
+    (Nat.sub_le left right).trans leftBound
+  have reverseBound : right - left ≤ limit :=
+    (Nat.sub_le right left).trans rightBound
+  have leftBits := encodeNat_length_mono leftBound
+  have rightBits := encodeNat_length_mono rightBound
+  have forwardBits := encodeNat_length_mono forwardBound
+  have reverseBits := encodeNat_length_mono reverseBound
+  have forwardPredBits :=
+    encodeNat_length_mono
+      ((Nat.pred_le (left - right)).trans forwardBound)
+  have reversePredBits :=
+    encodeNat_length_mono
+      ((Nat.pred_le (right - left)).trans reverseBound)
+  have leftSuccBits :=
+    encodeNat_length_mono
+      (show left + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have rightSuccBits :=
+    encodeNat_length_mono
+      (show right + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have forwardSuccBits :=
+    encodeNat_length_mono
+      (show left - right + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have reverseSuccBits :=
+    encodeNat_length_mono
+      (show right - left + 1 ≤ limit by
+        simp only [limit]
+        omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  by_cases forwardZero : left - right = 0 <;>
+    by_cases reverseZero : right - left = 0 <;>
+    simp [natEqCost, forwardZeroCost, reverseZeroCost,
+      reverseSubtractCost, swapPairCost, isZeroCost,
+      boolAndCost, normalizeBoolCost,
+      subtractCost, subtractInputCost, subtractLoopCost,
+      branchZeroZeroCost, branchZeroSuccCost,
+      branchZeroTestCost, prependCost, getCost, dropCost,
+      headCost, idCost, nilCost, zeroCost, oneCost,
+      tailCost, zeroPrimeCost, succCost,
+      forwardZero, reverseZero,
+      encodedListSpace_cons, encodedListSpace_nil,
+      limit, zeroBits, oneBits] at * <;>
+    omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
