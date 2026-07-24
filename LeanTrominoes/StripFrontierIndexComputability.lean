@@ -16,6 +16,20 @@ namespace RawWindowState
 
 open LeanTrominoes.Computability
 
+theorem rawWindowState_equivData_primrec :
+    Primrec equivData :=
+  Primrec.of_equiv
+
+theorem rawWindowState_phase_primrec :
+    Primrec RawWindowState.phase := by
+  exact (Primrec.fst.comp rawWindowState_equivData_primrec).of_eq
+    (fun _ => rfl)
+
+theorem rawWindowState_assignment_primrec :
+    Primrec RawWindowState.assignment := by
+  exact (Primrec.snd.comp rawWindowState_equivData_primrec).of_eq
+    (fun _ => rfl)
+
 private def cellDedup : List Cell → List Cell
   | [] => []
   | head :: tail =>
@@ -75,6 +89,33 @@ theorem assignmentKeys_primrec : Primrec assignmentKeys := by
         (Primrec.snd.comp₂ Primrec₂.left) Primrec₂.right)
   exact Primrec.list_flatMap
     (Primrec.const (List.finRange 5)) cellsForColumn
+
+theorem assignmentAtCell_primrec :
+    Primrec fun input :
+      PeriodicStrip × RawWindowState × WindowColumn × Cell =>
+      input.2.1.assignmentAtCell input.1 input.2.2.1 input.2.2.2 := by
+  let strip : Primrec fun input :
+      PeriodicStrip × RawWindowState × WindowColumn × Cell =>
+      input.1 :=
+    Primrec.fst
+  let raw : Primrec fun input :
+      PeriodicStrip × RawWindowState × WindowColumn × Cell =>
+      input.2.1 :=
+    Primrec.fst.comp Primrec.snd
+  let column : Primrec fun input :
+      PeriodicStrip × RawWindowState × WindowColumn × Cell =>
+      input.2.2.1 :=
+    Primrec.fst.comp (Primrec.snd.comp Primrec.snd)
+  let cell : Primrec fun input :
+      PeriodicStrip × RawWindowState × WindowColumn × Cell =>
+      input.2.2.2 :=
+    Primrec.snd.comp (Primrec.snd.comp Primrec.snd)
+  unfold assignmentAtCell
+  exact Primrec.list_getD (none : Option SquareSymmetry) |>.comp
+    (rawWindowState_assignment_primrec.comp raw)
+    (Primrec.list_idxOf.comp
+      (Primrec.pair column cell)
+      (assignmentKeys_primrec.comp strip))
 
 theorem assignmentDigit_primrec : Primrec assignmentDigit :=
   Primrec.dom_finite assignmentDigit

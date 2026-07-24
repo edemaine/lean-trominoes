@@ -28,6 +28,17 @@ structure RawWindowState where
 
 namespace RawWindowState
 
+/-- Product representation used by the standard computability encoding. -/
+def equivData :
+    RawWindowState ≃ Nat × List (Option SquareSymmetry) where
+  toFun raw := (raw.phase, raw.assignment)
+  invFun data := ⟨data.1, data.2⟩
+  left_inv raw := by cases raw; rfl
+  right_inv data := by cases data; rfl
+
+noncomputable instance : Primcodable RawWindowState :=
+  Primcodable.ofEquiv (Nat × List (Option SquareSymmetry)) equivData
+
 /-- The canonical list of distinct motif cells. -/
 def motifCells (periodicStrip : PeriodicStrip) : List Cell :=
   periodicStrip.motif.dedup
@@ -77,22 +88,40 @@ instance (periodicStrip : PeriodicStrip) (raw : RawWindowState) :
   unfold IsValid
   infer_instance
 
+/-- Read an assignment value at an untyped motif cell from a raw word. -/
+def assignmentAtCell (periodicStrip : PeriodicStrip)
+    (raw : RawWindowState) (column : WindowColumn) (cell : Cell) :
+    Option SquareSymmetry :=
+  raw.assignment.getD
+    (@List.idxOf (WindowColumn × Cell) instBEqOfDecidableEq
+      (column, cell) (assignmentKeys periodicStrip)) none
+
 /-- Read one semantic assignment value from a raw assignment word. -/
 def assignmentAt (periodicStrip : PeriodicStrip) (raw : RawWindowState)
     (column : WindowColumn) (base : periodicStrip.MotifCell) :
     Option SquareSymmetry :=
-  raw.assignment.getD
-    ((assignmentKeys periodicStrip).idxOf (column, base.val)) none
+  raw.assignmentAtCell periodicStrip column base.val
+
+/-- Interpret a valid raw state as a dependent semantic frontier state. -/
+def toWindowState (periodicStrip : PeriodicStrip) (raw : RawWindowState)
+    (valid : raw.IsValid periodicStrip) :
+    WindowState periodicStrip where
+  phase := ⟨raw.phase, valid.1⟩
+  assignment := raw.assignmentAt periodicStrip
 
 /-- Decode a well-sized raw state into the dependent semantic state type. -/
 def decode (periodicStrip : PeriodicStrip) (raw : RawWindowState) :
     Option (WindowState periodicStrip) :=
   if valid : raw.IsValid periodicStrip then
-    some
-      { phase := ⟨raw.phase, valid.1⟩
-        assignment := raw.assignmentAt periodicStrip }
+    some (raw.toWindowState periodicStrip valid)
   else
     none
+
+theorem decode_eq_some_toWindowState (periodicStrip : PeriodicStrip)
+    (raw : RawWindowState) (valid : raw.IsValid periodicStrip) :
+    decode periodicStrip raw =
+      some (raw.toWindowState periodicStrip valid) := by
+  rw [decode, dif_pos valid]
 
 /-- Read a semantic assignment at an untyped motif cell. -/
 def semanticAssignmentAtCell {periodicStrip : PeriodicStrip}
@@ -125,7 +154,7 @@ theorem encode_isValid {periodicStrip : PeriodicStrip}
   · exact state.phase.isLt
   · simp [encode]
 
-private theorem getD_map_idxOf_of_mem {α β : Type*} [BEq α] [LawfulBEq α]
+private theorem getD_map_idxOf_of_mem {α β : Type*} [DecidableEq α]
     (keys : List α) (value : α → β) (default : β) {key : α}
     (member : key ∈ keys) :
     (keys.map value).getD (keys.idxOf key) default = value key := by
@@ -142,7 +171,8 @@ theorem assignmentAt_encode {periodicStrip : PeriodicStrip}
   change
     ((assignmentKeys periodicStrip).map
       (semanticAssignmentAtCell state)).getD
-        ((assignmentKeys periodicStrip).idxOf (column, base.val)) none =
+        (@List.idxOf (WindowColumn × Cell) instBEqOfDecidableEq
+          (column, base.val) (assignmentKeys periodicStrip)) none =
       state.assignment column base
   calc
     _ = semanticAssignmentAtCell state (column, base.val) :=
@@ -152,16 +182,23 @@ theorem assignmentAt_encode {periodicStrip : PeriodicStrip}
       semanticAssignmentAtCell_base state column base
 
 @[simp]
+theorem toWindowState_encode {periodicStrip : PeriodicStrip}
+    (state : WindowState periodicStrip) :
+    (encode state).toWindowState periodicStrip (encode_isValid state) =
+      state := by
+  cases state with
+  | mk phase assignment =>
+      unfold toWindowState
+      congr 1
+      funext column base
+      exact assignmentAt_encode ⟨phase, assignment⟩ column base
+
+@[simp]
 theorem decode_encode {periodicStrip : PeriodicStrip}
     (state : WindowState periodicStrip) :
     decode periodicStrip (encode state) = some state := by
   rw [decode, dif_pos (encode_isValid state)]
-  congr 1
-  cases state with
-  | mk phase assignment =>
-      congr 1
-      funext column base
-      exact assignmentAt_encode ⟨phase, assignment⟩ column base
+  exact congrArg some (toWindowState_encode state)
 
 /-- All canonically sized raw frontier states for an input strip. -/
 def all (periodicStrip : PeriodicStrip) : List RawWindowState :=

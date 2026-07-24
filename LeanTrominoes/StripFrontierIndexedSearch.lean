@@ -23,17 +23,15 @@ def semanticOfIndex (periodicStrip : PeriodicStrip)
     WindowState periodicStrip :=
   let raw := ofIndex periodicStrip stateIndex.val
   let valid := ofIndex_isValid periodPositive stateIndex.isLt
-  { phase := ⟨raw.phase, valid.1⟩
-    assignment := raw.assignmentAt periodicStrip }
+  raw.toWindowState periodicStrip valid
 
 theorem decode_ofIndex_eq_some (periodicStrip : PeriodicStrip)
     (periodPositive : 0 < periodicStrip.period)
     (stateIndex : Fin (indexCount periodicStrip)) :
     decode periodicStrip (ofIndex periodicStrip stateIndex.val) =
       some (semanticOfIndex periodicStrip periodPositive stateIndex) := by
-  rw [decode, dif_pos
-    (ofIndex_isValid periodPositive stateIndex.isLt)]
-  rfl
+  unfold decode semanticOfIndex
+  rw [dif_pos (ofIndex_isValid periodPositive stateIndex.isLt)]
 
 /-- Arithmetic index of a semantic frontier state. -/
 def indexOfWindow {periodicStrip : PeriodicStrip}
