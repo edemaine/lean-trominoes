@@ -536,9 +536,11 @@ The representation choices for this target are:
   fixed-width state retains the original motif for assignment lookup, a
   decreasing suffix, the packed phase and word, and one validity bit; the
   closed loop is proved equal to `PackedWindowState.normalizedColumnBool`.
-  Exact evaluator-space certificates now fit every component of one
-  streaming step and the surrounding flat-countdown body, ready for the
-  reachable-state uniform bound.
+  Exact evaluator-space certificates fit every component of one streaming
+  step and the surrounding flat-countdown body.  A preserved reachable-state
+  invariant restricts those steps to actual motif suffixes, yielding one
+  finite workspace envelope for the complete fitted column program; its
+  polynomial majorant remains to be established.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

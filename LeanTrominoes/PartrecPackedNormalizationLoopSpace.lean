@@ -533,6 +533,306 @@ theorem packedNormalizationLoopInput
     Code.packedNormalizationState,
     prependCost, values] using result
 
+/-- Sum of the exact body costs over every suffix of one motif, for a fixed
+countdown.  This finite envelope is useful before its eventual polynomial
+majorant is established. -/
+def packedNormalizationSuffixSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) : List Cell → Nat
+  | [] =>
+      packedNormalizationBodyCost periodicStrip packed column
+          countdown false [] +
+        packedNormalizationBodyCost periodicStrip packed column
+          countdown true []
+  | cell :: remaining =>
+      packedNormalizationBodyCost periodicStrip packed column
+          countdown false (cell :: remaining) +
+        packedNormalizationBodyCost periodicStrip packed column
+          countdown true (cell :: remaining) +
+        packedNormalizationSuffixSpaceBound periodicStrip packed
+          column countdown remaining
+
+theorem packedNormalizationBodyCost_le_suffixSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) (valid : Bool)
+    (leading remaining : List Cell) :
+    packedNormalizationBodyCost periodicStrip packed column
+        countdown valid remaining ≤
+      packedNormalizationSuffixSpaceBound periodicStrip packed
+        column countdown (leading ++ remaining) := by
+  induction leading with
+  | nil =>
+      cases remaining <;>
+        cases valid <;>
+        simp [packedNormalizationSuffixSpaceBound] <;>
+        omega
+  | cons cell leading induction =>
+      have bounded := induction
+      simp only [List.cons_append,
+        packedNormalizationSuffixSpaceBound]
+      omega
+
+/-- Sum of the suffix envelopes for every countdown up to the supplied
+limit. -/
+def packedNormalizationSpaceBoundUpTo
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    Nat → Nat
+  | 0 =>
+      packedNormalizationSuffixSpaceBound periodicStrip packed
+        column 0 periodicStrip.motif
+  | limit + 1 =>
+      packedNormalizationSuffixSpaceBound periodicStrip packed
+          column (limit + 1) periodicStrip.motif +
+        packedNormalizationSpaceBoundUpTo periodicStrip packed
+          column limit
+
+theorem packedNormalizationSuffixSpaceBound_le_upTo
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown limit : Nat) (bounded : countdown ≤ limit) :
+    packedNormalizationSuffixSpaceBound periodicStrip packed
+        column countdown periodicStrip.motif ≤
+      packedNormalizationSpaceBoundUpTo periodicStrip packed
+        column limit := by
+  induction limit with
+  | zero =>
+      have countdownZero : countdown = 0 := by omega
+      subst countdown
+      simp [packedNormalizationSpaceBoundUpTo]
+  | succ limit induction =>
+      by_cases top : countdown = limit + 1
+      · subst countdown
+        simp [packedNormalizationSpaceBoundUpTo]
+      · have below : countdown ≤ limit := by omega
+        have previous := induction below
+        simp only [packedNormalizationSpaceBoundUpTo]
+        omega
+
+/-- One workspace envelope for every typed state reachable during the
+complete normalization scan. -/
+def packedNormalizationSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) : Nat :=
+  packedNormalizationSpaceBoundUpTo periodicStrip packed column
+    (Encodable.encode periodicStrip.motif)
+
+theorem packedNormalizationBodyCost_le_spaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) (valid : Bool)
+    (remaining leading : List Cell)
+    (countdownBound :
+      countdown ≤ Encodable.encode periodicStrip.motif)
+    (suffix : periodicStrip.motif = leading ++ remaining) :
+    packedNormalizationBodyCost periodicStrip packed column
+        countdown valid remaining ≤
+      packedNormalizationSpaceBound periodicStrip packed column := by
+  have bodyToSuffix :=
+    packedNormalizationBodyCost_le_suffixSpaceBound
+      periodicStrip packed column countdown valid leading remaining
+  rw [← suffix] at bodyToSuffix
+  exact bodyToSuffix.trans
+    (packedNormalizationSuffixSpaceBound_le_upTo
+      periodicStrip packed column countdown
+      (Encodable.encode periodicStrip.motif) countdownBound)
+
+/-- Typed suffix states reachable while the packed normalization countdown
+is running. -/
+def PackedNormalizationReachable
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) (values : List Nat) : Prop :=
+  ∃ valid remaining leading,
+    values =
+      Code.packedNormalizationState periodicStrip packed
+        column valid remaining ∧
+    countdown ≤ Encodable.encode periodicStrip.motif ∧
+    periodicStrip.motif = leading ++ remaining
+
+theorem packedNormalizationReachable_initial
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (valid : Bool) :
+    PackedNormalizationReachable periodicStrip packed column
+      (Encodable.encode periodicStrip.motif)
+      (Code.packedNormalizationState periodicStrip packed
+        column valid periodicStrip.motif) := by
+  exact ⟨valid, periodicStrip.motif, [], rfl,
+    Nat.le_refl _, by simp⟩
+
+theorem packedNormalizationReachable_step
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (countdown : Nat) (values : List Nat)
+    (reachable :
+      PackedNormalizationReachable periodicStrip packed column
+        (countdown + 1) values) :
+    PackedNormalizationReachable periodicStrip packed column
+      countdown
+      (Code.packedNormalizationNativeStep
+        periodicStrip packed column values) := by
+  obtain ⟨valid, remaining, leading, rfl,
+    countdownBound, suffix⟩ := reachable
+  cases remaining with
+  | nil =>
+      exact ⟨valid, [], leading,
+        Code.packedNormalizationNativeStep_state_nil
+          periodicStrip packed column valid,
+        by omega, suffix⟩
+  | cons cell remaining =>
+      refine
+        ⟨valid &&
+            packed.normalizedAtBool periodicStrip column cell,
+          remaining, leading ++ [cell], ?_, by omega, ?_⟩
+      · exact
+          Code.packedNormalizationNativeStep_state_cons
+            periodicStrip packed column valid cell remaining
+      · simpa [List.append_assoc] using suffix
+
+theorem packedNormalizationReachable_iterate
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (valid : Bool) (countdown taken : Nat)
+    (total :
+      countdown + taken =
+        Encodable.encode periodicStrip.motif) :
+    PackedNormalizationReachable periodicStrip packed column
+      countdown
+      (((Code.packedNormalizationNativeStep
+        periodicStrip packed column)^[taken])
+        (Code.packedNormalizationState periodicStrip packed
+          column valid periodicStrip.motif)) := by
+  induction taken generalizing countdown with
+  | zero =>
+      have countdownEq :
+          countdown = Encodable.encode periodicStrip.motif := by
+        simpa using total
+      subst countdown
+      simpa using
+        packedNormalizationReachable_initial
+          periodicStrip packed column valid
+  | succ taken induction =>
+      have previousTotal :
+          (countdown + 1) + taken =
+            Encodable.encode periodicStrip.motif := by
+        omega
+      have previous := induction (countdown + 1) previousTotal
+      rw [Function.iterate_succ_apply']
+      exact
+        packedNormalizationReachable_step periodicStrip packed
+          column countdown _ previous
+
+/-- The complete normalization countdown reuses one finite reachable-state
+workspace envelope at every iteration. -/
+theorem packedNormalizationFlatUniform
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    EvaluatorCodeFits
+      (Code.flatIterate Code.packedNormalizationStepCode)
+      (Encodable.encode periodicStrip.motif ::
+        Code.packedNormalizationState periodicStrip packed
+          column true periodicStrip.motif)
+      (Code.packedNormalizationState periodicStrip packed column
+        (packed.normalizedColumnBool periodicStrip column) [])
+      (packedNormalizationSpaceBound
+        periodicStrip packed column) where
+  input_space := by
+    have body :=
+      packedNormalizationBody periodicStrip packed column
+        (Encodable.encode periodicStrip.motif)
+        true periodicStrip.motif
+    exact body.input_space.trans
+      (packedNormalizationBodyCost_le_spaceBound
+        periodicStrip packed column
+        (Encodable.encode periodicStrip.motif)
+        true periodicStrip.motif []
+        (Nat.le_refl _) (by simp))
+  output_space := by
+    let result :=
+      packed.normalizedColumnBool periodicStrip column
+    have body :=
+      packedNormalizationBody periodicStrip packed column
+        0 result []
+    have input := body.input_space
+    have cost :=
+      packedNormalizationBodyCost_le_spaceBound
+        periodicStrip packed column 0 result []
+        periodicStrip.motif (Nat.zero_le _) (by simp)
+    simp only [result] at input cost
+    simp only [Code.packedNormalizationState,
+      encodedListSpace_cons] at input ⊢
+    omega
+  call continuation bound budget after := by
+    apply
+      EvaluatorCallFits.flatIterate_of_reachable_code_fits
+        (step :=
+          Code.packedNormalizationNativeStep
+            periodicStrip packed column)
+        (bodyCost := fun _ _ =>
+          packedNormalizationSpaceBound
+            periodicStrip packed column)
+        (invariant :=
+          PackedNormalizationReachable
+            periodicStrip packed column)
+    · intro countdown values reachable
+      obtain ⟨valid, remaining, leading, rfl,
+        countdownBound, suffix⟩ := reachable
+      exact
+        (packedNormalizationBody periodicStrip packed column
+          countdown valid remaining).mono
+          (packedNormalizationBodyCost_le_spaceBound
+            periodicStrip packed column countdown valid
+            remaining leading countdownBound suffix)
+    · exact packedNormalizationReachable_initial
+        periodicStrip packed column true
+    · exact packedNormalizationReachable_step
+        periodicStrip packed column
+    · intro countdown values reachable
+      exact budget
+    · rw [Code.packedNormalizationNativeStep_iterate,
+        Code.packedNormalizationProcess_encode]
+      simpa using after
+
+def packedNormalizationColumnCost
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) : Nat :=
+  let result :=
+    Code.packedNormalizationState periodicStrip packed column
+      (packed.normalizedColumnBool periodicStrip column) []
+  getCost 6 result +
+    (packedNormalizationSpaceBound periodicStrip packed column +
+      packedNormalizationLoopInputCost
+        periodicStrip packed column)
+
+/-- Fitted closed program for normalization of one packed frontier column. -/
+theorem packedNormalizationColumn
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    EvaluatorCodeFits Code.packedNormalizationColumnCode
+      [periodicStrip.period, packed.phase,
+        Encodable.encode periodicStrip.motif,
+        column.val, packed.assignmentWord]
+      [(packed.normalizedColumnBool
+        periodicStrip column).toNat]
+      (packedNormalizationColumnCost
+        periodicStrip packed column) := by
+  let result :=
+    Code.packedNormalizationState periodicStrip packed column
+      (packed.normalizedColumnBool periodicStrip column) []
+  have loop :=
+    comp
+      (packedNormalizationFlatUniform
+        periodicStrip packed column)
+      (packedNormalizationLoopInput
+        periodicStrip packed column)
+  have projected := comp (get 6 result) loop
+  simpa [Code.packedNormalizationColumnCode,
+    packedNormalizationColumnCost, result,
+    Code.packedNormalizationState] using projected
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
