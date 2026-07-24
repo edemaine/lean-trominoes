@@ -3008,6 +3008,70 @@ theorem normalized
     EvaluatorCallFits code continuation values bound :=
   ⟨normal, execution⟩
 
+/-- Fit the `zero'` primitive.  Its one extra normalization cell is exactly
+the delimiter of the zero prepended to the returned list. -/
+theorem zero'
+    {continuation : ToPartrec.Cont} {values : List Nat}
+    {bound : Nat}
+    (after :
+      EvaluatorExecutionFits bound
+        (.ret continuation (0 :: values))) :
+    EvaluatorCallFits ToPartrec.Code.zero' continuation values
+      bound := by
+  have returnedSpace :
+      evaluatorCfgSpace (.ret continuation (0 :: values)) ≤
+        bound := by
+    have returnedFits :
+        retSimulationFits continuation (0 :: values) bound :=
+      (retSimulationFits_iff _ _ _).2 (by
+        simpa [cfgSimulationSpace] using after.current_space)
+    simpa [evaluatorCfgSpace] using
+      retSimulationFits_start returnedFits
+  constructor
+  · simp only [normalSimulationSpace]
+    simp [evaluatorCfgSpace, encodedListSpace_cons,
+      Computability.encodeNat, Computability.encodeNum] at returnedSpace
+    omega
+  · simpa [ToPartrec.stepNormal] using after
+
+/-- Fit the binary-successor primitive from bounds on its source footprint
+and its one-cell transient output overhead. -/
+theorem succ
+    {continuation : ToPartrec.Cont} {values : List Nat}
+    {bound : Nat}
+    (source :
+      encodedListSpace values + continuationSpace continuation + 1 ≤
+        bound)
+    (result :
+      encodedListSpace [values.headI] +
+          continuationSpace continuation + 1 ≤
+        bound)
+    (after :
+      EvaluatorExecutionFits bound
+        (.ret continuation [values.headI.succ])) :
+    EvaluatorCallFits ToPartrec.Code.succ continuation values
+      bound := by
+  constructor
+  · simp only [normalSimulationSpace]
+    exact max_le source result
+  · simpa [ToPartrec.stepNormal] using after
+
+/-- Fit the list-tail primitive from its source milestone bound. -/
+theorem tail
+    {continuation : ToPartrec.Cont} {values : List Nat}
+    {bound : Nat}
+    (source :
+      encodedListSpace values + continuationSpace continuation ≤
+        bound)
+    (after :
+      EvaluatorExecutionFits bound
+        (.ret continuation values.tail)) :
+    EvaluatorCallFits ToPartrec.Code.tail continuation values
+      bound := by
+  constructor
+  · simpa [normalSimulationSpace] using source
+  · simpa [ToPartrec.stepNormal] using after
+
 /-- Fitting the selected first subcall fits normalization of `cons`. -/
 theorem cons
     {first rest : ToPartrec.Code} {continuation : ToPartrec.Cont}
