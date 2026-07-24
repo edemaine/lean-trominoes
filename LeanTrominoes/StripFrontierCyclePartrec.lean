@@ -584,10 +584,11 @@ theorem stripCycleSearchCode_eval (tromino : Tromino)
       simp [cycleSearchIndexDFSBoolAtDepth]
       rfl
 
-private noncomputable def stripIndexCountCode : Code :=
+/-- Unary code computing the exact sparse-frontier state count. -/
+noncomputable def stripIndexCountCode : Code :=
   codeOfPrimrec indexCount indexCount_primrec
 
-private theorem stripIndexCountCode_eval
+theorem stripIndexCountCode_eval
     (periodicStrip : PeriodicStrip) :
     stripIndexCountCode.eval [Encodable.encode periodicStrip] =
       pure [indexCount periodicStrip] := by
@@ -595,10 +596,11 @@ private theorem stripIndexCountCode_eval
   simpa [stripIndexCountCode] using
     codeOfPrimrec_eval indexCount indexCount_primrec periodicStrip
 
-private noncomputable def stripSearchDepthCode : Code :=
+/-- Unary code computing the certified Savitch search depth. -/
+noncomputable def stripSearchDepthCode : Code :=
   codeOfPrimrec stripSearchDepth stripSearchDepth_primrec
 
-private theorem stripSearchDepthCode_eval
+theorem stripSearchDepthCode_eval
     (periodicStrip : PeriodicStrip) :
     stripSearchDepthCode.eval [Encodable.encode periodicStrip] =
       pure [stripSearchDepth periodicStrip] := by
@@ -611,11 +613,12 @@ private theorem encodeBool_eq_divideBoolTag (value : Bool) :
     Encodable.encode value = divideBoolTag value := by
   cases value <;> rfl
 
-private noncomputable def stripWellFormedCode : Code :=
+/-- Unary code deciding whether a strip presentation is well formed. -/
+noncomputable def stripWellFormedCode : Code :=
   codeOfPrimrec PeriodicStrip.wellFormed
     periodicStrip_wellFormed_primrec
 
-private theorem stripWellFormedCode_eval
+theorem stripWellFormedCode_eval
     (periodicStrip : PeriodicStrip) :
     stripWellFormedCode.eval [Encodable.encode periodicStrip] =
       pure [divideBoolTag periodicStrip.wellFormed] := by
@@ -624,12 +627,14 @@ private theorem stripWellFormedCode_eval
     codeOfPrimrec_eval PeriodicStrip.wellFormed
       periodicStrip_wellFormed_primrec periodicStrip
 
-private noncomputable def stripCycleParametersCode : Code :=
+/-- Assemble the encoded strip, state count, and search depth consumed by the
+parameterized cycle search. -/
+noncomputable def stripCycleParametersCode : Code :=
   Code.prepend (Code.get 0) <|
     Code.prepend stripIndexCountCode <|
       Code.prepend stripSearchDepthCode Code.nil
 
-private theorem stripCycleParametersCode_eval
+theorem stripCycleParametersCode_eval
     (periodicStrip : PeriodicStrip) :
     stripCycleParametersCode.eval [Encodable.encode periodicStrip] =
       pure [Encodable.encode periodicStrip, indexCount periodicStrip,
@@ -637,7 +642,8 @@ private theorem stripCycleParametersCode_eval
   simp [stripCycleParametersCode, stripIndexCountCode_eval,
     stripSearchDepthCode_eval]
 
-private noncomputable def guardedStripCycleCode (tromino : Tromino) : Code :=
+/-- Guard the parameterized cycle search by strip well-formedness. -/
+noncomputable def guardedStripCycleCode (tromino : Tromino) : Code :=
   Code.boolAnd stripWellFormedCode <|
     (stripCycleSearchCode tromino).comp stripCycleParametersCode
 

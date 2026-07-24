@@ -348,6 +348,8 @@ The representation choices for this target are:
   `cycleSearchIndexDFSBoolAtDepth`; a unary front end computes the strip's
   state count and certified search depth, rejects malformed presentations,
   and is proved equal to `periodicStripTrominoTilingIndexBool`.
+  Its state-count, depth, well-formedness, parameter-assembly, and guarded
+  driver codes are named public control points for the evaluator-space proof.
 - [`LeanTrominoes/StripFrontierPartrecSpace.lean`](LeanTrominoes/StripFrontierPartrecSpace.lean)
   bounds the complete serialized payload of each compiled exact-fuel
   reachability loop.  Although the countdown's numeric value is exponential,
