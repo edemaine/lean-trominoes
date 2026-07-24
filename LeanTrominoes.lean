@@ -50,8 +50,12 @@ import LeanTrominoes.PartrecCellDecodeSpace
 import LeanTrominoes.PartrecCodeSpace
 import LeanTrominoes.PartrecDiv2Parity
 import LeanTrominoes.PartrecDiv2ParitySpace
+import LeanTrominoes.PartrecDivision
+import LeanTrominoes.PartrecDivisionSpace
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
+import LeanTrominoes.PartrecFrontierIndexDecode
+import LeanTrominoes.PartrecFrontierIndexDecodeSpace
 import LeanTrominoes.PartrecFuel
 import LeanTrominoes.PartrecFuelSpace
 import LeanTrominoes.PartrecListCode

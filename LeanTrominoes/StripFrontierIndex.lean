@@ -70,6 +70,60 @@ def decodeAssignment (length code : Nat) :
   (List.range length).map fun position =>
     assignmentOfDigit (assignmentDigitAt code position)
 
+/-- Decode a base-nine word by repeatedly exposing its low digit.  This
+recursive presentation is the semantic model for the fitted streaming
+decoder, while `decodeAssignment` remains convenient for primitive-recursive
+indexing proofs. -/
+def decodeAssignmentStream : Nat → Nat →
+    List (Option SquareSymmetry)
+  | 0, _ => []
+  | length + 1, code =>
+      assignmentOfDigit (code % 9) ::
+        decodeAssignmentStream length (code / 9)
+
+@[simp]
+theorem length_decodeAssignmentStream (length code : Nat) :
+    (decodeAssignmentStream length code).length = length := by
+  induction length generalizing code with
+  | zero => rfl
+  | succ length induction =>
+      simp [decodeAssignmentStream, induction]
+
+theorem getElem_decodeAssignmentStream
+    (length code position : Nat)
+    (positionBound : position < length) :
+    (decodeAssignmentStream length code)[position]'(by
+        simpa using positionBound) =
+      assignmentOfDigit (assignmentDigitAt code position) := by
+  induction length generalizing code position with
+  | zero =>
+      omega
+  | succ length induction =>
+      cases position with
+      | zero =>
+          simp [decodeAssignmentStream, assignmentDigitAt]
+      | succ position =>
+          simp only [decodeAssignmentStream, List.getElem_cons_succ]
+          rw [induction (code := code / 9) (position := position)
+            (by omega)]
+          apply congrArg assignmentOfDigit
+          unfold assignmentDigitAt
+          rw [pow_succ, Nat.div_div_eq_div_mul,
+            Nat.mul_comm 9 (9 ^ position)]
+
+theorem decodeAssignmentStream_eq_decodeAssignment
+    (length code : Nat) :
+    decodeAssignmentStream length code =
+      decodeAssignment length code := by
+  apply List.ext_getElem
+  · simp [decodeAssignment]
+  · intro position leftBound rightBound
+    have positionBound : position < length := by
+      simpa using leftBound
+    rw [getElem_decodeAssignmentStream
+      length code position positionBound]
+    simp [decodeAssignment]
+
 theorem encodeAssignment_lt (assignment : List (Option SquareSymmetry)) :
     encodeAssignment assignment < 9 ^ assignment.length := by
   unfold encodeAssignment

@@ -287,6 +287,11 @@ theorem divisionBodyCost_le_input
   have divisorPredBits :=
     encodeNat_length_mono
       ((Nat.pred_le divisor).trans divisorBound)
+  have divisorSuccBits :=
+    encodeNat_length_mono
+      (show divisor + 1 ≤ limit by
+        simp only [limit]
+        omega)
   have quotientSuccBits :=
     encodeNat_length_mono
       (show quotient + 1 ≤ limit by
@@ -354,7 +359,7 @@ theorem divisionBodyCost_le_input
         Code.divisionListStep, divisorZero, below,
         encodedListSpace_cons, encodedListSpace_nil,
         limit, zeroBits, oneBits] at * <;>
-      nlinarith
+      omega
   exact plumbing.trans comparisonReserve
 
 /-- Reachable loop states, expressed only through the bounds needed by the

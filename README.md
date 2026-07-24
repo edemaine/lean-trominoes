@@ -459,6 +459,17 @@ The representation choices for this target are:
   dividend, yielding a uniform input-linear evaluator-space certificate.
   This shared primitive supports both period division of frontier indices
   and repeated base-nine assignment-word decoding.
+- [`LeanTrominoes/PartrecFrontierIndexDecode.lean`](LeanTrominoes/PartrecFrontierIndexDecode.lean)
+  and
+  [`LeanTrominoes/PartrecFrontierIndexDecodeSpace.lean`](LeanTrominoes/PartrecFrontierIndexDecodeSpace.lean)
+  turn `[period, firstIndex, lastIndex]` into the fixed-width packed view
+  `[firstWord, firstPhase, lastWord, lastPhase]`, then expose each word's
+  low base-nine digit and residual quotient on demand.  Repeated digit steps
+  are proved extensionally equal to the existing assignment-list decoder,
+  and every projection, period division, and paired digit step has a
+  compositional evaluator-space certificate.  Thus later motif scans can
+  stream both frontier assignments without allocating either assignment
+  list.
 - [`LeanTrominoes/PartrecStripCellBounds.lean`](LeanTrominoes/PartrecStripCellBounds.lean)
   and
   [`LeanTrominoes/PartrecStripCellBoundsSpace.lean`](LeanTrominoes/PartrecStripCellBoundsSpace.lean)
