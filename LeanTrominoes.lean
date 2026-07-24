@@ -42,6 +42,7 @@ import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecFlatIteration
+import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.StripFrontier

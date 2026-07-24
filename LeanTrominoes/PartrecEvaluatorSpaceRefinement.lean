@@ -2854,6 +2854,7 @@ theorem before_reaches
     (space :
       ∀ current,
         Reaches ToPartrec.step first current →
+          Reaches ToPartrec.step current last →
           cfgSimulationSpace current ≤ bound) :
     EvaluatorExecutionFits bound first := by
   revert lastExecution
@@ -2876,8 +2877,14 @@ theorem before_reaches
             apply EvaluatorExecutionFits.ret continuation values
             · simpa [cfgSimulationSpace] using
                 space (.ret continuation values) reachable
+                  (Relation.ReflTransGen.single edge)
             · exact lastExecution
-      exact induction middleExecution
+      apply induction
+      · intro current firstToCurrent currentToMiddle
+        exact
+          space current firstToCurrent
+            (currentToMiddle.tail edge)
+      · exact middleExecution
 
 /-- Every high-level configuration reached along a fitted finite execution
 satisfies its numeric simulation requirement. -/
@@ -3324,6 +3331,8 @@ theorem of_trace
       ∀ current,
         Reaches ToPartrec.step
           (ToPartrec.stepNormal code continuation values) current →
+          Reaches ToPartrec.step current
+            (ToPartrec.stepRet continuation output) →
           cfgSimulationSpace current ≤ bound) :
     EvaluatorCallFits code continuation values bound := by
   refine ⟨normal, ?_⟩

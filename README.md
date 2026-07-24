@@ -344,6 +344,12 @@ The representation choices for this target are:
   correctness for any total payload-step code is proved by induction.  The
   recursive call is in tail position, so exponential iteration does not
   accumulate an exponential continuation stack.
+- [`LeanTrominoes/PartrecFlatIterationSpace.lean`](LeanTrominoes/PartrecFlatIterationSpace.lean)
+  proves the matching fitted-call rule.  A certificate for one fixed-point
+  body trace, its normalization, and its returned tagged value lifts to any
+  number of countdown iterations under the same evaluator-space budget.
+  Thus the space proof depends on the largest live iteration payload, not on
+  the possibly exponential iteration count.
 - [`LeanTrominoes/PartrecListCode.lean`](LeanTrominoes/PartrecListCode.lean)
   builds direct `ToPartrec.Code` combinators for fixed-offset fields, preserved
   zero-branches, and Boolean tags.  Their list semantics are verified without
