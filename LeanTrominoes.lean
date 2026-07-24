@@ -41,6 +41,7 @@ import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecBinaryLength
+import LeanTrominoes.PartrecCodeSpace
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecListCode

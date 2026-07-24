@@ -338,6 +338,12 @@ The representation choices for this target are:
   invariant over the trace.  This supplies the reusable interface needed to
   certify a tail-recursive countdown without replaying the continuation
   plumbing of every derived code combinator.
+- [`LeanTrominoes/PartrecCodeSpace.lean`](LeanTrominoes/PartrecCodeSpace.lean)
+  separates a finite code call's data cost from its ambient continuation.
+  Primitive, composition, pairing, and selected-case rules compose these
+  costs while producing full `EvaluatorCallFits` certificates.  This is the
+  arithmetic layer used to certify explicit list programs without repeatedly
+  unfolding the evaluator's saved continuation data.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;
