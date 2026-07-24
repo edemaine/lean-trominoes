@@ -529,6 +529,11 @@ The representation choices for this target are:
   signed horizontal cell coordinate with its wrapped column phase or accepts
   an absent packed assignment; the fitted Boolean composition is proved
   equal to `PackedWindowState.normalizedAtBool`.
+- [`LeanTrominoes/PartrecPackedNormalizationLoop.lean`](LeanTrominoes/PartrecPackedNormalizationLoop.lean)
+  streams that predicate through one complete encoded motif column.  Its
+  fixed-width state retains the original motif for assignment lookup, a
+  decreasing suffix, the packed phase and word, and one validity bit; the
+  closed loop is proved equal to `PackedWindowState.normalizedColumnBool`.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
