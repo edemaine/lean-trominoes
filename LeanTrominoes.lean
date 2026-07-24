@@ -42,6 +42,8 @@ import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecEncodedListDecode
 import LeanTrominoes.PartrecEncodedListDecodeSpace
+import LeanTrominoes.PartrecAdd
+import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecBinaryLengthSpace
 import LeanTrominoes.PartrecBooleanSpace

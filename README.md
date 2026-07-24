@@ -402,6 +402,12 @@ The representation choices for this target are:
   `Nat.sqrt`, while all live fields and evaluator traces use linear space.
   This supplies the square-root operation needed by Mathlib's standard
   pairing decoder `Nat.unpair`.
+- [`LeanTrominoes/PartrecAdd.lean`](LeanTrominoes/PartrecAdd.lean) and
+  [`LeanTrominoes/PartrecAddSpace.lean`](LeanTrominoes/PartrecAddSpace.lean)
+  provide fixed-width natural addition for frontier phase arithmetic.  A
+  flat countdown increments one accumulator, whose invariant bounds every
+  intermediate value by the final sum and yields a reusable linear-space
+  evaluator certificate.
 - [`LeanTrominoes/PartrecSubtract.lean`](LeanTrominoes/PartrecSubtract.lean),
   [`LeanTrominoes/PartrecSubtractSpace.lean`](LeanTrominoes/PartrecSubtractSpace.lean),
   [`LeanTrominoes/PartrecUnpair.lean`](LeanTrominoes/PartrecUnpair.lean), and
