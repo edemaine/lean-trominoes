@@ -307,6 +307,9 @@ The representation choices for this target are:
   its little-endian binary encoding has quadratic length; combining that
   bound with the flat DFS theorem accounts explicitly for the strip context,
   graph-size and stack-length counters, and every semantic loop milestone.
+  The surrounding first- and second-endpoint countdown payloads have a
+  separate explicit linear bound, including all loop counters and their
+  Boolean accumulator.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
