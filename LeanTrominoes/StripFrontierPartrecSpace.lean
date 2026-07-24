@@ -403,6 +403,71 @@ theorem stripResult_encodedListSpace_le (result : Bool) :
     encodedListSpace [Encodable.encode result] ≤ 2 := by
   cases result <;> decide
 
+/-- Fitted-call obligations for the six opaque primitive-recursive leaves
+used by the otherwise explicit strip evaluator.  Each field is
+continuation-passing: given a fitted execution after the leaf returns its
+verified result, it supplies a fitted execution of the leaf call itself.
+
+Separating this interface prevents correctness-only code selection from
+silently being treated as a space bound. -/
+structure StripEvaluatorLeafCallsFit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (bound : Nat) : Prop where
+  base :
+    ∀ first last continuation,
+      first < indexCount periodicStrip →
+      last < indexCount periodicStrip →
+      EvaluatorExecutionFits bound
+        (.ret continuation
+          [FiniteState.divideBoolTag
+            (decide (first = last) ||
+              indexedTransitionRawBool tromino periodicStrip
+                first last)]) →
+      EvaluatorCallFits (stripBaseVectorCode tromino)
+        continuation
+        [Encodable.encode periodicStrip, first, last] bound
+  edge :
+    ∀ first last continuation,
+      first < indexCount periodicStrip →
+      last < indexCount periodicStrip →
+      EvaluatorExecutionFits bound
+        (.ret continuation
+          [FiniteState.divideBoolTag
+            (indexedTransitionRawBool tromino periodicStrip
+              first last)]) →
+      EvaluatorCallFits (stripEdgeVectorCode tromino)
+        continuation
+        [Encodable.encode periodicStrip, first, last] bound
+  fuel :
+    ∀ continuation,
+      EvaluatorExecutionFits bound
+        (.ret continuation
+          [FiniteState.divideEvalFuel
+            (indexCount periodicStrip)
+            (stripSearchDepth periodicStrip)]) →
+      EvaluatorCallFits divideEvalFuelCode continuation
+        [indexCount periodicStrip, stripSearchDepth periodicStrip]
+        bound
+  indexCount :
+    ∀ continuation,
+      EvaluatorExecutionFits bound
+        (.ret continuation [RawWindowState.indexCount periodicStrip]) →
+      EvaluatorCallFits stripIndexCountCode continuation
+        [Encodable.encode periodicStrip] bound
+  searchDepth :
+    ∀ continuation,
+      EvaluatorExecutionFits bound
+        (.ret continuation [stripSearchDepth periodicStrip]) →
+      EvaluatorCallFits stripSearchDepthCode continuation
+        [Encodable.encode periodicStrip] bound
+  wellFormed :
+    ∀ continuation,
+      EvaluatorExecutionFits bound
+        (.ret continuation
+          [FiniteState.divideBoolTag periodicStrip.wellFormed]) →
+      EvaluatorCallFits stripWellFormedCode continuation
+        [Encodable.encode periodicStrip] bound
+
 end RawWindowState
 end PeriodicStrip
 end LeanTrominoes

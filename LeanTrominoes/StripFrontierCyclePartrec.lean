@@ -39,11 +39,12 @@ private theorem divideEvalFuelVector_primrec :
     Primrec.vector_head
     (Primrec.vector_head.comp Primrec.vector_tail)
 
-private noncomputable def divideEvalFuelCode : Code :=
+/-- Two-argument code computing the exact fuel of one Savitch query. -/
+noncomputable def divideEvalFuelCode : Code :=
   codeOfVectorPrimrec divideEvalFuelVector
     divideEvalFuelVector_primrec
 
-private theorem divideEvalFuelCode_eval (stateCount depth : Nat) :
+theorem divideEvalFuelCode_eval (stateCount depth : Nat) :
     divideEvalFuelCode.eval [stateCount, depth] =
       pure [divideEvalFuel stateCount depth] := by
   let input : List.Vector Nat 2 :=

@@ -368,6 +368,11 @@ The representation choices for this target are:
   Boolean accumulator.  `stripEvaluatorSpacePolynomial` combines both bounds
   with the exact typed-input size and constant Boolean-output size into one
   polynomial envelope for the evaluator proof.
+  `StripEvaluatorLeafCallsFit` isolates the six opaque
+  primitive-recursive leaf programs—base relation, raw edge, Savitch fuel,
+  state count, search depth, and well-formedness—as continuation-passing
+  fitted-call obligations.  This keeps semantic correctness of a chosen code
+  distinct from the space certificate still required for that code.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
