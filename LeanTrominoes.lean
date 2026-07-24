@@ -29,6 +29,7 @@ import LeanTrominoes.GadgetReductionComputability
 import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.IndexedSavitch
+import LeanTrominoes.IndexedSavitchComputability
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecPolySpace

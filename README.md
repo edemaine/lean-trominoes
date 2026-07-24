@@ -196,6 +196,11 @@ The representation choices for this target are:
   `List.range` followed by `List.any`.  Its result is proved equivalent to
   the semantic cycle predicate on `Fin stateCount`; neither the state list nor
   a range of all state indices is constructed.
+- [`LeanTrominoes/IndexedSavitchComputability.lean`](LeanTrominoes/IndexedSavitchComputability.lean)
+  proves that the direct bounded search, including its two nested state-index
+  loops, preserves primitive recursiveness for any primitive-recursive
+  indexed predicate.  The proof compiles the loop through `Nat.rec` and does
+  not replace it with a list enumeration.
 - [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
   fills a machine-level gap in Mathlib's computability stack.  A TM2 program
   described over an infinite ambient label type can be restricted to a
