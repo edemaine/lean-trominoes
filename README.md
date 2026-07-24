@@ -393,6 +393,14 @@ The representation choices for this target are:
   `2 ^ processed`.  Every intermediate value is bounded by the final power,
   yielding a linear-space certificate in the binary lengths of the depth and
   padded graph bound.
+- [`LeanTrominoes/PartrecSqrt.lean`](LeanTrominoes/PartrecSqrt.lean) and
+  [`LeanTrominoes/PartrecSqrtSpace.lean`](LeanTrominoes/PartrecSqrtSpace.lean)
+  begin the explicit decoder layer for the remaining strip predicates.
+  A flat scan maintains the distance to the next square, the odd gap between
+  squares, and the current root; its invariant proves the result is
+  `Nat.sqrt`, while all live fields and evaluator traces use linear space.
+  This supplies the square-root operation needed by Mathlib's standard
+  pairing decoder `Nat.unpair`.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,

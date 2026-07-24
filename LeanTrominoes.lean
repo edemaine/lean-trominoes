@@ -52,6 +52,8 @@ import LeanTrominoes.PartrecListCodeSpace
 import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.PartrecPowerTwo
 import LeanTrominoes.PartrecPowerTwoSpace
+import LeanTrominoes.PartrecSqrt
+import LeanTrominoes.PartrecSqrtSpace
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
 import LeanTrominoes.StripFrontierCyclePartrec
