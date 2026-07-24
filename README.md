@@ -227,6 +227,15 @@ The representation choices for this target are:
   states store assignments only at cells from the finite motif, so sparse
   presentations do not incur space proportional to the binary-encoded strip
   width; the transition predicate is decidable.
+- [`LeanTrominoes/StripFrontierEncoding.lean`](LeanTrominoes/StripFrontierEncoding.lean)
+  gives those input-dependent, function-valued states a uniform raw
+  representation: a natural phase and a list over the nine assignment
+  symbols.  Five columns of the computably deduplicated motif determine a
+  canonical word of length `5 × distinct motif cells`.  Encoding produces a
+  valid raw state, decoding recovers the original semantic state exactly,
+  and the verified fixed-length word generator contains an encoding of every
+  semantic frontier state.  This is the storage format for the forthcoming
+  space-bounded strip evaluator.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
