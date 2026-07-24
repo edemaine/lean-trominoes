@@ -1365,6 +1365,216 @@ theorem stripWellFormedExplicit
     stripWellFormedExplicitCost,
     Code.stripWellFormedAccumulator_eq] using fitted
 
+/-- Continuation-independent cost of the uniform-space certificate.  Unlike
+`stripWellFormedExplicitCost`, its loop summand is reused rather than summed
+over the numeric motif encoding. -/
+def stripWellFormedUniformCost
+    (periodicStrip : PeriodicStrip) : Nat :=
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) &&
+      decide (0 < periodicStrip.period)
+  let result :=
+    dimensionsValid &&
+      motifInStripBounds periodicStrip.width
+        periodicStrip.period periodicStrip.motif
+  getCost 1
+      (Code.stripMotifState periodicStrip.width
+        periodicStrip.period result []) +
+    (stripMotifSpaceBound (Encodable.encode periodicStrip) +
+      stripWellFormedLoopInputCost periodicStrip.width
+        periodicStrip.period
+        (Encodable.encode periodicStrip.motif)) +
+    periodicStripHeaderCost periodicStrip
+
+theorem stripWellFormedExplicitUniform
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits Code.stripWellFormedExplicitCode
+      [Encodable.encode periodicStrip]
+      [periodicStrip.wellFormed.toNat]
+      (stripWellFormedUniformCost periodicStrip) := by
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) &&
+      decide (0 < periodicStrip.period)
+  let result :=
+    dimensionsValid &&
+      motifInStripBounds periodicStrip.width
+        periodicStrip.period periodicStrip.motif
+  have loop :=
+    stripMotifFlatUniform periodicStrip dimensionsValid
+  have prepared :=
+    comp loop
+      (stripWellFormedLoopInput periodicStrip.width
+        periodicStrip.period
+        (Encodable.encode periodicStrip.motif))
+  have projected :=
+    comp
+      (get 1
+        (Code.stripMotifState periodicStrip.width
+          periodicStrip.period result []))
+      prepared
+  have decoded :=
+    comp projected (periodicStripHeader periodicStrip)
+  simpa [Code.stripWellFormedExplicitCode,
+    Code.stripWellFormedHeaderCode,
+    stripWellFormedUniformCost, dimensionsValid, result,
+    Code.stripMotifState,
+    Code.stripWellFormedAccumulator_eq] using decoded
+
+set_option maxHeartbeats 800000 in
+theorem stripWellFormedLoopInputCost_le_linear
+    (periodicStrip : PeriodicStrip) :
+    stripWellFormedLoopInputCost periodicStrip.width
+        periodicStrip.period
+        (Encodable.encode periodicStrip.motif) ≤
+      10000000000000 *
+        (encodedListSpace
+          [Encodable.encode periodicStrip] + 1) := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  have widthBound :
+      periodicStrip.width ≤ stripCode := by
+    simp only [stripCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.left_le_pair _ _
+  have periodBound :
+      periodicStrip.period ≤ stripCode := by
+    simp only [stripCode, PeriodicStrip.encode_eq_pair]
+    exact (Nat.left_le_pair _ _).trans
+      (Nat.right_le_pair _ _)
+  have motifBound : motifCode ≤ stripCode := by
+    simp only [motifCode, stripCode,
+      PeriodicStrip.encode_eq_pair]
+    exact (Nat.right_le_pair _ _).trans
+      (Nat.right_le_pair _ _)
+  have widthBits := encodeNat_length_mono widthBound
+  have periodBits := encodeNat_length_mono periodBound
+  have motifBits := encodeNat_length_mono motifBound
+  have widthPredBits :=
+    encodeNat_length_mono
+      ((Nat.pred_le periodicStrip.width).trans widthBound)
+  have periodPredBits :=
+    encodeNat_length_mono
+      ((Nat.pred_le periodicStrip.period).trans periodBound)
+  have widthSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.width + 1 ≤ 8 * stripCode + 4
+        by omega)
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.period + 1 ≤ 8 * stripCode + 4
+        by omega)
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ 8 * stripCode + 4 by omega)
+  have scaledBits :=
+    encodeNat_eight_mul_add_four_length_le stripCode
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  cases widthEq : periodicStrip.width <;>
+    cases periodEq : periodicStrip.period <;>
+    simp [stripWellFormedLoopInputCost,
+      stripWellFormedPayloadCost,
+      stripWellFormedDimensionHeaderCost,
+      stripDimensionsValidCost,
+      stripDimensionWidthCost,
+      stripDimensionPeriodCost, natPositiveCost,
+      boolAndCost, normalizeBoolCost,
+      branchZeroZeroCost, branchZeroSuccCost,
+      branchZeroTestCost, prependCost, getCost,
+      dropCost, headCost, idCost, nilCost,
+      zeroCost, oneCost, tailCost, zeroPrimeCost,
+      succCost, widthEq, periodEq,
+      encodedListSpace_cons, encodedListSpace_nil,
+      stripCode, motifCode, zeroBits, oneBits] at * <;>
+    omega
+
+set_option maxHeartbeats 800000 in
+theorem stripWellFormedProjectionCost_le_linear
+    (periodicStrip : PeriodicStrip) (result : Bool) :
+    getCost 1
+        (Code.stripMotifState periodicStrip.width
+          periodicStrip.period result []) ≤
+      1000000000000 *
+        (encodedListSpace
+          [Encodable.encode periodicStrip] + 1) := by
+  let stripCode := Encodable.encode periodicStrip
+  have widthBound :
+      periodicStrip.width ≤ stripCode := by
+    simp only [stripCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.left_le_pair _ _
+  have periodBound :
+      periodicStrip.period ≤ stripCode := by
+    simp only [stripCode, PeriodicStrip.encode_eq_pair]
+    exact (Nat.left_le_pair _ _).trans
+      (Nat.right_le_pair _ _)
+  have widthBits := encodeNat_length_mono widthBound
+  have periodBits := encodeNat_length_mono periodBound
+  have widthSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.width + 1 ≤ 8 * stripCode + 4
+        by omega)
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.period + 1 ≤ 8 * stripCode + 4
+        by omega)
+  have scaledBits :=
+    encodeNat_eight_mul_add_four_length_le stripCode
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := rfl
+  cases result <;>
+    simp [Code.stripMotifState, getCost, dropCost,
+      headCost, idCost, nilCost, tailCost,
+      zeroPrimeCost, succCost,
+      encodedListSpace_cons, encodedListSpace_nil,
+      stripCode, zeroBits, oneBits, twoBits] at * <;>
+    omega
+
+def stripWellFormedInputSpaceBound
+    (encodedStrip : Nat) : Nat :=
+  1000000000000000 *
+    (encodedListSpace [encodedStrip] + 1)
+
+theorem stripWellFormedUniformCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    stripWellFormedUniformCost periodicStrip ≤
+      stripWellFormedInputSpaceBound
+        (Encodable.encode periodicStrip) := by
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) &&
+      decide (0 < periodicStrip.period)
+  let result :=
+    dimensionsValid &&
+      motifInStripBounds periodicStrip.width
+        periodicStrip.period periodicStrip.motif
+  have projection :=
+    stripWellFormedProjectionCost_le_linear
+      periodicStrip result
+  have loopInput :=
+    stripWellFormedLoopInputCost_le_linear periodicStrip
+  have header :=
+    periodicStripHeaderCost_le_linear periodicStrip
+  simp only [result, dimensionsValid] at projection
+  simp only [stripWellFormedUniformCost,
+    stripWellFormedInputSpaceBound, stripMotifSpaceBound]
+  omega
+
+/-- The complete explicit well-formedness evaluator fits the same linear
+allowance reserved for the other fixed strip arithmetic. -/
+theorem stripWellFormedExplicitInputSpace
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits Code.stripWellFormedExplicitCode
+      [Encodable.encode periodicStrip]
+      [periodicStrip.wellFormed.toNat]
+      (stripWellFormedInputSpaceBound
+        (Encodable.encode periodicStrip)) :=
+  (stripWellFormedExplicitUniform periodicStrip).mono
+    (stripWellFormedUniformCost_le_input periodicStrip)
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

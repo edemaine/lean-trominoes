@@ -1,5 +1,6 @@
 import LeanTrominoes.PartrecPeriodicStripDecode
 import LeanTrominoes.PartrecUnpairSpace
+import LeanTrominoes.PartrecBinaryLengthSpace
 
 /-!
 # Evaluator-space certificate for periodic-strip header decoding
@@ -90,6 +91,77 @@ theorem periodicStripHeader
         periodicStrip.period
         (Encodable.encode periodicStrip.motif))
       outer
+
+set_option maxHeartbeats 800000 in
+theorem periodicStripHeaderCost_le_linear
+    (periodicStrip : PeriodicStrip) :
+    periodicStripHeaderCost periodicStrip ≤
+      100000000000 *
+        (encodedListSpace
+          [Encodable.encode periodicStrip] + 1) := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  let restCode :=
+    Nat.pair periodicStrip.period motifCode
+  have stripEq :
+      stripCode =
+        Nat.pair periodicStrip.width restCode := by
+    simp [stripCode, restCode, motifCode,
+      PeriodicStrip.encode_eq_pair]
+  have widthBound :
+      periodicStrip.width ≤ stripCode := by
+    rw [stripEq]
+    exact Nat.left_le_pair _ _
+  have restBound : restCode ≤ stripCode := by
+    rw [stripEq]
+    exact Nat.right_le_pair _ _
+  have periodBound :
+      periodicStrip.period ≤ stripCode :=
+    (Nat.left_le_pair _ _).trans restBound
+  have motifBound : motifCode ≤ stripCode :=
+    (Nat.right_le_pair _ _).trans restBound
+  have widthBits := encodeNat_length_mono widthBound
+  have restBits := encodeNat_length_mono restBound
+  have periodBits := encodeNat_length_mono periodBound
+  have motifBits := encodeNat_length_mono motifBound
+  have widthSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.width + 1 ≤ 2 * stripCode + 4
+        by omega)
+  have restSuccBits :=
+    encodeNat_length_mono
+      (show restCode + 1 ≤ 2 * stripCode + 4 by omega)
+  have periodSuccBits :=
+    encodeNat_length_mono
+      (show periodicStrip.period + 1 ≤
+          2 * stripCode + 4 by omega)
+  have motifSuccBits :=
+    encodeNat_length_mono
+      (show motifCode + 1 ≤ 2 * stripCode + 4 by omega)
+  have scaledBits :=
+    encodeNat_eight_mul_add_four_length_le stripCode
+  have localScaledBits :=
+    encodeNat_length_mono
+      (show 2 * stripCode + 4 ≤ 8 * stripCode + 4 by omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have outerUnpair := unpairCost_le_linear stripCode
+  have innerUnpair := unpairCost_le_linear restCode
+  have innerLimit :
+      encodedListSpace [2 * restCode + 4] ≤
+        encodedListSpace [2 * stripCode + 4] := by
+    simpa only [encodedListSpace_cons,
+      encodedListSpace_nil, Nat.add_le_add_iff_right] using
+      encodeNat_length_mono
+        (show 2 * restCode + 4 ≤ 2 * stripCode + 4 by omega)
+  simp [periodicStripHeaderCost,
+    periodicStripHeaderRestCost,
+    periodicStripHeaderTailCost, prependCost,
+    getCost, dropCost, headCost, idCost, nilCost,
+    tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    stripCode, motifCode, restCode, zeroBits] at *
+  omega
 
 end EvaluatorCodeFits
 

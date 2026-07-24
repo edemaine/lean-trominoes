@@ -4,6 +4,7 @@ import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecBinaryLengthSpace
 import LeanTrominoes.PartrecFuelSpace
 import LeanTrominoes.PartrecPowerTwoSpace
+import LeanTrominoes.PartrecStripWellFormedSpace
 
 /-!
 # Space bounds for compiled strip-search payloads
@@ -859,8 +860,72 @@ theorem stripResult_encodedListSpace_le (result : Bool) :
     encodedListSpace [Encodable.encode result] ≤ 2 := by
   cases result <;> decide
 
-/-- Fitted-call obligations for the three opaque primitive-recursive leaves
-used by the otherwise explicit strip evaluator.  Each field is
+/-- The explicit well-formedness program consumes only the arithmetic
+allowance; all other strip-evaluator reserves remain available to its
+continuation. -/
+theorem stripWellFormedCode_fits
+    (periodicStrip : PeriodicStrip)
+    (continuation : Turing.ToPartrec.Cont)
+    (continuationBound :
+      continuationSpace continuation ≤
+        stripEvaluatorCoreSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        stripStateBoundComputationSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        stripFuelComputationSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+    (after :
+      EvaluatorExecutionFits
+        (stripEvaluatorSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+        (.ret continuation
+          [FiniteState.divideBoolTag periodicStrip.wellFormed])) :
+    EvaluatorCallFits stripWellFormedCode continuation
+      [Encodable.encode periodicStrip]
+      (stripEvaluatorSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have inputSpace :
+      encodedListSpace [Encodable.encode periodicStrip] =
+        inputLength := by
+    dsimp only [inputLength]
+    exact stripInput_encodedListSpace periodicStrip
+  have fits :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripWellFormedExplicitInputSpace
+      periodicStrip
+  have after' :
+      EvaluatorExecutionFits
+        (stripEvaluatorSpaceBound inputLength)
+        (.ret continuation [periodicStrip.wellFormed.toNat]) := by
+    cases wellFormed : periodicStrip.wellFormed <;>
+      simpa [inputLength, wellFormed,
+        FiniteState.divideBoolTag] using after
+  have call :=
+    fits.call continuation
+      (stripEvaluatorSpaceBound inputLength)
+      (by
+        simp only [
+          Turing.PartrecToTM2.EvaluatorCodeFits.stripWellFormedInputSpaceBound,
+          inputSpace, stripEvaluatorSpaceBound,
+          stripArithmeticSpaceBound]
+        change continuationSpace continuation ≤
+          stripEvaluatorCoreSpaceBound inputLength +
+            stripStateBoundComputationSpaceBound inputLength +
+              stripFuelComputationSpaceBound inputLength
+          at continuationBound
+        omega)
+      after'
+  simpa [stripWellFormedCode, inputLength] using call
+
+/-- Fitted-call obligations for the two remaining opaque primitive-recursive
+leaves used by the otherwise explicit strip evaluator.  Each field is
 continuation-passing: given a fitted execution after the leaf returns its
 verified result, it supplies a fitted execution of the leaf call itself.
 
@@ -894,13 +959,6 @@ structure StripEvaluatorLeafCallsFit
       EvaluatorCallFits (stripEdgeVectorCode tromino)
         continuation
         [Encodable.encode periodicStrip, first, last] bound
-  wellFormed :
-    ∀ continuation,
-      EvaluatorExecutionFits bound
-        (.ret continuation
-          [FiniteState.divideBoolTag periodicStrip.wellFormed]) →
-      EvaluatorCallFits stripWellFormedCode continuation
-        [Encodable.encode periodicStrip] bound
 
 end RawWindowState
 end PeriodicStrip

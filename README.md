@@ -468,10 +468,10 @@ The representation choices for this target are:
   It lifts these certificates through the complete typed countdown, dimension
   checks, loop-input assembly, header projection, and strip-header decoder,
   yielding an `EvaluatorCodeFits` certificate for the full explicit unary
-  well-formedness program.  `PartrecFlatIterationSpace` also offers a
-  reachable-state loop rule; the remaining integration step is to give this
-  completed program one uniform polynomial envelope inside the strip
-  evaluator bound.
+  well-formedness program.  Its reachable-state loop certificate tracks that
+  every live motif is a suffix of the input motif, so all iterations reuse one
+  input-linear workspace allowance instead of summing space over the numeric
+  countdown.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
@@ -511,9 +511,10 @@ The representation choices for this target are:
   `stripStateBoundCode_fits` composes it with the fitted repeated-doubling
   calculation of the padded graph bound.
   `stripFuelCode_fits` similarly certifies the explicit exact-fuel
-  computation within a quadratic reserve.  `StripEvaluatorLeafCallsFit`
-  isolates the leaf calls as continuation-passing fitted-call obligations.
-  The well-formedness leaf now uses the complete explicit program above;
+  computation within a quadratic reserve.  `stripWellFormedCode_fits`
+  certifies the complete explicit well-formedness program within the shared
+  arithmetic reserve.  `StripEvaluatorLeafCallsFit` isolates the two
+  remaining leaf calls as continuation-passing fitted-call obligations:
   only the base relation and raw edge still use correctness-only code
   selection while their explicit fitted implementations are developed.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
