@@ -60,6 +60,22 @@ end PeriodicLiteral
 
 namespace PeriodicClause
 
+/-- Manhattan distance between the offsets of two literals. -/
+def offsetDistance {Variable : Type*}
+    (first second : PeriodicLiteral Variable) : Nat :=
+  (first.offset.1 - second.offset.1).natAbs +
+    (first.offset.2 - second.offset.2).natAbs
+
+/-- A protoclauses is local when every two offsets in it are at Manhattan
+distance at most one, matching the paper's definition. -/
+def IsLocal {Variable : Type*} (clause : PeriodicClause Variable) : Prop :=
+  ∀ first ∈ clause, ∀ second ∈ clause, offsetDistance first second ≤ 1
+
+/-- A width bound on one local clause. -/
+def WidthAtMost {Variable : Type*}
+    (width : Nat) (clause : PeriodicClause Variable) : Prop :=
+  clause.length ≤ width
+
 /-- Whether at least one literal in a local clause holds at one translate. -/
 def Holds {Variable : Type*} (assignment : Variable → Cell → Bool)
     (translate : Cell) (clause : PeriodicClause Variable) : Prop :=
@@ -89,6 +105,15 @@ theorem equivData_symm_primrec {Variable : Type*} [Primcodable Variable] :
     Primrec (equivData.symm :
       List (PeriodicClause Variable) → PeriodicCNF Variable) :=
   Primrec.of_equiv_symm
+
+/-- Every protoclauses in the finite presentation is local. -/
+def IsLocal {Variable : Type*} (formula : PeriodicCNF Variable) : Prop :=
+  ∀ clause ∈ formula.clauses, clause.IsLocal
+
+/-- Every protoclauses has at most the specified number of literals. -/
+def WidthAtMost {Variable : Type*}
+    (width : Nat) (formula : PeriodicCNF Variable) : Prop :=
+  ∀ clause ∈ formula.clauses, clause.WidthAtMost width
 
 /-- Whether an assignment satisfies every clause at every lattice translate. -/
 def Satisfies {Variable : Type*} (formula : PeriodicCNF Variable)

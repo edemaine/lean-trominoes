@@ -93,6 +93,55 @@ theorem verticalClause_mem {tiles : TileSet} {lower upper : WangTile}
   simp only [formula, List.mem_append, List.mem_cons]
   exact Or.inr vertical_mem
 
+theorem atLeastOneClause_isLocal (tiles : TileSet) :
+    (atLeastOneClause tiles).IsLocal := by
+  intro first first_mem second second_mem
+  simp only [atLeastOneClause, List.mem_map] at first_mem second_mem
+  rcases first_mem with ⟨firstTile, _, rfl⟩
+  rcases second_mem with ⟨secondTile, _, rfl⟩
+  simp [PeriodicClause.offsetDistance, positive, here]
+
+theorem horizontalClauses_areLocal {tiles : TileSet}
+    {clause : PeriodicClause WangTile} (clause_mem : clause ∈ horizontalClauses tiles) :
+    clause.IsLocal := by
+  simp only [horizontalClauses, List.mem_filterMap] at clause_mem
+  rcases clause_mem with ⟨⟨left, right⟩, _, clause_eq⟩
+  split at clause_eq
+  · contradiction
+  · simp only [Option.some.injEq] at clause_eq
+    subst clause
+    intro first first_mem second second_mem
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at first_mem second_mem
+    rcases first_mem with rfl | rfl <;>
+      rcases second_mem with rfl | rfl <;>
+      simp [PeriodicClause.offsetDistance, negative, here, east]
+
+theorem verticalClauses_areLocal {tiles : TileSet}
+    {clause : PeriodicClause WangTile} (clause_mem : clause ∈ verticalClauses tiles) :
+    clause.IsLocal := by
+  simp only [verticalClauses, List.mem_filterMap] at clause_mem
+  rcases clause_mem with ⟨⟨lower, upper⟩, _, clause_eq⟩
+  split at clause_eq
+  · contradiction
+  · simp only [Option.some.injEq] at clause_eq
+    subst clause
+    intro first first_mem second second_mem
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at first_mem second_mem
+    rcases first_mem with rfl | rfl <;>
+      rcases second_mem with rfl | rfl <;>
+      simp [PeriodicClause.offsetDistance, negative, here, north]
+
+/-- The Wang encoding is local: every protoclauses is contained in one cell or
+crosses exactly one horizontal or vertical grid edge. -/
+theorem formula_isLocal (tiles : TileSet) :
+    (formula tiles).IsLocal := by
+  intro clause clause_mem
+  simp only [formula, List.mem_append, List.mem_cons] at clause_mem
+  rcases clause_mem with (rfl | clause_mem) | clause_mem
+  · exact atLeastOneClause_isLocal tiles
+  · exact horizontalClauses_areLocal clause_mem
+  · exact verticalClauses_areLocal clause_mem
+
 /-- Every Wang tiling gives a satisfying periodic Boolean assignment. -/
 theorem satisfiable_of_tilesPlane {tiles : TileSet} :
     TilesPlane tiles → (formula tiles).Satisfiable := by

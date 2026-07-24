@@ -142,5 +142,26 @@ theorem coREHard : LeanWang.CoREHard Holds := by
   rw [reduce_correct input]
   exact formula_correct (reduce input)
 
+/-- The local periodic-CNF decision predicate, treating nonlocal presentations
+as no-instances. -/
+def LocalHolds (periodicCNF : PeriodicCNF WangTile) : Prop :=
+  periodicCNF.IsLocal ∧ periodicCNF.Satisfiable
+
+/-- Co-r.e.-hardness holds for the actual local source problem, not merely for
+unrestricted periodic CNF. -/
+theorem localCoREHard : LeanWang.CoREHard LocalHolds := by
+  intro α _ source source_coRE
+  obtain ⟨reduce, reduce_computable, reduce_correct⟩ :=
+    LeanWang.domino_problem_coRE_hard source source_coRE
+  refine ⟨formula ∘ reduce, formula_computable.comp reduce_computable, ?_⟩
+  intro input
+  rw [reduce_correct input]
+  constructor
+  · intro tilesPlane
+    exact ⟨formula_isLocal (reduce input),
+      (formula_correct (reduce input)).1 tilesPlane⟩
+  · exact fun localHolds =>
+      (formula_correct (reduce input)).2 localHolds.2
+
 end WangPeriodicCNF
 end LeanTrominoes
