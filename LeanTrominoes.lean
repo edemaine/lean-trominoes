@@ -45,6 +45,8 @@ import LeanTrominoes.PartrecEncodedListDecodeSpace
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecBinaryLengthSpace
 import LeanTrominoes.PartrecCodeSpace
+import LeanTrominoes.PartrecDiv2Parity
+import LeanTrominoes.PartrecDiv2ParitySpace
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecFuel

@@ -427,6 +427,13 @@ The representation choices for this target are:
   tail step then discards the head while retaining the encoded tail; iterating
   it with the original list code as a safe countdown is proved to exhaust
   every standard encoded list.
+- [`LeanTrominoes/PartrecDiv2Parity.lean`](LeanTrominoes/PartrecDiv2Parity.lean)
+  and
+  [`LeanTrominoes/PartrecDiv2ParitySpace.lean`](LeanTrominoes/PartrecDiv2ParitySpace.lean)
+  expose the fitted binary-division loop's complete result
+  `[quotient, lowBit]`.  This low bit is the sign tag in Mathlib's standard
+  integer encoding, while the quotient is the coordinate magnitude needed
+  by motif predicates.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
