@@ -287,7 +287,9 @@ The representation choices for this target are:
   main-stack head extraction, whose synthesized empty-list zero needs at
   most one additional delimiter cell.  Continuation-stack head extraction is
   bounded by its input footprint because the consumed outer-list delimiter
-  pays for the inserted natural-number delimiter.
+  pays for the inserted natural-number delimiter.  Its binary-successor
+  certificate bounds carry propagation at every bit and allows one extra
+  cell precisely for a newly created high bit.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;
