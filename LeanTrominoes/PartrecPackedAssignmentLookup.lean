@@ -453,6 +453,72 @@ theorem packedLookupColumnStepCode_eval_cons
         (by simp)
   · rfl
 
+/-- Total native-list semantics used by the reachable-state space rule.  Only
+typed encoded motif states are reachable in the fitted loop. -/
+def packedLookupColumnNativeStep (values : List Nat) : List Nat :=
+  if values[5]?.getD 0 ≠ 0 then values
+  else
+    match decodeCellList values.headI with
+    | none => values
+    | some [] => values
+    | some (cell :: remaining) =>
+        if values[6]?.getD 0 ≠ 0 ∧
+            Encodable.encode cell = values[2]?.getD 0 then
+          [Encodable.encode remaining,
+            values[1]?.getD 0, values[2]?.getD 0,
+            values[3]?.getD 0 / 9,
+            values[3]?.getD 0 % 9, 1,
+            values[6]?.getD 0]
+        else
+          [Encodable.encode remaining,
+            values[1]?.getD 0, values[2]?.getD 0,
+            values[3]?.getD 0 / 9,
+            values[4]?.getD 0, values[5]?.getD 0,
+            values[6]?.getD 0]
+
+@[simp]
+theorem packedLookupColumnNativeStep_state_found
+    (original remaining : List Cell) (target : Cell)
+    (word digit : Nat) (selected : Bool) :
+    packedLookupColumnNativeStep
+        (packedLookupColumnState original remaining target
+          word digit true selected) =
+      packedLookupColumnState original remaining target
+        word digit true selected := by
+  simp [packedLookupColumnNativeStep,
+    packedLookupColumnState]
+
+@[simp]
+theorem packedLookupColumnNativeStep_state_nil
+    (original : List Cell) (target : Cell)
+    (word digit : Nat) (selected : Bool) :
+    packedLookupColumnNativeStep
+        (packedLookupColumnState original [] target
+          word digit false selected) =
+      packedLookupColumnState original [] target
+        word digit false selected := by
+  simp [packedLookupColumnNativeStep,
+    packedLookupColumnState]
+
+@[simp]
+theorem packedLookupColumnNativeStep_state_cons
+    (original : List Cell) (target cell : Cell)
+    (remaining : List Cell) (word digit : Nat)
+    (selected : Bool) :
+    packedLookupColumnNativeStep
+        (packedLookupColumnState original (cell :: remaining)
+          target word digit false selected) =
+      if selected && decide (cell = target) then
+        packedLookupColumnState original remaining target
+          (word / 9) (word % 9) true selected
+      else
+        packedLookupColumnState original remaining target
+          (word / 9) digit false selected := by
+  cases selected <;>
+    by_cases equal : cell = target <;>
+    simp [packedLookupColumnNativeStep,
+      packedLookupColumnState, equal]
+
 /-- Typed semantics of exactly `steps` packed column iterations. -/
 def packedLookupColumnProcess
     (original : List Cell) (target : Cell) :

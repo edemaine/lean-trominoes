@@ -483,6 +483,12 @@ The representation choices for this target are:
   cells.  The explicit tail loop is proved equal to a closed recursive scan;
   selected, absent, and skipped-column outcomes are tied to the same
   `List.idxOf` digit used by the semantic packed frontier.
+- [`LeanTrominoes/PartrecPackedAssignmentLookupSpace.lean`](LeanTrominoes/PartrecPackedAssignmentLookupSpace.lean)
+  fits every projection, encoded-list view, equality test, quotient/remainder
+  digit peel, branch, complete lookup step, and flat-countdown body on the
+  typed packed state.  These compositional certificates are the local input
+  to the reachable-suffix proof that gives the complete loop one uniform
+  polynomial workspace allowance.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
