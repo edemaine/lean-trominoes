@@ -301,6 +301,12 @@ The representation choices for this target are:
   `cycleSearchIndexDFSBoolAtDepth`; a unary front end computes the strip's
   state count and certified search depth, rejects malformed presentations,
   and is proved equal to `periodicStripTrominoTilingIndexBool`.
+- [`LeanTrominoes/StripFrontierPartrecSpace.lean`](LeanTrominoes/StripFrontierPartrecSpace.lean)
+  bounds the complete serialized payload of each compiled exact-fuel
+  reachability loop.  Although the countdown's numeric value is exponential,
+  its little-endian binary encoding has quadratic length; combining that
+  bound with the flat DFS theorem accounts explicitly for the strip context,
+  graph-size and stack-length counters, and every semantic loop milestone.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
