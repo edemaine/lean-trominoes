@@ -105,5 +105,40 @@ noncomputable def finiteEvaluator_outputs {code : ToPartrec.Code}
       (some (trList output)) :=
   Classical.choice (nonempty_finiteEvaluator_outputs evaluates)
 
+/-- Package any total function represented by a partial-recursive code as a
+finite Turing machine using the evaluator-native finite encodings. -/
+noncomputable def finiteEvaluatorComputable
+    {α β : Type} [Primcodable α] [Primcodable β]
+    (code : ToPartrec.Code) (function : α → β)
+    (computes : ∀ input,
+      [Encodable.encode (function input)] ∈
+        ToPartrec.Code.eval code [Encodable.encode input]) :
+    TM2Computable
+      (LeanTrominoes.Complexity.primcodableFinEncoding α).encode
+      (LeanTrominoes.Complexity.primcodableFinEncoding β).encode
+      function where
+  tm := finiteEvaluator code
+  inputAlphabet := by
+    unfold finiteEvaluator FinTM2.ofSupported
+    exact Equiv.refl _
+  outputAlphabet := by
+    unfold finiteEvaluator FinTM2.ofSupported
+    exact Equiv.refl _
+  outputsFun input := by
+    unfold finiteEvaluator FinTM2.ofSupported
+    simp only [LeanTrominoes.Complexity.primcodableFinEncoding,
+      id_eq]
+    have mapRefl (values : List Γ') :
+        List.map (Equiv.refl Γ').invFun values = values := by
+      induction values with
+      | nil => rfl
+      | cons head tail ih =>
+          change head :: List.map (Equiv.refl Γ').invFun tail =
+            head :: tail
+          rw [ih]
+    rw [mapRefl, mapRefl]
+    simpa only [finiteEvaluator, FinTM2.ofSupported] using
+      finiteEvaluator_outputs (computes input)
+
 end PartrecToTM2
 end Turing

@@ -115,9 +115,9 @@ theorem clog_period_le_encoding_length (periodicStrip : PeriodicStrip) :
     Nat.clog 2 periodicStrip.period ≤
       ((Complexity.primcodableFinEncoding PeriodicStrip).encode
         periodicStrip).length := by
-  change Nat.clog 2 periodicStrip.period ≤
-    (encodeNat (Encodable.encode periodicStrip)).length
-  apply Nat.clog_le_of_le_pow
+  rw [Complexity.primcodableFinEncoding_encode_length]
+  apply Nat.le_trans (Nat.clog_le_of_le_pow ?_)
+    (Nat.le_add_right _ _)
   exact (period_le_encode periodicStrip).trans
     (EncodingBounds.nat_lt_pow_encodeNat_length
       (Encodable.encode periodicStrip)).le
@@ -126,8 +126,7 @@ theorem motif_length_le_encoding_length (periodicStrip : PeriodicStrip) :
     periodicStrip.motif.length ≤
       ((Complexity.primcodableFinEncoding PeriodicStrip).encode
         periodicStrip).length := by
-  change periodicStrip.motif.length ≤
-    (encodeNat (Encodable.encode periodicStrip)).length
+  rw [Complexity.primcodableFinEncoding_encode_length]
   cases motifEq : periodicStrip.motif with
   | nil =>
       exact Nat.zero_le _

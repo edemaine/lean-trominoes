@@ -163,8 +163,11 @@ The representation choices for this target are:
   Malformed finite presentations are no-instances of the decision predicates.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
-  machines.  Space is the total number of occupied stack cells, and hardness
-  uses polynomial-time many-one reductions.
+  machines.  Its `Primcodable` encoding is ordinary little-endian binary in
+  the four-symbol alphabet of Mathlib's partial-recursive evaluator, followed
+  by one list delimiter; this makes the verified evaluator directly usable
+  without changing asymptotic input length.  Space is the total number of
+  occupied stack cells, and hardness uses polynomial-time many-one reductions.
 - [`LeanTrominoes/EncodingBounds.lean`](LeanTrominoes/EncodingBounds.lean)
   proves size bounds for the actual pairing-based `PeriodicStrip` input
   encoding.  Both `⌈log₂ period⌉` and motif length are at most the binary
@@ -201,9 +204,10 @@ The representation choices for this target are:
   partial-recursive codes.  For each fixed code it produces a genuine finite
   `FinTM2`, proves that its initial and halting configurations erase to
   Mathlib's configurations, and transfers the evaluator's output-correctness
-  theorem to the finite machine.  Adapting the evaluator's four-symbol tape
-  encoding to the PSPACE interface and proving a polynomial stack-space bound
-  for the strip-decider code remain separate steps.
+  theorem to the finite machine.  `finiteEvaluatorComputable` now packages
+  any total represented code directly against the project's standard input
+  and output encodings.  Constructing the strip-decider code and proving its
+  polynomial stack-space bound remain separate steps.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
