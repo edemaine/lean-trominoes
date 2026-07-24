@@ -924,6 +924,12 @@ The representation choices for this target are:
   output variable occurs once in the copied source formula and at most twice
   in its implication cycle.  Thus the cycle construction genuinely produces
   periodic 3SAT-3 instances.
+- [`LeanTrominoes/PeriodicThreeSATThreeComputability.lean`](LeanTrominoes/PeriodicThreeSATThreeComputability.lean)
+  implements indexed list traversal, duplicate removal, and directed
+  implication cycles by primitive recursion.  It proves the complete
+  occurrence-splitting reduction computable and composes it with the Wang and
+  width-three reductions to establish co-r.e.-hardness of local periodic
+  3SAT-3.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
