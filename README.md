@@ -326,6 +326,12 @@ The representation choices for this target are:
   `21 × binary input length + 1` is primitive recursive as well, and the
   complete well-formedness-guarded strip tiling decider is now proved
   primitive recursive through the depth-first Savitch driver.
+- [`LeanTrominoes/StripFrontierIndexedSearchSpace.lean`](LeanTrominoes/StripFrontierIndexedSearchSpace.lean)
+  specializes the flat DFS bound to sparse strip frontiers.  Taking one more
+  bit than the certified search depth bounds both every frontier index and
+  the depth counter, and substitution of
+  `depth = 21 × binary input length + 1` gives an explicit quadratic
+  polynomial bounding every reachability configuration.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
