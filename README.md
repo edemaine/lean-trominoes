@@ -423,7 +423,10 @@ The representation choices for this target are:
   [`LeanTrominoes/PartrecEncodedListDecodeSpace.lean`](LeanTrominoes/PartrecEncodedListDecodeSpace.lean)
   provide the fitted one-constructor view used by that traversal.  They
   distinguish the zero-encoded empty list from a successor-encoded cons and
-  return the fixed-width native state `[tag, headCode, tailCode]`.
+  return the fixed-width native state `[tag, headCode, tailCode]`.  A fitted
+  tail step then discards the head while retaining the encoded tail; iterating
+  it with the original list code as a safe countdown is proved to exhaust
+  every standard encoded list.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,

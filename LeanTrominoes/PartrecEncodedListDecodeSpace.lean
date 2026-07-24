@@ -41,11 +41,35 @@ theorem encodedListNilView (values : List Nat) :
     encodedListNilViewCost, prependCost] using
     prepend (zero values) (encodedListNilTail values)
 
-def encodedListConsTailCost
-    (headCode tailCode : Nat) : Nat :=
+def encodedListConsTailAtCost
+    (headCode tailCode : Nat)
+    (remaining : List Nat) : Nat :=
   unpairCost (Nat.pair headCode tailCode) +
     predCost
-      [Nat.succ (Nat.pair headCode tailCode)]
+      (Nat.succ (Nat.pair headCode tailCode) ::
+        remaining)
+
+theorem encodedListConsTailAt
+    (headCode tailCode : Nat)
+    (remaining : List Nat) :
+    EvaluatorCodeFits
+      (Code.unpairCode.comp Code.pred)
+      (Nat.succ (Nat.pair headCode tailCode) ::
+        remaining)
+      [headCode, tailCode]
+      (encodedListConsTailAtCost
+        headCode tailCode remaining) := by
+  simpa [encodedListConsTailAtCost,
+    Code.subtractStepList] using
+    comp
+      (unpair (Nat.pair headCode tailCode))
+      (pred_named
+        (Nat.succ (Nat.pair headCode tailCode) ::
+          remaining))
+
+def encodedListConsTailCost
+    (headCode tailCode : Nat) : Nat :=
+  encodedListConsTailAtCost headCode tailCode []
 
 theorem encodedListConsTail
     (headCode tailCode : Nat) :
@@ -54,21 +78,43 @@ theorem encodedListConsTail
       [Nat.succ (Nat.pair headCode tailCode)]
       [headCode, tailCode]
       (encodedListConsTailCost headCode tailCode) := by
-  simpa [encodedListConsTailCost,
-    Code.subtractStepList] using
-    comp
-      (unpair (Nat.pair headCode tailCode))
-      (pred_named
-        [Nat.succ (Nat.pair headCode tailCode)])
+  simpa [encodedListConsTailCost] using
+    encodedListConsTailAt headCode tailCode []
+
+def encodedListConsViewAtCost
+    (headCode tailCode : Nat)
+    (remaining : List Nat) : Nat :=
+  prependCost
+    (Nat.succ (Nat.pair headCode tailCode) ::
+      remaining)
+    [1] [headCode, tailCode]
+    (oneCost
+      (Nat.succ (Nat.pair headCode tailCode) ::
+        remaining))
+    (encodedListConsTailAtCost
+      headCode tailCode remaining)
+
+theorem encodedListConsViewAt
+    (headCode tailCode : Nat)
+    (remaining : List Nat) :
+    EvaluatorCodeFits Code.encodedListConsViewCode
+      (Nat.succ (Nat.pair headCode tailCode) ::
+        remaining)
+      [1, headCode, tailCode]
+      (encodedListConsViewAtCost
+        headCode tailCode remaining) := by
+  simpa [Code.encodedListConsViewCode,
+    encodedListConsViewAtCost, prependCost] using
+    prepend
+      (one
+        (Nat.succ (Nat.pair headCode tailCode) ::
+          remaining))
+      (encodedListConsTailAt
+        headCode tailCode remaining)
 
 def encodedListConsViewCost
     (headCode tailCode : Nat) : Nat :=
-  prependCost
-    [Nat.succ (Nat.pair headCode tailCode)]
-    [1] [headCode, tailCode]
-    (oneCost
-      [Nat.succ (Nat.pair headCode tailCode)])
-    (encodedListConsTailCost headCode tailCode)
+  encodedListConsViewAtCost headCode tailCode []
 
 theorem encodedListConsView
     (headCode tailCode : Nat) :
@@ -76,11 +122,92 @@ theorem encodedListConsView
       [Nat.succ (Nat.pair headCode tailCode)]
       [1, headCode, tailCode]
       (encodedListConsViewCost headCode tailCode) := by
-  simpa [Code.encodedListConsViewCode,
-    encodedListConsViewCost, prependCost] using
-    prepend
-      (one [Nat.succ (Nat.pair headCode tailCode)])
-      (encodedListConsTail headCode tailCode)
+  simpa [encodedListConsViewCost] using
+    encodedListConsViewAt headCode tailCode []
+
+def encodedListViewValuesCost
+    (values : List Nat) : Nat :=
+  match values.headI with
+  | 0 =>
+      branchZeroZeroCost values [0, 0, 0] 0
+        (headCost values)
+        (encodedListNilViewCost values)
+  | constructorCode + 1 =>
+      branchZeroSuccCost values
+        [1, constructorCode.unpair.1,
+          constructorCode.unpair.2]
+        (constructorCode + 1)
+        (headCost values)
+        (encodedListConsViewAtCost
+          constructorCode.unpair.1
+          constructorCode.unpair.2 values.tail)
+
+theorem encodedListViewValues
+    (values : List Nat) :
+    EvaluatorCodeFits Code.encodedListViewCode
+      values (Code.encodedListView values)
+      (encodedListViewValuesCost values) := by
+  cases values with
+  | nil =>
+      simpa [Code.encodedListViewCode,
+        Code.encodedListView,
+        encodedListViewValuesCost] using
+        branchZero_zero rfl
+          (head [])
+          (encodedListNilView [])
+  | cons value remaining =>
+      cases value with
+      | zero =>
+          simpa [Code.encodedListViewCode,
+            Code.encodedListView,
+            encodedListViewValuesCost] using
+            branchZero_zero rfl
+              (head (0 :: remaining))
+              (encodedListNilView (0 :: remaining))
+      | succ constructorCode =>
+          have positive :
+              0 < Nat.succ constructorCode :=
+            Nat.succ_pos constructorCode
+          have consView :
+              EvaluatorCodeFits
+                Code.encodedListConsViewCode
+                (Nat.succ constructorCode :: remaining)
+                [1, constructorCode.unpair.1,
+                  constructorCode.unpair.2]
+                (encodedListConsViewAtCost
+                  constructorCode.unpair.1
+                  constructorCode.unpair.2
+                  remaining) := by
+            simpa using
+              encodedListConsViewAt
+                constructorCode.unpair.1
+                constructorCode.unpair.2
+                remaining
+          simpa [Code.encodedListViewCode,
+            Code.encodedListView,
+            encodedListViewValuesCost] using
+            branchZero_succ positive
+              (head
+                (Nat.succ constructorCode ::
+                  remaining))
+              consView
+
+def encodedListTailStepCost
+    (values : List Nat) : Nat :=
+  getCost 2 (Code.encodedListView values) +
+    encodedListViewValuesCost values
+
+theorem encodedListTailStep
+    (values : List Nat) :
+    EvaluatorCodeFits Code.encodedListTailStepCode
+      values (Code.encodedListTailStep values)
+      (encodedListTailStepCost values) := by
+  simpa [Code.encodedListTailStepCode,
+    Code.encodedListTailStep,
+    encodedListTailStepCost] using
+    comp
+      (get 2 (Code.encodedListView values))
+      (encodedListViewValues values)
 
 def encodedListViewCost
     {α : Type*} [Encodable α] (values : List α) : Nat :=
