@@ -897,6 +897,11 @@ The representation choices for this target are:
   correctness theorem proves that this periodic CNF is satisfiable exactly
   when the original tileset tiles the plane; no uniqueness clauses are needed
   because any active tile can be chosen at each cell.
+- [`LeanTrominoes/WangPeriodicCNFComputability.lean`](LeanTrominoes/WangPeriodicCNFComputability.lean)
+  proves that translation primitive recursive, including its ordered-pair
+  enumeration and incompatibility filters.  Composing it with
+  `LeanWang.domino_problem_coRE_hard` establishes a concrete computable
+  many-one reduction and co-r.e.-hardness of this periodic-CNF endpoint.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the
