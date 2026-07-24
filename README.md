@@ -298,7 +298,13 @@ The representation choices for this target are:
   common bound covering all of its low-level configurations.  The companion
   `retSimulationFits` and `tr_ret_respects_inSpace` handle every continuation
   return, including the three-way stack rotation for `cons`, nested returns,
-  composition, and both branches of `fix`.
+  composition, and both branches of `fix`.  `EvaluatorRunFits` packages these
+  local obligations across an entire high-level execution; the resulting
+  run-level refinement splices all corresponding low-level segments into one
+  bounded run from the concrete evaluator input to its unique halt
+  configuration.  Determinism then bounds every low-level configuration
+  reachable from that input, which is the quantitative premise needed by
+  `PolySpaceDecider`.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

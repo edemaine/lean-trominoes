@@ -2549,5 +2549,163 @@ noncomputable def tr_ret_respects_inSpace
                 recursiveContinuation] using related.down⟩,
             (pop.trans clear).trans normalRun'⟩
 
+/-- The data-space obligation attached to a high-level evaluator
+configuration. -/
+def cfgSimulationFits :
+    ToPartrec.Cfg → Nat → Prop
+  | .halt values, bound =>
+      encodedListSpace values ≤ bound
+  | .ret continuation values, bound =>
+      retSimulationFits continuation values bound
+
+/-- A configuration's simulation obligation bounds the corresponding
+high-level milestone space. -/
+theorem cfgSimulationFits_space
+    {configuration : ToPartrec.Cfg} {bound : Nat}
+    (fits : cfgSimulationFits configuration bound) :
+    evaluatorCfgSpace configuration ≤ bound := by
+  cases configuration with
+  | halt values =>
+      simpa [cfgSimulationFits, evaluatorCfgSpace] using fits
+  | ret continuation values =>
+      simpa [cfgSimulationFits, evaluatorCfgSpace] using
+        retSimulationFits_start fits
+
+/-- A common space certificate for one complete run of a partial-recursive
+evaluator.  Besides the structurally normalized initial call, it covers
+every sequential evaluator milestone reachable after that call. -/
+structure EvaluatorRunFits
+    (code : ToPartrec.Code) (values : List Nat) (bound : Nat) :
+    Prop where
+  normal :
+    normalSimulationFits code ToPartrec.Cont.halt values bound
+  configuration :
+    ∀ current,
+      Reaches ToPartrec.step
+          (ToPartrec.stepNormal code ToPartrec.Cont.halt values)
+          current →
+        cfgSimulationFits current bound
+
+/-- A high-level evaluator run between related milestones can be refined to
+a low-level run that stays within the common budget. -/
+theorem trCfg_reaches_inSpace_nonempty
+    {origin first last : ToPartrec.Cfg} {source : Cfg'}
+    {bound : Nat}
+    (originToFirst :
+      Reaches ToPartrec.step origin first)
+    (run : Reaches ToPartrec.step first last)
+    (related : TrCfg first source)
+    (fits :
+      ∀ current,
+        Reaches ToPartrec.step origin current →
+          cfgSimulationFits current bound) :
+    ∃ target,
+      TrCfg last target ∧
+        Nonempty
+          (EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+            source target) := by
+  induction run generalizing source with
+  | refl =>
+      have sourceBound : TM2.stackSpace source ≤ bound := by
+        rw [stackSpace_eq_evaluatorCfgSpace_of_TrCfg related]
+        exact cfgSimulationFits_space (fits first originToFirst)
+      exact
+        ⟨source, related,
+          ⟨EvalsToInSpace.refl (TM2.step tr) TM2.stackSpace
+            bound source sourceBound⟩⟩
+  | @tail middle last run edge induction =>
+      obtain ⟨middleTarget, middleRelated, ⟨before⟩⟩ :=
+        induction related
+      have originToMiddle :
+          Reaches ToPartrec.step origin middle :=
+        originToFirst.trans run
+      cases middle with
+      | halt values =>
+          simp [ToPartrec.step] at edge
+      | ret continuation values =>
+          have lastEq :
+              last = ToPartrec.stepRet continuation values := by
+            simpa [ToPartrec.step, Option.mem_def] using edge.symm
+          subst last
+          rw [TrCfg] at middleRelated
+          obtain ⟨state, rfl⟩ := middleRelated
+          have returnFits :
+              retSimulationFits continuation values bound :=
+            fits (.ret continuation values) originToMiddle
+          obtain ⟨target, targetRelated, after⟩ :=
+            tr_ret_respects_inSpace continuation values state
+              bound returnFits
+          exact
+            ⟨target, targetRelated.down,
+              ⟨before.trans after⟩⟩
+
+/-- A terminating high-level evaluation gives a complete bounded run of the
+four-stack evaluator from its concrete initial state to its concrete halt
+state. -/
+theorem evaluator_run_inSpace_nonempty
+    (code : ToPartrec.Code) (values output : List Nat)
+    (bound : Nat) (fits : EvaluatorRunFits code values bound)
+    (evaluates : output ∈ code.eval values) :
+    Nonempty
+      (EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+        (init code values) (halt output)) := by
+  have highEvaluation :
+      ToPartrec.Cfg.halt output ∈
+        StateTransition.eval ToPartrec.step
+          (ToPartrec.stepNormal code ToPartrec.Cont.halt values) := by
+    rw [ToPartrec.stepNormal_eval]
+    exact (Part.mem_map_iff _).2 ⟨output, evaluates, rfl⟩
+  have highRun :
+      Reaches ToPartrec.step
+        (ToPartrec.stepNormal code ToPartrec.Cont.halt values)
+        (.halt output) :=
+    (StateTransition.mem_eval.mp highEvaluation).1
+  obtain ⟨middle, middleRelated, initialRun⟩ :=
+    trNormal_respects_inSpace code ToPartrec.Cont.halt values
+      none bound fits.normal
+  have initialRun' :
+      EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+        (init code values) middle := by
+    simpa [init, trCont, trContStack] using initialRun
+  obtain ⟨target, targetRelated, ⟨remainingRun⟩⟩ :=
+    trCfg_reaches_inSpace_nonempty
+      (origin := ToPartrec.stepNormal code ToPartrec.Cont.halt values)
+      (first := ToPartrec.stepNormal code ToPartrec.Cont.halt values)
+      (last := ToPartrec.Cfg.halt output)
+      (source := middle)
+      Relation.ReflTransGen.refl highRun middleRelated.down
+      fits.configuration
+  rw [TrCfg] at targetRelated
+  subst target
+  exact ⟨initialRun'.trans remainingRun⟩
+
+/-- Noncomputably select the complete bounded evaluator run certified
+above. -/
+noncomputable def evaluator_run_inSpace
+    (code : ToPartrec.Code) (values output : List Nat)
+    (bound : Nat) (fits : EvaluatorRunFits code values bound)
+    (evaluates : output ∈ code.eval values) :
+    EvalsToInSpace (TM2.step tr) TM2.stackSpace bound
+      (init code values) (halt output) :=
+  Classical.choice
+    (evaluator_run_inSpace_nonempty code values output bound
+      fits evaluates)
+
+/-- Every concrete four-stack configuration reachable during a certified
+terminating evaluator run respects the common space budget. -/
+theorem evaluator_reachable_space_le
+    (code : ToPartrec.Code) (values output : List Nat)
+    (bound : Nat) (fits : EvaluatorRunFits code values bound)
+    (evaluates : output ∈ code.eval values)
+    {configuration : Cfg'}
+    (reachable :
+      Reaches (TM2.step tr) (init code values) configuration) :
+    TM2.stackSpace configuration ≤ bound := by
+  apply
+    EvalsToInSpace.space_le_of_terminal
+      (evaluator_run_inSpace code values output bound fits evaluates)
+      _ reachable
+  simp [halt, TM2.step]
+
 end PartrecToTM2
 end Turing
