@@ -205,6 +205,12 @@ The representation choices for this target are:
   loops, preserves primitive recursiveness for any primitive-recursive
   indexed predicate.  The proof compiles the loop through `Nat.rec` and does
   not replace it with a list enumeration.
+- [`LeanTrominoes/IndexedSavitchDFS.lean`](LeanTrominoes/IndexedSavitchDFS.lean)
+  refines the recursive reachability specification to an explicit
+  depth-first evaluator.  A configuration stores one current query and one
+  continuation frame per unfinished query, never the recursive-call tree.
+  The formal depth invariant proves that every reachable configuration has
+  at most the original Savitch depth many frames.
 - [`LeanTrominoes/FiniteTMCompiler.lean`](LeanTrominoes/FiniteTMCompiler.lean)
   fills a machine-level gap in Mathlib's computability stack.  A TM2 program
   described over an infinite ambient label type can be restricted to a
