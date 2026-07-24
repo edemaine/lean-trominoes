@@ -62,6 +62,8 @@ import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecListCodeSpace
 import LeanTrominoes.PartrecNatCompare
 import LeanTrominoes.PartrecNatCompareSpace
+import LeanTrominoes.PartrecNatEquality
+import LeanTrominoes.PartrecNatEqualitySpace
 import LeanTrominoes.PartrecPeriodicStripDecode
 import LeanTrominoes.PartrecPeriodicStripDecodeSpace
 import LeanTrominoes.PartrecPolySpace

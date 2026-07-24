@@ -450,6 +450,12 @@ The representation choices for this target are:
   use fitted truncated subtraction to return a normalized tag for natural
   strict comparison.  These operations express positive strip dimensions
   and coordinate upper bounds.
+- [`LeanTrominoes/PartrecNatEquality.lean`](LeanTrominoes/PartrecNatEquality.lean)
+  and
+  [`LeanTrominoes/PartrecNatEqualitySpace.lean`](LeanTrominoes/PartrecNatEqualitySpace.lean)
+  compare two native naturals by conjoining zero tests for both truncated
+  differences.  The result is a normalized fitted Boolean used by the strip
+  base case and by first-occurrence searches through encoded motif cells.
 - [`LeanTrominoes/PartrecDivision.lean`](LeanTrominoes/PartrecDivision.lean)
   and
   [`LeanTrominoes/PartrecDivisionSpace.lean`](LeanTrominoes/PartrecDivisionSpace.lean)
