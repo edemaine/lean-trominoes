@@ -46,6 +46,14 @@ theorem get_eval (index : Nat) (values : List Nat) :
 def prepend (field rest : Code) : Code :=
   cons field rest
 
+@[simp]
+theorem prepend_eval_eq (field rest : Code) (values : List Nat) :
+    (prepend field rest).eval values = (do
+      let fieldResult ← field.eval values
+      let restResult ← rest.eval values
+      pure (fieldResult.headI :: restResult)) := by
+  rfl
+
 theorem prepend_eval (field rest : Code)
     (fieldValue : List Nat → Nat) (restValue : List Nat → List Nat)
     (fieldCorrect : ∀ values, field.eval values = pure [fieldValue values])

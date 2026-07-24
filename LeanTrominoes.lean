@@ -35,6 +35,7 @@ import LeanTrominoes.IndexedSavitchDFS
 import LeanTrominoes.IndexedSavitchDFSCorrectness
 import LeanTrominoes.IndexedSavitchDFSComputability
 import LeanTrominoes.IndexedSavitchDFSListEncoding
+import LeanTrominoes.IndexedSavitchDFSPartrec
 import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PartrecFiniteEvaluator

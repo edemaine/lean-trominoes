@@ -280,6 +280,12 @@ The representation choices for this target are:
   zero-branches, and Boolean tags.  Their list semantics are verified without
   pairing the variable-length payload into one natural; they form the
   instruction layer for compiling the flat DFS transition.
+- [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
+  compiles one structural step of the flat Savitch evaluator directly to
+  `ToPartrec.Code`.  Its machine payload retains the context, state count,
+  explicit frame count, and six natural fields per continuation frame.
+  The compiled step is proved equal to the semantic DFS transition, and its
+  tail-recursive countdown loop is proved equal to repeated semantic steps.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
