@@ -403,7 +403,7 @@ theorem stripResult_encodedListSpace_le (result : Bool) :
     encodedListSpace [Encodable.encode result] ≤ 2 := by
   cases result <;> decide
 
-/-- Fitted-call obligations for the six opaque primitive-recursive leaves
+/-- Fitted-call obligations for the five opaque primitive-recursive leaves
 used by the otherwise explicit strip evaluator.  Each field is
 continuation-passing: given a fitted execution after the leaf returns its
 verified result, it supplies a fitted execution of the leaf call itself.
@@ -453,12 +453,6 @@ structure StripEvaluatorLeafCallsFit
       EvaluatorExecutionFits bound
         (.ret continuation [RawWindowState.indexCount periodicStrip]) →
       EvaluatorCallFits stripIndexCountCode continuation
-        [Encodable.encode periodicStrip] bound
-  searchDepth :
-    ∀ continuation,
-      EvaluatorExecutionFits bound
-        (.ret continuation [stripSearchDepth periodicStrip]) →
-      EvaluatorCallFits stripSearchDepthCode continuation
         [Encodable.encode periodicStrip] bound
   wellFormed :
     ∀ continuation,

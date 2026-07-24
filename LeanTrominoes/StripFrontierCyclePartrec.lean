@@ -1,4 +1,5 @@
 import LeanTrominoes.StripFrontierPartrec
+import LeanTrominoes.PartrecBinaryLength
 
 /-!
 # Flat partial-recursive strip cycle search
@@ -598,17 +599,17 @@ theorem stripIndexCountCode_eval
     codeOfPrimrec_eval indexCount indexCount_primrec periodicStrip
 
 /-- Unary code computing the certified Savitch search depth. -/
-noncomputable def stripSearchDepthCode : Code :=
-  codeOfPrimrec stripSearchDepth stripSearchDepth_primrec
+def stripSearchDepthCode : Code :=
+  Code.binaryLengthAffineCode 21 22
 
 theorem stripSearchDepthCode_eval
     (periodicStrip : PeriodicStrip) :
     stripSearchDepthCode.eval [Encodable.encode periodicStrip] =
       pure [stripSearchDepth periodicStrip] := by
-  apply Part.eq_some_iff.mpr
-  simpa [stripSearchDepthCode] using
-    codeOfPrimrec_eval stripSearchDepth stripSearchDepth_primrec
-      periodicStrip
+  simp [stripSearchDepthCode, stripSearchDepth,
+    LeanTrominoes.Complexity.primcodableFinEncoding_encode_length,
+    binaryEncodingLength_eq]
+  ring
 
 private theorem encodeBool_eq_divideBoolTag (value : Bool) :
     Encodable.encode value = divideBoolTag value := by

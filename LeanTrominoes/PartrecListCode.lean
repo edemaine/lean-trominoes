@@ -42,6 +42,31 @@ theorem get_eval (index : Nat) (values : List Nat) :
             simpa using induction values
   simp [get, Part.bind_eq_bind, headAfterDrop]
 
+/-- Add a fixed natural constant to the input head and return a singleton. -/
+def addConst : Nat → Code
+  | 0 => head
+  | increment + 1 => succ.comp (addConst increment)
+
+@[simp]
+theorem addConst_eval (increment : Nat) (values : List Nat) :
+    (addConst increment).eval values =
+      pure [values.headI + increment] := by
+  induction increment with
+  | zero =>
+      simp [addConst]
+  | succ increment induction =>
+      simp [addConst, induction, Part.bind_eq_bind]
+      omega
+
+/-- Return a fixed singleton natural. -/
+def numeral (value : Nat) : Code :=
+  (addConst value).comp zero
+
+@[simp]
+theorem numeral_eval (value : Nat) (values : List Nat) :
+    (numeral value).eval values = pure [value] := by
+  simp [numeral, Part.bind_eq_bind]
+
 /-- Prepend the singleton result of `field` to the list result of `rest`. -/
 def prepend (field rest : Code) : Code :=
   cons field rest

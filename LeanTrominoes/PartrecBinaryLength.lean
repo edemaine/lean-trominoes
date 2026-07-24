@@ -203,4 +203,58 @@ theorem binaryEncodingLengthCode_eval (number : Nat) :
     binaryLengthListStep_iterate number (number, 0),
     binaryEncodingLength]
 
+/-- Singleton-list semantics of adding a fixed increment. -/
+def addConstListStep (increment : Nat) (values : List Nat) :
+    List Nat :=
+  [values.headI + increment]
+
+@[simp]
+theorem addConstListStepCode_eval
+    (increment : Nat) (values : List Nat) :
+    (addConst increment).eval values =
+      pure (addConstListStep increment values) := by
+  simp [addConstListStep]
+
+theorem addConstListStep_iterate
+    (increment steps value : Nat) :
+    ((addConstListStep increment)^[steps]) [value] =
+      [value + steps * increment] := by
+  induction steps with
+  | zero =>
+      simp
+  | succ steps induction =>
+      rw [Function.iterate_succ_apply', induction]
+      simp [addConstListStep]
+      ring
+
+/-- Assemble `[binary length, offset]` for a flat affine loop. -/
+def binaryLengthAffineInputCode (offset : Nat) : Code :=
+  prepend binaryEncodingLengthCode <|
+    prepend (numeral offset) nil
+
+@[simp]
+theorem binaryLengthAffineInputCode_eval
+    (offset number : Nat) :
+    (binaryLengthAffineInputCode offset).eval [number] =
+      pure [binaryEncodingLength number, offset] := by
+  simp [binaryLengthAffineInputCode]
+
+/-- Explicit unary code for
+`offset + multiplier * binaryEncodingLength number`. -/
+def binaryLengthAffineCode (multiplier offset : Nat) : Code :=
+  (flatIterate (addConst multiplier)).comp
+    (binaryLengthAffineInputCode offset)
+
+@[simp]
+theorem binaryLengthAffineCode_eval
+    (multiplier offset number : Nat) :
+    (binaryLengthAffineCode multiplier offset).eval [number] =
+      pure [offset + multiplier * binaryEncodingLength number] := by
+  simp [binaryLengthAffineCode,
+    flatIterate_eval (addConst multiplier)
+      (addConstListStep multiplier)
+      (addConstListStepCode_eval multiplier),
+    addConstListStep_iterate]
+  ring
+
 end Turing.ToPartrec.Code

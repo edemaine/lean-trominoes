@@ -182,7 +182,9 @@ The representation choices for this target are:
   selecting an arbitrary extensionally correct primitive-recursive program.
   Division by two is a flat quotient/parity countdown, and a second flat loop
   repeatedly halves the input while incrementing its length; both programs
-  are proved correct.
+  are proved correct.  A reusable affine wrapper adds a fixed amount per bit;
+  the strip search-depth leaf is now the explicit instance
+  `21 × bitLength + 22`.
 - [`LeanTrominoes/FiniteState.lean`](LeanTrominoes/FiniteState.lean) proves the
   pumping fact underlying the 1.5D upper bound: a finite transition system has
   a bi-infinite path exactly when it has a nonempty directed cycle.  The strip
@@ -374,9 +376,9 @@ The representation choices for this target are:
   Boolean accumulator.  `stripEvaluatorSpacePolynomial` combines both bounds
   with the exact typed-input size and constant Boolean-output size into one
   polynomial envelope for the evaluator proof.
-  `StripEvaluatorLeafCallsFit` isolates the six opaque
+  `StripEvaluatorLeafCallsFit` isolates the five remaining opaque
   primitive-recursive leaf programs—base relation, raw edge, Savitch fuel,
-  state count, search depth, and well-formedness—as continuation-passing
+  state count, and well-formedness—as continuation-passing
   fitted-call obligations.  This keeps semantic correctness of a chosen code
   distinct from the space certificate still required for that code.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
