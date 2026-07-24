@@ -252,6 +252,14 @@ The representation choices for this target are:
   to a valid state when the period is positive.  Thus later midpoint searches
   can loop over natural indices without materializing the exponential state
   list.
+- [`LeanTrominoes/StripFrontierIndexedSearch.lean`](LeanTrominoes/StripFrontierIndexedSearch.lean)
+  instantiates arithmetic Savitch search with the tromino frontier relation.
+  Each bounded index is decoded to one semantic state only when its transition
+  is checked.  Cycles in this indexed graph are proved equivalent to cycles
+  in the original `WindowState` graph, in both directions, yielding
+  `periodicStripTrominoTilingIndexBool` and a proof that it decides the full
+  strip-tiling predicate.  This removes the exponential state enumeration
+  from the executable upper-bound algorithm.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is
