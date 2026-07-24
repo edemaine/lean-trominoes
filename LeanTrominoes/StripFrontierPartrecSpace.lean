@@ -437,6 +437,16 @@ theorem stripInput_encodedListSpace
     Turing.PartrecToTM2.stackSpace_typed_init
       (periodicStripTrominoTilingCode Tromino.I) periodicStrip
 
+private theorem stripEncodingPairBits
+    (periodicStrip : PeriodicStrip) :
+    (Computability.encodeNat
+      (Nat.pair periodicStrip.width
+        (Nat.pair periodicStrip.period
+          (Encodable.encode periodicStrip.motif)))).length =
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip)).length := by
+  rw [PeriodicStrip.encode_eq_pair]
+
 /-- The explicit repeated-doubling program fits the linear reserve assigned
 to the padded power-of-two state bound. -/
 theorem stripStateBoundCodeCost_le
@@ -493,6 +503,7 @@ theorem stripStateBoundCodeCost_le
       (Computability.encodeNat 0).length = 0 := rfl
   have oneBits :
       (Computability.encodeNat 1).length = 1 := rfl
+  have pairBits := stripEncodingPairBits periodicStrip
   simp [EvaluatorCodeFits.powerTwoCost,
     EvaluatorCodeFits.powerTwoInputCost,
     EvaluatorCodeFits.powerTwoLoopCost,
@@ -565,6 +576,17 @@ theorem stripFuelCodeCost_le
       (Computability.encodeNat 0).length = 0 := rfl
   have oneBits :
       (Computability.encodeNat 1).length = 1 := rfl
+  have pairBits := stripEncodingPairBits periodicStrip
+  have pairFuelBits :
+      stripFuelBits
+          ((Computability.encodeNat
+            (Nat.pair periodicStrip.width
+              (Nat.pair periodicStrip.period
+                (Encodable.encode periodicStrip.motif)))).length + 1) =
+        stripFuelBits
+          ((Computability.encodeNat
+            (Encodable.encode periodicStrip)).length + 1) := by
+    rw [pairBits]
   have inputLengthDirect :
       (Computability.encodeNat
           (Encodable.encode periodicStrip)).length + 1 =

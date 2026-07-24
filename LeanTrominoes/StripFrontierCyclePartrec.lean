@@ -2,6 +2,7 @@ import LeanTrominoes.StripFrontierPartrec
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecFuel
 import LeanTrominoes.PartrecPowerTwo
+import LeanTrominoes.PartrecStripWellFormed
 
 /-!
 # Flat partial-recursive strip cycle search
@@ -319,8 +320,12 @@ private theorem candidateStepCode_eval (tromino : Tromino)
         divideBoolTag
           (found || cycleCandidateBool tromino periodicStrip stateCount
             depth first secondRemaining.pred)] := by
-  simp [candidateStepCode, candidateSecond,
-    candidateFoundCode_eval]
+  have foundRun :=
+    candidateFoundCode_eval tromino periodicStrip
+      stateCount depth first secondRemaining found
+  simp only [candidateStepCode, Code.prepend_eval_eq]
+  rw [foundRun]
+  simp [candidateSecond]
 
 /-- Running the inner countdown checks exactly the second-state indices below
 `remaining`, in descending order. -/
@@ -355,8 +360,28 @@ private theorem candidateCountdownCode_eval (tromino : Tromino)
             (found ||
               cycleCandidateBool tromino periodicStrip stateCount
                 depth first remaining)], ?_, ?_⟩
-      · simp [Code.flatCountdownBody,
-          candidateStepCode_eval]
+      · have stepRun :=
+          candidateStepCode_eval tromino periodicStrip
+            stateCount depth first (remaining + 1) found
+        rw [PeriodicStrip.encode_eq_pair] at stepRun
+        have bodyRun :
+            (Code.flatCountdownBody
+              (candidateStepCode tromino)).eval
+                ((remaining + 1) ::
+                  [Encodable.encode periodicStrip, stateCount,
+                    depth, first, remaining + 1,
+                    divideBoolTag found]) =
+              pure
+                (1 :: remaining ::
+                  [Encodable.encode periodicStrip, stateCount,
+                    depth, first, remaining,
+                    divideBoolTag
+                      (found ||
+                        cycleCandidateBool tromino periodicStrip
+                          stateCount depth first remaining)]) := by
+          simp [Code.flatCountdownBody, stepRun]
+        rw [bodyRun]
+        simp
       · simpa [boundedAny, Bool.or_assoc] using
           induction
             (found ||
@@ -490,8 +515,30 @@ private theorem outerCountdownCode_eval (tromino : Tromino)
                 (cycleCandidateBool tromino periodicStrip stateCount
                   depth remaining)
                 stateCount)], ?_, ?_⟩
-      · simp [Code.flatCountdownBody,
-          innerScanCode_eval]
+      · have stepRun :=
+          innerScanCode_eval tromino periodicStrip
+            stateCount depth (remaining + 1) found
+        rw [PeriodicStrip.encode_eq_pair] at stepRun
+        have bodyRun :
+            (Code.flatCountdownBody
+              (innerScanCode tromino)).eval
+                ((remaining + 1) ::
+                  [Encodable.encode periodicStrip, stateCount,
+                    depth, remaining + 1,
+                    divideBoolTag found]) =
+              pure
+                (1 :: remaining ::
+                  [Encodable.encode periodicStrip, stateCount,
+                    depth, remaining,
+                    divideBoolTag
+                      (found ||
+                        boundedAny
+                          (cycleCandidateBool tromino periodicStrip
+                            stateCount depth remaining)
+                          stateCount)]) := by
+          simp [Code.flatCountdownBody, stepRun]
+        rw [bodyRun]
+        simp
       · simpa [boundedAny, Bool.or_assoc] using
           induction
             (found ||
@@ -591,26 +638,31 @@ theorem stripStateBoundCode_eval
     (periodicStrip : PeriodicStrip) :
     stripStateBoundCode.eval [Encodable.encode periodicStrip] =
       pure [stripStateBound periodicStrip] := by
-  simp [stripStateBoundCode, stripStateBound,
-    stripSearchDepthCode_eval]
+  calc
+    _ = Code.powerTwoCode.eval
+        [stripSearchDepth periodicStrip] :=
+      comp_eval_pure _ _ _ _
+        (stripSearchDepthCode_eval periodicStrip)
+    _ = _ := by
+      simp [stripStateBound]
 
 private theorem encodeBool_eq_divideBoolTag (value : Bool) :
     Encodable.encode value = divideBoolTag value := by
   cases value <;> rfl
 
 /-- Unary code deciding whether a strip presentation is well formed. -/
-noncomputable def stripWellFormedCode : Code :=
-  codeOfPrimrec PeriodicStrip.wellFormed
-    periodicStrip_wellFormed_primrec
+def stripWellFormedCode : Code :=
+  Code.stripWellFormedExplicitCode
 
 theorem stripWellFormedCode_eval
     (periodicStrip : PeriodicStrip) :
     stripWellFormedCode.eval [Encodable.encode periodicStrip] =
       pure [divideBoolTag periodicStrip.wellFormed] := by
-  apply Part.eq_some_iff.mpr
-  simpa [stripWellFormedCode, encodeBool_eq_divideBoolTag] using
-    codeOfPrimrec_eval PeriodicStrip.wellFormed
-      periodicStrip_wellFormed_primrec periodicStrip
+  have explicit :=
+    Code.stripWellFormedExplicitCode_eval periodicStrip
+  cases wellFormed : periodicStrip.wellFormed <;>
+    simpa [stripWellFormedCode, wellFormed,
+      FiniteState.divideBoolTag] using explicit
 
 /-- Assemble the encoded strip, padded state bound, and search depth consumed by the
 parameterized cycle search. -/
@@ -624,8 +676,11 @@ theorem stripCycleParametersCode_eval
     stripCycleParametersCode.eval [Encodable.encode periodicStrip] =
       pure [Encodable.encode periodicStrip, stripStateBound periodicStrip,
         stripSearchDepth periodicStrip] := by
-  simp [stripCycleParametersCode, stripStateBoundCode_eval,
-    stripSearchDepthCode_eval]
+  have stateRun := stripStateBoundCode_eval periodicStrip
+  have depthRun := stripSearchDepthCode_eval periodicStrip
+  simp only [stripCycleParametersCode, Code.prepend_eval_eq]
+  rw [stateRun, depthRun]
+  simp
 
 /-- Guard the parameterized cycle search by strip well-formedness. -/
 noncomputable def guardedStripCycleCode (tromino : Tromino) : Code :=

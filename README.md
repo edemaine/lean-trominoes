@@ -512,10 +512,10 @@ The representation choices for this target are:
   calculation of the padded graph bound.
   `stripFuelCode_fits` similarly certifies the explicit exact-fuel
   computation within a quadratic reserve.  `StripEvaluatorLeafCallsFit`
-  isolates the three remaining leaf certificates—base relation, raw edge,
-  and well-formedness—as continuation-passing fitted-call obligations.  These
-  still use correctness-only code selection, keeping semantic correctness
-  distinct from the space certificate required for each code.
+  isolates the leaf calls as continuation-passing fitted-call obligations.
+  The well-formedness leaf now uses the complete explicit program above;
+  only the base relation and raw edge still use correctness-only code
+  selection while their explicit fitted implementations are developed.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
