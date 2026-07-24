@@ -885,6 +885,18 @@ The representation choices for this target are:
   proves the entire 2D conjunct conditionally on the isolated
   `NormalizedOrientationCoREHard` interface.  Establishing that source
   interface remains the 2D hardness gap.
+- [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
+  the local translation-invariant Boolean formulas used at the beginning of
+  that source reduction chain: each finite clause refers to variables at
+  integer-lattice offsets, and the finite conjunction is imposed at every
+  translate of the plane.
+- [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
+  starts the 2D hardness construction from the imported Wang domino problem.
+  It activates at least one Wang tile at every cell and forbids incompatible
+  active pairs across horizontal and vertical edges.  The semantic
+  correctness theorem proves that this periodic CNF is satisfiable exactly
+  when the original tileset tiles the plane; no uniqueness clauses are needed
+  because any active tile can be chosen at each cell.
 - [`LeanTrominoes/OrthogonalDrawing.lean`](LeanTrominoes/OrthogonalDrawing.lean)
   defines the finite toroidal normalized source drawings, colored port
   matching, and their global 1-in-3 / 0-or-3 orientation predicate on the

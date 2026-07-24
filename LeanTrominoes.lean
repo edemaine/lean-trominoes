@@ -38,6 +38,7 @@ import LeanTrominoes.IndexedSavitchDFSListEncoding
 import LeanTrominoes.IndexedSavitchDFSPartrec
 import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
+import LeanTrominoes.PeriodicCNF
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
 import LeanTrominoes.PartrecEncodedListDecode
@@ -118,6 +119,7 @@ import LeanTrominoes.StripFrontierSpace
 import LeanTrominoes.SpaceRefinement
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
+import LeanTrominoes.WangPeriodicCNF
 
 /-!
 # LeanTrominoes
