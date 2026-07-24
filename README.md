@@ -890,6 +890,11 @@ The representation choices for this target are:
   that source reduction chain: each finite clause refers to variables at
   integer-lattice offsets, and the finite conjunction is imposed at every
   translate of the plane.
+- [`LeanTrominoes/PeriodicThreeCNF.lean`](LeanTrominoes/PeriodicThreeCNF.lean)
+  implements the standard auxiliary-variable chain that splits arbitrary
+  protoclauses into clauses of width at most three.  Auxiliary variables are
+  anchored at the first source-literal offset, and the output is proved to
+  preserve the paper's locality condition.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
