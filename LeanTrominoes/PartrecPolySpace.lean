@@ -12,7 +12,126 @@ four-stack evaluator; finite-label restriction preserves the stacks exactly.
 namespace Turing
 namespace PartrecToTM2
 
+open Computability
 open Relation
+
+/-- Native tape cells occupied by an evaluator-encoded list of naturals. -/
+def encodedListSpace (values : List Nat) : Nat :=
+  (trList values).length
+
+/-- Native tape cells used to store the data retained by a continuation. -/
+def continuationSpace (continuation : ToPartrec.Cont) : Nat :=
+  (trContStack continuation).length
+
+/-- Data space at a milestone of the high-level sequential evaluator. -/
+def evaluatorCfgSpace : ToPartrec.Cfg → Nat
+  | .halt values => encodedListSpace values
+  | .ret continuation values =>
+      encodedListSpace values + continuationSpace continuation
+
+@[simp]
+theorem encodedListSpace_nil :
+    encodedListSpace [] = 0 := rfl
+
+@[simp]
+theorem encodedListSpace_cons (value : Nat) (values : List Nat) :
+    encodedListSpace (value :: values) =
+      (encodeNat value).length + 1 + encodedListSpace values := by
+  simp only [encodedListSpace, trList, List.length_append,
+    List.length_cons,
+    LeanTrominoes.Complexity.partrec_trNat_length]
+  omega
+
+theorem encodedListSpace_eq_sum (values : List Nat) :
+    encodedListSpace values =
+      (values.map fun value => (encodeNat value).length + 1).sum := by
+  induction values with
+  | nil => rfl
+  | cons value values ih =>
+      rw [encodedListSpace_cons, ih]
+      simp
+
+theorem list_length_le_encodedListSpace (values : List Nat) :
+    values.length ≤ encodedListSpace values := by
+  induction values with
+  | nil => simp
+  | cons value values ih =>
+      rw [encodedListSpace_cons]
+      simp only [List.length_cons]
+      omega
+
+theorem trLList_length_eq_sum (values : List (List Nat)) :
+    (trLList values).length =
+      (values.map fun value => encodedListSpace value + 1).sum := by
+  induction values with
+  | nil => rfl
+  | cons value values ih =>
+      simp only [trLList, List.length_append, List.length_cons,
+        List.map_cons, List.sum_cons, ih,
+        encodedListSpace]
+      omega
+
+theorem continuationSpace_eq_sum (continuation : ToPartrec.Cont) :
+    continuationSpace continuation =
+      ((contStack continuation).map
+        fun value => encodedListSpace value + 1).sum := by
+  rw [continuationSpace, trContStack, trLList_length_eq_sum]
+
+/-- Expanding the four named evaluator stacks computes their total size. -/
+theorem stackSpace_elim (label : Option Λ') (state : Option Γ')
+    (mainStack reverseStack auxiliaryStack continuationStack : List Γ') :
+    TM2.stackSpace
+        (TM2.Cfg.mk label state
+          (K'.elim mainStack reverseStack auxiliaryStack
+            continuationStack)) =
+      mainStack.length + reverseStack.length +
+        auxiliaryStack.length + continuationStack.length := by
+  unfold TM2.stackSpace
+  rw [show (Finset.univ : Finset K') =
+      {.main, .rev, .aux, .stack} by
+    ext index
+    cases index <;> simp]
+  simp [Nat.add_assoc]
+
+@[simp]
+theorem stackSpace_init (code : ToPartrec.Code) (values : List Nat) :
+    TM2.stackSpace (init code values) = encodedListSpace values := by
+  rw [init, stackSpace_elim]
+  simp [encodedListSpace]
+
+@[simp]
+theorem stackSpace_halt (values : List Nat) :
+    TM2.stackSpace (halt values) = encodedListSpace values := by
+  rw [halt, stackSpace_elim]
+  simp [encodedListSpace]
+
+/-- At every high-level evaluator milestone, the transcription relation
+records exactly the value and continuation data counted by
+`evaluatorCfgSpace`. -/
+theorem stackSpace_eq_evaluatorCfgSpace_of_TrCfg
+    {source : ToPartrec.Cfg} {target : Cfg'}
+    (related : TrCfg source target) :
+    TM2.stackSpace target = evaluatorCfgSpace source := by
+  cases source with
+  | halt values =>
+      rw [TrCfg] at related
+      subst target
+      simp [evaluatorCfgSpace]
+  | ret continuation values =>
+      rw [TrCfg] at related
+      obtain ⟨state, rfl⟩ := related
+      rw [stackSpace_elim]
+      simp [evaluatorCfgSpace, encodedListSpace, continuationSpace]
+
+/-- The typed input encoding length is exactly the initial ambient evaluator
+stack space. -/
+theorem stackSpace_typed_init
+    {α : Type} [Primcodable α] (code : ToPartrec.Code) (input : α) :
+    TM2.stackSpace (init code [Encodable.encode input]) =
+      ((LeanTrominoes.Complexity.primcodableFinEncoding α).encode
+        input).length := by
+  simp [encodedListSpace,
+    LeanTrominoes.Complexity.primcodableFinEncoding]
 
 /-- Erasing a run of the finite evaluator gives a run of Mathlib's ambient
 partial-recursive evaluator. -/

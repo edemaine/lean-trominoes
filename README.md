@@ -218,7 +218,10 @@ The representation choices for this target are:
   configuration.  `PolySpaceDecider.toFiniteDecider` transfers the execution
   to the finite supported machine and proves the exact
   `Complexity.DeciderInPolySpace` certificate, using preservation of all
-  stack contents under label restriction.
+  stack contents under label restriction.  The file also gives exact native
+  tape-size formulas for encoded natural lists, retained continuation data,
+  initial and halting configurations, and every high-level evaluator
+  milestone related by Mathlib's transcription invariant.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
