@@ -418,6 +418,12 @@ The representation choices for this target are:
   strip.  The fitted header program exposes native evaluator fields
   `[width, period, motifCode]`, leaving the variable-length motif encoded for
   the following traversal.
+- [`LeanTrominoes/PartrecEncodedListDecode.lean`](LeanTrominoes/PartrecEncodedListDecode.lean)
+  and
+  [`LeanTrominoes/PartrecEncodedListDecodeSpace.lean`](LeanTrominoes/PartrecEncodedListDecodeSpace.lean)
+  provide the fitted one-constructor view used by that traversal.  They
+  distinguish the zero-encoded empty list from a successor-encoded cons and
+  return the fixed-width native state `[tag, headCode, tailCode]`.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
