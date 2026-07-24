@@ -44,6 +44,7 @@ import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
+import LeanTrominoes.StripFrontierCyclePartrec
 import LeanTrominoes.StripFrontierEncoding
 import LeanTrominoes.StripFrontierIndex
 import LeanTrominoes.StripFrontierIndexComputability

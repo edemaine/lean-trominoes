@@ -290,7 +290,14 @@ The representation choices for this target are:
   supplies the evaluator's strip-specific depth-zero program.  It extracts
   the encoded strip and two queried frontier indices from the flat payload,
   computes equality or the indexed frontier edge relation, and is connected
-  to both the verified small step and the tail-recursive iterator.
+  to both the verified small step and the tail-recursive iterator.  A
+  separately verified raw-edge program supports the outer cycle scan.
+- [`LeanTrominoes/StripFrontierCyclePartrec.lean`](LeanTrominoes/StripFrontierCyclePartrec.lean)
+  builds the complete parameterized cycle-search driver.  One wrapper
+  initializes a reachability query and runs its exact verified fuel; nested
+  tail-recursive countdowns then scan both frontier endpoints while retaining
+  only loop counters, a Boolean accumulator, and the current flat DFS stack.
+  The final code is proved equal to `cycleSearchIndexDFSBoolAtDepth`.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

@@ -106,6 +106,105 @@ theorem stripBaseVectorCode_eval (tromino : Tromino)
       pure [stripBaseBoolValue tromino encodedStrip first last] at correctness
   exact correctness
 
+/-- Natural-valued raw edge test, without the reflexive base case used by
+Savitch reachability. -/
+def stripEdgeBoolValue (tromino : Tromino)
+    (encodedStrip first last : Nat) : Nat :=
+  let periodicStrip :=
+    (Encodable.decode (α := PeriodicStrip) encodedStrip).getD
+      emptyPeriodicStrip
+  divideBoolTag
+    (indexedTransitionRawBool tromino periodicStrip first last)
+
+theorem stripEdgeBoolValue_primrec (tromino : Tromino) :
+    Primrec fun input : Nat × Nat × Nat =>
+      stripEdgeBoolValue tromino input.1 input.2.1 input.2.2 := by
+  let periodicStrip : Primrec fun input : Nat × Nat × Nat =>
+      (Encodable.decode (α := PeriodicStrip) input.1).getD
+        emptyPeriodicStrip :=
+    Primrec.option_getD.comp
+      (Primrec.decode.comp Primrec.fst)
+      (Primrec.const emptyPeriodicStrip)
+  let first : Primrec fun input : Nat × Nat × Nat => input.2.1 :=
+    Primrec.fst.comp Primrec.snd
+  let last : Primrec fun input : Nat × Nat × Nat => input.2.2 :=
+    Primrec.snd.comp Primrec.snd
+  let transition : Primrec fun input : Nat × Nat × Nat =>
+      indexedTransitionRawBool tromino
+        ((Encodable.decode (α := PeriodicStrip) input.1).getD
+          emptyPeriodicStrip)
+        input.2.1 input.2.2 :=
+    (indexedTransitionRawBool_primrec tromino).comp
+      (Primrec.pair periodicStrip (Primrec.pair first last))
+  unfold stripEdgeBoolValue
+  exact (Primrec.dom_finite divideBoolTag).comp transition
+
+private def stripEdgeVectorValue (tromino : Tromino)
+    (values : List.Vector Nat 3) : Nat :=
+  stripEdgeBoolValue tromino values.head values.tail.head
+    values.tail.tail.head
+
+private theorem stripEdgeVectorValue_primrec (tromino : Tromino) :
+    Primrec (stripEdgeVectorValue tromino) := by
+  let arguments : Primrec fun values : List.Vector Nat 3 =>
+      (values.head, values.tail.head, values.tail.tail.head) :=
+    Primrec.pair Primrec.vector_head
+      (Primrec.pair
+        (Primrec.vector_head.comp Primrec.vector_tail)
+        (Primrec.vector_head.comp
+          (Primrec.vector_tail.comp Primrec.vector_tail)))
+  exact ((stripEdgeBoolValue_primrec tromino).comp arguments).of_eq
+    fun _ => rfl
+
+private theorem exists_stripEdgeVectorCode (tromino : Tromino) :
+    ∃ code : Code, ∀ values : List.Vector Nat 3,
+      code.eval values.1 =
+        pure [stripEdgeVectorValue tromino values] := by
+  have vectorPrimrec :
+      Nat.Primrec' (stripEdgeVectorValue tromino) :=
+    Nat.Primrec'.prim_iff.mpr
+      (stripEdgeVectorValue_primrec tromino)
+  have vectorPartrec :
+      Nat.Partrec'
+        (fun values : List.Vector Nat 3 =>
+          stripEdgeVectorValue tromino values) :=
+    Nat.Partrec'.prim vectorPrimrec
+  simpa using Code.exists_code vectorPartrec
+
+/-- Fixed three-argument code for the raw indexed frontier edge relation. -/
+noncomputable def stripEdgeVectorCode (tromino : Tromino) : Code :=
+  Classical.choose (exists_stripEdgeVectorCode tromino)
+
+theorem stripEdgeVectorCode_spec (tromino : Tromino)
+    (values : List.Vector Nat 3) :
+    (stripEdgeVectorCode tromino).eval values.1 =
+      pure [stripEdgeVectorValue tromino values] := by
+  unfold stripEdgeVectorCode
+  exact Classical.choose_spec
+    (exists_stripEdgeVectorCode tromino) values
+
+theorem stripEdgeVectorCode_eval (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    (stripEdgeVectorCode tromino).eval
+        [Encodable.encode periodicStrip, first, last] =
+      pure [divideBoolTag
+        (indexedTransitionRawBool tromino periodicStrip first last)] := by
+  let values : List.Vector Nat 3 :=
+    ⟨[Encodable.encode periodicStrip, first, last], rfl⟩
+  have correctness := stripEdgeVectorCode_spec tromino values
+  have valueEq :
+      stripEdgeVectorValue tromino values =
+        divideBoolTag
+          (indexedTransitionRawBool tromino periodicStrip first last) := by
+    change
+      stripEdgeBoolValue tromino (Encodable.encode periodicStrip)
+          first last =
+        divideBoolTag
+          (indexedTransitionRawBool tromino periodicStrip first last)
+    simp [stripEdgeBoolValue]
+  rw [valueEq] at correctness
+  simpa only [values] using correctness
+
 private def stripBaseArguments : Code :=
   Code.prepend (Code.get 0) <|
     Code.prepend (Code.get 5) <|

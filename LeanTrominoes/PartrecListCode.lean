@@ -94,6 +94,30 @@ theorem branchZero_eval_succ
     Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt positive)
   simp [branchZero, testCorrect, whenSuccCorrect, predecessorEq]
 
+theorem branchZero_eval_zero_at
+    (test whenZero whenSucc : Code) (values : List Nat) (testValue : Nat)
+    (testCorrect : test.eval values = pure [testValue])
+    (whenZeroValue : List Nat)
+    (whenZeroCorrect : whenZero.eval values = pure whenZeroValue)
+    (zero : testValue = 0) :
+    (branchZero test whenZero whenSucc).eval values =
+      pure whenZeroValue := by
+  simp [branchZero, testCorrect, whenZeroCorrect, zero,
+    Part.bind_eq_bind]
+
+theorem branchZero_eval_succ_at
+    (test whenZero whenSucc : Code) (values : List Nat) (testValue : Nat)
+    (testCorrect : test.eval values = pure [testValue])
+    (whenSuccValue : List Nat)
+    (whenSuccCorrect : whenSucc.eval values = pure whenSuccValue)
+    (positive : 0 < testValue) :
+    (branchZero test whenZero whenSucc).eval values =
+      pure whenSuccValue := by
+  obtain ⟨predecessor, predecessorEq⟩ :=
+    Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt positive)
+  simp [branchZero, testCorrect, whenSuccCorrect, predecessorEq,
+    Part.bind_eq_bind]
+
 /-- Normalize a natural truth tag to Boolean `0` or `1`. -/
 def normalizeBool (value : Code) : Code :=
   branchZero value zero one
@@ -112,6 +136,19 @@ theorem normalizeBool_eval
     exact branchZero_eval_succ value zero one result correct
       (fun _ => [1]) (fun input => by simp) values
       (Nat.pos_of_ne_zero zeroResult)
+
+theorem normalizeBool_eval_at
+    (value : Code) (values : List Nat) (result : Nat)
+    (correct : value.eval values = pure [result]) :
+    (normalizeBool value).eval values =
+      pure [if result = 0 then 0 else 1] := by
+  by_cases zeroResult : result = 0
+  · rw [if_pos zeroResult]
+    exact branchZero_eval_zero_at value zero one values result correct
+      [0] (by simp) zeroResult
+  · rw [if_neg zeroResult]
+    exact branchZero_eval_succ_at value zero one values result correct
+      [1] (by simp) (Nat.pos_of_ne_zero zeroResult)
 
 /-- Boolean conjunction of two computed natural truth tags. -/
 def boolAnd (left right : Code) : Code :=
@@ -138,6 +175,27 @@ theorem boolAnd_eval
       (normalizeBool_eval right rightValue rightCorrect)
       values leftPositive]
     by_cases rightZero : rightValue values = 0
+    · simp [rightZero]
+    · simp [leftZero, rightZero]
+
+theorem boolAnd_eval_at
+    (left right : Code) (values : List Nat)
+    (leftValue rightValue : Nat)
+    (leftCorrect : left.eval values = pure [leftValue])
+    (rightCorrect : right.eval values = pure [rightValue]) :
+    (boolAnd left right).eval values =
+      pure [if leftValue = 0 ∨ rightValue = 0 then 0 else 1] := by
+  unfold boolAnd
+  by_cases leftZero : leftValue = 0
+  · rw [if_pos (Or.inl leftZero)]
+    exact branchZero_eval_zero_at left zero (normalizeBool right)
+      values leftValue leftCorrect [0] (by simp) leftZero
+  · rw [branchZero_eval_succ_at left zero (normalizeBool right)
+      values leftValue leftCorrect
+      [if rightValue = 0 then 0 else 1]
+      (normalizeBool_eval_at right values rightValue rightCorrect)
+      (Nat.pos_of_ne_zero leftZero)]
+    by_cases rightZero : rightValue = 0
     · simp [rightZero]
     · simp [leftZero, rightZero]
 
@@ -168,6 +226,28 @@ theorem boolOr_eval
     exact branchZero_eval_succ left (normalizeBool right) one
       leftValue leftCorrect (fun _ => [1]) (fun input => by simp)
       values leftPositive
+
+theorem boolOr_eval_at
+    (left right : Code) (values : List Nat)
+    (leftValue rightValue : Nat)
+    (leftCorrect : left.eval values = pure [leftValue])
+    (rightCorrect : right.eval values = pure [rightValue]) :
+    (boolOr left right).eval values =
+      pure [if leftValue = 0 ∧ rightValue = 0 then 0 else 1] := by
+  unfold boolOr
+  by_cases leftZero : leftValue = 0
+  · rw [branchZero_eval_zero_at left (normalizeBool right) one
+      values leftValue leftCorrect
+      [if rightValue = 0 then 0 else 1]
+      (normalizeBool_eval_at right values rightValue rightCorrect)
+      leftZero]
+    by_cases rightZero : rightValue = 0
+    · simp [leftZero, rightZero]
+    · simp [leftZero, rightZero]
+  · rw [if_neg (fun both => leftZero both.1)]
+    exact branchZero_eval_succ_at left (normalizeBool right) one
+      values leftValue leftCorrect [1] (by simp)
+      (Nat.pos_of_ne_zero leftZero)
 
 /-- Convert a normalized Boolean tag to the optional-Boolean answer tags:
 `0 ↦ 1` and nonzero `↦ 2`. -/

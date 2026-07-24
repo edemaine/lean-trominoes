@@ -221,6 +221,37 @@ theorem exists_code_of_primrec
     pure [encodedFunction function (Encodable.encode input)] at correctness
   simpa [encodedInput, encodedFunction] using correctness
 
+/-- Extract a `ToPartrec.Code` directly from a fixed-arity
+natural-vector function.  Unlike `exists_code_of_primrec`, the resulting code
+receives the vector entries as separate list fields rather than as one encoded
+natural. -/
+theorem exists_code_of_vector_primrec {arity : Nat}
+    (function : List.Vector Nat arity → Nat)
+    (primrec : Primrec function) :
+    ∃ code : ToPartrec.Code, ∀ input : List.Vector Nat arity,
+      code.eval input.1 = pure [function input] := by
+  have vectorPrimrec : Nat.Primrec' function :=
+    Nat.Primrec'.prim_iff.mpr primrec
+  have vectorPartrec :
+      Nat.Partrec' (fun input : List.Vector Nat arity => function input) :=
+    Nat.Partrec'.prim vectorPrimrec
+  simpa using ToPartrec.Code.exists_code vectorPartrec
+
+/-- A chosen fixed-arity code for a primitive-recursive natural function. -/
+noncomputable def codeOfVectorPrimrec {arity : Nat}
+    (function : List.Vector Nat arity → Nat)
+    (primrec : Primrec function) :
+    ToPartrec.Code :=
+  Classical.choose (exists_code_of_vector_primrec function primrec)
+
+theorem codeOfVectorPrimrec_eval {arity : Nat}
+    (function : List.Vector Nat arity → Nat)
+    (primrec : Primrec function) (input : List.Vector Nat arity) :
+    (codeOfVectorPrimrec function primrec).eval input.1 =
+      pure [function input] :=
+  Classical.choose_spec
+    (exists_code_of_vector_primrec function primrec) input
+
 /-- A chosen partial-recursive program representing `function`. -/
 noncomputable def codeOfPrimrec
     {α β : Type} [Primcodable α] [Primcodable β] [Inhabited α]
