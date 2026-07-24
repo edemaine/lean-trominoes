@@ -265,13 +265,19 @@ The representation choices for this target are:
   motif deduplication, the canonical five-column key list, and the exact
   arithmetic state count are now primitive recursive as well.  Raw-state
   phase and assignment projections and lookup of a raw assignment at a
-  window cell are primitive recursive too; semantic decoding is factored
-  through one verified conversion from valid raw states to `WindowState`.
+  window cell are primitive recursive too, as is on-demand decoding of a
+  complete state index; semantic decoding is factored through one verified
+  conversion from valid raw states to `WindowState`.
 - [`LeanTrominoes/StripFrontierRawTransition.lean`](LeanTrominoes/StripFrontierRawTransition.lean)
   gives normalization, center-column exact-cover, and four-column overlap
   checks directly on uniform raw states, using only explicit finite lists and
   Boolean tests.  On valid raw states, the combined raw transition is proved
   equivalent to the original semantic `WindowState.Transition`.
+- [`LeanTrominoes/StripFrontierRawTransitionComputability.lean`](LeanTrominoes/StripFrontierRawTransitionComputability.lean)
+  proves primitive recursiveness of every layer of that executable
+  transition: modular phases, raw and local lookups, active candidates,
+  containment and single-coverage checks, overlap, and their final Boolean
+  conjunction.
 - [`LeanTrominoes/StripFrontierIndexedSearch.lean`](LeanTrominoes/StripFrontierIndexedSearch.lean)
   instantiates arithmetic Savitch search with the tromino frontier relation.
   Each bounded index is decoded to one raw state only when its transition is
@@ -283,6 +289,11 @@ The representation choices for this target are:
   from the executable upper-bound algorithm.  The decider uses the already
   certified sufficient depth `21 × binary input length + 1`, avoiding any
   need to compute `Nat.log` in the primitive-recursive program.
+- [`LeanTrominoes/StripFrontierIndexedSearchComputability.lean`](LeanTrominoes/StripFrontierIndexedSearchComputability.lean)
+  composes primitive-recursive range checks, on-demand arithmetic decoding,
+  and the raw transition verifier.  Thus the indexed edge predicate consumed
+  by Savitch search is now primitive recursive without enumerating the state
+  space.
 - [`LeanTrominoes/StripFrontierSpace.lean`](LeanTrominoes/StripFrontierSpace.lean)
   computes the exact frontier-state count as
   `period × 9^(5 × distinct motif cells)`.  Consequently the Savitch depth is

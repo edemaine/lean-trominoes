@@ -58,11 +58,10 @@ theorem semanticOfIndex_indexOfWindow {periodicStrip : PeriodicStrip}
   rw [ofIndex_index (encode_isValid state), decode_encode] at decoded
   exact Option.some.inj decoded.symm
 
-/-- Boolean transition check on natural indices.  Out-of-range indices are
-rejected before decoding. -/
-def indexedTransitionBool (tromino : Tromino)
+/-- Proof-free Boolean transition check on natural indices.  Out-of-range
+indices are rejected before decoding. -/
+def indexedTransitionRawBool (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
-    (_periodPositive : 0 < periodicStrip.period)
     (first last : Nat) : Bool :=
   if _firstBound : first < indexCount periodicStrip then
     if _lastBound : last < indexCount periodicStrip then
@@ -72,6 +71,14 @@ def indexedTransitionBool (tromino : Tromino)
       false
   else
     false
+
+/-- Indexed transition with the positivity witness expected by the semantic
+correctness interface.  The executable raw test does not inspect the proof. -/
+def indexedTransitionBool (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (_periodPositive : 0 < periodicStrip.period)
+    (first last : Nat) : Bool :=
+  indexedTransitionRawBool tromino periodicStrip first last
 
 theorem indexedRelation_iff_transition (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -84,6 +91,7 @@ theorem indexedRelation_iff_transition (tromino : Tromino)
         (semanticOfIndex periodicStrip periodPositive first)
         (semanticOfIndex periodicStrip periodPositive last) := by
   rw [FiniteState.IndexedRelation, indexedTransitionBool,
+    indexedTransitionRawBool,
     dif_pos first.isLt, dif_pos last.isLt,
     transitionBool_eq_true_iff,
     transition_iff_toWindowState tromino periodicStrip

@@ -153,6 +153,30 @@ theorem indexCount_primrec : Primrec indexCount := by
       (Primrec.const (9 : Nat))
       (Primrec.list_length.comp assignmentKeys_primrec))
 
+theorem ofIndex_primrec : Primrec₂ ofIndex := by
+  change Primrec fun input : PeriodicStrip × Nat =>
+    ofIndex input.1 input.2
+  let period : Primrec fun input : PeriodicStrip × Nat =>
+      input.1.period :=
+    periodicStrip_period_primrec.comp Primrec.fst
+  let phase : Primrec fun input : PeriodicStrip × Nat =>
+      input.2 % input.1.period :=
+    Primrec.nat_mod.comp Primrec.snd period
+  let assignmentLength : Primrec fun input : PeriodicStrip × Nat =>
+      (assignmentKeys input.1).length :=
+    Primrec.list_length.comp (assignmentKeys_primrec.comp Primrec.fst)
+  let assignmentCode : Primrec fun input : PeriodicStrip × Nat =>
+      input.2 / input.1.period :=
+    Primrec.nat_div.comp Primrec.snd period
+  let assignment : Primrec fun input : PeriodicStrip × Nat =>
+      decodeAssignment (assignmentKeys input.1).length
+        (input.2 / input.1.period) :=
+    decodeAssignment_primrec.comp assignmentLength assignmentCode
+  have inversePrimrec : Primrec equivData.symm :=
+    Primrec.of_equiv_symm
+  exact (inversePrimrec.comp (Primrec.pair phase assignment)).of_eq
+    fun _ => rfl
+
 end RawWindowState
 end PeriodicStrip
 end LeanTrominoes

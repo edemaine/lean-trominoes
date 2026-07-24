@@ -14,6 +14,43 @@ namespace LeanTrominoes
 namespace PeriodicStrip
 namespace RawWindowState
 
+/-- A branch-only implementation of the five possible window displacements.
+Unlike the specification in `StripFrontier`, it avoids signed-to-natural
+conversion and is convenient for the primitive-recursive compiler. -/
+def WindowColumn.ofDisplacementCode? (displacement : Int) :
+    Option WindowColumn :=
+  if displacement = -2 then some ⟨0, by omega⟩
+  else if displacement = -1 then some ⟨1, by omega⟩
+  else if displacement = 0 then some ⟨2, by omega⟩
+  else if displacement = 1 then some ⟨3, by omega⟩
+  else if displacement = 2 then some ⟨4, by omega⟩
+  else none
+
+theorem WindowColumn.ofDisplacementCode?_eq (displacement : Int) :
+    WindowColumn.ofDisplacementCode? displacement =
+      WindowColumn.ofDisplacement? displacement := by
+  unfold WindowColumn.ofDisplacementCode? WindowColumn.ofDisplacement?
+  by_cases minusTwo : displacement = -2
+  · subst displacement
+    simp
+  by_cases minusOne : displacement = -1
+  · subst displacement
+    simp
+  by_cases zero : displacement = 0
+  · subst displacement
+    simp
+  by_cases one : displacement = 1
+  · subst displacement
+    simp
+  by_cases two : displacement = 2
+  · subst displacement
+    simp
+  simp only [minusTwo, minusOne, zero, one, two, ↓reduceIte]
+  rw [dif_neg]
+  intro inside
+  rcases inside with ⟨lower, upper⟩
+  omega
+
 /-- Horizontal phase represented by one column of a raw five-column window.
 The two extra periods make the subtraction nontruncating whenever the period
 is positive. -/
@@ -93,7 +130,7 @@ theorem valueAt_toWindowState (periodicStrip : PeriodicStrip)
 def localAssignment (periodicStrip : PeriodicStrip)
     (raw : RawWindowState) : TrominoAssignment :=
   fun offset =>
-    match WindowColumn.ofDisplacement? offset.1 with
+    match WindowColumn.ofDisplacementCode? offset.1 with
     | some column => raw.valueAt periodicStrip column offset.2
     | none => none
 
@@ -103,6 +140,7 @@ theorem localAssignment_toWindowState (periodicStrip : PeriodicStrip)
       (raw.toWindowState periodicStrip valid).localAssignment := by
   funext offset
   unfold localAssignment WindowState.localAssignment
+  rw [WindowColumn.ofDisplacementCode?_eq]
   cases displacement : WindowColumn.ofDisplacement? offset.1 with
   | none => simp
   | some selected =>
@@ -156,41 +194,94 @@ def Transition (tromino : Tromino) (periodicStrip : PeriodicStrip)
     current.IsCenterValid tromino periodicStrip ∧
       current.Overlaps periodicStrip next
 
+/-- Executable normalization check at one raw assignment key. -/
+def normalizedAtBool (periodicStrip : PeriodicStrip)
+    (raw : RawWindowState) (column : WindowColumn) (base : Cell) : Bool :=
+  decide (base.1 = (raw.columnPhase periodicStrip column : Int)) ||
+    decide (raw.assignmentAtCell periodicStrip column base = none)
+
+/-- Executable normalization check for one window column. -/
+def normalizedColumnBool (periodicStrip : PeriodicStrip)
+    (raw : RawWindowState) (column : WindowColumn) : Bool :=
+  (motifCells periodicStrip).all fun base =>
+    raw.normalizedAtBool periodicStrip column base
+
 /-- Executable normalization check over the canonical key lists. -/
 def isNormalizedBool (periodicStrip : PeriodicStrip)
     (raw : RawWindowState) : Bool :=
   (List.finRange 5).all fun column =>
-    (motifCells periodicStrip).all fun base =>
-      decide (base.1 = (raw.columnPhase periodicStrip column : Int)) ||
-        decide (raw.assignmentAtCell periodicStrip column base = none)
+    raw.normalizedColumnBool periodicStrip column
+
+/-- Containment check for one source cell of a center-column placement. -/
+def centerSourceInsideBool (periodicStrip : PeriodicStrip)
+    (raw : RawWindowState) (base : Cell) (symmetry : SquareSymmetry)
+    (source : Cell) : Bool :=
+  periodicStrip.contains
+    (Cell.add ((raw.phase : Int), base.2) (symmetry.act source))
+
+/-- Containment check for one possible selected symmetry at a center base. -/
+def centerSymmetryInsideBool (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (raw : RawWindowState)
+    (base : Cell) (symmetry : SquareSymmetry) : Bool :=
+  decide (raw.assignmentAtCell periodicStrip WindowState.center base ≠
+    some symmetry) ||
+    (TrominoAssignment.trominoCellList tromino).all fun source =>
+      raw.centerSourceInsideBool periodicStrip base symmetry source
+
+/-- Containment check for every possible selected placement at one base. -/
+def centerBaseInsideBool (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (raw : RawWindowState)
+    (base : Cell) : Bool :=
+  decide (base.1 ≠ (raw.phase : Int)) ||
+    TrominoAssignment.squareSymmetryList.all fun symmetry =>
+      raw.centerSymmetryInsideBool tromino periodicStrip base symmetry
+
+/-- Containment check for every center-column base. -/
+def centerInsideBool (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (raw : RawWindowState) : Bool :=
+  (motifCells periodicStrip).all fun base =>
+    raw.centerBaseInsideBool tromino periodicStrip base
+
+/-- Single-coverage check at one possible center-column base. -/
+def centerBaseCoveredBool (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (raw : RawWindowState)
+    (base : Cell) : Bool :=
+  decide (base.1 ≠ (raw.phase : Int)) ||
+    decide ((raw.activePlacementList tromino periodicStrip base.2).length = 1)
+
+/-- Single-coverage check for every center-column base. -/
+def centerCoveredBool (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (raw : RawWindowState) : Bool :=
+  (motifCells periodicStrip).all fun base =>
+    raw.centerBaseCoveredBool tromino periodicStrip base
 
 /-- Executable center-column constraint check over the canonical finite
 candidate lists. -/
 def isCenterValidBool (tromino : Tromino)
     (periodicStrip : PeriodicStrip) (raw : RawWindowState) : Bool :=
-  ((motifCells periodicStrip).all fun base =>
-      decide (base.1 ≠ (raw.phase : Int)) ||
-        TrominoAssignment.squareSymmetryList.all fun symmetry =>
-          decide (raw.assignmentAtCell periodicStrip WindowState.center base ≠
-            some symmetry) ||
-            (TrominoAssignment.trominoCellList tromino).all fun source =>
-              periodicStrip.contains
-                (Cell.add ((raw.phase : Int), base.2)
-                  (symmetry.act source))) &&
-    ((motifCells periodicStrip).all fun base =>
-      decide (base.1 ≠ (raw.phase : Int)) ||
-        decide
-          ((raw.activePlacementList tromino periodicStrip base.2).length = 1))
+  raw.centerInsideBool tromino periodicStrip &&
+    raw.centerCoveredBool tromino periodicStrip
+
+/-- Executable shared-assignment check at one overlap key. -/
+def overlapsAtBool (periodicStrip : PeriodicStrip)
+    (current next : RawWindowState) (column : Fin 4) (base : Cell) : Bool :=
+  decide
+    (current.assignmentAtCell periodicStrip column.succ base =
+      next.assignmentAtCell periodicStrip column.castSucc base)
+
+/-- Executable shared-assignment check for one of the four overlapping
+columns. -/
+def overlapsColumnBool (periodicStrip : PeriodicStrip)
+    (current next : RawWindowState) (column : Fin 4) : Bool :=
+  (motifCells periodicStrip).all fun base =>
+    current.overlapsAtBool periodicStrip next column base
 
 /-- Executable phase-advance and shared-column check. -/
 def overlapsBool (periodicStrip : PeriodicStrip)
     (current next : RawWindowState) : Bool :=
   decide (next.phase = (current.phase + 1) % periodicStrip.period) &&
     (List.finRange 4).all fun column =>
-      (motifCells periodicStrip).all fun base =>
-        decide
-          (current.assignmentAtCell periodicStrip column.succ base =
-            next.assignmentAtCell periodicStrip column.castSucc base)
+      current.overlapsColumnBool periodicStrip next column
 
 /-- Executable raw transition check. -/
 def transitionBool (tromino : Tromino) (periodicStrip : PeriodicStrip)
@@ -219,7 +310,8 @@ theorem isNormalizedBool_eq_true_iff (periodicStrip : PeriodicStrip)
     (raw : RawWindowState) :
     raw.isNormalizedBool periodicStrip = true ↔
       raw.IsNormalized periodicStrip := by
-  simp [isNormalizedBool, IsNormalized, decide_eq_true_eq]
+  simp [isNormalizedBool, normalizedColumnBool, normalizedAtBool,
+    IsNormalized, decide_eq_true_eq]
 
 theorem isCenterValidBool_eq_true_iff (tromino : Tromino)
     (periodicStrip : PeriodicStrip) (raw : RawWindowState) :
@@ -228,7 +320,9 @@ theorem isCenterValidBool_eq_true_iff (tromino : Tromino)
   have boolIff :
       raw.isCenterValidBool tromino periodicStrip = true ↔
         IsCenterValidGuarded tromino periodicStrip raw := by
-    simp [isCenterValidBool, IsCenterValidGuarded, decide_eq_true_eq]
+    simp [isCenterValidBool, centerInsideBool, centerBaseInsideBool,
+      centerSymmetryInsideBool, centerSourceInsideBool, centerCoveredBool,
+      centerBaseCoveredBool, IsCenterValidGuarded, decide_eq_true_eq]
   rw [boolIff]
   unfold IsCenterValidGuarded IsCenterValid
   constructor
@@ -268,7 +362,8 @@ theorem overlapsBool_eq_true_iff (periodicStrip : PeriodicStrip)
     (current next : RawWindowState) :
     current.overlapsBool periodicStrip next = true ↔
       current.Overlaps periodicStrip next := by
-  simp [overlapsBool, Overlaps, decide_eq_true_eq]
+  simp [overlapsBool, overlapsColumnBool, overlapsAtBool, Overlaps,
+    decide_eq_true_eq]
 
 theorem transitionBool_eq_true_iff (tromino : Tromino)
     (periodicStrip : PeriodicStrip) (current next : RawWindowState) :

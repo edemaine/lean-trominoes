@@ -39,8 +39,10 @@ import LeanTrominoes.StripFrontierEncoding
 import LeanTrominoes.StripFrontierIndex
 import LeanTrominoes.StripFrontierIndexComputability
 import LeanTrominoes.StripFrontierIndexedSearch
+import LeanTrominoes.StripFrontierIndexedSearchComputability
 import LeanTrominoes.StripFrontierReconstruction
 import LeanTrominoes.StripFrontierRawTransition
+import LeanTrominoes.StripFrontierRawTransitionComputability
 import LeanTrominoes.StripFrontierSpace
 import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
