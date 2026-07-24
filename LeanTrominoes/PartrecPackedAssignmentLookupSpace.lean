@@ -1096,6 +1096,143 @@ theorem packedLookupColumnFlatUniform
     · rw [Code.packedLookupColumnNativeStep_iterate]
       exact after
 
+def packedLookupColumnLoopInputCost
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) : Nat :=
+  let values :=
+    [Encodable.encode motif, Encodable.encode target,
+      word, digit, found.toNat, selected.toNat]
+  let rest7 :=
+    prependCost values [found.toNat] [selected.toNat]
+      (getCost 4 values) (getCost 5 values)
+  let rest6 :=
+    prependCost values [digit] [found.toNat, selected.toNat]
+      (getCost 3 values) rest7
+  let rest5 :=
+    prependCost values [word]
+      [digit, found.toNat, selected.toNat]
+      (getCost 2 values) rest6
+  let rest4 :=
+    prependCost values [Encodable.encode target]
+      [word, digit, found.toNat, selected.toNat]
+      (getCost 1 values) rest5
+  let rest3 :=
+    prependCost values [Encodable.encode motif]
+      [Encodable.encode target, word, digit,
+        found.toNat, selected.toNat]
+      (getCost 0 values) rest4
+  let rest2 :=
+    prependCost values [Encodable.encode motif]
+      [Encodable.encode motif, Encodable.encode target,
+        word, digit, found.toNat, selected.toNat]
+      (getCost 0 values) rest3
+  prependCost values [Encodable.encode motif]
+    [Encodable.encode motif, Encodable.encode motif,
+      Encodable.encode target, word, digit,
+      found.toNat, selected.toNat]
+    (getCost 0 values) rest2
+
+theorem packedLookupColumnLoopInput
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    EvaluatorCodeFits Code.packedLookupColumnLoopInputCode
+      [Encodable.encode motif, Encodable.encode target,
+        word, digit, found.toNat, selected.toNat]
+      (Encodable.encode motif ::
+        Code.packedLookupColumnState motif motif target
+          word digit found selected)
+      (packedLookupColumnLoopInputCost motif target
+        word digit found selected) := by
+  let values :=
+    [Encodable.encode motif, Encodable.encode target,
+      word, digit, found.toNat, selected.toNat]
+  have rest7 := prepend (get 4 values) (get 5 values)
+  have rest6 := prepend (get 3 values) rest7
+  have rest5 := prepend (get 2 values) rest6
+  have rest4 := prepend (get 1 values) rest5
+  have rest3 := prepend (get 0 values) rest4
+  have rest2 := prepend (get 0 values) rest3
+  have result := prepend (get 0 values) rest2
+  simpa [Code.packedLookupColumnLoopInputCode,
+    packedLookupColumnLoopInputCost, prependCost,
+    Code.packedLookupColumnState, values] using result
+
+def packedLookupColumnProjectionValuesCost
+    (values : List Nat) : Nat :=
+  let rest5 :=
+    prependCost values [values[4]?.getD 0]
+      [values[5]?.getD 0]
+      (getCost 4 values) (getCost 5 values)
+  let rest4 :=
+    prependCost values [values[3]?.getD 0]
+      [values[4]?.getD 0, values[5]?.getD 0]
+      (getCost 3 values) rest5
+  let rest3 :=
+    prependCost values [values[2]?.getD 0]
+      [values[3]?.getD 0, values[4]?.getD 0,
+        values[5]?.getD 0]
+      (getCost 2 values) rest4
+  prependCost values [values[1]?.getD 0]
+    [values[2]?.getD 0, values[3]?.getD 0,
+      values[4]?.getD 0, values[5]?.getD 0]
+    (getCost 1 values) rest3
+
+theorem packedLookupColumnProjectionValues
+    (values : List Nat) :
+    EvaluatorCodeFits Code.packedLookupColumnProjectionCode
+      values
+      [values[1]?.getD 0, values[2]?.getD 0,
+        values[3]?.getD 0, values[4]?.getD 0,
+        values[5]?.getD 0]
+      (packedLookupColumnProjectionValuesCost values) := by
+  have rest5 := prepend (get 4 values) (get 5 values)
+  have rest4 := prepend (get 3 values) rest5
+  have rest3 := prepend (get 2 values) rest4
+  have result := prepend (get 1 values) rest3
+  simpa [Code.packedLookupColumnProjectionCode,
+    packedLookupColumnProjectionValuesCost,
+    prependCost] using result
+
+def packedLookupColumnCodeCost
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) : Nat :=
+  let process :=
+    Code.packedLookupColumnProcess motif target
+      (Encodable.encode motif) motif
+      word digit found selected
+  packedLookupColumnProjectionValuesCost process +
+    (packedLookupColumnSpaceBound motif target word digit +
+      packedLookupColumnLoopInputCost motif target
+        word digit found selected)
+
+theorem packedLookupColumn
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    EvaluatorCodeFits Code.packedLookupColumnCode
+      [Encodable.encode motif, Encodable.encode target,
+        word, digit, found.toNat, selected.toNat]
+      (Code.packedLookupColumnResult motif target
+        word digit found selected)
+      (packedLookupColumnCodeCost motif target
+        word digit found selected) := by
+  let process :=
+    Code.packedLookupColumnProcess motif target
+      (Encodable.encode motif) motif
+      word digit found selected
+  have loop :=
+    comp
+      (packedLookupColumnFlatUniform motif target
+        word digit found selected)
+      (packedLookupColumnLoopInput motif target
+        word digit found selected)
+  have projected :=
+    packedLookupColumnProjectionValues process
+  have result := comp projected loop
+  simpa [Code.packedLookupColumnCode,
+    packedLookupColumnCodeCost, process,
+    Code.packedLookupColumnResult,
+    Code.packedLookupColumnProcess_encode] using result
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

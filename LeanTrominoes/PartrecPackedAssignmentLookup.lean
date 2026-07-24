@@ -24,6 +24,13 @@ open LeanTrominoes
 
 attribute [local simp] Part.bind_eq_bind
 
+private theorem comp_eval_pure
+    (outer inner : Code) (input output : List Nat)
+    (innerCorrect : inner.eval input = pure output) :
+    (outer.comp inner).eval input =
+      outer.eval output := by
+  simp [innerCorrect, Part.bind_eq_bind]
+
 /-- Reachable payload for one packed assignment-column scan.
 
 The fields are remaining motif, original motif, target cell, residual packed
@@ -844,5 +851,394 @@ theorem packedLookupColumnScanState_not_selected
                 tailMember
       · exact packedLookupColumnScanState_of_not_mem
           original remaining target word digit false member
+
+@[simp]
+theorem packedLookupColumnScanState_not_selected_false
+    (original remaining : List Cell) (target : Cell)
+    (word digit : Nat) :
+    packedLookupColumnScanState original target remaining
+        word digit false false =
+      packedLookupColumnState original [] target
+        (word / 9 ^ remaining.length) digit false false := by
+  induction remaining generalizing word with
+  | nil =>
+      simp [packedLookupColumnScanState,
+        packedLookupColumnState]
+  | cons cell remaining induction =>
+      rw [packedLookupColumnScanState, if_neg (by simp)]
+      rw [induction (word / 9)]
+      apply congrArg (fun finalWord =>
+        packedLookupColumnState original [] target
+          finalWord digit false false)
+      rw [Nat.div_div_eq_div_mul]
+      simp only [List.length_cons, pow_succ]
+      rw [Nat.mul_comm]
+
+/-- Assemble the flat-loop input from
+`[motifCode, targetCellCode, word, digit, found, selected]`. -/
+def packedLookupColumnLoopInputCode : Code :=
+  prepend (get 0) <|
+    prepend (get 0) <|
+      prepend (get 0) <|
+        prepend (get 1) <|
+          prepend (get 2) <|
+            prepend (get 3) <|
+              prepend (get 4) (get 5)
+
+@[simp]
+theorem packedLookupColumnLoopInputCode_eval
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    packedLookupColumnLoopInputCode.eval
+        [Encodable.encode motif, Encodable.encode target,
+          word, digit, found.toNat, selected.toNat] =
+      pure
+        (Encodable.encode motif ::
+          packedLookupColumnState motif motif target
+            word digit found selected) := by
+  simp [packedLookupColumnLoopInputCode,
+    packedLookupColumnState]
+
+/-- Retain the original motif and target together with the residual word,
+recorded digit, and found tag after one column scan. -/
+def packedLookupColumnProjectionCode : Code :=
+  prepend (get 1) <|
+    prepend (get 2) <|
+      prepend (get 3) <|
+        prepend (get 4) (get 5)
+
+@[simp]
+theorem packedLookupColumnProjectionCode_eval_values
+    (values : List Nat) :
+    packedLookupColumnProjectionCode.eval values =
+      pure
+        [values[1]?.getD 0, values[2]?.getD 0,
+          values[3]?.getD 0, values[4]?.getD 0,
+          values[5]?.getD 0] := by
+  simp [packedLookupColumnProjectionCode]
+
+@[simp]
+theorem packedLookupColumnProjectionCode_eval
+    (original remaining : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    packedLookupColumnProjectionCode.eval
+        (packedLookupColumnState original remaining target
+          word digit found selected) =
+      pure
+        [Encodable.encode original, Encodable.encode target,
+          word, digit, found.toNat] := by
+  simp [packedLookupColumnProjectionCode,
+    packedLookupColumnState]
+
+@[simp]
+theorem packedLookupColumnScanState_original_field
+    (original remaining : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    (packedLookupColumnScanState original target remaining
+        word digit found selected)[1]?.getD 0 =
+      Encodable.encode original := by
+  induction remaining generalizing word digit found with
+  | nil =>
+      cases found <;>
+        simp [packedLookupColumnScanState,
+          packedLookupColumnState]
+  | cons cell remaining induction =>
+      cases found with
+      | true =>
+          simp [packedLookupColumnScanState,
+            packedLookupColumnState]
+      | false =>
+          by_cases hit : selected && decide (cell = target)
+          · simp [packedLookupColumnScanState,
+              packedLookupColumnState, hit]
+          · simpa [packedLookupColumnScanState, hit] using
+              induction (word / 9) digit false
+
+@[simp]
+theorem packedLookupColumnScanState_target_field
+    (original remaining : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    (packedLookupColumnScanState original target remaining
+        word digit found selected)[2]?.getD 0 =
+      Encodable.encode target := by
+  induction remaining generalizing word digit found with
+  | nil =>
+      cases found <;>
+        simp [packedLookupColumnScanState,
+          packedLookupColumnState]
+  | cons cell remaining induction =>
+      cases found with
+      | true =>
+          simp [packedLookupColumnScanState,
+            packedLookupColumnState]
+      | false =>
+          by_cases hit : selected && decide (cell = target)
+          · simp [packedLookupColumnScanState,
+              packedLookupColumnState, hit]
+          · simpa [packedLookupColumnScanState, hit] using
+              induction (word / 9) digit false
+
+/-- Three live fields retained after one complete column scan. -/
+def packedLookupColumnOutcome
+    (target : Cell) (selected : Bool) :
+    List Cell → Nat → Nat → Bool → Nat × Nat × Bool
+  | _, word, digit, true => (word, digit, true)
+  | [], word, digit, false => (word, digit, false)
+  | cell :: remaining, word, digit, false =>
+      if selected && decide (cell = target) then
+        (word / 9, word % 9, true)
+      else
+        packedLookupColumnOutcome target selected remaining
+          (word / 9) digit false
+
+@[simp]
+theorem packedLookupColumnOutcome_found
+    (target : Cell) (selected : Bool)
+    (remaining : List Cell) (word digit : Nat) :
+    packedLookupColumnOutcome target selected remaining
+        word digit true =
+      (word, digit, true) := by
+  cases remaining <;> rfl
+
+@[simp]
+theorem packedLookupColumnOutcome_not_selected
+    (target : Cell) (remaining : List Cell)
+    (word digit : Nat) :
+    packedLookupColumnOutcome target false remaining
+        word digit false =
+      (word / 9 ^ remaining.length, digit, false) := by
+  induction remaining generalizing word with
+  | nil =>
+      simp [packedLookupColumnOutcome]
+  | cons cell remaining induction =>
+      rw [packedLookupColumnOutcome, if_neg (by simp)]
+      rw [induction (word / 9)]
+      apply congrArg (fun finalWord =>
+        (finalWord, digit, false))
+      rw [Nat.div_div_eq_div_mul]
+      simp only [List.length_cons, pow_succ]
+      rw [Nat.mul_comm]
+
+theorem packedLookupColumnOutcome_of_not_mem
+    (target : Cell) (selected : Bool)
+    (remaining : List Cell) (word digit : Nat)
+    (absent : target ∉ remaining) :
+    packedLookupColumnOutcome target selected remaining
+        word digit false =
+      (word / 9 ^ remaining.length, digit, false) := by
+  induction remaining generalizing word with
+  | nil =>
+      simp [packedLookupColumnOutcome]
+  | cons cell remaining induction =>
+      have unequal : cell ≠ target := by
+        intro equal
+        exact absent (by simp [equal])
+      have tailAbsent : target ∉ remaining := by
+        intro member
+        exact absent (by simp [member])
+      rw [packedLookupColumnOutcome, if_neg (by simp [unequal])]
+      rw [induction (word / 9) tailAbsent]
+      apply congrArg (fun finalWord =>
+        (finalWord, digit, false))
+      rw [Nat.div_div_eq_div_mul]
+      simp only [List.length_cons, pow_succ]
+      rw [Nat.mul_comm]
+
+theorem packedLookupColumnOutcome_selected_of_mem
+    (target : Cell) (remaining : List Cell)
+    (word digit : Nat) (member : target ∈ remaining) :
+    packedLookupColumnOutcome target true remaining
+        word digit false =
+      (word /
+          9 ^ (@List.idxOf Cell instBEqOfDecidableEq
+            target remaining + 1),
+        LeanTrominoes.PeriodicStrip.RawWindowState.assignmentDigitAt
+          word
+          (@List.idxOf Cell instBEqOfDecidableEq
+            target remaining),
+        true) := by
+  induction remaining generalizing word with
+  | nil =>
+      simp at member
+  | cons cell remaining induction =>
+      by_cases equal : cell = target
+      · subst target
+        simp [packedLookupColumnOutcome,
+          LeanTrominoes.PeriodicStrip.RawWindowState.assignmentDigitAt]
+      · have targetNe : target ≠ cell := Ne.symm equal
+        have idxCons :
+            @List.idxOf Cell instBEqOfDecidableEq
+                target (cell :: remaining) =
+              Nat.succ
+                (@List.idxOf Cell instBEqOfDecidableEq
+                  target remaining) :=
+          by
+            letI : BEq Cell := instBEqOfDecidableEq
+            exact List.idxOf_cons_ne remaining equal
+        have tailMember : target ∈ remaining := by
+          simpa [targetNe] using member
+        rw [packedLookupColumnOutcome, if_neg (by simp [equal])]
+        rw [induction (word / 9) tailMember]
+        rw [idxCons]
+        apply congrArg₂ (fun finalWord finalDigit =>
+          (finalWord, finalDigit, true))
+        · rw [Nat.div_div_eq_div_mul]
+          simp [pow_succ, Nat.mul_comm]
+        · rw [assignmentDigitAt_div_nine]
+
+theorem packedLookupColumnScanState_outcome_fields
+    (original remaining : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    let state :=
+      packedLookupColumnScanState original target remaining
+        word digit found selected
+    let outcome :=
+      packedLookupColumnOutcome target selected remaining
+        word digit found
+    [state[3]?.getD 0, state[4]?.getD 0, state[5]?.getD 0] =
+      [outcome.1, outcome.2.1, outcome.2.2.toNat] := by
+  induction remaining generalizing word digit found with
+  | nil =>
+      cases found <;>
+        simp [packedLookupColumnScanState,
+          packedLookupColumnState,
+          packedLookupColumnOutcome]
+  | cons cell remaining induction =>
+      cases found with
+      | true =>
+          simp [packedLookupColumnScanState,
+            packedLookupColumnState,
+            packedLookupColumnOutcome]
+      | false =>
+          by_cases hit : selected && decide (cell = target)
+          · simp [packedLookupColumnScanState,
+              packedLookupColumnState,
+              packedLookupColumnOutcome, hit]
+          · simpa [packedLookupColumnScanState,
+              packedLookupColumnOutcome, hit] using
+              induction (word / 9) digit false
+
+/-- Closed output of one complete packed column lookup. -/
+def packedLookupColumnResult
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) : List Nat :=
+  let final :=
+    packedLookupColumnScanState motif target motif
+      word digit found selected
+  [Encodable.encode motif, Encodable.encode target,
+    final[3]?.getD 0, final[4]?.getD 0, final[5]?.getD 0]
+
+@[simp]
+theorem packedLookupColumnResult_eq_outcome
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    packedLookupColumnResult motif target
+        word digit found selected =
+      let outcome :=
+        packedLookupColumnOutcome target selected motif
+          word digit found
+      [Encodable.encode motif, Encodable.encode target,
+        outcome.1, outcome.2.1, outcome.2.2.toNat] := by
+  unfold packedLookupColumnResult
+  have fields :=
+    packedLookupColumnScanState_outcome_fields
+      motif motif target word digit found selected
+  simp only at fields
+  simp [fields]
+
+@[simp]
+theorem packedLookupColumnResult_found
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (selected : Bool) :
+    packedLookupColumnResult motif target
+        word digit true selected =
+      [Encodable.encode motif, Encodable.encode target,
+        word, digit, 1] := by
+  simp [packedLookupColumnResult,
+    packedLookupColumnScanState,
+    packedLookupColumnState]
+
+@[simp]
+theorem packedLookupColumnResult_not_selected
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) :
+    packedLookupColumnResult motif target
+        word digit false false =
+      [Encodable.encode motif, Encodable.encode target,
+        word / 9 ^ motif.length, digit, 0] := by
+  simp [packedLookupColumnResult,
+    packedLookupColumnScanState_not_selected_false,
+    packedLookupColumnState]
+
+theorem packedLookupColumnResult_digit_selected_of_mem
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (member : target ∈ motif) :
+    (packedLookupColumnResult motif target
+        word digit false true)[3]?.getD 0 =
+      LeanTrominoes.PeriodicStrip.RawWindowState.assignmentDigitAt
+        word
+        (@List.idxOf Cell instBEqOfDecidableEq target motif) := by
+  simp only [packedLookupColumnResult, List.getElem?_cons_zero,
+    List.getElem?_cons_succ, Option.getD_some]
+  exact packedLookupColumnScanState_digit_of_mem
+    motif motif target word digit member
+
+theorem packedLookupColumnResult_found_selected_of_mem
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (member : target ∈ motif) :
+    (packedLookupColumnResult motif target
+        word digit false true)[4]?.getD 0 = 1 := by
+  simp only [packedLookupColumnResult, List.getElem?_cons_zero,
+    List.getElem?_cons_succ, Option.getD_some]
+  exact packedLookupColumnScanState_found_of_mem
+    motif motif target word digit member
+
+/-- Complete explicit program for one motif-column lookup. -/
+def packedLookupColumnCode : Code :=
+  packedLookupColumnProjectionCode.comp <|
+    (flatIterate packedLookupColumnStepCode).comp
+      packedLookupColumnLoopInputCode
+
+@[simp]
+theorem packedLookupColumnCode_eval
+    (motif : List Cell) (target : Cell)
+    (word digit : Nat) (found selected : Bool) :
+    packedLookupColumnCode.eval
+        [Encodable.encode motif, Encodable.encode target,
+          word, digit, found.toNat, selected.toNat] =
+      pure
+        (packedLookupColumnResult motif target
+          word digit found selected) := by
+  let input :=
+    [Encodable.encode motif, Encodable.encode target,
+      word, digit, found.toNat, selected.toNat]
+  let process :=
+    packedLookupColumnProcess motif target
+      (Encodable.encode motif) motif
+      word digit found selected
+  have loopRun :
+      ((flatIterate packedLookupColumnStepCode).comp
+          packedLookupColumnLoopInputCode).eval input =
+        pure process := by
+    calc
+      _ = (flatIterate packedLookupColumnStepCode).eval
+          (Encodable.encode motif ::
+            packedLookupColumnState motif motif target
+              word digit found selected) :=
+        comp_eval_pure _ _ _ _
+          (packedLookupColumnLoopInputCode_eval
+            motif target word digit found selected)
+      _ = pure process := by
+        exact packedLookupColumnFlatIterateCode_eval
+          motif motif target (Encodable.encode motif)
+          word digit found selected
+  calc
+    _ = packedLookupColumnProjectionCode.eval process :=
+      comp_eval_pure _ _ _ _ loopRun
+    _ = pure
+        (packedLookupColumnResult motif target
+          word digit found selected) := by
+      simp [process, packedLookupColumnProcess_encode,
+        packedLookupColumnResult]
 
 end Turing.ToPartrec.Code

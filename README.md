@@ -490,6 +490,13 @@ The representation choices for this target are:
   encodings and residual words only decrease, while a newly exposed digit is
   at most eight.  Consequently the complete numeric countdown reuses one
   uniform workspace allowance linear in the encoded live fields.
+- [`LeanTrominoes/PartrecPackedAssignmentAt.lean`](LeanTrominoes/PartrecPackedAssignmentAt.lean)
+  unrolls the fixed five frontier columns around that scanner.  Each numbered
+  stage either skips one complete motif-sized base-nine block or freezes a
+  first-occurrence result.  The composed program returns `[digit, found]`,
+  and its successful digit is proved to occur at exactly the canonical
+  `assignmentKeys` index
+  `column * motif.length + motif.idxOf target`.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
