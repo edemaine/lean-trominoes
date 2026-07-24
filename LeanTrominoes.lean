@@ -44,6 +44,7 @@ import LeanTrominoes.PartrecEncodedListDecode
 import LeanTrominoes.PartrecEncodedListDecodeSpace
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecBinaryLengthSpace
+import LeanTrominoes.PartrecBooleanSpace
 import LeanTrominoes.PartrecCellDecode
 import LeanTrominoes.PartrecCellDecodeSpace
 import LeanTrominoes.PartrecCodeSpace
@@ -55,6 +56,8 @@ import LeanTrominoes.PartrecFuel
 import LeanTrominoes.PartrecFuelSpace
 import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecListCodeSpace
+import LeanTrominoes.PartrecNatCompare
+import LeanTrominoes.PartrecNatCompareSpace
 import LeanTrominoes.PartrecPeriodicStripDecode
 import LeanTrominoes.PartrecPeriodicStripDecodeSpace
 import LeanTrominoes.PartrecPolySpace

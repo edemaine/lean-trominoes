@@ -441,6 +441,14 @@ The representation choices for this target are:
   cell into `[xMagnitude, xSign, yMagnitude, ySign]`.  Correctness is tied
   directly to Mathlib's even/odd encoding of nonnegative and negative
   integers, and every component has a fitted evaluator certificate.
+- [`LeanTrominoes/PartrecBooleanSpace.lean`](LeanTrominoes/PartrecBooleanSpace.lean)
+  fits Boolean normalization and short-circuiting conjunction, while
+  [`LeanTrominoes/PartrecNatCompare.lean`](LeanTrominoes/PartrecNatCompare.lean)
+  and
+  [`LeanTrominoes/PartrecNatCompareSpace.lean`](LeanTrominoes/PartrecNatCompareSpace.lean)
+  use fitted truncated subtraction to return a normalized tag for natural
+  strict comparison.  These operations express positive strip dimensions
+  and coordinate upper bounds.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
