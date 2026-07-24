@@ -307,6 +307,31 @@ theorem stackSpace_eraseRestrictedCfg
 
 end TM2
 
+/-- A reflexive-transitive execution admits Mathlib's step-counted `EvalsTo`
+certificate. -/
+theorem nonempty_evalsTo_of_reaches {state : Type*}
+    {transition : state → Option state} {first last : state}
+    (reaches : StateTransition.Reaches transition first last) :
+    Nonempty (StateTransition.EvalsTo transition first (some last)) := by
+  induction reaches with
+  | refl =>
+      exact ⟨StateTransition.EvalsTo.refl transition first⟩
+  | @tail middle last reaches stepTo ih =>
+      obtain ⟨ih⟩ := ih
+      refine ⟨StateTransition.EvalsTo.trans transition first middle
+        (some last) ih ⟨1, ?_⟩⟩
+      simp only [Option.mem_def] at stepTo
+      simp only [Function.iterate_one]
+      change transition middle = some last
+      exact stepTo
+
+/-- Noncomputably select the step count forgotten by `Reaches`. -/
+noncomputable def EvalsTo.of_reaches {state : Type*}
+    {transition : state → Option state} {first last : state}
+    (reaches : StateTransition.Reaches transition first last) :
+    StateTransition.EvalsTo transition first (some last) :=
+  Classical.choice (nonempty_evalsTo_of_reaches reaches)
+
 /-- Bundle a supported ambient TM2 program as a machine with an actually
 finite label type. -/
 def FinTM2.ofSupported

@@ -196,6 +196,14 @@ The representation choices for this target are:
   uniquely to the restricted machine.  This is the first compiler layer
   needed to package the verified strip decider as an explicit
   polynomial-space machine.
+- [`LeanTrominoes/PartrecFiniteEvaluator.lean`](LeanTrominoes/PartrecFiniteEvaluator.lean)
+  applies that compiler to Mathlib's verified four-stack evaluator for
+  partial-recursive codes.  For each fixed code it produces a genuine finite
+  `FinTM2`, proves that its initial and halting configurations erase to
+  Mathlib's configurations, and transfers the evaluator's output-correctness
+  theorem to the finite machine.  Adapting the evaluator's four-symbol tape
+  encoding to the PSPACE interface and proving a polynomial stack-space bound
+  for the strip-decider code remain separate steps.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
