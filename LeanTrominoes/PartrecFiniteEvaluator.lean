@@ -140,5 +140,82 @@ noncomputable def finiteEvaluatorComputable
     simpa only [finiteEvaluator, FinTM2.ofSupported] using
       finiteEvaluator_outputs (computes input)
 
+/-- Total natural-number realization of a typed function, with an arbitrary
+default on natural numbers that do not decode as inputs. -/
+def encodedFunction {α β : Type} [Primcodable α] [Primcodable β]
+    [Inhabited α] (function : α → β) (inputCode : Nat) : Nat :=
+  Encodable.encode
+    (function ((Encodable.decode (α := α) inputCode).getD default))
+
+theorem encodedFunction_primrec
+    {α β : Type} [Primcodable α] [Primcodable β] [Inhabited α]
+    {function : α → β} (primrec : Primrec function) :
+    Nat.Primrec (encodedFunction function) := by
+  apply Primrec.nat_iff.mp
+  exact Primrec.encode.comp
+    (primrec.comp
+      (Primrec.option_getD_default.comp Primrec.decode))
+
+/-- Extract a unary `ToPartrec.Code` for any typed primitive-recursive
+function.  On valid encoded inputs it returns the encoded typed output. -/
+theorem exists_code_of_primrec
+    {α β : Type} [Primcodable α] [Primcodable β] [Inhabited α]
+    (function : α → β) (primrec : Primrec function) :
+    ∃ code : ToPartrec.Code,
+      ∀ input : α,
+        code.eval [Encodable.encode input] =
+          pure [Encodable.encode (function input)] := by
+  have vectorPrimrec :
+    Nat.Primrec'
+        (fun values : List.Vector Nat 1 =>
+          encodedFunction function values.head) :=
+    Nat.Primrec'.prim_iff₁.mpr
+      (Primrec.nat_iff.mpr (encodedFunction_primrec primrec))
+  have partialRecursive :
+      Nat.Partrec'
+        (fun values : List.Vector Nat 1 =>
+          encodedFunction function values.head) :=
+    Nat.Partrec'.prim vectorPrimrec
+  obtain ⟨code, codeCorrect⟩ :=
+    ToPartrec.Code.exists_code partialRecursive
+  refine ⟨code, fun input => ?_⟩
+  let encodedInput : List.Vector Nat 1 :=
+    ⟨[Encodable.encode input], rfl⟩
+  have correctness := codeCorrect encodedInput
+  change code.eval [Encodable.encode input] =
+    pure [encodedFunction function (Encodable.encode input)] at correctness
+  simpa [encodedInput, encodedFunction] using correctness
+
+/-- A chosen partial-recursive program representing `function`. -/
+noncomputable def codeOfPrimrec
+    {α β : Type} [Primcodable α] [Primcodable β] [Inhabited α]
+    (function : α → β) (primrec : Primrec function) :
+    ToPartrec.Code :=
+  Classical.choose (exists_code_of_primrec function primrec)
+
+theorem codeOfPrimrec_eval
+    {α β : Type} [Primcodable α] [Primcodable β] [Inhabited α]
+    (function : α → β) (primrec : Primrec function) (input : α) :
+    [Encodable.encode (function input)] ∈
+      (codeOfPrimrec function primrec).eval
+        [Encodable.encode input] := by
+  unfold codeOfPrimrec
+  have correctness :=
+    Classical.choose_spec (exists_code_of_primrec function primrec)
+  rw [correctness input]
+  exact Part.mem_some _
+
+/-- Compile a typed primitive-recursive function all the way to a finite
+four-stack Turing machine with the project's standard finite encodings. -/
+noncomputable def primrecFiniteEvaluatorComputable
+    {α β : Type} [Primcodable α] [Primcodable β] [Inhabited α]
+    (function : α → β) (primrec : Primrec function) :
+    TM2Computable
+      (LeanTrominoes.Complexity.primcodableFinEncoding α).encode
+      (LeanTrominoes.Complexity.primcodableFinEncoding β).encode
+      function :=
+  finiteEvaluatorComputable (codeOfPrimrec function primrec)
+    function (codeOfPrimrec_eval function primrec)
+
 end PartrecToTM2
 end Turing

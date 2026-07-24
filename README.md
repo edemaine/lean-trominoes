@@ -206,8 +206,11 @@ The representation choices for this target are:
   Mathlib's configurations, and transfers the evaluator's output-correctness
   theorem to the finite machine.  `finiteEvaluatorComputable` now packages
   any total represented code directly against the project's standard input
-  and output encodings.  Constructing the strip-decider code and proving its
-  polynomial stack-space bound remain separate steps.
+  and output encodings.  `primrecFiniteEvaluatorComputable` additionally
+  extracts a `ToPartrec.Code` from any typed primitive-recursive function and
+  compiles it all the way to such a finite machine.  Proving the strip decider
+  primitive recursive and establishing its polynomial stack-space bound
+  remain separate steps.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
