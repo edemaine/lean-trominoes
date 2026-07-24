@@ -306,7 +306,10 @@ The representation choices for this target are:
   reachable from that input, which is the quantitative premise needed by
   `PolySpaceDecider`.  `inPSPACE_of_evaluatorRunFits` packages such
   input-indexed run certificates all the way through the finite-machine
-  compiler to the project's proposition-level PSPACE interface.
+  compiler to the project's proposition-level PSPACE interface.  Normal,
+  return, configuration, and whole-run certificates are all monotone in the
+  chosen budget, so separately derived local bounds can be combined under
+  one polynomial.
 - [`LeanTrominoes/PartrecFlatIteration.lean`](LeanTrominoes/PartrecFlatIteration.lean)
   supplies the evaluator-level countdown loop used by the direct machine
   program.  A state `remaining :: payload` is updated through `Code.fix`;

@@ -1607,6 +1607,41 @@ theorem normalSimulationFits_start
       have recursiveStart := induction fits
       simpa [continuationSpace, trContStack] using recursiveStart
 
+/-- A normal-call simulation certificate remains valid when its common
+budget is enlarged. -/
+theorem normalSimulationFits_mono
+    {code : ToPartrec.Code} {continuation : ToPartrec.Cont}
+    {values : List Nat} {small large : Nat}
+    (fits : normalSimulationFits code continuation values small)
+    (budget : small ≤ large) :
+    normalSimulationFits code continuation values large := by
+  induction code generalizing continuation values with
+  | zero' =>
+      simp only [normalSimulationFits] at fits ⊢
+      omega
+  | succ =>
+      simp only [normalSimulationFits] at fits ⊢
+      constructor <;> omega
+  | tail =>
+      exact fits.trans budget
+  | cons first rest firstInduction _ =>
+      exact firstInduction fits
+  | comp first second _ secondInduction =>
+      exact secondInduction fits
+  | case zeroBranch successorBranch
+      zeroInduction successorInduction =>
+      simp only [normalSimulationFits] at fits ⊢
+      refine ⟨fits.1.trans budget, ?_⟩
+      cases head : values.headI with
+      | zero =>
+          apply zeroInduction
+          simpa [head] using fits.2
+      | succ predecessor =>
+          apply successorInduction
+          simpa [head] using fits.2
+  | fix body induction =>
+      exact induction fits
+
 /-- Space-aware refinement of Mathlib's structurally normalized evaluator
 call.  The supplied `normalSimulationFits` witness gives one common budget
 for every primitive and recursive subcall in the normalization. -/
@@ -2009,6 +2044,39 @@ theorem retSimulationFits_start
     simp only [retSimulationFits] at fits
   · simpa [continuationSpace, trContStack] using fits
   all_goals exact fits.1
+
+/-- A continuation-return simulation certificate remains valid when its
+common budget is enlarged. -/
+theorem retSimulationFits_mono
+    {continuation : ToPartrec.Cont} {values : List Nat}
+    {small large : Nat}
+    (fits : retSimulationFits continuation values small)
+    (budget : small ≤ large) :
+    retSimulationFits continuation values large := by
+  induction continuation generalizing values with
+  | halt =>
+      exact fits.trans budget
+  | cons₁ rest arguments continuation induction =>
+      simp only [retSimulationFits] at fits ⊢
+      exact
+        ⟨fits.1.trans budget,
+          normalSimulationFits_mono fits.2 budget⟩
+  | cons₂ saved continuation induction =>
+      simp only [retSimulationFits] at fits ⊢
+      exact ⟨fits.1.trans budget, induction fits.2⟩
+  | comp first continuation induction =>
+      simp only [retSimulationFits] at fits ⊢
+      exact
+        ⟨fits.1.trans budget,
+          normalSimulationFits_mono fits.2 budget⟩
+  | fix body continuation induction =>
+      simp only [retSimulationFits] at fits ⊢
+      refine ⟨fits.1.trans budget, ?_⟩
+      split <;> rename_i branch
+      · exact induction (by simpa [branch] using fits.2)
+      · exact
+          normalSimulationFits_mono
+            (by simpa [branch] using fits.2) budget
 
 /-- Space-aware refinement of one continuation return. -/
 noncomputable def tr_ret_respects_inSpace
@@ -2571,6 +2639,19 @@ theorem cfgSimulationFits_space
       simpa [cfgSimulationFits, evaluatorCfgSpace] using
         retSimulationFits_start fits
 
+/-- A configuration simulation obligation is monotone in its common
+budget. -/
+theorem cfgSimulationFits_mono
+    {configuration : ToPartrec.Cfg} {small large : Nat}
+    (fits : cfgSimulationFits configuration small)
+    (budget : small ≤ large) :
+    cfgSimulationFits configuration large := by
+  cases configuration with
+  | halt values =>
+      exact fits.trans budget
+  | ret continuation values =>
+      exact retSimulationFits_mono fits budget
+
 /-- A common space certificate for one complete run of a partial-recursive
 evaluator.  Besides the structurally normalized initial call, it covers
 every sequential evaluator milestone reachable after that call. -/
@@ -2585,6 +2666,23 @@ structure EvaluatorRunFits
           (ToPartrec.stepNormal code ToPartrec.Cont.halt values)
           current →
         cfgSimulationFits current bound
+
+namespace EvaluatorRunFits
+
+/-- Enlarge the common budget of a complete evaluator-run certificate. -/
+theorem mono
+    {code : ToPartrec.Code} {values : List Nat}
+    {small large : Nat}
+    (fits : EvaluatorRunFits code values small)
+    (budget : small ≤ large) :
+    EvaluatorRunFits code values large where
+  normal := normalSimulationFits_mono fits.normal budget
+  configuration := by
+    intro current reachable
+    exact cfgSimulationFits_mono
+      (fits.configuration current reachable) budget
+
+end EvaluatorRunFits
 
 /-- A high-level evaluator run between related milestones can be refined to
 a low-level run that stays within the common budget. -/
