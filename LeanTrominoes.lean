@@ -49,6 +49,8 @@ import LeanTrominoes.PartrecFuel
 import LeanTrominoes.PartrecFuelSpace
 import LeanTrominoes.PartrecListCode
 import LeanTrominoes.PartrecListCodeSpace
+import LeanTrominoes.PartrecPeriodicStripDecode
+import LeanTrominoes.PartrecPeriodicStripDecodeSpace
 import LeanTrominoes.PartrecPolySpace
 import LeanTrominoes.PartrecPowerTwo
 import LeanTrominoes.PartrecPowerTwoSpace

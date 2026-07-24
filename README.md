@@ -411,6 +411,13 @@ The representation choices for this target are:
   uses two bounded subtractions to select and compute the appropriate
   coordinate.  Its result is proved exactly equal to Mathlib's pairing
   decoder.
+- [`LeanTrominoes/PartrecPeriodicStripDecode.lean`](LeanTrominoes/PartrecPeriodicStripDecode.lean)
+  and
+  [`LeanTrominoes/PartrecPeriodicStripDecodeSpace.lean`](LeanTrominoes/PartrecPeriodicStripDecodeSpace.lean)
+  apply that decoder twice to the standard nested-pair encoding of a periodic
+  strip.  The fitted header program exposes native evaluator fields
+  `[width, period, motifCode]`, leaving the variable-length motif encoded for
+  the following traversal.
 - [`LeanTrominoes/IndexedSavitchDFSPartrec.lean`](LeanTrominoes/IndexedSavitchDFSPartrec.lean)
   compiles one structural step of the flat Savitch evaluator directly to
   `ToPartrec.Code`.  Its machine payload retains the context, state count,
