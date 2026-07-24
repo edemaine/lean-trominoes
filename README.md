@@ -470,6 +470,15 @@ The representation choices for this target are:
   compositional evaluator-space certificate.  Thus later motif scans can
   stream both frontier assignments without allocating either assignment
   list.
+- [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
+  and
+  [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
+  connect that decoder to the actual leaf payload
+  `[encodedStrip, firstIndex, lastIndex]`.  The explicit program returns the
+  fixed-width native context
+  `[width, period, motifCode, firstWord, firstPhase, lastWord, lastPhase]`;
+  its fitted certificate composes only the verified strip-header decoder,
+  quotient/remainder calls, field projections, and native-list assembly.
 - [`LeanTrominoes/PartrecStripCellBounds.lean`](LeanTrominoes/PartrecStripCellBounds.lean)
   and
   [`LeanTrominoes/PartrecStripCellBoundsSpace.lean`](LeanTrominoes/PartrecStripCellBoundsSpace.lean)
