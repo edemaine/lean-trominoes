@@ -1259,6 +1259,10 @@ The representation choices for this target are:
   classifies every main clause-blue incidence by variable and occurrence
   slot: precisely the literal-side port of each occurrence in that clause is
   retained, with the reversed source-literal offset.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMBlueComplementIncidences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMBlueComplementIncidences.lean)
+  classifies an occurrence-specific complement blue element as the opposite
+  variable port followed by the matching zero-offset clause auxiliary in the
+  stable typed enumeration.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
