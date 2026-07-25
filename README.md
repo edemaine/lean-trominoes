@@ -1251,6 +1251,10 @@ The representation choices for this target are:
   green variable element exactly the two neighbors in the symbolic six-cycle,
   at zero offset.  Thus exact cover on those elements implies the verified
   `VariableGadgetHolds` predicate.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMClauseIncidences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMClauseIncidences.lean)
+  proves that each clause-core red and green element sees exactly its
+  zero-offset auxiliary triples, with one incidence per tagged literal in
+  source order.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
