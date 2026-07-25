@@ -1514,6 +1514,11 @@ The representation choices for this target are:
   and color.  Consequently the variable-side incidences selected by an
   arbitrary perfect matching at each merged clause terminal are exactly the
   truth values of its corresponding source occurrences.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTypedSoundness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTypedSoundness.lean)
+  combines those arbitrary variable-side values with the global terminal
+  covers and local clause-core covers.  The Figure 5 truth table then forces
+  each recovered binary or ternary source clause to satisfy exact-one,
+  completing the typed satisfiability equivalence.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
