@@ -200,6 +200,10 @@ The representation choices for this target are:
   uniqueness of overlapping translates whose horizontal span is at most one
   period; its fanout midpoint invariant separately identifies the short
   source and target fanout pieces by their real graph ports.
+  [`LeanTrominoes/PeriodicOrthocrossingHorizontalUnique.lean`](LeanTrominoes/PeriodicOrthocrossingHorizontalUnique.lean)
+  combines the private-lane and fanout-midpoint invariants to prove that
+  horizontal segment occurrences with a common interior point have identical
+  occurrence keys.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
