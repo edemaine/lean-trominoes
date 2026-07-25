@@ -1453,6 +1453,10 @@ The representation choices for this target are:
   duplicate-free permutation of the source tagged-literal order under the
   occurrence-three bound, including its restriction to each clause
   terminal.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTerminalOccurrenceCounts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTerminalOccurrenceCounts.lean)
+  derives the zero-or-one source occurrence count at every clause terminal:
+  arity-two clauses leave the right terminal unused, while arity-three
+  clauses use all three.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
