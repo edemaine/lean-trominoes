@@ -302,6 +302,11 @@ The representation choices for this target are:
   proves that a fixed incidence has at most one translated route reaching a
   lifted variable site.  Thus each routed variable list is bounded by the
   source protovariable's formal occurrence count, and by three for 3SAT-3.
+  [`LeanTrominoes/PeriodicCNFPlanarWidth.lean`](LeanTrominoes/PeriodicCNFPlanarWidth.lean)
+  proves that the complete routed planar block retains width three.  The
+  fixed crossover, equality-wire, bend, and duplicator components inherit
+  the generic gadget certificates; a keyed-incidence argument shows that
+  each routed source clause has exactly its original number of literals.
   [`LeanTrominoes/PeriodicCNFPlanarVariableSoundness.lean`](LeanTrominoes/PeriodicCNFPlanarVariableSoundness.lean)
   uses that bound to show every routed target is one of the three duplicator
   ports.  In a satisfying combined formula, every routed clause terminal
