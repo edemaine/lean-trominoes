@@ -199,6 +199,59 @@ theorem crossoverExtends_iff (aLeft aRight bTop bBottom : Bool) :
   cases aLeft <;> cases aRight <;> cases bTop <;> cases bBottom <;>
     native_decide
 
+/-- Every satisfying assignment to the crossover propagates each boundary
+value to the opposite port.  This is the soundness direction needed when a
+crossover embedded in a larger formula is projected back to its two original
+wires. -/
+theorem crossover_boundary_eq_of_holds
+    {assignment : CrossoverVariable → Bool}
+    (holds : CrossoverHolds assignment) :
+    assignment .aLeft = assignment .aRight ∧
+      assignment .bTop = assignment .bBottom := by
+  apply (crossoverExtends_iff
+    (assignment .aLeft) (assignment .aRight)
+    (assignment .bTop) (assignment .bBottom)).mp
+  refine ⟨assignment .aInnerLeft, assignment .upperLeft,
+    assignment .lowerLeft, assignment .bInnerTop, assignment .center,
+    assignment .bInnerBottom, assignment .upperRight,
+    assignment .lowerRight, assignment .aInnerRight, ?_⟩
+  have assignment_eq :
+      crossoverAssignment
+        (assignment .aLeft) (assignment .aRight)
+        (assignment .bTop) (assignment .bBottom)
+        (assignment .aInnerLeft) (assignment .upperLeft)
+        (assignment .lowerLeft) (assignment .bInnerTop)
+        (assignment .center) (assignment .bInnerBottom)
+        (assignment .upperRight) (assignment .lowerRight)
+        (assignment .aInnerRight) = assignment := by
+    funext x
+    cases x <;> rfl
+  rw [assignment_eq]
+  exact holds
+
+/-- Conversely, two independently propagated boundary values can always be
+extended to a satisfying assignment of the whole crossover. -/
+theorem exists_crossover_holds_of_boundary_eq
+    {aLeft aRight bTop bBottom : Bool}
+    (horizontal : aLeft = aRight) (vertical : bTop = bBottom) :
+    ∃ assignment : CrossoverVariable → Bool,
+      CrossoverHolds assignment ∧
+        assignment .aLeft = aLeft ∧
+        assignment .aRight = aRight ∧
+        assignment .bTop = bTop ∧
+        assignment .bBottom = bBottom := by
+  have hExtends :
+      CrossoverExtends aLeft aRight bTop bBottom :=
+    (crossoverExtends_iff aLeft aRight bTop bBottom).mpr
+      ⟨horizontal, vertical⟩
+  rcases hExtends with
+    ⟨aInnerLeft, upperLeft, lowerLeft, bInnerTop, center, bInnerBottom,
+      upperRight, lowerRight, aInnerRight, holds⟩
+  refine ⟨crossoverAssignment aLeft aRight bTop bBottom
+    aInnerLeft upperLeft lowerLeft bInnerTop center bInnerBottom
+    upperRight lowerRight aInnerRight, holds, ?_⟩
+  simp [crossoverAssignment]
+
 /-! ## Variable duplicator -/
 
 /-- The center and three ports of Figure 8(a). -/
@@ -247,6 +300,24 @@ theorem duplicatorHolds_iff (center left top right : Bool) :
       left = center ∧ top = center ∧ right = center := by
   cases center <;> cases left <;> cases top <;> cases right <;>
     native_decide
+
+/-- Assignment-independent form of `duplicatorHolds_iff`, convenient when
+the four vertices are supplied by a larger embedded formula. -/
+theorem duplicator_holds_iff (assignment : DuplicatorVariable → Bool) :
+    FormulaHolds assignment duplicatorFormula ↔
+      assignment .left = assignment .center ∧
+      assignment .top = assignment .center ∧
+      assignment .right = assignment .center := by
+  have assignment_eq :
+      duplicatorAssignment
+        (assignment .center) (assignment .left)
+        (assignment .top) (assignment .right) = assignment := by
+    funext x
+    cases x <;> rfl
+  rw [← assignment_eq]
+  exact duplicatorHolds_iff
+    (assignment .center) (assignment .left)
+    (assignment .top) (assignment .right)
 
 end PlanarThreeSAT
 end LeanTrominoes
