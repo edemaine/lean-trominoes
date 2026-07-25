@@ -958,6 +958,12 @@ The representation choices for this target are:
   maps the clause gadget over the indexed periodic presentation and proves
   the full conversion computable.  Composing it with the Wang-to-periodic-
   3SAT-3 chain establishes co-r.e.-hardness of local periodic 1-in-3SAT-3.
+- [`LeanTrominoes/PeriodicThreeDM.lean`](LeanTrominoes/PeriodicThreeDM.lean)
+  defines periodic 3-dimensional matching by translated red, green, and blue
+  element references.  It proves the semantic core of Theorem 3.8: selecting
+  triples to cover each element exactly once is equivalent to directing every
+  triple's three incidences coherently while exactly one incidence points
+  into each colored element.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible

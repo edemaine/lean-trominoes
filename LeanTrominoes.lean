@@ -49,6 +49,7 @@ import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicThreeCNF
 import LeanTrominoes.PeriodicThreeCNFCorrectness
 import LeanTrominoes.PeriodicThreeCNFComputability
+import LeanTrominoes.PeriodicThreeDM
 import LeanTrominoes.PeriodicThreeSATThree
 import LeanTrominoes.PeriodicThreeSATThreeCorrectness
 import LeanTrominoes.PeriodicThreeSATThreeOccurrences
