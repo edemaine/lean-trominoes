@@ -1457,6 +1457,10 @@ The representation choices for this target are:
   derives the zero-or-one source occurrence count at every clause terminal:
   arity-two clauses leave the right terminal unused, while arity-three
   clauses use all three.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableTerminalIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableTerminalIncidences.lean)
+  verifies that every assembled occurrence contributes exactly one
+  incidence of each color to its selected clause terminal, so variable-side
+  terminal incidence counts equal the source occurrence counts.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
