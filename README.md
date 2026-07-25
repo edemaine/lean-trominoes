@@ -1475,6 +1475,11 @@ The representation choices for this target are:
   Ordinary and fixed-red occurrence modules use their verified alternating
   selections, while each clause translate chooses its explicit `EFI`,
   `BDH`, or `ACG` core cover from the three signed terminal signals.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseSignals.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseSignals.lean)
+  proves that a binary source clause presents its two literal truth values
+  and a false unused right terminal, while a ternary clause presents all
+  three truth values.  Source exact-one satisfaction therefore supplies the
+  exact boundary condition required by the canonical clause-core cover.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
