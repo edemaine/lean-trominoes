@@ -1369,6 +1369,12 @@ The representation choices for this target are:
   endpoint values of one directed wire; degree-three colored vertices retain
   their exact-one constraint.  Under the degree-two-or-three promise this
   transformed orientation problem is proved equivalent to periodic 3DM.
+- [`LeanTrominoes/PeriodicThreeDMContraction.lean`](LeanTrominoes/PeriodicThreeDMContraction.lean)
+  makes that contraction executable.  Degree-three elements retain their
+  three colored incidence edges, while each degree-two element becomes one
+  colored edge between its two incident triples with the correct periodic
+  offset.  Every edge retains its original incidence tags for later route
+  concatenation and orientation transport.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
