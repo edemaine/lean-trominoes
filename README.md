@@ -1278,6 +1278,9 @@ The representation choices for this target are:
   reconnects a valid filtered tagged-occurrence list to its source clause and
   proves that their literal truth-value lists are permutations, preserving
   the exact-one predicate.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMMainClauseValues.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMMainClauseValues.lean)
+  proves that the canonical matching's actual main clause-blue incident
+  values are a permutation of the corresponding source clause truth values.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
