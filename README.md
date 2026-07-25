@@ -349,6 +349,18 @@ The representation choices for this target are:
   satisfiable exactly when the original width-three occurrence-three source
   is satisfiable.  Its geometric placement is deliberately factored into the
   following embedding layer.
+  [`LeanTrominoes/PeriodicCNFPlanarThreeSATThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarThreeSATThreePositioned.lean)
+  introduces positioned periodic clauses, which retain both drawing
+  coordinates and periodic literal offsets.  It assigns canonical positions
+  to routed protovariables, places every occurrence copy and implication-cycle
+  clause in a refined variable macrocell, and proves that forgetting all
+  positions gives exactly the verified occurrence-split periodic formula.
+  [`LeanTrominoes/PeriodicCNFPlanarOneInThreeThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeThreePositioned.lean)
+  applies the local Figure 9 placement to that offset-preserving
+  representation.  Erasure is proved equal to the logical exact-one
+  endpoint, transferring its width-three, occurrence-three, and end-to-end
+  satisfiability theorems.  Explicit noncrossing incidence routes remain for
+  the subsequent geometric layer.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
