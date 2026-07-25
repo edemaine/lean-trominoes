@@ -262,6 +262,10 @@ The representation choices for this target are:
   combines internal crossover propagation with the equality links between
   consecutive sites, proving that the start and finish terminals of every
   neighboring straight segment occurrence carry the same value.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarRouteSoundness.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarRouteSoundness.lean)
+  composes straight-segment and bend propagation by induction over each
+  constructed polyline, equating the canonical first and last terminals of
+  every neighboring translated route.
   [`LeanTrominoes/PeriodicOrthocrossingPlanarEndpoints.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarEndpoints.lean)
   recovers the source and target terminal of every neighboring translated
   protoedge route, retains the lifted graph vertex reached at each end, and
