@@ -1464,6 +1464,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseTerminalIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseTerminalIncidences.lean)
   adds the two local Figure 5 incidences at each colored terminal, yielding
   total terminal degree two or three.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMDegree.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMDegree.lean)
+  combines every element classification to prove the complete typed
+  assembly has degree two or three under the source occurrence and arity
+  bounds.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
