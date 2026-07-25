@@ -1384,6 +1384,11 @@ The representation choices for this target are:
   endpoints; restricted vertex positions remain distinct and inside the
   fundamental square, completing compatibility with the executable
   contracted graph.
+- [`LeanTrominoes/PeriodicThreeDMContractionGeometry.lean`](LeanTrominoes/PeriodicThreeDMContractionGeometry.lean)
+  proves the first geometric invariant of contraction: translating,
+  reversing, and joining the original incidence polylines preserves
+  orthogonality, so the complete compatible contracted drawing remains
+  orthogonal.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
