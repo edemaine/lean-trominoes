@@ -1448,6 +1448,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMCycleLinkIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMCycleLinkIncidences.lean)
   proves every used red variable-cycle link has degree two, for all one-,
   two-, and three-occurrence cycles and both literal polarities.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMOccurrenceCorrespondence.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMOccurrenceCorrespondence.lean)
+  proves that the assembled variable/used-slot module order is a
+  duplicate-free permutation of the source tagged-literal order under the
+  occurrence-three bound, including its restriction to each clause
+  terminal.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
