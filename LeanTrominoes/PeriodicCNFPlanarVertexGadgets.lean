@@ -76,16 +76,37 @@ def drawingVariableRouteEndpoints
 def drawingClauseRouteSites
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) : List ClauseRouteSite :=
-  ((drawingClauseRouteEndpoints formula).map
-    CNFRouteEndpoint.clauseSite).dedup
+  formula.clauses.zipIdx.flatMap fun taggedClause =>
+    neighborTranslations.map fun translate =>
+      (taggedClause.2, translate)
 
 /-- The finite lifted variable sites represented in the neighboring block. -/
 def drawingVariableRouteSites
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     List (VariableRouteSite Variable) :=
-  ((drawingVariableRouteEndpoints formula).map
-    CNFRouteEndpoint.variableSite).dedup
+  ((drawingCNFRouteOccurrences formula).map
+    CNFRouteOccurrence.variableOccurrence).dedup
+
+/-- Incidence-route occurrences at one lifted clause vertex, in original
+literal order. -/
+def clauseRouteOccurrencesAt
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (site : ClauseRouteSite) :
+    List (CNFRouteOccurrence Variable) :=
+  (drawingCNFRouteOccurrences formula).filter fun occurrence =>
+    occurrence.clauseOccurrence = site
+
+/-- Incidence-route occurrences at one lifted variable vertex, in global
+edge order. -/
+def variableRouteOccurrencesAt
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    List (CNFRouteOccurrence Variable) :=
+  ((drawingCNFRouteOccurrences formula).filter fun occurrence =>
+    occurrence.variableOccurrence = site).insertionSort fun first second =>
+      first.edgeIndex ≤ second.edgeIndex
 
 /-- Clause endpoints at one lifted clause vertex, in original literal order. -/
 def clauseRouteEndpointsAt
@@ -136,9 +157,9 @@ def routedClauseAt
       (liftedIncidenceVertexMacroOrigin formula
         (.clause site.1) site.2) (10, 10)
   literals :=
-    (clauseRouteEndpointsAt formula site).map fun endpoint =>
-      (endpoint.planarNode,
-        endpoint.occurrence.incidence.literal.value)
+    (clauseRouteOccurrencesAt formula site).map fun occurrence =>
+      (.carrier (.terminal (occurrence.sourceTerminal formula)),
+        occurrence.incidence.literal.value)
 
 /-- All routed original clauses in the neighboring block. -/
 def drawingRoutedClauseFormula
@@ -177,8 +198,9 @@ def routedVariablePorts
     DuplicatorPorts (PlanarSATNode Variable) :=
   let center : PlanarSATNode Variable := .atom site
   let endpoints :=
-    (variableRouteEndpointsAt formula site).map
-      CNFRouteEndpoint.planarNode
+    (variableRouteOccurrencesAt formula site).map fun occurrence =>
+      PlanarSATNode.carrier
+        (.terminal (occurrence.targetTerminal formula))
   ⟨center,
     endpoints.getD 0 center,
     endpoints.getD 1 center,

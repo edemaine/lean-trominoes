@@ -269,8 +269,10 @@ The representation choices for this target are:
   be attached back to their SAT meaning.
   [`LeanTrominoes/PeriodicCNFPlanarVertexGadgets.lean`](LeanTrominoes/PeriodicCNFPlanarVertexGadgets.lean)
   groups routed source endpoints into the original signed clauses and routed
-  target endpoints into Figure 8(a) variable duplicators.  Both positioned
-  finite families have exact satisfaction characterizations.
+  target endpoints into Figure 8(a) variable duplicators.  Clause sites are
+  enumerated independently of their incidences, so empty clauses remain
+  explicit contradictions.  Both positioned finite families have exact
+  satisfaction characterizations.
   [`LeanTrominoes/PeriodicCNFPlanarFormula.lean`](LeanTrominoes/PeriodicCNFPlanarFormula.lean)
   combines the complete crossover/route core with both routed vertex
   families under one variable type.  Componentwise satisfaction is exact,

@@ -138,6 +138,62 @@ def CNFRouteOccurrence.variableOccurrence {Variable : Type*}
   (occurrence.incidence.literal.atom,
     Cell.add occurrence.translate occurrence.edge.offset)
 
+/-- Tagged geometric segments of one metadata-rich route occurrence. -/
+def CNFRouteOccurrence.taggedSegments
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) :
+    List (GridSegment × Nat) :=
+  (gridPolylineSegments
+    (constructedEdgeRoute
+      (PeriodicCNF.incidenceGraph formula)
+      occurrence.edge occurrence.edgeIndex)).zipIdx
+
+/-- Harmless total default for selecting from a route segment list.  Every
+constructed route is proved nonempty, so semantic uses never observe it. -/
+def defaultTaggedGridSegment : GridSegment × Nat :=
+  (⟨(0, 0), (0, 0)⟩, 0)
+
+/-- Canonical terminal at the clause/source end of a routed incidence. -/
+def CNFRouteOccurrence.sourceTerminal
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) : SegmentTerminal :=
+  let first :=
+    (occurrence.taggedSegments formula).getD
+      0 defaultTaggedGridSegment
+  ⟨⟨occurrence.edgeIndex, first.2, first.1⟩,
+    occurrence.translate, .start⟩
+
+/-- Canonical terminal at the variable/target end of a routed incidence. -/
+def CNFRouteOccurrence.targetTerminal
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) : SegmentTerminal :=
+  let last :=
+    (occurrence.taggedSegments formula).getLastD
+      defaultTaggedGridSegment
+  ⟨⟨occurrence.edgeIndex, last.2, last.1⟩,
+    occurrence.translate, .finish⟩
+
+@[simp]
+theorem CNFRouteOccurrence.sourceTerminal_routeKey
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) :
+    (occurrence.sourceTerminal formula).routeKey =
+      occurrence.routeKey := by
+  rfl
+
+@[simp]
+theorem CNFRouteOccurrence.targetTerminal_routeKey
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) :
+    (occurrence.targetTerminal formula).routeKey =
+      occurrence.routeKey := by
+  rfl
+
 /-- Every neighboring translated occurrence of every metadata-rich
 incidence edge. -/
 def drawingCNFRouteOccurrences
