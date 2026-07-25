@@ -386,6 +386,62 @@ theorem satisfiable_iff {Variable : Type*}
     exact ⟨extendAssignment assignment,
       formula_satisfies_of_satisfies source assignment satisfies⟩
 
+/-- Embedding literals does not change their offset distance. -/
+theorem liftLiteral_offsetDistance {Variable : Type*}
+    (first second : PeriodicLiteral Variable) :
+    PeriodicClause.offsetDistance
+        (liftLiteral first) (liftLiteral second) =
+      PeriodicClause.offsetDistance first second := by
+  rfl
+
+/-- Mapping the embedding over a local clause preserves locality. -/
+theorem map_liftLiteral_isLocal {Variable : Type*}
+    {source : PeriodicClause Variable} (sourceLocal : source.IsLocal) :
+    PeriodicClause.IsLocal (source.map liftLiteral) := by
+  intro first firstMem second secondMem
+  simp only [List.mem_map] at firstMem secondMem
+  rcases firstMem with ⟨sourceFirst, sourceFirstMem, rfl⟩
+  rcases secondMem with ⟨sourceSecond, sourceSecondMem, rfl⟩
+  rw [liftLiteral_offsetDistance]
+  exact sourceLocal sourceFirst sourceFirstMem sourceSecond sourceSecondMem
+
+/-- Every clause in one unit-elimination gadget remains local. -/
+theorem clauseClauses_areLocal {Variable : Type*}
+    (clauseIndex : Nat) {source : PeriodicClause Variable}
+    (sourceLocal : source.IsLocal) :
+    ∀ generated ∈ clauseClauses clauseIndex source,
+      generated.IsLocal := by
+  intro generated generatedMem
+  rcases source with _ | ⟨first, rest⟩
+  · simp [clauseClauses] at generatedMem
+    rcases generatedMem with rfl | rfl | rfl <;>
+      simp [PeriodicClause.IsLocal,
+        PeriodicClause.offsetDistance, auxiliary,
+        PeriodicOneInThree.anchor]
+  · cases rest with
+    | nil =>
+        simp [clauseClauses] at generatedMem
+        rcases generatedMem with rfl | rfl <;>
+          simp [PeriodicClause.IsLocal,
+            PeriodicClause.offsetDistance, auxiliary,
+            liftLiteral, PeriodicOneInThree.negate,
+            PeriodicOneInThree.anchor]
+    | cons second rest =>
+        simp only [clauseClauses, List.mem_singleton] at generatedMem
+        subst generated
+        exact map_liftLiteral_isLocal sourceLocal
+
+/-- Unit elimination preserves the paper's locality condition. -/
+theorem formula_isLocal {Variable : Type*}
+    {source : PeriodicCNF Variable} (sourceLocal : source.IsLocal) :
+    (formula source).IsLocal := by
+  intro generated generatedMem
+  simp only [formula, List.mem_flatMap] at generatedMem
+  rcases generatedMem with ⟨tagged, taggedMem, generatedMem⟩
+  exact clauseClauses_areLocal tagged.2
+    (sourceLocal tagged.1 (List.fst_mem_of_mem_zipIdx taggedMem))
+    generated generatedMem
+
 /-- Every clause has one of the two arities accepted by the 3DM gadget. -/
 def ArityTwoOrThree {Variable : Type*}
     (source : PeriodicCNF Variable) : Prop :=

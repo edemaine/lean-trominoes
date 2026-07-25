@@ -1195,7 +1195,13 @@ The representation choices for this target are:
   literal is forced by one ternary and one binary exact-one clause, while an
   empty clause maps to an unsatisfiable triangle of binary clauses.  The
   translation preserves periodic satisfiability exactly and, on width-three
-  inputs, leaves every clause with arity two or three.
+  inputs, leaves every clause with arity two or three while preserving
+  locality.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsOccurrences.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsOccurrences.lean)
+  proves that unit elimination preserves every original occurrence count
+  exactly and uses each clause-local auxiliary at most twice.  Consequently
+  the transformation preserves the occurrence-three restriction needed by
+  the six-triple variable gadget.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
