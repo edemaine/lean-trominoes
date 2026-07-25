@@ -1274,6 +1274,10 @@ The representation choices for this target are:
   proves that variable/slot order and source-clause literal order enumerate
   the same main-blue tagged occurrences up to permutation whenever every
   variable occurs at most three times.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMClauseOccurrenceValues.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMClauseOccurrenceValues.lean)
+  reconnects a valid filtered tagged-occurrence list to its source clause and
+  proves that their literal truth-value lists are permutations, preserving
+  the exact-one predicate.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
