@@ -198,7 +198,8 @@ The representation choices for this target are:
   normalizes every horizontal segment to a private fundamental-domain lane,
   proves those lane representatives lie within one drawing period, and proves
   uniqueness of overlapping translates whose horizontal span is at most one
-  period.
+  period; its fanout midpoint invariant separately identifies the short
+  source and target fanout pieces by their real graph ports.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
