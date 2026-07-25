@@ -22,7 +22,7 @@ namespace LeanTrominoes
 /-- Canonical protovariable positions and the drawing-grid length of one
 semantic lattice step. -/
 structure PeriodicVariablePlacement (Variable : Type*) where
-  period : Int
+  period : Nat
   position : Variable → Cell
 
 namespace PeriodicVariablePlacement
@@ -63,7 +63,7 @@ def placement {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
     (sourcePlacement : PeriodicVariablePlacement Variable) :
     PeriodicVariablePlacement (ThreeOccurrenceVariable Variable) where
-  period := refinementScale source * sourcePlacement.period
+  period := (refinementScale source).toNat * sourcePlacement.period
   position :=
     occurrenceVariablePosition source sourcePlacement.position
 
@@ -98,7 +98,8 @@ def placement {Variable : Type*}
     (source : PositionedPeriodicCNF Variable)
     (sourcePlacement : PeriodicVariablePlacement Variable) :
     PeriodicVariablePlacement (OneInThreeVariable Variable) where
-  period := PlanarOneInThree.gadgetScale * sourcePlacement.period
+  period :=
+    PlanarOneInThree.gadgetScale.toNat * sourcePlacement.period
   position
     | .inl atom =>
         Cell.scale PlanarOneInThree.gadgetScale
@@ -107,7 +108,8 @@ def placement {Variable : Type*}
         Cell.sub
           (auxiliaryOccurrencePosition source clauseIndex kind)
           (Cell.scale
-            (PlanarOneInThree.gadgetScale * sourcePlacement.period)
+            (PlanarOneInThree.gadgetScale *
+              (sourcePlacement.period : Int))
             (PeriodicOneInThree.anchor clause))
 
 /-- Restoring the logical anchor translates every Figure 9 auxiliary to its
@@ -125,7 +127,7 @@ theorem placement_auxiliary_at_anchor {Variable : Type*}
           (PeriodicOneInThree.anchor clause)) =
       auxiliaryOccurrencePosition source clauseIndex kind := by
   simp [placement, PeriodicVariablePlacement.translation,
-    Cell.add, Cell.sub]
+    PlanarOneInThree.gadgetScale, Cell.add, Cell.sub]
 
 end PeriodicOneInThreePositioned
 
@@ -153,14 +155,14 @@ def placement {Variable : Type*}
     (source : PositionedPeriodicCNF Variable)
     (sourcePlacement : PeriodicVariablePlacement Variable) :
     PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable) where
-  period := gadgetScale * sourcePlacement.period
+  period := gadgetScale.toNat * sourcePlacement.period
   position
     | .inl atom =>
         Cell.scale gadgetScale (sourcePlacement.position atom)
     | .inr ((clauseIndex, clause), kind) =>
         Cell.sub
           (auxiliaryOccurrencePosition source clauseIndex kind)
-          (Cell.scale (gadgetScale * sourcePlacement.period)
+          (Cell.scale (gadgetScale * (sourcePlacement.period : Int))
             (PeriodicOneInThree.anchor clause))
 
 /-- Restoring the logical anchor translates every unit-elimination auxiliary
@@ -178,7 +180,7 @@ theorem placement_auxiliary_at_anchor {Variable : Type*}
           (PeriodicOneInThree.anchor clause)) =
       auxiliaryOccurrencePosition source clauseIndex kind := by
   simp [placement, PeriodicVariablePlacement.translation,
-    Cell.add, Cell.sub]
+    gadgetScale, Cell.add, Cell.sub]
 
 end PeriodicOneInThreeNoUnitsPositioned
 
@@ -192,8 +194,8 @@ def drawingPeriodicPlanarSATPlacement
     PeriodicVariablePlacement
       (PeriodicPlanarSATVariable Variable) where
   period :=
-    planarMacroScale *
-      (drawingGridSize (PeriodicCNF.incidenceGraph formula) : Int)
+    planarMacroScale.toNat *
+      drawingGridSize (PeriodicCNF.incidenceGraph formula)
   position := drawingPeriodicPlanarSATVariablePosition formula
 
 /-- Placement transported through the opaque routed-variable wrapper. -/

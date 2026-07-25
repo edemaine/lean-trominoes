@@ -372,6 +372,13 @@ The representation choices for this target are:
   logical anchor offsets, with checked cancellation lemmas showing that each
   translated occurrence lands at its declared local gadget vertex.  Explicit
   noncrossing incidence routes remain for the subsequent geometric layer.
+  [`LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean)
+  defines that layer's exact certificate: one polyline per literal in the
+  incidence graph's presentation order, compatible variable-then-clause
+  vertex positions, orthogonality, and periodic planarity.  Clause prototype
+  positions subtract the common logical anchor, and verified endpoint
+  identities recover both the displayed clause point and each translated
+  literal point.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
