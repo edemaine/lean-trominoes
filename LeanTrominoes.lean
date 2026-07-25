@@ -136,6 +136,7 @@ import LeanTrominoes.PeriodicThreeDM
 import LeanTrominoes.PeriodicThreeDMComputability
 import LeanTrominoes.PeriodicThreeDMGraph
 import LeanTrominoes.PeriodicThreeDMGraphOrientation
+import LeanTrominoes.PeriodicThreeDMContractionSemantics
 import LeanTrominoes.PeriodicThreeDMHardness
 import LeanTrominoes.PeriodicPlanarThreeDM
 import LeanTrominoes.PlanarThreeDMVariableGadget

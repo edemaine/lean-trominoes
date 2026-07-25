@@ -1363,6 +1363,12 @@ The representation choices for this target are:
   triple/color presentation and therefore proves that perfect periodic 3D
   matchings are exactly valid 1-in-3/0-or-3 orientations of the incidence
   graph.
+- [`LeanTrominoes/PeriodicThreeDMContractionSemantics.lean`](LeanTrominoes/PeriodicThreeDMContractionSemantics.lean)
+  isolates the degree-two contraction used by Theorem 3.8.  At a suppressed
+  colored vertex, the two former incidence values become the opposite
+  endpoint values of one directed wire; degree-three colored vertices retain
+  their exact-one constraint.  Under the degree-two-or-three promise this
+  transformed orientation problem is proved equivalent to periodic 3DM.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
