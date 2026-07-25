@@ -935,6 +935,11 @@ The representation choices for this target are:
   reduction from a width-three disjunction, padding short clauses with fresh
   variables forced false.  Its finite Boolean truth table is verified, and
   the generated formula is proved local and of width at most three.
+- [`LeanTrominoes/PeriodicOneInThreeCorrectness.lean`](LeanTrominoes/PeriodicOneInThreeCorrectness.lean)
+  gives every source assignment a canonical assignment of the clause-local
+  auxiliary variables.  The gadget truth table proves completeness, while
+  its converse and the forced-false padding clauses prove soundness; together
+  they establish exact preservation of periodic satisfiability.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
