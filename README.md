@@ -1241,6 +1241,11 @@ The representation choices for this target are:
   transports matching assignments between typed triples and natural-number
   prototype indices.  The two transports are proved inverse on every declared
   typed triple and every valid numbered index.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMMatchingSoundness.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMMatchingSoundness.lean)
+  recovers a Boolean assignment from the top-left port of each arbitrary valid
+  variable-cycle matching.  The six-cycle classification then proves that
+  every literal port is the recovered literal truth value and every paired
+  port is its complement; a clause gadget recovers the exact-one clause.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
