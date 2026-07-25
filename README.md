@@ -181,6 +181,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOrthocrossingCorrectness.lean`](LeanTrominoes/PeriodicOrthocrossingCorrectness.lean)
   proves distinct in-domain vertex positions and exact translated endpoints
   for every generated protoedge route.
+  [`LeanTrominoes/PeriodicOrthocrossingPorts.lean`](LeanTrominoes/PeriodicOrthocrossingPorts.lean)
+  proves that port count equals graph degree and that all real edge-end ports
+  receive distinct columns under the maximum-degree-three premise.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
