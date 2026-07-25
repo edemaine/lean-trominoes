@@ -315,6 +315,11 @@ The representation choices for this target are:
   assembles plane-wide atom and route values with independently chosen
   crossover internals in every translated block, proving that source
   satisfiability implies periodicized planar satisfiability.
+  [`LeanTrominoes/PeriodicCNFPlanarPeriodicSoundness.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicSoundness.lean)
+  follows each satisfied routed clause terminal through its route and
+  degree-three duplicator, reconstructing a satisfying source assignment.
+  Thus the periodicized planar formula preserves satisfiability exactly for
+  occurrence-three sources.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
