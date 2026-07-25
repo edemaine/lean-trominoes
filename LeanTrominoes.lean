@@ -46,6 +46,7 @@ import LeanTrominoes.PeriodicOneInThreeCorrectness
 import LeanTrominoes.PeriodicOneInThreeOccurrences
 import LeanTrominoes.PeriodicOneInThreeReductionComputability
 import LeanTrominoes.PeriodicCNF
+import LeanTrominoes.PeriodicGraph
 import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicThreeCNF
 import LeanTrominoes.PeriodicThreeCNFCorrectness

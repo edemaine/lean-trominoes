@@ -161,6 +161,11 @@ The representation choices for this target are:
   1.5D analogue, `PeriodicStrip`, uses a finite motif in
   $\mathbb Z \times \{0,\ldots,W-1\}$ and one positive horizontal period.
   Malformed finite presentations are no-instances of the decision predicates.
+- [`LeanTrominoes/PeriodicGraph.lean`](LeanTrominoes/PeriodicGraph.lean)
+  represents an infinite periodic graph by finite protovertices and
+  offset-labelled protoedges, with locality, degree, and lifted-adjacency
+  predicates.  It also constructs the periodic incidence graph of a CNF
+  presentation, anchoring each clause orbit at its first literal.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
