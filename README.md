@@ -1396,6 +1396,12 @@ The representation choices for this target are:
   explicit trichromatic references.  Their exhaustive truth table proves the
   same all-or-none RGB-terminal contract as the fixed-red detour, so the three
   module kinds cover every terminal order needed by the colored clause core.
+- [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
+  packages the fixed-red, fixed-green, and fixed-blue modules behind one
+  boundary relation.  Exhaustive checks of the actual finite gadgets prove
+  that each kind realizes exactly two boundaries: complementary red
+  continuation states and one common RGB connector state equal to the first
+  continuation.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
