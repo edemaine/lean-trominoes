@@ -1489,6 +1489,11 @@ The representation choices for this target are:
   It proves every colored terminal is covered exactly once, including the
   binary clause's unused right terminal where the absent variable incidence
   is represented by the clause core's false external signal.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMCycleLinkCovers.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMCycleLinkCovers.lean)
+  proves that each occurrence contributes the variable phase to its own
+  red cycle link and the complementary phase to its successor, independently
+  of sign and connector kind.  Closing the one-, two-, or three-module cycle
+  therefore covers every link exactly once.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
