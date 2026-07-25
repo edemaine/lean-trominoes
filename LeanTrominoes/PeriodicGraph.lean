@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicOccurrences
 import Mathlib.Computability.Primrec.List
 import Mathlib.Data.List.Dedup
+import Mathlib.Data.List.Sigma
 
 /-!
 # Finite presentations of periodic graphs
@@ -353,6 +354,120 @@ theorem incidenceGraph_variable_degree {Variable : Type*}
   rw [taggedIncidenceEdges_variable_count]
   rw [zipIdx_flatMap_fst]
   rfl
+
+theorem clauseIncidenceEdges_clause_count_of_anchor {Variable : Type*}
+    [DecidableEq Variable]
+    (clauseIndex wantedIndex : Nat) (anchor : Cell)
+    (clause : PeriodicClause Variable) :
+    ((clause.map (incidenceEdge clauseIndex anchor)).flatMap
+        PeriodicEdge.incidences).count (.clause wantedIndex) =
+      if clauseIndex = wantedIndex then clause.length else 0 := by
+  induction clause with
+  | nil => simp
+  | cons literal rest induction =>
+      by_cases same : clauseIndex = wantedIndex
+      · subst wantedIndex
+        simp [PeriodicEdge.incidences, incidenceEdge, induction]
+      · simp [PeriodicEdge.incidences, incidenceEdge, same, induction]
+
+theorem clauseIncidenceEdges_clause_count {Variable : Type*}
+    [DecidableEq Variable]
+    (clauseIndex wantedIndex : Nat)
+    (clause : PeriodicClause Variable) :
+    ((clauseIncidenceEdges clauseIndex clause).flatMap
+        PeriodicEdge.incidences).count (.clause wantedIndex) =
+      if clauseIndex = wantedIndex then clause.length else 0 :=
+  clauseIncidenceEdges_clause_count_of_anchor
+    clauseIndex wantedIndex (clauseAnchor clause) clause
+
+theorem taggedIncidenceEdges_clause_count {Variable : Type*}
+    [DecidableEq Variable]
+    (taggedClauses : List (PeriodicClause Variable × Nat))
+    (wantedIndex : Nat) :
+    (taggedClauses.flatMap (fun tagged =>
+        clauseIncidenceEdges tagged.2 tagged.1) |>.flatMap
+          PeriodicEdge.incidences).count (.clause wantedIndex) =
+      (taggedClauses.map fun tagged =>
+        if tagged.2 = wantedIndex then tagged.1.length else 0).sum := by
+  induction taggedClauses with
+  | nil => simp
+  | cons tagged rest induction =>
+      simp only [List.flatMap_cons]
+      rw [List.flatMap_append, List.count_append]
+      rw [clauseIncidenceEdges_clause_count, induction]
+      rfl
+
+theorem clauseWeight_sum_eq_zero_of_not_mem {Variable : Type*}
+    (taggedClauses : List (PeriodicClause Variable × Nat))
+    (wantedIndex : Nat)
+    (absent : wantedIndex ∉ taggedClauses.map Prod.snd) :
+    (taggedClauses.map fun tagged =>
+      if tagged.2 = wantedIndex then tagged.1.length else 0).sum = 0 := by
+  induction taggedClauses with
+  | nil => simp
+  | cons tagged rest induction =>
+      simp only [List.map_cons, List.mem_cons, not_or] at absent
+      have different : tagged.2 ≠ wantedIndex := by
+        intro equal
+        exact absent.1 equal.symm
+      simp [different, induction absent.2]
+
+theorem clauseWeight_sum_le_of_nodup {Variable : Type*}
+    (taggedClauses : List (PeriodicClause Variable × Nat))
+    (wantedIndex bound : Nat)
+    (indicesNodup : (taggedClauses.map Prod.snd).Nodup)
+    (width : ∀ tagged ∈ taggedClauses, tagged.1.length ≤ bound) :
+    (taggedClauses.map fun tagged =>
+      if tagged.2 = wantedIndex then tagged.1.length else 0).sum ≤ bound := by
+  induction taggedClauses with
+  | nil => simp
+  | cons tagged rest induction =>
+      simp only [List.map_cons] at indicesNodup
+      rw [List.nodup_cons] at indicesNodup
+      by_cases same : tagged.2 = wantedIndex
+      · have absent : wantedIndex ∉ rest.map Prod.snd := by
+          rw [← same]
+          exact indicesNodup.1
+        simp only [List.map_cons, List.sum_cons, if_pos same]
+        rw [clauseWeight_sum_eq_zero_of_not_mem rest wantedIndex absent,
+          add_zero]
+        exact width tagged (by simp)
+      · simp only [List.map_cons, List.sum_cons, if_neg same, zero_add]
+        exact induction indicesNodup.2
+          (fun later later_mem => width later (by simp [later_mem]))
+
+/-- Clause-vertex degree is bounded by the corresponding formula-width
+bound. -/
+theorem incidenceGraph_clause_degree_le {Variable : Type*}
+    [DecidableEq Variable] {formula : PeriodicCNF Variable}
+    {bound : Nat} (width : formula.WidthAtMost bound)
+    (clauseIndex : Nat) :
+    (incidenceGraph formula).incidences.count (.clause clauseIndex) ≤
+      bound := by
+  rw [show (incidenceGraph formula).incidences =
+    (formula.clauses.zipIdx.flatMap fun tagged =>
+      clauseIncidenceEdges tagged.2 tagged.1).flatMap
+        PeriodicEdge.incidences by rfl]
+  rw [taggedIncidenceEdges_clause_count]
+  apply clauseWeight_sum_le_of_nodup
+  · exact List.nodup_zipIdx_map_snd formula.clauses
+  · intro tagged tagged_mem
+    exact width tagged.1 (List.fst_mem_of_mem_zipIdx tagged_mem)
+
+/-- Width and occurrence bounds become the ordinary maximum-degree bound on
+the periodic incidence graph. -/
+theorem incidenceGraph_degreeAtMost {Variable : Type*}
+    [DecidableEq Variable] {formula : PeriodicCNF Variable}
+    {bound : Nat} (width : formula.WidthAtMost bound)
+    (occurrences : formula.OccurrencesAtMost bound) :
+    (incidenceGraph formula).DegreeAtMost bound := by
+  intro vertex
+  cases vertex with
+  | «variable» atom =>
+      rw [incidenceGraph_variable_degree]
+      exact occurrences atom
+  | clause clauseIndex =>
+      exact incidenceGraph_clause_degree_le width clauseIndex
 
 end PeriodicCNF
 

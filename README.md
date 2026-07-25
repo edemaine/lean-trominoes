@@ -165,7 +165,11 @@ The representation choices for this target are:
   represents an infinite periodic graph by finite protovertices and
   offset-labelled protoedges, with locality, degree, and lifted-adjacency
   predicates.  It also constructs the periodic incidence graph of a CNF
-  presentation, anchoring each clause orbit at its first literal.
+  presentation, anchoring each clause orbit at its first literal.  The
+  companion
+  [`LeanTrominoes/PeriodicThreeSATThreeGraph.lean`](LeanTrominoes/PeriodicThreeSATThreeGraph.lean)
+  proves that the occurrence-split formula produces a well-formed local
+  incidence graph of maximum degree three.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

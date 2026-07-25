@@ -54,6 +54,7 @@ import LeanTrominoes.PeriodicThreeCNFComputability
 import LeanTrominoes.PeriodicThreeDM
 import LeanTrominoes.PeriodicThreeSATThree
 import LeanTrominoes.PeriodicThreeSATThreeCorrectness
+import LeanTrominoes.PeriodicThreeSATThreeGraph
 import LeanTrominoes.PeriodicThreeSATThreeOccurrences
 import LeanTrominoes.PeriodicThreeSATThreeComputability
 import LeanTrominoes.PartrecFiniteEvaluator
