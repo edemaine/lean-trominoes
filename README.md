@@ -1398,6 +1398,12 @@ The representation choices for this target are:
   colored edge between its two incident triples with the correct periodic
   offset.  Every edge retains its original incidence tags for later route
   concatenation and orientation transport.
+- [`LeanTrominoes/PeriodicThreeDMContractionOrientation.lean`](LeanTrominoes/PeriodicThreeDMContractionOrientation.lean)
+  transports a suppressed 3DM orientation to the actual endpoints of the
+  executable contracted edges.  It proves that every emitted retained or
+  through edge has opposite inward endpoint values at the correct periodic
+  translates, that retained degree-three element endpoints satisfy exact
+  one, and that the triple-endpoint values remain trichromatically coherent.
 - [`LeanTrominoes/PeriodicThreeDMContractionDrawing.lean`](LeanTrominoes/PeriodicThreeDMContractionDrawing.lean)
   retrieves original planar routes by their unique incidence tags and
   realizes every contracted edge geometrically.  Retained routes are reused;
