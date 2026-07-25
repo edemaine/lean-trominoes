@@ -1363,18 +1363,27 @@ The representation choices for this target are:
   triple/color presentation and therefore proves that perfect periodic 3D
   matchings are exactly valid 1-in-3/0-or-3 orientations of the incidence
   graph.
+- [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
+  defines the geometric certificate still required for planar hardness: a
+  compatible orthogonal drawing of the periodic 3DM incidence graph whose
+  lifted routes avoid every other route interior and every lifted vertex.
+  The certificate retains route colors through the verified edge/tag ordering
+  and packages the degree-two-or-three restriction.
 - [`LeanTrominoes/PlanarThreeDMVariableGadget.lean`](LeanTrominoes/PlanarThreeDMVariableGadget.lean)
   transcribes the six-triple variable gadget of Figure 10(a), including its
   planar coordinates and open blue interface ports.  An exhaustive finite
   truth table proves that covering its internal red and green elements permits
   exactly the two alternating selections encoding the variable's truth value.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
-  gives a smaller paired-port clause gadget tailored to that variable cycle.
+  gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
   force three auxiliary triples to repeat the literal values through
   degree-two blue elements and common red and green elements.  Its generic
   correctness theorem and its arity-two and arity-three truth tables are
-  machine checked; every colored element has degree two or three.
+  machine checked; every colored element has degree two or three.  This is the
+  semantic reduction only: a planar embedding with the alternating port order
+  is not claimed, and must instead meet the separate planar-presentation
+  certificate above.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible

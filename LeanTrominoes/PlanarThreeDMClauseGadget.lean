@@ -1,7 +1,7 @@
 import LeanTrominoes.PlanarThreeDMVariableGadget
 
 /-!
-# A paired-port planar 3DM clause gadget
+# A paired-port 3DM clause relation
 
 The Dyer--Frieze variable cycle exposes two complementary triple selections
 for every literal occurrence.  This file records a small clause gadget that
@@ -15,9 +15,11 @@ green element.  Those two elements repeat the same exact-one constraint.
 
 Thus every auxiliary triple has one reference of each color; the shared
 clause, red, and green elements have degree two or three for clauses of size
-two or three; and the complementary elements have degree two.  This replaces
-the much larger combined drawing in Figure 10(b) while preserving precisely
-the local relation needed by the reduction.
+two or three; and the complementary elements have degree two.  The finite
+relation is useful for the abstract reduction, but this file deliberately
+makes no planar-embedding claim for the natural alternating boundary order
+of the literal/complement port pairs.  The geometric reduction must separately
+produce a `PeriodicThreeDM.PlanarPresentation`.
 -/
 
 namespace LeanTrominoes

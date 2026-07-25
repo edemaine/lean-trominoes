@@ -74,6 +74,15 @@ instance (first last value : Int) :
   unfold StrictlyBetween
   infer_instance
 
+/-- Closed betweenness on the integer line, independent of endpoint order. -/
+def Between (first last value : Int) : Prop :=
+  (first ≤ value ∧ value ≤ last) ∨ (last ≤ value ∧ value ≤ first)
+
+instance (first last value : Int) :
+    Decidable (Between first last value) := by
+  unfold Between
+  infer_instance
+
 /-- A point lies in the relative interior of a horizontal or vertical
 segment. -/
 def InteriorContains (segment : GridSegment) (point : Cell) : Prop :=
@@ -86,6 +95,32 @@ instance (segment : GridSegment) (point : Cell) :
     Decidable (segment.InteriorContains point) := by
   unfold InteriorContains
   infer_instance
+
+/-- A point lies on a horizontal or vertical segment, including its
+endpoints. -/
+def Contains (segment : GridSegment) (point : Cell) : Prop :=
+  (segment.IsHorizontal ∧ point.2 = segment.start.2 ∧
+      Between segment.start.1 segment.finish.1 point.1) ∨
+    (segment.IsVertical ∧ point.1 = segment.start.1 ∧
+      Between segment.start.2 segment.finish.2 point.2)
+
+instance (segment : GridSegment) (point : Cell) :
+    Decidable (segment.Contains point) := by
+  unfold Contains
+  infer_instance
+
+/-- Relative-interior containment implies closed containment. -/
+theorem contains_of_interiorContains {segment : GridSegment} {point : Cell}
+    (contains : segment.InteriorContains point) :
+    segment.Contains point := by
+  rcases contains with
+      ⟨horizontal, same, between⟩ | ⟨vertical, same, between⟩
+  · exact Or.inl ⟨horizontal, same, between.elim
+      (fun bounds => Or.inl ⟨bounds.1.le, bounds.2.le⟩)
+      (fun bounds => Or.inr ⟨bounds.1.le, bounds.2.le⟩)⟩
+  · exact Or.inr ⟨vertical, same, between.elim
+      (fun bounds => Or.inl ⟨bounds.1.le, bounds.2.le⟩)
+      (fun bounds => Or.inr ⟨bounds.1.le, bounds.2.le⟩)⟩
 
 /-- Two segment interiors cross properly at a point: one segment is
 horizontal and the other vertical. -/
@@ -256,6 +291,42 @@ def IsOrthocrossing (drawing : PeriodicGridDrawing) : Prop :=
             (second.segment.translate
               (drawing.periodTranslation secondTranslate))
             point
+
+/-- No segment interior in the infinite periodic lift meets any distinct
+segment occurrence.  Quantifying over the ordered pair also excludes a
+route endpoint from touching the interior of another route.  Shared route
+and graph endpoints remain permitted. -/
+def RoutesAvoidInteriors (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ first ∈ drawing.indexedSegments,
+    ∀ second ∈ drawing.indexedSegments,
+      ∀ firstTranslate secondTranslate point,
+        SegmentOccurrenceKey first firstTranslate ≠
+            SegmentOccurrenceKey second secondTranslate →
+          (first.segment.translate
+              (drawing.periodTranslation firstTranslate)).InteriorContains
+            point →
+          ¬(second.segment.translate
+              (drawing.periodTranslation secondTranslate)).Contains point
+
+/-- No lifted graph vertex lies in the relative interior of a lifted route
+segment.  Incidence endpoints are allowed because they are segment
+endpoints, not interior points. -/
+def VerticesAvoidRouteInteriors
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ vertexPosition ∈ drawing.vertexPositions,
+    ∀ indexed ∈ drawing.indexedSegments,
+      ∀ vertexTranslate routeTranslate,
+        ¬(indexed.segment.translate
+            (drawing.periodTranslation routeTranslate)).InteriorContains
+          (Cell.add vertexPosition
+            (drawing.periodTranslation vertexTranslate))
+
+/-- The geometric nonintersection conditions needed of a planar periodic
+grid drawing.  Compatibility with a particular graph and orthogonality are
+kept separate because both are independently useful. -/
+def IsPlanar (drawing : PeriodicGridDrawing) : Prop :=
+  drawing.RoutesAvoidInteriors ∧
+    drawing.VerticesAvoidRouteInteriors
 
 end PeriodicGridDrawing
 
