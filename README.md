@@ -364,8 +364,14 @@ The representation choices for this target are:
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
   logical unit-free formula, and its end-to-end satisfiability theorem is
-  retained.  Explicit noncrossing incidence routes remain for the subsequent
-  geometric layer.
+  retained.
+  [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
+  carries canonical protovariable positions and the physical drawing period
+  through occurrence splitting, Figure 9, its opaque wrapper, and final
+  unit-clause elimination.  Clause-local auxiliaries compensate for their
+  logical anchor offsets, with checked cancellation lemmas showing that each
+  translated occurrence lands at its declared local gadget vertex.  Explicit
+  noncrossing incidence routes remain for the subsequent geometric layer.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

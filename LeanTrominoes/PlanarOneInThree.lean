@@ -21,8 +21,11 @@ namespace PlanarOneInThree
 open PlanarThreeSAT
 open PeriodicOneInThree
 
-/-- Refine every source drawing cell to a `4 × 4` Figure 9 box. -/
-def gadgetScale : Int := 4
+/-- Refine every source drawing cell to a `12 × 12` Figure 9 box.  The
+extra room separates all clause and auxiliary-variable vertices on the
+integer grid, and leaves routing lanes for the later planar incidence
+certificate. -/
+def gadgetScale : Int := 12
 
 /-- Position of a generated exact-one clause inside a refined source box.
 The first three positions are respectively the top, left, and right clauses
@@ -32,12 +35,12 @@ def generatedClausePosition (sourcePosition : Cell)
     (generatedIndex : Nat) : Cell :=
   let localOffset : Cell :=
     match generatedIndex with
-    | 0 => (2, 1)
-    | 1 => (1, 2)
-    | 2 => (3, 2)
-    | 3 => (1, 3)
-    | 4 => (2, 3)
-    | _ => (3, 3)
+    | 0 => (6, 2)
+    | 1 => (3, 5)
+    | 2 => (9, 5)
+    | 3 => (3, 10)
+    | 4 => (6, 10)
+    | _ => (9, 10)
   Cell.add (Cell.scale gadgetScale sourcePosition) localOffset
 
 /-- Forget an embedded clause's drawing position and put all of its literals
