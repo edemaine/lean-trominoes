@@ -1445,6 +1445,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseInternalIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseInternalIncidences.lean)
   proves that each colored internal element of every assembled Figure 5
   clause core has exactly its three local incidences.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMCycleLinkIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMCycleLinkIncidences.lean)
+  proves every used red variable-cycle link has degree two, for all one-,
+  two-, and three-occurrence cycles and both literal polarities.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
