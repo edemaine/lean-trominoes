@@ -1504,6 +1504,11 @@ The representation choices for this target are:
   occurrence module and fixed-red detour satisfies its verified private
   constraints, and every clause core satisfies all three internal
   exact-cover constraints.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSoundness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSoundness.lean)
+  reads each occurrence module as a signed connector boundary.  Coverage of
+  the red cycle links synchronizes the first boundary field across all used
+  slots, yielding a recovered source assignment whose literal value equals
+  every occurrence connector signal.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
