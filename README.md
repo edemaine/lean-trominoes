@@ -337,6 +337,18 @@ The representation choices for this target are:
   SAT variables.  This proves exact satisfiability preservation relative to
   the routed planar block and, for width-three occurrence-three sources,
   relative to the original periodic CNF.
+  [`LeanTrominoes/PeriodicCNFPlanarThreeSATThree.lean`](LeanTrominoes/PeriodicCNFPlanarThreeSATThree.lean)
+  applies the paper's implication-cycle occurrence split after planarization,
+  where crossover internals may have acquired degree above three.  The
+  resulting periodic formula is proved equisatisfiable with the routed
+  formula, retains width three, and has at most three occurrences of every
+  protovariable.
+  [`LeanTrominoes/PeriodicCNFPlanarOneInThreeThree.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeThree.lean)
+  then applies Figure 9 to that repaired formula.  It proves the resulting
+  periodic exact-one instance has width and occurrence bound three and is
+  satisfiable exactly when the original width-three occurrence-three source
+  is satisfiable.  Its geometric placement is deliberately factored into the
+  following embedding layer.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
