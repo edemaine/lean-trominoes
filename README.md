@@ -1435,6 +1435,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEnumeration.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEnumeration.lean)
   packages the nested variable/used-slot order as a duplicate-free module
   enumeration and relates its flat-map back to the actual triple list.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPrivateIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPrivateIncidences.lean)
+  localizes the global incidence filters for ordinary fixed-green and
+  fixed-blue modules, proving that each of their private colored elements
+  has exactly the two advertised local incidences.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
