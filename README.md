@@ -1297,6 +1297,10 @@ The representation choices for this target are:
   begins the semantic bridge to natural-number `PeriodicThreeDM`, proving
   generically that numbered incidence enumeration is a permutation of the
   corresponding duplicate-free typed incidence list.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMEncodingCorrectness.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEncodingCorrectness.lean)
+  specializes the encoding bridge to red, green, and blue and proves incident
+  truth-value permutations for both encoded typed assignments and decoded
+  natural-number assignments.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
