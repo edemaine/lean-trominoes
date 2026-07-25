@@ -258,6 +258,10 @@ The representation choices for this target are:
   combines all crossover, straight-chain, and bend clauses.  Its interface
   proves both simultaneous extension of arbitrary route values and all three
   propagation laws for every satisfying core assignment.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarCarrierSoundness.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarCarrierSoundness.lean)
+  combines internal crossover propagation with the equality links between
+  consecutive sites, proving that the start and finish terminals of every
+  neighboring straight segment occurrence carry the same value.
   [`LeanTrominoes/PeriodicOrthocrossingPlanarEndpoints.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarEndpoints.lean)
   recovers the source and target terminal of every neighboring translated
   protoedge route, retains the lifted graph vertex reached at each end, and
