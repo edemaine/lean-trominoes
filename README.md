@@ -1423,6 +1423,10 @@ The representation choices for this target are:
   literal; RGB connector ports are identified with the correctly ordered
   clause terminal at the reversed literal offset; and every clause receives
   the nine colored core triples.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMSemantics.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMSemantics.lean)
+  defines translated typed incidences, perfect-matching semantics,
+  well-formedness, and the degree-two-or-three invariant for that
+  presentation.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
