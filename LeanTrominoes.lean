@@ -51,6 +51,7 @@ import LeanTrominoes.PeriodicOneInThreeOccurrences
 import LeanTrominoes.PeriodicOneInThreeReductionComputability
 import LeanTrominoes.PeriodicCNF
 import LeanTrominoes.PeriodicCNFPlanarIncidences
+import LeanTrominoes.PeriodicCNFPlanarVertexGadgets
 import LeanTrominoes.PeriodicGraph
 import LeanTrominoes.PeriodicGridDrawing
 import LeanTrominoes.PeriodicOrthocrossingConstruction

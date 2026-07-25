@@ -1,0 +1,225 @@
+import LeanTrominoes.PeriodicCNFPlanarIncidences
+
+/-!
+# Clause and variable gadgets at routed SAT vertices
+
+The planar route core ends at the vertices of the CNF incidence graph.
+Clause vertices reuse the original signed clause, with each literal atom
+replaced by its incoming route terminal.  Variable vertices receive the
+Figure 8(a) three-way duplicator, padded by its center variable when their
+degree is below three.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicOrthocrossing
+
+open PlanarThreeSAT
+
+/-- External variables of the routed planar SAT construction: carrier nodes
+along protoedge routes, plus one central Boolean at each lifted variable
+vertex. -/
+inductive PlanarSATNode (Variable : Type*)
+  | carrier (node : CarrierNode)
+  | atom (occurrence : Variable × Cell)
+  deriving DecidableEq, Repr
+
+/-- A lifted clause vertex is named by its protoclauses index and cell. -/
+abbrev ClauseRouteSite := Nat × Cell
+
+/-- A lifted variable vertex is named by its atom and cell. -/
+abbrev VariableRouteSite (Variable : Type*) := Variable × Cell
+
+/-- Whether a metadata-rich endpoint is the clause end of its incidence
+route. -/
+def CNFRouteEndpoint.isClauseEnd {Variable : Type*}
+    (endpoint : CNFRouteEndpoint Variable) : Bool :=
+  decide (endpoint.endpoint.endKind = .source)
+
+/-- Whether a metadata-rich endpoint is the variable end of its incidence
+route. -/
+def CNFRouteEndpoint.isVariableEnd {Variable : Type*}
+    (endpoint : CNFRouteEndpoint Variable) : Bool :=
+  decide (endpoint.endpoint.endKind = .target)
+
+/-- Carrier-node variable reached by a routed SAT endpoint. -/
+def CNFRouteEndpoint.planarNode {Variable : Type*}
+    (endpoint : CNFRouteEndpoint Variable) : PlanarSATNode Variable :=
+  .carrier endpoint.endpoint.carrierNode
+
+/-- Lifted clause site reached by the source end of an incidence route. -/
+def CNFRouteEndpoint.clauseSite {Variable : Type*}
+    (endpoint : CNFRouteEndpoint Variable) : ClauseRouteSite :=
+  endpoint.occurrence.clauseOccurrence
+
+/-- Lifted variable site reached by the target end of an incidence route. -/
+def CNFRouteEndpoint.variableSite {Variable : Type*}
+    (endpoint : CNFRouteEndpoint Variable) : VariableRouteSite Variable :=
+  endpoint.occurrence.variableOccurrence
+
+/-- All routed endpoints incident to clause vertices. -/
+def drawingClauseRouteEndpoints
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (CNFRouteEndpoint Variable) :=
+  (drawingCNFRouteEndpoints formula).filter
+    CNFRouteEndpoint.isClauseEnd
+
+/-- All routed endpoints incident to variable vertices. -/
+def drawingVariableRouteEndpoints
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (CNFRouteEndpoint Variable) :=
+  (drawingCNFRouteEndpoints formula).filter
+    CNFRouteEndpoint.isVariableEnd
+
+/-- The finite lifted clause sites represented in the neighboring block. -/
+def drawingClauseRouteSites
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) : List ClauseRouteSite :=
+  ((drawingClauseRouteEndpoints formula).map
+    CNFRouteEndpoint.clauseSite).dedup
+
+/-- The finite lifted variable sites represented in the neighboring block. -/
+def drawingVariableRouteSites
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (VariableRouteSite Variable) :=
+  ((drawingVariableRouteEndpoints formula).map
+    CNFRouteEndpoint.variableSite).dedup
+
+/-- Clause endpoints at one lifted clause vertex, in original literal order. -/
+def clauseRouteEndpointsAt
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (site : ClauseRouteSite) :
+    List (CNFRouteEndpoint Variable) :=
+  ((drawingClauseRouteEndpoints formula).filter fun endpoint =>
+    endpoint.clauseSite = site).insertionSort fun first second =>
+      first.occurrence.incidence.literalIndex ≤
+        second.occurrence.incidence.literalIndex
+
+/-- Variable endpoints at one lifted variable vertex, in global edge order. -/
+def variableRouteEndpointsAt
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    List (CNFRouteEndpoint Variable) :=
+  ((drawingVariableRouteEndpoints formula).filter fun endpoint =>
+    endpoint.variableSite = site).insertionSort fun first second =>
+      first.occurrence.edgeIndex ≤ second.occurrence.edgeIndex
+
+/-- Drawing-grid position of a lifted incidence-graph vertex. -/
+def liftedIncidenceVertexPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (vertex : CNFVertex Variable) (translate : Cell) : Cell :=
+  let graph := PeriodicCNF.incidenceGraph formula
+  Cell.add
+    (PeriodicGridDrawing.vertexPosition graph (drawing graph) vertex)
+    ((drawing graph).periodTranslation translate)
+
+/-- Macro-grid origin surrounding a lifted incidence-graph vertex. -/
+def liftedIncidenceVertexMacroOrigin
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (vertex : CNFVertex Variable) (translate : Cell) : Cell :=
+  Cell.scale planarMacroScale
+    (liftedIncidenceVertexPosition formula vertex translate)
+
+/-- The original signed clause, attached to the carrier node of each
+incoming incidence route. -/
+def routedClauseAt
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (site : ClauseRouteSite) :
+    EmbeddedClause (PlanarSATNode Variable) where
+  position :=
+    Cell.add
+      (liftedIncidenceVertexMacroOrigin formula
+        (.clause site.1) site.2) (10, 10)
+  literals :=
+    (clauseRouteEndpointsAt formula site).map fun endpoint =>
+      (endpoint.planarNode,
+        endpoint.occurrence.incidence.literal.value)
+
+/-- All routed original clauses in the neighboring block. -/
+def drawingRoutedClauseFormula
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (EmbeddedClause (PlanarSATNode Variable)) :=
+  (drawingClauseRouteSites formula).map
+    (routedClauseAt formula)
+
+/-- Satisfaction of the routed clause family is exactly satisfaction of
+every listed routed clause. -/
+theorem drawingRoutedClauseFormula_holds_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (assignment : PlanarSATNode Variable → Bool) :
+    FormulaHolds assignment (drawingRoutedClauseFormula formula) ↔
+      ∀ site ∈ drawingClauseRouteSites formula,
+        ClauseHolds assignment (routedClauseAt formula site) := by
+  unfold FormulaHolds drawingRoutedClauseFormula
+  constructor
+  · intro holds site siteMem
+    exact holds (routedClauseAt formula site)
+      (List.mem_map.mpr ⟨site, siteMem, rfl⟩)
+  · intro holds clause clauseMem
+    rcases List.mem_map.mp clauseMem with
+      ⟨site, siteMem, clauseEq⟩
+    subst clause
+    exact holds site siteMem
+
+/-- Three duplicator ports at one lifted variable vertex.  Missing endpoint
+ports are padded by the center variable, which imposes no new condition. -/
+def routedVariablePorts
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    DuplicatorPorts (PlanarSATNode Variable) :=
+  let center : PlanarSATNode Variable := .atom site
+  let endpoints :=
+    (variableRouteEndpointsAt formula site).map
+      CNFRouteEndpoint.planarNode
+  ⟨center,
+    endpoints.getD 0 center,
+    endpoints.getD 1 center,
+    endpoints.getD 2 center⟩
+
+/-- Position the Figure 8(a) duplicator at a lifted variable vertex. -/
+def routedVariableOrigin
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) : Cell :=
+  liftedIncidenceVertexMacroOrigin formula
+    (.variable site.1) site.2
+
+/-- All routed variable duplicators in the neighboring block. -/
+def drawingRoutedVariableFormula
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (EmbeddedClause (PlanarSATNode Variable)) :=
+  duplicatorFamily (drawingVariableRouteSites formula)
+    (routedVariablePorts formula)
+    (routedVariableOrigin formula) 1
+
+/-- The variable family holds exactly when all three (possibly padded) route
+ports agree with the central lifted atom at every represented site. -/
+theorem drawingRoutedVariableFormula_holds_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (assignment : PlanarSATNode Variable → Bool) :
+    FormulaHolds assignment (drawingRoutedVariableFormula formula) ↔
+      ∀ site ∈ drawingVariableRouteSites formula,
+        assignment (routedVariablePorts formula site).left =
+            assignment (.atom site) ∧
+          assignment (routedVariablePorts formula site).top =
+            assignment (.atom site) ∧
+          assignment (routedVariablePorts formula site).right =
+            assignment (.atom site) := by
+  simpa [drawingRoutedVariableFormula, routedVariablePorts] using
+    duplicatorFamily_holds_iff assignment
+      (drawingVariableRouteSites formula)
+      (routedVariablePorts formula)
+      (routedVariableOrigin formula) 1
+
+end PeriodicOrthocrossing
+end LeanTrominoes
