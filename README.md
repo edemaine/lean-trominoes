@@ -1246,6 +1246,11 @@ The representation choices for this target are:
   variable-cycle matching.  The six-cycle classification then proves that
   every literal port is the recovered literal truth value and every paired
   port is its complement; a clause gadget recovers the exact-one clause.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMVariableIncidences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMVariableIncidences.lean)
+  proves that the typed incidence enumerator gives every internal red and
+  green variable element exactly the two neighbors in the symbolic six-cycle,
+  at zero offset.  Thus exact cover on those elements implies the verified
+  `VariableGadgetHolds` predicate.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)

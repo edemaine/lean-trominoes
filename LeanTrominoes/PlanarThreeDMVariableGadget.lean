@@ -93,7 +93,7 @@ namespace VariableRed
 def neighbors : VariableRed → List VariableTriple
   | .right => [.topRight, .rightMiddle]
   | .bottom => [.bottomRight, .bottomLeft]
-  | .left => [.leftMiddle, .topLeft]
+  | .left => [.topLeft, .leftMiddle]
 
 /-- Integer-grid coordinates matching the layout of Figure 10(a). -/
 def position : VariableRed → Cell
