@@ -249,6 +249,28 @@ theorem exists_classifiedSegment_of_mem {Vertex : Type*}
   · exact congrArg Prod.fst equality
   · exact congrArg Prod.snd equality
 
+/-- Every segment in the completed drawing exposes its originating indexed
+protoedge and its semantic classified occurrence. -/
+theorem exists_classifiedSegment_of_drawing_mem {Vertex : Type*}
+    [DecidableEq Vertex] {graph : PeriodicGraph Vertex}
+    {indexed : IndexedGridSegment}
+    (indexedMem : indexed ∈ (drawing graph).indexedSegments) :
+    ∃ taggedRoute ∈ graph.edges.zipIdx.zipIdx,
+      ∃ taggedClassified ∈
+          (classifiedRouteSegments graph
+            taggedRoute.1.1 taggedRoute.1.2).zipIdx,
+        indexed =
+          ⟨taggedRoute.2, taggedClassified.2,
+            taggedClassified.1.segment⟩ := by
+  rcases (mem_drawing_indexedSegments_iff.mp indexedMem) with
+    ⟨taggedRoute, routeMem, taggedSegment, segmentMem, indexedEq⟩
+  rcases exists_classifiedSegment_of_mem segmentMem with
+    ⟨taggedClassified, classifiedMem, segmentEq, indexEq⟩
+  refine ⟨taggedRoute, routeMem, taggedClassified, classifiedMem, ?_⟩
+  rw [indexedEq]
+  simp only [IndexedGridSegment.mk.injEq, true_and]
+  exact ⟨indexEq.symm, segmentEq.symm⟩
+
 /-- Every role remembers the protoedge index that owns its piece. -/
 def SegmentRole.edgeIndex {Vertex : Type*} : SegmentRole Vertex → Nat
   | .sourceFanoutHorizontal port

@@ -57,6 +57,20 @@ theorem nested_zipIdx_indices_eq {α : Type*} {values : List α}
   have atIndex := congrArg Prod.snd (List.mem_zipIdx' taggedMem).2
   simpa using atIndex
 
+/-- The numeric index in `zipIdx` uniquely determines the tagged value. -/
+theorem tagged_eq_of_mem_zipIdx_of_snd_eq {α : Type*} {values : List α}
+    {first second : α × Nat}
+    (firstMem : first ∈ values.zipIdx)
+    (secondMem : second ∈ values.zipIdx)
+    (indicesEqual : first.2 = second.2) :
+    first = second := by
+  apply Prod.ext
+  · have firstAt := (List.mem_zipIdx_iff_getElem?).mp firstMem
+    have secondAt := (List.mem_zipIdx_iff_getElem?).mp secondMem
+    rw [indicesEqual, secondAt] at firstAt
+    exact Option.some.inj firstAt.symm
+  · exact indicesEqual
+
 /-- A representative in one half-open period and its integer translate are
 unique.  This is the arithmetic basis for all private-lane arguments. -/
 theorem periodic_coordinate_unique
