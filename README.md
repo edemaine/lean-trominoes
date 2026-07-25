@@ -1070,6 +1070,12 @@ The representation choices for this target are:
   equality link.  It proves that a finite link family is satisfied exactly
   when every pair of wire endpoints agrees, including a factoring lemma for
   assignments pulled back from common carrier keys.
+- [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
+  packages Figure 9 as a positioned constant-size replacement for each
+  embedded width-three disjunction.  Generated clauses occupy an explicit
+  `4 × 4` refinement box and use clause-index-scoped auxiliaries; completeness,
+  soundness, and exact finite satisfiability preservation are proved by
+  connecting the layout to the verified periodic exact-one truth table.
 - [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
   the local translation-invariant Boolean formulas used at the beginning of
   that source reduction chain: each finite clause refers to variables at
