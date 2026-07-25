@@ -1285,6 +1285,10 @@ The representation choices for this target are:
   assembles all typed incidence cases and proves the forward correctness
   direction: every satisfying occurrence-three exact-one assignment induces
   a perfect matching of the typed periodic 3DM construction.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMTypedSoundness.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMTypedSoundness.lean)
+  recovers a Boolean assignment from any typed perfect matching, proves every
+  source clause exact-one, and concludes satisfiability equivalence for the
+  typed reduction under the occurrence-three bound.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
