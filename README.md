@@ -244,6 +244,11 @@ The representation choices for this target are:
   and appends both clause families.  Every segment-carrier assignment extends
   to a satisfying core assignment, and every satisfying core assignment
   obeys all crossover propagation and inter-site equality laws.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarTerminals.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarTerminals.lean)
+  adds explicit start and finish variables to every neighboring segment
+  occurrence.  Sorting terminals together with crossing boundaries produces
+  complete carrier chains, including carriers with no crossings and the
+  portions before the first and after the last crossing.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
