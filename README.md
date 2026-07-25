@@ -930,6 +930,11 @@ The representation choices for this target are:
   occurrence-splitting reduction computable and composes it with the Wang and
   width-three reductions to establish co-r.e.-hardness of local periodic
   3SAT-3.
+- [`LeanTrominoes/PeriodicOneInThree.lean`](LeanTrominoes/PeriodicOneInThree.lean)
+  defines periodic exact-one satisfaction and the paper's three-clause
+  reduction from a width-three disjunction, padding short clauses with fresh
+  variables forced false.  Its finite Boolean truth table is verified, and
+  the generated formula is proved local and of width at most three.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
