@@ -184,6 +184,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOrthocrossingPorts.lean`](LeanTrominoes/PeriodicOrthocrossingPorts.lean)
   proves that port count equals graph degree and that all real edge-end ports
   receive distinct columns under the maximum-degree-three premise.
+  [`LeanTrominoes/PeriodicOrthocrossingOrthogonal.lean`](LeanTrominoes/PeriodicOrthocrossingOrthogonal.lean)
+  classifies every local offset into the five cardinal cases, proves each
+  complete route orthogonal, and lifts this fact to the full periodic drawing.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

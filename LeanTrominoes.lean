@@ -50,6 +50,7 @@ import LeanTrominoes.PeriodicGraph
 import LeanTrominoes.PeriodicGridDrawing
 import LeanTrominoes.PeriodicOrthocrossingConstruction
 import LeanTrominoes.PeriodicOrthocrossingCorrectness
+import LeanTrominoes.PeriodicOrthocrossingOrthogonal
 import LeanTrominoes.PeriodicOrthocrossingPorts
 import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicThreeCNF
