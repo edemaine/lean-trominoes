@@ -1309,6 +1309,9 @@ The representation choices for this target are:
   composes unit elimination with encoded 3DM, proves the resulting typed
   instance has degree two or three, and preserves exact-one satisfiability
   and abstract trichromatic orientability.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsComputability.lean)
+  proves that the reviewed empty- and unit-clause elimination is primitive
+  recursive, both clause by clause and over a complete periodic formula.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
