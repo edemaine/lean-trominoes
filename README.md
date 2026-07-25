@@ -331,6 +331,12 @@ The representation choices for this target are:
   become literal offsets, clause-local auxiliaries remain at offset zero,
   and periodic exact-one satisfaction is proved equivalent to satisfying
   the finite positioned formula at every lattice translate.
+  [`LeanTrominoes/PeriodicCNFPlanarOneInThreeCorrectness.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeCorrectness.lean)
+  assembles the finite Figure 9 auxiliary choices into a plane-wide
+  exact-one assignment and restricts any such assignment back to the routed
+  SAT variables.  This proves exact satisfiability preservation relative to
+  the routed planar block and, for width-three occurrence-three sources,
+  relative to the original periodic CNF.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
