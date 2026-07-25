@@ -139,6 +139,7 @@ import LeanTrominoes.PeriodicThreeDMGraphOrientation
 import LeanTrominoes.PeriodicThreeDMHardness
 import LeanTrominoes.PeriodicPlanarThreeDM
 import LeanTrominoes.PlanarThreeDMVariableGadget
+import LeanTrominoes.PlanarX3CClauseGadget
 import LeanTrominoes.PlanarThreeDMClauseGadget
 import LeanTrominoes.PeriodicThreeSATThree
 import LeanTrominoes.PeriodicThreeSATThreeCorrectness

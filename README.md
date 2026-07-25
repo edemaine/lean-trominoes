@@ -1374,6 +1374,13 @@ The representation choices for this target are:
   planar coordinates and open blue interface ports.  An exhaustive finite
   truth table proves that covering its internal red and green elements permits
   exactly the two alternating selections encoding the variable's truth value.
+- [`LeanTrominoes/PlanarX3CClauseGadget.lean`](LeanTrominoes/PlanarX3CClauseGadget.lean)
+  transcribes the nine-set clause core in Figure 5 of the Dyer--Frieze planar
+  3DM reduction.  Its twelve elements, incidence lists, degrees, and triangular
+  coordinates are explicit.  A machine-checked exhaustive truth table proves
+  that the internal elements and all nonexternal terminal elements have an
+  exact cover precisely when exactly one of the three three-element terminals
+  is covered externally.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports

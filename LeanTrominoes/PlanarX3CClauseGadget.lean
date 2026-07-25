@@ -1,0 +1,264 @@
+import LeanTrominoes.PlanarThreeDMVariableGadget
+
+/-!
+# The Dyer--Frieze planar X3C clause core
+
+Before coloring the reduction as a three-dimensional-matching instance,
+Dyer and Frieze represent each clause by the nine-set planar X3C gadget in
+Figure 5 of their planar-3DM reduction.
+
+The gadget has three internal elements and three terminals, each consisting
+of three elements.  Every internal element occurs in three sets and every
+terminal element occurs in two.  A terminal Boolean records whether all
+three of its elements are covered outside the gadget.  Exhaustive checking
+below proves that the gadget can cover everything else exactly when exactly
+one terminal is covered externally.
+
+The names and coordinates follow the triangular layout of Figure 5.  Dashed
+curves in that figure merely delimit terminals and are not incidences.
+-/
+
+namespace LeanTrominoes
+namespace PlanarThreeDM
+
+/-- The nine sets (future matching triples) in the clause core. -/
+inductive X3CClauseSet
+  | topLeftOuter
+  | topLeftInner
+  | topRightInner
+  | topRightOuter
+  | leftMiddle
+  | rightMiddle
+  | bottomLeft
+  | bottomRight
+  | bottom
+  deriving DecidableEq, Repr, Fintype
+
+/-- The three elements internal to the clause core. -/
+inductive X3CClauseInternal
+  | left
+  | right
+  | bottom
+  deriving DecidableEq, Repr, Fintype
+
+/-- The three three-element terminals of the clause core. -/
+inductive X3CClauseTerminalGroup
+  | top
+  | left
+  | right
+  deriving DecidableEq, Repr, Fintype
+
+/-- Positions within a three-element terminal, in boundary order. -/
+inductive X3CClauseTerminalSlot
+  | first
+  | second
+  | third
+  deriving DecidableEq, Repr, Fintype
+
+/-- A terminal element is identified by its terminal and its slot. -/
+structure X3CClauseTerminal where
+  group : X3CClauseTerminalGroup
+  slot : X3CClauseTerminalSlot
+  deriving DecidableEq, Repr
+
+/-- All twelve elements of the uncolored X3C clause core. -/
+inductive X3CClauseElement
+  | internal (value : X3CClauseInternal)
+  | terminal (value : X3CClauseTerminal)
+  deriving DecidableEq, Repr
+
+namespace X3CClauseSet
+
+/-- The three elements contained in each set of Figure 5. -/
+def references : X3CClauseSet → List X3CClauseElement
+  | .topLeftOuter =>
+      [.terminal ⟨.top, .first⟩,
+        .terminal ⟨.left, .first⟩,
+        .internal .left]
+  | .topLeftInner =>
+      [.terminal ⟨.top, .first⟩,
+        .terminal ⟨.top, .second⟩,
+        .internal .left]
+  | .topRightInner =>
+      [.terminal ⟨.top, .second⟩,
+        .terminal ⟨.top, .third⟩,
+        .internal .right]
+  | .topRightOuter =>
+      [.terminal ⟨.top, .third⟩,
+        .terminal ⟨.right, .first⟩,
+        .internal .right]
+  | .leftMiddle =>
+      [.terminal ⟨.left, .first⟩,
+        .terminal ⟨.left, .second⟩,
+        .internal .left]
+  | .rightMiddle =>
+      [.terminal ⟨.right, .first⟩,
+        .terminal ⟨.right, .second⟩,
+        .internal .right]
+  | .bottomLeft =>
+      [.terminal ⟨.left, .second⟩,
+        .terminal ⟨.left, .third⟩,
+        .internal .bottom]
+  | .bottomRight =>
+      [.terminal ⟨.right, .second⟩,
+        .terminal ⟨.right, .third⟩,
+        .internal .bottom]
+  | .bottom =>
+      [.terminal ⟨.left, .third⟩,
+        .terminal ⟨.right, .third⟩,
+        .internal .bottom]
+
+/-- Integer coordinates preserving the triangular combinatorial layout of
+Figure 5. -/
+def position : X3CClauseSet → Cell
+  | .topLeftOuter => (2, 3)
+  | .topLeftInner => (4, 2)
+  | .topRightInner => (6, 2)
+  | .topRightOuter => (8, 3)
+  | .leftMiddle => (2, 6)
+  | .rightMiddle => (8, 6)
+  | .bottomLeft => (4, 8)
+  | .bottomRight => (6, 8)
+  | .bottom => (5, 10)
+
+end X3CClauseSet
+
+namespace X3CClauseInternal
+
+/-- The three sets incident to each internal element. -/
+def neighbors : X3CClauseInternal → List X3CClauseSet
+  | .left => [.topLeftOuter, .topLeftInner, .leftMiddle]
+  | .right => [.topRightInner, .topRightOuter, .rightMiddle]
+  | .bottom => [.bottomLeft, .bottomRight, .bottom]
+
+/-- Integer coordinates for the three internal element vertices. -/
+def position : X3CClauseInternal → Cell
+  | .left => (3, 5)
+  | .right => (7, 5)
+  | .bottom => (5, 8)
+
+end X3CClauseInternal
+
+namespace X3CClauseTerminal
+
+/-- The two sets incident to each terminal element. -/
+def neighbors : X3CClauseTerminal → List X3CClauseSet
+  | ⟨.top, .first⟩ => [.topLeftOuter, .topLeftInner]
+  | ⟨.top, .second⟩ => [.topLeftInner, .topRightInner]
+  | ⟨.top, .third⟩ => [.topRightInner, .topRightOuter]
+  | ⟨.left, .first⟩ => [.topLeftOuter, .leftMiddle]
+  | ⟨.left, .second⟩ => [.leftMiddle, .bottomLeft]
+  | ⟨.left, .third⟩ => [.bottomLeft, .bottom]
+  | ⟨.right, .first⟩ => [.topRightOuter, .rightMiddle]
+  | ⟨.right, .second⟩ => [.rightMiddle, .bottomRight]
+  | ⟨.right, .third⟩ => [.bottomRight, .bottom]
+
+/-- Integer coordinates for the nine terminal element vertices. -/
+def position : X3CClauseTerminal → Cell
+  | ⟨.top, .first⟩ => (3, 0)
+  | ⟨.top, .second⟩ => (5, 0)
+  | ⟨.top, .third⟩ => (7, 0)
+  | ⟨.left, .first⟩ => (0, 5)
+  | ⟨.left, .second⟩ => (1, 7)
+  | ⟨.left, .third⟩ => (3, 10)
+  | ⟨.right, .first⟩ => (10, 5)
+  | ⟨.right, .second⟩ => (9, 7)
+  | ⟨.right, .third⟩ => (7, 10)
+
+end X3CClauseTerminal
+
+namespace X3CClauseElement
+
+/-- The incident sets of any element in the clause core. -/
+def neighbors : X3CClauseElement → List X3CClauseSet
+  | .internal value => value.neighbors
+  | .terminal value => value.neighbors
+
+end X3CClauseElement
+
+/-- The two incidence descriptions agree. -/
+theorem x3cClause_mem_neighbors_iff_mem_references
+    (set : X3CClauseSet) (element : X3CClauseElement) :
+    set ∈ element.neighbors ↔ element ∈ set.references := by
+  cases set <;>
+    cases element with
+    | internal value => cases value <;> native_decide
+    | terminal value =>
+        rcases value with ⟨group, slot⟩
+        cases group <;> cases slot <;> native_decide
+
+/-- Every set in the clause core contains exactly three elements. -/
+theorem x3cClauseSet_reference_length (set : X3CClauseSet) :
+    set.references.length = 3 := by
+  cases set <;> rfl
+
+/-- Every set in the clause core contains three distinct elements. -/
+theorem x3cClauseSet_references_nodup (set : X3CClauseSet) :
+    set.references.Nodup := by
+  cases set <;> native_decide
+
+/-- Every internal element has degree three. -/
+theorem x3cClauseInternal_degree_three (element : X3CClauseInternal) :
+    element.neighbors.length = 3 := by
+  cases element <;> rfl
+
+/-- Every open terminal element has degree two inside the clause core. -/
+theorem x3cClauseTerminal_degree_two (element : X3CClauseTerminal) :
+    element.neighbors.length = 2 := by
+  rcases element with ⟨group, slot⟩
+  cases group <;> cases slot <;> rfl
+
+/-- A selected family of the nine sets is an exact cover relative to the
+three all-or-none external terminal choices. -/
+def X3CClauseCoreHolds
+    (selected : X3CClauseSet → Bool)
+    (external : X3CClauseTerminalGroup → Bool) : Prop :=
+  (∀ element : X3CClauseInternal, PeriodicOneInThree.ExactlyOne
+      (element.neighbors.map selected)) ∧
+    ∀ group : X3CClauseTerminalGroup,
+      ∀ slot : X3CClauseTerminalSlot,
+        PeriodicOneInThree.ExactlyOne
+          (external group ::
+            (X3CClauseTerminal.neighbors ⟨group, slot⟩).map selected)
+
+instance
+    (selected : X3CClauseSet → Bool)
+    (external : X3CClauseTerminalGroup → Bool) :
+    Decidable (X3CClauseCoreHolds selected external) := by
+  unfold X3CClauseCoreHolds
+  infer_instance
+
+/-- Package three Boolean terminal choices as a function. -/
+private def x3cClauseExternalAssignment
+    (top left right : Bool) : X3CClauseTerminalGroup → Bool
+  | .top => top
+  | .left => left
+  | .right => right
+
+/-- Exhaustive truth table for the nine-set core. -/
+private theorem exists_x3cClauseCoreHolds_assignment_iff
+    (top left right : Bool) :
+    (∃ selected : X3CClauseSet → Bool,
+        X3CClauseCoreHolds selected
+          (x3cClauseExternalAssignment top left right)) ↔
+      PeriodicOneInThree.ExactlyOne [top, left, right] := by
+  cases top <;> cases left <;> cases right <;> native_decide
+
+/-- The Figure 5 clause core admits an exact cover precisely when exactly one
+of its three terminals is covered externally. -/
+theorem exists_x3cClauseCoreHolds_iff
+    (external : X3CClauseTerminalGroup → Bool) :
+    (∃ selected, X3CClauseCoreHolds selected external) ↔
+      PeriodicOneInThree.ExactlyOne
+        [external .top, external .left, external .right] := by
+  let assignment :=
+    x3cClauseExternalAssignment
+      (external .top) (external .left) (external .right)
+  have externalEq : external = assignment := by
+    funext group
+    cases group <;> rfl
+  rw [externalEq]
+  exact exists_x3cClauseCoreHolds_assignment_iff _ _ _
+
+end PlanarThreeDM
+end LeanTrominoes
