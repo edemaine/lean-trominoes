@@ -212,6 +212,10 @@ The representation choices for this target are:
   bounds every vertical route piece by one drawing period and proves that
   vertical occurrences with a common interior point have identical occurrence
   keys.
+  [`LeanTrominoes/PeriodicOrthocrossingCertified.lean`](LeanTrominoes/PeriodicOrthocrossingCertified.lean)
+  combines the two axis-specific uniqueness theorems with orthogonality to
+  certify the complete constructed drawing as a proper periodic
+  orthocrossing drawing.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
