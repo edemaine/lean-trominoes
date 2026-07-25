@@ -1442,6 +1442,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFixedRedIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFixedRedIncidences.lean)
   performs the analogous global check for all eight private elements of the
   seven-triple fixed-red detour.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseInternalIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseInternalIncidences.lean)
+  proves that each colored internal element of every assembled Figure 5
+  clause core has exactly its three local incidences.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
