@@ -294,6 +294,10 @@ The representation choices for this target are:
   proves that every satisfying assignment of the original periodic CNF
   satisfies all routed clause copies and therefore extends through the full
   finite planarized drawing formula.
+  [`LeanTrominoes/PeriodicCNFPlanarRouteSoundness.lean`](LeanTrominoes/PeriodicCNFPlanarRouteSoundness.lean)
+  specializes complete route propagation to metadata-rich CNF incidences,
+  proving equality of every canonical routed clause terminal and its
+  corresponding variable terminal.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
