@@ -26,6 +26,16 @@ inductive VariableConnectorKind
   | fixedBlue
   deriving DecidableEq, Repr, Fintype
 
+namespace VariableConnectorKind
+
+/-- Color occupying the fixed geometric position of this connector kind. -/
+def fixedColor : VariableConnectorKind → Gadget.WireColor
+  | .fixedRed => .red
+  | .fixedGreen => .green
+  | .fixedBlue => .blue
+
+end VariableConnectorKind
+
 /-- The three Boolean values visible at the boundary of one occurrence
 module.  `first` and `second` are the two red cycle continuations;
 `connector` is the common state of the RGB terminal. -/

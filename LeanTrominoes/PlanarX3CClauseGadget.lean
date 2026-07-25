@@ -186,6 +186,29 @@ def color : X3CClauseTerminal → WireColor
   | ⟨.right, .second⟩ => .red
   | ⟨.right, .third⟩ => .green
 
+/-- Terminal order seen by a noncrossing three-strand attachment.  The top
+and right sides are read in the reverse of their local boundary indexing,
+while the left side is read forward. -/
+def attachmentElement
+    (group : X3CClauseTerminalGroup) :
+    X3CClauseTerminalSlot → X3CClauseTerminal
+  | .first =>
+      match group with
+      | .top => ⟨.top, .third⟩
+      | .left => ⟨.left, .first⟩
+      | .right => ⟨.right, .third⟩
+  | .second => ⟨group, .second⟩
+  | .third =>
+      match group with
+      | .top => ⟨.top, .first⟩
+      | .left => ⟨.left, .third⟩
+      | .right => ⟨.right, .first⟩
+
+/-- Color occupying the fixed position of each terminal attachment. -/
+def fixedAttachmentColor
+    (group : X3CClauseTerminalGroup) : WireColor :=
+  (attachmentElement group .first).color
+
 end X3CClauseTerminal
 
 namespace X3CClauseElement
@@ -290,6 +313,23 @@ theorem x3cClause_terminal_colors
       ([WireColor.red, .green, .blue] : List WireColor).toFinset := by
   cases group <;> native_decide
 
+/-- In attachment order, the three terminals have the red-blue-green,
+blue-green-red, and green-red-blue patterns described by Dyer and Frieze
+(with green replacing their yellow). -/
+theorem x3cClause_terminal_attachment_colors
+    (group : X3CClauseTerminalGroup) :
+    [X3CClauseTerminal.color
+        (X3CClauseTerminal.attachmentElement group .first),
+      X3CClauseTerminal.color
+        (X3CClauseTerminal.attachmentElement group .second),
+      X3CClauseTerminal.color
+        (X3CClauseTerminal.attachmentElement group .third)] =
+      match group with
+      | .top => [.red, .blue, .green]
+      | .left => [.blue, .green, .red]
+      | .right => [.green, .red, .blue] := by
+  cases group <;> native_decide
+
 /-- The two incidence descriptions agree. -/
 theorem x3cClause_mem_neighbors_iff_mem_references
     (set : X3CClauseSet) (element : X3CClauseElement) :
@@ -343,7 +383,7 @@ instance
   infer_instance
 
 /-- Package three Boolean terminal choices as a function. -/
-private def x3cClauseExternalAssignment
+def x3cClauseExternalAssignment
     (top left right : Bool) : X3CClauseTerminalGroup → Bool
   | .top => top
   | .left => left

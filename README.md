@@ -1409,6 +1409,13 @@ The representation choices for this target are:
   assembly theorems prove that every connector-kind sequence has exactly two
   cycle phases.  The signed versions classify every occurrence terminal as
   the corresponding source literal value of one common variable assignment.
+- [`LeanTrominoes/PlanarThreeDMGadgetSemantics.lean`](LeanTrominoes/PlanarThreeDMGadgetSemantics.lean)
+  matches the three noncrossing clause-terminal orders to the fixed-red,
+  fixed-blue, and fixed-green connector kinds and composes their contracts.
+  It proves that three connected terminals implement exact-one, that leaving
+  one degree-two terminal unconnected implements the two-literal case, and
+  that substituting signed variable-cycle signals recovers the source literal
+  clauses exactly.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
