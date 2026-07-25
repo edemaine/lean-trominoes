@@ -1427,6 +1427,11 @@ The representation choices for this target are:
   defines translated typed incidences, perfect-matching semantics,
   well-formedness, and the degree-two-or-three invariant for that
   presentation.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMWellFormed.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMWellFormed.lean)
+  proves every listed ordinary connector, fixed-red detour, and clause-core
+  triple references declared colored elements.  In particular, it verifies
+  that signed continuation swaps preserve membership in each finite
+  variable cycle.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
