@@ -41,6 +41,7 @@ import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PlanarThreeSATGadgets
 import LeanTrominoes.PlanarThreeSATInstantiation
 import LeanTrominoes.PlanarThreeSATFamilies
+import LeanTrominoes.PlanarThreeSATFamilyExtensions
 import LeanTrominoes.PeriodicOneInThree
 import LeanTrominoes.PeriodicOneInThreeClauseComputability
 import LeanTrominoes.PeriodicOneInThreeComputability

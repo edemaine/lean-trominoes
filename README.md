@@ -969,6 +969,11 @@ The representation choices for this target are:
   internals are scoped by their canonical site key, and the family semantics
   are proved to be precisely the conjunction of the independent crossover
   propagation or duplicator equality laws at all listed sites.
+- [`LeanTrominoes/PlanarThreeSATFamilyExtensions.lean`](LeanTrominoes/PlanarThreeSATFamilyExtensions.lean)
+  composes local crossover completeness across the whole finite family:
+  an assignment to the external wire variables extends simultaneously to all
+  site-scoped internals exactly when both opposite-port equalities hold at
+  every listed crossing.
 - [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
   the local translation-invariant Boolean formulas used at the beginning of
   that source reduction chain: each finite clause refers to variables at
