@@ -302,6 +302,10 @@ The representation choices for this target are:
   proves that a fixed incidence has at most one translated route reaching a
   lifted variable site.  Thus each routed variable list is bounded by the
   source protovariable's formal occurrence count, and by three for 3SAT-3.
+  [`LeanTrominoes/PeriodicCNFPlanarVariableSoundness.lean`](LeanTrominoes/PeriodicCNFPlanarVariableSoundness.lean)
+  uses that bound to show every routed target is one of the three duplicator
+  ports.  In a satisfying combined formula, every routed clause terminal
+  therefore equals the central atom at the incidence route's target.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

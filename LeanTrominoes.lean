@@ -57,6 +57,7 @@ import LeanTrominoes.PeriodicCNFPlanarAssignment
 import LeanTrominoes.PeriodicCNFPlanarCompleteness
 import LeanTrominoes.PeriodicCNFPlanarRouteSoundness
 import LeanTrominoes.PeriodicCNFPlanarDegree
+import LeanTrominoes.PeriodicCNFPlanarVariableSoundness
 import LeanTrominoes.PeriodicGraph
 import LeanTrominoes.PeriodicGridDrawing
 import LeanTrominoes.PeriodicOrthocrossingConstruction
