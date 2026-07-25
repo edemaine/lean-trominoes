@@ -886,10 +886,10 @@ The representation choices for this target are:
   `NormalizedOrientationCoREHard` interface.  Establishing that source
   interface remains the 2D hardness gap.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
-  records the 13 variable vertices, 26 positioned clauses, and literal signs
-  of the Lichtenstein crossover in Figure 8(b).  An exhaustive Lean
-  certificate proves that the two crossing Boolean signals propagate
-  independently between opposite ports.
+  records the positioned clauses and literal signs of both Figure 8
+  primitives.  Exhaustive Lean certificates prove that the duplicator copies
+  its center value to all three ports and that the Lichtenstein crossover's
+  two Boolean signals propagate independently between opposite ports.
 - [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
   the local translation-invariant Boolean formulas used at the beginning of
   that source reduction chain: each finite clause refers to variables at

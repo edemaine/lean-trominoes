@@ -199,5 +199,54 @@ theorem crossoverExtends_iff (aLeft aRight bTop bBottom : Bool) :
   cases aLeft <;> cases aRight <;> cases bTop <;> cases bBottom <;>
     native_decide
 
+/-! ## Variable duplicator -/
+
+/-- The center and three ports of Figure 8(a). -/
+inductive DuplicatorVariable
+  | center
+  | left
+  | top
+  | right
+  deriving DecidableEq, Repr, Fintype
+
+/-- Grid position of each variable in Figure 8(a). -/
+def DuplicatorVariable.position : DuplicatorVariable → Cell
+  | .center => (4, 4)
+  | .left => (2, 4)
+  | .top => (4, 2)
+  | .right => (6, 4)
+
+/-- One positioned clause of the duplicator. -/
+def duplicatorClause (x y : Int)
+    (literals : List (DuplicatorVariable × Bool)) :
+    EmbeddedClause DuplicatorVariable :=
+  ⟨(x, y), literals⟩
+
+/-- The six binary implication clauses drawn in Figure 8(a). -/
+def duplicatorFormula : List (EmbeddedClause DuplicatorVariable) :=
+  [duplicatorClause 3 4 [(.left, true), (.center, false)],
+    duplicatorClause 3 3 [(.left, false), (.center, true)],
+    duplicatorClause 4 3 [(.top, true), (.center, false)],
+    duplicatorClause 5 3 [(.top, false), (.center, true)],
+    duplicatorClause 5 4 [(.right, true), (.center, false)],
+    duplicatorClause 5 5 [(.right, false), (.center, true)]]
+
+/-- Assemble values into a complete duplicator assignment. -/
+def duplicatorAssignment (center left top right : Bool) :
+    DuplicatorVariable → Bool
+  | .center => center
+  | .left => left
+  | .top => top
+  | .right => right
+
+/-- The duplicator is satisfied exactly when every port carries the center
+value. -/
+theorem duplicatorHolds_iff (center left top right : Bool) :
+    FormulaHolds (duplicatorAssignment center left top right)
+        duplicatorFormula ↔
+      left = center ∧ top = center ∧ right = center := by
+  cases center <;> cases left <;> cases top <;> cases right <;>
+    native_decide
+
 end PlanarThreeSAT
 end LeanTrominoes
