@@ -1461,6 +1461,9 @@ The representation choices for this target are:
   verifies that every assembled occurrence contributes exactly one
   incidence of each color to its selected clause terminal, so variable-side
   terminal incidence counts equal the source occurrence counts.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseTerminalIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMClauseTerminalIncidences.lean)
+  adds the two local Figure 5 incidences at each colored terminal, yielding
+  total terminal degree two or three.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
