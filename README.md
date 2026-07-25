@@ -940,6 +940,11 @@ The representation choices for this target are:
   auxiliary variables.  The gadget truth table proves completeness, while
   its converse and the forced-false padding clauses prove soundness; together
   they establish exact preservation of periodic satisfiability.
+- [`LeanTrominoes/PeriodicOneInThreeOccurrences.lean`](LeanTrominoes/PeriodicOneInThreeOccurrences.lean)
+  formalizes the gadget's incidence accounting.  Each source occurrence is
+  preserved once, while every choice, slack, or padding auxiliary occurs at
+  most twice, so the reduction takes periodic 3SAT-3 instances to periodic
+  1-in-3SAT-3 instances.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
