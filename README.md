@@ -1375,6 +1375,13 @@ The representation choices for this target are:
   colored edge between its two incident triples with the correct periodic
   offset.  Every edge retains its original incidence tags for later route
   concatenation and orientation transport.
+- [`LeanTrominoes/PeriodicThreeDMContractionDrawing.lean`](LeanTrominoes/PeriodicThreeDMContractionDrawing.lean)
+  retrieves original planar routes by their unique incidence tags and
+  realizes every contracted edge geometrically.  Retained routes are reused;
+  for a suppressed element, the second route is period-translated, reversed,
+  and joined to the first at their common colored endpoint.  The resulting
+  polyline is proved to have exactly the contracted edge's periodic
+  endpoints.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
