@@ -208,6 +208,10 @@ The representation choices for this target are:
   eliminates unit vertical fanout and boundary pieces from integer-grid
   crossings, then normalizes the remaining real-port and private-gate columns
   and proves that equal normalized columns identify equal semantic roles.
+  [`LeanTrominoes/PeriodicOrthocrossingVerticalUnique.lean`](LeanTrominoes/PeriodicOrthocrossingVerticalUnique.lean)
+  bounds every vertical route piece by one drawing period and proves that
+  vertical occurrences with a common interior point have identical occurrence
+  keys.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
