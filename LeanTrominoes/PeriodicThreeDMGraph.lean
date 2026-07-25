@@ -181,6 +181,55 @@ theorem incidenceEdgeAt_eq_of_tag_mem (problem : PeriodicThreeDM)
   unfold incidenceEdgeAt
   rw [List.getD_eq_getElem]
 
+/-- The uncolored graph edge list and the colored tag list have exactly the
+same order.  This lets later drawing routes recover their wire colors by
+using the same list index. -/
+theorem incidenceGraph_edges_eq_tags_map
+    (problem : PeriodicThreeDM) :
+    problem.incidenceGraph.edges =
+      problem.incidenceTags.map problem.incidenceEdgeAt := by
+  change
+    problem.triples.zipIdx.flatMap
+        (fun tagged =>
+          tripleIncidenceEdges tagged.2 tagged.1) =
+      (problem.triples.zipIdx.flatMap fun tagged =>
+        tripleIncidenceTags tagged.2).map problem.incidenceEdgeAt
+  rw [List.map_flatMap]
+  apply List.flatMap_congr
+  intro tagged taggedMem
+  simp only [tripleIncidenceEdges, tripleIncidenceTags, List.map_map]
+  apply List.map_congr_left
+  intro color colorMem
+  change incidenceEdge tagged.2 tagged.1 color =
+    incidenceEdge tagged.2
+      (problem.triples.getD tagged.2 default) color
+  have indexLt : tagged.2 < problem.triples.length :=
+    List.snd_lt_of_mem_zipIdx taggedMem
+  rw [List.getD_eq_getElem _ _ indexLt]
+  have tripleAt :
+      problem.triples[tagged.2]'indexLt = tagged.1 := by
+    simpa using (List.mem_zipIdx' taggedMem).2.symm
+  rw [tripleAt]
+
+@[simp]
+theorem incidenceGraph_edges_length (problem : PeriodicThreeDM) :
+    problem.incidenceGraph.edges.length =
+      problem.incidenceTags.length := by
+  rw [incidenceGraph_edges_eq_tags_map]
+  simp
+
+/-- A generated incidence edge joins precisely the translated triple and
+translated colored element described by its reference. -/
+theorem incidenceEdge_connects
+    (tripleIndex : Nat) (triple : PeriodicThreeDMTriple)
+    (color : WireColor) (translate : Cell) :
+    (incidenceEdge tripleIndex triple color).Connects
+      (.triple tripleIndex, translate)
+      (.element color (triple.reference color).atom,
+        Cell.add translate (triple.reference color).offset) := by
+  apply Or.inl
+  exact ⟨translate, rfl, rfl⟩
+
 theorem incidenceGraph_isWellFormed (problem : PeriodicThreeDM)
     (wellFormed : problem.IsWellFormed) :
     problem.incidenceGraph.IsWellFormed := by

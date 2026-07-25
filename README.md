@@ -1350,7 +1350,14 @@ The representation choices for this target are:
   The graph is well formed whenever all element references are in range, its
   colored-element graph degrees are exactly the corresponding 3DM degrees,
   and a well-formed degree-two-or-three instance has ordinary maximum degree
-  three, as required by the drawing construction.
+  three, as required by the drawing construction.  The edge list is proved
+  index-for-index equal to the separately retained colored incidence tags.
+- [`LeanTrominoes/PeriodicThreeDMGraphOrientation.lean`](LeanTrominoes/PeriodicThreeDMGraphOrientation.lean)
+  expresses orientations directly as values on those colored incidence-edge
+  orbits.  It proves this tagged graph presentation equivalent to the
+  triple/color presentation and therefore proves that perfect periodic 3D
+  matchings are exactly valid 1-in-3/0-or-3 orientations of the incidence
+  graph.
 - [`LeanTrominoes/PlanarThreeDMVariableGadget.lean`](LeanTrominoes/PlanarThreeDMVariableGadget.lean)
   transcribes the six-triple variable gadget of Figure 10(a), including its
   planar coordinates and open blue interface ports.  An exhaustive finite
