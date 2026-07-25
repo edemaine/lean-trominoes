@@ -1233,6 +1233,10 @@ The representation choices for this target are:
   Variable cycles are proved to take an alternating matching, literal and
   complementary ports carry opposite truth values at the correctly translated
   variable cell, and clause auxiliaries repeat their source literals.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMNodup.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMNodup.lean)
+  proves that the typed red, green, blue, and triple prototype lists are all
+  duplicate-free.  Consequently the natural-number encoding gives every
+  declared prototype a unique `idxOf` position instead of merging names.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
