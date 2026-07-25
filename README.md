@@ -249,6 +249,10 @@ The representation choices for this target are:
   occurrence.  Sorting terminals together with crossing boundaries produces
   complete carrier chains, including carriers with no crossings and the
   portions before the first and after the last crossing.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarBends.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarBends.lean)
+  places equality links at every turn of every neighboring route occurrence.
+  Together with the straight-segment carrier chains, one Boolean value now
+  propagates through an entire translated route.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
