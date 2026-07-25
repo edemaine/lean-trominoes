@@ -1202,6 +1202,12 @@ The representation choices for this target are:
   exactly and uses each clause-local auxiliary at most twice.  Consequently
   the transformation preserves the occurrence-three restriction needed by
   the six-triple variable gadget.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMTyped.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMTyped.lean)
+  assembles the typed periodic 3DM presentation: six triples and alternating
+  red/green elements per occurring variable, paired literal/complement blue
+  ports, one red/green clause core and auxiliary triple per literal, and
+  degree-two blue caps for unused slots.  Variable-to-clause references use
+  the negated literal offset, with a checked coordinate-cancellation lemma.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
