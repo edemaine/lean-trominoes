@@ -1266,6 +1266,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMBlueUnusedIncidences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMBlueUnusedIncidences.lean)
   proves that a private cap for an unused occurrence slot has exactly the two
   complementary variable-port incidences, both at zero offset.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMBlueComplementUnique.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMBlueComplementUnique.lean)
+  uses uniqueness of tagged clause/literal positions and occurrence slots to
+  prove that every genuine complement blue element has exactly two
+  incidences: one opposite variable port and one clause auxiliary.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
