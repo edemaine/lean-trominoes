@@ -325,6 +325,12 @@ The representation choices for this target are:
   degree-three duplicator, reconstructing a satisfying source assignment.
   Thus the periodicized planar formula preserves satisfiability exactly for
   occurrence-three sources.
+  [`LeanTrominoes/PeriodicCNFPlanarOneInThree.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThree.lean)
+  applies the positioned Figure 9 replacement to the complete routed block
+  and periodicizes it.  Explicit translations on original routed variables
+  become literal offsets, clause-local auxiliaries remain at offset zero,
+  and periodic exact-one satisfaction is proved equivalent to satisfying
+  the finite positioned formula at every lattice translate.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

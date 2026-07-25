@@ -65,6 +65,7 @@ import LeanTrominoes.PeriodicCNFPlanarWidth
 import LeanTrominoes.PeriodicCNFPlanarPeriodicization
 import LeanTrominoes.PeriodicCNFPlanarPeriodicCompleteness
 import LeanTrominoes.PeriodicCNFPlanarPeriodicSoundness
+import LeanTrominoes.PeriodicCNFPlanarOneInThree
 import LeanTrominoes.PeriodicGraph
 import LeanTrominoes.PeriodicGridDrawing
 import LeanTrominoes.PeriodicOrthocrossingConstruction
