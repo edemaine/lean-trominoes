@@ -1223,6 +1223,11 @@ The representation choices for this target are:
   corresponding finite typed red, green, or blue list.  In particular,
   variable ports distinguish valid clause cores, occurrence-specific
   complements, and the private caps of unused slots.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMEncode.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEncode.lean)
+  compiles each typed color class to natural-number indices and produces a
+  concrete `PeriodicThreeDM`.  Typed well-formedness proves that all three
+  references of every encoded triple are strictly within their declared
+  color counts.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
