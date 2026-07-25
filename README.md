@@ -958,6 +958,12 @@ The representation choices for this target are:
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
   its center value to all three ports and that the Lichtenstein crossover's
   two Boolean signals propagate independently between opposite ports.
+- [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
+  proves that renaming and affine placement preserve the finite gadget
+  semantics.  It packages caller-supplied duplicator ports and crossover
+  ports with nine fresh internal crossover variables, proving that an
+  instantiated crossover extends exactly when its opposite boundary signals
+  agree independently.
 - [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
   the local translation-invariant Boolean formulas used at the beginning of
   that source reduction chain: each finite clause refers to variables at
