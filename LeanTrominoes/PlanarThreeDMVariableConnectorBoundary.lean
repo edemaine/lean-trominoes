@@ -107,5 +107,65 @@ theorem variableConnectorBoundary_eq_canonical
   cases first <;> cases second <;> cases connector <;>
     simp_all [VariableConnectorBoundary.canonical]
 
+/-- Exchange the two red continuation ports without changing the RGB
+terminal.  This is the reflected attachment used for a negated occurrence in
+Dyer--Frieze Figure 4(b). -/
+def VariableConnectorBoundary.swapContinuations
+    (boundary : VariableConnectorBoundary) :
+    VariableConnectorBoundary :=
+  ⟨boundary.second, boundary.first, boundary.connector⟩
+
+/-- Realize a positive occurrence directly and a negative occurrence after
+exchanging its continuation ports. -/
+def VariableConnectorBoundary.RealizableFor
+    (kind : VariableConnectorKind) (polarity : Bool)
+    (boundary : VariableConnectorBoundary) : Prop :=
+  if polarity then
+    boundary.Realizable kind
+  else
+    boundary.swapContinuations.Realizable kind
+
+instance
+    (kind : VariableConnectorKind) (polarity : Bool)
+    (boundary : VariableConnectorBoundary) :
+    Decidable (boundary.RealizableFor kind polarity) := by
+  unfold VariableConnectorBoundary.RealizableFor
+  infer_instance
+
+/-- Truth value carried from a variable-cycle phase to a signed literal
+occurrence. -/
+def variableConnectorLiteralSignal
+    (variableValue polarity : Bool) : Bool :=
+  variableValue == polarity
+
+/-- A signed connector still has complementary continuation states, while
+its RGB signal is the value of the represented signed literal. -/
+theorem variableConnectorBoundary_realizableFor_iff
+    (kind : VariableConnectorKind) (polarity : Bool)
+    (boundary : VariableConnectorBoundary) :
+    boundary.RealizableFor kind polarity ↔
+      boundary.first = !boundary.second ∧
+        boundary.connector =
+          variableConnectorLiteralSignal boundary.first polarity := by
+  rcases boundary with ⟨first, second, connector⟩
+  cases kind <;> cases polarity <;> cases first <;> cases second <;>
+    cases connector <;> native_decide
+
+/-- Canonical signed boundary at one variable-cycle phase. -/
+def VariableConnectorBoundary.canonicalFor
+    (variableValue polarity : Bool) : VariableConnectorBoundary :=
+  ⟨variableValue, !variableValue,
+    variableConnectorLiteralSignal variableValue polarity⟩
+
+/-- Every connector kind realizes the canonical boundary for either
+polarity and either variable value. -/
+theorem variableConnectorBoundary_canonicalFor_realizable
+    (kind : VariableConnectorKind)
+    (variableValue polarity : Bool) :
+    (VariableConnectorBoundary.canonicalFor
+      variableValue polarity).RealizableFor kind polarity := by
+  rw [variableConnectorBoundary_realizableFor_iff]
+  cases variableValue <;> cases polarity <;> native_decide
+
 end PlanarThreeDM
 end LeanTrominoes

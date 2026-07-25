@@ -1400,14 +1400,15 @@ The representation choices for this target are:
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
   that each kind realizes exactly two boundaries: complementary red
-  continuation states and one common RGB connector state equal to the first
-  continuation.
+  continuation states and one common RGB connector state.  Reflecting the
+  continuation attachment formalizes Figure 4 negation, making that signal
+  equal to `variable == polarity`.
 - [`LeanTrominoes/PlanarThreeDMVariableCycle.lean`](LeanTrominoes/PlanarThreeDMVariableCycle.lean)
   closes one, two, or three occurrence modules with degree-two red
   continuation elements, covering the source's three-occurrence bound.  The
   assembly theorems prove that every connector-kind sequence has exactly two
-  cycle phases and that all of its RGB occurrence terminals carry the same
-  Boolean signal.
+  cycle phases.  The signed versions classify every occurrence terminal as
+  the corresponding source literal value of one common variable assignment.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
