@@ -379,6 +379,14 @@ The representation choices for this target are:
   positions subtract the common logical anchor, and verified endpoint
   identities recover both the displayed clause point and each translated
   literal point.
+  [`LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean)
+  reduces the certificate's two infinite nonintersection predicates to
+  executable finite checks whenever all stored vertices and segment endpoints
+  lie inside one fundamental square.  Translation-normalization lemmas prove
+  that every possible global contact becomes a contact in the canonical
+  square with one of only nine neighboring route translations; successful
+  finite route/route and vertex/route checks therefore imply full periodic
+  planarity.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
