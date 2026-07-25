@@ -389,6 +389,41 @@ def x3cClauseExternalAssignment
   | .left => left
   | .right => right
 
+/-- A canonical cover of the clause core for each possible external
+terminal.  In the lettering of Figure 5, the three covers are `EFI` when
+the top terminal is external, `BDH` when the left terminal is external, and
+`ACG` when the right terminal is external.  The all-false fallback is used
+only when the external values do not satisfy exact-one. -/
+def x3cClauseCoreSelection
+    (top left right : Bool) : X3CClauseSet → Bool :=
+  if top then
+    fun set => set ∈
+      ([.leftMiddle, .rightMiddle, .bottom] : List X3CClauseSet)
+  else if left then
+    fun set => set ∈
+      ([.topLeftInner, .topRightOuter, .bottomRight] :
+        List X3CClauseSet)
+  else if right then
+    fun set => set ∈
+      ([.topLeftOuter, .topRightInner, .bottomLeft] :
+        List X3CClauseSet)
+  else
+    fun _ => false
+
+/-- The canonical three-set selection covers the clause core whenever its
+external terminals satisfy exact-one. -/
+theorem x3cClauseCoreSelection_holds
+    (top left right : Bool)
+    (exactlyOne :
+      PeriodicOneInThree.ExactlyOne [top, left, right]) :
+    X3CClauseCoreHolds
+      (x3cClauseCoreSelection top left right)
+      (x3cClauseExternalAssignment top left right) := by
+  cases top <;> cases left <;> cases right
+  all_goals
+    simp [PeriodicOneInThree.ExactlyOne] at exactlyOne
+  all_goals native_decide
+
 /-- Exhaustive truth table for the nine-set core. -/
 private theorem exists_x3cClauseCoreHolds_assignment_iff
     (top left right : Bool) :

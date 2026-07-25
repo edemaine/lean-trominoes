@@ -1379,7 +1379,9 @@ The representation choices for this target are:
   3DM reduction.  Its twelve elements, incidence lists, degrees, and triangular
   coordinates are explicit.  It records and verifies an explicit coloring in
   which every set and every three-element terminal contains one red, one
-  green, and one blue element.  A machine-checked exhaustive truth table
+  green, and one blue element.  The canonical local covers `EFI`, `BDH`, and
+  `ACG` are defined explicitly for their three external terminal choices.
+  A machine-checked exhaustive truth table
   proves that the internal elements and all nonexternal terminal elements
   have an exact cover precisely when exactly one terminal is covered
   externally.
