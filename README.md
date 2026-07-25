@@ -1293,6 +1293,10 @@ The representation choices for this target are:
   proves the typed construction's degree-two-or-three condition from the
   occurrence-three bound and the source formula's unit-free arity-two-or-three
   invariant.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMEncodingSemantics.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEncodingSemantics.lean)
+  begins the semantic bridge to natural-number `PeriodicThreeDM`, proving
+  generically that numbered incidence enumeration is a permutation of the
+  corresponding duplicate-free typed incidence list.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
