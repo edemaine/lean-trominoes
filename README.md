@@ -1432,6 +1432,9 @@ The representation choices for this target are:
   triple references declared colored elements.  In particular, it verifies
   that signed continuation swaps preserve membership in each finite
   variable cycle.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEnumeration.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEnumeration.lean)
+  packages the nested variable/used-slot order as a duplicate-free module
+  enumeration and relates its flat-map back to the actual triple list.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
