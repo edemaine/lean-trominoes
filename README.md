@@ -1315,6 +1315,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMComputability.lean`](LeanTrominoes/PeriodicThreeDMComputability.lean)
   supplies canonical primitive-recursive encodings for natural-number
   periodic 3DM references, triples, and complete finite presentations.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMEnumerationComputability.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEnumerationComputability.lean)
+  proves primitive recursiveness of the typed reduction's occurring-variable,
+  unused-slot, colored-element, and prototype-triple enumerations.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
