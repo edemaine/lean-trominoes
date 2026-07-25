@@ -278,6 +278,10 @@ The representation choices for this target are:
   families under one variable type.  Componentwise satisfaction is exact,
   and compatible route and atom values extend simultaneously through every
   fresh crossover internal.
+  [`LeanTrominoes/PeriodicCNFPlanarAssignment.lean`](LeanTrominoes/PeriodicCNFPlanarAssignment.lean)
+  pulls a plane-wide atom assignment onto routes by their global incidence
+  index.  Every in-range lookup is proved exact, and the resulting target
+  terminal values satisfy all routed variable duplicators.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

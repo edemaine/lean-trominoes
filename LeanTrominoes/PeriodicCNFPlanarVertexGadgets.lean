@@ -94,8 +94,11 @@ def clauseRouteOccurrencesAt
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) (site : ClauseRouteSite) :
     List (CNFRouteOccurrence Variable) :=
-  (drawingCNFRouteOccurrences formula).filter fun occurrence =>
-    occurrence.clauseOccurrence = site
+  ((PeriodicCNF.incidencesWithMetadata formula).zipIdx.filter
+      fun taggedIncidence =>
+        taggedIncidence.1.clauseIndex = site.1).map
+    fun taggedIncidence =>
+      ⟨taggedIncidence.1, taggedIncidence.2, site.2⟩
 
 /-- Incidence-route occurrences at one lifted variable vertex, in global
 edge order. -/
