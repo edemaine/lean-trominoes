@@ -204,6 +204,10 @@ The representation choices for this target are:
   combines the private-lane and fanout-midpoint invariants to prove that
   horizontal segment occurrences with a common interior point have identical
   occurrence keys.
+  [`LeanTrominoes/PeriodicOrthocrossingVertical.lean`](LeanTrominoes/PeriodicOrthocrossingVertical.lean)
+  eliminates unit vertical fanout and boundary pieces from integer-grid
+  crossings, then normalizes the remaining real-port and private-gate columns
+  and proves that equal normalized columns identify equal semantic roles.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
