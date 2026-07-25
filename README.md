@@ -1208,6 +1208,11 @@ The representation choices for this target are:
   ports, one red/green clause core and auxiliary triple per literal, and
   degree-two blue caps for unused slots.  Variable-to-clause references use
   the negated literal offset, with a checked coordinate-cancellation lemma.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMSemantics.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMSemantics.lean)
+  defines direct periodic exact-cover semantics for the typed presentation,
+  together with typed well-formedness and degree-two-or-three predicates.
+  Incidence values use the same translated-cell convention as
+  `PeriodicThreeDM`, including a verified reversed-offset calculation.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
