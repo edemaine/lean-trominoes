@@ -38,6 +38,7 @@ import LeanTrominoes.IndexedSavitchDFSListEncoding
 import LeanTrominoes.IndexedSavitchDFSPartrec
 import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
+import LeanTrominoes.PlanarThreeSATGadgets
 import LeanTrominoes.PeriodicOneInThree
 import LeanTrominoes.PeriodicOneInThreeClauseComputability
 import LeanTrominoes.PeriodicOneInThreeComputability
