@@ -1187,6 +1187,12 @@ The representation choices for this target are:
   the same cell-by-cell value.  Extending and restricting assignments then
   proves that occurrence splitting preserves periodic satisfiability exactly,
   including presentations with repeated clauses or literals.
+- [`LeanTrominoes/PeriodicThreeSATThreeOrdered.lean`](LeanTrominoes/PeriodicThreeSATThreeOrdered.lean)
+  parameterizes occurrence splitting by a per-variable permutation of the
+  genuine syntactic copies.  Every such cyclic order is proved
+  equisatisfiable with the source, allowing the geometric construction to
+  follow the rotation order of incident edges around each planar variable
+  vertex instead of the unrelated clause-presentation order.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that
