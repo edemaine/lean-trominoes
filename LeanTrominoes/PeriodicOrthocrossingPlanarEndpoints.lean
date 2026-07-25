@@ -95,6 +95,26 @@ theorem routeEndpointsFromSegments_terminal_routeKey
       rcases endpointMem with endpointEq | endpointEq <;>
         subst endpoint <;> rfl
 
+/-- The endpoint record itself retains the requested route index and
+translation. -/
+theorem routeEndpointsFromSegments_routeKey
+    {Vertex : Type*}
+    (edge : PeriodicEdge Vertex) (edgeIndex : Nat) (translate : Cell)
+    (segments : List (GridSegment × Nat))
+    {endpoint : RouteEndpoint Vertex}
+    (endpointMem :
+      endpoint ∈
+        routeEndpointsFromSegments edge edgeIndex translate segments) :
+    endpoint.routeKey = (edgeIndex, translate) := by
+  cases segments with
+  | nil =>
+      simp [routeEndpointsFromSegments] at endpointMem
+  | cons first rest =>
+      simp only [routeEndpointsFromSegments, List.mem_cons,
+        List.not_mem_nil, or_false] at endpointMem
+      rcases endpointMem with endpointEq | endpointEq <;>
+        subst endpoint <;> rfl
+
 /-- Every enumerated endpoint terminal stays on the translated protoedge
 route named by its endpoint record. -/
 theorem drawingRouteEndpoints_terminal_routeKey

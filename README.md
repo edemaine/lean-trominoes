@@ -262,6 +262,11 @@ The representation choices for this target are:
   recovers the source and target terminal of every neighboring translated
   protoedge route, retains the lifted graph vertex reached at each end, and
   proves that every terminal has the advertised route-occurrence key.
+  [`LeanTrominoes/PeriodicCNFPlanarIncidences.lean`](LeanTrominoes/PeriodicCNFPlanarIncidences.lean)
+  retains the source clause, literal index, sign, and atom behind every
+  incidence protoedge.  Forgetting this metadata is proved to reproduce the
+  graph's edge list in exactly the same global order, so routed endpoints can
+  be attached back to their SAT meaning.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
