@@ -1263,6 +1263,9 @@ The representation choices for this target are:
   classifies an occurrence-specific complement blue element as the opposite
   variable port followed by the matching zero-offset clause auxiliary in the
   stable typed enumeration.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMBlueUnusedIncidences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMBlueUnusedIncidences.lean)
+  proves that a private cap for an unused occurrence slot has exactly the two
+  complementary variable-port incidences, both at zero offset.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
