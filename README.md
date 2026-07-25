@@ -1228,6 +1228,11 @@ The representation choices for this target are:
   concrete `PeriodicThreeDM`.  Typed well-formedness proves that all three
   references of every encoded triple are strictly within their declared
   color counts.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMMatching.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMMatching.lean)
+  defines the canonical triple selection induced by an exact-one assignment.
+  Variable cycles are proved to take an alternating matching, literal and
+  complementary ports carry opposite truth values at the correctly translated
+  variable cell, and clause auxiliaries repeat their source literals.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
