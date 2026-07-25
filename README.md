@@ -1212,6 +1212,13 @@ The representation choices for this target are:
   planar coordinates and open blue interface ports.  An exhaustive finite
   truth table proves that covering its internal red and green elements permits
   exactly the two alternating selections encoding the variable's truth value.
+- [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
+  gives a smaller paired-port clause gadget tailored to that variable cycle.
+  Literal ports share one blue exact-one element, while complementary ports
+  force three auxiliary triples to repeat the literal values through
+  degree-two blue elements and common red and green elements.  Its generic
+  correctness theorem and its arity-two and arity-three truth tables are
+  machine checked; every colored element has degree two or three.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
