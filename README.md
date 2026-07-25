@@ -1377,10 +1377,12 @@ The representation choices for this target are:
 - [`LeanTrominoes/PlanarX3CClauseGadget.lean`](LeanTrominoes/PlanarX3CClauseGadget.lean)
   transcribes the nine-set clause core in Figure 5 of the Dyer--Frieze planar
   3DM reduction.  Its twelve elements, incidence lists, degrees, and triangular
-  coordinates are explicit.  A machine-checked exhaustive truth table proves
-  that the internal elements and all nonexternal terminal elements have an
-  exact cover precisely when exactly one of the three three-element terminals
-  is covered externally.
+  coordinates are explicit.  It records and verifies an explicit coloring in
+  which every set and every three-element terminal contains one red, one
+  green, and one blue element.  A machine-checked exhaustive truth table
+  proves that the internal elements and all nonexternal terminal elements
+  have an exact cover precisely when exactly one terminal is covered
+  externally.
 - [`LeanTrominoes/PlanarThreeDMConnectorGadget.lean`](LeanTrominoes/PlanarThreeDMConnectorGadget.lean)
   transcribes the fixed-red connector detour in Dyer--Frieze Figure 6 as a
   planar two-by-three ladder and one auxiliary triple.  Every triple has an

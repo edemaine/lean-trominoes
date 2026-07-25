@@ -21,6 +21,8 @@ curves in that figure merely delimit terminals and are not incidences.
 namespace LeanTrominoes
 namespace PlanarThreeDM
 
+open Gadget
+
 /-- The nine sets (future matching triples) in the clause core. -/
 inductive X3CClauseSet
   | topLeftOuter
@@ -137,6 +139,13 @@ def position : X3CClauseInternal → Cell
   | .right => (7, 5)
   | .bottom => (5, 8)
 
+/-- One of the six colorings of the clause core, modulo global color
+permutation. -/
+def color : X3CClauseInternal → WireColor
+  | .left => .red
+  | .right => .green
+  | .bottom => .blue
+
 end X3CClauseInternal
 
 namespace X3CClauseTerminal
@@ -165,6 +174,18 @@ def position : X3CClauseTerminal → Cell
   | ⟨.right, .second⟩ => (9, 7)
   | ⟨.right, .third⟩ => (7, 10)
 
+/-- The terminal part of the selected clause-core coloring. -/
+def color : X3CClauseTerminal → WireColor
+  | ⟨.top, .first⟩ => .green
+  | ⟨.top, .second⟩ => .blue
+  | ⟨.top, .third⟩ => .red
+  | ⟨.left, .first⟩ => .blue
+  | ⟨.left, .second⟩ => .green
+  | ⟨.left, .third⟩ => .red
+  | ⟨.right, .first⟩ => .blue
+  | ⟨.right, .second⟩ => .red
+  | ⟨.right, .third⟩ => .green
+
 end X3CClauseTerminal
 
 namespace X3CClauseElement
@@ -174,7 +195,100 @@ def neighbors : X3CClauseElement → List X3CClauseSet
   | .internal value => value.neighbors
   | .terminal value => value.neighbors
 
+/-- The color of every clause-core element. -/
+def color : X3CClauseElement → WireColor
+  | .internal value => value.color
+  | .terminal value => value.color
+
 end X3CClauseElement
+
+/-- One explicitly colored red, green, and blue reference. -/
+structure ColoredX3CClauseReferences where
+  red : X3CClauseElement
+  green : X3CClauseElement
+  blue : X3CClauseElement
+  deriving DecidableEq, Repr
+
+namespace X3CClauseSet
+
+/-- Reorder each uncolored three-set into its red, green, and blue
+references. -/
+def coloredReferences : X3CClauseSet → ColoredX3CClauseReferences
+  | .topLeftOuter =>
+      ⟨.internal .left,
+        .terminal ⟨.top, .first⟩,
+        .terminal ⟨.left, .first⟩⟩
+  | .topLeftInner =>
+      ⟨.internal .left,
+        .terminal ⟨.top, .first⟩,
+        .terminal ⟨.top, .second⟩⟩
+  | .topRightInner =>
+      ⟨.terminal ⟨.top, .third⟩,
+        .internal .right,
+        .terminal ⟨.top, .second⟩⟩
+  | .topRightOuter =>
+      ⟨.terminal ⟨.top, .third⟩,
+        .internal .right,
+        .terminal ⟨.right, .first⟩⟩
+  | .leftMiddle =>
+      ⟨.internal .left,
+        .terminal ⟨.left, .second⟩,
+        .terminal ⟨.left, .first⟩⟩
+  | .rightMiddle =>
+      ⟨.terminal ⟨.right, .second⟩,
+        .internal .right,
+        .terminal ⟨.right, .first⟩⟩
+  | .bottomLeft =>
+      ⟨.terminal ⟨.left, .third⟩,
+        .terminal ⟨.left, .second⟩,
+        .internal .bottom⟩
+  | .bottomRight =>
+      ⟨.terminal ⟨.right, .second⟩,
+        .terminal ⟨.right, .third⟩,
+        .internal .bottom⟩
+  | .bottom =>
+      ⟨.terminal ⟨.left, .third⟩,
+        .terminal ⟨.right, .third⟩,
+        .internal .bottom⟩
+
+end X3CClauseSet
+
+/-- The colored and uncolored descriptions contain exactly the same three
+elements. -/
+theorem x3cClause_coloredReferences_eq_references
+    (set : X3CClauseSet) :
+    ([set.coloredReferences.red, set.coloredReferences.green,
+        set.coloredReferences.blue] : List X3CClauseElement).toFinset =
+      set.references.toFinset := by
+  cases set <;> native_decide
+
+/-- The red field really is red in every clause-core set. -/
+theorem x3cClause_coloredReferences_red
+    (set : X3CClauseSet) :
+    set.coloredReferences.red.color = .red := by
+  cases set <;> rfl
+
+/-- The green field really is green in every clause-core set. -/
+theorem x3cClause_coloredReferences_green
+    (set : X3CClauseSet) :
+    set.coloredReferences.green.color = .green := by
+  cases set <;> rfl
+
+/-- The blue field really is blue in every clause-core set. -/
+theorem x3cClause_coloredReferences_blue
+    (set : X3CClauseSet) :
+    set.coloredReferences.blue.color = .blue := by
+  cases set <;> rfl
+
+/-- Each three-element terminal contains one element of each color. -/
+theorem x3cClause_terminal_colors
+    (group : X3CClauseTerminalGroup) :
+    (([X3CClauseTerminal.color ⟨group, .first⟩,
+        X3CClauseTerminal.color ⟨group, .second⟩,
+        X3CClauseTerminal.color ⟨group, .third⟩] :
+          List WireColor).toFinset) =
+      ([WireColor.red, .green, .blue] : List WireColor).toFinset := by
+  cases group <;> native_decide
 
 /-- The two incidence descriptions agree. -/
 theorem x3cClause_mem_neighbors_iff_mem_references
