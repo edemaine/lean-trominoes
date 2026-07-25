@@ -282,6 +282,10 @@ The representation choices for this target are:
   pulls a plane-wide atom assignment onto routes by their global incidence
   index.  Every in-range lookup is proved exact, and the resulting target
   terminal values satisfy all routed variable duplicators.
+  [`LeanTrominoes/PeriodicCNFPlanarCompleteness.lean`](LeanTrominoes/PeriodicCNFPlanarCompleteness.lean)
+  proves that every satisfying assignment of the original periodic CNF
+  satisfies all routed clause copies and therefore extends through the full
+  finite planarized drawing formula.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
