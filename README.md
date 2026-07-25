@@ -1270,6 +1270,10 @@ The representation choices for this target are:
   uses uniqueness of tagged clause/literal positions and occurrence slots to
   prove that every genuine complement blue element has exactly two
   incidences: one opposite variable port and one clause auxiliary.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMMainClauseOccurrences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMMainClauseOccurrences.lean)
+  proves that variable/slot order and source-clause literal order enumerate
+  the same main-blue tagged occurrences up to permutation whenever every
+  variable occurs at most three times.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
