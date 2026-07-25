@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOrthocrossingCrossings
+import Mathlib.Data.Int.Range
 
 /-!
 # Finite checking of periodic drawing planarity
@@ -300,20 +301,57 @@ theorem relativeTranslate_isNeighbor_of_contact
           (by omega) (by omega) (by omega) (by omega)
           pointYLower pointYUpper between'⟩
 
+/-- Integer coordinates strictly between two endpoints, independent of
+their order. -/
+def strictlyBetweenCoordinates (first last : Int) : List Int :=
+  Int.range (first + 1) last ++ Int.range (last + 1) first
+
+@[simp]
+theorem mem_strictlyBetweenCoordinates_iff
+    (first last value : Int) :
+    value ∈ strictlyBetweenCoordinates first last ↔
+      GridSegment.StrictlyBetween first last value := by
+  simp [strictlyBetweenCoordinates, Int.mem_range_iff,
+    GridSegment.StrictlyBetween]
+  omega
+
+/-- All integer points in the relative interior of one horizontal or
+vertical segment. -/
+def segmentInteriorPoints (segment : GridSegment) : List Cell :=
+  (if segment.IsHorizontal then
+    (strictlyBetweenCoordinates segment.start.1 segment.finish.1).map
+      fun horizontal => (horizontal, segment.start.2)
+  else []) ++
+  (if segment.IsVertical then
+    (strictlyBetweenCoordinates segment.start.2 segment.finish.2).map
+      fun vertical => (segment.start.1, vertical)
+  else [])
+
+@[simp]
+theorem mem_segmentInteriorPoints_iff
+    (segment : GridSegment) (point : Cell) :
+    point ∈ segmentInteriorPoints segment ↔
+      segment.InteriorContains point := by
+  rcases segment with ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+  rcases point with ⟨pointX, pointY⟩
+  simp [segmentInteriorPoints, GridSegment.InteriorContains,
+    GridSegment.IsHorizontal, GridSegment.IsVertical]
+  tauto
+
 /-- Boolean finite check for route-interior avoidance, after fixing the
 second occurrence at translate zero. -/
 def finiteRoutesAvoidInteriors (drawing : PeriodicGridDrawing) : Bool :=
   drawing.indexedSegments.all fun first =>
     drawing.indexedSegments.all fun second =>
       neighborTranslations.all fun relative =>
-        drawing.fundamentalPoints.all fun point =>
+        (segmentInteriorPoints
+          (first.segment.translate
+            (drawing.periodTranslation relative))).all fun point =>
           decide
-            (SegmentOccurrenceKey first relative ≠
-                SegmentOccurrenceKey second (0, 0) →
-              (first.segment.translate
-                  (drawing.periodTranslation relative)).InteriorContains
-                point →
-              ¬second.segment.Contains point)
+            (point ∈ drawing.fundamentalPoints →
+              SegmentOccurrenceKey first relative ≠
+                  SegmentOccurrenceKey second (0, 0) →
+                ¬second.segment.Contains point)
 
 /-- Boolean finite check that no stored vertex is in any neighboring route
 interior. -/
@@ -339,7 +377,23 @@ theorem finiteRoutesAvoidInteriors_spec
                   (drawing.periodTranslation relative)).InteriorContains
                 point ∨
               ¬second.segment.Contains point := by
-  simpa [finiteRoutesAvoidInteriors] using checked
+  intro first firstMember second secondMember
+    relative relativeMember point pointMember
+  have raw := checked
+  simp only [finiteRoutesAvoidInteriors, List.all_eq_true] at raw
+  by_cases contains :
+      (first.segment.translate
+        (drawing.periodTranslation relative)).InteriorContains point
+  · have verdict :=
+      raw first firstMember second secondMember relative relativeMember
+        point ((mem_segmentInteriorPoints_iff _ _).mpr contains)
+    have avoids := (of_decide_eq_true verdict) pointMember
+    by_cases same :
+        SegmentOccurrenceKey first relative =
+          SegmentOccurrenceKey second (0, 0)
+    · exact Or.inl same
+    · exact Or.inr (Or.inr (avoids same))
+  · exact Or.inr (Or.inl contains)
 
 theorem finiteVerticesAvoidRouteInteriors_spec
     {drawing : PeriodicGridDrawing}

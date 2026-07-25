@@ -386,7 +386,9 @@ The representation choices for this target are:
   that every possible global contact becomes a contact in the canonical
   square with one of only nine neighboring route translations; successful
   finite route/route and vertex/route checks therefore imply full periodic
-  planarity.
+  planarity.  The checker enumerates only integer points in each segment
+  interior, rather than the area of the whole fundamental square, so the
+  fixed gadget certificates remain practical to evaluate.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
