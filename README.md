@@ -174,6 +174,10 @@ The representation choices for this target are:
   gives rational periodic drawings their scaled integer-grid representation:
   vertex positions, protoedge polylines, translated segment occurrences,
   route compatibility, orthogonality, and proper orthocrossing.
+- [`LeanTrominoes/PeriodicOrthocrossingConstruction.lean`](LeanTrominoes/PeriodicOrthocrossingConstruction.lean)
+  implements the linear-grid track construction: three private port columns
+  per degree-three vertex, private rows per protoedge, boundary-aware
+  neighbor-cell routes, and private gate columns for vertical translations.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
