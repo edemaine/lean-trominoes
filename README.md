@@ -1190,6 +1190,12 @@ The representation choices for this target are:
   preserved once, while every choice, slack, or padding auxiliary occurs at
   most twice, so the reduction takes periodic 3SAT-3 instances to periodic
   1-in-3SAT-3 instances.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnits.lean`](LeanTrominoes/PeriodicOneInThreeNoUnits.lean)
+  removes the unit clauses used to pin Figure 9's padding variables.  A unit
+  literal is forced by one ternary and one binary exact-one clause, while an
+  empty clause maps to an unsatisfiable triangle of binary clauses.  The
+  translation preserves periodic satisfiability exactly and, on width-three
+  inputs, leaves every clause with arity two or three.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
