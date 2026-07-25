@@ -311,6 +311,10 @@ The representation choices for this target are:
   explicit terminal and atom translations become literal offsets.  Its
   satisfaction is proved equivalent to satisfying the routed finite block
   at every lattice translate.
+  [`LeanTrominoes/PeriodicCNFPlanarPeriodicCompleteness.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicCompleteness.lean)
+  assembles plane-wide atom and route values with independently chosen
+  crossover internals in every translated block, proving that source
+  satisfiability implies periodicized planar satisfiability.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
