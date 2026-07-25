@@ -194,6 +194,11 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOrthocrossingClassification.lean`](LeanTrominoes/PeriodicOrthocrossingClassification.lean)
   assigns every erased route piece its exact semantic role and preserves its
   protoedge and within-route indices for the private-lane argument.
+  [`LeanTrominoes/PeriodicOrthocrossingHorizontal.lean`](LeanTrominoes/PeriodicOrthocrossingHorizontal.lean)
+  normalizes every horizontal segment to a private fundamental-domain lane,
+  proves those lane representatives lie within one drawing period, and proves
+  uniqueness of overlapping translates whose horizontal span is at most one
+  period.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

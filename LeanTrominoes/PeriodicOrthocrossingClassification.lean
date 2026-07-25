@@ -296,5 +296,74 @@ theorem classifiedSegment_role_edgeIndex {Vertex : Type*}
       (sourceAll classified) (coreAll classified))
     (targetAll classified)
 
+/-- Semantic roles occur at most once within a constructed route. -/
+theorem classifiedRouteSegments_roles_nodup {Vertex : Type*}
+    [DecidableEq Vertex] (graph : PeriodicGraph Vertex)
+    (edge : PeriodicEdge Vertex) (edgeIndex : Nat) :
+    ((classifiedRouteSegments graph edge edgeIndex).map
+      ClassifiedSegment.role).Nodup := by
+  let sourceCenter := vertexX (graph.vertices.idxOf edge.source)
+  let targetCenter := vertexX (graph.vertices.idxOf edge.target)
+  let sourceColumn := portX graph (sourcePort edge edgeIndex)
+  let targetColumn := portX graph (targetPort edge edgeIndex)
+  by_cases sourceSame : sourceCenter = sourceColumn <;>
+    by_cases targetSame : targetCenter = targetColumn <;>
+    simp [classifiedRouteSegments, classifiedSourceFanout,
+      classifiedEdgeCore, classifiedTargetFanout, sourceCenter,
+      targetCenter, sourceColumn, targetColumn, sourceSame, targetSame]
+  all_goals split <;> simp_all
+  all_goals split <;> simp_all
+
+/-- Equal roles in one indexed classified route are the same occurrence,
+including the same within-route index. -/
+theorem taggedClassified_eq_of_role_eq {Vertex : Type*}
+    [DecidableEq Vertex] {graph : PeriodicGraph Vertex}
+    {edge : PeriodicEdge Vertex} {edgeIndex : Nat}
+    {first second : ClassifiedSegment Vertex × Nat}
+    (firstMem :
+      first ∈ (classifiedRouteSegments graph edge edgeIndex).zipIdx)
+    (secondMem :
+      second ∈ (classifiedRouteSegments graph edge edgeIndex).zipIdx)
+    (rolesEqual : first.1.role = second.1.role) :
+    first = second := by
+  let classified := classifiedRouteSegments graph edge edgeIndex
+  let roles := classified.map ClassifiedSegment.role
+  have firstIndexLt : first.2 < classified.length := by
+    simpa [classified] using List.snd_lt_of_mem_zipIdx firstMem
+  have secondIndexLt : second.2 < classified.length := by
+    simpa [classified] using List.snd_lt_of_mem_zipIdx secondMem
+  have firstAt : classified[first.2]'firstIndexLt = first.1 := by
+    simpa [classified] using (List.mem_zipIdx' firstMem).2.symm
+  have secondAt : classified[second.2]'secondIndexLt = second.1 := by
+    simpa [classified] using (List.mem_zipIdx' secondMem).2.symm
+  have rolesNodup : roles.Nodup := by
+    exact classifiedRouteSegments_roles_nodup graph edge edgeIndex
+  have firstRoleAt :
+      roles[first.2]'(by simpa [roles] using firstIndexLt) =
+        first.1.role := by
+    simp [roles, firstAt]
+  have secondRoleAt :
+      roles[second.2]'(by simpa [roles] using secondIndexLt) =
+        second.1.role := by
+    simp [roles, secondAt]
+  have firstIdxOf :=
+    rolesNodup.idxOf_getElem first.2
+      (by simpa [roles] using firstIndexLt)
+  have secondIdxOf :=
+    rolesNodup.idxOf_getElem second.2
+      (by simpa [roles] using secondIndexLt)
+  rw [firstRoleAt] at firstIdxOf
+  rw [secondRoleAt, ← rolesEqual] at secondIdxOf
+  have indicesEqual : first.2 = second.2 := by
+    omega
+  apply Prod.ext
+  · have firstAtOption :=
+      (List.mem_zipIdx_iff_getElem?).mp firstMem
+    have secondAtOption :=
+      (List.mem_zipIdx_iff_getElem?).mp secondMem
+    rw [indicesEqual, secondAtOption] at firstAtOption
+    exact Option.some.inj firstAtOption.symm
+  · exact indicesEqual
+
 end PeriodicOrthocrossing
 end LeanTrominoes
