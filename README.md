@@ -1207,6 +1207,11 @@ The representation choices for this target are:
   triples to cover each element exactly once is equivalent to directing every
   triple's three incidences coherently while exactly one incidence points
   into each colored element.
+- [`LeanTrominoes/PlanarThreeDMVariableGadget.lean`](LeanTrominoes/PlanarThreeDMVariableGadget.lean)
+  transcribes the six-triple variable gadget of Figure 10(a), including its
+  planar coordinates and open blue interface ports.  An exhaustive finite
+  truth table proves that covering its internal red and green elements permits
+  exactly the two alternating selections encoding the variable's truth value.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
