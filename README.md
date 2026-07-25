@@ -1345,6 +1345,12 @@ The representation choices for this target are:
   triples to cover each element exactly once is equivalent to directing every
   triple's three incidences coherently while exactly one incidence points
   into each colored element.
+- [`LeanTrominoes/PeriodicThreeDMGraph.lean`](LeanTrominoes/PeriodicThreeDMGraph.lean)
+  compiles periodic 3DM into its colored bipartite periodic incidence graph.
+  The graph is well formed whenever all element references are in range, its
+  colored-element graph degrees are exactly the corresponding 3DM degrees,
+  and a well-formed degree-two-or-three instance has ordinary maximum degree
+  three, as required by the drawing construction.
 - [`LeanTrominoes/PlanarThreeDMVariableGadget.lean`](LeanTrominoes/PlanarThreeDMVariableGadget.lean)
   transcribes the six-triple variable gadget of Figure 10(a), including its
   planar coordinates and open blue interface ports.  An exhaustive finite
