@@ -1519,6 +1519,24 @@ The representation choices for this target are:
   covers and local clause-core covers.  The Figure 5 truth table then forces
   each recovered binary or ternary source clause to satisfy exact-one,
   completing the typed satisfiability equivalence.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMNodup.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMNodup.lean)
+  proves that the assembled prototype triples and each of the three colored
+  element lists are duplicate-free.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncode.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncode.lean)
+  assigns those typed prototypes faithful natural-number names, proves all
+  encoded references are in range, and defines matching round trips.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingSemantics.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingSemantics.lean)
+  proves that numbered and typed incidence enumerations agree up to
+  permutation.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingCorrectness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingCorrectness.lean)
+  transports the incidence permutations through encoded and decoded
+  matching assignments for all three colors.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodedSatisfiability.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodedSatisfiability.lean)
+  proves that the natural-number instance has a perfect matching (or graph
+  orientation) exactly when the source exact-one formula is satisfiable.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodedDegree.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodedDegree.lean)
+  transfers the typed degree-two-or-three invariant to the natural-number
+  periodic 3DM instance.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
