@@ -1480,6 +1480,10 @@ The representation choices for this target are:
   and a false unused right terminal, while a ternary clause presents all
   three truth values.  Source exact-one satisfaction therefore supplies the
   exact boundary condition required by the canonical clause-core cover.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTerminalValues.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTerminalValues.lean)
+  strengthens variable-side terminal incidence counting to an equality of
+  Boolean value lists: every RGB occurrence incidence carries exactly its
+  signed source literal truth value at the correctly translated cell.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
