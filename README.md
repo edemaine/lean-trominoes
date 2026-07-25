@@ -271,6 +271,11 @@ The representation choices for this target are:
   groups routed source endpoints into the original signed clauses and routed
   target endpoints into Figure 8(a) variable duplicators.  Both positioned
   finite families have exact satisfaction characterizations.
+  [`LeanTrominoes/PeriodicCNFPlanarFormula.lean`](LeanTrominoes/PeriodicCNFPlanarFormula.lean)
+  combines the complete crossover/route core with both routed vertex
+  families under one variable type.  Componentwise satisfaction is exact,
+  and compatible route and atom values extend simultaneously through every
+  fresh crossover internal.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
