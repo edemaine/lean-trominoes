@@ -1439,6 +1439,9 @@ The representation choices for this target are:
   localizes the global incidence filters for ordinary fixed-green and
   fixed-blue modules, proving that each of their private colored elements
   has exactly the two advertised local incidences.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFixedRedIncidences.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFixedRedIncidences.lean)
+  performs the analogous global check for all eight private elements of the
+  seven-triple fixed-red detour.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
