@@ -42,6 +42,7 @@ import LeanTrominoes.PlanarThreeSATGadgets
 import LeanTrominoes.PlanarThreeSATInstantiation
 import LeanTrominoes.PlanarThreeSATFamilies
 import LeanTrominoes.PlanarThreeSATFamilyExtensions
+import LeanTrominoes.PlanarThreeSATWires
 import LeanTrominoes.PeriodicOneInThree
 import LeanTrominoes.PeriodicOneInThreeClauseComputability
 import LeanTrominoes.PeriodicOneInThreeComputability

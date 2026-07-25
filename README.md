@@ -979,6 +979,11 @@ The representation choices for this target are:
   an assignment to the external wire variables extends simultaneously to all
   site-scoped internals exactly when both opposite-port equalities hold at
   every listed crossing.
+- [`LeanTrominoes/PlanarThreeSATWires.lean`](LeanTrominoes/PlanarThreeSATWires.lean)
+  packages the standard two binary implication clauses as a positioned
+  equality link.  It proves that a finite link family is satisfied exactly
+  when every pair of wire endpoints agrees, including a factoring lemma for
+  assignments pulled back from common carrier keys.
 - [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
   the local translation-invariant Boolean formulas used at the beginning of
   that source reduction chain: each finite clause refers to variables at
