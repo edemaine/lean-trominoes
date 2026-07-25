@@ -1324,6 +1324,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMEncodedDegree.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEncodedDegree.lean)
   transports typed incidence degrees through the natural-number encoding and
   proves that the complete unit-free output has degree two or three.
+- [`LeanTrominoes/PeriodicThreeDMHardness.lean`](LeanTrominoes/PeriodicThreeDMHardness.lean)
+  composes the computable Wang reduction through exact-one SAT and unit-free
+  encoded 3DM, proving co-r.e.-hardness for well-formed periodic 3DM of degree
+  two or three and for its equivalent abstract trichromatic orientation.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
