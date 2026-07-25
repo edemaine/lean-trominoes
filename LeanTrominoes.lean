@@ -43,6 +43,7 @@ import LeanTrominoes.PlanarThreeSATInstantiation
 import LeanTrominoes.PlanarThreeSATFamilies
 import LeanTrominoes.PlanarThreeSATFamilyExtensions
 import LeanTrominoes.PlanarThreeSATWires
+import LeanTrominoes.PlanarThreeSATWidth
 import LeanTrominoes.PlanarOneInThree
 import LeanTrominoes.PlanarOneInThreeOccurrences
 import LeanTrominoes.PeriodicOneInThree

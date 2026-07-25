@@ -1070,6 +1070,11 @@ The representation choices for this target are:
   equality link.  It proves that a finite link family is satisfied exactly
   when every pair of wire endpoints agrees, including a factoring lemma for
   assignments pulled back from common carrier keys.
+- [`LeanTrominoes/PlanarThreeSATWidth.lean`](LeanTrominoes/PlanarThreeSATWidth.lean)
+  gives embedded formulas a compositional clause-width predicate.  Renaming,
+  affine placement, concatenation, and finite gadget families preserve width,
+  and the fixed crossover, duplicator, and equality-link libraries are all
+  certified to have width at most three.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
