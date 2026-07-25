@@ -170,6 +170,10 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicThreeSATThreeGraph.lean`](LeanTrominoes/PeriodicThreeSATThreeGraph.lean)
   proves that the occurrence-split formula produces a well-formed local
   incidence graph of maximum degree three.
+- [`LeanTrominoes/PeriodicGridDrawing.lean`](LeanTrominoes/PeriodicGridDrawing.lean)
+  gives rational periodic drawings their scaled integer-grid representation:
+  vertex positions, protoedge polylines, translated segment occurrences,
+  route compatibility, orthogonality, and proper orthocrossing.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
