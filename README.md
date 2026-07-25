@@ -1494,6 +1494,11 @@ The representation choices for this target are:
   red cycle link and the complementary phase to its successor, independently
   of sign and connector kind.  Closing the one-, two-, or three-module cycle
   therefore covers every link exactly once.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTypedCompleteness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTypedCompleteness.lean)
+  assembles the private-element, cycle-link, clause-internal, and merged
+  terminal cases.  Every satisfying occurrence-three, arity-two-or-three
+  exact-one assignment now induces a perfect matching of the complete typed
+  planar 3DM presentation.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
