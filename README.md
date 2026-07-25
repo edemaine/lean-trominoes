@@ -1076,6 +1076,12 @@ The representation choices for this target are:
   `4 × 4` refinement box and use clause-index-scoped auxiliaries; completeness,
   soundness, and exact finite satisfiability preservation are proved by
   connecting the layout to the verified periodic exact-one truth table.
+- [`LeanTrominoes/PlanarOneInThreeOccurrences.lean`](LeanTrominoes/PlanarOneInThreeOccurrences.lean)
+  proves that adding Figure 9's positions does not change the underlying
+  literal-occurrence list.  The periodic exact-one accounting therefore
+  transfers verbatim: original variables retain their occurrence counts and
+  every fresh auxiliary occurs at most twice, preserving the 3-occurrence
+  bound.
 - [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
   the local translation-invariant Boolean formulas used at the beginning of
   that source reduction chain: each finite clause refers to variables at
