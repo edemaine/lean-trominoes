@@ -39,8 +39,11 @@ import LeanTrominoes.IndexedSavitchDFSPartrec
 import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PeriodicOneInThree
+import LeanTrominoes.PeriodicOneInThreeClauseComputability
+import LeanTrominoes.PeriodicOneInThreeComputability
 import LeanTrominoes.PeriodicOneInThreeCorrectness
 import LeanTrominoes.PeriodicOneInThreeOccurrences
+import LeanTrominoes.PeriodicOneInThreeReductionComputability
 import LeanTrominoes.PeriodicCNF
 import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicThreeCNF

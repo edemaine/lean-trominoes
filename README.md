@@ -918,7 +918,9 @@ The representation choices for this target are:
   including presentations with repeated clauses or literals.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
-  “each variable occurs at most three times” restriction.
+  “each variable occurs at most three times” restriction, and proves that
+  this bound is independent of the chosen lawful Boolean equality
+  implementation.
 - [`LeanTrominoes/PeriodicThreeSATThreeOccurrences.lean`](LeanTrominoes/PeriodicThreeSATThreeOccurrences.lean)
   proves that positional occurrence copies are duplicate-free and that every
   output variable occurs once in the copied source formula and at most twice
@@ -945,6 +947,17 @@ The representation choices for this target are:
   preserved once, while every choice, slack, or padding auxiliary occurs at
   most twice, so the reduction takes periodic 3SAT-3 instances to periodic
   1-in-3SAT-3 instances.
+- [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
+  and
+  [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
+  give primitive-recursive implementations of every exact-one gadget and of
+  the complete short-clause case split.  The latter uses indexed lookup with
+  fresh-padding defaults, proved extensionally equal to the declarative
+  pattern match.
+- [`LeanTrominoes/PeriodicOneInThreeReductionComputability.lean`](LeanTrominoes/PeriodicOneInThreeReductionComputability.lean)
+  maps the clause gadget over the indexed periodic presentation and proves
+  the full conversion computable.  Composing it with the Wang-to-periodic-
+  3SAT-3 chain establishes co-r.e.-hardness of local periodic 1-in-3SAT-3.
 - [`LeanTrominoes/WangPeriodicCNF.lean`](LeanTrominoes/WangPeriodicCNF.lean)
   starts the 2D hardness construction from the imported Wang domino problem.
   It activates at least one Wang tile at every cell and forbids incompatible
