@@ -306,6 +306,11 @@ The representation choices for this target are:
   uses that bound to show every routed target is one of the three duplicator
   ports.  In a satisfying combined formula, every routed clause terminal
   therefore equals the central atom at the incidence route's target.
+  [`LeanTrominoes/PeriodicCNFPlanarPeriodicization.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicization.lean)
+  turns the finite neighboring drawing block into a genuine periodic CNF:
+  explicit terminal and atom translations become literal offsets.  Its
+  satisfaction is proved equivalent to satisfying the routed finite block
+  at every lattice translate.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
