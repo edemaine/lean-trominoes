@@ -220,6 +220,11 @@ The representation choices for this target are:
   bounds every stored segment endpoint inside the surrounding `3 × 3` block
   of drawing cells and proves that only the nine neighboring translates can
   meet the canonical fundamental square, making crossing enumeration finite.
+  [`LeanTrominoes/PeriodicOrthocrossingCrossings.lean`](LeanTrominoes/PeriodicOrthocrossingCrossings.lean)
+  enumerates the finite neighboring segment occurrences and fundamental-square
+  lattice points, filters them to proper crossings of distinct occurrences,
+  and proves that every actual crossing in the square appears in this
+  executable canonical list.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
