@@ -1237,6 +1237,10 @@ The representation choices for this target are:
   proves that the typed red, green, blue, and triple prototype lists are all
   duplicate-free.  Consequently the natural-number encoding gives every
   declared prototype a unique `idxOf` position instead of merging names.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMAssignmentEncoding.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMAssignmentEncoding.lean)
+  transports matching assignments between typed triples and natural-number
+  prototype indices.  The two transports are proved inverse on every declared
+  typed triple and every valid numbered index.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
