@@ -1301,6 +1301,10 @@ The representation choices for this target are:
   specializes the encoding bridge to red, green, and blue and proves incident
   truth-value permutations for both encoded typed assignments and decoded
   natural-number assignments.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMEncodedSatisfiability.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEncodedSatisfiability.lean)
+  transports exact cover in both directions, proving the encoded
+  `PeriodicThreeDM` instance (and its abstract trichromatic orientation
+  problem) satisfiable exactly when the occurrence-three source is.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
