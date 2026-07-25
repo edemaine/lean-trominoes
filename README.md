@@ -178,6 +178,9 @@ The representation choices for this target are:
   implements the linear-grid track construction: three private port columns
   per degree-three vertex, private rows per protoedge, boundary-aware
   neighbor-cell routes, and private gate columns for vertical translations.
+  [`LeanTrominoes/PeriodicOrthocrossingCorrectness.lean`](LeanTrominoes/PeriodicOrthocrossingCorrectness.lean)
+  proves distinct in-domain vertex positions and exact translated endpoints
+  for every generated protoedge route.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
