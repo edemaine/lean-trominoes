@@ -234,6 +234,11 @@ The representation choices for this target are:
   macrocells, with four explicit boundary-wire variables and internals scoped
   by the crossing record.  Segment-occurrence assignments extend through all
   crossovers, while every satisfying family propagates both carrier signals.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarWires.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarWires.lean)
+  groups boundary ports by translated segment-occurrence key, sorts them
+  along their carrier axis, and inserts positioned equality links between
+  consecutive distinct crossover sites.  Every link is certified to remain
+  on one carrier, so carrier assignments satisfy the complete wire layer.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
