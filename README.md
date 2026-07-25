@@ -1381,6 +1381,13 @@ The representation choices for this target are:
   that the internal elements and all nonexternal terminal elements have an
   exact cover precisely when exactly one of the three three-element terminals
   is covered externally.
+- [`LeanTrominoes/PlanarThreeDMConnectorGadget.lean`](LeanTrominoes/PlanarThreeDMConnectorGadget.lean)
+  transcribes the fixed-red connector detour in Dyer--Frieze Figure 6 as a
+  planar two-by-three ladder and one auxiliary triple.  Every triple has an
+  explicit red, green, and blue reference, every internal element has degree
+  two, and its complete seven-bit truth table proves that the connector's
+  three colored ports carry one common all-or-none state while its two
+  variable-cycle continuation ports remain complementary.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports

@@ -140,6 +140,7 @@ import LeanTrominoes.PeriodicThreeDMHardness
 import LeanTrominoes.PeriodicPlanarThreeDM
 import LeanTrominoes.PlanarThreeDMVariableGadget
 import LeanTrominoes.PlanarX3CClauseGadget
+import LeanTrominoes.PlanarThreeDMConnectorGadget
 import LeanTrominoes.PlanarThreeDMClauseGadget
 import LeanTrominoes.PeriodicThreeSATThree
 import LeanTrominoes.PeriodicThreeSATThreeCorrectness
