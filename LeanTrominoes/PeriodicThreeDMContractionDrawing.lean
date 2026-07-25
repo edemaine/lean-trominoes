@@ -1,6 +1,6 @@
 import LeanTrominoes.PeriodicPlanarThreeDM
 import LeanTrominoes.PeriodicThreeDMContraction
-import LeanTrominoes.PeriodicOrthocrossingConstruction
+import LeanTrominoes.PeriodicOrthocrossingCorrectness
 
 /-!
 # Drawing the contracted periodic 3DM graph
@@ -272,9 +272,9 @@ def PlanarPresentation.contractedEdgeRoute
 def PlanarPresentation.contractedVertexPositions
     {problem : PeriodicThreeDM}
     (presentation : problem.PlanarPresentation) : List Cell :=
-  problem.contractedGraph.vertices.map fun vertex =>
+  problem.contractedGraph.vertices.zipIdx.map fun tagged =>
     presentation.drawing.vertexPosition
-      problem.incidenceGraph vertex
+      problem.incidenceGraph tagged.1
 
 /-- The planar drawing obtained by retaining or concatenating original
 routes.  Its period is unchanged. -/
@@ -285,8 +285,8 @@ def PlanarPresentation.contractedDrawing
   gridSizePred := presentation.drawing.gridSizePred
   vertexPositions := presentation.contractedVertexPositions
   edgeRoutes :=
-    problem.contractedEdges.map
-      presentation.contractedEdgeRoute
+    problem.contractedEdges.zipIdx.map fun tagged =>
+      presentation.contractedEdgeRoute tagged.1
 
 /-- Translation by the incidence-offset difference carries the second
 element endpoint to the first element endpoint. -/
@@ -500,6 +500,304 @@ theorem PlanarPresentation.contractedEdgeRoute_endpoints
               (presentation.drawing.periodTranslation
                 (Cell.sub first.offset second.offset)))
         exact joinedLast
+
+/-- Every retained contracted vertex was already a vertex of the original
+3DM incidence graph. -/
+theorem contractedGraph_vertex_mem_incidenceGraph
+    (problem : PeriodicThreeDM) {vertex : PeriodicThreeDMVertex}
+    (member : vertex ∈ problem.contractedGraph.vertices) :
+    vertex ∈ problem.incidenceGraph.vertices := by
+  simp only [contractedGraph, List.mem_append] at member
+  rcases member with tripleMember | elementMember
+  · exact List.mem_append_left _ tripleMember
+  · apply List.mem_append_right
+    simp only [contractedElementVertices,
+      List.mem_flatMap] at elementMember
+    rcases elementMember with
+      ⟨color, colorMem, elementMember⟩
+    simp only [contractedElementVerticesForColor,
+      List.mem_map] at elementMember
+    rcases elementMember with
+      ⟨atom, atomMember, rfl⟩
+    have atomLt : atom < problem.elementCount color := by
+      simpa using (List.mem_filter.mp atomMember).1
+    cases color with
+    | red =>
+        apply List.mem_append_left
+        apply List.mem_append_left
+        exact
+          (coloredElementVertices_mem_iff
+            problem .red atom).2 atomLt
+    | green =>
+        apply List.mem_append_left
+        apply List.mem_append_right
+        exact
+          (coloredElementVertices_mem_iff
+            problem .green atom).2 atomLt
+    | blue =>
+        apply List.mem_append_right
+        exact
+          (coloredElementVertices_mem_iff
+            problem .blue atom).2 atomLt
+
+/-- Looking up a listed original vertex position returns an actual entry in
+the presentation's position list. -/
+theorem PlanarPresentation.vertexPosition_mem
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {vertex : PeriodicThreeDMVertex}
+    (member : vertex ∈ problem.incidenceGraph.vertices) :
+    presentation.drawing.vertexPosition
+        problem.incidenceGraph vertex ∈
+      presentation.drawing.vertexPositions := by
+  have indexLt :
+      problem.incidenceGraph.vertices.idxOf vertex <
+        problem.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr member
+  have positionIndexLt :
+      problem.incidenceGraph.vertices.idxOf vertex <
+        presentation.drawing.vertexPositions.length := by
+    rwa [presentation.compatible.2.1]
+  unfold PeriodicGridDrawing.vertexPosition
+  rw [List.getD_eq_getElem _ _ positionIndexLt]
+  exact List.getElem_mem positionIndexLt
+
+/-- Original position lookup is injective on listed incidence-graph
+vertices because both presentation lists are duplicate-free and aligned. -/
+theorem PlanarPresentation.vertexPosition_injective_on
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {first second : PeriodicThreeDMVertex}
+    (firstMember : first ∈ problem.incidenceGraph.vertices)
+    (secondMember : second ∈ problem.incidenceGraph.vertices)
+    (equal :
+      presentation.drawing.vertexPosition
+          problem.incidenceGraph first =
+        presentation.drawing.vertexPosition
+          problem.incidenceGraph second) :
+    first = second := by
+  have firstIndexLt :
+      problem.incidenceGraph.vertices.idxOf first <
+        problem.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr firstMember
+  have secondIndexLt :
+      problem.incidenceGraph.vertices.idxOf second <
+        problem.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr secondMember
+  have firstPositionLt :
+      problem.incidenceGraph.vertices.idxOf first <
+        presentation.drawing.vertexPositions.length := by
+    rwa [presentation.compatible.2.1]
+  have secondPositionLt :
+      problem.incidenceGraph.vertices.idxOf second <
+        presentation.drawing.vertexPositions.length := by
+    rwa [presentation.compatible.2.1]
+  unfold PeriodicGridDrawing.vertexPosition at equal
+  rw [List.getD_eq_getElem _ _ firstPositionLt,
+    List.getD_eq_getElem _ _ secondPositionLt] at equal
+  have indicesEqual :
+      problem.incidenceGraph.vertices.idxOf first =
+        problem.incidenceGraph.vertices.idxOf second :=
+    (presentation.compatible.2.2.2.1.getElem_inj_iff).mp equal
+  calc
+    first =
+        problem.incidenceGraph.vertices[
+          problem.incidenceGraph.vertices.idxOf first]'firstIndexLt :=
+      (List.idxOf_get firstIndexLt).symm
+    _ =
+        problem.incidenceGraph.vertices[
+          problem.incidenceGraph.vertices.idxOf second]'secondIndexLt := by
+      simp only [indicesEqual]
+    _ = second :=
+      List.idxOf_get secondIndexLt
+
+/-- The zip-index implementation of contracted positions is extensionally
+the direct map over contracted vertices. -/
+theorem PlanarPresentation.contractedVertexPositions_eq_map
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.contractedVertexPositions =
+      problem.contractedGraph.vertices.map fun vertex =>
+        presentation.drawing.vertexPosition
+          problem.incidenceGraph vertex := by
+  unfold PlanarPresentation.contractedVertexPositions
+  calc
+    _ =
+        (problem.contractedGraph.vertices.zipIdx.map Prod.fst).map
+          (fun vertex =>
+            presentation.drawing.vertexPosition
+              problem.incidenceGraph vertex) := by
+      rw [List.map_map]
+      rfl
+    _ = _ := by
+      rw [List.zipIdx_map_fst]
+
+/-- Contracted drawing lookup agrees with the original position of every
+retained vertex. -/
+theorem PlanarPresentation.contractedDrawing_vertexPosition
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {vertex : PeriodicThreeDMVertex}
+    (member : vertex ∈ problem.contractedGraph.vertices) :
+    presentation.contractedDrawing.vertexPosition
+        problem.contractedGraph vertex =
+      presentation.drawing.vertexPosition
+        problem.incidenceGraph vertex := by
+  have indexLt :
+      problem.contractedGraph.vertices.idxOf vertex <
+        problem.contractedGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr member
+  have taggedMember :
+      (vertex, problem.contractedGraph.vertices.idxOf vertex) ∈
+        problem.contractedGraph.vertices.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨indexLt, List.idxOf_get indexLt⟩
+  unfold PeriodicGridDrawing.vertexPosition
+    PlanarPresentation.contractedDrawing
+    PlanarPresentation.contractedVertexPositions
+  exact
+    getD_map_zipIdx_of_mem
+      problem.contractedGraph.vertices
+      (fun tagged =>
+        presentation.drawing.vertexPosition
+          problem.incidenceGraph tagged.1)
+      (0, 0) taggedMember
+
+/-- Contracted vertex positions remain pairwise distinct. -/
+theorem PlanarPresentation.contractedVertexPositions_nodup
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.contractedVertexPositions.Nodup := by
+  rw [presentation.contractedVertexPositions_eq_map]
+  apply List.Nodup.map_on
+  · intro first firstMem second secondMem equal
+    exact presentation.vertexPosition_injective_on
+      (contractedGraph_vertex_mem_incidenceGraph
+        problem firstMem)
+      (contractedGraph_vertex_mem_incidenceGraph
+        problem secondMem) equal
+  · exact contractedGraph_vertices_nodup problem
+
+/-- Every retained vertex stays in the open fundamental square. -/
+theorem PlanarPresentation.contractedPositions_in_fundamental_square
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    ∀ position ∈ presentation.contractedVertexPositions,
+      presentation.contractedDrawing.PositionInFundamentalSquare
+        position := by
+  intro position positionMem
+  rw [presentation.contractedVertexPositions_eq_map] at positionMem
+  rcases List.mem_map.mp positionMem with
+    ⟨vertex, vertexMem, rfl⟩
+  have originalVertexMem :=
+    contractedGraph_vertex_mem_incidenceGraph
+      problem vertexMem
+  have originalPositionMem :=
+    presentation.vertexPosition_mem originalVertexMem
+  exact presentation.compatible.2.2.2.2.1 _
+    originalPositionMem
+
+/-- Indexed lookup in the contracted route list returns the route belonging
+to the same contracted-edge occurrence. -/
+theorem PlanarPresentation.contractedDrawing_edgeRoute
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {tagged : ContractedEdge × Nat}
+    (member : tagged ∈ problem.contractedEdges.zipIdx) :
+    presentation.contractedDrawing.edgeRoute tagged.2 =
+      presentation.contractedEdgeRoute tagged.1 := by
+  unfold PeriodicGridDrawing.edgeRoute
+    PlanarPresentation.contractedDrawing
+  exact
+    getD_map_zipIdx_of_mem problem.contractedEdges
+      (fun tagged =>
+        presentation.contractedEdgeRoute tagged.1)
+      [] member
+
+/-- Every indexed graph edge comes from the contracted-edge occurrence at
+the same list index. -/
+theorem contractedGraph_edge_zipIdx
+    (problem : PeriodicThreeDM)
+    {taggedGraphEdge :
+      PeriodicEdge PeriodicThreeDMVertex × Nat}
+    (member :
+      taggedGraphEdge ∈ problem.contractedGraph.edges.zipIdx) :
+    ∃ edge : ContractedEdge,
+      (edge, taggedGraphEdge.2) ∈
+        problem.contractedEdges.zipIdx ∧
+      edge.toPeriodicEdge = taggedGraphEdge.1 := by
+  have indexLt :
+      taggedGraphEdge.2 < problem.contractedEdges.length := by
+    simpa [contractedGraph] using
+      List.snd_lt_of_mem_zipIdx member
+  let edge :=
+    problem.contractedEdges[taggedGraphEdge.2]'indexLt
+  have edgeMember :
+      (edge, taggedGraphEdge.2) ∈
+        problem.contractedEdges.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨indexLt, rfl⟩
+  refine ⟨edge, edgeMember, ?_⟩
+  have graphEdgeAt :=
+    (List.mem_zipIdx' member).2.symm
+  simpa [contractedGraph, edge] using graphEdgeAt
+
+/-- The contracted routes match the endpoints and periodic offsets of the
+contracted graph. -/
+theorem PlanarPresentation.contractedDrawing_routesMatch
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.contractedDrawing.RoutesMatch
+      problem.contractedGraph := by
+  intro taggedGraphEdge graphEdgeMem
+  rcases contractedGraph_edge_zipIdx
+      problem graphEdgeMem with
+    ⟨edge, edgeZipMem, edgeEq⟩
+  rw [← edgeEq]
+  have edgeMem : edge ∈ problem.contractedEdges :=
+    List.fst_mem_of_mem_zipIdx edgeZipMem
+  simp only [contractedEdges,
+    List.mem_flatMap] at edgeMem
+  rcases edgeMem with ⟨color, colorMem, edgeMem⟩
+  simp only [contractedEdgesForColor,
+    List.mem_flatMap] at edgeMem
+  rcases edgeMem with ⟨atom, atomMem, edgeMem⟩
+  have endpoints :=
+    presentation.contractedEdgeRoute_endpoints
+      color atom edgeMem
+  have graphEdgeListMem :
+      edge.toPeriodicEdge ∈ problem.contractedGraph.edges := by
+    rw [edgeEq]
+    exact List.fst_mem_of_mem_zipIdx graphEdgeMem
+  have endpointMembers :=
+    (contractedGraph_isWellFormed problem).2
+      edge.toPeriodicEdge graphEdgeListMem
+  rw [presentation.contractedDrawing_edgeRoute edgeZipMem]
+  rw [presentation.contractedDrawing_vertexPosition
+      endpointMembers.1,
+    presentation.contractedDrawing_vertexPosition
+      endpointMembers.2]
+  exact endpoints
+
+/-- Route concatenation gives a finite presentation compatible with the
+contracted periodic graph. -/
+theorem PlanarPresentation.contractedDrawing_isCompatible
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.contractedDrawing.IsCompatible
+      problem.contractedGraph := by
+  refine
+    ⟨contractedGraph_isWellFormed problem, ?_, ?_, ?_, ?_, ?_⟩
+  · simp [PlanarPresentation.contractedDrawing,
+      PlanarPresentation.contractedVertexPositions]
+  · simp [PlanarPresentation.contractedDrawing,
+      contractedGraph]
+  · exact presentation.contractedVertexPositions_nodup
+  · exact
+      presentation.contractedPositions_in_fundamental_square
+  · exact presentation.contractedDrawing_routesMatch
 
 end PeriodicThreeDM
 

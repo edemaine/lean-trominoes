@@ -1381,7 +1381,9 @@ The representation choices for this target are:
   for a suppressed element, the second route is period-translated, reversed,
   and joined to the first at their common colored endpoint.  The resulting
   polyline is proved to have exactly the contracted edge's periodic
-  endpoints.
+  endpoints; restricted vertex positions remain distinct and inside the
+  fundamental square, completing compatibility with the executable
+  contracted graph.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
