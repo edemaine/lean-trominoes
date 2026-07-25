@@ -1218,6 +1218,11 @@ The representation choices for this target are:
   duplicate-free, filtering by atom has exactly the ordinary occurrence
   count, and the occurrence-three bound assigns every tagged literal to one
   unique pair of complementary variable ports.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean)
+  proves that every generated triple reference names an element in the
+  corresponding finite typed red, green, or blue list.  In particular,
+  variable ports distinguish valid clause cores, occurrence-specific
+  complements, and the private caps of unused slots.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
