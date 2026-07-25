@@ -1499,6 +1499,11 @@ The representation choices for this target are:
   terminal cases.  Every satisfying occurrence-three, arity-two-or-three
   exact-one assignment now induces a perfect matching of the complete typed
   planar 3DM presentation.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMLocalSoundness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMLocalSoundness.lean)
+  restricts any perfect matching back to the finite gadgets: every ordinary
+  occurrence module and fixed-red detour satisfies its verified private
+  constraints, and every clause core satisfies all three internal
+  exact-cover constraints.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
