@@ -1281,6 +1281,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMMainClauseValues.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMMainClauseValues.lean)
   proves that the canonical matching's actual main clause-blue incident
   values are a permutation of the corresponding source clause truth values.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMTypedCompleteness.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMTypedCompleteness.lean)
+  assembles all typed incidence cases and proves the forward correctness
+  direction: every satisfying occurrence-three exact-one assignment induces
+  a perfect matching of the typed periodic 3DM construction.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
