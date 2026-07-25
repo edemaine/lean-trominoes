@@ -258,6 +258,10 @@ The representation choices for this target are:
   combines all crossover, straight-chain, and bend clauses.  Its interface
   proves both simultaneous extension of arbitrary route values and all three
   propagation laws for every satisfying core assignment.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarEndpoints.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarEndpoints.lean)
+  recovers the source and target terminal of every neighboring translated
+  protoedge route, retains the lifted graph vertex reached at each end, and
+  proves that every terminal has the advertised route-occurrence key.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
