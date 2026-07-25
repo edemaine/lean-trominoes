@@ -216,6 +216,10 @@ The representation choices for this target are:
   combines the two axis-specific uniqueness theorems with orthogonality to
   certify the complete constructed drawing as a proper periodic
   orthocrossing drawing.
+  [`LeanTrominoes/PeriodicOrthocrossingBounds.lean`](LeanTrominoes/PeriodicOrthocrossingBounds.lean)
+  bounds every stored segment endpoint inside the surrounding `3 × 3` block
+  of drawing cells and proves that only the nine neighboring translates can
+  meet the canonical fundamental square, making crossing enumeration finite.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
