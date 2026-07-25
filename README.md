@@ -1305,6 +1305,10 @@ The representation choices for this target are:
   transports exact cover in both directions, proving the encoded
   `PeriodicThreeDM` instance (and its abstract trichromatic orientation
   problem) satisfiable exactly when the occurrence-three source is.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMReductionCorrectness.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMReductionCorrectness.lean)
+  composes unit elimination with encoded 3DM, proves the resulting typed
+  instance has degree two or three, and preserves exact-one satisfiability
+  and abstract trichromatic orientability.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
