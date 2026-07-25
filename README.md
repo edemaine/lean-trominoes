@@ -1321,6 +1321,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMEncodingComputability.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEncodingComputability.lean)
   proves that typed reference calculation, first-index numbering, complete
   natural-number 3DM encoding, and its unit-free composition are computable.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMEncodedDegree.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMEncodedDegree.lean)
+  transports typed incidence degrees through the natural-number encoding and
+  proves that the complete unit-free output has degree two or three.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)

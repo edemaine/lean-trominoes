@@ -93,6 +93,16 @@ def degree (problem : PeriodicThreeDM) (color : WireColor)
     (atom : Nat) : Nat :=
   (problem.incidences color atom).length
 
+/-- The degree-two-or-three restriction used by the exact-one reduction. -/
+def DegreeTwoOrThree (problem : PeriodicThreeDM) : Prop :=
+  ∀ color atom, atom < problem.elementCount color →
+    problem.degree color atom ∈ ([2, 3] : List Nat)
+
+instance (problem : PeriodicThreeDM) :
+    Decidable problem.DegreeTwoOrThree := by
+  unfold DegreeTwoOrThree
+  infer_instance
+
 /-- The degree-three restriction used before conversion to trichromatic graph
 orientation. -/
 def DegreeThree (problem : PeriodicThreeDM) : Prop :=
