@@ -1470,6 +1470,11 @@ The representation choices for this target are:
   combines every element classification to prove the complete typed
   assembly has degree two or three under the source occurrence and arity
   bounds.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMMatching.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMMatching.lean)
+  defines the canonical periodic matching induced by a source assignment.
+  Ordinary and fixed-red occurrence modules use their verified alternating
+  selections, while each clause translate chooses its explicit `EFI`,
+  `BDH`, or `ACG` core cover from the three signed terminal signals.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
