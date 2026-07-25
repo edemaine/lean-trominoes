@@ -1416,6 +1416,13 @@ The representation choices for this target are:
   one degree-two terminal unconnected implements the two-literal case, and
   that substituting signed variable-cycle signals recovers the source literal
   clauses exactly.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTyped.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTyped.lean)
+  assembles those local gadgets into an inspectable typed periodic 3DM
+  presentation.  Used occurrence slots are closed cyclically by red
+  continuation elements; connector kind and polarity come from the source
+  literal; RGB connector ports are identified with the correctly ordered
+  clause terminal at the reversed literal offset; and every clause receives
+  the nine colored core triples.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
