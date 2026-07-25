@@ -1289,6 +1289,10 @@ The representation choices for this target are:
   recovers a Boolean assignment from any typed perfect matching, proves every
   source clause exact-one, and concludes satisfiability equivalence for the
   typed reduction under the occurrence-three bound.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMDegree.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMDegree.lean)
+  proves the typed construction's degree-two-or-three condition from the
+  occurrence-three bound and the source formula's unit-free arity-two-or-three
+  invariant.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
