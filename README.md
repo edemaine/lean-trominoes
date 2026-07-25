@@ -1312,6 +1312,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsComputability.lean)
   proves that the reviewed empty- and unit-clause elimination is primitive
   recursive, both clause by clause and over a complete periodic formula.
+- [`LeanTrominoes/PeriodicThreeDMComputability.lean`](LeanTrominoes/PeriodicThreeDMComputability.lean)
+  supplies canonical primitive-recursive encodings for natural-number
+  periodic 3DM references, triples, and complete finite presentations.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
