@@ -359,8 +359,13 @@ The representation choices for this target are:
   applies the local Figure 9 placement to that offset-preserving
   representation.  Erasure is proved equal to the logical exact-one
   endpoint, transferring its width-three, occurrence-three, and end-to-end
-  satisfiability theorems.  Explicit noncrossing incidence routes remain for
-  the subsequent geometric layer.
+  satisfiability theorems.
+  [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
+  places the final unit-elimination gadgets in constant-size refinements of
+  those exact-one clause cells.  Erasing positions is exactly the verified
+  logical unit-free formula, and its end-to-end satisfiability theorem is
+  retained.  Explicit noncrossing incidence routes remain for the subsequent
+  geometric layer.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
