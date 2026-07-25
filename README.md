@@ -1413,6 +1413,12 @@ The representation choices for this target are:
   endpoints; restricted vertex positions remain distinct and inside the
   fundamental square, completing compatibility with the executable
   contracted graph.
+- [`LeanTrominoes/PeriodicThreeDMContractionCoverage.lean`](LeanTrominoes/PeriodicThreeDMContractionCoverage.lean)
+  reconciles the contracted graph's element-major edge order with the
+  original graph's triple-major incidence order.  Under the well-formed
+  degree-two-or-three promise, flattening the tags stored on contracted edges
+  covers exactly all original incidence tags; the endpoint-opposition law is
+  also lifted from one element block to every executable contracted edge.
 - [`LeanTrominoes/PeriodicThreeDMContractionGeometry.lean`](LeanTrominoes/PeriodicThreeDMContractionGeometry.lean)
   proves the first geometric invariant of contraction: translating,
   reversing, and joining the original incidence polylines preserves
