@@ -239,6 +239,11 @@ The representation choices for this target are:
   along their carrier axis, and inserts positioned equality links between
   consecutive distinct crossover sites.  Every link is certified to remain
   on one carrier, so carrier assignments satisfy the complete wire layer.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarCore.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarCore.lean)
+  renames the wire variables into the crossover formula's external summand
+  and appends both clause families.  Every segment-carrier assignment extends
+  to a satisfying core assignment, and every satisfying core assignment
+  obeys all crossover propagation and inter-site equality laws.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
