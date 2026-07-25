@@ -1213,6 +1213,11 @@ The representation choices for this target are:
   together with typed well-formedness and degree-two-or-three predicates.
   Incidence values use the same translated-cell convention as
   `PeriodicThreeDM`, including a verified reversed-offset calculation.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMOccurrences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMOccurrences.lean)
+  proves the occurrence-slot bookkeeping: tagged clause/literal positions are
+  duplicate-free, filtering by atom has exactly the ordinary occurrence
+  count, and the occurrence-three bound assigns every tagged literal to one
+  unique pair of complementary variable ports.
 - [`LeanTrominoes/PeriodicOneInThreeComputability.lean`](LeanTrominoes/PeriodicOneInThreeComputability.lean)
   and
   [`LeanTrominoes/PeriodicOneInThreeClauseComputability.lean`](LeanTrominoes/PeriodicOneInThreeClauseComputability.lean)
