@@ -229,6 +229,11 @@ The representation choices for this target are:
   orders every crossing horizontal-first, deduplicates the resulting records,
   and proves that every actual crossing selects one of the two possible
   occurrence orders in this normalized gadget-site list.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarCrossovers.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarCrossovers.lean)
+  replaces those records by positioned crossover formulas in `20 × 20`
+  macrocells, with four explicit boundary-wire variables and internals scoped
+  by the crossing record.  Segment-occurrence assignments extend through all
+  crossovers, while every satisfying family propagates both carrier signals.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
