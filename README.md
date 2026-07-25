@@ -187,6 +187,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOrthocrossingOrthogonal.lean`](LeanTrominoes/PeriodicOrthocrossingOrthogonal.lean)
   classifies every local offset into the five cardinal cases, proves each
   complete route orthogonal, and lifts this fact to the full periodic drawing.
+  [`LeanTrominoes/PeriodicOrthocrossingSegments.lean`](LeanTrominoes/PeriodicOrthocrossingSegments.lean)
+  exposes the equivalent protoedge-first enumeration of drawing segments and
+  proves periodic-coordinate and common-lane lemmas for the crossing proof.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

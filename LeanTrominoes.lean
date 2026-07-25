@@ -52,6 +52,7 @@ import LeanTrominoes.PeriodicOrthocrossingConstruction
 import LeanTrominoes.PeriodicOrthocrossingCorrectness
 import LeanTrominoes.PeriodicOrthocrossingOrthogonal
 import LeanTrominoes.PeriodicOrthocrossingPorts
+import LeanTrominoes.PeriodicOrthocrossingSegments
 import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicThreeCNF
 import LeanTrominoes.PeriodicThreeCNFCorrectness
