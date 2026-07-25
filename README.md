@@ -1484,6 +1484,11 @@ The representation choices for this target are:
   strengthens variable-side terminal incidence counting to an equality of
   Boolean value lists: every RGB occurrence incidence carries exactly its
   signed source literal truth value at the correctly translated cell.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTerminalCovers.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTerminalCovers.lean)
+  combines those variable values with the two local Figure 5 incidences.
+  It proves every colored terminal is covered exactly once, including the
+  binary clause's unused right terminal where the absent variable incidence
+  is represented by the clause core's false external signal.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
