@@ -964,6 +964,11 @@ The representation choices for this target are:
   ports with nine fresh internal crossover variables, proving that an
   instantiated crossover extends exactly when its opposite boundary signals
   agree independently.
+- [`LeanTrominoes/PlanarThreeSATFamilies.lean`](LeanTrominoes/PlanarThreeSATFamilies.lean)
+  concatenates finite families of positioned gadget formulas.  Crossover
+  internals are scoped by their canonical site key, and the family semantics
+  are proved to be precisely the conjunction of the independent crossover
+  propagation or duplicator equality laws at all listed sites.
 - [`LeanTrominoes/PeriodicCNF.lean`](LeanTrominoes/PeriodicCNF.lean) defines
   the local translation-invariant Boolean formulas used at the beginning of
   that source reduction chain: each finite clause refers to variables at
