@@ -189,7 +189,11 @@ The representation choices for this target are:
   complete route orthogonal, and lifts this fact to the full periodic drawing.
   [`LeanTrominoes/PeriodicOrthocrossingSegments.lean`](LeanTrominoes/PeriodicOrthocrossingSegments.lean)
   exposes the equivalent protoedge-first enumeration of drawing segments and
-  proves periodic-coordinate and common-lane lemmas for the crossing proof.
+  proves periodic-coordinate and common-lane lemmas for the crossing proof;
+  it also reduces orthocrossing to uniqueness of parallel interiors.
+  [`LeanTrominoes/PeriodicOrthocrossingClassification.lean`](LeanTrominoes/PeriodicOrthocrossingClassification.lean)
+  assigns every erased route piece its exact semantic role and preserves its
+  protoedge and within-route indices for the private-lane argument.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

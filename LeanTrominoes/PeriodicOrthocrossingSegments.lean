@@ -137,5 +137,63 @@ theorem properlyCrossesAt_of_different_axes
     GridSegment.ProperlyCrossesAt first second point :=
   ⟨firstContains, secondContains, axes⟩
 
+/-- Private lanes rule out common interior points for two distinct horizontal
+or two distinct vertical segment occurrences. -/
+def HasUniqueParallelInteriors (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ first ∈ drawing.indexedSegments,
+    ∀ second ∈ drawing.indexedSegments,
+      ∀ firstTranslate secondTranslate point,
+        (first.segment.translate
+            (drawing.periodTranslation firstTranslate)).InteriorContains
+          point →
+        (second.segment.translate
+            (drawing.periodTranslation secondTranslate)).InteriorContains
+          point →
+        ((first.segment.translate
+              (drawing.periodTranslation firstTranslate)).IsHorizontal ∧
+            (second.segment.translate
+              (drawing.periodTranslation secondTranslate)).IsHorizontal ∨
+          (first.segment.translate
+              (drawing.periodTranslation firstTranslate)).IsVertical ∧
+            (second.segment.translate
+              (drawing.periodTranslation secondTranslate)).IsVertical) →
+        PeriodicGridDrawing.SegmentOccurrenceKey first firstTranslate =
+          PeriodicGridDrawing.SegmentOccurrenceKey second secondTranslate
+
+/-- For an orthogonal drawing, uniqueness of parallel interiors is precisely
+the missing global ingredient for the orthocrossing condition. -/
+theorem isOrthocrossing_of_isOrthogonal_of_uniqueParallelInteriors
+    {drawing : PeriodicGridDrawing}
+    (orthogonal : drawing.IsOrthogonal)
+    (parallelUnique : HasUniqueParallelInteriors drawing) :
+    drawing.IsOrthocrossing := by
+  intro first firstMem second secondMem
+    firstTranslate secondTranslate point different
+    firstContains secondContains
+  let firstSegment :=
+    first.segment.translate (drawing.periodTranslation firstTranslate)
+  let secondSegment :=
+    second.segment.translate (drawing.periodTranslation secondTranslate)
+  have firstAxis : firstSegment.IsAxisAligned := by
+    exact (GridSegment.isAxisAligned_translate _ _).mpr
+      (orthogonal first firstMem)
+  have secondAxis : secondSegment.IsAxisAligned := by
+    exact (GridSegment.isAxisAligned_translate _ _).mpr
+      (orthogonal second secondMem)
+  rcases firstAxis with firstHorizontal | firstVertical <;>
+    rcases secondAxis with secondHorizontal | secondVertical
+  · exact (different (parallelUnique first firstMem second secondMem
+      firstTranslate secondTranslate point firstContains secondContains
+      (Or.inl ⟨firstHorizontal, secondHorizontal⟩))).elim
+  · exact properlyCrossesAt_of_different_axes
+      firstContains secondContains
+      (Or.inl ⟨firstHorizontal, secondVertical⟩)
+  · exact properlyCrossesAt_of_different_axes
+      firstContains secondContains
+      (Or.inr ⟨firstVertical, secondHorizontal⟩)
+  · exact (different (parallelUnique first firstMem second secondMem
+      firstTranslate secondTranslate point firstContains secondContains
+      (Or.inr ⟨firstVertical, secondVertical⟩))).elim
+
 end PeriodicOrthocrossing
 end LeanTrominoes
