@@ -253,6 +253,11 @@ The representation choices for this target are:
   places equality links at every turn of every neighboring route occurrence.
   Together with the straight-segment carrier chains, one Boolean value now
   propagates through an entire translated route.
+  [`LeanTrominoes/PeriodicOrthocrossingPlanarRouteCore.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarRouteCore.lean)
+  embeds crossover boundaries into that complete carrier-node type and
+  combines all crossover, straight-chain, and bend clauses.  Its interface
+  proves both simultaneous extension of arbitrary route values and all three
+  propagation laws for every satisfying core assignment.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

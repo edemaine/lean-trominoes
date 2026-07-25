@@ -1,0 +1,193 @@
+import LeanTrominoes.PeriodicOrthocrossingPlanarBends
+
+/-!
+# Complete crossover-and-route planarization core
+
+The first planar core connected only crossover boundary variables.  The
+complete route layer has the larger external type `CarrierNode`, containing
+both crossing boundaries and segment terminals.  This file instantiates the
+crossover family directly with boundary nodes, scopes the complete route
+formula into the external summand, and proves the combined semantic
+interface.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicOrthocrossing
+
+open PlanarThreeSAT
+
+/-- Crossover ports expressed in the complete carrier-node variable type. -/
+def carrierNodeCrossingPorts (crossing : CrossingRecord) :
+    CrossoverPorts CarrierNode where
+  aLeft := .boundary ⟨crossing, .left⟩
+  aRight := .boundary ⟨crossing, .right⟩
+  bTop := .boundary ⟨crossing, .top⟩
+  bBottom := .boundary ⟨crossing, .bottom⟩
+
+/-- All crossover gadgets, with their external variables embedded into
+`CarrierNode`. -/
+def drawingCarrierNodeCrossoverFormula
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    List (EmbeddedClause
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))) :=
+  crossoverFamily (orientedCrossings graph)
+    carrierNodeCrossingPorts crossingMacroOrigin 1
+
+/-- Scope every complete route-wire variable into the external summand used
+by the crossover family. -/
+def scopedDrawingRouteWireFormula
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    List (EmbeddedClause
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))) :=
+  (drawingRouteWireFormula graph).map fun clause =>
+    clause.rename fun node =>
+      (Sum.inl node :
+        Sum CarrierNode (CrossingRecord × CrossoverInternal))
+
+@[simp]
+theorem scopedDrawingRouteWireFormula_holds_iff
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (assignment :
+      Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool) :
+    FormulaHolds assignment (scopedDrawingRouteWireFormula graph) ↔
+      FormulaHolds (assignment ∘ Sum.inl)
+        (drawingRouteWireFormula graph) := by
+  exact formulaHolds_map assignment
+    (fun node =>
+      (Sum.inl node :
+        Sum CarrierNode (CrossingRecord × CrossoverInternal)))
+    id (drawingRouteWireFormula graph)
+
+/-- The complete local planar core: every canonical crossover, every straight
+carrier chain, and every route-bend equality. -/
+def drawingRoutePlanarCoreFormula
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    List (EmbeddedClause
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))) :=
+  drawingCarrierNodeCrossoverFormula graph ++
+    scopedDrawingRouteWireFormula graph
+
+/-- Satisfaction of the complete core splits into its crossover and route
+wire components. -/
+theorem drawingRoutePlanarCoreFormula_holds_iff
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (assignment :
+      Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool) :
+    FormulaHolds assignment (drawingRoutePlanarCoreFormula graph) ↔
+      FormulaHolds assignment
+          (drawingCarrierNodeCrossoverFormula graph) ∧
+        FormulaHolds (assignment ∘ Sum.inl)
+          (drawingRouteWireFormula graph) := by
+  rw [drawingRoutePlanarCoreFormula,
+    formulaHolds_route_append_iff,
+    scopedDrawingRouteWireFormula_holds_iff]
+
+/-- Every value assignment to translated routes extends through all complete
+wires and all fresh crossover internals, while retaining the requested value
+at every carrier node. -/
+theorem exists_drawingRoutePlanarCoreFormula_holds_of_routeAssignment
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (routeAssignment : RouteOccurrenceKey → Bool) :
+    ∃ assignment :
+        Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool,
+      FormulaHolds assignment (drawingRoutePlanarCoreFormula graph) ∧
+        ∀ node,
+          assignment (.inl node) = routeAssignment node.routeKey := by
+  let carrierAssignment : CarrierNode → Bool :=
+    routeAssignment ∘ CarrierNode.routeKey
+  have boundaryLaws :
+      ∀ crossing ∈ orientedCrossings graph,
+        carrierAssignment
+            (carrierNodeCrossingPorts crossing).aLeft =
+            carrierAssignment
+              (carrierNodeCrossingPorts crossing).aRight ∧
+          carrierAssignment
+              (carrierNodeCrossingPorts crossing).bTop =
+            carrierAssignment
+              (carrierNodeCrossingPorts crossing).bBottom := by
+    intro crossing crossingMem
+    exact ⟨rfl, rfl⟩
+  have crossoverExtension :
+      CrossoverFamilyExtends carrierAssignment
+        (orientedCrossings graph)
+        carrierNodeCrossingPorts crossingMacroOrigin 1 :=
+    (crossoverFamilyExtends_iff carrierAssignment
+      (orientedCrossings graph)
+      carrierNodeCrossingPorts crossingMacroOrigin 1).mpr
+        boundaryLaws
+  rcases crossoverExtension with ⟨internal, crossoverHolds⟩
+  let assignment :
+      Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool :=
+    Sum.elim carrierAssignment internal
+  refine ⟨assignment,
+    (drawingRoutePlanarCoreFormula_holds_iff graph assignment).mpr
+      ⟨crossoverHolds, ?_⟩, ?_⟩
+  · have routeHolds :=
+      drawingRouteWireFormula_holds graph routeAssignment
+    have restriction :
+        assignment ∘ Sum.inl =
+          routeAssignment ∘ CarrierNode.routeKey := by
+      funext node
+      rfl
+    rw [restriction]
+    exact routeHolds
+  · intro node
+    rfl
+
+/-- Every satisfying complete core assignment obeys all crossover,
+straight-carrier, and route-bend propagation laws. -/
+theorem drawingRoutePlanarCoreFormula_boundary_laws
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (assignment :
+      Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool)
+    (holds : FormulaHolds assignment
+      (drawingRoutePlanarCoreFormula graph)) :
+    (∀ crossing ∈ orientedCrossings graph,
+      assignment
+          (.inl (.boundary ⟨crossing, .left⟩)) =
+          assignment
+            (.inl (.boundary ⟨crossing, .right⟩)) ∧
+        assignment
+            (.inl (.boundary ⟨crossing, .top⟩)) =
+          assignment
+            (.inl (.boundary ⟨crossing, .bottom⟩))) ∧
+      (∀ link ∈ drawingCompleteCarrierLinks graph,
+        assignment (.inl link.first) =
+          assignment (.inl link.second)) ∧
+      ∀ link ∈ drawingRouteBendLinks graph,
+        assignment (.inl link.first) =
+          assignment (.inl link.second) := by
+  have components :=
+    (drawingRoutePlanarCoreFormula_holds_iff graph assignment).mp holds
+  constructor
+  · simpa [carrierNodeCrossingPorts] using
+      crossoverFamily_boundary_eq assignment
+        (orientedCrossings graph)
+        carrierNodeCrossingPorts crossingMacroOrigin 1
+        components.1
+  · have wireComponents :
+        FormulaHolds (assignment ∘ Sum.inl)
+            (drawingCompleteCarrierFormula graph) ∧
+          FormulaHolds (assignment ∘ Sum.inl)
+            (drawingRouteBendFormula graph) :=
+      (formulaHolds_route_append_iff
+        (assignment ∘ Sum.inl)
+        (drawingCompleteCarrierFormula graph)
+        (drawingRouteBendFormula graph)).mp components.2
+    constructor
+    · exact (equalityFamily_holds_iff
+        (assignment ∘ Sum.inl)
+        (drawingCompleteCarrierLinks graph)).mp wireComponents.1
+    · exact (equalityFamily_holds_iff
+        (assignment ∘ Sum.inl)
+        (drawingRouteBendLinks graph)).mp wireComponents.2
+
+end PeriodicOrthocrossing
+end LeanTrominoes
