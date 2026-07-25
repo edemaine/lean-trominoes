@@ -1509,6 +1509,11 @@ The representation choices for this target are:
   the red cycle links synchronizes the first boundary field across all used
   slots, yielding a recovered source assignment whose literal value equals
   every occurrence connector signal.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMMatchingTerminalValues.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMMatchingTerminalValues.lean)
+  propagates that recovered literal value through every connector variant
+  and color.  Consequently the variable-side incidences selected by an
+  arbitrary perfect matching at each merged clause terminal are exactly the
+  truth values of its corresponding source occurrences.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
