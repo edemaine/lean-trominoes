@@ -1390,6 +1390,12 @@ The representation choices for this target are:
   two, and its complete seven-bit truth table proves that the connector's
   three colored ports carry one common all-or-none state while its two
   variable-cycle continuation ports remain complementary.
+- [`LeanTrominoes/PlanarThreeDMVariableOccurrenceGadget.lean`](LeanTrominoes/PlanarThreeDMVariableOccurrenceGadget.lean)
+  gives the ordinary three-triple occurrence modules with fixed-green and
+  fixed-blue terminals.  Both variants use red continuation ports and have
+  explicit trichromatic references.  Their exhaustive truth table proves the
+  same all-or-none RGB-terminal contract as the fixed-red detour, so the three
+  module kinds cover every terminal order needed by the colored clause core.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
