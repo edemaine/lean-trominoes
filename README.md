@@ -1301,7 +1301,15 @@ The representation choices for this target are:
   affine instantiation preserves these counts; exhaustive certificates bound
   every Figure 8 crossover variable by eight occurrences and every
   duplicator variable by six, while a single equality link contributes at
-  most four.
+  most four.  A jointly injective site/role naming map preserves a member
+  gadget's bound across a noduplicated family, and equality-family counts are
+  exactly twice their link-endpoint counts.
+- [`LeanTrominoes/PeriodicCNFPlanarOccurrences.lean`](LeanTrominoes/PeriodicCNFPlanarOccurrences.lean)
+  begins the componentwise degree-eight proof for the routed planarizer.
+  Canonical crossing records and fixed crossover roles are jointly
+  injective, so the complete family of crossover gadgets retains the
+  exhaustively certified eight-occurrence bound without accumulating across
+  sites.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
