@@ -1333,6 +1333,11 @@ The representation choices for this target are:
   angular occurrence index.  Every suffix is proved orthogonal with exact
   endpoints at that boundary and the selected semantic copy, and is
   identified with the corresponding route of the certified local fan.
+- [`LeanTrominoes/OrthogonalPolylineJoin.lean`](LeanTrominoes/OrthogonalPolylineJoin.lean)
+  joins independently certified route pieces at a shared endpoint while
+  removing its duplicate list entry.  The joined route is proved to preserve
+  both outer endpoints and orthogonality, supplying the generic splice lemma
+  used by fan and later gadget routing.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
