@@ -1295,6 +1295,12 @@ The representation choices for this target are:
   planarization gadgets.  A source certificate that every genuine route has
   one of these directions and separates same-atom incidences is transported
   to the split formula's collision-free and three-occurrence certificates.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitTerminalPortGeometry.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitTerminalPortGeometry.lean)
+  characterizes those valid rays as the nonzero vectors on the two axes or
+  two 45-degree diagonals, numbers them in the east-first cyclic order used
+  by occurrence splitting, and proves that positive integral refinement
+  preserves both terminal vectors' directions and complete terminal-port
+  certificates.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
