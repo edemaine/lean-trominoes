@@ -1432,6 +1432,12 @@ The representation choices for this target are:
   every consecutive pair is exactly one genuine cardinal step.  This is the
   discrete interface used to assemble certified ribbon-turn templates across
   adjacent 128-by-128 macrocells.
+- [`LeanTrominoes/OrthogonalPolylineEndpointDirections.lean`](LeanTrominoes/OrthogonalPolylineEndpointDirections.lean)
+  exposes total first- and last-edge direction lookups for unit orthogonal
+  polylines.  Every route with at least one edge receives genuine cardinal
+  endpoint directions, and the last lookup is identified with the forward
+  direction of any explicitly displayed final edge.  These are the finite
+  direction parameters consumed by the ribbon endpoint fans.
 - [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionContacts.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionContacts.lean)
   tracks every point introduced by unit subdivision back to either an
   original listed route point or the relative interior of an original
