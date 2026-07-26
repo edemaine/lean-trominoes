@@ -193,7 +193,7 @@ def completeCarrierNodes
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) (key : Nat × Nat × Cell) :
     List CarrierNode :=
-  ((drawingCarrierNodes graph).filter fun node =>
+  ((drawingCarrierNodes graph).dedup.filter fun node =>
     node.carrierKey = key).insertionSort fun first second =>
       first.orderCoordinate graph ≤ second.orderCoordinate graph
 
@@ -205,6 +205,23 @@ theorem mem_completeCarrierNodes_iff
     node ∈ completeCarrierNodes graph key ↔
       node ∈ drawingCarrierNodes graph ∧ node.carrierKey = key := by
   simp [completeCarrierNodes]
+
+/-- Set-normalization before sorting makes every carrier chain a simple
+vertex list. -/
+theorem completeCarrierNodes_nodup
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (key : Nat × Nat × Cell) :
+    (completeCarrierNodes graph key).Nodup := by
+  unfold completeCarrierNodes
+  apply
+    (List.perm_insertionSort
+      (fun first second =>
+        first.orderCoordinate graph ≤
+          second.orderCoordinate graph)
+      ((drawingCarrierNodes graph).dedup.filter fun node =>
+        node.carrierKey = key)).nodup_iff.mpr
+  exact (List.nodup_dedup _).filter _
 
 /-- Whether a pair consists of the two boundary ports of the same crossover
 site.  Their equality is already enforced inside the crossover gadget. -/

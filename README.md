@@ -1309,7 +1309,10 @@ The representation choices for this target are:
   Canonical crossing records and fixed crossover roles are jointly
   injective, so the complete family of crossover gadgets retains the
   exhaustively certified eight-occurrence bound without accumulating across
-  sites.
+  sites.  Complete carrier chains are normalized to simple sorted paths;
+  adjacent-pair endpoint counting and the disjoint carrier-key partition show
+  that every carrier node meets at most two chain links, hence occurs at most
+  four times in all complete-carrier equality clauses.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
