@@ -473,7 +473,10 @@ The representation choices for this target are:
   supplies the corresponding certificate for genuine periodic incidences:
   route endpoints may occupy the one-cell halo, route contacts are checked
   over 25 relative translations, and successful checks still promote to the
-  same continuously planar incidence-presentation interface.
+  same continuously planar incidence-presentation interface.  Its
+  ribbon-ready refinement additionally carries pointwise route bounds and
+  the endpoint-contact check, promoting directly to the strengthened source
+  interface used by topological lane expansion.
   [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean)
   fixes the periodic gauge used by that splice: it subtracts each clause's
   first literal offset from every literal and from the displayed clause
@@ -567,6 +570,13 @@ The representation choices for this target are:
   overlap and adds an executable exact-interior check.  Together the expanded
   checks certify continuous planarity of periodic drawings with genuine
   boundary-crossing edges.
+  [`LeanTrominoes/PeriodicGridDrawingEndpointContacts.lean`](LeanTrominoes/PeriodicGridDrawingEndpointContacts.lean)
+  closes the remaining contact loophole needed before ribbon thickening.
+  Distinct lifted listed route points may coincide only when both are outer
+  route endpoints; thus two unrelated bends cannot conceal a four-way
+  topological crossing.  Pointwise halo bounds reduce this condition to an
+  executable check over the same 25 relative translations and prove the
+  check sound for the complete infinite periodic lift.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

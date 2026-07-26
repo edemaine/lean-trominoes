@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicGridDrawingExpandedFiniteContinuousPlanarity
+import LeanTrominoes.PeriodicGridDrawingEndpointContacts
 import LeanTrominoes.PositionedPeriodicCNFRebasedRouteBounds
 
 /-!
@@ -125,5 +126,48 @@ def toHaloBoundedContinuousPlanarIncidencePresentation
   rebasedRoutePointsInside := rebasedRoutePointsInside
 
 end ExpandedFiniteContinuousPlanarIncidenceCertificate
+
+/-- The expanded continuous certificate with the additional finite
+listed-point contact check required for sound ribbon thickening. -/
+structure ExpandedFiniteRibbonReadyIncidenceCertificate
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    extends
+      ExpandedFiniteContinuousPlanarIncidenceCertificate source placement
+    where
+  routePointBounds :
+    (incidenceDrawing source placement routes)
+      |>.RoutePointsInExpandedSquare
+  endpointContactsChecked :
+    ((incidenceDrawing source placement routes)
+      |>.expandedFiniteRoutePointsMeetOnlyAtEndpoints) = true
+
+namespace ExpandedFiniteRibbonReadyIncidenceCertificate
+
+/-- Promote the four finite nonintersection checks and the rebased-route
+halo bound to the complete source interface for ribbon thickening. -/
+def toHaloBoundedRibbonReadyIncidencePresentation
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (certificate :
+      ExpandedFiniteRibbonReadyIncidenceCertificate source placement)
+    (rebasedRoutePointsInside :
+      certificate.toExpandedFiniteContinuousPlanarIncidenceCertificate
+        |>.toContinuousPlanarIncidencePresentation
+        |>.toPlanarIncidencePresentation
+        |>.RebasedRoutePointsInExpandedSquare) :
+    HaloBoundedRibbonReadyIncidencePresentation source placement where
+  toHaloBoundedContinuousPlanarIncidencePresentation :=
+    certificate.toExpandedFiniteContinuousPlanarIncidenceCertificate
+      |>.toHaloBoundedContinuousPlanarIncidencePresentation
+        rebasedRoutePointsInside
+  endpointContacts :=
+    PeriodicGridDrawing.routePointsMeetOnlyAtEndpoints_of_expandedFinite
+      certificate.routePointBounds
+      certificate.endpointContactsChecked
+
+end ExpandedFiniteRibbonReadyIncidenceCertificate
 end PositionedPeriodicCNF
 end LeanTrominoes
