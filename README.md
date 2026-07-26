@@ -1475,6 +1475,15 @@ The representation choices for this target are:
   both route-interior avoidance and vertex-interior avoidance from the
   original presentation.  Thus the complete contracted drawing is certified
   planar.
+- [`LeanTrominoes/PeriodicContinuousPlanarThreeDM.lean`](LeanTrominoes/PeriodicContinuousPlanarThreeDM.lean)
+  strengthens the planar 3DM presentation interface with exact continuous
+  relative-interior separation between distinct lifted route segments.
+- [`LeanTrominoes/PeriodicThreeDMContractionContinuousPlanarity.lean`](LeanTrominoes/PeriodicThreeDMContractionContinuousPlanarity.lean)
+  proves that degree-two contraction preserves this stronger certificate.
+  Reversing a segment is shown not to change continuous interior
+  intersection, and segment provenance transports any alleged contracted
+  overlap to two distinct original occurrences, contradicting the source
+  certificate.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
