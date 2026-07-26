@@ -1392,6 +1392,12 @@ The representation choices for this target are:
   removing its duplicate list entry.  The joined route is proved to preserve
   both outer endpoints and orthogonality, supplying the generic splice lemma
   used by fan and later gadget routing.
+- [`LeanTrominoes/OrthogonalPolylineRibbon.lean`](LeanTrominoes/OrthogonalPolylineRibbon.lean)
+  replaces the unsound uniform diagonal lane translation by the local
+  geometry of a genuine rectilinear ribbon.  Each source segment is displaced
+  in its directed normal direction; consecutive offsets are joined through a
+  small corner rectangle.  Exact endpoints and orthogonality are proved for
+  every local template and for the recursively assembled offset polyline.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
