@@ -250,7 +250,11 @@ The representation choices for this target are:
   adds explicit start and finish variables to every neighboring segment
   occurrence.  Sorting terminals together with crossing boundaries produces
   complete carrier chains, including carriers with no crossings and the
-  portions before the first and after the last crossing.
+  portions before the first and after the last crossing.  Each terminal is
+  placed at the directional port of its `20 × 20` macrocell, matching the
+  crossover boundary coordinates; these ports are proved interior to the
+  macrocell, distinct across the ends of every genuine segment, and
+  equivariant under periodic translation.
   [`LeanTrominoes/PeriodicOrthocrossingPlanarBends.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarBends.lean)
   places equality links at every turn of every neighboring route occurrence.
   Together with the straight-segment carrier chains, one Boolean value now
