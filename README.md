@@ -1259,6 +1259,11 @@ The representation choices for this target are:
   packages the ordered construction behind that single eight-slot premise.
   It preserves satisfiability, locality, and width three, and a fitting
   rotation order yields the full three-occurrence certificate.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitTerminalPorts.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitTerminalPorts.lean)
+  classifies the eight axis and 45-degree terminal rays used by the
+  planarization gadgets.  A source certificate that every genuine route has
+  one of these directions and separates same-atom incidences is transported
+  to the split formula's collision-free and three-occurrence certificates.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover

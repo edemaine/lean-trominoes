@@ -207,6 +207,18 @@ theorem copy_eq_iff
   · rintro ⟨rfl, rfl⟩
     rfl
 
+/-- Tagged source occurrences are distinct because their positional copies
+are distinct. -/
+theorem taggedLiterals_nodup
+    {Variable : Type*}
+    (source : PeriodicCNF Variable) :
+    (taggedLiterals source).Nodup := by
+  apply List.Nodup.of_map
+    (fun tagged =>
+      (tagged.1.atom, tagged.2.1, tagged.2.2))
+  simpa [allOccurrenceVariables] using
+    allOccurrenceVariables_nodup source
+
 /-- `idxOf` is injective on values that occur in the indexed list. -/
 theorem idxOf_injective_on
     {Element : Type*} [BEq Element] [LawfulBEq Element]
@@ -234,15 +246,9 @@ theorem occurrencePortsOfOrder_collisionFree
     (occurrencePortsOfOrder source order).CollisionFree
       source := by
   unfold OccurrencePorts.CollisionFree selectedCopies
-  have taggedNodup :
-      (taggedLiterals source).Nodup := by
-    apply List.Nodup.of_map
-      (fun tagged =>
-        (tagged.1.atom, tagged.2.1, tagged.2.2))
-    simpa [allOccurrenceVariables] using
-      allOccurrenceVariables_nodup source
   apply List.Nodup.map_on
-    (l := taggedLiterals source) ?_ taggedNodup
+    (l := taggedLiterals source) ?_
+      (taggedLiterals_nodup source)
   intro first firstMember second secondMember copiesEqual
   rw [occurrencePortsOfOrder_eq source order
       first firstMember,
