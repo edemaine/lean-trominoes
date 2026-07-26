@@ -469,6 +469,11 @@ The representation choices for this target are:
   orthogonality, and three Boolean checks over the nine neighboring period
   translates, it derives an infinite continuously planar incidence drawing
   and the presentation consumed by the exact-one-to-3DM reduction.
+  [`LeanTrominoes/PositionedPeriodicCNFExpandedFinitePlanarCertificate.lean`](LeanTrominoes/PositionedPeriodicCNFExpandedFinitePlanarCertificate.lean)
+  supplies the corresponding certificate for genuine periodic incidences:
+  route endpoints may occupy the one-cell halo, route contacts are checked
+  over 25 relative translations, and successful checks still promote to the
+  same continuously planar incidence-presentation interface.
   [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean)
   fixes the periodic gauge used by that splice: it subtracts each clause's
   first literal offset from every literal and from the displayed clause
