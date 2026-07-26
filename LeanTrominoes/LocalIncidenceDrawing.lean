@@ -207,10 +207,29 @@ def VerticesAvoidRouteInteriors
         ¬segment.InteriorContains (drawing.elementPosition element)
 
 instance {Triple Element : Type*}
+    [DecidableEq Triple] [DecidableEq Element]
     [Fintype Triple] [Fintype Element]
     (drawing : LocalIncidenceDrawing Triple Element) :
     Decidable drawing.VerticesAvoidRouteInteriors := by
   unfold VerticesAvoidRouteInteriors
+  infer_instance
+
+/-- Distinct graph vertices occupy distinct points, including across the two
+parts of the bipartition. -/
+def VertexPositionsDistinct
+    {Triple Element : Type*}
+    (drawing : LocalIncidenceDrawing Triple Element) : Prop :=
+  Function.Injective drawing.triplePosition ∧
+    Function.Injective drawing.elementPosition ∧
+    ∀ triple element,
+      drawing.triplePosition triple ≠ drawing.elementPosition element
+
+instance {Triple Element : Type*}
+    [DecidableEq Triple] [DecidableEq Element]
+    [Fintype Triple] [Fintype Element]
+    (drawing : LocalIncidenceDrawing Triple Element) :
+    Decidable drawing.VertexPositionsDistinct := by
+  unfold VertexPositionsDistinct Function.Injective
   infer_instance
 
 /-- Exact finite nonintersection certificate for a local gadget drawing. -/
@@ -221,10 +240,12 @@ def IsPlanar {Triple Element : Type*}
       first ≠ second →
         drawing.RoutesAvoidEachOther first second ∧
           drawing.RoutesMeetOnlyAtEndpoints first second) ∧
-    drawing.VerticesAvoidRouteInteriors
+    drawing.VerticesAvoidRouteInteriors ∧
+    drawing.VertexPositionsDistinct
 
 instance {Triple Element : Type*}
-    [DecidableEq Triple] [Fintype Triple] [Fintype Element]
+    [DecidableEq Triple] [DecidableEq Element]
+    [Fintype Triple] [Fintype Element]
     (drawing : LocalIncidenceDrawing Triple Element) :
     Decidable drawing.IsPlanar := by
   unfold IsPlanar
@@ -236,7 +257,8 @@ def IsValid {Triple Element : Type*}
   drawing.RoutesMatch ∧ drawing.IsOrthogonal ∧ drawing.IsPlanar
 
 instance {Triple Element : Type*}
-    [DecidableEq Triple] [Fintype Triple] [Fintype Element]
+    [DecidableEq Triple] [DecidableEq Element]
+    [Fintype Triple] [Fintype Element]
     (drawing : LocalIncidenceDrawing Triple Element) :
     Decidable drawing.IsValid := by
   unfold IsValid

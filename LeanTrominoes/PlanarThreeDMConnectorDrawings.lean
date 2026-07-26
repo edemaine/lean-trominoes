@@ -367,9 +367,9 @@ ports agree with the ordinary template's standard points. -/
 def normalizeFixedRedBoundary (point : Cell) : Cell :=
   (2 * point.1 + 4, point.2 - 2)
 
-/-- Rotate the fixed-red module to put its continuation ports on top,
-reflect positive polarity to put the current slot first, and normalize their
-spacing to `(4, 0)` and `(12, 0)`. -/
+/-- Rotate the fixed-red module, reflect positive polarity to put the current
+slot first, normalize the continuation spacing, and place the module above
+the common cycle-port line. -/
 def boundaryDrawing (polarity : Bool) :
     LocalIncidenceDrawing
       FixedRedConnectorTriple FixedRedConnectorElement :=
@@ -379,7 +379,8 @@ def boundaryDrawing (polarity : Bool) :
       rotated.mapPoints (reflectAcrossVertical 2)
     else
       rotated
-  oriented.mapPoints normalizeFixedRedBoundary
+  (oriented.mapPoints normalizeFixedRedBoundary).mapPoints
+    (reflectAcrossHorizontal 0)
 
 @[simp]
 theorem boundaryDrawing_reference

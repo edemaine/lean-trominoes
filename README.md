@@ -1506,7 +1506,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/LocalIncidenceDrawing.lean`](LeanTrominoes/LocalIncidenceDrawing.lean)
   defines finite orthogonal incidence-drawing certificates with exact
   continuous tests for collinear overlap, route simplicity, endpoint-only
-  contact, and vertex-interior avoidance.
+  contact, vertex-interior avoidance, and injective positions for all
+  vertices in both parts of the incidence graph.
 - [`LeanTrominoes/PlanarThreeDMConnectorDrawings.lean`](LeanTrominoes/PlanarThreeDMConnectorDrawings.lean)
   supplies explicit orthogonal routes for both ordinary occurrence modules
   and the fixed-red detour.  Finite computation verifies every advertised
@@ -1514,6 +1515,12 @@ The representation choices for this target are:
   second family of outer-face templates exposes all five degree-one ports and
   puts the two polarity-normalized cycle ports at the common coordinates
   `(4, 0)` and `(12, 0)`.
+- [`LeanTrominoes/PlanarThreeDMVariableSiteDrawing.lean`](LeanTrominoes/PlanarThreeDMVariableSiteDrawing.lean)
+  places one, two, or three selected occurrence modules above a common port
+  line and closes their red continuations on private lanes below it.  The
+  actual shared cycle-link elements are identified in the finite incidence
+  graph, and exhaustive computation certifies a planar orthogonal drawing
+  for every connector-kind and polarity pattern.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
