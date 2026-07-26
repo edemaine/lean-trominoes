@@ -1969,6 +1969,13 @@ The representation choices for this target are:
   actual shared cycle-link elements are identified in the finite incidence
   graph, and exhaustive computation certifies a planar orthogonal drawing
   for every connector-kind and polarity pattern.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteDrawing.lean)
+  identifies the periodic reduction's occurrence slots with those finite
+  drawing slots and instantiates the checked one-, two-, or three-module
+  site at every occurring source variable.  Every listed periodic
+  variable triple is packaged as an active finite triple, with exact route
+  endpoints and orthogonality inherited from the exhaustive local
+  certificate.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
