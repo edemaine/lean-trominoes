@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarOrderedOneInThreePositioned
 import LeanTrominoes.PositionedPeriodicCNFIncidenceDrawing
+import LeanTrominoes.PositionedPeriodicCNFIncidenceRouteLookup
 import Mathlib.Data.List.Sort
 
 /-!
@@ -108,6 +109,121 @@ def occurrenceTerminalDirection
     (copy : ThreeOccurrenceVariable Variable) :
     TerminalDirection :=
   routeTerminalDirection (routes copy.2.1 copy.2.2)
+
+/-- Every genuine occurrence copy determines the matching metadata-rich
+incidence at the same clause and literal indices. -/
+theorem exists_taggedIncidence_of_mem_occurrenceVariables
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (copy : ThreeOccurrenceVariable Variable)
+    (copyMember : copy ∈ occurrenceVariables source atom) :
+    ∃ tagged :
+        CNFIncidence Variable × Nat,
+      tagged ∈
+          (PeriodicCNF.incidencesWithMetadata source).zipIdx ∧
+        tagged.1.clauseIndex = copy.2.1 ∧
+        tagged.1.literalIndex = copy.2.2 := by
+  simp only [occurrenceVariables, List.mem_filterMap] at copyMember
+  rcases copyMember with
+    ⟨taggedLiteral, taggedLiteralMember, selected⟩
+  split at selected
+  · simp only [Option.some.injEq] at selected
+    subst copy
+    simp only [taggedLiterals, List.mem_flatMap,
+      List.mem_map] at taggedLiteralMember
+    rcases taggedLiteralMember with
+      ⟨taggedClause, taggedClauseMember,
+        sourceTaggedLiteral, sourceTaggedLiteralMember,
+        taggedLiteralEq⟩
+    subst taggedLiteral
+    let incidence : CNFIncidence Variable :=
+      ⟨taggedClause.2, taggedClause.1,
+        sourceTaggedLiteral.2, sourceTaggedLiteral.1⟩
+    have incidenceMember :
+        incidence ∈
+          PeriodicCNF.incidencesWithMetadata source := by
+      simp only [PeriodicCNF.incidencesWithMetadata,
+        List.mem_flatMap, List.mem_map]
+      exact
+        ⟨taggedClause, taggedClauseMember,
+          sourceTaggedLiteral, sourceTaggedLiteralMember, rfl⟩
+    rcases List.mem_iff_getElem.mp incidenceMember with
+      ⟨index, indexLt, incidenceAt⟩
+    refine ⟨(incidence, index), ?_, rfl, rfl⟩
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨indexLt, incidenceAt⟩
+  · contradiction
+
+/-- Every final segment of the certified route belonging to a genuine
+occurrence copy is axis-aligned. -/
+theorem occurrence_route_last_axisAligned
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.PlanarIncidencePresentation
+        source placement)
+    (atom : Variable) (copy : ThreeOccurrenceVariable Variable)
+    (copyMember :
+      copy ∈ occurrenceVariables source.erase atom)
+    {segment : GridSegment}
+    (last :
+      (gridPolylineSegments
+        (presentation.routes copy.2.1 copy.2.2)).getLast? =
+          some segment) :
+    segment.IsAxisAligned := by
+  rcases
+      exists_taggedIncidence_of_mem_occurrenceVariables
+        source.erase atom copy copyMember with
+    ⟨tagged, taggedMember, clauseIndex, literalIndex⟩
+  have routeOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (presentation.routes copy.2.1 copy.2.2) :=
+    by
+      have taggedRouteOrthogonal :=
+        presentation.route_orthogonal_of_tagged taggedMember
+      simpa [clauseIndex, literalIndex] using
+        taggedRouteOrthogonal
+  apply
+    (PeriodicOrthocrossing.orthogonalPolyline_iff_segments
+      (presentation.routes copy.2.1 copy.2.2)).mp
+      routeOrthogonal
+  have segmentLastMember :
+      segment ∈
+        (gridPolylineSegments
+          (presentation.routes copy.2.1 copy.2.2)).getLast? := by
+    rw [last]
+    simp
+  rcases List.mem_getLast?_eq_getLast segmentLastMember with
+    ⟨segmentsNonempty, segmentEq⟩
+  rw [segmentEq]
+  exact List.getLast_mem segmentsNonempty
+
+/-- A certified occurrence route with a final segment receives one of the
+four genuine cyclic direction keys. -/
+theorem occurrenceTerminalDirection_ne_degenerate
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.PlanarIncidencePresentation
+        source placement)
+    (atom : Variable) (copy : ThreeOccurrenceVariable Variable)
+    (copyMember :
+      copy ∈ occurrenceVariables source.erase atom)
+    {segment : GridSegment}
+    (last :
+      (gridPolylineSegments
+        (presentation.routes copy.2.1 copy.2.2)).getLast? =
+          some segment) :
+    occurrenceTerminalDirection presentation.routes copy ≠
+      .degenerate := by
+  exact
+    routeTerminalDirection_ne_degenerate_of_last_axisAligned
+      last
+      (occurrence_route_last_axisAligned
+        presentation atom copy copyMember last)
 
 /-- Boolean comparison used to sort occurrence copies cyclically around
 their common variable endpoint. -/

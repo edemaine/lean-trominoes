@@ -1,5 +1,6 @@
 import LeanTrominoes.PositionedPeriodicCNFIncidenceDrawing
 import LeanTrominoes.PeriodicCNFPlanarIncidences
+import LeanTrominoes.PeriodicOrthocrossingOrthogonal
 
 /-!
 # Pointwise lookup in positioned periodic incidence drawings
@@ -255,6 +256,51 @@ theorem PlanarIncidencePresentation.route_endpoints_of_tagged
       source placement presentation.routes endpointMembers.2] at endpoints
   simpa [CNFIncidence.edge, PeriodicCNF.incidenceEdge,
     incidenceVertexPositionAt] using endpoints
+
+/-- Every actual pointwise incidence route occurs in the certified drawing's
+flat route list. -/
+theorem PlanarIncidencePresentation.route_mem_of_tagged
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PlanarIncidencePresentation source placement)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMember :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    presentation.routes
+        tagged.1.clauseIndex tagged.1.literalIndex ∈
+      (incidenceDrawing source placement
+        presentation.routes).edgeRoutes := by
+  change
+    presentation.routes
+        tagged.1.clauseIndex tagged.1.literalIndex ∈
+      incidenceEdgeRoutes source presentation.routes
+  rw [incidenceEdgeRoutes_eq_metadata_map]
+  exact List.mem_map.mpr
+    ⟨tagged.1, List.fst_mem_of_mem_zipIdx taggedMember, rfl⟩
+
+/-- Every actual pointwise incidence route in a certified presentation is an
+orthogonal polyline. -/
+theorem PlanarIncidencePresentation.route_orthogonal_of_tagged
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PlanarIncidencePresentation source placement)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMember :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (presentation.routes
+        tagged.1.clauseIndex tagged.1.literalIndex) := by
+  exact
+    (PeriodicGridDrawing.isOrthogonal_iff_routes
+      (incidenceDrawing source placement
+        presentation.routes)).mp presentation.orthogonal _
+      (presentation.route_mem_of_tagged taggedMember)
 
 end PositionedPeriodicCNF
 end LeanTrominoes

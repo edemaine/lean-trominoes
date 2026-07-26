@@ -186,7 +186,9 @@ The representation choices for this target are:
   receive distinct columns under the maximum-degree-three premise.
   [`LeanTrominoes/PeriodicOrthocrossingOrthogonal.lean`](LeanTrominoes/PeriodicOrthocrossingOrthogonal.lean)
   classifies every local offset into the five cardinal cases, proves each
-  complete route orthogonal, and lifts this fact to the full periodic drawing.
+  complete route orthogonal, and identifies drawing orthogonality with
+  route-by-route orthogonal polylines before lifting the construction to the
+  full periodic drawing.
   [`LeanTrominoes/PeriodicOrthocrossingSegments.lean`](LeanTrominoes/PeriodicOrthocrossingSegments.lean)
   exposes the equivalent protoedge-first enumeration of drawing segments and
   proves periodic-coordinate and common-lane lemmas for the crossing proof;
@@ -383,8 +385,10 @@ The representation choices for this target are:
   bridges the certificate's flat drawing lists back to individual
   clause/literal occurrences.  It proves pointwise vertex-position and route
   lookup, recovers each occurrence's positioned metadata, and derives the
-  exact source and translated-target endpoints of its declared route.  This
-  is the splice interface used by the planar 3DM gadget assembly.
+  exact source and translated-target endpoints of its declared route; every
+  genuine pointwise route is also recovered from the flat list with its
+  orthogonal-polyline certificate.  This is the splice interface used by the
+  planar 3DM gadget assembly.
   [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean)
   fixes the periodic gauge used by that splice: it subtracts each clause's
   first literal offset from every literal and from the displayed clause
@@ -1240,8 +1244,10 @@ The representation choices for this target are:
   extracts such an order from a planar incidence route family by sorting
   genuine occurrence copies in cyclic order of their terminal segment
   directions.  Merge-sort permutation certifies that no syntactic
-  occurrence is introduced or lost, and the construction is specialized to
-  the wrapped routed SAT presentation.
+  occurrence is introduced or lost, while metadata lookup and route
+  orthogonality prove that every existing final segment of a genuine
+  occurrence receives a nondegenerate direction.  The construction is
+  specialized to the wrapped routed SAT presentation.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that

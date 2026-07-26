@@ -127,6 +127,61 @@ theorem orthogonalPolyline_iff_segments (points : List Cell) :
           intro segment segmentMem
           exact segments segment (by simp [gridPolylineSegments, segmentMem])
 
+end PeriodicOrthocrossing
+
+/-- The indexed-segment definition of drawing orthogonality is equivalent
+to checking every route as an orthogonal polyline. -/
+theorem PeriodicGridDrawing.isOrthogonal_iff_routes
+    (drawing : PeriodicGridDrawing) :
+    drawing.IsOrthogonal ↔
+      ∀ route ∈ drawing.edgeRoutes,
+        PeriodicOrthocrossing.OrthogonalPolyline route := by
+  constructor
+  · intro orthogonal route routeMem
+    apply
+      (PeriodicOrthocrossing.orthogonalPolyline_iff_segments
+        route).2
+    intro segment segmentMem
+    rcases List.mem_iff_getElem.mp routeMem with
+      ⟨routeIndex, routeIndexLt, routeAt⟩
+    rcases List.mem_iff_getElem.mp segmentMem with
+      ⟨segmentIndex, segmentIndexLt, segmentAt⟩
+    have taggedRouteMem :
+        (route, routeIndex) ∈ drawing.edgeRoutes.zipIdx := by
+      rw [List.mem_zipIdx_iff_getElem?,
+        List.getElem?_eq_some_iff]
+      exact ⟨routeIndexLt, routeAt⟩
+    have taggedSegmentMem :
+        (segment, segmentIndex) ∈
+          (gridPolylineSegments route).zipIdx := by
+      rw [List.mem_zipIdx_iff_getElem?,
+        List.getElem?_eq_some_iff]
+      exact ⟨segmentIndexLt, segmentAt⟩
+    apply orthogonal
+      ⟨routeIndex, segmentIndex, segment⟩
+    unfold PeriodicGridDrawing.indexedSegments
+    apply List.mem_flatMap.mpr
+    refine ⟨(route, routeIndex), taggedRouteMem, ?_⟩
+    apply List.mem_map.mpr
+    exact
+      ⟨(segment, segmentIndex), taggedSegmentMem, rfl⟩
+  · intro routes indexed indexedMem
+    unfold PeriodicGridDrawing.indexedSegments at indexedMem
+    rcases List.mem_flatMap.mp indexedMem with
+      ⟨taggedRoute, taggedRouteMem, indexedMem⟩
+    rcases List.mem_map.mp indexedMem with
+      ⟨taggedSegment, taggedSegmentMem, indexedEq⟩
+    subst indexed
+    exact
+      (PeriodicOrthocrossing.orthogonalPolyline_iff_segments
+        taggedRoute.1).1
+        (routes taggedRoute.1
+          (List.fst_mem_of_mem_zipIdx taggedRouteMem))
+        taggedSegment.1
+        (List.fst_mem_of_mem_zipIdx taggedSegmentMem)
+
+namespace PeriodicOrthocrossing
+
 theorem isChain_joinPolylines {relation : Cell → Cell → Prop}
     {first second : List Cell}
     (firstChain : first.IsChain relation)
