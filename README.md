@@ -1515,6 +1515,14 @@ The representation choices for this target are:
   duplicate-free unit-step source route are pairwise contact-free.  The
   recursive proof separates each leading tile from all later tiles and then
   composes the four resulting piecewise certificates across both joins.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSeparation.lean)
+  retains full-route provenance while recursively comparing every tile in
+  two different corridor cores.  Duplicate-freeness makes each displayed
+  tile center internal to its complete source route, so endpoint-only source
+  contact and the local macrocell theorem give strict separation for
+  arbitrary colors.  This is specialized to unequal active occurrences whose
+  unit source routes have at least three points; the exceptional one-edge
+  route shape remains part of the endpoint layer.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean)
   lifts the closed-block bound from individual ribbon tiles to recursively
   assembled corridor cores.  Every listed core point is assigned to the
