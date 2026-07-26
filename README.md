@@ -1434,9 +1434,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMContractionPlanarity.lean`](LeanTrominoes/PeriodicThreeDMContractionPlanarity.lean)
   records segment-level provenance for every retained and through route.
   Joining is proved to introduce no segment, while translation and reversal
-  realize each contracted segment from its unique original incidence segment;
-  this is the route decomposition used to transfer the two planarity
-  predicates.
+  realize each contracted segment from its unique original incidence segment.
+  The provenance enumeration is index-for-index equal to the contracted
+  drawing's indexed segments, and its original occurrence-key map is
+  injective under the degree promise; this is the route decomposition used
+  to transfer the two planarity predicates.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
