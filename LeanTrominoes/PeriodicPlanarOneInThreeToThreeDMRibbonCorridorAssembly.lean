@@ -32,6 +32,9 @@ def SourceRouteHasNoImmediateReversal : List Cell → Prop
 /-- Join one translated half-edge tile for every interior source point. -/
 def ribbonCorridorCore
     (color : WireColor) : List Cell → List Cell
+  | first :: second :: [] =>
+      [ribbonMacrocellExit first
+        (AxisDirection.between first second) color]
   | first :: center :: next :: [] =>
       ribbonMacrocellRoute center
         (AxisDirection.between first center)
@@ -46,6 +49,12 @@ def ribbonCorridorCore
   | _ => []
 termination_by points => points.length
 
+/-- Advertised variable-side boundary point of every nondegenerate core. -/
+def ribbonCorridorCoreStart
+    (color : WireColor) (first second : Cell) : Cell :=
+  ribbonMacrocellExit first
+    (AxisDirection.between first second) color
+
 /-- Final advertised boundary point of a nonempty corridor core. -/
 def ribbonCorridorCoreFinish
     (color : WireColor) :
@@ -56,6 +65,15 @@ def ribbonCorridorCoreFinish
   | _, center, next, fourth :: rest =>
       ribbonCorridorCoreFinish color
         center next fourth rest
+
+/-- A one-edge source route has a one-point core at the common half-edge
+boundary of its two endpoint macrocells. -/
+@[simp]
+theorem ribbonCorridorCore_pair
+    (color : WireColor) (first second : Cell) :
+    ribbonCorridorCore color [first, second] =
+      [ribbonCorridorCoreStart color first second] := by
+  simp [ribbonCorridorCore, ribbonCorridorCoreStart]
 
 /-- The core begins on the first source edge's macrocell boundary. -/
 theorem ribbonCorridorCore_head?
@@ -175,6 +193,126 @@ theorem ribbonCorridorCore_orthogonal
       rw [shared]
       exact ribbonCorridorCore_head? color
         center next fourth rest
+
+/-- Total final boundary point for a source route with at least two points. -/
+def ribbonCorridorCoreEnd
+    (color : WireColor)
+    (first second : Cell) : List Cell → Cell
+  | [] =>
+      ribbonCorridorCoreStart color first second
+  | next :: rest =>
+      ribbonCorridorCoreFinish color
+        first second next rest
+
+/-- Exact endpoints of every unit-step core with at least two source points. -/
+theorem ribbonCorridorCore_endpoints
+    (color : WireColor)
+    (first second : Cell) (rest : List Cell)
+    (unitSteps :
+      (first :: second :: rest).IsChain
+        AxisDirection.IsUnitAxisStep) :
+    (ribbonCorridorCore color
+        (first :: second :: rest)).head? =
+        some (ribbonCorridorCoreStart color first second) ∧
+      (ribbonCorridorCore color
+        (first :: second :: rest)).getLast? =
+        some (ribbonCorridorCoreEnd color
+          first second rest) := by
+  cases rest with
+  | nil =>
+      simp [ribbonCorridorCoreStart,
+        ribbonCorridorCoreEnd]
+  | cons next rest =>
+      have firstStep :=
+        (List.isChain_cons_cons.mp unitSteps).1
+      have shared :=
+        ribbonMacrocellExit_eq_entry_of_unitAxisStep
+          firstStep color
+      constructor
+      · rw [ribbonCorridorCore_head?]
+        exact congrArg some shared.symm
+      · simpa [ribbonCorridorCoreEnd] using
+          ribbonCorridorCore_getLast? color
+            first second next rest unitSteps
+
+/-- Every certified unit-step source route with at least two points has a
+rectilinear colored core, including the one-edge case. -/
+theorem ribbonCorridorCore_orthogonal_of_cons_cons
+    (color : WireColor)
+    (first second : Cell) (rest : List Cell)
+    (unitSteps :
+      (first :: second :: rest).IsChain
+        AxisDirection.IsUnitAxisStep)
+    (noReversal :
+      SourceRouteHasNoImmediateReversal
+        (first :: second :: rest)) :
+    OrthogonalPolyline
+      (ribbonCorridorCore color
+        (first :: second :: rest)) := by
+  cases rest with
+  | nil =>
+      simp [OrthogonalPolyline]
+  | cons next rest =>
+      exact ribbonCorridorCore_orthogonal color
+        first second next rest unitSteps noReversal
+
+/-- Total advertised first boundary point of a source route. -/
+def ribbonCorridorRouteStart
+    (color : WireColor) : List Cell → Cell
+  | first :: second :: _ =>
+      ribbonCorridorCoreStart color first second
+  | _ => (0, 0)
+
+/-- Total advertised final boundary point of a source route. -/
+def ribbonCorridorRouteEnd
+    (color : WireColor) : List Cell → Cell
+  | first :: second :: rest =>
+      ribbonCorridorCoreEnd color first second rest
+  | _ => (0, 0)
+
+/-- Exact endpoints of every nondegenerate unit-step source route. -/
+theorem ribbonCorridorCore_endpoints_of_length_ge_two
+    (color : WireColor) {points : List Cell}
+    (length : 2 ≤ points.length)
+    (unitSteps :
+      points.IsChain AxisDirection.IsUnitAxisStep) :
+    (ribbonCorridorCore color points).head? =
+        some (ribbonCorridorRouteStart color points) ∧
+      (ribbonCorridorCore color points).getLast? =
+        some (ribbonCorridorRouteEnd color points) := by
+  cases points with
+  | nil =>
+      simp at length
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp at length
+      | cons second rest =>
+          simpa [ribbonCorridorRouteStart,
+            ribbonCorridorRouteEnd] using
+            ribbonCorridorCore_endpoints color
+              first second rest unitSteps
+
+/-- Rectilinearity of every nondegenerate certified unit-step source route. -/
+theorem ribbonCorridorCore_orthogonal_of_length_ge_two
+    (color : WireColor) {points : List Cell}
+    (length : 2 ≤ points.length)
+    (unitSteps :
+      points.IsChain AxisDirection.IsUnitAxisStep)
+    (noReversal :
+      SourceRouteHasNoImmediateReversal points) :
+    OrthogonalPolyline (ribbonCorridorCore color points) := by
+  cases points with
+  | nil =>
+      simp at length
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp at length
+      | cons second rest =>
+          exact
+            ribbonCorridorCore_orthogonal_of_cons_cons
+              color first second rest unitSteps noReversal
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

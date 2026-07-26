@@ -29,6 +29,13 @@ def unitSegmentPoints (first second : Cell) : List Cell :=
     Cell.add first (Cell.scale (index : Int) direction.step)
 
 @[simp]
+theorem unitSegmentPoints_length
+    (first second : Cell) :
+    (unitSegmentPoints first second).length =
+      segmentLength first second + 1 := by
+  simp [unitSegmentPoints]
+
+@[simp]
 theorem unitSegmentPoints_head?
     (first second : Cell) :
     (unitSegmentPoints first second).head? = some first := by
@@ -85,6 +92,27 @@ theorem add_length_step_eq_second_of_axisAligned
         exact Int.natAbs_of_nonneg (by omega)
       simp [segmentLength, between, forward, backward, step,
         Cell.add, Cell.scale, castLength, nondegenerate]
+
+/-- A nondegenerate axis-aligned segment has positive lattice length. -/
+theorem segmentLength_positive_of_axisAligned
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    0 < segmentLength first second := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [GridSegment.IsAxisAligned,
+    GridSegment.IsHorizontal, GridSegment.IsVertical] at aligned
+  rcases aligned with
+      ⟨horizontal, nondegenerate⟩ |
+      ⟨vertical, nondegenerate⟩
+  · unfold segmentLength
+    rw [show secondY - firstY = 0 by omega]
+    simp only [Int.natAbs_zero, add_zero, Int.natAbs_pos]
+    omega
+  · unfold segmentLength
+    rw [show secondX - firstX = 0 by omega]
+    simp only [Int.natAbs_zero, zero_add, Int.natAbs_pos]
+    omega
 
 @[simp]
 theorem unitSegmentPoints_getLast?
@@ -311,6 +339,24 @@ theorem unitSubdividePolyline_unitSteps
         (unitSegmentPoints_getLast? parts.1)
       simpa using unitSubdividePolyline_head?
         (points := second :: rest) (by simp)
+
+/-- A route with at least one source segment still has at least two points
+after unit subdivision. -/
+theorem unitSubdividePolyline_length_ge_two
+    {first second : Cell} {rest : List Cell}
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (first :: second :: rest)) :
+    2 ≤
+      (unitSubdividePolyline
+        (first :: second :: rest)).length := by
+  have aligned :=
+    (List.isChain_cons_cons.mp orthogonal).1
+  have positive :=
+    segmentLength_positive_of_axisAligned aligned
+  rw [unitSubdividePolyline]
+  simp [joinAtEndpoint]
+  omega
 
 end AxisDirection
 end LeanTrominoes

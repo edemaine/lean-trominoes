@@ -1424,7 +1424,15 @@ The representation choices for this target are:
   Under the explicit no-immediate-reversal condition, the assembled core is
   proved rectilinear with exact first and last macrocell-boundary endpoints;
   every join uses the proved equality of the two neighboring half-edge
-  boundary points.
+  boundary points.  A one-edge source route is handled uniformly by the
+  single point shared by its two endpoint macrocells.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonUnitRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonUnitRoutes.lean)
+  specializes unit subdivision to every active exact-one incidence.  Each
+  selected route retains its exact variable and clause endpoints, remains
+  rectilinear, has at least two points, and is a chain of genuine unit
+  cardinal steps.  Its colored corridor core therefore has exact half-edge
+  boundary endpoints; source continuous planarity still needs to discharge
+  the explicit no-immediate-reversal premise.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
