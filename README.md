@@ -1997,6 +1997,12 @@ The representation choices for this target are:
   encoded edge count, every assembled route is proved rectilinear, and
   tag-indexed lookup proves its endpoints are exactly the corresponding
   global typed triple and periodically translated colored element.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
+  packages those typed positions and routes as the numeric periodic grid
+  drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
+  incidence-tag route lookup prove full graph endpoint compatibility, while
+  a separate global geometry certificate isolates the remaining
+  distinctness, fundamental-square, and periodic-planarity obligations.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
