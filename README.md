@@ -1307,6 +1307,11 @@ The representation choices for this target are:
   merge-sorted occurrence list is pairwise ordered by its actual terminal
   rays, providing the rotation-system fact needed by the noncrossing local
   fan even when an incidence is not compass-aligned.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularFanOrder.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularFanOrder.lean)
+  identifies each angular occurrence-list index with its east-first Figure 7
+  port, cyclic port rank, and positioned split-copy vertex.  Increasing list
+  indices are also proved to follow the actual polar order of the source
+  terminal rays, giving the local fan a direct combinatorial interface.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
