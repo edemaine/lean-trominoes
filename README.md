@@ -1498,6 +1498,14 @@ The representation choices for this target are:
   explicit trichromatic references.  Their exhaustive truth table proves the
   same all-or-none RGB-terminal contract as the fixed-red detour, so the three
   module kinds cover every terminal order needed by the colored clause core.
+- [`LeanTrominoes/LocalIncidenceDrawing.lean`](LeanTrominoes/LocalIncidenceDrawing.lean)
+  defines finite orthogonal incidence-drawing certificates with exact
+  continuous tests for collinear overlap, route simplicity, endpoint-only
+  contact, and vertex-interior avoidance.
+- [`LeanTrominoes/PlanarThreeDMConnectorDrawings.lean`](LeanTrominoes/PlanarThreeDMConnectorDrawings.lean)
+  supplies explicit orthogonal routes for both ordinary occurrence modules
+  and the fixed-red detour.  Finite computation verifies every advertised
+  endpoint and proves all three connector drawings continuously planar.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
