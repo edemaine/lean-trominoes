@@ -1249,6 +1249,10 @@ The representation choices for this target are:
   accounting.  A selected compass copy occurs at most once in the copied
   source clauses, while its fixed implication ring contributes at most two
   occurrences, so every output variable occurs at most three times.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean)
+  assigns a chosen rotation order to the eight clockwise Figure 7 ports.
+  Whenever every per-variable occurrence list has length at most eight, the
+  induced total clause/literal-indexed assignment is proved collision-free.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover
