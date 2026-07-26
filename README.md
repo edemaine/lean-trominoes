@@ -1454,6 +1454,11 @@ The representation choices for this target are:
   the verified Figure 7 copy and implication-clause coordinates.  Erasing
   positions recovers exactly the semantic fixed-eight split, and the refined
   placement retains a positive drawing period.
+- [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean)
+  equips the positioned split with canonical orthogonal incidence detours.
+  Their periodic endpoints agree exactly with the refined formula and
+  placement, providing the compatible axis-aligned baseline for the later
+  noncrossing ring splice.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
