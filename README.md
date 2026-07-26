@@ -1376,6 +1376,14 @@ The representation choices for this target are:
   fixed terminal prototype to coincide.  Thus bend deduplication contributes
   at most two occurrences, and the complete normalized route wire has the
   terminal bound `6 + 2 = 8`.
+- [`LeanTrominoes/PeriodicOrthocrossingRouteEndpointNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingRouteEndpointNormalizationDegree.lean)
+  sharpens the normalized route-wire bound at the CNF incidence endpoints.
+  Source terminals use segment index zero, while every bend's outgoing
+  segment has successor index; every bend's incoming segment is likewise
+  proved to precede the route's final target segment.  Thus neither endpoint
+  prototype occurs in the normalized bend family, leaving only the
+  at-most-six complete-carrier occurrences before clause and variable
+  attachments are added.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
