@@ -1470,6 +1470,11 @@ The representation choices for this target are:
   direction and color; same-entry, same-exit, opposite-direction, and
   different-color coincidences are impossible.  Translation lifts this
   classification from the origin to arbitrary adjacent source centers.
+  [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellStrictSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellStrictSeparation.lean)
+  turns those exact contact classifications into contact-free separation
+  certificates.  Different colors in one legal tile never meet, and tiles
+  at distinct centers strictly avoid one another whenever the one classified
+  common-directed-edge contact is excluded.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
   recursively joins those half-edge tiles along a unit-step source route.
   Under the explicit no-immediate-reversal condition, the assembled core is
