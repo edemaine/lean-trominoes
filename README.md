@@ -1439,6 +1439,12 @@ The representation choices for this target are:
   original routes whose listed contacts are endpoint-only retain
   endpoint-only contacts after subdivision; in particular, their strictly
   internal unit points are distinct.
+- [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionSimplicity.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionSimplicity.lean)
+  proves that subdivision of one simple orthogonal route is duplicate-free.
+  Each individual segment subdivision is injective, while source point/segment
+  and distinct-segment separation exclude every possible duplicate across
+  recursively joined segments.  The module also proves that route simplicity
+  is preserved by reversal.
 - [`LeanTrominoes/PeriodicGridDrawingNoImmediateReversal.lean`](LeanTrominoes/PeriodicGridDrawingNoImmediateReversal.lean)
   turns continuous planarity into the local route condition needed by ribbon
   assembly.  An immediate reversal makes two adjacent open segment interiors
@@ -1500,9 +1506,11 @@ The representation choices for this target are:
   rectilinear, has at least two points, and is a chain of genuine unit
   cardinal steps.  Continuous planarity rules out immediate reversals on the
   stored route, and that certificate is proved invariant under reversal,
-  periodic rebasing, and unit subdivision.  Thus each colored corridor core
-  has exact half-edge boundary endpoints and is unconditionally rectilinear
-  for a continuously planar source presentation.
+  periodic rebasing, and unit subdivision.  Ribbon-ready source certificates
+  additionally make the unit route duplicate-free, so differently colored
+  corridor cores along the same occurrence are pairwise contact-free.  Thus
+  each core has exact half-edge boundary endpoints and is unconditionally
+  rectilinear for a continuously planar source presentation.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

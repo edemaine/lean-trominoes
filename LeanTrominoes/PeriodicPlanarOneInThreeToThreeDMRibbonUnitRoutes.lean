@@ -1,5 +1,7 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridorSeparation
 import LeanTrominoes.PeriodicGridDrawingNoImmediateReversal
+import LeanTrominoes.OrthogonalPolylineUnitSubdivisionSimplicity
 
 /-!
 # Unit source routes for 3DM ribbon corridors
@@ -19,6 +21,7 @@ namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PeriodicOrthocrossing
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 /-- The source incidence route with every axis-aligned segment subdivided
 into ordered unit lattice steps. -/
@@ -91,6 +94,47 @@ theorem occurrenceSourceRoute_hasNoImmediateReversal
     variableToClauseRoute_hasNoImmediateReversal
       presentation data.indexedMember
 
+/-- Reversing and rebasing a tagged route from a ribbon-ready presentation
+preserves its finite simplicity certificate. -/
+theorem variableToClauseRoute_isSimple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMember :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (presentation.toPlanarIncidencePresentation
+        |>.variableToClauseRoute tagged.1) := by
+  have originalSimple :=
+    presentation.routeIsSimple_of_tagged taggedMember
+  have reversedSimple := originalSimple.reverse
+  unfold
+    PositionedPeriodicCNF.PlanarIncidencePresentation.variableToClauseRoute
+    PeriodicOrthocrossing.translatePolyline
+  exact routeIsSimple_translate reversedSimple _
+
+/-- Every active occurrence source route selected from a ribbon-ready
+presentation is simple after reversal and periodic rebasing. -/
+theorem occurrenceSourceRoute_isSimple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (occurrenceSourceRoute
+        presentation.toPlanarIncidencePresentation entry) := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let data := occurrenceSpliceData planar entry
+  exact
+    variableToClauseRoute_isSimple
+      presentation data.indexedMember
+
 /-- The unitized source route remains orthogonal. -/
 theorem occurrenceUnitSourceRoute_orthogonal
     {Variable : Type*} [DecidableEq Variable]
@@ -136,6 +180,23 @@ theorem occurrenceUnitSourceRoute_hasNoImmediateReversal
         presentation.toPlanarIncidencePresentation entry)
       (occurrenceSourceRoute_hasNoImmediateReversal
         presentation entry)
+
+/-- Unit subdivision of an active simple occurrence route introduces no
+duplicate lattice points. -/
+theorem occurrenceUnitSourceRoute_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    (occurrenceUnitSourceRoute
+      presentation.toPlanarIncidencePresentation entry).Nodup := by
+  exact
+    AxisDirection.unitSubdividePolyline_nodup
+      (occurrenceSourceRoute_orthogonal
+        presentation.toPlanarIncidencePresentation entry)
+      (occurrenceSourceRoute_isSimple presentation entry)
 
 /-- Unit subdivision cannot collapse a genuine incidence route below two
 points. -/
@@ -272,6 +333,57 @@ theorem occurrenceRibbonCorridorCore_orthogonal
       entry color
       (occurrenceUnitSourceRoute_hasNoImmediateReversal
         presentation entry)
+
+/-- The differently colored ribbon cores placed along one active occurrence
+route are separated without any point or interior contact. -/
+theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase)
+    {firstColor secondColor : WireColor}
+    (colorsDifferent : firstColor ≠ secondColor) :
+    RoutesStrictlyAvoidEachOther
+      (occurrenceRibbonCorridorCore
+        presentation.toPlanarIncidencePresentation
+        entry firstColor)
+      (occurrenceRibbonCorridorCore
+        presentation.toPlanarIncidencePresentation
+        entry secondColor) := by
+  let points :=
+    occurrenceUnitSourceRoute
+      presentation.toPlanarIncidencePresentation entry
+  have length :=
+    occurrenceUnitSourceRoute_length
+      presentation.toPlanarIncidencePresentation entry
+  cases pointsEquation : points with
+  | nil =>
+      simp [pointsEquation, points] at length
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp [pointsEquation, points] at length
+      | cons second rest =>
+          simpa [occurrenceRibbonCorridorCore,
+            points, pointsEquation] using
+            ribbonCorridorCores_strictlyAvoidEachOther
+              colorsDifferent first second rest
+              (by
+                simpa [points, pointsEquation] using
+                  occurrenceUnitSourceRoute_unitSteps
+                    presentation.toPlanarIncidencePresentation
+                    entry)
+              (by
+                simpa [points, pointsEquation] using
+                  occurrenceUnitSourceRoute_hasNoImmediateReversal
+                    presentation.toContinuousPlanarIncidencePresentation
+                    entry)
+              (by
+                simpa [points, pointsEquation] using
+                  occurrenceUnitSourceRoute_nodup
+                    presentation entry)
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
