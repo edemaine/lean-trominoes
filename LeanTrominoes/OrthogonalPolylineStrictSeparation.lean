@@ -103,6 +103,29 @@ theorem RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther
         _ (List.get_mem _ secondIndex)
         equal).elim
 
+/-- Contact-free route separation is symmetric. -/
+theorem RoutesStrictlyAvoidEachOther.symm
+    {first second : List Cell}
+    (strict : RoutesStrictlyAvoidEachOther first second) :
+    RoutesStrictlyAvoidEachOther second first := by
+  unfold RoutesStrictlyAvoidEachOther at strict ⊢
+  exact
+    ⟨fun secondSegment secondMember firstSegment firstMember =>
+        by
+          intro meet
+          apply strict.1 firstSegment firstMember
+            secondSegment secondMember
+          simpa [GridSegment.InteriorsMeet,
+            GridSegment.OpenIntervalsOverlap,
+            and_comm, and_left_comm, and_assoc,
+            or_comm, or_left_comm, or_assoc,
+            eq_comm] using meet,
+      strict.2.2.1,
+      strict.2.1,
+      fun secondPoint secondMember firstPoint firstMember equal =>
+        strict.2.2.2 firstPoint firstMember
+          secondPoint secondMember equal.symm⟩
+
 /-- Segment enumeration of `joinAtEndpoint` is exact when the advertised
 boundary points agree. -/
 theorem gridPolylineSegments_joinAtEndpoint

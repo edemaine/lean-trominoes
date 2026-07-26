@@ -1470,11 +1470,12 @@ The representation choices for this target are:
   direction and color; same-entry, same-exit, opposite-direction, and
   different-color coincidences are impossible.  Translation lifts this
   classification from the origin to arbitrary adjacent source centers.
-  [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellStrictSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellStrictSeparation.lean)
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellStrictSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellStrictSeparation.lean)
   turns those exact contact classifications into contact-free separation
   certificates.  Different colors in one legal tile never meet, and tiles
   at distinct centers strictly avoid one another whenever the one classified
-  common-directed-edge contact is excluded.
+  common-directed-edge contact is excluded; distinct colors exclude that
+  contact automatically.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
   recursively joins those half-edge tiles along a unit-step source route.
   Under the explicit no-immediate-reversal condition, the assembled core is
@@ -1482,6 +1483,11 @@ The representation choices for this target are:
   every join uses the proved equality of the two neighboring half-edge
   boundary points.  A one-edge source route is handled uniformly by the
   single point shared by its two endpoint macrocells.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorSeparation.lean)
+  proves that the three differently colored cores assembled along one
+  duplicate-free unit-step source route are pairwise contact-free.  The
+  recursive proof separates each leading tile from all later tiles and then
+  composes the four resulting piecewise certificates across both joins.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonUnitRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonUnitRoutes.lean)
   specializes unit subdivision to every active exact-one incidence.  Each
   selected route retains its exact variable and clause endpoints, remains

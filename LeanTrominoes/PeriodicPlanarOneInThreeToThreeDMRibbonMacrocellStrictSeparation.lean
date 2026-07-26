@@ -336,5 +336,38 @@ theorem ribbonMacrocellRoutes_strictlyAvoidEachOther_of_centers_ne
         secondIncomingGenuine secondOutgoingGenuine secondNoReverse
         firstColor secondColor noEndpointContact
 
+/-- Legal macrocell routes with distinct centers and distinct colors cannot
+realize the only classified endpoint contact, so they are contact-free. -/
+theorem ribbonMacrocellRoutes_strictlyAvoidEachOther_of_centers_ne_of_colors_ne
+    {firstCenter secondCenter : Cell}
+    (centersDifferent : firstCenter ≠ secondCenter)
+    {firstIncoming firstOutgoing
+      secondIncoming secondOutgoing : AxisDirection}
+    (firstIncomingGenuine : firstIncoming.IsGenuine)
+    (firstOutgoingGenuine : firstOutgoing.IsGenuine)
+    (firstNoReverse :
+      firstOutgoing ≠ firstIncoming.opposite)
+    (secondIncomingGenuine : secondIncoming.IsGenuine)
+    (secondOutgoingGenuine : secondOutgoing.IsGenuine)
+    (secondNoReverse :
+      secondOutgoing ≠ secondIncoming.opposite)
+    {firstColor secondColor : WireColor}
+    (colorsDifferent : firstColor ≠ secondColor) :
+    RoutesStrictlyAvoidEachOther
+      (ribbonMacrocellRoute firstCenter
+        firstIncoming firstOutgoing firstColor)
+      (ribbonMacrocellRoute secondCenter
+        secondIncoming secondOutgoing secondColor) := by
+  apply
+    ribbonMacrocellRoutes_strictlyAvoidEachOther_of_centers_ne
+      centersDifferent
+      firstIncomingGenuine firstOutgoingGenuine firstNoReverse
+      secondIncomingGenuine secondOutgoingGenuine secondNoReverse
+      firstColor secondColor
+  intro firstEnd secondEnd contact
+  apply colorsDifferent
+  cases firstEnd <;> cases secondEnd <;>
+    simp_all [RibbonMacrocellEndpointContact]
+
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
