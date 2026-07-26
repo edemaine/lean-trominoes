@@ -21,13 +21,8 @@ open Gadget PeriodicOrthocrossing
 
 /-- Every interior vertex of a source route is straight or a quarter turn,
 never an immediate reversal. -/
-def SourceRouteHasNoImmediateReversal : List Cell → Prop
-  | first :: center :: next :: rest =>
-      AxisDirection.between center next ≠
-          (AxisDirection.between first center).opposite ∧
-        SourceRouteHasNoImmediateReversal
-          (center :: next :: rest)
-  | _ => True
+abbrev SourceRouteHasNoImmediateReversal :=
+  AxisDirection.HasNoImmediateReversal
 
 /-- Join one translated half-edge tile for every interior source point. -/
 def ribbonCorridorCore

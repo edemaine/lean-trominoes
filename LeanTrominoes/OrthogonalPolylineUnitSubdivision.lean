@@ -153,6 +153,15 @@ instance (source target : Cell) :
   unfold IsUnitAxisStep
   infer_instance
 
+/-- Every interior vertex of a directed route is straight or a turn, never
+an immediate reversal along the axis just traversed. -/
+def HasNoImmediateReversal : List Cell → Prop
+  | first :: center :: next :: rest =>
+      between center next ≠
+          (between first center).opposite ∧
+        HasNoImmediateReversal (center :: next :: rest)
+  | _ => True
+
 /-- Taking one genuine cardinal step computes that same directed axis. -/
 theorem between_add_step
     (source : Cell) {direction : AxisDirection}

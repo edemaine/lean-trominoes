@@ -1406,6 +1406,12 @@ The representation choices for this target are:
   every consecutive pair is exactly one genuine cardinal step.  This is the
   discrete interface used to assemble certified ribbon-turn templates across
   adjacent 128-by-128 macrocells.
+- [`LeanTrominoes/PeriodicGridDrawingNoImmediateReversal.lean`](LeanTrominoes/PeriodicGridDrawingNoImmediateReversal.lean)
+  turns continuous planarity into the local route condition needed by ribbon
+  assembly.  An immediate reversal makes two adjacent open segment interiors
+  overlap, contradicting the drawing certificate; consequently every stored
+  orthogonal route in a continuously planar drawing has no immediate
+  reversal.
 - [`LeanTrominoes/OrthogonalPolylineRibbonTurnGeometry.lean`](LeanTrominoes/OrthogonalPolylineRibbonTurnGeometry.lean)
   certifies the finite same-corridor kernel.  At an inside turn the two
   offset lines are trimmed to their intersection; at an outside turn they
