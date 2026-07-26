@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicOneInThreeAnchorNormalization
 import LeanTrominoes.PeriodicPlanarThreeDMIncidenceRouting
 import LeanTrominoes.PeriodicGridDrawingContinuousPlanarity
+import LeanTrominoes.PeriodicGridDrawingEndpointContacts
 import LeanTrominoes.PositionedPeriodicCNFRebasedRouteBounds
 
 /-!
@@ -175,6 +176,19 @@ def normalizedHaloBoundedIncidencePresentation
     (presentation :
       source.HaloBoundedContinuousPlanarIncidencePresentation placement) :
     PositionedPeriodicCNF.HaloBoundedContinuousPlanarIncidencePresentation
+      (normalizedPositionedSource source placement) placement :=
+  presentation.anchorNormalize
+
+/-- The full halo-bounded ribbon-ready presentation, including
+endpoint-only lifted route contacts, transports unchanged to the normalized
+source. -/
+def normalizedRibbonReadyIncidencePresentation
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement) :
+    PositionedPeriodicCNF.HaloBoundedRibbonReadyIncidencePresentation
       (normalizedPositionedSource source placement) placement :=
   presentation.anchorNormalize
 

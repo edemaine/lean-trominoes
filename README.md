@@ -2346,7 +2346,9 @@ The representation choices for this target are:
   fixes the exact normalized source and natural-number 3DM target for the
   geometric assembly.  It packages well-formedness, colored degree two or
   three, perfect-matching and graph-orientation equivalence to the original
-  exact-one source, and the transported routed incidence presentation.
+  exact-one source, and the transported routed incidence presentation,
+  including the halo bounds and endpoint-only contact certificate needed by
+  ribbon thickening.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRoutedTriples.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRoutedTriples.lean)
   identifies, for every used occurrence slot and color, the unique typed
   triple whose terminal incidence leaves the variable gadget.  It proves
