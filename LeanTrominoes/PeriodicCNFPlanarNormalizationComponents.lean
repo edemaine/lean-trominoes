@@ -551,6 +551,34 @@ theorem
     formula (.atom atom)
 
 theorem
+    componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_terminal_occurrence_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (indexed : IndexedGridSegment) (endpoint : SegmentEnd) :
+    (componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
+      formula).variableOccurrences.count
+        (.terminal indexed endpoint) =
+      (PeriodicCNF.variableOccurrences
+        ⟨(normalizedScopedDrawingCrossoverClauses
+          formula).dedup⟩).count (.terminal indexed endpoint) +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(embeddedNormalizedCompleteCarrierClauses
+          formula).dedup⟩).count (.terminal indexed endpoint) +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(embeddedNormalizedRouteBendClauses
+          formula).dedup⟩).count (.terminal indexed endpoint) +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(normalizedRoutedClauseClauses
+          formula).dedup⟩).count (.terminal indexed endpoint) +
+      (PeriodicCNF.variableOccurrences
+        ⟨(PeriodicEquality.normalizedFormulaClauses
+          normalizePlanarSATNode
+          (drawingRoutedVariableLinks formula)).dedup⟩).count
+            (.terminal indexed endpoint)))) :=
+  componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_occurrence_count
+    formula (.terminal indexed endpoint)
+
+theorem
     deduplicatedDrawingPeriodicPlanarSATFormula_variableOccurrences_sublist
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :

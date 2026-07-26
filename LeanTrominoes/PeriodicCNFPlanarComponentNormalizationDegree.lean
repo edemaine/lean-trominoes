@@ -17,13 +17,16 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
-theorem normalizedScopedDrawingCrossoverClauses_terminal_not_mem
+theorem normalizedScopedDrawingCrossoverClauses_terminal_count_eq_zero
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (indexed : IndexedGridSegment) (endpoint : SegmentEnd) :
-    .terminal indexed endpoint ∉
-      ((normalizedScopedDrawingCrossoverClauses formula).dedup.flatMap
-        fun clause => clause.map PeriodicLiteral.atom) := by
+    (PeriodicCNF.variableOccurrences
+      ⟨(normalizedScopedDrawingCrossoverClauses
+        formula).dedup⟩).count
+          (.terminal indexed endpoint) = 0 := by
+  unfold PeriodicCNF.variableOccurrences
+  apply List.count_eq_zero_of_not_mem
   intro terminalMem
   rcases List.mem_flatMap.mp terminalMem with
     ⟨clause, clauseMem, terminalMem⟩

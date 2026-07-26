@@ -1433,6 +1433,12 @@ The representation choices for this target are:
   no carrier occurrence.  Crossover, carrier, bend, and routed-clause
   separation then leaves central atoms with only their active-arm family,
   preserving its six-occurrence bound in the componentwise formula.
+- [`LeanTrominoes/PeriodicCNFPlanarTerminalNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarTerminalNormalizationDegree.lean)
+  recovers represented route occurrences from normalized source-clause and
+  target-arm attachments.  An active attachment excludes the bend family at
+  that terminal; otherwise bends contribute at most two occurrences.  With
+  at most six complete-carrier occurrences, every normalized terminal
+  prototype has degree at most eight.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
