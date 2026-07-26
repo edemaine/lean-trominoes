@@ -1656,6 +1656,12 @@ The representation choices for this target are:
   reference and reversed offset, correspondence with flattened CNF incidence
   metadata, and recovers the certified route and its two endpoints for every
   occurrence entry.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMIncidenceClassification.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMIncidenceClassification.lean)
+  assigns every typed triple and colored element to a variable or clause
+  gadget site.  It proves that every colored incidence of every listed triple
+  is either local to one site with zero offset or exactly one of the routed
+  occurrence incidences, giving the geometric assembly an exhaustive splice
+  interface.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
