@@ -410,6 +410,13 @@ The representation choices for this target are:
   planarity.  The checker enumerates only integer points in each segment
   interior, rather than the area of the whole fundamental square, so the
   fixed gadget certificates remain practical to evaluate.
+  [`LeanTrominoes/PeriodicGridDrawingContinuousPlanarity.lean`](LeanTrominoes/PeriodicGridDrawingContinuousPlanarity.lean)
+  closes the checker’s continuous-geometry gap for collinear unit segments:
+  it adds exact open-interior separation for every pair of periodic segment
+  occurrences, packages this with the established endpoint and vertex
+  conditions, and defines the strengthened positioned-incidence
+  presentation required for safe gadget substitution.  The stronger
+  certificate is invariant under clause-anchor normalization.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

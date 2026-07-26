@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicOneInThreeAnchorNormalization
 import LeanTrominoes.PeriodicPlanarThreeDMIncidenceRouting
+import LeanTrominoes.PeriodicGridDrawingContinuousPlanarity
 
 /-!
 # Normalized input to the planar exact-one-to-3DM reduction
@@ -149,6 +150,18 @@ def normalizedIncidencePresentation
     (presentation :
       source.PlanarIncidencePresentation placement) :
     PositionedPeriodicCNF.PlanarIncidencePresentation
+      (normalizedPositionedSource source placement) placement :=
+  presentation.anchorNormalize
+
+/-- The continuously planar splice presentation likewise transports
+unchanged to the normalized source. -/
+def normalizedContinuousIncidencePresentation
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.ContinuousPlanarIncidencePresentation placement) :
+    PositionedPeriodicCNF.ContinuousPlanarIncidencePresentation
       (normalizedPositionedSource source placement) placement :=
   presentation.anchorNormalize
 
