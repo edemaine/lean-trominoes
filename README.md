@@ -1416,6 +1416,11 @@ The representation choices for this target are:
   finite degree-eight bounds transfer through periodicization, anchor
   normalization, opaque wrapping, and clause deduplication without
   accumulation.
+- [`LeanTrominoes/PeriodicCNFPlanarDeduplicationWrapping.lean`](LeanTrominoes/PeriodicCNFPlanarDeduplicationWrapping.lean)
+  proves that opaque variable wrapping commutes exactly with clause-anchor
+  normalization and deduplication.  It exposes an equivalent unwrapped
+  deduplicated formula for the remaining occurrence accounting, together
+  with exact equality of every wrapped and unwrapped variable count.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
