@@ -1406,6 +1406,13 @@ The representation choices for this target are:
   every consecutive pair is exactly one genuine cardinal step.  This is the
   discrete interface used to assemble certified ribbon-turn templates across
   adjacent 128-by-128 macrocells.
+- [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionContacts.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionContacts.lean)
+  tracks every point introduced by unit subdivision back to either an
+  original listed route point or the relative interior of an original
+  segment.  It uses that provenance to prove that continuously separated
+  original routes whose listed contacts are endpoint-only retain
+  endpoint-only contacts after subdivision; in particular, their strictly
+  internal unit points are distinct.
 - [`LeanTrominoes/PeriodicGridDrawingNoImmediateReversal.lean`](LeanTrominoes/PeriodicGridDrawingNoImmediateReversal.lean)
   turns continuous planarity into the local route condition needed by ribbon
   assembly.  An immediate reversal makes two adjacent open segment interiors
