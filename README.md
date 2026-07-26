@@ -1473,6 +1473,11 @@ The representation choices for this target are:
   in a parallel metadata list.  Projecting the metadata recovers the existing
   formula exactly, so global route lookup can select certified local routes
   without arithmetic assumptions about block size.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean)
+  gives the copied source-clause prefix its matching lossless index bridge.
+  Every transformed clause and literal recovers the original positioned
+  incidence at the same presentation indices together with the exact angular
+  compass copy selected for its endpoint.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean)
   equips the positioned split with canonical orthogonal incidence detours.
   Their periodic endpoints agree exactly with the refined formula and
