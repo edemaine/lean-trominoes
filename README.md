@@ -1531,6 +1531,13 @@ The representation choices for this target are:
   colored strands; five endpoint-containing pair types form the exact local
   interface still to prove.  Once supplied, strict separation composes across
   both endpoint joins to separate the complete corrected routes.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFiniteGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFiniteGeometry.lean)
+  transfers normalized gadget-vertex distinctness and fundamental-square
+  bounds to the corrected ribbon routing.  Because the corrected construction
+  retains the standard period and gadget origins, these facts hold
+  definitionally; a route-specific finite continuous-planarity certificate
+  is therefore the only remaining input to the global assembly-geometry
+  interface.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean)
   lifts the closed-block bound from individual ribbon tiles to recursively
   assembled corridor cores.  Every listed core point is assigned to the
