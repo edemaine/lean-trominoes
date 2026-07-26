@@ -1237,6 +1237,13 @@ The representation choices for this target are:
   Finite computation certifies all 24 incidences simultaneously: exact
   endpoints, orthogonality, and continuous planarity.  This is the local
   kernel for the geometry-ordered occurrence-splitting substitution.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplit.lean`](LeanTrominoes/PeriodicEightOccurrenceSplit.lean)
+  gives that geometric kernel a matching periodic Boolean reduction.  Every
+  source occurrence selects one of eight compass copies, all eight copies
+  remain on the implication ring, and unused copies are harmless.  The
+  resulting formula is proved equisatisfiable for every slot assignment;
+  the geometric no-collision condition is intentionally reserved for the
+  degree-three certificate.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover
