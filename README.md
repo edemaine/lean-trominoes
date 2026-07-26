@@ -1517,6 +1517,12 @@ The representation choices for this target are:
   corridor cores along the same occurrence are pairwise contact-free.  Thus
   each core has exact half-edge boundary endpoints and is unconditionally
   rectilinear for a continuously planar source presentation.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirections.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirections.lean)
+  names the genuine cardinal directions in which every active unit route
+  leaves its variable and enters its clause.  It rewrites the two ribbon-core
+  endpoints as the standard exit and entry points of those endpoint
+  macrocells, reducing each remaining endpoint fan to finite gadget data,
+  color, and one of four directions.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean)
   connects each corrected corridor core from its two macrocell-boundary
   endpoints to the existing finite variable and clause gadget ports.  The

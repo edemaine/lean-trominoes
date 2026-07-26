@@ -12,6 +12,33 @@ available for every unit-step route containing at least one edge.
 namespace LeanTrominoes
 namespace AxisDirection
 
+/-- Any list with at least two entries can be split at its final edge. -/
+theorem exists_eq_append_pair_of_length_ge_two
+    {α : Type*} {items : List α}
+    (length : 2 ≤ items.length) :
+    ∃ leading before last,
+      items = leading ++ [before, last] := by
+  induction items with
+  | nil =>
+      simp at length
+  | cons first rest induction =>
+      cases rest with
+      | nil =>
+          simp at length
+      | cons second rest =>
+          cases rest with
+          | nil =>
+              exact ⟨[], first, second, rfl⟩
+          | cons third rest =>
+              have tailLength :
+                  2 ≤ (second :: third :: rest).length := by
+                simp
+              rcases induction tailLength with
+                ⟨leading, before, last, equation⟩
+              exact
+                ⟨first :: leading, before, last, by
+                  simp [equation]⟩
+
 /-- Direction of the first listed edge of a polyline, with the invalid
 fallback on lists containing fewer than two points. -/
 def polylineFirstDirection : List Cell → AxisDirection
