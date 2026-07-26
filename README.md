@@ -1436,6 +1436,13 @@ The representation choices for this target are:
   exact equal/far/adjacent trichotomy then proves complete separation for
   any legal tiles with distinct centers.  Thus only equal-center contacts
   remain in the global corridor-planarity proof.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellContacts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellContacts.lean)
+  classifies every possible advertised-endpoint contact between legal tiles
+  at adjacent centers.  An exhaustive exact check proves that contact occurs
+  only when both tiles traverse their common source edge in the same
+  direction and color; same-entry, same-exit, opposite-direction, and
+  different-color coincidences are impossible.  Translation lifts this
+  classification from the origin to arbitrary adjacent source centers.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
   recursively joins those half-edge tiles along a unit-step source route.
   Under the explicit no-immediate-reversal condition, the assembled core is
