@@ -1410,6 +1410,12 @@ The representation choices for this target are:
   occurrences.  Route wires and routed source clauses contain no central
   atoms, so the same six-occurrence bound holds for their complete normalized
   external union.
+- [`LeanTrominoes/PeriodicCNFPlanarCrossoverNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarCrossoverNormalizationDegree.lean)
+  handles crossover boundaries and internal variables.  Both classes have
+  zero normalization offset and a unique finite-variable preimage, so their
+  finite degree-eight bounds transfer through periodicization, anchor
+  normalization, opaque wrapping, and clause deduplication without
+  accumulation.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
