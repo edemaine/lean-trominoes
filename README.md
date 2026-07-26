@@ -440,6 +440,12 @@ The representation choices for this target are:
   drawing is proved to have exact periodic endpoints and to be orthogonal.
   These deliberately generic routes do not assert planarity, leaving later
   construction files to choose noncrossing lanes.
+  [`LeanTrominoes/PositionedPeriodicCNFFinitePlanarCertificate.lean`](LeanTrominoes/PositionedPeriodicCNFFinitePlanarCertificate.lean)
+  packages the remaining geometric proof boundary into finite data.  Given
+  distinct bounded vertices, bounded route endpoints, exact compatibility,
+  orthogonality, and three Boolean checks over the nine neighboring period
+  translates, it derives an infinite continuously planar incidence drawing
+  and the presentation consumed by the exact-one-to-3DM reduction.
   [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean)
   fixes the periodic gauge used by that splice: it subtracts each clause's
   first literal offset from every literal and from the displayed clause
