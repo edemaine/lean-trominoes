@@ -2014,6 +2014,13 @@ The representation choices for this target are:
   variable-site and X3C clause-core certificates separate vertices within
   one owner.  Consequently the complete normalized assembled position list
   is duplicate-free.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFiniteGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFiniteGeometry.lean)
+  reduces the remaining infinite periodic planarity field to an executable
+  finite certificate: all stored segment endpoints lie in the fundamental
+  square, and the route/route and vertex/route checks pass over the nine
+  neighboring translates.  For the normalized construction it combines such
+  a certificate with the established vertex distinctness and bounds to produce
+  the complete global assembly geometry.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget
