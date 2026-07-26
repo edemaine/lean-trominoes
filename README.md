@@ -2002,6 +2002,12 @@ The representation choices for this target are:
   open-macrocell offset.  Source compatibility and zero-anchor normalization
   therefore prove, unconditionally, that all assembled vertices remain
   strictly inside the refined fundamental square.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteElements.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteElements.lean)
+  identifies every listed typed red, green, and blue variable-side element
+  with an active element of the exhaustively checked complete variable-site
+  drawing.  The corresponding macrocell offsets are proved equal, exposing
+  the finite drawing's injective-position certificate to the global
+  distinctness proof.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget
