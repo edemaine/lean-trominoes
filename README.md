@@ -1309,6 +1309,12 @@ The representation choices for this target are:
   collinear ties, and proves that sorting preserves exactly the source
   occurrences.  This supplies the cyclic order consumed by occurrence
   splitting without prematurely asserting an orthogonal drawing.
+- [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreePositioned.lean)
+  specializes the full positioned ordered pipeline to those terminal-ray
+  angles.  It fixes the occurrence-split formula and placement, carries them
+  through Figure 9 and unit elimination, and proves the resulting exact-one
+  source has occurrence degree at most three, clause arity two or three, and
+  exactly the original periodic-CNF satisfiability semantics.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that
