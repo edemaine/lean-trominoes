@@ -478,6 +478,11 @@ The representation choices for this target are:
   conditions, and defines the strengthened positioned-incidence
   presentation required for safe gadget substitution.  The stronger
   certificate is invariant under clause-anchor normalization.
+  [`LeanTrominoes/PeriodicGridDrawingScaling.lean`](LeanTrominoes/PeriodicGridDrawingScaling.lean)
+  supplies the positive integral-refinement algebra used by local
+  substitutions.  Scaling commutes with translations and polyline
+  segmentation and preserves orthogonality, open and closed containment,
+  continuous segment-interior intersection, and route endpoints exactly.
   [`LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean)
   makes that extra condition executable.  An interval-overlap bound reduces
   every possible continuous contact to the same nine neighboring periodic
