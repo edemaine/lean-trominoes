@@ -1444,6 +1444,11 @@ The representation choices for this target are:
   estimates.  Global clause deduplication can only decrease their counts,
   and opaque wrapping preserves them exactly, so the actual wrapped
   planar-SAT output has at most eight occurrences of every variable.
+- [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplit.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplit.lean)
+  applies that degree bound to the routed angular occurrence order.  Every
+  local width-three, occurrence-three source fits the eight Figure 7 compass
+  slots; the resulting fixed implication rings have degree three and remain
+  satisfiable exactly when the planarized formula is.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
