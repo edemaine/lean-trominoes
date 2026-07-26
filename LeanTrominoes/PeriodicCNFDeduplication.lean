@@ -1,5 +1,6 @@
-import LeanTrominoes.PeriodicCNF
+import LeanTrominoes.PeriodicOccurrences
 import Mathlib.Data.List.Dedup
+import Mathlib.Data.List.Flatten
 
 /-!
 # Deduplicating periodic CNF presentations
@@ -96,6 +97,31 @@ theorem deduplicate_widthAtMost_iff
   · intro bounded clause clauseMember
     exact bounded clause
       ((mem_deduplicate_clauses_iff source clause).mp clauseMember)
+
+/-- Removing duplicate clauses removes, but never adds, literal
+occurrences. -/
+theorem deduplicate_variableOccurrences_sublist
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    List.Sublist source.deduplicate.variableOccurrences
+      source.variableOccurrences := by
+  unfold variableOccurrences deduplicate
+  exact (List.dedup_sublist source.clauses).flatMap
+    (fun clause => clause.map PeriodicLiteral.atom)
+
+/-- Every finite-presentation occurrence bound survives clause
+deduplication. -/
+theorem deduplicate_occurrencesAtMost
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (bound : Nat)
+    (sourceOccurrences : source.OccurrencesAtMost bound) :
+    source.deduplicate.OccurrencesAtMost bound := by
+  intro atom
+  exact
+    ((deduplicate_variableOccurrences_sublist source).subperm.count_le
+      atom).trans
+        (sourceOccurrences atom)
 
 end PeriodicCNF
 end LeanTrominoes

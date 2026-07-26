@@ -388,7 +388,8 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicCNFDeduplication.lean`](LeanTrominoes/PeriodicCNFDeduplication.lean)
   removes repeated protoclauses from an ordinary periodic CNF.  Membership,
   assignment satisfaction, satisfiability, locality, and every clause-width
-  bound are proved unchanged.
+  bound are proved unchanged; its occurrence list is a sublist of the source
+  list, so every finite-presentation occurrence bound is preserved as well.
   [`LeanTrominoes/PositionedPeriodicCNFDeduplication.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplication.lean)
   removes repeated periodic clause orbits from neighboring-block
   presentations while retaining one geometric representative.  Erasure is
@@ -1295,6 +1296,12 @@ The representation choices for this target are:
   affine placement, concatenation, and finite gadget families preserve width,
   and the fixed crossover, duplicator, and equality-link libraries are all
   certified to have width at most three.
+- [`LeanTrominoes/PlanarThreeSATOcurrences.lean`](LeanTrominoes/PlanarThreeSATOcurrences.lean)
+  gives finite embedded formulas compositional occurrence counts.  Injective
+  affine instantiation preserves these counts; exhaustive certificates bound
+  every Figure 8 crossover variable by eight occurrences and every
+  duplicator variable by six, while a single equality link contributes at
+  most four.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
