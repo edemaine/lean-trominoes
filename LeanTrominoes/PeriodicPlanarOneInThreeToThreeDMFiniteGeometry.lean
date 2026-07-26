@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVertexDistinctness
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRouteBounds
 import LeanTrominoes.PeriodicGridDrawingExpandedFiniteContinuousPlanarity
 import LeanTrominoes.PeriodicContinuousPlanarThreeDM
 
@@ -47,6 +48,52 @@ structure FiniteContinuousAssemblyPlanarityCertificate
   continuousChecked :
     (assembledDrawing routing).expandedFiniteRoutesHaveDisjointInteriors =
       true
+
+/-- After source normalization, all non-executable geometry fields are now
+proved.  These are exactly the three remaining finite Boolean checks for the
+standard assembled routing. -/
+structure StandardNormalizedFiniteContinuousPlanarityChecks
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedContinuousPlanarIncidencePresentation placement) :
+    Prop where
+  routesChecked :
+    (assembledDrawing
+      (standardNormalizedThreeStrandRouting presentation)
+      |>.expandedFiniteRoutesAvoidInteriors) = true
+  verticesChecked :
+    (assembledDrawing
+      (standardNormalizedThreeStrandRouting presentation)
+      |>.finiteVerticesAvoidRouteInteriors) = true
+  continuousChecked :
+    (assembledDrawing
+      (standardNormalizedThreeStrandRouting presentation)
+      |>.expandedFiniteRoutesHaveDisjointInteriors) = true
+
+namespace StandardNormalizedFiniteContinuousPlanarityChecks
+
+/-- Add the proved route-coordinate theorem to obtain the generic finite
+continuous assembly certificate. -/
+def toFiniteContinuousAssemblyPlanarityCertificate
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {presentation :
+      source.HaloBoundedContinuousPlanarIncidencePresentation placement}
+    (checks :
+      StandardNormalizedFiniteContinuousPlanarityChecks presentation) :
+    FiniteContinuousAssemblyPlanarityCertificate
+      (standardNormalizedThreeStrandRouting presentation) where
+  endpointBounds :=
+    standardNormalizedAssembledSegmentEndpointsInExpandedSquare
+      presentation
+  routesChecked := checks.routesChecked
+  verticesChecked := checks.verticesChecked
+  continuousChecked := checks.continuousChecked
+
+end StandardNormalizedFiniteContinuousPlanarityChecks
 
 /-- Global geometry strong enough for subsequent degree-two contraction and
 geometric normalization. -/
@@ -201,6 +248,24 @@ def standardNormalizedContinuousAssemblyGeometryOfFinite
   certificate.toContinuousAssemblyGeometry
     (standardNormalizedAssembledVertexPositions_nodup presentation)
     (standardNormalizedAssembledVertexPositions_inside presentation)
+
+/-- For a halo-bounded continuously planar source, the three Boolean checks
+are the only remaining inputs to complete continuously planar assembly
+geometry. -/
+noncomputable def standardNormalizedContinuousAssemblyGeometryOfChecks
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedContinuousPlanarIncidencePresentation placement)
+    (checks :
+      StandardNormalizedFiniteContinuousPlanarityChecks presentation) :
+    ContinuousAssemblyGeometry
+      (standardNormalizedThreeStrandRouting presentation) := by
+  exact
+    standardNormalizedContinuousAssemblyGeometryOfFinite
+      presentation.toPlanarIncidencePresentation
+      checks.toFiniteContinuousAssemblyPlanarityCertificate
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

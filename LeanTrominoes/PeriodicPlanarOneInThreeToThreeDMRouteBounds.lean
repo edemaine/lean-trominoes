@@ -1077,22 +1077,40 @@ theorem standardAssembledSegmentEndpointsInExpandedSquare
       presentation anchorsZero sourceBounds)
 
 /-- For an arbitrary halo-bounded source presentation, anchor normalization
-supplies all hypotheses of the standard assembled endpoint theorem. -/
+supplies the canonical standard three-strand routing used by the remaining
+finite checks. -/
+noncomputable def standardNormalizedThreeStrandRouting
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedContinuousPlanarIncidencePresentation placement) :
+    ThreeStrandRouting
+      (normalizedPositionedSource source placement).erase :=
+  constructedThreeStrandRouting
+    (normalizedHaloBoundedIncidencePresentation presentation
+      |>.toPlanarIncidencePresentation)
+    standardThreeStrandLayout
+
+/-- Anchor normalization supplies all hypotheses of the standard assembled
+endpoint theorem. -/
 theorem standardNormalizedAssembledSegmentEndpointsInExpandedSquare
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation :
       source.HaloBoundedContinuousPlanarIncidencePresentation placement) :
-    let normalized :=
-      normalizedHaloBoundedIncidencePresentation presentation
+    (assembledDrawing
+      (standardNormalizedThreeStrandRouting presentation))
+      |>.SegmentEndpointsInExpandedSquare := by
+  let normalized :=
+    normalizedHaloBoundedIncidencePresentation presentation
+  change
     (assembledDrawing
       (constructedThreeStrandRouting
         normalized.toPlanarIncidencePresentation
         standardThreeStrandLayout))
-      |>.SegmentEndpointsInExpandedSquare := by
-  let normalized :=
-    normalizedHaloBoundedIncidencePresentation presentation
+      |>.SegmentEndpointsInExpandedSquare
   exact
     standardAssembledSegmentEndpointsInExpandedSquare
       normalized.toPlanarIncidencePresentation

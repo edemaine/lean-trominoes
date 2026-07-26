@@ -2062,11 +2062,13 @@ The representation choices for this target are:
   finite certificate: all stored segment endpoints lie in the one-cell halo,
   the route/route checks pass over 25 relative translations, and the
   vertex/route check passes over the nine neighboring translates.  For the
-  normalized construction it combines such a certificate with the established
-  vertex distinctness and bounds to produce the complete global assembly
-  geometry.  Its continuous refinement adds the exact collinear-interior
-  check, yielding the stronger 3DM presentation needed by degree-two
-  contraction without overlooking coincident unit segments.
+  normalized halo-bounded construction, endpoint bounds are now discharged
+  automatically by the route-coordinate theorem.  Thus exactly three finite
+  Boolean checks remain: route/vertex avoidance, route/route interior
+  disjointness, and the exact collinear-interior refinement.  Passing those
+  checks combines with the established vertex distinctness and bounds to
+  produce the stronger 3DM presentation needed by degree-two contraction
+  without overlooking coincident unit segments.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget
