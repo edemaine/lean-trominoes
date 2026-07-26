@@ -1989,6 +1989,12 @@ The representation choices for this target are:
   neighborhood.  It emits these coordinates in exactly the
   triple/red/green/blue vertex order of the encoded 3DM incidence graph and
   proves the resulting list has the required length.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalRoutes.lean)
+  emits one route per encoded RGB incidence in triple-major order.  Local
+  clause and complete-variable-site routes are translated into their global
+  neighborhoods, while exactly the classified routed connector incidence
+  is joined to its three-strand corridor.  The resulting list has the
+  encoded edge count, and every assembled route is proved rectilinear.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
