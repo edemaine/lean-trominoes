@@ -391,14 +391,164 @@ theorem drawingPeriodicPlanarSATFormula_anchorNormalize_components
   simp only [List.flatten_cons, List.flatten_nil,
     List.append_nil, List.append_assoc]
 
+theorem drawingPeriodicPlanarSATFormula_anchorNormalize_five_components
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (drawingPeriodicPlanarSATFormula
+      formula).anchorNormalize.clauses =
+      normalizedScopedDrawingCrossoverClauses formula ++
+        (embeddedNormalizedCompleteCarrierClauses formula ++
+          (embeddedNormalizedRouteBendClauses formula ++
+            (normalizedRoutedClauseClauses formula ++
+              PeriodicEquality.normalizedFormulaClauses
+                normalizePlanarSATNode
+                (drawingRoutedVariableLinks formula)))) := by
+  rw [
+    drawingPeriodicPlanarSATFormula_anchorNormalize_clauses,
+    normalizedScopedDrawingPlanarSATCoreClauses_eq]
+  unfold normalizedEmbeddedRouteWireClauses
+  simp only [List.append_assoc]
+
+theorem List.dedup_five_append_sublist
+    {Value : Type*} [DecidableEq Value]
+    (first second third fourth fifth : List Value) :
+    List.Sublist
+      (first ++ (second ++ (third ++ (fourth ++ fifth)))).dedup
+      (first.dedup ++
+        (second.dedup ++
+          (third.dedup ++
+            (fourth.dedup ++ fifth.dedup)))) := by
+  have fourthFifth :=
+    List.dedup_append_sublist_dedup_append fourth fifth
+  have thirdTail :=
+    (List.dedup_append_sublist_dedup_append
+      third (fourth ++ fifth)).trans
+      ((List.Sublist.refl third.dedup).append fourthFifth)
+  have secondTail :=
+    (List.dedup_append_sublist_dedup_append
+      second (third ++ (fourth ++ fifth))).trans
+      ((List.Sublist.refl second.dedup).append thirdTail)
+  exact
+    (List.dedup_append_sublist_dedup_append
+      first
+        (second ++ (third ++ (fourth ++ fifth)))).trans
+      ((List.Sublist.refl first.dedup).append secondTail)
+
+theorem PeriodicCNF.deduplicate_five_components_variableOccurrences_sublist
+    {Variable : Type*} [DecidableEq Variable]
+    (first second third fourth fifth :
+      List (PeriodicClause Variable)) :
+    List.Sublist
+      (PeriodicCNF.variableOccurrences
+        ⟨(first ++
+          (second ++
+            (third ++
+              (fourth ++ fifth)))).dedup⟩)
+      (PeriodicCNF.variableOccurrences
+        ⟨first.dedup ++
+          (second.dedup ++
+            (third.dedup ++
+              (fourth.dedup ++ fifth.dedup)))⟩) := by
+  unfold PeriodicCNF.variableOccurrences
+  exact
+    (List.dedup_five_append_sublist
+      first second third fourth fifth).flatMap
+        (fun clause => clause.map PeriodicLiteral.atom)
+
 /-- The normalized drawing formula with each geometric component
 deduplicated separately before concatenation. -/
 def componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     PeriodicCNF (PeriodicPlanarSATVariable Variable) :=
-  ⟨(normalizedDrawingPlanarSATComponents formula).flatMap
-    List.dedup⟩
+  ⟨(normalizedScopedDrawingCrossoverClauses formula).dedup ++
+    ((embeddedNormalizedCompleteCarrierClauses formula).dedup ++
+      ((embeddedNormalizedRouteBendClauses formula).dedup ++
+        ((normalizedRoutedClauseClauses formula).dedup ++
+          (PeriodicEquality.normalizedFormulaClauses
+            normalizePlanarSATNode
+            (drawingRoutedVariableLinks formula)).dedup)))⟩
+
+theorem PeriodicCNF.five_component_occurrence_count
+    {Variable : Type*} [DecidableEq Variable]
+    (first second third fourth fifth :
+      List (PeriodicClause Variable))
+    (atom : Variable) :
+    (PeriodicCNF.variableOccurrences
+      ⟨first ++
+        (second ++
+          (third ++
+            (fourth ++ fifth)))⟩).count atom =
+      (PeriodicCNF.variableOccurrences ⟨first⟩).count atom +
+        ((PeriodicCNF.variableOccurrences ⟨second⟩).count atom +
+          ((PeriodicCNF.variableOccurrences ⟨third⟩).count atom +
+            ((PeriodicCNF.variableOccurrences ⟨fourth⟩).count atom +
+              (PeriodicCNF.variableOccurrences
+                ⟨fifth⟩).count atom))) := by
+  simp [PeriodicCNF.variableOccurrences,
+    List.flatMap_append, List.count_append]
+
+theorem
+    componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_occurrence_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (atom : PeriodicPlanarSATVariable Variable) :
+    (componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
+      formula).variableOccurrences.count atom =
+      (PeriodicCNF.variableOccurrences
+        ⟨(normalizedScopedDrawingCrossoverClauses
+          formula).dedup⟩).count atom +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(embeddedNormalizedCompleteCarrierClauses
+          formula).dedup⟩).count atom +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(embeddedNormalizedRouteBendClauses
+          formula).dedup⟩).count atom +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(normalizedRoutedClauseClauses
+          formula).dedup⟩).count atom +
+      (PeriodicCNF.variableOccurrences
+        ⟨(PeriodicEquality.normalizedFormulaClauses
+          normalizePlanarSATNode
+          (drawingRoutedVariableLinks formula)).dedup⟩).count atom))) := by
+  unfold componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
+  exact
+    PeriodicCNF.five_component_occurrence_count
+      (normalizedScopedDrawingCrossoverClauses formula).dedup
+      (embeddedNormalizedCompleteCarrierClauses formula).dedup
+      (embeddedNormalizedRouteBendClauses formula).dedup
+      (normalizedRoutedClauseClauses formula).dedup
+      (PeriodicEquality.normalizedFormulaClauses
+        normalizePlanarSATNode
+        (drawingRoutedVariableLinks formula)).dedup
+      atom
+
+theorem
+    componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_atom_occurrence_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (atom : Variable) :
+    (componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
+      formula).variableOccurrences.count (.atom atom) =
+      (PeriodicCNF.variableOccurrences
+        ⟨(normalizedScopedDrawingCrossoverClauses
+          formula).dedup⟩).count (.atom atom) +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(embeddedNormalizedCompleteCarrierClauses
+          formula).dedup⟩).count (.atom atom) +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(embeddedNormalizedRouteBendClauses
+          formula).dedup⟩).count (.atom atom) +
+      ((PeriodicCNF.variableOccurrences
+        ⟨(normalizedRoutedClauseClauses
+          formula).dedup⟩).count (.atom atom) +
+      (PeriodicCNF.variableOccurrences
+        ⟨(PeriodicEquality.normalizedFormulaClauses
+          normalizePlanarSATNode
+          (drawingRoutedVariableLinks formula)).dedup⟩).count
+            (.atom atom)))) :=
+  componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_occurrence_count
+    formula (.atom atom)
 
 theorem
     deduplicatedDrawingPeriodicPlanarSATFormula_variableOccurrences_sublist
@@ -412,17 +562,17 @@ theorem
   unfold deduplicatedDrawingPeriodicPlanarSATFormula
     componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
   unfold PeriodicCNF.deduplicate
-  show List.Sublist
-    (PeriodicCNF.variableOccurrences
-      ⟨((drawingPeriodicPlanarSATFormula
-        formula).anchorNormalize.clauses).dedup⟩)
-    (PeriodicCNF.variableOccurrences
-      ⟨(normalizedDrawingPlanarSATComponents
-        formula).flatMap List.dedup⟩)
-  rw [drawingPeriodicPlanarSATFormula_anchorNormalize_components]
+  rw [
+    drawingPeriodicPlanarSATFormula_anchorNormalize_five_components]
   exact
-    PeriodicCNF.deduplicate_components_variableOccurrences_sublist
-      (normalizedDrawingPlanarSATComponents formula)
+    PeriodicCNF.deduplicate_five_components_variableOccurrences_sublist
+      (normalizedScopedDrawingCrossoverClauses formula)
+      (embeddedNormalizedCompleteCarrierClauses formula)
+      (embeddedNormalizedRouteBendClauses formula)
+      (normalizedRoutedClauseClauses formula)
+      (PeriodicEquality.normalizedFormulaClauses
+        normalizePlanarSATNode
+        (drawingRoutedVariableLinks formula))
 
 end PeriodicOrthocrossing
 end LeanTrominoes

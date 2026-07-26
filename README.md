@@ -1427,6 +1427,12 @@ The representation choices for this target are:
   general list lemma then shows that global clause deduplication can only
   reduce occurrences relative to deduplicating these five components
   separately, providing the bridge from local bounds to the actual formula.
+- [`LeanTrominoes/PeriodicCNFPlanarComponentNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarComponentNormalizationDegree.lean)
+  transfers the normalized carrier bounds through the full planar-SAT
+  variable embedding and proves that an absent indexed segment contributes
+  no carrier occurrence.  Crossover, carrier, bend, and routed-clause
+  separation then leaves central atoms with only their active-arm family,
+  preserving its six-occurrence bound in the componentwise formula.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
