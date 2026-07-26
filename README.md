@@ -228,6 +228,11 @@ The representation choices for this target are:
   both opposite shifts from meeting the half-open square.  Consequently at
   most two translated copies of a segment can participate in the canonical
   square, the quotient bound needed for periodic terminal occurrence counts.
+  [`LeanTrominoes/PeriodicOrthocrossingCrossingTranslationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCrossingTranslationDegree.lean)
+  specializes the bound to translations that actually carry a canonical
+  crossing.  It also projects every crossover boundary to its indexed segment
+  and translation and proves that translation belongs to the resulting
+  at-most-two-element set.
   [`LeanTrominoes/PeriodicOrthocrossingCrossings.lean`](LeanTrominoes/PeriodicOrthocrossingCrossings.lean)
   enumerates the finite neighboring segment occurrences and fundamental-square
   lattice points, filters them to proper crossings of distinct occurrences,
