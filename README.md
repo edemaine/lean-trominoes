@@ -1976,6 +1976,13 @@ The representation choices for this target are:
   variable triple is packaged as an active finite triple, with exact route
   endpoints and orthogonality inherited from the exhaustive local
   certificate.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMThreeStrandRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMThreeStrandRouting.lean)
+  isolates the topological thickening step that turns one exact-one
+  incidence into three distinct RGB corridors.  Its certificate fixes the
+  physical period and variable/clause gadget origins, then requires exact
+  endpoints from the checked variable-site ports to the correctly
+  translated clause-terminal positions, together with rectilinearity of
+  every strand.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
