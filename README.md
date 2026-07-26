@@ -1523,6 +1523,13 @@ The representation choices for this target are:
   endpoints as the standard exit and entry points of those endpoint
   macrocells, reducing each remaining endpoint fan to finite gadget data,
   color, and one of four directions.
+- [`LeanTrominoes/OrthogonalPolylineElbow.lean`](LeanTrominoes/OrthogonalPolylineElbow.lean)
+  supplies horizontal-first and vertical-first one-bend routes for those
+  finite endpoint fans.  Coincident or already aligned endpoints are
+  simplified so all retained segments are nondegenerate.  Each route has
+  certified exact endpoints and orthogonality, and every listed point is an
+  endpoint or the single coordinatewise bend; unlike a fresh-coordinate
+  detour, it therefore cannot leave the coordinate box of its endpoints.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean)
   connects each corrected corridor core from its two macrocell-boundary
   endpoints to the existing finite variable and clause gadget ports.  The
