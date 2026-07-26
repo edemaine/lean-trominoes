@@ -1497,6 +1497,12 @@ The representation choices for this target are:
   at distinct centers strictly avoid one another whenever the one classified
   common-directed-edge contact is excluded; distinct colors exclude that
   contact automatically.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceMacrocellSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceMacrocellSeparation.lean)
+  excludes that last adjacent-tile contact for interior tiles inherited from
+  two source routes whose listed contacts are endpoint-only.  Either possible
+  shared boundary would identify one route's internal center with a listed
+  neighbor on the other route, contradicting the source separation
+  certificate; the resulting strict separation holds for arbitrary colors.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
   recursively joins those half-edge tiles along a unit-step source route.
   Under the explicit no-immediate-reversal condition, the assembled core is
@@ -1535,7 +1541,10 @@ The representation choices for this target are:
   proves the local topological fact behind endpoint fanout: two
   nondegenerate axis-aligned segments leaving one point in the same direction
   overlap immediately.  Thus continuously separated orthogonal routes that
-  share their first or last point must use distinct endpoint directions.
+  share their first or last point must use distinct endpoint directions.  It
+  also extracts the basic discrete consequence of endpoint-only contact:
+  listed points on two such routes are unequal whenever either point is
+  internal.
 - [`LeanTrominoes/OrthogonalPolylineElbow.lean`](LeanTrominoes/OrthogonalPolylineElbow.lean)
   supplies horizontal-first and vertical-first one-bend routes for those
   finite endpoint fans.  Coincident or already aligned endpoints are

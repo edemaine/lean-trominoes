@@ -117,9 +117,48 @@ theorem opposite_injective : Function.Injective opposite := by
   cases first <;> cases second <;>
     simp_all [opposite]
 
+/-- A step in the opposite direction followed by the original genuine step
+returns to the starting lattice point. -/
+theorem add_opposite_step_add_step
+    (point : Cell) {direction : AxisDirection}
+    (genuine : direction.IsGenuine) :
+    Cell.add
+        (Cell.add point direction.opposite.step)
+        direction.step =
+      point := by
+  rcases point with ⟨horizontal, vertical⟩
+  cases direction <;>
+    simp_all [IsGenuine, opposite, step, Cell.add]
+
 end AxisDirection
 
 namespace PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+/-- Two listed points on endpoint-contact-separated routes are unequal as
+soon as either occurrence is known not to be an advertised route endpoint. -/
+theorem routePoints_ne_of_routesMeetOnlyAtEndpoints
+    {first second : List Cell}
+    (meetOnly : RoutesMeetOnlyAtEndpoints first second)
+    {firstPoint secondPoint : Cell}
+    (firstMember : firstPoint ∈ first)
+    (secondMember : secondPoint ∈ second)
+    (oneInternal :
+      ¬RoutePointIsEndpoint first firstPoint ∨
+        ¬RoutePointIsEndpoint second secondPoint) :
+    firstPoint ≠ secondPoint := by
+  intro equal
+  rcases List.mem_iff_get.mp firstMember with
+    ⟨firstIndex, firstEquation⟩
+  rcases List.mem_iff_get.mp secondMember with
+    ⟨secondIndex, secondEquation⟩
+  have endpoints :=
+    meetOnly firstIndex secondIndex
+      (firstEquation.trans
+        (equal.trans secondEquation.symm))
+  rw [firstEquation, secondEquation] at endpoints
+  exact oneInternal.elim
+    (fun firstInternal => firstInternal endpoints.1)
+    (fun secondInternal => secondInternal endpoints.2)
 
 /-- Continuously separated orthogonal routes with the same initial point
 must leave it in different directions. -/
