@@ -1622,6 +1622,13 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodedDegree.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodedDegree.lean)
   transfers the typed degree-two-or-three invariant to the natural-number
   periodic 3DM instance.
+- [`LeanTrominoes/PeriodicPlanarThreeDMIncidenceRouting.lean`](LeanTrominoes/PeriodicPlanarThreeDMIncidenceRouting.lean)
+  reorients each certified exact-one incidence route into the offset
+  convention used by the 3DM assembly.  Reversing the clause-to-variable
+  route and translating by `anchor - literal.offset` produces an orthogonal
+  variable-to-clause route from the variable prototype at cell zero to the
+  displayed clause gadget at the negated literal offset, with both endpoints
+  proved exactly.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
