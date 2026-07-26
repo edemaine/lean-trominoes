@@ -1449,6 +1449,11 @@ The representation choices for this target are:
   local width-three, occurrence-three source fits the eight Figure 7 compass
   slots; the resulting fixed implication rings have degree three and remain
   satisfiable exactly when the planarized formula is.
+- [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitPositioned.lean)
+  places those fixed rings in uniform `12 × 12` refinement macrocells using
+  the verified Figure 7 copy and implication-clause coordinates.  Erasing
+  positions recovers exactly the semantic fixed-eight split, and the refined
+  placement retains a positive drawing period.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
