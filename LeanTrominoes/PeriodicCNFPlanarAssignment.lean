@@ -141,13 +141,12 @@ theorem drawingRoutedVariableFormula_holds_incidenceAssignment
       formula external).mpr
   intro site siteMem
   let nodes : List (PlanarSATNode Variable) :=
-    (variableRouteOccurrencesAt formula site).map fun occurrence =>
-      .carrier (.terminal (occurrence.targetTerminal formula))
+    routedVariableNodes formula site
   have allAgree :
       ∀ node ∈ nodes,
         external node = external (.atom site) := by
     intro node nodeMem
-    rcases List.mem_map.mp nodeMem with
+    rcases List.mem_map.mp (List.mem_dedup.mp nodeMem) with
       ⟨occurrence, occurrenceMem, nodeEq⟩
     subst node
     have occurrenceData :

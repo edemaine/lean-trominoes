@@ -102,16 +102,20 @@ theorem scopedDrawingPlanarSATCore_widthAtMostThree
       (drawingRoutePlanarCoreFormula_widthAtMostThree
         (PeriodicCNF.incidenceGraph formula))
 
-/-- Routed variable gadgets are a duplicator family, hence width three. -/
+/-- Routed variable gadgets are families of active equality arms, hence
+width three. -/
 theorem drawingRoutedVariableFormula_widthAtMostThree
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     FormulaWidthAtMost 3
       (drawingRoutedVariableFormula formula) := by
-  exact duplicatorFamily_widthAtMostThree
-    (drawingVariableRouteSites formula)
-    (routedVariablePorts formula)
-    (routedVariableOrigin formula) 1
+  apply
+    (formulaWidthAtMost_flatMap_iff 3
+      (drawingVariableRouteSites formula)
+      (routedVariableFormulaAt formula)).mpr
+  intro site _
+  exact equalityFamily_widthAtMostThree
+    (routedVariableLinksAt formula site)
 
 /-- Scoping routed variable gadgets preserves width. -/
 theorem scopedDrawingRoutedVariableFormula_widthAtMostThree

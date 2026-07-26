@@ -70,8 +70,7 @@ theorem drawingRoutedVariableFormula_target_eq_atom
       (occurrence.targetTerminal formula))
   let center : PlanarSATNode Variable := .atom site
   let nodes : List (PlanarSATNode Variable) :=
-    (variableRouteOccurrencesAt formula site).map fun routed =>
-      .carrier (.terminal (routed.targetTerminal formula))
+    routedVariableNodes formula site
   have siteMem :
       site ∈ drawingVariableRouteSites formula := by
     simp only [drawingVariableRouteSites, List.mem_dedup,
@@ -81,12 +80,22 @@ theorem drawingRoutedVariableFormula_target_eq_atom
       occurrence ∈ variableRouteOccurrencesAt formula site := by
     simp [variableRouteOccurrencesAt, site, occurrenceMem]
   have nodeMem : occurrenceNode ∈ nodes := by
+    apply List.mem_dedup.mpr
     exact List.mem_map.mpr
       ⟨occurrence, occurrenceAtMem, rfl⟩
   have lengthLe : nodes.length ≤ 3 := by
-    simpa [nodes] using
-      variableRouteOccurrencesAt_length_le_three
-        formula occurrences site
+    calc
+      nodes.length ≤
+          ((variableRouteOccurrencesAt formula site).map fun routed =>
+            (PlanarSATNode.carrier
+              (.terminal (routed.targetTerminal formula)) :
+              PlanarSATNode Variable)).length := by
+        exact List.Sublist.length_le
+          (List.dedup_sublist _)
+      _ ≤ 3 := by
+        simpa using
+          variableRouteOccurrencesAt_length_le_three
+            formula occurrences site
   have portLaws :=
     (drawingRoutedVariableFormula_holds_iff
       formula assignment).mp variablesHold site siteMem

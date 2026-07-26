@@ -192,18 +192,28 @@ theorem drawingRoutedClauseFormula_holds_iff
     subst clause
     exact holds site siteMem
 
-/-- Three duplicator ports at one lifted variable vertex.  Missing endpoint
-ports are padded by the center variable, which imposes no new condition. -/
+/-- Distinct routed terminal nodes at one lifted variable vertex, in global
+edge order.  Set-normalization is semantically inert and makes the active
+duplicator arms syntactically collision-free. -/
+def routedVariableNodes
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    List (PlanarSATNode Variable) :=
+  ((variableRouteOccurrencesAt formula site).map fun occurrence =>
+    PlanarSATNode.carrier
+      (.terminal (occurrence.targetTerminal formula))).dedup
+
+/-- Three total duplicator ports at one lifted variable vertex.  Missing
+ports still project to the center in the semantic interface, but no clauses
+are generated for those inactive arms. -/
 def routedVariablePorts
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (site : VariableRouteSite Variable) :
     DuplicatorPorts (PlanarSATNode Variable) :=
   let center : PlanarSATNode Variable := .atom site
-  let endpoints :=
-    (variableRouteOccurrencesAt formula site).map fun occurrence =>
-      PlanarSATNode.carrier
-        (.terminal (occurrence.targetTerminal formula))
+  let endpoints := routedVariableNodes formula site
   ⟨center,
     endpoints.getD 0 center,
     endpoints.getD 1 center,
@@ -217,14 +227,90 @@ def routedVariableOrigin
   liftedIncidenceVertexMacroOrigin formula
     (.variable site.1) site.2
 
-/-- All routed variable duplicators in the neighboring block. -/
+/-- Figure 8(a)'s two implication-clause positions for one active arm. -/
+def routedVariableEqualityPositions
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    (index : Nat) : EqualityPositions :=
+  let origin := routedVariableOrigin formula site
+  match index with
+  | 0 => ⟨Cell.add origin (3, 4), Cell.add origin (3, 3)⟩
+  | 1 => ⟨Cell.add origin (4, 3), Cell.add origin (5, 3)⟩
+  | _ => ⟨Cell.add origin (5, 4), Cell.add origin (5, 5)⟩
+
+/-- The active (at most three) equality arms of one routed variable
+duplicator. -/
+def routedVariableLinksAt
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    List (EqualityLink (PlanarSATNode Variable)) :=
+  ((routedVariableNodes formula site).take 3).zipIdx.map
+    fun taggedNode =>
+      ⟨taggedNode.1, .atom site,
+        routedVariableEqualityPositions formula site taggedNode.2⟩
+
+/-- The active Figure 8(a) subgadget at one lifted variable vertex. -/
+def routedVariableFormulaAt
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    List (EmbeddedClause (PlanarSATNode Variable)) :=
+  equalityFamily (routedVariableLinksAt formula site)
+
+/-- Active-arm satisfaction is equivalent to the original total three-port
+interface: inactive `getD` ports equal the center definitionally. -/
+theorem routedVariableFormulaAt_holds_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (assignment : PlanarSATNode Variable → Bool)
+    (site : VariableRouteSite Variable) :
+    FormulaHolds assignment
+        (routedVariableFormulaAt formula site) ↔
+      assignment (routedVariablePorts formula site).left =
+          assignment (.atom site) ∧
+        assignment (routedVariablePorts formula site).top =
+          assignment (.atom site) ∧
+        assignment (routedVariablePorts formula site).right =
+          assignment (.atom site) := by
+  rw [routedVariableFormulaAt, equalityFamily_holds_iff]
+  let endpoints := routedVariableNodes formula site
+  change
+    (∀ link ∈
+        (endpoints.take 3).zipIdx.map fun taggedNode =>
+          (⟨taggedNode.1, .atom site,
+            routedVariableEqualityPositions
+              formula site taggedNode.2⟩ :
+            EqualityLink (PlanarSATNode Variable)),
+      assignment link.first = assignment link.second) ↔
+      assignment (endpoints.getD 0 (.atom site)) =
+          assignment (.atom site) ∧
+        assignment (endpoints.getD 1 (.atom site)) =
+          assignment (.atom site) ∧
+        assignment (endpoints.getD 2 (.atom site)) =
+          assignment (.atom site)
+  cases endpoints with
+  | nil =>
+      simp
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp
+      | cons second rest =>
+          cases rest with
+          | nil =>
+              simp
+          | cons third rest =>
+              simp
+
+/-- All active routed variable subgadgets in the neighboring block. -/
 def drawingRoutedVariableFormula
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     List (EmbeddedClause (PlanarSATNode Variable)) :=
-  duplicatorFamily (drawingVariableRouteSites formula)
-    (routedVariablePorts formula)
-    (routedVariableOrigin formula) 1
+  (drawingVariableRouteSites formula).flatMap
+    (routedVariableFormulaAt formula)
 
 /-- The variable family holds exactly when all three (possibly padded) route
 ports agree with the central lifted atom at every represented site. -/
@@ -240,11 +326,19 @@ theorem drawingRoutedVariableFormula_holds_iff
             assignment (.atom site) ∧
           assignment (routedVariablePorts formula site).right =
             assignment (.atom site) := by
-  simpa [drawingRoutedVariableFormula, routedVariablePorts] using
-    duplicatorFamily_holds_iff assignment
-      (drawingVariableRouteSites formula)
-      (routedVariablePorts formula)
-      (routedVariableOrigin formula) 1
+  rw [drawingRoutedVariableFormula,
+    formulaHolds_flatMap_iff]
+  constructor
+  · intro holds site siteMem
+    exact
+      (routedVariableFormulaAt_holds_iff
+        formula assignment site).mp
+        (holds site siteMem)
+  · intro holds site siteMem
+    exact
+      (routedVariableFormulaAt_holds_iff
+        formula assignment site).mpr
+        (holds site siteMem)
 
 end PeriodicOrthocrossing
 end LeanTrominoes
