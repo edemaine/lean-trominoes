@@ -2042,11 +2042,19 @@ The representation choices for this target are:
   translated clause-terminal positions, together with rectilinearity of
   every strand.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMThreeStrandConstruction.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMThreeStrandConstruction.lean)
-  constructs that routing interface from any certified exact-one incidence
-  presentation.  Each source route is positively refined and shifted onto a
-  caller-selected color lane, then joined to the checked variable and clause
-  ports by orthogonal endpoint stubs; all resulting endpoints and
-  rectilinearity obligations are proved.
+  provides the original endpoint-and-orthogonality prototype.  It positively
+  refines and uniformly shifts each source route, then joins it to the checked
+  variable and clause ports.  This establishes the assembly interfaces and
+  coordinate bookkeeping, but its diagonal shifts are not used as a
+  noncrossing theorem: bends require the corrected ribbon construction below.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridors.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridors.lean)
+  instantiates the corrected normal-offset construction for the three 3DM
+  colors at lane distances `40`, `44`, and `48` inside each `128`-cell
+  refinement corridor.  Every genuine rebased source incidence is proved
+  nondegenerate, and each resulting central lane has exact computed
+  variable/clause-side endpoints and is orthogonal.  Noncrossing endpoint
+  fans into the finite gadgets remain separate from this central-corridor
+  theorem.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexGeometry.lean)
   chooses a concrete `128 × 128` refinement layout and certifies the complete
   finite coordinate range of every variable-site and clause-core vertex.

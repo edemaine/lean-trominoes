@@ -233,6 +233,23 @@ def ribbonPolylineFinish
   | _, second, third :: rest =>
       ribbonPolylineFinish factor distance second third rest
 
+/-- Total first endpoint of the generated ribbon. -/
+def ribbonPolylineStart
+    (factor : Nat) (distance : Int) : List Cell → Cell
+  | [] => (0, 0)
+  | [point] => Cell.scale factor point
+  | first :: second :: _ =>
+      ribbonPoint factor distance
+        (AxisDirection.between first second) first
+
+/-- Total final endpoint of the generated ribbon. -/
+def ribbonPolylineEnd
+    (factor : Nat) (distance : Int) : List Cell → Cell
+  | [] => (0, 0)
+  | [point] => Cell.scale factor point
+  | first :: second :: rest =>
+      ribbonPolylineFinish factor distance first second rest
+
 @[simp]
 theorem ribbonPolyline_cons_cons_head?
     (factor : Nat) (distance : Int)
@@ -274,6 +291,42 @@ theorem ribbonPolyline_cons_cons_getLast?
             factor distance second third rest
         · simpa [ribbonPolylineFinish] using
             induction (first := second) (second := third)
+
+/-- Every nonempty source route gives the generated ribbon its advertised
+total first endpoint. -/
+theorem ribbonPolyline_head?_eq_some_start
+    (factor : Nat) (distance : Int)
+    {points : List Cell} (nonempty : points ≠ []) :
+    (ribbonPolyline factor distance points).head? =
+      some (ribbonPolylineStart factor distance points) := by
+  cases points with
+  | nil => exact (nonempty rfl).elim
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp [ribbonPolyline, ribbonPolylineStart]
+      | cons second rest =>
+          simpa [ribbonPolylineStart] using
+            ribbonPolyline_cons_cons_head?
+              factor distance first second rest
+
+/-- Every nonempty source route gives the generated ribbon its advertised
+total final endpoint. -/
+theorem ribbonPolyline_getLast?_eq_some_end
+    (factor : Nat) (distance : Int)
+    {points : List Cell} (nonempty : points ≠ []) :
+    (ribbonPolyline factor distance points).getLast? =
+      some (ribbonPolylineEnd factor distance points) := by
+  cases points with
+  | nil => exact (nonempty rfl).elim
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp [ribbonPolyline, ribbonPolylineEnd]
+      | cons second rest =>
+          simpa [ribbonPolylineEnd] using
+            ribbonPolyline_cons_cons_getLast?
+              factor distance first second rest
 
 /-- The complete normal-offset construction preserves orthogonality. -/
 theorem ribbonPolyline_orthogonal
