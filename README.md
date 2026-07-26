@@ -1231,6 +1231,11 @@ The representation choices for this target are:
   variable placement.  Erasing coordinates recovers the ordered semantic
   formula exactly; satisfiability and the occurrence-three bound therefore
   transfer, while presentation order remains a definitional specialization.
+- [`LeanTrominoes/PeriodicCNFPlanarOrderedOneInThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOrderedOneInThreePositioned.lean)
+  threads that geometric order through the positioned Figure 9 replacement,
+  opaque wrapping, and unit-clause elimination.  Erasure, end-to-end
+  satisfiability, the occurrence-three bound, and final clause arity two or
+  three are certified for every lawful rotation order.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that

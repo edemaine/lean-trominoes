@@ -285,6 +285,30 @@ theorem orderedSatisfiable_iff
         satisfies_of_orderedFormula_satisfies
           source order assignment satisfies⟩
 
+/-! ## Clause width -/
+
+/-- Geometry-ordered occurrence splitting preserves a width-three bound. -/
+theorem orderedFormula_widthAtMostThree
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (order : OccurrenceOrder source)
+    (width : source.WidthAtMost 3) :
+    (orderedFormula source order).WidthAtMost 3 := by
+  intro clause clauseMem
+  simp only [orderedFormula, List.mem_append] at clauseMem
+  rcases clauseMem with sourceMem | cycleMem
+  · simp only [occurrenceClauses, List.mem_map] at sourceMem
+    rcases sourceMem with
+      ⟨taggedClause, taggedClauseMem, rfl⟩
+    rw [PeriodicClause.WidthAtMost, occurrenceClause_length]
+    exact width taggedClause.1
+      (List.fst_mem_of_mem_zipIdx taggedClauseMem)
+  · simp only [orderedCycleClauses,
+      List.mem_flatMap] at cycleMem
+    rcases cycleMem with ⟨atom, _atomMem, cycleMem⟩
+    exact cycleClauses_widthAtMostThree
+      (order.copies atom) clause cycleMem
+
 /-! ## Occurrence bound -/
 
 /-- Every literal in one ordered cycle still belongs to the variable whose
