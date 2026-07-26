@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicThreeSATThreeOrderedPositioned
 import LeanTrominoes.PeriodicCNFPlanarOneInThreeNoUnitsPositioned
+import LeanTrominoes.PeriodicCNFPlanarSATDeduplication
 
 /-!
 # Geometry-ordered positioned planar exact-one pipeline
@@ -97,7 +98,8 @@ abbrev DrawingOccurrenceOrder
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :=
   PeriodicThreeSATThree.OccurrenceOrder
-    (wrappedDrawingPositionedPeriodicPlanarSATFormula formula).erase
+    (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula).erase
 
 /-- Positioned routed formula after geometry-ordered occurrence splitting. -/
 def drawingOrderedPositionedPeriodicPlanarThreeSATThreeFormula
@@ -107,7 +109,8 @@ def drawingOrderedPositionedPeriodicPlanarThreeSATThreeFormula
     PositionedPeriodicCNF
       (PeriodicPlanarThreeSATThreeVariable Variable) :=
   PeriodicThreeSATThreePositioned.orderedFormula
-    (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+    (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula)
     (fun wrapped =>
       drawingPeriodicPlanarSATVariablePosition
         formula wrapped.original)
@@ -121,7 +124,8 @@ def drawingOrderedPeriodicPlanarThreeSATThreePlacement
     PeriodicVariablePlacement
       (PeriodicPlanarThreeSATThreeVariable Variable) :=
   PeriodicThreeSATThreePositioned.orderedPlacement
-    (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+    (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula)
     (wrappedDrawingPeriodicPlanarSATPlacement formula)
     order
 
@@ -212,7 +216,8 @@ theorem drawingOrderedPositionedPeriodicPlanarThreeSATThreeFormula_erase
     (drawingOrderedPositionedPeriodicPlanarThreeSATThreeFormula
       formula order).erase =
       PeriodicThreeSATThree.orderedFormula
-        (wrappedDrawingPositionedPeriodicPlanarSATFormula formula).erase
+        (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).erase
         order := by
   simp [drawingOrderedPositionedPeriodicPlanarThreeSATThreeFormula]
 
@@ -226,7 +231,8 @@ theorem
       formula order).erase =
       PeriodicOneInThree.formula
         (PeriodicThreeSATThree.orderedFormula
-          (wrappedDrawingPositionedPeriodicPlanarSATFormula formula).erase
+          (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+            formula).erase
           order) := by
   simp [drawingOrderedPositionedPeriodicPlanarOneInThreeThreeRawFormula]
 
@@ -241,7 +247,8 @@ theorem
       wrapPeriodicPlanarSATFormula
         (PeriodicOneInThree.formula
           (PeriodicThreeSATThree.orderedFormula
-            (wrappedDrawingPositionedPeriodicPlanarSATFormula formula).erase
+            (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+              formula).erase
             order)) := by
   rw [drawingOrderedPositionedPeriodicPlanarOneInThreeThreeFormula,
     PositionedPeriodicCNF.erase_rename,
@@ -260,7 +267,8 @@ theorem
         (wrapPeriodicPlanarSATFormula
           (PeriodicOneInThree.formula
             (PeriodicThreeSATThree.orderedFormula
-              (wrappedDrawingPositionedPeriodicPlanarSATFormula formula).erase
+              (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+                formula).erase
               order))) := by
   simp [drawingOrderedPositionedPeriodicPlanarOneInThreeNoUnitsFormula]
 
@@ -276,10 +284,13 @@ theorem
   rw [
     drawingOrderedPositionedPeriodicPlanarThreeSATThreeFormula_erase]
   apply PeriodicThreeSATThree.orderedFormula_widthAtMostThree order
-  rw [wrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
-  apply wrapPeriodicPlanarSATFormula_widthAtMost
-  exact drawingPeriodicPlanarSATFormula_widthAtMostThree
-    formula sourceWidth
+  rw [
+    deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
+  exact
+    deduplicatedWrappedDrawingPeriodicPlanarSATFormula_widthAtMost
+      formula 3
+      (drawingPeriodicPlanarSATFormula_widthAtMostThree
+        formula sourceWidth)
 
 /-- The occurrence-three bound survives the ordered split, Figure 9,
 opaque wrapping, and unit elimination for any source type.  Stating the
@@ -410,17 +421,21 @@ theorem
   rw [
     drawingOrderedPositionedPeriodicPlanarOneInThreeNoUnitsFormula_erase]
   have sourceWidth' :
-      (wrappedDrawingPositionedPeriodicPlanarSATFormula
+      (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
         formula).erase.WidthAtMost 3 := by
-    rw [wrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
-    apply wrapPeriodicPlanarSATFormula_widthAtMost
-    exact drawingPeriodicPlanarSATFormula_widthAtMostThree
-      formula sourceWidth
+    rw [
+      deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
+    exact
+      deduplicatedWrappedDrawingPeriodicPlanarSATFormula_widthAtMost
+        formula 3
+        (drawingPeriodicPlanarSATFormula_widthAtMostThree
+          formula sourceWidth)
   have generatedOccurrences :=
     @orderedOneInThreeNoUnits_occurrencesAtMostThree
       (WrappedPeriodicPlanarSATVariable Variable)
       drawingOrderedWrappedPeriodicPlanarSATVariableDecidableEq
-      (wrappedDrawingPositionedPeriodicPlanarSATFormula formula).erase
+      (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).erase
       order sourceWidth'
   exact PeriodicCNF.occurrencesAtMost_congr_beq
     _ _ (by infer_instance) (by infer_instance) 3
@@ -428,7 +443,7 @@ theorem
       (wrapPeriodicPlanarSATFormula
         (PeriodicOneInThree.formula
           (PeriodicThreeSATThree.orderedFormula
-            (wrappedDrawingPositionedPeriodicPlanarSATFormula
+            (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
               formula).erase
             order))))
     generatedOccurrences
@@ -463,12 +478,14 @@ theorem
     drawingOrderedPositionedPeriodicPlanarThreeSATThreeFormula_erase]
   exact
     (PeriodicThreeSATThree.orderedSatisfiable_iff
-      (wrappedDrawingPositionedPeriodicPlanarSATFormula formula).erase
+      (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).erase
       order).symm.trans
       (by
-        rw [wrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
+        rw [
+          deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
         exact
-          wrappedDrawingPeriodicPlanarSATFormula_satisfiable_iff
+          deduplicatedWrappedDrawingPeriodicPlanarSATFormula_satisfiable_iff
             formula)
 
 /-- Figure 9 preserves satisfiability for the geometry-ordered positioned

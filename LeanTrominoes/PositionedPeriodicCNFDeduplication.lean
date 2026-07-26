@@ -1,5 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarOneInThreePlacements
-import Mathlib.Data.List.Dedup
+import LeanTrominoes.PeriodicCNFDeduplication
 
 /-!
 # Deduplicating positioned periodic clauses
@@ -43,8 +43,9 @@ theorem erase_deduplicateByLiterals
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable) :
     source.deduplicateByLiterals.erase =
-      ⟨source.erase.clauses.dedup⟩ := by
+      source.erase.deduplicate := by
   simp [deduplicateByLiterals, erase,
+    PeriodicCNF.deduplicate,
     List.map_map, Function.comp_def]
 
 /-- Deduplication retains precisely the original erased protoclauses. -/
@@ -66,15 +67,8 @@ theorem deduplicateByLiterals_satisfies_iff
     (assignment : Variable → Cell → Bool) :
     source.deduplicateByLiterals.erase.Satisfies assignment ↔
       source.erase.Satisfies assignment := by
-  constructor
-  · intro satisfies translate clause clauseMember
-    exact satisfies translate clause
-      ((clause_mem_erase_deduplicateByLiterals_iff
-        source clause).mpr clauseMember)
-  · intro satisfies translate clause clauseMember
-    exact satisfies translate clause
-      ((clause_mem_erase_deduplicateByLiterals_iff
-        source clause).mp clauseMember)
+  rw [erase_deduplicateByLiterals]
+  exact source.erase.deduplicate_satisfies_iff assignment
 
 /-- Removing duplicate positioned protoclauses preserves periodic
 satisfiability. -/
@@ -84,18 +78,8 @@ theorem deduplicateByLiterals_satisfiable_iff
     (source : PositionedPeriodicCNF Variable) :
     source.deduplicateByLiterals.erase.Satisfiable ↔
       source.erase.Satisfiable := by
-  unfold PeriodicCNF.Satisfiable
-  constructor
-  · rintro ⟨assignment, satisfies⟩
-    exact
-      ⟨assignment,
-        (source.deduplicateByLiterals_satisfies_iff assignment).mp
-          satisfies⟩
-  · rintro ⟨assignment, satisfies⟩
-    exact
-      ⟨assignment,
-        (source.deduplicateByLiterals_satisfies_iff assignment).mpr
-          satisfies⟩
+  rw [erase_deduplicateByLiterals]
+  exact source.erase.deduplicate_satisfiable_iff
 
 /-- Clause locality is insensitive to duplicate removal. -/
 @[simp]
@@ -104,16 +88,8 @@ theorem deduplicateByLiterals_isLocal_iff
     (source : PositionedPeriodicCNF Variable) :
     source.deduplicateByLiterals.erase.IsLocal ↔
       source.erase.IsLocal := by
-  unfold PeriodicCNF.IsLocal
-  constructor
-  · intro localProof clause clauseMember
-    exact localProof clause
-      ((clause_mem_erase_deduplicateByLiterals_iff
-        source clause).mpr clauseMember)
-  · intro localProof clause clauseMember
-    exact localProof clause
-      ((clause_mem_erase_deduplicateByLiterals_iff
-        source clause).mp clauseMember)
+  rw [erase_deduplicateByLiterals]
+  exact source.erase.deduplicate_isLocal_iff
 
 /-- Every clause-width bound is insensitive to duplicate removal. -/
 @[simp]
@@ -123,16 +99,8 @@ theorem deduplicateByLiterals_widthAtMost_iff
     (width : Nat) :
     source.deduplicateByLiterals.erase.WidthAtMost width ↔
       source.erase.WidthAtMost width := by
-  unfold PeriodicCNF.WidthAtMost
-  constructor
-  · intro bounded clause clauseMember
-    exact bounded clause
-      ((clause_mem_erase_deduplicateByLiterals_iff
-        source clause).mpr clauseMember)
-  · intro bounded clause clauseMember
-    exact bounded clause
-      ((clause_mem_erase_deduplicateByLiterals_iff
-        source clause).mp clauseMember)
+  rw [erase_deduplicateByLiterals]
+  exact source.erase.deduplicate_widthAtMost_iff width
 
 end PositionedPeriodicCNF
 end LeanTrominoes

@@ -381,11 +381,20 @@ The representation choices for this target are:
   Subtracting a clause's common anchor from a finite incidence polyline then
   produces the canonical periodic clause and translated-variable endpoints
   required by the incidence graph.
+  [`LeanTrominoes/PeriodicCNFDeduplication.lean`](LeanTrominoes/PeriodicCNFDeduplication.lean)
+  removes repeated protoclauses from an ordinary periodic CNF.  Membership,
+  assignment satisfaction, satisfiability, locality, and every clause-width
+  bound are proved unchanged.
   [`LeanTrominoes/PositionedPeriodicCNFDeduplication.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplication.lean)
   removes repeated periodic clause orbits from neighboring-block
   presentations while retaining one geometric representative.  Erasure is
-  exactly list deduplication, and assignment satisfaction, satisfiability,
-  locality, and every clause-width bound are proved unchanged.
+  exactly the generic semantic deduplication, so all of those invariants
+  transfer.
+  [`LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean`](LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean)
+  specializes that normalization to the routed SAT block, wraps its variables,
+  and proves that the resulting positioned source remains equisatisfiable
+  with the full routed periodic formula and retains its width bound.  This is
+  the finite clause-vertex set used by the geometry-ordered pipeline.
   [`LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean)
   defines that layer's exact certificate: one polyline per literal in the
   incidence graph's presentation order, compatible variable-then-clause
@@ -1250,10 +1259,11 @@ The representation choices for this target are:
   formula exactly; satisfiability and the occurrence-three bound therefore
   transfer, while presentation order remains a definitional specialization.
 - [`LeanTrominoes/PeriodicCNFPlanarOrderedOneInThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOrderedOneInThreePositioned.lean)
-  threads that geometric order through the positioned Figure 9 replacement,
-  opaque wrapping, and unit-clause elimination.  Erasure, end-to-end
-  satisfiability, the occurrence-three bound, and final clause arity two or
-  three are certified for every lawful rotation order.
+  threads that geometric order from the deduplicated routed clause-orbit
+  source through the positioned Figure 9 replacement, opaque wrapping, and
+  unit-clause elimination.  Erasure, end-to-end satisfiability, the
+  occurrence-three bound, and final clause arity two or three are certified
+  for every lawful rotation order.
 - [`LeanTrominoes/PeriodicThreeSATThreeGeometricOrder.lean`](LeanTrominoes/PeriodicThreeSATThreeGeometricOrder.lean)
   extracts such an order from a planar incidence route family by sorting
   genuine occurrence copies in cyclic order of their terminal segment
@@ -1261,8 +1271,9 @@ The representation choices for this target are:
   occurrence is introduced or lost, while metadata lookup and route
   orthogonality prove that every genuine occurrence has a final segment with
   a nondegenerate direction, whose rank lies in the four-position cyclic
-  range.  The construction is specialized to the wrapped routed SAT
-  presentation.
+  range.  The construction is specialized to the deduplicated wrapped routed
+  SAT presentation, so every geometric clause vertex represents a distinct
+  periodic clause orbit.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that

@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarOrderedOneInThreePositioned
+import LeanTrominoes.PeriodicCNFPlanarSATDeduplication
 import LeanTrominoes.PositionedPeriodicCNFIncidenceDrawing
 import LeanTrominoes.PositionedPeriodicCNFIncidenceRouteLookup
 import Mathlib.Data.List.Sort
@@ -410,7 +411,8 @@ def drawingOccurrenceOrderOfPresentation
     (formula : PeriodicCNF Variable)
     (presentation :
       PositionedPeriodicCNF.PlanarIncidencePresentation
-        (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+        (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula)
         (wrappedDrawingPeriodicPlanarSATPlacement formula)) :
     DrawingOccurrenceOrder formula :=
   presentation.occurrenceOrder
