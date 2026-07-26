@@ -1675,6 +1675,12 @@ The representation choices for this target are:
   is either local to one site with zero offset or exactly one of the routed
   occurrence incidences, giving the geometric assembly an exhaustive splice
   interface.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMLocalDrawings.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMLocalDrawings.lean)
+  exposes all three verified finite templates through one typed interface.
+  Every typed triple has a local position, every colored incidence has a
+  temporary port, and its local route prefix is proved orthogonal with exact
+  endpoints; clause ports are additionally identified with their assembled
+  typed element positions.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
