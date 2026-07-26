@@ -390,6 +390,11 @@ The representation choices for this target are:
   first literal offset from every literal and from the displayed clause
   position.  Every resulting clause has anchor zero, while satisfaction by
   every plane-wide assignment—and therefore satisfiability—is unchanged.
+  [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalizationDrawing.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalizationDrawing.lean)
+  proves that this change of gauge preserves the finite incidence graph,
+  vertex positions, route list, and complete periodic drawing exactly.
+  Consequently a certified planar incidence presentation transports directly
+  to the normalized formula.
   [`LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean)
   reduces the certificate's two infinite nonintersection predicates to
   executable finite checks whenever all stored vertices and segment endpoints
