@@ -169,6 +169,122 @@ theorem interiorsMeet_scale_iff
   simp [Cell.scale, openIntervalsOverlap_mul_iff positive,
     strictlyBetween_mul_iff positive, positive.ne']
 
+/-- A point on an axis-aligned segment is either in its relative interior
+or is one of its endpoints. -/
+theorem interiorContains_or_eq_start_or_eq_finish_of_contains
+    {segment : GridSegment} {point : Cell}
+    (contains : segment.Contains point) :
+    segment.InteriorContains point ∨
+      point = segment.start ∨ point = segment.finish := by
+  rcases segment with
+    ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+  rcases point with ⟨pointX, pointY⟩
+  simp only [Contains, IsHorizontal, IsVertical, Between] at contains
+  rcases contains with
+      ⟨horizontal, sameY, between⟩ |
+      ⟨vertical, sameX, between⟩
+  · rcases between with bounds | bounds
+    · by_cases atStart : pointX = startX
+      · exact Or.inr (Or.inl (by
+          simp only [Prod.mk.injEq]
+          exact ⟨atStart, sameY⟩))
+      · by_cases atFinish : pointX = finishX
+        · exact Or.inr (Or.inr (by
+            simp only [Prod.mk.injEq]
+            exact ⟨atFinish, sameY.trans horizontal.1⟩))
+        · have strict :
+              StrictlyBetween startX finishX pointX :=
+            Or.inl ⟨by omega, by omega⟩
+          exact Or.inl (Or.inl
+            ⟨horizontal, sameY, strict⟩)
+    · by_cases atFinish : pointX = finishX
+      · exact Or.inr (Or.inr (by
+          simp only [Prod.mk.injEq]
+          exact ⟨atFinish, sameY.trans horizontal.1⟩))
+      · by_cases atStart : pointX = startX
+        · exact Or.inr (Or.inl (by
+            simp only [Prod.mk.injEq]
+            exact ⟨atStart, sameY⟩))
+        · have strict :
+              StrictlyBetween startX finishX pointX :=
+            Or.inr ⟨by omega, by omega⟩
+          exact Or.inl (Or.inl
+            ⟨horizontal, sameY, strict⟩)
+  · rcases between with bounds | bounds
+    · by_cases atStart : pointY = startY
+      · exact Or.inr (Or.inl (by
+          simp only [Prod.mk.injEq]
+          exact ⟨sameX, atStart⟩))
+      · by_cases atFinish : pointY = finishY
+        · exact Or.inr (Or.inr (by
+            simp only [Prod.mk.injEq]
+            exact ⟨sameX.trans vertical.1, atFinish⟩))
+        · have strict :
+              StrictlyBetween startY finishY pointY :=
+            Or.inl ⟨by omega, by omega⟩
+          exact Or.inl (Or.inr
+            ⟨vertical, sameX, strict⟩)
+    · by_cases atFinish : pointY = finishY
+      · exact Or.inr (Or.inr (by
+          simp only [Prod.mk.injEq]
+          exact ⟨sameX.trans vertical.1, atFinish⟩))
+      · by_cases atStart : pointY = startY
+        · exact Or.inr (Or.inl (by
+            simp only [Prod.mk.injEq]
+            exact ⟨sameX, atStart⟩))
+        · have strict :
+              StrictlyBetween startY finishY pointY :=
+            Or.inr ⟨by omega, by omega⟩
+          exact Or.inl (Or.inr
+            ⟨vertical, sameX, strict⟩)
+
+/-- One common strict point forces two open intervals to overlap. -/
+theorem openIntervalsOverlap_of_strictlyBetween
+    {firstStart firstFinish secondStart secondFinish point : Int}
+    (firstContains : StrictlyBetween firstStart firstFinish point)
+    (secondContains : StrictlyBetween secondStart secondFinish point) :
+    OpenIntervalsOverlap
+      firstStart firstFinish secondStart secondFinish := by
+  rcases firstContains with firstBounds | firstBounds
+  <;> rcases secondContains with secondBounds | secondBounds
+  <;> simp only [OpenIntervalsOverlap]
+  <;> omega
+
+/-- A common point in two relative interiors witnesses continuous
+interior intersection. -/
+theorem interiorsMeet_of_interiorContains
+    {first second : GridSegment} {point : Cell}
+    (firstContains : first.InteriorContains point)
+    (secondContains : second.InteriorContains point) :
+    first.InteriorsMeet second := by
+  rcases firstContains with
+      ⟨firstHorizontal, firstSameY, firstBetween⟩ |
+      ⟨firstVertical, firstSameX, firstBetween⟩
+  · rcases secondContains with
+        ⟨secondHorizontal, secondSameY, secondBetween⟩ |
+        ⟨secondVertical, secondSameX, secondBetween⟩
+    · exact Or.inl
+        ⟨firstHorizontal, secondHorizontal,
+          firstSameY.symm.trans secondSameY,
+          openIntervalsOverlap_of_strictlyBetween
+            firstBetween secondBetween⟩
+    · exact Or.inr (Or.inr (Or.inl
+        ⟨firstHorizontal, secondVertical,
+          by simpa [secondSameX] using firstBetween,
+          by simpa [firstSameY] using secondBetween⟩))
+  · rcases secondContains with
+        ⟨secondHorizontal, secondSameY, secondBetween⟩ |
+        ⟨secondVertical, secondSameX, secondBetween⟩
+    · exact Or.inr (Or.inr (Or.inr
+        ⟨firstVertical, secondHorizontal,
+          by simpa [firstSameX] using secondBetween,
+          by simpa [secondSameY] using firstBetween⟩))
+    · exact Or.inr (Or.inl
+        ⟨firstVertical, secondVertical,
+          firstSameX.symm.trans secondSameX,
+          openIntervalsOverlap_of_strictlyBetween
+            firstBetween secondBetween⟩)
+
 end GridSegment
 
 /-- Scale every point of a grid polyline about the origin. -/
@@ -437,6 +553,118 @@ theorem routesHaveDisjointInteriors_scale
       (second.segment.translate
         (drawing.periodTranslation secondTranslate))).mp scaledMeet
 
+/-- Continuous separation closes the apparent divisibility gap in
+integer-grid planarity: a contact at a newly introduced refined-grid point
+is either an interior/interior contact or occurs at a scaled old endpoint. -/
+theorem routesAvoidInteriors_scale
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing)
+    (avoids : drawing.RoutesAvoidInteriors)
+    (disjoint : drawing.RoutesHaveDisjointInteriors) :
+    (drawing.scale factor).RoutesAvoidInteriors := by
+  intro scaledFirst scaledFirstMember scaledSecond scaledSecondMember
+    firstTranslate secondTranslate point different
+    firstContains secondContains
+  rw [indexedSegments_scale] at scaledFirstMember
+  rw [indexedSegments_scale] at scaledSecondMember
+  rcases List.mem_map.mp scaledFirstMember with
+    ⟨first, firstMember, rfl⟩
+  rcases List.mem_map.mp scaledSecondMember with
+    ⟨second, secondMember, rfl⟩
+  have originalDifferent :
+      SegmentOccurrenceKey first firstTranslate ≠
+        SegmentOccurrenceKey second secondTranslate := by
+    simpa [SegmentOccurrenceKey, IndexedGridSegment.scale] using different
+  have factorPositive : (0 : Int) < factor := by
+    exact_mod_cast positive
+  let firstOriginal :=
+    first.segment.translate
+      (drawing.periodTranslation firstTranslate)
+  let secondOriginal :=
+    second.segment.translate
+      (drawing.periodTranslation secondTranslate)
+  have firstGeometry :
+      (IndexedGridSegment.scale factor first).segment.translate
+          ((drawing.scale factor).periodTranslation firstTranslate) =
+        firstOriginal.scale factor := by
+    simp only [IndexedGridSegment.scale_segment,
+      periodTranslation_scale positive]
+    exact
+      (GridSegment.scale_translate factor
+        (drawing.periodTranslation firstTranslate)
+        first.segment).symm
+  have secondGeometry :
+      (IndexedGridSegment.scale factor second).segment.translate
+          ((drawing.scale factor).periodTranslation secondTranslate) =
+        secondOriginal.scale factor := by
+    simp only [IndexedGridSegment.scale_segment,
+      periodTranslation_scale positive]
+    exact
+      (GridSegment.scale_translate factor
+        (drawing.periodTranslation secondTranslate)
+        second.segment).symm
+  rcases
+      GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+        secondContains with
+    secondInterior | pointAtStart | pointAtFinish
+  · exact
+      (routesHaveDisjointInteriors_scale positive drawing disjoint
+        (IndexedGridSegment.scale factor first)
+        (by simpa [indexedSegments_scale] using
+          List.mem_map.mpr ⟨first, firstMember, rfl⟩)
+        (IndexedGridSegment.scale factor second)
+        (by simpa [indexedSegments_scale] using
+          List.mem_map.mpr ⟨second, secondMember, rfl⟩)
+        firstTranslate secondTranslate different)
+        (GridSegment.interiorsMeet_of_interiorContains
+          firstContains secondInterior)
+  · have pointPreimage :
+        point = Cell.scale factor secondOriginal.start := by
+      rw [pointAtStart, secondGeometry,
+        GridSegment.scale_start]
+    rw [firstGeometry, pointPreimage] at firstContains
+    rw [secondGeometry, pointPreimage] at secondContains
+    have originalFirstContains :
+        firstOriginal.InteriorContains secondOriginal.start := by
+      exact
+        (GridSegment.interiorContains_scale_iff
+          factorPositive firstOriginal secondOriginal.start).mp
+          firstContains
+    have originalSecondContains :
+        secondOriginal.Contains secondOriginal.start := by
+      exact
+        (GridSegment.contains_scale_iff
+          factorPositive secondOriginal secondOriginal.start).mp
+          secondContains
+    exact
+      (avoids first firstMember second secondMember
+        firstTranslate secondTranslate secondOriginal.start
+        originalDifferent originalFirstContains)
+        originalSecondContains
+  · have pointPreimage :
+        point = Cell.scale factor secondOriginal.finish := by
+      rw [pointAtFinish, secondGeometry,
+        GridSegment.scale_finish]
+    rw [firstGeometry, pointPreimage] at firstContains
+    rw [secondGeometry, pointPreimage] at secondContains
+    have originalFirstContains :
+        firstOriginal.InteriorContains secondOriginal.finish := by
+      exact
+        (GridSegment.interiorContains_scale_iff
+          factorPositive firstOriginal secondOriginal.finish).mp
+          firstContains
+    have originalSecondContains :
+        secondOriginal.Contains secondOriginal.finish := by
+      exact
+        (GridSegment.contains_scale_iff
+          factorPositive secondOriginal secondOriginal.finish).mp
+          secondContains
+    exact
+      (avoids first firstMember second secondMember
+        firstTranslate secondTranslate secondOriginal.finish
+        originalDifferent originalFirstContains)
+        originalSecondContains
+
 /-- Positive refinement preserves avoidance of route interiors by every
 lifted graph vertex. -/
 theorem verticesAvoidRouteInteriors_scale
@@ -468,6 +696,29 @@ theorem verticesAvoidRouteInteriors_scale
         (drawing.periodTranslation routeTranslate))
       (Cell.add vertex
         (drawing.periodTranslation vertexTranslate))).mp scaledContains
+
+/-- Positive refinement preserves integer-grid planarity when the source
+also has the continuous separation needed to exclude new intermediate-grid
+contacts. -/
+theorem isPlanar_scale_of_routesHaveDisjointInteriors
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing)
+    (planar : drawing.IsPlanar)
+    (disjoint : drawing.RoutesHaveDisjointInteriors) :
+    (drawing.scale factor).IsPlanar :=
+  ⟨routesAvoidInteriors_scale positive drawing planar.1 disjoint,
+    verticesAvoidRouteInteriors_scale positive drawing planar.2⟩
+
+/-- Positive integral refinement preserves continuous periodic
+planarity. -/
+theorem isContinuouslyPlanar_scale
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing)
+    (planar : drawing.IsContinuouslyPlanar) :
+    (drawing.scale factor).IsContinuouslyPlanar :=
+  ⟨isPlanar_scale_of_routesHaveDisjointInteriors
+      positive drawing planar.1 planar.2,
+    routesHaveDisjointInteriors_scale positive drawing planar.2⟩
 
 end PeriodicGridDrawing
 
