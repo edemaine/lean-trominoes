@@ -131,5 +131,174 @@ theorem polylineLastDirection_append_pair
     (between_isGenuine_of_unitAxisStep unit)]
   simp
 
+/-- Ordered unit subdivision preserves the first directed axis of every
+nondegenerate orthogonal polyline. -/
+theorem polylineFirstDirection_unitSubdividePolyline
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points) :
+    polylineFirstDirection (unitSubdividePolyline points) =
+      polylineFirstDirection points := by
+  cases points with
+  | nil =>
+      simp at length
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp at length
+      | cons second rest =>
+          have aligned :=
+            (List.isChain_cons_cons.mp orthogonal).1
+          rcases unitSubdividePolyline_firstDirection aligned with
+            ⟨after, tail, equation, direction⟩
+          rw [equation]
+          simpa [polylineFirstDirection] using direction
+
+/-- Removing an initial point from a route containing at least three points
+does not change its final directed axis. -/
+theorem polylineLastDirection_cons_cons_cons
+    (first second third : Cell) (rest : List Cell) :
+    polylineLastDirection (first :: second :: third :: rest) =
+      polylineLastDirection (second :: third :: rest) := by
+  unfold polylineLastDirection
+  rw [List.reverse_cons]
+  congr 1
+  cases reverseEquation :
+      (second :: third :: rest).reverse with
+  | nil =>
+      have length :
+          2 ≤ (second :: third :: rest).reverse.length := by
+        simp
+      simp [reverseEquation] at length
+  | cons reversedFirst reversedRest =>
+      cases reversedRest with
+      | nil =>
+          have length :
+              2 ≤ (second :: third :: rest).reverse.length := by
+            simp
+          simp [reverseEquation] at length
+      | cons reversedSecond reversedRest =>
+          simp [polylineFirstDirection]
+
+/-- Prepending any list to a route with at least two displayed points does
+not change its final directed axis. -/
+theorem polylineLastDirection_append_cons_cons
+    (leading : List Cell) (first second : Cell) (rest : List Cell) :
+    polylineLastDirection (leading ++ first :: second :: rest) =
+      polylineLastDirection (first :: second :: rest) := by
+  induction leading with
+  | nil =>
+      rfl
+  | cons head tail induction =>
+      rw [List.cons_append]
+      cases tail with
+      | nil =>
+          simp only [List.nil_append]
+          rw [polylineLastDirection_cons_cons_cons]
+      | cons next tail =>
+          cases tail with
+          | nil =>
+              simp only [List.cons_append, List.nil_append]
+              rw [polylineLastDirection_cons_cons_cons]
+              exact induction
+          | cons third tail =>
+              simp only [List.cons_append]
+              rw [polylineLastDirection_cons_cons_cons]
+              exact induction
+
+/-- Joining a prefix to a nondegenerate suffix at their common endpoint
+preserves the suffix's final directed axis. -/
+theorem polylineLastDirection_joinAtEndpoint
+    {first second : List Cell} {middle : Cell}
+    (firstLast : first.getLast? = some middle)
+    (secondHead : second.head? = some middle)
+    (secondLength : 2 ≤ second.length) :
+    polylineLastDirection (joinAtEndpoint first second) =
+      polylineLastDirection second := by
+  cases second with
+  | nil =>
+      simp at secondLength
+  | cons secondFirst secondRest =>
+      cases secondRest with
+      | nil =>
+          simp at secondLength
+      | cons secondNext secondRest =>
+          have secondFirstEq : secondFirst = middle := by
+            simpa using Option.some.inj secondHead
+          subst secondFirst
+          cases first using List.reverseRecOn with
+          | nil =>
+              simp at firstLast
+          | append_singleton leading last =>
+              have lastEq : last = middle := by
+                apply Option.some.inj
+                simpa using firstLast
+              subst last
+              simp only [joinAtEndpoint, List.tail_cons,
+                List.append_assoc]
+              exact
+                polylineLastDirection_append_cons_cons
+                  leading middle secondNext secondRest
+
+/-- Ordered unit subdivision preserves the final directed axis of every
+nondegenerate orthogonal polyline. -/
+theorem polylineLastDirection_unitSubdividePolyline
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points) :
+    polylineLastDirection (unitSubdividePolyline points) =
+      polylineLastDirection points := by
+  induction points using List.twoStepInduction with
+  | nil =>
+      simp at length
+  | singleton point =>
+      simp at length
+  | cons_cons first second rest _ induction =>
+      have parts :=
+        (List.isChain_cons_cons.mp orthogonal :
+          (GridSegment.mk first second).IsAxisAligned ∧
+            PeriodicOrthocrossing.OrthogonalPolyline
+              (second :: rest))
+      cases rest with
+      | nil =>
+          rw [unitSubdividePolyline]
+          rcases unitSegmentPoints_lastDirection parts.1 with
+            ⟨leading, before, equation, direction⟩
+          have segmentUnit :=
+            unitSegmentPoints_unitSteps parts.1
+          rw [equation] at segmentUnit
+          have finalUnit :
+              IsUnitAxisStep before second :=
+            (List.isChain_append_cons_cons.mp segmentUnit).2.1
+          rw [equation]
+          simp only [unitSubdividePolyline_singleton,
+            joinAtEndpoint, List.tail_cons, List.append_nil]
+          rw [polylineLastDirection_append_pair
+            leading finalUnit]
+          rw [direction]
+          change
+            between first second =
+              (between second first).opposite
+          rw [between_reverse_eq_opposite
+            (between_isGenuine_of_axisAligned parts.1),
+            opposite_opposite]
+      | cons third rest =>
+          rw [unitSubdividePolyline]
+          rw [polylineLastDirection_joinAtEndpoint
+            (unitSegmentPoints_getLast? parts.1)
+            (by
+              simpa using unitSubdividePolyline_head?
+                (points := second :: third :: rest)
+                (by simp))
+            (unitSubdividePolyline_length_ge_two
+              (first := second) (second := third)
+              (rest := rest) parts.2)]
+          rw [induction second (by simp) parts.2]
+          exact
+            (polylineLastDirection_cons_cons_cons
+              first second third rest).symm
+
 end AxisDirection
 end LeanTrominoes

@@ -1522,10 +1522,16 @@ The representation choices for this target are:
   rectilinear for a continuously planar source presentation.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirections.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirections.lean)
   names the genuine cardinal directions in which every active unit route
-  leaves its variable and enters its clause.  It rewrites the two ribbon-core
-  endpoints as the standard exit and entry points of those endpoint
-  macrocells, reducing each remaining endpoint fan to finite gadget data,
-  color, and one of four directions.
+  leaves its variable and enters its clause.  Ordered unit subdivision is
+  proved to preserve both endpoint directions.  The module rewrites the two
+  ribbon-core endpoints as the standard exit and entry points of those
+  endpoint macrocells, reducing each remaining endpoint fan to finite gadget
+  data, color, and one of four directions.
+- [`LeanTrominoes/OrthogonalPolylineEndpointDirectionSeparation.lean`](LeanTrominoes/OrthogonalPolylineEndpointDirectionSeparation.lean)
+  proves the local topological fact behind endpoint fanout: two
+  nondegenerate axis-aligned segments leaving one point in the same direction
+  overlap immediately.  Thus continuously separated orthogonal routes that
+  share their first or last point must use distinct endpoint directions.
 - [`LeanTrominoes/OrthogonalPolylineElbow.lean`](LeanTrominoes/OrthogonalPolylineElbow.lean)
   supplies horizontal-first and vertical-first one-bend routes for those
   finite endpoint fans.  Coincident or already aligned endpoints are
@@ -1548,6 +1554,12 @@ The representation choices for this target are:
   and orthogonality required by `ThreeStrandRouting`, yielding a normalized
   corrected routing object for the hardness assembly.  Contact-freeness of
   the endpoint fans remains the next geometric layer.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean)
+  specializes endpoint-direction separation to the active exact-one
+  incidences.  Unequal occurrences of one variable leave in different
+  directions, and unequal occurrences sharing one lifted clause endpoint
+  enter in different directions.  These are the finite direction constraints
+  available to the remaining noncrossing endpoint-fan construction.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

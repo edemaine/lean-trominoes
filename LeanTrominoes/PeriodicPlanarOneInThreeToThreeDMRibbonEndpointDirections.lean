@@ -70,6 +70,38 @@ theorem occurrenceSourceClauseDirection_isGenuine
       (occurrenceUnitSourceRoute_length presentation entry)
       (occurrenceUnitSourceRoute_unitSteps presentation entry)
 
+/-- Unit subdivision does not change the direction in which the selected
+source route leaves its variable endpoint. -/
+theorem occurrenceSourceVariableDirection_eq_sourceRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    occurrenceSourceVariableDirection presentation entry =
+      AxisDirection.polylineFirstDirection
+        (occurrenceSourceRoute presentation entry) := by
+  exact
+    AxisDirection.polylineFirstDirection_unitSubdividePolyline
+      (occurrenceSourceRoute_length presentation entry)
+      (occurrenceSourceRoute_orthogonal presentation entry)
+
+/-- Unit subdivision does not change the direction in which the selected
+source route enters its clause endpoint. -/
+theorem occurrenceSourceClauseDirection_eq_sourceRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    occurrenceSourceClauseDirection presentation entry =
+      AxisDirection.polylineLastDirection
+        (occurrenceSourceRoute presentation entry) := by
+  exact
+    AxisDirection.polylineLastDirection_unitSubdividePolyline
+      (occurrenceSourceRoute_length presentation entry)
+      (occurrenceSourceRoute_orthogonal presentation entry)
+
 /-- Removing a first point from a route containing at least three points
 does not change its advertised final ribbon boundary. -/
 theorem ribbonCorridorRouteEnd_cons_cons_cons
