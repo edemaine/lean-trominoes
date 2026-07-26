@@ -1340,6 +1340,11 @@ The representation choices for this target are:
   removing its duplicate list entry.  The joined route is proved to preserve
   both outer endpoints and orthogonality, supplying the generic splice lemma
   used by fan and later gadget routing.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
+  isolates the remaining global obligation for copied source incidences:
+  route each copied clause to its angular fan boundary.  Joining any such
+  certified prefix with the translated local spoke is proved to give the
+  copied literal's exact canonical endpoint while preserving orthogonality.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
