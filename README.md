@@ -1312,6 +1312,11 @@ The representation choices for this target are:
   port, cyclic port rank, and positioned split-copy vertex.  Increasing list
   indices are also proved to follow the actual polar order of the source
   terminal rays, giving the local fan a direct combinatorial interface.
+- [`LeanTrominoes/OccurrenceSplitAngularFanDrawing.lean`](LeanTrominoes/OccurrenceSplitAngularFanDrawing.lean)
+  extracts the first `n` east-first Figure 7 spokes together with the full
+  implication ring.  All nine possible sizes `0 ≤ n ≤ 8` are mechanically
+  certified for exact endpoints, orthogonality, and continuous planarity,
+  providing the finite geometric kernel for each angular variable fan.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
