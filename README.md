@@ -1459,6 +1459,12 @@ The representation choices for this target are:
   Their periodic endpoints agree exactly with the refined formula and
   placement, providing the compatible axis-aligned baseline for the later
   noncrossing ring splice.
+- [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean)
+  assigns the eight copies by their actual routed terminal rays rather than
+  by an arbitrary starting point in the cyclic angular order.  The resulting
+  semantic and positioned formulas preserve satisfiability, locality, and
+  width; their degree-three proof is reduced exactly to validity and
+  separation of the physical compass-ray ports.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
