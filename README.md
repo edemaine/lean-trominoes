@@ -1425,6 +1425,13 @@ The representation choices for this target are:
   the same point to their shared boundary.  Every legal translated tile is
   rectilinear and simple, and its three colored lanes are pairwise
   continuously separated.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellBounds.lean)
+  proves that every tile point and segment stays in the closed square of
+  half-span 64 around its 128-refined source center.  Tiles whose source
+  centers differ by at least two lattice units in either coordinate cannot
+  share points, contain each other's points in segment interiors, or have
+  meeting segment interiors.  Thus all remaining global corridor contacts
+  reduce to equal or neighboring source macrocells.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
   recursively joins those half-edge tiles along a unit-step source route.
   Under the explicit no-immediate-reversal condition, the assembled core is
