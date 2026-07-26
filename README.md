@@ -1226,6 +1226,11 @@ The representation choices for this target are:
   equisatisfiable with the source, allowing the geometric construction to
   follow the rotation order of incident edges around each planar variable
   vertex instead of the unrelated clause-presentation order.
+- [`LeanTrominoes/PeriodicThreeSATThreeOrderedPositioned.lean`](LeanTrominoes/PeriodicThreeSATThreeOrderedPositioned.lean)
+  lifts the same geometry-selected order to the positioned reduction and its
+  variable placement.  Erasing coordinates recovers the ordered semantic
+  formula exactly; satisfiability and the occurrence-three bound therefore
+  transfer, while presentation order remains a definitional specialization.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that
