@@ -124,5 +124,102 @@ theorem instantiatedAngularFanDrawing_spokeRoute
       simpa only [angularFanPorts_length] using indexLt),
     angularFanPorts_getElem count index indexLt]
 
+/-! ## Periodically translated fan occurrences -/
+
+/-- Physical boundary point of the same fan in the periodic occurrence
+translate named by `logicalOffset`. -/
+def angularFanBoundaryPositionAt
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable) (logicalOffset : Cell)
+    (index : Nat) : Cell :=
+  Cell.add
+    (angularFanBoundaryPosition
+      sourcePlacement atom index)
+    ((placement sourcePlacement).translation logicalOffset)
+
+/-- Lift the certified local suffix to a neighboring periodic occurrence of
+the same split-variable fan. -/
+def angularFanSpokeRouteAt
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable) (logicalOffset : Cell)
+    (index : Nat) : List Cell :=
+  (angularFanSpokeRoute
+    sourcePlacement atom index).map
+      (Cell.add
+        ((placement sourcePlacement).translation
+          logicalOffset))
+
+/-- Translating every point of an orthogonal polyline preserves
+orthogonality. -/
+theorem PeriodicOrthocrossing.OrthogonalPolyline.map_add
+    {points : List Cell}
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (offset : Cell) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (points.map (Cell.add offset)) := by
+  unfold PeriodicOrthocrossing.OrthogonalPolyline
+    at orthogonal ⊢
+  apply List.isChain_map_of_isChain
+    (Cell.add offset)
+  · intro first second aligned
+    exact
+      (GridSegment.isAxisAligned_translate
+        (GridSegment.mk first second) offset).2 aligned
+  · exact orthogonal
+
+/-- The lifted suffix starts at the corresponding lifted fan boundary. -/
+@[simp]
+theorem angularFanSpokeRouteAt_head?
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable) (logicalOffset : Cell)
+    (index : Nat) :
+    (angularFanSpokeRouteAt sourcePlacement
+      atom logicalOffset index).head? =
+        some
+          (angularFanBoundaryPositionAt
+            sourcePlacement atom logicalOffset index) := by
+  simp [angularFanSpokeRouteAt,
+    angularFanBoundaryPositionAt,
+    Cell.add, add_comm]
+
+/-- The lifted suffix ends at the selected split copy in the advertised
+periodic occurrence translate. -/
+@[simp]
+theorem angularFanSpokeRouteAt_getLast?
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable) (logicalOffset : Cell)
+    (index : Nat) :
+    (angularFanSpokeRouteAt sourcePlacement
+      atom logicalOffset index).getLast? =
+        some
+          (Cell.add
+            (occurrenceVariablePosition sourcePlacement
+              (copy atom (angularPortOfIndex index)))
+            ((placement sourcePlacement).translation
+              logicalOffset)) := by
+  simp [angularFanSpokeRouteAt,
+    Cell.add, add_comm]
+
+/-- Periodic lifting preserves orthogonality of every local fan suffix. -/
+theorem angularFanSpokeRouteAt_orthogonal
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable) (logicalOffset : Cell)
+    (index : Nat) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (angularFanSpokeRouteAt sourcePlacement
+        atom logicalOffset index) := by
+  exact
+    PeriodicOrthocrossing.OrthogonalPolyline.map_add
+      (angularFanSpokeRoute_orthogonal
+        sourcePlacement atom index)
+      ((placement sourcePlacement).translation
+        logicalOffset)
+
 end OccurrenceSplitRing
 end LeanTrominoes

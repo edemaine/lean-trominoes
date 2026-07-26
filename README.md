@@ -1333,6 +1333,8 @@ The representation choices for this target are:
   angular occurrence index.  Every suffix is proved orthogonal with exact
   endpoints at that boundary and the selected semantic copy, and is
   identified with the corresponding route of the certified local fan.
+  Periodically translated variants correctly lift the boundary and suffix to
+  the neighboring occurrence named by a literal's anchor-relative offset.
 - [`LeanTrominoes/OrthogonalPolylineJoin.lean`](LeanTrominoes/OrthogonalPolylineJoin.lean)
   joins independently certified route pieces at a shared endpoint while
   removing its duplicate list entry.  The joined route is proved to preserve
