@@ -257,6 +257,7 @@ The representation choices for this target are:
   equivariant under periodic translation.
   [`LeanTrominoes/PeriodicOrthocrossingPlanarBends.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarBends.lean)
   places equality links at every turn of every neighboring route occurrence.
+  Exact duplicate bend records are removed before links are generated.
   Together with the straight-segment carrier chains, one Boolean value now
   propagates through an entire translated route.
   [`LeanTrominoes/PeriodicOrthocrossingPlanarRouteCore.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarRouteCore.lean)
@@ -1312,7 +1313,10 @@ The representation choices for this target are:
   sites.  Complete carrier chains are normalized to simple sorted paths;
   adjacent-pair endpoint counting and the disjoint carrier-key partition show
   that every carrier node meets at most two chain links, hence occurs at most
-  four times in all complete-carrier equality clauses.
+  four times in all complete-carrier equality clauses.  Bend identity and
+  endpoint-role arguments show that a terminal meets at most one bend link,
+  contributing at most two more occurrences; the entire route-wire family is
+  therefore bounded by six.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit

@@ -180,7 +180,7 @@ def drawingRouteBendLinks
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) :
     List (EqualityLink CarrierNode) :=
-  (drawingRouteBends graph).map fun routeBend =>
+  (drawingRouteBends graph).dedup.map fun routeBend =>
     routeBend.equalityLink graph
 
 /-- Every bend link stays within one translated route occurrence. -/

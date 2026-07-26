@@ -327,6 +327,7 @@ theorem constructedRouteTerminals_assignment_eq
     apply bendLaws (routeBend.equalityLink graph)
     apply List.mem_map.mpr
     refine ⟨routeBend, ?_, rfl⟩
+    apply List.mem_dedup.mpr
     apply List.mem_flatMap.mpr
     refine
       ⟨(points, taggedEdge.2),

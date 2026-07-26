@@ -285,5 +285,335 @@ theorem drawingCompleteCarrierFormula_occurrencesAtMostFour
     (drawingCompleteCarrierLinks graph) 2 4 rfl
   exact drawingCompleteCarrierLinks_endpoint_count_le_two graph
 
+/-- Every bend enumerated from a route tail retains the fixed route,
+translation, and an incoming-segment index no smaller than the starting
+index. -/
+theorem routeBendsAux_member_data
+    (routeIndex : Nat) (translate : Cell) :
+    ∀ (points : List Cell) (startIndex : Nat)
+      {routeBend : RouteBend},
+      routeBend ∈
+          routeBendsAux routeIndex translate startIndex points →
+        routeBend.routeIndex = routeIndex ∧
+          routeBend.translate = translate ∧
+          startIndex ≤ routeBend.incomingSegmentIndex := by
+  intro points
+  induction points with
+  | nil =>
+      intro startIndex routeBend routeBendMem
+      simp [routeBendsAux] at routeBendMem
+  | cons first rest induction =>
+      cases rest with
+      | nil =>
+          intro startIndex routeBend routeBendMem
+          simp [routeBendsAux] at routeBendMem
+      | cons second rest =>
+          cases rest with
+          | nil =>
+              intro startIndex routeBend routeBendMem
+              simp [routeBendsAux] at routeBendMem
+          | cons third rest =>
+              intro startIndex routeBend routeBendMem
+              simp only [routeBendsAux, List.mem_cons]
+                at routeBendMem
+              rcases routeBendMem with routeBendEq | routeBendMem
+              · subst routeBend
+                simp
+              · have tailData :=
+                  induction (startIndex + 1) routeBendMem
+                exact
+                  ⟨tailData.1, tailData.2.1,
+                    Nat.le_trans
+                      (Nat.le_add_right startIndex 1)
+                      tailData.2.2⟩
+
+/-- Within one enumerated route tail, the incoming segment index uniquely
+identifies a bend. -/
+theorem routeBendsAux_eq_of_index_eq
+    (routeIndex : Nat) (translate : Cell) :
+    ∀ (points : List Cell) (startIndex : Nat)
+      {first second : RouteBend},
+      first ∈
+          routeBendsAux routeIndex translate startIndex points →
+        second ∈
+          routeBendsAux routeIndex translate startIndex points →
+        first.incomingSegmentIndex =
+          second.incomingSegmentIndex →
+        first = second := by
+  intro points
+  induction points with
+  | nil =>
+      intro startIndex first second firstMem
+      simp [routeBendsAux] at firstMem
+  | cons firstPoint rest induction =>
+      cases rest with
+      | nil =>
+          intro startIndex first second firstMem
+          simp [routeBendsAux] at firstMem
+      | cons secondPoint rest =>
+          cases rest with
+          | nil =>
+              intro startIndex first second firstMem
+              simp [routeBendsAux] at firstMem
+          | cons thirdPoint rest =>
+              intro startIndex first second firstMem secondMem indexEq
+              simp only [routeBendsAux, List.mem_cons]
+                at firstMem secondMem
+              rcases firstMem with firstEq | firstMem <;>
+                rcases secondMem with secondEq | secondMem
+              · subst first
+                subst second
+                rfl
+              · subst first
+                have secondData :=
+                  routeBendsAux_member_data routeIndex translate
+                    (secondPoint :: thirdPoint :: rest)
+                    (startIndex + 1) secondMem
+                simp at indexEq
+                omega
+              · subst second
+                have firstData :=
+                  routeBendsAux_member_data routeIndex translate
+                    (secondPoint :: thirdPoint :: rest)
+                    (startIndex + 1) firstMem
+                simp at indexEq
+                omega
+              · exact induction (startIndex + 1)
+                  firstMem secondMem indexEq
+
+/-- In the finite drawing enumeration, route index, translation, and
+incoming-segment index jointly identify a bend. -/
+theorem drawingRouteBends_eq_of_identity_eq
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {first second : RouteBend}
+    (firstMem : first ∈ drawingRouteBends graph)
+    (secondMem : second ∈ drawingRouteBends graph)
+    (routeEq : first.routeIndex = second.routeIndex)
+    (translateEq : first.translate = second.translate)
+    (indexEq :
+      first.incomingSegmentIndex =
+        second.incomingSegmentIndex) :
+    first = second := by
+  rcases List.mem_flatMap.mp firstMem with
+    ⟨firstTaggedRoute, firstTaggedRouteMem, firstTranslateMem⟩
+  rcases List.mem_flatMap.mp firstTranslateMem with
+    ⟨firstTranslate, firstTranslateMem, firstBendMem⟩
+  rcases List.mem_flatMap.mp secondMem with
+    ⟨secondTaggedRoute, secondTaggedRouteMem, secondTranslateMem⟩
+  rcases List.mem_flatMap.mp secondTranslateMem with
+    ⟨secondTranslate, secondTranslateMem, secondBendMem⟩
+  have firstData :=
+    routeBendsAux_member_data firstTaggedRoute.2 firstTranslate
+      firstTaggedRoute.1 0 firstBendMem
+  have secondData :=
+    routeBendsAux_member_data secondTaggedRoute.2 secondTranslate
+      secondTaggedRoute.1 0 secondBendMem
+  have taggedRouteEq :
+      firstTaggedRoute = secondTaggedRoute :=
+    tagged_eq_of_mem_zipIdx_of_snd_eq
+      firstTaggedRouteMem secondTaggedRouteMem
+      (firstData.1.symm.trans
+        (routeEq.trans secondData.1))
+  subst secondTaggedRoute
+  have translatesEq :
+      firstTranslate = secondTranslate :=
+    firstData.2.1.symm.trans
+      (translateEq.trans secondData.2.1)
+  subst secondTranslate
+  exact
+    routeBendsAux_eq_of_index_eq
+      firstTaggedRoute.2 firstTranslate firstTaggedRoute.1 0
+      firstBendMem secondBendMem indexEq
+
+/-- Incoming terminals identify their bends inside the drawing
+enumeration. -/
+theorem drawingRouteBends_incomingTerminal_injective_on
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {first second : RouteBend}
+    (firstMem : first ∈ drawingRouteBends graph)
+    (secondMem : second ∈ drawingRouteBends graph)
+    (terminalEq :
+      first.incomingTerminal = second.incomingTerminal) :
+    first = second := by
+  apply drawingRouteBends_eq_of_identity_eq graph
+    firstMem secondMem
+  · exact congrArg
+      (fun terminal => terminal.indexed.routeIndex) terminalEq
+  · exact congrArg SegmentTerminal.translate terminalEq
+  · exact congrArg
+      (fun terminal => terminal.indexed.segmentIndex) terminalEq
+
+/-- Outgoing terminals likewise identify their bends inside the drawing
+enumeration. -/
+theorem drawingRouteBends_outgoingTerminal_injective_on
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {first second : RouteBend}
+    (firstMem : first ∈ drawingRouteBends graph)
+    (secondMem : second ∈ drawingRouteBends graph)
+    (terminalEq :
+      first.outgoingTerminal = second.outgoingTerminal) :
+    first = second := by
+  apply drawingRouteBends_eq_of_identity_eq graph
+    firstMem secondMem
+  · exact congrArg
+      (fun terminal => terminal.indexed.routeIndex) terminalEq
+  · exact congrArg SegmentTerminal.translate terminalEq
+  · have successorEq :
+        first.incomingSegmentIndex + 1 =
+          second.incomingSegmentIndex + 1 :=
+      congrArg
+        (fun terminal => terminal.indexed.segmentIndex) terminalEq
+    omega
+
+/-- Incoming and outgoing terminals can never coincide, even when they come
+from different bends, because they name different segment ends. -/
+theorem RouteBend.incomingTerminal_ne_outgoingTerminal
+    (first second : RouteBend) :
+    first.incomingTerminal ≠ second.outgoingTerminal := by
+  intro terminalEq
+  have endpointEq :=
+    congrArg SegmentTerminal.endpoint terminalEq
+  simp [RouteBend.incomingTerminal,
+    RouteBend.outgoingTerminal] at endpointEq
+
+/-- Carrier-node endpoints of a bend list, with the incoming endpoint
+followed by the outgoing endpoint of each bend. -/
+def routeBendEndpointNodes (routeBends : List RouteBend) :
+    List CarrierNode :=
+  routeBends.flatMap fun routeBend =>
+    [.terminal routeBend.incomingTerminal,
+      .terminal routeBend.outgoingTerminal]
+
+/-- A noduplicated sublist of the drawing's bend records has a noduplicated
+endpoint list.  Same-role collisions identify their bends; cross-role
+collisions are impossible. -/
+theorem routeBendEndpointNodes_nodup
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    ∀ (routeBends : List RouteBend),
+      routeBends.Nodup →
+      (∀ routeBend ∈ routeBends,
+        routeBend ∈ drawingRouteBends graph) →
+      (routeBendEndpointNodes routeBends).Nodup := by
+  intro routeBends
+  induction routeBends with
+  | nil =>
+      simp [routeBendEndpointNodes]
+  | cons routeBend routeBends induction =>
+      intro bendsNodup allMembers
+      have routeBendMem :
+          routeBend ∈ drawingRouteBends graph :=
+        allMembers routeBend (by simp)
+      have tailMembers :
+          ∀ tailBend ∈ routeBends,
+            tailBend ∈ drawingRouteBends graph := by
+        intro tailBend tailBendMem
+        exact allMembers tailBend
+          (List.mem_cons_of_mem routeBend tailBendMem)
+      have routeBendNotMem : routeBend ∉ routeBends :=
+        (List.nodup_cons.mp bendsNodup).1
+      have tailNodup : routeBends.Nodup :=
+        (List.nodup_cons.mp bendsNodup).2
+      change
+        (CarrierNode.terminal routeBend.incomingTerminal ::
+          CarrierNode.terminal routeBend.outgoingTerminal ::
+            routeBendEndpointNodes routeBends).Nodup
+      rw [List.nodup_cons, List.nodup_cons]
+      constructor
+      · intro incomingMem
+        simp only [List.mem_cons] at incomingMem
+        rcases incomingMem with outgoingEq | tailMem
+        · exact
+            (routeBend.incomingTerminal_ne_outgoingTerminal
+              routeBend)
+              (CarrierNode.terminal.inj outgoingEq)
+        · rcases List.mem_flatMap.mp tailMem with
+            ⟨tailBend, tailBendMem, endpointMem⟩
+          simp only [List.mem_cons, List.not_mem_nil,
+            or_false] at endpointMem
+          rcases endpointMem with incomingEq | outgoingEq
+          · have bendEq :=
+              drawingRouteBends_incomingTerminal_injective_on
+                graph routeBendMem
+                (tailMembers tailBend tailBendMem)
+                (CarrierNode.terminal.inj incomingEq)
+            exact routeBendNotMem (bendEq ▸ tailBendMem)
+          · exact
+              (routeBend.incomingTerminal_ne_outgoingTerminal
+                tailBend)
+                (CarrierNode.terminal.inj outgoingEq)
+      · constructor
+        · intro tailMem
+          rcases List.mem_flatMap.mp tailMem with
+            ⟨tailBend, tailBendMem, endpointMem⟩
+          simp only [List.mem_cons, List.not_mem_nil,
+            or_false] at endpointMem
+          rcases endpointMem with incomingEq | outgoingEq
+          · exact
+              (tailBend.incomingTerminal_ne_outgoingTerminal
+                routeBend)
+                (CarrierNode.terminal.inj incomingEq.symm)
+          · have bendEq :=
+              drawingRouteBends_outgoingTerminal_injective_on
+                graph routeBendMem
+                (tailMembers tailBend tailBendMem)
+                (CarrierNode.terminal.inj outgoingEq)
+            exact routeBendNotMem (bendEq ▸ tailBendMem)
+        · exact induction tailNodup tailMembers
+
+/-- Bend-link endpoints are precisely the two terminal nodes of each
+deduplicated bend record. -/
+theorem drawingRouteBendLinks_endpoints
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    equalityLinkEndpoints (drawingRouteBendLinks graph) =
+      routeBendEndpointNodes (drawingRouteBends graph).dedup := by
+  simp [drawingRouteBendLinks, equalityLinkEndpoints,
+    routeBendEndpointNodes, RouteBend.equalityLink,
+    List.flatMap_map]
+
+/-- Every carrier node is an endpoint of at most one bend link. -/
+theorem drawingRouteBendLinks_endpoint_count_le_one
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (node : CarrierNode) :
+    (equalityLinkEndpoints
+      (drawingRouteBendLinks graph)).count node ≤ 1 := by
+  rw [drawingRouteBendLinks_endpoints]
+  have endpointsNodup :=
+    routeBendEndpointNodes_nodup graph
+      (drawingRouteBends graph).dedup
+      (List.nodup_dedup _)
+      (by
+        intro routeBend routeBendMem
+        exact List.mem_dedup.mp routeBendMem)
+  exact List.nodup_iff_count_le_one.mp endpointsNodup node
+
+/-- Bend equalities contribute at most two formula occurrences of any
+carrier node. -/
+theorem drawingRouteBendFormula_occurrencesAtMostTwo
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    FormulaOccurrencesAtMost 2
+      (drawingRouteBendFormula graph) := by
+  apply equalityFamily_occurrencesAtMost
+    (drawingRouteBendLinks graph) 1 2 rfl
+  exact drawingRouteBendLinks_endpoint_count_le_one graph
+
+/-- Straight-chain and bend equality clauses together use every carrier node
+at most six times. -/
+theorem drawingRouteWireFormula_occurrencesAtMostSix
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    FormulaOccurrencesAtMost 6
+      (drawingRouteWireFormula graph) := by
+  simpa [drawingRouteWireFormula] using
+    formulaOccurrencesAtMost_append
+      (drawingCompleteCarrierFormula_occurrencesAtMostFour graph)
+      (drawingRouteBendFormula_occurrencesAtMostTwo graph)
+
 end PeriodicOrthocrossing
 end LeanTrominoes
