@@ -1463,6 +1463,11 @@ The representation choices for this target are:
   the semantic fixed-eight cycle for any renamed source atom.  A general
   translation-invariance theorem for embedded CNF drawings then places this
   complete certificate at every input-dependent ring macrocell.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleDrawing.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleDrawing.lean)
+  identifies each positioned atom cycle definitionally with that translated
+  template: local compass ports are renamed to the corresponding fixed
+  copies, and the refined variable placement agrees exactly with the
+  translated local vertices.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean)
   equips the positioned split with canonical orthogonal incidence detours.
   Their periodic endpoints agree exactly with the refined formula and
