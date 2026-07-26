@@ -144,6 +144,7 @@ import LeanTrominoes.PeriodicOrthocrossingPorts
 import LeanTrominoes.PeriodicOrthocrossingSegments
 import LeanTrominoes.PeriodicOrthocrossingVertical
 import LeanTrominoes.PeriodicOrthocrossingVerticalUnique
+import LeanTrominoes.PeriodicOrthocrossingTranslationDegree
 import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicThreeCNF
 import LeanTrominoes.PeriodicThreeCNFCorrectness

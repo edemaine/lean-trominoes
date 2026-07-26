@@ -222,6 +222,12 @@ The representation choices for this target are:
   bounds every stored segment endpoint inside the surrounding `3 × 3` block
   of drawing cells and proves that only the nine neighboring translates can
   meet the canonical fundamental square, making crossing enumeration finite.
+  [`LeanTrominoes/PeriodicOrthocrossingTranslationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingTranslationDegree.lean)
+  sharpens that finite bound for one fixed segment: its parallel coordinate
+  selects a unique neighboring shift, and its one-period axial span prevents
+  both opposite shifts from meeting the half-open square.  Consequently at
+  most two translated copies of a segment can participate in the canonical
+  square, the quotient bound needed for periodic terminal occurrence counts.
   [`LeanTrominoes/PeriodicOrthocrossingCrossings.lean`](LeanTrominoes/PeriodicOrthocrossingCrossings.lean)
   enumerates the finite neighboring segment occurrences and fundamental-square
   lattice points, filters them to proper crossings of distinct occurrences,
