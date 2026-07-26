@@ -1465,17 +1465,17 @@ The representation choices for this target are:
   of red, green, and blue lanes continuously separated.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells.lean)
   converts that kernel into half-edge tiles for the actual 128-fold
-  refinement.  A tile occupies the 64 units on either side of its source
-  lattice point; neighboring translated tiles are proved to assign exactly
-  the same point to their shared boundary.  Every legal translated tile is
-  rectilinear and simple, and its three colored lanes are pairwise
-  continuously separated.
+  refinement.  A tile is centered at local coordinate `(64, 64)` in its
+  owning `128 × 128` refined block and occupies the 64 units on either side;
+  neighboring translated tiles are proved to assign exactly the same point
+  to their shared boundary.  Every legal translated tile is rectilinear and
+  simple, and its three colored lanes are pairwise continuously separated.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellBounds.lean)
-  proves that every tile point and segment stays in the closed square of
-  half-span 64 around its 128-refined source center.  Tiles whose source
-  centers differ by at least two lattice units in either coordinate cannot
-  share points, contain each other's points in segment interiors, or have
-  meeting segment interiors.  One certified finite check covers all 10,368
+  proves that every tile point and segment stays in its closed owning
+  `128 × 128` block, centered at local coordinate `(64, 64)`.  Tiles whose
+  source centers differ by at least two lattice units in either coordinate
+  cannot share points, contain each other's points in segment interiors, or
+  have meeting segment interiors.  One certified finite check covers all 10,368
   pairs of legal tiles at the eight nonzero offsets in the surrounding
   `3 × 3` block, and translation lifts it to arbitrary source centers.  An
   exact equal/far/adjacent trichotomy then proves complete separation for
@@ -2188,9 +2188,10 @@ The representation choices for this target are:
   fans into the finite gadgets remain separate from this central-corridor
   theorem.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexGeometry.lean)
-  chooses a concrete `128 × 128` refinement layout and certifies the complete
-  finite coordinate range of every variable-site and clause-core vertex.
-  Every assembled vertex is expressed as its source incidence vertex plus an
+  chooses concrete variable-site and clause-core templates centered in the
+  same `128 × 128` block as each ribbon tile and certifies the complete finite
+  coordinate range of every template vertex.  Every assembled vertex is
+  expressed as its source incidence vertex plus an
   open-macrocell offset.  Source compatibility and zero-anchor normalization
   therefore prove, unconditionally, that all assembled vertices remain
   strictly inside the refined fundamental square.

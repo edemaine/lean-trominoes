@@ -36,21 +36,28 @@ theorem standardRibbonMacrocellHalfSpan_twice :
       standardThreeStrandLayout.factor := by
   decide
 
+/-- Center of a ribbon tile inside its owning `128 × 128` refined block. -/
+def standardRibbonMacrocellCenter : Cell :=
+  (standardRibbonMacrocellHalfSpan,
+    standardRibbonMacrocellHalfSpan)
+
 /-- Local point where an incoming lane enters the macrocell centered at the
-origin. -/
+center of its refined block. -/
 def standardRibbonMacrocellEntry
     (incoming : AxisDirection) (color : WireColor) : Cell :=
-  Cell.add
-    (Cell.scale (-standardRibbonMacrocellHalfSpan) incoming.step)
-    (incoming.rightNormal (standardRibbonLaneDistance color))
+  Cell.add standardRibbonMacrocellCenter
+    (Cell.add
+      (Cell.scale (-standardRibbonMacrocellHalfSpan) incoming.step)
+      (incoming.rightNormal (standardRibbonLaneDistance color)))
 
 /-- Local point where an outgoing lane exits the macrocell centered at the
-origin. -/
+center of its refined block. -/
 def standardRibbonMacrocellExit
     (outgoing : AxisDirection) (color : WireColor) : Cell :=
-  Cell.add
-    (Cell.scale standardRibbonMacrocellHalfSpan outgoing.step)
-    (outgoing.rightNormal (standardRibbonLaneDistance color))
+  Cell.add standardRibbonMacrocellCenter
+    (Cell.add
+      (Cell.scale standardRibbonMacrocellHalfSpan outgoing.step)
+      (outgoing.rightNormal (standardRibbonLaneDistance color)))
 
 /-- One colored half-edge tile at the origin.  Inside turns are trimmed to
 the intersection of their two offset lines; outside turns follow the other
@@ -60,9 +67,15 @@ def standardRibbonMacrocellRoute
     (color : WireColor) : List Cell :=
   let distance := standardRibbonLaneDistance color
   let first := standardRibbonMacrocellEntry incoming color
-  let incomingAtCenter := incoming.rightNormal distance
-  let outgoingAtCenter := outgoing.rightNormal distance
-  let middle := Cell.add incomingAtCenter outgoingAtCenter
+  let incomingAtCenter :=
+    Cell.add standardRibbonMacrocellCenter
+      (incoming.rightNormal distance)
+  let outgoingAtCenter :=
+    Cell.add standardRibbonMacrocellCenter
+      (outgoing.rightNormal distance)
+  let middle :=
+    Cell.add incomingAtCenter
+      (outgoing.rightNormal distance)
   let last := standardRibbonMacrocellExit outgoing color
   if incoming = outgoing then
     [first, incomingAtCenter, last]

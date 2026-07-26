@@ -4,30 +4,28 @@ import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells
 /-!
 # Bounding boxes for ribbon macrocells
 
-Every half-edge ribbon tile lies in the closed square of half-span `64`
-around its `128`-refined source lattice point.  Consequently tiles whose
-source centers differ by at least two in either lattice coordinate cannot
-meet at all.  An exhaustive certificate covers the eight remaining
-nonzero offsets, so any legal tiles with distinct source centers satisfy
-complete continuous route separation.
+Every half-edge ribbon tile lies in the closed `128 × 128` block based at
+its refined source lattice point and centered at local coordinate
+`(64, 64)`.  Consequently tiles whose source centers differ by at least two
+in either lattice coordinate cannot meet at all.  An exhaustive certificate
+covers the eight remaining nonzero offsets, so any legal tiles with distinct
+source centers satisfy complete continuous route separation.
 -/
 
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
-/-- A refined point lies in the closed ribbon macrocell centered at one
-source lattice point. -/
+/-- A refined point lies in the closed ribbon block owned by one source
+lattice point. -/
 def InRibbonMacrocell (center point : Cell) : Prop :=
-  (ribbonMacrocellOrigin center).1 -
-        standardRibbonMacrocellHalfSpan ≤ point.1 ∧
+  (ribbonMacrocellOrigin center).1 ≤ point.1 ∧
     point.1 ≤
       (ribbonMacrocellOrigin center).1 +
-        standardRibbonMacrocellHalfSpan ∧
-    (ribbonMacrocellOrigin center).2 -
-        standardRibbonMacrocellHalfSpan ≤ point.2 ∧
+        standardThreeStrandLayout.factor ∧
+    (ribbonMacrocellOrigin center).2 ≤ point.2 ∧
     point.2 ≤
       (ribbonMacrocellOrigin center).2 +
-        standardRibbonMacrocellHalfSpan
+        standardThreeStrandLayout.factor
 
 instance (center point : Cell) :
     Decidable (InRibbonMacrocell center point) := by
@@ -36,10 +34,10 @@ instance (center point : Cell) :
 
 /-- The local version of the closed ribbon-macrocell bound. -/
 def InStandardRibbonMacrocell (point : Cell) : Prop :=
-  -standardRibbonMacrocellHalfSpan ≤ point.1 ∧
-    point.1 ≤ standardRibbonMacrocellHalfSpan ∧
-    -standardRibbonMacrocellHalfSpan ≤ point.2 ∧
-    point.2 ≤ standardRibbonMacrocellHalfSpan
+  0 ≤ point.1 ∧
+    point.1 ≤ standardThreeStrandLayout.factor ∧
+    0 ≤ point.2 ∧
+    point.2 ≤ standardThreeStrandLayout.factor
 
 instance (point : Cell) :
     Decidable (InStandardRibbonMacrocell point) := by
@@ -58,7 +56,9 @@ theorem standardRibbonMacrocellRoute_points_bounded
     simp [standardRibbonMacrocellRoute,
       standardRibbonMacrocellEntry,
       standardRibbonMacrocellExit,
+      standardRibbonMacrocellCenter,
       standardRibbonMacrocellHalfSpan,
+      standardThreeStrandLayout,
       standardRibbonLaneDistance,
       AxisDirection.step, AxisDirection.rightNormal,
       AxisDirection.opposite, AxisDirection.TurnsRight,
@@ -74,9 +74,9 @@ theorem inRibbonMacrocell_add_origin
   rcases center with ⟨centerX, centerY⟩
   rcases localPoint with ⟨localX, localY⟩
   simp only [InStandardRibbonMacrocell,
-    standardRibbonMacrocellHalfSpan] at bounded
+    standardThreeStrandLayout] at bounded
   simp only [InRibbonMacrocell, ribbonMacrocellOrigin,
-    standardThreeStrandLayout, standardRibbonMacrocellHalfSpan,
+    standardThreeStrandLayout,
     Cell.add, Cell.scale]
   omega
 
@@ -213,7 +213,7 @@ theorem ne_of_inRibbonMacrocells_of_centersFar
   rcases firstPoint with ⟨firstX, firstY⟩
   rcases secondPoint with ⟨secondX, secondY⟩
   simp only [InRibbonMacrocell, ribbonMacrocellOrigin,
-    standardThreeStrandLayout, standardRibbonMacrocellHalfSpan,
+    standardThreeStrandLayout,
     Cell.scale] at firstBounded secondBounded
   simp only [RibbonMacrocellCentersFar] at far
   intro equal
@@ -240,7 +240,7 @@ theorem not_interiorContains_of_inRibbonMacrocells_of_centersFar
   rcases segment with
     ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
   simp only [InRibbonMacrocell, ribbonMacrocellOrigin,
-    standardThreeStrandLayout, standardRibbonMacrocellHalfSpan,
+    standardThreeStrandLayout,
     Cell.scale] at pointBounded startBounded finishBounded
   simp only [RibbonMacrocellCentersFar] at far
   simp only [GridSegment.InteriorContains,
@@ -273,7 +273,7 @@ theorem not_interiorsMeet_of_inRibbonMacrocells_of_centersFar
     ⟨⟨secondStartX, secondStartY⟩,
       ⟨secondFinishX, secondFinishY⟩⟩
   simp only [InRibbonMacrocell, ribbonMacrocellOrigin,
-    standardThreeStrandLayout, standardRibbonMacrocellHalfSpan,
+    standardThreeStrandLayout,
     Cell.scale] at firstStart firstFinish secondStart secondFinish
   simp only [RibbonMacrocellCentersFar] at far
   simp only [GridSegment.InteriorsMeet,

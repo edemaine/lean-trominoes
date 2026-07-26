@@ -24,13 +24,14 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 open Gadget PlanarThreeDM
 
 /-- A fixed refinement large enough for every complete variable site and
-clause core.  The lane offsets reserve three distinct interior points; their
-eventual nonintersection is a separate routing theorem. -/
+clause core.  Both gadgets are centered around `(64, 64)`, matching the
+ribbon-macrocell center inside the same refined block.  The legacy lane
+offsets remain distinct interior points for the prototype routing. -/
 def standardThreeStrandLayout : ThreeStrandLayout where
   factor := 128
   factorPositive := by decide
-  variableOffset := (8, 16)
-  clauseOffset := (8, 8)
+  variableOffset := (20, 64)
+  clauseOffset := (50, 52)
   laneOffset
     | .red => (96, 96)
     | .green => (100, 100)
