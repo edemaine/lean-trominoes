@@ -1479,7 +1479,9 @@ The representation choices for this target are:
   placement.  It also defines the first exact route splice: copied source
   clauses retain those canonical detours, while every appended implication
   cycle selects its translated certified Figure 7 route through the parallel
-  metadata index.
+  metadata index.  The spliced family is proved to retain the complete
+  periodic endpoint condition and orthogonality; its remaining obligation is
+  global noncrossing geometry for the copied source incidences.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean)
   assigns the eight copies by their actual routed terminal rays rather than
   by an arbitrary starting point in the cyclic angular order.  The resulting

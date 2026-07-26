@@ -57,6 +57,26 @@ theorem cycleClauseMetadataFor_clauses
   simp [cycleClauseMetadataFor, List.map_map,
     Function.comp_def]
 
+/-- Metadata stored in one atom's block points back to a genuine clause at
+its recorded local index. -/
+theorem cycleClauseMetadataFor_valid
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable)
+    {metadata : CycleClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈
+        cycleClauseMetadataFor sourcePlacement atom) :
+    metadata.atom = atom ∧
+      (metadata.clause, metadata.localClauseIndex) ∈
+        (cycleClausesFor sourcePlacement atom).zipIdx := by
+  rw [cycleClauseMetadataFor] at metadataMember
+  rcases List.mem_map.mp metadataMember with
+    ⟨taggedClause, taggedClauseMember,
+      metadataEqual⟩
+  subst metadata
+  exact ⟨rfl, taggedClauseMember⟩
+
 /-- Forgetting the indexing metadata recovers the existing positioned cycle
 list definitionally block-for-block. -/
 @[simp]
@@ -69,6 +89,28 @@ theorem allCycleClauseMetadata_clauses
       allCycleClauses source sourcePlacement := by
   simp [allCycleClauseMetadata, allCycleClauses,
     List.map_flatMap]
+
+/-- Every entry in the global metadata list retains the local cycle
+membership certified by its atom and local index. -/
+theorem allCycleClauseMetadata_valid
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {metadata : CycleClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈
+        allCycleClauseMetadata source sourcePlacement) :
+    (metadata.clause, metadata.localClauseIndex) ∈
+      (cycleClausesFor
+        sourcePlacement metadata.atom).zipIdx := by
+  rw [allCycleClauseMetadata,
+    List.mem_flatMap] at metadataMember
+  rcases metadataMember with
+    ⟨atom, _atomMember, metadataMember⟩
+  have valid :=
+    cycleClauseMetadataFor_valid
+      sourcePlacement atom metadataMember
+  simpa [valid.1] using valid.2
 
 /-- Looking up a genuine flattened cycle clause yields metadata carrying
 that exact clause. -/
@@ -101,6 +143,51 @@ theorem allCycleClauseMetadata_lookup
   rw [List.getElem?_map] at projectedLookup
   simp only [Option.map_eq_some_iff] at projectedLookup
   exact projectedLookup
+
+/-- A genuine flattened clause lookup also returns the local membership
+invariant needed to apply the per-atom route certificate. -/
+theorem allCycleClauseMetadata_lookup_valid
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable Variable)}
+    {cycleIndex : Nat}
+    (clauseMember :
+      (clause, cycleIndex) ∈
+        (allCycleClauses source sourcePlacement).zipIdx) :
+    ∃ metadata,
+      (allCycleClauseMetadata
+          source sourcePlacement)[cycleIndex]? =
+        some metadata ∧
+      metadata.clause = clause ∧
+      (metadata.clause, metadata.localClauseIndex) ∈
+        (cycleClausesFor
+          sourcePlacement metadata.atom).zipIdx := by
+  rcases allCycleClauseMetadata_lookup
+      source sourcePlacement clauseMember with
+    ⟨metadata, metadataLookup, clauseEqual⟩
+  have metadataIndexLt :
+      cycleIndex <
+        (allCycleClauseMetadata
+          source sourcePlacement).length :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).1
+  have metadataAt :
+      (allCycleClauseMetadata
+          source sourcePlacement)[cycleIndex] =
+        metadata :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).2
+  have metadataMember :
+      metadata ∈
+        allCycleClauseMetadata
+          source sourcePlacement := by
+    rw [← metadataAt]
+    exact List.getElem_mem metadataIndexLt
+  exact
+    ⟨metadata, metadataLookup, clauseEqual,
+      allCycleClauseMetadata_valid
+        source sourcePlacement metadataMember⟩
 
 /-- Route lookup for the flattened cycle suffix, indexed relative to the
 start of that suffix. -/
