@@ -314,5 +314,69 @@ theorem EmbeddedCNFIncidenceDrawing.routesMatch_of_physical
     incidence.clause incidence.clauseIndex indexedMembers.1
     incidence.literal incidence.literalIndex indexedMembers.2
 
+/-- Direct geometric segment from a clause vertex to a variable vertex.
+This route is intentionally not required to be axis-aligned: it records the
+full terminal ray used to choose the cyclic order before high-degree
+variables are occurrence-split. -/
+def straightIncidenceRoute (source target : Cell) : List Cell :=
+  [source, target]
+
+/-- Total presentation-indexed family of direct embedded-CNF incidences. -/
+def straightIncidenceRoutes
+    {Variable : Type*}
+    (formula : List (EmbeddedClause Variable))
+    (variablePosition : Variable → Cell) :
+    Nat → Nat → List Cell :=
+  fun clauseIndex literalIndex =>
+    match formula[clauseIndex]? with
+    | none => []
+    | some clause =>
+        match clause.literals[literalIndex]? with
+        | none => []
+        | some literal =>
+            straightIncidenceRoute
+              clause.position (variablePosition literal.1)
+
+/-- Every genuine indexed direct route has its advertised physical
+endpoints. -/
+theorem straightIncidenceRoutes_physicalRoutesMatch
+    {Variable : Type*}
+    (formula : List (EmbeddedClause Variable))
+    (variablePosition : Variable → Cell) :
+    EmbeddedPhysicalIncidenceRoutesMatch
+      formula variablePosition
+      (straightIncidenceRoutes formula variablePosition) := by
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp clauseMember
+  have literalLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp literalMember
+  simp [straightIncidenceRoutes, straightIncidenceRoute,
+    clauseLookup, literalLookup]
+
+/-- Direct incidences packaged as a finite drawing.  Its endpoint field is
+always valid; orthogonality and planarity are deliberately deferred until
+after occurrence splitting. -/
+def straightIncidenceDrawing
+    {Variable : Type*}
+    (formula : List (EmbeddedClause Variable))
+    (variablePosition : Variable → Cell) :
+    EmbeddedCNFIncidenceDrawing Variable where
+  formula := formula
+  variablePosition := variablePosition
+  routes := straightIncidenceRoutes formula variablePosition
+
+/-- The packaged direct incidence drawing satisfies `RoutesMatch`. -/
+theorem straightIncidenceDrawing_routesMatch
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : List (EmbeddedClause Variable))
+    (variablePosition : Variable → Cell) :
+    (straightIncidenceDrawing formula variablePosition).RoutesMatch := by
+  apply
+    EmbeddedCNFIncidenceDrawing.routesMatch_of_physical
+  exact straightIncidenceRoutes_physicalRoutesMatch
+    formula variablePosition
+
 end PlanarThreeSAT
 end LeanTrominoes

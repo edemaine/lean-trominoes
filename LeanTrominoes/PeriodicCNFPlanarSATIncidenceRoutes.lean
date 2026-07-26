@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicCNFPlanarSATDeduplication
 import LeanTrominoes.PositionedPeriodicCNFDeduplicationRoutes
 import LeanTrominoes.EmbeddedCNFIncidenceDrawing
+import LeanTrominoes.PeriodicThreeSATThreeAngularOrder
 
 /-!
 # Incidence routes for the deduplicated routed SAT source
@@ -32,6 +33,29 @@ def DrawingPlanarSATPhysicalIncidenceRoutesMatch
   EmbeddedPhysicalIncidenceRoutesMatch
     (drawingPlanarSATFormula formula)
     (drawingPlanarSATVariablePosition formula) routes
+
+/-- Direct physical incidences in the finite routed SAT block.  These
+straight terminal rays need not yet be orthogonal: their purpose is to retain
+the full cyclic order at variables whose degree can exceed four before
+occurrence splitting. -/
+def drawingPlanarSATStraightIncidenceRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    PositionedPeriodicCNF.IncidenceRoutes :=
+  straightIncidenceRoutes
+    (drawingPlanarSATFormula formula)
+    (drawingPlanarSATVariablePosition formula)
+
+/-- Every genuine direct routed-SAT incidence has its exact finite physical
+endpoints. -/
+theorem drawingPlanarSATStraightIncidenceRoutes_physicalRoutesMatch
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    DrawingPlanarSATPhysicalIncidenceRoutesMatch
+      formula (drawingPlanarSATStraightIncidenceRoutes formula) := by
+  exact straightIncidenceRoutes_physicalRoutesMatch
+    (drawingPlanarSATFormula formula)
+    (drawingPlanarSATVariablePosition formula)
 
 /-- Periodicizing an arbitrary finite planar-SAT formula preserves a raw
 route family's physical endpoints whenever the placement realizes the
@@ -159,6 +183,29 @@ def deduplicatedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
     (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
       (wrappedDrawingPeriodicPlanarSATPlacement formula) routes
 
+/-- Canonical periodic routes obtained from the direct finite terminal rays
+after wrapping, clause-orbit deduplication, and anchor normalization. -/
+def deduplicatedWrappedDrawingPeriodicPlanarSATStraightIncidenceRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    PositionedPeriodicCNF.IncidenceRoutes :=
+  deduplicatedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+    formula (drawingPlanarSATStraightIncidenceRoutes formula)
+
+/-- Lawful cyclic occurrence order of the unsplit routed SAT source,
+computed from full terminal-ray polar angles. -/
+def drawingAngularOccurrenceOrder
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    PeriodicThreeSATThree.OccurrenceOrder
+      (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).erase :=
+  PeriodicThreeSATThree.angularOccurrenceOrder
+    (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula).erase
+    (deduplicatedWrappedDrawingPeriodicPlanarSATStraightIncidenceRoutes
+      formula)
+
 /-- Every genuine incidence in the deduplicated wrapped source retrieves the
 canonical normalized route with its exact periodic endpoints. -/
 theorem
@@ -233,6 +280,26 @@ theorem
     (by norm_num [planarMacroScale])
     (drawingGridSize_pos
       (PeriodicCNF.incidenceGraph formula))
+
+/-- The concrete normalized direct-ray family satisfies the complete
+periodic endpoint condition without any remaining route premise. -/
+theorem
+    deduplicatedWrappedDrawingPeriodicPlanarSATStraightIncidenceDrawing_routesMatch
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+      (wrappedDrawingPeriodicPlanarSATPlacement formula)
+      (deduplicatedWrappedDrawingPeriodicPlanarSATStraightIncidenceRoutes
+        formula)).RoutesMatch
+      (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).erase.incidenceGraph := by
+  exact
+    deduplicatedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesMatch
+      formula
+      (drawingPlanarSATStraightIncidenceRoutes formula)
+      (drawingPlanarSATStraightIncidenceRoutes_physicalRoutesMatch
+        formula)
 
 end PeriodicOrthocrossing
 end LeanTrominoes

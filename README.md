@@ -413,6 +413,9 @@ The representation choices for this target are:
   through periodicization, opaque variable wrapping, clause-orbit
   deduplication, and clause-anchor normalization, yielding both pointwise
   endpoint identities and the complete periodic `RoutesMatch` certificate.
+  In particular, its canonical direct rays have exact normalized endpoints
+  and induce a lawful polar-angle occurrence order before high-degree
+  variables are split; these rays are not claimed to be orthogonal routes.
   [`LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean)
   defines that layer's exact certificate: one polyline per literal in the
   incidence graph's presentation order, compatible variable-then-clause
@@ -1299,6 +1302,13 @@ The representation choices for this target are:
   range.  The construction is specialized to the deduplicated wrapped routed
   SAT presentation, so every geometric clause vertex represents a distinct
   periodic clause orbit.
+- [`LeanTrominoes/PeriodicThreeSATThreeAngularOrder.lean`](LeanTrominoes/PeriodicThreeSATThreeAngularOrder.lean)
+  handles the earlier unsplit routed source, whose crossover variables can
+  have degree greater than four.  It sorts every genuine occurrence by the
+  polar angle of its full terminal ray, uses stable presentation order for
+  collinear ties, and proves that sorting preserves exactly the source
+  occurrences.  This supplies the cyclic order consumed by occurrence
+  splitting without prematurely asserting an orthogonal drawing.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that
