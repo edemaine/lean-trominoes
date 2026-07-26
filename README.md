@@ -1445,9 +1445,11 @@ The representation choices for this target are:
   and opaque wrapping preserves them exactly, so the actual wrapped
   planar-SAT output has at most eight occurrences of every variable.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplit.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplit.lean)
-  applies that degree bound to the routed angular occurrence order.  Every
-  local width-three, occurrence-three source fits the eight Figure 7 compass
-  slots; the resulting fixed implication rings have degree three and remain
+  applies that degree bound to the routed angular occurrence order.  Its
+  east-first compass enumeration matches the absolute starting ray of the
+  polar-angle sort and keeps collinear ties in adjacent slots.  Every local
+  width-three, occurrence-three source fits the eight Figure 7 compass slots;
+  the resulting fixed implication rings have degree three and remain
   satisfiable exactly when the planarized formula is.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitPositioned.lean)
   places those fixed rings in uniform `12 × 12` refinement macrocells using

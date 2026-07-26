@@ -171,7 +171,7 @@ def drawingEightOccurrenceSplitPositionedFormula
     (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
       formula)
     (wrappedDrawingPeriodicPlanarSATPlacement formula)
-    (PeriodicEightOccurrenceSplit.occurrencePortsOfOrder
+    (PeriodicEightOccurrenceSplit.occurrencePortsOfAngularOrder
       (deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula)
       (drawingSemanticAngularOccurrenceOrder formula))
 
@@ -192,7 +192,6 @@ theorem drawingEightOccurrenceSplitPositionedFormula_erase
       drawingEightOccurrenceSplitFormula formula := by
   unfold drawingEightOccurrenceSplitPositionedFormula
     drawingEightOccurrenceSplitFormula
-    PeriodicEightOccurrenceSplit.orderedFormula
   rw [PeriodicEightOccurrenceSplitPositioned.erase_formula,
     deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
 

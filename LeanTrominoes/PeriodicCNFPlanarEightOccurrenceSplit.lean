@@ -1,6 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarAngularOneInThreePositioned
 import LeanTrominoes.PeriodicCNFPlanarNormalizationDegree
-import LeanTrominoes.PeriodicEightOccurrenceSplitOrdered
+import LeanTrominoes.PeriodicEightOccurrenceSplitAngularPorts
 
 /-!
 # Fixed-eight occurrence splitting after periodic planarization
@@ -70,21 +70,27 @@ def drawingEightOccurrenceSplitFormula
     PeriodicCNF
       (ThreeOccurrenceVariable
         (WrappedPeriodicPlanarSATVariable Variable)) :=
-  PeriodicEightOccurrenceSplit.orderedFormula
+  PeriodicEightOccurrenceSplit.formula
     (deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula)
-    (drawingSemanticAngularOccurrenceOrder formula)
+    (PeriodicEightOccurrenceSplit.occurrencePortsOfAngularOrder
+      (deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula)
+      (drawingSemanticAngularOccurrenceOrder formula))
 
 theorem drawingEightOccurrenceSplitFormula_occurrencesAtMostThree
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     (isLocal : formula.IsLocal)
     (width : formula.WidthAtMost 3)
-    (occurrences : formula.OccurrencesAtMost 3) :
+  (occurrences : formula.OccurrencesAtMost 3) :
     (drawingEightOccurrenceSplitFormula
       formula).OccurrencesAtMost 3 := by
-  apply PeriodicEightOccurrenceSplit.orderedFormula_occurrencesAtMostThree
-  exact drawingSemanticAngularOccurrenceOrder_fitsEightSlots
-    isLocal width occurrences
+  apply PeriodicEightOccurrenceSplit.formula_occurrencesAtMostThree
+  exact
+    PeriodicEightOccurrenceSplit.occurrencePortsOfAngularOrder_collisionFree
+      (deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula)
+      (drawingSemanticAngularOccurrenceOrder formula)
+      (drawingSemanticAngularOccurrenceOrder_fitsEightSlots
+        isLocal width occurrences)
 
 theorem drawingEightOccurrenceSplitFormula_satisfiable_iff
     {Variable : Type*} [DecidableEq Variable]
@@ -93,9 +99,11 @@ theorem drawingEightOccurrenceSplitFormula_satisfiable_iff
       formula).Satisfiable ↔
       (drawingPeriodicPlanarSATFormula formula).Satisfiable := by
   exact
-    (PeriodicEightOccurrenceSplit.orderedFormula_satisfiable_iff
+    (PeriodicEightOccurrenceSplit.satisfiable_iff
       (deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula)
-      (drawingSemanticAngularOccurrenceOrder formula)).trans
+      (PeriodicEightOccurrenceSplit.occurrencePortsOfAngularOrder
+        (deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula)
+        (drawingSemanticAngularOccurrenceOrder formula))).trans
       (deduplicatedWrappedDrawingPeriodicPlanarSATFormula_satisfiable_iff
         formula)
 
