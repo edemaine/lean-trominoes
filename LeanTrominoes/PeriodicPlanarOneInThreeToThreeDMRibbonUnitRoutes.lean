@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly
+import LeanTrominoes.PeriodicGridDrawingNoImmediateReversal
 
 /-!
 # Unit source routes for 3DM ribbon corridors
@@ -8,8 +9,10 @@ incidence selected by the 3DM reduction.  The resulting source route retains
 its exact variable and clause endpoints, has at least two points, remains
 orthogonal, and consists entirely of genuine cardinal unit steps.
 
-The separate no-immediate-reversal consequence of source continuous
-planarity is intentionally left explicit for the next geometry layer.
+Continuous planarity excludes immediate reversals on the stored incidence
+route.  This property survives reversal, rebasing, and unit subdivision, so
+the assembled colored macrocell core is unconditionally rectilinear for a
+continuously planar presentation.
 -/
 
 namespace LeanTrominoes
@@ -41,6 +44,53 @@ theorem occurrenceSourceRoute_orthogonal
     presentation.variableToClauseRoute_orthogonal
       (occurrenceSpliceData presentation entry).indexedMember
 
+/-- Reversing and rebasing a continuously planar incidence route preserves
+its no-immediate-reversal certificate. -/
+theorem variableToClauseRoute_hasNoImmediateReversal
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.ContinuousPlanarIncidencePresentation placement)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMember :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    AxisDirection.HasNoImmediateReversal
+      (presentation.toPlanarIncidencePresentation
+        |>.variableToClauseRoute tagged.1) := by
+  have originalNoReversal :=
+    presentation.route_hasNoImmediateReversal_of_tagged
+      taggedMember
+  have originalOrthogonal :=
+    presentation.toPlanarIncidencePresentation
+      |>.route_orthogonal_of_tagged taggedMember
+  have reversedNoReversal :=
+    originalNoReversal.reverse originalOrthogonal
+  unfold
+    PositionedPeriodicCNF.PlanarIncidencePresentation.variableToClauseRoute
+    PeriodicOrthocrossing.translatePolyline
+  exact reversedNoReversal.translate _
+
+/-- Every rebased active occurrence route from a continuously planar source
+has no immediate reversal. -/
+theorem occurrenceSourceRoute_hasNoImmediateReversal
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.ContinuousPlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    AxisDirection.HasNoImmediateReversal
+      (occurrenceSourceRoute
+        presentation.toPlanarIncidencePresentation entry) := by
+  let planar :=
+    presentation.toPlanarIncidencePresentation
+  let data := occurrenceSpliceData planar entry
+  exact
+    variableToClauseRoute_hasNoImmediateReversal
+      presentation data.indexedMember
+
 /-- The unitized source route remains orthogonal. -/
 theorem occurrenceUnitSourceRoute_orthogonal
     {Variable : Type*} [DecidableEq Variable]
@@ -67,6 +117,25 @@ theorem occurrenceUnitSourceRoute_unitSteps
   exact
     AxisDirection.unitSubdividePolyline_unitSteps
       (occurrenceSourceRoute_orthogonal presentation entry)
+
+/-- Unit subdivision preserves the no-reversal certificate inherited from
+continuous planarity. -/
+theorem occurrenceUnitSourceRoute_hasNoImmediateReversal
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.ContinuousPlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    SourceRouteHasNoImmediateReversal
+      (occurrenceUnitSourceRoute
+        presentation.toPlanarIncidencePresentation entry) := by
+  exact
+    AxisDirection.unitSubdividePolyline_hasNoImmediateReversal
+      (occurrenceSourceRoute_orthogonal
+        presentation.toPlanarIncidencePresentation entry)
+      (occurrenceSourceRoute_hasNoImmediateReversal
+        presentation entry)
 
 /-- Unit subdivision cannot collapse a genuine incidence route below two
 points. -/
@@ -162,9 +231,9 @@ theorem occurrenceRibbonCorridorCore_endpoints
       (occurrenceUnitSourceRoute_length presentation entry)
       (occurrenceUnitSourceRoute_unitSteps presentation entry)
 
-/-- Once source planarity supplies the no-reversal fact, the occurrence's
-macrocell core is rectilinear. -/
-theorem occurrenceRibbonCorridorCore_orthogonal
+/-- An explicit no-reversal certificate suffices to make an occurrence's
+macrocell core rectilinear. -/
+theorem occurrenceRibbonCorridorCore_orthogonal_of_noImmediateReversal
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
@@ -182,6 +251,27 @@ theorem occurrenceRibbonCorridorCore_orthogonal
       (occurrenceUnitSourceRoute_length presentation entry)
       (occurrenceUnitSourceRoute_unitSteps presentation entry)
       noReversal
+
+/-- Every occurrence corridor core inherited from a continuously planar
+source drawing is rectilinear. -/
+theorem occurrenceRibbonCorridorCore_orthogonal
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.ContinuousPlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (color : WireColor) :
+    OrthogonalPolyline
+      (occurrenceRibbonCorridorCore
+        presentation.toPlanarIncidencePresentation
+        entry color) := by
+  exact
+    occurrenceRibbonCorridorCore_orthogonal_of_noImmediateReversal
+      presentation.toPlanarIncidencePresentation
+      entry color
+      (occurrenceUnitSourceRoute_hasNoImmediateReversal
+        presentation entry)
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

@@ -1436,9 +1436,11 @@ The representation choices for this target are:
   specializes unit subdivision to every active exact-one incidence.  Each
   selected route retains its exact variable and clause endpoints, remains
   rectilinear, has at least two points, and is a chain of genuine unit
-  cardinal steps.  Its colored corridor core therefore has exact half-edge
-  boundary endpoints; source continuous planarity still needs to discharge
-  the explicit no-immediate-reversal premise.
+  cardinal steps.  Continuous planarity rules out immediate reversals on the
+  stored route, and that certificate is proved invariant under reversal,
+  periodic rebasing, and unit subdivision.  Thus each colored corridor core
+  has exact half-edge boundary endpoints and is unconditionally rectilinear
+  for a continuously planar source presentation.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

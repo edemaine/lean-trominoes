@@ -20,6 +20,88 @@ def segmentLength (first second : Cell) : Nat :=
   (second.1 - first.1).natAbs +
     (second.2 - first.2).natAbs
 
+/-- The four direction constructors are characterized by their coordinate
+equalities and strict inequalities. -/
+theorem between_eq_east_iff (first second : Cell) :
+    between first second = .east ↔
+      first.2 = second.2 ∧ first.1 < second.1 := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [between]
+  split_ifs <;> simp_all
+
+theorem between_eq_north_iff (first second : Cell) :
+    between first second = .north ↔
+      first.1 = second.1 ∧ first.2 < second.2 := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [between]
+  split_ifs <;> simp_all
+
+theorem between_eq_west_iff (first second : Cell) :
+    between first second = .west ↔
+      first.2 = second.2 ∧ second.1 < first.1 := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [between]
+  split_ifs <;> simp_all <;> omega
+
+theorem between_eq_south_iff (first second : Cell) :
+    between first second = .south ↔
+      first.1 = second.1 ∧ second.2 < first.2 := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [between]
+  split_ifs <;> simp_all <;> omega
+
+/-- Reversing a genuine directed segment computes the opposite cardinal
+direction. -/
+theorem between_reverse_eq_opposite
+    {first second : Cell}
+    (genuine : (between first second).IsGenuine) :
+    between second first =
+      (between first second).opposite := by
+  cases direction : between first second with
+  | invalid =>
+      simp [direction, IsGenuine] at genuine
+  | east =>
+      have data :=
+        (between_eq_east_iff first second).mp direction
+      rw [(between_eq_west_iff second first).mpr
+        ⟨data.1.symm, data.2⟩]
+      simp [direction, opposite]
+  | north =>
+      have data :=
+        (between_eq_north_iff first second).mp direction
+      rw [(between_eq_south_iff second first).mpr
+        ⟨data.1.symm, data.2⟩]
+      simp [direction, opposite]
+  | west =>
+      have data :=
+        (between_eq_west_iff first second).mp direction
+      rw [(between_eq_east_iff second first).mpr
+        ⟨data.1.symm, data.2⟩]
+      simp [direction, opposite]
+  | south =>
+      have data :=
+        (between_eq_south_iff first second).mp direction
+      rw [(between_eq_north_iff second first).mpr
+        ⟨data.1.symm, data.2⟩]
+      simp [direction, opposite]
+
+/-- Translating both endpoints preserves their computed direction. -/
+@[simp]
+theorem between_add_left
+    (offset first second : Cell) :
+    between (Cell.add offset first)
+        (Cell.add offset second) =
+      between first second := by
+  rcases offset with ⟨offsetX, offsetY⟩
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [between, Cell.add]
+  split_ifs <;> simp_all <;> omega
+
 /-- The ordered unit subdivision of one directed lattice segment, including
 both endpoints.  Malformed input is total but is used only under an
 axis-alignment hypothesis. -/
@@ -162,6 +244,242 @@ def HasNoImmediateReversal : List Cell → Prop
         HasNoImmediateReversal (center :: next :: rest)
   | _ => True
 
+/-- A genuine cardinal direction is different from its opposite. -/
+theorem ne_opposite_of_isGenuine
+    {direction : AxisDirection}
+    (genuine : direction.IsGenuine) :
+    direction ≠ direction.opposite := by
+  cases direction <;>
+    simp_all [IsGenuine, opposite]
+
+/-- Taking the opposite cardinal direction twice is the identity. -/
+@[simp]
+theorem opposite_opposite (direction : AxisDirection) :
+    direction.opposite.opposite = direction := by
+  cases direction <;> rfl
+
+/-- A route whose every step has one fixed genuine direction cannot
+immediately reverse. -/
+theorem hasNoImmediateReversal_of_constantDirection
+    {points : List Cell} {direction : AxisDirection}
+    (directions :
+      points.IsChain fun first second =>
+        between first second = direction)
+    (genuine : direction.IsGenuine) :
+    HasNoImmediateReversal points := by
+  induction points using List.twoStepInduction with
+  | nil | singleton =>
+      simp [HasNoImmediateReversal]
+  | cons_cons first second rest _ tailInduction =>
+      cases rest with
+      | nil =>
+          simp [HasNoImmediateReversal]
+      | cons third rest =>
+          have firstParts :=
+            List.isChain_cons_cons.mp directions
+          have secondParts :=
+            List.isChain_cons_cons.mp firstParts.2
+          constructor
+          · rw [firstParts.1, secondParts.1]
+            exact ne_opposite_of_isGenuine genuine
+          · exact
+              tailInduction second firstParts.2
+
+/-- The unit points generated for one segment have no immediate reversal. -/
+theorem unitSegmentPoints_hasNoImmediateReversal
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    HasNoImmediateReversal
+      (unitSegmentPoints first second) := by
+  exact
+    hasNoImmediateReversal_of_constantDirection
+      (unitSegmentPoints_direction aligned)
+      (between_isGenuine_of_axisAligned aligned)
+
+/-- A list of length at least two exposes its first two entries. -/
+private theorem exists_eq_cons_cons_of_length_ge_two
+    {α : Type*} {items : List α}
+    (length : 2 ≤ items.length) :
+    ∃ first second rest,
+      items = first :: second :: rest := by
+  cases items with
+  | nil => simp at length
+  | cons first rest =>
+      cases rest with
+      | nil => simp at length
+      | cons second rest =>
+          exact ⟨first, second, rest, rfl⟩
+
+/-- A list of length at least two exposes its final two entries. -/
+private theorem exists_eq_append_cons_cons_of_length_ge_two
+    {α : Type*} {items : List α}
+    (length : 2 ≤ items.length) :
+    ∃ leading before last,
+      items = leading ++ [before, last] := by
+  induction items with
+  | nil =>
+      simp at length
+  | cons first rest induction =>
+      cases rest with
+      | nil =>
+          simp at length
+      | cons second rest =>
+          cases rest with
+          | nil =>
+              exact ⟨[], first, second, rfl⟩
+          | cons third rest =>
+              have tailLength :
+                  2 ≤ (second :: third :: rest).length := by
+                simp
+              rcases induction tailLength with
+                ⟨leading, before, last, equation⟩
+              exact
+                ⟨first :: leading, before, last, by
+                  simp [equation]⟩
+
+/-- Splicing two no-reversal routes at a shared middle point preserves the
+property when the one newly adjacent pair of directions is compatible. -/
+theorem HasNoImmediateReversal.append_boundary
+    {leading : List Cell}
+    {before middle after : Cell} {rest : List Cell}
+    (left :
+      HasNoImmediateReversal
+        (leading ++ [before, middle]))
+    (right :
+      HasNoImmediateReversal
+        (middle :: after :: rest))
+    (boundary :
+      between middle after ≠
+        (between before middle).opposite) :
+    HasNoImmediateReversal
+      (leading ++ before :: middle :: after :: rest) := by
+  induction leading with
+  | nil =>
+      exact ⟨boundary, right⟩
+  | cons first leading induction =>
+      cases leading with
+      | nil =>
+          exact ⟨left.1, boundary, right⟩
+      | cons second rest =>
+          cases rest <;>
+            exact
+              ⟨left.1,
+                induction left.2⟩
+
+/-- Translating every point of a route preserves the absence of immediate
+reversals. -/
+theorem HasNoImmediateReversal.translate
+    {points : List Cell}
+    (noReversal : HasNoImmediateReversal points)
+    (offset : Cell) :
+    HasNoImmediateReversal
+      (points.map (Cell.add offset)) := by
+  induction points using List.twoStepInduction with
+  | nil | singleton =>
+      simp [HasNoImmediateReversal]
+  | cons_cons first center rest _ tailInduction =>
+      cases rest with
+      | nil =>
+          simp [HasNoImmediateReversal]
+      | cons next rest =>
+          constructor
+          · simpa using
+              noReversal.1
+          · exact
+              tailInduction center noReversal.2
+
+/-- Reversing an orthogonal route preserves the absence of immediate
+reversals. -/
+theorem HasNoImmediateReversal.reverse
+    {points : List Cell}
+    (noReversal : HasNoImmediateReversal points)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points) :
+    HasNoImmediateReversal points.reverse := by
+  induction points using List.twoStepInduction with
+  | nil | singleton =>
+      simp [HasNoImmediateReversal]
+  | cons_cons first second rest _ tailInduction =>
+      cases rest with
+      | nil =>
+          simp [HasNoImmediateReversal]
+      | cons third rest =>
+          have orthogonalParts :=
+            (List.isChain_cons_cons.mp orthogonal :
+              (GridSegment.mk first second).IsAxisAligned ∧
+                PeriodicOrthocrossing.OrthogonalPolyline
+                  (second :: third :: rest))
+          have noReversalParts :
+              between second third ≠
+                  (between first second).opposite ∧
+                HasNoImmediateReversal
+                  (second :: third :: rest) :=
+            noReversal
+          have tailNoReversal :=
+            tailInduction second noReversalParts.2
+              orthogonalParts.2
+          have tailEquation :
+              (second :: third :: rest).reverse =
+                rest.reverse ++ [third, second] := by
+            simp
+          rw [tailEquation] at tailNoReversal
+          have secondAligned :=
+            (List.isChain_cons_cons.mp
+              orthogonalParts.2).1
+          have reversedBoundary :
+              between second first ≠
+                (between third second).opposite := by
+            rw [between_reverse_eq_opposite
+                (between_isGenuine_of_axisAligned
+                  orthogonalParts.1),
+              between_reverse_eq_opposite
+                (between_isGenuine_of_axisAligned
+                  secondAligned),
+              opposite_opposite]
+            exact noReversalParts.1.symm
+          have joined :=
+            HasNoImmediateReversal.append_boundary
+              tailNoReversal
+              (by simp [HasNoImmediateReversal] :
+                HasNoImmediateReversal [second, first])
+              reversedBoundary
+          simpa [List.reverse_cons,
+            List.append_assoc] using joined
+
+/-- The final unit step of a subdivided segment retains the segment's
+original direction. -/
+theorem unitSegmentPoints_lastDirection
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    ∃ leading before,
+      unitSegmentPoints first second =
+          leading ++ [before, second] ∧
+        between before second = between first second := by
+  have positive :=
+    segmentLength_positive_of_axisAligned aligned
+  have length :
+      2 ≤ (unitSegmentPoints first second).length := by
+    rw [unitSegmentPoints_length]
+    omega
+  rcases
+      exists_eq_append_cons_cons_of_length_ge_two length with
+    ⟨leading, before, last, equation⟩
+  have lastEqual : last = second := by
+    have lastEndpoint :=
+      unitSegmentPoints_getLast? aligned
+    rw [equation] at lastEndpoint
+    simpa using lastEndpoint
+  subst last
+  refine ⟨leading, before, equation, ?_⟩
+  have directionChain :=
+    unitSegmentPoints_direction aligned
+  rw [equation] at directionChain
+  have suffixChain :
+      [before, second].IsChain fun source target =>
+        between source target = between first second :=
+    (List.isChain_append.mp directionChain).2.1
+  simpa using suffixChain
+
 /-- Taking one genuine cardinal step computes that same directed axis. -/
 theorem between_add_step
     (source : Cell) {direction : AxisDirection}
@@ -268,6 +586,44 @@ theorem unitSubdividePolyline_head?
           simpa using joinAtEndpoint_head?
             (unitSegmentPoints_head? first second)
 
+/-- The first unit step of a nondegenerate subdivided polyline retains the
+direction of its first source segment. -/
+theorem unitSubdividePolyline_firstDirection
+    {first second : Cell} {rest : List Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    ∃ after tail,
+      unitSubdividePolyline (first :: second :: rest) =
+          first :: after :: tail ∧
+        between first after = between first second := by
+  have positive :=
+    segmentLength_positive_of_axisAligned aligned
+  have length :
+      2 ≤ (unitSegmentPoints first second).length := by
+    rw [unitSegmentPoints_length]
+    omega
+  rcases exists_eq_cons_cons_of_length_ge_two length with
+    ⟨actualFirst, after, segmentRest, segmentEquation⟩
+  have firstEqual : actualFirst = first := by
+    have firstEndpoint :=
+      unitSegmentPoints_head? first second
+    rw [segmentEquation] at firstEndpoint
+    simpa using firstEndpoint
+  subst actualFirst
+  have firstDirection :
+      between first after = between first second := by
+    have directionChain :=
+      unitSegmentPoints_direction aligned
+    rw [segmentEquation] at directionChain
+    exact (List.isChain_cons_cons.mp directionChain).1
+  refine
+    ⟨after,
+      segmentRest ++
+        (unitSubdividePolyline (second :: rest)).tail,
+      ?_, firstDirection⟩
+  rw [unitSubdividePolyline, joinAtEndpoint,
+    segmentEquation]
+  simp
+
 /-- Subdivision preserves the final endpoint of every nonempty orthogonal
 route. -/
 theorem unitSubdividePolyline_getLast?
@@ -348,6 +704,71 @@ theorem unitSubdividePolyline_unitSteps
         (unitSegmentPoints_getLast? parts.1)
       simpa using unitSubdividePolyline_head?
         (points := second :: rest) (by simp)
+
+/-- Unit subdivision preserves the absence of immediate reversals. -/
+theorem unitSubdividePolyline_hasNoImmediateReversal
+    {points : List Cell}
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (noReversal : HasNoImmediateReversal points) :
+    HasNoImmediateReversal
+      (unitSubdividePolyline points) := by
+  induction points using List.twoStepInduction with
+  | nil | singleton =>
+      simp [unitSubdividePolyline,
+        HasNoImmediateReversal]
+  | cons_cons first second rest _ tailInduction =>
+      have orthogonalParts :=
+        (List.isChain_cons_cons.mp orthogonal :
+          (GridSegment.mk first second).IsAxisAligned ∧
+            PeriodicOrthocrossing.OrthogonalPolyline
+              (second :: rest))
+      cases rest with
+      | nil =>
+          rw [unitSubdividePolyline]
+          simpa [joinAtEndpoint] using
+            unitSegmentPoints_hasNoImmediateReversal
+              orthogonalParts.1
+      | cons third rest =>
+          have noReversalParts :
+              between second third ≠
+                  (between first second).opposite ∧
+                HasNoImmediateReversal
+                  (second :: third :: rest) :=
+            noReversal
+          have tailNoReversal :=
+            tailInduction second orthogonalParts.2
+              noReversalParts.2
+          rcases
+              unitSegmentPoints_lastDirection
+                orthogonalParts.1 with
+            ⟨leading, before, segmentEquation,
+              incomingDirection⟩
+          have nextAligned :=
+            (List.isChain_cons_cons.mp
+              orthogonalParts.2).1
+          rcases
+              unitSubdividePolyline_firstDirection
+                (rest := rest) nextAligned with
+            ⟨after, tail, tailEquation,
+              outgoingDirection⟩
+          have segmentNoReversal :=
+            unitSegmentPoints_hasNoImmediateReversal
+              orthogonalParts.1
+          rw [segmentEquation] at segmentNoReversal
+          rw [tailEquation] at tailNoReversal
+          have joined :=
+            HasNoImmediateReversal.append_boundary
+              segmentNoReversal
+              tailNoReversal
+              (by
+                simpa [incomingDirection,
+                  outgoingDirection] using
+                    noReversalParts.1)
+          rw [unitSubdividePolyline,
+            segmentEquation, tailEquation,
+            joinAtEndpoint]
+          simpa [List.append_assoc] using joined
 
 /-- A route with at least one source segment still has at least two points
 after unit subdivision. -/

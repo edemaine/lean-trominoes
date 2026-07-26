@@ -1,5 +1,6 @@
 import LeanTrominoes.OrthogonalPolylineUnitSubdivision
 import LeanTrominoes.PeriodicGridDrawingContinuousPlanarity
+import LeanTrominoes.PositionedPeriodicCNFIncidenceRouteLookup
 
 /-!
 # Continuous planarity excludes immediate route reversals
@@ -13,40 +14,6 @@ continuous-planarity certificate to every stored route.
 namespace LeanTrominoes
 
 namespace AxisDirection
-
-/-- The four direction constructors are characterized by their coordinate
-equalities and strict inequalities. -/
-theorem between_eq_east_iff (first second : Cell) :
-    between first second = .east ↔
-      first.2 = second.2 ∧ first.1 < second.1 := by
-  rcases first with ⟨firstX, firstY⟩
-  rcases second with ⟨secondX, secondY⟩
-  simp only [between]
-  split_ifs <;> simp_all <;> omega
-
-theorem between_eq_north_iff (first second : Cell) :
-    between first second = .north ↔
-      first.1 = second.1 ∧ first.2 < second.2 := by
-  rcases first with ⟨firstX, firstY⟩
-  rcases second with ⟨secondX, secondY⟩
-  simp only [between]
-  split_ifs <;> simp_all <;> omega
-
-theorem between_eq_west_iff (first second : Cell) :
-    between first second = .west ↔
-      first.2 = second.2 ∧ second.1 < first.1 := by
-  rcases first with ⟨firstX, firstY⟩
-  rcases second with ⟨secondX, secondY⟩
-  simp only [between]
-  split_ifs <;> simp_all <;> omega
-
-theorem between_eq_south_iff (first second : Cell) :
-    between first second = .south ↔
-      first.1 = second.1 ∧ second.2 < first.2 := by
-  rcases first with ⟨firstX, firstY⟩
-  rcases second with ⟨secondX, secondY⟩
-  simp only [between]
-  split_ifs <;> simp_all <;> omega
 
 /-- Reversing immediately after a genuine orthogonal segment forces the two
 adjacent open segment interiors to overlap. -/
@@ -379,4 +346,44 @@ theorem IsContinuouslyPlanar.routeHasNoImmediateReversal
       routeIndexLt
 
 end PeriodicGridDrawing
+
+namespace PositionedPeriodicCNF
+
+/-- Every metadata-selected incidence route in a continuously planar
+presentation inherits the drawing's no-reversal certificate. -/
+theorem ContinuousPlanarIncidencePresentation.route_hasNoImmediateReversal_of_tagged
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      ContinuousPlanarIncidencePresentation source placement)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMember :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    AxisDirection.HasNoImmediateReversal
+      (presentation.routes
+        tagged.1.clauseIndex tagged.1.literalIndex) := by
+  let drawing :=
+    incidenceDrawing source placement presentation.routes
+  have routeIndexLt :
+      tagged.2 < drawing.edgeRoutes.length := by
+    change
+      tagged.2 <
+        (incidenceEdgeRoutes source
+          presentation.routes).length
+    rw [incidenceEdgeRoutes_eq_metadata_map]
+    simpa using
+      List.snd_lt_of_mem_zipIdx taggedMember
+  have storedRoute :=
+    presentation.continuouslyPlanar.routeHasNoImmediateReversal
+      presentation.orthogonal routeIndexLt
+  have routeLookup :=
+    incidenceDrawing_edgeRoute_of_tagged
+      source placement presentation.routes taggedMember
+  unfold PeriodicGridDrawing.edgeRoute at routeLookup
+  rw [List.getD_eq_getElem _ _ routeIndexLt] at routeLookup
+  simpa [drawing, routeLookup] using storedRoute
+
+end PositionedPeriodicCNF
 end LeanTrominoes
