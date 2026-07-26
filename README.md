@@ -1350,6 +1350,16 @@ The representation choices for this target are:
   terminals, target terminals, and central atoms gives the complete finite
   planar SAT formula an eight-occurrence certificate (`6 + 1` at source
   terminals and `6 + 2` at target terminals).
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
+  sharpens the finite complete-carrier accounting at segment terminals.
+  The two directional terminal ports are proved to lie strictly beyond every
+  crossover boundary on their translated segment occurrence, including the
+  closest possible integer crossing.  Together with the opposite terminal,
+  this makes each terminal a strict extreme of the carrier's sorted simple
+  node chain.  It follows that a terminal can be an endpoint of at most one
+  retained consecutive-pair equality link, improving the generic
+  two-link bound at exactly the variables that can collapse under periodic
+  translation normalization.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
