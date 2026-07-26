@@ -542,7 +542,9 @@ The representation choices for this target are:
   route-splice membership lemma lets assembly proofs establish those bounds
   independently for each local prefix, corridor, and suffix.  Conversely,
   endpoint bounds control every point of any nondegenerate stored route,
-  which is the form needed when refining a certified source drawing.
+  which is the form needed when refining a certified source drawing.  The
+  same point-to-segment conversion is available for the one-cell halo used
+  by boundary-crossing periodic routes.
   [`LeanTrominoes/PeriodicGridDrawingExpandedBounds.lean`](LeanTrominoes/PeriodicGridDrawingExpandedBounds.lean)
   replaces the unusably strict fundamental-square endpoint hypothesis by the
   natural one-cell halo `(-P,2P)²`.  It proves that any contact between two

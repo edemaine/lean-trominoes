@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicGridDrawingFinitePlanarity
+import LeanTrominoes.PeriodicGridDrawingExpandedBounds
 import LeanTrominoes.OrthogonalPolylineJoin
 
 /-!
@@ -98,12 +99,48 @@ def RoutePointsInFundamentalSquare
     ∀ point ∈ route,
       drawing.PositionInFundamentalSquare point
 
+/-- Pointwise route-coordinate hypothesis for the open one-cell halo used by
+general periodic edges. -/
+def RoutePointsInExpandedSquare
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ route ∈ drawing.edgeRoutes,
+    ∀ point ∈ route,
+      drawing.PositionInExpandedSquare point
+
 /-- Pointwise route bounds imply bounds for both endpoints of every indexed
 segment occurrence. -/
 theorem segmentEndpointsInFundamentalSquare_of_routePoints
     {drawing : PeriodicGridDrawing}
     (pointsInside : drawing.RoutePointsInFundamentalSquare) :
     drawing.SegmentEndpointsInFundamentalSquare := by
+  intro indexed indexedMember
+  unfold indexedSegments at indexedMember
+  rcases List.mem_flatMap.mp indexedMember with
+    ⟨taggedRoute, taggedRouteMember, indexedMember⟩
+  rcases List.mem_map.mp indexedMember with
+    ⟨taggedSegment, taggedSegmentMember, indexedEqual⟩
+  subst indexed
+  have routeMember :
+      taggedRoute.1 ∈ drawing.edgeRoutes :=
+    List.fst_mem_of_mem_zipIdx taggedRouteMember
+  have segmentMember :
+      taggedSegment.1 ∈
+        gridPolylineSegments taggedRoute.1 :=
+    List.fst_mem_of_mem_zipIdx taggedSegmentMember
+  have endpointMembers :=
+    gridPolylineSegments_endpoints_mem segmentMember
+  exact
+    ⟨pointsInside taggedRoute.1 routeMember
+        taggedSegment.1.start endpointMembers.1,
+      pointsInside taggedRoute.1 routeMember
+        taggedSegment.1.finish endpointMembers.2⟩
+
+/-- Pointwise halo bounds imply halo bounds for every indexed segment
+endpoint. -/
+theorem segmentEndpointsInExpandedSquare_of_routePoints
+    {drawing : PeriodicGridDrawing}
+    (pointsInside : drawing.RoutePointsInExpandedSquare) :
+    drawing.SegmentEndpointsInExpandedSquare := by
   intro indexed indexedMember
   unfold indexedSegments at indexedMember
   rcases List.mem_flatMap.mp indexedMember with
