@@ -1419,6 +1419,12 @@ The representation choices for this target are:
   the same point to their shared boundary.  Every legal translated tile is
   rectilinear and simple, and its three colored lanes are pairwise
   continuously separated.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
+  recursively joins those half-edge tiles along a unit-step source route.
+  Under the explicit no-immediate-reversal condition, the assembled core is
+  proved rectilinear with exact first and last macrocell-boundary endpoints;
+  every join uses the proved equality of the two neighboring half-edge
+  boundary points.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

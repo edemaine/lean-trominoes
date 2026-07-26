@@ -1,4 +1,5 @@
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
+import LeanTrominoes.OrthogonalPolylineUnitSubdivision
 import LeanTrominoes.OrthogonalPolylineRibbonTurnGeometry
 
 /-!
@@ -201,6 +202,25 @@ theorem ribbonMacrocellExit_eq_entry_next
       AxisDirection.step, AxisDirection.rightNormal,
       Cell.add, Cell.scale] <;>
     omega
+
+/-- The two tiles on the ends of a genuine unit source edge assign the same
+colored point to their shared boundary. -/
+theorem ribbonMacrocellExit_eq_entry_of_unitAxisStep
+    {source target : Cell}
+    (unit : AxisDirection.IsUnitAxisStep source target)
+    (color : WireColor) :
+    ribbonMacrocellExit source
+        (AxisDirection.between source target) color =
+      ribbonMacrocellEntry target
+        (AxisDirection.between source target) color := by
+  let direction := AxisDirection.between source target
+  calc
+    ribbonMacrocellExit source direction color =
+        ribbonMacrocellEntry
+          (Cell.add source direction.step) direction color :=
+      ribbonMacrocellExit_eq_entry_next source direction color
+    _ = ribbonMacrocellEntry target direction color := by
+      rw [← AxisDirection.add_between_step_eq_of_unitAxisStep unit]
 
 /-- Translation preserves rectilinearity of a legal macrocell lane. -/
 theorem ribbonMacrocellRoute_orthogonal

@@ -125,6 +125,33 @@ instance (source target : Cell) :
   unfold IsUnitAxisStep
   infer_instance
 
+/-- Taking one genuine cardinal step computes that same directed axis. -/
+theorem between_add_step
+    (source : Cell) {direction : AxisDirection}
+    (genuine : direction.IsGenuine) :
+    between source (Cell.add source direction.step) =
+      direction := by
+  rcases source with ⟨sourceX, sourceY⟩
+  cases direction <;>
+    simp_all [IsGenuine, between, step, Cell.add]
+
+/-- The computed direction of a unit step is genuine. -/
+theorem between_isGenuine_of_unitAxisStep
+    {source target : Cell}
+    (unit : IsUnitAxisStep source target) :
+    (between source target).IsGenuine := by
+  rcases unit with ⟨direction, genuine, rfl⟩
+  rw [between_add_step source genuine]
+  exact genuine
+
+/-- A unit step can be reconstructed from its computed direction. -/
+theorem add_between_step_eq_of_unitAxisStep
+    {source target : Cell}
+    (unit : IsUnitAxisStep source target) :
+    target = Cell.add source (between source target).step := by
+  rcases unit with ⟨direction, genuine, rfl⟩
+  rw [between_add_step source genuine]
+
 /-- Every consecutive pair emitted for one segment is a genuine unit step. -/
 theorem unitSegmentPoints_unitSteps
     {first second : Cell}
