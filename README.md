@@ -588,9 +588,10 @@ The representation choices for this target are:
   routes are traversed in reverse, as required by variable-to-clause routing.
   [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceSeparation.lean)
   identifies each active rebased source route by its stable drawing-route
-  index and lattice translate.  Distinct identities inherit complete
-  separation, and unit subdivision can create contacts only at both routes'
-  advertised outer endpoints.
+  index and lattice translate, proves this key injective on active
+  variable/slot entries, and transfers complete separation to any two
+  unequal entries.  Unit subdivision can create contacts only at both
+  routes' advertised outer endpoints.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in

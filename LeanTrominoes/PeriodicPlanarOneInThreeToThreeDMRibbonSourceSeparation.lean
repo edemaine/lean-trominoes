@@ -157,6 +157,79 @@ noncomputable def occurrenceSourceRouteKey
     PositionedPeriodicCNF.variableToClauseTranslate
       data.indexed.1)
 
+/-- Different active variable/slot entries select different lifted source
+route identities.  In fact, the stable route index alone already determines
+the incidence metadata and hence the active entry. -/
+theorem occurrenceSourceRouteKey_injective
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement) :
+    Function.Injective (occurrenceSourceRouteKey presentation) := by
+  intro first second keyEqual
+  let firstData := occurrenceSpliceData presentation first
+  let secondData := occurrenceSpliceData presentation second
+  have indexEqual :
+      firstData.indexed.2 = secondData.indexed.2 := by
+    exact congrArg Prod.fst keyEqual
+  have firstAt := firstData.indexedMember
+  have secondAt := secondData.indexedMember
+  rw [List.mem_zipIdx_iff_getElem?] at firstAt secondAt
+  have incidenceEqual :
+      firstData.indexed.1 = secondData.indexed.1 := by
+    rw [indexEqual] at firstAt
+    exact Option.some.inj (firstAt.symm.trans secondAt)
+  have taggedEqual :
+      firstData.tagged = secondData.tagged := by
+    calc
+      firstData.tagged =
+          incidenceTaggedOccurrence firstData.indexed.1 :=
+        firstData.metadataEq.symm
+      _ = incidenceTaggedOccurrence secondData.indexed.1 :=
+        congrArg incidenceTaggedOccurrence incidenceEqual
+      _ = secondData.tagged :=
+        secondData.metadataEq
+  have firstAtom :=
+    (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
+      source.erase first.1.1 first.1.2 firstData.tagged
+      firstData.occurrenceLookup).2
+  have secondAtom :=
+    (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
+      source.erase second.1.1 second.1.2 secondData.tagged
+      secondData.occurrenceLookup).2
+  have atomEqual : first.1.1 = second.1.1 := by
+    calc
+      first.1.1 = firstData.tagged.1.atom := firstAtom.symm
+      _ = secondData.tagged.1.atom :=
+        congrArg (fun tagged => tagged.1.atom) taggedEqual
+      _ = second.1.1 := secondAtom
+  have firstLookup :
+      occurrenceAt source.erase second.1.1 first.1.2 =
+        some secondData.tagged := by
+    simpa [atomEqual, taggedEqual] using
+      firstData.occurrenceLookup
+  have slotEqual : first.1.2 = second.1.2 :=
+    PeriodicOneInThreeToThreeDM.occurrenceAt_slot_unique
+      source.erase second.1.1 secondData.tagged
+      first.1.2 second.1.2
+      firstLookup secondData.occurrenceLookup
+  apply Subtype.ext
+  exact Prod.ext atomEqual slotEqual
+
+/-- Unequal active entries have unequal lifted-route keys. -/
+theorem occurrenceSourceRouteKey_ne_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second) :
+    occurrenceSourceRouteKey presentation first ≠
+      occurrenceSourceRouteKey presentation second :=
+  fun equal =>
+    different
+      (occurrenceSourceRouteKey_injective presentation equal)
+
 /-- Active occurrence source routes with distinct lifted-route identities
 satisfy the complete finite separation predicate. -/
 theorem occurrenceSourceRoutes_avoidEachOther
@@ -226,6 +299,45 @@ theorem occurrenceUnitSourceRoutes_meetOnlyAtEndpoints
   · exact
       occurrenceSourceRoutes_avoidEachOther
         presentation first second different
+
+/-- Source routes selected by any two unequal active entries satisfy complete
+continuous separation. -/
+theorem occurrenceSourceRoutes_avoidEachOther_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second) :
+    RoutesAvoidEachOther
+      (occurrenceSourceRoute
+        presentation.toPlanarIncidencePresentation first)
+      (occurrenceSourceRoute
+        presentation.toPlanarIncidencePresentation second) :=
+  occurrenceSourceRoutes_avoidEachOther presentation first second
+    (occurrenceSourceRouteKey_ne_of_ne
+      presentation.toPlanarIncidencePresentation different)
+
+/-- Unit subdivisions belonging to unequal active entries can meet only at
+both routes' advertised outer endpoints. -/
+theorem occurrenceUnitSourceRoutes_meetOnlyAtEndpoints_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second) :
+    RoutesMeetOnlyAtEndpoints
+      (occurrenceUnitSourceRoute
+        presentation.toPlanarIncidencePresentation first)
+      (occurrenceUnitSourceRoute
+        presentation.toPlanarIncidencePresentation second) :=
+  occurrenceUnitSourceRoutes_meetOnlyAtEndpoints
+    presentation first second
+    (occurrenceSourceRouteKey_ne_of_ne
+      presentation.toPlanarIncidencePresentation different)
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
