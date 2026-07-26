@@ -395,6 +395,11 @@ The representation choices for this target are:
   vertex positions, route list, and complete periodic drawing exactly.
   Consequently a certified planar incidence presentation transports directly
   to the normalized formula.
+  [`LeanTrominoes/PeriodicOneInThreeAnchorNormalization.lean`](LeanTrominoes/PeriodicOneInThreeAnchorNormalization.lean)
+  closes the corresponding semantic obligation for exact-one formulas:
+  normalization preserves each ordered clause-value list up to translation,
+  exact-one satisfiability, occurrence bounds, and the arity-two-or-three
+  promise.
   [`LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean)
   reduces the certificate's two infinite nonintersection predicates to
   executable finite checks whenever all stored vertices and segment endpoints
@@ -1639,6 +1644,11 @@ The representation choices for this target are:
   variable-to-clause route from the variable prototype at cell zero to the
   displayed clause gadget at the negated literal offset, with both endpoints
   proved exactly.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMNormalized.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMNormalized.lean)
+  fixes the exact normalized source and natural-number 3DM target for the
+  geometric assembly.  It packages well-formedness, colored degree two or
+  three, perfect-matching and graph-orientation equivalence to the original
+  exact-one source, and the transported routed incidence presentation.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
