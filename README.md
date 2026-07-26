@@ -1393,11 +1393,17 @@ The representation choices for this target are:
   both outer endpoints and orthogonality, supplying the generic splice lemma
   used by fan and later gadget routing.
 - [`LeanTrominoes/OrthogonalPolylineRibbon.lean`](LeanTrominoes/OrthogonalPolylineRibbon.lean)
-  replaces the unsound uniform diagonal lane translation by the local
-  geometry of a genuine rectilinear ribbon.  Each source segment is displaced
-  in its directed normal direction; consecutive offsets are joined through a
-  small corner rectangle.  Exact endpoints and orthogonality are proved for
-  every local template and for the recursively assembled offset polyline.
+  introduces directed normal offsets as the replacement for unsound uniform
+  diagonal lane translation.  It gives exact endpoint and orthogonality
+  infrastructure for offset segments, corner pieces, and their recursive
+  composition; the nonoverlapping inside/outside turn geometry used by the
+  final construction is refined and certified in the next module.
+- [`LeanTrominoes/OrthogonalPolylineRibbonTurnGeometry.lean`](LeanTrominoes/OrthogonalPolylineRibbonTurnGeometry.lean)
+  certifies the finite same-corridor kernel.  At an inside turn the two
+  offset lines are trimmed to their intersection; at an outside turn they
+  follow the three-point corner rectangle.  Exhaustive checks over all legal
+  direction and color cases prove each standard lane simple and every pair
+  of red, green, and blue lanes continuously separated.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
