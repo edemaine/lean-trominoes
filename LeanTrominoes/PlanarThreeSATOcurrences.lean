@@ -217,6 +217,63 @@ theorem scopedOccurrences_count_le
           zero_add]
         exact induction nodupParts.2
 
+/-- For a jointly injective gadget family, the count of one target is bounded
+by any uniform bound on the source variables that can map to that target. -/
+theorem instantiateFamily_occurrence_count_le_of_jointly_injective
+    {Site Source Target : Type*}
+    [DecidableEq Site] [DecidableEq Source] [DecidableEq Target]
+    (bound : Nat)
+    (sites : List Site)
+    (variableMap : Site → Source → Target)
+    (origin : Site → Cell) (scale : Int)
+    (formula : List (EmbeddedClause Source))
+    (sitesNodup : sites.Nodup)
+    (jointlyInjective :
+      Function.Injective
+        (fun pair : Site × Source =>
+          variableMap pair.1 pair.2))
+    (target : Target)
+    (sourceBound :
+      ∀ source : Site × Source,
+        variableMap source.1 source.2 = target →
+          (embeddedVariableOccurrences formula).count source.2 ≤
+            bound) :
+    (embeddedVariableOccurrences
+      (sites.flatMap fun site =>
+        instantiateFormula (variableMap site)
+          (origin site) scale formula)).count target ≤ bound := by
+  let scopedOccurrences :=
+    sites.flatMap fun site =>
+      (embeddedVariableOccurrences formula).map fun atom =>
+        (site, atom)
+  let combinedMap : Site × Source → Target :=
+    fun pair => variableMap pair.1 pair.2
+  have occurrenceList :
+      embeddedVariableOccurrences
+          (sites.flatMap fun site =>
+            instantiateFormula (variableMap site)
+              (origin site) scale formula) =
+        scopedOccurrences.map combinedMap := by
+    rw [embeddedVariableOccurrences_flatMap]
+    simp only [embeddedVariableOccurrences_instantiateFormula]
+    simp [scopedOccurrences, combinedMap,
+      List.map_flatMap, List.map_map, Function.comp_def]
+  rw [occurrenceList]
+  by_cases targetMember :
+      target ∈ scopedOccurrences.map combinedMap
+  · rcases List.mem_map.mp targetMember with
+      ⟨source, _sourceMember, targetEqual⟩
+    rw [← targetEqual,
+      List.count_map_of_injective
+        scopedOccurrences combinedMap jointlyInjective source]
+    exact
+      (scopedOccurrences_count_le
+        sites (embeddedVariableOccurrences formula)
+        sitesNodup source).trans
+          (sourceBound source targetEqual)
+  · rw [List.count_eq_zero_of_not_mem targetMember]
+    exact Nat.zero_le _
+
 /-- A noduplicated family of identical finite gadgets preserves the member
 occurrence bound whenever the site-scoped variable maps are jointly
 injective. -/
@@ -276,6 +333,16 @@ times. -/
 theorem crossoverFormula_occurrencesAtMostEight :
     FormulaOccurrencesAtMost 8 crossoverFormula := by
   native_decide
+
+/-- Each of the four external ports of Figure 8(b) occurs in two clauses. -/
+theorem crossoverFormula_boundary_count_le_two
+    (sourceVariable : CrossoverVariable)
+    (boundary :
+      sourceVariable = .aLeft ∨ sourceVariable = .aRight ∨
+        sourceVariable = .bTop ∨ sourceVariable = .bBottom) :
+    (embeddedVariableOccurrences crossoverFormula).count
+      sourceVariable ≤ 2 := by
+  cases sourceVariable <;> simp at boundary <;> native_decide
 
 /-- Every variable of the fixed Figure 8 duplicator occurs at most six
 times. -/

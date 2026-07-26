@@ -1316,7 +1316,11 @@ The representation choices for this target are:
   four times in all complete-carrier equality clauses.  Bend identity and
   endpoint-role arguments show that a terminal meets at most one bend link,
   contributing at most two more occurrences; the entire route-wire family is
-  therefore bounded by six.
+  therefore bounded by six.  A target-sensitive family-counting lemma sharpens
+  the crossover contribution to two occurrences for external ports, while
+  scoped internals never occur in wire clauses.  Splitting on these two
+  variable kinds proves that the complete crossover-and-route core has at
+  most eight occurrences per variable.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit

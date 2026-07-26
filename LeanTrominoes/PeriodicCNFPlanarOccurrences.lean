@@ -149,6 +149,37 @@ theorem drawingCarrierNodeCrossoverFormula_occurrencesAtMostEight
       carrierNodeScopedCrossoverVariableMap_injective
       crossoverFormula_occurrencesAtMostEight
 
+/-- Every external boundary port occurs exactly in its two local crossover
+implication clauses, and therefore at most twice in the entire crossover
+family. -/
+theorem drawingCarrierNodeCrossoverFormula_external_count_le_two
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (node : CarrierNode) :
+    @List.count
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+      instBEqOfDecidableEq (.inl node)
+      (embeddedVariableOccurrences
+        (drawingCarrierNodeCrossoverFormula graph)) ≤ 2 := by
+  simpa [drawingCarrierNodeCrossoverFormula,
+    crossoverFamily, scopedCrossoverInstance,
+    carrierNodeScopedCrossoverVariableMap] using
+    instantiateFamily_occurrence_count_le_of_jointly_injective
+      2 (orientedCrossings graph)
+      (fun site =>
+        scopedCrossoverVariableMap site
+          (carrierNodeCrossingPorts site))
+      crossingMacroOrigin 1 crossoverFormula
+      (orientedCrossings_nodup graph)
+      carrierNodeScopedCrossoverVariableMap_injective
+      (.inl node)
+      (by
+        rintro ⟨site, sourceVariable⟩ sourceEq
+        apply crossoverFormula_boundary_count_le_two
+        cases sourceVariable <;>
+          simp [scopedCrossoverVariableMap,
+            carrierNodeCrossingPorts] at sourceEq ⊢)
+
 /-- Equality-link endpoints of one carrier chain are exactly the endpoints
 of its retained adjacent carrier-node pairs. -/
 theorem completeCarrierLinks_endpoints
@@ -614,6 +645,70 @@ theorem drawingRouteWireFormula_occurrencesAtMostSix
     formulaOccurrencesAtMost_append
       (drawingCompleteCarrierFormula_occurrencesAtMostFour graph)
       (drawingRouteBendFormula_occurrencesAtMostTwo graph)
+
+/-- Scoping route-wire variables into the external summand preserves the
+six-occurrence bound. -/
+theorem scopedDrawingRouteWireFormula_occurrencesAtMostSix
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    FormulaOccurrencesAtMost 6
+      (scopedDrawingRouteWireFormula graph) := by
+  simpa [scopedDrawingRouteWireFormula,
+    EmbeddedClause.rename] using
+    formulaOccurrencesAtMost_map_of_injective
+      6
+      (fun node =>
+        (Sum.inl node :
+          Sum CarrierNode
+            (CrossingRecord × CrossoverInternal)))
+      id (drawingRouteWireFormula graph)
+      (fun first second equal =>
+        Sum.inl.inj equal)
+      (drawingRouteWireFormula_occurrencesAtMostSix graph)
+
+/-- Route-wire clauses contain no crossover-internal variables. -/
+theorem scopedDrawingRouteWireFormula_internal_count_eq_zero
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (internal : CrossingRecord × CrossoverInternal) :
+    @List.count
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+      instBEqOfDecidableEq (.inr internal)
+      (embeddedVariableOccurrences
+        (scopedDrawingRouteWireFormula graph)) = 0 := by
+  apply @List.count_eq_zero_of_not_mem
+    (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+    instBEqOfDecidableEq (by infer_instance)
+  simp [scopedDrawingRouteWireFormula,
+    EmbeddedClause.rename]
+
+/-- The complete crossover-and-route core fits the paper's degree-eight
+budget.  External nodes contribute at most `2 + 6`; internal nodes occur only
+in their crossover family. -/
+theorem drawingRoutePlanarCoreFormula_occurrencesAtMostEight
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    FormulaOccurrencesAtMost 8
+      (drawingRoutePlanarCoreFormula graph) := by
+  intro atom
+  rw [drawingRoutePlanarCoreFormula,
+    embeddedVariableOccurrences_append]
+  rw [@List.count_append
+    (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+    instBEqOfDecidableEq]
+  cases atom with
+  | inl node =>
+      exact Nat.add_le_add
+        (drawingCarrierNodeCrossoverFormula_external_count_le_two
+          graph node)
+        (scopedDrawingRouteWireFormula_occurrencesAtMostSix
+          graph (.inl node))
+  | inr internal =>
+      rw [scopedDrawingRouteWireFormula_internal_count_eq_zero,
+        Nat.add_zero]
+      exact
+        drawingCarrierNodeCrossoverFormula_occurrencesAtMostEight
+          graph (.inr internal)
 
 end PeriodicOrthocrossing
 end LeanTrominoes
