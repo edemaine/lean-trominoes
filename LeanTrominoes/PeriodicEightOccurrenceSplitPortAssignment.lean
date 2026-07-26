@@ -79,6 +79,74 @@ def FitsEightSlots
     (order : OccurrenceOrder source) : Prop :=
   ∀ atom, (order.copies atom).length ≤ 8
 
+/-- Forgetting positional indices from all genuine occurrence copies gives
+the ordinary source occurrence list. -/
+theorem allOccurrenceVariables_fst
+    {Variable : Type*}
+    (source : PeriodicCNF Variable) :
+    (allOccurrenceVariables source).map Prod.fst =
+      source.variableOccurrences := by
+  have clauseMap (clause : PeriodicClause Variable) :
+      (clause.zipIdx.map fun tagged =>
+        tagged.1.atom) =
+        clause.map PeriodicLiteral.atom := by
+    have mapped := congrArg
+      (List.map PeriodicLiteral.atom)
+      (List.zipIdx_map_fst 0 clause)
+    simpa only [List.map_map, Function.comp_def] using mapped
+  have helper
+      (clauses : List (PeriodicClause Variable))
+      (start : Nat) :
+      (((clauses.zipIdx start).flatMap fun taggedClause =>
+          taggedClause.1.zipIdx.map fun taggedLiteral =>
+            (taggedLiteral.1, taggedClause.2,
+              taggedLiteral.2)).map
+          (fun occurrence => occurrence.1.atom)) =
+        clauses.flatMap fun clause =>
+          clause.map PeriodicLiteral.atom := by
+    induction clauses generalizing start with
+    | nil =>
+        rfl
+    | cons clause rest induction =>
+        simp [Function.comp_def, induction, clauseMap]
+  simpa [allOccurrenceVariables, taggedLiterals,
+    PeriodicCNF.variableOccurrences, List.map_map,
+    Function.comp_def] using
+      helper source.clauses 0
+
+/-- The genuine copy list for one atom has exactly its ordinary source
+occurrence count. -/
+theorem occurrenceVariables_length
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) :
+    (occurrenceVariables source atom).length =
+      source.variableOccurrences.count atom := by
+  rw [occurrenceVariables_eq_filter,
+    ← allOccurrenceVariables_fst]
+  generalize
+    allOccurrenceVariables source = occurrences
+  induction occurrences with
+  | nil =>
+      rfl
+  | cons occurrence rest induction =>
+      by_cases same : occurrence.1 = atom
+      · simp [same, induction]
+      · simp [same, induction]
+
+/-- Any rotation order fits the eight compass ports whenever the source has
+at most eight ordinary occurrences per variable. -/
+theorem fitsEightSlots_of_occurrencesAtMostEight
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (order : OccurrenceOrder source)
+    (occurrences : source.OccurrencesAtMost 8) :
+    FitsEightSlots order := by
+  intro atom
+  rw [(order.perm atom).length_eq,
+    occurrenceVariables_length]
+  exact occurrences atom
+
 /-- Assign a genuine occurrence copy the port at its position in the chosen
 rotation order. -/
 def orderedOccurrencePort

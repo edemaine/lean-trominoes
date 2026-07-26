@@ -77,5 +77,18 @@ theorem orderedFormula_occurrencesAtMostThree
     (occurrencePortsOfOrder source order)
     (orderedFormula_ports_collisionFree source order fits)
 
+/-- The standard source occurrence predicate supplies the eight-slot
+premise for every rotation order. -/
+theorem orderedFormula_occurrencesAtMostThree_of_source
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (order : OccurrenceOrder source)
+    (sourceOccurrences : source.OccurrencesAtMost 8) :
+    (orderedFormula source order).OccurrencesAtMost 3 := by
+  exact orderedFormula_occurrencesAtMostThree
+    source order
+    (fitsEightSlots_of_occurrencesAtMostEight
+      order sourceOccurrences)
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -1253,6 +1253,8 @@ The representation choices for this target are:
   assigns a chosen rotation order to the eight clockwise Figure 7 ports.
   Whenever every per-variable occurrence list has length at most eight, the
   induced total clause/literal-indexed assignment is proved collision-free.
+  This premise is also derived from the standard
+  `PeriodicCNF.OccurrencesAtMost 8` predicate.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitOrdered.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitOrdered.lean)
   packages the ordered construction behind that single eight-slot premise.
   It preserves satisfiability, locality, and width three, and a fitting
