@@ -400,6 +400,75 @@ theorem isOrthogonal_scale
       (by exact_mod_cast positive) indexed.segment).mpr
       (orthogonal indexed indexedMember)
 
+/-- Positive refinement preserves disjoint continuous interiors of all
+distinct lifted segment occurrences. -/
+theorem routesHaveDisjointInteriors_scale
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing)
+    (disjoint : drawing.RoutesHaveDisjointInteriors) :
+    (drawing.scale factor).RoutesHaveDisjointInteriors := by
+  intro scaledFirst scaledFirstMember scaledSecond scaledSecondMember
+    firstTranslate secondTranslate different
+  rw [indexedSegments_scale] at scaledFirstMember
+  rw [indexedSegments_scale] at scaledSecondMember
+  rcases List.mem_map.mp scaledFirstMember with
+    ⟨first, firstMember, rfl⟩
+  rcases List.mem_map.mp scaledSecondMember with
+    ⟨second, secondMember, rfl⟩
+  have originalDifferent :
+      SegmentOccurrenceKey first firstTranslate ≠
+        SegmentOccurrenceKey second secondTranslate := by
+    simpa [SegmentOccurrenceKey, IndexedGridSegment.scale] using different
+  have originalDisjoint :=
+    disjoint first firstMember second secondMember
+      firstTranslate secondTranslate originalDifferent
+  intro scaledMeet
+  apply originalDisjoint
+  simp only [IndexedGridSegment.scale_segment] at scaledMeet
+  rw [periodTranslation_scale positive,
+    periodTranslation_scale positive,
+    ← GridSegment.scale_translate,
+    ← GridSegment.scale_translate] at scaledMeet
+  exact
+    (GridSegment.interiorsMeet_scale_iff
+      (by exact_mod_cast positive)
+      (first.segment.translate
+        (drawing.periodTranslation firstTranslate))
+      (second.segment.translate
+        (drawing.periodTranslation secondTranslate))).mp scaledMeet
+
+/-- Positive refinement preserves avoidance of route interiors by every
+lifted graph vertex. -/
+theorem verticesAvoidRouteInteriors_scale
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing)
+    (avoids : drawing.VerticesAvoidRouteInteriors) :
+    (drawing.scale factor).VerticesAvoidRouteInteriors := by
+  intro scaledVertex scaledVertexMember scaledIndexed scaledIndexedMember
+    vertexTranslate routeTranslate
+  unfold scale at scaledVertexMember
+  rcases List.mem_map.mp scaledVertexMember with
+    ⟨vertex, vertexMember, rfl⟩
+  rw [indexedSegments_scale] at scaledIndexedMember
+  rcases List.mem_map.mp scaledIndexedMember with
+    ⟨indexed, indexedMember, rfl⟩
+  intro scaledContains
+  apply
+    (avoids vertex vertexMember indexed indexedMember
+      vertexTranslate routeTranslate)
+  simp only [IndexedGridSegment.scale_segment] at scaledContains
+  rw [periodTranslation_scale positive,
+    periodTranslation_scale positive,
+    ← GridSegment.scale_translate,
+    ← Cell.scale_add] at scaledContains
+  exact
+    (GridSegment.interiorContains_scale_iff
+      (by exact_mod_cast positive)
+      (indexed.segment.translate
+        (drawing.periodTranslation routeTranslate))
+      (Cell.add vertex
+        (drawing.periodTranslation vertexTranslate))).mp scaledContains
+
 end PeriodicGridDrawing
 
 end LeanTrominoes

@@ -485,7 +485,8 @@ The representation choices for this target are:
   continuous segment-interior intersection, and route endpoints exactly.
   At the whole-drawing level it scales the period and all vertex and route
   lookups coherently, preserving fundamental-square bounds, endpoint
-  compatibility, and orthogonality.
+  compatibility, orthogonality, disjoint continuous route interiors, and
+  avoidance of route interiors by graph vertices.
   [`LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean)
   makes that extra condition executable.  An interval-overlap bound reduces
   every possible continuous contact to the same nine neighboring periodic
