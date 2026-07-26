@@ -154,6 +154,7 @@ import LeanTrominoes.PeriodicThreeDMHardness
 import LeanTrominoes.PeriodicPlanarThreeDM
 import LeanTrominoes.PlanarThreeDMVariableGadget
 import LeanTrominoes.PlanarX3CClauseGadget
+import LeanTrominoes.PlanarX3CClauseDrawing
 import LeanTrominoes.PlanarThreeDMConnectorGadget
 import LeanTrominoes.PlanarThreeDMVariableOccurrenceGadget
 import LeanTrominoes.LocalIncidenceDrawing

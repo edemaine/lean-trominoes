@@ -1485,6 +1485,11 @@ The representation choices for this target are:
   proves that the internal elements and all nonexternal terminal elements
   have an exact cover precisely when exactly one terminal is covered
   externally.
+- [`LeanTrominoes/PlanarX3CClauseDrawing.lean`](LeanTrominoes/PlanarX3CClauseDrawing.lean)
+  gives the nine-set clause core an explicit orthogonal drawing: an
+  eighteen-vertex boundary cycle and three disjoint internal tripods.  The
+  exact checker proves continuous planarity and records the three boundary
+  terminal orders needed for noncrossing colored-strand attachment.
 - [`LeanTrominoes/PlanarThreeDMConnectorGadget.lean`](LeanTrominoes/PlanarThreeDMConnectorGadget.lean)
   transcribes the fixed-red connector detour in Dyer--Frieze Figure 6 as a
   planar two-by-three ladder and one auxiliary triple.  Every triple has an
