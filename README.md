@@ -543,6 +543,11 @@ The representation choices for this target are:
   natural one-cell halo `(-P,2P)²`.  It proves that any contact between two
   halo-bounded route occurrences has relative translation in an explicit
   `5 × 5` set, accommodating genuine nonzero-offset periodic edges.
+  [`LeanTrominoes/PeriodicGridDrawingExpandedFinitePlanarity.lean`](LeanTrominoes/PeriodicGridDrawingExpandedFinitePlanarity.lean)
+  evaluates route/route avoidance over those 25 relative translations and
+  proves the check complete for the infinite periodic lift.  Because stored
+  vertices remain in the canonical square, its vertex/route half reuses the
+  smaller nine-translation Boolean check.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
