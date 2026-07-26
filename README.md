@@ -1350,6 +1350,12 @@ The representation choices for this target are:
   ring into one total route family for the final positioned split formula.
   All genuine routes are proved to have exact canonical endpoints and to
   remain orthogonal.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitCanonicalAngularRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCanonicalAngularRoutes.lean)
+  instantiates the boundary interface unconditionally with canonical
+  Manhattan prefixes and specializes the resulting complete angular-spliced
+  drawing to the concrete planarized hardness source.  Endpoint compatibility
+  and orthogonality are now unconditional; only global nonintersection
+  remains.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
