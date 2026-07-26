@@ -1509,6 +1509,10 @@ The representation choices for this target are:
   duplicate-free unit-step source route are pairwise contact-free.  The
   recursive proof separates each leading tile from all later tiles and then
   composes the four resulting piecewise certificates across both joins.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean)
+  lifts the closed-block bound from individual ribbon tiles to recursively
+  assembled corridor cores.  Every listed core point is assigned to the
+  refined block of an actual point on its selected unit source route.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonUnitRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonUnitRoutes.lean)
   specializes unit subdivision to every active exact-one incidence.  Each
   selected route retains its exact variable and clause endpoints, remains
@@ -1554,6 +1558,11 @@ The representation choices for this target are:
   and orthogonality required by `ThreeStrandRouting`, yielding a normalized
   corrected routing object for the hardness assembly.  Contact-freeness of
   the endpoint fans remains the next geometric layer.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRoutingBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRoutingBounds.lean)
+  propagates block ownership through both endpoint joins.  Every point of a
+  complete corrected colored route lies in the refined block of a listed
+  point on its unit source route, including the variable and lifted clause
+  endpoint blocks.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean)
   specializes endpoint-direction separation to the active exact-one
   incidences.  Unequal occurrences of one variable leave in different
