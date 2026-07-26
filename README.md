@@ -1995,6 +1995,13 @@ The representation choices for this target are:
   caller-selected color lane, then joined to the checked variable and clause
   ports by orthogonal endpoint stubs; all resulting endpoints and
   rectilinearity obligations are proved.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexGeometry.lean)
+  chooses a concrete `128 × 128` refinement layout and certifies the complete
+  finite coordinate range of every variable-site and clause-core vertex.
+  Every assembled vertex is expressed as its source incidence vertex plus an
+  open-macrocell offset.  Source compatibility and zero-anchor normalization
+  therefore prove, unconditionally, that all assembled vertices remain
+  strictly inside the refined fundamental square.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget
