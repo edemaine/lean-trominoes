@@ -167,6 +167,29 @@ theorem occurrenceVariableSiteSlot_index_lt
         simp_all [sourceVariableSiteCount, occurrenceVariableSiteSlot,
           VariableSiteSlot.index]
 
+/-- The cyclic successor used by the periodic assembly agrees with the
+finite variable-site successor on every active slot. -/
+theorem occurrenceVariableSiteSlot_nextUsedSlot
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (atomMember : atom ∈ occurringVariables source)
+    (slot : OccurrenceSlot) (slotMember : slot ∈ usedSlots source atom) :
+    occurrenceVariableSiteSlot (nextUsedSlot source atom slot) =
+      nextVariableSiteSlot (sourceVariableSiteCount source atom)
+        (occurrenceVariableSiteSlot slot) := by
+  rcases usedSlots_cases_of_atom_mem source atom atomMember with
+    one | twoOrThree
+  · cases slot <;>
+      simp_all [nextUsedSlot, sourceVariableSiteCount,
+        occurrenceVariableSiteSlot, nextVariableSiteSlot]
+  · rcases twoOrThree with two | three
+    · cases slot <;>
+        simp_all [nextUsedSlot, sourceVariableSiteCount,
+          occurrenceVariableSiteSlot, nextVariableSiteSlot]
+    · cases slot <;>
+        simp_all [nextUsedSlot, sourceVariableSiteCount,
+          occurrenceVariableSiteSlot, nextVariableSiteSlot]
+
 /-- Forget the periodic names on a variable-module triple while retaining
 its finite site slot and local template name.  The clause fallback is never
 used by the variable-site interface. -/

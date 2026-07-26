@@ -1994,7 +1994,9 @@ The representation choices for this target are:
   clause and complete-variable-site routes are translated into their global
   neighborhoods, while exactly the classified routed connector incidence
   is joined to its three-strand corridor.  The resulting list has the
-  encoded edge count, and every assembled route is proved rectilinear.
+  encoded edge count, every assembled route is proved rectilinear, and
+  tag-indexed lookup proves its endpoints are exactly the corresponding
+  global typed triple and periodically translated colored element.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
