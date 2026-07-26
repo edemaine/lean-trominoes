@@ -100,6 +100,248 @@ theorem incidenceLocalRoute_orthogonal
       exact X3CClauseOrthogonal.drawing_isValid.2.1
         (set, color) segment member
 
+/-- Position in the polarity-normalized occurrence template, or in the
+unchanged clause template. -/
+def orientedTripleLocalPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    Triple Variable → Cell
+  | .ordinary atom slot variant triple =>
+      (VariableOccurrence.orientedDrawing
+        variant (occurrencePolarity source atom slot)).triplePosition triple
+  | .fixedRed atom slot triple =>
+      (FixedRedConnector.orientedDrawing
+        (occurrencePolarity source atom slot)).triplePosition triple
+  | .clause _ set =>
+      X3CClauseOrthogonal.setPosition set
+
+/-- Port position in the polarity-normalized local template. -/
+def orientedIncidencePortPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    Triple Variable → WireColor → Cell
+  | .ordinary atom slot variant triple, color =>
+      (VariableOccurrence.orientedDrawing
+        variant (occurrencePolarity source atom slot)).elementPosition
+          (VariableOccurrence.reference variant triple color)
+  | .fixedRed atom slot triple, color =>
+      (FixedRedConnector.orientedDrawing
+        (occurrencePolarity source atom slot)).elementPosition
+          (FixedRedConnector.reference triple color)
+  | .clause _ set, color =>
+      X3CClauseOrthogonal.elementPosition
+        (X3CClauseOrthogonal.reference set color)
+
+/-- Route prefix in the polarity-normalized local template. -/
+def orientedIncidenceLocalRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    Triple Variable → WireColor → List Cell
+  | .ordinary atom slot variant triple, color =>
+      (VariableOccurrence.orientedDrawing
+        variant (occurrencePolarity source atom slot)).route triple color
+  | .fixedRed atom slot triple, color =>
+      (FixedRedConnector.orientedDrawing
+        (occurrencePolarity source atom slot)).route triple color
+  | .clause _ set, color =>
+      X3CClauseOrthogonal.route set color
+
+/-- Normalized local routes retain their exact typed endpoints. -/
+theorem orientedIncidenceLocalRoute_endpoints
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (triple : Triple Variable) (color : WireColor) :
+    (orientedIncidenceLocalRoute source triple color).head? =
+        some (orientedTripleLocalPosition source triple) ∧
+      (orientedIncidenceLocalRoute source triple color).getLast? =
+        some (orientedIncidencePortPosition source triple color) := by
+  cases triple with
+  | ordinary atom slot variant localTriple =>
+      simpa [orientedIncidenceLocalRoute,
+        orientedTripleLocalPosition,
+        orientedIncidencePortPosition,
+        LocalIncidenceDrawing.routeAt,
+        LocalIncidenceDrawing.sourcePosition,
+        LocalIncidenceDrawing.targetPosition] using
+        (VariableOccurrence.orientedDrawing_isValid
+          variant (occurrencePolarity source atom slot)).1
+            (localTriple, color)
+  | fixedRed atom slot localTriple =>
+      simpa [orientedIncidenceLocalRoute,
+        orientedTripleLocalPosition,
+        orientedIncidencePortPosition,
+        LocalIncidenceDrawing.routeAt,
+        LocalIncidenceDrawing.sourcePosition,
+        LocalIncidenceDrawing.targetPosition] using
+        (FixedRedConnector.orientedDrawing_isValid
+          (occurrencePolarity source atom slot)).1
+            (localTriple, color)
+  | clause clauseIndex set =>
+      exact X3CClauseOrthogonal.drawing_isValid.1
+        (set, color)
+
+/-- Every normalized local route segment remains axis-aligned. -/
+theorem orientedIncidenceLocalRoute_orthogonal
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (triple : Triple Variable) (color : WireColor)
+    (segment : GridSegment)
+    (member :
+      segment ∈ gridPolylineSegments
+        (orientedIncidenceLocalRoute source triple color)) :
+    segment.IsAxisAligned := by
+  cases triple with
+  | ordinary atom slot variant localTriple =>
+      exact
+        (VariableOccurrence.orientedDrawing_isValid
+          variant (occurrencePolarity source atom slot)).2.1
+            (localTriple, color) segment member
+  | fixedRed atom slot localTriple =>
+      exact
+        (FixedRedConnector.orientedDrawing_isValid
+          (occurrencePolarity source atom slot)).2.1
+            (localTriple, color) segment member
+  | clause clauseIndex set =>
+      exact X3CClauseOrthogonal.drawing_isValid.2.1
+        (set, color) segment member
+
+/-- Typed triple whose red continuation is incident to the current
+occurrence's cycle-link element. -/
+def slotContinuationTypedTriple
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot) : Triple Variable :=
+  let polarity := occurrencePolarity source atom slot
+  match occurrenceConnectorKind source atom slot with
+  | .fixedRed =>
+      .fixedRed atom slot
+        (FixedRedConnector.slotContinuationTriple polarity)
+  | .fixedGreen =>
+      .ordinary atom slot .fixedGreen
+        (VariableOccurrence.slotContinuationTriple polarity)
+  | .fixedBlue =>
+      .ordinary atom slot .fixedBlue
+        (VariableOccurrence.slotContinuationTriple polarity)
+
+/-- Typed triple whose red continuation is incident to the successor
+cycle-link element. -/
+def nextContinuationTypedTriple
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot) : Triple Variable :=
+  let polarity := occurrencePolarity source atom slot
+  match occurrenceConnectorKind source atom slot with
+  | .fixedRed =>
+      .fixedRed atom slot
+        (FixedRedConnector.nextContinuationTriple polarity)
+  | .fixedGreen =>
+      .ordinary atom slot .fixedGreen
+        (VariableOccurrence.nextContinuationTriple polarity)
+  | .fixedBlue =>
+      .ordinary atom slot .fixedBlue
+        (VariableOccurrence.nextContinuationTriple polarity)
+
+/-- Both standardized continuation triples are present in their occurrence
+block. -/
+theorem continuationTypedTriples_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot) :
+    slotContinuationTypedTriple source atom slot ∈
+        occurrenceTriples source atom slot ∧
+      nextContinuationTypedTriple source atom slot ∈
+        occurrenceTriples source atom slot := by
+  cases kindEq : occurrenceConnectorKind source atom slot <;>
+    cases polarityEq : occurrencePolarity source atom slot <;>
+    simp [slotContinuationTypedTriple, nextContinuationTypedTriple,
+      kindEq, polarityEq, occurrenceTriples, allFixedRedTriples,
+      allOrdinaryTriples, FixedRedConnector.slotContinuationTriple,
+      FixedRedConnector.nextContinuationTriple,
+      VariableOccurrence.slotContinuationTriple,
+      VariableOccurrence.nextContinuationTriple]
+
+/-- The first standardized continuation references the current cycle-link
+element with zero offset. -/
+theorem slotContinuationTypedTriple_red_reference
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot) :
+    (tripleReferences source
+      (slotContinuationTypedTriple source atom slot)).red =
+        ⟨.cycleLink atom slot, (0, 0)⟩ := by
+  cases kindEq : occurrenceConnectorKind source atom slot <;>
+    cases polarityEq : occurrencePolarity source atom slot <;>
+    simp [slotContinuationTypedTriple, kindEq, polarityEq,
+      tripleReferences, ordinaryTripleReferences,
+      fixedRedTripleReferences, VariableOccurrence.slotContinuationTriple,
+      FixedRedConnector.slotContinuationTriple,
+      VariableOccurrenceTriple.references,
+      FixedRedConnectorTriple.references,
+      ordinaryRedElement, fixedRedRedElement,
+      firstCycleLinkSlot, secondCycleLinkSlot]
+
+/-- The second standardized continuation references the successor
+cycle-link element with zero offset. -/
+theorem nextContinuationTypedTriple_red_reference
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot) :
+    (tripleReferences source
+      (nextContinuationTypedTriple source atom slot)).red =
+        ⟨.cycleLink atom (nextUsedSlot source atom slot), (0, 0)⟩ := by
+  cases kindEq : occurrenceConnectorKind source atom slot <;>
+    cases polarityEq : occurrencePolarity source atom slot <;>
+    simp [nextContinuationTypedTriple, kindEq, polarityEq,
+      tripleReferences, ordinaryTripleReferences,
+      fixedRedTripleReferences, VariableOccurrence.nextContinuationTriple,
+      FixedRedConnector.nextContinuationTriple,
+      VariableOccurrenceTriple.references,
+      FixedRedConnectorTriple.references,
+      ordinaryRedElement, fixedRedRedElement,
+      firstCycleLinkSlot, secondCycleLinkSlot]
+
+/-- Standard current-slot boundary point for each connector template. -/
+def slotCyclePortPosition : VariableConnectorKind → Cell
+  | .fixedRed => (-2, 0)
+  | .fixedGreen | .fixedBlue => (0, -6)
+
+/-- Standard successor-slot boundary point for each connector template. -/
+def nextCyclePortPosition : VariableConnectorKind → Cell
+  | .fixedRed => (-2, 4)
+  | .fixedGreen | .fixedBlue => (0, 2)
+
+/-- The current-slot typed continuation ends at the standardized upper
+cycle port. -/
+theorem orientedIncidencePortPosition_slotContinuation
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot) :
+    orientedIncidencePortPosition source
+        (slotContinuationTypedTriple source atom slot) .red =
+      slotCyclePortPosition
+        (occurrenceConnectorKind source atom slot) := by
+  cases kindEq : occurrenceConnectorKind source atom slot <;>
+    cases polarityEq : occurrencePolarity source atom slot <;>
+    simp [orientedIncidencePortPosition,
+      slotContinuationTypedTriple, slotCyclePortPosition,
+      kindEq, polarityEq]
+
+/-- The successor-slot continuation ends at the standardized lower cycle
+port. -/
+theorem orientedIncidencePortPosition_nextContinuation
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot) :
+    orientedIncidencePortPosition source
+        (nextContinuationTypedTriple source atom slot) .red =
+      nextCyclePortPosition
+        (occurrenceConnectorKind source atom slot) := by
+  cases kindEq : occurrenceConnectorKind source atom slot <;>
+    cases polarityEq : occurrencePolarity source atom slot <;>
+    simp [orientedIncidencePortPosition,
+      nextContinuationTypedTriple, nextCyclePortPosition,
+      kindEq, polarityEq]
+
 /-- Local position of a red clause-core element in the rectilinear
 template. -/
 def redClauseElementLocalPosition {Variable : Type*} :

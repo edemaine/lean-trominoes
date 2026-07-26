@@ -1680,7 +1680,9 @@ The representation choices for this target are:
   Every typed triple has a local position, every colored incidence has a
   temporary port, and its local route prefix is proved orthogonal with exact
   endpoints; clause ports are additionally identified with their assembled
-  typed element positions.
+  typed element positions.  Polarity-normalized occurrence templates are
+  also certified: their two red continuations are proved to reference the
+  current and successor cycle links in one fixed geometric order.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports

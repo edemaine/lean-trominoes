@@ -71,6 +71,25 @@ namespace LocalIncidenceDrawing
 
 open Gadget
 
+/-- Apply one coordinate transformation to all vertices and route points. -/
+def mapPoints {Triple Element : Type*}
+    (transform : Cell → Cell)
+    (drawing : LocalIncidenceDrawing Triple Element) :
+    LocalIncidenceDrawing Triple Element where
+  triplePosition triple := transform (drawing.triplePosition triple)
+  elementPosition element := transform (drawing.elementPosition element)
+  reference := drawing.reference
+  route triple color := (drawing.route triple color).map transform
+
+@[simp]
+theorem mapPoints_reference {Triple Element : Type*}
+    (transform : Cell → Cell)
+    (drawing : LocalIncidenceDrawing Triple Element)
+    (triple : Triple) (color : Gadget.WireColor) :
+    (drawing.mapPoints transform).reference triple color =
+      drawing.reference triple color := by
+  rfl
+
 /-- A colored incidence names one route in the local drawing. -/
 abbrev RouteKey (Triple : Type*) := Triple × WireColor
 

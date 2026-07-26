@@ -20,6 +20,14 @@ namespace PlanarThreeDM
 
 open Gadget
 
+/-- Clockwise quarter turn of the integer grid. -/
+def rotateClockwise (point : Cell) : Cell :=
+  (point.2, -point.1)
+
+/-- Reflection across the horizontal line with the given ordinate. -/
+def reflectAcrossHorizontal (axis : Int) (point : Cell) : Cell :=
+  (point.1, 2 * axis - point.2)
+
 namespace VariableOccurrence
 
 /-- A direct one-segment route. -/
@@ -69,6 +77,65 @@ drawings with the advertised incidence endpoints. -/
 theorem drawing_isValid (variant : VariableOccurrenceVariant) :
     (drawing variant).IsValid := by
   cases variant <;> native_decide
+
+/-- Rotate an ordinary module so that its continuation ports lie on one
+vertical boundary.  Positive polarity additionally reflects it so the port
+for the current slot is always above the port for the next slot. -/
+def orientedDrawing (variant : VariableOccurrenceVariant)
+    (polarity : Bool) :
+    LocalIncidenceDrawing
+      VariableOccurrenceTriple VariableOccurrenceElement :=
+  let rotated := (drawing variant).mapPoints rotateClockwise
+  if polarity then
+    rotated.mapPoints (reflectAcrossHorizontal (-2))
+  else
+    rotated
+
+@[simp]
+theorem orientedDrawing_reference
+    (variant : VariableOccurrenceVariant) (polarity : Bool)
+    (triple : VariableOccurrenceTriple) (color : WireColor) :
+    (orientedDrawing variant polarity).reference triple color =
+      reference variant triple color := by
+  cases polarity <;> rfl
+
+/-- The cycle triple incident to the current occurrence slot. -/
+def slotContinuationTriple
+    (polarity : Bool) : VariableOccurrenceTriple :=
+  if polarity then .first else .second
+
+/-- The cycle triple incident to the next used occurrence slot. -/
+def nextContinuationTriple
+    (polarity : Bool) : VariableOccurrenceTriple :=
+  if polarity then .second else .first
+
+/-- In the oriented ordinary template, the current-slot continuation has a
+fixed upper boundary position. -/
+@[simp]
+theorem orientedDrawing_slotContinuationPosition
+    (variant : VariableOccurrenceVariant) (polarity : Bool) :
+    (orientedDrawing variant polarity).elementPosition
+        (reference variant
+          (slotContinuationTriple polarity) .red) =
+      (0, -6) := by
+  cases variant <;> cases polarity <;> native_decide
+
+/-- The next-slot continuation has a fixed lower boundary position. -/
+@[simp]
+theorem orientedDrawing_nextContinuationPosition
+    (variant : VariableOccurrenceVariant) (polarity : Bool) :
+    (orientedDrawing variant polarity).elementPosition
+        (reference variant
+          (nextContinuationTriple polarity) .red) =
+      (0, 2) := by
+  cases variant <;> cases polarity <;> native_decide
+
+/-- Rotation and the polarity-dependent reflection preserve the complete
+ordinary-module drawing certificate. -/
+theorem orientedDrawing_isValid
+    (variant : VariableOccurrenceVariant) (polarity : Bool) :
+    (orientedDrawing variant polarity).IsValid := by
+  cases variant <;> cases polarity <;> native_decide
 
 end VariableOccurrence
 
@@ -141,6 +208,62 @@ def drawing :
 advertised incidence endpoints. -/
 theorem drawing_isValid : drawing.IsValid := by
   native_decide
+
+/-- Reflect positive fixed-red occurrences so that the continuation incident
+to the current slot is always the upper of the two left boundary ports. -/
+def orientedDrawing (polarity : Bool) :
+    LocalIncidenceDrawing
+      FixedRedConnectorTriple FixedRedConnectorElement :=
+  if polarity then
+    drawing.mapPoints (reflectAcrossHorizontal 2)
+  else
+    drawing
+
+@[simp]
+theorem orientedDrawing_reference
+    (polarity : Bool) (triple : FixedRedConnectorTriple)
+    (color : WireColor) :
+    (orientedDrawing polarity).reference triple color =
+      reference triple color := by
+  cases polarity <;> rfl
+
+/-- Fixed-red triple incident to the current occurrence slot. -/
+def slotContinuationTriple
+    (polarity : Bool) : FixedRedConnectorTriple :=
+  if polarity then .bottomLeft else .topLeft
+
+/-- Fixed-red triple incident to the next used occurrence slot. -/
+def nextContinuationTriple
+    (polarity : Bool) : FixedRedConnectorTriple :=
+  if polarity then .topLeft else .bottomLeft
+
+/-- The current-slot fixed-red continuation always occupies the upper
+boundary point. -/
+@[simp]
+theorem orientedDrawing_slotContinuationPosition
+    (polarity : Bool) :
+    (orientedDrawing polarity).elementPosition
+        (reference
+          (slotContinuationTriple polarity) .red) =
+      (-2, 0) := by
+  cases polarity <;> native_decide
+
+/-- The next-slot fixed-red continuation always occupies the lower boundary
+point. -/
+@[simp]
+theorem orientedDrawing_nextContinuationPosition
+    (polarity : Bool) :
+    (orientedDrawing polarity).elementPosition
+        (reference
+          (nextContinuationTriple polarity) .red) =
+      (-2, 4) := by
+  cases polarity <;> native_decide
+
+/-- The polarity-normalized fixed-red template remains a certified planar
+orthogonal drawing. -/
+theorem orientedDrawing_isValid (polarity : Bool) :
+    (orientedDrawing polarity).IsValid := by
+  cases polarity <;> native_decide
 
 end FixedRedConnector
 
