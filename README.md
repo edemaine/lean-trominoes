@@ -1253,6 +1253,10 @@ The representation choices for this target are:
   assigns a chosen rotation order to the eight clockwise Figure 7 ports.
   Whenever every per-variable occurrence list has length at most eight, the
   induced total clause/literal-indexed assignment is proved collision-free.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitOrdered.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitOrdered.lean)
+  packages the ordered construction behind that single eight-slot premise.
+  It preserves satisfiability, locality, and width three, and a fitting
+  rotation order yields the full three-occurrence certificate.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover
