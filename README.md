@@ -385,6 +385,11 @@ The representation choices for this target are:
   lookup, recovers each occurrence's positioned metadata, and derives the
   exact source and translated-target endpoints of its declared route.  This
   is the splice interface used by the planar 3DM gadget assembly.
+  [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean)
+  fixes the periodic gauge used by that splice: it subtracts each clause's
+  first literal offset from every literal and from the displayed clause
+  position.  Every resulting clause has anchor zero, while satisfaction by
+  every plane-wide assignment—and therefore satisfiability—is unchanged.
   [`LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean)
   reduces the certificate's two infinite nonintersection predicates to
   executable finite checks whenever all stored vertices and segment endpoints
