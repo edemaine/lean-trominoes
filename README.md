@@ -390,6 +390,13 @@ The representation choices for this target are:
   presentations while retaining one geometric representative.  Erasure is
   exactly the generic semantic deduplication, so all of those invariants
   transfer.
+  [`LeanTrominoes/PositionedPeriodicCNFDeduplicationRoutes.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationRoutes.lean)
+  transports finite geometric incidence routes through that changed clause
+  indexing.  Each retained clause selects its first positioned source
+  representative, reuses the matching literal route, and subtracts the
+  common clause anchor.  The transported family is proved to satisfy every
+  periodic incidence endpoint, and compatibility is reduced to finite
+  distinctness and fundamental-square bounds for the retained vertices.
   [`LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean`](LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean)
   specializes that normalization to the routed SAT block, wraps its variables,
   and proves that the resulting positioned source remains equisatisfiable
