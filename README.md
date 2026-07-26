@@ -1264,6 +1264,11 @@ The representation choices for this target are:
   planarization gadgets.  A source certificate that every genuine route has
   one of these directions and separates same-atom incidences is transported
   to the split formula's collision-free and three-occurrence certificates.
+- [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
+  proves that subtracting a retained clause's periodic anchor changes no
+  terminal ray.  It reduces the canonical deduplicated source certificate to
+  validity and separation checks on the corresponding raw representative
+  routes in the finite planar-SAT presentation.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover

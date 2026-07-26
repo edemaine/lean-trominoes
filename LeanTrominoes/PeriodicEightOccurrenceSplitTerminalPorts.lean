@@ -54,6 +54,34 @@ def terminalPort (vector : Cell) : Option Port :=
   else
     none
 
+/-- Subtracting one common offset from every point of a polyline leaves its
+terminal vector unchanged. -/
+theorem routeTerminalVector_map_sub
+    (route : List Cell) (offset : Cell) :
+    routeTerminalVector
+        (route.map fun point => Cell.sub point offset) =
+      routeTerminalVector route := by
+  have segments :
+      gridPolylineSegments
+          (route.map fun point => Cell.sub point offset) =
+        (gridPolylineSegments route).map fun segment =>
+          GridSegment.mk
+            (Cell.sub segment.start offset)
+            (Cell.sub segment.finish offset) := by
+    induction route using List.twoStepInduction with
+    | nil | singleton => rfl
+    | cons_cons first second rest _ tailInduction =>
+        simp only [List.map_cons, gridPolylineSegments, List.map_cons]
+        congr 1
+        exact tailInduction second
+  unfold routeTerminalVector
+  rw [segments, List.getLast?_map]
+  cases (gridPolylineSegments route).getLast? with
+  | none => rfl
+  | some segment =>
+      apply Prod.ext <;>
+      simp [Cell.sub]
+
 /-- Compass port read from one clause-to-variable incidence route.  Invalid
 or empty routes use a harmless northwest fallback; certificates below rule
 that fallback out for genuine incidences. -/
