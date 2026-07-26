@@ -1511,6 +1511,13 @@ The representation choices for this target are:
   corridor cores along the same occurrence are pairwise contact-free.  Thus
   each core has exact half-edge boundary endpoints and is unconditionally
   rectilinear for a continuously planar source presentation.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean)
+  connects each corrected corridor core from its two macrocell-boundary
+  endpoints to the existing finite variable and clause gadget ports.  The
+  joined route is proved to have the exact endpoints and orthogonality
+  required by `ThreeStrandRouting`, yielding a normalized corrected routing
+  object for the hardness assembly.  Contact-freeness of these endpoint
+  fans remains the next geometric layer.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
