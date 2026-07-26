@@ -180,8 +180,12 @@ def deduplicatedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
     (routes : PositionedPeriodicCNF.IncidenceRoutes) :
     PositionedPeriodicCNF.IncidenceRoutes :=
   PositionedPeriodicCNF.deduplicatedIncidenceRoutes
-    (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
-      (wrappedDrawingPeriodicPlanarSATPlacement formula) routes
+    (anchorNormalizedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula)
+    (wrappedDrawingPeriodicPlanarSATPlacement formula)
+    (PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes
+      (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+      (wrappedDrawingPeriodicPlanarSATPlacement formula) routes)
 
 /-- Canonical periodic routes obtained from the direct finite terminal rays
 after wrapping, clause-orbit deduplication, and anchor normalization. -/
@@ -242,11 +246,18 @@ theorem
               tagged.1.edge.offset)) := by
   exact
     PositionedPeriodicCNF.deduplicatedIncidenceRoutes_endpoints_of_tagged
-        (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+        (anchorNormalizedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula)
         (wrappedDrawingPeriodicPlanarSATPlacement formula)
-        routes
-        (wrappedDrawingPositionedPeriodicPlanarSATFormula_physicalRoutesMatch
-          formula routes routesMatch)
+        (PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes
+          (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+          (wrappedDrawingPeriodicPlanarSATPlacement formula) routes)
+        (PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes_physicalRoutesMatch
+            (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+            (wrappedDrawingPeriodicPlanarSATPlacement formula)
+            routes
+            (wrappedDrawingPositionedPeriodicPlanarSATFormula_physicalRoutesMatch
+              formula routes routesMatch))
         taggedMember
 
 /-- The specialized transported routes satisfy the complete periodic
@@ -267,11 +278,18 @@ theorem
         formula).erase.incidenceGraph := by
   apply
     PositionedPeriodicCNF.deduplicatedIncidenceDrawing_routesMatch
-      (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+      (anchorNormalizedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
       (wrappedDrawingPeriodicPlanarSATPlacement formula)
-      routes
-      (wrappedDrawingPositionedPeriodicPlanarSATFormula_physicalRoutesMatch
-        formula routes routesMatch)
+      (PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes
+        (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+        (wrappedDrawingPeriodicPlanarSATPlacement formula) routes)
+      (PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes_physicalRoutesMatch
+          (wrappedDrawingPositionedPeriodicPlanarSATFormula formula)
+          (wrappedDrawingPeriodicPlanarSATPlacement formula)
+          routes
+          (wrappedDrawingPositionedPeriodicPlanarSATFormula_physicalRoutesMatch
+            formula routes routesMatch))
   change
     0 <
       planarMacroScale.toNat *

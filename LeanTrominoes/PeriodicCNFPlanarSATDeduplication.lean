@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarSATGeometry
 import LeanTrominoes.PositionedPeriodicCNFDeduplication
+import LeanTrominoes.PositionedPeriodicCNFAnchorNormalizationDrawing
 
 /-!
 # Deduplicated periodic routed SAT presentation
@@ -17,6 +18,8 @@ appropriate finite vertex set for a nonoverlapping incidence drawing.
 namespace LeanTrominoes
 namespace PeriodicOrthocrossing
 
+set_option maxHeartbeats 800000
+
 /-- The routed positioned periodic formula with one representative per
 distinct periodic literal list. -/
 def deduplicatedDrawingPositionedPeriodicPlanarSATFormula
@@ -24,7 +27,8 @@ def deduplicatedDrawingPositionedPeriodicPlanarSATFormula
     (formula : PeriodicCNF Variable) :
     PositionedPeriodicCNF
       (PeriodicPlanarSATVariable Variable) :=
-  (drawingPositionedPeriodicPlanarSATFormula formula).deduplicateByLiterals
+  ((drawingPositionedPeriodicPlanarSATFormula formula).anchorNormalize
+    (drawingPeriodicPlanarSATPlacement formula)).deduplicateByLiterals
 
 /-- Semantic counterpart of the deduplicated positioned source, behind the
 opaque routed-variable wrapper. -/
@@ -32,7 +36,19 @@ def deduplicatedWrappedDrawingPeriodicPlanarSATFormula
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     PeriodicCNF (WrappedPeriodicPlanarSATVariable Variable) :=
-  (wrappedDrawingPeriodicPlanarSATFormula formula).deduplicate
+  (wrappedDrawingPeriodicPlanarSATFormula formula).anchorNormalize.deduplicate
+
+/-- The wrapped positioned source after putting every clause orbit in its
+canonical anchor gauge. -/
+def anchorNormalizedWrappedDrawingPositionedPeriodicPlanarSATFormula
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    PositionedPeriodicCNF
+      (WrappedPeriodicPlanarSATVariable Variable) :=
+  ((wrappedDrawingPositionedPeriodicPlanarSATFormula
+    formula).anchorNormalize
+      (wrappedDrawingPeriodicPlanarSATPlacement
+        formula))
 
 /-- Positioned and wrapped source used by geometry-ordered occurrence
 splitting. -/
@@ -41,7 +57,7 @@ def deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
     (formula : PeriodicCNF Variable) :
     PositionedPeriodicCNF
       (WrappedPeriodicPlanarSATVariable Variable) :=
-  (wrappedDrawingPositionedPeriodicPlanarSATFormula
+  (anchorNormalizedWrappedDrawingPositionedPeriodicPlanarSATFormula
     formula).deduplicateByLiterals
 
 /-- Positioned erasure agrees exactly with the semantic deduplicated wrapped
@@ -56,7 +72,9 @@ theorem
       deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula := by
   rw [
     deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula,
+    anchorNormalizedWrappedDrawingPositionedPeriodicPlanarSATFormula,
     PositionedPeriodicCNF.erase_deduplicateByLiterals,
+    PositionedPeriodicCNF.erase_anchorNormalize,
     wrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
   rfl
 
@@ -71,9 +89,12 @@ theorem
       (drawingPeriodicPlanarSATFormula formula).Satisfiable := by
   exact
     (PeriodicCNF.deduplicate_satisfiable_iff
-      (wrappedDrawingPeriodicPlanarSATFormula formula)).trans
+      (wrappedDrawingPeriodicPlanarSATFormula
+        formula).anchorNormalize).trans
+      ((PeriodicCNF.anchorNormalize_satisfiable_iff
+        (wrappedDrawingPeriodicPlanarSATFormula formula)).trans
         (wrappedDrawingPeriodicPlanarSATFormula_satisfiable_iff
-          formula)
+          formula))
 
 /-- The deduplicated wrapped source retains every routed clause-width
 bound. -/
@@ -88,9 +109,11 @@ theorem
       formula).WidthAtMost width := by
   apply
     ((PeriodicCNF.deduplicate_widthAtMost_iff
-      (wrappedDrawingPeriodicPlanarSATFormula formula) width).mpr)
-  apply wrapPeriodicPlanarSATFormula_widthAtMost
-  exact bounded
+      (wrappedDrawingPeriodicPlanarSATFormula
+        formula).anchorNormalize width).mpr)
+  apply PeriodicCNF.anchorNormalize_widthAtMost
+  exact wrapPeriodicPlanarSATFormula_widthAtMost
+    (drawingPeriodicPlanarSATFormula formula) width bounded
 
 end PeriodicOrthocrossing
 end LeanTrominoes

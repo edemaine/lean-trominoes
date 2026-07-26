@@ -1,4 +1,5 @@
 import LeanTrominoes.PositionedPeriodicCNFDeduplication
+import LeanTrominoes.PositionedPeriodicCNFAnchorNormalization
 import LeanTrominoes.PositionedPeriodicCNFIncidenceRouteLookup
 
 /-!
@@ -167,6 +168,99 @@ theorem normalizeIncidenceRoute_getLast?
     PeriodicVariablePlacement.translation,
     Cell.add, Cell.sub, Cell.scale] <;>
   ring
+
+/-- Normalize every raw physical route by the anchor of the source clause at
+the same index.  This is the route family naturally indexed by the
+anchor-normalized positioned formula. -/
+def anchorNormalizedIncidenceRoutes
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes) : IncidenceRoutes :=
+  fun clauseIndex literalIndex =>
+    match source.clauses[clauseIndex]? with
+    | none => []
+    | some clause =>
+        normalizeIncidenceRoute placement clause
+          (routes clauseIndex literalIndex)
+
+/-- Normalizing both a positioned formula and its raw route family preserves
+the physical endpoint condition. -/
+theorem anchorNormalizedIncidenceRoutes_physicalRoutesMatch
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (routesMatch :
+      source.PhysicalIncidenceRoutesMatch placement routes) :
+    (source.anchorNormalize placement).PhysicalIncidenceRoutesMatch
+      placement
+      (source.anchorNormalizedIncidenceRoutes placement routes) := by
+  intro normalizedClause clauseIndex normalizedClauseMember
+    normalizedLiteral literalIndex normalizedLiteralMember
+  change
+    (normalizedClause, clauseIndex) ∈
+      (source.clauses.map fun clause =>
+        ⟨canonicalClausePosition placement clause,
+          clause.literals.anchorNormalize⟩).zipIdx
+    at normalizedClauseMember
+  rw [List.zipIdx_map] at normalizedClauseMember
+  rcases List.mem_map.mp normalizedClauseMember with
+    ⟨taggedClause, taggedClauseMember, normalizedClauseEqual⟩
+  have clauseIndexEqual :
+      taggedClause.2 = clauseIndex :=
+    congrArg Prod.snd normalizedClauseEqual
+  have normalizedClauseValueEqual :
+      normalizedClause =
+        ⟨canonicalClausePosition placement taggedClause.1,
+          taggedClause.1.literals.anchorNormalize⟩ := by
+    exact (congrArg Prod.fst normalizedClauseEqual).symm
+  subst clauseIndex
+  subst normalizedClause
+  change
+    (normalizedLiteral, literalIndex) ∈
+      (taggedClause.1.literals.map
+        (PeriodicLiteral.anchorNormalize
+          (PeriodicCNF.clauseAnchor
+            taggedClause.1.literals))).zipIdx
+    at normalizedLiteralMember
+  rw [List.zipIdx_map] at normalizedLiteralMember
+  rcases List.mem_map.mp normalizedLiteralMember with
+    ⟨taggedLiteral, taggedLiteralMember,
+      normalizedLiteralEqual⟩
+  have literalIndexEqual :
+      taggedLiteral.2 = literalIndex :=
+    congrArg Prod.snd normalizedLiteralEqual
+  have normalizedLiteralValueEqual :
+      normalizedLiteral =
+        taggedLiteral.1.anchorNormalize
+          (PeriodicCNF.clauseAnchor
+            taggedClause.1.literals) := by
+    exact (congrArg Prod.fst normalizedLiteralEqual).symm
+  subst literalIndex
+  subst normalizedLiteral
+  have sourceClauseLookup :
+      source.clauses[taggedClause.2]? =
+        some taggedClause.1 :=
+    (List.mem_zipIdx_iff_getElem?).mp taggedClauseMember
+  have rawEndpoints :=
+    routesMatch taggedClause.1 taggedClause.2
+      taggedClauseMember taggedLiteral.1 taggedLiteral.2
+      taggedLiteralMember
+  constructor
+  · simpa [anchorNormalizedIncidenceRoutes,
+      sourceClauseLookup] using
+        normalizeIncidenceRoute_head?
+          placement taggedClause.1
+          (routes taggedClause.2 taggedLiteral.2)
+          rawEndpoints.1
+  · simpa [anchorNormalizedIncidenceRoutes,
+      sourceClauseLookup,
+      PeriodicVariablePlacement.literalPosition] using
+        normalizeIncidenceRoute_getLast?
+          placement taggedClause.1 taggedLiteral.1
+          (routes taggedClause.2 taggedLiteral.2)
+          rawEndpoints.2
 
 /-- The first source clause carrying a given erased literal list. -/
 def representativeClauseIndex

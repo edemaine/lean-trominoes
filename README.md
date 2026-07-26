@@ -398,16 +398,20 @@ The representation choices for this target are:
   transfer.
   [`LeanTrominoes/PositionedPeriodicCNFDeduplicationRoutes.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationRoutes.lean)
   transports finite geometric incidence routes through that changed clause
-  indexing.  Each retained clause selects its first positioned source
-  representative, reuses the matching literal route, and subtracts the
-  common clause anchor.  The transported family is proved to satisfy every
+  indexing.  It also proves that normalizing every source clause and its
+  physical routes together preserves their endpoints.  Each retained clause
+  then selects its first anchor-normalized representative and reuses the
+  matching literal route.  The transported family is proved to satisfy every
   periodic incidence endpoint, and compatibility is reduced to finite
   distinctness and fundamental-square bounds for the retained vertices.
   [`LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean`](LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean)
-  specializes that normalization to the routed SAT block, wraps its variables,
-  and proves that the resulting positioned source remains equisatisfiable
-  with the full routed periodic formula and retains its width bound.  This is
-  the finite clause-vertex set used by the geometry-ordered pipeline.
+  first puts every routed clause orbit in its canonical anchor gauge, then
+  removes exact duplicates and wraps its variables.  Normalizing before
+  deduplication ensures that uniformly translated finite clauses select one
+  periodic representative.  The resulting positioned source remains
+  equisatisfiable with the full routed periodic formula and retains its width
+  bound; it is the finite clause-vertex set used by the geometry-ordered
+  pipeline.
   [`LeanTrominoes/PeriodicCNFPlanarSATIncidenceRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarSATIncidenceRoutes.lean)
   reduces the routed SAT block's periodic endpoint proof to a finite physical
   obligation: connect each displayed clause to the displayed position of each

@@ -195,6 +195,20 @@ theorem anchorNormalize_satisfiable_iff
         (formula.anchorNormalize_satisfies_iff assignment).mpr
           satisfies⟩
 
+/-- Subtracting a common anchor preserves every clause-width bound. -/
+theorem anchorNormalize_widthAtMost
+    {Variable : Type*}
+    (formula : PeriodicCNF Variable)
+    (width : Nat)
+    (bounded : formula.WidthAtMost width) :
+    formula.anchorNormalize.WidthAtMost width := by
+  intro normalizedClause normalizedClauseMem
+  rcases List.mem_map.mp normalizedClauseMem with
+    ⟨clause, clauseMem, normalizedClauseEq⟩
+  subst normalizedClause
+  simpa [PeriodicClause.WidthAtMost] using
+    bounded clause clauseMem
+
 end PeriodicCNF
 
 namespace PositionedPeriodicCNF
