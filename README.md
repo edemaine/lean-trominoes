@@ -1525,6 +1525,12 @@ The representation choices for this target are:
   arbitrary colors.  Separate singleton/long and singleton/singleton cases
   make the specialization unconditional: the colored cores of any two
   unequal active occurrences strictly avoid one another.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouteSeparation.lean)
+  packages the remaining endpoint geometry without asserting it prematurely.
+  Core-versus-core separation is unconditional for every pair of distinct
+  colored strands; five endpoint-containing pair types form the exact local
+  interface still to prove.  Once supplied, strict separation composes across
+  both endpoint joins to separate the complete corrected routes.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean)
   lifts the closed-block bound from individual ribbon tiles to recursively
   assembled corridor cores.  Every listed core point is assigned to the
