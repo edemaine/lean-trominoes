@@ -1510,7 +1510,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PlanarThreeDMConnectorDrawings.lean`](LeanTrominoes/PlanarThreeDMConnectorDrawings.lean)
   supplies explicit orthogonal routes for both ordinary occurrence modules
   and the fixed-red detour.  Finite computation verifies every advertised
-  endpoint and proves all three connector drawings continuously planar.
+  endpoint and proves all three connector drawings continuously planar.  A
+  second family of outer-face templates exposes all five degree-one ports and
+  puts the two polarity-normalized cycle ports at the common coordinates
+  `(4, 0)` and `(12, 0)`.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
@@ -1682,7 +1685,8 @@ The representation choices for this target are:
   endpoints; clause ports are additionally identified with their assembled
   typed element positions.  Polarity-normalized occurrence templates are
   also certified: their two red continuations are proved to reference the
-  current and successor cycle links in one fixed geometric order.
+  current and successor cycle links in one fixed geometric order, using the
+  common outer-face boundary coordinates of all three connector kinds.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports

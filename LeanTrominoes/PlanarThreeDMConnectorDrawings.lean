@@ -28,6 +28,10 @@ def rotateClockwise (point : Cell) : Cell :=
 def reflectAcrossHorizontal (axis : Int) (point : Cell) : Cell :=
   (point.1, 2 * axis - point.2)
 
+/-- Reflection across the vertical line with the given abscissa. -/
+def reflectAcrossVertical (axis : Int) (point : Cell) : Cell :=
+  (2 * axis - point.1, point.2)
+
 namespace VariableOccurrence
 
 /-- A direct one-segment route. -/
@@ -135,6 +139,97 @@ ordinary-module drawing certificate. -/
 theorem orientedDrawing_isValid
     (variant : VariableOccurrenceVariant) (polarity : Bool) :
     (orientedDrawing variant polarity).IsValid := by
+  cases variant <;> cases polarity <;> native_decide
+
+/-! ## Outer-face boundary template -/
+
+/-- Triple positions in a path-shaped outer-face embedding of the ordinary
+module. -/
+def boundaryTriplePosition : VariableOccurrenceTriple → Cell
+  | .first => (4, 4)
+  | .second => (12, 4)
+  | .auxiliary => (20, 4)
+
+/-- Element positions in the outer-face embedding.  The fixed connector
+color is the lower leaf of the first triple; the other two connector colors
+are the upper and lower leaves of the auxiliary triple. -/
+def boundaryElementPosition
+    (variant : VariableOccurrenceVariant) :
+    VariableOccurrenceElement → Cell
+  | .leftContinuation => (4, 0)
+  | .rightContinuation => (12, 0)
+  | .cycleShared => (8, 4)
+  | .auxiliaryShared => (16, 4)
+  | .connectorRed => (20, 0)
+  | .connectorGreen =>
+      if variant = .fixedGreen then (4, 8) else (20, 8)
+  | .connectorBlue =>
+      if variant = .fixedBlue then (4, 8) else (20, 8)
+
+/-- Every incidence of the path-shaped embedding is a direct segment. -/
+def boundaryRoute (variant : VariableOccurrenceVariant)
+    (triple : VariableOccurrenceTriple)
+    (color : WireColor) : List Cell :=
+  directRoute (boundaryTriplePosition triple)
+    (boundaryElementPosition variant (reference variant triple color))
+
+/-- Outer-face local drawing with all five degree-one ports exposed. -/
+def boundaryDrawing (variant : VariableOccurrenceVariant) :
+    LocalIncidenceDrawing
+      VariableOccurrenceTriple VariableOccurrenceElement where
+  triplePosition := boundaryTriplePosition
+  elementPosition := boundaryElementPosition variant
+  reference := reference variant
+  route := boundaryRoute variant
+
+/-- Both outer-face ordinary templates are valid. -/
+theorem boundaryDrawing_isValid
+    (variant : VariableOccurrenceVariant) :
+    (boundaryDrawing variant).IsValid := by
+  cases variant <;> native_decide
+
+/-- Reflect a negative occurrence so the continuation for the current slot
+is always the left boundary port. -/
+def orientedBoundaryDrawing
+    (variant : VariableOccurrenceVariant) (polarity : Bool) :
+    LocalIncidenceDrawing
+      VariableOccurrenceTriple VariableOccurrenceElement :=
+  if polarity then
+    boundaryDrawing variant
+  else
+    (boundaryDrawing variant).mapPoints (reflectAcrossVertical 8)
+
+@[simp]
+theorem orientedBoundaryDrawing_reference
+    (variant : VariableOccurrenceVariant) (polarity : Bool)
+    (triple : VariableOccurrenceTriple) (color : WireColor) :
+    (orientedBoundaryDrawing variant polarity).reference triple color =
+      reference variant triple color := by
+  cases polarity <;> rfl
+
+@[simp]
+theorem orientedBoundaryDrawing_slotContinuationPosition
+    (variant : VariableOccurrenceVariant) (polarity : Bool) :
+    (orientedBoundaryDrawing variant polarity).elementPosition
+        (reference variant
+          (slotContinuationTriple polarity) .red) =
+      (4, 0) := by
+  cases variant <;> cases polarity <;> native_decide
+
+@[simp]
+theorem orientedBoundaryDrawing_nextContinuationPosition
+    (variant : VariableOccurrenceVariant) (polarity : Bool) :
+    (orientedBoundaryDrawing variant polarity).elementPosition
+        (reference variant
+          (nextContinuationTriple polarity) .red) =
+      (12, 0) := by
+  cases variant <;> cases polarity <;> native_decide
+
+/-- The standardized outer-face ordinary template remains valid for either
+polarity. -/
+theorem orientedBoundaryDrawing_isValid
+    (variant : VariableOccurrenceVariant) (polarity : Bool) :
+    (orientedBoundaryDrawing variant polarity).IsValid := by
   cases variant <;> cases polarity <;> native_decide
 
 end VariableOccurrence
@@ -263,6 +358,59 @@ theorem orientedDrawing_nextContinuationPosition
 orthogonal drawing. -/
 theorem orientedDrawing_isValid (polarity : Bool) :
     (orientedDrawing polarity).IsValid := by
+  cases polarity <;> native_decide
+
+/-! ## Standardized outer-face boundary template -/
+
+/-- Stretch and translate the rotated fixed-red module so its two cycle
+ports agree with the ordinary template's standard points. -/
+def normalizeFixedRedBoundary (point : Cell) : Cell :=
+  (2 * point.1 + 4, point.2 - 2)
+
+/-- Rotate the fixed-red module to put its continuation ports on top,
+reflect positive polarity to put the current slot first, and normalize their
+spacing to `(4, 0)` and `(12, 0)`. -/
+def boundaryDrawing (polarity : Bool) :
+    LocalIncidenceDrawing
+      FixedRedConnectorTriple FixedRedConnectorElement :=
+  let rotated := drawing.mapPoints rotateClockwise
+  let oriented :=
+    if polarity then
+      rotated.mapPoints (reflectAcrossVertical 2)
+    else
+      rotated
+  oriented.mapPoints normalizeFixedRedBoundary
+
+@[simp]
+theorem boundaryDrawing_reference
+    (polarity : Bool) (triple : FixedRedConnectorTriple)
+    (color : WireColor) :
+    (boundaryDrawing polarity).reference triple color =
+      reference triple color := by
+  cases polarity <;> rfl
+
+@[simp]
+theorem boundaryDrawing_slotContinuationPosition
+    (polarity : Bool) :
+    (boundaryDrawing polarity).elementPosition
+        (reference
+          (slotContinuationTriple polarity) .red) =
+      (4, 0) := by
+  cases polarity <;> native_decide
+
+@[simp]
+theorem boundaryDrawing_nextContinuationPosition
+    (polarity : Bool) :
+    (boundaryDrawing polarity).elementPosition
+        (reference
+          (nextContinuationTriple polarity) .red) =
+      (12, 0) := by
+  cases polarity <;> native_decide
+
+/-- The standardized fixed-red boundary template is valid for either
+polarity. -/
+theorem boundaryDrawing_isValid (polarity : Bool) :
+    (boundaryDrawing polarity).IsValid := by
   cases polarity <;> native_decide
 
 end FixedRedConnector
