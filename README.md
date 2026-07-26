@@ -1412,6 +1412,13 @@ The representation choices for this target are:
   follow the three-point corner rectangle.  Exhaustive checks over all legal
   direction and color cases prove each standard lane simple and every pair
   of red, green, and blue lanes continuously separated.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells.lean)
+  converts that kernel into half-edge tiles for the actual 128-fold
+  refinement.  A tile occupies the 64 units on either side of its source
+  lattice point; neighboring translated tiles are proved to assign exactly
+  the same point to their shared boundary.  Every legal translated tile is
+  rectilinear and simple, and its three colored lanes are pairwise
+  continuously separated.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
