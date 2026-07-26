@@ -374,6 +374,13 @@ The representation choices for this target are:
   logical anchor offsets, with checked cancellation lemmas showing that each
   translated occurrence lands at its declared local gadget vertex.  Explicit
   noncrossing incidence routes remain for the subsequent geometric layer.
+  [`LeanTrominoes/PeriodicCNFPlanarSATGeometry.lean`](LeanTrominoes/PeriodicCNFPlanarSATGeometry.lean)
+  connects the finite routed block to that periodic placement.  It proves
+  that removing a neighboring translate from a finite variable name and
+  storing it as a literal offset preserves the physical vertex exactly.
+  Subtracting a clause's common anchor from a finite incidence polyline then
+  produces the canonical periodic clause and translated-variable endpoints
+  required by the incidence graph.
   [`LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean)
   defines that layer's exact certificate: one polyline per literal in the
   incidence graph's presentation order, compatible variable-then-clause
