@@ -512,6 +512,14 @@ The representation choices for this target are:
   avoidance of route interiors by graph vertices.  Continuous separation
   also rules out contacts at newly introduced intermediate grid points, so
   continuous planarity is preserved as a whole.
+  [`LeanTrominoes/PositionedPeriodicCNFScaling.lean`](LeanTrominoes/PositionedPeriodicCNFScaling.lean)
+  lifts that refinement operation to positioned clauses, variable
+  placements, and clause-major incidence routes.  It proves that logical
+  literals and their periodic offsets are unchanged, while every physical
+  clause vertex, variable vertex, literal endpoint, route point, and period
+  scales uniformly.  Assembling the scaled data is exactly whole-drawing
+  scaling, so every continuously planar incidence presentation transports
+  directly to the refined coordinates needed for bounded-degree local fans.
   [`LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean)
   makes that extra condition executable.  An interval-overlap bound reduces
   every possible continuous contact to the same nine neighboring periodic
