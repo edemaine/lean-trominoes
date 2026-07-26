@@ -1649,6 +1649,13 @@ The representation choices for this target are:
   geometric assembly.  It packages well-formedness, colored degree two or
   three, perfect-matching and graph-orientation equivalence to the original
   exact-one source, and the transported routed incidence presentation.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRoutedTriples.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRoutedTriples.lean)
+  identifies, for every used occurrence slot and color, the unique typed
+  triple whose terminal incidence leaves the variable gadget.  It proves
+  membership and stable natural-number indices, the exact encoded terminal
+  reference and reversed offset, correspondence with flattened CNF incidence
+  metadata, and recovers the certified route and its two endpoints for every
+  occurrence entry.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
