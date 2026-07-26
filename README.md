@@ -538,6 +538,11 @@ The representation choices for this target are:
   independently for each local prefix, corridor, and suffix.  Conversely,
   endpoint bounds control every point of any nondegenerate stored route,
   which is the form needed when refining a certified source drawing.
+  [`LeanTrominoes/PeriodicGridDrawingExpandedBounds.lean`](LeanTrominoes/PeriodicGridDrawingExpandedBounds.lean)
+  replaces the unusably strict fundamental-square endpoint hypothesis by the
+  natural one-cell halo `(-P,2P)²`.  It proves that any contact between two
+  halo-bounded route occurrences has relative translation in an explicit
+  `5 × 5` set, accommodating genuine nonzero-offset periodic edges.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
