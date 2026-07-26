@@ -583,6 +583,12 @@ The representation choices for this target are:
   nondegenerate orthogonal routes are proved to have disjoint segment
   interiors, symmetric point/interior avoidance, and endpoint-only listed
   contacts after applying their independent period translations.
+  [`LeanTrominoes/PeriodicGridDrawingRouteSimplicity.lean`](LeanTrominoes/PeriodicGridDrawingRouteSimplicity.lean)
+  extracts the corresponding one-route invariant.  A stored orthogonal route
+  with distinct advertised endpoints is proved duplicate-free, disjoint from
+  its own segment interiors at every listed point, and free of intersections
+  between distinct segment interiors; together these are the finite
+  `RouteIsSimple` certificate needed by unit subdivision.
   [`LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean`](LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean)
   proves that this finite separation certificate is preserved when both
   routes are traversed in reverse, as required by variable-to-clause routing.
