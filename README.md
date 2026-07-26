@@ -512,6 +512,12 @@ The representation choices for this target are:
   avoidance of route interiors by graph vertices.  Continuous separation
   also rules out contacts at newly introduced intermediate grid points, so
   continuous planarity is preserved as a whole.
+  [`LeanTrominoes/PeriodicMacrocellGeometry.lean`](LeanTrominoes/PeriodicMacrocellGeometry.lean)
+  records the arithmetic for placing bounded local gadgets inside a uniform
+  periodic refinement.  Open offsets stay inside the enlarged fundamental
+  square, and equality of two refined points recovers both their source
+  lattice cells and local offsets; in particular, gadgets based at distinct
+  source vertices cannot collide.
   [`LeanTrominoes/PositionedPeriodicCNFScaling.lean`](LeanTrominoes/PositionedPeriodicCNFScaling.lean)
   lifts that refinement operation to positioned clauses, variable
   placements, and clause-major incidence routes.  It proves that logical
