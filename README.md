@@ -1421,6 +1421,12 @@ The representation choices for this target are:
   normalization and deduplication.  It exposes an equivalent unwrapped
   deduplicated formula for the remaining occurrence accounting, together
   with exact equality of every wrapped and unwrapped variable count.
+- [`LeanTrominoes/PeriodicCNFPlanarNormalizationComponents.lean`](LeanTrominoes/PeriodicCNFPlanarNormalizationComponents.lean)
+  decomposes the anchor-normalized drawing exactly into crossover,
+  straight-carrier, bend, routed-clause, and variable-arm families.  A
+  general list lemma then shows that global clause deduplication can only
+  reduce occurrences relative to deduplicating these five components
+  separately, providing the bridge from local bounds to the actual formula.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
