@@ -583,6 +583,9 @@ The representation choices for this target are:
   nondegenerate orthogonal routes are proved to have disjoint segment
   interiors, symmetric point/interior avoidance, and endpoint-only listed
   contacts after applying their independent period translations.
+  [`LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean`](LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean)
+  proves that this finite separation certificate is preserved when both
+  routes are traversed in reverse, as required by variable-to-clause routing.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
