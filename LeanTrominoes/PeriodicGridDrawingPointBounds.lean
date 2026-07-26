@@ -89,6 +89,21 @@ theorem mem_joinAtEndpoint
   · exact Or.inl member
   · exact Or.inr (List.mem_of_mem_tail member)
 
+/-- A point returned by optional last-element lookup belongs to the list. -/
+theorem mem_of_getLast?_eq_some
+    {α : Type*} {values : List α} {value : α}
+    (lookup : values.getLast? = some value) :
+    value ∈ values := by
+  have nonempty : values ≠ [] := by
+    intro empty
+    subst values
+    simp at lookup
+  have lastEqual : values.getLast nonempty = value := by
+    rw [List.getLast?_eq_getLast_of_ne_nil nonempty] at lookup
+    exact Option.some.inj lookup
+  rw [← lastEqual]
+  exact List.getLast_mem nonempty
+
 namespace PeriodicGridDrawing
 
 /-- Pointwise version of the route-coordinate hypothesis used by the finite

@@ -26,12 +26,58 @@ def PositionInExpandedSquare
     -(drawing.gridSize : Int) < position.2 ∧
     position.2 < 2 * drawing.gridSize
 
+/-- A halo point with one additional unit of room below the upper boundary
+in each coordinate.  This is the exact margin needed by the canonical
+`max + 1` Manhattan detour. -/
+def PositionInExpandedSquareWithUpperMargin
+    (drawing : PeriodicGridDrawing) (position : Cell) : Prop :=
+  -(drawing.gridSize : Int) < position.1 ∧
+    position.1 + 1 < 2 * drawing.gridSize ∧
+    -(drawing.gridSize : Int) < position.2 ∧
+    position.2 + 1 < 2 * drawing.gridSize
+
+/-- Forgetting the extra unit of upper margin recovers ordinary halo
+membership. -/
+theorem positionInExpandedSquare_of_upperMargin
+    {drawing : PeriodicGridDrawing} {position : Cell}
+    (inside :
+      drawing.PositionInExpandedSquareWithUpperMargin position) :
+    drawing.PositionInExpandedSquare position := by
+  simp only [PositionInExpandedSquareWithUpperMargin] at inside
+  simp only [PositionInExpandedSquare]
+  omega
+
 /-- Every stored segment endpoint lies in the open one-cell halo. -/
 def SegmentEndpointsInExpandedSquare
     (drawing : PeriodicGridDrawing) : Prop :=
   ∀ indexed ∈ drawing.indexedSegments,
     drawing.PositionInExpandedSquare indexed.segment.start ∧
       drawing.PositionInExpandedSquare indexed.segment.finish
+
+/-- The canonical open fundamental square is contained in its one-cell
+halo. -/
+theorem positionInExpandedSquare_of_fundamental
+    {drawing : PeriodicGridDrawing} {position : Cell}
+    (inside : drawing.PositionInFundamentalSquare position) :
+    drawing.PositionInExpandedSquare position := by
+  simp only [PositionInFundamentalSquare] at inside
+  simp only [PositionInExpandedSquare]
+  have periodPositive : (0 : Int) < drawing.gridSize := by
+    exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+  omega
+
+/-- Fundamental-square points have the one-unit upper margin needed by the
+canonical detour, because the positive period leaves an entire neighboring
+cell above them. -/
+theorem positionInExpandedSquareWithUpperMargin_of_fundamental
+    {drawing : PeriodicGridDrawing} {position : Cell}
+    (inside : drawing.PositionInFundamentalSquare position) :
+    drawing.PositionInExpandedSquareWithUpperMargin position := by
+  simp only [PositionInFundamentalSquare] at inside
+  simp only [PositionInExpandedSquareWithUpperMargin]
+  have periodPositive : (0 : Int) < drawing.gridSize := by
+    exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+  omega
 
 /-- The five possible coordinates of a relative translation between two
 halo-bounded segment occurrences that meet. -/

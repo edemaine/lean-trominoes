@@ -24,6 +24,18 @@ def PositionInOpenMacrocell (factor : Nat) (position : Cell) : Prop :=
   0 < position.1 ∧ position.1 < factor ∧
     0 < position.2 ∧ position.2 < factor
 
+/-- A local coordinate lies less than one full refined cell from its
+macrocell origin in either direction.  Route bends may lie on or just outside
+the nominal local cell even when all graph vertices lie strictly inside it. -/
+def PositionInMacrocellHalo (factor : Nat) (position : Cell) : Prop :=
+  -(factor : Int) < position.1 ∧ position.1 < factor ∧
+    -(factor : Int) < position.2 ∧ position.2 < factor
+
+instance (factor : Nat) (position : Cell) :
+    Decidable (PositionInMacrocellHalo factor position) := by
+  unfold PositionInMacrocellHalo
+  infer_instance
+
 /-- Place a local point in the macrocell refining a base lattice point. -/
 def macrocellPosition
     (factor : Nat) (base offset : Cell) : Cell :=
@@ -107,6 +119,37 @@ theorem macrocellPosition_in_refined_square
   constructor
   · nlinarith [baseInside.2.2.1, offsetInside.2.2.1]
   · nlinarith [baseInside.2.2.2, offsetInside.2.2.2]
+
+/-- A halo offset over an old point strictly inside the fundamental square
+still lies strictly inside the refined square.  The integral base coordinate
+provides one complete cell of slack on every side. -/
+theorem macrocellPosition_halo_in_refined_square
+    {factor period : Nat} (factorPositive : 0 < factor)
+    {base offset : Cell}
+    (baseInside :
+      0 < base.1 ∧ base.1 < period ∧
+        0 < base.2 ∧ base.2 < period)
+    (offsetInside : PositionInMacrocellHalo factor offset) :
+    let position := macrocellPosition factor base offset
+    0 < position.1 ∧ position.1 < factor * period ∧
+      0 < position.2 ∧ position.2 < factor * period := by
+  rcases base with ⟨baseX, baseY⟩
+  rcases offset with ⟨offsetX, offsetY⟩
+  simp only [PositionInMacrocellHalo] at offsetInside
+  simp only [macrocellPosition, add, scale]
+  have factorIntPositive : (0 : Int) < factor := by
+    exact_mod_cast factorPositive
+  have baseXAtLeastOne : 1 ≤ baseX := by omega
+  have baseYAtLeastOne : 1 ≤ baseY := by omega
+  have baseXBelowLast : baseX + 1 ≤ period := by omega
+  have baseYBelowLast : baseY + 1 ≤ period := by omega
+  constructor
+  · nlinarith [offsetInside.1]
+  constructor
+  · nlinarith [offsetInside.2.1]
+  constructor
+  · nlinarith [offsetInside.2.2.1]
+  · nlinarith [offsetInside.2.2.2]
 
 end Cell
 

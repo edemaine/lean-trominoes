@@ -700,6 +700,50 @@ theorem standardMacrocellPosition_inside
       presentation anchorsZero owner declared)
     offsetInside
 
+/-- The same refined-square conclusion holds for route points lying within
+one complete cell of their owner origin.  This permits local routes to touch
+or pass just outside a gadget's nominal open macrocell. -/
+theorem standardMacrocellHaloPosition_inside
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (owner : AssemblyMacrocellOwner Variable)
+    (declared : owner.IsDeclared source.erase)
+    (offset : Cell)
+    (offsetInside :
+      Cell.PositionInMacrocellHalo
+        standardThreeStrandLayout.factor offset) :
+    PeriodicGridDrawing.PositionInFundamentalSquare
+      (assembledDrawing
+        (constructedThreeStrandRouting
+          presentation standardThreeStrandLayout))
+        (Cell.macrocellPosition
+          standardThreeStrandLayout.factor
+          (assemblyMacrocellOwnerPosition
+            source placement owner)
+          offset) := by
+  rw [PeriodicGridDrawing.PositionInFundamentalSquare,
+    assembledDrawing_gridSize]
+  change
+    let position :=
+      Cell.macrocellPosition
+        standardThreeStrandLayout.factor
+        (assemblyMacrocellOwnerPosition source placement owner)
+        offset
+    0 < position.1 ∧
+      position.1 <
+        standardThreeStrandLayout.factor * placement.period ∧
+      0 < position.2 ∧
+      position.2 <
+        standardThreeStrandLayout.factor * placement.period
+  exact Cell.macrocellPosition_halo_in_refined_square
+    standardThreeStrandLayout.factorPositive
+    (assemblyMacrocellOwnerPosition_inside
+      presentation anchorsZero owner declared)
+    offsetInside
+
 /-- All vertex positions in the standard assembled drawing lie inside its
 fundamental square. -/
 theorem standardAssembledVertexPositions_inside

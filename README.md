@@ -2039,10 +2039,12 @@ The representation choices for this target are:
   therefore prove, unconditionally, that all assembled vertices remain
   strictly inside the refined fundamental square.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRouteBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRouteBounds.lean)
-  starts the corresponding route-coordinate proof.  Pointwise halo bounds on
-  a reversed-and-rebased source incidence imply halo bounds on all three
-  refined central RGB lanes: the standard offsets fit in the strict slack
-  created by the `128`-fold refinement.
+  completes the corresponding route-coordinate proof.  Exhaustive checks
+  bound every finite variable-site and clause-core route, while pointwise
+  bounds on a reversed-and-rebased source incidence control all three refined
+  RGB lanes.  One-unit upper margins handle the canonical endpoint detours,
+  and the bounds lift through every splice and encoded incidence to prove the
+  assembled drawing's indexed segment endpoints lie in the one-cell halo.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteElements.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteElements.lean)
   identifies every listed typed red, green, and blue variable-side element
   with an active element of the exhaustively checked complete variable-site
