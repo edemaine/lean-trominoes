@@ -1430,10 +1430,12 @@ The representation choices for this target are:
   half-span 64 around its 128-refined source center.  Tiles whose source
   centers differ by at least two lattice units in either coordinate cannot
   share points, contain each other's points in segment interiors, or have
-  meeting segment interiors.  One certified finite check covers all 5,184
-  pairs of legal tiles in neighboring macrocells, and translation lifts it
-  to arbitrary source centers.  Thus only equal-center contacts remain in
-  the global corridor-planarity proof.
+  meeting segment interiors.  One certified finite check covers all 10,368
+  pairs of legal tiles at the eight nonzero offsets in the surrounding
+  `3 × 3` block, and translation lifts it to arbitrary source centers.  An
+  exact equal/far/adjacent trichotomy then proves complete separation for
+  any legal tiles with distinct centers.  Thus only equal-center contacts
+  remain in the global corridor-planarity proof.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
   recursively joins those half-edge tiles along a unit-step source route.
   Under the explicit no-immediate-reversal condition, the assembled core is

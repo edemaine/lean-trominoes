@@ -1,3 +1,4 @@
+import LeanTrominoes.PeriodicGridDrawingPointBounds
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells
 
 /-!
@@ -6,8 +7,9 @@ import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells
 Every half-edge ribbon tile lies in the closed square of half-span `64`
 around its `128`-refined source lattice point.  Consequently tiles whose
 source centers differ by at least two in either lattice coordinate cannot
-meet at all.  This isolates the remaining global corridor-planarity proof
-to equal or neighboring source macrocells.
+meet at all.  An exhaustive certificate covers the eight remaining
+nonzero offsets, so any legal tiles with distinct source centers satisfy
+complete continuous route separation.
 -/
 
 namespace LeanTrominoes
@@ -128,6 +130,73 @@ instance (first second : Cell) :
   unfold RibbonMacrocellCentersFar
   infer_instance
 
+/-- Being separated by at least two lattice units is symmetric. -/
+theorem RibbonMacrocellCentersFar.symm
+    {first second : Cell}
+    (far : RibbonMacrocellCentersFar first second) :
+    RibbonMacrocellCentersFar second first := by
+  rcases far with horizontalForward | horizontalBackward |
+      verticalForward | verticalBackward
+  · exact Or.inr (Or.inl horizontalForward)
+  · exact Or.inl horizontalBackward
+  · exact Or.inr (Or.inr (Or.inr verticalForward))
+  · exact Or.inr (Or.inr (Or.inl verticalBackward))
+
+/-- A nonzero source offset in the surrounding `3 × 3` block. -/
+def RibbonMacrocellOffsetAdjacent (offset : Cell) : Prop :=
+  -1 ≤ offset.1 ∧ offset.1 ≤ 1 ∧
+    -1 ≤ offset.2 ∧ offset.2 ≤ 1 ∧
+    offset ≠ (0, 0)
+
+instance (offset : Cell) :
+    Decidable (RibbonMacrocellOffsetAdjacent offset) := by
+  unfold RibbonMacrocellOffsetAdjacent
+  infer_instance
+
+/-- Two distinct source centers in the same surrounding `3 × 3` block. -/
+def RibbonMacrocellCentersAdjacent
+    (first second : Cell) : Prop :=
+  RibbonMacrocellOffsetAdjacent (Cell.sub second first)
+
+instance (first second : Cell) :
+    Decidable (RibbonMacrocellCentersAdjacent first second) := by
+  unfold RibbonMacrocellCentersAdjacent
+  infer_instance
+
+/-- Any two source centers are equal, far enough for the bounding-box
+argument, or one of the eight adjacent pairs. -/
+theorem ribbonMacrocellCenters_eq_or_far_or_adjacent
+    (first second : Cell) :
+    first = second ∨ RibbonMacrocellCentersFar first second ∨
+      RibbonMacrocellCentersAdjacent first second := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  by_cases equal :
+      (firstX, firstY) = (secondX, secondY)
+  · exact Or.inl equal
+  · right
+    by_cases far :
+        RibbonMacrocellCentersFar
+          (firstX, firstY) (secondX, secondY)
+    · exact Or.inl far
+    · right
+      unfold RibbonMacrocellCentersAdjacent
+        RibbonMacrocellOffsetAdjacent
+      simp only [Cell.sub]
+      refine ⟨by
+        unfold RibbonMacrocellCentersFar at far
+        omega, by
+        unfold RibbonMacrocellCentersFar at far
+        omega, by
+        unfold RibbonMacrocellCentersFar at far
+        omega, by
+        unfold RibbonMacrocellCentersFar at far
+        omega, ?_⟩
+      intro zero
+      apply equal
+      simp only [Prod.mk.injEq] at zero ⊢
+      omega
+
 /-- Closed ribbon macrocells with non-neighboring centers have no common
 point. -/
 theorem ne_of_inRibbonMacrocells_of_centersFar
@@ -215,15 +284,130 @@ theorem not_interiorsMeet_of_inRibbonMacrocells_of_centersFar
     simp_all [min_def, max_def] <;>
     omega
 
-/-- The four genuine directions, used to package finite geometry checks. -/
-private def genuineAxisDirections : List AxisDirection :=
-  [.east, .north, .west, .south]
+/-- Legal ribbon tiles in far source macrocells satisfy the complete
+continuous route-separation predicate. -/
+theorem farRibbonMacrocellRoutes_avoidEachOther
+    {firstCenter secondCenter : Cell}
+    (far :
+      RibbonMacrocellCentersFar firstCenter secondCenter)
+    (firstIncoming firstOutgoing
+      secondIncoming secondOutgoing : AxisDirection)
+    (firstColor secondColor : Gadget.WireColor) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (ribbonMacrocellRoute firstCenter
+        firstIncoming firstOutgoing firstColor)
+      (ribbonMacrocellRoute secondCenter
+        secondIncoming secondOutgoing secondColor) := by
+  unfold
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro firstIndex secondIndex
+    have firstMember :=
+      List.get_mem
+        (gridPolylineSegments
+          (ribbonMacrocellRoute firstCenter
+            firstIncoming firstOutgoing firstColor))
+        firstIndex
+    have secondMember :=
+      List.get_mem
+        (gridPolylineSegments
+          (ribbonMacrocellRoute secondCenter
+            secondIncoming secondOutgoing secondColor))
+        secondIndex
+    have firstEndpoints :=
+      gridPolylineSegments_endpoints_mem firstMember
+    have secondEndpoints :=
+      gridPolylineSegments_endpoints_mem secondMember
+    exact
+      not_interiorsMeet_of_inRibbonMacrocells_of_centersFar
+        (ribbonMacrocellRoute_points_bounded
+          firstCenter firstIncoming firstOutgoing firstColor
+          _ firstEndpoints.1)
+        (ribbonMacrocellRoute_points_bounded
+          firstCenter firstIncoming firstOutgoing firstColor
+          _ firstEndpoints.2)
+        (ribbonMacrocellRoute_points_bounded
+          secondCenter secondIncoming secondOutgoing secondColor
+          _ secondEndpoints.1)
+        (ribbonMacrocellRoute_points_bounded
+          secondCenter secondIncoming secondOutgoing secondColor
+          _ secondEndpoints.2)
+        far
+  · intro pointIndex segmentIndex
+    have segmentMember :=
+      List.get_mem
+        (gridPolylineSegments
+          (ribbonMacrocellRoute secondCenter
+            secondIncoming secondOutgoing secondColor))
+        segmentIndex
+    have segmentEndpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    exact
+      not_interiorContains_of_inRibbonMacrocells_of_centersFar
+        (ribbonMacrocellRoute_points_bounded
+          firstCenter firstIncoming firstOutgoing firstColor
+          _ (List.get_mem _ pointIndex))
+        (ribbonMacrocellRoute_points_bounded
+          secondCenter secondIncoming secondOutgoing secondColor
+          _ segmentEndpoints.1)
+        (ribbonMacrocellRoute_points_bounded
+          secondCenter secondIncoming secondOutgoing secondColor
+          _ segmentEndpoints.2)
+        far
+  · intro pointIndex segmentIndex
+    have segmentMember :=
+      List.get_mem
+        (gridPolylineSegments
+          (ribbonMacrocellRoute firstCenter
+            firstIncoming firstOutgoing firstColor))
+        segmentIndex
+    have segmentEndpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    exact
+      not_interiorContains_of_inRibbonMacrocells_of_centersFar
+        (ribbonMacrocellRoute_points_bounded
+          secondCenter secondIncoming secondOutgoing secondColor
+          _ (List.get_mem _ pointIndex))
+        (ribbonMacrocellRoute_points_bounded
+          firstCenter firstIncoming firstOutgoing firstColor
+          _ segmentEndpoints.1)
+        (ribbonMacrocellRoute_points_bounded
+          firstCenter firstIncoming firstOutgoing firstColor
+          _ segmentEndpoints.2)
+        far.symm
+  · intro firstPointIndex secondPointIndex equal
+    exact
+      (ne_of_inRibbonMacrocells_of_centersFar
+        (ribbonMacrocellRoute_points_bounded
+          firstCenter firstIncoming firstOutgoing firstColor
+          _ (List.get_mem _ firstPointIndex))
+        (ribbonMacrocellRoute_points_bounded
+          secondCenter secondIncoming secondOutgoing secondColor
+          _ (List.get_mem _ secondPointIndex))
+        far equal).elim
 
-private theorem mem_genuineAxisDirections_iff
-    (direction : AxisDirection) :
-    direction ∈ genuineAxisDirections ↔ direction.IsGenuine := by
+/-- The eight nonzero offsets in the surrounding `3 × 3` block. -/
+private def adjacentRibbonMacrocellOffsets : List Cell :=
+  [(-1, -1), (-1, 0), (-1, 1), (0, -1),
+    (0, 1), (1, -1), (1, 0), (1, 1)]
+
+private theorem mem_adjacentRibbonMacrocellOffsets_iff
+    (offset : Cell) :
+    offset ∈ adjacentRibbonMacrocellOffsets ↔
+      RibbonMacrocellOffsetAdjacent offset := by
+  rcases offset with ⟨offsetX, offsetY⟩
+  simp [adjacentRibbonMacrocellOffsets,
+    RibbonMacrocellOffsetAdjacent]
+  omega
+
+/-- A genuine cardinal step is one of the eight adjacent offsets. -/
+theorem ribbonMacrocellOffsetAdjacent_step
+    {direction : AxisDirection}
+    (genuine : direction.IsGenuine) :
+    RibbonMacrocellOffsetAdjacent direction.step := by
   cases direction <;>
-    decide
+    simp_all [AxisDirection.IsGenuine,
+      AxisDirection.step, RibbonMacrocellOffsetAdjacent]
 
 /-- The twelve genuine, nonreversing incoming/outgoing direction pairs. -/
 private def legalRibbonTurns :
@@ -251,10 +435,10 @@ private theorem mem_ribbonWireColors
   cases color <;>
     simp [ribbonWireColors]
 
-/-- One executable check of all `4 · 12² · 3² = 5,184` legal pairs of
-tiles in neighboring macrocells. -/
-private def allOriginNeighborRibbonMacrocellRoutesAvoid : Bool :=
-  genuineAxisDirections.all fun direction =>
+/-- One executable check of all `8 · 12² · 3² = 10,368` legal pairs of
+tiles in distinct adjacent macrocells. -/
+private def allOriginAdjacentRibbonMacrocellRoutesAvoid : Bool :=
+  adjacentRibbonMacrocellOffsets.all fun offset =>
     legalRibbonTurns.all fun firstTurn =>
       legalRibbonTurns.all fun secondTurn =>
         ribbonWireColors.all fun firstColor =>
@@ -263,14 +447,173 @@ private def allOriginNeighborRibbonMacrocellRoutesAvoid : Bool :=
               (PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
                 (ribbonMacrocellRoute (0, 0)
                   firstTurn.1 firstTurn.2 firstColor)
-                (ribbonMacrocellRoute direction.step
+                (ribbonMacrocellRoute offset
                   secondTurn.1 secondTurn.2 secondColor))
 
-private theorem allOriginNeighborRibbonMacrocellRoutesAvoid_eq_true :
-    allOriginNeighborRibbonMacrocellRoutesAvoid = true := by
+private theorem allOriginAdjacentRibbonMacrocellRoutesAvoid_eq_true :
+    allOriginAdjacentRibbonMacrocellRoutesAvoid = true := by
   native_decide
 
-/-- At the origin, every pair of legal tiles in neighboring source
+/-- At the origin, every pair of legal tiles in distinct adjacent source
+macrocells is continuously compatible. -/
+theorem originAdjacentRibbonMacrocellRoutes_avoidEachOther
+    {offset : Cell}
+    {firstIncoming firstOutgoing
+      secondIncoming secondOutgoing : AxisDirection}
+    (offsetAdjacent : RibbonMacrocellOffsetAdjacent offset)
+    (firstIncomingGenuine : firstIncoming.IsGenuine)
+    (firstOutgoingGenuine : firstOutgoing.IsGenuine)
+    (firstNoReverse :
+      firstOutgoing ≠ firstIncoming.opposite)
+    (secondIncomingGenuine : secondIncoming.IsGenuine)
+    (secondOutgoingGenuine : secondOutgoing.IsGenuine)
+    (secondNoReverse :
+      secondOutgoing ≠ secondIncoming.opposite)
+    (firstColor secondColor : Gadget.WireColor) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (ribbonMacrocellRoute (0, 0)
+        firstIncoming firstOutgoing firstColor)
+      (ribbonMacrocellRoute offset
+        secondIncoming secondOutgoing secondColor) := by
+  have checked :=
+    allOriginAdjacentRibbonMacrocellRoutesAvoid_eq_true
+  simp only [allOriginAdjacentRibbonMacrocellRoutesAvoid,
+    List.all_eq_true, decide_eq_true_eq] at checked
+  exact checked offset
+    ((mem_adjacentRibbonMacrocellOffsets_iff offset).2
+      offsetAdjacent)
+    (firstIncoming, firstOutgoing)
+    ((mem_legalRibbonTurns_iff
+      firstIncoming firstOutgoing).2
+        ⟨firstIncomingGenuine, firstOutgoingGenuine,
+          firstNoReverse⟩)
+    (secondIncoming, secondOutgoing)
+    ((mem_legalRibbonTurns_iff
+      secondIncoming secondOutgoing).2
+        ⟨secondIncomingGenuine, secondOutgoingGenuine,
+          secondNoReverse⟩)
+    firstColor (mem_ribbonWireColors firstColor)
+    secondColor (mem_ribbonWireColors secondColor)
+
+/-- Every pair of legal tiles in distinct adjacent source macrocells is
+continuously compatible, at any source center. -/
+theorem adjacentRibbonMacrocellRoutes_avoidEachOther
+    (center : Cell) {offset : Cell}
+    {firstIncoming firstOutgoing
+      secondIncoming secondOutgoing : AxisDirection}
+    (offsetAdjacent : RibbonMacrocellOffsetAdjacent offset)
+    (firstIncomingGenuine : firstIncoming.IsGenuine)
+    (firstOutgoingGenuine : firstOutgoing.IsGenuine)
+    (firstNoReverse :
+      firstOutgoing ≠ firstIncoming.opposite)
+    (secondIncomingGenuine : secondIncoming.IsGenuine)
+    (secondOutgoingGenuine : secondOutgoing.IsGenuine)
+    (secondNoReverse :
+      secondOutgoing ≠ secondIncoming.opposite)
+    (firstColor secondColor : Gadget.WireColor) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (ribbonMacrocellRoute center
+        firstIncoming firstOutgoing firstColor)
+      (ribbonMacrocellRoute
+        (Cell.add center offset)
+        secondIncoming secondOutgoing secondColor) := by
+  have originAvoids :=
+    originAdjacentRibbonMacrocellRoutes_avoidEachOther
+      offsetAdjacent
+      firstIncomingGenuine firstOutgoingGenuine firstNoReverse
+      secondIncomingGenuine secondOutgoingGenuine secondNoReverse
+      firstColor secondColor
+  have translated :=
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesAvoidEachOther_translate
+      originAvoids (ribbonMacrocellOrigin center)
+  have firstTranslation :
+      ribbonMacrocellRoute center
+          firstIncoming firstOutgoing firstColor =
+        (ribbonMacrocellRoute (0, 0)
+          firstIncoming firstOutgoing firstColor).map
+            (Cell.add (ribbonMacrocellOrigin center)) := by
+    simpa [Cell.add] using
+      ribbonMacrocellRoute_add_center center (0, 0)
+        firstIncoming firstOutgoing firstColor
+  rw [firstTranslation,
+    ribbonMacrocellRoute_add_center center offset]
+  exact translated
+
+/-- The adjacent-macrocell certificate expressed directly in terms of two
+source centers. -/
+theorem adjacentCentersRibbonMacrocellRoutes_avoidEachOther
+    {firstCenter secondCenter : Cell}
+    (adjacent :
+      RibbonMacrocellCentersAdjacent firstCenter secondCenter)
+    {firstIncoming firstOutgoing
+      secondIncoming secondOutgoing : AxisDirection}
+    (firstIncomingGenuine : firstIncoming.IsGenuine)
+    (firstOutgoingGenuine : firstOutgoing.IsGenuine)
+    (firstNoReverse :
+      firstOutgoing ≠ firstIncoming.opposite)
+    (secondIncomingGenuine : secondIncoming.IsGenuine)
+    (secondOutgoingGenuine : secondOutgoing.IsGenuine)
+    (secondNoReverse :
+      secondOutgoing ≠ secondIncoming.opposite)
+    (firstColor secondColor : Gadget.WireColor) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (ribbonMacrocellRoute firstCenter
+        firstIncoming firstOutgoing firstColor)
+      (ribbonMacrocellRoute secondCenter
+        secondIncoming secondOutgoing secondColor) := by
+  let offset := Cell.sub secondCenter firstCenter
+  have secondEquation :
+      secondCenter = Cell.add firstCenter offset := by
+    rcases firstCenter with ⟨firstX, firstY⟩
+    rcases secondCenter with ⟨secondX, secondY⟩
+    simp [offset, Cell.sub, Cell.add]
+  rw [secondEquation]
+  exact
+    adjacentRibbonMacrocellRoutes_avoidEachOther firstCenter
+      (by simpa [offset, RibbonMacrocellCentersAdjacent] using
+        adjacent)
+      firstIncomingGenuine firstOutgoingGenuine firstNoReverse
+      secondIncomingGenuine secondOutgoingGenuine secondNoReverse
+      firstColor secondColor
+
+/-- Any two legal tiles with distinct source centers satisfy complete
+continuous route separation. -/
+theorem ribbonMacrocellRoutes_avoidEachOther_of_centers_ne
+    {firstCenter secondCenter : Cell}
+    (centersDifferent : firstCenter ≠ secondCenter)
+    {firstIncoming firstOutgoing
+      secondIncoming secondOutgoing : AxisDirection}
+    (firstIncomingGenuine : firstIncoming.IsGenuine)
+    (firstOutgoingGenuine : firstOutgoing.IsGenuine)
+    (firstNoReverse :
+      firstOutgoing ≠ firstIncoming.opposite)
+    (secondIncomingGenuine : secondIncoming.IsGenuine)
+    (secondOutgoingGenuine : secondOutgoing.IsGenuine)
+    (secondNoReverse :
+      secondOutgoing ≠ secondIncoming.opposite)
+    (firstColor secondColor : Gadget.WireColor) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (ribbonMacrocellRoute firstCenter
+        firstIncoming firstOutgoing firstColor)
+      (ribbonMacrocellRoute secondCenter
+        secondIncoming secondOutgoing secondColor) := by
+  rcases
+      ribbonMacrocellCenters_eq_or_far_or_adjacent
+        firstCenter secondCenter with
+    equal | far | adjacent
+  · exact (centersDifferent equal).elim
+  · exact
+      farRibbonMacrocellRoutes_avoidEachOther far
+        firstIncoming firstOutgoing
+        secondIncoming secondOutgoing
+        firstColor secondColor
+  · exact
+      adjacentCentersRibbonMacrocellRoutes_avoidEachOther adjacent
+        firstIncomingGenuine firstOutgoingGenuine firstNoReverse
+        secondIncomingGenuine secondOutgoingGenuine secondNoReverse
+        firstColor secondColor
+
+/-- At the origin, every pair of legal tiles in edge-neighboring source
 macrocells is continuously compatible.  When both tiles use their common
 source edge in the same direction and color, their only contact is the
 intended shared endpoint. -/
@@ -292,26 +635,14 @@ theorem originNeighborRibbonMacrocellRoutes_avoidEachOther
         firstIncoming firstOutgoing firstColor)
       (ribbonMacrocellRoute direction.step
         secondIncoming secondOutgoing secondColor) := by
-  have checked :=
-    allOriginNeighborRibbonMacrocellRoutesAvoid_eq_true
-  simp only [allOriginNeighborRibbonMacrocellRoutesAvoid,
-    List.all_eq_true, decide_eq_true_eq] at checked
-  exact checked direction
-    ((mem_genuineAxisDirections_iff direction).2 directionGenuine)
-    (firstIncoming, firstOutgoing)
-    ((mem_legalRibbonTurns_iff
-      firstIncoming firstOutgoing).2
-        ⟨firstIncomingGenuine, firstOutgoingGenuine,
-          firstNoReverse⟩)
-    (secondIncoming, secondOutgoing)
-    ((mem_legalRibbonTurns_iff
-      secondIncoming secondOutgoing).2
-        ⟨secondIncomingGenuine, secondOutgoingGenuine,
-          secondNoReverse⟩)
-    firstColor (mem_ribbonWireColors firstColor)
-    secondColor (mem_ribbonWireColors secondColor)
+  exact
+    originAdjacentRibbonMacrocellRoutes_avoidEachOther
+      (ribbonMacrocellOffsetAdjacent_step directionGenuine)
+      firstIncomingGenuine firstOutgoingGenuine firstNoReverse
+      secondIncomingGenuine secondOutgoingGenuine secondNoReverse
+      firstColor secondColor
 
-/-- Every pair of legal tiles in neighboring source macrocells is
+/-- Every pair of legal tiles in edge-neighboring source macrocells is
 continuously compatible, at any source center. -/
 theorem neighborRibbonMacrocellRoutes_avoidEachOther
     (center : Cell)
@@ -333,27 +664,12 @@ theorem neighborRibbonMacrocellRoutes_avoidEachOther
       (ribbonMacrocellRoute
         (Cell.add center direction.step)
         secondIncoming secondOutgoing secondColor) := by
-  have originAvoids :=
-    originNeighborRibbonMacrocellRoutes_avoidEachOther
-      directionGenuine
+  exact
+    adjacentRibbonMacrocellRoutes_avoidEachOther center
+      (ribbonMacrocellOffsetAdjacent_step directionGenuine)
       firstIncomingGenuine firstOutgoingGenuine firstNoReverse
       secondIncomingGenuine secondOutgoingGenuine secondNoReverse
       firstColor secondColor
-  have translated :=
-    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesAvoidEachOther_translate
-      originAvoids (ribbonMacrocellOrigin center)
-  have firstTranslation :
-      ribbonMacrocellRoute center
-          firstIncoming firstOutgoing firstColor =
-        (ribbonMacrocellRoute (0, 0)
-          firstIncoming firstOutgoing firstColor).map
-            (Cell.add (ribbonMacrocellOrigin center)) := by
-    simpa [Cell.add] using
-      ribbonMacrocellRoute_add_center center (0, 0)
-        firstIncoming firstOutgoing firstColor
-  rw [firstTranslation,
-    ribbonMacrocellRoute_add_center center direction.step]
-  exact translated
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
