@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicGridDrawingPointBounds
+import LeanTrominoes.OrthogonalPolylineStrictSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonMacrocells
 
 /-!
@@ -284,6 +285,64 @@ theorem not_interiorsMeet_of_inRibbonMacrocells_of_centersFar
     simp_all [min_def, max_def] <;>
     omega
 
+/-- Any two finite routes contained in non-neighboring ribbon macrocells
+satisfy complete contact-free separation. -/
+theorem routesStrictlyAvoidEachOther_of_inFarRibbonMacrocells
+    {firstCenter secondCenter : Cell}
+    {first second : List Cell}
+    (firstBounded :
+      ∀ point ∈ first,
+        InRibbonMacrocell firstCenter point)
+    (secondBounded :
+      ∀ point ∈ second,
+        InRibbonMacrocell secondCenter point)
+    (far :
+      RibbonMacrocellCentersFar firstCenter secondCenter) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      first second := by
+  unfold
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro firstSegment firstMember secondSegment secondMember
+    have firstEndpoints :=
+      gridPolylineSegments_endpoints_mem firstMember
+    have secondEndpoints :=
+      gridPolylineSegments_endpoints_mem secondMember
+    exact
+      not_interiorsMeet_of_inRibbonMacrocells_of_centersFar
+        (firstBounded _ firstEndpoints.1)
+        (firstBounded _ firstEndpoints.2)
+        (secondBounded _ secondEndpoints.1)
+        (secondBounded _ secondEndpoints.2)
+        far
+  · intro firstPoint firstPointMember
+      secondSegment secondSegmentMember
+    have secondEndpoints :=
+      gridPolylineSegments_endpoints_mem secondSegmentMember
+    exact
+      not_interiorContains_of_inRibbonMacrocells_of_centersFar
+        (firstBounded _ firstPointMember)
+        (secondBounded _ secondEndpoints.1)
+        (secondBounded _ secondEndpoints.2)
+        far
+  · intro secondPoint secondPointMember
+      firstSegment firstSegmentMember
+    have firstEndpoints :=
+      gridPolylineSegments_endpoints_mem firstSegmentMember
+    exact
+      not_interiorContains_of_inRibbonMacrocells_of_centersFar
+        (secondBounded _ secondPointMember)
+        (firstBounded _ firstEndpoints.1)
+        (firstBounded _ firstEndpoints.2)
+        far.symm
+  · intro firstPoint firstPointMember
+      secondPoint secondPointMember
+    exact
+      ne_of_inRibbonMacrocells_of_centersFar
+        (firstBounded _ firstPointMember)
+        (secondBounded _ secondPointMember)
+        far
+
 /-- Legal ribbon tiles in far source macrocells satisfy the complete
 continuous route-separation predicate. -/
 theorem farRibbonMacrocellRoutes_avoidEachOther
@@ -298,93 +357,17 @@ theorem farRibbonMacrocellRoutes_avoidEachOther
         firstIncoming firstOutgoing firstColor)
       (ribbonMacrocellRoute secondCenter
         secondIncoming secondOutgoing secondColor) := by
-  unfold
-    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · intro firstIndex secondIndex
-    have firstMember :=
-      List.get_mem
-        (gridPolylineSegments
-          (ribbonMacrocellRoute firstCenter
-            firstIncoming firstOutgoing firstColor))
-        firstIndex
-    have secondMember :=
-      List.get_mem
-        (gridPolylineSegments
-          (ribbonMacrocellRoute secondCenter
-            secondIncoming secondOutgoing secondColor))
-        secondIndex
-    have firstEndpoints :=
-      gridPolylineSegments_endpoints_mem firstMember
-    have secondEndpoints :=
-      gridPolylineSegments_endpoints_mem secondMember
-    exact
-      not_interiorsMeet_of_inRibbonMacrocells_of_centersFar
-        (ribbonMacrocellRoute_points_bounded
+  exact
+    (routesStrictlyAvoidEachOther_of_inFarRibbonMacrocells
+      (fun point member =>
+        ribbonMacrocellRoute_points_bounded
           firstCenter firstIncoming firstOutgoing firstColor
-          _ firstEndpoints.1)
-        (ribbonMacrocellRoute_points_bounded
-          firstCenter firstIncoming firstOutgoing firstColor
-          _ firstEndpoints.2)
-        (ribbonMacrocellRoute_points_bounded
+          point member)
+      (fun point member =>
+        ribbonMacrocellRoute_points_bounded
           secondCenter secondIncoming secondOutgoing secondColor
-          _ secondEndpoints.1)
-        (ribbonMacrocellRoute_points_bounded
-          secondCenter secondIncoming secondOutgoing secondColor
-          _ secondEndpoints.2)
-        far
-  · intro pointIndex segmentIndex
-    have segmentMember :=
-      List.get_mem
-        (gridPolylineSegments
-          (ribbonMacrocellRoute secondCenter
-            secondIncoming secondOutgoing secondColor))
-        segmentIndex
-    have segmentEndpoints :=
-      gridPolylineSegments_endpoints_mem segmentMember
-    exact
-      not_interiorContains_of_inRibbonMacrocells_of_centersFar
-        (ribbonMacrocellRoute_points_bounded
-          firstCenter firstIncoming firstOutgoing firstColor
-          _ (List.get_mem _ pointIndex))
-        (ribbonMacrocellRoute_points_bounded
-          secondCenter secondIncoming secondOutgoing secondColor
-          _ segmentEndpoints.1)
-        (ribbonMacrocellRoute_points_bounded
-          secondCenter secondIncoming secondOutgoing secondColor
-          _ segmentEndpoints.2)
-        far
-  · intro pointIndex segmentIndex
-    have segmentMember :=
-      List.get_mem
-        (gridPolylineSegments
-          (ribbonMacrocellRoute firstCenter
-            firstIncoming firstOutgoing firstColor))
-        segmentIndex
-    have segmentEndpoints :=
-      gridPolylineSegments_endpoints_mem segmentMember
-    exact
-      not_interiorContains_of_inRibbonMacrocells_of_centersFar
-        (ribbonMacrocellRoute_points_bounded
-          secondCenter secondIncoming secondOutgoing secondColor
-          _ (List.get_mem _ pointIndex))
-        (ribbonMacrocellRoute_points_bounded
-          firstCenter firstIncoming firstOutgoing firstColor
-          _ segmentEndpoints.1)
-        (ribbonMacrocellRoute_points_bounded
-          firstCenter firstIncoming firstOutgoing firstColor
-          _ segmentEndpoints.2)
-        far.symm
-  · intro firstPointIndex secondPointIndex equal
-    exact
-      (ne_of_inRibbonMacrocells_of_centersFar
-        (ribbonMacrocellRoute_points_bounded
-          firstCenter firstIncoming firstOutgoing firstColor
-          _ (List.get_mem _ firstPointIndex))
-        (ribbonMacrocellRoute_points_bounded
-          secondCenter secondIncoming secondOutgoing secondColor
-          _ (List.get_mem _ secondPointIndex))
-        far equal).elim
+          point member)
+      far).toRoutesAvoidEachOther
 
 /-- The eight nonzero offsets in the surrounding `3 × 3` block. -/
 private def adjacentRibbonMacrocellOffsets : List Cell :=

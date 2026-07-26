@@ -1475,12 +1475,15 @@ The representation choices for this target are:
   `128 × 128` block, centered at local coordinate `(64, 64)`.  Tiles whose
   source centers differ by at least two lattice units in either coordinate
   cannot share points, contain each other's points in segment interiors, or
-  have meeting segment interiors.  One certified finite check covers all 10,368
-  pairs of legal tiles at the eight nonzero offsets in the surrounding
-  `3 × 3` block, and translation lifts it to arbitrary source centers.  An
-  exact equal/far/adjacent trichotomy then proves complete separation for
-  any legal tiles with distinct centers.  Thus only equal-center contacts
-  remain in the global corridor-planarity proof.
+  have meeting segment interiors.  Any two finite routes contained in such
+  far blocks therefore satisfy the stronger contact-free separation
+  predicate; the tile theorem is an immediate specialization.  One
+  certified finite check covers all 10,368 pairs of legal tiles at the eight
+  nonzero offsets in the surrounding `3 × 3` block, and translation lifts it
+  to arbitrary source centers.  An exact equal/far/adjacent trichotomy then
+  proves complete separation for any legal tiles with distinct centers.
+  Thus only equal-center contacts remain in the global corridor-planarity
+  proof.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellContacts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonMacrocellContacts.lean)
   classifies every possible advertised-endpoint contact between legal tiles
   at adjacent centers.  An exhaustive exact check proves that contact occurs
