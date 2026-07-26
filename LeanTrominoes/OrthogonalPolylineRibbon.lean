@@ -25,7 +25,7 @@ inductive AxisDirection
   | west
   | south
   | invalid
-  deriving DecidableEq, Repr
+  deriving DecidableEq, Fintype, Repr
 
 namespace AxisDirection
 
@@ -49,6 +49,27 @@ def opposite : AxisDirection → AxisDirection
   | .west => .east
   | .south => .north
   | .invalid => .invalid
+
+/-- Unit lattice step in a genuine directed axis. -/
+def step : AxisDirection → Cell
+  | .east => (1, 0)
+  | .north => (0, 1)
+  | .west => (-1, 0)
+  | .south => (0, -1)
+  | .invalid => (0, 0)
+
+/-- Clockwise quarter-turn relation. -/
+def TurnsRight : AxisDirection → AxisDirection → Prop
+  | .east, .south
+  | .south, .west
+  | .west, .north
+  | .north, .east => True
+  | _, _ => False
+
+instance (incoming outgoing : AxisDirection) :
+    Decidable (TurnsRight incoming outgoing) := by
+  cases incoming <;> cases outgoing <;>
+    simp [TurnsRight] <;> infer_instance
 
 /-- A genuine direction is one of the four axes. -/
 def IsGenuine (direction : AxisDirection) : Prop :=

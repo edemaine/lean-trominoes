@@ -17,7 +17,8 @@ orthogonal and their advertised endpoints agree.
 namespace LeanTrominoes
 
 /-- Concatenate two routes while listing their common endpoint only once. -/
-def joinAtEndpoint (first second : List Cell) : List Cell :=
+def joinAtEndpoint {α : Type*}
+    (first second : List α) : List α :=
   first ++ second.tail
 
 /-- A nonempty first route determines the joined route's first endpoint. -/
@@ -58,16 +59,16 @@ theorem joinAtEndpoint_getLast?
       | cons secondNext secondTail =>
           simpa [joinAtEndpoint] using secondLast
 
-/-- Orthogonality is preserved when two orthogonal routes are joined at
-their common endpoint. -/
-theorem PeriodicOrthocrossing.OrthogonalPolyline.joinAtEndpoint
-    {first second : List Cell} {middle : Cell}
-    (firstOrthogonal : OrthogonalPolyline first)
-    (secondOrthogonal : OrthogonalPolyline second)
+/-- Any chain relation is preserved when two chains are joined at a common
+listed endpoint. -/
+theorem List.IsChain.joinAtEndpoint
+    {α : Type*} {relation : α → α → Prop}
+    {first second : List α} {middle : α}
+    (firstChain : first.IsChain relation)
+    (secondChain : second.IsChain relation)
     (firstLast : first.getLast? = some middle)
     (secondHead : second.head? = some middle) :
-    OrthogonalPolyline (LeanTrominoes.joinAtEndpoint first second) := by
-  unfold OrthogonalPolyline at firstOrthogonal secondOrthogonal ⊢
+    (LeanTrominoes.joinAtEndpoint first second).IsChain relation := by
   cases first with
   | nil =>
       simp at firstLast
@@ -79,12 +80,12 @@ theorem PeriodicOrthocrossing.OrthogonalPolyline.joinAtEndpoint
           cases secondRest with
           | nil =>
               simpa [LeanTrominoes.joinAtEndpoint] using
-                firstOrthogonal
+                firstChain
           | cons secondNext secondTail =>
               have secondParts :=
-                List.isChain_cons_cons.mp secondOrthogonal
+                List.isChain_cons_cons.mp secondChain
               apply List.IsChain.append
-                firstOrthogonal secondParts.2
+                firstChain secondParts.2
               intro lastPoint lastMember
                 nextPoint nextMember
               have lastEqual :
@@ -101,5 +102,18 @@ theorem PeriodicOrthocrossing.OrthogonalPolyline.joinAtEndpoint
               subst secondPoint
               subst nextPoint
               exact secondParts.1
+
+/-- Orthogonality is preserved when two orthogonal routes are joined at
+their common endpoint. -/
+theorem PeriodicOrthocrossing.OrthogonalPolyline.joinAtEndpoint
+    {first second : List Cell} {middle : Cell}
+    (firstOrthogonal : OrthogonalPolyline first)
+    (secondOrthogonal : OrthogonalPolyline second)
+    (firstLast : first.getLast? = some middle)
+    (secondHead : second.head? = some middle) :
+    OrthogonalPolyline (LeanTrominoes.joinAtEndpoint first second) := by
+  unfold OrthogonalPolyline at firstOrthogonal secondOrthogonal ⊢
+  exact List.IsChain.joinAtEndpoint firstOrthogonal
+    secondOrthogonal firstLast secondHead
 
 end LeanTrominoes

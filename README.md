@@ -1390,14 +1390,22 @@ The representation choices for this target are:
 - [`LeanTrominoes/OrthogonalPolylineJoin.lean`](LeanTrominoes/OrthogonalPolylineJoin.lean)
   joins independently certified route pieces at a shared endpoint while
   removing its duplicate list entry.  The joined route is proved to preserve
-  both outer endpoints and orthogonality, supplying the generic splice lemma
-  used by fan and later gadget routing.
+  both outer endpoints and any caller-specified chain relation, with
+  orthogonality as an immediate specialization, supplying the generic splice
+  lemma used by fan and later gadget routing.
 - [`LeanTrominoes/OrthogonalPolylineRibbon.lean`](LeanTrominoes/OrthogonalPolylineRibbon.lean)
   introduces directed normal offsets as the replacement for unsound uniform
   diagonal lane translation.  It gives exact endpoint and orthogonality
   infrastructure for offset segments, corner pieces, and their recursive
   composition; the nonoverlapping inside/outside turn geometry used by the
   final construction is refined and certified in the next module.
+- [`LeanTrominoes/OrthogonalPolylineUnitSubdivision.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivision.lean)
+  replaces each nondegenerate axis-aligned source segment by its ordered
+  lattice points.  It proves exact first and last endpoints, preserves
+  orthogonality across joins, and strengthens the result to a chain in which
+  every consecutive pair is exactly one genuine cardinal step.  This is the
+  discrete interface used to assemble certified ribbon-turn templates across
+  adjacent 128-by-128 macrocells.
 - [`LeanTrominoes/OrthogonalPolylineRibbonTurnGeometry.lean`](LeanTrominoes/OrthogonalPolylineRibbonTurnGeometry.lean)
   certifies the finite same-corridor kernel.  At an inside turn the two
   offset lines are trimmed to their intersection; at an outside turn they

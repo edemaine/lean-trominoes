@@ -16,31 +16,6 @@ separated, including listed-point/interior contacts.
 
 namespace LeanTrominoes
 
-namespace AxisDirection
-
-/-- Unit lattice step in a genuine directed axis. -/
-def step : AxisDirection → Cell
-  | .east => (1, 0)
-  | .north => (0, 1)
-  | .west => (-1, 0)
-  | .south => (0, -1)
-  | .invalid => (0, 0)
-
-/-- Clockwise quarter-turn relation. -/
-def TurnsRight : AxisDirection → AxisDirection → Prop
-  | .east, .south
-  | .south, .west
-  | .west, .north
-  | .north, .east => True
-  | _, _ => False
-
-instance (incoming outgoing : AxisDirection) :
-    Decidable (TurnsRight incoming outgoing) := by
-  cases incoming <;> cases outgoing <;>
-    simp [TurnsRight] <;> infer_instance
-
-end AxisDirection
-
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PeriodicOrthocrossing
