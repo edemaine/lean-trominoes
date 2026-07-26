@@ -1983,6 +1983,12 @@ The representation choices for this target are:
   endpoints from the checked variable-site ports to the correctly
   translated clause-terminal positions, together with rectilinearity of
   every strand.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMThreeStrandConstruction.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMThreeStrandConstruction.lean)
+  constructs that routing interface from any certified exact-one incidence
+  presentation.  Each source route is positively refined and shifted onto a
+  caller-selected color lane, then joined to the checked variable and clause
+  ports by orthogonal endpoint stubs; all resulting endpoints and
+  rectilinearity obligations are proved.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget
