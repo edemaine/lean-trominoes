@@ -1392,6 +1392,16 @@ The representation choices for this target are:
   implication-literal occurrences.  Embedding the normalized carrier formula
   into the full periodic SAT variable type then proves the sharp target
   terminal total `6 + 2 = 8`.
+- [`LeanTrominoes/PeriodicCNFPlanarClauseNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarClauseNormalizationDegree.lean)
+  anchor-normalizes the routed source clauses before periodic clause
+  deduplication.  All literals at one explicit clause site share its
+  translation offset, so normalization yields a zero-offset prototype
+  determined only by the original clause index.  Global incidence indices
+  make every prototype's terminal atoms duplicate-free and identify at most
+  one distinct clause containing a fixed source terminal.  Consequently the
+  source attachment contributes one occurrence, and the complete normalized
+  external family has sharp endpoint totals seven at sources and eight at
+  targets.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
