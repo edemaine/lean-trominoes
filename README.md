@@ -1456,6 +1456,11 @@ The representation choices for this target are:
   the verified Figure 7 copy and implication-clause coordinates.  Erasing
   positions recovers exactly the semantic fixed-eight split, and the refined
   placement retains a positive drawing period.
+- [`LeanTrominoes/OccurrenceSplitRingCycleDrawing.lean`](LeanTrominoes/OccurrenceSplitRingCycleDrawing.lean)
+  extracts the eight implication clauses as an independently indexed local
+  drawing.  Its sixteen routes have exhaustively verified endpoints,
+  orthogonality, and continuous planarity, and its erasure is definitionally
+  the semantic fixed-eight cycle for any renamed source atom.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean)
   equips the positioned split with canonical orthogonal incidence detours.
   Their periodic endpoints agree exactly with the refined formula and

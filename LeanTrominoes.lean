@@ -307,6 +307,7 @@ import LeanTrominoes.PartrecSubtractSpace
 import LeanTrominoes.PartrecUnpair
 import LeanTrominoes.PartrecUnpairSpace
 import LeanTrominoes.OccurrenceSplitRingDrawing
+import LeanTrominoes.OccurrenceSplitRingCycleDrawing
 import LeanTrominoes.PeriodicEightOccurrenceSplit
 import LeanTrominoes.PeriodicEightOccurrenceSplitOccurrences
 import LeanTrominoes.PeriodicEightOccurrenceSplitPortAssignment
