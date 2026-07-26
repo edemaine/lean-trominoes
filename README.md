@@ -1983,6 +1983,12 @@ The representation choices for this target are:
   endpoints from the checked variable-site ports to the correctly
   translated clause-terminal positions, together with rectilinearity of
   every strand.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
+  translates every typed triple and colored element from its checked
+  variable-site or clause-core template into the reserved global gadget
+  neighborhood.  It emits these coordinates in exactly the
+  triple/red/green/blue vertex order of the encoded 3DM incidence graph and
+  proves the resulting list has the required length.
 - [`LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean`](LeanTrominoes/PlanarThreeDMVariableConnectorBoundary.lean)
   packages the fixed-red, fixed-green, and fixed-blue modules behind one
   boundary relation.  Exhaustive checks of the actual finite gadgets prove
