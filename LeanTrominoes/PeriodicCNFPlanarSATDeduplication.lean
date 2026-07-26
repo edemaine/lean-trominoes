@@ -32,8 +32,7 @@ def deduplicatedWrappedDrawingPeriodicPlanarSATFormula
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     PeriodicCNF (WrappedPeriodicPlanarSATVariable Variable) :=
-  wrapPeriodicPlanarSATFormula
-    (drawingPeriodicPlanarSATFormula formula).deduplicate
+  (wrappedDrawingPeriodicPlanarSATFormula formula).deduplicate
 
 /-- Positioned and wrapped source used by geometry-ordered occurrence
 splitting. -/
@@ -42,8 +41,8 @@ def deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
     (formula : PeriodicCNF Variable) :
     PositionedPeriodicCNF
       (WrappedPeriodicPlanarSATVariable Variable) :=
-  (deduplicatedDrawingPositionedPeriodicPlanarSATFormula formula).rename
-    WrappedPeriodicVariable.mk
+  (wrappedDrawingPositionedPeriodicPlanarSATFormula
+    formula).deduplicateByLiterals
 
 /-- Positioned erasure agrees exactly with the semantic deduplicated wrapped
 formula. -/
@@ -55,11 +54,10 @@ theorem
     (deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula
       formula).erase =
       deduplicatedWrappedDrawingPeriodicPlanarSATFormula formula := by
-  rw [deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula,
-    PositionedPeriodicCNF.erase_rename,
-    deduplicatedDrawingPositionedPeriodicPlanarSATFormula,
+  rw [
+    deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula,
     PositionedPeriodicCNF.erase_deduplicateByLiterals,
-    drawingPositionedPeriodicPlanarSATFormula_erase]
+    wrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
   rfl
 
 /-- Clause-orbit deduplication and opaque wrapping together preserve the
@@ -72,10 +70,10 @@ theorem
       formula).Satisfiable ↔
       (drawingPeriodicPlanarSATFormula formula).Satisfiable := by
   exact
-    (wrapPeriodicPlanarSATFormula_satisfiable_iff
-      (drawingPeriodicPlanarSATFormula formula).deduplicate).trans
-        (PeriodicCNF.deduplicate_satisfiable_iff
-          (drawingPeriodicPlanarSATFormula formula))
+    (PeriodicCNF.deduplicate_satisfiable_iff
+      (wrappedDrawingPeriodicPlanarSATFormula formula)).trans
+        (wrappedDrawingPeriodicPlanarSATFormula_satisfiable_iff
+          formula)
 
 /-- The deduplicated wrapped source retains every routed clause-width
 bound. -/
@@ -88,10 +86,11 @@ theorem
       (drawingPeriodicPlanarSATFormula formula).WidthAtMost width) :
     (deduplicatedWrappedDrawingPeriodicPlanarSATFormula
       formula).WidthAtMost width := by
-  apply wrapPeriodicPlanarSATFormula_widthAtMost
-  exact
+  apply
     ((PeriodicCNF.deduplicate_widthAtMost_iff
-      (drawingPeriodicPlanarSATFormula formula) width).mpr bounded)
+      (wrappedDrawingPeriodicPlanarSATFormula formula) width).mpr)
+  apply wrapPeriodicPlanarSATFormula_widthAtMost
+  exact bounded
 
 end PeriodicOrthocrossing
 end LeanTrominoes

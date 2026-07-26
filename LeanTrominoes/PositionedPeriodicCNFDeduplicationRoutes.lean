@@ -35,6 +35,87 @@ def PhysicalIncidenceRoutesMatch
             (routes clauseIndex literalIndex).getLast? =
               some (placement.literalPosition literal)
 
+/-- Renaming positioned variables preserves raw physical route endpoints
+when the target placement assigns every renamed variable the same point. -/
+theorem PhysicalIncidenceRoutesMatch.rename
+    {Source Target : Type*}
+    (source : PositionedPeriodicCNF Source)
+    (sourcePlacement : PeriodicVariablePlacement Source)
+    (targetPlacement : PeriodicVariablePlacement Target)
+    (routes : IncidenceRoutes)
+    (variableMap : Source → Target)
+    (routesMatch :
+      source.PhysicalIncidenceRoutesMatch
+        sourcePlacement routes)
+    (positionsMatch :
+      ∀ atom,
+        targetPlacement.position (variableMap atom) =
+          sourcePlacement.position atom)
+    (periodsMatch :
+      targetPlacement.period = sourcePlacement.period) :
+    (source.rename variableMap).PhysicalIncidenceRoutesMatch
+      targetPlacement routes := by
+  intro targetClause clauseIndex targetClauseMember
+    targetLiteral literalIndex targetLiteralMember
+  change
+    (targetClause, clauseIndex) ∈
+      (source.clauses.map fun clause =>
+        ⟨clause.position, clause.literals.map fun literal =>
+          ⟨variableMap literal.atom,
+            literal.offset, literal.value⟩⟩).zipIdx
+    at targetClauseMember
+  rw [List.zipIdx_map] at targetClauseMember
+  rcases List.mem_map.mp targetClauseMember with
+    ⟨taggedSourceClause, taggedSourceClauseMember,
+      targetClauseEqual⟩
+  have sourceClauseMember :
+      (taggedSourceClause.1, taggedSourceClause.2) ∈
+        source.clauses.zipIdx :=
+    taggedSourceClauseMember
+  have clauseIndexEqual :
+      taggedSourceClause.2 = clauseIndex :=
+    congrArg Prod.snd targetClauseEqual
+  have targetClauseValueEqual :
+      targetClause =
+        ⟨taggedSourceClause.1.position,
+          taggedSourceClause.1.literals.map fun literal =>
+            ⟨variableMap literal.atom,
+              literal.offset, literal.value⟩⟩ := by
+    exact (congrArg Prod.fst targetClauseEqual).symm
+  subst clauseIndex
+  subst targetClause
+  change
+    (targetLiteral, literalIndex) ∈
+      (taggedSourceClause.1.literals.map fun literal =>
+        ⟨variableMap literal.atom,
+          literal.offset, literal.value⟩).zipIdx
+    at targetLiteralMember
+  rw [List.zipIdx_map] at targetLiteralMember
+  rcases List.mem_map.mp targetLiteralMember with
+    ⟨taggedSourceLiteral, taggedSourceLiteralMember,
+      targetLiteralEqual⟩
+  have literalIndexEqual :
+      taggedSourceLiteral.2 = literalIndex :=
+    congrArg Prod.snd targetLiteralEqual
+  have targetLiteralValueEqual :
+      targetLiteral =
+        ⟨variableMap taggedSourceLiteral.1.atom,
+          taggedSourceLiteral.1.offset,
+          taggedSourceLiteral.1.value⟩ := by
+    exact (congrArg Prod.fst targetLiteralEqual).symm
+  subst literalIndex
+  subst targetLiteral
+  have endpoints :=
+    routesMatch taggedSourceClause.1 taggedSourceClause.2
+      sourceClauseMember taggedSourceLiteral.1
+      taggedSourceLiteral.2 taggedSourceLiteralMember
+  refine ⟨endpoints.1, ?_⟩
+  rw [endpoints.2]
+  apply congrArg some
+  simp [PeriodicVariablePlacement.literalPosition,
+    PeriodicVariablePlacement.translation,
+    positionsMatch, periodsMatch]
+
 /-- Translate a displayed physical route into the canonical clause-anchor
 gauge of the periodic incidence graph. -/
 def normalizeIncidenceRoute

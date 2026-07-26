@@ -402,6 +402,13 @@ The representation choices for this target are:
   and proves that the resulting positioned source remains equisatisfiable
   with the full routed periodic formula and retains its width bound.  This is
   the finite clause-vertex set used by the geometry-ordered pipeline.
+  [`LeanTrominoes/PeriodicCNFPlanarSATIncidenceRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarSATIncidenceRoutes.lean)
+  reduces the routed SAT block's periodic endpoint proof to a finite physical
+  obligation: connect each displayed clause to the displayed position of each
+  literal in its presentation order.  Any such route family is transported
+  through periodicization, opaque variable wrapping, clause-orbit
+  deduplication, and clause-anchor normalization, yielding both pointwise
+  endpoint identities and the complete periodic `RoutesMatch` certificate.
   [`LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean)
   defines that layer's exact certificate: one polyline per literal in the
   incidence graph's presentation order, compatible variable-then-clause
