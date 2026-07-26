@@ -1306,7 +1306,8 @@ The representation choices for this target are:
   gadget's bound across a noduplicated family, and equality-family counts are
   exactly twice their link-endpoint counts.
 - [`LeanTrominoes/PeriodicCNFPlanarOccurrences.lean`](LeanTrominoes/PeriodicCNFPlanarOccurrences.lean)
-  begins the componentwise degree-eight proof for the routed planarizer.
+  proves the componentwise degree-eight bound for the complete finite routed
+  planarizer.
   Canonical crossing records and fixed crossover roles are jointly
   injective, so the complete family of crossover gadgets retains the
   exhaustively certified eight-occurrence bound without accumulating across
@@ -1320,7 +1321,14 @@ The representation choices for this target are:
   the crossover contribution to two occurrences for external ports, while
   scoped internals never occur in wire clauses.  Splitting on these two
   variable kinds proves that the complete crossover-and-route core has at
-  most eight occurrences per variable.
+  most eight occurrences per variable.  Routed clause terminals are then
+  proved duplicate-free, so they contribute at most one occurrence.  The
+  variable gadget contains only its active Figure 8(a) equality arms:
+  target terminals meet one arm and the central atom meets at most three.
+  Finally, constructor-level separation of crossover boundaries, source
+  terminals, target terminals, and central atoms gives the complete finite
+  planar SAT formula an eight-occurrence certificate (`6 + 1` at source
+  terminals and `6 + 2` at target terminals).
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit

@@ -710,5 +710,1153 @@ theorem drawingRoutePlanarCoreFormula_occurrencesAtMostEight
         drawingCarrierNodeCrossoverFormula_occurrencesAtMostEight
           graph (.inr internal)
 
+/-! ## Routed SAT vertex families -/
+
+/-- Within the neighboring route enumeration, the global edge index and
+translation identify the complete metadata-rich occurrence. -/
+theorem drawingCNFRouteOccurrences_eq_of_edgeIndex_eq_of_translate_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {first second : CNFRouteOccurrence Variable}
+    (firstMem : first ∈ drawingCNFRouteOccurrences formula)
+    (secondMem : second ∈ drawingCNFRouteOccurrences formula)
+    (edgeIndexEq : first.edgeIndex = second.edgeIndex)
+    (translateEq : first.translate = second.translate) :
+    first = second := by
+  rcases List.mem_flatMap.mp firstMem with
+    ⟨firstTagged, firstTaggedMem, firstTranslateMem⟩
+  rcases List.mem_map.mp firstTranslateMem with
+    ⟨firstTranslate, firstTranslateMem, firstEq⟩
+  rcases List.mem_flatMap.mp secondMem with
+    ⟨secondTagged, secondTaggedMem, secondTranslateMem⟩
+  rcases List.mem_map.mp secondTranslateMem with
+    ⟨secondTranslate, secondTranslateMem, secondEq⟩
+  subst first
+  subst second
+  have taggedEq :
+      firstTagged = secondTagged :=
+    tagged_eq_of_mem_zipIdx_of_snd_eq
+      firstTaggedMem secondTaggedMem edgeIndexEq
+  subst secondTagged
+  change firstTranslate = secondTranslate at translateEq
+  subst secondTranslate
+  rfl
+
+/-- Source terminals identify neighboring CNF route occurrences. -/
+theorem drawingCNFRouteOccurrences_sourceTerminal_injective_on
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {first second : CNFRouteOccurrence Variable}
+    (firstMem : first ∈ drawingCNFRouteOccurrences formula)
+    (secondMem : second ∈ drawingCNFRouteOccurrences formula)
+    (terminalEq :
+      first.sourceTerminal formula =
+        second.sourceTerminal formula) :
+    first = second := by
+  apply
+    drawingCNFRouteOccurrences_eq_of_edgeIndex_eq_of_translate_eq
+      formula firstMem secondMem
+  · exact congrArg
+      (fun terminal => terminal.indexed.routeIndex) terminalEq
+  · exact congrArg SegmentTerminal.translate terminalEq
+
+/-- Target terminals likewise identify neighboring CNF route
+occurrences. -/
+theorem drawingCNFRouteOccurrences_targetTerminal_injective_on
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {first second : CNFRouteOccurrence Variable}
+    (firstMem : first ∈ drawingCNFRouteOccurrences formula)
+    (secondMem : second ∈ drawingCNFRouteOccurrences formula)
+    (terminalEq :
+      first.targetTerminal formula =
+        second.targetTerminal formula) :
+    first = second := by
+  apply
+    drawingCNFRouteOccurrences_eq_of_edgeIndex_eq_of_translate_eq
+      formula firstMem secondMem
+  · exact congrArg
+      (fun terminal => terminal.indexed.routeIndex) terminalEq
+  · exact congrArg SegmentTerminal.translate terminalEq
+
+/-- The finite list of represented clause sites has no duplicates. -/
+theorem drawingClauseRouteSites_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (drawingClauseRouteSites formula).Nodup := by
+  have indicesPairwise :
+      formula.clauses.zipIdx.Pairwise
+        (fun first second => first.2 ≠ second.2) := by
+    rw [← List.pairwise_map]
+    exact List.nodup_zipIdx_map_snd formula.clauses
+  rw [drawingClauseRouteSites, List.nodup_flatMap]
+  constructor
+  · intro taggedClause _
+    exact neighborTranslations_nodup.map
+      (fun first second equal =>
+        congrArg Prod.snd equal)
+  · exact indicesPairwise.imp fun {first second} indexNe => by
+      change List.Disjoint
+        (neighborTranslations.map fun translate =>
+          (first.2, translate))
+        (neighborTranslations.map fun translate =>
+          (second.2, translate))
+      rw [List.disjoint_left]
+      intro site firstMem secondMem
+      rcases List.mem_map.mp firstMem with
+        ⟨firstTranslate, firstTranslateMem, siteEq⟩
+      rcases List.mem_map.mp secondMem with
+        ⟨secondTranslate, secondTranslateMem, siteEq'⟩
+      have indexEq :
+          first.2 = second.2 := by
+        exact congrArg Prod.fst (siteEq.trans siteEq'.symm)
+      exact indexNe indexEq
+
+/-- Every routed occurrence selected at a represented clause site belongs
+to the global neighboring occurrence enumeration. -/
+theorem clauseRouteOccurrencesAt_mem_drawing
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {site : ClauseRouteSite}
+    (siteMem : site ∈ drawingClauseRouteSites formula)
+    {occurrence : CNFRouteOccurrence Variable}
+    (occurrenceMem :
+      occurrence ∈ clauseRouteOccurrencesAt formula site) :
+    occurrence ∈ drawingCNFRouteOccurrences formula := by
+  rcases List.mem_flatMap.mp siteMem with
+    ⟨taggedClause, taggedClauseMem, siteMem⟩
+  rcases List.mem_map.mp siteMem with
+    ⟨translate, translateMem, siteEq⟩
+  rcases List.mem_map.mp occurrenceMem with
+    ⟨taggedIncidence, taggedIncidenceMem, occurrenceEq⟩
+  subst site
+  subst occurrence
+  apply List.mem_flatMap.mpr
+  refine ⟨taggedIncidence, ?_, ?_⟩
+  · exact (List.mem_filter.mp taggedIncidenceMem).1
+  · exact List.mem_map.mpr
+      ⟨translate, translateMem, rfl⟩
+
+/-- A selected clause-route occurrence reaches exactly its selecting
+clause site. -/
+theorem clauseRouteOccurrencesAt_clauseOccurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : ClauseRouteSite)
+    {occurrence : CNFRouteOccurrence Variable}
+    (occurrenceMem :
+      occurrence ∈ clauseRouteOccurrencesAt formula site) :
+    occurrence.clauseOccurrence = site := by
+  rcases List.mem_map.mp occurrenceMem with
+    ⟨taggedIncidence, taggedIncidenceMem, occurrenceEq⟩
+  subst occurrence
+  have clauseIndexEq :=
+    of_decide_eq_true
+      (List.mem_filter.mp taggedIncidenceMem).2
+  exact Prod.ext clauseIndexEq rfl
+
+/-- At one clause site the selected route occurrences are duplicate-free. -/
+theorem clauseRouteOccurrencesAt_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : ClauseRouteSite) :
+    (clauseRouteOccurrencesAt formula site).Nodup := by
+  have taggedNodup :
+      (PeriodicCNF.incidencesWithMetadata formula).zipIdx.Nodup :=
+    (List.nodup_zipIdx_map_snd
+      (PeriodicCNF.incidencesWithMetadata formula)).of_map
+        Prod.snd
+  exact (taggedNodup.filter _).map
+    (fun first second equal => by
+      apply Prod.ext
+      · exact congrArg CNFRouteOccurrence.incidence equal
+      · exact congrArg CNFRouteOccurrence.edgeIndex equal)
+
+/-- Equality of two selected source terminals identifies both their routed
+occurrences and their selecting clause sites. -/
+theorem clauseRouteOccurrencesAt_eq_and_site_eq_of_sourceTerminal_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {firstSite secondSite : ClauseRouteSite}
+    {first second : CNFRouteOccurrence Variable}
+    (firstMem :
+      first ∈ clauseRouteOccurrencesAt formula firstSite)
+    (secondMem :
+      second ∈ clauseRouteOccurrencesAt formula secondSite)
+    (terminalEq :
+      first.sourceTerminal formula =
+        second.sourceTerminal formula) :
+    first = second ∧ firstSite = secondSite := by
+  rcases List.mem_map.mp firstMem with
+    ⟨firstTagged, firstTaggedMem, firstEq⟩
+  rcases List.mem_map.mp secondMem with
+    ⟨secondTagged, secondTaggedMem, secondEq⟩
+  subst first
+  subst second
+  have taggedEq :
+      firstTagged = secondTagged :=
+    tagged_eq_of_mem_zipIdx_of_snd_eq
+      (List.mem_filter.mp firstTaggedMem).1
+      (List.mem_filter.mp secondTaggedMem).1
+      (congrArg
+        (fun terminal => terminal.indexed.routeIndex)
+        terminalEq)
+  subst secondTagged
+  have horizontalEq :
+      firstSite.1 = secondSite.1 := by
+    have firstClauseEq :=
+      of_decide_eq_true
+        (List.mem_filter.mp firstTaggedMem).2
+    have secondClauseEq :=
+      of_decide_eq_true
+        (List.mem_filter.mp secondTaggedMem).2
+    exact firstClauseEq.symm.trans secondClauseEq
+  have translateEq :
+      firstSite.2 = secondSite.2 := by
+    exact congrArg SegmentTerminal.translate terminalEq
+  have siteEq : firstSite = secondSite :=
+    Prod.ext horizontalEq translateEq
+  subst secondSite
+  exact ⟨rfl, rfl⟩
+
+/-- The source-terminal nodes appearing in the routed clause family are
+duplicate-free. -/
+theorem drawingRoutedClauseNodes_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    ((drawingClauseRouteSites formula).flatMap fun site =>
+      (clauseRouteOccurrencesAt formula site).map fun occurrence =>
+        (PlanarSATNode.carrier
+          (.terminal
+            (occurrence.sourceTerminal formula)) :
+          PlanarSATNode Variable)).Nodup := by
+  rw [List.nodup_flatMap]
+  constructor
+  · intro site siteMem
+    apply (clauseRouteOccurrencesAt_nodup formula site).map_on
+    intro first firstMem second secondMem nodeEq
+    exact
+      (clauseRouteOccurrencesAt_eq_and_site_eq_of_sourceTerminal_eq
+        formula firstMem secondMem
+        (CarrierNode.terminal.inj
+          (PlanarSATNode.carrier.inj nodeEq))).1
+  · exact (drawingClauseRouteSites_nodup formula).imp
+      fun {firstSite secondSite} siteNe => by
+        change List.Disjoint
+          ((clauseRouteOccurrencesAt formula firstSite).map
+            fun occurrence =>
+              (PlanarSATNode.carrier
+                (.terminal
+                  (occurrence.sourceTerminal formula)) :
+                PlanarSATNode Variable))
+          ((clauseRouteOccurrencesAt formula secondSite).map
+            fun occurrence =>
+              (PlanarSATNode.carrier
+                (.terminal
+                  (occurrence.sourceTerminal formula)) :
+                PlanarSATNode Variable))
+        rw [List.disjoint_left]
+        intro node firstMem secondMem
+        rcases List.mem_map.mp firstMem with
+          ⟨first, firstOccurrenceMem, nodeEq⟩
+        rcases List.mem_map.mp secondMem with
+          ⟨second, secondOccurrenceMem, nodeEq'⟩
+        have occurrenceData :=
+          clauseRouteOccurrencesAt_eq_and_site_eq_of_sourceTerminal_eq
+            formula firstOccurrenceMem secondOccurrenceMem
+            (CarrierNode.terminal.inj
+              (PlanarSATNode.carrier.inj
+                (nodeEq.trans nodeEq'.symm)))
+        exact siteNe occurrenceData.2
+
+/-- Flattening routed clauses exposes exactly their source-terminal node
+list. -/
+theorem embeddedVariableOccurrences_drawingRoutedClauseFormula
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    embeddedVariableOccurrences
+        (drawingRoutedClauseFormula formula) =
+      (drawingClauseRouteSites formula).flatMap fun site =>
+        (clauseRouteOccurrencesAt formula site).map fun occurrence =>
+          (PlanarSATNode.carrier
+            (.terminal
+              (occurrence.sourceTerminal formula)) :
+            PlanarSATNode Variable) := by
+  simp [drawingRoutedClauseFormula, routedClauseAt,
+    embeddedVariableOccurrences, List.flatMap_map,
+    Function.comp_def]
+
+/-- Each routed clause terminal occurs in exactly one source literal at
+most. -/
+theorem drawingRoutedClauseFormula_occurrencesAtMostOne
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    FormulaOccurrencesAtMost 1
+      (drawingRoutedClauseFormula formula) := by
+  intro node
+  rw [embeddedVariableOccurrences_drawingRoutedClauseFormula]
+  exact
+    (List.nodup_iff_count_le_one.mp
+      (drawingRoutedClauseNodes_nodup formula)) node
+
+/-! ### Active variable arms -/
+
+/-- Collect all active routed-variable equality links. -/
+def drawingRoutedVariableLinks
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (EqualityLink (PlanarSATNode Variable)) :=
+  (drawingVariableRouteSites formula).flatMap
+    (routedVariableLinksAt formula)
+
+/-- Flattening the per-site active equality families is the equality family
+of the flattened link list. -/
+theorem drawingRoutedVariableFormula_eq_equalityFamily
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    drawingRoutedVariableFormula formula =
+      equalityFamily (drawingRoutedVariableLinks formula) := by
+  unfold drawingRoutedVariableFormula
+    drawingRoutedVariableLinks routedVariableFormulaAt
+    equalityFamily
+  rw [List.flatMap_assoc]
+
+/-- A routed-variable occurrence is selected from the global neighboring
+enumeration and reaches exactly its selecting variable site. -/
+theorem variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    {occurrence : CNFRouteOccurrence Variable}
+    (occurrenceMem :
+      occurrence ∈ variableRouteOccurrencesAt formula site) :
+    occurrence ∈ drawingCNFRouteOccurrences formula ∧
+      occurrence.variableOccurrence = site := by
+  simpa [variableRouteOccurrencesAt] using occurrenceMem
+
+/-- Membership in the deduplicated active node list comes from a routed
+occurrence reaching that site. -/
+theorem mem_routedVariableNodes_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    (node : PlanarSATNode Variable) :
+    node ∈ routedVariableNodes formula site ↔
+      ∃ occurrence ∈ variableRouteOccurrencesAt formula site,
+        node = .carrier
+          (.terminal (occurrence.targetTerminal formula)) := by
+  simp [routedVariableNodes, eq_comm]
+
+/-- Active target-terminal node lists at different variable sites are
+disjoint. -/
+theorem routedVariableNodes_disjoint_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {firstSite secondSite : VariableRouteSite Variable}
+    (siteNe : firstSite ≠ secondSite) :
+    List.Disjoint
+      (routedVariableNodes formula firstSite)
+      (routedVariableNodes formula secondSite) := by
+  rw [List.disjoint_left]
+  intro node firstMem secondMem
+  rcases (mem_routedVariableNodes_iff
+      formula firstSite node).mp firstMem with
+    ⟨first, firstMem, nodeEq⟩
+  rcases (mem_routedVariableNodes_iff
+      formula secondSite node).mp secondMem with
+    ⟨second, secondMem, nodeEq'⟩
+  have firstData :=
+    variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+      formula firstSite firstMem
+  have secondData :=
+    variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+      formula secondSite secondMem
+  have occurrenceEq :=
+    drawingCNFRouteOccurrences_targetTerminal_injective_on
+      formula firstData.1 secondData.1
+      (CarrierNode.terminal.inj
+        (PlanarSATNode.carrier.inj
+          (nodeEq.symm.trans nodeEq')))
+  exact siteNe
+    (firstData.2.symm.trans
+      ((congrArg CNFRouteOccurrence.variableOccurrence
+        occurrenceEq).trans secondData.2))
+
+/-- The first endpoints of all active variable links are exactly the
+deduplicated target nodes, truncated to the three Figure 8(a) arms. -/
+theorem drawingRoutedVariableLinks_firsts
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (drawingRoutedVariableLinks formula).map EqualityLink.first =
+      (drawingVariableRouteSites formula).flatMap fun site =>
+        (routedVariableNodes formula site).take 3 := by
+  simp [drawingRoutedVariableLinks, routedVariableLinksAt,
+    List.map_flatMap, List.map_map, Function.comp_def]
+
+/-- Across the complete represented variable family, active target
+terminals serve as first endpoints of at most one equality arm. -/
+theorem drawingRoutedVariableLinks_firsts_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    ((drawingRoutedVariableLinks formula).map
+      EqualityLink.first).Nodup := by
+  rw [drawingRoutedVariableLinks_firsts,
+    List.nodup_flatMap]
+  constructor
+  · intro site _
+    exact (List.nodup_dedup _).take
+  · exact (List.nodup_dedup _).imp
+      fun {firstSite secondSite} siteNe => by
+        change List.Disjoint
+          ((routedVariableNodes formula firstSite).take 3)
+          ((routedVariableNodes formula secondSite).take 3)
+        rw [List.disjoint_left]
+        intro node firstMem secondMem
+        exact
+          (routedVariableNodes_disjoint_of_ne formula siteNe)
+            (List.mem_of_mem_take firstMem)
+            (List.mem_of_mem_take secondMem)
+
+/-- Each variable site has at most three active equality links. -/
+theorem routedVariableLinksAt_length_le_three
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    (routedVariableLinksAt formula site).length ≤ 3 := by
+  simp [routedVariableLinksAt]
+
+/-- The second endpoint of every active arm is its site's central atom. -/
+theorem routedVariableLinksAt_second
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    {link : EqualityLink (PlanarSATNode Variable)}
+    (linkMem : link ∈ routedVariableLinksAt formula site) :
+    link.second = .atom site := by
+  rcases List.mem_map.mp linkMem with
+    ⟨taggedNode, taggedNodeMem, linkEq⟩
+  subst link
+  rfl
+
+/-- Central atoms are second endpoints of at most their three active
+arms; carrier nodes are never second endpoints. -/
+theorem drawingRoutedVariableLinks_seconds_count_le_three
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (node : PlanarSATNode Variable) :
+    ((drawingRoutedVariableLinks formula).map
+      EqualityLink.second).count node ≤ 3 := by
+  let sites := drawingVariableRouteSites formula
+  have sitesNodup : sites.Nodup := List.nodup_dedup _
+  change
+    (((sites.flatMap
+      (routedVariableLinksAt formula))).map
+        EqualityLink.second).count node ≤ 3
+  rw [List.map_flatMap]
+  cases node with
+  | carrier carrier =>
+      have countZero :
+          (sites.flatMap fun site =>
+            (routedVariableLinksAt formula site).map
+              EqualityLink.second).count
+              (.carrier carrier) = 0 := by
+        apply List.count_eq_zero_of_not_mem
+        intro nodeMem
+        rcases List.mem_flatMap.mp nodeMem with
+          ⟨site, siteMem, nodeMem⟩
+        rcases List.mem_map.mp nodeMem with
+          ⟨link, linkMem, nodeEq⟩
+        have secondEq :=
+          routedVariableLinksAt_second formula site linkMem
+        simp [secondEq] at nodeEq
+      omega
+  | atom targetSite =>
+      revert sitesNodup
+      induction sites with
+      | nil =>
+          intro _
+          simp
+      | cons site sites induction =>
+          intro sitesNodup
+          have nodupData := List.nodup_cons.mp sitesNodup
+          rw [List.flatMap_cons, List.count_append]
+          by_cases siteEq : site = targetSite
+          · subst site
+            have tailZero :
+                (sites.flatMap fun site =>
+                  (routedVariableLinksAt formula site).map
+                    EqualityLink.second).count
+                    (.atom targetSite) = 0 := by
+              apply List.count_eq_zero_of_not_mem
+              intro targetMem
+              rcases List.mem_flatMap.mp targetMem with
+                ⟨tailSite, tailSiteMem, targetMem⟩
+              rcases List.mem_map.mp targetMem with
+                ⟨link, linkMem, targetEq⟩
+              have secondEq :=
+                routedVariableLinksAt_second
+                  formula tailSite linkMem
+              exact nodupData.1
+                (PlanarSATNode.atom.inj
+                  (secondEq.symm.trans targetEq) ▸
+                    tailSiteMem)
+            rw [tailZero, Nat.add_zero]
+            have headCountLe :
+                ((routedVariableLinksAt formula targetSite).map
+                  EqualityLink.second).count
+                    (.atom targetSite) ≤
+                  ((routedVariableLinksAt formula targetSite).map
+                    EqualityLink.second).length :=
+              List.count_le_length
+            exact
+              headCountLe.trans
+                (by
+                  rw [List.length_map]
+                  exact routedVariableLinksAt_length_le_three
+                    formula targetSite)
+          · have headZero :
+                ((routedVariableLinksAt formula site).map
+                  EqualityLink.second).count
+                    (.atom targetSite) = 0 := by
+              apply List.count_eq_zero_of_not_mem
+              intro targetMem
+              rcases List.mem_map.mp targetMem with
+                ⟨link, linkMem, targetEq⟩
+              have secondEq :=
+                routedVariableLinksAt_second formula site linkMem
+              exact siteEq
+                (PlanarSATNode.atom.inj
+                  (secondEq.symm.trans targetEq))
+            rw [headZero, Nat.zero_add]
+            exact induction nodupData.2
+
+/-- Counting equality-link endpoints splits into first- and second-endpoint
+counts. -/
+theorem equalityLinkEndpoints_count_eq_firsts_add_seconds
+    {Variable : Type*} [DecidableEq Variable]
+    (links : List (EqualityLink Variable))
+    (node : Variable) :
+    (equalityLinkEndpoints links).count node =
+      (links.map EqualityLink.first).count node +
+        (links.map EqualityLink.second).count node := by
+  simpa [equalityLinkEndpoints, pairEndpoints,
+    List.flatMap_map, Function.comp_def] using
+    pairEndpoints_count
+      (links.map fun link => (link.first, link.second)) node
+
+/-- Active variable links have endpoint degree at most three. -/
+theorem drawingRoutedVariableLinks_endpoint_count_le_three
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (node : PlanarSATNode Variable) :
+    (equalityLinkEndpoints
+      (drawingRoutedVariableLinks formula)).count node ≤ 3 := by
+  rw [equalityLinkEndpoints_count_eq_firsts_add_seconds]
+  cases node with
+  | carrier carrier =>
+      have firstLe :
+          ((drawingRoutedVariableLinks formula).map
+            EqualityLink.first).count (.carrier carrier) ≤ 1 :=
+        (List.nodup_iff_count_le_one.mp
+          (drawingRoutedVariableLinks_firsts_nodup formula))
+          (.carrier carrier)
+      have secondZero :
+          ((drawingRoutedVariableLinks formula).map
+            EqualityLink.second).count (.carrier carrier) = 0 := by
+        apply List.count_eq_zero_of_not_mem
+        intro nodeMem
+        rcases List.mem_map.mp nodeMem with
+          ⟨link, linkMem, nodeEq⟩
+        rcases List.mem_flatMap.mp linkMem with
+          ⟨site, siteMem, linkMem⟩
+        have secondEq :=
+          routedVariableLinksAt_second formula site linkMem
+        simp [secondEq] at nodeEq
+      omega
+  | atom site =>
+      have firstZero :
+          ((drawingRoutedVariableLinks formula).map
+            EqualityLink.first).count (.atom site) = 0 := by
+        apply List.count_eq_zero_of_not_mem
+        intro nodeMem
+        rcases List.mem_map.mp nodeMem with
+          ⟨link, linkMem, nodeEq⟩
+        rcases List.mem_flatMap.mp linkMem with
+          ⟨linkSite, linkSiteMem, linkMem⟩
+        rcases List.mem_map.mp linkMem with
+          ⟨taggedNode, taggedNodeMem, linkEq⟩
+        subst link
+        have nodeMemInTake :
+            taggedNode.1 ∈
+              (routedVariableNodes formula linkSite).take 3 :=
+          List.fst_mem_of_mem_zipIdx taggedNodeMem
+        have nodeMem :
+            taggedNode.1 ∈
+              routedVariableNodes formula linkSite :=
+          List.mem_of_mem_take nodeMemInTake
+        rcases (mem_routedVariableNodes_iff
+            formula linkSite taggedNode.1).mp nodeMem with
+          ⟨occurrence, occurrenceMem, taggedNodeEq⟩
+        have impossible :
+            (PlanarSATNode.carrier
+              (.terminal (occurrence.targetTerminal formula)) :
+              PlanarSATNode Variable) =
+                .atom site :=
+          taggedNodeEq.symm.trans nodeEq
+        cases impossible
+      have secondLe :=
+        drawingRoutedVariableLinks_seconds_count_le_three
+          formula (.atom site)
+      omega
+
+/-- The complete active variable family uses every external node at most
+six times. -/
+theorem drawingRoutedVariableFormula_occurrencesAtMostSix
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    FormulaOccurrencesAtMost 6
+      (drawingRoutedVariableFormula formula) := by
+  rw [drawingRoutedVariableFormula_eq_equalityFamily]
+  apply equalityFamily_occurrencesAtMost
+    (drawingRoutedVariableLinks formula) 3 6 rfl
+  exact drawingRoutedVariableLinks_endpoint_count_le_three formula
+
+/-- A carrier target participates in at most one active variable arm, hence
+in at most two implication literals. -/
+theorem drawingRoutedVariableFormula_carrier_count_le_two
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (carrier : CarrierNode) :
+    (embeddedVariableOccurrences
+      (drawingRoutedVariableFormula formula)).count
+        (.carrier carrier) ≤ 2 := by
+  rw [drawingRoutedVariableFormula_eq_equalityFamily,
+    equalityFamily_occurrence_count]
+  rw [equalityLinkEndpoints_count_eq_firsts_add_seconds]
+  have firstLe :
+      ((drawingRoutedVariableLinks formula).map
+        EqualityLink.first).count (.carrier carrier) ≤ 1 :=
+    (List.nodup_iff_count_le_one.mp
+      (drawingRoutedVariableLinks_firsts_nodup formula))
+      (.carrier carrier)
+  have secondZero :
+      ((drawingRoutedVariableLinks formula).map
+        EqualityLink.second).count (.carrier carrier) = 0 := by
+    apply List.count_eq_zero_of_not_mem
+    intro nodeMem
+    rcases List.mem_map.mp nodeMem with
+      ⟨link, linkMem, nodeEq⟩
+    rcases List.mem_flatMap.mp linkMem with
+      ⟨site, siteMem, linkMem⟩
+    have secondEq :=
+      routedVariableLinksAt_second formula site linkMem
+    simp [secondEq] at nodeEq
+  omega
+
+/-! ## Separating route endpoints from local gadgets -/
+
+/-- Crossover gadgets use boundary carrier nodes, never segment
+terminals. -/
+theorem drawingCarrierNodeCrossoverFormula_terminal_count_eq_zero
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (terminal : SegmentTerminal) :
+    @List.count
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+      instBEqOfDecidableEq
+      (.inl (.terminal terminal))
+      (embeddedVariableOccurrences
+        (drawingCarrierNodeCrossoverFormula graph)) = 0 := by
+  apply @List.count_eq_zero_of_not_mem
+    (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+    instBEqOfDecidableEq (by infer_instance)
+  simp [drawingCarrierNodeCrossoverFormula,
+    crossoverFamily, scopedCrossoverInstance,
+    scopedCrossoverVariableMap, carrierNodeCrossingPorts]
+  intro crossing crossingMem horizontal source sourceMem
+  cases source <;> simp
+
+/-- A segment terminal therefore receives only the route-wire part of the
+core's six-occurrence budget. -/
+theorem drawingRoutePlanarCoreFormula_terminal_count_le_six
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (terminal : SegmentTerminal) :
+    @List.count
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+      instBEqOfDecidableEq
+      (.inl (.terminal terminal))
+      (embeddedVariableOccurrences
+        (drawingRoutePlanarCoreFormula graph)) ≤ 6 := by
+  rw [drawingRoutePlanarCoreFormula,
+    embeddedVariableOccurrences_append]
+  rw [@List.count_append
+    (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+    instBEqOfDecidableEq]
+  rw [drawingCarrierNodeCrossoverFormula_terminal_count_eq_zero,
+    Nat.zero_add]
+  exact
+    scopedDrawingRouteWireFormula_occurrencesAtMostSix
+      graph (.inl (.terminal terminal))
+
+/-- Routed source clauses contain carrier terminals, never central atoms. -/
+theorem drawingRoutedClauseFormula_atom_count_eq_zero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    (embeddedVariableOccurrences
+      (drawingRoutedClauseFormula formula)).count
+        (.atom site) = 0 := by
+  apply List.count_eq_zero_of_not_mem
+  rw [embeddedVariableOccurrences_drawingRoutedClauseFormula]
+  simp
+
+/-- Routed source clauses contain terminals, never crossover boundaries. -/
+theorem drawingRoutedClauseFormula_boundary_count_eq_zero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (boundary : CrossingBoundary) :
+    (embeddedVariableOccurrences
+      (drawingRoutedClauseFormula formula)).count
+        (.carrier (.boundary boundary)) = 0 := by
+  apply List.count_eq_zero_of_not_mem
+  rw [embeddedVariableOccurrences_drawingRoutedClauseFormula]
+  simp
+
+/-- A non-source segment end cannot appear in a routed source clause. -/
+theorem drawingRoutedClauseFormula_terminal_count_eq_zero_of_ne_start
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (terminal : SegmentTerminal)
+    (endNe : terminal.endpoint ≠ .start) :
+    (embeddedVariableOccurrences
+      (drawingRoutedClauseFormula formula)).count
+        (.carrier (.terminal terminal)) = 0 := by
+  apply List.count_eq_zero_of_not_mem
+  rw [embeddedVariableOccurrences_drawingRoutedClauseFormula]
+  intro nodeMem
+  rcases List.mem_flatMap.mp nodeMem with
+    ⟨site, siteMem, nodeMem⟩
+  rcases List.mem_map.mp nodeMem with
+    ⟨occurrence, occurrenceMem, nodeEq⟩
+  have terminalEq :
+      occurrence.sourceTerminal formula = terminal :=
+    CarrierNode.terminal.inj
+      (PlanarSATNode.carrier.inj nodeEq)
+  exact endNe
+    (by
+      have endpointEq :=
+        congrArg SegmentTerminal.endpoint terminalEq
+      simpa [CNFRouteOccurrence.sourceTerminal] using endpointEq.symm)
+
+/-- Active variable arms contain target terminals and atoms, never
+crossover boundaries. -/
+theorem drawingRoutedVariableFormula_boundary_count_eq_zero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (boundary : CrossingBoundary) :
+    (embeddedVariableOccurrences
+      (drawingRoutedVariableFormula formula)).count
+        (.carrier (.boundary boundary)) = 0 := by
+  rw [drawingRoutedVariableFormula_eq_equalityFamily,
+    equalityFamily_occurrence_count,
+    equalityLinkEndpoints_count_eq_firsts_add_seconds]
+  have firstZero :
+      ((drawingRoutedVariableLinks formula).map
+        EqualityLink.first).count
+          (.carrier (.boundary boundary)) = 0 := by
+    apply List.count_eq_zero_of_not_mem
+    intro nodeMem
+    rw [drawingRoutedVariableLinks_firsts] at nodeMem
+    rcases List.mem_flatMap.mp nodeMem with
+      ⟨site, siteMem, nodeMem⟩
+    have nodeMem' :=
+      List.mem_of_mem_take nodeMem
+    rcases (mem_routedVariableNodes_iff
+        formula site (.carrier (.boundary boundary))).mp nodeMem' with
+      ⟨occurrence, occurrenceMem, nodeEq⟩
+    cases PlanarSATNode.carrier.inj nodeEq
+  have secondZero :
+      ((drawingRoutedVariableLinks formula).map
+        EqualityLink.second).count
+          (.carrier (.boundary boundary)) = 0 := by
+    apply List.count_eq_zero_of_not_mem
+    intro nodeMem
+    rcases List.mem_map.mp nodeMem with
+      ⟨link, linkMem, nodeEq⟩
+    rcases List.mem_flatMap.mp linkMem with
+      ⟨site, siteMem, linkMem⟩
+    have secondEq :=
+      routedVariableLinksAt_second formula site linkMem
+    simp [secondEq] at nodeEq
+  omega
+
+/-- A non-target segment end cannot appear in an active variable arm. -/
+theorem drawingRoutedVariableFormula_terminal_count_eq_zero_of_ne_finish
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (terminal : SegmentTerminal)
+    (endNe : terminal.endpoint ≠ .finish) :
+    (embeddedVariableOccurrences
+      (drawingRoutedVariableFormula formula)).count
+        (.carrier (.terminal terminal)) = 0 := by
+  rw [drawingRoutedVariableFormula_eq_equalityFamily,
+    equalityFamily_occurrence_count,
+    equalityLinkEndpoints_count_eq_firsts_add_seconds]
+  have firstZero :
+      ((drawingRoutedVariableLinks formula).map
+        EqualityLink.first).count
+          (.carrier (.terminal terminal)) = 0 := by
+    apply List.count_eq_zero_of_not_mem
+    intro nodeMem
+    rw [drawingRoutedVariableLinks_firsts] at nodeMem
+    rcases List.mem_flatMap.mp nodeMem with
+      ⟨site, siteMem, nodeMem⟩
+    have nodeMem' :=
+      List.mem_of_mem_take nodeMem
+    rcases (mem_routedVariableNodes_iff
+        formula site (.carrier (.terminal terminal))).mp nodeMem' with
+      ⟨occurrence, occurrenceMem, nodeEq⟩
+    have terminalEq :
+        occurrence.targetTerminal formula = terminal :=
+      CarrierNode.terminal.inj
+        (PlanarSATNode.carrier.inj nodeEq.symm)
+    exact endNe
+      (by
+        have endpointEq :=
+          congrArg SegmentTerminal.endpoint terminalEq
+        simpa [CNFRouteOccurrence.targetTerminal] using endpointEq.symm)
+  have secondZero :
+      ((drawingRoutedVariableLinks formula).map
+        EqualityLink.second).count
+          (.carrier (.terminal terminal)) = 0 := by
+    apply List.count_eq_zero_of_not_mem
+    intro nodeMem
+    rcases List.mem_map.mp nodeMem with
+      ⟨link, linkMem, nodeEq⟩
+    rcases List.mem_flatMap.mp linkMem with
+      ⟨site, siteMem, linkMem⟩
+    have secondEq :=
+      routedVariableLinksAt_second formula site linkMem
+    simp [secondEq] at nodeEq
+  omega
+
+/-! ## The combined finite planar SAT formula -/
+
+/-- The route-core renaming into the combined SAT variable type is
+injective. -/
+theorem planarSATCoreVariableMap_injective
+    {Variable : Type*} :
+    Function.Injective
+      (@planarSATCoreVariableMap Variable) := by
+  intro first second equal
+  cases first <;> cases second <;>
+    simp [planarSATCoreVariableMap] at equal ⊢
+  all_goals exact equal
+
+/-- A renamed route-core variable has exactly its original occurrence
+count. -/
+theorem scopedDrawingPlanarSATCore_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (node :
+      Sum CarrierNode (CrossingRecord × CrossoverInternal)) :
+    @List.count
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq
+      (planarSATCoreVariableMap node)
+      (embeddedVariableOccurrences
+        (scopedDrawingPlanarSATCore formula)) =
+      @List.count
+        (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+        instBEqOfDecidableEq node
+        (embeddedVariableOccurrences
+          (drawingRoutePlanarCoreFormula
+            (PeriodicCNF.incidenceGraph formula))) := by
+  unfold scopedDrawingPlanarSATCore
+  simp only [EmbeddedClause.rename]
+  rw [embeddedVariableOccurrences_map]
+  exact
+    @List.count_map_of_injective
+      (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq (by infer_instance)
+      instBEqOfDecidableEq (by infer_instance)
+      (embeddedVariableOccurrences
+        (drawingRoutePlanarCoreFormula
+          (PeriodicCNF.incidenceGraph formula)))
+      planarSATCoreVariableMap
+      planarSATCoreVariableMap_injective node
+
+/-- Specialized count preservation for an external carrier node. -/
+theorem scopedDrawingPlanarSATCore_carrier_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (carrier : CarrierNode) :
+    @List.count
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq
+      (.inl (.carrier carrier))
+      (embeddedVariableOccurrences
+        (scopedDrawingPlanarSATCore formula)) =
+      @List.count
+        (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+        instBEqOfDecidableEq (.inl carrier)
+        (embeddedVariableOccurrences
+          (drawingRoutePlanarCoreFormula
+            (PeriodicCNF.incidenceGraph formula))) := by
+  simpa [planarSATCoreVariableMap] using
+    scopedDrawingPlanarSATCore_count formula (.inl carrier)
+
+/-- Specialized count preservation for a crossover-internal node. -/
+theorem scopedDrawingPlanarSATCore_internal_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (internal : CrossingRecord × CrossoverInternal) :
+    @List.count
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq
+      (.inr internal)
+      (embeddedVariableOccurrences
+        (scopedDrawingPlanarSATCore formula)) =
+      @List.count
+        (Sum CarrierNode (CrossingRecord × CrossoverInternal))
+        instBEqOfDecidableEq (.inr internal)
+        (embeddedVariableOccurrences
+          (drawingRoutePlanarCoreFormula
+            (PeriodicCNF.incidenceGraph formula))) := by
+  simpa [planarSATCoreVariableMap] using
+    scopedDrawingPlanarSATCore_count formula (.inr internal)
+
+/-- Central atoms are outside the route-core renaming's image. -/
+theorem scopedDrawingPlanarSATCore_atom_count_eq_zero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable) :
+    @List.count
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq
+      (.inl (.atom site))
+      (embeddedVariableOccurrences
+        (scopedDrawingPlanarSATCore formula)) = 0 := by
+  apply @List.count_eq_zero_of_not_mem
+    (PlanarSATVariable Variable)
+    instBEqOfDecidableEq (by infer_instance)
+  unfold scopedDrawingPlanarSATCore
+  simp only [EmbeddedClause.rename]
+  rw [embeddedVariableOccurrences_map]
+  simp [planarSATCoreVariableMap]
+
+/-- Renaming an external node into the combined SAT type preserves its
+occurrence count in the routed clause family. -/
+theorem scopedDrawingRoutedClauseFormula_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (node : PlanarSATNode Variable) :
+    @List.count
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq
+      (.inl node)
+      (embeddedVariableOccurrences
+        (scopedDrawingRoutedClauseFormula formula)) =
+      @List.count
+        (PlanarSATNode Variable)
+        instBEqOfDecidableEq node
+        (embeddedVariableOccurrences
+          (drawingRoutedClauseFormula formula)) := by
+  unfold scopedDrawingRoutedClauseFormula
+  simp only [EmbeddedClause.rename]
+  rw [embeddedVariableOccurrences_map]
+  exact
+    @List.count_map_of_injective
+      (PlanarSATNode Variable) (PlanarSATVariable Variable)
+      instBEqOfDecidableEq (by infer_instance)
+      instBEqOfDecidableEq (by infer_instance)
+      (embeddedVariableOccurrences
+        (drawingRoutedClauseFormula formula))
+      planarSATExternalVariableMap
+      (fun first second equal => Sum.inl.inj equal) node
+
+/-- The same count preservation holds for routed variable gadgets. -/
+theorem scopedDrawingRoutedVariableFormula_count
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (node : PlanarSATNode Variable) :
+    @List.count
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq
+      (.inl node)
+      (embeddedVariableOccurrences
+        (scopedDrawingRoutedVariableFormula formula)) =
+      @List.count
+        (PlanarSATNode Variable)
+        instBEqOfDecidableEq node
+        (embeddedVariableOccurrences
+          (drawingRoutedVariableFormula formula)) := by
+  unfold scopedDrawingRoutedVariableFormula
+  simp only [EmbeddedClause.rename]
+  rw [embeddedVariableOccurrences_map]
+  exact
+    @List.count_map_of_injective
+      (PlanarSATNode Variable) (PlanarSATVariable Variable)
+      instBEqOfDecidableEq (by infer_instance)
+      instBEqOfDecidableEq (by infer_instance)
+      (embeddedVariableOccurrences
+        (drawingRoutedVariableFormula formula))
+      planarSATExternalVariableMap
+      (fun first second equal => Sum.inl.inj equal) node
+
+/-- External clause and variable families contain no crossover-internal
+summand. -/
+theorem scopedDrawingRoutedExternal_internal_count_eq_zero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (internal : CrossingRecord × CrossoverInternal) :
+    @List.count
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq
+      (.inr internal)
+      (embeddedVariableOccurrences
+        (scopedDrawingRoutedClauseFormula formula)) = 0 ∧
+      @List.count
+        (PlanarSATVariable Variable)
+        instBEqOfDecidableEq
+        (.inr internal)
+        (embeddedVariableOccurrences
+          (scopedDrawingRoutedVariableFormula formula)) = 0 := by
+  constructor <;>
+    apply @List.count_eq_zero_of_not_mem
+      (PlanarSATVariable Variable)
+      instBEqOfDecidableEq (by infer_instance)
+  · unfold scopedDrawingRoutedClauseFormula
+    simp only [EmbeddedClause.rename]
+    rw [embeddedVariableOccurrences_map]
+    simp [planarSATExternalVariableMap]
+  · unfold scopedDrawingRoutedVariableFormula
+    simp only [EmbeddedClause.rename]
+    rw [embeddedVariableOccurrences_map]
+    simp [planarSATExternalVariableMap]
+
+/-- Under the source occurrence-three premise, the complete finite routed
+planar SAT formula fits the paper's degree-eight budget.  (The premise is
+used upstream to ensure there are at most three active variable arms.) -/
+theorem drawingPlanarSATFormula_occurrencesAtMostEight
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (_occurrences : formula.OccurrencesAtMost 3) :
+    FormulaOccurrencesAtMost 8
+      (drawingPlanarSATFormula formula) := by
+  intro atom
+  rw [drawingPlanarSATFormula,
+    embeddedVariableOccurrences_append,
+    embeddedVariableOccurrences_append]
+  rw [@List.count_append
+      (PlanarSATVariable Variable) instBEqOfDecidableEq,
+    @List.count_append
+      (PlanarSATVariable Variable) instBEqOfDecidableEq]
+  cases atom with
+  | inr internal =>
+      have externalZero :=
+        scopedDrawingRoutedExternal_internal_count_eq_zero
+          formula internal
+      rw [externalZero.1, externalZero.2]
+      simp only [Nat.add_zero]
+      rw [scopedDrawingPlanarSATCore_internal_count
+        formula internal]
+      exact
+        drawingRoutePlanarCoreFormula_occurrencesAtMostEight
+          (PeriodicCNF.incidenceGraph formula) (.inr internal)
+  | inl node =>
+      cases node with
+      | atom site =>
+          rw [scopedDrawingPlanarSATCore_atom_count_eq_zero
+              formula site,
+            scopedDrawingRoutedClauseFormula_count
+              formula (.atom site),
+            drawingRoutedClauseFormula_atom_count_eq_zero
+              formula site,
+            scopedDrawingRoutedVariableFormula_count
+              formula (.atom site)]
+          simp only [Nat.zero_add]
+          exact
+            (drawingRoutedVariableFormula_occurrencesAtMostSix
+              formula (.atom site)).trans (by omega)
+      | carrier carrier =>
+          cases carrier with
+          | boundary boundary =>
+              rw [scopedDrawingPlanarSATCore_carrier_count
+                    formula (.boundary boundary),
+                scopedDrawingRoutedClauseFormula_count
+                    formula (.carrier (.boundary boundary)),
+                drawingRoutedClauseFormula_boundary_count_eq_zero
+                    formula boundary,
+                scopedDrawingRoutedVariableFormula_count
+                    formula (.carrier (.boundary boundary)),
+                drawingRoutedVariableFormula_boundary_count_eq_zero
+                    formula boundary]
+              simp only [Nat.add_zero]
+              exact
+                drawingRoutePlanarCoreFormula_occurrencesAtMostEight
+                  (PeriodicCNF.incidenceGraph formula)
+                  (.inl (.boundary boundary))
+          | terminal terminal =>
+              cases terminal with
+              | mk indexed translate endpoint =>
+                  cases endpoint with
+                  | start =>
+                      rw [scopedDrawingPlanarSATCore_carrier_count
+                            formula
+                            (.terminal
+                              ⟨indexed, translate, .start⟩),
+                        scopedDrawingRoutedClauseFormula_count
+                            formula
+                            (.carrier (.terminal
+                              ⟨indexed, translate, .start⟩)),
+                        scopedDrawingRoutedVariableFormula_count
+                            formula
+                            (.carrier (.terminal
+                              ⟨indexed, translate, .start⟩)),
+                        drawingRoutedVariableFormula_terminal_count_eq_zero_of_ne_finish
+                            formula
+                            ⟨indexed, translate, .start⟩
+                            (by simp)]
+                      simp only [Nat.add_zero]
+                      have coreLe :=
+                        drawingRoutePlanarCoreFormula_terminal_count_le_six
+                          (PeriodicCNF.incidenceGraph formula)
+                          ⟨indexed, translate, .start⟩
+                      have clauseLe :=
+                        drawingRoutedClauseFormula_occurrencesAtMostOne
+                          formula
+                          (.carrier (.terminal
+                            ⟨indexed, translate, .start⟩))
+                      omega
+                  | finish =>
+                      rw [scopedDrawingPlanarSATCore_carrier_count
+                            formula
+                            (.terminal
+                              ⟨indexed, translate, .finish⟩),
+                        scopedDrawingRoutedClauseFormula_count
+                            formula
+                            (.carrier (.terminal
+                              ⟨indexed, translate, .finish⟩)),
+                        drawingRoutedClauseFormula_terminal_count_eq_zero_of_ne_start
+                            formula
+                            ⟨indexed, translate, .finish⟩
+                            (by simp),
+                        scopedDrawingRoutedVariableFormula_count
+                            formula
+                            (.carrier (.terminal
+                              ⟨indexed, translate, .finish⟩))]
+                      have coreLe :=
+                        drawingRoutePlanarCoreFormula_terminal_count_le_six
+                          (PeriodicCNF.incidenceGraph formula)
+                          ⟨indexed, translate, .finish⟩
+                      have variableLe :=
+                        drawingRoutedVariableFormula_carrier_count_le_two
+                          formula (.terminal
+                            ⟨indexed, translate, .finish⟩)
+                      omega
+
 end PeriodicOrthocrossing
 end LeanTrominoes
