@@ -2020,7 +2020,9 @@ The representation choices for this target are:
   square, and the route/route and vertex/route checks pass over the nine
   neighboring translates.  For the normalized construction it combines such
   a certificate with the established vertex distinctness and bounds to produce
-  the complete global assembly geometry.
+  the complete global assembly geometry.  Its continuous refinement adds the
+  exact collinear-interior check, yielding the stronger 3DM presentation needed
+  by degree-two contraction without overlooking coincident unit segments.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget
