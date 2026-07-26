@@ -1301,6 +1301,12 @@ The representation choices for this target are:
   by occurrence splitting, and proves that positive integral refinement
   preserves both terminal vectors' directions and complete terminal-port
   certificates.
+- [`LeanTrominoes/PeriodicThreeSATThreeAngularOrderSorted.lean`](LeanTrominoes/PeriodicThreeSATThreeAngularOrderSorted.lean)
+  proves that the arbitrary integer-ray polar comparator is total and
+  transitive, including its zero fallback.  Consequently each stable
+  merge-sorted occurrence list is pairwise ordered by its actual terminal
+  rays, providing the rotation-system fact needed by the noncrossing local
+  fan even when an incidence is not compass-aligned.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
