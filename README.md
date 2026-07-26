@@ -2008,6 +2008,12 @@ The representation choices for this target are:
   drawing.  The corresponding macrocell offsets are proved equal, exposing
   the finite drawing's injective-position certificate to the global
   distinctness proof.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexDistinctness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVertexDistinctness.lean)
+  tags the four assembled vertex families uniformly.  Source drawing
+  injectivity separates different owner macrocells, while the exhaustive
+  variable-site and X3C clause-core certificates separate vertices within
+  one owner.  Consequently the complete normalized assembled position list
+  is duplicate-free.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget
