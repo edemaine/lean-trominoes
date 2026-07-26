@@ -1368,6 +1368,14 @@ The representation choices for this target are:
   contain canonical crossings.  Hence every terminal prototype has normalized
   link-endpoint degree at most three and occurs at most six times in the
   deduplicated periodic equality formula.
+- [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
+  performs the corresponding periodic quotient for route-bend equalities.
+  Erasing a bend record's explicit translation preserves its normalized link,
+  and route plus incoming-segment index determine this erased geometry.
+  Endpoint orientation then forces all normalized bend links incident to a
+  fixed terminal prototype to coincide.  Thus bend deduplication contributes
+  at most two occurrences, and the complete normalized route wire has the
+  terminal bound `6 + 2 = 8`.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
