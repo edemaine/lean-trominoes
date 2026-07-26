@@ -134,6 +134,16 @@ end AxisDirection
 
 namespace PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+/-- Endpoint-only listed contact is symmetric in the two routes. -/
+theorem RoutesMeetOnlyAtEndpoints.symm
+    {first second : List Cell}
+    (meetOnly : RoutesMeetOnlyAtEndpoints first second) :
+    RoutesMeetOnlyAtEndpoints second first := by
+  intro secondIndex firstIndex equal
+  have endpoints :=
+    meetOnly firstIndex secondIndex equal.symm
+  exact ⟨endpoints.2, endpoints.1⟩
+
 /-- Two listed points on endpoint-contact-separated routes are unequal as
 soon as either occurrence is known not to be an advertised route endpoint. -/
 theorem routePoints_ne_of_routesMeetOnlyAtEndpoints

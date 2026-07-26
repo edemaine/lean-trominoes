@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceMacrocellSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceSeparation
 
@@ -193,6 +194,102 @@ theorem interiorSourceRibbonMacrocellRoute_strictlyAvoids_ribbonCorridorCore
           secondCenter secondNext fourth
           tailRouteEquation secondParts.2.2
           secondNoReversal.2
+      have shared :=
+        ribbonMacrocellExit_eq_entry_of_unitAxisStep
+          secondParts.2.1 secondColor
+      apply headAvoid.join_right tailAvoid
+        (ribbonMacrocellRoute_getLast? secondCenter
+          (AxisDirection.between secondPrevious secondCenter)
+          (AxisDirection.between secondCenter secondNext)
+          secondColor)
+      rw [shared]
+      exact
+        ribbonCorridorCore_head? secondColor
+          secondCenter secondNext fourth rest
+
+/-- The singleton core of a one-edge source route strictly avoids every tile
+in a longer corridor whose centers are interior to the second full route. -/
+theorem sourceRibbonPairCore_strictlyAvoids_ribbonCorridorCore
+    {firstRoute secondRoute : List Cell}
+    (meetOnly :
+      RoutesMeetOnlyAtEndpoints firstRoute secondRoute)
+    (firstCenter firstNext : Cell)
+    (firstCenterMember : firstCenter ∈ firstRoute)
+    (firstNextMember : firstNext ∈ firstRoute)
+    (firstUnit :
+      AxisDirection.IsUnitAxisStep firstCenter firstNext)
+    (secondLeading : List Cell)
+    (secondPrevious secondCenter secondNext : Cell)
+    (secondRest : List Cell)
+    (secondRouteEquation :
+      secondRoute =
+        secondLeading ++
+          secondPrevious :: secondCenter :: secondNext :: secondRest)
+    (secondNodup : secondRoute.Nodup)
+    (secondUnitSteps :
+      (secondPrevious :: secondCenter :: secondNext :: secondRest).IsChain
+        AxisDirection.IsUnitAxisStep)
+    (secondNoReversal :
+      SourceRouteHasNoImmediateReversal
+        (secondPrevious :: secondCenter :: secondNext :: secondRest))
+    (firstColor secondColor : WireColor) :
+    RoutesStrictlyAvoidEachOther
+      [ribbonMacrocellExit firstCenter
+        (AxisDirection.between firstCenter firstNext)
+        firstColor]
+      (ribbonCorridorCore secondColor
+        (secondPrevious :: secondCenter :: secondNext :: secondRest)) := by
+  induction secondRest generalizing
+      secondLeading secondPrevious secondCenter secondNext with
+  | nil =>
+      rw [ribbonCorridorCore]
+      have secondParts :=
+        unitSteps_cons_cons_cons secondUnitSteps
+      exact
+        sourceRibbonPairCore_strictlyAvoids_interiorSourceRibbonMacrocellRoute
+          meetOnly
+          firstCenterMember firstNextMember
+          (by
+            rw [secondRouteEquation]
+            simp)
+          (routeCenter_not_endpoint_of_nodup_of_eq_append_triple
+            secondRouteEquation secondNodup)
+          firstUnit secondParts.1 secondParts.2.1
+          secondNoReversal.1 firstColor secondColor
+  | cons fourth rest tailInduction =>
+      rw [ribbonCorridorCore]
+      have secondParts :=
+        unitSteps_cons_cons_cons secondUnitSteps
+      have headAvoid :=
+        sourceRibbonPairCore_strictlyAvoids_interiorSourceRibbonMacrocellRoute
+          meetOnly
+          firstCenterMember firstNextMember
+          (by
+            rw [secondRouteEquation]
+            simp)
+          (routeCenter_not_endpoint_of_nodup_of_eq_append_triple
+            secondRouteEquation secondNodup)
+          firstUnit secondParts.1 secondParts.2.1
+          secondNoReversal.1 firstColor secondColor
+      have tailRouteEquation :
+          secondRoute =
+            (secondLeading ++ [secondPrevious]) ++
+              secondCenter :: secondNext :: fourth :: rest := by
+        calc
+          secondRoute =
+              secondLeading ++
+                secondPrevious :: secondCenter :: secondNext ::
+                  fourth :: rest :=
+            secondRouteEquation
+          _ =
+              (secondLeading ++ [secondPrevious]) ++
+                secondCenter :: secondNext :: fourth :: rest := by
+            simp
+      have tailAvoid :=
+        tailInduction
+          (secondLeading ++ [secondPrevious])
+          secondCenter secondNext fourth
+          tailRouteEquation secondParts.2.2 secondNoReversal.2
       have shared :=
         ribbonMacrocellExit_eq_entry_of_unitAxisStep
           secondParts.2.1 secondColor
@@ -418,6 +515,188 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_length_ge_three
       (occurrenceUnitSourceRoute_hasNoImmediateReversal
         presentation.toContinuousPlanarIncidencePresentation second)
       firstColor secondColor
+
+/-- Colored corridor cores belonging to any two unequal active occurrences
+are strictly separated, including the one-edge singleton-core cases. -/
+theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second)
+    (firstColor secondColor : WireColor) :
+    RoutesStrictlyAvoidEachOther
+      (occurrenceRibbonCorridorCore
+        presentation.toPlanarIncidencePresentation first firstColor)
+      (occurrenceRibbonCorridorCore
+        presentation.toPlanarIncidencePresentation second secondColor) := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let firstRoute := occurrenceUnitSourceRoute planar first
+  let secondRoute := occurrenceUnitSourceRoute planar second
+  have meetOnly :
+      RoutesMeetOnlyAtEndpoints firstRoute secondRoute := by
+    simpa [firstRoute, secondRoute, planar] using
+      occurrenceUnitSourceRoutes_meetOnlyAtEndpoints_of_ne
+        presentation different
+  have firstNodup : firstRoute.Nodup := by
+    simpa [firstRoute, planar] using
+      occurrenceUnitSourceRoute_nodup presentation first
+  have secondNodup : secondRoute.Nodup := by
+    simpa [secondRoute, planar] using
+      occurrenceUnitSourceRoute_nodup presentation second
+  have firstLength : 2 ≤ firstRoute.length := by
+    simpa [firstRoute] using
+      occurrenceUnitSourceRoute_length planar first
+  have secondLength : 2 ≤ secondRoute.length := by
+    simpa [secondRoute] using
+      occurrenceUnitSourceRoute_length planar second
+  have firstUnitSteps :
+      firstRoute.IsChain AxisDirection.IsUnitAxisStep := by
+    simpa [firstRoute] using
+      occurrenceUnitSourceRoute_unitSteps planar first
+  have secondUnitSteps :
+      secondRoute.IsChain AxisDirection.IsUnitAxisStep := by
+    simpa [secondRoute] using
+      occurrenceUnitSourceRoute_unitSteps planar second
+  have firstNoReversal :
+      SourceRouteHasNoImmediateReversal firstRoute := by
+    simpa [firstRoute, planar] using
+      occurrenceUnitSourceRoute_hasNoImmediateReversal
+        presentation.toContinuousPlanarIncidencePresentation first
+  have secondNoReversal :
+      SourceRouteHasNoImmediateReversal secondRoute := by
+    simpa [secondRoute, planar] using
+      occurrenceUnitSourceRoute_hasNoImmediateReversal
+        presentation.toContinuousPlanarIncidencePresentation second
+  change
+    RoutesStrictlyAvoidEachOther
+      (ribbonCorridorCore firstColor firstRoute)
+      (ribbonCorridorCore secondColor secondRoute)
+  cases firstEquation : firstRoute with
+  | nil =>
+      simp [firstEquation] at firstLength
+  | cons firstCenter firstTail =>
+      cases firstTail with
+      | nil =>
+          simp [firstEquation] at firstLength
+      | cons firstNext firstRest =>
+          have firstUnit :
+              AxisDirection.IsUnitAxisStep
+                firstCenter firstNext :=
+            (List.isChain_cons_cons.mp
+              (by simpa [firstEquation] using firstUnitSteps)).1
+          cases secondEquation : secondRoute with
+          | nil =>
+              simp [secondEquation] at secondLength
+          | cons secondCenter secondTail =>
+              cases secondTail with
+              | nil =>
+                  simp [secondEquation] at secondLength
+              | cons secondNext secondRest =>
+                  have secondUnit :
+                      AxisDirection.IsUnitAxisStep
+                        secondCenter secondNext :=
+                    (List.isChain_cons_cons.mp
+                      (by
+                        simpa [secondEquation] using
+                          secondUnitSteps)).1
+                  cases firstRest with
+                  | nil =>
+                      cases secondRest with
+                      | nil =>
+                          have directionsDifferent
+                              (sameCenter :
+                                firstCenter = secondCenter) :
+                              AxisDirection.between
+                                  firstCenter firstNext ≠
+                                AxisDirection.between
+                                  secondCenter secondNext := by
+                            have sameStart :
+                                (occurrenceUnitSourceRoute
+                                    planar first).head? =
+                                  (occurrenceUnitSourceRoute
+                                    planar second).head? := by
+                              simp [firstRoute, secondRoute,
+                                firstEquation, secondEquation,
+                                sameCenter]
+                            have sourceDirectionsDifferent :=
+                              occurrenceSourceVariableDirections_ne_of_same_start
+                                presentation different
+                                (by
+                                  simpa [planar] using sameStart)
+                            change
+                              (AxisDirection.polylineFirstDirection
+                                    firstRoute ≠
+                                AxisDirection.polylineFirstDirection
+                                    secondRoute) at sourceDirectionsDifferent
+                            simpa [firstEquation, secondEquation] using
+                              sourceDirectionsDifferent
+                          simpa [firstEquation, secondEquation,
+                            ribbonCorridorCore,
+                            ribbonCorridorCoreStart] using
+                            sourceRibbonPairCores_strictlyAvoidEachOther
+                              firstUnit secondUnit
+                              directionsDifferent
+                              firstColor secondColor
+                      | cons secondThird secondRest =>
+                          simpa [firstEquation, secondEquation,
+                            ribbonCorridorCore,
+                            ribbonCorridorCoreStart] using
+                            sourceRibbonPairCore_strictlyAvoids_ribbonCorridorCore
+                              meetOnly
+                              firstCenter firstNext
+                              (by
+                                rw [firstEquation]
+                                simp)
+                              (by
+                                rw [firstEquation]
+                                simp)
+                              firstUnit
+                              [] secondCenter secondNext secondThird secondRest
+                              secondEquation secondNodup
+                              (by
+                                simpa [secondEquation] using
+                                  secondUnitSteps)
+                              (by
+                                simpa [secondEquation] using
+                                  secondNoReversal)
+                              firstColor secondColor
+                  | cons firstThird firstRest =>
+                      cases secondRest with
+                      | nil =>
+                          simpa [firstEquation, secondEquation,
+                            ribbonCorridorCore,
+                            ribbonCorridorCoreStart] using
+                            (sourceRibbonPairCore_strictlyAvoids_ribbonCorridorCore
+                              meetOnly.symm
+                              secondCenter secondNext
+                              (by
+                                rw [secondEquation]
+                                simp)
+                              (by
+                                rw [secondEquation]
+                                simp)
+                              secondUnit
+                              [] firstCenter firstNext firstThird firstRest
+                              firstEquation firstNodup
+                              (by
+                                simpa [firstEquation] using
+                                  firstUnitSteps)
+                              (by
+                                simpa [firstEquation] using
+                                  firstNoReversal)
+                              secondColor firstColor).symm
+                      | cons secondThird secondRest =>
+                          simpa [firstEquation, secondEquation] using
+                            sourceRibbonCorridorCores_strictlyAvoidEachOther
+                              meetOnly firstNodup secondNodup
+                              (by simp [firstEquation])
+                              (by simp [secondEquation])
+                              firstUnitSteps secondUnitSteps
+                              firstNoReversal secondNoReversal
+                              firstColor secondColor
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

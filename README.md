@@ -1503,6 +1503,8 @@ The representation choices for this target are:
   shared boundary would identify one route's internal center with a listed
   neighbor on the other route, contradicting the source separation
   certificate; the resulting strict separation holds for arbitrary colors.
+  Companion lemmas handle the singleton core of a one-edge source route and
+  prove that same-center exits in different genuine directions are distinct.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly.lean)
   recursively joins those half-edge tiles along a unit-step source route.
   Under the explicit no-immediate-reversal condition, the assembled core is
@@ -1520,9 +1522,9 @@ The representation choices for this target are:
   two different corridor cores.  Duplicate-freeness makes each displayed
   tile center internal to its complete source route, so endpoint-only source
   contact and the local macrocell theorem give strict separation for
-  arbitrary colors.  This is specialized to unequal active occurrences whose
-  unit source routes have at least three points; the exceptional one-edge
-  route shape remains part of the endpoint layer.
+  arbitrary colors.  Separate singleton/long and singleton/singleton cases
+  make the specialization unconditional: the colored cores of any two
+  unequal active occurrences strictly avoid one another.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean)
   lifts the closed-block bound from individual ribbon tiles to recursively
   assembled corridor cores.  Every listed core point is assigned to the
@@ -1582,9 +1584,10 @@ The representation choices for this target are:
   endpoint blocks.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean)
   specializes endpoint-direction separation to the active exact-one
-  incidences.  Unequal occurrences of one variable leave in different
-  directions, and unequal occurrences sharing one lifted clause endpoint
-  enter in different directions.  These are the finite direction constraints
+  incidences.  Unequal occurrences sharing any unitized start leave in
+  different directions (in particular, so do occurrences of one variable),
+  and unequal occurrences sharing one lifted clause endpoint enter in
+  different directions.  These are the finite direction constraints
   available to the remaining noncrossing endpoint-fan construction.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:

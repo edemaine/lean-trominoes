@@ -16,6 +16,61 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+/-- Distinct active source routes with the same unitized initial point leave
+that point in different cardinal directions. -/
+theorem occurrenceSourceVariableDirections_ne_of_same_start
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second)
+    (sameStart :
+      (occurrenceUnitSourceRoute
+          presentation.toPlanarIncidencePresentation first).head? =
+        (occurrenceUnitSourceRoute
+          presentation.toPlanarIncidencePresentation second).head?) :
+    occurrenceSourceVariableDirection
+        presentation.toPlanarIncidencePresentation first ≠
+      occurrenceSourceVariableDirection
+        presentation.toPlanarIncidencePresentation second := by
+  let planar := presentation.toPlanarIncidencePresentation
+  have firstNonempty :
+      occurrenceSourceRoute planar first ≠ [] :=
+    List.ne_nil_of_length_pos
+      (lt_of_lt_of_le (by decide)
+        (occurrenceSourceRoute_length planar first))
+  have secondNonempty :
+      occurrenceSourceRoute planar second ≠ [] :=
+    List.ne_nil_of_length_pos
+      (lt_of_lt_of_le (by decide)
+        (occurrenceSourceRoute_length planar second))
+  have originalSameStart :
+      (occurrenceSourceRoute planar first).head? =
+        (occurrenceSourceRoute planar second).head? := by
+    calc
+      (occurrenceSourceRoute planar first).head? =
+          (occurrenceUnitSourceRoute planar first).head? := by
+        rw [occurrenceUnitSourceRoute,
+          AxisDirection.unitSubdividePolyline_head? firstNonempty]
+      _ = (occurrenceUnitSourceRoute planar second).head? := by
+        simpa [planar] using sameStart
+      _ = (occurrenceSourceRoute planar second).head? := by
+        rw [occurrenceUnitSourceRoute,
+          AxisDirection.unitSubdividePolyline_head? secondNonempty]
+  rw [occurrenceSourceVariableDirection_eq_sourceRoute,
+    occurrenceSourceVariableDirection_eq_sourceRoute]
+  exact
+    polylineFirstDirections_ne_of_routesAvoidEachOther
+      (occurrenceSourceRoute_length planar first)
+      (occurrenceSourceRoute_length planar second)
+      (occurrenceSourceRoute_orthogonal planar first)
+      (occurrenceSourceRoute_orthogonal planar second)
+      originalSameStart
+      (occurrenceSourceRoutes_avoidEachOther_of_ne
+        presentation different)
+
 /-- Distinct active occurrences of one variable leave its source macrocell
 in different cardinal directions. -/
 theorem occurrenceSourceVariableDirections_ne_of_same_variable

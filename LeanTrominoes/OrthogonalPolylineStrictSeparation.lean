@@ -73,6 +73,46 @@ theorem routesStrictlyAvoidEachOther_of_avoid_of_noContact
     rw [← secondEqual, ← firstEqual]
     exact avoid.2.2.1 secondIndex firstIndex
 
+/-- Restricting the first route to one of its listed points preserves
+ordinary route separation.  The resulting singleton has no segments. -/
+theorem RoutesAvoidEachOther.singleton_left
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    {point : Cell}
+    (pointMember : point ∈ first) :
+    RoutesAvoidEachOther [point] second := by
+  rcases List.mem_iff_get.mp pointMember with
+    ⟨sourceIndex, sourceEquation⟩
+  unfold RoutesAvoidEachOther
+    SegmentInteriorsDisjoint
+    RoutePointsAvoidInteriors
+    RoutesMeetOnlyAtEndpoints
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro singletonSegment
+    exact Fin.elim0 singletonSegment
+  · intro singletonPoint secondSegment
+    have singletonEquation :
+        [point].get singletonPoint = point := by
+      simp
+    rw [singletonEquation, ← sourceEquation]
+    exact avoid.2.1 sourceIndex secondSegment
+  · intro _secondPoint singletonSegment
+    exact Fin.elim0 singletonSegment
+  · intro singletonPoint secondPoint equal
+    have singletonEquation :
+        [point].get singletonPoint = point := by
+      simp
+    have sourceEqual :
+        first.get sourceIndex = second.get secondPoint := by
+      exact
+        sourceEquation.trans
+          (singletonEquation.symm.trans equal)
+    have endpoints :=
+      avoid.2.2.2 sourceIndex secondPoint sourceEqual
+    constructor
+    · simp [RoutePointIsEndpoint]
+    · exact endpoints.2
+
 /-- Strict separation implies the ordinary endpoint-contact-permitting
 predicate. -/
 theorem RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther
