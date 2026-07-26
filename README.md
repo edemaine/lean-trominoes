@@ -379,6 +379,12 @@ The representation choices for this target are:
   positions subtract the common logical anchor, and verified endpoint
   identities recover both the displayed clause point and each translated
   literal point.
+  [`LeanTrominoes/PositionedPeriodicCNFIncidenceRouteLookup.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceRouteLookup.lean)
+  bridges the certificate's flat drawing lists back to individual
+  clause/literal occurrences.  It proves pointwise vertex-position and route
+  lookup, recovers each occurrence's positioned metadata, and derives the
+  exact source and translated-target endpoints of its declared route.  This
+  is the splice interface used by the planar 3DM gadget assembly.
   [`LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFinitePlanarity.lean)
   reduces the certificate's two infinite nonintersection predicates to
   executable finite checks whenever all stored vertices and segment endpoints
