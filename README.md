@@ -484,6 +484,13 @@ The representation choices for this target are:
   vertex positions, route list, and complete periodic drawing exactly.
   Consequently a certified planar incidence presentation transports directly
   to the normalized formula.
+  [`LeanTrominoes/PositionedPeriodicCNFRebasedRouteBounds.lean`](LeanTrominoes/PositionedPeriodicCNFRebasedRouteBounds.lean)
+  states the pointwise one-cell-halo bound needed after a source incidence is
+  reversed and rebased from its clause prototype to its variable prototype.
+  It proves that anchor normalization maps the metadata-rich incidence list
+  pointwise while leaving every such rebased route unchanged, and packages
+  the bound together with continuous source planarity for the three-strand
+  assembly.
   [`LeanTrominoes/PeriodicOneInThreeAnchorNormalization.lean`](LeanTrominoes/PeriodicOneInThreeAnchorNormalization.lean)
   closes the corresponding semantic obligation for exact-one formulas:
   normalization preserves each ordered clause-value list up to translation,

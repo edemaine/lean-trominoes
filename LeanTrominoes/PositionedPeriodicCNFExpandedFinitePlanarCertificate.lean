@@ -1,5 +1,5 @@
 import LeanTrominoes.PeriodicGridDrawingExpandedFiniteContinuousPlanarity
-import LeanTrominoes.PositionedPeriodicCNFIncidenceRouteLookup
+import LeanTrominoes.PositionedPeriodicCNFRebasedRouteBounds
 
 /-!
 # Halo-bounded finite certificates for positioned periodic CNF drawings
@@ -104,6 +104,25 @@ def toContinuousPlanarIncidencePresentation
   orthogonal := certificate.orthogonal
   planar := certificate.isContinuouslyPlanar.isPlanar
   continuouslyPlanar := certificate.isContinuouslyPlanar
+
+/-- Promote a finite drawing certificate together with the one additional
+rebased-route halo bound needed by the planar 3DM assembly. -/
+def toHaloBoundedContinuousPlanarIncidencePresentation
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (certificate :
+      ExpandedFiniteContinuousPlanarIncidenceCertificate
+        source placement)
+    (rebasedRoutePointsInside :
+      certificate.toContinuousPlanarIncidencePresentation
+        |>.toPlanarIncidencePresentation
+        |>.RebasedRoutePointsInExpandedSquare) :
+    HaloBoundedContinuousPlanarIncidencePresentation
+      source placement where
+  toContinuousPlanarIncidencePresentation :=
+    certificate.toContinuousPlanarIncidencePresentation
+  rebasedRoutePointsInside := rebasedRoutePointsInside
 
 end ExpandedFiniteContinuousPlanarIncidenceCertificate
 end PositionedPeriodicCNF
