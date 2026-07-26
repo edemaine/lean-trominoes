@@ -535,7 +535,9 @@ The representation choices for this target are:
   converts pointwise bounds on every stored polyline into the indexed
   segment-endpoint bounds required by the finite periodic checker.  Its
   route-splice membership lemma lets assembly proofs establish those bounds
-  independently for each local prefix, corridor, and suffix.
+  independently for each local prefix, corridor, and suffix.  Conversely,
+  endpoint bounds control every point of any nondegenerate stored route,
+  which is the form needed when refining a certified source drawing.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
