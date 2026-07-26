@@ -1468,6 +1468,11 @@ The representation choices for this target are:
   template: local compass ports are renamed to the corresponding fixed
   copies, and the refined variable placement agrees exactly with the
   translated local vertices.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleIndex.lean)
+  carries each flattened cycle clause's source atom and local Figure 7 index
+  in a parallel metadata list.  Projecting the metadata recovers the existing
+  formula exactly, so global route lookup can select certified local routes
+  without arithmetic assumptions about block size.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean)
   equips the positioned split with canonical orthogonal incidence detours.
   Their periodic endpoints agree exactly with the refined formula and
