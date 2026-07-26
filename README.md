@@ -417,6 +417,11 @@ The representation choices for this target are:
   conditions, and defines the strengthened positioned-incidence
   presentation required for safe gadget substitution.  The stronger
   certificate is invariant under clause-anchor normalization.
+  [`LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean)
+  makes that extra condition executable.  An interval-overlap bound reduces
+  every possible continuous contact to the same nine neighboring periodic
+  translations, and a finite Boolean check now certifies exact continuous
+  planarity together with the existing endpoint and vertex checks.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
