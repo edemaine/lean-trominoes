@@ -1437,8 +1437,11 @@ The representation choices for this target are:
   realize each contracted segment from its unique original incidence segment.
   The provenance enumeration is index-for-index equal to the contracted
   drawing's indexed segments, and its original occurrence-key map is
-  injective under the degree promise; this is the route decomposition used
-  to transfer the two planarity predicates.
+  injective under the degree promise.  Periodic translation and optional
+  reversal preserve closed and relative-interior containment, which transfers
+  both route-interior avoidance and vertex-interior avoidance from the
+  original presentation.  Thus the complete contracted drawing is certified
+  planar.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose

@@ -1302,6 +1302,281 @@ theorem PlanarPresentation.contractedOccurrenceKey_eq_of_originKey_eq
   subst secondTranslate
   rw [firstIndexedEq, secondIndexedEq]
 
+/-- Period translations respect addition in the graph lattice. -/
+theorem periodTranslation_add
+    (drawing : PeriodicGridDrawing) (first second : Cell) :
+    drawing.periodTranslation (Cell.add first second) =
+      Cell.add (drawing.periodTranslation first)
+        (drawing.periodTranslation second) := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [PeriodicGridDrawing.periodTranslation,
+    Cell.scale, Cell.add, Prod.mk.injEq]
+  constructor <;> ring
+
+/-- Successive segment translations combine by vector addition. -/
+theorem gridSegment_translate_translate
+    (segment : GridSegment) (first second : Cell) :
+    (segment.translate first).translate second =
+      segment.translate (Cell.add first second) := by
+  rcases segment with ⟨start, finish⟩
+  rcases start with ⟨startX, startY⟩
+  rcases finish with ⟨finishX, finishY⟩
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [GridSegment.translate, Cell.add]
+  congr 1 <;> apply Prod.ext <;> simp <;> ring
+
+/-- Contracting routes does not change the fundamental period. -/
+@[simp]
+theorem PlanarPresentation.contractedDrawing_periodTranslation
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (translate : Cell) :
+    presentation.contractedDrawing.periodTranslation translate =
+      presentation.drawing.periodTranslation translate := by
+  rfl
+
+/-- Translating a realized contracted segment is the same as translating
+its original segment by the sum of its provenance and occurrence shifts,
+up to the harmless traversal reversal recorded in the provenance. -/
+theorem ContractedSegmentOrigin.realize_translate
+    (drawing : PeriodicGridDrawing)
+    (origin : ContractedSegmentOrigin)
+    (translate : Cell) :
+    (origin.realize drawing).translate
+        (drawing.periodTranslation translate) =
+      let translated :=
+        origin.original.segment.translate
+          (drawing.periodTranslation
+            (Cell.add origin.latticeShift translate))
+      if origin.reversed then translated.reverse else translated := by
+  cases reversedEq : origin.reversed
+  · simp only [ContractedSegmentOrigin.realize, reversedEq,
+      Bool.false_eq_true, ↓reduceIte]
+    rw [gridSegment_translate_translate,
+      periodTranslation_add]
+  · simp only [ContractedSegmentOrigin.realize, reversedEq,
+      ↓reduceIte]
+    rw [← GridSegment.reverse_translate,
+      gridSegment_translate_translate,
+      periodTranslation_add]
+
+/-- Closed containment of a translated realized segment is exactly closed
+containment of its translated original segment. -/
+theorem ContractedSegmentOrigin.realize_translate_contains_iff
+    (drawing : PeriodicGridDrawing)
+    (origin : ContractedSegmentOrigin)
+    (translate point : Cell) :
+    ((origin.realize drawing).translate
+        (drawing.periodTranslation translate)).Contains point ↔
+      (origin.original.segment.translate
+        (drawing.periodTranslation
+          (Cell.add origin.latticeShift translate))).Contains point := by
+  rw [origin.realize_translate]
+  split
+  · simpa only using
+      GridSegment.contains_reverse
+        (origin.original.segment.translate
+          (drawing.periodTranslation
+            (Cell.add origin.latticeShift translate)))
+        point
+  · rfl
+
+/-- Relative-interior containment of a translated realized segment is
+exactly relative-interior containment of its translated original segment. -/
+theorem ContractedSegmentOrigin.realize_translate_interiorContains_iff
+    (drawing : PeriodicGridDrawing)
+    (origin : ContractedSegmentOrigin)
+    (translate point : Cell) :
+    ((origin.realize drawing).translate
+        (drawing.periodTranslation translate)).InteriorContains point ↔
+      (origin.original.segment.translate
+        (drawing.periodTranslation
+          (Cell.add origin.latticeShift translate))).InteriorContains
+        point := by
+  rw [origin.realize_translate]
+  split
+  · simpa only using
+      GridSegment.interiorContains_reverse
+        (origin.original.segment.translate
+          (drawing.periodTranslation
+            (Cell.add origin.latticeShift translate)))
+        point
+  · rfl
+
+/-- No contracted route segment enters any distinct contracted route
+occurrence.  Provenance injectivity turns distinct contracted occurrences
+into distinct occurrences of the original planar presentation. -/
+theorem PlanarPresentation.contractedDrawing_routesAvoidInteriors
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (degreeTwoOrThree : problem.DegreeTwoOrThree) :
+    presentation.contractedDrawing.RoutesAvoidInteriors := by
+  intro first firstMember second secondMember
+    firstTranslate secondTranslate point keysDifferent
+    firstInterior secondContains
+  rcases presentation.contractedIndexedSegment_has_origin
+      firstMember with
+    ⟨firstTaggedEdge, firstTaggedOrigin,
+      firstEdgeMember, firstOriginMember, firstIndexedEq⟩
+  rcases presentation.contractedIndexedSegment_has_origin
+      secondMember with
+    ⟨secondTaggedEdge, secondTaggedOrigin,
+      secondEdgeMember, secondOriginMember, secondIndexedEq⟩
+  have firstEdgeValueMember :
+      firstTaggedEdge.1 ∈ problem.contractedEdges :=
+    List.fst_mem_of_mem_zipIdx firstEdgeMember
+  have secondEdgeValueMember :
+      secondTaggedEdge.1 ∈ problem.contractedEdges :=
+    List.fst_mem_of_mem_zipIdx secondEdgeMember
+  have firstOriginValueMember :
+      firstTaggedOrigin.1 ∈
+        presentation.contractedSegmentOrigins
+          firstTaggedEdge.1 :=
+    List.fst_mem_of_mem_zipIdx firstOriginMember
+  have secondOriginValueMember :
+      secondTaggedOrigin.1 ∈
+        presentation.contractedSegmentOrigins
+          secondTaggedEdge.1 :=
+    List.fst_mem_of_mem_zipIdx secondOriginMember
+  have firstOriginalMember :=
+    presentation.contractedSegmentOrigin_original_mem
+      firstEdgeValueMember firstOriginValueMember
+  have secondOriginalMember :=
+    presentation.contractedSegmentOrigin_original_mem
+      secondEdgeValueMember secondOriginValueMember
+  have originKeysDifferent :
+      PeriodicGridDrawing.SegmentOccurrenceKey
+          firstTaggedOrigin.1.original
+          (Cell.add firstTaggedOrigin.1.latticeShift
+            firstTranslate) ≠
+        PeriodicGridDrawing.SegmentOccurrenceKey
+          secondTaggedOrigin.1.original
+          (Cell.add secondTaggedOrigin.1.latticeShift
+            secondTranslate) := by
+    intro originKeysEqual
+    exact keysDifferent
+      (presentation.contractedOccurrenceKey_eq_of_originKey_eq
+        degreeTwoOrThree
+        firstEdgeMember secondEdgeMember
+        firstOriginMember secondOriginMember
+        firstIndexedEq secondIndexedEq
+        firstTranslate secondTranslate originKeysEqual)
+  have firstRealizedInterior :
+      ((firstTaggedOrigin.1.realize presentation.drawing).translate
+        (presentation.drawing.periodTranslation
+          firstTranslate)).InteriorContains point := by
+    rw [firstIndexedEq] at firstInterior
+    simpa using firstInterior
+  have secondRealizedContains :
+      ((secondTaggedOrigin.1.realize presentation.drawing).translate
+        (presentation.drawing.periodTranslation
+          secondTranslate)).Contains point := by
+    rw [secondIndexedEq] at secondContains
+    simpa using secondContains
+  have firstOriginalInterior :
+      (firstTaggedOrigin.1.original.segment.translate
+        (presentation.drawing.periodTranslation
+          (Cell.add firstTaggedOrigin.1.latticeShift
+            firstTranslate))).InteriorContains point :=
+    (firstTaggedOrigin.1.realize_translate_interiorContains_iff
+      presentation.drawing firstTranslate point).mp
+      firstRealizedInterior
+  have secondOriginalContains :
+      (secondTaggedOrigin.1.original.segment.translate
+        (presentation.drawing.periodTranslation
+          (Cell.add secondTaggedOrigin.1.latticeShift
+            secondTranslate))).Contains point :=
+    (secondTaggedOrigin.1.realize_translate_contains_iff
+      presentation.drawing secondTranslate point).mp
+      secondRealizedContains
+  exact
+    (presentation.planar.1
+      firstTaggedOrigin.1.original firstOriginalMember
+      secondTaggedOrigin.1.original secondOriginalMember
+      (Cell.add firstTaggedOrigin.1.latticeShift firstTranslate)
+      (Cell.add secondTaggedOrigin.1.latticeShift secondTranslate)
+      point originKeysDifferent firstOriginalInterior)
+      secondOriginalContains
+
+/-- Contracted vertices remain clear of contracted route interiors because
+both are inherited from the original planar presentation. -/
+theorem PlanarPresentation.contractedDrawing_verticesAvoidRouteInteriors
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.contractedDrawing.VerticesAvoidRouteInteriors := by
+  intro vertexPosition vertexPositionMember
+    indexed indexedMember vertexTranslate routeTranslate
+    interiorContains
+  change vertexPosition ∈
+    presentation.contractedVertexPositions at vertexPositionMember
+  rw [presentation.contractedVertexPositions_eq_map] at vertexPositionMember
+  rcases List.mem_map.mp vertexPositionMember with
+    ⟨vertex, vertexMember, vertexPositionEq⟩
+  subst vertexPosition
+  have originalVertexMember :=
+    contractedGraph_vertex_mem_incidenceGraph
+      problem vertexMember
+  have originalPositionMember :=
+    presentation.vertexPosition_mem originalVertexMember
+  rcases presentation.contractedIndexedSegment_has_origin
+      indexedMember with
+    ⟨taggedEdge, taggedOrigin, edgeMember,
+      originMember, indexedEq⟩
+  have edgeValueMember :
+      taggedEdge.1 ∈ problem.contractedEdges :=
+    List.fst_mem_of_mem_zipIdx edgeMember
+  have originValueMember :
+      taggedOrigin.1 ∈
+        presentation.contractedSegmentOrigins taggedEdge.1 :=
+    List.fst_mem_of_mem_zipIdx originMember
+  have originalSegmentMember :=
+    presentation.contractedSegmentOrigin_original_mem
+      edgeValueMember originValueMember
+  have realizedInterior :
+      ((taggedOrigin.1.realize presentation.drawing).translate
+        (presentation.drawing.periodTranslation
+          routeTranslate)).InteriorContains
+        (Cell.add
+          (presentation.drawing.vertexPosition
+            problem.incidenceGraph vertex)
+          (presentation.drawing.periodTranslation
+            vertexTranslate)) := by
+    rw [indexedEq] at interiorContains
+    simpa using interiorContains
+  have originalInterior :
+      (taggedOrigin.1.original.segment.translate
+        (presentation.drawing.periodTranslation
+          (Cell.add taggedOrigin.1.latticeShift
+            routeTranslate))).InteriorContains
+        (Cell.add
+          (presentation.drawing.vertexPosition
+            problem.incidenceGraph vertex)
+          (presentation.drawing.periodTranslation
+            vertexTranslate)) :=
+    (taggedOrigin.1.realize_translate_interiorContains_iff
+      presentation.drawing routeTranslate _).mp realizedInterior
+  exact
+    presentation.planar.2
+      (presentation.drawing.vertexPosition
+        problem.incidenceGraph vertex)
+      originalPositionMember
+      taggedOrigin.1.original originalSegmentMember
+      vertexTranslate
+      (Cell.add taggedOrigin.1.latticeShift routeTranslate)
+      originalInterior
+
+/-- Degree-two contraction preserves the complete geometric planarity
+predicate. -/
+theorem PlanarPresentation.contractedDrawing_isPlanar
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (degreeTwoOrThree : problem.DegreeTwoOrThree) :
+    presentation.contractedDrawing.IsPlanar :=
+  ⟨presentation.contractedDrawing_routesAvoidInteriors degreeTwoOrThree,
+    presentation.contractedDrawing_verticesAvoidRouteInteriors⟩
+
 end PeriodicThreeDM
 
 end LeanTrominoes
