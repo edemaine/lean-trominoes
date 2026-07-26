@@ -1,5 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMNormalized
-import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonUnitRoutes
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFans
 
 /-!
 # Packaging corrected ribbon corridors as three-strand routing
@@ -16,40 +16,6 @@ namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PeriodicOrthocrossing
-
-/-- Orthogonal variable-side stub from the finite gadget port to the first
-ribbon macrocell boundary. -/
-noncomputable def occurrenceRibbonVariableStub
-    {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (entry : ActiveOccurrenceEntry source.erase)
-    (color : WireColor) : List Cell :=
-  PositionedPeriodicCNF.orthogonalDetour
-    (Cell.add
-      (constructedVariableOrigin placement
-        standardThreeStrandLayout entry.1.1)
-      (routedVariablePortPosition source.erase entry color))
-    (ribbonCorridorRouteStart color
-      (occurrenceUnitSourceRoute presentation entry))
-
-/-- Orthogonal clause-side stub from the final ribbon macrocell boundary to
-the finite clause terminal in its referenced periodic translate. -/
-noncomputable def occurrenceRibbonClauseStub
-    {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (entry : ActiveOccurrenceEntry source.erase)
-    (color : WireColor) : List Cell :=
-  PositionedPeriodicCNF.orthogonalDetour
-    (ribbonCorridorRouteEnd color
-      (occurrenceUnitSourceRoute presentation entry))
-    (routedClauseTargetPosition source.erase
-      (standardThreeStrandLayout.factor * placement.period)
-      (constructedClauseOrigin source standardThreeStrandLayout)
-      entry color)
 
 /-- Complete corrected colored route: variable stub, certified ribbon core,
 and clause stub. -/
@@ -90,17 +56,23 @@ theorem occurrenceRibbonThreeStrandRoute_endpoints
   have coreEndpoints :=
     occurrenceRibbonCorridorCore_endpoints
       presentation entry color
+  have variableEndpoints :=
+    occurrenceRibbonVariableStub_endpoints
+      presentation entry color
+  have clauseEndpoints :=
+    occurrenceRibbonClauseStub_endpoints
+      presentation entry color
   constructor
   · apply joinAtEndpoint_head?
     apply joinAtEndpoint_head?
-    exact PositionedPeriodicCNF.orthogonalDetour_head? _ _
+    exact variableEndpoints.1
   · apply joinAtEndpoint_getLast?
     · apply joinAtEndpoint_getLast?
-      · exact PositionedPeriodicCNF.orthogonalDetour_getLast? _ _
+      · exact variableEndpoints.2
       · exact coreEndpoints.1
       · exact coreEndpoints.2
-    · exact PositionedPeriodicCNF.orthogonalDetour_head? _ _
-    · exact PositionedPeriodicCNF.orthogonalDetour_getLast? _ _
+    · exact clauseEndpoints.1
+    · exact clauseEndpoints.2
 
 /-- Every corrected route inherited from a continuously planar source is
 rectilinear. -/
@@ -120,30 +92,36 @@ theorem occurrenceRibbonThreeStrandRoute_orthogonal
   have coreEndpoints :=
     occurrenceRibbonCorridorCore_endpoints
       planar entry color
+  have variableEndpoints :=
+    occurrenceRibbonVariableStub_endpoints
+      planar entry color
+  have clauseEndpoints :=
+    occurrenceRibbonClauseStub_endpoints
+      planar entry color
   have variableStubOrthogonal :
       OrthogonalPolyline
         (occurrenceRibbonVariableStub
           planar entry color) := by
-    simp only [occurrenceRibbonVariableStub]
-    exact PositionedPeriodicCNF.orthogonalDetour_orthogonal _ _
+    exact occurrenceRibbonVariableStub_orthogonal
+      planar entry color
   have clauseStubOrthogonal :
       OrthogonalPolyline
         (occurrenceRibbonClauseStub
           planar entry color) := by
-    simp only [occurrenceRibbonClauseStub]
-    exact PositionedPeriodicCNF.orthogonalDetour_orthogonal _ _
+    exact occurrenceRibbonClauseStub_orthogonal
+      planar entry color
   have firstOrthogonal :=
     variableStubOrthogonal.joinAtEndpoint
       (occurrenceRibbonCorridorCore_orthogonal
         presentation entry color)
-      (PositionedPeriodicCNF.orthogonalDetour_getLast? _ _)
+      variableEndpoints.2
       coreEndpoints.1
   apply firstOrthogonal.joinAtEndpoint clauseStubOrthogonal
   · apply joinAtEndpoint_getLast?
-    · exact PositionedPeriodicCNF.orthogonalDetour_getLast? _ _
+    · exact variableEndpoints.2
     · exact coreEndpoints.1
     · exact coreEndpoints.2
-  · exact PositionedPeriodicCNF.orthogonalDetour_head? _ _
+  · exact clauseEndpoints.1
 
 /-- A continuously planar exact-one incidence presentation supplies the
 corrected endpoint-certified three-strand routing interface. -/

@@ -1530,13 +1530,21 @@ The representation choices for this target are:
   certified exact endpoints and orthogonality, and every listed point is an
   endpoint or the single coordinatewise bend; unlike a fresh-coordinate
   detour, it therefore cannot leave the coordinate box of its endpoints.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFans.lean)
+  instantiates those elbows between every exact finite-gadget port and its
+  direction-dependent ribbon boundary point.  The variable fan approaches
+  the boundary parallel to the outgoing source edge, while the clause fan
+  leaves it parallel to the incoming edge.  Exhaustive finite checks put
+  every possible variable and clause port in the standard block; the elbow
+  membership theorem then proves that every translated fan point remains in
+  its owning refined block.  Both fans have certified exact endpoints and
+  orthogonality.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean)
-  connects each corrected corridor core from its two macrocell-boundary
-  endpoints to the existing finite variable and clause gadget ports.  The
-  joined route is proved to have the exact endpoints and orthogonality
-  required by `ThreeStrandRouting`, yielding a normalized corrected routing
-  object for the hardness assembly.  Contact-freeness of these endpoint
-  fans remains the next geometric layer.
+  joins the two certified block-local endpoint fans to each corrected
+  corridor core.  The complete route is proved to have the exact endpoints
+  and orthogonality required by `ThreeStrandRouting`, yielding a normalized
+  corrected routing object for the hardness assembly.  Contact-freeness of
+  the endpoint fans remains the next geometric layer.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
