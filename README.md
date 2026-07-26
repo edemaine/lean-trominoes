@@ -1402,6 +1402,14 @@ The representation choices for this target are:
   source attachment contributes one occurrence, and the complete normalized
   external family has sharp endpoint totals seven at sources and eight at
   targets.
+- [`LeanTrominoes/PeriodicCNFPlanarAtomNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarAtomNormalizationDegree.lean)
+  bounds the remaining external variable class, the central SAT atoms.
+  Distinct normalized active arms at a fixed atom inject into distinct global
+  source-incidence indices.  The source formula's three-occurrence hypothesis
+  therefore permits at most three arms and six implication-literal
+  occurrences.  Route wires and routed source clauses contain no central
+  atoms, so the same six-occurrence bound holds for their complete normalized
+  external union.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
