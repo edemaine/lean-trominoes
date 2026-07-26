@@ -1423,7 +1423,8 @@ The representation choices for this target are:
   reconciles the contracted graph's element-major edge order with the
   original graph's triple-major incidence order.  Under the well-formed
   degree-two-or-three promise, flattening the tags stored on contracted edges
-  covers exactly all original incidence tags; the endpoint-opposition law is
+  is a duplicate-free permutation of all original incidence tags, so every
+  original route is consumed exactly once; the endpoint-opposition law is
   also lifted from one element block to every executable contracted edge.
 - [`LeanTrominoes/PeriodicThreeDMContractionGeometry.lean`](LeanTrominoes/PeriodicThreeDMContractionGeometry.lean)
   proves the first geometric invariant of contraction: translating,
