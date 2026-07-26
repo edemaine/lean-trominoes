@@ -1322,6 +1322,12 @@ The representation choices for this target are:
   injective logical variable renaming whose target placement preserves the
   source coordinates.  Incidence order and routes remain unchanged, while
   injectivity preserves the deduplicated graph-vertex list.
+- [`LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean`](LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean)
+  renames a certified angular fan's ports to the actual
+  `copy atom port` variables and translates it into the selected positioned
+  source-variable macrocell.  The resulting total variable placement is
+  proved identical to the semantic fixed-eight placement, and every fitting
+  instance inherits the full finite drawing certificate.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
