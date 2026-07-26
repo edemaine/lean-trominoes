@@ -39,6 +39,7 @@ import LeanTrominoes.IndexedSavitchDFSPartrec
 import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PlanarThreeSATGadgets
+import LeanTrominoes.EmbeddedCNFIncidenceDrawing
 import LeanTrominoes.PlanarThreeSATInstantiation
 import LeanTrominoes.PlanarThreeSATFamilies
 import LeanTrominoes.PlanarThreeSATFamilyExtensions

@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarSATDeduplication
 import LeanTrominoes.PositionedPeriodicCNFDeduplicationRoutes
+import LeanTrominoes.EmbeddedCNFIncidenceDrawing
 
 /-!
 # Incidence routes for the deduplicated routed SAT source
@@ -21,22 +22,6 @@ namespace PeriodicOrthocrossing
 open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
-
-/-- Raw endpoint condition for an arbitrary finite embedded formula and a
-declared physical position for each finite variable. -/
-def EmbeddedPhysicalIncidenceRoutesMatch
-    {FiniteVariable : Type*}
-    (finiteFormula : List (EmbeddedClause FiniteVariable))
-    (variablePosition : FiniteVariable → Cell)
-    (routes : PositionedPeriodicCNF.IncidenceRoutes) : Prop :=
-  ∀ clause clauseIndex,
-    (clause, clauseIndex) ∈ finiteFormula.zipIdx →
-      ∀ literal literalIndex,
-        (literal, literalIndex) ∈ clause.literals.zipIdx →
-          (routes clauseIndex literalIndex).head? =
-              some clause.position ∧
-            (routes clauseIndex literalIndex).getLast? =
-              some (variablePosition literal.1)
 
 /-- Raw endpoint condition for routes indexed by the finite routed planar SAT
 formula before periodicization. -/

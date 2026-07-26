@@ -1196,6 +1196,13 @@ The representation choices for this target are:
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
   its center value to all three ports and that the Lichtenstein crossover's
   two Boolean signals propagate independently between opposite ports.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawing.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawing.lean)
+  packages a finite positioned CNF with variable coordinates and one
+  presentation-indexed route per literal.  Its finitely decidable certificate
+  checks exact endpoints, orthogonality, continuous route separation,
+  endpoint-only contact, vertex-interior avoidance, and distinct graph
+  vertices; bridge lemmas recover the membership-style endpoint obligation
+  used by the input-dependent periodic routing layer.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover
