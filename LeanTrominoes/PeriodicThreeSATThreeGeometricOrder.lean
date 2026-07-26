@@ -67,6 +67,39 @@ def routeTerminalDirection (route : List Cell) : TerminalDirection :=
       else
         .degenerate
 
+/-- An axis-aligned final segment always determines one of the four genuine
+directions. -/
+theorem routeTerminalDirection_ne_degenerate_of_last_axisAligned
+    {route : List Cell} {segment : GridSegment}
+    (last : (gridPolylineSegments route).getLast? = some segment)
+    (aligned : segment.IsAxisAligned) :
+    routeTerminalDirection route ≠ .degenerate := by
+  unfold routeTerminalDirection
+  rw [last]
+  rcases segment with ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+  simp only [GridSegment.IsAxisAligned,
+    GridSegment.IsHorizontal, GridSegment.IsVertical] at aligned
+  rcases aligned with ⟨sameY, differentX⟩ |
+      ⟨sameX, differentY⟩
+  · subst finishY
+    by_cases east : finishX < startX
+    · simp [east]
+    · have west : startX < finishX := by omega
+      simp [east, west]
+  · subst finishX
+    by_cases north : finishY < startY
+    · simp [differentY, north]
+    · have south : startY < finishY := by omega
+      simp [differentY, north, south]
+
+/-- Every genuine terminal direction has a rank in the four-position cyclic
+range. -/
+theorem TerminalDirection.rank_lt_four
+    {direction : TerminalDirection}
+    (genuine : direction ≠ .degenerate) :
+    direction.rank < 4 := by
+  cases direction <;> simp_all [TerminalDirection.rank]
+
 /-- Terminal direction of the incidence route named by one occurrence
 copy's clause and literal indices. -/
 def occurrenceTerminalDirection
@@ -108,6 +141,30 @@ theorem geometricOccurrenceVariables_perm
     (geometricOccurrenceVariables source routes atom).Perm
       (occurrenceVariables source atom) := by
   exact List.mergeSort_perm _ _
+
+/-- The extracted list is monotonically ordered by cyclic direction rank. -/
+theorem geometricOccurrenceVariables_pairwise
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (atom : Variable) :
+    (geometricOccurrenceVariables source routes atom).Pairwise
+      (fun first second =>
+        (occurrenceTerminalDirection routes first).rank ≤
+          (occurrenceTerminalDirection routes second).rank) := by
+  unfold geometricOccurrenceVariables
+  have sorted :=
+    List.pairwise_mergeSort
+      (le := occurrenceDirectionLE routes)
+      (fun first second third firstLe secondLe => by
+        simp only [occurrenceDirectionLE, decide_eq_true_eq] at firstLe secondLe
+        simp only [occurrenceDirectionLE, decide_eq_true_eq]
+        omega)
+      (fun first second => by
+        simp only [occurrenceDirectionLE, Bool.or_eq_true, decide_eq_true_eq]
+        omega)
+      (occurrenceVariables source atom)
+  simpa only [occurrenceDirectionLE, decide_eq_true_eq] using sorted
 
 /-- A lawful occurrence order extracted from the terminal directions of a
 route family. -/
