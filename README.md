@@ -1476,8 +1476,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean)
   equips the positioned split with canonical orthogonal incidence detours.
   Their periodic endpoints agree exactly with the refined formula and
-  placement, providing the compatible axis-aligned baseline for the later
-  noncrossing ring splice.
+  placement.  It also defines the first exact route splice: copied source
+  clauses retain those canonical detours, while every appended implication
+  cycle selects its translated certified Figure 7 route through the parallel
+  metadata index.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean)
   assigns the eight copies by their actual routed terminal rays rather than
   by an arbitrary starting point in the cyclic angular order.  The resulting
