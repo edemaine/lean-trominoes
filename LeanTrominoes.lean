@@ -284,6 +284,7 @@ import LeanTrominoes.PartrecSubtract
 import LeanTrominoes.PartrecSubtractSpace
 import LeanTrominoes.PartrecUnpair
 import LeanTrominoes.PartrecUnpairSpace
+import LeanTrominoes.OccurrenceSplitRingDrawing
 import LeanTrominoes.StripFrontier
 import LeanTrominoes.StripFrontierCorrectness
 import LeanTrominoes.StripFrontierCyclePartrec

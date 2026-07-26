@@ -1230,6 +1230,13 @@ The representation choices for this target are:
   endpoint-only contact, vertex-interior avoidance, and distinct graph
   vertices; bridge lemmas recover the membership-style endpoint obligation
   used by the input-dependent periodic routing layer.
+- [`LeanTrominoes/OccurrenceSplitRingDrawing.lean`](LeanTrominoes/OccurrenceSplitRingDrawing.lean)
+  encodes the worst-case degree-eight neighborhood of Figure 7.  Eight
+  occurrence copies lie on an inner square, the implication clauses occupy
+  its eight gaps, and the four diagonal old rays bend outside the ring.
+  Finite computation certifies all 24 incidences simultaneously: exact
+  endpoints, orthogonality, and continuous planarity.  This is the local
+  kernel for the geometry-ordered occurrence-splitting substitution.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover
