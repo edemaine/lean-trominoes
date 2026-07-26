@@ -1301,6 +1301,11 @@ The representation choices for this target are:
   by occurrence splitting, and proves that positive integral refinement
   preserves both terminal vectors' directions and complete terminal-port
   certificates.
+- [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
+  packages compass-validity for finite embedded incidence drawings and
+  exhaustively certifies every direct incidence of the fixed Figure 8(a)
+  duplicator and Figure 8(b) crossover.  Collinear ties are allowed here
+  because the later stable angular split separates them into adjacent ports.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
