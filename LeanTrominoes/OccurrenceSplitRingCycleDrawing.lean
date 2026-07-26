@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicEightOccurrenceSplit
+import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
 
 /-!
 # Certified implication-cycle subdrawing of Figure 7
@@ -52,6 +53,18 @@ theorem cycleDrawing_isOrthogonal : cycleDrawing.IsOrthogonal :=
 
 theorem cycleDrawing_isPlanar : cycleDrawing.IsPlanar :=
   cycleDrawing_isValid.2.2
+
+/-- One implication ring placed at an arbitrary macrocell origin. -/
+def translatedCycleDrawing (offset : Cell) :
+    EmbeddedCNFIncidenceDrawing Port :=
+  cycleDrawing.translate offset
+
+/-- Every translated implication ring inherits the complete local
+certificate. -/
+theorem translatedCycleDrawing_isValid (offset : Cell) :
+    (translatedCycleDrawing offset).IsValid :=
+  EmbeddedCNFIncidenceDrawing.isValid_translate
+    cycleDrawing_isValid offset
 
 /-- Rename one local implication clause to the eight fixed copies of a
 source atom and add the common zero periodic offset. -/

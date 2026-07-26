@@ -1460,7 +1460,9 @@ The representation choices for this target are:
   extracts the eight implication clauses as an independently indexed local
   drawing.  Its sixteen routes have exhaustively verified endpoints,
   orthogonality, and continuous planarity, and its erasure is definitionally
-  the semantic fixed-eight cycle for any renamed source atom.
+  the semantic fixed-eight cycle for any renamed source atom.  A general
+  translation-invariance theorem for embedded CNF drawings then places this
+  complete certificate at every input-dependent ring macrocell.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitRoutes.lean)
   equips the positioned split with canonical orthogonal incidence detours.
   Their periodic endpoints agree exactly with the refined formula and
