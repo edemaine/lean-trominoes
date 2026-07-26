@@ -402,6 +402,12 @@ The representation choices for this target are:
   assignment satisfaction, satisfiability, locality, and every clause-width
   bound are proved unchanged; its occurrence list is a sublist of the source
   list, so every finite-presentation occurrence bound is preserved as well.
+  [`LeanTrominoes/PeriodicEqualityNormalization.lean`](LeanTrominoes/PeriodicEqualityNormalization.lean)
+  gives translated equality families a sharper quotient count.  It identifies
+  a normalized link by its endpoint protovariables and relative offset, proves
+  that anchor normalization followed by clause deduplication retains exactly
+  the two implication clauses for each distinct normalized link, and derives
+  that formula occurrence degree is twice normalized endpoint degree.
   [`LeanTrominoes/PositionedPeriodicCNFDeduplication.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplication.lean)
   removes repeated periodic clause orbits from neighboring-block
   presentations while retaining one geometric representative.  Erasure is
