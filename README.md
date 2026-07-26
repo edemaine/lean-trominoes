@@ -433,6 +433,13 @@ The representation choices for this target are:
   vertex placement furthermore separate its endpoints, so its polyline has
   at least one segment.  This is the splice interface used by the planar 3DM
   gadget assembly.
+  [`LeanTrominoes/PositionedPeriodicCNFOrthogonalIncidenceRoutes.lean`](LeanTrominoes/PositionedPeriodicCNFOrthogonalIncidenceRoutes.lean)
+  supplies a total canonical Manhattan detour for every positioned literal
+  incidence.  Fresh detour coordinates make all four segments nondegenerate
+  and axis-aligned even for coincident advertised endpoints; the assembled
+  drawing is proved to have exact periodic endpoints and to be orthogonal.
+  These deliberately generic routes do not assert planarity, leaving later
+  construction files to choose noncrossing lanes.
   [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean)
   fixes the periodic gauge used by that splice: it subtracts each clause's
   first literal offset from every literal and from the displayed clause
