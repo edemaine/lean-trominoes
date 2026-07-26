@@ -1384,6 +1384,14 @@ The representation choices for this target are:
   prototype occurs in the normalized bend family, leaving only the
   at-most-six complete-carrier occurrences before clause and variable
   attachments are added.
+- [`LeanTrominoes/PeriodicCNFPlanarVariableNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarVariableNormalizationDegree.lean)
+  normalizes the active variable-duplicator arms together with their terminal
+  and central-atom offsets.  Each normalized arm is determined by its source
+  incidence edge, independent of the explicit neighboring translation, so a
+  target terminal meets at most one distinct arm and receives at most two
+  implication-literal occurrences.  Embedding the normalized carrier formula
+  into the full periodic SAT variable type then proves the sharp target
+  terminal total `6 + 2 = 8`.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
