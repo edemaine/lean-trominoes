@@ -1431,6 +1431,12 @@ The representation choices for this target are:
   reversing, and joining the original incidence polylines preserves
   orthogonality, so the complete compatible contracted drawing remains
   orthogonal.
+- [`LeanTrominoes/PeriodicThreeDMContractionPlanarity.lean`](LeanTrominoes/PeriodicThreeDMContractionPlanarity.lean)
+  records segment-level provenance for every retained and through route.
+  Joining is proved to introduce no segment, while translation and reversal
+  realize each contracted segment from its unique original incidence segment;
+  this is the route decomposition used to transfer the two planarity
+  predicates.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
