@@ -1328,6 +1328,11 @@ The representation choices for this target are:
   source-variable macrocell.  The resulting total variable placement is
   proved identical to the semantic fixed-eight placement, and every fitting
   instance inherits the full finite drawing certificate.
+- [`LeanTrominoes/OccurrenceSplitAngularFanBoundary.lean`](LeanTrominoes/OccurrenceSplitAngularFanBoundary.lean)
+  exposes one positioned boundary point and one local route suffix for each
+  angular occurrence index.  Every suffix is proved orthogonal with exact
+  endpoints at that boundary and the selected semantic copy, and is
+  identified with the corresponding route of the certified local fan.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
