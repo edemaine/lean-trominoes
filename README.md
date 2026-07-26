@@ -1236,6 +1236,12 @@ The representation choices for this target are:
   opaque wrapping, and unit-clause elimination.  Erasure, end-to-end
   satisfiability, the occurrence-three bound, and final clause arity two or
   three are certified for every lawful rotation order.
+- [`LeanTrominoes/PeriodicThreeSATThreeGeometricOrder.lean`](LeanTrominoes/PeriodicThreeSATThreeGeometricOrder.lean)
+  extracts such an order from a planar incidence route family by sorting
+  genuine occurrence copies in cyclic order of their terminal segment
+  directions.  Merge-sort permutation certifies that no syntactic
+  occurrence is introduced or lost, and the construction is specialized to
+  the wrapped routed SAT presentation.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that
