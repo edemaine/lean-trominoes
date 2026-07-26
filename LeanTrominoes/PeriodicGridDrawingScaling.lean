@@ -11,6 +11,36 @@ preserves all axis-aligned containment and continuous-intersection tests.
 
 namespace LeanTrominoes
 
+namespace Cell
+
+/-- Coordinatewise scaling distributes over coordinatewise addition. -/
+theorem scale_add (factor : Int) (first second : Cell) :
+    scale factor (add first second) =
+      add (scale factor first) (scale factor second) := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp [scale, add]
+  constructor <;> ring
+
+/-- Successive coordinatewise scalings multiply their factors. -/
+theorem scale_scale (first second : Int) (point : Cell) :
+    scale first (scale second point) =
+      scale (first * second) point := by
+  rcases point with ⟨pointX, pointY⟩
+  simp [scale]
+  constructor <;> ring
+
+/-- Scaling by a nonzero integer is injective on lattice points. -/
+theorem scale_injective {factor : Int} (nonzero : factor ≠ 0) :
+    Function.Injective (scale factor) := by
+  rintro ⟨firstX, firstY⟩ ⟨secondX, secondY⟩ equality
+  simp only [scale, Prod.mk.injEq] at equality ⊢
+  exact
+    ⟨mul_left_cancel₀ nonzero equality.1,
+      mul_left_cancel₀ nonzero equality.2⟩
+
+end Cell
+
 namespace GridSegment
 
 /-- Scale both endpoints of a grid segment about the origin. -/
@@ -184,5 +214,192 @@ theorem scalePolyline_getLast?
     (scalePolyline factor route).getLast? =
       route.getLast?.map (Cell.scale factor) := by
   simp [scalePolyline]
+
+namespace IndexedGridSegment
+
+/-- Scale an indexed segment without changing its syntactic occurrence
+indices. -/
+def scale (factor : Int)
+    (indexed : IndexedGridSegment) : IndexedGridSegment where
+  routeIndex := indexed.routeIndex
+  segmentIndex := indexed.segmentIndex
+  segment := indexed.segment.scale factor
+
+@[simp]
+theorem scale_routeIndex (factor : Int)
+    (indexed : IndexedGridSegment) :
+    (indexed.scale factor).routeIndex = indexed.routeIndex :=
+  rfl
+
+@[simp]
+theorem scale_segmentIndex (factor : Int)
+    (indexed : IndexedGridSegment) :
+    (indexed.scale factor).segmentIndex = indexed.segmentIndex :=
+  rfl
+
+@[simp]
+theorem scale_segment (factor : Int)
+    (indexed : IndexedGridSegment) :
+    (indexed.scale factor).segment =
+      indexed.segment.scale factor :=
+  rfl
+
+end IndexedGridSegment
+
+namespace PeriodicGridDrawing
+
+/-- Refine a complete periodic drawing by a natural scale factor.  The
+positive-factor theorems below identify its new side length with the old
+side length times `factor`; the total definition keeps factor zero harmless. -/
+def scale (factor : Nat) (drawing : PeriodicGridDrawing) :
+    PeriodicGridDrawing where
+  gridSizePred := factor * drawing.gridSize - 1
+  vertexPositions :=
+    drawing.vertexPositions.map (Cell.scale factor)
+  edgeRoutes :=
+    drawing.edgeRoutes.map (scalePolyline factor)
+
+/-- A positive refinement multiplies the fundamental-square side length. -/
+@[simp]
+theorem gridSize_scale {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing) :
+    (drawing.scale factor).gridSize = factor * drawing.gridSize := by
+  change factor * drawing.gridSize - 1 + 1 =
+    factor * drawing.gridSize
+  have productPositive : 0 < factor * (drawing.gridSizePred + 1) :=
+    Nat.mul_pos positive (by omega)
+  exact Nat.sub_add_cancel productPositive
+
+/-- The scaled drawing's lattice translation is the scaled old
+translation. -/
+theorem periodTranslation_scale
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing) (translate : Cell) :
+    (drawing.scale factor).periodTranslation translate =
+      Cell.scale factor (drawing.periodTranslation translate) := by
+  rcases translate with ⟨translateX, translateY⟩
+  simp [periodTranslation, gridSize_scale positive,
+    Cell.scale]
+  constructor <;> ring
+
+/-- Vertex lookup commutes with positive drawing refinement. -/
+theorem vertexPosition_scale
+    {Vertex : Type*} [BEq Vertex]
+    (factor : Nat) (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing) (vertex : Vertex) :
+    (drawing.scale factor).vertexPosition graph vertex =
+      Cell.scale factor (drawing.vertexPosition graph vertex) := by
+  unfold vertexPosition scale
+  change
+    (drawing.vertexPositions.map (Cell.scale factor)).getD
+        (graph.vertices.idxOf vertex) (Cell.scale factor (0, 0)) =
+      Cell.scale factor
+        (drawing.vertexPositions.getD
+          (graph.vertices.idxOf vertex) (0, 0))
+  rw [List.getD_map]
+
+/-- Edge-route lookup commutes with drawing refinement. -/
+theorem edgeRoute_scale
+    (factor : Nat) (drawing : PeriodicGridDrawing)
+    (edgeIndex : Nat) :
+    (drawing.scale factor).edgeRoute edgeIndex =
+      scalePolyline factor (drawing.edgeRoute edgeIndex) := by
+  unfold edgeRoute scale
+  change
+    (drawing.edgeRoutes.map (scalePolyline factor)).getD
+        edgeIndex (scalePolyline factor []) =
+      scalePolyline factor
+        (drawing.edgeRoutes.getD edgeIndex [])
+  rw [List.getD_map]
+
+/-- The indexed segment list of a refined drawing has exactly the original
+occurrence keys and the scaled segment geometry. -/
+theorem indexedSegments_scale
+    (factor : Nat) (drawing : PeriodicGridDrawing) :
+    (drawing.scale factor).indexedSegments =
+      drawing.indexedSegments.map
+        (IndexedGridSegment.scale factor) := by
+  unfold indexedSegments scale
+  rw [List.zipIdx_map, List.flatMap_map, List.map_flatMap]
+  apply List.flatMap_congr
+  rintro ⟨route, routeIndex⟩ taggedRouteMember
+  simp [gridPolylineSegments_scalePolyline,
+    List.zipIdx_map, List.map_map,
+    IndexedGridSegment.scale, Function.comp_def]
+
+/-- Positive refinement preserves membership in the open fundamental
+square exactly. -/
+theorem positionInFundamentalSquare_scale_iff
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing) (position : Cell) :
+    (drawing.scale factor).PositionInFundamentalSquare
+        (Cell.scale factor position) ↔
+      drawing.PositionInFundamentalSquare position := by
+  rcases position with ⟨horizontal, vertical⟩
+  simp only [PositionInFundamentalSquare, Cell.scale,
+    gridSize_scale positive]
+  norm_cast
+  simp [positive]
+
+/-- A positive refinement preserves exact graph endpoints. -/
+theorem routesMatch_scale
+    {Vertex : Type*} [BEq Vertex]
+    {factor : Nat} (positive : 0 < factor)
+    (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing)
+    (routeMatches : drawing.RoutesMatch graph) :
+    (drawing.scale factor).RoutesMatch graph := by
+  intro taggedEdge taggedEdgeMember
+  have endpoints := routeMatches taggedEdge taggedEdgeMember
+  constructor
+  · rw [edgeRoute_scale, scalePolyline_head?, endpoints.1]
+    simp [vertexPosition_scale]
+  · rw [edgeRoute_scale, scalePolyline_getLast?, endpoints.2]
+    simp only [Option.map_some]
+    rw [vertexPosition_scale, periodTranslation_scale positive,
+      Cell.scale_add]
+
+/-- Positive refinement preserves complete graph compatibility. -/
+theorem isCompatible_scale
+    {Vertex : Type*} [DecidableEq Vertex]
+    {factor : Nat} (positive : 0 < factor)
+    (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing)
+    (compatible : drawing.IsCompatible graph) :
+    (drawing.scale factor).IsCompatible graph := by
+  rcases compatible with
+    ⟨wellFormed, vertexLength, routeLength, positionsNodup,
+      positionBounds, routesMatch⟩
+  refine
+    ⟨wellFormed, ?_, ?_, ?_, ?_,
+      routesMatch_scale positive graph drawing routesMatch⟩
+  · simpa [scale] using vertexLength
+  · simpa [scale] using routeLength
+  · exact positionsNodup.map
+      (Cell.scale_injective (by positivity : (factor : Int) ≠ 0))
+  · intro scaledPosition scaledPositionMember
+    rcases List.mem_map.mp scaledPositionMember with
+      ⟨position, positionMember, rfl⟩
+    exact
+      (positionInFundamentalSquare_scale_iff
+        positive drawing position).mpr
+        (positionBounds position positionMember)
+
+/-- Positive refinement preserves orthogonality of every route segment. -/
+theorem isOrthogonal_scale
+    {factor : Nat} (positive : 0 < factor)
+    (drawing : PeriodicGridDrawing)
+    (orthogonal : drawing.IsOrthogonal) :
+    (drawing.scale factor).IsOrthogonal := by
+  intro scaledIndexed scaledIndexedMember
+  rw [indexedSegments_scale] at scaledIndexedMember
+  rcases List.mem_map.mp scaledIndexedMember with
+    ⟨indexed, indexedMember, rfl⟩
+  exact
+    (GridSegment.isAxisAligned_scale_iff
+      (by exact_mod_cast positive) indexed.segment).mpr
+      (orthogonal indexed indexedMember)
+
+end PeriodicGridDrawing
 
 end LeanTrominoes
