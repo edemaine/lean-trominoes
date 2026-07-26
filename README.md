@@ -2038,6 +2038,11 @@ The representation choices for this target are:
   open-macrocell offset.  Source compatibility and zero-anchor normalization
   therefore prove, unconditionally, that all assembled vertices remain
   strictly inside the refined fundamental square.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRouteBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRouteBounds.lean)
+  starts the corresponding route-coordinate proof.  Pointwise halo bounds on
+  a reversed-and-rebased source incidence imply halo bounds on all three
+  refined central RGB lanes: the standard offsets fit in the strict slack
+  created by the `128`-fold refinement.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteElements.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMVariableSiteElements.lean)
   identifies every listed typed red, green, and blue variable-side element
   with an active element of the exhaustively checked complete variable-site

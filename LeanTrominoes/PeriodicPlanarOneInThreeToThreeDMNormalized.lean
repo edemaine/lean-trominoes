@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicOneInThreeAnchorNormalization
 import LeanTrominoes.PeriodicPlanarThreeDMIncidenceRouting
 import LeanTrominoes.PeriodicGridDrawingContinuousPlanarity
+import LeanTrominoes.PositionedPeriodicCNFRebasedRouteBounds
 
 /-!
 # Normalized input to the planar exact-one-to-3DM reduction
@@ -162,6 +163,18 @@ def normalizedContinuousIncidencePresentation
     (presentation :
       source.ContinuousPlanarIncidencePresentation placement) :
     PositionedPeriodicCNF.ContinuousPlanarIncidencePresentation
+      (normalizedPositionedSource source placement) placement :=
+  presentation.anchorNormalize
+
+/-- The continuously planar, rebased-route-bounded presentation transports
+unchanged to the normalized source as well. -/
+def normalizedHaloBoundedIncidencePresentation
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedContinuousPlanarIncidencePresentation placement) :
+    PositionedPeriodicCNF.HaloBoundedContinuousPlanarIncidencePresentation
       (normalizedPositionedSource source placement) placement :=
   presentation.anchorNormalize
 
