@@ -1360,6 +1360,14 @@ The representation choices for this target are:
   retained consecutive-pair equality link, improving the generic
   two-link bound at exactly the variables that can collapse under periodic
   translation normalization.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean)
+  performs that periodic quotient for all complete-carrier equality links.
+  Distinct normalized links at a fixed terminal inject into one direct-link
+  class plus the segment's crossing-bearing translations.  The direct class
+  is canonical across neighboring copies, while at most two translations can
+  contain canonical crossings.  Hence every terminal prototype has normalized
+  link-endpoint degree at most three and occurs at most six times in the
+  deduplicated periodic equality formula.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
