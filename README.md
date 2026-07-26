@@ -1345,6 +1345,11 @@ The representation choices for this target are:
   route each copied clause to its angular fan boundary.  Joining any such
   certified prefix with the translated local spoke is proved to give the
   copied literal's exact canonical endpoint while preserving orthogonality.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularSplicedRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularSplicedRoutes.lean)
+  assembles those copied-incidence splices with every certified implication
+  ring into one total route family for the final positioned split formula.
+  All genuine routes are proved to have exact canonical endpoints and to
+  remain orthogonal.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
