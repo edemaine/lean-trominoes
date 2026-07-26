@@ -112,6 +112,15 @@ def placement {Variable : Type*}
               (sourcePlacement.period : Int))
             (PeriodicOneInThree.anchor clause))
 
+/-- Figure 9 refinement preserves positivity of the physical period. -/
+theorem placement_period_pos {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourcePeriodPositive : 0 < sourcePlacement.period) :
+    0 < (placement source sourcePlacement).period := by
+  simpa [placement, PlanarOneInThree.gadgetScale] using
+    Nat.mul_pos (by decide : 0 < 12) sourcePeriodPositive
+
 /-- Restoring the logical anchor translates every Figure 9 auxiliary to its
 declared local gadget vertex. -/
 @[simp]
@@ -165,6 +174,15 @@ def placement {Variable : Type*}
           (Cell.scale (gadgetScale * (sourcePlacement.period : Int))
             (PeriodicOneInThree.anchor clause))
 
+/-- Unit-clause elimination preserves positivity of the physical period. -/
+theorem placement_period_pos {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourcePeriodPositive : 0 < sourcePlacement.period) :
+    0 < (placement source sourcePlacement).period := by
+  simpa [placement, gadgetScale] using
+    Nat.mul_pos (by decide : 0 < 6) sourcePeriodPositive
+
 /-- Restoring the logical anchor translates every unit-elimination auxiliary
 to its declared local gadget vertex. -/
 @[simp]
@@ -197,6 +215,16 @@ def drawingPeriodicPlanarSATPlacement
     planarMacroScale.toNat *
       drawingGridSize (PeriodicCNF.incidenceGraph formula)
   position := drawingPeriodicPlanarSATVariablePosition formula
+
+/-- The routed planar SAT placement has a positive physical period. -/
+theorem drawingPeriodicPlanarSATPlacement_period_pos
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    0 < (drawingPeriodicPlanarSATPlacement formula).period := by
+  simp only [drawingPeriodicPlanarSATPlacement,
+    planarMacroScale]
+  exact Nat.mul_pos (by decide)
+    (drawingGridSize_pos (PeriodicCNF.incidenceGraph formula))
 
 /-- Placement transported through the opaque routed-variable wrapper. -/
 def wrappedDrawingPeriodicPlanarSATPlacement

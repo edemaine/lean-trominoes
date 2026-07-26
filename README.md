@@ -1321,7 +1321,10 @@ The representation choices for this target are:
   angles.  It fixes the occurrence-split formula and placement, carries them
   through Figure 9 and unit elimination, and proves the resulting exact-one
   source has occurrence degree at most three, clause arity two or three, and
-  exactly the original periodic-CNF satisfiability semantics.
+  exactly the original periodic-CNF satisfiability semantics.  Its physical
+  period is proved positive, and the canonical detour family supplies
+  unconditional endpoint and orthogonality certificates for this concrete
+  source; nonintersection remains the geometric obligation.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that

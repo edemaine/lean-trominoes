@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarOrderedOneInThreePositioned
 import LeanTrominoes.PeriodicCNFPlanarSATIncidenceRoutes
+import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
 
 /-!
 # Angularly ordered positioned planar exact-one source
@@ -119,6 +120,79 @@ theorem
     drawingOrderedPositionedPeriodicPlanarOneInThreeNoUnitsFormula_satisfiable_iff
       formula (drawingOrderedAngularOccurrenceOrder formula)
       sourceWidth sourceOccurrences
+
+/-- All refinement stages retain a positive physical drawing period. -/
+theorem drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement_period_pos
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    0 <
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement
+        formula).period := by
+  unfold
+    drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement
+    drawingOrderedPeriodicPlanarOneInThreeNoUnitsPlacement
+  apply PeriodicOneInThreeNoUnitsPositioned.placement_period_pos
+  unfold drawingOrderedPeriodicPlanarOneInThreeThreePlacement
+  change
+    0 <
+      (drawingOrderedPeriodicPlanarOneInThreeThreeRawPlacement
+        formula (drawingOrderedAngularOccurrenceOrder formula)).period
+  unfold drawingOrderedPeriodicPlanarOneInThreeThreeRawPlacement
+  apply PeriodicOneInThreePositioned.placement_period_pos
+  unfold drawingOrderedPeriodicPlanarThreeSATThreePlacement
+  apply PeriodicThreeSATThreePositioned.orderedPlacement_period_pos
+  change 0 < (drawingPeriodicPlanarSATPlacement formula).period
+  exact drawingPeriodicPlanarSATPlacement_period_pos formula
+
+/-- Canonical orthogonal detours for the concrete angular exact-one source. -/
+def drawingAngularPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    PositionedPeriodicCNF.IncidenceRoutes :=
+  PositionedPeriodicCNF.orthogonalIncidenceRoutes
+    (drawingAngularPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+      formula)
+    (drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement formula)
+
+/-- The concrete angular exact-one detours have exact periodic incidence
+endpoints. -/
+theorem
+    drawingAngularPeriodicPlanarOneInThreeNoUnitsIncidenceDrawing_routesMatch
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      (drawingAngularPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        formula)
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement formula)
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+        formula)).RoutesMatch
+      (drawingAngularPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        formula).erase.incidenceGraph := by
+  exact
+    PositionedPeriodicCNF.orthogonalIncidenceDrawing_routesMatch
+      (drawingAngularPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        formula)
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement formula)
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement_period_pos
+        formula)
+
+/-- Every segment in the concrete angular exact-one detour drawing is
+axis-aligned. -/
+theorem
+    drawingAngularPeriodicPlanarOneInThreeNoUnitsIncidenceDrawing_isOrthogonal
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      (drawingAngularPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        formula)
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement formula)
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+        formula)).IsOrthogonal := by
+  exact
+    PositionedPeriodicCNF.orthogonalIncidenceDrawing_isOrthogonal
+      (drawingAngularPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        formula)
+      (drawingAngularPeriodicPlanarOneInThreeNoUnitsPlacement formula)
 
 end PeriodicOrthocrossing
 end LeanTrominoes

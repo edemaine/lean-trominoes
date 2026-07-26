@@ -191,6 +191,22 @@ def orderedPlacement
     orderedOccurrenceVariablePosition
       source sourcePlacement.position order
 
+/-- Ordered occurrence splitting preserves positivity of the physical
+period. -/
+theorem orderedPlacement_period_pos
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (order :
+      PeriodicThreeSATThree.OccurrenceOrder source.erase)
+    (sourcePeriodPositive : 0 < sourcePlacement.period) :
+    0 < (orderedPlacement source sourcePlacement order).period := by
+  have refinementPositive :
+      0 < (refinementScale source).toNat := by
+    unfold refinementScale
+    omega
+  exact Nat.mul_pos refinementPositive sourcePeriodPositive
+
 /-- Presentation order recovers the established occurrence-splitting
 placement. -/
 @[simp]
