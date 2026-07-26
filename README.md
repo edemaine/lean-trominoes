@@ -1317,6 +1317,11 @@ The representation choices for this target are:
   implication ring.  All nine possible sizes `0 ≤ n ≤ 8` are mechanically
   certified for exact endpoints, orthogonality, and continuous planarity,
   providing the finite geometric kernel for each angular variable fan.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingRenaming.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingRenaming.lean)
+  transports a complete finite incidence-drawing certificate through an
+  injective logical variable renaming whose target placement preserves the
+  source coordinates.  Incidence order and routes remain unchanged, while
+  injectivity preserves the deduplicated graph-vertex list.
 - [`LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean`](LeanTrominoes/PlanarThreeSATTerminalPortCertificates.lean)
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
