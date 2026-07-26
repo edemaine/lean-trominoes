@@ -1242,8 +1242,8 @@ The representation choices for this target are:
   source occurrence selects one of eight compass copies, all eight copies
   remain on the implication ring, and unused copies are harmless.  The
   resulting formula is proved equisatisfiable for every slot assignment;
-  the geometric no-collision condition is intentionally reserved for the
-  degree-three certificate.
+  it also preserves width three and locality.  The geometric no-collision
+  condition is intentionally reserved for the degree-three certificate.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitOccurrences.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitOccurrences.lean)
   isolates that no-collision condition and proves the promised degree
   accounting.  A selected compass copy occurs at most once in the copied

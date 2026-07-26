@@ -98,6 +98,111 @@ def formula {Variable : Type*} [DecidableEq Variable]
     occurrenceClauses source occurrencePorts ++
       allCycleClauses source
 
+theorem occurrenceClause_length
+    {Variable : Type*}
+    (occurrencePorts : OccurrencePorts)
+    (clauseIndex : Nat)
+    (clause : PeriodicClause Variable) :
+    (occurrenceClause occurrencePorts clauseIndex clause).length =
+      clause.length := by
+  simp [occurrenceClause]
+
+theorem occurrenceLiteral_offsetDistance
+    {Variable : Type*}
+    (occurrencePorts : OccurrencePorts)
+    (firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat)
+    (first second : PeriodicLiteral Variable) :
+    PeriodicClause.offsetDistance
+        (occurrenceLiteral occurrencePorts
+          firstClauseIndex firstLiteralIndex first)
+        (occurrenceLiteral occurrencePorts
+          secondClauseIndex secondLiteralIndex second) =
+      PeriodicClause.offsetDistance first second := by
+  rfl
+
+theorem occurrenceClause_isLocal
+    {Variable : Type*}
+    (occurrencePorts : OccurrencePorts)
+    (clauseIndex : Nat)
+    {clause : PeriodicClause Variable}
+    (sourceLocal : clause.IsLocal) :
+    (occurrenceClause occurrencePorts
+      clauseIndex clause).IsLocal := by
+  intro first firstMember second secondMember
+  simp only [occurrenceClause, List.mem_map] at firstMember secondMember
+  rcases firstMember with
+    ⟨firstTagged, firstTaggedMember, rfl⟩
+  rcases secondMember with
+    ⟨secondTagged, secondTaggedMember, rfl⟩
+  rw [occurrenceLiteral_offsetDistance]
+  exact sourceLocal firstTagged.1
+    (List.fst_mem_of_mem_zipIdx firstTaggedMember)
+    secondTagged.1
+    (List.fst_mem_of_mem_zipIdx secondTaggedMember)
+
+theorem cycleClausesFor_areLocal
+    {Variable : Type*}
+    (atom : Variable) :
+    ∀ clause ∈ cycleClausesFor atom, clause.IsLocal :=
+  PeriodicThreeSATThree.cycleClauses_areLocal (copies atom)
+
+/-- Fixed-eight occurrence splitting preserves the paper's locality
+condition. -/
+theorem formula_isLocal
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (occurrencePorts : OccurrencePorts)
+    (sourceLocal : source.IsLocal) :
+    (formula source occurrencePorts).IsLocal := by
+  intro clause clauseMember
+  simp only [formula, List.mem_append] at clauseMember
+  rcases clauseMember with sourceMember | cycleMember
+  · simp only [occurrenceClauses, List.mem_map] at sourceMember
+    rcases sourceMember with
+      ⟨taggedClause, taggedClauseMember, rfl⟩
+    exact occurrenceClause_isLocal occurrencePorts
+      taggedClause.2
+      (sourceLocal taggedClause.1
+        (List.fst_mem_of_mem_zipIdx taggedClauseMember))
+  · simp only [allCycleClauses,
+      List.mem_flatMap] at cycleMember
+    rcases cycleMember with
+      ⟨atom, _atomMember, cycleMember⟩
+    exact cycleClausesFor_areLocal atom clause cycleMember
+
+theorem cycleClausesFor_widthAtMostThree
+    {Variable : Type*}
+    (atom : Variable) :
+    ∀ clause ∈ cycleClausesFor atom,
+      clause.WidthAtMost 3 :=
+  PeriodicThreeSATThree.cycleClauses_widthAtMostThree
+    (copies atom)
+
+/-- Fixed-eight occurrence splitting preserves a width-three bound. -/
+theorem formula_widthAtMostThree
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (occurrencePorts : OccurrencePorts)
+    (sourceWidth : source.WidthAtMost 3) :
+    (formula source occurrencePorts).WidthAtMost 3 := by
+  intro clause clauseMember
+  simp only [formula, List.mem_append] at clauseMember
+  rcases clauseMember with sourceMember | cycleMember
+  · simp only [occurrenceClauses, List.mem_map] at sourceMember
+    rcases sourceMember with
+      ⟨taggedClause, taggedClauseMember, rfl⟩
+    rw [PeriodicClause.WidthAtMost,
+      occurrenceClause_length]
+    exact sourceWidth taggedClause.1
+      (List.fst_mem_of_mem_zipIdx taggedClauseMember)
+  · simp only [allCycleClauses,
+      List.mem_flatMap] at cycleMember
+    rcases cycleMember with
+      ⟨atom, _atomMember, cycleMember⟩
+    exact cycleClausesFor_widthAtMostThree
+      atom clause cycleMember
+
 /-- Read a source value from the first fixed compass copy. -/
 def restrictAssignment {Variable : Type*}
     (assignment :
