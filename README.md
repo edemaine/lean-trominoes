@@ -381,6 +381,11 @@ The representation choices for this target are:
   Subtracting a clause's common anchor from a finite incidence polyline then
   produces the canonical periodic clause and translated-variable endpoints
   required by the incidence graph.
+  [`LeanTrominoes/PositionedPeriodicCNFDeduplication.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplication.lean)
+  removes repeated periodic clause orbits from neighboring-block
+  presentations while retaining one geometric representative.  Erasure is
+  exactly list deduplication, and assignment satisfaction, satisfiability,
+  locality, and every clause-width bound are proved unchanged.
   [`LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceDrawing.lean)
   defines that layer's exact certificate: one polyline per literal in the
   incidence graph's presentation order, compatible variable-then-clause
