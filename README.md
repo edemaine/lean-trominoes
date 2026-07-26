@@ -548,6 +548,11 @@ The representation choices for this target are:
   proves the check complete for the infinite periodic lift.  Because stored
   vertices remain in the canonical square, its vertex/route half reuses the
   smaller nine-translation Boolean check.
+  [`LeanTrominoes/PeriodicGridDrawingExpandedFiniteContinuousPlanarity.lean`](LeanTrominoes/PeriodicGridDrawingExpandedFiniteContinuousPlanarity.lean)
+  proves the matching 25-translation bound for open collinear interval
+  overlap and adds an executable exact-interior check.  Together the expanded
+  checks certify continuous planarity of periodic drawings with genuine
+  boundary-crossing edges.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
@@ -2033,13 +2038,14 @@ The representation choices for this target are:
   is duplicate-free.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFiniteGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFiniteGeometry.lean)
   reduces the remaining infinite periodic planarity field to an executable
-  finite certificate: all stored segment endpoints lie in the fundamental
-  square, and the route/route and vertex/route checks pass over the nine
-  neighboring translates.  For the normalized construction it combines such
-  a certificate with the established vertex distinctness and bounds to produce
-  the complete global assembly geometry.  Its continuous refinement adds the
-  exact collinear-interior check, yielding the stronger 3DM presentation needed
-  by degree-two contraction without overlooking coincident unit segments.
+  finite certificate: all stored segment endpoints lie in the one-cell halo,
+  the route/route checks pass over 25 relative translations, and the
+  vertex/route check passes over the nine neighboring translates.  For the
+  normalized construction it combines such a certificate with the established
+  vertex distinctness and bounds to produce the complete global assembly
+  geometry.  Its continuous refinement adds the exact collinear-interior
+  check, yielding the stronger 3DM presentation needed by degree-two
+  contraction without overlooking coincident unit segments.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalPositions.lean)
   translates every typed triple and colored element from its checked
   variable-site or clause-core template into the reserved global gadget

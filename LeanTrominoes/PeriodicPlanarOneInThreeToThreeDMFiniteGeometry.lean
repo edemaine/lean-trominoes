@@ -1,5 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVertexDistinctness
-import LeanTrominoes.PeriodicGridDrawingFiniteContinuousPlanarity
+import LeanTrominoes.PeriodicGridDrawingExpandedFiniteContinuousPlanarity
 import LeanTrominoes.PeriodicContinuousPlanarThreeDM
 
 /-!
@@ -7,9 +7,9 @@ import LeanTrominoes.PeriodicContinuousPlanarThreeDM
 
 The assembled periodic drawing has finitely many stored vertices and route
 segments, but its planarity predicate quantifies over all periodic translates.
-Once all stored segment endpoints lie in the open fundamental square, the
-general neighboring-translate checker reduces those global obligations to two
-Boolean equalities.
+Once all stored segment endpoints lie in the open one-cell halo around the
+fundamental square, the expanded neighboring-translate checker reduces those
+global obligations to two Boolean equalities.
 
 This file packages precisely that remaining executable certificate.  For the
 standard normalized construction, the already proved vertex distinctness and
@@ -31,9 +31,9 @@ structure FiniteAssemblyPlanarityCertificate
     {source : PeriodicCNF Variable}
     (routing : ThreeStrandRouting source) : Prop where
   endpointBounds :
-    (assembledDrawing routing).SegmentEndpointsInFundamentalSquare
+    (assembledDrawing routing).SegmentEndpointsInExpandedSquare
   routesChecked :
-    (assembledDrawing routing).finiteRoutesAvoidInteriors = true
+    (assembledDrawing routing).expandedFiniteRoutesAvoidInteriors = true
   verticesChecked :
     (assembledDrawing routing).finiteVerticesAvoidRouteInteriors = true
 
@@ -45,7 +45,8 @@ structure FiniteContinuousAssemblyPlanarityCertificate
     (routing : ThreeStrandRouting source) : Prop
     extends FiniteAssemblyPlanarityCertificate routing where
   continuousChecked :
-    (assembledDrawing routing).finiteRoutesHaveDisjointInteriors = true
+    (assembledDrawing routing).expandedFiniteRoutesHaveDisjointInteriors =
+      true
 
 /-- Global geometry strong enough for subsequent degree-two contraction and
 geometric normalization. -/
@@ -102,7 +103,7 @@ theorem planar
       ∀ position ∈ assembledVertexPositions routing,
         (assembledDrawing routing).PositionInFundamentalSquare position) :
     (assembledDrawing routing).IsPlanar := by
-  exact PeriodicGridDrawing.isPlanar_of_finite
+  exact PeriodicGridDrawing.isPlanar_of_expandedFinite
     certificate.endpointBounds positionsInside
     certificate.routesChecked certificate.verticesChecked
 
@@ -137,7 +138,7 @@ theorem continuouslyPlanar
       ∀ position ∈ assembledVertexPositions routing,
         (assembledDrawing routing).PositionInFundamentalSquare position) :
     (assembledDrawing routing).IsContinuouslyPlanar := by
-  exact PeriodicGridDrawing.isContinuouslyPlanar_of_finite
+  exact PeriodicGridDrawing.isContinuouslyPlanar_of_expandedFinite
     certificate.endpointBounds positionsInside
     certificate.routesChecked certificate.verticesChecked
     certificate.continuousChecked
