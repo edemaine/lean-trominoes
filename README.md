@@ -1244,6 +1244,11 @@ The representation choices for this target are:
   resulting formula is proved equisatisfiable for every slot assignment;
   the geometric no-collision condition is intentionally reserved for the
   degree-three certificate.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitOccurrences.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitOccurrences.lean)
+  isolates that no-collision condition and proves the promised degree
+  accounting.  A selected compass copy occurs at most once in the copied
+  source clauses, while its fixed implication ring contributes at most two
+  occurrences, so every output variable occurs at most three times.
 - [`LeanTrominoes/PlanarThreeSATInstantiation.lean`](LeanTrominoes/PlanarThreeSATInstantiation.lean)
   proves that renaming and affine placement preserve the finite gadget
   semantics.  It packages caller-supplied duplicator ports and crossover
