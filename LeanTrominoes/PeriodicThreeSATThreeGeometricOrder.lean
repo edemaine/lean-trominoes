@@ -200,9 +200,48 @@ theorem occurrence_route_last_axisAligned
   rw [segmentEq]
   exact List.getLast_mem segmentsNonempty
 
-/-- A certified occurrence route with a final segment receives one of the
-four genuine cyclic direction keys. -/
+/-- Every genuine occurrence route in a certified presentation receives one
+of the four genuine cyclic direction keys. -/
 theorem occurrenceTerminalDirection_ne_degenerate
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.PlanarIncidencePresentation
+        source placement)
+    (atom : Variable) (copy : ThreeOccurrenceVariable Variable)
+    (copyMember :
+      copy ∈ occurrenceVariables source.erase atom) :
+    occurrenceTerminalDirection presentation.routes copy ≠
+      .degenerate := by
+  rcases
+      exists_taggedIncidence_of_mem_occurrenceVariables
+        source.erase atom copy copyMember with
+    ⟨tagged, taggedMember, clauseIndex, literalIndex⟩
+  have taggedSegmentsNonempty :=
+    presentation.route_segments_ne_nil_of_tagged taggedMember
+  have segmentsNonempty :
+      gridPolylineSegments
+          (presentation.routes copy.2.1 copy.2.2) ≠ [] := by
+    simpa [clauseIndex, literalIndex] using
+      taggedSegmentsNonempty
+  let segment :=
+    (gridPolylineSegments
+      (presentation.routes copy.2.1 copy.2.2)).getLast
+        segmentsNonempty
+  apply
+    routeTerminalDirection_ne_degenerate_of_last_axisAligned
+      (segment := segment)
+  · exact List.getLast?_eq_getLast_of_ne_nil
+      segmentsNonempty
+  · exact occurrence_route_last_axisAligned
+      presentation atom copy copyMember
+        (List.getLast?_eq_getLast_of_ne_nil
+          segmentsNonempty)
+
+/-- A certified occurrence route with an explicitly selected final segment
+receives one of the four genuine cyclic direction keys. -/
+theorem occurrenceTerminalDirection_ne_degenerate_of_last
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
@@ -281,6 +320,48 @@ theorem geometricOccurrenceVariables_pairwise
         omega)
       (occurrenceVariables source atom)
   simpa only [occurrenceDirectionLE, decide_eq_true_eq] using sorted
+
+/-- Every copy retained by geometry sorting has a genuine four-way terminal
+direction in a certified incidence presentation. -/
+theorem geometricOccurrenceVariables_direction_ne_degenerate
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.PlanarIncidencePresentation
+        source placement)
+    (atom : Variable) (copy : ThreeOccurrenceVariable Variable)
+    (copyMember :
+      copy ∈ geometricOccurrenceVariables
+        source.erase presentation.routes atom) :
+    occurrenceTerminalDirection presentation.routes copy ≠
+      .degenerate := by
+  have genuineMember :
+      copy ∈ occurrenceVariables source.erase atom :=
+    (geometricOccurrenceVariables_perm
+      source.erase presentation.routes atom).mem_iff.mp
+        copyMember
+  exact occurrenceTerminalDirection_ne_degenerate
+    presentation atom copy genuineMember
+
+/-- Consequently every direction rank appearing in the certified sorted
+list lies in the four-position cyclic range. -/
+theorem geometricOccurrenceVariables_rank_lt_four
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.PlanarIncidencePresentation
+        source placement)
+    (atom : Variable) (copy : ThreeOccurrenceVariable Variable)
+    (copyMember :
+      copy ∈ geometricOccurrenceVariables
+        source.erase presentation.routes atom) :
+    (occurrenceTerminalDirection
+      presentation.routes copy).rank < 4 :=
+  TerminalDirection.rank_lt_four
+    (geometricOccurrenceVariables_direction_ne_degenerate
+      presentation atom copy copyMember)
 
 /-- A lawful occurrence order extracted from the terminal directions of a
 route family. -/

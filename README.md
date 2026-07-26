@@ -387,8 +387,10 @@ The representation choices for this target are:
   lookup, recovers each occurrence's positioned metadata, and derives the
   exact source and translated-target endpoints of its declared route; every
   genuine pointwise route is also recovered from the flat list with its
-  orthogonal-polyline certificate.  This is the splice interface used by the
-  planar 3DM gadget assembly.
+  orthogonal-polyline certificate.  Fundamental-square bounds and injective
+  vertex placement furthermore separate its endpoints, so its polyline has
+  at least one segment.  This is the splice interface used by the planar 3DM
+  gadget assembly.
   [`LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFAnchorNormalization.lean)
   fixes the periodic gauge used by that splice: it subtracts each clause's
   first literal offset from every literal and from the displayed clause
@@ -1245,9 +1247,10 @@ The representation choices for this target are:
   genuine occurrence copies in cyclic order of their terminal segment
   directions.  Merge-sort permutation certifies that no syntactic
   occurrence is introduced or lost, while metadata lookup and route
-  orthogonality prove that every existing final segment of a genuine
-  occurrence receives a nondegenerate direction.  The construction is
-  specialized to the wrapped routed SAT presentation.
+  orthogonality prove that every genuine occurrence has a final segment with
+  a nondegenerate direction, whose rank lies in the four-position cyclic
+  range.  The construction is specialized to the wrapped routed SAT
+  presentation.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that

@@ -19,6 +19,64 @@ Every metadata-rich `(clause, literal)` occurrence retrieves:
 namespace LeanTrominoes
 namespace PositionedPeriodicCNF
 
+/-- Two distinct points in the open fundamental square cannot become equal
+after translating one by an integral drawing period. -/
+theorem fundamentalPosition_ne_translated
+    (drawing : PeriodicGridDrawing)
+    {first second translate : Cell}
+    (firstBounds :
+      drawing.PositionInFundamentalSquare first)
+    (secondBounds :
+      drawing.PositionInFundamentalSquare second)
+    (different : first ≠ second) :
+    first ≠
+      Cell.add second
+        (drawing.periodTranslation translate) := by
+  intro equal
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  rcases translate with ⟨translateX, translateY⟩
+  simp only [PeriodicGridDrawing.PositionInFundamentalSquare] at firstBounds secondBounds
+  simp only [Cell.add, PeriodicGridDrawing.periodTranslation,
+    Cell.scale, Prod.mk.injEq] at equal
+  have periodPositive :
+      (0 : Int) < drawing.gridSize := by
+    exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+  have translateXZero : translateX = 0 := by
+    by_contra nonzero
+    have cases : translateX ≤ -1 ∨ 1 ≤ translateX := by
+      omega
+    rcases cases with negative | positive
+    · have productBound :=
+        mul_le_mul_of_nonneg_left negative
+          (le_of_lt periodPositive)
+      norm_num at productBound
+      omega
+    · have productBound :=
+        mul_le_mul_of_nonneg_left positive
+          (le_of_lt periodPositive)
+      norm_num at productBound
+      omega
+  have translateYZero : translateY = 0 := by
+    by_contra nonzero
+    have cases : translateY ≤ -1 ∨ 1 ≤ translateY := by
+      omega
+    rcases cases with negative | positive
+    · have productBound :=
+        mul_le_mul_of_nonneg_left negative
+          (le_of_lt periodPositive)
+      norm_num at productBound
+      omega
+    · have productBound :=
+        mul_le_mul_of_nonneg_left positive
+          (le_of_lt periodPositive)
+      norm_num at productBound
+      omega
+  subst translateX
+  subst translateY
+  simp only [mul_zero, add_zero] at equal
+  exact different (Prod.ext equal.1 equal.2)
+
 /-- Total pointwise description of the vertex-position list used by a
 positioned incidence drawing. -/
 def incidenceVertexPositionAt
@@ -107,6 +165,93 @@ theorem incidenceDrawing_vertexPosition_of_mem
   simp only [List.getElem_map]
   apply congrArg (incidenceVertexPositionAt source placement)
   exact List.idxOf_get indexLt
+
+/-- Looking up a listed incidence vertex returns an actual member of the
+stored drawing-position list. -/
+theorem PlanarIncidencePresentation.vertexPosition_mem
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PlanarIncidencePresentation source placement)
+    {vertex : CNFVertex Variable}
+    (vertexMember :
+      vertex ∈ source.erase.incidenceGraph.vertices) :
+    (incidenceDrawing source placement
+      presentation.routes).vertexPosition
+        source.erase.incidenceGraph vertex ∈
+      (incidenceDrawing source placement
+        presentation.routes).vertexPositions := by
+  have indexLt :
+      source.erase.incidenceGraph.vertices.idxOf vertex <
+        source.erase.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr vertexMember
+  have positionIndexLt :
+      source.erase.incidenceGraph.vertices.idxOf vertex <
+        (incidenceDrawing source placement
+          presentation.routes).vertexPositions.length := by
+    rwa [presentation.compatible.2.1]
+  unfold PeriodicGridDrawing.vertexPosition
+  rw [List.getD_eq_getElem _ _ positionIndexLt]
+  exact List.getElem_mem positionIndexLt
+
+/-- Certified drawing positions are injective on the listed incidence-graph
+vertices. -/
+theorem PlanarIncidencePresentation.vertexPosition_injective_on
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PlanarIncidencePresentation source placement)
+    {first second : CNFVertex Variable}
+    (firstMember :
+      first ∈ source.erase.incidenceGraph.vertices)
+    (secondMember :
+      second ∈ source.erase.incidenceGraph.vertices)
+    (equal :
+      (incidenceDrawing source placement
+        presentation.routes).vertexPosition
+          source.erase.incidenceGraph first =
+        (incidenceDrawing source placement
+          presentation.routes).vertexPosition
+          source.erase.incidenceGraph second) :
+    first = second := by
+  have firstIndexLt :
+      source.erase.incidenceGraph.vertices.idxOf first <
+        source.erase.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr firstMember
+  have secondIndexLt :
+      source.erase.incidenceGraph.vertices.idxOf second <
+        source.erase.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr secondMember
+  have firstPositionLt :
+      source.erase.incidenceGraph.vertices.idxOf first <
+        (incidenceDrawing source placement
+          presentation.routes).vertexPositions.length := by
+    rwa [presentation.compatible.2.1]
+  have secondPositionLt :
+      source.erase.incidenceGraph.vertices.idxOf second <
+        (incidenceDrawing source placement
+          presentation.routes).vertexPositions.length := by
+    rwa [presentation.compatible.2.1]
+  unfold PeriodicGridDrawing.vertexPosition at equal
+  rw [List.getD_eq_getElem _ _ firstPositionLt,
+    List.getD_eq_getElem _ _ secondPositionLt] at equal
+  have indicesEqual :
+      source.erase.incidenceGraph.vertices.idxOf first =
+        source.erase.incidenceGraph.vertices.idxOf second :=
+    (presentation.compatible.2.2.2.1.getElem_inj_iff).mp equal
+  calc
+    first =
+        source.erase.incidenceGraph.vertices[
+          source.erase.incidenceGraph.vertices.idxOf first]'firstIndexLt :=
+      (List.idxOf_get firstIndexLt).symm
+    _ =
+        source.erase.incidenceGraph.vertices[
+          source.erase.incidenceGraph.vertices.idxOf second]'secondIndexLt := by
+      congr
+    _ = second :=
+      List.idxOf_get secondIndexLt
 
 /-- A genuine positioned clause index retrieves its canonical clause
 position. -/
@@ -256,6 +401,117 @@ theorem PlanarIncidencePresentation.route_endpoints_of_tagged
       source placement presentation.routes endpointMembers.2] at endpoints
   simpa [CNFIncidence.edge, PeriodicCNF.incidenceEdge,
     incidenceVertexPositionAt] using endpoints
+
+/-- The clause and translated-variable endpoints of every genuine incidence
+route are distinct. -/
+theorem PlanarIncidencePresentation.route_endpoints_ne_of_tagged
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PlanarIncidencePresentation source placement)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMember :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    incidenceVertexPositionAt source placement
+          (.clause tagged.1.clauseIndex) ≠
+      Cell.add
+        (placement.position tagged.1.literal.atom)
+        ((incidenceDrawing source placement
+          presentation.routes).periodTranslation
+            tagged.1.edge.offset) := by
+  let drawing :=
+    incidenceDrawing source placement presentation.routes
+  have edgeMember :=
+    PeriodicCNF.tagged_incidence_edge_mem
+      source.erase taggedMember
+  have endpointMembers :=
+    presentation.compatible.1.2 tagged.1.edge
+      (List.fst_mem_of_mem_zipIdx edgeMember)
+  have sourceLookup :=
+    incidenceDrawing_vertexPosition_of_mem
+      source placement presentation.routes endpointMembers.1
+  have targetLookup :=
+    incidenceDrawing_vertexPosition_of_mem
+      source placement presentation.routes endpointMembers.2
+  have sourceLookup' :
+      (incidenceDrawing source placement
+        presentation.routes).vertexPosition
+          source.erase.incidenceGraph
+          (.clause tagged.1.clauseIndex) =
+        incidenceVertexPositionAt source placement
+          (.clause tagged.1.clauseIndex) := by
+    simpa only [CNFIncidence.edge_source] using sourceLookup
+  have targetLookup' :
+      (incidenceDrawing source placement
+        presentation.routes).vertexPosition
+          source.erase.incidenceGraph
+          (.variable tagged.1.literal.atom) =
+        placement.position tagged.1.literal.atom := by
+    simpa only [CNFIncidence.edge_target,
+      incidenceVertexPositionAt] using targetLookup
+  have sourcePositionMember :=
+    presentation.vertexPosition_mem endpointMembers.1
+  have targetPositionMember :=
+    presentation.vertexPosition_mem endpointMembers.2
+  have sourceBounds :
+      drawing.PositionInFundamentalSquare
+        (incidenceVertexPositionAt source placement
+          (.clause tagged.1.clauseIndex)) := by
+    rw [← sourceLookup']
+    exact presentation.compatible.2.2.2.2.1 _
+      sourcePositionMember
+  have targetBounds :
+      drawing.PositionInFundamentalSquare
+        (placement.position tagged.1.literal.atom) := by
+    rw [← targetLookup']
+    exact presentation.compatible.2.2.2.2.1 _
+      targetPositionMember
+  apply fundamentalPosition_ne_translated
+    drawing sourceBounds targetBounds
+  intro prototypePositionsEqual
+  have verticesEqual :=
+    presentation.vertexPosition_injective_on
+      endpointMembers.1 endpointMembers.2
+      (sourceLookup'.trans
+        (prototypePositionsEqual.trans targetLookup'.symm))
+  cases verticesEqual
+
+/-- Every genuine incidence route contains at least one segment. -/
+theorem PlanarIncidencePresentation.route_segments_ne_nil_of_tagged
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PlanarIncidencePresentation source placement)
+    {tagged : CNFIncidence Variable × Nat}
+    (taggedMember :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    gridPolylineSegments
+        (presentation.routes
+          tagged.1.clauseIndex tagged.1.literalIndex) ≠ [] := by
+  have endpoints :=
+    presentation.route_endpoints_of_tagged taggedMember
+  have endpointDifferent :=
+    presentation.route_endpoints_ne_of_tagged taggedMember
+  generalize
+      presentation.routes
+        tagged.1.clauseIndex tagged.1.literalIndex = route at endpoints ⊢
+  cases route with
+  | nil =>
+      simp at endpoints
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp only [List.head?_singleton, List.getLast?_singleton,
+            Option.some.injEq] at endpoints
+          exact
+            (endpointDifferent
+              (endpoints.1.symm.trans endpoints.2)).elim
+      | cons second rest =>
+          simp [gridPolylineSegments]
 
 /-- Every actual pointwise incidence route occurs in the certified drawing's
 flat route list. -/
