@@ -1439,6 +1439,11 @@ The representation choices for this target are:
   that terminal; otherwise bends contribute at most two occurrences.  With
   at most six complete-carrier occurrences, every normalized terminal
   prototype has degree at most eight.
+- [`LeanTrominoes/PeriodicCNFPlanarNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarNormalizationDegree.lean)
+  combines the terminal, central-atom, boundary, and crossover-internal
+  estimates.  Global clause deduplication can only decrease their counts,
+  and opaque wrapping preserves them exactly, so the actual wrapped
+  planar-SAT output has at most eight occurrences of every variable.
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
