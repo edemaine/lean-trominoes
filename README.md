@@ -531,6 +531,11 @@ The representation choices for this target are:
   every possible continuous contact to the same nine neighboring periodic
   translations, and a finite Boolean check now certifies exact continuous
   planarity together with the existing endpoint and vertex checks.
+  [`LeanTrominoes/PeriodicGridDrawingPointBounds.lean`](LeanTrominoes/PeriodicGridDrawingPointBounds.lean)
+  converts pointwise bounds on every stored polyline into the indexed
+  segment-endpoint bounds required by the finite periodic checker.  Its
+  route-splice membership lemma lets assembly proofs establish those bounds
+  independently for each local prefix, corridor, and suffix.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
