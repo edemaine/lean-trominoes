@@ -577,6 +577,12 @@ The representation choices for this target are:
   topological crossing.  Pointwise halo bounds reduce this condition to an
   executable check over the same 25 relative translations and prove the
   check sound for the complete infinite periodic lift.
+  [`LeanTrominoes/PeriodicGridDrawingRibbonSeparation.lean`](LeanTrominoes/PeriodicGridDrawingRibbonSeparation.lean)
+  bridges that global periodic certificate to the finite two-route predicate
+  used by ribbon geometry.  Any two distinct lifted occurrences of stored
+  nondegenerate orthogonal routes are proved to have disjoint segment
+  interiors, symmetric point/interior avoidance, and endpoint-only listed
+  contacts after applying their independent period translations.
 - [`LeanTrominoes/Complexity.lean`](LeanTrominoes/Complexity.lean) supplies the
   missing PSPACE interface on top of Mathlib's finite multi-stack Turing
   machines.  Its `Primcodable` encoding is ordinary little-endian binary in
