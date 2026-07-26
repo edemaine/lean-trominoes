@@ -586,6 +586,11 @@ The representation choices for this target are:
   [`LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean`](LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean)
   proves that this finite separation certificate is preserved when both
   routes are traversed in reverse, as required by variable-to-clause routing.
+  [`LeanTrominoes/OrthogonalPolylineStrictSeparation.lean`](LeanTrominoes/OrthogonalPolylineStrictSeparation.lean)
+  strengthens the finite predicate to forbid all listed-point contact and
+  proves that this strict form composes through endpoint joins on either
+  side.  This is the form needed while tile endpoints become internal
+  points of a recursively assembled corridor.
   [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceSeparation.lean)
   identifies each active rebased source route by its stable drawing-route
   index and lattice translate, proves this key injective on active
