@@ -498,6 +498,11 @@ The representation choices for this target are:
   canonical periodic literal endpoints.  Its generic join theorem combines
   such a suffix with a normalized local clause route while preserving both
   outer endpoints and orthogonality.
+  [`LeanTrominoes/PositionedPeriodicCNFSumRouteSuffixes.lean`](LeanTrominoes/PositionedPeriodicCNFSumRouteSuffixes.lean)
+  reduces that suffix obligation for source/auxiliary sum types to inherited
+  source variables alone.  New auxiliaries receive a singleton suffix at
+  their already-final local endpoint, while supplied inherited suffixes are
+  retained with their endpoint and orthogonality certificates.
   [`LeanTrominoes/PositionedPeriodicCNFFinitePlanarCertificate.lean`](LeanTrominoes/PositionedPeriodicCNFFinitePlanarCertificate.lean)
   packages the remaining geometric proof boundary into finite data.  Given
   distinct bounded vertices, bounded route endpoints, exact compatibility,
