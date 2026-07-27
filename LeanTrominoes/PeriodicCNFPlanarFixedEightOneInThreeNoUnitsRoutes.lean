@@ -8,10 +8,12 @@ import LeanTrominoes.PositionedPeriodicCNFCanonicalOrthogonalRoutes
 This file reuses the complete wrapped Figure 9 routes as the inherited
 source routes for unit elimination, then splices in the local no-unit
 gadgets.  The resulting final route family has exact canonical endpoints
-and is orthogonal.
+and is orthogonal.  Its inherited routes connect the new local ports directly
+to the transformed first exits of the Figure 9 routes, removing the replaced
+Figure 9 clause points.
 
-As in the preceding Figure 9 layer, this construction does not yet claim
-global planarity.
+The remaining generic port-to-exit detours are not yet coordinated into a
+global noncrossing fan, so this construction does not yet claim planarity.
 -/
 
 namespace LeanTrominoes
@@ -59,6 +61,11 @@ noncomputable def
       (drawingFixedEightPeriodicPlanarOneInThreeIncidenceRoutes_valid
         input sourceLocal sourceWidth sourceOccurrences
         sourceClauseMember sourceLiteralMember).2.2)
+    (fun _sourceClause _sourceClauseIndex sourceClauseMember
+        _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+      drawingFixedEightPeriodicPlanarOneInThreeIncidenceRoutes_exists_tail_head?
+        input sourceLocal sourceWidth sourceOccurrences
+        sourceClauseMember sourceLiteralMember)
 
 /-- Complete local-plus-inherited routes for the final fixed-eight,
 unit-free exact-one formula. -/

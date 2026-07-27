@@ -461,12 +461,14 @@ The representation choices for this target are:
   boundary port.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteSplicing.lean)
   scales and translates the corresponding source incidence route through
-  the `6 × 6` unit-elimination refinement, joins it to that boundary port,
-  and proves exact canonical endpoints and orthogonality.
+  the `6 × 6` unit-elimination refinement, removes its obsolete clause
+  endpoint, and connects the boundary port directly to its transformed first
+  exit.  Exact canonical endpoints and orthogonality are preserved.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
   packages those per-incidence splices into a total proof-backed inherited
-  suffix family.  Any canonical orthogonal source route family can therefore
-  be lifted through unit elimination.
+  suffix family.  Any canonical orthogonal source route family with certified
+  first exits can therefore be lifted through unit elimination; the concrete
+  wrapped Figure 9 family supplies that additional certificate.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final

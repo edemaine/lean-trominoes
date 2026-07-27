@@ -8,6 +8,8 @@ The semantic and endpoint classification of an inherited unit-elimination
 incidence provides all indices needed to reuse its source route.  This file
 packages that information in a proof-backed total selector and instantiates
 the inherited-suffix interface consumed by the existing local-route splice.
+The source certificate also supplies a genuine first exit, allowing the
+unit-elimination adapter to remove the source route's obsolete clause point.
 
 The selector is noncomputable because route geometry is proof data rather
 than part of the reduction algorithm.  Every genuine inherited incidence is
@@ -157,8 +159,8 @@ private theorem value_eq_of_mem_zipIdx_same_index
     (List.mem_zipIdx' firstMember).2.trans
       (List.mem_zipIdx' secondMember).2.symm
 
-/-- Pointwise source endpoint and orthogonality certificates lift to the
-total inherited unit-elimination suffix lookup. -/
+/-- Pointwise source endpoint, orthogonality, and first-exit certificates
+lift to the total inherited unit-elimination suffix lookup. -/
 theorem inheritedRouteSuffixesRoutes_valid
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
@@ -190,6 +192,16 @@ theorem inheritedRouteSuffixesRoutes_valid
               sourceClause.literals.zipIdx →
           PeriodicOrthocrossing.OrthogonalPolyline
             (sourceRoutes sourceClauseIndex sourceLiteralIndex))
+    (sourceExits :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          ∃ exit,
+            (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).tail.head? =
+                some exit)
     {clause :
       PositionedPeriodicClause (OneInThreeNoUnitVariable Variable)}
     {clauseIndex : Nat}
@@ -252,12 +264,18 @@ theorem inheritedRouteSuffixesRoutes_valid
         data.sourceClauseMember
         data.sourceLiteral data.sourceLiteralIndex
         data.sourceLiteralMember)
+      (sourceExits
+        data.sourceClause data.sourceClauseIndex
+        data.sourceClauseMember
+        data.sourceLiteral data.sourceLiteralIndex
+        data.sourceLiteralMember)
       data.literalAtom data.literalOffset
   simpa [inheritedRouteSuffixesRoutes, dataLookup,
     data.localEndpoint] using valid
 
-/-- Any canonical orthogonal route family for the source formula induces all
-inherited unit-elimination suffixes required by the local gadget splice. -/
+/-- Any canonical orthogonal source route family with certified first exits
+induces all inherited unit-elimination suffixes required by the local gadget
+splice. -/
 noncomputable def inheritedRouteSuffixes
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
@@ -288,7 +306,17 @@ noncomputable def inheritedRouteSuffixes
           (sourceLiteral, sourceLiteralIndex) ∈
               sourceClause.literals.zipIdx →
           PeriodicOrthocrossing.OrthogonalPolyline
-            (sourceRoutes sourceClauseIndex sourceLiteralIndex)) :
+            (sourceRoutes sourceClauseIndex sourceLiteralIndex))
+    (sourceExits :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          ∃ exit,
+            (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).tail.head? =
+                some exit) :
     PositionedPeriodicCNF.InheritedCanonicalIncidenceRouteSuffixes
       (formula source)
       (placement source sourcePlacement)
@@ -303,7 +331,7 @@ noncomputable def inheritedRouteSuffixes
     have valid :=
       inheritedRouteSuffixesRoutes_valid
         source sourcePlacement sourceWidth sourceDistinct
-        sourceRoutes sourceEndpoints sourceOrthogonal
+        sourceRoutes sourceEndpoints sourceOrthogonal sourceExits
         clauseMember literalMember sourceAtom literalSource
     exact ⟨valid.1, valid.2.1⟩
   orthogonal := by
@@ -313,7 +341,7 @@ noncomputable def inheritedRouteSuffixes
     exact
       (inheritedRouteSuffixesRoutes_valid
         source sourcePlacement sourceWidth sourceDistinct
-        sourceRoutes sourceEndpoints sourceOrthogonal
+        sourceRoutes sourceEndpoints sourceOrthogonal sourceExits
         clauseMember literalMember sourceAtom literalSource).2.2
 
 end PeriodicOneInThreeNoUnitsPositioned

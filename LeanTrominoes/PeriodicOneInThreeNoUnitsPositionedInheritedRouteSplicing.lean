@@ -1,4 +1,4 @@
-import LeanTrominoes.OrthogonalPolylineJoin
+import LeanTrominoes.OrthogonalPolylineHeadReplacement
 import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints
 import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
@@ -8,7 +8,8 @@ import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
 
 This file scales a source incidence route by the unit-elimination refinement
 factor, translates it into a generated clause's canonical anchor gauge, and
-connects its source-clause endpoint to the appropriate local boundary port.
+replaces its obsolete source-clause endpoint by a route from the appropriate
+local boundary port to the transformed first exit.
 -/
 
 namespace LeanTrominoes
@@ -166,6 +167,38 @@ theorem inheritedSourceRoute_orthogonal
   apply orthogonalPolyline_translate
   exact orthogonalPolyline_scale sourceOrthogonal (by decide)
 
+/-- Scaling and changing the anchor gauge carry a source route's first exit
+to the correspondingly transformed point. -/
+theorem inheritedSourceRoute_tail_head?
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    (sourceRoute : List Cell)
+    (sourceExit : Cell)
+    (sourceTailHead :
+      sourceRoute.tail.head? = some sourceExit) :
+    (inheritedSourceRoute
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute).tail.head? =
+        some
+          (Cell.add
+            (inheritedSourceRouteShift
+              outputPlacement sourcePlacement sourceClause generatedClause)
+            (Cell.scale gadgetScale sourceExit)) := by
+  simpa [inheritedSourceRoute,
+    PeriodicOrthocrossing.translatePolyline,
+    scalePolyline] using
+    List.tail_head?_map
+      (Cell.add
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement sourceClause generatedClause))
+      (List.tail_head?_map
+        (Cell.scale gadgetScale) sourceTailHead)
+
 def inheritedRouteSuffix
     {Variable : Type*}
     (outputPlacement :
@@ -177,15 +210,16 @@ def inheritedRouteSuffix
     (sourceLiteralIndex : Nat)
     (sourceRoute : List Cell) :
     List Cell :=
-  joinAtEndpoint
+  let transformed :=
+    inheritedSourceRoute
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute
+  replacePolylineHead
     (PositionedPeriodicCNF.orthogonalDetour
       (normalizedSourcePort outputPlacement sourceClause
         generatedClause sourceLiteralIndex)
-      (normalizedSourceClausePosition outputPlacement sourceClause
-        generatedClause))
-    (inheritedSourceRoute
-      outputPlacement sourcePlacement sourceClause generatedClause
-      sourceRoute)
+      (polylineFirstExit transformed))
+    transformed
 
 theorem inheritedRouteSuffix_valid
     {Variable : Type*}
@@ -211,6 +245,9 @@ theorem inheritedRouteSuffix_valid
             sourcePlacement sourceClause sourceLiteral))
     (sourceOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline sourceRoute)
+    (sourceTailNonempty :
+      ∃ sourceExit,
+        sourceRoute.tail.head? = some sourceExit)
     (literalAtom :
       generatedLiteral.atom = .inl sourceLiteral.atom)
     (literalOffset :
@@ -240,22 +277,42 @@ theorem inheritedRouteSuffix_valid
     normalizedSourcePort
       (placement source sourcePlacement)
       sourceClause generatedClause sourceLiteralIndex
-  let sourcePoint :=
-    normalizedSourceClausePosition
-      (placement source sourcePlacement)
-      sourceClause generatedClause
-  let connector :=
-    PositionedPeriodicCNF.orthogonalDetour port sourcePoint
-  let transformed :=
+  let transformed : List Cell :=
     inheritedSourceRoute
       (placement source sourcePlacement)
       sourcePlacement sourceClause generatedClause sourceRoute
-  have transformedHead :
-      transformed.head? = some sourcePoint :=
+  have _transformedHead :
+      transformed.head? =
+        some
+          (normalizedSourceClausePosition
+            (placement source sourcePlacement)
+            sourceClause generatedClause) :=
     inheritedSourceRoute_head?
       (placement source sourcePlacement)
       sourcePlacement sourceClause generatedClause
       sourceRoute sourceHead
+  have transformedTailNonempty :
+      ∃ transformedExit,
+        transformed.tail.head? = some transformedExit := by
+    rcases sourceTailNonempty with
+      ⟨sourceExit, sourceTailHead⟩
+    exact
+      ⟨Cell.add
+          (inheritedSourceRouteShift
+            (placement source sourcePlacement)
+            sourcePlacement sourceClause generatedClause)
+          (Cell.scale gadgetScale sourceExit),
+        inheritedSourceRoute_tail_head?
+          (placement source sourcePlacement)
+          sourcePlacement sourceClause generatedClause
+          sourceRoute sourceExit sourceTailHead⟩
+  have transformedTailHead :
+      transformed.tail.head? =
+        some (polylineFirstExit transformed) :=
+    polylineFirstExit_spec transformedTailNonempty
+  let connector :=
+    PositionedPeriodicCNF.orthogonalDetour
+      port (polylineFirstExit transformed)
   have transformedLast :
       transformed.getLast? =
         some
@@ -267,25 +324,26 @@ theorem inheritedRouteSuffix_valid
       sourceLiteral generatedLiteral sourceRoute sourceLast
       literalAtom literalOffset
   change
-    (joinAtEndpoint connector transformed).head? = some port ∧
-      (joinAtEndpoint connector transformed).getLast? =
+    (replacePolylineHead connector transformed).head? =
+        some port ∧
+      (replacePolylineHead connector transformed).getLast? =
           some
             (PositionedPeriodicCNF.canonicalLiteralPosition
               (placement source sourcePlacement)
               generatedClause generatedLiteral) ∧
       PeriodicOrthocrossing.OrthogonalPolyline
-        (joinAtEndpoint connector transformed)
+        (replacePolylineHead connector transformed)
   exact
-    ⟨joinAtEndpoint_head? (by simp [connector]),
-      joinAtEndpoint_getLast?
-        (by simp [connector]) transformedHead transformedLast,
+    ⟨replacePolylineHead_head? (by simp [connector]),
+      replacePolylineHead_getLast?
+        (by simp [connector]) transformedTailHead transformedLast,
       (PositionedPeriodicCNF.orthogonalDetour_orthogonal
-        port sourcePoint).joinAtEndpoint
+        port (polylineFirstExit transformed)).replaceHead
           (inheritedSourceRoute_orthogonal
             (placement source sourcePlacement)
             sourcePlacement sourceClause generatedClause
             sourceRoute sourceOrthogonal)
-          (by simp) transformedHead⟩
+          (by simp) transformedTailHead⟩
 
 end PeriodicOneInThreeNoUnitsPositioned
 end LeanTrominoes
