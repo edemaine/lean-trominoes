@@ -1837,8 +1837,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PlanarThreeSATEqualityLensCarrierInterface.lean`](LeanTrominoes/PlanarThreeSATEqualityLensCarrierInterface.lean)
   bounds every point of a placed lens in the external closed region of both
   endpoint macrocells.  The proof transports the canonical endpoint wedges
-  through signed-axis orientation, translation, and logical renaming, ready
-  to compose with internal macrocell drawings at either carrier port.
+  and endpoint-only port contacts through signed-axis orientation,
+  translation, and logical renaming.  Each selected lens route then avoids
+  every route of any drawing certified inside either endpoint macrocell.
 - [`LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean)
   reduces drawing one positioned equality link to four carrier facts:
   distinct endpoints, axis alignment, span at least eight, and the advertised
@@ -1855,9 +1856,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PlanarThreeSATCornerEqualityCarrierInterface.lean`](LeanTrominoes/PlanarThreeSATCornerEqualityCarrierInterface.lean)
   formalizes the internal and external closed regions at every compass port.
   They meet only at the port itself, and pointwise containment on opposite
-  sides yields complete continuous route separation.  Exhaustive checks put
-  every corner route on the internal side of both of its occupied ports;
-  translation and logical renaming preserve those absolute bounds.
+  sides yields complete continuous route separation in local or translated
+  coordinates.  Exhaustive checks put every corner route on the internal
+  side of both occupied ports and make all port contact endpoint-only;
+  translation and logical renaming preserve both certificates.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to

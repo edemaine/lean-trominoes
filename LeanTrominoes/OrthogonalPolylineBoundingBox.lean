@@ -231,6 +231,25 @@ instance {Variable : Type*}
   unfold RoutePointsSatisfy incidenceAt incidences routeAt
   infer_instance
 
+/-- Whenever a listed route point equals one designated contact point, that
+occurrence is one of the route's two advertised endpoints. -/
+def RouteContactsAtEndpoint
+    {Variable : Type*}
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (contact : Cell) : Prop :=
+  ∀ incidenceIndex : Fin drawing.incidences.length,
+    ∀ point ∈ drawing.routeAt (drawing.incidenceAt incidenceIndex),
+      point = contact →
+        RoutePointIsEndpoint
+          (drawing.routeAt (drawing.incidenceAt incidenceIndex)) point
+
+instance {Variable : Type*}
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (contact : Cell) :
+    Decidable (drawing.RouteContactsAtEndpoint contact) := by
+  unfold RouteContactsAtEndpoint incidenceAt incidences routeAt
+  infer_instance
+
 /-- Finite route bounds can be used through clause- and literal-membership
 witnesses without manually constructing a finite incidence index. -/
 theorem RoutePointsSatisfy.of_members
@@ -271,6 +290,54 @@ theorem RoutePointsSatisfy.of_members
   rw [incidenceAtEqual]
   exact pointMember
 
+/-- A drawing-level endpoint-contact certificate can be selected through
+clause- and literal-membership witnesses. -/
+theorem RouteContactsAtEndpoint.of_members
+    {Variable : Type*}
+    {drawing : EmbeddedCNFIncidenceDrawing Variable}
+    {contact : Cell}
+    (contacts : drawing.RouteContactsAtEndpoint contact)
+    {clause : EmbeddedClause Variable} {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ drawing.formula.zipIdx)
+    {literal : Variable × Bool} {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember :
+      point ∈ drawing.routes clauseIndex literalIndex)
+    (pointEqual : point = contact) :
+    RoutePointIsEndpoint
+      (drawing.routes clauseIndex literalIndex) point := by
+  let incidence : EmbeddedCNFIncidence Variable :=
+    ⟨clause, clauseIndex, literal, literalIndex⟩
+  have incidenceMember :
+      incidence ∈ drawing.incidences := by
+    exact (mem_embeddedCNFIncidences_iff
+      drawing.formula incidence).mpr
+        ⟨clauseMember, literalMember⟩
+  rcases List.mem_iff_get.mp incidenceMember with
+    ⟨incidenceIndex, incidenceEqual⟩
+  have endpoint :=
+    contacts incidenceIndex point
+  change
+    point ∈
+      drawing.routes
+        (drawing.incidenceAt incidenceIndex).clauseIndex
+        (drawing.incidenceAt incidenceIndex).literalIndex →
+      point = contact →
+        RoutePointIsEndpoint
+          (drawing.routes
+            (drawing.incidenceAt incidenceIndex).clauseIndex
+            (drawing.incidenceAt incidenceIndex).literalIndex)
+          point
+    at endpoint
+  have incidenceAtEqual :
+      drawing.incidenceAt incidenceIndex = incidence :=
+    incidenceEqual
+  rw [incidenceAtEqual] at endpoint
+  exact endpoint pointMember pointEqual
+
 /-- Logical variable renaming leaves all route-point bounds unchanged. -/
 theorem RoutePointsSatisfy.rename
     {Source Target : Type*}
@@ -292,6 +359,31 @@ theorem RoutePointsSatisfy.rename
       drawing variableMap targetPosition renamedIndex
   rw [incidenceEqual, routeAt_rename_incidence] at pointMember
   exact bounded originalIndex point pointMember
+
+/-- Logical variable renaming leaves endpoint-only contact certificates
+unchanged. -/
+theorem RouteContactsAtEndpoint.rename
+    {Source Target : Type*}
+    {drawing : EmbeddedCNFIncidenceDrawing Source}
+    {contact : Cell}
+    (contacts : drawing.RouteContactsAtEndpoint contact)
+    (variableMap : Source → Target)
+    (targetPosition : Target → Cell) :
+    (drawing.rename
+      variableMap targetPosition).RouteContactsAtEndpoint contact := by
+  intro renamedIndex point pointMember pointEqual
+  let originalIndex : Fin drawing.incidences.length :=
+    ⟨renamedIndex.val, by
+      exact renamedIndex.isLt.trans_eq
+        (rename_incidences_length
+          drawing variableMap targetPosition)⟩
+  have incidenceEqual :=
+    incidenceAt_rename
+      drawing variableMap targetPosition renamedIndex
+  rw [incidenceEqual, routeAt_rename_incidence]
+    at pointMember ⊢
+  exact
+    contacts originalIndex point pointMember pointEqual
 
 /-- Conversely, a bound proved after logical renaming already bounds the
 unchanged route family of the source drawing. -/
@@ -348,6 +440,51 @@ theorem RoutePointsSatisfy.mapPoints
   exact mapsPredicate point
     (bounded originalIndex point pointMember)
 
+/-- Mapping a route maps each advertised endpoint to an advertised endpoint
+of the image route. -/
+theorem RoutePointIsEndpoint.map
+    {route : List Cell} {point : Cell}
+    (endpoint : RoutePointIsEndpoint route point)
+    (transform : Cell → Cell) :
+    RoutePointIsEndpoint
+      (route.map transform) (transform point) := by
+  rcases endpoint with first | last
+  · left
+    simpa only [List.head?_map, Option.map_some] using
+      congrArg (Option.map transform) first
+  · right
+    simpa only [List.getLast?_map, Option.map_some] using
+      congrArg (Option.map transform) last
+
+/-- An injective point map transports endpoint-only contact to the image
+of the designated contact point. -/
+theorem RouteContactsAtEndpoint.mapPoints
+    {Variable : Type*}
+    {drawing : EmbeddedCNFIncidenceDrawing Variable}
+    {contact : Cell}
+    (contacts : drawing.RouteContactsAtEndpoint contact)
+    (transform : Cell → Cell)
+    (injective : Function.Injective transform) :
+    (drawing.mapPoints transform).RouteContactsAtEndpoint
+      (transform contact) := by
+  intro mappedIndex mappedPoint mappedPointMember contactEqual
+  let originalIndex : Fin drawing.incidences.length :=
+    ⟨mappedIndex.val, by
+      exact mappedIndex.isLt.trans_eq
+        (mapPoints_incidences_length drawing transform)⟩
+  have incidenceEqual :=
+    incidenceAt_mapPoints drawing transform mappedIndex
+  rw [incidenceEqual, routeAt_mapPoints_incidence]
+    at mappedPointMember ⊢
+  rcases List.mem_map.mp mappedPointMember with
+    ⟨point, pointMember, pointEqual⟩
+  have sourceEqual : point = contact :=
+    injective (pointEqual.trans contactEqual)
+  have mappedEndpoint :=
+    (contacts originalIndex point
+      pointMember sourceEqual).map transform
+  simpa [originalIndex, pointEqual] using mappedEndpoint
+
 /-- Translation transports route-point bounds through any predicate that is
 stable under adding the same offset. -/
 theorem RoutePointsSatisfy.translate
@@ -374,6 +511,36 @@ theorem RoutePointsSatisfy.translate
   subst translatedPoint
   exact mapsPredicate point
     (bounded originalIndex point pointMember)
+
+/-- Translation transports endpoint-only contact to the translated contact
+point. -/
+theorem RouteContactsAtEndpoint.translate
+    {Variable : Type*}
+    {drawing : EmbeddedCNFIncidenceDrawing Variable}
+    {contact : Cell}
+    (contacts : drawing.RouteContactsAtEndpoint contact)
+    (offset : Cell) :
+    (drawing.translate offset).RouteContactsAtEndpoint
+      (Cell.add offset contact) := by
+  intro translatedIndex translatedPoint
+    translatedPointMember contactEqual
+  let originalIndex : Fin drawing.incidences.length :=
+    ⟨translatedIndex.val, by
+      exact translatedIndex.isLt.trans_eq
+        (translate_incidences_length drawing offset)⟩
+  have incidenceEqual :=
+    incidenceAt_translate drawing offset translatedIndex
+  rw [incidenceEqual, routeAt_translate_incidence]
+    at translatedPointMember ⊢
+  rcases List.mem_map.mp translatedPointMember with
+    ⟨point, pointMember, pointEqual⟩
+  have sourceEqual : point = contact :=
+    cell_add_left_injective offset
+      (pointEqual.trans contactEqual)
+  have translatedEndpoint :=
+    (contacts originalIndex point
+      pointMember sourceEqual).map (Cell.add offset)
+  simpa [originalIndex, pointEqual] using translatedEndpoint
 
 /-- A direct straight-line incidence drawing is bounded whenever all of its
 clause positions and occurring variable positions are bounded. -/

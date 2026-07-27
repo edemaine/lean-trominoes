@@ -279,6 +279,232 @@ theorem routesAvoidEachOther_of_outside_insideCarrierBoundary
         insidePortEndpoint _ insideMember
           (pointsEqual.symm.trans portEqual)⟩
 
+/-- The absolute internal and external regions of a translated macrocell
+meet only at its translated port position. -/
+theorem CornerPort.eq_add_position_of_insideAt_of_outsideAt
+    (port : CornerPort) (origin : Cell) {point : Cell}
+    (inside : port.InsideCarrierBoundaryAt origin point)
+    (outside : port.OutsideCarrierBoundaryAt origin point) :
+    point = Cell.add origin port.position := by
+  rcases origin with ⟨originX, originY⟩
+  rcases point with ⟨pointX, pointY⟩
+  cases port <;>
+    simp [CornerPort.InsideCarrierBoundaryAt,
+      CornerPort.OutsideCarrierBoundaryAt,
+      CornerPort.InsideCarrierBoundary,
+      CornerPort.OutsideCarrierBoundary,
+      CornerPort.position, Cell.add, Cell.sub]
+      at inside outside ⊢ <;>
+    omega
+
+/-- Segment interiors cannot meet across an absolute translated carrier
+boundary. -/
+theorem CornerPort.not_interiorsMeet_of_outsideAt_insideAt
+    (port : CornerPort) (origin : Cell)
+    {outside inside : GridSegment}
+    (outsideStart :
+      port.OutsideCarrierBoundaryAt origin outside.start)
+    (outsideFinish :
+      port.OutsideCarrierBoundaryAt origin outside.finish)
+    (insideStart :
+      port.InsideCarrierBoundaryAt origin inside.start)
+    (insideFinish :
+      port.InsideCarrierBoundaryAt origin inside.finish) :
+    ¬GridSegment.InteriorsMeet outside inside := by
+  rcases origin with ⟨originX, originY⟩
+  rcases outside with
+    ⟨⟨outsideStartX, outsideStartY⟩,
+      ⟨outsideFinishX, outsideFinishY⟩⟩
+  rcases inside with
+    ⟨⟨insideStartX, insideStartY⟩,
+      ⟨insideFinishX, insideFinishY⟩⟩
+  cases port <;>
+    simp only [CornerPort.InsideCarrierBoundaryAt,
+      CornerPort.OutsideCarrierBoundaryAt,
+      CornerPort.InsideCarrierBoundary,
+      CornerPort.OutsideCarrierBoundary, Cell.sub]
+      at outsideStart outsideFinish insideStart insideFinish <;>
+    simp only [GridSegment.InteriorsMeet,
+      GridSegment.IsHorizontal, GridSegment.IsVertical,
+      GridSegment.OpenIntervalsOverlap,
+      GridSegment.StrictlyBetween] <;>
+    simp_all [min_def, max_def] <;>
+    omega
+
+/-- An absolute external point cannot lie in the relative interior of an
+absolute internal axis-aligned segment. -/
+theorem CornerPort.not_interiorContains_insideAt_of_outsideAt
+    (port : CornerPort) (origin : Cell)
+    {point : Cell} {inside : GridSegment}
+    (pointOutside :
+      port.OutsideCarrierBoundaryAt origin point)
+    (insideStart :
+      port.InsideCarrierBoundaryAt origin inside.start)
+    (insideFinish :
+      port.InsideCarrierBoundaryAt origin inside.finish) :
+    ¬inside.InteriorContains point := by
+  rcases origin with ⟨originX, originY⟩
+  rcases point with ⟨pointX, pointY⟩
+  rcases inside with
+    ⟨⟨insideStartX, insideStartY⟩,
+      ⟨insideFinishX, insideFinishY⟩⟩
+  cases port <;>
+    simp only [CornerPort.InsideCarrierBoundaryAt,
+      CornerPort.OutsideCarrierBoundaryAt,
+      CornerPort.InsideCarrierBoundary,
+      CornerPort.OutsideCarrierBoundary, Cell.sub]
+      at pointOutside insideStart insideFinish <;>
+    simp only [GridSegment.InteriorContains,
+      GridSegment.IsHorizontal, GridSegment.IsVertical,
+      GridSegment.StrictlyBetween] <;>
+    omega
+
+/-- An absolute internal point cannot lie in the relative interior of an
+absolute external axis-aligned segment. -/
+theorem CornerPort.not_interiorContains_outsideAt_of_insideAt
+    (port : CornerPort) (origin : Cell)
+    {point : Cell} {outside : GridSegment}
+    (pointInside :
+      port.InsideCarrierBoundaryAt origin point)
+    (outsideStart :
+      port.OutsideCarrierBoundaryAt origin outside.start)
+    (outsideFinish :
+      port.OutsideCarrierBoundaryAt origin outside.finish) :
+    ¬outside.InteriorContains point := by
+  rcases origin with ⟨originX, originY⟩
+  rcases point with ⟨pointX, pointY⟩
+  rcases outside with
+    ⟨⟨outsideStartX, outsideStartY⟩,
+      ⟨outsideFinishX, outsideFinishY⟩⟩
+  cases port <;>
+    simp only [CornerPort.InsideCarrierBoundaryAt,
+      CornerPort.OutsideCarrierBoundaryAt,
+      CornerPort.InsideCarrierBoundary,
+      CornerPort.OutsideCarrierBoundary, Cell.sub]
+      at pointInside outsideStart outsideFinish <;>
+    simp only [GridSegment.InteriorContains,
+      GridSegment.IsHorizontal, GridSegment.IsVertical,
+      GridSegment.StrictlyBetween] <;>
+    omega
+
+/-- Absolute pointwise containment on opposite sides of a translated port
+boundary gives complete route separation, provided contact with the common
+physical port is endpoint-only on both routes. -/
+theorem routesAvoidEachOther_of_outside_insideCarrierBoundaryAt
+    (port : CornerPort) (origin : Cell)
+    {outside inside : List Cell}
+    (outsideBounded :
+      ∀ point ∈ outside,
+        port.OutsideCarrierBoundaryAt origin point)
+    (insideBounded :
+      ∀ point ∈ inside,
+        port.InsideCarrierBoundaryAt origin point)
+    (outsidePortEndpoint :
+      ∀ point ∈ outside,
+        point = Cell.add origin port.position →
+          EmbeddedCNFIncidenceDrawing.RoutePointIsEndpoint
+            outside point)
+    (insidePortEndpoint :
+      ∀ point ∈ inside,
+        point = Cell.add origin port.position →
+          EmbeddedCNFIncidenceDrawing.RoutePointIsEndpoint
+            inside point) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      outside inside := by
+  unfold EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro outsideIndex insideIndex
+    have outsideEndpoints :=
+      gridPolylineSegments_endpoints_mem
+        (List.get_mem
+          (gridPolylineSegments outside) outsideIndex)
+    have insideEndpoints :=
+      gridPolylineSegments_endpoints_mem
+        (List.get_mem
+          (gridPolylineSegments inside) insideIndex)
+    exact
+      port.not_interiorsMeet_of_outsideAt_insideAt origin
+        (outsideBounded _ outsideEndpoints.1)
+        (outsideBounded _ outsideEndpoints.2)
+        (insideBounded _ insideEndpoints.1)
+        (insideBounded _ insideEndpoints.2)
+  · intro outsidePointIndex insideSegmentIndex
+    have insideEndpoints :=
+      gridPolylineSegments_endpoints_mem
+        (List.get_mem
+          (gridPolylineSegments inside) insideSegmentIndex)
+    exact
+      port.not_interiorContains_insideAt_of_outsideAt origin
+        (outsideBounded _
+          (List.get_mem outside outsidePointIndex))
+        (insideBounded _ insideEndpoints.1)
+        (insideBounded _ insideEndpoints.2)
+  · intro insidePointIndex outsideSegmentIndex
+    have outsideEndpoints :=
+      gridPolylineSegments_endpoints_mem
+        (List.get_mem
+          (gridPolylineSegments outside) outsideSegmentIndex)
+    exact
+      port.not_interiorContains_outsideAt_of_insideAt origin
+        (insideBounded _
+          (List.get_mem inside insidePointIndex))
+        (outsideBounded _ outsideEndpoints.1)
+        (outsideBounded _ outsideEndpoints.2)
+  · intro outsidePointIndex insidePointIndex pointsEqual
+    have outsideMember :=
+      List.get_mem outside outsidePointIndex
+    have insideMember :=
+      List.get_mem inside insidePointIndex
+    have portEqual :
+        outside.get outsidePointIndex =
+          Cell.add origin port.position :=
+      port.eq_add_position_of_insideAt_of_outsideAt
+        origin
+        (by
+          rw [pointsEqual]
+          exact insideBounded _ insideMember)
+        (outsideBounded _ outsideMember)
+    exact
+      ⟨outsidePortEndpoint _ outsideMember portEqual,
+        insidePortEndpoint _ insideMember
+          (pointsEqual.symm.trans portEqual)⟩
+
+/-- Drawing-level route bounds and endpoint-contact certificates instantiate
+the absolute carrier-boundary separator for every selected route pair. -/
+theorem drawingRoutesAvoidEachOther_of_outside_insideCarrierBoundaryAt
+    {OutsideVariable InsideVariable : Type*}
+    (port : CornerPort) (origin : Cell)
+    {outsideDrawing :
+      EmbeddedCNFIncidenceDrawing OutsideVariable}
+    {insideDrawing :
+      EmbeddedCNFIncidenceDrawing InsideVariable}
+    (outsideBounded :
+      outsideDrawing.RoutePointsSatisfy
+        (port.OutsideCarrierBoundaryAt origin))
+    (insideBounded :
+      insideDrawing.RoutePointsSatisfy
+        (port.InsideCarrierBoundaryAt origin))
+    (outsideContacts :
+      outsideDrawing.RouteContactsAtEndpoint
+        (Cell.add origin port.position))
+    (insideContacts :
+      insideDrawing.RouteContactsAtEndpoint
+        (Cell.add origin port.position))
+    (outsideIndex : Fin outsideDrawing.incidences.length)
+    (insideIndex : Fin insideDrawing.incidences.length) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (outsideDrawing.routeAt
+        (outsideDrawing.incidenceAt outsideIndex))
+      (insideDrawing.routeAt
+        (insideDrawing.incidenceAt insideIndex)) := by
+  exact
+    routesAvoidEachOther_of_outside_insideCarrierBoundaryAt
+      port origin
+      (outsideBounded outsideIndex)
+      (insideBounded insideIndex)
+      (outsideContacts outsideIndex)
+      (insideContacts insideIndex)
+
 /-- Every route point in a fixed corner drawing remains on the macrocell
 side of both occupied compass-port boundaries. -/
 theorem cornerEqualityDrawing_routePoints_insideCarrierBoundaries
@@ -287,6 +513,22 @@ theorem cornerEqualityDrawing_routePoints_insideCarrierBoundaries
       fun point =>
         first.InsideCarrierBoundary point ∧
           second.InsideCarrierBoundary point := by
+  cases first <;> cases second <;> native_decide
+
+/-- A canonical corner route can list the first occupied port only as one
+of that route's advertised endpoints. -/
+theorem cornerEqualityDrawing_routeContactsAt_firstEndpoint
+    (first second : CornerPort) :
+    (cornerEqualityDrawing
+      first second).RouteContactsAtEndpoint first.position := by
+  cases first <;> cases second <;> native_decide
+
+/-- A canonical corner route can list the second occupied port only as one
+of that route's advertised endpoints. -/
+theorem cornerEqualityDrawing_routeContactsAt_secondEndpoint
+    (first second : CornerPort) :
+    (cornerEqualityDrawing
+      first second).RouteContactsAtEndpoint second.position := by
   cases first <;> cases second <;> native_decide
 
 /-- Translating a corner drawing to its macrocell origin preserves both
@@ -320,6 +562,36 @@ theorem placedCornerEqualityDrawing_routePoints_insideCarrierBoundaries
   exact
     (translatedCornerEqualityDrawing_routePoints_insideCarrierBoundaries
       firstPort secondPort origin).rename _ _
+
+/-- In a translated and renamed corner drawing, contact with the first
+physical port remains endpoint-only. -/
+theorem placedCornerEqualityDrawing_routeContactsAt_firstEndpoint
+    {Variable : Type*} [DecidableEq Variable]
+    (first second : Variable) (origin : Cell)
+    (firstPort secondPort : CornerPort) :
+    (placedCornerEqualityDrawing
+      first second origin firstPort secondPort).RouteContactsAtEndpoint
+        (Cell.add origin firstPort.position) := by
+  unfold placedCornerEqualityDrawing
+    EmbeddedCNFIncidenceDrawing.renameToImage
+  exact
+    ((cornerEqualityDrawing_routeContactsAt_firstEndpoint
+      firstPort secondPort).translate origin).rename _ _
+
+/-- In a translated and renamed corner drawing, contact with the second
+physical port remains endpoint-only. -/
+theorem placedCornerEqualityDrawing_routeContactsAt_secondEndpoint
+    {Variable : Type*} [DecidableEq Variable]
+    (first second : Variable) (origin : Cell)
+    (firstPort secondPort : CornerPort) :
+    (placedCornerEqualityDrawing
+      first second origin firstPort secondPort).RouteContactsAtEndpoint
+        (Cell.add origin secondPort.position) := by
+  unfold placedCornerEqualityDrawing
+    EmbeddedCNFIncidenceDrawing.renameToImage
+  exact
+    ((cornerEqualityDrawing_routeContactsAt_secondEndpoint
+      firstPort secondPort).translate origin).rename _ _
 
 end PlanarThreeSAT
 end LeanTrominoes
