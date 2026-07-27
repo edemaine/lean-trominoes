@@ -189,6 +189,17 @@ theorem
       drawingFixedEightPositionedPeriodicPlanarOneInThreeRawFormula_allAtomsNodup
         input
 
+/-- The wrapped fixed-eight Figure 9 source retains width three. -/
+theorem
+    drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula_widthAtMostThree
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable) :
+    (drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula
+      input).erase.WidthAtMost 3 := by
+  rw [drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula_erase]
+  apply wrapPeriodicPlanarSATFormula_widthAtMost
+  exact PeriodicOneInThree.formula_widthAtMostThree _
+
 /-- Unit elimination preserves fixed-eight Figure 9 atom distinctness. -/
 theorem
     drawingFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula_allAtomsNodup

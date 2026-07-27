@@ -455,6 +455,18 @@ The representation choices for this target are:
   canonical periodic endpoint.  As at the Figure 9 layer, it completes any
   inherited-variable suffix family automatically and packages the resulting
   canonical orthogonal splice, leaving only source-variable ports to supply.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean)
+  lifts the inherited semantic classification through the flattened final
+  formula and identifies each local endpoint with its exact source-clause
+  boundary port.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteSplicing.lean)
+  scales and translates the corresponding source incidence route through
+  the `6 × 6` unit-elimination refinement, joins it to that boundary port,
+  and proves exact canonical endpoints and orthogonality.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
+  packages those per-incidence splices into a total proof-backed inherited
+  suffix family.  Any canonical orthogonal source route family can therefore
+  be lifted through unit elimination.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final
@@ -2122,6 +2134,12 @@ The representation choices for this target are:
   variable wrapper without changing any polyline.  The wrapped Figure 9
   formula therefore retains the same pointwise canonical endpoints and
   orthogonality certificates needed by unit elimination.
+- [`LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeNoUnitsRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeNoUnitsRoutes.lean)
+  feeds those wrapped routes through the inherited unit-elimination adapter
+  and completes all local auxiliary incidences.  Thus the final fixed-eight,
+  unit-free exact-one formula has a total route family with exact canonical
+  endpoints and orthogonality; proving the family globally planar remains
+  the next geometric obligation.
 - [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean)
   threads the local atom-distinctness certificates through opaque wrapping
   and unit elimination, then specializes them to the angular hardness
