@@ -2053,7 +2053,8 @@ The representation choices for this target are:
   the flattened global Figure 9 clause index, translates the checked
   geometry by the combined `72 × 72` refinement, and inherits each complete
   validity certificate (requiring distinctness only among source atoms that
-  actually occur).
+  actually occur).  Exact formula identities cover arbitrary positions,
+  presentation indices, polarities, and periodic literal offsets.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal

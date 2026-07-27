@@ -77,6 +77,24 @@ def variableMap
             sourceClauseIndex source localClauseIndex),
           kind)
 
+/-- Actual local clause block obtained by running positioned Figure 9 and
+then unit elimination, using the supplied global index for the first
+Figure 9 clause. -/
+def composedClauseGadget
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    List
+      (EmbeddedClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))) :=
+  (PeriodicOneInThreePositioned.clauseGadget
+    sourceClauseIndex source).zipIdx.flatMap fun taggedClause =>
+      (PeriodicOneInThreeNoUnitsPositioned.clauseGadget
+        (figureNineClauseStart + taggedClause.2)
+        taggedClause.1).map
+          PlanarOneInThreeNoUnits.embedPositionedClause
+
 /-- First-stage variable map for a genuine ternary source clause. -/
 def threeInheritedMap
     {Variable : Type*}
@@ -133,6 +151,51 @@ def instantiatedThreeDrawing
       sourceClauseIndex figureNineClauseStart source
       first.atom second.atom third.atom)).translate
         (Cell.scale composedGadgetScale source.position)
+
+/-- The instantiated ternary drawing's formula is exactly its actual
+two-stage positioned clause block. -/
+theorem instantiatedThreeDrawing_formula
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second third : PeriodicLiteral Variable)
+    (sourceLiterals :
+      source.literals = [first, second, third]) :
+    (instantiatedThreeDrawing
+      sourceClauseIndex figureNineClauseStart source
+      first second third).formula =
+        composedClauseGadget
+          sourceClauseIndex figureNineClauseStart source := by
+  rcases source with ⟨sourcePosition, literals⟩
+  dsimp at sourceLiterals ⊢
+  subst literals
+  simp [instantiatedThreeDrawing,
+    EmbeddedCNFIncidenceDrawing.renameToImage,
+    EmbeddedCNFIncidenceDrawing.rename,
+    EmbeddedCNFIncidenceDrawing.translate,
+    fullDrawingFor, fullFormulaFor, clause,
+    threeVariableMap, variableMap, threeInheritedMap,
+    composedClauseGadget,
+    PeriodicOneInThreePositioned.clauseGadget,
+    PeriodicOneInThreeNoUnitsPositioned.clauseGadget,
+    PlanarOneInThreeNoUnits.embedPositionedClause,
+    PeriodicOneInThree.clauseClauses,
+    PeriodicOneInThreeNoUnits.clauseClauses,
+    PeriodicOneInThree.disjunctionGadget,
+    PeriodicOneInThree.liftLiteral,
+    PeriodicOneInThree.auxiliary,
+    PeriodicOneInThree.negate,
+    PlanarOneInThree.generatedClausePosition,
+    composedGadgetScale, PlanarOneInThree.gadgetScale,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    EmbeddedClause.rename, EmbeddedClause.map,
+    EmbeddedClause.translate, Cell.add, Cell.scale]
+  unfold
+    PeriodicOneInThreeNoUnitsPositioned.generatedClausePosition
+  simp [PeriodicOneInThreeNoUnits.liftLiteral,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    Cell.add, Cell.scale]
+  omega
 
 /-- Pairwise distinct source atoms make the composed ternary variable map
 injective on every role that occurs in the finite drawing. -/
@@ -258,6 +321,55 @@ def instantiatedTwoDrawing
       first.atom second.atom)).translate
         (Cell.scale composedGadgetScale source.position)
 
+/-- The instantiated binary drawing's formula is exactly its actual
+two-stage positioned clause block. -/
+theorem instantiatedTwoDrawing_formula
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second : PeriodicLiteral Variable)
+    (sourceLiterals : source.literals = [first, second]) :
+    (instantiatedTwoDrawing
+      sourceClauseIndex figureNineClauseStart source
+      first second).formula =
+        composedClauseGadget
+          sourceClauseIndex figureNineClauseStart source := by
+  rcases source with ⟨sourcePosition, literals⟩
+  dsimp at sourceLiterals ⊢
+  subst literals
+  simp [instantiatedTwoDrawing,
+    EmbeddedCNFIncidenceDrawing.renameToImage,
+    EmbeddedCNFIncidenceDrawing.rename,
+    EmbeddedCNFIncidenceDrawing.translate,
+    twoDrawingFor, twoFormulaFor,
+    forcedFalseUnitReplacement, clause,
+    twoVariableMap, variableMap, twoInheritedMap,
+    figureNineClauseLiterals,
+    composedClauseGadget,
+    PeriodicOneInThreePositioned.clauseGadget,
+    PeriodicOneInThreeNoUnitsPositioned.clauseGadget,
+    PlanarOneInThreeNoUnits.embedPositionedClause,
+    PeriodicOneInThree.clauseClauses,
+    PeriodicOneInThreeNoUnits.clauseClauses,
+    PeriodicOneInThree.disjunctionGadget,
+    PeriodicOneInThree.padding,
+    PeriodicOneInThree.forcePaddingFalse,
+    PeriodicOneInThree.liftLiteral,
+    PeriodicOneInThree.auxiliary,
+    PeriodicOneInThree.negate,
+    PlanarOneInThree.generatedClausePosition,
+    composedGadgetScale, PlanarOneInThree.gadgetScale,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    EmbeddedClause.rename, EmbeddedClause.map,
+    EmbeddedClause.translate, Cell.add, Cell.scale]
+  unfold
+    PeriodicOneInThreeNoUnitsPositioned.generatedClausePosition
+  simp [PeriodicOneInThreeNoUnits.liftLiteral,
+    PeriodicOneInThreeNoUnits.auxiliary,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    Cell.add, Cell.scale]
+  omega
+
 /-- Distinct binary source atoms make the composed map injective on every
 occurring finite role. -/
 theorem twoVariableMap_injectiveOn
@@ -379,6 +491,54 @@ def instantiatedOneDrawing
       first.atom)).translate
         (Cell.scale composedGadgetScale source.position)
 
+/-- The instantiated unit drawing's formula is exactly its actual two-stage
+positioned clause block. -/
+theorem instantiatedOneDrawing_formula
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first : PeriodicLiteral Variable)
+    (sourceLiterals : source.literals = [first]) :
+    (instantiatedOneDrawing
+      sourceClauseIndex figureNineClauseStart source first).formula =
+        composedClauseGadget
+          sourceClauseIndex figureNineClauseStart source := by
+  rcases source with ⟨sourcePosition, literals⟩
+  dsimp at sourceLiterals ⊢
+  subst literals
+  simp [instantiatedOneDrawing,
+    EmbeddedCNFIncidenceDrawing.renameToImage,
+    EmbeddedCNFIncidenceDrawing.rename,
+    EmbeddedCNFIncidenceDrawing.translate,
+    oneDrawingFor, oneFormulaFor,
+    forcedFalseUnitReplacement, clause,
+    oneVariableMap, variableMap, oneInheritedMap,
+    figureNineClauseLiterals,
+    composedClauseGadget,
+    PeriodicOneInThreePositioned.clauseGadget,
+    PeriodicOneInThreeNoUnitsPositioned.clauseGadget,
+    PlanarOneInThreeNoUnits.embedPositionedClause,
+    PeriodicOneInThree.clauseClauses,
+    PeriodicOneInThreeNoUnits.clauseClauses,
+    PeriodicOneInThree.disjunctionGadget,
+    PeriodicOneInThree.padding,
+    PeriodicOneInThree.forcePaddingFalse,
+    PeriodicOneInThree.liftLiteral,
+    PeriodicOneInThree.auxiliary,
+    PeriodicOneInThree.negate,
+    PlanarOneInThree.generatedClausePosition,
+    composedGadgetScale, PlanarOneInThree.gadgetScale,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    EmbeddedClause.rename, EmbeddedClause.map,
+    EmbeddedClause.translate, Cell.add, Cell.scale]
+  unfold
+    PeriodicOneInThreeNoUnitsPositioned.generatedClausePosition
+  simp [PeriodicOneInThreeNoUnits.liftLiteral,
+    PeriodicOneInThreeNoUnits.auxiliary,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    Cell.add, Cell.scale]
+  omega
+
 /-- The unit-source map is injective on every occurring finite role. -/
 theorem oneVariableMap_injectiveOn
     {Variable : Type*} [DecidableEq Variable]
@@ -489,6 +649,52 @@ def instantiatedZeroDrawing
     (zeroVariableMap
       sourceClauseIndex figureNineClauseStart source)).translate
         (Cell.scale composedGadgetScale source.position)
+
+/-- The instantiated empty drawing's formula is exactly its actual two-stage
+positioned clause block. -/
+theorem instantiatedZeroDrawing_formula
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (sourceLiterals : source.literals = []) :
+    (instantiatedZeroDrawing
+      sourceClauseIndex figureNineClauseStart source).formula =
+        composedClauseGadget
+          sourceClauseIndex figureNineClauseStart source := by
+  rcases source with ⟨sourcePosition, literals⟩
+  dsimp at sourceLiterals ⊢
+  subst literals
+  simp [instantiatedZeroDrawing,
+    EmbeddedCNFIncidenceDrawing.renameToImage,
+    EmbeddedCNFIncidenceDrawing.rename,
+    EmbeddedCNFIncidenceDrawing.translate,
+    zeroDrawing, zeroFormula,
+    forcedFalseUnitReplacement, clause,
+    zeroVariableMap, variableMap, zeroInheritedMap,
+    figureNineClauseLiterals,
+    composedClauseGadget,
+    PeriodicOneInThreePositioned.clauseGadget,
+    PeriodicOneInThreeNoUnitsPositioned.clauseGadget,
+    PlanarOneInThreeNoUnits.embedPositionedClause,
+    PeriodicOneInThree.clauseClauses,
+    PeriodicOneInThreeNoUnits.clauseClauses,
+    PeriodicOneInThree.disjunctionGadget,
+    PeriodicOneInThree.padding,
+    PeriodicOneInThree.forcePaddingFalse,
+    PeriodicOneInThree.auxiliary,
+    PeriodicOneInThree.negate,
+    PlanarOneInThree.generatedClausePosition,
+    composedGadgetScale, PlanarOneInThree.gadgetScale,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    EmbeddedClause.rename, EmbeddedClause.map,
+    EmbeddedClause.translate, Cell.add, Cell.scale]
+  unfold
+    PeriodicOneInThreeNoUnitsPositioned.generatedClausePosition
+  simp [PeriodicOneInThreeNoUnits.liftLiteral,
+    PeriodicOneInThreeNoUnits.auxiliary,
+    PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+    Cell.add, Cell.scale]
+  omega
 
 /-- The empty-source map is injective on every occurring finite role. -/
 theorem zeroVariableMap_injectiveOn
