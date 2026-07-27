@@ -1826,7 +1826,9 @@ The representation choices for this target are:
   a narrow rectilinear lens.  For every span of at least eight cells, explicit
   finite-index proofs certify exact endpoints, orthogonality, route
   simplicity, pairwise continuous separation, vertex avoidance, and distinct
-  vertex positions.
+  vertex positions.  Its endpoint rays are coordinated so consecutive lenses
+  use the four compass directions exactly once at their shared variable; a
+  symbolic theorem certifies separation of every such adjacent route pair.
 - [`LeanTrominoes/PlanarThreeSATEqualityLensPlacement.lean`](LeanTrominoes/PlanarThreeSATEqualityLensPlacement.lean)
   rotates and translates that lens onto any directed grid axis, then
   injectively renames its Boolean roles to any two distinct logical
@@ -1842,7 +1844,9 @@ The representation choices for this target are:
   Explicit rectilinear four-cycles cover all twelve ordered pairs of distinct
   compass ports in one `20 × 20` macrocell; exhaustive finite checks certify
   exact endpoints, orthogonality, and continuous planarity, and translation
-  plus injective renaming place the template at arbitrary bend links.
+  plus injective renaming place the template at arbitrary bend links.  Each
+  port uses the inward and free perpendicular rays and stays on the macrocell
+  side of the port, complementing the adjacent straight-carrier lens.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to

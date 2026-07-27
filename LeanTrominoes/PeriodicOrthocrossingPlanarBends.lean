@@ -156,7 +156,7 @@ def routeBendEqualityPositions
     (routeBend : RouteBend) : EqualityPositions :=
   let origin :=
     Cell.scale planarMacroScale (routeBend.drawingPoint graph)
-  ⟨Cell.add origin (8, 8), Cell.add origin (12, 12)⟩
+  ⟨Cell.add origin (5, 5), Cell.add origin (8, 8)⟩
 
 /-- The equality link joining the two segment terminals at one route bend. -/
 def RouteBend.equalityLink

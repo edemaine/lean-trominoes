@@ -12,9 +12,12 @@ that four-cycle a uniformly narrow rectilinear drawing.
 
 The canonical horizontal template has endpoint variables at `(0, 0)` and
 `(span, 0)`, with the two existing clause vertices at `(3, 0)` and `(6, 0)`.
-Its four routes occupy only the lanes `-2 ≤ y ≤ 2`; the only hypothesis is
-`8 ≤ span`.  Later carrier geometry can translate, reflect, or rotate this
-one parametric certificate.
+Its four routes occupy only the lanes `-2 ≤ y ≤ 1`; the only hypothesis is
+`8 ≤ span`.  At the left endpoint they use the east and north rays, while
+at the right endpoint they use the west and south rays.  Thus consecutive
+lenses use all four rays exactly once at their shared carrier variable.
+Later carrier geometry can translate, reflect, or rotate this one
+parametric certificate.
 -/
 
 namespace LeanTrominoes
@@ -32,21 +35,21 @@ def horizontalEqualityLensVariablePosition (span : Int) : Bool → Cell
   | false => (0, 0)
   | true => (span, 0)
 
-/-- Upper-left incidence of the equality four-cycle. -/
+/-- Forward incidence to the left endpoint, directly along the carrier. -/
 def horizontalEqualityLensUpperLeftRoute : List Cell :=
-  [(3, 0), (2, 0), (2, 1), (0, 1), (0, 0)]
+  [(3, 0), (0, 0)]
 
-/-- Upper-right incidence of the equality four-cycle. -/
+/-- Forward incidence to the right endpoint, routed below the carrier. -/
 def horizontalEqualityLensUpperRightRoute (span : Int) : List Cell :=
-  [(3, 0), (4, 0), (4, 2), (span, 2), (span, 0)]
+  [(3, 0), (3, -2), (span, -2), (span, 0)]
 
-/-- Lower-left incidence of the equality four-cycle. -/
+/-- Backward incidence to the left endpoint, routed above the carrier. -/
 def horizontalEqualityLensLowerLeftRoute : List Cell :=
-  [(6, 0), (5, 0), (5, -2), (0, -2), (0, 0)]
+  [(6, 0), (6, 1), (0, 1), (0, 0)]
 
-/-- Lower-right incidence of the equality four-cycle. -/
+/-- Backward incidence to the right endpoint, directly along the carrier. -/
 def horizontalEqualityLensLowerRightRoute (span : Int) : List Cell :=
-  [(6, 0), (7, 0), (7, -1), (span, -1), (span, 0)]
+  [(6, 0), (span, 0)]
 
 /-- Total presentation-indexed route lookup for the equality lens. -/
 def horizontalEqualityLensRoutes (span : Int) :
@@ -500,6 +503,71 @@ theorem horizontalEqualityLensDrawing_isValid
   ⟨horizontalEqualityLensDrawing_routesMatch span,
     horizontalEqualityLensDrawing_isOrthogonal span spanLarge,
     horizontalEqualityLensDrawing_isPlanar span spanLarge⟩
+
+set_option maxRecDepth 10000
+set_option maxHeartbeats 4000000
+
+/-- Any selected route of one horizontal lens avoids any selected route of
+the next lens on the same carrier.  The two drawings may meet only at their
+shared endpoint `(span, 0)`. -/
+theorem horizontalEqualityLensRoutes_adjacent_avoidEachOther
+    (span nextSpan : Int)
+    (spanLarge : 8 ≤ span)
+    (nextSpanLarge : 8 ≤ nextSpan)
+    (firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat)
+    (firstClauseLt : firstClauseIndex < 2)
+    (firstLiteralLt : firstLiteralIndex < 2)
+    (secondClauseLt : secondClauseIndex < 2)
+    (secondLiteralLt : secondLiteralIndex < 2) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (horizontalEqualityLensRoutes span
+        firstClauseIndex firstLiteralIndex)
+      ((horizontalEqualityLensRoutes nextSpan
+        secondClauseIndex secondLiteralIndex).map
+          (Cell.add (span, 0))) := by
+  interval_cases firstClauseIndex <;>
+    interval_cases firstLiteralIndex <;>
+    interval_cases secondClauseIndex <;>
+    interval_cases secondLiteralIndex
+  all_goals
+    unfold horizontalEqualityLensRoutes
+      horizontalEqualityLensUpperLeftRoute
+      horizontalEqualityLensUpperRightRoute
+      horizontalEqualityLensLowerLeftRoute
+      horizontalEqualityLensLowerRightRoute
+    constructor
+    · intro firstIndex secondIndex
+      fin_cases firstIndex <;> fin_cases secondIndex <;>
+        simp [gridPolylineSegments, GridSegment.InteriorsMeet,
+          GridSegment.OpenIntervalsOverlap,
+          GridSegment.StrictlyBetween,
+          GridSegment.IsHorizontal, GridSegment.IsVertical,
+          Cell.add] <;>
+        omega
+    constructor
+    · intro pointIndex segmentIndex
+      fin_cases pointIndex <;> fin_cases segmentIndex <;>
+        simp [gridPolylineSegments, GridSegment.InteriorContains,
+          GridSegment.StrictlyBetween,
+          GridSegment.IsHorizontal, GridSegment.IsVertical,
+          Cell.add] <;>
+        omega
+    constructor
+    · intro pointIndex segmentIndex
+      fin_cases pointIndex <;> fin_cases segmentIndex <;>
+        simp [gridPolylineSegments, GridSegment.InteriorContains,
+          GridSegment.StrictlyBetween,
+          GridSegment.IsHorizontal, GridSegment.IsVertical,
+          Cell.add] <;>
+        omega
+    · intro firstIndex secondIndex pointsEqual
+      fin_cases firstIndex <;> fin_cases secondIndex
+      all_goals
+        norm_num [Cell.add] at pointsEqual <;>
+        norm_num [EmbeddedCNFIncidenceDrawing.RoutePointIsEndpoint,
+          Cell.add] <;>
+        omega
 
 end PlanarThreeSAT
 end LeanTrominoes

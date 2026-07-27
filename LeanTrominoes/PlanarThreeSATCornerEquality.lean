@@ -7,13 +7,17 @@ import LeanTrominoes.PlanarThreeSATEqualityLensPlacement
 
 Straight carrier links use the narrow equality lens.  At a route bend, the
 two endpoint variables instead occupy two distinct compass ports of one
-`20 × 20` macrocell, while the equality clauses remain at `(8, 8)` and
-`(12, 12)`.  This file gives all twelve ordered pairs of distinct ports a
+`20 × 20` macrocell, while the equality clauses remain at `(5, 5)` and
+`(8, 8)`.  This file gives all twelve ordered pairs of distinct ports a
 fixed rectilinear drawing of their equality four-cycle.
 
-The route table is deliberately finite.  Its complete endpoint,
-orthogonality, and continuous-planarity certificate is checked once, then
-arbitrary links are obtained by translation and injective renaming.
+At each port, the two routes use the inward axial ray and the one
+perpendicular ray not used by the adjacent straight carrier lens.  The
+whole table also stays on the macrocell side of every occupied port, so it
+meets an incident carrier only at their common endpoint.  The route table is
+deliberately finite.  Its complete endpoint, orthogonality, and
+continuous-planarity certificate is checked once, then arbitrary links are
+obtained by translation and injective renaming.
 -/
 
 namespace LeanTrominoes
@@ -37,7 +41,7 @@ def CornerPort.position : CornerPort → Cell
 
 /-- The two fixed implication-clause positions around every route bend. -/
 def cornerEqualityPositions : EqualityPositions :=
-  ⟨(8, 8), (12, 12)⟩
+  ⟨(5, 5), (8, 8)⟩
 
 /-- Boolean endpoints placed at an ordered pair of compass ports. -/
 def cornerEqualityVariablePosition
@@ -51,65 +55,65 @@ the empty list. -/
 def cornerEqualityRouteTable :
     CornerPort → CornerPort → List (List Cell)
   | .west, .east =>
-      [[(8, 8), (1, 8), (1, 6)],
-        [(8, 8), (11, 8), (11, 6)],
-        [(12, 12), (0, 12), (0, 6), (1, 6)],
-        [(12, 12), (12, 6), (11, 6)]]
-  | .west, .south =>
-      [[(8, 8), (1, 8), (1, 6)],
-        [(8, 8), (8, 1), (6, 1)],
-        [(12, 12), (0, 12), (0, 6), (1, 6)],
-        [(12, 12), (12, 0), (6, 0), (6, 1)]]
-  | .west, .north =>
-      [[(8, 8), (1, 8), (1, 6)],
-        [(8, 8), (8, 11), (6, 11)],
-        [(12, 12), (12, 6), (1, 6)],
-        [(12, 12), (6, 12), (6, 11)]]
-  | .east, .west =>
-      [[(8, 8), (11, 8), (11, 6)],
+      [[(5, 5), (5, 6), (1, 6)],
+        [(5, 5), (11, 5), (11, 6)],
         [(8, 8), (1, 8), (1, 6)],
-        [(12, 12), (12, 6), (11, 6)],
-        [(12, 12), (0, 12), (0, 6), (1, 6)]]
+        [(8, 8), (8, 6), (11, 6)]]
+  | .west, .south =>
+      [[(5, 5), (5, 6), (1, 6)],
+        [(5, 5), (5, 1), (6, 1)],
+        [(8, 8), (1, 8), (1, 6)],
+        [(8, 8), (8, 2), (6, 2), (6, 1)]]
+  | .west, .north =>
+      [[(5, 5), (5, 6), (1, 6)],
+        [(5, 5), (9, 5), (9, 11), (6, 11)],
+        [(8, 8), (1, 8), (1, 6)],
+        [(8, 8), (8, 9), (6, 9), (6, 11)]]
+  | .east, .west =>
+      [[(5, 5), (5, 4), (10, 4), (10, 6), (11, 6)],
+        [(5, 5), (9, 5), (9, 10), (1, 10), (1, 6)],
+        [(8, 8), (4, 8), (4, 3), (11, 3), (11, 6)],
+        [(8, 8), (8, 9), (2, 9), (2, 6), (1, 6)]]
   | .east, .south =>
-      [[(8, 8), (11, 8), (11, 6)],
-        [(8, 8), (6, 8), (6, 1)],
-        [(12, 12), (12, 6), (11, 6)],
-        [(12, 12), (0, 12), (0, 1), (6, 1)]]
+      [[(5, 5), (5, 9), (9, 9), (9, 6), (11, 6)],
+        [(5, 5), (5, 1), (6, 1)],
+        [(8, 8), (8, 5), (11, 5), (11, 6)],
+        [(8, 8), (6, 8), (6, 1)]]
   | .east, .north =>
-      [[(8, 8), (11, 8), (11, 6)],
-        [(8, 8), (6, 8), (6, 11)],
-        [(12, 12), (12, 6), (11, 6)],
-        [(12, 12), (6, 12), (6, 11)]]
+      [[(5, 5), (6, 5), (6, 6), (11, 6)],
+        [(5, 5), (5, 7), (9, 7), (9, 11), (6, 11)],
+        [(8, 8), (4, 8), (4, 4), (11, 4), (11, 6)],
+        [(8, 8), (8, 9), (6, 9), (6, 11)]]
   | .south, .west =>
-      [[(8, 8), (6, 8), (6, 1)],
-        [(8, 8), (8, 0), (1, 0), (1, 6)],
-        [(12, 12), (2, 12), (2, 1), (6, 1)],
-        [(12, 12), (12, 13), (1, 13), (1, 6)]]
+      [[(5, 5), (5, 2), (6, 2), (6, 1)],
+        [(5, 5), (9, 5), (9, 9), (1, 9), (1, 6)],
+        [(8, 8), (8, 6), (4, 6), (4, 1), (6, 1)],
+        [(8, 8), (2, 8), (2, 6), (1, 6)]]
   | .south, .east =>
-      [[(8, 8), (6, 8), (6, 1)],
-        [(8, 8), (11, 8), (11, 6)],
-        [(12, 12), (0, 12), (0, 1), (6, 1)],
-        [(12, 12), (12, 6), (11, 6)]]
+      [[(5, 5), (5, 2), (6, 2), (6, 1)],
+        [(5, 5), (11, 5), (11, 6)],
+        [(8, 8), (4, 8), (4, 1), (6, 1)],
+        [(8, 8), (8, 6), (11, 6)]]
   | .south, .north =>
-      [[(8, 8), (6, 8), (6, 1)],
-        [(8, 8), (8, 11), (6, 11)],
-        [(12, 12), (12, 1), (6, 1)],
-        [(12, 12), (6, 12), (6, 11)]]
+      [[(5, 5), (6, 5), (6, 1)],
+        [(5, 5), (5, 6), (9, 6), (9, 11), (6, 11)],
+        [(8, 8), (4, 8), (4, 1), (6, 1)],
+        [(8, 8), (8, 9), (6, 9), (6, 11)]]
   | .north, .west =>
-      [[(8, 8), (6, 8), (6, 11)],
-        [(8, 8), (8, 6), (1, 6)],
-        [(12, 12), (6, 12), (6, 11)],
-        [(12, 12), (12, 0), (1, 0), (1, 6)]]
+      [[(5, 5), (6, 5), (6, 11)],
+        [(5, 5), (5, 7), (1, 7), (1, 6)],
+        [(8, 8), (8, 11), (6, 11)],
+        [(8, 8), (8, 4), (2, 4), (2, 6), (1, 6)]]
   | .north, .east =>
-      [[(8, 8), (6, 8), (6, 11)],
-        [(8, 8), (11, 8), (11, 6)],
-        [(12, 12), (6, 12), (6, 11)],
-        [(12, 12), (12, 6), (11, 6)]]
+      [[(5, 5), (6, 5), (6, 11)],
+        [(5, 5), (5, 4), (11, 4), (11, 6)],
+        [(8, 8), (8, 11), (6, 11)],
+        [(8, 8), (8, 6), (11, 6)]]
   | .north, .south =>
-      [[(8, 8), (6, 8), (6, 11)],
-        [(8, 8), (8, 1), (6, 1)],
-        [(12, 12), (6, 12), (6, 11)],
-        [(12, 12), (12, 0), (6, 0), (6, 1)]]
+      [[(5, 5), (6, 5), (6, 11)],
+        [(5, 5), (5, 1), (6, 1)],
+        [(8, 8), (8, 11), (6, 11)],
+        [(8, 8), (8, 2), (6, 2), (6, 1)]]
   | _, _ => []
 
 /-- Total presentation-indexed lookup into the four-route table. -/
@@ -157,7 +161,7 @@ theorem placedCornerEqualityDrawing_formula
     (placedCornerEqualityDrawing
       first second origin firstPort secondPort).formula =
       equalityInstance first second
-        ⟨Cell.add origin (8, 8), Cell.add origin (12, 12)⟩ := by
+        ⟨Cell.add origin (5, 5), Cell.add origin (8, 8)⟩ := by
   simp [placedCornerEqualityDrawing,
     EmbeddedCNFIncidenceDrawing.renameToImage,
     EmbeddedCNFIncidenceDrawing.rename,
