@@ -1581,6 +1581,12 @@ The representation choices for this target are:
   endpoint directions, and the last lookup is identified with the forward
   direction of any explicitly displayed final edge.  These are the finite
   direction parameters consumed by the ribbon endpoint fans.
+- [`LeanTrominoes/OrthogonalPolylineNoImmediateReversalJoin.lean`](LeanTrominoes/OrthogonalPolylineNoImmediateReversalJoin.lean)
+  proves that two nondegenerate orthogonal no-reversal routes can be spliced
+  at a shared endpoint whenever their newly adjacent directions are
+  compatible.  This isolates the only new local condition introduced by a
+  route join and supplies the compositional invariant used by the
+  orthocrossing construction.
 - [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionContacts.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionContacts.lean)
   tracks every point introduced by unit subdivision back to either an
   original listed route point or the relative interior of an original
@@ -1909,6 +1915,19 @@ The representation choices for this target are:
   no-immediate-reversal hypothesis makes those ports distinct.  The adapter
   then exposes the bend link's exact positioned formula, both real
   carrier-node endpoints, and the transported complete local certificate.
+- [`LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversalComponents.lean`](LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversalComponents.lean)
+  proves no-immediate-reversal certificates for source fanouts, all five
+  local edge-core shapes, and translated reversed target fanouts.  Their
+  endpoint directions are fixed: the source/core join heads north and the
+  core/target join heads south.
+- [`LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversal.lean`](LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversal.lean)
+  splices those component certificates into a route-wide theorem for every
+  edge of a well-formed local degree-three periodic graph.
+- [`LeanTrominoes/PeriodicOrthocrossingBendCornerDrawingFamily.lean`](LeanTrominoes/PeriodicOrthocrossingBendCornerDrawingFamily.lean)
+  lifts route orthogonality and the new no-reversal theorem through
+  `routeBendsAux`.  Every deduplicated bend link now has a fixed corner
+  drawing with exact incoming and outgoing carrier positions, orthogonal
+  routes, and continuous finite planarity.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean)
   performs that periodic quotient for all complete-carrier equality links.
   Distinct normalized links at a fixed terminal inject into one direct-link
