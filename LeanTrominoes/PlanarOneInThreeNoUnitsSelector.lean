@@ -107,5 +107,46 @@ theorem instantiatedDrawing_isValid
           first second third
           pairwise.1.1 pairwise.1.2 pairwise.2
 
+/-- Every clause-scoped auxiliary keeps its declared local unit-elimination
+coordinate under the uniform arity selector and the actual positioned
+auxiliary scope. -/
+theorem instantiatedDrawing_auxiliaryPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (clauseIndex : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (kind : OneInThreeNoUnitAux) :
+    (instantiatedDrawing clauseIndex source).variablePosition
+        (.inr ((clauseIndex, source.literals), kind)) =
+      Cell.add
+        (Cell.scale
+          PeriodicOneInThreeNoUnitsPositioned.gadgetScale
+          source.position)
+        (PeriodicOneInThreeNoUnitsPositioned.auxiliaryLocalPosition
+          kind) := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · cases kind <;>
+      simp [instantiatedDrawing, instantiatedEmptyDrawing,
+        emptyLocalPosition,
+        EmbeddedCNFIncidenceDrawing.rename,
+        EmbeddedCNFIncidenceDrawing.translate]
+  · rcases rest with _ | ⟨second, rest⟩
+    · cases kind <;>
+        simp [instantiatedDrawing, instantiatedUnitDrawing,
+          unitLocalPosition,
+          EmbeddedCNFIncidenceDrawing.rename,
+          EmbeddedCNFIncidenceDrawing.translate]
+    · rcases rest with _ | ⟨third, tail⟩
+      · cases kind <;>
+          simp [instantiatedDrawing, instantiatedTwoDrawing,
+            twoLocalPosition,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+      · cases kind <;>
+          simp [instantiatedDrawing, instantiatedThreeDrawing,
+            threeLocalPosition,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+
 end PlanarOneInThreeNoUnits
 end LeanTrominoes

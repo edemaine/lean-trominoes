@@ -420,6 +420,13 @@ The representation choices for this target are:
   theorem for unit elimination.  Its inherited-variable endpoints are the
   precise splice boundary, while its new auxiliary endpoints are already
   final.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean)
+  identifies the exact source scope and source-anchor offset of every fresh
+  unit-elimination auxiliary literal.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryEndpoints.lean)
+  then proves that each normalized auxiliary endpoint is already its final
+  canonical periodic endpoint, leaving only inherited source-variable ports
+  to splice.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final
@@ -1967,7 +1974,9 @@ The representation choices for this target are:
   packages the four unit-elimination instances behind one total arity
   selector.  For width-three clauses it proves exact agreement with the
   positioned output block and derives the complete local validity
-  certificate from per-clause atom distinctness.
+  certificate from per-clause atom distinctness.  It also identifies every
+  scoped auxiliary's translated physical position with its declared local
+  unit-elimination coordinate.
 - [`LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean`](LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean)
   proves that every clause produced by Figure 9 has distinct variable atoms,
   independently of repetitions in its source clause.  It also packages
