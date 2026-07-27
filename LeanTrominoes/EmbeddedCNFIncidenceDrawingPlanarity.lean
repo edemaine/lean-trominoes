@@ -13,6 +13,69 @@ separation.
 namespace LeanTrominoes
 namespace PlanarThreeSAT
 
+/-- Route simplicity, factored out from the first field of finite embedded
+planarity so input-dependent assemblies can prove it locally. -/
+def EmbeddedCNFIncidenceDrawing.RoutesAreSimple
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable) : Prop :=
+  ∀ incidenceIndex : Fin drawing.incidences.length,
+    LocalIncidenceDrawing.RouteIsSimple
+      (drawing.routeAt (drawing.incidenceAt incidenceIndex))
+
+/-- The three global separation fields of finite embedded planarity. -/
+def EmbeddedCNFIncidenceDrawing.GlobalSeparation
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable) : Prop :=
+  (∀ firstIndex secondIndex : Fin drawing.incidences.length,
+    firstIndex ≠ secondIndex →
+      EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        (drawing.routeAt (drawing.incidenceAt firstIndex))
+        (drawing.routeAt (drawing.incidenceAt secondIndex))) ∧
+    drawing.VerticesAvoidRouteInteriors ∧
+    drawing.vertexPositions.Nodup
+
+/-- Finite embedded planarity is exactly local route simplicity plus global
+separation. -/
+theorem EmbeddedCNFIncidenceDrawing.isPlanar_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable) :
+    drawing.IsPlanar ↔
+      drawing.RoutesAreSimple ∧ drawing.GlobalSeparation := by
+  rfl
+
+/-- Once route simplicity is known componentwise, only global separation
+remains. -/
+theorem EmbeddedCNFIncidenceDrawing.isPlanar_iff_globalSeparation
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (routesAreSimple : drawing.RoutesAreSimple) :
+    drawing.IsPlanar ↔ drawing.GlobalSeparation := by
+  rw [drawing.isPlanar_iff, and_iff_right routesAreSimple]
+
+/-- A membership-style simplicity proof for every presented literal implies
+indexed simplicity for the packaged drawing. -/
+theorem EmbeddedCNFIncidenceDrawing.routesAreSimple_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (simple :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ drawing.formula.zipIdx →
+          ∀ literal literalIndex,
+            (literal, literalIndex) ∈ clause.literals.zipIdx →
+              LocalIncidenceDrawing.RouteIsSimple
+                (drawing.routes clauseIndex literalIndex)) :
+    drawing.RoutesAreSimple := by
+  intro incidenceIndex
+  let incidence := drawing.incidenceAt incidenceIndex
+  have incidenceMember :
+      incidence ∈ drawing.incidences :=
+    List.get_mem drawing.incidences incidenceIndex
+  have members :=
+    (mem_embeddedCNFIncidences_iff
+      drawing.formula incidence).mp incidenceMember
+  exact simple incidence.clause incidence.clauseIndex members.1
+    incidence.literal incidence.literalIndex members.2
+
 /-- Extract route simplicity for one genuine presentation-indexed incidence
 from a finite drawing's indexed planarity certificate. -/
 theorem EmbeddedCNFIncidenceDrawing.embeddedRoute_isSimple_of_members

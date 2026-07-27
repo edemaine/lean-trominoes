@@ -1957,6 +1957,12 @@ The representation choices for this target are:
   planar.  The same endpoint certificate is transported
   through periodicization, opaque wrapping, clause-orbit deduplication, and
   anchor normalization.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATFiniteIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATFiniteIncidenceDrawing.lean)
+  packages the metadata-selected routes as one finite embedded incidence
+  drawing.  It proves exact endpoints and route simplicity for every global
+  incidence, exposes each route's precise valid local witness, and reduces
+  complete finite planarity to cross-component route separation, global
+  vertex avoidance, and assembled vertex-position distinctness.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
