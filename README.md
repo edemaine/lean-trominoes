@@ -242,6 +242,12 @@ The representation choices for this target are:
   orders every crossing horizontal-first, deduplicates the resulting records,
   and proves that every actual crossing selects one of the two possible
   occurrence orders in this normalized gadget-site list.
+  [`LeanTrominoes/PeriodicOrthocrossingCrossingHalo.lean`](LeanTrominoes/PeriodicOrthocrossingCrossingHalo.lean)
+  enlarges the physical site inventory to every proper crossing among the
+  nine neighboring segment translates retained by the finite route formula.
+  It computes the unique possible horizontal/vertical intersection directly,
+  proves soundness and completeness for the retained occurrences, and proves
+  that every canonical crossing remains in the halo.
   [`LeanTrominoes/PeriodicOrthocrossingPlanarCrossovers.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarCrossovers.lean)
   replaces those records by positioned crossover formulas in `20 × 20`
   macrocells, with four explicit boundary-wire variables and internals scoped
