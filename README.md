@@ -2095,6 +2095,11 @@ The representation choices for this target are:
   port to its transformed first exit.  Exact endpoints and orthogonality
   are preserved; coordinating these connectors continuously remains part
   of the global planarity proof.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteFamily.lean)
+  packages the two-stage classifier behind a proof-backed total selector.
+  Any original canonical orthogonal route family with genuine first exits
+  thereby induces exact, orthogonal suffixes for all and only the final
+  incidences inherited through both transformations.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
