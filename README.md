@@ -2094,6 +2094,11 @@ The representation choices for this target are:
   and Figure 9 back to its precise original source-clause occurrence.  Its
   offset is unchanged, and the normalized composed route ends at that
   occurrence's exact index-selected `72 × 72` boundary port.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineAuxiliaryEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineAuxiliaryEndpoints.lean)
+  handles both fresh-variable generations in the same composed block.  Each
+  Figure 9 auxiliary inherited through unit elimination and each later
+  unit-elimination auxiliary is proved to end exactly at its canonical
+  two-stage periodic variable position after clause-anchor normalization.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean)
   scales an original source incidence route directly by the combined factor
   `72`, changes it into the final clause's anchor gauge, and replaces its
