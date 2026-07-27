@@ -1935,6 +1935,14 @@ The representation choices for this target are:
   indexed equality link.  The adapter proves the exact clause block,
   realized endpoint positions, route endpoints, continuous planarity, and
   compass-valid terminal rays.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings.lean)
+  turns the five-way clause-source metadata into a total component-aware
+  route selector.  Every genuine global clause is proved to occur at the
+  selected drawing's recorded local index, and the selected crossover, lens,
+  corner, source-clause, or variable-arm route has its exact global
+  incidence endpoints.  The same endpoint certificate is transported
+  through periodicization, opaque wrapping, clause-orbit deduplication, and
+  anchor normalization.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
