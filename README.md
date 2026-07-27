@@ -2111,6 +2111,11 @@ The representation choices for this target are:
   Any original canonical orthogonal route family with genuine first exits
   thereby induces exact, orthogonal suffixes for all and only the final
   incidences inherited through both transformations.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineRouteFamily.lean)
+  completes that inherited family with singleton suffixes for both
+  generations of auxiliaries and splices every suffix onto its certified
+  normalized local route.  Every final incidence thereby has exact canonical
+  clause and literal endpoints and an orthogonal complete route.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
