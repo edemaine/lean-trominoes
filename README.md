@@ -1916,6 +1916,14 @@ The representation choices for this target are:
   constructed target fanout from its target-port rank.  It then proves that
   every selected target terminal is physically identical to the endpoint of
   its classified equality arm at the corresponding lifted variable site.
+- [`LeanTrominoes/PeriodicCNFPlanarClausePortGeometry.lean`](LeanTrominoes/PeriodicCNFPlanarClausePortGeometry.lean)
+  computes the corresponding physical arm and exact translated port of every
+  routed source-clause occurrence.  Degree three makes these source arms
+  pairwise distinct within each clause site.
+- [`LeanTrominoes/PlanarThreeSATRoutedClauseIncidenceDrawing.lean`](LeanTrominoes/PlanarThreeSATRoutedClauseIncidenceDrawing.lean)
+  certifies the fixed source-clause star: any signed subset of the three
+  distinct fanout ports has exact straight-ray endpoints and a continuously
+  planar incidence drawing.
 - [`LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean)
   translates the continuously planar Figure 8(b) incidence template to each
   canonical crossing and injectively renames its boundary and internal roles
@@ -1935,12 +1943,18 @@ The representation choices for this target are:
   indexed equality link.  The adapter proves the exact clause block,
   realized endpoint positions, route endpoints, continuous planarity, and
   compass-valid terminal rays.
+- [`LeanTrominoes/PeriodicOrthocrossingRoutedClauseIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingRoutedClauseIncidenceDrawing.lean)
+  translates the fixed three-port source-clause star into each routed clause
+  macrocell and renames its ports to the actual source terminals.  The
+  adapter proves the exact singleton formula, realized terminal positions,
+  route endpoints, and continuous planarity.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings.lean)
   turns the five-way clause-source metadata into a total component-aware
   route selector.  Every genuine global clause is proved to occur at the
   selected drawing's recorded local index, and the selected crossover, lens,
   corner, source-clause, or variable-arm route has its exact global
-  incidence endpoints.  The same endpoint certificate is transported
+  incidence endpoints, and every selected local drawing is continuously
+  planar.  The same endpoint certificate is transported
   through periodicization, opaque wrapping, clause-orbit deduplication, and
   anchor normalization.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)

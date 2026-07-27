@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicOrthocrossingCrossoverIncidenceDrawing
 import LeanTrominoes.PeriodicOrthocrossingWireIncidenceDrawings
+import LeanTrominoes.PeriodicOrthocrossingRoutedClauseIncidenceDrawing
 import LeanTrominoes.PeriodicOrthocrossingRoutedVariableIncidenceDrawing
 import LeanTrominoes.PeriodicCNFPlanarSATIncidenceRoutes
 
@@ -11,7 +12,8 @@ local geometric component that produced it.  This file turns that metadata
 into a total incidence-route selector.  Crossovers, straight carrier lenses,
 route-bend corners, and active variable arms use their certified local
 drawings.  A routed source clause uses its direct terminal rays, which retain
-the cyclic order needed by the later occurrence split.
+the cyclic order needed by the later occurrence split.  Every one of these
+selected drawings is continuously planar.
 
 The main result proves that every selected local route has the endpoints of
 the corresponding global incidence.  Consequently the existing
@@ -51,10 +53,7 @@ def incidenceDrawing
   | .bend routeBend _ =>
       drawingPlanarSATBendCornerIncidenceDrawing formula routeBend
   | .routedClause site =>
-      straightIncidenceDrawing
-        [(routedClauseAt formula site).rename
-          planarSATExternalVariableMap]
-        (drawingPlanarSATVariablePosition formula)
+      drawingPlanarSATRoutedClauseIncidenceDrawing formula site
   | .routedVariable site _ arm link _ =>
       drawingPlanarSATRoutedVariableIncidenceDrawing
         formula site arm link
@@ -104,10 +103,10 @@ theorem localClauseMember
           drawingPlanarSATBendCornerIncidenceDrawing_formula]
         exact valid.2
     | routedClause site =>
-        rw [DrawingPlanarSATClauseSource.incidenceDrawing]
+        rw [DrawingPlanarSATClauseSource.incidenceDrawing,
+          drawingPlanarSATRoutedClauseIncidenceDrawing_formula]
         rw [valid.2]
-        simp [DrawingPlanarSATClauseSource.localClauseIndex,
-          straightIncidenceDrawing]
+        simp [DrawingPlanarSATClauseSource.localClauseIndex]
     | routedVariable site armIndex arm link localClauseIndex =>
         have linkMember :
             link ∈ routedVariableLinksAt formula site :=
@@ -143,13 +142,48 @@ theorem localDrawingRoutesMatch
         exact (drawingPlanarSATBendCornerIncidenceDrawing_isValid
           wellFormed degree isLocal valid.1).1
     | routedClause site =>
-        exact straightIncidenceDrawing_routesMatch
-          [(routedClauseAt formula site).rename
-            planarSATExternalVariableMap]
-          (drawingPlanarSATVariablePosition formula)
+        exact
+          drawingPlanarSATRoutedClauseIncidenceDrawing_routesMatch
+            formula wellFormed site
     | routedVariable site armIndex arm link localClauseIndex =>
         exact
           drawingPlanarSATRoutedVariableIncidenceDrawing_routesMatch
+            formula wellFormed site arm
+            (List.fst_mem_of_mem_zipIdx valid.2.1)
+            valid.2.2.1
+
+/-- Every valid metadata-selected local component is continuously planar. -/
+theorem localDrawingIsPlanar
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.Valid formula) :
+    (metadata.source.incidenceDrawing formula).IsPlanar := by
+  cases metadata with
+  | mk clause source =>
+    cases source with
+    | crossover crossing localClauseIndex =>
+        exact drawingPlanarSATCrossoverIncidenceDrawing_isPlanar
+          formula crossing
+    | carrier link localClauseIndex =>
+        exact (drawingPlanarSATCarrierLensIncidenceDrawing_isValid
+          wellFormed degree isLocal valid.1).2.2
+    | bend routeBend localClauseIndex =>
+        exact (drawingPlanarSATBendCornerIncidenceDrawing_isValid
+          wellFormed degree isLocal valid.1).2.2
+    | routedClause site =>
+        exact
+          drawingPlanarSATRoutedClauseIncidenceDrawing_isPlanar
+            formula wellFormed degree site
+    | routedVariable site armIndex arm link localClauseIndex =>
+        exact
+          drawingPlanarSATRoutedVariableIncidenceDrawing_isPlanar
             formula wellFormed site arm
             (List.fst_mem_of_mem_zipIdx valid.2.1)
             valid.2.2.1

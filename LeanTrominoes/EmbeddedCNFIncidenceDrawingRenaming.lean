@@ -310,6 +310,67 @@ theorem routesMatch_rename
     rw [positionsMatch _ atomMember]
     exact base.2
 
+/-- If a position-preserving renaming has exact route endpoints, then the
+original drawing has the same endpoint property.  Injectivity is unnecessary
+because the argument follows each presentation-indexed incidence backward. -/
+theorem routesMatch_of_rename
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    {drawing : EmbeddedCNFIncidenceDrawing Source}
+    (variableMap : Source → Target)
+    (targetPosition : Target → Cell)
+    (positionsMatch :
+      ∀ atom ∈ drawing.variableVertices,
+        targetPosition (variableMap atom) =
+          drawing.variablePosition atom)
+    (routesMatch :
+      (drawing.rename variableMap targetPosition).RoutesMatch) :
+    drawing.RoutesMatch := by
+  apply routesMatch_of_physical
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember
+  have renamedClauseMember :
+      (clause.rename variableMap, clauseIndex) ∈
+        (drawing.rename
+          variableMap targetPosition).formula.zipIdx := by
+    change
+      (clause.rename variableMap, clauseIndex) ∈
+        (drawing.formula.map fun sourceClause =>
+          sourceClause.rename variableMap).zipIdx
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(clause, clauseIndex), clauseMember, rfl⟩
+  have renamedLiteralMember :
+      ((variableMap literal.1, literal.2), literalIndex) ∈
+        (clause.rename variableMap).literals.zipIdx := by
+    change
+      ((variableMap literal.1, literal.2), literalIndex) ∈
+        (clause.literals.map fun sourceLiteral =>
+          (variableMap sourceLiteral.1,
+            sourceLiteral.2)).zipIdx
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(literal, literalIndex), literalMember, rfl⟩
+  have endpoints :=
+    (drawing.rename variableMap targetPosition).physicalRoutesMatch
+      routesMatch (clause.rename variableMap) clauseIndex
+      renamedClauseMember
+      (variableMap literal.1, literal.2) literalIndex
+      renamedLiteralMember
+  have atomMember :
+      literal.1 ∈ drawing.variableVertices := by
+    unfold variableVertices
+    rw [List.mem_dedup]
+    apply List.mem_flatMap.mpr
+    refine
+      ⟨clause, List.fst_mem_of_mem_zipIdx clauseMember, ?_⟩
+    exact List.mem_map.mpr
+      ⟨literal, List.fst_mem_of_mem_zipIdx literalMember, rfl⟩
+  constructor
+  · exact endpoints.1
+  · rw [← positionsMatch literal.1 atomMember]
+    exact endpoints.2
+
 /-- Axis alignment depends only on routes, so renaming preserves it. -/
 theorem isOrthogonal_rename
     {Source Target : Type*}
@@ -449,6 +510,112 @@ theorem isPlanar_rename
     exact planar.2.2.1 originalVertexIndex
       originalIncidenceIndex
   · rw [verticesEqual]
+    exact planar.2.2.2
+
+/-- Continuous finite planarity also reflects through an injective
+position-preserving renaming.  Renaming changes incidence metadata but not
+routes or graph-vertex coordinates. -/
+theorem isPlanar_of_rename
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    {drawing : EmbeddedCNFIncidenceDrawing Source}
+    (variableMap : Source → Target)
+    (targetPosition : Target → Cell)
+    (injectiveOn :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          variableMap first = variableMap second →
+            first = second)
+    (positionsMatch :
+      ∀ atom ∈ drawing.variableVertices,
+        targetPosition (variableMap atom) =
+          drawing.variablePosition atom)
+    (planar :
+      (drawing.rename variableMap targetPosition).IsPlanar) :
+    drawing.IsPlanar := by
+  have verticesEqual :=
+    vertexPositions_rename drawing variableMap
+      targetPosition injectiveOn positionsMatch
+  constructor
+  · intro originalIndex
+    let renamedIndex :
+        Fin (drawing.rename
+          variableMap targetPosition).incidences.length :=
+      ⟨originalIndex.val, by
+        simp⟩
+    have incidenceEqual :=
+      incidenceAt_rename
+        drawing variableMap targetPosition renamedIndex
+    have simple := planar.1 renamedIndex
+    rw [incidenceEqual, routeAt_rename_incidence] at simple
+    exact simple
+  constructor
+  · intro originalFirstIndex originalSecondIndex different
+    let renamedFirstIndex :
+        Fin (drawing.rename
+          variableMap targetPosition).incidences.length :=
+      ⟨originalFirstIndex.val, by
+        simp⟩
+    let renamedSecondIndex :
+        Fin (drawing.rename
+          variableMap targetPosition).incidences.length :=
+      ⟨originalSecondIndex.val, by
+        simp⟩
+    have renamedDifferent :
+        renamedFirstIndex ≠ renamedSecondIndex := by
+      intro equal
+      apply different
+      apply Fin.ext
+      have values :=
+        congrArg (fun index => index.val) equal
+      exact values
+    have firstEqual :=
+      incidenceAt_rename
+        drawing variableMap targetPosition renamedFirstIndex
+    have secondEqual :=
+      incidenceAt_rename
+        drawing variableMap targetPosition renamedSecondIndex
+    have avoids :=
+      planar.2.1 renamedFirstIndex
+        renamedSecondIndex renamedDifferent
+    rw [firstEqual, secondEqual,
+      routeAt_rename_incidence,
+      routeAt_rename_incidence] at avoids
+    exact avoids
+  constructor
+  · intro originalVertexIndex originalIncidenceIndex
+    let renamedVertexIndex :
+        Fin (drawing.rename
+          variableMap targetPosition).vertexPositions.length :=
+      ⟨originalVertexIndex.val, by
+        simp [verticesEqual]⟩
+    let renamedIncidenceIndex :
+        Fin (drawing.rename
+          variableMap targetPosition).incidences.length :=
+      ⟨originalIncidenceIndex.val, by
+        simp⟩
+    have incidenceEqual :=
+      incidenceAt_rename drawing variableMap
+        targetPosition renamedIncidenceIndex
+    have vertexEqual :
+        (drawing.rename
+          variableMap targetPosition).vertexPositions.get
+            renamedVertexIndex =
+          drawing.vertexPositions.get originalVertexIndex := by
+      have lookup := congrArg
+        (fun positions => positions[originalVertexIndex.val]?)
+        verticesEqual
+      rw [List.getElem?_eq_getElem renamedVertexIndex.isLt,
+        List.getElem?_eq_getElem originalVertexIndex.isLt]
+        at lookup
+      exact Option.some.inj lookup
+    have avoids :=
+      planar.2.2.1 renamedVertexIndex
+        renamedIncidenceIndex
+    rw [incidenceEqual, routeAt_rename_incidence,
+      vertexEqual] at avoids
+    exact avoids
+  · rw [← verticesEqual]
     exact planar.2.2.2
 
 /-- The complete finite drawing certificate transports through injective
