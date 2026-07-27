@@ -2083,6 +2083,11 @@ The representation choices for this target are:
   periodic anchor gauge.  The normalized family has exact periodic clause
   and local splice endpoints, remains orthogonal, and preserves continuous
   route simplicity.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedEndpoints.lean)
+  classifies every twice-inherited final literal through unit elimination
+  and Figure 9 back to its precise original source-clause occurrence.  Its
+  offset is unchanged, and the normalized composed route ends at that
+  occurrence's exact index-selected `72 × 72` boundary port.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
