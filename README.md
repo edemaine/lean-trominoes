@@ -2025,6 +2025,12 @@ The representation choices for this target are:
   translation and logical renaming.  Thus two distinct routed-variable
   components sharing a lifted variable center must use different physical
   arms, and every pair of their selected routes avoids one another.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATNoncarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATNoncarrierSeparation.lean)
+  combines the macrocell rectangle bounds with all center-uniqueness and
+  center-disjointness theorems.  Selected routes from any two distinct
+  non-carrier components therefore avoid one another; the only possible
+  shared center is handled by the certified different-arm routed-variable
+  theorem.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
