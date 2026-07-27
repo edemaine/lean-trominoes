@@ -49,6 +49,7 @@ import LeanTrominoes.PlanarThreeSATWidth
 import LeanTrominoes.PlanarThreeSATOcurrences
 import LeanTrominoes.PlanarOneInThree
 import LeanTrominoes.PlanarOneInThreeFigureNineDrawing
+import LeanTrominoes.PlanarOneInThreeNoUnitsDrawing
 import LeanTrominoes.PlanarOneInThreeOccurrences
 import LeanTrominoes.PeriodicOneInThree
 import LeanTrominoes.PeriodicOneInThreeClauseComputability
