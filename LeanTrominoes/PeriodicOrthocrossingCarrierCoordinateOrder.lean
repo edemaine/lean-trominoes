@@ -345,6 +345,141 @@ theorem eq_first_of_mem_consecutivePairs_of_coordinate_between
             · exact induction ordered.2 pairMem
                 (by simpa only [List.mem_cons] using middleMem)
 
+/-- A strictly coordinate-sorted list cannot contain two different members
+at the same coordinate. -/
+theorem List.eq_of_mem_of_mem_of_pairwise_lt_coordinate_eq
+    {Value : Type*}
+    (coordinate : Value → Int)
+    {values : List Value}
+    (ordered :
+      values.Pairwise fun first second =>
+        coordinate first < coordinate second)
+    {first second : Value}
+    (firstMem : first ∈ values)
+    (secondMem : second ∈ values)
+    (coordinateEqual :
+      coordinate first = coordinate second) :
+    first = second := by
+  induction values generalizing first second with
+  | nil =>
+      simp at firstMem
+  | cons head tail induction =>
+      rw [List.pairwise_cons] at ordered
+      simp only [List.mem_cons] at firstMem secondMem
+      rcases firstMem with firstEqual | firstMem
+      · rcases secondMem with secondEqual | secondMem
+        · exact firstEqual.trans secondEqual.symm
+        · subst first
+          have headLtSecond :=
+            ordered.1 second secondMem
+          omega
+      · rcases secondMem with secondEqual | secondMem
+        · subst second
+          have headLtFirst :=
+            ordered.1 first firstMem
+          omega
+        · exact induction ordered.2 firstMem secondMem
+            coordinateEqual
+
+/-- A first member determines a consecutive pair in a strictly sorted
+list. -/
+theorem List.consecutivePairs_eq_of_fst_eq_of_pairwise_lt
+    {Value : Type*}
+    (coordinate : Value → Int)
+    {values : List Value}
+    (ordered :
+      values.Pairwise fun first second =>
+        coordinate first < coordinate second)
+    {firstPair secondPair : Value × Value}
+    (firstMem : firstPair ∈ consecutivePairs values)
+    (secondMem : secondPair ∈ consecutivePairs values)
+    (firstEqual : firstPair.1 = secondPair.1) :
+    firstPair = secondPair := by
+  induction values generalizing firstPair secondPair with
+  | nil =>
+      simp [consecutivePairs] at firstMem
+  | cons head tail induction =>
+      cases tail with
+      | nil =>
+          simp [consecutivePairs] at firstMem
+      | cons next rest =>
+          rw [List.pairwise_cons] at ordered
+          simp only [consecutivePairs, List.mem_cons] at firstMem secondMem
+          rcases firstMem with firstPairEqual | firstMem
+          · rcases secondMem with secondPairEqual | secondMem
+            · exact firstPairEqual.trans secondPairEqual.symm
+            · subst firstPair
+              have secondMembers :=
+                mem_of_mem_consecutivePairs secondMem
+              have headLtSecondFirst :=
+                ordered.1 secondPair.1
+                  (by simp [secondMembers.1])
+              change head = secondPair.1 at firstEqual
+              have coordinateEqual :=
+                congrArg coordinate firstEqual
+              omega
+          · rcases secondMem with secondPairEqual | secondMem
+            · subst secondPair
+              have firstMembers :=
+                mem_of_mem_consecutivePairs firstMem
+              have headLtFirstFirst :=
+                ordered.1 firstPair.1
+                  (by simp [firstMembers.1])
+              change firstPair.1 = head at firstEqual
+              have coordinateEqual :=
+                congrArg coordinate firstEqual
+              omega
+            · exact induction ordered.2 firstMem secondMem firstEqual
+
+/-- Distinct consecutive pairs in a strictly sorted list have disjoint
+ordered interiors. -/
+theorem List.consecutivePairs_nonoverlap_of_ne_of_pairwise_lt
+    {Value : Type*}
+    (coordinate : Value → Int)
+    {values : List Value}
+    (ordered :
+      values.Pairwise fun first second =>
+        coordinate first < coordinate second)
+    {firstPair secondPair : Value × Value}
+    (firstMem : firstPair ∈ consecutivePairs values)
+    (secondMem : secondPair ∈ consecutivePairs values)
+    (different : firstPair ≠ secondPair) :
+    coordinate firstPair.2 ≤ coordinate secondPair.1 ∨
+      coordinate secondPair.2 ≤ coordinate firstPair.1 := by
+  have firstMembers :=
+    mem_of_mem_consecutivePairs firstMem
+  have secondMembers :=
+    mem_of_mem_consecutivePairs secondMem
+  rcases lt_trichotomy
+      (coordinate firstPair.1)
+      (coordinate secondPair.1) with
+      firstLt | firstCoordinateEqual | secondLt
+  · left
+    by_contra overlap
+    have secondFirstEqual :=
+      eq_first_of_mem_consecutivePairs_of_coordinate_between
+        coordinate ordered firstMem secondMembers.1
+        (le_of_lt firstLt) (lt_of_not_ge overlap)
+    rw [secondFirstEqual] at firstLt
+    omega
+  · have firstNodeEqual :
+        firstPair.1 = secondPair.1 :=
+      List.eq_of_mem_of_mem_of_pairwise_lt_coordinate_eq
+        coordinate ordered firstMembers.1 secondMembers.1
+        firstCoordinateEqual
+    exact False.elim
+      (different
+        (List.consecutivePairs_eq_of_fst_eq_of_pairwise_lt
+          coordinate ordered firstMem secondMem firstNodeEqual))
+  · right
+    by_contra overlap
+    have firstFirstEqual :=
+      eq_first_of_mem_consecutivePairs_of_coordinate_between
+        coordinate ordered secondMem firstMembers.1
+        (le_of_lt secondLt) (lt_of_not_ge overlap)
+    rw [firstFirstEqual] at secondLt
+    omega
+
 /-- Retained adjacent carrier nodes advance by at least one full ten-cell
 port-coordinate step. -/
 theorem completeCarrierPair_orderCoordinate_add_ten_le
@@ -490,6 +625,62 @@ theorem drawingCompleteCarrierLink_first_isHorizontal_iff_second
       (carrierNode_isHorizontal_iff
         graph endpoints.1 firstAligned).mpr
         firstHorizontal
+
+/-- Distinct retained links on the same complete carrier occur in one of
+the two nonoverlapping axial orders. -/
+theorem drawingCompleteCarrierLinks_same_key_orderCoordinate
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {firstLink secondLink : EqualityLink CarrierNode}
+    (firstMem :
+      firstLink ∈ drawingCompleteCarrierLinks graph)
+    (secondMem :
+      secondLink ∈ drawingCompleteCarrierLinks graph)
+    (different : firstLink ≠ secondLink)
+    (sameKey :
+      firstLink.first.carrierKey =
+        secondLink.first.carrierKey) :
+    firstLink.second.orderCoordinate graph ≤
+        secondLink.first.orderCoordinate graph ∨
+      secondLink.second.orderCoordinate graph ≤
+        firstLink.first.orderCoordinate graph := by
+  rcases List.mem_flatMap.mp firstMem with
+    ⟨firstKey, _firstKeyMem, firstLinkMem⟩
+  rcases List.mem_flatMap.mp secondMem with
+    ⟨secondKey, _secondKeyMem, secondLinkMem⟩
+  have firstCommon :=
+    completeCarrierLinks_common_key
+      graph firstKey firstLinkMem
+  have secondCommon :=
+    completeCarrierLinks_common_key
+      graph secondKey secondLinkMem
+  have keyEqual : firstKey = secondKey :=
+    firstCommon.1.symm.trans
+      (sameKey.trans secondCommon.1)
+  subst secondKey
+  rcases List.mem_map.mp firstLinkMem with
+    ⟨firstPair, firstPairMem, firstLinkEqual⟩
+  rcases List.mem_map.mp secondLinkMem with
+    ⟨secondPair, secondPairMem, secondLinkEqual⟩
+  subst firstLink
+  subst secondLink
+  have firstRaw :=
+    (List.mem_filter.mp firstPairMem).1
+  have secondRaw :=
+    (List.mem_filter.mp secondPairMem).1
+  have pairDifferent : firstPair ≠ secondPair := by
+    intro pairEqual
+    subst secondPair
+    exact different rfl
+  simpa [carrierNodePairLink] using
+    List.consecutivePairs_nonoverlap_of_ne_of_pairwise_lt
+      (CarrierNode.orderCoordinate graph)
+      (completeCarrierNodes_pairwise_orderCoordinate_lt
+        wellFormed degree isLocal firstKey)
+      firstRaw secondRaw pairDifferent
 
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -2096,7 +2096,17 @@ The representation choices for this target are:
   proves that distinct nodes on one complete carrier cannot share an axis
   coordinate, upgrades each weakly sorted carrier list to strict pairwise
   order, and shows that every retained adjacent pair advances by at least
-  the full ten-cell port spacing.
+  the full ten-cell port spacing.  It also orients any two distinct retained
+  links on one carrier into one of the two nonoverlapping axial orders.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierAxisInterface.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierAxisInterface.lean)
+  proves that every node on one occurrence has the same horizontal/vertical
+  tag and reduces retained-link ports to their forward and backward compass
+  directions.
+- [`LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean)
+  turns strict carrier order into route separation for every pair of
+  distinct links on one carrier.  The later lens lies inside the earlier
+  lens's terminal boundary; adjacent links may share the boundary port, but
+  both drawings certify that contact as an advertised route endpoint.
 - [`LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean)
   adapts the fixed corner-equality template to one syntactic route bend.
   Genuine incoming and outgoing segments determine their compass ports; a
