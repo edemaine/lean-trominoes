@@ -2063,7 +2063,9 @@ The representation choices for this target are:
   packages the four composed instances behind a uniform arity selector.
   Width three gives exact agreement with the actual two-stage clause block,
   while per-clause atom distinctness yields its complete continuous-planarity
-  certificate.
+  certificate.  It also identifies every genuine original source occurrence
+  with its exact boundary port—`(36, 0)`, `(0, 30)`, or `(72, 30)`—inside
+  the combined `72 × 72` refinement box.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean)
   indexes the actual two-stage positioned formula one original source block
   at a time.  Every final clause is linked to its original source clause, the

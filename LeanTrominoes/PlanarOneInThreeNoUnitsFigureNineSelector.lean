@@ -123,5 +123,188 @@ theorem instantiatedDrawing_isValid
           first second third
           pairwise.1.1 pairwise.1.2 pairwise.2
 
+/-- Boundary port assigned to an original source literal by its index in the
+complete composed Figure 9-plus-unit-elimination neighborhood. -/
+def sourceLocalPosition : Nat → Cell
+  | 0 => (36, 0)
+  | 1 => (0, 30)
+  | _ => (72, 30)
+
+/-- Every genuine original source literal is placed at the composed
+neighborhood boundary port selected by its source-clause index. -/
+theorem instantiatedDrawing_sourcePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ source.literals.zipIdx) :
+    (instantiatedDrawing
+      sourceClauseIndex figureNineClauseStart source).variablePosition
+        (.inl (.inl literal.atom)) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        (sourceLocalPosition literalIndex) := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · simp at literalMember
+  · rcases rest with _ | ⟨second, rest⟩
+    · simp at literalMember
+      rcases literalMember with ⟨rfl, rfl⟩
+      have roleMember :
+          .inherited PlanarOneInThree.FigureNineVariable.sourceFirst ∈
+            (oneDrawingFor literal.value).variableVertices := by
+        simp [oneDrawingFor, oneFormulaFor,
+          forcedFalseUnitReplacement, clause,
+          EmbeddedCNFIncidenceDrawing.variableVertices]
+      have rolePosition :=
+        instantiatedOneDrawing_rolePosition
+          sourceClauseIndex figureNineClauseStart
+          ⟨sourcePosition, [literal]⟩ literal
+          (.inherited
+            PlanarOneInThree.FigureNineVariable.sourceFirst)
+          roleMember
+      simpa [instantiatedDrawing,
+        oneDrawingFor,
+        oneVariableMap, variableMap, oneInheritedMap,
+        variablePosition,
+        PlanarOneInThree.figureNineVariablePosition,
+        sourceLocalPosition, Cell.scale, Cell.add] using rolePosition
+    · rcases rest with _ | ⟨third, tail⟩
+      · have firstNeSecond :
+            first.atom ≠ second.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup]
+            using distinct
+        simp at literalMember
+        rcases literalMember with
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · have roleMember :
+              .inherited
+                  PlanarOneInThree.FigureNineVariable.sourceFirst ∈
+                (twoDrawingFor
+                  literal.value second.value).variableVertices := by
+            simp [twoDrawingFor, twoFormulaFor,
+              forcedFalseUnitReplacement, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+          have rolePosition :=
+            instantiatedTwoDrawing_rolePosition
+              sourceClauseIndex figureNineClauseStart
+              ⟨sourcePosition, [literal, second]⟩
+              literal second firstNeSecond
+              (.inherited
+                PlanarOneInThree.FigureNineVariable.sourceFirst)
+              roleMember
+          simpa [instantiatedDrawing,
+            twoDrawingFor,
+            twoVariableMap, variableMap, twoInheritedMap,
+            variablePosition,
+            PlanarOneInThree.figureNineVariablePosition,
+            sourceLocalPosition, Cell.scale, Cell.add] using rolePosition
+        · have roleMember :
+              .inherited
+                  PlanarOneInThree.FigureNineVariable.sourceSecond ∈
+                (twoDrawingFor
+                  first.value literal.value).variableVertices := by
+            simp [twoDrawingFor, twoFormulaFor,
+              forcedFalseUnitReplacement, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+          have rolePosition :=
+            instantiatedTwoDrawing_rolePosition
+              sourceClauseIndex figureNineClauseStart
+              ⟨sourcePosition, [first, literal]⟩
+              first literal firstNeSecond
+              (.inherited
+                PlanarOneInThree.FigureNineVariable.sourceSecond)
+              roleMember
+          simpa [instantiatedDrawing,
+            twoDrawingFor,
+            twoVariableMap, variableMap, twoInheritedMap,
+            variablePosition,
+            PlanarOneInThree.figureNineVariablePosition,
+            sourceLocalPosition, Cell.scale, Cell.add] using rolePosition
+      · have tailEmpty : tail = [] := by
+          apply List.length_eq_zero_iff.mp
+          simp at width
+          omega
+        subst tail
+        have pairwise :
+            (first.atom ≠ second.atom ∧
+              first.atom ≠ third.atom) ∧
+            second.atom ≠ third.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup]
+            using distinct
+        simp at literalMember
+        rcases literalMember with
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · have roleMember :
+              .inherited
+                  PlanarOneInThree.FigureNineVariable.sourceFirst ∈
+                (fullDrawingFor literal.value second.value
+                  third.value).variableVertices := by
+            simp [fullDrawingFor, fullFormulaFor, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+          have rolePosition :=
+            instantiatedThreeDrawing_rolePosition
+              sourceClauseIndex figureNineClauseStart
+              ⟨sourcePosition, [literal, second, third]⟩
+              literal second third
+              pairwise.1.1 pairwise.1.2 pairwise.2
+              (.inherited
+                PlanarOneInThree.FigureNineVariable.sourceFirst)
+              roleMember
+          simpa [instantiatedDrawing,
+            fullDrawingFor,
+            threeVariableMap, variableMap, threeInheritedMap,
+            variablePosition,
+            PlanarOneInThree.figureNineVariablePosition,
+            sourceLocalPosition, Cell.scale, Cell.add] using rolePosition
+        · have roleMember :
+              .inherited
+                  PlanarOneInThree.FigureNineVariable.sourceSecond ∈
+                (fullDrawingFor first.value literal.value
+                  third.value).variableVertices := by
+            simp [fullDrawingFor, fullFormulaFor, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+          have rolePosition :=
+            instantiatedThreeDrawing_rolePosition
+              sourceClauseIndex figureNineClauseStart
+              ⟨sourcePosition, [first, literal, third]⟩
+              first literal third
+              pairwise.1.1 pairwise.1.2 pairwise.2
+              (.inherited
+                PlanarOneInThree.FigureNineVariable.sourceSecond)
+              roleMember
+          simpa [instantiatedDrawing,
+            fullDrawingFor,
+            threeVariableMap, variableMap, threeInheritedMap,
+            variablePosition,
+            PlanarOneInThree.figureNineVariablePosition,
+            sourceLocalPosition, Cell.scale, Cell.add] using rolePosition
+        · have roleMember :
+              .inherited
+                  PlanarOneInThree.FigureNineVariable.sourceThird ∈
+                (fullDrawingFor first.value second.value
+                  literal.value).variableVertices := by
+            simp [fullDrawingFor, fullFormulaFor, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+          have rolePosition :=
+            instantiatedThreeDrawing_rolePosition
+              sourceClauseIndex figureNineClauseStart
+              ⟨sourcePosition, [first, second, literal]⟩
+              first second literal
+              pairwise.1.1 pairwise.1.2 pairwise.2
+              (.inherited
+                PlanarOneInThree.FigureNineVariable.sourceThird)
+              roleMember
+          simpa [instantiatedDrawing,
+            fullDrawingFor,
+            threeVariableMap, variableMap, threeInheritedMap,
+            variablePosition,
+            PlanarOneInThree.figureNineVariablePosition,
+            sourceLocalPosition, Cell.scale, Cell.add] using rolePosition
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

@@ -263,6 +263,59 @@ theorem instantiatedThreeDrawing_isValid
   · exact fullDrawingFor_isValid
       first.value second.value third.value
 
+/-- Canonical image renaming preserves the translated position of every
+occurring finite role in a ternary composed drawing. -/
+theorem instantiatedThreeDrawing_rolePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second third : PeriodicLiteral Variable)
+    (firstNeSecond : first.atom ≠ second.atom)
+    (firstNeThird : first.atom ≠ third.atom)
+    (secondNeThird : second.atom ≠ third.atom)
+    (role : FigureNineNoUnitsVariable)
+    (roleMember :
+      role ∈
+        (fullDrawingFor
+          first.value second.value third.value).variableVertices) :
+    (instantiatedThreeDrawing
+      sourceClauseIndex figureNineClauseStart source
+      first second third).variablePosition
+        (threeVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom second.atom third.atom role) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        ((fullDrawingFor
+          first.value second.value third.value).variablePosition role) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  change
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+        (fullDrawingFor
+          first.value second.value third.value)
+        (threeVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom second.atom third.atom)
+        (threeVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom second.atom third.atom role)) =
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      ((fullDrawingFor
+        first.value second.value third.value).variablePosition role)
+  rw [EmbeddedCNFIncidenceDrawing.imageVariablePosition_map
+    (fullDrawingFor first.value second.value third.value)
+    (threeVariableMap
+      sourceClauseIndex figureNineClauseStart source
+      first.atom second.atom third.atom)
+    (threeVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart source
+      first second third
+      firstNeSecond firstNeThird secondNeThird)
+    role roleMember]
+
 /-! ## Binary source clauses -/
 
 /-- First-stage variable map for a binary source clause.  The unused third
@@ -435,6 +488,55 @@ theorem instantiatedTwoDrawing_isValid
       first second firstNeSecond
   · exact twoDrawingFor_isValid first.value second.value
 
+/-- Canonical image renaming preserves the translated position of every
+occurring finite role in a binary composed drawing. -/
+theorem instantiatedTwoDrawing_rolePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second : PeriodicLiteral Variable)
+    (firstNeSecond : first.atom ≠ second.atom)
+    (role : FigureNineNoUnitsVariable)
+    (roleMember :
+      role ∈
+        (twoDrawingFor
+          first.value second.value).variableVertices) :
+    (instantiatedTwoDrawing
+      sourceClauseIndex figureNineClauseStart source
+      first second).variablePosition
+        (twoVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom second.atom role) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        ((twoDrawingFor
+          first.value second.value).variablePosition role) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  change
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+        (twoDrawingFor first.value second.value)
+        (twoVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom second.atom)
+        (twoVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom second.atom role)) =
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      ((twoDrawingFor
+        first.value second.value).variablePosition role)
+  rw [EmbeddedCNFIncidenceDrawing.imageVariablePosition_map
+    (twoDrawingFor first.value second.value)
+    (twoVariableMap
+      sourceClauseIndex figureNineClauseStart source
+      first.atom second.atom)
+    (twoVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart source
+      first second firstNeSecond)
+    role roleMember]
+
 /-! ## Unit source clauses -/
 
 /-- First-stage variable map for a unit source clause.  Unused source roles
@@ -596,6 +698,50 @@ theorem instantiatedOneDrawing_isValid
   · exact oneVariableMap_injectiveOn
       sourceClauseIndex figureNineClauseStart source first
   · exact oneDrawingFor_isValid first.value
+
+/-- Canonical image renaming preserves the translated position of every
+occurring finite role in a unit-source composed drawing. -/
+theorem instantiatedOneDrawing_rolePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first : PeriodicLiteral Variable)
+    (role : FigureNineNoUnitsVariable)
+    (roleMember :
+      role ∈
+        (oneDrawingFor first.value).variableVertices) :
+    (instantiatedOneDrawing
+      sourceClauseIndex figureNineClauseStart source
+      first).variablePosition
+        (oneVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom role) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        ((oneDrawingFor first.value).variablePosition role) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  change
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+        (oneDrawingFor first.value)
+        (oneVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom)
+        (oneVariableMap
+          sourceClauseIndex figureNineClauseStart source
+          first.atom role)) =
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      ((oneDrawingFor first.value).variablePosition role)
+  rw [EmbeddedCNFIncidenceDrawing.imageVariablePosition_map
+    (oneDrawingFor first.value)
+    (oneVariableMap
+      sourceClauseIndex figureNineClauseStart source
+      first.atom)
+    (oneVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart source first)
+    role roleMember]
 
 /-! ## Empty source clauses -/
 
