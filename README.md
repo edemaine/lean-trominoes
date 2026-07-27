@@ -2002,6 +2002,12 @@ The representation choices for this target are:
   graph, periodic normalization and the within-route no-duplicate
   classification then prove that two enumerated bends at the same drawing
   point are the same bend.
+- [`LeanTrominoes/PeriodicOrthocrossingMacrocellCenterDisjointness.lean`](LeanTrominoes/PeriodicOrthocrossingMacrocellCenterDisjointness.lean)
+  proves that no enumerated route-bend center can coincide with any lifted
+  declared graph-vertex position.  The local proof separates track and port
+  heights from vertex height, while the only remaining fanout case uses the
+  construction's explicit off-center condition; half-open periodic
+  normalization then lifts the disjointness to the infinite drawing.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean)
   transports the finite different-arm certificate through macrocell
   translation and logical renaming.  Thus two distinct routed-variable
