@@ -1890,6 +1890,13 @@ The representation choices for this target are:
   retained consecutive-pair equality link, improving the generic
   two-link bound at exactly the variables that can collapse under periodic
   translation normalization.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierLensGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierLensGeometry.lean)
+  certifies the equality lens for every retained complete-carrier link.
+  Uniform terminal/boundary coordinates put all axial ports in one residue
+  class modulo ten; strict sorted order, including a canonical-crossing
+  uniqueness proof, therefore gives at least ten cells of clearance.  Each
+  link consequently has its exact formula and endpoint positions together
+  with a complete finite orthogonality and continuous-planarity certificate.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean)
   performs that periodic quotient for all complete-carrier equality links.
   Distinct normalized links at a fixed terminal inject into one direct-link
