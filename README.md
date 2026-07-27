@@ -1793,6 +1793,12 @@ The representation choices for this target are:
   records executable continuous-planarity certificates for the direct
   incidence drawings of both fixed Figure 8 templates, ready for the global
   macrocell assembly.
+- [`LeanTrominoes/PlanarThreeSATEqualityLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLens.lean)
+  replaces each collinear four-incidence equality link on a long carrier by
+  a narrow rectilinear lens.  For every span of at least eight cells, explicit
+  finite-index proofs certify exact endpoints, orthogonality, route
+  simplicity, pairwise continuous separation, vertex avoidance, and distinct
+  vertex positions.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to

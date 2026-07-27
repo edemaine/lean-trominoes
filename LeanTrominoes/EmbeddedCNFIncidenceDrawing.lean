@@ -183,6 +183,24 @@ instance (first second : List Cell) :
   unfold RoutesAvoidEachOther
   infer_instance
 
+/-- The complete two-route avoidance predicate is symmetric. -/
+theorem routesAvoidEachOther_comm
+    {first second : List Cell}
+    (avoids : RoutesAvoidEachOther first second) :
+    RoutesAvoidEachOther second first := by
+  constructor
+  · intro secondIndex firstIndex interiorsMeet
+    exact avoids.1 firstIndex secondIndex
+      ((GridSegment.interiorsMeet_comm _ _).mpr interiorsMeet)
+  constructor
+  · exact avoids.2.2.1
+  constructor
+  · exact avoids.2.1
+  · intro secondIndex firstIndex pointsEqual
+    have endpoints :=
+      avoids.2.2.2 firstIndex secondIndex pointsEqual.symm
+    exact ⟨endpoints.2, endpoints.1⟩
+
 /-- Distinct formula variables in their first-occurrence order. -/
 def variableVertices {Variable : Type*} [DecidableEq Variable]
     (drawing : EmbeddedCNFIncidenceDrawing Variable) : List Variable :=

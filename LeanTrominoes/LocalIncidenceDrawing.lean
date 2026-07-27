@@ -56,6 +56,44 @@ instance (first second : GridSegment) :
   unfold InteriorsMeet
   infer_instance
 
+/-- Continuous relative-interior intersection is symmetric in the two
+segments. -/
+theorem interiorsMeet_comm (first second : GridSegment) :
+    InteriorsMeet first second ↔ InteriorsMeet second first := by
+  have overlap (firstStart firstFinish secondStart secondFinish : Int) :
+      OpenIntervalsOverlap
+          firstStart firstFinish secondStart secondFinish ↔
+        OpenIntervalsOverlap
+          secondStart secondFinish firstStart firstFinish := by
+    simp [OpenIntervalsOverlap, and_comm]
+  constructor
+  · rintro (horizontal | vertical | horizontalVertical | verticalHorizontal)
+    · exact Or.inl
+        ⟨horizontal.2.1, horizontal.1, horizontal.2.2.1.symm,
+          (overlap _ _ _ _).mp horizontal.2.2.2⟩
+    · exact Or.inr <| Or.inl
+        ⟨vertical.2.1, vertical.1, vertical.2.2.1.symm,
+          (overlap _ _ _ _).mp vertical.2.2.2⟩
+    · exact Or.inr <| Or.inr <| Or.inr
+        ⟨horizontalVertical.2.1, horizontalVertical.1,
+          horizontalVertical.2.2.1, horizontalVertical.2.2.2⟩
+    · exact Or.inr <| Or.inr <| Or.inl
+        ⟨verticalHorizontal.2.1, verticalHorizontal.1,
+          verticalHorizontal.2.2.1, verticalHorizontal.2.2.2⟩
+  · rintro (horizontal | vertical | horizontalVertical | verticalHorizontal)
+    · exact Or.inl
+        ⟨horizontal.2.1, horizontal.1, horizontal.2.2.1.symm,
+          (overlap _ _ _ _).mp horizontal.2.2.2⟩
+    · exact Or.inr <| Or.inl
+        ⟨vertical.2.1, vertical.1, vertical.2.2.1.symm,
+          (overlap _ _ _ _).mp vertical.2.2.2⟩
+    · exact Or.inr <| Or.inr <| Or.inr
+        ⟨horizontalVertical.2.1, horizontalVertical.1,
+          horizontalVertical.2.2.1, horizontalVertical.2.2.2⟩
+    · exact Or.inr <| Or.inr <| Or.inl
+        ⟨verticalHorizontal.2.1, verticalHorizontal.1,
+          verticalHorizontal.2.2.1, verticalHorizontal.2.2.2⟩
+
 end GridSegment
 
 /-- A finite bipartite incidence drawing.  Every triple has one incident
