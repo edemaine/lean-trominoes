@@ -4,9 +4,10 @@ import LeanTrominoes.PeriodicOrthocrossingContinuousParallel
 /-!
 # Separation of parallel retained carrier corridors
 
-Distinct horizontal source occurrences either lie on different rows or have
-disjoint continuous axial interiors.  The source-corridor bounds turn both
-cases into strict separation of the corresponding physical lens rectangles.
+Distinct parallel source occurrences either lie on different support lines
+or have disjoint continuous axial interiors.  The source-corridor bounds
+turn both cases into strict separation of the corresponding physical lens
+rectangles.
 -/
 
 namespace LeanTrominoes
@@ -97,6 +98,101 @@ theorem
       drawingCompleteCarrierLink_rectanglesSeparated_of_horizontal_support_disjoint
         wellFormed degree isLocal
         firstMem secondMem firstHorizontal secondHorizontal axialDisjoint
+
+/-- Vertical retained links with different occurrence keys have strictly
+separated lens rectangles. -/
+theorem
+    drawingCompleteCarrierLink_rectanglesSeparated_of_vertical_key_ne
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {firstLink secondLink : EqualityLink CarrierNode}
+    (firstMem : firstLink ∈ drawingCompleteCarrierLinks graph)
+    (secondMem : secondLink ∈ drawingCompleteCarrierLinks graph)
+    (firstVertical : ¬firstLink.first.isHorizontal = true)
+    (secondVertical : ¬secondLink.first.isHorizontal = true)
+    (keyDifferent :
+      firstLink.first.carrierKey ≠ secondLink.first.carrierKey) :
+    ClosedGridRectanglesSeparated
+      (drawingCompleteCarrierLinkRectangleLower graph firstLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph firstLink)
+      (drawingCompleteCarrierLinkRectangleLower graph secondLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph secondLink) := by
+  by_cases normalDifferent :
+      (firstLink.first.supportingSegment graph).start.1 ≠
+        (secondLink.first.supportingSegment graph).start.1
+  · exact
+      drawingCompleteCarrierLink_rectanglesSeparated_of_vertical_normal_ne
+        wellFormed degree isLocal
+        firstMem secondMem firstVertical secondVertical normalDifferent
+  · have endpointsFirst :=
+      drawingCompleteCarrierLink_endpoints_mem graph firstMem
+    have endpointsSecond :=
+      drawingCompleteCarrierLink_endpoints_mem graph secondMem
+    have firstAligned :
+        firstLink.first.indexed.segment.IsAxisAligned :=
+      drawing_isOrthogonal wellFormed isLocal degree
+        firstLink.first.indexed
+        (carrierNode_indexed_mem graph endpointsFirst.1)
+    have secondAligned :
+        secondLink.first.indexed.segment.IsAxisAligned :=
+      drawing_isOrthogonal wellFormed isLocal degree
+        secondLink.first.indexed
+        (carrierNode_indexed_mem graph endpointsSecond.1)
+    have firstNotHorizontal :
+        ¬firstLink.first.indexed.segment.IsHorizontal := by
+      intro horizontal
+      exact firstVertical
+        ((carrierNode_isHorizontal_iff
+          graph endpointsFirst.1 firstAligned).mpr horizontal)
+    have secondNotHorizontal :
+        ¬secondLink.first.indexed.segment.IsHorizontal := by
+      intro horizontal
+      exact secondVertical
+        ((carrierNode_isHorizontal_iff
+          graph endpointsSecond.1 secondAligned).mpr horizontal)
+    have firstStoredVertical :
+        firstLink.first.indexed.segment.IsVertical :=
+      firstAligned.resolve_left firstNotHorizontal
+    have secondStoredVertical :
+        secondLink.first.indexed.segment.IsVertical :=
+      secondAligned.resolve_left secondNotHorizontal
+    have firstSupportVertical :
+        (firstLink.first.supportingSegment graph).IsVertical :=
+      (GridSegment.isVertical_translate _ _).mpr firstStoredVertical
+    have secondSupportVertical :
+        (secondLink.first.supportingSegment graph).IsVertical :=
+      (GridSegment.isVertical_translate _ _).mpr secondStoredVertical
+    have occurrenceDifferent :
+        PeriodicGridDrawing.SegmentOccurrenceKey
+            firstLink.first.indexed firstLink.first.translate ≠
+          PeriodicGridDrawing.SegmentOccurrenceKey
+            secondLink.first.indexed secondLink.first.translate := by
+      simpa [CarrierNode.carrierKey_eq_indexed_translate] using keyDifferent
+    have noContinuousMeet :=
+      drawing_verticalContinuousInteriors_disjoint
+        wellFormed degree isLocal
+        (carrierNode_indexed_mem graph endpointsFirst.1)
+        (carrierNode_indexed_mem graph endpointsSecond.1)
+        firstSupportVertical secondSupportVertical occurrenceDifferent
+    have axialDisjoint :
+        ¬GridSegment.OpenIntervalsOverlap
+          (firstLink.first.supportingSegment graph).start.2
+          (firstLink.first.supportingSegment graph).finish.2
+          (secondLink.first.supportingSegment graph).start.2
+          (secondLink.first.supportingSegment graph).finish.2 := by
+      intro overlap
+      apply noContinuousMeet
+      exact Or.inr
+        (Or.inl
+          ⟨firstSupportVertical, secondSupportVertical,
+            not_ne_iff.mp normalDifferent, overlap⟩)
+    exact
+      drawingCompleteCarrierLink_rectanglesSeparated_of_vertical_support_disjoint
+        wellFormed degree isLocal
+        firstMem secondMem firstVertical secondVertical axialDisjoint
 
 end PeriodicOrthocrossing
 end LeanTrominoes
