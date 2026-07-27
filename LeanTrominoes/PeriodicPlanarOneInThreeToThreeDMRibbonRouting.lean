@@ -1,5 +1,4 @@
-import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMNormalized
-import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFans
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFanSystem
 
 /-!
 # Packaging corrected ribbon corridors as three-strand routing
@@ -31,6 +30,21 @@ noncomputable def occurrenceRibbonThreeStrandRoute
       (occurrenceRibbonVariableStub presentation entry color)
       (occurrenceRibbonCorridorCore presentation entry color))
     (occurrenceRibbonClauseStub presentation entry color)
+
+/-- The original corrected route is definitionally the route selected by the
+packaged independent one-bend fan system. -/
+theorem occurrenceRibbonThreeStrandRoute_eq_independentFanSystem
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (color : WireColor) :
+    occurrenceRibbonThreeStrandRoute presentation entry color =
+      RibbonEndpointFanSystem.occurrenceThreeStrandRoute
+        (independentOneBendEndpointFanSystem presentation)
+        entry color := by
+  rfl
 
 /-- The corrected route has exactly the finite gadget endpoints required by
 the global typed 3DM assembly. -/

@@ -1615,7 +1615,9 @@ The representation choices for this target are:
   endpoint macrocell.  Any such system composes with the certified ribbon
   cores to give the endpoint and orthogonality portions of a
   `ThreeStrandRouting`, and every resulting route point retains an explicit
-  endpoint-or-corridor macrocell owner.
+  endpoint-or-corridor macrocell owner.  The independent one-bend candidates
+  are packaged as one such system without asserting the still-missing
+  separation property.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean)
   joins the two certified block-local endpoint fans to each corrected
   corridor core.  The complete route is proved to have the exact endpoints

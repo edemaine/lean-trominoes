@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMNormalized
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFans
 
 /-!
 # Coordinated ribbon endpoint-fan systems
@@ -74,6 +75,34 @@ structure RibbonEndpointFanSystem
           (PositionedPeriodicCNF.variableToClauseTarget
             placement data.positionedClause data.tagged.1)
           point
+
+/-- The independent one-bend fans packaged as geometric endpoint data.
+
+This instance certifies endpoints, rectilinearity, and macrocell containment
+only.  In particular, its existence makes no claim that the independently
+chosen fans are pairwise separated. -/
+noncomputable def independentOneBendEndpointFanSystem
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement) :
+    RibbonEndpointFanSystem presentation where
+  variableStub :=
+    occurrenceRibbonVariableStub presentation
+  clauseStub :=
+    occurrenceRibbonClauseStub presentation
+  variableStubEndpoints :=
+    occurrenceRibbonVariableStub_endpoints presentation
+  clauseStubEndpoints :=
+    occurrenceRibbonClauseStub_endpoints presentation
+  variableStubOrthogonal :=
+    occurrenceRibbonVariableStub_orthogonal presentation
+  clauseStubOrthogonal :=
+    occurrenceRibbonClauseStub_orthogonal presentation
+  variableStubPointsBounded :=
+    occurrenceRibbonVariableStub_points_bounded presentation
+  clauseStubPointsBounded :=
+    occurrenceRibbonClauseStub_points_bounded presentation
 
 namespace RibbonEndpointFanSystem
 

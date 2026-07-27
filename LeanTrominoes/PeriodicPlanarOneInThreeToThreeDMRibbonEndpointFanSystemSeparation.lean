@@ -205,6 +205,30 @@ theorem occurrenceThreeStrandRoutes_strictlyAvoidEachOther
   simpa [occurrenceThreeStrandRoute, planar] using fullAvoid
 
 end Separation
+
+/-- The legacy five obligations for the independent one-bend candidates are
+exactly a separation certificate for their packaged fan system. -/
+def separationOfIndependentOneBend
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement}
+    (separation : RibbonEndpointFanSeparation presentation) :
+    Separation presentation
+      (independentOneBendEndpointFanSystem
+        presentation.toPlanarIncidencePresentation) where
+  variableVariable :=
+    separation.variableVariable
+  variableCore :=
+    separation.variableCore
+  variableClause :=
+    separation.variableClause
+  coreClause :=
+    separation.coreClause
+  clauseClause :=
+    separation.clauseClause
+
 end RibbonEndpointFanSystem
 
 end PeriodicPlanarOneInThreeToThreeDM
