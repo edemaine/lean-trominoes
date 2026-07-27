@@ -2120,6 +2120,15 @@ The representation choices for this target are:
   node between the two inward-facing endpoint ports of its source segment;
   thus source intervals with disjoint continuous interiors yield strictly
   separated lens rectangles even when the source segments share an endpoint.
+- [`LeanTrominoes/PeriodicOrthocrossingContinuousParallel.lean`](LeanTrominoes/PeriodicOrthocrossingContinuousParallel.lean)
+  strengthens horizontal private-lane uniqueness from integer contacts to
+  continuous open-interval overlap.  Every constructed horizontal endpoint
+  has even coordinate, so any continuous overlap contains a common integer
+  interior point and reduces to the established orthocrossing certificate.
+- [`LeanTrominoes/PeriodicOrthocrossingParallelCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingParallelCarrierSeparation.lean)
+  combines continuous source separation with the physical corridor bounds.
+  Consequently all horizontal retained links on different occurrence keys
+  have strictly separated lens rectangles, including collinear links.
 - [`LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean)
   turns strict carrier order into route separation for every pair of
   distinct links on one carrier.  The later lens lies inside the earlier
