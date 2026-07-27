@@ -77,6 +77,7 @@ inductive DrawingPlanarSATClauseSource
   | routedClause (site : ClauseRouteSite)
   | routedVariable
       (site : VariableRouteSite Variable)
+      (armIndex : Nat)
       (link : EqualityLink (PlanarSATNode Variable))
       (localClauseIndex : Nat)
 
@@ -114,9 +115,9 @@ def DrawingPlanarSATClauseMetadata.Valid
         metadata.clause =
           (routedClauseAt formula site).rename
             planarSATExternalVariableMap
-  | .routedVariable site link localClauseIndex =>
+  | .routedVariable site armIndex link localClauseIndex =>
       site ∈ drawingVariableRouteSites formula ∧
-        link ∈ routedVariableLinksAt formula site ∧
+        (link, armIndex) ∈ (routedVariableLinksAt formula site).zipIdx ∧
           (metadata.clause, localClauseIndex) ∈
             (drawingPlanarSATRoutedVariableFormulaAt link).zipIdx
 
@@ -372,19 +373,21 @@ theorem drawingPlanarSATRoutedClauseMetadata_valid
 def drawingPlanarSATRoutedVariableClauseMetadataFor
     {Variable : Type*}
     (site : VariableRouteSite Variable)
+    (armIndex : Nat)
     (link : EqualityLink (PlanarSATNode Variable)) :
     List (DrawingPlanarSATClauseMetadata Variable) :=
   (drawingPlanarSATRoutedVariableFormulaAt link).zipIdx.map
     fun tagged =>
-      ⟨tagged.1, .routedVariable site link tagged.2⟩
+      ⟨tagged.1, .routedVariable site armIndex link tagged.2⟩
 
 def drawingPlanarSATRoutedVariableClauseMetadata
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     List (DrawingPlanarSATClauseMetadata Variable) :=
   (drawingVariableRouteSites formula).flatMap fun site =>
-    (routedVariableLinksAt formula site).flatMap
-      (drawingPlanarSATRoutedVariableClauseMetadataFor site)
+    (routedVariableLinksAt formula site).zipIdx.flatMap fun taggedLink =>
+      drawingPlanarSATRoutedVariableClauseMetadataFor
+        site taggedLink.2 taggedLink.1
 
 @[simp] theorem drawingPlanarSATRoutedVariableClauseMetadata_clauses
     {Variable : Type*} [DecidableEq Variable]
@@ -401,6 +404,13 @@ def drawingPlanarSATRoutedVariableClauseMetadata
     equalityFamily, List.map_flatMap, List.map_map,
     Function.comp_def]
   rw [List.flatMap_assoc]
+  apply List.flatMap_congr
+  intro site _siteMember
+  exact PeriodicCNF.zipIdx_flatMap_fst
+    (fun link : EqualityLink (PlanarSATNode Variable) =>
+      (equalityInstance link.first link.second link.positions).map
+        fun clause => clause.rename planarSATExternalVariableMap)
+    (routedVariableLinksAt formula site) 0
 
 theorem drawingPlanarSATRoutedVariableClauseMetadataFor_valid
     {Variable : Type*} [DecidableEq Variable]
@@ -408,13 +418,16 @@ theorem drawingPlanarSATRoutedVariableClauseMetadataFor_valid
     (site : VariableRouteSite Variable)
     (siteMember :
       site ∈ drawingVariableRouteSites formula)
+    (armIndex : Nat)
     (link : EqualityLink (PlanarSATNode Variable))
     (linkMember :
-      link ∈ routedVariableLinksAt formula site)
+      (link, armIndex) ∈
+        (routedVariableLinksAt formula site).zipIdx)
     {metadata : DrawingPlanarSATClauseMetadata Variable}
     (metadataMember :
       metadata ∈
-        drawingPlanarSATRoutedVariableClauseMetadataFor site link) :
+        drawingPlanarSATRoutedVariableClauseMetadataFor
+          site armIndex link) :
     metadata.Valid formula := by
   rw [drawingPlanarSATRoutedVariableClauseMetadataFor] at metadataMember
   rcases List.mem_map.mp metadataMember with
@@ -434,9 +447,10 @@ theorem drawingPlanarSATRoutedVariableClauseMetadata_valid
   rcases List.mem_flatMap.mp metadataMember with
     ⟨site, siteMember, metadataMember⟩
   rcases List.mem_flatMap.mp metadataMember with
-    ⟨link, linkMember, metadataMember⟩
+    ⟨taggedLink, linkMember, metadataMember⟩
   exact drawingPlanarSATRoutedVariableClauseMetadataFor_valid
-    formula site siteMember link linkMember metadataMember
+    formula site siteMember taggedLink.2 taggedLink.1
+      linkMember metadataMember
 
 /-- Clause metadata parallel to the five concatenated geometric families of
 `drawingPlanarSATFormula`. -/
