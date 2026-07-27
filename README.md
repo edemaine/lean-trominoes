@@ -2065,6 +2065,14 @@ The representation choices for this target are:
   period is proved positive, and the canonical detour family supplies
   unconditional endpoint and orthogonality certificates for this concrete
   source; nonintersection remains the geometric obligation.
+- [`LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreePositioned.lean)
+  aligns that downstream exact-one pipeline with the certified fixed-eight
+  Figure 7 presentation.  It carries the same positioned formula used by
+  the angular-spliced routes through Figure 9, opaque wrapping, and unit
+  elimination, proving erasure, width three, occurrence degree three,
+  final arity two or three, positive period, and end-to-end satisfiability.
+  Subsequent geometric work can therefore use one common intermediate
+  formula instead of bridging variable-size and fixed-eight cycles.
 - [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean)
   threads the local atom-distinctness certificates through opaque wrapping
   and unit elimination, then specializes them to the angular hardness
