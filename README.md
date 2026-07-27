@@ -1892,6 +1892,15 @@ The representation choices for this target are:
   terminals, target terminals, and central atoms gives the complete finite
   planar SAT formula an eight-occurrence certificate (`6 + 1` at source
   terminals and `6 + 2` at target terminals).
+- [`LeanTrominoes/PeriodicCNFPlanarSATClauseIndex.lean`](LeanTrominoes/PeriodicCNFPlanarSATClauseIndex.lean)
+  indexes every clause of the finite planar-SAT formula by one of its five
+  geometric sources: a crossover, straight carrier link, route bend, routed
+  source clause, or routed variable arm.  The parallel metadata list projects
+  exactly to the original flattened formula and retains both finite-family
+  membership and the exact local clause index.  In particular, bend metadata
+  preserves its `RouteBend` and variable-arm metadata preserves its lifted
+  site, enabling lossless selection of the corresponding certified local
+  incidence drawing.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
