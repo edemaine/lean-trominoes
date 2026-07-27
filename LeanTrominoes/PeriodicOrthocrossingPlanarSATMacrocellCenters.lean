@@ -125,6 +125,60 @@ theorem liftedDrawingVertexPosition_eq
     ⟨(List.idxOf_inj firstVertexMember).mp indexEqual,
       data.2⟩
 
+/-- The constructed orthocrossing drawing has at most one canonical
+crossover record at any drawing-grid point. -/
+theorem orientedCrossing_eq_of_point_eq
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {first second : CrossingRecord}
+    (firstMem : first ∈ orientedCrossings graph)
+    (secondMem : second ∈ orientedCrossings graph)
+    (pointEqual : first.point = second.point) :
+    first = second := by
+  have firstSound := orientedCrossings_sound graph firstMem
+  have secondSound := orientedCrossings_sound graph secondMem
+  have firstOccurrenceEqual :
+      PeriodicGridDrawing.SegmentOccurrenceKey
+          first.first first.firstTranslate =
+        PeriodicGridDrawing.SegmentOccurrenceKey
+          second.first second.firstTranslate := by
+    by_contra occurrenceDifferent
+    have proper :=
+      drawing_isOrthocrossing wellFormed degree isLocal
+        first.first firstSound.1
+        second.first secondSound.1
+        first.firstTranslate second.firstTranslate first.point
+        occurrenceDifferent
+        firstSound.2.2.2.2.1.2.2.1
+        (by
+          rw [pointEqual]
+          exact secondSound.2.2.2.2.1.2.2.1)
+    have firstHorizontal :=
+      firstSound.2.2.2.2.2.1
+    have secondHorizontal :=
+      secondSound.2.2.2.2.2.1
+    rcases proper.2.2 with
+      horizontalVertical | verticalHorizontal
+    · exact secondHorizontal.2 horizontalVertical.2.1
+    · exact firstHorizontal.2 verticalHorizontal.1.1
+  have firstIndexedEqual :
+      first.first = second.first := by
+    apply indexedSegment_eq_of_indices_eq (drawing graph)
+      firstSound.1 secondSound.1
+    · exact congrArg Prod.fst firstOccurrenceEqual
+    · exact congrArg
+        (fun key => key.2.1) firstOccurrenceEqual
+  have firstTranslateEqual :
+      first.firstTranslate = second.firstTranslate :=
+    congrArg (fun key => key.2.2) firstOccurrenceEqual
+  exact
+    orientedCrossing_eq_of_firstOccurrence_eq_of_point_eq
+      wellFormed degree isLocal firstMem secondMem
+      firstIndexedEqual firstTranslateEqual pointEqual
+
 /-- Every represented lifted clause site names a declared incidence-graph
 clause vertex.  This also covers empty clauses, which have no incidence
 edge witnessing their vertex. -/

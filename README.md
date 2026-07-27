@@ -1992,7 +1992,8 @@ The representation choices for this target are:
   sites are position-injective, and a clause site can never coincide with a
   variable site, including when the source formula contains empty clauses.
   It also proves that two active links at one represented variable site
-  classified as the same physical duplicator arm are the same link.
+  classified as the same physical duplicator arm are the same link, and
+  that two canonical crossover records at the same drawing point are equal.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean)
   transports the finite different-arm certificate through macrocell
   translation and logical renaming.  Thus two distinct routed-variable
