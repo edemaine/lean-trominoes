@@ -1977,6 +1977,10 @@ The representation choices for this target are:
   macrocell and renames its ports to the actual source terminals.  The
   adapter proves the exact singleton formula, realized terminal positions,
   route endpoints, and continuous planarity.
+- [`LeanTrominoes/PeriodicOrthocrossingTerminalComponentCarrierInterface.lean`](LeanTrominoes/PeriodicOrthocrossingTerminalComponentCarrierInterface.lean)
+  transports the internal carrier-boundary and endpoint-only contact
+  certificates from the fixed arm and clause-star templates to the actual
+  placed routed-variable and routed-clause drawings.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings.lean)
   turns the five-way clause-source metadata into a total component-aware
   route selector.  Every genuine global clause is proved to occur at the
@@ -2094,6 +2098,16 @@ The representation choices for this target are:
   compass port; the reconstructed lens macrocell origin is proved to be the
   terminal's scaled drawing cell.  Four corollaries identify these data with
   either physical port of an incident route bend.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalComponentGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalComponentGeometry.lean)
+  identifies each selected occurrence terminal's carrier port with its
+  routed-variable or routed-clause fanout arm, and its scaled drawing point
+  with that component's macrocell origin.  Four interface theorems match
+  these data to either endpoint of an incident retained carrier lens.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalComponentSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalComponentSeparation.lean)
+  plugs those endpoint identities into the external-lens/internal-component
+  boundary separator.  Genuine carrier routes therefore avoid genuine
+  routed-variable and routed-clause routes whenever they share the selected
+  occurrence terminal.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierBendSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierBendSeparation.lean)
   plugs those endpoint identities into the external-lens/internal-corner
   boundary separator.  Every genuine local incidence route of a carrier
