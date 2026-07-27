@@ -2116,7 +2116,10 @@ The representation choices for this target are:
   identifies a carrier's fixed normal coordinate with its translated source
   segment line, scaled by twenty and shifted by the port coordinate six.
   Hence parallel retained links on different source rows or columns have
-  strictly separated physical rectangles.
+  strictly separated physical rectangles.  It also bounds every carrier
+  node between the two inward-facing endpoint ports of its source segment;
+  thus source intervals with disjoint continuous interiors yield strictly
+  separated lens rectangles even when the source segments share an endpoint.
 - [`LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean)
   turns strict carrier order into route separation for every pair of
   distinct links on one carrier.  The later lens lies inside the earlier
