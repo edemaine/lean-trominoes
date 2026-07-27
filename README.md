@@ -2065,7 +2065,10 @@ The representation choices for this target are:
   while per-clause atom distinctness yields its complete continuous-planarity
   certificate.  It also identifies every genuine original source occurrence
   with its exact boundary port—`(36, 0)`, `(0, 30)`, or `(72, 30)`—inside
-  the combined `72 × 72` refinement box.
+  the combined `72 × 72` refinement box.  A uniform template/map
+  decomposition additionally exposes the complete image of occurring
+  finite roles and preserves each role's exact translated position, enabling
+  endpoint proofs for both generations of auxiliaries.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean)
   indexes the actual two-stage positioned formula one original source block
   at a time.  Every final clause is linked to its original source clause, the

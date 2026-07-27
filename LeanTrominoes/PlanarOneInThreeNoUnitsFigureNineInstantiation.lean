@@ -894,5 +894,41 @@ theorem instantiatedZeroDrawing_isValid
       sourceClauseIndex figureNineClauseStart source
   · exact zeroDrawing_isValid
 
+/-- Canonical image renaming preserves the translated position of every
+occurring finite role in an empty-source composed drawing. -/
+theorem instantiatedZeroDrawing_rolePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (role : FigureNineNoUnitsVariable)
+    (roleMember : role ∈ zeroDrawing.variableVertices) :
+    (instantiatedZeroDrawing
+      sourceClauseIndex figureNineClauseStart source).variablePosition
+        (zeroVariableMap
+          sourceClauseIndex figureNineClauseStart source role) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        (zeroDrawing.variablePosition role) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  change
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+        zeroDrawing
+        (zeroVariableMap
+          sourceClauseIndex figureNineClauseStart source)
+        (zeroVariableMap
+          sourceClauseIndex figureNineClauseStart source role)) =
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      (zeroDrawing.variablePosition role)
+  rw [EmbeddedCNFIncidenceDrawing.imageVariablePosition_map
+    zeroDrawing
+    (zeroVariableMap
+      sourceClauseIndex figureNineClauseStart source)
+    (zeroVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart source)
+    role roleMember]
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

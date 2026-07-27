@@ -15,6 +15,13 @@ namespace PlanarOneInThreeNoUnitsFigureNine
 
 open PlanarThreeSAT
 
+local instance nestedDecidableEqInstance
+    {Variable : Type*} [DecidableEq Variable] :
+    DecidableEq
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable)) :=
+  nestedVariableDecidableEq
+
 /-- Select the composed drawing determined by a positioned source clause's
 arity.  Inputs beyond width three use the ternary prefix as a total
 fallback. -/
@@ -39,6 +46,176 @@ def instantiatedDrawing
       instantiatedThreeDrawing
         sourceClauseIndex figureNineClauseStart source
         first second third
+
+/-- The finite certified template selected by a source clause's arity. -/
+def templateDrawing
+    {Variable : Type*}
+    (source : PositionedPeriodicClause Variable) :
+    EmbeddedCNFIncidenceDrawing FigureNineNoUnitsVariable :=
+  match source.literals with
+  | [] => zeroDrawing
+  | [first] => oneDrawingFor first.value
+  | [first, second] =>
+      twoDrawingFor first.value second.value
+  | first :: second :: third :: _ =>
+      fullDrawingFor first.value second.value third.value
+
+/-- The actual nested-variable map selected by a source clause's arity. -/
+def instantiatedVariableMap
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    FigureNineNoUnitsVariable →
+      OneInThreeNoUnitVariable (OneInThreeVariable Variable) :=
+  match source.literals with
+  | [] =>
+      zeroVariableMap
+        sourceClauseIndex figureNineClauseStart source
+  | [first] =>
+      oneVariableMap
+        sourceClauseIndex figureNineClauseStart source
+        first.atom
+  | [first, second] =>
+      twoVariableMap
+        sourceClauseIndex figureNineClauseStart source
+        first.atom second.atom
+  | first :: second :: third :: _ =>
+      threeVariableMap
+        sourceClauseIndex figureNineClauseStart source
+        first.atom second.atom third.atom
+
+/-- The uniform selector is the selected finite template renamed by the
+selected actual-variable map and translated into the source macrocell. -/
+theorem instantiatedDrawing_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    instantiatedDrawing
+        sourceClauseIndex figureNineClauseStart source =
+      (EmbeddedCNFIncidenceDrawing.renameToImage
+        (templateDrawing source)
+        (instantiatedVariableMap
+          sourceClauseIndex figureNineClauseStart source)).translate
+        (Cell.scale composedGadgetScale source.position) := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · rfl
+  · rcases rest with _ | ⟨second, rest⟩
+    · rfl
+    · rcases rest with _ | ⟨third, tail⟩ <;> rfl
+
+/-- Width three and source-atom distinctness make the selected actual
+variable map injective on every role occurring in the selected template. -/
+theorem instantiatedVariableMap_injectiveOn
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup) :
+    ∀ left ∈ (templateDrawing source).variableVertices,
+      ∀ right ∈ (templateDrawing source).variableVertices,
+        instantiatedVariableMap
+            sourceClauseIndex figureNineClauseStart source left =
+          instantiatedVariableMap
+            sourceClauseIndex figureNineClauseStart source right →
+        left = right := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · exact zeroVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart
+      ⟨sourcePosition, []⟩
+  · rcases rest with _ | ⟨second, rest⟩
+    · exact oneVariableMap_injectiveOn
+        sourceClauseIndex figureNineClauseStart
+        ⟨sourcePosition, [first]⟩ first
+    · rcases rest with _ | ⟨third, tail⟩
+      · have firstNeSecond :
+            first.atom ≠ second.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup]
+            using distinct
+        exact twoVariableMap_injectiveOn
+          sourceClauseIndex figureNineClauseStart
+          ⟨sourcePosition, [first, second]⟩
+          first second firstNeSecond
+      · have tailEmpty : tail = [] := by
+          apply List.length_eq_zero_iff.mp
+          simp at width
+          omega
+        subst tail
+        have pairwise :
+            (first.atom ≠ second.atom ∧
+              first.atom ≠ third.atom) ∧
+            second.atom ≠ third.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup]
+            using distinct
+        exact threeVariableMap_injectiveOn
+          sourceClauseIndex figureNineClauseStart
+          ⟨sourcePosition, [first, second, third]⟩
+          first second third
+          pairwise.1.1 pairwise.1.2 pairwise.2
+
+/-- The variables occurring in a selected instantiated drawing are exactly
+the image of the variables occurring in its selected finite template. -/
+theorem instantiatedDrawing_variableVertices
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup) :
+    (instantiatedDrawing
+      sourceClauseIndex figureNineClauseStart source).variableVertices =
+      (templateDrawing source).variableVertices.map
+        (instantiatedVariableMap
+          sourceClauseIndex figureNineClauseStart source) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  rw [instantiatedDrawing_eq,
+    EmbeddedCNFIncidenceDrawing.variableVertices_translate]
+  unfold EmbeddedCNFIncidenceDrawing.renameToImage
+  apply EmbeddedCNFIncidenceDrawing.variableVertices_rename
+  exact instantiatedVariableMap_injectiveOn
+    sourceClauseIndex figureNineClauseStart
+    source width distinct
+
+/-- Every occurring finite role retains its exact translated template
+position under the uniform arity selector. -/
+theorem instantiatedDrawing_rolePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup)
+    (role : FigureNineNoUnitsVariable)
+    (roleMember :
+      role ∈ (templateDrawing source).variableVertices) :
+    (instantiatedDrawing
+      sourceClauseIndex figureNineClauseStart source).variablePosition
+        (instantiatedVariableMap
+          sourceClauseIndex figureNineClauseStart source role) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        ((templateDrawing source).variablePosition role) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  rw [instantiatedDrawing_eq]
+  change
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+        (templateDrawing source)
+        (instantiatedVariableMap
+          sourceClauseIndex figureNineClauseStart source)
+        (instantiatedVariableMap
+          sourceClauseIndex figureNineClauseStart source role)) =
+    Cell.add
+      (Cell.scale composedGadgetScale source.position)
+      ((templateDrawing source).variablePosition role)
+  rw [EmbeddedCNFIncidenceDrawing.imageVariablePosition_map
+    (templateDrawing source)
+    (instantiatedVariableMap
+      sourceClauseIndex figureNineClauseStart source)
+    (instantiatedVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart
+      source width distinct)
+    role roleMember]
 
 /-- For a width-three source, the selected drawing's formula is exactly the
 actual composed positioned clause block. -/
