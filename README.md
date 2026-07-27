@@ -1817,6 +1817,10 @@ The representation choices for this target are:
   ports.  Each arm has exact endpoints, continuous planarity, and
   compass-valid terminal rays; the complete three-arm equality star is also
   certified continuously planar.
+- [`LeanTrominoes/PlanarThreeSATDuplicatorArmSeparation.lean`](LeanTrominoes/PlanarThreeSATDuplicatorArmSeparation.lean)
+  exhaustively certifies that every genuine route selected from one physical
+  arm of the Figure 8(a) duplicator avoids every route selected from either
+  of the other two arms.
 - [`LeanTrominoes/PlanarThreeSATEqualityLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLens.lean)
   replaces each collinear four-incidence equality link on a long carrier by
   a narrow rectilinear lens.  For every span of at least eight cells, explicit
@@ -1987,6 +1991,13 @@ The representation choices for this target are:
   represented clause sites are position-injective, represented variable
   sites are position-injective, and a clause site can never coincide with a
   variable site, including when the source formula contains empty clauses.
+  It also proves that two active links at one represented variable site
+  classified as the same physical duplicator arm are the same link.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean)
+  transports the finite different-arm certificate through macrocell
+  translation and logical renaming.  Thus two distinct routed-variable
+  components sharing a lifted variable center must use different physical
+  arms, and every pair of their selected routes avoids one another.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every

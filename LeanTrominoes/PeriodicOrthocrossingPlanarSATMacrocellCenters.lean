@@ -69,6 +69,8 @@ end PeriodicGridDrawing
 
 namespace PeriodicOrthocrossing
 
+open PlanarThreeSAT
+
 /-- The constructed drawing position of any declared protovertex lies in
 the open fundamental square. -/
 theorem drawing_vertexPosition_in_fundamental_square
@@ -174,6 +176,196 @@ theorem drawingVariableRouteSite_vertex_mem
       (List.fst_mem_of_mem_zipIdx edgeMember)
   simpa only [CNFRouteOccurrence.variableOccurrence,
     CNFIncidence.edge_target] using endpoints.2
+
+/-- Every neighboring metadata-rich route occurrence retains its matching
+tagged incidence-graph edge. -/
+theorem CNFRouteOccurrence.edge_mem_of_mem_drawing
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {occurrence : CNFRouteOccurrence Variable}
+    (occurrenceMem :
+      occurrence ∈ drawingCNFRouteOccurrences formula) :
+    (occurrence.edge, occurrence.edgeIndex) ∈
+      (PeriodicCNF.incidenceGraph formula).edges.zipIdx := by
+  rcases List.mem_flatMap.mp occurrenceMem with
+    ⟨taggedIncidence, taggedIncidenceMem,
+      translatedOccurrenceMem⟩
+  rcases List.mem_map.mp translatedOccurrenceMem with
+    ⟨translate, translateMem, occurrenceEqual⟩
+  subst occurrence
+  exact
+    PeriodicCNF.tagged_incidence_edge_mem
+      formula taggedIncidenceMem
+
+/-- On the only target-port ranks allowed by degree three, the geometric
+duplicator-arm classifier is injective. -/
+theorem targetDuplicatorArm_injective_below_three
+    {firstRank secondRank : Nat}
+    (firstLt : firstRank < 3)
+    (secondLt : secondRank < 3)
+    (armEqual :
+      targetDuplicatorArm firstRank =
+        targetDuplicatorArm secondRank) :
+    firstRank = secondRank := by
+  interval_cases firstRank <;>
+    interval_cases secondRank <;>
+    simp_all [targetDuplicatorArm]
+
+/-- At one represented variable site, two active links with the same
+physical arm are the same link. -/
+theorem routedVariableLinksAt_eq_of_duplicatorArm_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (site : VariableRouteSite Variable)
+    {first second : EqualityLink (PlanarSATNode Variable)}
+    (firstMem : first ∈ routedVariableLinksAt formula site)
+    (secondMem : second ∈ routedVariableLinksAt formula site)
+    (armEqual :
+      first.first.duplicatorArm =
+        second.first.duplicatorArm) :
+    first = second := by
+  have linkArmEqual := armEqual
+  have firstNodeMem :
+      first.first ∈ routedVariableNodes formula site := by
+    rcases List.mem_map.mp firstMem with
+      ⟨taggedNode, taggedNodeMem, linkEqual⟩
+    subst first
+    exact List.mem_of_mem_take
+      (List.fst_mem_of_mem_zipIdx taggedNodeMem)
+  have secondNodeMem :
+      second.first ∈ routedVariableNodes formula site := by
+    rcases List.mem_map.mp secondMem with
+      ⟨taggedNode, taggedNodeMem, linkEqual⟩
+    subst second
+    exact List.mem_of_mem_take
+      (List.fst_mem_of_mem_zipIdx taggedNodeMem)
+  rcases (mem_routedVariableNodes_iff
+      formula site first.first).mp firstNodeMem with
+    ⟨firstOccurrence, firstOccurrenceAtMem, firstNodeEqual⟩
+  rcases (mem_routedVariableNodes_iff
+      formula site second.first).mp secondNodeMem with
+    ⟨secondOccurrence, secondOccurrenceAtMem, secondNodeEqual⟩
+  have firstData :=
+    variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+      formula site firstOccurrenceAtMem
+  have secondData :=
+    variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+      formula site secondOccurrenceAtMem
+  have firstEdgeMem :=
+    firstOccurrence.edge_mem_of_mem_drawing formula firstData.1
+  have secondEdgeMem :=
+    secondOccurrence.edge_mem_of_mem_drawing formula secondData.1
+  let graph := PeriodicCNF.incidenceGraph formula
+  let firstPort :=
+    targetPort firstOccurrence.edge firstOccurrence.edgeIndex
+  let secondPort :=
+    targetPort secondOccurrence.edge secondOccurrence.edgeIndex
+  have firstPortMem : firstPort ∈ allPorts graph :=
+    targetPort_mem_allPorts graph firstEdgeMem
+  have secondPortMem : secondPort ∈ allPorts graph :=
+    targetPort_mem_allPorts graph secondEdgeMem
+  rw [firstNodeEqual, secondNodeEqual] at armEqual
+  change
+    (firstOccurrence.targetTerminal formula).duplicatorArm =
+      (secondOccurrence.targetTerminal formula).duplicatorArm
+    at armEqual
+  rw [firstOccurrence.targetTerminal_duplicatorArm formula,
+    secondOccurrence.targetTerminal_duplicatorArm formula] at armEqual
+  have rankEqual :
+      portRank graph firstPort =
+        portRank graph secondPort := by
+    apply targetDuplicatorArm_injective_below_three
+    · exact portRank_lt_three degree firstPortMem
+    · exact portRank_lt_three degree secondPortMem
+    · exact armEqual
+  have targetVertexEqual :
+      firstPort.vertex = secondPort.vertex := by
+    have atomEqual :
+        firstOccurrence.incidence.literal.atom =
+          secondOccurrence.incidence.literal.atom :=
+      congrArg Prod.fst
+        (firstData.2.trans secondData.2.symm)
+    dsimp [firstPort, secondPort]
+    change
+      CNFVertex.variable
+          firstOccurrence.incidence.literal.atom =
+        CNFVertex.variable
+          secondOccurrence.incidence.literal.atom
+    exact congrArg CNFVertex.variable atomEqual
+  have portXEqual :
+      portX graph firstPort = portX graph secondPort := by
+    unfold portX
+    rw [targetVertexEqual, rankEqual]
+  have portEqual : firstPort = secondPort :=
+    portX_injective_on_allPorts
+      wellFormed degree firstPortMem secondPortMem portXEqual
+  have edgeIndexEqual :
+      firstOccurrence.edgeIndex =
+        secondOccurrence.edgeIndex :=
+    congrArg GraphPort.edgeIndex portEqual
+  have taggedEdgeEqual :
+      (firstOccurrence.edge, firstOccurrence.edgeIndex) =
+        (secondOccurrence.edge, secondOccurrence.edgeIndex) :=
+    tagged_eq_of_mem_zipIdx_of_snd_eq
+      firstEdgeMem secondEdgeMem edgeIndexEqual
+  have edgeEqual :
+      firstOccurrence.edge = secondOccurrence.edge :=
+    congrArg Prod.fst taggedEdgeEqual
+  have translatedTargetEqual :
+      Cell.add firstOccurrence.translate
+          firstOccurrence.edge.offset =
+        Cell.add secondOccurrence.translate
+          secondOccurrence.edge.offset := by
+    exact congrArg Prod.snd
+      (firstData.2.trans secondData.2.symm)
+  rw [edgeEqual] at translatedTargetEqual
+  have translateEqual :
+      firstOccurrence.translate =
+        secondOccurrence.translate := by
+    have xEqual :=
+      congrArg Prod.fst translatedTargetEqual
+    have yEqual :=
+      congrArg Prod.snd translatedTargetEqual
+    apply Prod.ext
+    · simp only [Cell.add] at xEqual
+      omega
+    · simp only [Cell.add] at yEqual
+      omega
+  have occurrenceEqual :
+      firstOccurrence = secondOccurrence :=
+    drawingCNFRouteOccurrences_eq_of_edgeIndex_eq_of_translate_eq
+      formula firstData.1 secondData.1
+      edgeIndexEqual translateEqual
+  have firstEndpointEqual :
+      first.first = second.first :=
+    firstNodeEqual.trans
+      ((congrArg
+        (fun occurrence =>
+          PlanarSATNode.carrier
+            (CarrierNode.terminal
+              (occurrence.targetTerminal formula)))
+        occurrenceEqual).trans secondNodeEqual.symm)
+  have secondEndpointEqual :
+      first.second = second.second :=
+    (routedVariableLinksAt_second formula site firstMem).trans
+      (routedVariableLinksAt_second
+        formula site secondMem).symm
+  have positionsEqual :
+      first.positions = second.positions := by
+    rw [routedVariableLink_positions formula site firstMem,
+      routedVariableLink_positions formula site secondMem,
+      linkArmEqual]
+  rcases first with ⟨firstFirst, firstSecond, firstPositions⟩
+  rcases second with ⟨secondFirst, secondSecond, secondPositions⟩
+  simp only at firstEndpointEqual secondEndpointEqual positionsEqual
+  subst secondFirst
+  subst secondSecond
+  subst secondPositions
+  rfl
 
 /-- Equal lifted positions of two represented clause sites force the
 entire site keys to agree. -/
