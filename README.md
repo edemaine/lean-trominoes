@@ -2067,8 +2067,10 @@ The representation choices for this target are:
   with its exact boundary port—`(36, 0)`, `(0, 30)`, or `(72, 30)`—inside
   the combined `72 × 72` refinement box.  A uniform template/map
   decomposition additionally exposes the complete image of occurring
-  finite roles and preserves each role's exact translated position, enabling
-  endpoint proofs for both generations of auxiliaries.
+  finite roles and preserves each role's exact translated position.  It
+  consequently identifies every occurring second-stage auxiliary with its
+  globally indexed unit-elimination vertex and every occurring first-stage
+  auxiliary with the sixfold-scaled Figure 9 vertex.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean)
   indexes the actual two-stage positioned formula one original source block
   at a time.  Every final clause is linked to its original source clause, the

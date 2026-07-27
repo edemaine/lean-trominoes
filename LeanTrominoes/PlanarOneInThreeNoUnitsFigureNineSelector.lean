@@ -217,6 +217,234 @@ theorem instantiatedDrawing_rolePosition
       source width distinct)
     role roleMember]
 
+/-- Every variable occurring in an instantiated drawing comes from one
+occurring finite role, and therefore retains that role's translated template
+position. -/
+theorem instantiatedDrawing_exists_role
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup)
+    {atom :
+      OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable)}
+    (atomMember :
+      atom ∈
+        (instantiatedDrawing
+          sourceClauseIndex figureNineClauseStart source).variableVertices) :
+    ∃ role,
+      role ∈ (templateDrawing source).variableVertices ∧
+      instantiatedVariableMap
+          sourceClauseIndex figureNineClauseStart source role = atom ∧
+      (instantiatedDrawing
+        sourceClauseIndex figureNineClauseStart source).variablePosition
+          atom =
+        Cell.add
+          (Cell.scale composedGadgetScale source.position)
+          ((templateDrawing source).variablePosition role) := by
+  rw [instantiatedDrawing_variableVertices
+    sourceClauseIndex figureNineClauseStart
+    source width distinct] at atomMember
+  rcases List.mem_map.mp atomMember with
+    ⟨role, roleMember, roleEqual⟩
+  refine ⟨role, roleMember, roleEqual, ?_⟩
+  rw [← roleEqual]
+  exact instantiatedDrawing_rolePosition
+    sourceClauseIndex figureNineClauseStart
+    source width distinct role roleMember
+
+/-- All arity-specific finite templates use the same composed variable
+positions. -/
+@[simp]
+theorem templateDrawing_variablePosition
+    {Variable : Type*}
+    (source : PositionedPeriodicClause Variable)
+    (role : FigureNineNoUnitsVariable) :
+    (templateDrawing source).variablePosition role =
+      variablePosition role := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · rfl
+  · rcases rest with _ | ⟨second, rest⟩
+    · rfl
+    · rcases rest with _ | ⟨third, tail⟩ <;> rfl
+
+/-- The uniform actual-variable selector maps a finite second-stage
+auxiliary role to its globally scoped nested auxiliary. -/
+@[simp]
+theorem instantiatedVariableMap_unitAux
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (localClauseIndex : Nat)
+    (kind : OneInThreeNoUnitAux) :
+    instantiatedVariableMap
+        sourceClauseIndex figureNineClauseStart source
+        (.unitAux localClauseIndex kind) =
+      .inr
+        ((figureNineClauseStart + localClauseIndex,
+          figureNineClauseLiterals
+            sourceClauseIndex source localClauseIndex),
+          kind) := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · rfl
+  · rcases rest with _ | ⟨second, rest⟩
+    · rfl
+    · rcases rest with _ | ⟨third, tail⟩ <;> rfl
+
+/-- Every occurring second-stage auxiliary has the physical position
+declared by its local Figure 9 clause index. -/
+theorem instantiatedDrawing_unitAuxiliaryPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup)
+    (localClauseIndex : Nat)
+    (kind : OneInThreeNoUnitAux)
+    (atomMember :
+      (.inr
+        ((figureNineClauseStart + localClauseIndex,
+          figureNineClauseLiterals
+            sourceClauseIndex source localClauseIndex),
+          kind) :
+        OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)) ∈
+        (instantiatedDrawing
+          sourceClauseIndex figureNineClauseStart source).variableVertices) :
+    (instantiatedDrawing
+      sourceClauseIndex figureNineClauseStart source).variablePosition
+        (.inr
+          ((figureNineClauseStart + localClauseIndex,
+            figureNineClauseLiterals
+              sourceClauseIndex source localClauseIndex),
+            kind)) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        (Cell.add
+          (Cell.scale
+            6
+            (PlanarOneInThree.generatedClausePosition
+              (0, 0) localClauseIndex))
+          (PeriodicOneInThreeNoUnitsPositioned.auxiliaryLocalPosition
+            kind)) := by
+  rcases instantiatedDrawing_exists_role
+      sourceClauseIndex figureNineClauseStart
+      source width distinct atomMember with
+    ⟨role, roleMember, roleEqual, rolePosition⟩
+  cases role with
+  | inherited role =>
+      rcases source with ⟨sourcePosition, literals⟩
+      rcases literals with _ | ⟨first, rest⟩
+      · simp [instantiatedVariableMap, zeroVariableMap,
+          variableMap] at roleEqual
+      · rcases rest with _ | ⟨second, rest⟩
+        · simp [instantiatedVariableMap, oneVariableMap,
+            variableMap] at roleEqual
+        · rcases rest with _ | ⟨third, tail⟩ <;>
+            simp [instantiatedVariableMap,
+              twoVariableMap, threeVariableMap,
+              variableMap] at roleEqual
+  | unitAux roleIndex roleKind =>
+      have roleData :
+          (figureNineClauseStart + roleIndex =
+              figureNineClauseStart + localClauseIndex ∧
+            figureNineClauseLiterals
+                sourceClauseIndex source roleIndex =
+              figureNineClauseLiterals
+                sourceClauseIndex source localClauseIndex) ∧
+            roleKind = kind := by
+        simpa only [instantiatedVariableMap_unitAux,
+          Sum.inr.injEq, Prod.mk.injEq] using roleEqual
+      have scopeEqual :
+          figureNineClauseStart + roleIndex =
+            figureNineClauseStart + localClauseIndex := by
+        exact roleData.1.1
+      have roleIndexEqual : roleIndex = localClauseIndex := by
+        omega
+      have roleKindEqual : roleKind = kind := by
+        exact roleData.2
+      subst roleIndex
+      subst roleKind
+      simpa [variablePosition] using rolePosition
+
+/-- Every occurring first-stage Figure 9 auxiliary retains its sixfold
+scaled Figure 9 variable position inside the composed source macrocell. -/
+theorem instantiatedDrawing_figureNineAuxiliaryPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup)
+    (kind : OneInThreeAux)
+    (atomMember :
+      (.inl
+        (.inr
+          ((sourceClauseIndex, source.literals), kind)) :
+        OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)) ∈
+        (instantiatedDrawing
+          sourceClauseIndex figureNineClauseStart source).variableVertices) :
+    (instantiatedDrawing
+      sourceClauseIndex figureNineClauseStart source).variablePosition
+        (.inl
+          (.inr
+            ((sourceClauseIndex, source.literals), kind))) =
+      Cell.add
+        (Cell.scale composedGadgetScale source.position)
+        (Cell.scale 6
+          (PeriodicOneInThreePositioned.auxiliaryLocalPosition kind)) := by
+  rcases instantiatedDrawing_exists_role
+      sourceClauseIndex figureNineClauseStart
+      source width distinct atomMember with
+    ⟨role, roleMember, roleEqual, rolePosition⟩
+  cases role with
+  | unitAux roleIndex roleKind =>
+      simp at roleEqual
+  | inherited role =>
+      have finitePosition :
+          PlanarOneInThree.figureNineVariablePosition role =
+            PeriodicOneInThreePositioned.auxiliaryLocalPosition kind := by
+        rcases source with ⟨sourcePosition, literals⟩
+        rcases literals with _ | ⟨first, rest⟩
+        · simp [templateDrawing, zeroDrawing, zeroFormula,
+              forcedFalseUnitReplacement, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+              at roleMember
+          cases role <;>
+            simp_all [instantiatedVariableMap,
+              zeroVariableMap, variableMap, zeroInheritedMap,
+              PlanarOneInThree.figureNineVariablePosition]
+        · rcases rest with _ | ⟨second, rest⟩
+          · simp [templateDrawing, oneDrawingFor, oneFormulaFor,
+                forcedFalseUnitReplacement, clause,
+                EmbeddedCNFIncidenceDrawing.variableVertices]
+                at roleMember
+            cases role <;>
+              simp_all [instantiatedVariableMap,
+                oneVariableMap, variableMap, oneInheritedMap,
+                PlanarOneInThree.figureNineVariablePosition]
+          · rcases rest with _ | ⟨third, tail⟩
+            · simp [templateDrawing, twoDrawingFor, twoFormulaFor,
+                  forcedFalseUnitReplacement, clause,
+                  EmbeddedCNFIncidenceDrawing.variableVertices]
+                  at roleMember
+              cases role <;>
+                simp_all [instantiatedVariableMap,
+                  twoVariableMap, variableMap, twoInheritedMap,
+                  PlanarOneInThree.figureNineVariablePosition]
+            · simp [templateDrawing, fullDrawingFor,
+                  fullFormulaFor, clause,
+                  EmbeddedCNFIncidenceDrawing.variableVertices]
+                  at roleMember
+              cases role <;>
+                simp_all [instantiatedVariableMap,
+                  threeVariableMap, variableMap, threeInheritedMap,
+                  PlanarOneInThree.figureNineVariablePosition]
+      simpa [variablePosition, finitePosition] using rolePosition
+
 /-- For a width-three source, the selected drawing's formula is exactly the
 actual composed positioned clause block. -/
 theorem instantiatedDrawing_formula
