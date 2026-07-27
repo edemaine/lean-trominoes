@@ -413,6 +413,13 @@ The representation choices for this target are:
   recovers the genuine source incidence behind every inherited output
   incidence and identifies its normalized local endpoint as the corresponding
   index-selected boundary port in the generated clause's anchor gauge.
+  [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteSplicing.lean)
+  scales an inherited source incidence route by the `12 × 12` Figure 9
+  refinement and translates it from the source clause's anchor gauge to the
+  generated clause's gauge.  A boundary-port connector then yields exact
+  canonical endpoints and orthogonality for one complete inherited suffix;
+  its generic Manhattan connector is the remaining piece to replace by a
+  noncrossing clause-boundary fan.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
