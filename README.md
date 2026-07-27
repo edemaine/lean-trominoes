@@ -1847,6 +1847,11 @@ The representation choices for this target are:
   plus injective renaming place the template at arbitrary bend links.  Each
   port uses the inward and free perpendicular rays and stays on the macrocell
   side of the port, complementing the adjacent straight-carrier lens.
+- [`LeanTrominoes/PlanarThreeSATCornerEqualityCarrierInterface.lean`](LeanTrominoes/PlanarThreeSATCornerEqualityCarrierInterface.lean)
+  formalizes the internal and external closed regions at every compass port.
+  They meet only at the port itself, and pointwise containment on opposite
+  sides yields complete continuous route separation.  Exhaustive checks put
+  every corner route on the internal side of both of its occupied ports.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
