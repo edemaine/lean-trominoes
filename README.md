@@ -1908,6 +1908,12 @@ The representation choices for this target are:
   local clause formula, every realized variable position, physical route
   endpoints, continuous planarity, and preservation of the fixed
   eight-direction compass terminal rays.
+- [`LeanTrominoes/PeriodicOrthocrossingWireIncidenceDrawings.lean`](LeanTrominoes/PeriodicOrthocrossingWireIncidenceDrawings.lean)
+  embeds both certified wire templates into the final planar-SAT variable
+  type through one common carrier map.  Every represented straight-carrier
+  lens and route-bend corner is identified with its exact indexed clause
+  block and retains its complete endpoint, orthogonality, and continuous
+  finite-planarity certificate under that embedding.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
