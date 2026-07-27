@@ -1951,6 +1951,11 @@ The representation choices for this target are:
   and every source-clause ray stays on the internal side of each incident
   port boundary, with endpoint-only contact, and transports both certificates
   through macrocell translation.
+- [`LeanTrominoes/PeriodicOrthocrossingCrossoverCarrierInterface.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverCarrierInterface.lean)
+  identifies the crossover's left, right, top, and bottom variables with
+  the west, east, south, and north carrier ports.  It certifies that every
+  fixed-template incidence route stays on the internal side of all four
+  boundaries and has endpoint-only contact at each port.
 - [`LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean)
   translates the continuously planar Figure 8(b) incidence template to each
   canonical crossing and injectively renames its boundary and internal roles
@@ -1958,6 +1963,9 @@ The representation choices for this target are:
   local clause formula, every realized variable position, physical route
   endpoints, continuous planarity, and preservation of the fixed
   eight-direction compass terminal rays.
+- [`LeanTrominoes/PeriodicOrthocrossingCrossoverComponentCarrierInterface.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverComponentCarrierInterface.lean)
+  transports all four internal boundary and endpoint-contact certificates
+  to each actual placed and logically scoped crossover drawing.
 - [`LeanTrominoes/PeriodicOrthocrossingWireIncidenceDrawings.lean`](LeanTrominoes/PeriodicOrthocrossingWireIncidenceDrawings.lean)
   embeds both certified wire templates into the final planar-SAT variable
   type through one common carrier map.  Every represented straight-carrier
