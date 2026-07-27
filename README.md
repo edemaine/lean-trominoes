@@ -1892,6 +1892,12 @@ The representation choices for this target are:
   the verified Figure 7 copy and implication-clause coordinates.  Erasing
   positions recovers exactly the semantic fixed-eight split, and the refined
   placement retains a positive drawing period.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitLocalDistinctness.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitLocalDistinctness.lean)
+  proves that collision-free compass assignment makes every copied source
+  clause atom-distinct and that every binary clause of the eight-copy ring
+  has distinct endpoints.  The positioned fixed-eight output therefore
+  satisfies the local distinctness hypothesis needed by every Figure 9
+  drawing instance.
 - [`LeanTrominoes/OccurrenceSplitRingCycleDrawing.lean`](LeanTrominoes/OccurrenceSplitRingCycleDrawing.lean)
   extracts the eight implication clauses as an independently indexed local
   drawing.  Its sixteen routes have exhaustively verified endpoints,

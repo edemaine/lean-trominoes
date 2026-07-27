@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicEightOccurrenceSplitCanonicalAngularRoutes
+import LeanTrominoes.PeriodicEightOccurrenceSplitLocalDistinctness
 import LeanTrominoes.PeriodicCNFPlanarOneInThreeNoUnitsPositioned
 import LeanTrominoes.PeriodicCNFPlanarOneInThreePlacements
 
@@ -140,6 +141,65 @@ theorem drawingAngularEightOccurrenceSplitPositionedFormula_widthAtMostThree
       input 3
       (drawingPeriodicPlanarSATFormula_widthAtMostThree
         input sourceWidth)
+
+/-- Collision-free angular ports make every clause of the positioned
+fixed-eight split atom-distinct. -/
+theorem drawingAngularEightOccurrenceSplitPositionedFormula_allAtomsNodup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable)
+    (sourceLocal : input.IsLocal)
+    (sourceWidth : input.WidthAtMost 3)
+    (sourceOccurrences : input.OccurrencesAtMost 3) :
+    (drawingAngularEightOccurrenceSplitPositionedFormula
+      input).AllAtomsNodup := by
+  unfold drawingAngularEightOccurrenceSplitPositionedFormula
+  apply PeriodicEightOccurrenceSplitPositioned.formula_allAtomsNodup
+  apply
+    PeriodicEightOccurrenceSplit.occurrencePortsOfAngularOrder_collisionFree
+  apply PeriodicEightOccurrenceSplit.fitsEightSlots_of_occurrencesAtMostEight
+  rw [
+    deduplicatedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
+  exact
+    deduplicatedWrappedDrawingPeriodicPlanarSATFormula_occurrencesAtMostEight_of_source
+      sourceLocal sourceWidth sourceOccurrences
+
+/-- The raw fixed-eight Figure 9 output has distinct atoms in every
+generated clause. -/
+theorem
+    drawingFixedEightPositionedPeriodicPlanarOneInThreeRawFormula_allAtomsNodup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable) :
+    (drawingFixedEightPositionedPeriodicPlanarOneInThreeRawFormula
+      input).AllAtomsNodup :=
+  PeriodicOneInThreePositioned.formula_allAtomsNodup
+    (drawingAngularEightOccurrenceSplitPositionedFormula input)
+
+/-- Opaque wrapping preserves fixed-eight Figure 9 atom distinctness. -/
+theorem
+    drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula_allAtomsNodup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable) :
+    (drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula
+      input).AllAtomsNodup := by
+  apply PositionedPeriodicCNF.allAtomsNodup_rename
+    WrappedPeriodicVariable.mk
+  · intro first second equal
+    exact WrappedPeriodicVariable.mk.inj equal
+  · exact
+      drawingFixedEightPositionedPeriodicPlanarOneInThreeRawFormula_allAtomsNodup
+        input
+
+/-- Unit elimination preserves fixed-eight Figure 9 atom distinctness. -/
+theorem
+    drawingFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula_allAtomsNodup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable) :
+    (drawingFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+      input).AllAtomsNodup :=
+  PeriodicOneInThreeNoUnitsPositioned.formula_allAtomsNodup
+    (drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula input)
+    (drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula_allAtomsNodup
+      input)
 
 /-- The positioned fixed-eight split has the semantics of the routed planar
 SAT formula. -/
