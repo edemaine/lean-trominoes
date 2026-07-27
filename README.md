@@ -1908,6 +1908,11 @@ The representation choices for this target are:
   offsets identifies each embedded formula with the real positioned
   `clauseGadget` output, and every instance inherits the complete local
   geometric certificate.
+- [`LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean`](LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean)
+  proves that every clause produced by Figure 9 has distinct variable atoms,
+  independently of repetitions in its source clause.  It also packages
+  per-clause atom distinctness for positioned formulas and proves that
+  injective renaming and the unit-elimination replacement preserve it.
 - [`LeanTrominoes/PlanarOneInThreeOccurrences.lean`](LeanTrominoes/PlanarOneInThreeOccurrences.lean)
   proves that adding Figure 9's positions does not change the underlying
   literal-occurrence list.  The periodic exact-one accounting therefore
@@ -1988,6 +1993,11 @@ The representation choices for this target are:
   period is proved positive, and the canonical detour family supplies
   unconditional endpoint and orthogonality certificates for this concrete
   source; nonintersection remains the geometric obligation.
+- [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean)
+  threads the local atom-distinctness certificates through opaque wrapping
+  and unit elimination, then specializes them to the angular hardness
+  pipeline.  Consequently every final binary or ternary source clause meets
+  the distinct-boundary assumptions of its certified local drawing.
 - [`LeanTrominoes/PeriodicOccurrences.lean`](LeanTrominoes/PeriodicOccurrences.lean)
   defines the finite-presentation literal count used by the paper's
   “each variable occurs at most three times” restriction, and proves that
