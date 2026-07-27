@@ -1957,7 +1957,9 @@ The representation choices for this target are:
   type through one common carrier map.  Every represented straight-carrier
   lens and route-bend corner is identified with its exact indexed clause
   block and retains its complete endpoint, orthogonality, and continuous
-  finite-planarity certificate under that embedding.
+  finite-planarity certificate under that embedding.  Both adapters also
+  expose the external lens and internal corner port-boundary bounds and
+  endpoint-only contact certificates in their final variable type.
 - [`LeanTrominoes/PeriodicOrthocrossingRoutedVariableIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingRoutedVariableIncidenceDrawing.lean)
   translates the certified two-clause template for an active physical arm
   into its lifted variable macrocell and renames its endpoint roles to the
@@ -1996,7 +1998,9 @@ The representation choices for this target are:
   defines closed integer rectangles and proves that routes contained in
   strictly separated rectangles have neither continuous interior
   intersections nor shared listed points.  Its route-point predicate is
-  preserved by variable renaming and translation.
+  preserved by point maps, variable renaming, and translation; a parallel
+  predicate records and transports endpoint-only contact at a designated
+  physical point.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATMacrocellBounds.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATMacrocellBounds.lean)
   bounds every crossover, bend,
   source-clause, and active variable-arm route inside the first `13 × 13`
@@ -2075,7 +2079,8 @@ The representation choices for this target are:
   Genuine incoming and outgoing segments determine their compass ports; a
   no-immediate-reversal hypothesis makes those ports distinct.  The adapter
   then exposes the bend link's exact positioned formula, both real
-  carrier-node endpoints, and the transported complete local certificate.
+  carrier-node endpoints, the transported complete local certificate, and
+  the internal bounds and endpoint-only contacts at both physical ports.
 - [`LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversalComponents.lean`](LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversalComponents.lean)
   proves no-immediate-reversal certificates for source fanouts, all five
   local edge-core shapes, and translated reversed target fanouts.  Their

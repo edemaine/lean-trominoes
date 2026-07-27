@@ -1,4 +1,4 @@
-import LeanTrominoes.PlanarThreeSATCornerEquality
+import LeanTrominoes.PlanarThreeSATCornerEqualityCarrierInterface
 import LeanTrominoes.PeriodicOrthocrossingPlanarBends
 import LeanTrominoes.OrthogonalPolylineEndpointDirections
 
@@ -139,6 +139,78 @@ def RouteBend.cornerDrawing
     (.terminal routeBend.outgoingTerminal)
     (Cell.scale planarMacroScale (routeBend.drawingPoint graph))
     routeBend.incomingPort routeBend.outgoingPort
+
+/-- Every route of a bend-corner drawing stays inside its incoming terminal
+macrocell boundary. -/
+theorem RouteBend.cornerDrawing_routePoints_insideIncomingCarrierBoundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
+    (routeBend.cornerDrawing graph).RoutePointsSatisfy
+      (routeBend.incomingPort.InsideCarrierBoundaryAt
+        (Cell.scale planarMacroScale
+          (routeBend.drawingPoint graph))) := by
+  have bounded :=
+    placedCornerEqualityDrawing_routePoints_insideCarrierBoundaries
+      (Variable := CarrierNode)
+      (.terminal routeBend.incomingTerminal)
+      (.terminal routeBend.outgoingTerminal)
+      (Cell.scale planarMacroScale (routeBend.drawingPoint graph))
+      routeBend.incomingPort routeBend.outgoingPort
+  simpa only [RouteBend.cornerDrawing] using
+    bounded.mono (fun _ pointBounded => pointBounded.1)
+
+/-- Every route of a bend-corner drawing stays inside its outgoing terminal
+macrocell boundary. -/
+theorem RouteBend.cornerDrawing_routePoints_insideOutgoingCarrierBoundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
+    (routeBend.cornerDrawing graph).RoutePointsSatisfy
+      (routeBend.outgoingPort.InsideCarrierBoundaryAt
+        (Cell.scale planarMacroScale
+          (routeBend.drawingPoint graph))) := by
+  have bounded :=
+    placedCornerEqualityDrawing_routePoints_insideCarrierBoundaries
+      (Variable := CarrierNode)
+      (.terminal routeBend.incomingTerminal)
+      (.terminal routeBend.outgoingTerminal)
+      (Cell.scale planarMacroScale (routeBend.drawingPoint graph))
+      routeBend.incomingPort routeBend.outgoingPort
+  simpa only [RouteBend.cornerDrawing] using
+    bounded.mono (fun _ pointBounded => pointBounded.2)
+
+/-- Contact with the incoming physical terminal is endpoint-only in every
+bend-corner route. -/
+theorem RouteBend.cornerDrawing_routeContactsAt_incomingCarrierPort
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
+    (routeBend.cornerDrawing graph).RouteContactsAtEndpoint
+      (Cell.add
+        (Cell.scale planarMacroScale (routeBend.drawingPoint graph))
+        routeBend.incomingPort.position) := by
+  simpa only [RouteBend.cornerDrawing] using
+    (placedCornerEqualityDrawing_routeContactsAt_firstEndpoint
+      (Variable := CarrierNode)
+      (.terminal routeBend.incomingTerminal)
+      (.terminal routeBend.outgoingTerminal)
+      (Cell.scale planarMacroScale (routeBend.drawingPoint graph))
+      routeBend.incomingPort routeBend.outgoingPort)
+
+/-- Contact with the outgoing physical terminal is endpoint-only in every
+bend-corner route. -/
+theorem RouteBend.cornerDrawing_routeContactsAt_outgoingCarrierPort
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
+    (routeBend.cornerDrawing graph).RouteContactsAtEndpoint
+      (Cell.add
+        (Cell.scale planarMacroScale (routeBend.drawingPoint graph))
+        routeBend.outgoingPort.position) := by
+  simpa only [RouteBend.cornerDrawing] using
+    (placedCornerEqualityDrawing_routeContactsAt_secondEndpoint
+      (Variable := CarrierNode)
+      (.terminal routeBend.incomingTerminal)
+      (.terminal routeBend.outgoingTerminal)
+      (Cell.scale planarMacroScale (routeBend.drawingPoint graph))
+      routeBend.incomingPort routeBend.outgoingPort)
 
 /-- The placed corner contains exactly the bend's positioned equality
 formula. -/

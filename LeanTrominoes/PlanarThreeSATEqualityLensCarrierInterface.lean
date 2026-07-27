@@ -1,4 +1,5 @@
 import LeanTrominoes.PlanarThreeSATCornerEqualityCarrierInterface
+import LeanTrominoes.PlanarThreeSATEqualityLinkLens
 import LeanTrominoes.PlanarThreeSATEqualityLensPlacement
 
 /-!
@@ -44,10 +45,7 @@ theorem horizontalEqualityLensDrawing_routePoints_inEndpointExteriors
       EmbeddedCNFIncidenceDrawing.incidences,
       embeddedCNFIncidences,
       EmbeddedCNFIncidenceDrawing.routeAt,
-      List.zipIdx_cons, List.zipIdx_nil,
-      List.flatMap_cons, List.flatMap_nil,
-      List.map_cons, List.map_nil,
-      List.get_cons_zero, List.get_cons_succ] at pointMember
+      List.zipIdx_cons, List.zipIdx_nil] at pointMember
   all_goals
     simp_all [horizontalEqualityLensUpperLeftRoute,
       horizontalEqualityLensUpperRightRoute,
@@ -83,18 +81,14 @@ theorem horizontalEqualityLensDrawing_routeContactsAt_firstEndpoint
       EmbeddedCNFIncidenceDrawing.incidences,
       embeddedCNFIncidences,
       EmbeddedCNFIncidenceDrawing.routeAt,
-      List.zipIdx_cons, List.zipIdx_nil,
-      List.flatMap_cons, List.flatMap_nil,
-      List.map_cons, List.map_nil,
-      List.get_cons_zero, List.get_cons_succ]
+      List.zipIdx_cons, List.zipIdx_nil]
       at pointMember ⊢
   all_goals
     simp_all [horizontalEqualityLensUpperLeftRoute,
       horizontalEqualityLensUpperRightRoute,
       horizontalEqualityLensLowerLeftRoute,
       horizontalEqualityLensLowerRightRoute,
-      EmbeddedCNFIncidenceDrawing.RoutePointIsEndpoint] <;>
-    omega
+      EmbeddedCNFIncidenceDrawing.RoutePointIsEndpoint]
 
 /-- A canonical lens route can list its second physical endpoint only as an
 advertised route endpoint. -/
@@ -113,10 +107,7 @@ theorem horizontalEqualityLensDrawing_routeContactsAt_secondEndpoint
       EmbeddedCNFIncidenceDrawing.incidences,
       embeddedCNFIncidences,
       EmbeddedCNFIncidenceDrawing.routeAt,
-      List.zipIdx_cons, List.zipIdx_nil,
-      List.flatMap_cons, List.flatMap_nil,
-      List.map_cons, List.map_nil,
-      List.get_cons_zero, List.get_cons_succ]
+      List.zipIdx_cons, List.zipIdx_nil]
       at pointMember ⊢
   all_goals
     simp_all [horizontalEqualityLensUpperLeftRoute,
@@ -172,8 +163,7 @@ theorem AxisDirection.add_firstCarrierMacroOrigin_portPosition
     apply Prod.ext <;>
     simp [AxisDirection.firstCarrierMacroOrigin,
       AxisDirection.firstCarrierPort,
-      CornerPort.position, Cell.add, Cell.sub] <;>
-    ring
+      CornerPort.position, Cell.add, Cell.sub]
 
 /-- The second carrier macrocell origin and compass-port offset reconstruct
 the second physical lens endpoint. -/
@@ -190,8 +180,7 @@ theorem AxisDirection.add_secondCarrierMacroOrigin_portPosition
     simp [AxisDirection.secondCarrierMacroOrigin,
       AxisDirection.secondCarrierPort,
       CornerPort.position, AxisDirection.placePoint,
-      AxisDirection.orientPoint, Cell.add, Cell.sub] <;>
-    ring
+      AxisDirection.orientPoint, Cell.add, Cell.sub]
 
 /-- Signed-axis placement sends the canonical first-end wedge to the
 absolute external region of the first compass port. -/
@@ -206,8 +195,7 @@ theorem AxisDirection.firstCarrierPort_outside_placePoint
   rcases origin with ⟨originX, originY⟩
   rcases point with ⟨pointX, pointY⟩
   cases direction <;>
-    simp [InHorizontalEqualityLensEndpointExteriors,
-      AxisDirection.firstCarrierPort,
+    simp [AxisDirection.firstCarrierPort,
       AxisDirection.firstCarrierMacroOrigin,
       CornerPort.OutsideCarrierBoundaryAt,
       CornerPort.OutsideCarrierBoundary,
@@ -581,6 +569,188 @@ theorem placedEqualityLensDrawing_secondCarrier_routesAvoidInsideDrawing
         first second origin direction span)
       insideContacts
       outsideIndex insideIndex
+
+namespace EqualityLink
+
+/-- Directed physical axis of an equality-link lens. -/
+def carrierDirection
+    {Variable : Type*}
+    (position : Variable → Cell) (link : EqualityLink Variable) :
+    AxisDirection :=
+  AxisDirection.between
+    (position link.first) (position link.second)
+
+/-- Physical span of an equality-link lens. -/
+def carrierSpan
+    {Variable : Type*}
+    (position : Variable → Cell) (link : EqualityLink Variable) : Int :=
+  AxisDirection.axisSpan
+    (position link.first) (position link.second)
+
+/-- Compass port occupied by the first endpoint of an equality-link lens. -/
+def firstCarrierPort
+    {Variable : Type*}
+    (position : Variable → Cell) (link : EqualityLink Variable) :
+    CornerPort :=
+  AxisDirection.firstCarrierPort (carrierDirection position link)
+
+/-- Compass port occupied by the second endpoint of an equality-link lens. -/
+def secondCarrierPort
+    {Variable : Type*}
+    (position : Variable → Cell) (link : EqualityLink Variable) :
+    CornerPort :=
+  AxisDirection.secondCarrierPort (carrierDirection position link)
+
+/-- Macrocell origin reconstructed from the first lens endpoint and port. -/
+def firstCarrierMacroOrigin
+    {Variable : Type*}
+    (position : Variable → Cell) (link : EqualityLink Variable) : Cell :=
+  AxisDirection.firstCarrierMacroOrigin
+    (position link.first) (carrierDirection position link)
+
+/-- Macrocell origin reconstructed from the second lens endpoint and port. -/
+def secondCarrierMacroOrigin
+    {Variable : Type*}
+    (position : Variable → Cell) (link : EqualityLink Variable) : Cell :=
+  AxisDirection.secondCarrierMacroOrigin
+    (position link.first) (carrierDirection position link)
+    (carrierSpan position link)
+
+/-- The first macrocell origin and port reconstruct the first assigned
+endpoint position. -/
+theorem add_firstCarrierMacroOrigin_portPosition
+    {Variable : Type*}
+    (position : Variable → Cell) (link : EqualityLink Variable) :
+    Cell.add
+        (firstCarrierMacroOrigin position link)
+        (firstCarrierPort position link).position =
+      position link.first := by
+  exact
+    AxisDirection.add_firstCarrierMacroOrigin_portPosition
+      (position link.first) (carrierDirection position link)
+
+/-- Under the lens alignment certificate, the second macrocell origin and
+port reconstruct the second assigned endpoint position. -/
+theorem add_secondCarrierMacroOrigin_portPosition
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell} {link : EqualityLink Variable}
+    (geometry : LensGeometry position link) :
+    Cell.add
+        (secondCarrierMacroOrigin position link)
+        (secondCarrierPort position link).position =
+      position link.second := by
+  rw [secondCarrierMacroOrigin, secondCarrierPort,
+    carrierDirection, carrierSpan,
+    AxisDirection.add_secondCarrierMacroOrigin_portPosition,
+    AxisDirection.placePoint_between_axisSpan geometry.axisAligned]
+
+/-- A geometrically certified equality-link lens is externally bounded at
+its first endpoint macrocell. -/
+theorem lensDrawing_routePoints_outsideFirstCarrierBoundary
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell} {link : EqualityLink Variable}
+    (geometry : LensGeometry position link) :
+    (lensDrawing position link).RoutePointsSatisfy
+      ((AxisDirection.firstCarrierPort
+        (AxisDirection.between
+          (position link.first)
+          (position link.second))).OutsideCarrierBoundaryAt
+          (AxisDirection.firstCarrierMacroOrigin
+            (position link.first)
+            (AxisDirection.between
+              (position link.first) (position link.second)))) := by
+  unfold lensDrawing
+  exact
+    placedEqualityLensDrawing_routePoints_outsideFirstCarrierBoundary
+      link.first link.second
+      (position link.first)
+      (AxisDirection.between
+        (position link.first) (position link.second))
+      (AxisDirection.axisSpan
+        (position link.first) (position link.second))
+      geometry.spanLarge
+
+/-- A geometrically certified equality-link lens is externally bounded at
+its second endpoint macrocell. -/
+theorem lensDrawing_routePoints_outsideSecondCarrierBoundary
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell} {link : EqualityLink Variable}
+    (geometry : LensGeometry position link) :
+    (lensDrawing position link).RoutePointsSatisfy
+      ((AxisDirection.secondCarrierPort
+        (AxisDirection.between
+          (position link.first)
+          (position link.second))).OutsideCarrierBoundaryAt
+          (AxisDirection.secondCarrierMacroOrigin
+            (position link.first)
+            (AxisDirection.between
+              (position link.first) (position link.second))
+            (AxisDirection.axisSpan
+              (position link.first) (position link.second)))) := by
+  unfold lensDrawing
+  exact
+    placedEqualityLensDrawing_routePoints_outsideSecondCarrierBoundary
+      link.first link.second
+      (position link.first)
+      (AxisDirection.between
+        (position link.first) (position link.second))
+      (AxisDirection.axisSpan
+        (position link.first) (position link.second))
+      geometry.spanLarge
+
+/-- A geometrically certified equality-link lens has endpoint-only contact
+with its first carrier port. -/
+theorem lensDrawing_routeContactsAt_firstCarrierPort
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell} {link : EqualityLink Variable}
+    (_geometry : LensGeometry position link) :
+    (lensDrawing position link).RouteContactsAtEndpoint
+      (Cell.add
+        (AxisDirection.firstCarrierMacroOrigin
+          (position link.first)
+          (AxisDirection.between
+            (position link.first) (position link.second)))
+        (AxisDirection.firstCarrierPort
+          (AxisDirection.between
+            (position link.first) (position link.second))).position) := by
+  unfold lensDrawing
+  exact
+    placedEqualityLensDrawing_routeContactsAt_firstCarrierPort
+      link.first link.second
+      (position link.first)
+      (AxisDirection.between
+        (position link.first) (position link.second))
+      (AxisDirection.axisSpan
+        (position link.first) (position link.second))
+
+/-- A geometrically certified equality-link lens has endpoint-only contact
+with its second carrier port. -/
+theorem lensDrawing_routeContactsAt_secondCarrierPort
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell} {link : EqualityLink Variable}
+    (_geometry : LensGeometry position link) :
+    (lensDrawing position link).RouteContactsAtEndpoint
+      (Cell.add
+        (AxisDirection.secondCarrierMacroOrigin
+          (position link.first)
+          (AxisDirection.between
+            (position link.first) (position link.second))
+          (AxisDirection.axisSpan
+            (position link.first) (position link.second)))
+        (AxisDirection.secondCarrierPort
+          (AxisDirection.between
+            (position link.first) (position link.second))).position) := by
+  unfold lensDrawing
+  exact
+    placedEqualityLensDrawing_routeContactsAt_secondCarrierPort
+      link.first link.second
+      (position link.first)
+      (AxisDirection.between
+        (position link.first) (position link.second))
+      (AxisDirection.axisSpan
+        (position link.first) (position link.second))
+
+end EqualityLink
 
 end PlanarThreeSAT
 end LeanTrominoes

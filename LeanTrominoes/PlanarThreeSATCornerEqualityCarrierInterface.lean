@@ -505,6 +505,70 @@ theorem drawingRoutesAvoidEachOther_of_outside_insideCarrierBoundaryAt
       (outsideContacts outsideIndex)
       (insideContacts insideIndex)
 
+/-- Clause- and literal-membership witnesses select the same drawing-level
+carrier-boundary separator without constructing finite incidence indices. -/
+theorem drawingRoutesAvoidEachOther_of_members_of_outside_insideCarrierBoundaryAt
+    {OutsideVariable InsideVariable : Type*}
+    (port : CornerPort) (origin : Cell)
+    {outsideDrawing :
+      EmbeddedCNFIncidenceDrawing OutsideVariable}
+    {insideDrawing :
+      EmbeddedCNFIncidenceDrawing InsideVariable}
+    (outsideBounded :
+      outsideDrawing.RoutePointsSatisfy
+        (port.OutsideCarrierBoundaryAt origin))
+    (insideBounded :
+      insideDrawing.RoutePointsSatisfy
+        (port.InsideCarrierBoundaryAt origin))
+    (outsideContacts :
+      outsideDrawing.RouteContactsAtEndpoint
+        (Cell.add origin port.position))
+    (insideContacts :
+      insideDrawing.RouteContactsAtEndpoint
+        (Cell.add origin port.position))
+    {outsideClause : EmbeddedClause OutsideVariable}
+    {outsideClauseIndex : Nat}
+    (outsideClauseMember :
+      (outsideClause, outsideClauseIndex) ∈
+        outsideDrawing.formula.zipIdx)
+    {outsideLiteral : OutsideVariable × Bool}
+    {outsideLiteralIndex : Nat}
+    (outsideLiteralMember :
+      (outsideLiteral, outsideLiteralIndex) ∈
+        outsideClause.literals.zipIdx)
+    {insideClause : EmbeddedClause InsideVariable}
+    {insideClauseIndex : Nat}
+    (insideClauseMember :
+      (insideClause, insideClauseIndex) ∈
+        insideDrawing.formula.zipIdx)
+    {insideLiteral : InsideVariable × Bool}
+    {insideLiteralIndex : Nat}
+    (insideLiteralMember :
+      (insideLiteral, insideLiteralIndex) ∈
+        insideClause.literals.zipIdx) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (outsideDrawing.routes
+        outsideClauseIndex outsideLiteralIndex)
+      (insideDrawing.routes
+        insideClauseIndex insideLiteralIndex) := by
+  apply
+    routesAvoidEachOther_of_outside_insideCarrierBoundaryAt
+      port origin
+  · intro point pointMember
+    exact outsideBounded.of_members
+      outsideClauseMember outsideLiteralMember pointMember
+  · intro point pointMember
+    exact insideBounded.of_members
+      insideClauseMember insideLiteralMember pointMember
+  · intro point pointMember pointEqual
+    exact outsideContacts.of_members
+      outsideClauseMember outsideLiteralMember
+      pointMember pointEqual
+  · intro point pointMember pointEqual
+    exact insideContacts.of_members
+      insideClauseMember insideLiteralMember
+      pointMember pointEqual
+
 /-- Every route point in a fixed corner drawing remains on the macrocell
 side of both occupied compass-port boundaries. -/
 theorem cornerEqualityDrawing_routePoints_insideCarrierBoundaries

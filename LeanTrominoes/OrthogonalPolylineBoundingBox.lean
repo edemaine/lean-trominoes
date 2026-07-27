@@ -290,6 +290,19 @@ theorem RoutePointsSatisfy.of_members
   rw [incidenceAtEqual]
   exact pointMember
 
+/-- A pointwise implication weakens a common route-point predicate. -/
+theorem RoutePointsSatisfy.mono
+    {Variable : Type*}
+    {drawing : EmbeddedCNFIncidenceDrawing Variable}
+    {sourcePredicate targetPredicate : Cell → Prop}
+    (bounded : drawing.RoutePointsSatisfy sourcePredicate)
+    (implies :
+      ∀ point, sourcePredicate point → targetPredicate point) :
+    drawing.RoutePointsSatisfy targetPredicate := by
+  intro incidenceIndex point pointMember
+  exact implies point
+    (bounded incidenceIndex point pointMember)
+
 /-- A drawing-level endpoint-contact certificate can be selected through
 clause- and literal-membership witnesses. -/
 theorem RouteContactsAtEndpoint.of_members

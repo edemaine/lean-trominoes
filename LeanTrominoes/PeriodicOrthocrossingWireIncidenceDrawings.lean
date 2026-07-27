@@ -3,6 +3,7 @@ import LeanTrominoes.PeriodicCNFPlanarSATGeometry
 import LeanTrominoes.PeriodicOrthocrossingCarrierLensGeometry
 import LeanTrominoes.PeriodicOrthocrossingBendCornerDrawingFamily
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingRenaming
+import LeanTrominoes.PlanarThreeSATEqualityLensCarrierInterface
 
 /-!
 # Wire incidence drawings in the finite planar-SAT block
@@ -122,6 +123,136 @@ theorem drawingPlanarSATCarrierLensIncidenceDrawing_isValid
   · exact drawingCompleteCarrierLink_lensDrawing_isValid
       wellFormed degree isLocal linkMember
 
+/-- The final-variable carrier drawing retains the first endpoint's
+external macrocell bound. -/
+theorem
+    drawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideFirst
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMember :
+      link ∈ drawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula)) :
+    (drawingPlanarSATCarrierLensIncidenceDrawing
+      formula link).RoutePointsSatisfy
+        ((EqualityLink.firstCarrierPort
+          (CarrierNode.position
+            (PeriodicCNF.incidenceGraph formula))
+          link).OutsideCarrierBoundaryAt
+            (EqualityLink.firstCarrierMacroOrigin
+              (CarrierNode.position
+                (PeriodicCNF.incidenceGraph formula))
+              link)) := by
+  unfold drawingPlanarSATCarrierLensIncidenceDrawing
+  exact
+    (EqualityLink.lensDrawing_routePoints_outsideFirstCarrierBoundary
+      (drawingCompleteCarrierLink_lensGeometry
+        wellFormed degree isLocal linkMember)).rename _ _
+
+/-- The final-variable carrier drawing retains the second endpoint's
+external macrocell bound. -/
+theorem
+    drawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideSecond
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMember :
+      link ∈ drawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula)) :
+    (drawingPlanarSATCarrierLensIncidenceDrawing
+      formula link).RoutePointsSatisfy
+        ((EqualityLink.secondCarrierPort
+          (CarrierNode.position
+            (PeriodicCNF.incidenceGraph formula))
+          link).OutsideCarrierBoundaryAt
+            (EqualityLink.secondCarrierMacroOrigin
+              (CarrierNode.position
+                (PeriodicCNF.incidenceGraph formula))
+              link)) := by
+  unfold drawingPlanarSATCarrierLensIncidenceDrawing
+  exact
+    (EqualityLink.lensDrawing_routePoints_outsideSecondCarrierBoundary
+      (drawingCompleteCarrierLink_lensGeometry
+        wellFormed degree isLocal linkMember)).rename _ _
+
+/-- The final-variable carrier drawing retains endpoint-only contact at its
+first carrier port. -/
+theorem
+    drawingPlanarSATCarrierLensIncidenceDrawing_routeContactsAt_first
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMember :
+      link ∈ drawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula)) :
+    (drawingPlanarSATCarrierLensIncidenceDrawing
+      formula link).RouteContactsAtEndpoint
+        (Cell.add
+          (EqualityLink.firstCarrierMacroOrigin
+            (CarrierNode.position
+              (PeriodicCNF.incidenceGraph formula))
+            link)
+          (EqualityLink.firstCarrierPort
+            (CarrierNode.position
+              (PeriodicCNF.incidenceGraph formula))
+            link).position) := by
+  unfold drawingPlanarSATCarrierLensIncidenceDrawing
+  exact
+    (EqualityLink.lensDrawing_routeContactsAt_firstCarrierPort
+      (drawingCompleteCarrierLink_lensGeometry
+        wellFormed degree isLocal linkMember)).rename _ _
+
+/-- The final-variable carrier drawing retains endpoint-only contact at its
+second carrier port. -/
+theorem
+    drawingPlanarSATCarrierLensIncidenceDrawing_routeContactsAt_second
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMember :
+      link ∈ drawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula)) :
+    (drawingPlanarSATCarrierLensIncidenceDrawing
+      formula link).RouteContactsAtEndpoint
+        (Cell.add
+          (EqualityLink.secondCarrierMacroOrigin
+            (CarrierNode.position
+              (PeriodicCNF.incidenceGraph formula))
+            link)
+          (EqualityLink.secondCarrierPort
+            (CarrierNode.position
+              (PeriodicCNF.incidenceGraph formula))
+            link).position) := by
+  unfold drawingPlanarSATCarrierLensIncidenceDrawing
+  exact
+    (EqualityLink.lensDrawing_routeContactsAt_secondCarrierPort
+      (drawingCompleteCarrierLink_lensGeometry
+        wellFormed degree isLocal linkMember)).rename _ _
+
 /-- A certified route-bend corner drawing renamed into the combined
 planar-SAT variable type. -/
 def drawingPlanarSATBendCornerIncidenceDrawing
@@ -197,6 +328,76 @@ theorem drawingPlanarSATBendCornerIncidenceDrawing_isValid
           wellFormed degree isLocal routeBendMember]
   · exact drawingRouteBend_cornerDrawing_isValid
       wellFormed degree isLocal routeBendMember
+
+/-- The final-variable bend drawing stays inside its incoming carrier
+boundary. -/
+theorem
+    drawingPlanarSATBendCornerIncidenceDrawing_routePoints_insideIncoming
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (routeBend : RouteBend) :
+    (drawingPlanarSATBendCornerIncidenceDrawing
+      formula routeBend).RoutePointsSatisfy
+        (routeBend.incomingPort.InsideCarrierBoundaryAt
+          (Cell.scale planarMacroScale
+            (routeBend.drawingPoint
+              (PeriodicCNF.incidenceGraph formula)))) := by
+  unfold drawingPlanarSATBendCornerIncidenceDrawing
+  exact
+    (routeBend.cornerDrawing_routePoints_insideIncomingCarrierBoundary
+      (PeriodicCNF.incidenceGraph formula)).rename _ _
+
+/-- The final-variable bend drawing stays inside its outgoing carrier
+boundary. -/
+theorem
+    drawingPlanarSATBendCornerIncidenceDrawing_routePoints_insideOutgoing
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (routeBend : RouteBend) :
+    (drawingPlanarSATBendCornerIncidenceDrawing
+      formula routeBend).RoutePointsSatisfy
+        (routeBend.outgoingPort.InsideCarrierBoundaryAt
+          (Cell.scale planarMacroScale
+            (routeBend.drawingPoint
+              (PeriodicCNF.incidenceGraph formula)))) := by
+  unfold drawingPlanarSATBendCornerIncidenceDrawing
+  exact
+    (routeBend.cornerDrawing_routePoints_insideOutgoingCarrierBoundary
+      (PeriodicCNF.incidenceGraph formula)).rename _ _
+
+/-- The final-variable bend drawing has endpoint-only contact with its
+incoming physical carrier port. -/
+theorem
+    drawingPlanarSATBendCornerIncidenceDrawing_routeContactsAt_incoming
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (routeBend : RouteBend) :
+    (drawingPlanarSATBendCornerIncidenceDrawing
+      formula routeBend).RouteContactsAtEndpoint
+        (Cell.add
+          (Cell.scale planarMacroScale
+            (routeBend.drawingPoint
+              (PeriodicCNF.incidenceGraph formula)))
+          routeBend.incomingPort.position) := by
+  unfold drawingPlanarSATBendCornerIncidenceDrawing
+  exact
+    (routeBend.cornerDrawing_routeContactsAt_incomingCarrierPort
+      (PeriodicCNF.incidenceGraph formula)).rename _ _
+
+/-- The final-variable bend drawing has endpoint-only contact with its
+outgoing physical carrier port. -/
+theorem
+    drawingPlanarSATBendCornerIncidenceDrawing_routeContactsAt_outgoing
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (routeBend : RouteBend) :
+    (drawingPlanarSATBendCornerIncidenceDrawing
+      formula routeBend).RouteContactsAtEndpoint
+        (Cell.add
+          (Cell.scale planarMacroScale
+            (routeBend.drawingPoint
+              (PeriodicCNF.incidenceGraph formula)))
+          routeBend.outgoingPort.position) := by
+  unfold drawingPlanarSATBendCornerIncidenceDrawing
+  exact
+    (routeBend.cornerDrawing_routeContactsAt_outgoingCarrierPort
+      (PeriodicCNF.incidenceGraph formula)).rename _ _
 
 end PeriodicOrthocrossing
 end LeanTrominoes
