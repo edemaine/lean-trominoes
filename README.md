@@ -2055,6 +2055,11 @@ The representation choices for this target are:
   validity certificate (requiring distinctness only among source atoms that
   actually occur).  Exact formula identities cover arbitrary positions,
   presentation indices, polarities, and periodic literal offsets.
+- [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineSelector.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineSelector.lean)
+  packages the four composed instances behind a uniform arity selector.
+  Width three gives exact agreement with the actual two-stage clause block,
+  while per-clause atom distinctness yields its complete continuous-planarity
+  certificate.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
