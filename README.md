@@ -378,11 +378,21 @@ The representation choices for this target are:
   representation.  Erasure is proved equal to the logical exact-one
   endpoint, transferring its width-three, occurrence-three, and end-to-end
   satisfiability theorems.
+  [`LeanTrominoes/PeriodicOneInThreePositionedIndex.lean`](LeanTrominoes/PeriodicOneInThreePositionedIndex.lean)
+  gives the flattened Figure 9 clause list a parallel lossless metadata
+  index.  Every output clause recovers its source clause, source
+  presentation index, and local generated-clause index, allowing global
+  route lookup to select the certified local drawing without assuming a
+  fixed block size.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
   logical unit-free formula, and its end-to-end satisfiability theorem is
   retained.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedIndex.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedIndex.lean)
+  supplies the analogous lossless index for the variable-size
+  unit-elimination blocks, retaining both source and local generated-clause
+  memberships at every flattened output index.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final
