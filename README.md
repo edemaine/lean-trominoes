@@ -408,6 +408,11 @@ The representation choices for this target are:
   classifies every inherited source literal in a generated Figure 9 clause
   by its precise source-clause presentation index, proving that its atom and
   periodic offset are unchanged.
+  [`LeanTrominoes/PeriodicOneInThreePositionedInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedEndpoints.lean)
+  lifts that classification through the flattened positioned formula.  It
+  recovers the genuine source incidence behind every inherited output
+  incidence and identifies its normalized local endpoint as the corresponding
+  index-selected boundary port in the generated clause's anchor gauge.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
