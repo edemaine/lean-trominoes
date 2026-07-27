@@ -1789,6 +1789,10 @@ The representation choices for this target are:
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
   duplicator and Figure 8(b) crossover.  Collinear ties are allowed here
   because the later stable angular split separates them into adjacent ports.
+- [`LeanTrominoes/PlanarThreeSATIncidencePlanarity.lean`](LeanTrominoes/PlanarThreeSATIncidencePlanarity.lean)
+  records executable continuous-planarity certificates for the direct
+  incidence drawings of both fixed Figure 8 templates, ready for the global
+  macrocell assembly.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
