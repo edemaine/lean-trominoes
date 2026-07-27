@@ -2102,6 +2102,13 @@ The representation choices for this target are:
   final arity two or three, positive period, and end-to-end satisfiability.
   Subsequent geometric work can therefore use one common intermediate
   formula instead of bridging variable-size and fixed-eight cycles.
+- [`LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeRoutes.lean)
+  feeds the fixed-eight angular-spliced routes into the inherited Figure 9
+  adapter and then completes fresh auxiliaries through the local-route splice.
+  The actual raw exact-one formula now has a total route family with exact
+  canonical endpoints and orthogonality.  Its generic source-port Manhattan
+  connectors isolate the remaining noncrossing clause-boundary-fan
+  obligation.
 - [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean)
   threads the local atom-distinctness certificates through opaque wrapping
   and unit elimination, then specializes them to the angular hardness

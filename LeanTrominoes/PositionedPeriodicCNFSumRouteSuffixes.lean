@@ -19,7 +19,6 @@ namespace PositionedPeriodicCNF
 variables of a sum-typed positioned formula. -/
 structure InheritedCanonicalIncidenceRouteSuffixes
     {Source Auxiliary : Type*}
-    [DecidableEq Source] [DecidableEq Auxiliary]
     (target : PositionedPeriodicCNF (Sum Source Auxiliary))
     (placement :
       PeriodicVariablePlacement (Sum Source Auxiliary))
@@ -52,7 +51,6 @@ structure InheritedCanonicalIncidenceRouteSuffixes
 auxiliaries.  Invalid presentation indices receive the harmless empty route. -/
 def completeSumIncidenceRouteSuffixesRoutes
     {Source Auxiliary : Type*}
-    [DecidableEq Source] [DecidableEq Auxiliary]
     {target : PositionedPeriodicCNF (Sum Source Auxiliary)}
     {placement :
       PeriodicVariablePlacement (Sum Source Auxiliary)}
@@ -78,7 +76,6 @@ def completeSumIncidenceRouteSuffixesRoutes
 form a complete canonical suffix family. -/
 def completeSumIncidenceRouteSuffixes
     {Source Auxiliary : Type*}
-    [DecidableEq Source] [DecidableEq Auxiliary]
     (target : PositionedPeriodicCNF (Sum Source Auxiliary))
     (placement :
       PeriodicVariablePlacement (Sum Source Auxiliary))

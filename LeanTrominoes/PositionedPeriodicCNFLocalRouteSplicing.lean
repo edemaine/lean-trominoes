@@ -20,7 +20,7 @@ namespace PositionedPeriodicCNF
 The route begins at a caller-supplied local splice point and ends at the
 canonical periodic literal endpoint. -/
 structure CanonicalIncidenceRouteSuffixes
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*}
     (source : PositionedPeriodicCNF Variable)
     (placement : PeriodicVariablePlacement Variable)
     (splicePoint : Nat → Nat → Cell) where
@@ -48,7 +48,7 @@ structure CanonicalIncidenceRouteSuffixes
 variable suffix. -/
 def spliceLocalIncidenceRoutes
     (localRoutes : IncidenceRoutes)
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {splicePoint : Nat → Nat → Cell}
@@ -64,7 +64,7 @@ def spliceLocalIncidenceRoutes
 /-- Matching local and suffix certificates give a complete canonical route
 with both outer endpoints and preserved orthogonality. -/
 theorem spliceLocalIncidenceRoutes_valid_of_members
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {splicePoint : Nat → Nat → Cell}
