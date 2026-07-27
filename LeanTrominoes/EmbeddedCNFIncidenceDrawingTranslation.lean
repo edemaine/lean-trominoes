@@ -288,6 +288,18 @@ theorem incidences_translate {Variable : Type*}
     EmbeddedClause.translate, List.map_map,
     Function.comp_def]
 
+/-- Translating a drawing changes vertex coordinates but not the ordered
+list of logical variables occurring in its formula. -/
+theorem variableVertices_translate
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (offset : Cell) :
+    (drawing.translate offset).variableVertices =
+      drawing.variableVertices := by
+  unfold variableVertices
+  simp [EmbeddedCNFIncidenceDrawing.translate,
+    EmbeddedClause.translate, List.flatMap_map]
+
 @[simp]
 theorem translate_incidences_length {Variable : Type*}
     (drawing : EmbeddedCNFIncidenceDrawing Variable)
