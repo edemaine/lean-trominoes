@@ -32,6 +32,11 @@ def placePoint
     Cell :=
   Cell.add origin (direction.orientPoint point)
 
+/-- Lattice length of an axis-aligned segment, written as an integer so it
+can parameterize finite templates directly. -/
+def axisSpan (first second : Cell) : Int :=
+  |second.1 - first.1| + |second.2 - first.2|
+
 /-- Every signed-axis orientation is injective. -/
 theorem orientPoint_injective (direction : AxisDirection) :
     Function.Injective direction.orientPoint := by
@@ -40,6 +45,31 @@ theorem orientPoint_injective (direction : AxisDirection) :
   rcases second with ⟨secondX, secondY⟩
   cases direction <;>
     simp [orientPoint] at equal ⊢ <;>
+    omega
+
+/-- Orienting a canonical segment by the direction between two genuine
+axis-aligned endpoints recovers the second endpoint exactly. -/
+theorem placePoint_between_axisSpan
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    (between first second).placePoint first
+        (axisSpan first second, 0) =
+      second := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [GridSegment.IsAxisAligned, GridSegment.IsHorizontal,
+    GridSegment.IsVertical] at aligned
+  simp only [placePoint, axisSpan, between, orientPoint, Cell.add]
+  split_ifs <;>
+    simp_all [abs_of_nonneg, abs_of_nonpos]
+  all_goals try omega
+  · have absolute :
+        |secondX - firstX| = secondX - firstX :=
+      abs_of_pos (by omega)
+    omega
+  · have absolute :
+        |secondY - firstY| = secondY - firstY :=
+      abs_of_pos (by omega)
     omega
 
 /-- Signed-axis orientation preserves nondegenerate axis alignment. -/

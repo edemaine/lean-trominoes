@@ -1812,6 +1812,11 @@ The representation choices for this target are:
   injectively renames its Boolean roles to any two distinct logical
   variables.  The resulting theorem exposes the exact equality formula and
   endpoint positions together with the transported complete certificate.
+- [`LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean)
+  reduces drawing one positioned equality link to four carrier facts:
+  distinct endpoints, axis alignment, span at least eight, and the advertised
+  clause offsets.  Those facts automatically produce the exact formula,
+  endpoint positions, and complete finite planarity certificate.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
