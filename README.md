@@ -2031,6 +2031,11 @@ The representation choices for this target are:
   non-carrier components therefore avoid one another; the only possible
   shared center is handled by the certified different-arm routed-variable
   theorem.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATCarrierSeparation.lean)
+  isolates the remaining component-level geometry to pairs involving at
+  least one straight carrier lens.  A proof of that precise residual
+  certificate now combines automatically with non-carrier separation and
+  lifts through clause metadata to the globally indexed route family.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
