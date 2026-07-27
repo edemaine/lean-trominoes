@@ -1622,6 +1622,12 @@ The representation choices for this target are:
   and unequal occurrences sharing one lifted clause endpoint enter in
   different directions.  These are the finite direction constraints
   available to the remaining noncrossing endpoint-fan construction.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean)
+  packages the coordinated local inputs needed by that construction.
+  Occurrences at one variable and at one lifted clause target are enumerated
+  without duplicates; their outgoing or incoming cardinal directions are
+  proved genuine and pairwise distinct.  Variable families are additionally
+  bounded by the three available occurrence slots.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
