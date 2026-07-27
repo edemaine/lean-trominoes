@@ -1902,6 +1902,12 @@ The representation choices for this target are:
   pairwise planarity, and exact formula equalities identify every template
   with the corresponding positioned unit-elimination output.  Exhaustive
   certificates cover every possible source-literal polarity pattern.
+- [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
+  renames and translates all four unit-elimination templates to actual
+  positioned periodic source clauses.  Forgetting only logical literal
+  offsets identifies each embedded formula with the real positioned
+  `clauseGadget` output, and every instance inherits the complete local
+  geometric certificate.
 - [`LeanTrominoes/PlanarOneInThreeOccurrences.lean`](LeanTrominoes/PlanarOneInThreeOccurrences.lean)
   proves that adding Figure 9's positions does not change the underlying
   literal-occurrence list.  The periodic exact-one accounting therefore
