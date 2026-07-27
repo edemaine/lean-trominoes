@@ -1817,6 +1817,12 @@ The representation choices for this target are:
   distinct endpoints, axis alignment, span at least eight, and the advertised
   clause offsets.  Those facts automatically produce the exact formula,
   endpoint positions, and complete finite planarity certificate.
+- [`LeanTrominoes/PlanarThreeSATCornerEquality.lean`](LeanTrominoes/PlanarThreeSATCornerEquality.lean)
+  supplies the complementary local equality drawing for a route bend.
+  Explicit rectilinear four-cycles cover all twelve ordered pairs of distinct
+  compass ports in one `20 × 20` macrocell; exhaustive finite checks certify
+  exact endpoints, orthogonality, and continuous planarity, and translation
+  plus injective renaming place the template at arbitrary bend links.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
