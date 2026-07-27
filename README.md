@@ -1471,6 +1471,14 @@ The representation choices for this target are:
   extracts route simplicity and pairwise continuous separation from those
   finite-index certificates using ordinary clause/literal membership data,
   which is the form needed by global assembly proofs.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingMapPoints.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingMapPoints.lean)
+  proves a generic transport theorem for complete finite drawing
+  certificates under any injective point map preserving axis alignment,
+  point/segment interiors, and segment/segment interior intersection.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingAxisPlacement.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingAxisPlacement.lean)
+  instantiates that transport theorem for all four signed grid axes.
+  Quarter-turn orientation followed by arbitrary translation preserves
+  endpoints, orthogonality, and continuous planarity.
 - [`LeanTrominoes/OccurrenceSplitRingDrawing.lean`](LeanTrominoes/OccurrenceSplitRingDrawing.lean)
   encodes the worst-case degree-eight neighborhood of Figure 7.  Eight
   occurrence copies lie on an inner square, the implication clauses occupy
