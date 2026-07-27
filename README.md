@@ -1965,10 +1965,12 @@ The representation choices for this target are:
   including distinct clauses of one gadget.  A generic duplicate-free
   incidence-index theorem lifts those local certificates to global incidence
   indices.  The five clause families now have certified, pairwise-distinct
-  `(geometric component, local clause index)` keys, so after
-  cross-component route separation, complete finite planarity reduces
-  exactly to global vertex avoidance and assembled vertex-position
-  distinctness.
+  `(geometric component, local clause index)` keys.  The remaining
+  cross-component obligation has also been factored into a purely geometric
+  certificate on two valid metadata-selected local drawings, with all global
+  clause-index and lookup bookkeeping discharged by a lifting theorem.
+  After that geometric certificate, complete finite planarity reduces exactly
+  to global vertex avoidance and assembled vertex-position distinctness.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every

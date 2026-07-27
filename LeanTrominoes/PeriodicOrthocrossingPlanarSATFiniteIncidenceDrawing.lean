@@ -53,6 +53,34 @@ irreducible_def drawingPlanarSATLocalIncidenceDrawing
       drawingPlanarSATLocalIncidenceRoutes formula := by
   rw [drawingPlanarSATLocalIncidenceDrawing]
 
+/-- The geometric form of cross-component route separation.  Unlike the
+global predicate below, this certificate speaks directly about two valid
+metadata-selected local drawings, so its proof does not need to manipulate
+global clause indices or metadata lookups. -/
+def DrawingPlanarSATComponentRoutesSeparated
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) : Prop :=
+  ∀ (firstMetadata secondMetadata :
+      DrawingPlanarSATClauseMetadata Variable),
+    firstMetadata.Valid formula →
+      secondMetadata.Valid formula →
+        ∀ {firstLiteral secondLiteral :
+            PlanarSATVariable Variable × Bool}
+          {firstLiteralIndex secondLiteralIndex : Nat},
+          (firstLiteral, firstLiteralIndex) ∈
+              firstMetadata.clause.literals.zipIdx →
+            (secondLiteral, secondLiteralIndex) ∈
+                secondMetadata.clause.literals.zipIdx →
+              firstMetadata.source.component ≠
+                  secondMetadata.source.component →
+                EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+                  ((firstMetadata.source.incidenceDrawing formula).routes
+                    firstMetadata.source.localClauseIndex
+                    firstLiteralIndex)
+                  ((secondMetadata.source.incidenceDrawing formula).routes
+                    secondMetadata.source.localClauseIndex
+                    secondLiteralIndex)
+
 /-- The residual pairwise route obligation after local component planarity:
 routes selected from genuinely different geometric components avoid one
 another. -/
@@ -88,6 +116,53 @@ def DrawingPlanarSATCrossComponentRoutesSeparated
                 formula firstClauseIndex firstLiteralIndex)
               (drawingPlanarSATLocalIncidenceRoutes
                 formula secondClauseIndex secondLiteralIndex)
+
+/-- A geometric separation certificate for valid local components lifts to
+the globally indexed route family selected by clause metadata. -/
+theorem drawingPlanarSAT_crossComponentRoutesSeparated_of_components
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (componentsSeparated :
+      DrawingPlanarSATComponentRoutesSeparated formula) :
+    DrawingPlanarSATCrossComponentRoutesSeparated formula := by
+  intro firstClause secondClause
+    firstClauseIndex secondClauseIndex
+    firstClauseMember secondClauseMember
+    firstLiteral secondLiteral
+    firstLiteralIndex secondLiteralIndex
+    firstLiteralMember secondLiteralMember
+    firstMetadata secondMetadata
+    firstLookup secondLookup differentComponents
+  rcases drawingPlanarSATClauseMetadata_lookup_valid
+      formula firstClauseMember with
+    ⟨firstMetadata', firstLookup', firstClauseEqual, firstValid⟩
+  rcases drawingPlanarSATClauseMetadata_lookup_valid
+      formula secondClauseMember with
+    ⟨secondMetadata', secondLookup', secondClauseEqual, secondValid⟩
+  have firstMetadataEqual :
+      firstMetadata' = firstMetadata := by
+    rw [firstLookup] at firstLookup'
+    exact Option.some.inj firstLookup'
+  have secondMetadataEqual :
+      secondMetadata' = secondMetadata := by
+    rw [secondLookup] at secondLookup'
+    exact Option.some.inj secondLookup'
+  subst firstMetadata'
+  subst secondMetadata'
+  have firstLocalLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstMetadata.clause.literals.zipIdx := by
+    simpa [firstClauseEqual] using firstLiteralMember
+  have secondLocalLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondMetadata.clause.literals.zipIdx := by
+    simpa [secondClauseEqual] using secondLiteralMember
+  have separated := componentsSeparated
+    firstMetadata secondMetadata firstValid secondValid
+    firstLocalLiteralMember secondLocalLiteralMember
+    differentComponents
+  simpa [drawingPlanarSATLocalIncidenceRoutes,
+    firstLookup, secondLookup] using separated
 
 /-- The assembled finite drawing has exact clause and variable endpoints. -/
 theorem drawingPlanarSATLocalIncidenceDrawing_routesMatch
