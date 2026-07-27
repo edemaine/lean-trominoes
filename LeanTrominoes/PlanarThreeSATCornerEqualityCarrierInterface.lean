@@ -52,6 +52,58 @@ instance (port : CornerPort) (point : Cell) :
     unfold CornerPort.OutsideCarrierBoundary <;>
     infer_instance
 
+/-- Absolute form of the internal port region for a macrocell with the
+given origin. -/
+def CornerPort.InsideCarrierBoundaryAt
+    (port : CornerPort) (origin point : Cell) : Prop :=
+  port.InsideCarrierBoundary (Cell.sub point origin)
+
+instance (port : CornerPort) (origin point : Cell) :
+    Decidable (port.InsideCarrierBoundaryAt origin point) := by
+  unfold CornerPort.InsideCarrierBoundaryAt
+  infer_instance
+
+/-- Absolute form of the external port region for a macrocell with the
+given origin. -/
+def CornerPort.OutsideCarrierBoundaryAt
+    (port : CornerPort) (origin point : Cell) : Prop :=
+  port.OutsideCarrierBoundary (Cell.sub point origin)
+
+instance (port : CornerPort) (origin point : Cell) :
+    Decidable (port.OutsideCarrierBoundaryAt origin point) := by
+  unfold CornerPort.OutsideCarrierBoundaryAt
+  infer_instance
+
+/-- Translating an internal local point by the macrocell origin realizes the
+absolute internal predicate. -/
+theorem CornerPort.insideCarrierBoundaryAt_add
+    (port : CornerPort) (origin point : Cell)
+    (inside : port.InsideCarrierBoundary point) :
+    port.InsideCarrierBoundaryAt origin
+      (Cell.add origin point) := by
+  simpa [CornerPort.InsideCarrierBoundaryAt,
+    Cell.sub, Cell.add] using inside
+
+/-- Translating an external local point by the macrocell origin realizes the
+absolute external predicate. -/
+theorem CornerPort.outsideCarrierBoundaryAt_add
+    (port : CornerPort) (origin point : Cell)
+    (outside : port.OutsideCarrierBoundary point) :
+    port.OutsideCarrierBoundaryAt origin
+      (Cell.add origin point) := by
+  simpa [CornerPort.OutsideCarrierBoundaryAt,
+    Cell.sub, Cell.add] using outside
+
+/-- Translating both an absolute external region and its point by the same
+offset preserves external containment. -/
+theorem CornerPort.outsideCarrierBoundaryAt_add_offset
+    (port : CornerPort) (offset origin point : Cell)
+    (outside : port.OutsideCarrierBoundaryAt origin point) :
+    port.OutsideCarrierBoundaryAt
+      (Cell.add offset origin) (Cell.add offset point) := by
+  simpa [CornerPort.OutsideCarrierBoundaryAt,
+    Cell.sub, Cell.add] using outside
+
 /-- The internal and external port regions have exactly one common lattice
 point. -/
 theorem CornerPort.eq_position_of_inside_of_outside
@@ -236,6 +288,38 @@ theorem cornerEqualityDrawing_routePoints_insideCarrierBoundaries
         first.InsideCarrierBoundary point ∧
           second.InsideCarrierBoundary point := by
   cases first <;> cases second <;> native_decide
+
+/-- Translating a corner drawing to its macrocell origin preserves both
+port-side route bounds. -/
+theorem translatedCornerEqualityDrawing_routePoints_insideCarrierBoundaries
+    (first second : CornerPort) (origin : Cell) :
+    ((cornerEqualityDrawing first second).translate origin).RoutePointsSatisfy
+      fun point =>
+        first.InsideCarrierBoundaryAt origin point ∧
+          second.InsideCarrierBoundaryAt origin point := by
+  exact
+    (cornerEqualityDrawing_routePoints_insideCarrierBoundaries
+      first second).translate origin
+      (fun point bounded =>
+        ⟨first.insideCarrierBoundaryAt_add origin point bounded.1,
+          second.insideCarrierBoundaryAt_add origin point bounded.2⟩)
+
+/-- Logical endpoint renaming does not change the absolute port-side bounds
+of a translated corner drawing. -/
+theorem placedCornerEqualityDrawing_routePoints_insideCarrierBoundaries
+    {Variable : Type*} [DecidableEq Variable]
+    (first second : Variable) (origin : Cell)
+    (firstPort secondPort : CornerPort) :
+    (placedCornerEqualityDrawing
+      first second origin firstPort secondPort).RoutePointsSatisfy
+        fun point =>
+          firstPort.InsideCarrierBoundaryAt origin point ∧
+            secondPort.InsideCarrierBoundaryAt origin point := by
+  unfold placedCornerEqualityDrawing
+    EmbeddedCNFIncidenceDrawing.renameToImage
+  exact
+    (translatedCornerEqualityDrawing_routePoints_insideCarrierBoundaries
+      firstPort secondPort origin).rename _ _
 
 end PlanarThreeSAT
 end LeanTrominoes

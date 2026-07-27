@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineStrictSeparation
+import LeanTrominoes.EmbeddedCNFIncidenceDrawingMapPoints
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingRenaming
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
 
@@ -318,6 +319,34 @@ theorem RoutePointsSatisfy.of_rename
   rw [incidenceEqual, routeAt_rename_incidence]
     at renamedBounded
   exact renamedBounded pointMember
+
+/-- Mapping every drawing point transports route-point bounds through any
+predicate respected by the point map. -/
+theorem RoutePointsSatisfy.mapPoints
+    {Variable : Type*}
+    {drawing : EmbeddedCNFIncidenceDrawing Variable}
+    {sourcePredicate targetPredicate : Cell → Prop}
+    (bounded : drawing.RoutePointsSatisfy sourcePredicate)
+    (transform : Cell → Cell)
+    (mapsPredicate :
+      ∀ point, sourcePredicate point →
+        targetPredicate (transform point)) :
+    (drawing.mapPoints transform).RoutePointsSatisfy
+      targetPredicate := by
+  intro mappedIndex mappedPoint mappedPointMember
+  let originalIndex : Fin drawing.incidences.length :=
+    ⟨mappedIndex.val, by
+      exact mappedIndex.isLt.trans_eq
+        (mapPoints_incidences_length drawing transform)⟩
+  have incidenceEqual :=
+    incidenceAt_mapPoints drawing transform mappedIndex
+  rw [incidenceEqual, routeAt_mapPoints_incidence]
+    at mappedPointMember
+  rcases List.mem_map.mp mappedPointMember with
+    ⟨point, pointMember, pointEqual⟩
+  subst mappedPoint
+  exact mapsPredicate point
+    (bounded originalIndex point pointMember)
 
 /-- Translation transports route-point bounds through any predicate that is
 stable under adding the same offset. -/

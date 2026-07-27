@@ -1834,6 +1834,11 @@ The representation choices for this target are:
   injectively renames its Boolean roles to any two distinct logical
   variables.  The resulting theorem exposes the exact equality formula and
   endpoint positions together with the transported complete certificate.
+- [`LeanTrominoes/PlanarThreeSATEqualityLensCarrierInterface.lean`](LeanTrominoes/PlanarThreeSATEqualityLensCarrierInterface.lean)
+  bounds every point of a placed lens in the external closed region of both
+  endpoint macrocells.  The proof transports the canonical endpoint wedges
+  through signed-axis orientation, translation, and logical renaming, ready
+  to compose with internal macrocell drawings at either carrier port.
 - [`LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean)
   reduces drawing one positioned equality link to four carrier facts:
   distinct endpoints, axis alignment, span at least eight, and the advertised
@@ -1851,7 +1856,8 @@ The representation choices for this target are:
   formalizes the internal and external closed regions at every compass port.
   They meet only at the port itself, and pointwise containment on opposite
   sides yields complete continuous route separation.  Exhaustive checks put
-  every corner route on the internal side of both of its occupied ports.
+  every corner route on the internal side of both of its occupied ports;
+  translation and logical renaming preserve those absolute bounds.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
