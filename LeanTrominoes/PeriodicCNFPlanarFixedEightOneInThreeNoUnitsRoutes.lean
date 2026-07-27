@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarFixedEightOneInThreeWrappedRoutes
 import LeanTrominoes.PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily
+import LeanTrominoes.PositionedPeriodicCNFCanonicalOrthogonalRoutes
 
 /-!
 # Complete unit-elimination routes over the fixed-eight hardness pipeline
@@ -136,6 +137,81 @@ theorem
       (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsInheritedRouteSuffixes
         input sourceLocal sourceWidth sourceOccurrences)
       clauseMember literalMember
+
+/-- The final fixed-eight route family packaged with its complete pointwise
+canonical endpoint and orthogonality certificates. -/
+noncomputable def
+    drawingFixedEightPeriodicPlanarOneInThreeNoUnitsCanonicalRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable)
+    (sourceLocal : input.IsLocal)
+    (sourceWidth : input.WidthAtMost 3)
+    (sourceOccurrences : input.OccurrencesAtMost 3) :
+    PositionedPeriodicCNF.CanonicalOrthogonalIncidenceRoutes
+      (drawingFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        input)
+      (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement
+        input) where
+  routes :=
+    drawingFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+      input sourceLocal sourceWidth sourceOccurrences
+  endpoints := by
+    intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    have valid :=
+      drawingFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_valid
+        input sourceLocal sourceWidth sourceOccurrences
+        clauseMember literalMember
+    exact ⟨valid.1, valid.2.1⟩
+  orthogonal := by
+    intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    exact
+      (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_valid
+        input sourceLocal sourceWidth sourceOccurrences
+        clauseMember literalMember).2.2
+
+/-- The complete final routes match every edge of the fixed-eight,
+unit-free exact-one incidence graph. -/
+theorem
+    drawingFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceDrawing_routesMatch
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable)
+    (sourceLocal : input.IsLocal)
+    (sourceWidth : input.WidthAtMost 3)
+    (sourceOccurrences : input.OccurrencesAtMost 3) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      (drawingFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        input)
+      (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement input)
+      (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+        input sourceLocal sourceWidth sourceOccurrences)).RoutesMatch
+      (drawingFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        input).erase.incidenceGraph := by
+  exact
+    (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsCanonicalRoutes
+      input sourceLocal sourceWidth sourceOccurrences).routesMatch
+        (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement_period_pos
+          input)
+
+/-- The assembled final fixed-eight unit-free exact-one incidence drawing is
+orthogonal. -/
+theorem
+    drawingFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceDrawing_isOrthogonal
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable)
+    (sourceLocal : input.IsLocal)
+    (sourceWidth : input.WidthAtMost 3)
+    (sourceOccurrences : input.OccurrencesAtMost 3) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      (drawingFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        input)
+      (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement input)
+      (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+        input sourceLocal sourceWidth sourceOccurrences)).IsOrthogonal := by
+  exact
+    (drawingFixedEightPeriodicPlanarOneInThreeNoUnitsCanonicalRoutes
+      input sourceLocal sourceWidth sourceOccurrences).isOrthogonal
 
 end PeriodicOrthocrossing
 end LeanTrominoes

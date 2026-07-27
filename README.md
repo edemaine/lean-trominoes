@@ -547,6 +547,11 @@ The representation choices for this target are:
   drawing is proved to have exact periodic endpoints and to be orthogonal.
   These deliberately generic routes do not assert planarity, leaving later
   construction files to choose noncrossing lanes.
+  [`LeanTrominoes/PositionedPeriodicCNFCanonicalOrthogonalRoutes.lean`](LeanTrominoes/PositionedPeriodicCNFCanonicalOrthogonalRoutes.lean)
+  packages any pointwise canonical endpoint and orthogonality proofs into a
+  complete route family.  It derives the assembled periodic drawing's
+  graph-level `RoutesMatch` and `IsOrthogonal` predicates, keeping vertex
+  separation and planarity as explicit independent obligations.
   [`LeanTrominoes/PositionedPeriodicCNFCanonicalRouteRenaming.lean`](LeanTrominoes/PositionedPeriodicCNFCanonicalRouteRenaming.lean)
   proves that position- and period-preserving variable renaming reuses a
   canonical route family verbatim, retaining pointwise clause/literal
@@ -2138,8 +2143,9 @@ The representation choices for this target are:
   feeds those wrapped routes through the inherited unit-elimination adapter
   and completes all local auxiliary incidences.  Thus the final fixed-eight,
   unit-free exact-one formula has a total route family with exact canonical
-  endpoints and orthogonality; proving the family globally planar remains
-  the next geometric obligation.
+  endpoints and orthogonality.  The file also proves the assembled drawing's
+  complete `RoutesMatch` and `IsOrthogonal` predicates; proving that drawing
+  globally planar remains the next geometric obligation.
 - [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean)
   threads the local atom-distinctness certificates through opaque wrapping
   and unit elimination, then specializes them to the angular hardness
