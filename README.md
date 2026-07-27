@@ -532,6 +532,10 @@ The representation choices for this target are:
   drawing is proved to have exact periodic endpoints and to be orthogonal.
   These deliberately generic routes do not assert planarity, leaving later
   construction files to choose noncrossing lanes.
+  [`LeanTrominoes/PositionedPeriodicCNFCanonicalRouteRenaming.lean`](LeanTrominoes/PositionedPeriodicCNFCanonicalRouteRenaming.lean)
+  proves that position- and period-preserving variable renaming reuses a
+  canonical route family verbatim, retaining pointwise clause/literal
+  endpoints and orthogonality.
   [`LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicing.lean`](LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicing.lean)
   packages orthogonal suffixes from arbitrary local gadget splice points to
   canonical periodic literal endpoints.  Its generic join theorem combines
@@ -2109,6 +2113,11 @@ The representation choices for this target are:
   canonical endpoints and orthogonality.  Its generic source-port Manhattan
   connectors isolate the remaining noncrossing clause-boundary-fan
   obligation.
+- [`LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeWrappedRoutes.lean)
+  transports that complete route family through the pipeline's opaque
+  variable wrapper without changing any polyline.  The wrapped Figure 9
+  formula therefore retains the same pointwise canonical endpoints and
+  orthogonality certificates needed by unit elimination.
 - [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean)
   threads the local atom-distinctness certificates through opaque wrapping
   and unit elimination, then specializes them to the angular hardness
