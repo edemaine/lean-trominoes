@@ -420,6 +420,12 @@ The representation choices for this target are:
   canonical endpoints and orthogonality for one complete inherited suffix;
   its generic Manhattan connector is the remaining piece to replace by a
   noncrossing clause-boundary fan.
+  [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean)
+  packages those per-incidence splices into the total inherited-suffix
+  interface.  Any source route family with pointwise canonical endpoints and
+  orthogonality now induces all inherited Figure 9 suffixes, with a
+  proof-backed selector recovering the exact source clause and literal
+  presentation indices.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
