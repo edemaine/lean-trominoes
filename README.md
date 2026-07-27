@@ -1883,15 +1883,17 @@ The representation choices for this target are:
   needed by short inputs.  Finite exact checkers prove their endpoints,
   orthogonality, route simplicity, vertex avoidance, and continuous pairwise
   planarity.  Exact formula equalities identify all four templates with the
-  actual positioned semantic replacement; unit elimination remains a
-  separate local replacement.
+  actual positioned semantic replacement, and exhaustive certificates cover
+  every polarity pattern of the present source literals; unit elimination
+  remains a separate local replacement.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean)
   certifies all four local cases of the subsequent `6 × 6` unit-elimination
   refinement: the empty-clause triangle, unit-clause diamond, and retained
   binary and ternary clauses.  Each exact finite certificate includes
   endpoints, orthogonality, simplicity, vertex avoidance, and continuous
   pairwise planarity, and exact formula equalities identify every template
-  with the corresponding positioned unit-elimination output.
+  with the corresponding positioned unit-elimination output.  Exhaustive
+  certificates cover every possible source-literal polarity pattern.
 - [`LeanTrominoes/PlanarOneInThreeOccurrences.lean`](LeanTrominoes/PlanarOneInThreeOccurrences.lean)
   proves that adding Figure 9's positions does not change the underlying
   literal-occurrence list.  The periodic exact-one accounting therefore

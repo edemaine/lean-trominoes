@@ -159,6 +159,87 @@ def threeDrawing :
 theorem threeDrawing_isValid : threeDrawing.IsValid := by
   native_decide
 
+/-! ## Source-polarity-independent certificates -/
+
+/-- The unit diamond with arbitrary source literal polarity.  Its ternary
+replacement clause contains the negated source literal. -/
+def unitFormulaFor
+    (polarity : Bool) :
+    List (EmbeddedClause UnitEliminationVariable) :=
+  [clause (3, 2)
+      [(.sourceFirst, !polarity), (.first, true), (.second, true)],
+    clause (3, 4) [(.first, true), (.second, true)]]
+
+/-- Unit-clause diamond with arbitrary source literal polarity. -/
+def unitDrawingFor
+    (polarity : Bool) :
+    EmbeddedCNFIncidenceDrawing UnitEliminationVariable where
+  formula := unitFormulaFor polarity
+  variablePosition := variablePosition
+  routes := unitRoute
+
+/-- The unit diamond is geometrically valid for either source polarity. -/
+theorem unitDrawingFor_isValid
+    (polarity : Bool) :
+    (unitDrawingFor polarity).IsValid := by
+  cases polarity <;> native_decide
+
+/-- A retained binary clause with arbitrary literal polarities. -/
+def twoFormulaFor
+    (first second : Bool) :
+    List (EmbeddedClause UnitEliminationVariable) :=
+  [clause (3, 3)
+      [(.sourceFirst, first), (.sourceSecond, second)]]
+
+/-- Retained binary drawing with arbitrary literal polarities. -/
+def twoDrawingFor
+    (first second : Bool) :
+    EmbeddedCNFIncidenceDrawing UnitEliminationVariable where
+  formula := twoFormulaFor first second
+  variablePosition := variablePosition
+  routes := twoRoute
+
+/-- The retained binary drawing is valid for every polarity pattern. -/
+theorem twoDrawingFor_isValid
+    (first second : Bool) :
+    (twoDrawingFor first second).IsValid := by
+  cases first <;> cases second <;> native_decide
+
+/-- A retained ternary clause with arbitrary literal polarities. -/
+def threeFormulaFor
+    (first second third : Bool) :
+    List (EmbeddedClause UnitEliminationVariable) :=
+  [clause (3, 3)
+      [(.sourceFirst, first), (.sourceSecond, second),
+        (.sourceThird, third)]]
+
+/-- Retained ternary drawing with arbitrary literal polarities. -/
+def threeDrawingFor
+    (first second third : Bool) :
+    EmbeddedCNFIncidenceDrawing UnitEliminationVariable where
+  formula := threeFormulaFor first second third
+  variablePosition := variablePosition
+  routes := threeRoute
+
+/-- The retained ternary drawing is valid for every polarity pattern. -/
+theorem threeDrawingFor_isValid
+    (first second third : Bool) :
+    (threeDrawingFor first second third).IsValid := by
+  cases first <;> cases second <;> cases third <;>
+    native_decide
+
+@[simp]
+theorem unitFormulaFor_true :
+    unitFormulaFor true = unitFormula := rfl
+
+@[simp]
+theorem twoFormulaFor_true :
+    twoFormulaFor true true = twoFormula := rfl
+
+@[simp]
+theorem threeFormulaFor_true :
+    threeFormulaFor true true true = threeFormula := rfl
+
 /-! ## Correspondence with the positioned unit-elimination transformation -/
 
 /-- Canonical source-variable roles used to compare the finite templates
@@ -207,6 +288,26 @@ def generatedTemplate
     (canonicalSource roles)).map fun generated =>
       (embedPositionedClause generated).rename outputRole
 
+/-- A canonical positioned source clause whose role and polarity are both
+explicit. -/
+def canonicalSourceFor
+    (literals :
+      List (UnitEliminationSourceVariable × Bool)) :
+    PositionedPeriodicClause UnitEliminationSourceVariable where
+  position := (0, 0)
+  literals := literals.map fun literal =>
+    ⟨literal.1, (0, 0), literal.2⟩
+
+/-- Actual positioned unit-elimination output for explicit canonical source
+polarities, embedded and renamed to the finite drawing roles. -/
+def generatedTemplateFor
+    (literals :
+      List (UnitEliminationSourceVariable × Bool)) :
+    List (EmbeddedClause UnitEliminationVariable) :=
+  (PeriodicOneInThreeNoUnitsPositioned.clauseGadget 0
+    (canonicalSourceFor literals)).map fun generated =>
+      (embedPositionedClause generated).rename outputRole
+
 /-- The empty finite template is exactly the positioned empty-clause
 replacement. -/
 theorem generatedTemplate_zero :
@@ -231,6 +332,33 @@ theorem generatedTemplate_three :
     generatedTemplate [.first, .second, .third] =
       threeFormula := by
   native_decide
+
+/-- The arbitrary-polarity unit template is exactly the corresponding
+positioned unit-elimination output. -/
+theorem generatedTemplateFor_one
+    (polarity : Bool) :
+    generatedTemplateFor [(.first, polarity)] =
+      unitFormulaFor polarity := by
+  cases polarity <;> native_decide
+
+/-- The arbitrary-polarity binary template is exactly the retained
+positioned source clause. -/
+theorem generatedTemplateFor_two
+    (first second : Bool) :
+    generatedTemplateFor
+        [(.first, first), (.second, second)] =
+      twoFormulaFor first second := by
+  cases first <;> cases second <;> native_decide
+
+/-- The arbitrary-polarity ternary template is exactly the retained
+positioned source clause. -/
+theorem generatedTemplateFor_three
+    (first second third : Bool) :
+    generatedTemplateFor
+        [(.first, first), (.second, second), (.third, third)] =
+      threeFormulaFor first second third := by
+  cases first <;> cases second <;> cases third <;>
+    native_decide
 
 end PlanarOneInThreeNoUnits
 end LeanTrominoes

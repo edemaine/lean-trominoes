@@ -262,6 +262,115 @@ theorem figureNineZeroDrawing_isValid :
     figureNineZeroDrawing.IsValid := by
   native_decide
 
+/-! ## Source-polarity-independent certificates -/
+
+/-- The full-width formula with arbitrary source literal polarities.
+Figure 9 negates the second and third source literals in its lower clauses. -/
+def figureNineFormulaFor
+    (first second third : Bool) :
+    List (EmbeddedClause FigureNineVariable) :=
+  [figureNineClause 0
+      [(.sourceFirst, first), (.firstChoice, true),
+        (.secondChoice, true)],
+    figureNineClause 1
+      [(.sourceSecond, !second), (.firstChoice, true),
+        (.firstSlack, true)],
+    figureNineClause 2
+      [(.sourceThird, !third), (.secondChoice, true),
+        (.secondSlack, true)]]
+
+/-- Full-width drawing with arbitrary source literal polarities. -/
+def figureNineDrawingFor
+    (first second third : Bool) :
+    EmbeddedCNFIncidenceDrawing FigureNineVariable where
+  formula := figureNineFormulaFor first second third
+  variablePosition := figureNineVariablePosition
+  routes := figureNineRoute
+
+/-- Geometry of the full-width Figure 9 replacement is valid for every
+source polarity pattern. -/
+theorem figureNineDrawingFor_isValid
+    (first second third : Bool) :
+    (figureNineDrawingFor first second third).IsValid := by
+  cases first <;> cases second <;> cases third <;>
+    native_decide
+
+/-- The padded binary formula with arbitrary present-source polarities. -/
+def figureNineTwoFormulaFor
+    (first second : Bool) :
+    List (EmbeddedClause FigureNineVariable) :=
+  [figureNineClause 0
+      [(.sourceFirst, first), (.firstChoice, true),
+        (.secondChoice, true)],
+    figureNineClause 1
+      [(.sourceSecond, !second), (.firstChoice, true),
+        (.firstSlack, true)],
+    figureNineClause 2
+      [(.thirdPadding, false), (.secondChoice, true),
+        (.secondSlack, true)],
+    figureNineClause 3 [(.thirdPadding, false)]]
+
+/-- Padded binary drawing with arbitrary present-source polarities. -/
+def figureNineTwoDrawingFor
+    (first second : Bool) :
+    EmbeddedCNFIncidenceDrawing FigureNineVariable where
+  formula := figureNineTwoFormulaFor first second
+  variablePosition := figureNineVariablePosition
+  routes := figureNineTwoRoute
+
+/-- Geometry of the padded binary Figure 9 replacement is valid for every
+source polarity pattern. -/
+theorem figureNineTwoDrawingFor_isValid
+    (first second : Bool) :
+    (figureNineTwoDrawingFor first second).IsValid := by
+  cases first <;> cases second <;> native_decide
+
+/-- The padded unit formula with arbitrary source literal polarity. -/
+def figureNineOneFormulaFor
+    (first : Bool) :
+    List (EmbeddedClause FigureNineVariable) :=
+  [figureNineClause 0
+      [(.sourceFirst, first), (.firstChoice, true),
+        (.secondChoice, true)],
+    figureNineClause 1
+      [(.secondPadding, false), (.firstChoice, true),
+        (.firstSlack, true)],
+    figureNineClause 2
+      [(.thirdPadding, false), (.secondChoice, true),
+        (.secondSlack, true)],
+    figureNineClause 3 [(.secondPadding, false)],
+    figureNineClause 4 [(.thirdPadding, false)]]
+
+/-- Padded unit drawing with arbitrary source literal polarity. -/
+def figureNineOneDrawingFor
+    (first : Bool) :
+    EmbeddedCNFIncidenceDrawing FigureNineVariable where
+  formula := figureNineOneFormulaFor first
+  variablePosition := figureNineVariablePosition
+  routes := figureNineOneRoute
+
+/-- Geometry of the padded unit Figure 9 replacement is valid for both
+source polarities. -/
+theorem figureNineOneDrawingFor_isValid
+    (first : Bool) :
+    (figureNineOneDrawingFor first).IsValid := by
+  cases first <;> native_decide
+
+@[simp]
+theorem figureNineFormulaFor_true :
+    figureNineFormulaFor true true true =
+      figureNineFormula := rfl
+
+@[simp]
+theorem figureNineTwoFormulaFor_true :
+    figureNineTwoFormulaFor true true =
+      figureNineTwoFormula := rfl
+
+@[simp]
+theorem figureNineOneFormulaFor_true :
+    figureNineOneFormulaFor true =
+      figureNineOneFormula := rfl
+
 /-! ## Correspondence with the semantic Figure 9 transformation -/
 
 /-- Canonical source-variable roles used to compare the finite templates
@@ -305,6 +414,22 @@ def generatedFigureNineTemplate
     (canonicalFigureNineSource roles)).map fun generated =>
       generated.rename figureNineOutputRole
 
+/-- A canonical source clause whose role and polarity are both explicit. -/
+def canonicalFigureNineSourceFor
+    (literals : List (FigureNineSourceVariable × Bool)) :
+    EmbeddedClause FigureNineSourceVariable where
+  position := (0, 0)
+  literals := literals
+
+/-- Actual positioned Figure 9 output for explicit canonical source
+polarities, renamed to the finite drawing roles. -/
+def generatedFigureNineTemplateFor
+    (literals : List (FigureNineSourceVariable × Bool)) :
+    List (EmbeddedClause FigureNineVariable) :=
+  (clauseGadget 0
+    (canonicalFigureNineSourceFor literals)).map fun generated =>
+      generated.rename figureNineOutputRole
+
 /-- The full finite drawing formula is exactly the positioned semantic
 replacement of a canonical ternary source clause. -/
 theorem generatedFigureNineTemplate_three :
@@ -332,6 +457,33 @@ theorem generatedFigureNineTemplate_zero :
     generatedFigureNineTemplate [] =
       figureNineZeroFormula := by
   native_decide
+
+/-- The arbitrary-polarity full template is exactly the corresponding
+positioned semantic replacement. -/
+theorem generatedFigureNineTemplateFor_three
+    (first second third : Bool) :
+    generatedFigureNineTemplateFor
+        [(.first, first), (.second, second), (.third, third)] =
+      figureNineFormulaFor first second third := by
+  cases first <;> cases second <;> cases third <;>
+    native_decide
+
+/-- The arbitrary-polarity binary template is exactly the corresponding
+positioned semantic replacement. -/
+theorem generatedFigureNineTemplateFor_two
+    (first second : Bool) :
+    generatedFigureNineTemplateFor
+        [(.first, first), (.second, second)] =
+      figureNineTwoFormulaFor first second := by
+  cases first <;> cases second <;> native_decide
+
+/-- The arbitrary-polarity unit template is exactly the corresponding
+positioned semantic replacement. -/
+theorem generatedFigureNineTemplateFor_one
+    (first : Bool) :
+    generatedFigureNineTemplateFor [(.first, first)] =
+      figureNineOneFormulaFor first := by
+  cases first <;> native_decide
 
 end PlanarOneInThree
 end LeanTrominoes
