@@ -130,6 +130,259 @@ theorem classifiedSegment_horizontalFanout_midpoint_ne_vertexX
       fanoutMidpointBase, portX, vertexX] <;>
     omega
 
+/-! ## Exact classified segments adjacent to an enumerated bend -/
+
+/-- The incoming segment carried by a bend record occurs at the record's
+incoming segment index in its source polyline. -/
+theorem routeBendsAux_member_incomingSegment_zipIdx
+    (routeIndex : Nat) (translate : Cell) :
+    ∀ (points : List Cell) (startIndex : Nat)
+      {routeBend : RouteBend},
+      routeBend ∈
+          routeBendsAux routeIndex translate startIndex points →
+        (⟨routeBend.incomingStart, routeBend.bend⟩,
+            routeBend.incomingSegmentIndex) ∈
+          (gridPolylineSegments points).zipIdx startIndex := by
+  intro points
+  induction points with
+  | nil =>
+      intro startIndex routeBend routeBendMem
+      simp [routeBendsAux] at routeBendMem
+  | cons first rest induction =>
+      cases rest with
+      | nil =>
+          intro startIndex routeBend routeBendMem
+          simp [routeBendsAux] at routeBendMem
+      | cons second rest =>
+          cases rest with
+          | nil =>
+              intro startIndex routeBend routeBendMem
+              simp [routeBendsAux] at routeBendMem
+          | cons third rest =>
+              intro startIndex routeBend routeBendMem
+              simp only [routeBendsAux, List.mem_cons]
+                at routeBendMem
+              rcases routeBendMem with routeBendEq | routeBendMem
+              · subst routeBend
+                simp [gridPolylineSegments]
+              · simp only [gridPolylineSegments, List.zipIdx_cons,
+                  List.mem_cons]
+                exact Or.inr
+                  (by
+                    simpa only [gridPolylineSegments,
+                      List.zipIdx_cons, List.mem_cons,
+                      Nat.add_assoc] using
+                        induction (startIndex + 1) routeBendMem)
+
+/-- The outgoing segment carried by a bend record occurs immediately after
+its incoming segment in its source polyline. -/
+theorem routeBendsAux_member_outgoingSegment_zipIdx
+    (routeIndex : Nat) (translate : Cell) :
+    ∀ (points : List Cell) (startIndex : Nat)
+      {routeBend : RouteBend},
+      routeBend ∈
+          routeBendsAux routeIndex translate startIndex points →
+        (⟨routeBend.bend, routeBend.outgoingFinish⟩,
+            routeBend.incomingSegmentIndex + 1) ∈
+          (gridPolylineSegments points).zipIdx startIndex := by
+  intro points
+  induction points with
+  | nil =>
+      intro startIndex routeBend routeBendMem
+      simp [routeBendsAux] at routeBendMem
+  | cons first rest induction =>
+      cases rest with
+      | nil =>
+          intro startIndex routeBend routeBendMem
+          simp [routeBendsAux] at routeBendMem
+      | cons second rest =>
+          cases rest with
+          | nil =>
+              intro startIndex routeBend routeBendMem
+              simp [routeBendsAux] at routeBendMem
+          | cons third rest =>
+              intro startIndex routeBend routeBendMem
+              simp only [routeBendsAux, List.mem_cons]
+                at routeBendMem
+              rcases routeBendMem with routeBendEq | routeBendMem
+              · subst routeBend
+                simp [gridPolylineSegments]
+              · have tailMem :=
+                  induction (startIndex + 1) routeBendMem
+                simpa only [gridPolylineSegments,
+                  List.zipIdx_cons, List.mem_cons,
+                  Nat.add_assoc] using Or.inr tailMem
+
+/-- Every bend in the finite drawing enumeration exposes the two exact
+classified segment occurrences adjacent to it. -/
+theorem drawingRouteBend_adjacentClassifiedSegments
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {routeBend : RouteBend}
+    (routeBendMem : routeBend ∈ drawingRouteBends graph) :
+    ∃ (edge : PeriodicEdge Vertex) (edgeIndex : Nat)
+        (incoming outgoing : ClassifiedSegment Vertex × Nat),
+      (edge, edgeIndex) ∈ graph.edges.zipIdx ∧
+        incoming ∈
+          (classifiedRouteSegments graph edge edgeIndex).zipIdx ∧
+        outgoing ∈
+          (classifiedRouteSegments graph edge edgeIndex).zipIdx ∧
+        routeBend.routeIndex = edgeIndex ∧
+        routeBend.incomingSegmentIndex = incoming.2 ∧
+        routeBend.incomingSegmentIndex + 1 = outgoing.2 ∧
+        incoming.1.segment =
+          ⟨routeBend.incomingStart, routeBend.bend⟩ ∧
+        outgoing.1.segment =
+          ⟨routeBend.bend, routeBend.outgoingFinish⟩ := by
+  rcases List.mem_flatMap.mp routeBendMem with
+    ⟨taggedRoute, taggedRouteMem, translatedBendsMem⟩
+  rcases List.mem_flatMap.mp translatedBendsMem with
+    ⟨translate, _translateMem, localBendMem⟩
+  have edgeIndexLt :
+      taggedRoute.2 < graph.edges.length := by
+    have routeIndexLt :=
+      List.snd_lt_of_mem_zipIdx taggedRouteMem
+    simpa [drawing, constructedEdgeRoutes] using routeIndexLt
+  let edge : PeriodicEdge Vertex :=
+    graph.edges[taggedRoute.2]'edgeIndexLt
+  have edgeMem :
+      (edge, taggedRoute.2) ∈ graph.edges.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨edgeIndexLt, rfl⟩
+  have constructedRouteMem :=
+    constructedEdgeRoute_mem_drawing_edgeRoutes_zipIdx
+      graph edgeMem
+  have taggedRouteEq :
+      taggedRoute =
+        (constructedEdgeRoute graph edge taggedRoute.2,
+          taggedRoute.2) :=
+    tagged_eq_of_mem_zipIdx_of_snd_eq
+      taggedRouteMem constructedRouteMem rfl
+  rw [taggedRouteEq] at localBendMem
+  have bendData :=
+    routeBendsAux_member_data taggedRoute.2 translate
+      (constructedEdgeRoute graph edge taggedRoute.2) 0
+      localBendMem
+  have incomingMem :=
+    routeBendsAux_member_incomingSegment_zipIdx
+      taggedRoute.2 translate
+      (constructedEdgeRoute graph edge taggedRoute.2) 0
+      localBendMem
+  have outgoingMem :=
+    routeBendsAux_member_outgoingSegment_zipIdx
+      taggedRoute.2 translate
+      (constructedEdgeRoute graph edge taggedRoute.2) 0
+      localBendMem
+  rcases exists_classifiedSegment_of_mem incomingMem with
+    ⟨incoming, incomingClassifiedMem,
+      incomingSegmentEq, incomingIndexEq⟩
+  rcases exists_classifiedSegment_of_mem outgoingMem with
+    ⟨outgoing, outgoingClassifiedMem,
+      outgoingSegmentEq, outgoingIndexEq⟩
+  exact
+    ⟨edge, taggedRoute.2, incoming, outgoing,
+      edgeMem, incomingClassifiedMem, outgoingClassifiedMem,
+      bendData.1, incomingIndexEq.symm, outgoingIndexEq.symm,
+      incomingSegmentEq, outgoingSegmentEq⟩
+
+/-- An endpoint of a horizontal segment whose span is at most one period
+cannot lie in the open interior of any periodic translate of that segment. -/
+theorem horizontalSegment_translate_not_interiorContains_endpoint
+    {segment : GridSegment}
+    (horizontal : segment.IsHorizontal)
+    {period : Int}
+    (periodPositive : 0 < period)
+    (spanForward :
+      segment.finish.1 - segment.start.1 ≤ period)
+    (spanBackward :
+      segment.start.1 - segment.finish.1 ≤ period)
+    (endpoint : SegmentEnd)
+    (segmentTranslate endpointTranslate : Cell) :
+    ¬(segment.translate
+        (Cell.scale period segmentTranslate)).InteriorContains
+      (Cell.add
+        (Cell.scale period endpointTranslate)
+        (match endpoint with
+          | .start => segment.start
+          | .finish => segment.finish)) := by
+  have endpointNotBetween :
+      ∀ endpointX,
+        endpointX = segment.start.1 ∨
+          endpointX = segment.finish.1 →
+        ¬GridSegment.StrictlyBetween
+          (period * segmentTranslate.1 + segment.start.1)
+          (period * segmentTranslate.1 + segment.finish.1)
+          (period * endpointTranslate.1 + endpointX) := by
+    intro endpointX endpointEq between
+    rcases endpointEq with rfl | rfl
+    · by_cases sameShift :
+          endpointTranslate.1 = segmentTranslate.1
+      · rw [sameShift] at between
+        unfold GridSegment.StrictlyBetween at between
+        omega
+      · rcases lt_or_gt_of_ne sameShift with
+          shiftLess | shiftGreater
+        · have shiftStep :
+              endpointTranslate.1 + 1 ≤
+                segmentTranslate.1 := by omega
+          have multiplied :=
+            mul_le_mul_of_nonneg_left shiftStep
+              (le_of_lt periodPositive)
+          unfold GridSegment.StrictlyBetween at between
+          rcases between with between | between <;>
+            nlinarith
+        · have shiftStep :
+              segmentTranslate.1 + 1 ≤
+                endpointTranslate.1 := by omega
+          have multiplied :=
+            mul_le_mul_of_nonneg_left shiftStep
+              (le_of_lt periodPositive)
+          unfold GridSegment.StrictlyBetween at between
+          rcases between with between | between <;>
+            nlinarith
+    · by_cases sameShift :
+          endpointTranslate.1 = segmentTranslate.1
+      · rw [sameShift] at between
+        unfold GridSegment.StrictlyBetween at between
+        omega
+      · rcases lt_or_gt_of_ne sameShift with
+          shiftLess | shiftGreater
+        · have shiftStep :
+              endpointTranslate.1 + 1 ≤
+                segmentTranslate.1 := by omega
+          have multiplied :=
+            mul_le_mul_of_nonneg_left shiftStep
+              (le_of_lt periodPositive)
+          unfold GridSegment.StrictlyBetween at between
+          rcases between with between | between <;>
+            nlinarith
+        · have shiftStep :
+              segmentTranslate.1 + 1 ≤
+                endpointTranslate.1 := by omega
+          have multiplied :=
+            mul_le_mul_of_nonneg_left shiftStep
+              (le_of_lt periodPositive)
+          unfold GridSegment.StrictlyBetween at between
+          rcases between with between | between <;>
+            nlinarith
+  intro contains
+  rcases contains with
+    ⟨_translatedHorizontal, sameY, between⟩ |
+      ⟨translatedVertical, _sameX, _between⟩
+  · cases endpoint with
+    | start =>
+        apply endpointNotBetween segment.start.1 (Or.inl rfl)
+        simpa only [GridSegment.translate, Cell.add,
+          Cell.scale] using between
+    | finish =>
+        apply endpointNotBetween segment.finish.1 (Or.inr rfl)
+        simpa only [GridSegment.translate, Cell.add,
+          Cell.scale] using between
+  · exact
+      ((GridSegment.isVertical_translate _ _).mp
+        translatedVertical).2 horizontal.1
+
 set_option maxRecDepth 4000 in
 /-- A canonical crossover center cannot coincide with any lifted declared
 graph-vertex position. -/
