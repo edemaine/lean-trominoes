@@ -1969,6 +1969,10 @@ The representation choices for this target are:
   cross-component obligation has also been factored into a purely geometric
   certificate on two valid metadata-selected local drawings, with all global
   clause-index and lookup bookkeeping discharged by a lifting theorem.
+  Closed-rectangle infrastructure now bounds every crossover, bend,
+  source-clause, and active variable-arm route inside the first `13 × 13`
+  cells of its `20 × 20` macrocell and proves contact-free separation for
+  any two such components at distinct drawing-grid centers.
   After that geometric certificate, complete finite planarity reduces exactly
   to global vertex avoidance and assembled vertex-position distinctness.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
