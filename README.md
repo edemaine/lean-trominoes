@@ -2081,6 +2081,18 @@ The representation choices for this target are:
   then exposes the bend link's exact positioned formula, both real
   carrier-node endpoints, the transported complete local certificate, and
   the internal bounds and endpoint-only contacts at both physical ports.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalPortGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalPortGeometry.lean)
+  identifies the endpoint interface computed by every retained carrier lens.
+  Complete-carrier order makes a first terminal the lower segment endpoint
+  and a second terminal the upper endpoint, which determines the exact
+  compass port; the reconstructed lens macrocell origin is proved to be the
+  terminal's scaled drawing cell.  Four corollaries identify these data with
+  either physical port of an incident route bend.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierBendSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierBendSeparation.lean)
+  plugs those endpoint identities into the external-lens/internal-corner
+  boundary separator.  Every genuine local incidence route of a carrier
+  lens therefore avoids every genuine local incidence route of any bend
+  corner with which it shares a terminal.
 - [`LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversalComponents.lean`](LeanTrominoes/PeriodicOrthocrossingRouteNoImmediateReversalComponents.lean)
   proves no-immediate-reversal certificates for source fanouts, all five
   local edge-core shapes, and translated reversed target fanouts.  Their
