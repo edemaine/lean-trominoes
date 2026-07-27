@@ -1,3 +1,4 @@
+import LeanTrominoes.PlanarThreeSATDuplicatorArm
 import LeanTrominoes.PlanarThreeSATIncidencePlanarity
 
 /-!
@@ -5,8 +6,8 @@ import LeanTrominoes.PlanarThreeSATIncidencePlanarity
 
 The routed variable gadget instantiates only the active arms of Figure 8(a).
 This module extracts the corresponding two-clause equality drawing for one
-left, top, or right arm.  The third and all later natural-number indices use
-the right-arm geometry, matching `routedVariableEqualityPositions`.
+left, middle, or right arm.  Its coordinates are adapted to the three target
+fanout terminals of the orthocrossing construction.
 
 The direct clause-to-variable segments are continuously planar and retain
 the eight-direction compass terminal rays needed by occurrence splitting.
@@ -16,88 +17,85 @@ They need not be orthogonal before that split.
 namespace LeanTrominoes
 namespace PlanarThreeSAT
 
-/-- The endpoint and center roles present in one active duplicator arm. -/
-inductive DuplicatorArmVariable
-  | port
-  | center
-  deriving DecidableEq, Repr, Fintype
-
-/-- The Figure 8(a) port selected by an active-arm index. -/
-def duplicatorArmPort : Nat → DuplicatorVariable
-  | 0 => .left
-  | 1 => .top
-  | _ => .right
-
-/-- Fixed-template position of each variable in one active arm. -/
-def DuplicatorArmVariable.position
-    (armIndex : Nat) : DuplicatorArmVariable → Cell
-  | .port =>
-      DuplicatorVariable.position
-        (duplicatorArmPort armIndex)
-  | .center => DuplicatorVariable.position .center
-
-/-- The two Figure 8(a) clause positions belonging to one arm. -/
-def duplicatorArmEqualityPositions :
-    Nat → EqualityPositions
-  | 0 => ⟨(3, 4), (3, 3)⟩
-  | 1 => ⟨(4, 3), (5, 3)⟩
-  | _ => ⟨(5, 4), (5, 5)⟩
-
 /-- The two implication clauses of one active duplicator arm. -/
 def duplicatorArmFormula
-    (armIndex : Nat) :
+    (arm : DuplicatorArm) :
     List (EmbeddedClause DuplicatorArmVariable) :=
   equalityInstance .port .center
-    (duplicatorArmEqualityPositions armIndex)
+    (duplicatorArmEqualityPositions arm)
 
 /-- Direct incidences for one active duplicator arm. -/
 def duplicatorArmStraightIncidenceDrawing
-    (armIndex : Nat) :
+    (arm : DuplicatorArm) :
     EmbeddedCNFIncidenceDrawing DuplicatorArmVariable :=
   straightIncidenceDrawing
-    (duplicatorArmFormula armIndex)
-    (DuplicatorArmVariable.position armIndex)
+    (duplicatorArmFormula arm)
+    (DuplicatorArmVariable.position arm)
 
 /-- Every direct arm incidence has its advertised clause and variable
 endpoints. -/
 theorem duplicatorArmStraightIncidenceDrawing_routesMatch
-    (armIndex : Nat) :
-    (duplicatorArmStraightIncidenceDrawing armIndex).RoutesMatch := by
+    (arm : DuplicatorArm) :
+    (duplicatorArmStraightIncidenceDrawing arm).RoutesMatch := by
   exact straightIncidenceDrawing_routesMatch
-    (duplicatorArmFormula armIndex)
-    (DuplicatorArmVariable.position armIndex)
+    (duplicatorArmFormula arm)
+    (DuplicatorArmVariable.position arm)
 
 /-- Every left, top, or right active-arm drawing is continuously planar. -/
 theorem duplicatorArmStraightIncidenceDrawing_isPlanar
-    (armIndex : Nat) :
-    (duplicatorArmStraightIncidenceDrawing armIndex).IsPlanar := by
-  cases armIndex with
-  | zero => native_decide
-  | succ armIndex =>
-      cases armIndex with
-      | zero => native_decide
-      | succ armIndex =>
-          change
-            (duplicatorArmStraightIncidenceDrawing 2).IsPlanar
-          native_decide
+    (arm : DuplicatorArm) :
+    (duplicatorArmStraightIncidenceDrawing arm).IsPlanar := by
+  cases arm <;> native_decide
 
 /-- Every incidence of one active arm has a compass-valid terminal ray. -/
 theorem duplicatorArmFormula_embeddedTerminalPortsValid
-    (armIndex : Nat) :
+    (arm : DuplicatorArm) :
     EmbeddedTerminalPortsValid
-      (duplicatorArmFormula armIndex)
-      (DuplicatorArmVariable.position armIndex) := by
-  cases armIndex with
-  | zero => native_decide
-  | succ armIndex =>
-      cases armIndex with
-      | zero => native_decide
-      | succ armIndex =>
-          change
-            EmbeddedTerminalPortsValid
-              (duplicatorArmFormula 2)
-              (DuplicatorArmVariable.position 2)
-          native_decide
+      (duplicatorArmFormula arm)
+      (DuplicatorArmVariable.position arm) := by
+  cases arm <;> native_decide
+
+/-- Reuse the four Figure 8(a) logical roles for the complete routed
+equality-star template. -/
+def DuplicatorArm.variable : DuplicatorArm → DuplicatorVariable
+  | .left => .left
+  | .middle => .top
+  | .right => .right
+
+/-- Physical placement of all four variables in the routed equality star. -/
+def routedDuplicatorVariablePosition :
+    DuplicatorVariable → Cell
+  | .center => duplicatorArmCenterPosition
+  | .left => DuplicatorArm.left.portPosition
+  | .top => DuplicatorArm.middle.portPosition
+  | .right => DuplicatorArm.right.portPosition
+
+/-- All three two-clause arms of the routed equality star. -/
+def routedDuplicatorFormula :
+    List (EmbeddedClause DuplicatorVariable) :=
+  [DuplicatorArm.left, .middle, .right].flatMap fun arm =>
+    equalityInstance arm.variable .center
+      (duplicatorArmEqualityPositions arm)
+
+/-- The direct incidence drawing of the complete routed equality star. -/
+def routedDuplicatorStraightIncidenceDrawing :
+    EmbeddedCNFIncidenceDrawing DuplicatorVariable :=
+  straightIncidenceDrawing
+    routedDuplicatorFormula routedDuplicatorVariablePosition
+
+/-- The complete three-arm layout is continuously planar, including
+separation between incidences belonging to different arms. -/
+theorem routedDuplicatorStraightIncidenceDrawing_isPlanar :
+    routedDuplicatorStraightIncidenceDrawing.IsPlanar := by
+  native_decide
+
+/-- Every incidence in the complete three-arm layout has a compass-valid
+terminal ray. -/
+theorem routedDuplicatorFormula_embeddedTerminalPortsValid :
+    EmbeddedTerminalPortsValid
+      routedDuplicatorFormula
+      routedDuplicatorVariablePosition := by
+  native_decide
 
 end PlanarThreeSAT
 end LeanTrominoes

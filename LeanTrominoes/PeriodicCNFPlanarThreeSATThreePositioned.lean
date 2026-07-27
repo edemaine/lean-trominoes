@@ -239,7 +239,7 @@ def drawingPeriodicPlanarSATVariablePosition
       Cell.add
         (liftedIncidenceVertexMacroOrigin formula
           (.variable atom) (0, 0))
-        (DuplicatorVariable.position .center)
+        duplicatorArmCenterPosition
   | .crossoverInternal (crossing, internal) =>
       Cell.add (crossingMacroOrigin crossing)
         (CrossoverVariable.position

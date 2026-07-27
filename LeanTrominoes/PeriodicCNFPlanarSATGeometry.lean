@@ -33,7 +33,7 @@ def drawingPlanarSATVariablePosition
       Cell.add
         (liftedIncidenceVertexMacroOrigin formula
           (.variable occurrence.1) occurrence.2)
-        (DuplicatorVariable.position .center)
+        duplicatorArmCenterPosition
   | .inr (crossing, internal) =>
       Cell.add (crossingMacroOrigin crossing)
         (CrossoverVariable.position

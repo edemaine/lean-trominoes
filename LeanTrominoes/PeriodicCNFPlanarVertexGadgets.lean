@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarIncidences
+import LeanTrominoes.PlanarThreeSATDuplicatorArm
 
 /-!
 # Clause and variable gadgets at routed SAT vertices
@@ -227,17 +228,37 @@ def routedVariableOrigin
   liftedIncidenceVertexMacroOrigin formula
     (.variable site.1) site.2
 
-/-- Figure 8(a)'s two implication-clause positions for one active arm. -/
+/-- Classify a segment terminal by the routed-variable port at its local
+macrocell endpoint. -/
+def SegmentTerminal.duplicatorArm
+    (terminal : SegmentTerminal) : DuplicatorArm :=
+  let localPosition :=
+    segmentTerminalLocalPosition
+      terminal.indexed.segment terminal.endpoint
+  if localPosition = DuplicatorArm.left.portPosition then
+    .left
+  else if localPosition = DuplicatorArm.middle.portPosition then
+    .middle
+  else
+    .right
+
+/-- Classify an external routed node by its physical terminal arm.  The
+fallback is unreachable for active routed-variable link endpoints. -/
+def PlanarSATNode.duplicatorArm
+    {Variable : Type*} : PlanarSATNode Variable → DuplicatorArm
+  | .carrier (.terminal terminal) => terminal.duplicatorArm
+  | _ => .right
+
+/-- The two implication-clause positions for one active routed arm. -/
 def routedVariableEqualityPositions
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (site : VariableRouteSite Variable)
-    (index : Nat) : EqualityPositions :=
+    (arm : DuplicatorArm) : EqualityPositions :=
   let origin := routedVariableOrigin formula site
-  match index with
-  | 0 => ⟨Cell.add origin (3, 4), Cell.add origin (3, 3)⟩
-  | 1 => ⟨Cell.add origin (4, 3), Cell.add origin (5, 3)⟩
-  | _ => ⟨Cell.add origin (5, 4), Cell.add origin (5, 5)⟩
+  let localPositions := duplicatorArmEqualityPositions arm
+  ⟨Cell.add origin localPositions.forward,
+    Cell.add origin localPositions.backward⟩
 
 /-- The active (at most three) equality arms of one routed variable
 duplicator. -/
@@ -249,7 +270,8 @@ def routedVariableLinksAt
   ((routedVariableNodes formula site).take 3).zipIdx.map
     fun taggedNode =>
       ⟨taggedNode.1, .atom site,
-        routedVariableEqualityPositions formula site taggedNode.2⟩
+        routedVariableEqualityPositions formula site
+          taggedNode.1.duplicatorArm⟩
 
 /-- The active Figure 8(a) subgadget at one lifted variable vertex. -/
 def routedVariableFormulaAt
@@ -281,7 +303,7 @@ theorem routedVariableFormulaAt_holds_iff
         (endpoints.take 3).zipIdx.map fun taggedNode =>
           (⟨taggedNode.1, .atom site,
             routedVariableEqualityPositions
-              formula site taggedNode.2⟩ :
+              formula site taggedNode.1.duplicatorArm⟩ :
             EqualityLink (PlanarSATNode Variable)),
       assignment link.first = assignment link.second) ↔
       assignment (endpoints.getD 0 (.atom site)) =

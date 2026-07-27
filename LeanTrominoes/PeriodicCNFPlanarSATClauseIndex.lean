@@ -78,6 +78,7 @@ inductive DrawingPlanarSATClauseSource
   | routedVariable
       (site : VariableRouteSite Variable)
       (armIndex : Nat)
+      (arm : DuplicatorArm)
       (link : EqualityLink (PlanarSATNode Variable))
       (localClauseIndex : Nat)
 
@@ -115,9 +116,10 @@ def DrawingPlanarSATClauseMetadata.Valid
         metadata.clause =
           (routedClauseAt formula site).rename
             planarSATExternalVariableMap
-  | .routedVariable site armIndex link localClauseIndex =>
+  | .routedVariable site armIndex arm link localClauseIndex =>
       site ∈ drawingVariableRouteSites formula ∧
         (link, armIndex) ∈ (routedVariableLinksAt formula site).zipIdx ∧
+          arm = link.first.duplicatorArm ∧
           (metadata.clause, localClauseIndex) ∈
             (drawingPlanarSATRoutedVariableFormulaAt link).zipIdx
 
@@ -374,11 +376,13 @@ def drawingPlanarSATRoutedVariableClauseMetadataFor
     {Variable : Type*}
     (site : VariableRouteSite Variable)
     (armIndex : Nat)
+    (arm : DuplicatorArm)
     (link : EqualityLink (PlanarSATNode Variable)) :
     List (DrawingPlanarSATClauseMetadata Variable) :=
   (drawingPlanarSATRoutedVariableFormulaAt link).zipIdx.map
     fun tagged =>
-      ⟨tagged.1, .routedVariable site armIndex link tagged.2⟩
+      ⟨tagged.1,
+        .routedVariable site armIndex arm link tagged.2⟩
 
 def drawingPlanarSATRoutedVariableClauseMetadata
     {Variable : Type*} [DecidableEq Variable]
@@ -387,7 +391,8 @@ def drawingPlanarSATRoutedVariableClauseMetadata
   (drawingVariableRouteSites formula).flatMap fun site =>
     (routedVariableLinksAt formula site).zipIdx.flatMap fun taggedLink =>
       drawingPlanarSATRoutedVariableClauseMetadataFor
-        site taggedLink.2 taggedLink.1
+        site taggedLink.2 taggedLink.1.first.duplicatorArm
+          taggedLink.1
 
 @[simp] theorem drawingPlanarSATRoutedVariableClauseMetadata_clauses
     {Variable : Type*} [DecidableEq Variable]
@@ -419,15 +424,17 @@ theorem drawingPlanarSATRoutedVariableClauseMetadataFor_valid
     (siteMember :
       site ∈ drawingVariableRouteSites formula)
     (armIndex : Nat)
+    (arm : DuplicatorArm)
     (link : EqualityLink (PlanarSATNode Variable))
     (linkMember :
       (link, armIndex) ∈
         (routedVariableLinksAt formula site).zipIdx)
+    (armEq : arm = link.first.duplicatorArm)
     {metadata : DrawingPlanarSATClauseMetadata Variable}
     (metadataMember :
       metadata ∈
         drawingPlanarSATRoutedVariableClauseMetadataFor
-          site armIndex link) :
+          site armIndex arm link) :
     metadata.Valid formula := by
   rw [drawingPlanarSATRoutedVariableClauseMetadataFor] at metadataMember
   rcases List.mem_map.mp metadataMember with
@@ -435,7 +442,8 @@ theorem drawingPlanarSATRoutedVariableClauseMetadataFor_valid
   subst metadata
   simpa [DrawingPlanarSATClauseMetadata.Valid] using
     And.intro siteMember
-      (And.intro linkMember taggedClauseMember)
+      (And.intro linkMember
+        (And.intro armEq taggedClauseMember))
 
 theorem drawingPlanarSATRoutedVariableClauseMetadata_valid
     {Variable : Type*} [DecidableEq Variable]
@@ -449,8 +457,9 @@ theorem drawingPlanarSATRoutedVariableClauseMetadata_valid
   rcases List.mem_flatMap.mp metadataMember with
     ⟨taggedLink, linkMember, metadataMember⟩
   exact drawingPlanarSATRoutedVariableClauseMetadataFor_valid
-    formula site siteMember taggedLink.2 taggedLink.1
-      linkMember metadataMember
+    formula site siteMember taggedLink.2
+      taggedLink.1.first.duplicatorArm taggedLink.1
+      linkMember rfl metadataMember
 
 /-- Clause metadata parallel to the five concatenated geometric families of
 `drawingPlanarSATFormula`. -/

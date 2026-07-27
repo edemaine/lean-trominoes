@@ -1807,11 +1807,16 @@ The representation choices for this target are:
   records executable continuous-planarity certificates for the direct
   incidence drawings of both fixed Figure 8 templates, ready for the global
   macrocell assembly.
+- [`LeanTrominoes/PlanarThreeSATDuplicatorArm.lean`](LeanTrominoes/PlanarThreeSATDuplicatorArm.lean)
+  defines the left, middle, and right fanout-aligned duplicator arms, their
+  actual target-terminal ports, their common center, and the two
+  compass-compatible equality-clause positions assigned to each arm.
 - [`LeanTrominoes/PlanarThreeSATDuplicatorArmIncidenceDrawing.lean`](LeanTrominoes/PlanarThreeSATDuplicatorArmIncidenceDrawing.lean)
-  extracts the two-clause direct incidence drawing for one active left, top,
-  or right arm of Figure 8(a).  Each arm has exact endpoints, continuous
-  planarity, and compass-valid terminal rays independently of the inactive
-  duplicator arms.
+  extracts the two-clause direct incidence drawing for one active left,
+  middle, or right arm of Figure 8(a), adapted to the actual target-fanout
+  ports.  Each arm has exact endpoints, continuous planarity, and
+  compass-valid terminal rays; the complete three-arm equality star is also
+  certified continuously planar.
 - [`LeanTrominoes/PlanarThreeSATEqualityLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLens.lean)
   replaces each collinear four-incidence equality link on a long carrier by
   a narrow rectilinear lens.  For every span of at least eight cells, explicit
@@ -1903,9 +1908,14 @@ The representation choices for this target are:
   source clause, or routed variable arm.  The parallel metadata list projects
   exactly to the original flattened formula and retains both finite-family
   membership and the exact local clause index.  In particular, bend metadata
-  preserves its `RouteBend` and variable-arm metadata preserves its lifted
-  site, enabling lossless selection of the corresponding certified local
-  incidence drawing.
+  preserves its `RouteBend`; variable-arm metadata preserves its lifted site,
+  enumeration index, and independently classified physical arm, enabling
+  lossless selection of the corresponding certified local incidence drawing.
+- [`LeanTrominoes/PeriodicCNFPlanarVariablePortGeometry.lean`](LeanTrominoes/PeriodicCNFPlanarVariablePortGeometry.lean)
+  computes the exact left, middle, or right local endpoint of every
+  constructed target fanout from its target-port rank.  It then proves that
+  every selected target terminal is physically identical to the endpoint of
+  its classified equality arm at the corresponding lifted variable site.
 - [`LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean)
   translates the continuously planar Figure 8(b) incidence template to each
   canonical crossing and injectively renames its boundary and internal roles
@@ -1919,6 +1929,12 @@ The representation choices for this target are:
   lens and route-bend corner is identified with its exact indexed clause
   block and retains its complete endpoint, orthogonality, and continuous
   finite-planarity certificate under that embedding.
+- [`LeanTrominoes/PeriodicOrthocrossingRoutedVariableIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingRoutedVariableIncidenceDrawing.lean)
+  translates the certified two-clause template for an active physical arm
+  into its lifted variable macrocell and renames its endpoint roles to the
+  indexed equality link.  The adapter proves the exact clause block,
+  realized endpoint positions, route endpoints, continuous planarity, and
+  compass-valid terminal rays.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
