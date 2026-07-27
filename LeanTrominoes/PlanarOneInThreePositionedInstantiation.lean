@@ -494,5 +494,99 @@ theorem instantiatedDrawing_auxiliaryPosition
             EmbeddedCNFIncidenceDrawing.rename,
             EmbeddedCNFIncidenceDrawing.translate]
 
+/-- Boundary port assigned to a source literal by its index in the Figure 9
+input clause. -/
+def sourceLocalPosition : Nat → Cell
+  | 0 => (6, 0)
+  | 1 => (0, 5)
+  | _ => (12, 5)
+
+/-- Every genuine source literal is placed at the Figure 9 boundary port
+selected by its source-clause index. -/
+theorem instantiatedDrawing_sourcePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (clauseIndex : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ source.literals.zipIdx) :
+    (instantiatedDrawing clauseIndex source).variablePosition
+        (.inl literal.atom) =
+      Cell.add
+        (Cell.scale PlanarOneInThree.gadgetScale source.position)
+        (sourceLocalPosition literalIndex) := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · simp at literalMember
+  · rcases rest with _ | ⟨second, rest⟩
+    · simp_all [instantiatedDrawing, instantiatedOneDrawing,
+        rescopeDrawing, rescopeEquiv,
+        PlanarOneInThree.instantiatedOneDrawing,
+        PlanarOneInThree.oneLocalPosition,
+        sourceLocalPosition,
+        EmbeddedCNFIncidenceDrawing.rename,
+        EmbeddedCNFIncidenceDrawing.translate]
+    · rcases rest with _ | ⟨third, tail⟩
+      · have firstNeSecond :
+            first.atom ≠ second.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup]
+            using distinct
+        simp at literalMember
+        rcases literalMember with
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · simp [instantiatedDrawing, instantiatedTwoDrawing,
+            rescopeDrawing, rescopeEquiv,
+            PlanarOneInThree.instantiatedTwoDrawing,
+            PlanarOneInThree.twoLocalPosition,
+            sourceLocalPosition,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+        · simp [instantiatedDrawing, instantiatedTwoDrawing,
+            rescopeDrawing, rescopeEquiv,
+            PlanarOneInThree.instantiatedTwoDrawing,
+            PlanarOneInThree.twoLocalPosition,
+            sourceLocalPosition, Ne.symm firstNeSecond,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+      · have tailEmpty : tail = [] := by
+          apply List.length_eq_zero_iff.mp
+          simp at width
+          omega
+        subst tail
+        have pairwise :
+            (first.atom ≠ second.atom ∧
+              first.atom ≠ third.atom) ∧
+            second.atom ≠ third.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup]
+            using distinct
+        simp at literalMember
+        rcases literalMember with
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · simp [instantiatedDrawing, instantiatedThreeDrawing,
+            rescopeDrawing, rescopeEquiv,
+            PlanarOneInThree.instantiatedThreeDrawing,
+            PlanarOneInThree.threeLocalPosition,
+            sourceLocalPosition,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+        · simp [instantiatedDrawing, instantiatedThreeDrawing,
+            rescopeDrawing, rescopeEquiv,
+            PlanarOneInThree.instantiatedThreeDrawing,
+            PlanarOneInThree.threeLocalPosition,
+            sourceLocalPosition, Ne.symm pairwise.1.1,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+        · simp [instantiatedDrawing, instantiatedThreeDrawing,
+            rescopeDrawing, rescopeEquiv,
+            PlanarOneInThree.instantiatedThreeDrawing,
+            PlanarOneInThree.threeLocalPosition,
+            sourceLocalPosition, Ne.symm pairwise.1.2,
+            Ne.symm pairwise.2,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+
 end PlanarOneInThreePositioned
 end LeanTrominoes

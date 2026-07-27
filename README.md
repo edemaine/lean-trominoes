@@ -404,6 +404,10 @@ The representation choices for this target are:
   periodic literal endpoint.  It completes any inherited-variable suffix
   family with singleton auxiliary suffixes and packages the resulting
   canonical orthogonal splice; only source-variable ports remain to supply.
+  [`LeanTrominoes/PeriodicOneInThreeInheritedIncidences.lean`](LeanTrominoes/PeriodicOneInThreeInheritedIncidences.lean)
+  classifies every inherited source literal in a generated Figure 9 clause
+  by its precise source-clause presentation index, proving that its atom and
+  periodic offset are unchanged.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -1964,7 +1968,8 @@ The representation choices for this target are:
   positioned `clauseGadget` blocks, and a uniform selector proves validity
   from width three and per-clause atom distinctness.  The selector also
   identifies every scoped auxiliary's physical position with its declared
-  local Figure 9 coordinate in the refined source-clause box.
+  local Figure 9 coordinate in the refined source-clause box, and assigns
+  every genuine source occurrence its index-selected boundary port.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean)
   certifies all four local cases of the subsequent `6 × 6` unit-elimination
   refinement: the empty-clause triangle, unit-clause diamond, and retained
