@@ -401,7 +401,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOneInThreePositionedAuxiliaryEndpoints.lean`](LeanTrominoes/PeriodicOneInThreePositionedAuxiliaryEndpoints.lean)
   combines that semantic fact with the instantiated local placement to show
   that every normalized auxiliary endpoint is already the final canonical
-  periodic literal endpoint; only source-variable ports remain to splice.
+  periodic literal endpoint.  It completes any inherited-variable suffix
+  family with singleton auxiliary suffixes and packages the resulting
+  canonical orthogonal splice; only source-variable ports remain to supply.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -425,8 +427,9 @@ The representation choices for this target are:
   unit-elimination auxiliary literal.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryEndpoints.lean)
   then proves that each normalized auxiliary endpoint is already its final
-  canonical periodic endpoint, leaving only inherited source-variable ports
-  to splice.
+  canonical periodic endpoint.  As at the Figure 9 layer, it completes any
+  inherited-variable suffix family automatically and packages the resulting
+  canonical orthogonal splice, leaving only source-variable ports to supply.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final
