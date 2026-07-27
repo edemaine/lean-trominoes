@@ -1,0 +1,586 @@
+import LeanTrominoes.PlanarOneInThreeNoUnitsFigureNineInstantiation
+
+/-!
+# Indexing the composed Figure 9 and unit-elimination replacement
+
+The two positioned reductions flatten two variable-size layers of local
+clause blocks.  This module enumerates the same output one original source
+clause at a time.  Each final clause thereby retains:
+
+* its original positioned source clause and presentation index;
+* the global presentation index at which that source's Figure 9 block starts;
+* its local presentation index in the complete composed block.
+
+Projecting final clauses from the metadata recovers the actual two-stage
+positioned formula exactly.  The local index is consequently also the clause
+index used by the certified composed drawing.
+-/
+
+namespace LeanTrominoes
+namespace PlanarOneInThreeNoUnitsFigureNine
+
+/-- Enumerate positioned Figure 9 blocks beginning at an arbitrary source
+presentation index. -/
+def figureNineClausesFrom
+    {Variable : Type*}
+    (sourceClauseIndex : Nat) :
+    List (PositionedPeriodicClause Variable) →
+      List
+        (PositionedPeriodicClause
+          (OneInThreeVariable Variable))
+  | [] => []
+  | sourceClause :: rest =>
+      PeriodicOneInThreePositioned.clauseGadget
+          sourceClauseIndex sourceClause ++
+        figureNineClausesFrom
+          (sourceClauseIndex + 1) rest
+
+/-- Enumerate positioned unit-elimination blocks beginning at an arbitrary
+Figure 9 presentation index. -/
+def unitEliminationClausesFrom
+    {Variable : Type*}
+    (figureNineClauseIndex : Nat) :
+    List (PositionedPeriodicClause Variable) →
+      List
+        (PositionedPeriodicClause
+          (OneInThreeNoUnitVariable Variable))
+  | [] => []
+  | sourceClause :: rest =>
+      PeriodicOneInThreeNoUnitsPositioned.clauseGadget
+          figureNineClauseIndex sourceClause ++
+        unitEliminationClausesFrom
+          (figureNineClauseIndex + 1) rest
+
+/-- Enumerate both transformations one original source block at a time,
+threading the global Figure 9 presentation index between blocks. -/
+def composedClausesFrom
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat) :
+    List (PositionedPeriodicClause Variable) →
+      List
+        (PositionedPeriodicClause
+          (OneInThreeNoUnitVariable
+            (OneInThreeVariable Variable)))
+  | [] => []
+  | sourceClause :: rest =>
+      let figureNineBlock :=
+        PeriodicOneInThreePositioned.clauseGadget
+          sourceClauseIndex sourceClause
+      unitEliminationClausesFrom
+          figureNineClauseStart figureNineBlock ++
+        composedClausesFrom
+          (sourceClauseIndex + 1)
+          (figureNineClauseStart + figureNineBlock.length)
+          rest
+
+/-- Source and local indexing information for one final clause in the
+composed replacement. -/
+structure ClauseMetadata
+    (Variable : Type*) where
+  sourceClause : PositionedPeriodicClause Variable
+  sourceClauseIndex : Nat
+  figureNineClauseStart : Nat
+  clause :
+    PositionedPeriodicClause
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable))
+  localClauseIndex : Nat
+
+/-- Index every final clause in one original source clause's complete
+composed block. -/
+def clauseMetadataFor
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClause : PositionedPeriodicClause Variable) :
+    List (ClauseMetadata Variable) :=
+  (unitEliminationClausesFrom
+      figureNineClauseStart
+      (PeriodicOneInThreePositioned.clauseGadget
+        sourceClauseIndex sourceClause)).zipIdx.map
+    fun taggedClause =>
+      ⟨sourceClause, sourceClauseIndex,
+        figureNineClauseStart,
+        taggedClause.1, taggedClause.2⟩
+
+/-- Metadata parallel to a recursively enumerated suffix of the composed
+formula. -/
+def formulaClauseMetadataFrom
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat) :
+    List (PositionedPeriodicClause Variable) →
+      List (ClauseMetadata Variable)
+  | [] => []
+  | sourceClause :: rest =>
+      let figureNineBlock :=
+        PeriodicOneInThreePositioned.clauseGadget
+          sourceClauseIndex sourceClause
+      clauseMetadataFor
+          sourceClauseIndex figureNineClauseStart sourceClause ++
+        formulaClauseMetadataFrom
+          (sourceClauseIndex + 1)
+          (figureNineClauseStart + figureNineBlock.length)
+          rest
+
+/-- Metadata parallel to the complete two-stage positioned formula. -/
+def formulaClauseMetadata
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable) :
+    List (ClauseMetadata Variable) :=
+  formulaClauseMetadataFrom 0 0 source.clauses
+
+theorem figureNineClausesFrom_eq_zipIdx
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable)) :
+    figureNineClausesFrom sourceClauseIndex sourceClauses =
+      (sourceClauses.zipIdx sourceClauseIndex).flatMap
+        (fun taggedSource =>
+          PeriodicOneInThreePositioned.clauseGadget
+            taggedSource.2 taggedSource.1) := by
+  induction sourceClauses generalizing sourceClauseIndex with
+  | nil => simp [figureNineClausesFrom]
+  | cons sourceClause rest induction =>
+      simp [figureNineClausesFrom, induction,
+        List.zipIdx_cons]
+
+theorem unitEliminationClausesFrom_eq_zipIdx
+    {Variable : Type*}
+    (figureNineClauseIndex : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable)) :
+    unitEliminationClausesFrom
+        figureNineClauseIndex sourceClauses =
+      (sourceClauses.zipIdx figureNineClauseIndex).flatMap
+        (fun taggedSource =>
+          PeriodicOneInThreeNoUnitsPositioned.clauseGadget
+            taggedSource.2 taggedSource.1) := by
+  induction sourceClauses generalizing figureNineClauseIndex with
+  | nil => simp [unitEliminationClausesFrom]
+  | cons sourceClause rest induction =>
+      simp [unitEliminationClausesFrom, induction,
+        List.zipIdx_cons]
+
+/-- Equivalently, retain local indices in `zipIdx` and add a fixed global
+offset when selecting each unit-elimination block. -/
+theorem unitEliminationClausesFrom_eq_shiftedZipIdx
+    {Variable : Type*}
+    (globalStart localStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable)) :
+    unitEliminationClausesFrom
+        (globalStart + localStart) sourceClauses =
+      (sourceClauses.zipIdx localStart).flatMap
+        (fun taggedSource =>
+          PeriodicOneInThreeNoUnitsPositioned.clauseGadget
+            (globalStart + taggedSource.2) taggedSource.1) := by
+  induction sourceClauses generalizing localStart with
+  | nil => simp [unitEliminationClausesFrom]
+  | cons sourceClause rest induction =>
+      rw [unitEliminationClausesFrom, List.zipIdx_cons,
+        List.flatMap_cons]
+      have nextIndex :
+          globalStart + localStart + 1 =
+            globalStart + (localStart + 1) := by
+        omega
+      rw [nextIndex, induction]
+
+/-- The common zero-based form of shifted local enumeration. -/
+theorem unitEliminationClausesFrom_eq_localZipIdx
+    {Variable : Type*}
+    (globalStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable)) :
+    unitEliminationClausesFrom globalStart sourceClauses =
+      sourceClauses.zipIdx.flatMap
+        (fun taggedSource =>
+          PeriodicOneInThreeNoUnitsPositioned.clauseGadget
+            (globalStart + taggedSource.2) taggedSource.1) := by
+  simpa using
+    unitEliminationClausesFrom_eq_shiftedZipIdx
+      (Variable := Variable) globalStart 0 sourceClauses
+
+/-- Unit-elimination enumeration splits across concatenated source lists,
+with the second list's presentation indices shifted by the first length. -/
+theorem unitEliminationClausesFrom_append
+    {Variable : Type*}
+    (figureNineClauseIndex : Nat)
+    (initial remaining : List (PositionedPeriodicClause Variable)) :
+    unitEliminationClausesFrom
+        figureNineClauseIndex (initial ++ remaining) =
+      unitEliminationClausesFrom
+          figureNineClauseIndex initial ++
+        unitEliminationClausesFrom
+          (figureNineClauseIndex + initial.length) remaining := by
+  induction initial generalizing figureNineClauseIndex with
+  | nil => simp [unitEliminationClausesFrom]
+  | cons sourceClause rest induction =>
+      simp only [List.cons_append,
+        unitEliminationClausesFrom, List.length_cons,
+        List.append_assoc]
+      rw [induction]
+      have indexEqual :
+          figureNineClauseIndex + 1 + rest.length =
+            figureNineClauseIndex + (rest.length + 1) := by
+        omega
+      rw [indexEqual]
+
+/-- Blockwise composed enumeration equals unit elimination applied after
+the complete Figure 9 enumeration. -/
+theorem composedClausesFrom_eq
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable)) :
+    composedClausesFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses =
+      unitEliminationClausesFrom
+        figureNineClauseStart
+        (figureNineClausesFrom
+          sourceClauseIndex sourceClauses) := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart with
+  | nil =>
+      simp [composedClausesFrom, figureNineClausesFrom,
+        unitEliminationClausesFrom]
+  | cons sourceClause rest induction =>
+      rw [figureNineClausesFrom, composedClausesFrom,
+        unitEliminationClausesFrom_append]
+      rw [induction]
+
+@[simp]
+theorem clauseMetadataFor_clauses
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClause : PositionedPeriodicClause Variable) :
+    (clauseMetadataFor
+      sourceClauseIndex figureNineClauseStart sourceClause).map
+        ClauseMetadata.clause =
+      unitEliminationClausesFrom
+        figureNineClauseStart
+        (PeriodicOneInThreePositioned.clauseGadget
+          sourceClauseIndex sourceClause) := by
+  simp [clauseMetadataFor, List.map_map,
+    Function.comp_def]
+
+@[simp]
+theorem formulaClauseMetadataFrom_clauses
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable)) :
+    (formulaClauseMetadataFrom
+      sourceClauseIndex figureNineClauseStart sourceClauses).map
+        ClauseMetadata.clause =
+      composedClausesFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart with
+  | nil =>
+      simp [formulaClauseMetadataFrom, composedClausesFrom]
+  | cons sourceClause rest induction =>
+      simp [formulaClauseMetadataFrom, composedClausesFrom,
+        induction]
+
+/-- Forgetting the composed metadata recovers the actual two-stage
+positioned formula exactly. -/
+@[simp]
+theorem formulaClauseMetadata_clauses
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable) :
+    (formulaClauseMetadata source).map
+        ClauseMetadata.clause =
+      (PeriodicOneInThreeNoUnitsPositioned.formula
+        (PeriodicOneInThreePositioned.formula source)).clauses := by
+  rw [formulaClauseMetadata,
+    formulaClauseMetadataFrom_clauses,
+    composedClausesFrom_eq,
+    figureNineClausesFrom_eq_zipIdx,
+    unitEliminationClausesFrom_eq_zipIdx]
+  rfl
+
+/-- Embedding positions out of one enumerated composed block recovers the
+exact embedded block used by the instantiated drawing. -/
+@[simp]
+theorem unitEliminationClausesFrom_embed
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClause : PositionedPeriodicClause Variable) :
+    (unitEliminationClausesFrom
+      figureNineClauseStart
+      (PeriodicOneInThreePositioned.clauseGadget
+        sourceClauseIndex sourceClause)).map
+          PlanarOneInThreeNoUnits.embedPositionedClause =
+      composedClauseGadget
+        sourceClauseIndex figureNineClauseStart sourceClause := by
+  rw [unitEliminationClausesFrom_eq_localZipIdx]
+  simp [composedClauseGadget, List.map_flatMap]
+
+/-- A genuine positioned local clause remains at the same local index after
+forgetting its position for the composed drawing. -/
+theorem localClauseMember_embedded
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClause : PositionedPeriodicClause Variable)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {localClauseIndex : Nat}
+    (clauseMember :
+      (clause, localClauseIndex) ∈
+        (unitEliminationClausesFrom
+          figureNineClauseStart
+          (PeriodicOneInThreePositioned.clauseGadget
+            sourceClauseIndex sourceClause)).zipIdx) :
+    (PlanarOneInThreeNoUnits.embedPositionedClause clause,
+        localClauseIndex) ∈
+      (composedClauseGadget
+        sourceClauseIndex figureNineClauseStart sourceClause).zipIdx := by
+  rw [← unitEliminationClausesFrom_embed]
+  apply List.mem_zipIdx_iff_getElem?.mpr
+  rw [List.getElem?_map,
+    (List.mem_zipIdx_iff_getElem?).mp clauseMember]
+  rfl
+
+/-- A local metadata entry retains its source and its genuine clause index
+inside that source's composed block. -/
+theorem clauseMetadataFor_valid
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClause : PositionedPeriodicClause Variable)
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ clauseMetadataFor
+        sourceClauseIndex figureNineClauseStart sourceClause) :
+    metadata.sourceClause = sourceClause ∧
+      metadata.sourceClauseIndex = sourceClauseIndex ∧
+      metadata.figureNineClauseStart = figureNineClauseStart ∧
+      (metadata.clause, metadata.localClauseIndex) ∈
+        (unitEliminationClausesFrom
+          figureNineClauseStart
+          (PeriodicOneInThreePositioned.clauseGadget
+            sourceClauseIndex sourceClause)).zipIdx := by
+  rw [clauseMetadataFor] at metadataMember
+  rcases List.mem_map.mp metadataMember with
+    ⟨taggedClause, taggedClauseMember, metadataEqual⟩
+  subst metadata
+  exact ⟨rfl, rfl, rfl, taggedClauseMember⟩
+
+/-- Every global metadata entry retains a genuine original source-clause
+membership and a genuine local composed-clause membership. -/
+theorem formulaClauseMetadataFrom_valid
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable))
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ formulaClauseMetadataFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses) :
+    (metadata.sourceClause,
+        metadata.sourceClauseIndex) ∈
+      sourceClauses.zipIdx sourceClauseIndex ∧
+    (metadata.clause, metadata.localClauseIndex) ∈
+      (unitEliminationClausesFrom
+        metadata.figureNineClauseStart
+        (PeriodicOneInThreePositioned.clauseGadget
+          metadata.sourceClauseIndex
+          metadata.sourceClause)).zipIdx := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart with
+  | nil =>
+      simp [formulaClauseMetadataFrom] at metadataMember
+  | cons sourceClause rest induction =>
+      rw [formulaClauseMetadataFrom,
+        List.mem_append] at metadataMember
+      rcases metadataMember with headMember | tailMember
+      · have valid :=
+          clauseMetadataFor_valid
+            sourceClauseIndex figureNineClauseStart
+            sourceClause headMember
+        constructor
+        · simp [valid.1, valid.2.1,
+            List.zipIdx_cons]
+        · simpa [valid.1, valid.2.1,
+            valid.2.2.1] using valid.2.2.2
+      · have valid :=
+          induction
+            (sourceClauseIndex :=
+              sourceClauseIndex + 1)
+            (figureNineClauseStart :=
+              figureNineClauseStart +
+                (PeriodicOneInThreePositioned.clauseGadget
+                  sourceClauseIndex sourceClause).length)
+            tailMember
+        constructor
+        · simp only [List.zipIdx_cons, List.mem_cons]
+          exact Or.inr valid.1
+        · exact valid.2
+
+/-- Every complete metadata entry has the same two membership invariants. -/
+theorem formulaClauseMetadata_valid
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ formulaClauseMetadata source) :
+    (metadata.sourceClause,
+        metadata.sourceClauseIndex) ∈
+      source.clauses.zipIdx ∧
+    (metadata.clause, metadata.localClauseIndex) ∈
+      (unitEliminationClausesFrom
+        metadata.figureNineClauseStart
+        (PeriodicOneInThreePositioned.clauseGadget
+          metadata.sourceClauseIndex
+          metadata.sourceClause)).zipIdx := by
+  exact formulaClauseMetadataFrom_valid
+    0 0 source.clauses metadataMember
+
+/-- Every complete metadata entry also gives the corresponding embedded
+clause membership in the exact formula of its certified composed drawing. -/
+theorem formulaClauseMetadata_valid_embedded
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ formulaClauseMetadata source) :
+    (metadata.sourceClause,
+        metadata.sourceClauseIndex) ∈
+      source.clauses.zipIdx ∧
+    (PlanarOneInThreeNoUnits.embedPositionedClause metadata.clause,
+        metadata.localClauseIndex) ∈
+      (composedClauseGadget
+        metadata.sourceClauseIndex
+        metadata.figureNineClauseStart
+        metadata.sourceClause).zipIdx := by
+  have valid :=
+    formulaClauseMetadata_valid source metadataMember
+  exact
+    ⟨valid.1,
+      localClauseMember_embedded
+        metadata.sourceClauseIndex
+        metadata.figureNineClauseStart
+        metadata.sourceClause valid.2⟩
+
+/-- Looking up a genuine final clause yields metadata carrying that exact
+clause. -/
+theorem formulaClauseMetadata_lookup
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx) :
+    ∃ metadata,
+      (formulaClauseMetadata source)[clauseIndex]? =
+        some metadata ∧
+      metadata.clause = clause := by
+  have clauseLookup :
+      (PeriodicOneInThreeNoUnitsPositioned.formula
+        (PeriodicOneInThreePositioned.formula source)).clauses[
+          clauseIndex]? =
+        some clause :=
+    (List.mem_zipIdx_iff_getElem?).mp clauseMember
+  have projectedLookup :
+      ((formulaClauseMetadata source).map
+          ClauseMetadata.clause)[clauseIndex]? =
+        some clause := by
+    simpa using clauseLookup
+  rw [List.getElem?_map] at projectedLookup
+  simpa only [Option.map_eq_some_iff] using projectedLookup
+
+/-- A genuine final lookup also returns the original-source and local-block
+membership invariants needed to select its certified composed route. -/
+theorem formulaClauseMetadata_lookup_valid
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx) :
+    ∃ metadata,
+      (formulaClauseMetadata source)[clauseIndex]? =
+        some metadata ∧
+      metadata.clause = clause ∧
+      (metadata.sourceClause,
+          metadata.sourceClauseIndex) ∈
+        source.clauses.zipIdx ∧
+      (metadata.clause, metadata.localClauseIndex) ∈
+        (unitEliminationClausesFrom
+          metadata.figureNineClauseStart
+          (PeriodicOneInThreePositioned.clauseGadget
+            metadata.sourceClauseIndex
+            metadata.sourceClause)).zipIdx := by
+  rcases formulaClauseMetadata_lookup
+      source clauseMember with
+    ⟨metadata, metadataLookup, clauseEqual⟩
+  have metadataIndexLt :
+      clauseIndex <
+        (formulaClauseMetadata source).length :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).1
+  have metadataAt :
+      (formulaClauseMetadata source)[clauseIndex] =
+        metadata :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).2
+  have metadataMember :
+      metadata ∈ formulaClauseMetadata source := by
+    rw [← metadataAt]
+    exact List.getElem_mem metadataIndexLt
+  exact
+    ⟨metadata, metadataLookup, clauseEqual,
+      formulaClauseMetadata_valid
+        source metadataMember⟩
+
+/-- A genuine final lookup additionally identifies its exact clause
+occurrence in the embedded composed drawing formula. -/
+theorem formulaClauseMetadata_lookup_valid_embedded
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx) :
+    ∃ metadata,
+      (formulaClauseMetadata source)[clauseIndex]? =
+        some metadata ∧
+      metadata.clause = clause ∧
+      (metadata.sourceClause,
+          metadata.sourceClauseIndex) ∈
+        source.clauses.zipIdx ∧
+      (PlanarOneInThreeNoUnits.embedPositionedClause metadata.clause,
+          metadata.localClauseIndex) ∈
+        (composedClauseGadget
+          metadata.sourceClauseIndex
+          metadata.figureNineClauseStart
+          metadata.sourceClause).zipIdx := by
+  rcases formulaClauseMetadata_lookup
+      source clauseMember with
+    ⟨metadata, metadataLookup, clauseEqual⟩
+  have metadataIndexLt :
+      clauseIndex <
+        (formulaClauseMetadata source).length :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).1
+  have metadataAt :
+      (formulaClauseMetadata source)[clauseIndex] =
+        metadata :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).2
+  have metadataMember :
+      metadata ∈ formulaClauseMetadata source := by
+    rw [← metadataAt]
+    exact List.getElem_mem metadataIndexLt
+  exact
+    ⟨metadata, metadataLookup, clauseEqual,
+      formulaClauseMetadata_valid_embedded
+        source metadataMember⟩
+
+end PlanarOneInThreeNoUnitsFigureNine
+end LeanTrominoes

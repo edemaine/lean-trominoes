@@ -2060,6 +2060,11 @@ The representation choices for this target are:
   Width three gives exact agreement with the actual two-stage clause block,
   while per-clause atom distinctness yields its complete continuous-planarity
   certificate.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineIndex.lean)
+  indexes the actual two-stage positioned formula one original source block
+  at a time.  Every final clause is linked to its original source clause, the
+  global start of its Figure 9 block, and its exact local occurrence in the
+  certified composed drawing.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
