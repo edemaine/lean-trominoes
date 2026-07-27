@@ -1901,6 +1901,13 @@ The representation choices for this target are:
   preserves its `RouteBend` and variable-arm metadata preserves its lifted
   site, enabling lossless selection of the corresponding certified local
   incidence drawing.
+- [`LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean)
+  translates the continuously planar Figure 8(b) incidence template to each
+  canonical crossing and injectively renames its boundary and internal roles
+  into the final planar-SAT variable type.  The adapter proves the exact
+  local clause formula, every realized variable position, physical route
+  endpoints, continuous planarity, and preservation of the fixed
+  eight-direction compass terminal rays.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalDegree.lean)
   sharpens the finite complete-carrier accounting at segment terminals.
   The two directional terminal ports are proved to lie strictly beyond every
