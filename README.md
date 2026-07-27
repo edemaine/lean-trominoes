@@ -1601,7 +1601,17 @@ The representation choices for this target are:
   every possible variable and clause port in the standard block; the elbow
   membership theorem then proves that every translated fan point remains in
   its owning refined block.  Both fans have certified exact endpoints and
-  orthogonality.
+  orthogonality.  These independently chosen elbows are geometric candidates,
+  not yet a certificate that the three colors respect the cyclic boundary
+  order at every source vertex.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFanSystem.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFanSystem.lean)
+  makes that coordination requirement explicit.  A fan system selects every
+  variable- and clause-side stub together and certifies its exact finite
+  gadget and corridor endpoints, orthogonality, and containment in the
+  endpoint macrocell.  Any such system composes with the certified ribbon
+  cores to give the endpoint and orthogonality portions of a
+  `ThreeStrandRouting`; its global pairwise separation certificate remains a
+  distinct obligation.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean)
   joins the two certified block-local endpoint fans to each corrected
   corridor core.  The complete route is proved to have the exact endpoints
