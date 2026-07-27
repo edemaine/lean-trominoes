@@ -2092,6 +2092,11 @@ The representation choices for this target are:
   uniqueness proof, therefore gives at least ten cells of clearance.  Each
   link consequently has its exact formula and endpoint positions together
   with a complete finite orthogonality and continuous-planarity certificate.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierCoordinateOrder.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierCoordinateOrder.lean)
+  proves that distinct nodes on one complete carrier cannot share an axis
+  coordinate, upgrades each weakly sorted carrier list to strict pairwise
+  order, and shows that every retained adjacent pair advances by at least
+  the full ten-cell port spacing.
 - [`LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean)
   adapts the fixed corner-equality template to one syntactic route bend.
   Genuine incoming and outgoing segments determine their compass ports; a
@@ -2106,6 +2111,15 @@ The representation choices for this target are:
   compass port; the reconstructed lens macrocell origin is proved to be the
   terminal's scaled drawing cell.  Four corollaries identify these data with
   either physical port of an incident route bend.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierCrossoverPortGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierCrossoverPortGeometry.lean)
+  uses strict carrier order to show that retained links leave crossovers
+  only through right or bottom boundaries and enter only through left or
+  top boundaries.  It then identifies both lens ports and reconstructed
+  macrocell origins with the exact incident crossover interfaces.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierCrossoverSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierCrossoverSeparation.lean)
+  applies the external-lens/internal-crossover boundary separator at that
+  exact interface, proving that every genuine carrier route avoids every
+  genuine route of an incident crossover drawing.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTerminalComponentGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTerminalComponentGeometry.lean)
   identifies each selected occurrence terminal's carrier port with its
   routed-variable or routed-clause fanout arm, and its scaled drawing point
