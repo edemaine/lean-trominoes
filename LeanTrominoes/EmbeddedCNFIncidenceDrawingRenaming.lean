@@ -476,6 +476,88 @@ theorem isValid_rename
     isPlanar_rename variableMap targetPosition
       injectiveOn positionsMatch valid.2.2⟩
 
+/-! ## Canonical positions on the image of a renaming -/
+
+/-- Give a renamed variable the position of the first occurring source
+variable that maps to it.  Values outside the finite image receive an
+irrelevant default position. -/
+def imageVariablePosition
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    (drawing : EmbeddedCNFIncidenceDrawing Source)
+    (variableMap : Source → Target)
+    (target : Target) : Cell :=
+  match drawing.variableVertices.find?
+      (fun source => variableMap source == target) with
+  | some source => drawing.variablePosition source
+  | none => (0, 0)
+
+/-- If the renaming is injective on occurring variables, its canonical image
+placement recovers every source position. -/
+theorem imageVariablePosition_map
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    (drawing : EmbeddedCNFIncidenceDrawing Source)
+    (variableMap : Source → Target)
+    (injectiveOn :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          variableMap first = variableMap second →
+            first = second)
+    (source : Source)
+    (sourceMember : source ∈ drawing.variableVertices) :
+    imageVariablePosition drawing variableMap
+        (variableMap source) =
+      drawing.variablePosition source := by
+  unfold imageVariablePosition
+  split
+  case h_1 found foundEqual =>
+    have foundMember :
+        found ∈ drawing.variableVertices :=
+      List.mem_of_find?_eq_some foundEqual
+    have foundMaps :
+        variableMap found = variableMap source := by
+      have predicateTrue := List.find?_some foundEqual
+      simpa using predicateTrue
+    rw [injectiveOn found foundMember
+      source sourceMember foundMaps]
+  case h_2 noneEqual =>
+    have predicateFalse :=
+      List.find?_eq_none.mp noneEqual source sourceMember
+    simp at predicateFalse
+
+/-- Rename a drawing while deriving the target placement canonically from
+the finite image of the variable map. -/
+def renameToImage
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    (drawing : EmbeddedCNFIncidenceDrawing Source)
+    (variableMap : Source → Target) :
+    EmbeddedCNFIncidenceDrawing Target :=
+  drawing.rename variableMap
+    (imageVariablePosition drawing variableMap)
+
+/-- An injective-on-occurrences renaming to its canonical image placement
+preserves the complete drawing certificate. -/
+theorem renameToImage_isValid
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    (drawing : EmbeddedCNFIncidenceDrawing Source)
+    (variableMap : Source → Target)
+    (injectiveOn :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          variableMap first = variableMap second →
+            first = second)
+    (valid : drawing.IsValid) :
+    (renameToImage drawing variableMap).IsValid := by
+  apply isValid_rename variableMap
+    (imageVariablePosition drawing variableMap)
+    injectiveOn
+  · exact imageVariablePosition_map
+      drawing variableMap injectiveOn
+  · exact valid
+
 end EmbeddedCNFIncidenceDrawing
 end PlanarThreeSAT
 end LeanTrominoes

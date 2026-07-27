@@ -1528,7 +1528,9 @@ The representation choices for this target are:
   logical variable renaming that is injective on the variables actually
   occurring in the drawing and whose target placement preserves their source
   coordinates.  Incidence order and routes remain unchanged; unused template
-  roles impose no artificial injectivity obligation.
+  roles impose no artificial injectivity obligation.  A canonical
+  image-placement construction now derives those target coordinates
+  automatically from any injective-on-occurrences variable map.
 - [`LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean`](LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean)
   renames a certified angular fan's ports to the actual
   `copy atom port` variables and translates it into the selected positioned
