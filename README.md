@@ -2008,6 +2008,12 @@ The representation choices for this target are:
   heights from vertex height, while the only remaining fanout case uses the
   construction's explicit off-center condition; half-open periodic
   normalization then lifts the disjointness to the infinite drawing.
+- [`LeanTrominoes/PeriodicOrthocrossingCrossoverCenterDisjointness.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverCenterDisjointness.lean)
+  proves that no canonical crossover center can coincide with a lifted
+  declared graph vertex.  A reusable one-coordinate normalization lemma
+  first identifies the crossover's horizontal lane: private tracks are too
+  high, and the unique interior grid point of a remaining fanout lane lies
+  one column away from every vertex center.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean)
   transports the finite different-arm certificate through macrocell
   translation and logical renaming.  Thus two distinct routed-variable
