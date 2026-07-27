@@ -1840,6 +1840,11 @@ The representation choices for this target are:
   and endpoint-only port contacts through signed-axis orientation,
   translation, and logical renaming.  Each selected lens route then avoids
   every route of any drawing certified inside either endpoint macrocell.
+- [`LeanTrominoes/PlanarThreeSATEqualityLensBoundingBox.lean`](LeanTrominoes/PlanarThreeSATEqualityLensBoundingBox.lean)
+  bounds the canonical lens between its endpoints and within normal offsets
+  `-2` through `1`, transports the exact narrow rectangle through signed-axis
+  placement and renaming, and exposes the resulting corridor for every
+  geometrically certified positioned link.
 - [`LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLinkLens.lean)
   reduces drawing one positioned equality link to four carrier facts:
   distinct endpoints, axis alignment, span at least eight, and the advertised
@@ -2100,8 +2105,13 @@ The representation choices for this target are:
   links on one carrier into one of the two nonoverlapping axial orders.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierAxisInterface.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierAxisInterface.lean)
   proves that every node on one occurrence has the same horizontal/vertical
-  tag and reduces retained-link ports to their forward and backward compass
-  directions.
+  tag and reduces retained-link directions and ports to their forward and
+  backward compass directions.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierBoundingBox.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierBoundingBox.lean)
+  simplifies every retained link's generic corridor to an explicit narrow
+  rectangle between its two physical nodes.  The bound survives final
+  planar-SAT renaming, and separated rectangles immediately give complete
+  contact-free separation of all selected route pairs.
 - [`LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean)
   turns strict carrier order into route separation for every pair of
   distinct links on one carrier.  The later lens lies inside the earlier

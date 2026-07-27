@@ -62,6 +62,46 @@ theorem carrierNode_isHorizontal_iff_of_commonCarrier
       (carrierNode_isHorizontal_iff
         graph firstMem firstAligned).mpr firstHorizontal
 
+/-- Every retained link advances east or north according to its carrier
+axis. -/
+theorem drawingCompleteCarrierLink_carrierDirection_eq_axis
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ drawingCompleteCarrierLinks graph) :
+    EqualityLink.carrierDirection
+        (CarrierNode.position graph) link =
+      if link.first.isHorizontal then .east else .north := by
+  have clearance :=
+    drawingCompleteCarrierLink_hasForwardClearance
+      wellFormed degree isLocal linkMem
+  by_cases horizontal : link.first.isHorizontal = true
+  · rw [if_pos horizontal]
+    unfold CarrierNode.HasForwardClearance at clearance
+    rw [if_pos horizontal] at clearance
+    have xLt :
+        (link.first.position graph).1 <
+          (link.second.position graph).1 := by
+      omega
+    simp [EqualityLink.carrierDirection,
+      AxisDirection.between, clearance.1, xLt]
+  · rw [if_neg horizontal]
+    unfold CarrierNode.HasForwardClearance at clearance
+    rw [if_neg horizontal] at clearance
+    have yLt :
+        (link.first.position graph).2 <
+          (link.second.position graph).2 := by
+      omega
+    have yNe :
+        (link.first.position graph).2 ≠
+          (link.second.position graph).2 :=
+      ne_of_lt yLt
+    simp [EqualityLink.carrierDirection,
+      AxisDirection.between, clearance.1, yLt, yNe]
+
 /-- The first port of a retained link points forward along its carrier. -/
 theorem drawingCompleteCarrierLink_firstCarrierPort_eq_axis
     {Vertex : Type*} [DecidableEq Vertex]
