@@ -2035,12 +2035,13 @@ The representation choices for this target are:
   with the corresponding positioned unit-elimination output.  Exhaustive
   certificates cover every possible source-literal polarity pattern.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineDrawing.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineDrawing.lean)
-  begins the composed geometric certificate for Figure 9 followed by unit
-  elimination.  In the full-width case it clips every scaled Figure 9 route
-  past the closed `6 × 6` replacement cell and supplies coordinated
-  connectors from the retained-clause ports.  One exact finite certificate
-  then verifies endpoints, orthogonality, simplicity, vertex avoidance, and
-  continuous planarity for the whole two-stage neighborhood.
+  gives the composed geometric certificates for Figure 9 followed by unit
+  elimination.  For all four possible source arities it clips every scaled
+  Figure 9 route past the closed `6 × 6` replacement cell and supplies
+  coordinated connectors from the new local ports.  Exact finite
+  certificates verify endpoints, orthogonality, simplicity, vertex
+  avoidance, and continuous planarity for each complete two-stage
+  neighborhood, including all auxiliaries created from padding unit clauses.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
