@@ -1994,6 +1994,14 @@ The representation choices for this target are:
   It also proves that two active links at one represented variable site
   classified as the same physical duplicator arm are the same link, and
   that two canonical crossover records at the same drawing point are equal.
+- [`LeanTrominoes/PeriodicOrthocrossingRouteBendCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRouteBendCenters.lean)
+  classifies every inner point of a constructed route as one of eight
+  semantic port, track, gate, boundary, or fanout positions in the half-open
+  fundamental square.  The generated route list is proved to enumerate
+  exactly those indexed placements.  For a well-formed local degree-three
+  graph, periodic normalization and the within-route no-duplicate
+  classification then prove that two enumerated bends at the same drawing
+  point are the same bend.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean)
   transports the finite different-arm certificate through macrocell
   translation and logical renaming.  Thus two distinct routed-variable
