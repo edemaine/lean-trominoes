@@ -52,6 +52,60 @@ irreducible_def drawingPlanarSATLocalIncidenceDrawing
       drawingPlanarSATLocalIncidenceRoutes formula := by
   rw [drawingPlanarSATLocalIncidenceDrawing]
 
+/-- Equal geometric-component/local-clause keys returned at two global
+metadata positions identify the same global clause occurrence. -/
+def DrawingPlanarSATComponentClauseKeysInjective
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) : Prop :=
+  ∀ {firstMetadata secondMetadata :
+      DrawingPlanarSATClauseMetadata Variable}
+    {firstClauseIndex secondClauseIndex : Nat},
+    (drawingPlanarSATClauseMetadata formula)[firstClauseIndex]? =
+        some firstMetadata →
+      (drawingPlanarSATClauseMetadata formula)[secondClauseIndex]? =
+        some secondMetadata →
+      firstMetadata.source.component =
+          secondMetadata.source.component →
+      firstMetadata.source.localClauseIndex =
+          secondMetadata.source.localClauseIndex →
+      firstClauseIndex = secondClauseIndex
+
+/-- The residual pairwise route obligation after local component planarity:
+routes selected from genuinely different geometric components avoid one
+another. -/
+def DrawingPlanarSATCrossComponentRoutesSeparated
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) : Prop :=
+  ∀ {firstClause secondClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat},
+    (firstClause, firstClauseIndex) ∈
+        (drawingPlanarSATFormula formula).zipIdx →
+      (secondClause, secondClauseIndex) ∈
+        (drawingPlanarSATFormula formula).zipIdx →
+      ∀ {firstLiteral secondLiteral :
+          PlanarSATVariable Variable × Bool}
+        {firstLiteralIndex secondLiteralIndex : Nat},
+        (firstLiteral, firstLiteralIndex) ∈
+            firstClause.literals.zipIdx →
+          (secondLiteral, secondLiteralIndex) ∈
+            secondClause.literals.zipIdx →
+          ∀ {firstMetadata secondMetadata :
+              DrawingPlanarSATClauseMetadata Variable},
+            (drawingPlanarSATClauseMetadata
+                formula)[firstClauseIndex]? =
+              some firstMetadata →
+            (drawingPlanarSATClauseMetadata
+                formula)[secondClauseIndex]? =
+              some secondMetadata →
+            firstMetadata.source.component ≠
+                secondMetadata.source.component →
+            EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+              (drawingPlanarSATLocalIncidenceRoutes
+                formula firstClauseIndex firstLiteralIndex)
+              (drawingPlanarSATLocalIncidenceRoutes
+                formula secondClauseIndex secondLiteralIndex)
+
 /-- The assembled finite drawing has exact clause and variable endpoints. -/
 theorem drawingPlanarSATLocalIncidenceDrawing_routesMatch
     {Variable : Type*} [DecidableEq Variable]
@@ -256,6 +310,149 @@ theorem drawingPlanarSATLocalIncidenceDrawing_routesAreSimple
     literal literalIndex literalMember
   exact drawingPlanarSATLocalIncidenceRoute_isSimple
     formula wellFormed degree isLocal clauseMember literalMember
+
+/-- Component/local-clause key injectivity and cross-component separation
+discharge the complete pairwise-route field of global separation. -/
+theorem drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (keyInjective :
+      DrawingPlanarSATComponentClauseKeysInjective formula)
+    (crossComponent :
+      DrawingPlanarSATCrossComponentRoutesSeparated formula) :
+    ∀ firstIndex secondIndex :
+        Fin
+          (drawingPlanarSATLocalIncidenceDrawing
+            formula).incidences.length,
+      firstIndex ≠ secondIndex →
+        EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+          ((drawingPlanarSATLocalIncidenceDrawing formula).routeAt
+            ((drawingPlanarSATLocalIncidenceDrawing
+              formula).incidenceAt firstIndex))
+          ((drawingPlanarSATLocalIncidenceDrawing formula).routeAt
+            ((drawingPlanarSATLocalIncidenceDrawing
+              formula).incidenceAt secondIndex)) := by
+  intro firstIndex secondIndex different
+  let drawing :=
+    drawingPlanarSATLocalIncidenceDrawing formula
+  let firstIncidence := drawing.incidenceAt firstIndex
+  let secondIncidence := drawing.incidenceAt secondIndex
+  have firstIncidenceMember :
+      firstIncidence ∈ drawing.incidences :=
+    List.get_mem drawing.incidences firstIndex
+  have secondIncidenceMember :
+      secondIncidence ∈ drawing.incidences :=
+    List.get_mem drawing.incidences secondIndex
+  have firstMembers :=
+    (mem_embeddedCNFIncidences_iff
+      drawing.formula firstIncidence).mp firstIncidenceMember
+  have secondMembers :=
+    (mem_embeddedCNFIncidences_iff
+      drawing.formula secondIncidence).mp secondIncidenceMember
+  have firstClauseMember :
+      (firstIncidence.clause, firstIncidence.clauseIndex) ∈
+        (drawingPlanarSATFormula formula).zipIdx := by
+    simpa [drawing,
+      drawingPlanarSATLocalIncidenceDrawing_formula] using
+        firstMembers.1
+  have secondClauseMember :
+      (secondIncidence.clause, secondIncidence.clauseIndex) ∈
+        (drawingPlanarSATFormula formula).zipIdx := by
+    simpa [drawing,
+      drawingPlanarSATLocalIncidenceDrawing_formula] using
+        secondMembers.1
+  rcases drawingPlanarSATClauseMetadata_lookup_valid
+      formula firstClauseMember with
+    ⟨firstMetadata, firstLookup,
+      firstClauseEqual, firstValid⟩
+  rcases drawingPlanarSATClauseMetadata_lookup_valid
+      formula secondClauseMember with
+    ⟨secondMetadata, secondLookup,
+      secondClauseEqual, secondValid⟩
+  change EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+    (drawing.routes
+      firstIncidence.clauseIndex firstIncidence.literalIndex)
+    (drawing.routes
+      secondIncidence.clauseIndex secondIncidence.literalIndex)
+  rw [show drawing.routes =
+      drawingPlanarSATLocalIncidenceRoutes formula by
+    simp [drawing]]
+  by_cases sameComponent :
+      firstMetadata.source.component =
+        secondMetadata.source.component
+  · have localCoordinatesDifferent :
+        firstMetadata.source.localClauseIndex ≠
+              secondMetadata.source.localClauseIndex ∨
+          firstIncidence.literalIndex ≠
+              secondIncidence.literalIndex := by
+      rcases drawing.incidenceCoordinates_ne_of_ne different with
+        globalClauseDifferent | literalDifferent
+      · left
+        intro localClauseEqual
+        exact globalClauseDifferent
+          (keyInjective firstLookup secondLookup
+            sameComponent localClauseEqual)
+      · exact Or.inr literalDifferent
+    have firstLiteralMember :
+        (firstIncidence.literal, firstIncidence.literalIndex) ∈
+          firstMetadata.clause.literals.zipIdx := by
+      simpa [firstClauseEqual] using firstMembers.2
+    have secondLiteralMember :
+        (secondIncidence.literal, secondIncidence.literalIndex) ∈
+          secondMetadata.clause.literals.zipIdx := by
+      simpa [secondClauseEqual] using secondMembers.2
+    have localAvoids :=
+      firstMetadata.localRoutesAvoidEachOther
+        wellFormed degree isLocal secondMetadata
+        firstValid secondValid sameComponent
+        firstLiteralMember secondLiteralMember
+        localCoordinatesDifferent
+    simpa [drawingPlanarSATLocalIncidenceRoutes,
+      firstLookup, secondLookup] using localAvoids
+  · exact crossComponent
+      firstClauseMember secondClauseMember
+      firstMembers.2 secondMembers.2
+      firstLookup secondLookup sameComponent
+
+/-- Once component keys are injective and different components are
+geometrically separated, only vertex/route avoidance and vertex-position
+distinctness remain for complete finite planarity. -/
+theorem
+    drawingPlanarSATLocalIncidenceDrawing_isPlanar_iff_vertexSeparation
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (keyInjective :
+      DrawingPlanarSATComponentClauseKeysInjective formula)
+    (crossComponent :
+      DrawingPlanarSATCrossComponentRoutesSeparated formula) :
+    (drawingPlanarSATLocalIncidenceDrawing formula).IsPlanar ↔
+      (drawingPlanarSATLocalIncidenceDrawing
+          formula).VerticesAvoidRouteInteriors ∧
+        (drawingPlanarSATLocalIncidenceDrawing
+          formula).vertexPositions.Nodup := by
+  constructor
+  · intro planar
+    exact planar.2.2
+  · rintro ⟨verticesAvoid, verticesNodup⟩
+    exact
+      ⟨drawingPlanarSATLocalIncidenceDrawing_routesAreSimple
+          formula wellFormed degree isLocal,
+        drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
+          formula wellFormed degree isLocal
+          keyInjective crossComponent,
+        verticesAvoid, verticesNodup⟩
 
 /-- Complete finite planarity now reduces exactly to global separation;
 route simplicity is already discharged component by component. -/

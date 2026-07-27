@@ -37,6 +37,55 @@ def embeddedCNFIncidences {Variable : Type*}
       ⟨taggedClause.1, taggedClause.2,
         taggedLiteral.1, taggedLiteral.2⟩
 
+/-- Presentation indices make the flattened incidence list duplicate-free,
+even when the formula repeats a clause or a clause repeats a literal. -/
+theorem embeddedCNFIncidences_nodup
+    {Variable : Type*}
+    (formula : List (EmbeddedClause Variable)) :
+    (embeddedCNFIncidences formula).Nodup := by
+  have clauseIndicesPairwise :
+      formula.zipIdx.Pairwise
+        (fun first second => first.2 ≠ second.2) := by
+    rw [← List.pairwise_map]
+    exact List.nodup_zipIdx_map_snd formula
+  rw [embeddedCNFIncidences, List.nodup_flatMap]
+  constructor
+  · intro taggedClause taggedClauseMember
+    have taggedLiteralsNodup :
+        taggedClause.1.literals.zipIdx.Nodup :=
+      (List.nodup_zipIdx_map_snd
+        taggedClause.1.literals).of_map Prod.snd
+    apply taggedLiteralsNodup.map_on
+    intro first firstMember second secondMember equal
+    have indexEqual :
+        first.2 = second.2 :=
+      congrArg EmbeddedCNFIncidence.literalIndex equal
+    have firstLookup :=
+      (List.mk_mem_zipIdx_iff_getElem?
+        (l := taggedClause.1.literals)
+        (x := first.1) (i := first.2)).mp firstMember
+    have secondLookup :=
+      (List.mk_mem_zipIdx_iff_getElem?
+        (l := taggedClause.1.literals)
+        (x := second.1) (i := second.2)).mp secondMember
+    have valueEqual : first.1 = second.1 := by
+      rw [indexEqual] at firstLookup
+      exact Option.some.inj
+        (firstLookup.symm.trans secondLookup)
+    exact Prod.ext valueEqual indexEqual
+  · exact clauseIndicesPairwise.imp fun
+      {first second} clauseIndexNe => by
+        change List.Disjoint _ _
+        rw [List.disjoint_left]
+        intro incidence firstMember secondMember
+        rcases List.mem_map.mp firstMember with
+          ⟨firstLiteral, firstLiteralMember, incidenceEqual⟩
+        rcases List.mem_map.mp secondMember with
+          ⟨secondLiteral, secondLiteralMember, incidenceEqual'⟩
+        exact clauseIndexNe
+          (congrArg EmbeddedCNFIncidence.clauseIndex
+            (incidenceEqual.trans incidenceEqual'.symm))
+
 /-- Membership in the flattened incidence list is exactly membership at
 both levels of the embedded formula's indexed presentation. -/
 theorem mem_embeddedCNFIncidences_iff
@@ -64,6 +113,55 @@ theorem mem_embeddedCNFIncidences_iff
       ⟨(incidence.literal, incidence.literalIndex),
         literalMember, by cases incidence; rfl⟩
 
+/-- Two genuine flattened incidences with the same two presentation indices
+are the same metadata-rich occurrence. -/
+theorem embeddedCNFIncidence_eq_of_indices_eq
+    {Variable : Type*}
+    (formula : List (EmbeddedClause Variable))
+    {first second : EmbeddedCNFIncidence Variable}
+    (firstMember : first ∈ embeddedCNFIncidences formula)
+    (secondMember : second ∈ embeddedCNFIncidences formula)
+    (clauseIndexEqual :
+      first.clauseIndex = second.clauseIndex)
+    (literalIndexEqual :
+      first.literalIndex = second.literalIndex) :
+    first = second := by
+  have firstMembers :=
+    (mem_embeddedCNFIncidences_iff formula first).mp firstMember
+  have secondMembers :=
+    (mem_embeddedCNFIncidences_iff formula second).mp secondMember
+  have firstClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?
+      (l := formula)
+      (x := first.clause) (i := first.clauseIndex)).mp
+        firstMembers.1
+  have secondClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?
+      (l := formula)
+      (x := second.clause) (i := second.clauseIndex)).mp
+        secondMembers.1
+  have clauseEqual : first.clause = second.clause := by
+    rw [clauseIndexEqual] at firstClauseLookup
+    exact Option.some.inj
+      (firstClauseLookup.symm.trans secondClauseLookup)
+  have firstLiteralLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?
+      (l := first.clause.literals)
+      (x := first.literal) (i := first.literalIndex)).mp
+        firstMembers.2
+  have secondLiteralLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?
+      (l := second.clause.literals)
+      (x := second.literal) (i := second.literalIndex)).mp
+        secondMembers.2
+  have literalEqual : first.literal = second.literal := by
+    rw [clauseEqual, literalIndexEqual] at firstLiteralLookup
+    exact Option.some.inj
+      (firstLiteralLookup.symm.trans secondLiteralLookup)
+  cases first
+  cases second
+  simp_all
+
 /-- A finite embedded formula together with its physical variable positions
 and one total indexed route family.  Out-of-range route values are harmless:
 all predicates inspect only `embeddedCNFIncidences`. -/
@@ -86,6 +184,39 @@ def incidenceAt {Variable : Type*}
     (index : Fin drawing.incidences.length) :
     EmbeddedCNFIncidence Variable :=
   drawing.incidences.get index
+
+/-- Selecting a genuine incidence by its finite list index is injective. -/
+theorem incidenceAt_injective {Variable : Type*}
+    (drawing : EmbeddedCNFIncidenceDrawing Variable) :
+    Function.Injective drawing.incidenceAt := by
+  intro first second equal
+  exact
+    ((embeddedCNFIncidences_nodup drawing.formula).get_inj_iff).mp
+      equal
+
+/-- Distinct finite incidence indices differ at the clause or literal
+presentation level. -/
+theorem incidenceCoordinates_ne_of_ne {Variable : Type*}
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    {first second : Fin drawing.incidences.length}
+    (different : first ≠ second) :
+    (drawing.incidenceAt first).clauseIndex ≠
+        (drawing.incidenceAt second).clauseIndex ∨
+      (drawing.incidenceAt first).literalIndex ≠
+        (drawing.incidenceAt second).literalIndex := by
+  by_cases clauseIndexNe :
+      (drawing.incidenceAt first).clauseIndex ≠
+        (drawing.incidenceAt second).clauseIndex
+  · exact Or.inl clauseIndexNe
+  · right
+    intro literalIndexEqual
+    apply different
+    apply drawing.incidenceAt_injective
+    apply embeddedCNFIncidence_eq_of_indices_eq drawing.formula
+    · exact List.get_mem drawing.incidences first
+    · exact List.get_mem drawing.incidences second
+    · exact Decidable.not_not.mp clauseIndexNe
+    · exact literalIndexEqual
 
 /-- Select the route belonging to one metadata-rich occurrence. -/
 def routeAt {Variable : Type*}
