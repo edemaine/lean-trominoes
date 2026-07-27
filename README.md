@@ -1887,6 +1887,12 @@ The representation choices for this target are:
   actual positioned semantic replacement, and exhaustive certificates cover
   every polarity pattern of the present source literals; unit elimination
   remains a separate local replacement.
+- [`LeanTrominoes/PlanarOneInThreeFigureNineInstantiation.lean`](LeanTrominoes/PlanarOneInThreeFigureNineInstantiation.lean)
+  renames the certified full-width template to arbitrary pairwise-distinct
+  source atoms and the actual clause-scoped Figure 9 auxiliaries, then
+  translates it into the source clause's refinement cell.  Its formula is
+  definitionally the real positioned `clauseGadget` output, and the
+  instantiated drawing inherits the complete geometric certificate.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean)
   certifies all four local cases of the subsequent `6 × 6` unit-elimination
   refinement: the empty-clause triangle, unit-clause diamond, and retained

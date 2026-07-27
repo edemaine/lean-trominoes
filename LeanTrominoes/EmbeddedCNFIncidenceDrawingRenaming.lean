@@ -172,8 +172,9 @@ theorem vertexPositions_rename
           variableMap first = variableMap second →
             first = second)
     (positionsMatch :
-      ∀ atom, targetPosition (variableMap atom) =
-        drawing.variablePosition atom) :
+      ∀ atom ∈ drawing.variableVertices,
+        targetPosition (variableMap atom) =
+          drawing.variablePosition atom) :
     (drawing.rename variableMap targetPosition).vertexPositions =
       drawing.vertexPositions := by
   rw [vertexPositions, vertexPositions,
@@ -181,8 +182,11 @@ theorem vertexPositions_rename
       drawing variableMap targetPosition injectiveOn]
   simp only [EmbeddedCNFIncidenceDrawing.rename,
     List.map_map, Function.comp_def]
-  simp_rw [positionsMatch]
-  rfl
+  apply congrArg₂ (· ++ ·)
+  · apply List.map_congr_left
+    intro atom atomMember
+    exact positionsMatch atom atomMember
+  · rfl
 
 /-- Route lookup is unaffected by logical variable renaming. -/
 @[simp]
@@ -233,8 +237,9 @@ theorem routesMatch_rename
     (variableMap : Source → Target)
     (targetPosition : Target → Cell)
     (positionsMatch :
-      ∀ atom, targetPosition (variableMap atom) =
-        drawing.variablePosition atom)
+      ∀ atom ∈ drawing.variableVertices,
+        targetPosition (variableMap atom) =
+          drawing.variablePosition atom)
     (routesMatch : drawing.RoutesMatch) :
     (drawing.rename variableMap targetPosition).RoutesMatch := by
   apply routesMatch_of_physical
@@ -289,7 +294,20 @@ theorem routesMatch_rename
         some
           (targetPosition
             (variableMap taggedLiteral.1.1))
-    rw [positionsMatch]
+    have atomMember :
+        taggedLiteral.1.1 ∈ drawing.variableVertices := by
+      unfold variableVertices
+      rw [List.mem_dedup]
+      apply List.mem_flatMap.mpr
+      refine
+        ⟨taggedClause.1,
+          List.fst_mem_of_mem_zipIdx taggedClauseMember,
+          ?_⟩
+      exact List.mem_map.mpr
+        ⟨taggedLiteral.1,
+          List.fst_mem_of_mem_zipIdx taggedLiteralMember,
+          rfl⟩
+    rw [positionsMatch _ atomMember]
     exact base.2
 
 /-- Axis alignment depends only on routes, so renaming preserves it. -/
@@ -326,8 +344,9 @@ theorem isPlanar_rename
           variableMap first = variableMap second →
             first = second)
     (positionsMatch :
-      ∀ atom, targetPosition (variableMap atom) =
-        drawing.variablePosition atom)
+      ∀ atom ∈ drawing.variableVertices,
+        targetPosition (variableMap atom) =
+          drawing.variablePosition atom)
     (planar : drawing.IsPlanar) :
     (drawing.rename variableMap targetPosition).IsPlanar := by
   have verticesEqual :=
@@ -446,8 +465,9 @@ theorem isValid_rename
           variableMap first = variableMap second →
             first = second)
     (positionsMatch :
-      ∀ atom, targetPosition (variableMap atom) =
-        drawing.variablePosition atom)
+      ∀ atom ∈ drawing.variableVertices,
+        targetPosition (variableMap atom) =
+          drawing.variablePosition atom)
     (valid : drawing.IsValid) :
     (drawing.rename variableMap targetPosition).IsValid :=
   ⟨routesMatch_rename variableMap targetPosition

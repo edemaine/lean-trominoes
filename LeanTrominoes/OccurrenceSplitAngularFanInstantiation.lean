@@ -113,8 +113,9 @@ theorem instantiatedAngularFanDrawing_isValid
           sourcePlacement atom)
   · intro first _firstMember second _secondMember equal
     exact copy_injective atom equal
-  · exact angularFanLocalVariablePosition_copy
-      sourcePlacement atom
+  · intro port _portMember
+    exact angularFanLocalVariablePosition_copy
+      sourcePlacement atom port
   · exact angularFanDrawing_isValid count fits
 
 /-- The angular fan has exactly `count` selected spoke ports. -/
