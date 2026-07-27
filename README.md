@@ -1899,11 +1899,17 @@ The representation choices for this target are:
   remains a separate local replacement.
 - [`LeanTrominoes/PlanarOneInThreeFigureNineInstantiation.lean`](LeanTrominoes/PlanarOneInThreeFigureNineInstantiation.lean)
   renames every certified arity template to arbitrary present source atoms
-  and the actual clause-scoped Figure 9 auxiliaries, then translates it into
-  the source clause's refinement cell.  Each formula is definitionally the
-  real positioned `clauseGadget` output, and every instantiated drawing
-  inherits the complete geometric certificate; only source atoms that occur
-  in a template must be distinct.
+  and offset-zero clause-scoped Figure 9 auxiliaries, then translates it into
+  the source clause's refinement cell.  Each local formula is definitionally
+  its finite `clauseGadget` output, and every instantiated drawing inherits
+  the complete geometric certificate; only source atoms that occur in a
+  template must be distinct.
+- [`LeanTrominoes/PlanarOneInThreePositionedInstantiation.lean`](LeanTrominoes/PlanarOneInThreePositionedInstantiation.lean)
+  bijectively swaps those offset-zero auxiliary scopes for the actual
+  periodic source clauses, including nonzero literal offsets, without
+  changing any route or coordinate.  All four arities embed exactly the real
+  positioned `clauseGadget` blocks, and a uniform selector proves validity
+  from width three and per-clause atom distinctness.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean)
   certifies all four local cases of the subsequent `6 × 6` unit-elimination
   refinement: the empty-clause triangle, unit-clause diamond, and retained
