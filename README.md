@@ -1924,6 +1924,11 @@ The representation choices for this target are:
   offsets identifies each embedded formula with the real positioned
   `clauseGadget` output, and every instance inherits the complete local
   geometric certificate.
+- [`LeanTrominoes/PlanarOneInThreeNoUnitsSelector.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsSelector.lean)
+  packages the four unit-elimination instances behind one total arity
+  selector.  For width-three clauses it proves exact agreement with the
+  positioned output block and derives the complete local validity
+  certificate from per-clause atom distinctness.
 - [`LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean`](LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean)
   proves that every clause produced by Figure 9 has distinct variable atoms,
   independently of repetitions in its source clause.  It also packages
