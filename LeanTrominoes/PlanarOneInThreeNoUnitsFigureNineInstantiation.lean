@@ -200,5 +200,347 @@ theorem instantiatedThreeDrawing_isValid
   · exact fullDrawingFor_isValid
       first.value second.value third.value
 
+/-! ## Binary source clauses -/
+
+/-- First-stage variable map for a binary source clause.  The unused third
+source role may harmlessly reuse the first atom. -/
+def twoInheritedMap
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second : Variable) :
+    PlanarOneInThree.FigureNineVariable →
+      OneInThreeVariable Variable
+  | .sourceFirst => .inl first
+  | .sourceSecond => .inl second
+  | .sourceThird => .inl first
+  | .firstChoice =>
+      .inr ((sourceClauseIndex, source.literals), .firstChoice)
+  | .secondChoice =>
+      .inr ((sourceClauseIndex, source.literals), .secondChoice)
+  | .firstSlack =>
+      .inr ((sourceClauseIndex, source.literals), .firstSlack)
+  | .secondSlack =>
+      .inr ((sourceClauseIndex, source.literals), .secondSlack)
+  | .firstPadding =>
+      .inr ((sourceClauseIndex, source.literals), .firstPadding)
+  | .secondPadding =>
+      .inr ((sourceClauseIndex, source.literals), .secondPadding)
+  | .thirdPadding =>
+      .inr ((sourceClauseIndex, source.literals), .thirdPadding)
+
+/-- Complete two-stage variable map for a binary source clause. -/
+def twoVariableMap
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second : Variable) :
+    FigureNineNoUnitsVariable →
+      OneInThreeNoUnitVariable (OneInThreeVariable Variable) :=
+  variableMap sourceClauseIndex figureNineClauseStart source
+    (twoInheritedMap sourceClauseIndex source first second)
+
+/-- Certified composed drawing instantiated at an arbitrary binary
+positioned source clause. -/
+def instantiatedTwoDrawing
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second : PeriodicLiteral Variable) :
+    EmbeddedCNFIncidenceDrawing
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable)) :=
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  (EmbeddedCNFIncidenceDrawing.renameToImage
+    (twoDrawingFor first.value second.value)
+    (twoVariableMap
+      sourceClauseIndex figureNineClauseStart source
+      first.atom second.atom)).translate
+        (Cell.scale composedGadgetScale source.position)
+
+/-- Distinct binary source atoms make the composed map injective on every
+occurring finite role. -/
+theorem twoVariableMap_injectiveOn
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second : PeriodicLiteral Variable)
+    (firstNeSecond : first.atom ≠ second.atom) :
+    ∀ left ∈
+        (twoDrawingFor
+          first.value second.value).variableVertices,
+      ∀ right ∈
+        (twoDrawingFor
+          first.value second.value).variableVertices,
+        twoVariableMap
+            sourceClauseIndex figureNineClauseStart source
+            first.atom second.atom left =
+          twoVariableMap
+            sourceClauseIndex figureNineClauseStart source
+            first.atom second.atom right →
+        left = right := by
+  intro left leftMember right rightMember equal
+  simp [EmbeddedCNFIncidenceDrawing.variableVertices,
+    twoDrawingFor, twoFormulaFor, forcedFalseUnitReplacement,
+    clause] at leftMember rightMember
+  cases left with
+  | inherited leftRole =>
+      cases right with
+      | inherited rightRole =>
+          cases leftRole <;> cases rightRole <;>
+            simp_all [twoVariableMap, variableMap,
+              twoInheritedMap]
+      | unitAux rightIndex rightKind =>
+          simp [twoVariableMap, variableMap] at equal
+  | unitAux leftIndex leftKind =>
+      cases right with
+      | inherited rightRole =>
+          simp [twoVariableMap, variableMap] at equal
+      | unitAux rightIndex rightKind =>
+          cases leftKind <;> cases rightKind <;>
+            simp_all [twoVariableMap, variableMap]
+
+/-- Every genuine binary instance inherits the complete finite geometric
+certificate. -/
+theorem instantiatedTwoDrawing_isValid
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first second : PeriodicLiteral Variable)
+    (firstNeSecond : first.atom ≠ second.atom) :
+    @EmbeddedCNFIncidenceDrawing.IsValid
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable))
+      nestedVariableDecidableEq
+      (instantiatedTwoDrawing
+        sourceClauseIndex figureNineClauseStart source
+        first second) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  apply EmbeddedCNFIncidenceDrawing.isValid_translate
+  apply EmbeddedCNFIncidenceDrawing.renameToImage_isValid
+  · exact twoVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart source
+      first second firstNeSecond
+  · exact twoDrawingFor_isValid first.value second.value
+
+/-! ## Unit source clauses -/
+
+/-- First-stage variable map for a unit source clause.  Unused source roles
+may reuse its sole atom. -/
+def oneInheritedMap
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first : Variable) :
+    PlanarOneInThree.FigureNineVariable →
+      OneInThreeVariable Variable
+  | .sourceFirst | .sourceSecond | .sourceThird => .inl first
+  | .firstChoice =>
+      .inr ((sourceClauseIndex, source.literals), .firstChoice)
+  | .secondChoice =>
+      .inr ((sourceClauseIndex, source.literals), .secondChoice)
+  | .firstSlack =>
+      .inr ((sourceClauseIndex, source.literals), .firstSlack)
+  | .secondSlack =>
+      .inr ((sourceClauseIndex, source.literals), .secondSlack)
+  | .firstPadding =>
+      .inr ((sourceClauseIndex, source.literals), .firstPadding)
+  | .secondPadding =>
+      .inr ((sourceClauseIndex, source.literals), .secondPadding)
+  | .thirdPadding =>
+      .inr ((sourceClauseIndex, source.literals), .thirdPadding)
+
+/-- Complete two-stage variable map for a unit source clause. -/
+def oneVariableMap
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first : Variable) :
+    FigureNineNoUnitsVariable →
+      OneInThreeNoUnitVariable (OneInThreeVariable Variable) :=
+  variableMap sourceClauseIndex figureNineClauseStart source
+    (oneInheritedMap sourceClauseIndex source first)
+
+/-- Certified composed drawing instantiated at an arbitrary unit positioned
+source clause. -/
+def instantiatedOneDrawing
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first : PeriodicLiteral Variable) :
+    EmbeddedCNFIncidenceDrawing
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable)) :=
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  (EmbeddedCNFIncidenceDrawing.renameToImage
+    (oneDrawingFor first.value)
+    (oneVariableMap
+      sourceClauseIndex figureNineClauseStart source
+      first.atom)).translate
+        (Cell.scale composedGadgetScale source.position)
+
+/-- The unit-source map is injective on every occurring finite role. -/
+theorem oneVariableMap_injectiveOn
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first : PeriodicLiteral Variable) :
+    ∀ left ∈
+        (oneDrawingFor first.value).variableVertices,
+      ∀ right ∈
+        (oneDrawingFor first.value).variableVertices,
+        oneVariableMap
+            sourceClauseIndex figureNineClauseStart source
+            first.atom left =
+          oneVariableMap
+            sourceClauseIndex figureNineClauseStart source
+            first.atom right →
+        left = right := by
+  intro left leftMember right rightMember equal
+  simp [EmbeddedCNFIncidenceDrawing.variableVertices,
+    oneDrawingFor, oneFormulaFor, forcedFalseUnitReplacement,
+    clause] at leftMember rightMember
+  cases left with
+  | inherited leftRole =>
+      cases right with
+      | inherited rightRole =>
+          cases leftRole <;> cases rightRole <;>
+            simp_all [oneVariableMap, variableMap,
+              oneInheritedMap]
+      | unitAux rightIndex rightKind =>
+          simp [oneVariableMap, variableMap] at equal
+  | unitAux leftIndex leftKind =>
+      cases right with
+      | inherited rightRole =>
+          simp [oneVariableMap, variableMap] at equal
+      | unitAux rightIndex rightKind =>
+          cases leftKind <;> cases rightKind <;>
+            simp_all [oneVariableMap, variableMap]
+
+/-- Every genuine unit instance inherits the complete finite geometric
+certificate. -/
+theorem instantiatedOneDrawing_isValid
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (first : PeriodicLiteral Variable) :
+    @EmbeddedCNFIncidenceDrawing.IsValid
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable))
+      nestedVariableDecidableEq
+      (instantiatedOneDrawing
+        sourceClauseIndex figureNineClauseStart source first) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  apply EmbeddedCNFIncidenceDrawing.isValid_translate
+  apply EmbeddedCNFIncidenceDrawing.renameToImage_isValid
+  · exact oneVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart source first
+  · exact oneDrawingFor_isValid first.value
+
+/-! ## Empty source clauses -/
+
+/-- First-stage variable map for an empty source clause.  Absent source roles
+receive a harmless auxiliary name that does not occur in the finite drawing. -/
+def zeroInheritedMap
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    PlanarOneInThree.FigureNineVariable →
+      OneInThreeVariable Variable
+  | .sourceFirst | .sourceSecond | .sourceThird =>
+      .inr ((sourceClauseIndex, source.literals), .firstChoice)
+  | .firstChoice =>
+      .inr ((sourceClauseIndex, source.literals), .firstChoice)
+  | .secondChoice =>
+      .inr ((sourceClauseIndex, source.literals), .secondChoice)
+  | .firstSlack =>
+      .inr ((sourceClauseIndex, source.literals), .firstSlack)
+  | .secondSlack =>
+      .inr ((sourceClauseIndex, source.literals), .secondSlack)
+  | .firstPadding =>
+      .inr ((sourceClauseIndex, source.literals), .firstPadding)
+  | .secondPadding =>
+      .inr ((sourceClauseIndex, source.literals), .secondPadding)
+  | .thirdPadding =>
+      .inr ((sourceClauseIndex, source.literals), .thirdPadding)
+
+/-- Complete two-stage variable map for an empty source clause. -/
+def zeroVariableMap
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    FigureNineNoUnitsVariable →
+      OneInThreeNoUnitVariable (OneInThreeVariable Variable) :=
+  variableMap sourceClauseIndex figureNineClauseStart source
+    (zeroInheritedMap sourceClauseIndex source)
+
+/-- Certified composed drawing instantiated at an arbitrary empty positioned
+source clause. -/
+def instantiatedZeroDrawing
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    EmbeddedCNFIncidenceDrawing
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable)) :=
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  (EmbeddedCNFIncidenceDrawing.renameToImage
+    zeroDrawing
+    (zeroVariableMap
+      sourceClauseIndex figureNineClauseStart source)).translate
+        (Cell.scale composedGadgetScale source.position)
+
+/-- The empty-source map is injective on every occurring finite role. -/
+theorem zeroVariableMap_injectiveOn
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    ∀ left ∈ zeroDrawing.variableVertices,
+      ∀ right ∈ zeroDrawing.variableVertices,
+        zeroVariableMap
+            sourceClauseIndex figureNineClauseStart source left =
+          zeroVariableMap
+            sourceClauseIndex figureNineClauseStart source right →
+        left = right := by
+  intro left leftMember right rightMember equal
+  simp [EmbeddedCNFIncidenceDrawing.variableVertices,
+    zeroDrawing, zeroFormula, forcedFalseUnitReplacement,
+    clause] at leftMember rightMember
+  cases left with
+  | inherited leftRole =>
+      cases right with
+      | inherited rightRole =>
+          cases leftRole <;> cases rightRole <;>
+            simp_all [zeroVariableMap, variableMap,
+              zeroInheritedMap]
+      | unitAux rightIndex rightKind =>
+          simp [zeroVariableMap, variableMap] at equal
+  | unitAux leftIndex leftKind =>
+      cases right with
+      | inherited rightRole =>
+          simp [zeroVariableMap, variableMap] at equal
+      | unitAux rightIndex rightKind =>
+          cases leftKind <;> cases rightKind <;>
+            simp_all [zeroVariableMap, variableMap]
+
+/-- Every genuine empty instance inherits the complete finite geometric
+certificate. -/
+theorem instantiatedZeroDrawing_isValid
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable) :
+    @EmbeddedCNFIncidenceDrawing.IsValid
+      (OneInThreeNoUnitVariable
+        (OneInThreeVariable Variable))
+      nestedVariableDecidableEq
+      (instantiatedZeroDrawing
+        sourceClauseIndex figureNineClauseStart source) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  apply EmbeddedCNFIncidenceDrawing.isValid_translate
+  apply EmbeddedCNFIncidenceDrawing.renameToImage_isValid
+  · exact zeroVariableMap_injectiveOn
+      sourceClauseIndex figureNineClauseStart source
+  · exact zeroDrawing_isValid
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

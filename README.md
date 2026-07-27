@@ -2048,11 +2048,12 @@ The representation choices for this target are:
   identify every template with the actual composition of the two positioned
   transformations.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineInstantiation.lean)
-  begins instantiating the composed templates at arbitrary positioned source
-  clauses.  The ternary case renames both nested levels of scoped variables,
-  accounts for the flattened global Figure 9 clause index, translates the
-  checked geometry by the combined `72 × 72` refinement, and inherits the
-  complete validity certificate when the three source atoms are distinct.
+  instantiates all four composed templates at arbitrary positioned source
+  clauses.  It renames both nested levels of scoped variables, accounts for
+  the flattened global Figure 9 clause index, translates the checked
+  geometry by the combined `72 × 72` refinement, and inherits each complete
+  validity certificate (requiring distinctness only among source atoms that
+  actually occur).
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
