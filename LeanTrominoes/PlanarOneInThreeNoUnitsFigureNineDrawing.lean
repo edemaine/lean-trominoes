@@ -329,5 +329,194 @@ planar. -/
 theorem zeroDrawing_isValid : zeroDrawing.IsValid := by
   native_decide
 
+/-! ## Source-polarity-independent certificates -/
+
+/-- Full-width composed formula with arbitrary source polarities. -/
+def fullFormulaFor
+    (first second third : Bool) :
+    List (EmbeddedClause FigureNineNoUnitsVariable) :=
+  [clause (39, 15)
+      [(.inherited .sourceFirst, first),
+        (.inherited .firstChoice, true),
+        (.inherited .secondChoice, true)],
+    clause (21, 33)
+      [(.inherited .sourceSecond, !second),
+        (.inherited .firstChoice, true),
+        (.inherited .firstSlack, true)],
+    clause (57, 33)
+      [(.inherited .sourceThird, !third),
+        (.inherited .secondChoice, true),
+        (.inherited .secondSlack, true)]]
+
+/-- Full-width composed drawing with arbitrary source polarities. -/
+def fullDrawingFor
+    (first second third : Bool) :
+    EmbeddedCNFIncidenceDrawing FigureNineNoUnitsVariable where
+  formula := fullFormulaFor first second third
+  variablePosition := variablePosition
+  routes := fullRoute
+
+/-- The full-width geometry is valid for every source-polarity pattern. -/
+theorem fullDrawingFor_isValid
+    (first second third : Bool) :
+    (fullDrawingFor first second third).IsValid := by
+  cases first <;> cases second <;> cases third <;>
+    native_decide
+
+/-- Binary-source composed formula with arbitrary present-source
+polarities. -/
+def twoFormulaFor
+    (first second : Bool) :
+    List (EmbeddedClause FigureNineNoUnitsVariable) :=
+  [clause (39, 15)
+      [(.inherited .sourceFirst, first),
+        (.inherited .firstChoice, true),
+        (.inherited .secondChoice, true)],
+    clause (21, 33)
+      [(.inherited .sourceSecond, !second),
+        (.inherited .firstChoice, true),
+        (.inherited .firstSlack, true)],
+    clause (57, 33)
+      [(.inherited .thirdPadding, false),
+        (.inherited .secondChoice, true),
+        (.inherited .secondSlack, true)]] ++
+    forcedFalseUnitReplacement 3 .thirdPadding
+
+/-- Binary-source composed drawing with arbitrary present-source
+polarities. -/
+def twoDrawingFor
+    (first second : Bool) :
+    EmbeddedCNFIncidenceDrawing FigureNineNoUnitsVariable where
+  formula := twoFormulaFor first second
+  variablePosition := variablePosition
+  routes := twoRoute
+
+/-- The binary-source geometry is valid for every source-polarity pattern. -/
+theorem twoDrawingFor_isValid
+    (first second : Bool) :
+    (twoDrawingFor first second).IsValid := by
+  cases first <;> cases second <;> native_decide
+
+/-- Unit-source composed formula with arbitrary source polarity. -/
+def oneFormulaFor
+    (first : Bool) :
+    List (EmbeddedClause FigureNineNoUnitsVariable) :=
+  [clause (39, 15)
+      [(.inherited .sourceFirst, first),
+        (.inherited .firstChoice, true),
+        (.inherited .secondChoice, true)],
+    clause (21, 33)
+      [(.inherited .secondPadding, false),
+        (.inherited .firstChoice, true),
+        (.inherited .firstSlack, true)],
+    clause (57, 33)
+      [(.inherited .thirdPadding, false),
+        (.inherited .secondChoice, true),
+        (.inherited .secondSlack, true)]] ++
+    forcedFalseUnitReplacement 3 .secondPadding ++
+    forcedFalseUnitReplacement 4 .thirdPadding
+
+/-- Unit-source composed drawing with arbitrary source polarity. -/
+def oneDrawingFor
+    (first : Bool) :
+    EmbeddedCNFIncidenceDrawing FigureNineNoUnitsVariable where
+  formula := oneFormulaFor first
+  variablePosition := variablePosition
+  routes := oneRoute
+
+/-- The unit-source geometry is valid for either source polarity. -/
+theorem oneDrawingFor_isValid
+    (first : Bool) :
+    (oneDrawingFor first).IsValid := by
+  cases first <;> native_decide
+
+@[simp]
+theorem fullFormulaFor_true :
+    fullFormulaFor true true true = fullFormula := rfl
+
+@[simp]
+theorem twoFormulaFor_true :
+    twoFormulaFor true true = twoFormula := rfl
+
+@[simp]
+theorem oneFormulaFor_true :
+    oneFormulaFor true = oneFormula := rfl
+
+/-! ## Correspondence with the composed positioned transformation -/
+
+/-- Regard a Figure 9 embedded clause as a positioned periodic clause whose
+literal offsets are all zero. -/
+def positionFigureNineClause
+    {Variable : Type*}
+    (source : EmbeddedClause Variable) :
+    PositionedPeriodicClause Variable where
+  position := source.position
+  literals := source.literals.map fun literal =>
+    ⟨literal.1, (0, 0), literal.2⟩
+
+/-- Forget the nested scopes introduced by the two transformations while
+remembering exactly which finite combined role each output variable has. -/
+def composedOutputRole :
+    OneInThreeNoUnitVariable
+        (OneInThreeVariable
+          PlanarOneInThree.FigureNineSourceVariable) →
+      FigureNineNoUnitsVariable
+  | .inl source =>
+      .inherited
+        (PlanarOneInThree.figureNineOutputRole source)
+  | .inr ((sourceClauseIndex, _), kind) =>
+      .unitAux sourceClauseIndex kind
+
+/-- Run Figure 9 and then positioned unit elimination on one canonical
+source clause, forget only logical offsets, and rename nested scopes to the
+finite combined roles. -/
+def generatedComposedTemplateFor
+    (literals :
+      List
+        (PlanarOneInThree.FigureNineSourceVariable × Bool)) :
+    List (EmbeddedClause FigureNineNoUnitsVariable) :=
+  let figureNine :=
+    PlanarOneInThree.clauseGadget 0
+      (PlanarOneInThree.canonicalFigureNineSourceFor literals)
+  figureNine.zipIdx.flatMap fun taggedClause =>
+    (PeriodicOneInThreeNoUnitsPositioned.clauseGadget
+      taggedClause.2
+      (positionFigureNineClause taggedClause.1)).map fun generated =>
+        (PlanarOneInThreeNoUnits.embedPositionedClause
+          generated).rename composedOutputRole
+
+/-- The arbitrary-polarity full template is exactly Figure 9 followed by
+positioned unit elimination. -/
+theorem generatedComposedTemplateFor_three
+    (first second third : Bool) :
+    generatedComposedTemplateFor
+        [(.first, first), (.second, second), (.third, third)] =
+      fullFormulaFor first second third := by
+  cases first <;> cases second <;> cases third <;>
+    native_decide
+
+/-- The arbitrary-polarity binary template is exactly the corresponding
+two-stage positioned transformation. -/
+theorem generatedComposedTemplateFor_two
+    (first second : Bool) :
+    generatedComposedTemplateFor
+        [(.first, first), (.second, second)] =
+      twoFormulaFor first second := by
+  cases first <;> cases second <;> native_decide
+
+/-- The arbitrary-polarity unit template is exactly the corresponding
+two-stage positioned transformation. -/
+theorem generatedComposedTemplateFor_one
+    (first : Bool) :
+    generatedComposedTemplateFor [(.first, first)] =
+      oneFormulaFor first := by
+  cases first <;> native_decide
+
+/-- The empty template is exactly the corresponding two-stage positioned
+transformation. -/
+theorem generatedComposedTemplateFor_zero :
+    generatedComposedTemplateFor [] = zeroFormula := by
+  native_decide
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

@@ -2042,6 +2042,9 @@ The representation choices for this target are:
   certificates verify endpoints, orthogonality, simplicity, vertex
   avoidance, and continuous planarity for each complete two-stage
   neighborhood, including all auxiliaries created from padding unit clauses.
+  Exhaustive polarity-independent certificates and exact formula equalities
+  identify every template with the actual composition of the two positioned
+  transformations.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
