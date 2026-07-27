@@ -159,5 +159,78 @@ def threeDrawing :
 theorem threeDrawing_isValid : threeDrawing.IsValid := by
   native_decide
 
+/-! ## Correspondence with the positioned unit-elimination transformation -/
+
+/-- Canonical source-variable roles used to compare the finite templates
+with `PeriodicOneInThreeNoUnitsPositioned.clauseGadget`. -/
+inductive UnitEliminationSourceVariable
+  | first
+  | second
+  | third
+  deriving DecidableEq, Repr, Fintype
+
+/-- Rename the actual scoped output variables of a canonical unit-elimination
+replacement to their finite drawing roles. -/
+def outputRole :
+    OneInThreeNoUnitVariable UnitEliminationSourceVariable →
+      UnitEliminationVariable
+  | .inl .first => .sourceFirst
+  | .inl .second => .sourceSecond
+  | .inl .third => .sourceThird
+  | .inr (_, .first) => .first
+  | .inr (_, .second) => .second
+  | .inr (_, .third) => .third
+
+/-- A canonical positioned periodic clause at the origin with positive,
+zero-offset literals in the given role order. -/
+def canonicalSource
+    (roles : List UnitEliminationSourceVariable) :
+    PositionedPeriodicClause UnitEliminationSourceVariable where
+  position := (0, 0)
+  literals := roles.map fun role =>
+    ⟨role, (0, 0), true⟩
+
+/-- Forget only the periodic literal offsets of a positioned clause. -/
+def embedPositionedClause {Variable : Type*}
+    (source : PositionedPeriodicClause Variable) :
+    EmbeddedClause Variable where
+  position := source.position
+  literals := source.literals.map fun literal =>
+    (literal.atom, literal.value)
+
+/-- Run the actual positioned unit-elimination replacement, forget logical
+offsets, and rename its scoped variables to finite local roles. -/
+def generatedTemplate
+    (roles : List UnitEliminationSourceVariable) :
+    List (EmbeddedClause UnitEliminationVariable) :=
+  (PeriodicOneInThreeNoUnitsPositioned.clauseGadget 0
+    (canonicalSource roles)).map fun generated =>
+      (embedPositionedClause generated).rename outputRole
+
+/-- The empty finite template is exactly the positioned empty-clause
+replacement. -/
+theorem generatedTemplate_zero :
+    generatedTemplate [] = emptyFormula := by
+  native_decide
+
+/-- The unit finite template is exactly the positioned unit-clause
+replacement. -/
+theorem generatedTemplate_one :
+    generatedTemplate [.first] = unitFormula := by
+  native_decide
+
+/-- The binary finite template is exactly the retained positioned binary
+clause. -/
+theorem generatedTemplate_two :
+    generatedTemplate [.first, .second] = twoFormula := by
+  native_decide
+
+/-- The ternary finite template is exactly the retained positioned ternary
+clause. -/
+theorem generatedTemplate_three :
+    generatedTemplate [.first, .second, .third] =
+      threeFormula := by
+  native_decide
+
 end PlanarOneInThreeNoUnits
 end LeanTrominoes

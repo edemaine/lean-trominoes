@@ -262,5 +262,76 @@ theorem figureNineZeroDrawing_isValid :
     figureNineZeroDrawing.IsValid := by
   native_decide
 
+/-! ## Correspondence with the semantic Figure 9 transformation -/
+
+/-- Canonical source-variable roles used to compare the finite templates
+with `PlanarOneInThree.clauseGadget`. -/
+inductive FigureNineSourceVariable
+  | first
+  | second
+  | third
+  deriving DecidableEq, Repr, Fintype
+
+/-- Rename the actual scoped output variables of a canonical Figure 9
+replacement to their finite drawing roles. -/
+def figureNineOutputRole :
+    OneInThreeVariable FigureNineSourceVariable →
+      FigureNineVariable
+  | .inl .first => .sourceFirst
+  | .inl .second => .sourceSecond
+  | .inl .third => .sourceThird
+  | .inr (_, .firstChoice) => .firstChoice
+  | .inr (_, .secondChoice) => .secondChoice
+  | .inr (_, .firstSlack) => .firstSlack
+  | .inr (_, .secondSlack) => .secondSlack
+  | .inr (_, .firstPadding) => .firstPadding
+  | .inr (_, .secondPadding) => .secondPadding
+  | .inr (_, .thirdPadding) => .thirdPadding
+
+/-- A canonical source clause at the origin with positive literals in the
+given role order. -/
+def canonicalFigureNineSource
+    (roles : List FigureNineSourceVariable) :
+    EmbeddedClause FigureNineSourceVariable where
+  position := (0, 0)
+  literals := roles.map fun role => (role, true)
+
+/-- Run the actual semantic/positioned Figure 9 replacement and rename its
+scoped output variables to the finite local roles. -/
+def generatedFigureNineTemplate
+    (roles : List FigureNineSourceVariable) :
+    List (EmbeddedClause FigureNineVariable) :=
+  (clauseGadget 0
+    (canonicalFigureNineSource roles)).map fun generated =>
+      generated.rename figureNineOutputRole
+
+/-- The full finite drawing formula is exactly the positioned semantic
+replacement of a canonical ternary source clause. -/
+theorem generatedFigureNineTemplate_three :
+    generatedFigureNineTemplate [.first, .second, .third] =
+      figureNineFormula := by
+  native_decide
+
+/-- The padded binary drawing formula is exactly the corresponding
+positioned semantic replacement. -/
+theorem generatedFigureNineTemplate_two :
+    generatedFigureNineTemplate [.first, .second] =
+      figureNineTwoFormula := by
+  native_decide
+
+/-- The padded unit drawing formula is exactly the corresponding positioned
+semantic replacement. -/
+theorem generatedFigureNineTemplate_one :
+    generatedFigureNineTemplate [.first] =
+      figureNineOneFormula := by
+  native_decide
+
+/-- The padded empty drawing formula is exactly the corresponding positioned
+semantic replacement. -/
+theorem generatedFigureNineTemplate_zero :
+    generatedFigureNineTemplate [] =
+      figureNineZeroFormula := by
+  native_decide
+
 end PlanarOneInThree
 end LeanTrominoes
