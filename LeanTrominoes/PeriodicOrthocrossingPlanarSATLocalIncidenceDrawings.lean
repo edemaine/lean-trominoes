@@ -28,7 +28,32 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
+/-- The geometric component underlying a clause source, forgetting only the
+component's local clause index and enumeration bookkeeping. -/
+inductive DrawingPlanarSATComponent
+    (Variable : Type*)
+  | crossover (crossing : CrossingRecord)
+  | carrier (link : EqualityLink CarrierNode)
+  | bend (routeBend : RouteBend)
+  | routedClause (site : ClauseRouteSite)
+  | routedVariable
+      (site : VariableRouteSite Variable)
+      (arm : DuplicatorArm)
+      (link : EqualityLink (PlanarSATNode Variable))
+
 namespace DrawingPlanarSATClauseSource
+
+/-- Forget a clause source's local index while retaining its complete local
+geometric drawing. -/
+def component {Variable : Type*} :
+    DrawingPlanarSATClauseSource Variable →
+      DrawingPlanarSATComponent Variable
+  | .crossover crossing _ => .crossover crossing
+  | .carrier link _ => .carrier link
+  | .bend routeBend _ => .bend routeBend
+  | .routedClause site => .routedClause site
+  | .routedVariable site _ arm link _ =>
+      .routedVariable site arm link
 
 /-- The clause index inside the local drawing selected by one source. -/
 def localClauseIndex {Variable : Type*} :
@@ -57,6 +82,18 @@ def incidenceDrawing
   | .routedVariable site _ arm link _ =>
       drawingPlanarSATRoutedVariableIncidenceDrawing
         formula site arm link
+
+/-- Sources naming the same geometric component select the same complete
+local drawing, even when their local clause indices differ. -/
+theorem incidenceDrawing_eq_of_component_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (first second : DrawingPlanarSATClauseSource Variable)
+    (sameComponent : first.component = second.component) :
+    first.incidenceDrawing formula =
+      second.incidenceDrawing formula := by
+  cases first <;> cases second <;>
+    simp_all [component, incidenceDrawing]
 
 /-- Every selected local drawing uses the common final planar-SAT variable
 placement. -/

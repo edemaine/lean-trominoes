@@ -99,8 +99,9 @@ theorem DrawingPlanarSATClauseMetadata.localRouteIsSimple
           wellFormed degree isLocal valid)
         literalMember
 
-/-- Two distinct local incidences selected from the same component inherit
-that component's continuous route separation. -/
+/-- Two distinct local incidences selected from the same geometric component
+inherit that component's continuous route separation, even when they belong
+to different local clauses. -/
 theorem DrawingPlanarSATClauseMetadata.localRoutesAvoidEachOther
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
@@ -113,7 +114,8 @@ theorem DrawingPlanarSATClauseMetadata.localRoutesAvoidEachOther
     (first second : DrawingPlanarSATClauseMetadata Variable)
     (firstValid : first.Valid formula)
     (secondValid : second.Valid formula)
-    (sameSource : first.source = second.source)
+    (sameComponent :
+      first.source.component = second.source.component)
     {firstLiteral secondLiteral :
       PlanarSATVariable Variable × Bool}
     {firstLiteralIndex secondLiteralIndex : Nat}
@@ -132,10 +134,15 @@ theorem DrawingPlanarSATClauseMetadata.localRoutesAvoidEachOther
         first.source.localClauseIndex firstLiteralIndex)
       ((second.source.incidenceDrawing formula).routes
         second.source.localClauseIndex secondLiteralIndex) := by
+  have sameDrawing :
+      first.source.incidenceDrawing formula =
+        second.source.incidenceDrawing formula :=
+    first.source.incidenceDrawing_eq_of_component_eq
+      formula second.source sameComponent
   have secondClauseMember :=
     second.localClauseMember
       wellFormed degree isLocal secondValid
-  rw [← sameSource] at secondClauseMember different ⊢
+  rw [← sameDrawing] at secondClauseMember ⊢
   apply
     (first.source.incidenceDrawing formula)
       |>.embeddedRoutes_avoidEachOther_of_members
