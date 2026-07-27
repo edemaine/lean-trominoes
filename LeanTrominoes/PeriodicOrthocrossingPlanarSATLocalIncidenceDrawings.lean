@@ -40,6 +40,7 @@ inductive DrawingPlanarSATComponent
       (site : VariableRouteSite Variable)
       (arm : DuplicatorArm)
       (link : EqualityLink (PlanarSATNode Variable))
+  deriving DecidableEq
 
 namespace DrawingPlanarSATClauseSource
 

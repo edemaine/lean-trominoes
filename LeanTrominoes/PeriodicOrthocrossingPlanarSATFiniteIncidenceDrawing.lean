@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings
+import LeanTrominoes.PeriodicOrthocrossingPlanarSATClauseKeyLookup
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingPlanarity
 
 /-!
@@ -51,24 +52,6 @@ irreducible_def drawingPlanarSATLocalIncidenceDrawing
     (drawingPlanarSATLocalIncidenceDrawing formula).routes =
       drawingPlanarSATLocalIncidenceRoutes formula := by
   rw [drawingPlanarSATLocalIncidenceDrawing]
-
-/-- Equal geometric-component/local-clause keys returned at two global
-metadata positions identify the same global clause occurrence. -/
-def DrawingPlanarSATComponentClauseKeysInjective
-    {Variable : Type*} [DecidableEq Variable]
-    (formula : PeriodicCNF Variable) : Prop :=
-  ∀ {firstMetadata secondMetadata :
-      DrawingPlanarSATClauseMetadata Variable}
-    {firstClauseIndex secondClauseIndex : Nat},
-    (drawingPlanarSATClauseMetadata formula)[firstClauseIndex]? =
-        some firstMetadata →
-      (drawingPlanarSATClauseMetadata formula)[secondClauseIndex]? =
-        some secondMetadata →
-      firstMetadata.source.component =
-          secondMetadata.source.component →
-      firstMetadata.source.localClauseIndex =
-          secondMetadata.source.localClauseIndex →
-      firstClauseIndex = secondClauseIndex
 
 /-- The residual pairwise route obligation after local component planarity:
 routes selected from genuinely different geometric components avoid one
@@ -313,7 +296,8 @@ theorem drawingPlanarSATLocalIncidenceDrawing_routesAreSimple
 
 /-- Component/local-clause key injectivity and cross-component separation
 discharge the complete pairwise-route field of global separation. -/
-theorem drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
+theorem
+    drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther_of_keyInjective
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (wellFormed :
@@ -420,6 +404,38 @@ theorem drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
       firstMembers.2 secondMembers.2
       firstLookup secondLookup sameComponent
 
+/-- Cross-component separation alone now discharges global pairwise route
+separation: component/local-clause key injectivity is certified by the
+five-family metadata enumeration. -/
+theorem drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (crossComponent :
+      DrawingPlanarSATCrossComponentRoutesSeparated formula) :
+    ∀ firstIndex secondIndex :
+        Fin
+          (drawingPlanarSATLocalIncidenceDrawing
+            formula).incidences.length,
+      firstIndex ≠ secondIndex →
+        EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+          ((drawingPlanarSATLocalIncidenceDrawing formula).routeAt
+            ((drawingPlanarSATLocalIncidenceDrawing
+              formula).incidenceAt firstIndex))
+          ((drawingPlanarSATLocalIncidenceDrawing formula).routeAt
+            ((drawingPlanarSATLocalIncidenceDrawing
+              formula).incidenceAt secondIndex)) := by
+  exact
+    drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther_of_keyInjective
+      formula wellFormed degree isLocal
+      (drawingPlanarSAT_componentClauseKeysInjective formula)
+      crossComponent
+
 /-- Once component keys are injective and different components are
 geometrically separated, only vertex/route avoidance and vertex-position
 distinctness remain for complete finite planarity. -/
@@ -433,8 +449,6 @@ theorem
       (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
     (isLocal :
       (PeriodicCNF.incidenceGraph formula).IsLocal)
-    (keyInjective :
-      DrawingPlanarSATComponentClauseKeysInjective formula)
     (crossComponent :
       DrawingPlanarSATCrossComponentRoutesSeparated formula) :
     (drawingPlanarSATLocalIncidenceDrawing formula).IsPlanar ↔
@@ -451,7 +465,7 @@ theorem
           formula wellFormed degree isLocal,
         drawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
           formula wellFormed degree isLocal
-          keyInjective crossComponent,
+          crossComponent,
         verticesAvoid, verticesNodup⟩
 
 /-- Complete finite planarity now reduces exactly to global separation;

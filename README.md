@@ -1963,8 +1963,9 @@ The representation choices for this target are:
   incidence, exposes each route's precise valid local witness, and proves
   pairwise route separation within every shared geometric component,
   including distinct clauses of one gadget.  A generic duplicate-free
-  incidence-index theorem now lifts those local certificates to global
-  incidence indices: after component/local-clause key injectivity and
+  incidence-index theorem lifts those local certificates to global incidence
+  indices.  The five clause families now have certified, pairwise-distinct
+  `(geometric component, local clause index)` keys, so after
   cross-component route separation, complete finite planarity reduces
   exactly to global vertex avoidance and assembled vertex-position
   distinctness.
