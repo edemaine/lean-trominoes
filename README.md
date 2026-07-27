@@ -395,6 +395,13 @@ The representation choices for this target are:
   start, its exact local boundary or auxiliary endpoint, and an
   orthogonality certificate, exposing the endpoint used by the forthcoming
   inherited-route splice.
+  [`LeanTrominoes/PeriodicOneInThreeAuxiliaryIncidences.lean`](LeanTrominoes/PeriodicOneInThreeAuxiliaryIncidences.lean)
+  proves that every Figure 9 auxiliary literal carries exactly its source
+  clause/index scope and the source anchor offset.
+  [`LeanTrominoes/PeriodicOneInThreePositionedAuxiliaryEndpoints.lean`](LeanTrominoes/PeriodicOneInThreePositionedAuxiliaryEndpoints.lean)
+  combines that semantic fact with the instantiated local placement to show
+  that every normalized auxiliary endpoint is already the final canonical
+  periodic literal endpoint; only source-variable ports remain to splice.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -1939,7 +1946,9 @@ The representation choices for this target are:
   periodic source clauses, including nonzero literal offsets, without
   changing any route or coordinate.  All four arities embed exactly the real
   positioned `clauseGadget` blocks, and a uniform selector proves validity
-  from width three and per-clause atom distinctness.
+  from width three and per-clause atom distinctness.  The selector also
+  identifies every scoped auxiliary's physical position with its declared
+  local Figure 9 coordinate in the refined source-clause box.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsDrawing.lean)
   certifies all four local cases of the subsequent `6 × 6` unit-elimination
   refinement: the empty-clause triangle, unit-clause diamond, and retained

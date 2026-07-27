@@ -448,5 +448,51 @@ theorem instantiatedDrawing_isValid
           first second third
           pairwise.1.1 pairwise.1.2 pairwise.2
 
+/-- Every clause-scoped auxiliary keeps its declared local Figure 9
+coordinate under the uniform arity selector and the actual positioned
+auxiliary scope. -/
+theorem instantiatedDrawing_auxiliaryPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (clauseIndex : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (kind : OneInThreeAux) :
+    (instantiatedDrawing clauseIndex source).variablePosition
+        (.inr ((clauseIndex, source.literals), kind)) =
+      Cell.add
+        (Cell.scale PlanarOneInThree.gadgetScale source.position)
+        (PeriodicOneInThreePositioned.auxiliaryLocalPosition kind) := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · cases kind <;>
+      simp [instantiatedDrawing, instantiatedZeroDrawing,
+        rescopeDrawing, rescopeEquiv,
+        PlanarOneInThree.instantiatedZeroDrawing,
+        PlanarOneInThree.zeroLocalPosition,
+        EmbeddedCNFIncidenceDrawing.rename,
+        EmbeddedCNFIncidenceDrawing.translate]
+  · rcases rest with _ | ⟨second, rest⟩
+    · cases kind <;>
+        simp [instantiatedDrawing, instantiatedOneDrawing,
+          rescopeDrawing, rescopeEquiv,
+          PlanarOneInThree.instantiatedOneDrawing,
+          PlanarOneInThree.oneLocalPosition,
+          EmbeddedCNFIncidenceDrawing.rename,
+          EmbeddedCNFIncidenceDrawing.translate]
+    · rcases rest with _ | ⟨third, tail⟩
+      · cases kind <;>
+          simp [instantiatedDrawing, instantiatedTwoDrawing,
+            rescopeDrawing, rescopeEquiv,
+            PlanarOneInThree.instantiatedTwoDrawing,
+            PlanarOneInThree.twoLocalPosition,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+      · cases kind <;>
+          simp [instantiatedDrawing, instantiatedThreeDrawing,
+            rescopeDrawing, rescopeEquiv,
+            PlanarOneInThree.instantiatedThreeDrawing,
+            PlanarOneInThree.threeLocalPosition,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate]
+
 end PlanarOneInThreePositioned
 end LeanTrominoes
