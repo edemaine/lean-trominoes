@@ -1903,6 +1903,12 @@ The representation choices for this target are:
   uniqueness proof, therefore gives at least ten cells of clearance.  Each
   link consequently has its exact formula and endpoint positions together
   with a complete finite orthogonality and continuous-planarity certificate.
+- [`LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean)
+  adapts the fixed corner-equality template to one syntactic route bend.
+  Genuine incoming and outgoing segments determine their compass ports; a
+  no-immediate-reversal hypothesis makes those ports distinct.  The adapter
+  then exposes the bend link's exact positioned formula, both real
+  carrier-node endpoints, and the transported complete local certificate.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierNormalizationDegree.lean)
   performs that periodic quotient for all complete-carrier equality links.
   Distinct normalized links at a fixed terminal inject into one direct-link
