@@ -677,6 +677,101 @@ theorem formulaClauseMetadataFrom_valid
           exact Or.inr valid.1
         · exact valid.2
 
+/-- Reindex a genuine zero-based list occurrence from an arbitrary starting
+index. -/
+theorem mem_zipIdx_from
+    {α : Type*}
+    (start : Nat)
+    (values : List α)
+    {value : α}
+    {index : Nat}
+    (member : (value, index) ∈ values.zipIdx) :
+    (value, start + index) ∈ values.zipIdx start := by
+  rw [List.zipIdx_eq_map_add]
+  exact List.mem_map.mpr
+    ⟨(value, index), member, rfl⟩
+
+/-- The stored start of a composed metadata block converts every local
+Figure 9 clause index into its genuine index in the recursively flattened
+first-stage formula. -/
+theorem formulaClauseMetadataFrom_figureNineClause_member
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable))
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ formulaClauseMetadataFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses)
+    {figureNineClause :
+      PositionedPeriodicClause
+        (OneInThreeVariable Variable)}
+    {localClauseIndex : Nat}
+    (figureNineClauseMember :
+      (figureNineClause, localClauseIndex) ∈
+        (PeriodicOneInThreePositioned.clauseGadget
+          metadata.sourceClauseIndex
+          metadata.sourceClause).zipIdx) :
+    (figureNineClause,
+        metadata.figureNineClauseStart + localClauseIndex) ∈
+      (figureNineClausesFrom
+        sourceClauseIndex sourceClauses).zipIdx
+          figureNineClauseStart := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart with
+  | nil =>
+      simp [formulaClauseMetadataFrom] at metadataMember
+  | cons sourceClause rest induction =>
+      rw [formulaClauseMetadataFrom,
+        List.mem_append] at metadataMember
+      rw [figureNineClausesFrom, List.zipIdx_append,
+        List.mem_append]
+      rcases metadataMember with headMember | tailMember
+      · left
+        have valid :=
+          clauseMetadataFor_valid
+            sourceClauseIndex figureNineClauseStart
+            sourceClause headMember
+        simpa [valid.1, valid.2.1, valid.2.2.1] using
+          mem_zipIdx_from figureNineClauseStart
+            (PeriodicOneInThreePositioned.clauseGadget
+              metadata.sourceClauseIndex metadata.sourceClause)
+            figureNineClauseMember
+      · right
+        exact induction
+          (sourceClauseIndex := sourceClauseIndex + 1)
+          (figureNineClauseStart :=
+            figureNineClauseStart +
+                (PeriodicOneInThreePositioned.clauseGadget
+                  sourceClauseIndex sourceClause).length)
+          tailMember
+
+/-- In the complete enumeration, a metadata block's local Figure 9 indices
+are therefore exact global presentation indices of the actual first-stage
+positioned formula. -/
+theorem formulaClauseMetadata_figureNineClause_member
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ formulaClauseMetadata source)
+    {figureNineClause :
+      PositionedPeriodicClause
+        (OneInThreeVariable Variable)}
+    {localClauseIndex : Nat}
+    (figureNineClauseMember :
+      (figureNineClause, localClauseIndex) ∈
+        (PeriodicOneInThreePositioned.clauseGadget
+          metadata.sourceClauseIndex
+          metadata.sourceClause).zipIdx) :
+    (figureNineClause,
+        metadata.figureNineClauseStart + localClauseIndex) ∈
+      (PeriodicOneInThreePositioned.formula source).clauses.zipIdx := by
+  have member :=
+    formulaClauseMetadataFrom_figureNineClause_member
+      0 0 source.clauses metadataMember figureNineClauseMember
+  simpa [figureNineClausesFrom_eq_zipIdx,
+    PeriodicOneInThreePositioned.formula] using member
+
 /-- Every complete metadata entry has the same two membership invariants. -/
 theorem formulaClauseMetadata_valid
     {Variable : Type*}

@@ -2076,7 +2076,8 @@ The representation choices for this target are:
   at a time.  Every final clause is linked to its original source clause, the
   global start of its Figure 9 block, and its exact local occurrence in the
   certified composed drawing.  The resulting source-block/local-clause keys
-  are proved globally unique.
+  are proved globally unique, and each stored block start is proved to turn
+  every local Figure 9 clause index into its exact first-stage global index.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean)
   uses that index to select one route from the appropriate certified
   `72 × 72` composed neighborhood for every final incidence.  Every genuine
