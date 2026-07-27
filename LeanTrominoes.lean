@@ -48,6 +48,7 @@ import LeanTrominoes.PlanarThreeSATWires
 import LeanTrominoes.PlanarThreeSATWidth
 import LeanTrominoes.PlanarThreeSATOcurrences
 import LeanTrominoes.PlanarOneInThree
+import LeanTrominoes.PlanarOneInThreeFigureNineDrawing
 import LeanTrominoes.PlanarOneInThreeOccurrences
 import LeanTrominoes.PeriodicOneInThree
 import LeanTrominoes.PeriodicOneInThreeClauseComputability

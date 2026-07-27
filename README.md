@@ -1874,9 +1874,15 @@ The representation choices for this target are:
 - [`LeanTrominoes/PlanarOneInThree.lean`](LeanTrominoes/PlanarOneInThree.lean)
   packages Figure 9 as a positioned constant-size replacement for each
   embedded width-three disjunction.  Generated clauses occupy an explicit
-  `4 × 4` refinement box and use clause-index-scoped auxiliaries; completeness,
+  `12 × 12` refinement box and use clause-index-scoped auxiliaries; completeness,
   soundness, and exact finite satisfiability preservation are proved by
   connecting the layout to the verified periodic exact-one truth table.
+- [`LeanTrominoes/PlanarOneInThreeFigureNineDrawing.lean`](LeanTrominoes/PlanarOneInThreeFigureNineDrawing.lean)
+  realizes the full three-literal Figure 9 core as nine explicit rectilinear
+  incidence routes.  A finite exact checker proves their endpoints,
+  orthogonality, route simplicity, vertex avoidance, and continuous pairwise
+  planarity; the short-clause padding and unit-elimination neighborhoods
+  remain separate local cases.
 - [`LeanTrominoes/PlanarOneInThreeOccurrences.lean`](LeanTrominoes/PlanarOneInThreeOccurrences.lean)
   proves that adding Figure 9's positions does not change the underlying
   literal-occurrence list.  The periodic exact-one accounting therefore
