@@ -216,5 +216,48 @@ theorem
         input sourceLocal sourceWidth sourceOccurrences)
       clauseMember literalMember
 
+/-- Every genuine raw fixed-eight Figure 9 route records a first exit after
+its generated clause endpoint. -/
+theorem
+    drawingFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes_exists_tail_head?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable)
+    (sourceLocal : input.IsLocal)
+    (sourceWidth : input.WidthAtMost 3)
+    (sourceOccurrences : input.OccurrencesAtMost 3)
+    {clause :
+      PositionedPeriodicClause
+        (PeriodicPlanarOneInThreeThreeRawVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (drawingFixedEightPositionedPeriodicPlanarOneInThreeRawFormula
+          input).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (PeriodicPlanarOneInThreeThreeRawVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ exit,
+      (drawingFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes
+        input sourceLocal sourceWidth sourceOccurrences
+        clauseIndex literalIndex).tail.head? =
+        some exit := by
+  simpa
+    [drawingFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes,
+      drawingFixedEightPositionedPeriodicPlanarOneInThreeRawFormula,
+      drawingFixedEightPeriodicPlanarOneInThreeRawPlacement] using
+    PeriodicOneInThreePositioned.splicedRoutes_exists_tail_head?_of_members
+      (drawingAngularEightOccurrenceSplitPositionedFormula input)
+      (drawingAngularEightOccurrenceSplitPlacement input)
+      (drawingAngularEightOccurrenceSplitPositionedFormula_widthAtMostThree
+        input sourceWidth)
+      (drawingAngularEightOccurrenceSplitPositionedFormula_allAtomsNodup
+        input sourceLocal sourceWidth sourceOccurrences)
+      (drawingFixedEightPeriodicPlanarOneInThreeInheritedRouteSuffixes
+        input sourceLocal sourceWidth sourceOccurrences)
+      clauseMember literalMember
+
 end PeriodicOrthocrossing
 end LeanTrominoes

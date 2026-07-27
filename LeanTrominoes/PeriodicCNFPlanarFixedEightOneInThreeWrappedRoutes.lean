@@ -129,5 +129,58 @@ theorem
     drawingFixedEightPeriodicPlanarOneInThreePlacement] using
       ⟨endpoints.1, endpoints.2, orthogonal⟩
 
+/-- Opaque wrapping preserves the first exit of every genuine fixed-eight
+Figure 9 route because it leaves the route lookup unchanged. -/
+theorem
+    drawingFixedEightPeriodicPlanarOneInThreeIncidenceRoutes_exists_tail_head?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable)
+    (sourceLocal : input.IsLocal)
+    (sourceWidth : input.WidthAtMost 3)
+    (sourceOccurrences : input.OccurrencesAtMost 3)
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula
+          input).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (WrappedPeriodicVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ exit,
+      (drawingFixedEightPeriodicPlanarOneInThreeIncidenceRoutes
+        input sourceLocal sourceWidth sourceOccurrences
+        clauseIndex literalIndex).tail.head? =
+        some exit := by
+  let rawFormula :=
+    drawingFixedEightPositionedPeriodicPlanarOneInThreeRawFormula input
+  let routes :=
+    drawingFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes
+      input sourceLocal sourceWidth sourceOccurrences
+  have transferred :=
+    PositionedPeriodicCNF.incidenceIndexProperty_rename
+      rawFormula WrappedPeriodicVariable.mk
+      (fun sourceClauseIndex sourceLiteralIndex =>
+        ∃ exit,
+          (routes sourceClauseIndex sourceLiteralIndex).tail.head? =
+            some exit)
+      (fun _sourceClause _sourceClauseIndex sourceClauseMember
+          _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+        drawingFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes_exists_tail_head?
+          input sourceLocal sourceWidth sourceOccurrences
+          sourceClauseMember sourceLiteralMember)
+      clauseMember literalMember
+  simpa
+    [drawingFixedEightPeriodicPlanarOneInThreeIncidenceRoutes,
+      drawingFixedEightPositionedPeriodicPlanarOneInThreeFormula,
+      rawFormula, routes] using transferred
+
 end PeriodicOrthocrossing
 end LeanTrominoes

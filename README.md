@@ -567,6 +567,12 @@ The representation choices for this target are:
   tail.  The replacement preserves the far endpoint and orthogonality, which
   lets coordinated gadget fans attach to distinct source-route exits instead
   of converging again at the replaced vertex.
+  [`LeanTrominoes/EmbeddedCNFIncidenceRouteExits.lean`](LeanTrominoes/EmbeddedCNFIncidenceRouteExits.lean)
+  proves that every genuine route in a valid finite embedded drawing has
+  such a first exit: its clause and variable endpoints belong to opposite
+  halves of the drawing's duplicate-free vertex list and are therefore
+  distinct.  The Figure 9 route layer lifts this witness through anchor
+  normalization, local-suffix splicing, and opaque variable wrapping.
   [`LeanTrominoes/PositionedPeriodicCNFSumRouteSuffixes.lean`](LeanTrominoes/PositionedPeriodicCNFSumRouteSuffixes.lean)
   reduces that suffix obligation for source/auxiliary sum types to inherited
   source variables alone.  New auxiliaries receive a singleton suffix at

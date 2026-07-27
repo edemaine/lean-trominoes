@@ -201,5 +201,45 @@ theorem splicedRoutes_valid_of_members
         source sourcePlacement sourceWidth sourceDistinct
         clauseMember literalMember)
 
+/-- The first exit of a complete Figure 9 route is inherited from its
+certified local clause route, independently of the chosen suffix family. -/
+theorem splicedRoutes_exists_tail_head?_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (inherited :
+      PositionedPeriodicCNF.InheritedCanonicalIncidenceRouteSuffixes
+        (formula source)
+        (placement source sourcePlacement)
+        (normalizedLocalEndpoint source sourcePlacement))
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈
+        clause.literals.zipIdx) :
+    ∃ exit,
+      (splicedRoutes source sourcePlacement inherited
+        clauseIndex literalIndex).tail.head? =
+        some exit := by
+  rcases normalizedLocalRoutes_exists_tail_head?_of_members
+      source sourcePlacement sourceWidth sourceDistinct
+      clauseMember literalMember with
+    ⟨exit, localTailHead⟩
+  exact
+    ⟨exit, by
+      apply joinAtEndpoint_tail_head?
+      exact localTailHead⟩
+
 end PeriodicOneInThreePositioned
 end LeanTrominoes

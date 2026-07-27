@@ -253,5 +253,51 @@ theorem normalizedLocalRoutes_orthogonal_of_members
         source sourceWidth sourceDistinct
         clauseMember literalMember)
 
+/-- Anchor normalization preserves the first exit of every genuine local
+Figure 9 route. -/
+theorem normalizedLocalRoutes_exists_tail_head?_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈
+        clause.literals.zipIdx) :
+    ∃ exit,
+      (normalizedLocalRoutes source sourcePlacement
+        clauseIndex literalIndex).tail.head? =
+        some exit := by
+  rcases formulaClauseMetadata_lookup
+      source clauseMember with
+    ⟨metadata, metadataLookup, clauseEqual⟩
+  subst clause
+  rcases localRoutes_exists_tail_head?_of_members
+      source sourceWidth sourceDistinct
+      clauseMember literalMember with
+    ⟨exit, tailHead⟩
+  let normalizePoint : Cell → Cell :=
+    fun point =>
+      Cell.sub point
+        ((placement source sourcePlacement).translation
+          (PeriodicCNF.clauseAnchor
+            metadata.clause.literals))
+  refine ⟨normalizePoint exit, ?_⟩
+  simpa [normalizedLocalRoutes, metadataLookup,
+    PositionedPeriodicCNF.normalizeIncidenceRoute,
+    normalizePoint] using
+      List.tail_head?_map normalizePoint tailHead
+
 end PeriodicOneInThreePositioned
 end LeanTrominoes
