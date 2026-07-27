@@ -1807,6 +1807,11 @@ The representation choices for this target are:
   finite-index proofs certify exact endpoints, orthogonality, route
   simplicity, pairwise continuous separation, vertex avoidance, and distinct
   vertex positions.
+- [`LeanTrominoes/PlanarThreeSATEqualityLensPlacement.lean`](LeanTrominoes/PlanarThreeSATEqualityLensPlacement.lean)
+  rotates and translates that lens onto any directed grid axis, then
+  injectively renames its Boolean roles to any two distinct logical
+  variables.  The resulting theorem exposes the exact equality formula and
+  endpoint positions together with the transported complete certificate.
 - [`LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationTerminalPorts.lean)
   proves that subtracting a retained clause's periodic anchor changes no
   terminal ray.  It reduces the canonical deduplicated source certificate to
