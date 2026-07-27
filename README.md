@@ -1467,6 +1467,10 @@ The representation choices for this target are:
   endpoint-only contact, vertex-interior avoidance, and distinct graph
   vertices; bridge lemmas recover the membership-style endpoint obligation
   used by the input-dependent periodic routing layer.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingPlanarity.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingPlanarity.lean)
+  extracts route simplicity and pairwise continuous separation from those
+  finite-index certificates using ordinary clause/literal membership data,
+  which is the form needed by global assembly proofs.
 - [`LeanTrominoes/OccurrenceSplitRingDrawing.lean`](LeanTrominoes/OccurrenceSplitRingDrawing.lean)
   encodes the worst-case degree-eight neighborhood of Figure 7.  Eight
   occurrence copies lie on an inner square, the implication clauses occupy
@@ -2068,7 +2072,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean)
   uses that index to select one route from the appropriate certified
   `72 × 72` composed neighborhood for every final incidence.  Every genuine
-  selected route has its exact displayed endpoints and is orthogonal.
+  selected route has its exact displayed endpoints, is orthogonal, and is
+  continuously simple.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal

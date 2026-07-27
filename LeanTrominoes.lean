@@ -40,6 +40,7 @@ import LeanTrominoes.IndexedSavitchDFSSpace
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PlanarThreeSATGadgets
 import LeanTrominoes.EmbeddedCNFIncidenceDrawing
+import LeanTrominoes.EmbeddedCNFIncidenceDrawingPlanarity
 import LeanTrominoes.EmbeddedCNFIncidenceRouteExits
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
 import LeanTrominoes.PlanarThreeSATInstantiation
