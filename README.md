@@ -1542,13 +1542,20 @@ The representation choices for this target are:
   colored strands; five endpoint-containing pair types form the exact local
   interface still to prove.  Once supplied, strict separation composes across
   both endpoint joins to separate the complete corrected routes.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouting.lean)
+  makes the factor-two padded construction the final normalized corrected
+  routing candidate.  Pointwise corrected-route bounds combine with the
+  unchanged finite gadget prefixes and clause routes to bound every assembled
+  route, proving the open-halo endpoint hypothesis required by the expanded
+  finite checker.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFiniteGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFiniteGeometry.lean)
   transfers normalized gadget-vertex distinctness and fundamental-square
   bounds to the corrected ribbon routing.  Because the corrected construction
   retains the standard period and gadget origins, these facts hold
-  definitionally; a route-specific finite continuous-planarity certificate
-  is therefore the only remaining input to the global assembly-geometry
-  interface.
+  definitionally.  For the padded final routing it also supplies the proved
+  segment-endpoint bounds and packages the exact three remaining executable
+  route/route, vertex/route, and continuous-interior checks into global
+  continuous assembly geometry.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorBounds.lean)
   lifts the closed-block bound from individual ribbon tiles to recursively
   assembled corridor cores.  Every listed core point is assigned to the
