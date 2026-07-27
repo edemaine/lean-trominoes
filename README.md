@@ -248,6 +248,12 @@ The representation choices for this target are:
   It computes the unique possible horizontal/vertical intersection directly,
   proves soundness and completeness for the retained occurrences, and proves
   that every canonical crossing remains in the halo.
+  [`LeanTrominoes/PeriodicOrthocrossingCrossingNormalization.lean`](LeanTrominoes/PeriodicOrthocrossingCrossingNormalization.lean)
+  computes the common periodic shift of every halo crossing, moves both
+  segment occurrences and the crossing point into the canonical square, and
+  proves that the normalized record belongs to the canonical oriented list.
+  It also certifies reconstruction of the physical point, segments, and
+  occurrence translations from that canonical representative and shift.
   [`LeanTrominoes/PeriodicOrthocrossingPlanarCrossovers.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarCrossovers.lean)
   replaces those records by positioned crossover formulas in `20 × 20`
   macrocells, with four explicit boundary-wire variables and internals scoped
