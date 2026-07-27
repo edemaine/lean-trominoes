@@ -286,6 +286,254 @@ theorem drawingRouteBend_adjacentClassifiedSegments
       bendData.1, incomingIndexEq.symm, outgoingIndexEq.symm,
       incomingSegmentEq, outgoingSegmentEq⟩
 
+/-- Exactly the roles represented by vertical classified segments,
+including the unit fanout and boundary pieces that are not active crossing
+lanes. -/
+def SegmentRole.IsVerticalRole {Vertex : Type*} :
+    SegmentRole Vertex → Prop
+  | .sourceFanoutVertical _
+  | .sourcePortVertical _
+  | .gateVertical _
+  | .boundaryVertical _
+  | .targetPortVertical _
+  | .targetFanoutVertical _ => True
+  | _ => False
+
+/-- Executable form of `SegmentRole.IsVerticalRole`. -/
+def SegmentRole.isVerticalRole {Vertex : Type*} :
+    SegmentRole Vertex → Bool
+  | .sourceFanoutVertical _
+  | .sourcePortVertical _
+  | .gateVertical _
+  | .boundaryVertical _
+  | .targetPortVertical _
+  | .targetFanoutVertical _ => true
+  | _ => false
+
+theorem SegmentRole.isVerticalRole_eq_true_iff
+    {Vertex : Type*} (role : SegmentRole Vertex) :
+    role.isVerticalRole = true ↔ role.IsVerticalRole := by
+  cases role <;> simp [isVerticalRole, IsVerticalRole]
+
+/-- Whether a semantic route-bend center is the height-three port marker. -/
+def RouteBendCenterKind.isPort {Vertex : Type*} :
+    RouteBendCenterKind Vertex → Bool
+  | .port _ => true
+  | _ => false
+
+theorem RouteBendCenterKind.isPort_eq_true_iff
+    {Vertex : Type*} (kind : RouteBendCenterKind Vertex) :
+    kind.isPort = true ↔ ∃ port, kind = .port port := by
+  cases kind <;> simp [isPort]
+
+/-- A geometrically vertical classified segment carries a vertical semantic
+role. -/
+theorem classifiedSegment_verticalRole_of_isVertical
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {edge : PeriodicEdge Vertex}
+    {edgeIndex : Nat}
+    {classified : ClassifiedSegment Vertex}
+    (classifiedMem :
+      classified ∈ classifiedRouteSegments graph edge edgeIndex)
+    (vertical : classified.segment.IsVertical) :
+    classified.role.IsVerticalRole := by
+  have sourceAll :
+      ∀ item ∈ classifiedSourceFanout graph edge edgeIndex,
+        item.segment.IsVertical → item.role.IsVerticalRole := by
+    simp [classifiedSourceFanout, SegmentRole.IsVerticalRole,
+      GridSegment.IsVertical]
+    split <;> simp_all
+  have coreAll :
+      ∀ item ∈ classifiedEdgeCore graph edge edgeIndex,
+        item.segment.IsVertical → item.role.IsVerticalRole := by
+    simp [classifiedEdgeCore, SegmentRole.IsVerticalRole,
+      GridSegment.IsVertical, Cell.add, Cell.scale]
+    split <;> simp_all
+    all_goals split <;> simp_all
+  have targetAll :
+      ∀ item ∈ classifiedTargetFanout graph edge edgeIndex,
+        item.segment.IsVertical → item.role.IsVerticalRole := by
+    simp [classifiedTargetFanout, SegmentRole.IsVerticalRole,
+      GridSegment.IsVertical, Cell.add, Cell.scale]
+    split <;> simp_all
+  simp only [classifiedRouteSegments, List.mem_append] at classifiedMem
+  exact classifiedMem.elim
+    (fun sourceOrCore => sourceOrCore.elim
+      (fun sourceMem =>
+        sourceAll classified sourceMem vertical)
+      (fun coreMem =>
+        coreAll classified coreMem vertical))
+    (fun targetMem =>
+      targetAll classified targetMem vertical)
+
+/-- The port flags of the semantic bend placements are exactly the
+conjunctions of the vertical flags of consecutive classified segments. -/
+theorem routeBendCenterPlacements_map_isPort
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (edge : PeriodicEdge Vertex)
+    (edgeIndex : Nat) :
+    (routeBendCenterPlacements graph edge edgeIndex).map
+        (fun placement => placement.kind.isPort) =
+      let vertical :=
+        (classifiedRouteSegments graph edge edgeIndex).map
+          (fun classified => classified.role.isVerticalRole)
+      List.zipWith (· && ·) vertical vertical.tail := by
+  simp [routeBendCenterPlacements,
+    classifiedRouteSegments, classifiedSourceFanout,
+    classifiedEdgeCore, classifiedTargetFanout,
+    SegmentRole.isVerticalRole, RouteBendCenterKind.isPort]
+  all_goals split <;> simp_all
+  all_goals try split <;> simp_all
+  all_goals try split <;> simp_all
+  all_goals try split <;> simp_all
+
+/-- In the parallel lists of semantic center placements and classified
+roles, two adjacent vertical roles can surround only a port placement. -/
+theorem routeBendCenterPlacement_kind_port_of_adjacent_verticalRoles
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (edge : PeriodicEdge Vertex)
+    (edgeIndex : Nat)
+    {placement : RouteBendCenterPlacement Vertex × Nat}
+    (placementMem :
+      placement ∈
+        (routeBendCenterPlacements
+          graph edge edgeIndex).zipIdx)
+    {incomingRole outgoingRole : SegmentRole Vertex}
+    {incomingIndex outgoingIndex : Nat}
+    (incomingRoleMem :
+      (incomingRole, incomingIndex) ∈
+        ((classifiedRouteSegments graph edge edgeIndex).map
+          ClassifiedSegment.role).zipIdx)
+    (outgoingRoleMem :
+      (outgoingRole, outgoingIndex) ∈
+        ((classifiedRouteSegments graph edge edgeIndex).map
+          ClassifiedSegment.role).zipIdx)
+    (incomingIndexEq : incomingIndex = placement.2)
+    (outgoingIndexEq : outgoingIndex = placement.2 + 1)
+    (incomingVertical : incomingRole.IsVerticalRole)
+    (outgoingVertical : outgoingRole.IsVerticalRole) :
+    ∃ port, placement.1.kind = .port port := by
+  let roles :=
+    (classifiedRouteSegments graph edge edgeIndex).map
+      ClassifiedSegment.role
+  let vertical :=
+    (classifiedRouteSegments graph edge edgeIndex).map
+      (fun classified => classified.role.isVerticalRole)
+  have placementFlagMem :
+      (placement.1.kind.isPort, placement.2) ∈
+        ((routeBendCenterPlacements graph edge edgeIndex).map
+          (fun item => item.kind.isPort)).zipIdx := by
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr ⟨placement, placementMem, rfl⟩
+  have placementFlagAt :=
+    (List.mem_zipIdx_iff_getElem?).mp placementFlagMem
+  have verticalEq :
+      vertical = roles.map SegmentRole.isVerticalRole := by
+    simp [vertical, roles, List.map_map]
+  have incomingFlagMem :
+      (incomingRole.isVerticalRole, incomingIndex) ∈
+        vertical.zipIdx := by
+    rw [verticalEq, List.zipIdx_map]
+    exact
+      List.mem_map.mpr
+        ⟨(incomingRole, incomingIndex), incomingRoleMem, rfl⟩
+  have outgoingFlagMem :
+      (outgoingRole.isVerticalRole, outgoingIndex) ∈
+        vertical.zipIdx := by
+    rw [verticalEq, List.zipIdx_map]
+    exact
+      List.mem_map.mpr
+        ⟨(outgoingRole, outgoingIndex), outgoingRoleMem, rfl⟩
+  have incomingFlagAtRaw :=
+    (List.mem_zipIdx_iff_getElem?).mp incomingFlagMem
+  have outgoingFlagAtRaw :=
+    (List.mem_zipIdx_iff_getElem?).mp outgoingFlagMem
+  have incomingFlagAt :
+      vertical[placement.2]? = some true := by
+    rw [← incomingIndexEq, incomingFlagAtRaw]
+    simp only [Option.some.injEq]
+    exact
+      (SegmentRole.isVerticalRole_eq_true_iff incomingRole).mpr
+        incomingVertical
+  have outgoingFlagAt :
+      vertical[placement.2 + 1]? = some true := by
+    rw [← outgoingIndexEq, outgoingFlagAtRaw]
+    simp only [Option.some.injEq]
+    exact
+      (SegmentRole.isVerticalRole_eq_true_iff outgoingRole).mpr
+        outgoingVertical
+  have outgoingTailFlagAt :
+      vertical.tail[placement.2]? = some true := by
+    simpa only [List.getElem?_tail] using outgoingFlagAt
+  have adjacentFlagAt :
+      (List.zipWith (· && ·) vertical vertical.tail)[placement.2]? =
+        some true := by
+    simp [List.getElem?_zipWith, incomingFlagAt, outgoingTailFlagAt]
+  rw [routeBendCenterPlacements_map_isPort graph edge edgeIndex]
+    at placementFlagAt
+  change
+    (List.zipWith (· && ·) vertical vertical.tail)[placement.2]? =
+      some placement.1.kind.isPort at placementFlagAt
+  rw [adjacentFlagAt] at placementFlagAt
+  exact
+    (RouteBendCenterKind.isPort_eq_true_iff placement.1.kind).mp
+      (Option.some.inj placementFlagAt.symm)
+
+set_option maxHeartbeats 500000 in
+/-- The only semantic inner point whose adjacent classified segments are
+both vertical is the height-three port marker between fanout and core. -/
+theorem routeBendCenterPlacement_kind_port_of_adjacent_vertical
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (edge : PeriodicEdge Vertex)
+    (edgeIndex : Nat)
+    {placement : RouteBendCenterPlacement Vertex × Nat}
+    (placementMem :
+      placement ∈
+        (routeBendCenterPlacements
+          graph edge edgeIndex).zipIdx)
+    {incoming outgoing : ClassifiedSegment Vertex × Nat}
+    (incomingMem :
+      incoming ∈
+        (classifiedRouteSegments graph edge edgeIndex).zipIdx)
+    (outgoingMem :
+      outgoing ∈
+        (classifiedRouteSegments graph edge edgeIndex).zipIdx)
+    (incomingIndex : incoming.2 = placement.2)
+    (outgoingIndex : outgoing.2 = placement.2 + 1)
+    (incomingVertical : incoming.1.segment.IsVertical)
+    (outgoingVertical : outgoing.1.segment.IsVertical) :
+    ∃ port, placement.1.kind = .port port := by
+  have incomingVerticalRole :=
+    classifiedSegment_verticalRole_of_isVertical
+      (List.fst_mem_of_mem_zipIdx incomingMem)
+      incomingVertical
+  have outgoingVerticalRole :=
+    classifiedSegment_verticalRole_of_isVertical
+      (List.fst_mem_of_mem_zipIdx outgoingMem)
+      outgoingVertical
+  have incomingRoleMem :
+      (incoming.1.role, incoming.2) ∈
+        ((classifiedRouteSegments graph edge edgeIndex).map
+          ClassifiedSegment.role).zipIdx := by
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr ⟨incoming, incomingMem, rfl⟩
+  have outgoingRoleMem :
+      (outgoing.1.role, outgoing.2) ∈
+        ((classifiedRouteSegments graph edge edgeIndex).map
+          ClassifiedSegment.role).zipIdx := by
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr ⟨outgoing, outgoingMem, rfl⟩
+  exact
+    routeBendCenterPlacement_kind_port_of_adjacent_verticalRoles
+      graph edge edgeIndex placementMem
+      incomingRoleMem outgoingRoleMem
+      incomingIndex outgoingIndex
+      incomingVerticalRole outgoingVerticalRole
+
 /-- An endpoint of a horizontal segment whose span is at most one period
 cannot lie in the open interior of any periodic translate of that segment. -/
 theorem horizontalSegment_translate_not_interiorContains_endpoint
