@@ -169,6 +169,37 @@ theorem normalizeIncidenceRoute_getLast?
     Cell.add, Cell.sub, Cell.scale] <;>
   ring
 
+/-- Translating a displayed route into the periodic clause-anchor gauge
+preserves axis alignment of every segment. -/
+theorem normalizeIncidenceRoute_orthogonal
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable)
+    (clause : PositionedPeriodicClause Variable)
+    (route : List Cell)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline route) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (normalizeIncidenceRoute placement clause route) := by
+  unfold PeriodicOrthocrossing.OrthogonalPolyline at orthogonal ⊢
+  unfold normalizeIncidenceRoute
+  apply List.isChain_map_of_isChain
+    (fun point =>
+      Cell.sub point
+        (placement.translation
+          (PeriodicCNF.clauseAnchor clause.literals)))
+  · intro first second aligned
+    let offset :=
+      placement.translation
+        (PeriodicCNF.clauseAnchor clause.literals)
+    have translated :=
+      (GridSegment.isAxisAligned_translate
+        (GridSegment.mk first second)
+        (Cell.scale (-1) offset)).mpr aligned
+    simpa [GridSegment.translate, Cell.add,
+      Cell.sub, Cell.scale, offset, sub_eq_add_neg,
+      add_comm] using translated
+  · exact orthogonal
+
 /-- Normalize every raw physical route by the anchor of the source clause at
 the same index.  This is the route family naturally indexed by the
 anchor-normalized positioned formula. -/
