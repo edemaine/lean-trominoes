@@ -447,6 +447,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean)
   identifies the exact source scope and source-anchor offset of every fresh
   unit-elimination auxiliary literal.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsInheritedIncidences.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsInheritedIncidences.lean)
+  classifies every inherited unit-elimination literal by its precise source
+  presentation index, preserving its atom and periodic offset.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryEndpoints.lean)
   then proves that each normalized auxiliary endpoint is already its final
   canonical periodic endpoint.  As at the Figure 9 layer, it completes any
@@ -2012,7 +2015,8 @@ The representation choices for this target are:
   positioned output block and derives the complete local validity
   certificate from per-clause atom distinctness.  It also identifies every
   scoped auxiliary's translated physical position with its declared local
-  unit-elimination coordinate.
+  unit-elimination coordinate, and assigns every genuine source occurrence
+  its index-selected boundary port.
 - [`LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean`](LeanTrominoes/PlanarOneInThreeLocalDistinctness.lean)
   proves that every clause produced by Figure 9 has distinct variable atoms,
   independently of repetitions in its source clause.  It also packages
