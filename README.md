@@ -493,6 +493,11 @@ The representation choices for this target are:
   drawing is proved to have exact periodic endpoints and to be orthogonal.
   These deliberately generic routes do not assert planarity, leaving later
   construction files to choose noncrossing lanes.
+  [`LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicing.lean`](LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicing.lean)
+  packages orthogonal suffixes from arbitrary local gadget splice points to
+  canonical periodic literal endpoints.  Its generic join theorem combines
+  such a suffix with a normalized local clause route while preserving both
+  outer endpoints and orthogonality.
   [`LeanTrominoes/PositionedPeriodicCNFFinitePlanarCertificate.lean`](LeanTrominoes/PositionedPeriodicCNFFinitePlanarCertificate.lean)
   packages the remaining geometric proof boundary into finite data.  Given
   distinct bounded vertices, bounded route endpoints, exact compatibility,
