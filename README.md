@@ -1807,6 +1807,11 @@ The representation choices for this target are:
   records executable continuous-planarity certificates for the direct
   incidence drawings of both fixed Figure 8 templates, ready for the global
   macrocell assembly.
+- [`LeanTrominoes/PlanarThreeSATDuplicatorArmIncidenceDrawing.lean`](LeanTrominoes/PlanarThreeSATDuplicatorArmIncidenceDrawing.lean)
+  extracts the two-clause direct incidence drawing for one active left, top,
+  or right arm of Figure 8(a).  Each arm has exact endpoints, continuous
+  planarity, and compass-valid terminal rays independently of the inactive
+  duplicator arms.
 - [`LeanTrominoes/PlanarThreeSATEqualityLens.lean`](LeanTrominoes/PlanarThreeSATEqualityLens.lean)
   replaces each collinear four-incidence equality link on a long carrier by
   a narrow rectilinear lens.  For every span of at least eight cells, explicit
