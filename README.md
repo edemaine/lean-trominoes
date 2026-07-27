@@ -1945,6 +1945,12 @@ The representation choices for this target are:
   certifies the fixed source-clause star: any signed subset of the three
   distinct fanout ports has exact straight-ray endpoints and a continuously
   planar incidence drawing.
+- [`LeanTrominoes/PlanarThreeSATTerminalCarrierInterface.lean`](LeanTrominoes/PlanarThreeSATTerminalCarrierInterface.lean)
+  identifies the left, middle, and right fanout arms with the west, north,
+  and east carrier ports.  It proves that every active duplicator-arm route
+  and every source-clause ray stays on the internal side of each incident
+  port boundary, with endpoint-only contact, and transports both certificates
+  through macrocell translation.
 - [`LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverIncidenceDrawing.lean)
   translates the continuously planar Figure 8(b) incidence template to each
   canonical crossing and injectively renames its boundary and internal roles

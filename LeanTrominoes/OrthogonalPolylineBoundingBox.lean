@@ -398,6 +398,33 @@ theorem RouteContactsAtEndpoint.rename
   exact
     contacts originalIndex point pointMember pointEqual
 
+/-- Conversely, endpoint-only contact proved after logical renaming already
+holds for the unchanged route family of the source drawing. -/
+theorem RouteContactsAtEndpoint.of_rename
+    {Source Target : Type*}
+    {drawing : EmbeddedCNFIncidenceDrawing Source}
+    {contact : Cell}
+    (variableMap : Source → Target)
+    (targetPosition : Target → Cell)
+    (contacts :
+      (drawing.rename
+        variableMap targetPosition).RouteContactsAtEndpoint contact) :
+    drawing.RouteContactsAtEndpoint contact := by
+  intro sourceIndex point pointMember pointEqual
+  let renamedIndex :
+      Fin (drawing.rename
+        variableMap targetPosition).incidences.length :=
+    ⟨sourceIndex.val, by
+      simpa using sourceIndex.isLt⟩
+  have incidenceEqual :=
+    incidenceAt_rename
+      drawing variableMap targetPosition renamedIndex
+  have renamedContacts :=
+    contacts renamedIndex point
+  rw [incidenceEqual, routeAt_rename_incidence]
+    at renamedContacts
+  exact renamedContacts pointMember pointEqual
+
 /-- Conversely, a bound proved after logical renaming already bounds the
 unchanged route family of the source drawing. -/
 theorem RoutePointsSatisfy.of_rename
@@ -603,6 +630,46 @@ theorem straightIncidenceDrawing_routePointsSatisfy
       (List.fst_mem_of_mem_zipIdx indexedMembers.1)
       incidence.literal
       (List.fst_mem_of_mem_zipIdx indexedMembers.2)
+
+/-- Every listed point of every genuine direct straight route is one of its
+two advertised endpoints. -/
+theorem straightIncidenceDrawing_routeContactsAtEndpoint
+    {Variable : Type*}
+    (formula : List (EmbeddedClause Variable))
+    (variablePosition : Variable → Cell)
+    (contact : Cell) :
+    (straightIncidenceDrawing
+      formula variablePosition).RouteContactsAtEndpoint contact := by
+  intro incidenceIndex point pointMember _pointEqual
+  let incidence :=
+    (straightIncidenceDrawing
+      formula variablePosition).incidenceAt incidenceIndex
+  have incidenceMember :
+      incidence ∈
+        (straightIncidenceDrawing
+          formula variablePosition).incidences :=
+    List.get_mem _ incidenceIndex
+  change incidence ∈ embeddedCNFIncidences formula
+    at incidenceMember
+  have indexedMembers :=
+    (mem_embeddedCNFIncidences_iff formula incidence).mp
+      incidenceMember
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp indexedMembers.1
+  have literalLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp indexedMembers.2
+  change
+    point ∈
+      straightIncidenceRoutes formula variablePosition
+        incidence.clauseIndex incidence.literalIndex at pointMember
+  change
+    RoutePointIsEndpoint
+      (straightIncidenceRoutes formula variablePosition
+        incidence.clauseIndex incidence.literalIndex) point
+  simp [straightIncidenceRoutes, clauseLookup,
+    literalLookup, straightIncidenceRoute] at pointMember ⊢
+  rcases pointMember with rfl | rfl <;>
+    simp [RoutePointIsEndpoint]
 
 /-- Every route point lies in one closed rectangle. -/
 def RoutePointsInClosedRectangle
