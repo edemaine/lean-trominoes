@@ -2088,6 +2088,13 @@ The representation choices for this target are:
   and Figure 9 back to its precise original source-clause occurrence.  Its
   offset is unchanged, and the normalized composed route ends at that
   occurrence's exact index-selected `72 × 72` boundary port.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean)
+  scales an original source incidence route directly by the combined factor
+  `72`, changes it into the final clause's anchor gauge, and replaces its
+  obsolete source-clause head by a connector from the certified composed
+  port to its transformed first exit.  Exact endpoints and orthogonality
+  are preserved; coordinating these connectors continuously remains part
+  of the global planarity proof.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
