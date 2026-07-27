@@ -561,6 +561,12 @@ The representation choices for this target are:
   canonical periodic literal endpoints.  Its generic join theorem combines
   such a suffix with a normalized local clause route while preserving both
   outer endpoints and orthogonality.
+  [`LeanTrominoes/OrthogonalPolylineHeadReplacement.lean`](LeanTrominoes/OrthogonalPolylineHeadReplacement.lean)
+  supports the complementary source-side operation: replace a route's old
+  first point by a certified prefix ending at the first point of its nonempty
+  tail.  The replacement preserves the far endpoint and orthogonality, which
+  lets coordinated gadget fans attach to distinct source-route exits instead
+  of converging again at the replaced vertex.
   [`LeanTrominoes/PositionedPeriodicCNFSumRouteSuffixes.lean`](LeanTrominoes/PositionedPeriodicCNFSumRouteSuffixes.lean)
   reduces that suffix obligation for source/auxiliary sum types to inherited
   source variables alone.  New auxiliaries receive a singleton suffix at
