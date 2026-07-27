@@ -493,7 +493,9 @@ The representation choices for this target are:
   It proves that anchor normalization maps the metadata-rich incidence list
   pointwise while leaving every such rebased route unchanged, and packages
   the bound together with continuous source planarity for the three-strand
-  assembly.
+  assembly.  Its upper-margin variant records the extra unit of room needed
+  by a closed refined ribbon block and is likewise invariant under anchor
+  normalization.
   [`LeanTrominoes/PeriodicOneInThreeAnchorNormalization.lean`](LeanTrominoes/PeriodicOneInThreeAnchorNormalization.lean)
   closes the corresponding semantic obligation for exact-one formulas:
   normalization preserves each ordered clause-value list up to translation,
@@ -541,6 +543,13 @@ The representation choices for this target are:
   scales uniformly.  Assembling the scaled data is exactly whole-drawing
   scaling, so every continuously planar incidence presentation transports
   directly to the refined coordinates needed for bounded-degree local fans.
+  [`LeanTrominoes/PositionedPeriodicCNFRibbonScaling.lean`](LeanTrominoes/PositionedPeriodicCNFRibbonScaling.lean)
+  specializes that refinement to the padding needed by ribbon routing.
+  Doubling an open-halo source point leaves one full integer unit below the
+  doubled upper boundary, and positive scaling preserves endpoint-only
+  listed-point contacts.  Thus any halo-bounded ribbon-ready presentation
+  doubles to another ribbon-ready presentation carrying the stronger upper
+  route margin.
   [`LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean`](LeanTrominoes/PeriodicGridDrawingFiniteContinuousPlanarity.lean)
   makes that extra condition executable.  An interval-overlap bound reduces
   every possible continuous contact to the same nine neighboring periodic
@@ -559,7 +568,9 @@ The representation choices for this target are:
   replaces the unusably strict fundamental-square endpoint hypothesis by the
   natural one-cell halo `(-P,2P)²`.  It proves that any contact between two
   halo-bounded route occurrences has relative translation in an explicit
-  `5 × 5` set, accommodating genuine nonzero-offset periodic edges.
+  `5 × 5` set, accommodating genuine nonzero-offset periodic edges.  Closed
+  containment also preserves the one-unit upper-margin variant used by
+  padded ribbon routes.
   [`LeanTrominoes/PeriodicGridDrawingExpandedFinitePlanarity.lean`](LeanTrominoes/PeriodicGridDrawingExpandedFinitePlanarity.lean)
   evaluates route/route avoidance over those 25 relative translations and
   proves the check complete for the infinite periodic lift.  Because stored
@@ -1594,7 +1605,9 @@ The representation choices for this target are:
   propagates block ownership through both endpoint joins.  Every point of a
   complete corrected colored route lies in the refined block of a listed
   point on its unit source route, including the variable and lifted clause
-  endpoint blocks.
+  endpoint blocks.  Unit subdivision preserves both ordinary and
+  upper-margin source halo bounds; with the latter, every complete corrected
+  occurrence route lies in the assembled open halo.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation.lean)
   specializes endpoint-direction separation to the active exact-one
   incidences.  Unequal occurrences sharing any unitized start leave in

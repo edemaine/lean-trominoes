@@ -209,6 +209,33 @@ theorem expanded_of_contains
       simp only [PositionInExpandedSquare] <;>
       omega
 
+/-- Closed containment in a segment whose endpoints have one unit of upper
+halo margin preserves that margin. -/
+theorem expandedWithUpperMargin_of_contains
+    {drawing : PeriodicGridDrawing}
+    {segment : GridSegment} {point : Cell}
+    (startBounds :
+      drawing.PositionInExpandedSquareWithUpperMargin segment.start)
+    (finishBounds :
+      drawing.PositionInExpandedSquareWithUpperMargin segment.finish)
+    (contains : segment.Contains point) :
+    drawing.PositionInExpandedSquareWithUpperMargin point := by
+  rcases startBounds with
+    ⟨startXLower, startXUpper, startYLower, startYUpper⟩
+  rcases finishBounds with
+    ⟨finishXLower, finishXUpper, finishYLower, finishYUpper⟩
+  rcases contains with
+    ⟨horizontal, same, between⟩ |
+      ⟨vertical, same, between⟩
+  · rcases between with between | between <;>
+      simp only [GridSegment.IsHorizontal] at horizontal <;>
+      simp only [PositionInExpandedSquareWithUpperMargin] <;>
+      omega
+  · rcases between with between | between <;>
+      simp only [GridSegment.IsVertical] at vertical <;>
+      simp only [PositionInExpandedSquareWithUpperMargin] <;>
+      omega
+
 /-- A contact between two halo-bounded segment occurrences has relative
 translation in the finite `5 × 5` set. -/
 theorem relativeTranslate_isDoubleNeighbor_of_contact

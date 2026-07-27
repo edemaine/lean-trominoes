@@ -96,6 +96,35 @@ def PlanarIncidencePresentation.RebasedRoutePointsInExpandedSquare
       (incidenceDrawing source placement presentation.routes)
         |>.PositionInExpandedSquare point
 
+/-- Stronger rebased-route bound with one unit of room below both upper
+halo boundaries.  This is the margin consumed by a closed refined ribbon
+macrocell. -/
+def PlanarIncidencePresentation.RebasedRoutePointsInExpandedSquareWithUpperMargin
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : PlanarIncidencePresentation source placement) : Prop :=
+  ∀ tagged ∈
+      (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx,
+    ∀ point ∈ presentation.variableToClauseRoute tagged.1,
+      (incidenceDrawing source placement presentation.routes)
+        |>.PositionInExpandedSquareWithUpperMargin point
+
+/-- Forgetting the extra unit of upper room recovers the ordinary
+rebased-route halo bound. -/
+theorem PlanarIncidencePresentation.rebasedRoutePointsInExpandedSquare_of_upperMargin
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {presentation : PlanarIncidencePresentation source placement}
+    (bounds :
+      presentation.RebasedRoutePointsInExpandedSquareWithUpperMargin) :
+    presentation.RebasedRoutePointsInExpandedSquare := by
+  intro tagged taggedMember point pointMember
+  exact
+    PeriodicGridDrawing.positionInExpandedSquare_of_upperMargin
+      (bounds tagged taggedMember point pointMember)
+
 /-- Anchor normalization leaves each reversed-and-rebased incidence route
 literally unchanged. -/
 theorem PlanarIncidencePresentation.variableToClauseRoute_anchorNormalize
@@ -128,6 +157,33 @@ theorem PlanarIncidencePresentation.rebasedRoutePointsInExpandedSquare_anchorNor
     (bounds : presentation.RebasedRoutePointsInExpandedSquare) :
     presentation.anchorNormalize
       |>.RebasedRoutePointsInExpandedSquare := by
+  intro normalizedTagged normalizedTaggedMember point pointMember
+  rw [PositionedPeriodicCNF.erase_anchorNormalize,
+    PeriodicCNF.incidencesWithMetadata_anchorNormalize,
+    List.zipIdx_map] at normalizedTaggedMember
+  rcases List.mem_map.mp normalizedTaggedMember with
+    ⟨tagged, taggedMember, taggedEqual⟩
+  subst normalizedTagged
+  have pointMember' :
+      point ∈
+        presentation.anchorNormalize.variableToClauseRoute
+          tagged.1.anchorNormalize := by
+    simpa using pointMember
+  rw [variableToClauseRoute_anchorNormalize] at pointMember'
+  rw [incidenceDrawing_anchorNormalize]
+  exact bounds tagged taggedMember point pointMember'
+
+/-- The stronger one-unit upper halo margin likewise survives anchor
+normalization. -/
+theorem PlanarIncidencePresentation.rebasedRoutePointsInExpandedSquareWithUpperMargin_anchorNormalize
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : PlanarIncidencePresentation source placement)
+    (bounds :
+      presentation.RebasedRoutePointsInExpandedSquareWithUpperMargin) :
+    presentation.anchorNormalize
+      |>.RebasedRoutePointsInExpandedSquareWithUpperMargin := by
   intro normalizedTagged normalizedTaggedMember point pointMember
   rw [PositionedPeriodicCNF.erase_anchorNormalize,
     PeriodicCNF.incidencesWithMetadata_anchorNormalize,

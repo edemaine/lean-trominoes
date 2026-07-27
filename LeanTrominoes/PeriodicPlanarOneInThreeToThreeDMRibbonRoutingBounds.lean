@@ -140,5 +140,147 @@ theorem occurrenceRibbonThreeStrandRoute_point_in_source_macrocell
           presentation entry,
         clauseBounded⟩
 
+/-- Unit subdivision preserves the ordinary pointwise source halo bound. -/
+theorem occurrenceUnitSourceRoute_pointsInsideExpandedSquare
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (sourceBounds :
+      presentation.RebasedRoutePointsInExpandedSquare)
+    (entry : ActiveOccurrenceEntry source.erase)
+    {point : Cell}
+    (pointMember :
+      point ∈ occurrenceUnitSourceRoute presentation entry) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      source placement presentation.routes)
+      |>.PositionInExpandedSquare point := by
+  let data := occurrenceSpliceData presentation entry
+  have originalPointInside :
+      ∀ originalPoint ∈ occurrenceSourceRoute presentation entry,
+        (PositionedPeriodicCNF.incidenceDrawing
+          source placement presentation.routes)
+          |>.PositionInExpandedSquare originalPoint := by
+    intro originalPoint originalPointMember
+    exact
+      sourceBounds data.indexed data.indexedMember
+        originalPoint originalPointMember
+  rcases
+      AxisDirection.unitSubdividePolyline_mem_original_or_segmentInterior
+        (occurrenceSourceRoute_orthogonal presentation entry)
+        pointMember with
+    originalMember | ⟨segment, segmentMember, interior⟩
+  · exact originalPointInside point originalMember
+  · have endpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    exact
+      PeriodicGridDrawing.expanded_of_contains
+        (originalPointInside segment.start endpoints.1)
+        (originalPointInside segment.finish endpoints.2)
+        (GridSegment.contains_of_interiorContains interior)
+
+/-- Unit subdivision also preserves a one-unit upper halo margin. -/
+theorem occurrenceUnitSourceRoute_pointsInsideExpandedSquareWithUpperMargin
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (sourceBounds :
+      presentation.RebasedRoutePointsInExpandedSquareWithUpperMargin)
+    (entry : ActiveOccurrenceEntry source.erase)
+    {point : Cell}
+    (pointMember :
+      point ∈ occurrenceUnitSourceRoute presentation entry) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      source placement presentation.routes)
+      |>.PositionInExpandedSquareWithUpperMargin point := by
+  let data := occurrenceSpliceData presentation entry
+  have originalPointInside :
+      ∀ originalPoint ∈ occurrenceSourceRoute presentation entry,
+        (PositionedPeriodicCNF.incidenceDrawing
+          source placement presentation.routes)
+          |>.PositionInExpandedSquareWithUpperMargin originalPoint := by
+    intro originalPoint originalPointMember
+    exact
+      sourceBounds data.indexed data.indexedMember
+        originalPoint originalPointMember
+  rcases
+      AxisDirection.unitSubdividePolyline_mem_original_or_segmentInterior
+        (occurrenceSourceRoute_orthogonal presentation entry)
+        pointMember with
+    originalMember | ⟨segment, segmentMember, interior⟩
+  · exact originalPointInside point originalMember
+  · have endpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    exact
+      PeriodicGridDrawing.expandedWithUpperMargin_of_contains
+        (originalPointInside segment.start endpoints.1)
+        (originalPointInside segment.finish endpoints.2)
+        (GridSegment.contains_of_interiorContains interior)
+
+/-- A point in the closed refined block above a source point with one unit
+of upper halo margin lies in the corrected assembled open halo. -/
+theorem inRibbonMacrocell_insideExpandedSquare
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.ContinuousPlanarIncidencePresentation placement)
+    {center point : Cell}
+    (centerInside :
+      (PositionedPeriodicCNF.incidenceDrawing
+        source placement presentation.routes)
+        |>.PositionInExpandedSquareWithUpperMargin center)
+    (bounded : InRibbonMacrocell center point) :
+    (assembledDrawing
+      (ribbonThreeStrandRouting presentation))
+      |>.PositionInExpandedSquare point := by
+  simp only
+      [PeriodicGridDrawing.PositionInExpandedSquareWithUpperMargin]
+    at centerInside
+  simp only [PeriodicGridDrawing.PositionInExpandedSquare]
+  rw [PositionedPeriodicCNF.incidenceDrawing_gridSize
+    source placement presentation.routes presentation.periodPositive]
+    at centerInside
+  rw [assembledDrawing_gridSize]
+  rcases center with ⟨centerX, centerY⟩
+  rcases point with ⟨pointX, pointY⟩
+  simp only [InRibbonMacrocell, ribbonMacrocellOrigin,
+    ribbonThreeStrandRouting, standardThreeStrandLayout,
+    Cell.scale] at bounded ⊢
+  omega
+
+/-- Every point of a complete corrected occurrence route is halo-bounded
+once the source rebased routes carry one unit of upper margin. -/
+theorem occurrenceRibbonThreeStrandRoute_pointsInsideExpandedSquare
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.ContinuousPlanarIncidencePresentation placement)
+    (sourceBounds :
+      presentation.toPlanarIncidencePresentation
+        |>.RebasedRoutePointsInExpandedSquareWithUpperMargin)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (color : WireColor)
+    {point : Cell}
+    (pointMember :
+      point ∈ occurrenceRibbonThreeStrandRoute
+        presentation.toPlanarIncidencePresentation entry color) :
+    (assembledDrawing
+      (ribbonThreeStrandRouting presentation))
+      |>.PositionInExpandedSquare point := by
+  rcases
+      occurrenceRibbonThreeStrandRoute_point_in_source_macrocell
+        presentation.toPlanarIncidencePresentation
+        entry color pointMember with
+    ⟨center, centerMember, bounded⟩
+  exact
+    inRibbonMacrocell_insideExpandedSquare presentation
+      (occurrenceUnitSourceRoute_pointsInsideExpandedSquareWithUpperMargin
+        presentation.toPlanarIncidencePresentation
+        sourceBounds entry centerMember)
+      bounded
+
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
