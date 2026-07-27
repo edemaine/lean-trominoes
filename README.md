@@ -2017,7 +2017,9 @@ The representation choices for this target are:
   classified segments adjacent to every enumerated bend, proves that two
   vertical adjacent roles characterize exactly the height-three port
   markers, and proves the period-wide endpoint/interior exclusion lemma
-  needed to separate bend centers from genuine crossings.
+  needed to separate bend centers from genuine crossings.  Combining those
+  facts with an even-endpoint/odd-fanout-midpoint invariant proves that no
+  canonical crossover center can coincide with any enumerated bend center.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATRoutedVariableSeparation.lean)
   transports the finite different-arm certificate through macrocell
   translation and logical renaming.  Thus two distinct routed-variable

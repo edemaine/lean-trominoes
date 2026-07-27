@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOrthocrossingMacrocellCenterDisjointness
+import LeanTrominoes.PeriodicOrthocrossingBendCornerDrawingFamily
 
 /-!
 # Crossover centers avoid declared vertices
@@ -129,6 +130,115 @@ theorem classifiedSegment_horizontalFanout_midpoint_ne_vertexX
       SegmentRole.horizontalFanoutPort,
       fanoutMidpointBase, portX, vertexX] <;>
     omega
+
+/-- Both endpoints of every translated horizontal fanout have even
+horizontal coordinate. -/
+theorem horizontalFanout_translated_endpoints_even
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {edge : PeriodicEdge Vertex}
+    {edgeIndex : Nat}
+    {classified : ClassifiedSegment Vertex}
+    (classifiedMem :
+      classified ∈ classifiedRouteSegments graph edge edgeIndex)
+    (fanout : classified.role.IsHorizontalFanout)
+    (translate : Cell) :
+    Even
+        ((classified.segment.translate
+          ((drawing graph).periodTranslation translate)).start.1) ∧
+      Even
+        ((classified.segment.translate
+          ((drawing graph).periodTranslation translate)).finish.1) := by
+  simp only [classifiedRouteSegments, List.mem_append] at classifiedMem
+  rcases classifiedMem with
+    (sourceMem | coreMem) | targetMem
+  · by_cases same :
+        vertexX (graph.vertices.idxOf edge.source) =
+          portX graph (sourcePort edge edgeIndex)
+    · simp [classifiedSourceFanout, same] at sourceMem
+      subst classified
+      simp [SegmentRole.IsHorizontalFanout] at fanout
+    · simp [classifiedSourceFanout, same] at sourceMem
+      rcases sourceMem with classifiedEq | classifiedEq
+      · subst classified
+        norm_num [GridSegment.translate,
+          PeriodicGridDrawing.periodTranslation, drawing_gridSize,
+          Cell.add, Cell.scale, drawingGridSize, vertexX, portX,
+          parity_simps]
+      · subst classified
+        simp [SegmentRole.IsHorizontalFanout] at fanout
+  · simp [classifiedEdgeCore,
+      SegmentRole.IsHorizontalFanout] at coreMem fanout
+    all_goals aesop
+  · by_cases same :
+        vertexX (graph.vertices.idxOf edge.target) =
+          portX graph (targetPort edge edgeIndex)
+    · simp [classifiedTargetFanout, same] at targetMem
+      subst classified
+      simp [SegmentRole.IsHorizontalFanout] at fanout
+    · simp [classifiedTargetFanout, same] at targetMem
+      rcases targetMem with classifiedEq | classifiedEq
+      · subst classified
+        simp [SegmentRole.IsHorizontalFanout] at fanout
+      · subst classified
+        norm_num [GridSegment.translate,
+          PeriodicGridDrawing.periodTranslation, drawing_gridSize,
+          Cell.add, Cell.scale, drawingGridSize, vertexX, portX,
+          parity_simps]
+
+/-- The unique interior grid point of a translated horizontal fanout has
+odd horizontal coordinate. -/
+theorem horizontalFanout_interior_point_not_even
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (degree : graph.DegreeAtMost 3)
+    {edge : PeriodicEdge Vertex}
+    {edgeIndex : Nat}
+    (edgeMem : (edge, edgeIndex) ∈ graph.edges.zipIdx)
+    {classified : ClassifiedSegment Vertex}
+    (classifiedMem :
+      classified ∈ classifiedRouteSegments graph edge edgeIndex)
+    (fanout : classified.role.IsHorizontalFanout)
+    (translate point : Cell)
+    (contains :
+      (classified.segment.translate
+        ((drawing graph).periodTranslation translate)).InteriorContains
+          point) :
+    ¬Even point.1 := by
+  rcases horizontalFanout_midpoint_of_interiorContains
+      degree edgeMem classifiedMem fanout translate point contains with
+    ⟨port, portEq, portMem, pointEq⟩
+  have rankLt := portRank_lt_three degree portMem
+  have offCenter :=
+    classifiedSegment_horizontalFanout_center_ne
+      graph edge edgeIndex classifiedMem fanout portEq
+  have rankNeOne : portRank graph port ≠ 1 := by
+    intro rankEq
+    apply offCenter
+    simp [portX, rankEq]
+  rw [Int.not_even_iff_odd]
+  have rankCases :
+      portRank graph port = 0 ∨ portRank graph port = 2 := by
+    omega
+  rcases rankCases with rankEq | rankEq
+  · refine
+      ⟨4 * (graph.vertices.idxOf port.vertex : Int) + 1 +
+          8 * (graph.vertices.length + graph.edges.length + 1) *
+            (horizontalFanoutCellShift edge classified.role).1 +
+          8 * (graph.vertices.length + graph.edges.length + 1) *
+            translate.1, ?_⟩
+    rw [pointEq]
+    simp [rankEq, drawingGridSize, vertexX]
+    ring
+  · refine
+      ⟨4 * (graph.vertices.idxOf port.vertex : Int) + 2 +
+          8 * (graph.vertices.length + graph.edges.length + 1) *
+            (horizontalFanoutCellShift edge classified.role).1 +
+          8 * (graph.vertices.length + graph.edges.length + 1) *
+            translate.1, ?_⟩
+    rw [pointEq]
+    simp [rankEq, drawingGridSize, vertexX]
+    ring
 
 /-! ## Exact classified segments adjacent to an enumerated bend -/
 
@@ -630,6 +740,427 @@ theorem horizontalSegment_translate_not_interiorContains_endpoint
   · exact
       ((GridSegment.isVertical_translate _ _).mp
         translatedVertical).2 horizontal.1
+
+/-- The reserved port row at height three contains no canonical crossover
+center. -/
+theorem orientedCrossing_point_snd_ne_three
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossings graph) :
+    crossing.point.2 ≠ 3 := by
+  intro pointYBase
+  have sound := orientedCrossings_sound graph crossingMem
+  have canonical := sound.2.2.2.2.1
+  rcases exists_classifiedSegment_of_drawing_mem sound.1 with
+    ⟨taggedRoute, taggedRouteMem,
+      taggedClassified, taggedClassifiedMem, firstEq⟩
+  have edgeMem :
+      taggedRoute.1 ∈ graph.edges.zipIdx :=
+    List.fst_mem_of_mem_zipIdx taggedRouteMem
+  have classifiedMem :
+      taggedClassified.1 ∈
+        classifiedRouteSegments graph
+          taggedRoute.1.1 taggedRoute.1.2 :=
+    List.fst_mem_of_mem_zipIdx taggedClassifiedMem
+  have translatedHorizontal :
+      (taggedClassified.1.segment.translate
+        ((drawing graph).periodTranslation
+          crossing.firstTranslate)).IsHorizontal := by
+    simpa [CrossingRecord.firstSegment, firstEq] using
+      sound.2.2.2.2.2.1
+  have storedHorizontal :
+      taggedClassified.1.segment.IsHorizontal :=
+    (GridSegment.isHorizontal_translate _ _).mp
+      translatedHorizontal
+  have horizontalRole :=
+    classifiedSegment_horizontalRole_of_isHorizontal
+      classifiedMem storedHorizontal
+  have translatedContains :
+      (taggedClassified.1.segment.translate
+        ((drawing graph).periodTranslation
+          crossing.firstTranslate)).InteriorContains
+        crossing.point := by
+    simpa [CrossingRecord.firstSegment, firstEq] using
+      canonical.2.2.1
+  have pointY :
+      crossing.point.2 =
+        taggedClassified.1.segment.start.2 +
+          drawingGridSize graph * crossing.firstTranslate.2 := by
+    rcases translatedContains with
+      ⟨_horizontal, sameY, _between⟩ |
+        ⟨vertical, _sameX, _between⟩
+    · simpa [GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        drawing_gridSize, Cell.add, Cell.scale,
+        add_comm] using sameY
+    · exact (translatedHorizontal.2 vertical.1).elim
+  have lane :=
+    classifiedSegment_horizontal_lane
+      classifiedMem horizontalRole
+  have laneBounds :=
+    horizontalLaneBase_bounds
+      edgeMem classifiedMem horizontalRole
+  have threeBounds :
+      0 ≤ (3 : Int) ∧
+        (3 : Int) < (drawing graph).gridSize := by
+    rw [drawing_gridSize]
+    have sizePositive := drawingGridSize_pos graph
+    unfold drawingGridSize at sizePositive ⊢
+    omega
+  have laneBounds' :
+      0 ≤ horizontalLaneBase taggedClassified.1.role ∧
+        horizontalLaneBase taggedClassified.1.role <
+          (drawing graph).gridSize := by
+    simpa [drawing_gridSize] using laneBounds
+  have lanePeriodicEqual :
+      (3 : Int) + (drawing graph).gridSize * 0 =
+        horizontalLaneBase taggedClassified.1.role +
+          (drawing graph).gridSize *
+            (horizontalLaneCellShift taggedRoute.1.1
+              taggedClassified.1.role +
+                crossing.firstTranslate.2) := by
+    rw [drawing_gridSize]
+    rw [lane] at pointY
+    rw [pointYBase] at pointY
+    simpa [mul_add, add_assoc] using pointY
+  have laneBaseEqual :=
+    ((drawing graph).translatedHalfOpenCoordinates_eq
+      threeBounds laneBounds' lanePeriodicEqual).1
+  cases roleEq : taggedClassified.1.role <;>
+    simp_all [SegmentRole.IsHorizontalRole,
+      horizontalLaneBase, edgeTrack] <;>
+    omega
+
+/-- A proper crossover cannot occur at either endpoint of any translated
+horizontal classified route segment. -/
+theorem orientedCrossing_point_ne_horizontal_classified_endpoint
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossings graph)
+    {edge : PeriodicEdge Vertex}
+    {edgeIndex : Nat}
+    (edgeMem : (edge, edgeIndex) ∈ graph.edges.zipIdx)
+    {classified : ClassifiedSegment Vertex × Nat}
+    (classifiedMem :
+      classified ∈
+        (classifiedRouteSegments graph edge edgeIndex).zipIdx)
+    (horizontal : classified.1.segment.IsHorizontal)
+    (translate : Cell)
+    (endpoint : SegmentEnd) :
+    crossing.point ≠
+      Cell.add
+        ((drawing graph).periodTranslation translate)
+        (match endpoint with
+          | .start => classified.1.segment.start
+          | .finish => classified.1.segment.finish) := by
+  intro pointEq
+  have sound := orientedCrossings_sound graph crossingMem
+  have canonical := sound.2.2.2.2.1
+  rcases exists_classifiedSegment_of_drawing_mem sound.1 with
+    ⟨crossingRoute, crossingRouteMem,
+      crossingClassified, crossingClassifiedMem, firstEq⟩
+  have crossingEdgeMem :
+      crossingRoute.1 ∈ graph.edges.zipIdx :=
+    List.fst_mem_of_mem_zipIdx crossingRouteMem
+  have crossingClassifiedListMem :
+      crossingClassified.1 ∈
+        classifiedRouteSegments graph
+          crossingRoute.1.1 crossingRoute.1.2 :=
+    List.fst_mem_of_mem_zipIdx crossingClassifiedMem
+  have crossingTranslatedHorizontal :
+      (crossingClassified.1.segment.translate
+        ((drawing graph).periodTranslation
+          crossing.firstTranslate)).IsHorizontal := by
+    simpa [CrossingRecord.firstSegment, firstEq] using
+      sound.2.2.2.2.2.1
+  have crossingStoredHorizontal :
+      crossingClassified.1.segment.IsHorizontal :=
+    (GridSegment.isHorizontal_translate _ _).mp
+      crossingTranslatedHorizontal
+  have crossingHorizontalRole :=
+    classifiedSegment_horizontalRole_of_isHorizontal
+      crossingClassifiedListMem crossingStoredHorizontal
+  have endpointHorizontalRole :=
+    classifiedSegment_horizontalRole_of_isHorizontal
+      (List.fst_mem_of_mem_zipIdx classifiedMem) horizontal
+  have crossingContains :
+      (crossingClassified.1.segment.translate
+        ((drawing graph).periodTranslation
+          crossing.firstTranslate)).InteriorContains
+        crossing.point := by
+    simpa [CrossingRecord.firstSegment, firstEq] using
+      canonical.2.2.1
+  have crossingPointY :
+      crossing.point.2 =
+        crossingClassified.1.segment.start.2 +
+          drawingGridSize graph * crossing.firstTranslate.2 := by
+    rcases crossingContains with
+      ⟨_horizontal, sameY, _between⟩ |
+        ⟨vertical, _sameX, _between⟩
+    · simpa [GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        drawing_gridSize, Cell.add, Cell.scale,
+        add_comm] using sameY
+    · exact
+        (crossingTranslatedHorizontal.2 vertical.1).elim
+  have endpointPointY :
+      crossing.point.2 =
+        classified.1.segment.start.2 +
+          drawingGridSize graph * translate.2 := by
+    have coordinateEq := congrArg Prod.snd pointEq
+    cases endpoint with
+    | start =>
+        simpa [PeriodicGridDrawing.periodTranslation,
+          drawing_gridSize, Cell.add, Cell.scale,
+          add_comm] using coordinateEq
+    | finish =>
+        calc
+          crossing.point.2 =
+              drawingGridSize graph * translate.2 +
+                classified.1.segment.finish.2 := by
+            simpa [PeriodicGridDrawing.periodTranslation,
+              drawing_gridSize, Cell.add, Cell.scale] using
+                coordinateEq
+          _ = drawingGridSize graph * translate.2 +
+                classified.1.segment.start.2 := by
+            rw [horizontal.1]
+          _ = _ := by ring
+  have crossingLane :=
+    classifiedSegment_horizontal_lane
+      crossingClassifiedListMem crossingHorizontalRole
+  have endpointLane :=
+    classifiedSegment_horizontal_lane
+      (List.fst_mem_of_mem_zipIdx classifiedMem)
+      endpointHorizontalRole
+  have normalizedLanesEqual :
+      horizontalLaneBase crossingClassified.1.role +
+          drawingGridSize graph *
+            (horizontalLaneCellShift
+              crossingRoute.1.1 crossingClassified.1.role +
+                crossing.firstTranslate.2) =
+        horizontalLaneBase classified.1.role +
+          drawingGridSize graph *
+            (horizontalLaneCellShift edge classified.1.role +
+              translate.2) := by
+    calc
+      _ = crossingClassified.1.segment.start.2 +
+          drawingGridSize graph * crossing.firstTranslate.2 := by
+            rw [crossingLane]
+            ring
+      _ = crossing.point.2 := crossingPointY.symm
+      _ = classified.1.segment.start.2 +
+          drawingGridSize graph * translate.2 := endpointPointY
+      _ = _ := by
+        rw [endpointLane]
+        ring
+  have periodPositive : (0 : Int) < drawingGridSize graph := by
+    exact_mod_cast drawingGridSize_pos graph
+  have crossingLaneBounds :=
+    horizontalLaneBase_bounds
+      crossingEdgeMem crossingClassifiedListMem
+      crossingHorizontalRole
+  have endpointLaneBounds :=
+    horizontalLaneBase_bounds
+      edgeMem (List.fst_mem_of_mem_zipIdx classifiedMem)
+      endpointHorizontalRole
+  have normalizedLaneData :=
+    periodic_coordinate_unique
+      periodPositive crossingLaneBounds endpointLaneBounds
+      normalizedLanesEqual
+  rcases horizontal_roles_eq_or_both_fanout
+      crossingHorizontalRole endpointHorizontalRole
+      normalizedLaneData.1 with
+    rolesEqual | ⟨crossingFanout, endpointFanout⟩
+  · have crossingRoleIndex :=
+      classifiedSegment_role_edgeIndex
+        crossingClassifiedListMem
+    have endpointRoleIndex :=
+      classifiedSegment_role_edgeIndex
+        (List.fst_mem_of_mem_zipIdx classifiedMem)
+    have edgeIndexEq :
+        crossingRoute.1.2 = edgeIndex := by
+      rw [← crossingRoleIndex, ← endpointRoleIndex]
+      exact congrArg SegmentRole.edgeIndex rolesEqual
+    have taggedEdgeEq :
+        crossingRoute.1 = (edge, edgeIndex) :=
+      tagged_eq_of_mem_zipIdx_of_snd_eq
+        crossingEdgeMem edgeMem edgeIndexEq
+    rw [taggedEdgeEq] at crossingClassifiedMem
+    have taggedClassifiedEq :
+        crossingClassified = classified :=
+      taggedClassified_eq_of_role_eq
+        crossingClassifiedMem classifiedMem rolesEqual
+    rw [taggedClassifiedEq] at crossingContains
+    have edgeLocal :
+        edge.span ≤ 1 :=
+      isLocal edge (List.fst_mem_of_mem_zipIdx edgeMem)
+    have span :=
+      classifiedSegment_horizontal_span_le_period
+        wellFormed degree edgeMem edgeLocal
+        (List.fst_mem_of_mem_zipIdx classifiedMem)
+        horizontal
+    apply
+      horizontalSegment_translate_not_interiorContains_endpoint
+        horizontal periodPositive span.1 span.2 endpoint
+        crossing.firstTranslate translate
+    rw [pointEq] at crossingContains
+    simpa [PeriodicGridDrawing.periodTranslation,
+      drawing_gridSize] using crossingContains
+  · have crossingNotEven :=
+      horizontalFanout_interior_point_not_even
+        degree crossingEdgeMem crossingClassifiedListMem
+        crossingFanout crossing.firstTranslate crossing.point
+        crossingContains
+    have endpointEven :=
+      horizontalFanout_translated_endpoints_even
+        (List.fst_mem_of_mem_zipIdx classifiedMem)
+        endpointFanout translate
+    apply crossingNotEven
+    rw [pointEq]
+    cases endpoint with
+    | start =>
+        simpa [GridSegment.translate] using endpointEven.1
+    | finish =>
+        simpa [GridSegment.translate] using endpointEven.2
+
+/-- A canonical crossover center cannot coincide with the center of any
+enumerated route bend. -/
+theorem orientedCrossing_point_ne_drawingRouteBend_drawingPoint
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossings graph)
+    {routeBend : RouteBend}
+    (routeBendMem : routeBend ∈ drawingRouteBends graph) :
+    crossing.point ≠ routeBend.drawingPoint graph := by
+  intro pointEq
+  rcases drawingRouteBend_adjacentClassifiedSegments
+      graph routeBendMem with
+    ⟨edge, edgeIndex, incoming, outgoing,
+      edgeMem, incomingMem, outgoingMem,
+      routeIndexEq, incomingIndexEq, outgoingIndexEq,
+      incomingSegmentEq, outgoingSegmentEq⟩
+  have geometry :=
+    drawingRouteBend_cornerGeometry
+      wellFormed degree isLocal routeBendMem
+  rcases geometry.incomingAligned with
+    incomingHorizontal | incomingVertical
+  · have incomingHorizontal' :
+        incoming.1.segment.IsHorizontal := by
+      rw [incomingSegmentEq]
+      exact incomingHorizontal
+    apply
+      orientedCrossing_point_ne_horizontal_classified_endpoint
+        wellFormed degree isLocal crossingMem
+        edgeMem incomingMem incomingHorizontal'
+        routeBend.translate .finish
+    rw [incomingSegmentEq]
+    simpa [RouteBend.drawingPoint] using pointEq
+  · rcases geometry.outgoingAligned with
+      outgoingHorizontal | outgoingVertical
+    · have outgoingHorizontal' :
+          outgoing.1.segment.IsHorizontal := by
+        rw [outgoingSegmentEq]
+        exact outgoingHorizontal
+      apply
+        orientedCrossing_point_ne_horizontal_classified_endpoint
+          wellFormed degree isLocal crossingMem
+          edgeMem outgoingMem outgoingHorizontal'
+          routeBend.translate .start
+      rw [outgoingSegmentEq]
+      simpa [RouteBend.drawingPoint] using pointEq
+    · have incomingVertical' :
+          incoming.1.segment.IsVertical := by
+        rw [incomingSegmentEq]
+        exact incomingVertical
+      have outgoingVertical' :
+          outgoing.1.segment.IsVertical := by
+        rw [outgoingSegmentEq]
+        exact outgoingVertical
+      rcases drawingRouteBend_centerPlacement
+          graph isLocal routeBendMem with
+        ⟨placementEdge, placementEdgeIndex,
+          placement, placementIndex,
+          placementEdgeMem, placementMem,
+          placementRouteIndexEq, placementIndexEq,
+          placementPointEq⟩
+      have edgeIndexEq :
+          placementEdgeIndex = edgeIndex := by
+        rw [← placementRouteIndexEq, ← routeIndexEq]
+      have taggedEdgeEq :
+          (placementEdge, placementEdgeIndex) =
+            (edge, edgeIndex) :=
+        tagged_eq_of_mem_zipIdx_of_snd_eq
+          placementEdgeMem edgeMem edgeIndexEq
+      have placementEdgeEq :
+          placementEdge = edge :=
+        congrArg Prod.fst taggedEdgeEq
+      subst placementEdge
+      rw [edgeIndexEq] at placementMem
+      have incomingPlacementIndexEq :
+          incoming.2 = placementIndex := by
+        omega
+      have outgoingPlacementIndexEq :
+          outgoing.2 = placementIndex + 1 := by
+        omega
+      rcases
+          routeBendCenterPlacement_kind_port_of_adjacent_vertical
+            graph edge edgeIndex placementMem
+            incomingMem outgoingMem
+            incomingPlacementIndexEq
+            outgoingPlacementIndexEq
+            incomingVertical' outgoingVertical' with
+        ⟨port, placementKindEq⟩
+      have placementListMem :
+          placement ∈
+            routeBendCenterPlacements graph edge edgeIndex :=
+        List.fst_mem_of_mem_zipIdx placementMem
+      have placementValid :=
+        routeBendCenterPlacements_kind_valid
+          edgeMem placementListMem
+      have sound := orientedCrossings_sound graph crossingMem
+      have canonical := sound.2.2.2.2.1
+      have crossingBounds :
+          0 ≤ crossing.point.1 ∧
+            crossing.point.1 < (drawing graph).gridSize ∧
+            0 ≤ crossing.point.2 ∧
+            crossing.point.2 < (drawing graph).gridSize := by
+        simpa [InFundamentalDrawingSquare, drawing_gridSize] using
+          canonical.1
+      have placementBounds :
+          0 ≤ (placement.kind.position graph).1 ∧
+            (placement.kind.position graph).1 <
+              (drawing graph).gridSize ∧
+            0 ≤ (placement.kind.position graph).2 ∧
+            (placement.kind.position graph).2 <
+              (drawing graph).gridSize := by
+        simpa [drawing_gridSize] using
+          RouteBendCenterKind.position_in_fundamental
+            wellFormed degree placementValid
+      have normalizedPointEq :
+          Cell.add crossing.point
+              ((drawing graph).periodTranslation (0, 0)) =
+            Cell.add
+              (placement.kind.position graph)
+              ((drawing graph).periodTranslation
+                (Cell.add routeBend.translate
+                  placement.offset)) := by
+        simpa [PeriodicGridDrawing.periodTranslation,
+          Cell.add, Cell.scale] using pointEq.trans placementPointEq
+      have pointBaseEq :=
+        ((drawing graph).translatedHalfOpenPositions_eq
+          crossingBounds placementBounds normalizedPointEq).1
+      apply orientedCrossing_point_snd_ne_three crossingMem
+      rw [pointBaseEq, placementKindEq]
+      rfl
 
 set_option maxRecDepth 4000 in
 /-- A canonical crossover center cannot coincide with any lifted declared
