@@ -86,6 +86,13 @@ structure ClauseMetadata
         (OneInThreeVariable Variable))
   localClauseIndex : Nat
 
+/-- The original source block and local final-clause index uniquely identify
+an entry in the composed metadata list. -/
+def ClauseMetadata.key
+    {Variable : Type*}
+    (metadata : ClauseMetadata Variable) : Nat × Nat :=
+  (metadata.sourceClauseIndex, metadata.localClauseIndex)
+
 /-- Index every final clause in one original source clause's complete
 composed block. -/
 def clauseMetadataFor
@@ -360,6 +367,265 @@ theorem clauseMetadataFor_valid
     ⟨taggedClause, taggedClauseMember, metadataEqual⟩
   subst metadata
   exact ⟨rfl, rfl, rfl, taggedClauseMember⟩
+
+/-- Local composed-clause indices do not repeat inside one source block. -/
+theorem clauseMetadataFor_keys_nodup
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClause : PositionedPeriodicClause Variable) :
+    ((clauseMetadataFor
+      sourceClauseIndex figureNineClauseStart sourceClause).map
+        ClauseMetadata.key).Nodup := by
+  let clauses :=
+    unitEliminationClausesFrom
+      figureNineClauseStart
+      (PeriodicOneInThreePositioned.clauseGadget
+        sourceClauseIndex sourceClause)
+  have indicesNodup :
+      (clauses.zipIdx.map Prod.snd).Nodup :=
+    List.nodup_zipIdx_map_snd clauses
+  have keyedNodup :=
+    indicesNodup.map
+      (fun first second equal =>
+        congrArg Prod.snd equal :
+        Function.Injective fun localClauseIndex : Nat =>
+          (sourceClauseIndex, localClauseIndex))
+  unfold clauseMetadataFor
+  rw [List.map_map]
+  change
+    (clauses.zipIdx.map
+      ((fun localClauseIndex =>
+        (sourceClauseIndex, localClauseIndex)) ∘ Prod.snd)).Nodup
+  rw [List.map_map] at keyedNodup
+  exact keyedNodup
+
+/-- Every source index in a metadata suffix is at least the suffix's initial
+source index. -/
+theorem formulaClauseMetadataFrom_sourceClauseIndex_le
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable))
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ formulaClauseMetadataFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses) :
+    sourceClauseIndex ≤ metadata.sourceClauseIndex := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart with
+  | nil =>
+      simp [formulaClauseMetadataFrom] at metadataMember
+  | cons sourceClause rest induction =>
+      rw [formulaClauseMetadataFrom,
+        List.mem_append] at metadataMember
+      rcases metadataMember with headMember | tailMember
+      · have valid :=
+          clauseMetadataFor_valid
+            sourceClauseIndex figureNineClauseStart
+            sourceClause headMember
+        simp [valid.2.1]
+      · have tailBound :=
+          induction
+            (sourceClauseIndex := sourceClauseIndex + 1)
+            (figureNineClauseStart :=
+              figureNineClauseStart +
+                (PeriodicOneInThreePositioned.clauseGadget
+                  sourceClauseIndex sourceClause).length)
+            tailMember
+        omega
+
+/-- Within one metadata suffix, the original source presentation index
+uniquely determines both the source clause and the global start of its
+Figure 9 block. -/
+theorem formulaClauseMetadataFrom_sourceBlock_eq
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable))
+    {firstMetadata secondMetadata : ClauseMetadata Variable}
+    (firstMember :
+      firstMetadata ∈ formulaClauseMetadataFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses)
+    (secondMember :
+      secondMetadata ∈ formulaClauseMetadataFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses)
+    (sourceIndicesEqual :
+      firstMetadata.sourceClauseIndex =
+        secondMetadata.sourceClauseIndex) :
+    firstMetadata.sourceClause = secondMetadata.sourceClause ∧
+      firstMetadata.figureNineClauseStart =
+        secondMetadata.figureNineClauseStart := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart with
+  | nil =>
+      simp [formulaClauseMetadataFrom] at firstMember
+  | cons sourceClause rest induction =>
+      rw [formulaClauseMetadataFrom,
+        List.mem_append] at firstMember secondMember
+      rcases firstMember with firstHead | firstTail
+      · have firstValid :=
+          clauseMetadataFor_valid
+            sourceClauseIndex figureNineClauseStart
+            sourceClause firstHead
+        rcases secondMember with secondHead | secondTail
+        · have secondValid :=
+            clauseMetadataFor_valid
+              sourceClauseIndex figureNineClauseStart
+              sourceClause secondHead
+          exact
+            ⟨firstValid.1.trans secondValid.1.symm,
+              firstValid.2.2.1.trans
+                secondValid.2.2.1.symm⟩
+        · have secondBound :=
+            formulaClauseMetadataFrom_sourceClauseIndex_le
+              (sourceClauseIndex + 1)
+              (figureNineClauseStart +
+                (PeriodicOneInThreePositioned.clauseGadget
+                  sourceClauseIndex sourceClause).length)
+              rest secondTail
+          rw [firstValid.2.1] at sourceIndicesEqual
+          omega
+      · have firstBound :=
+          formulaClauseMetadataFrom_sourceClauseIndex_le
+            (sourceClauseIndex + 1)
+            (figureNineClauseStart +
+              (PeriodicOneInThreePositioned.clauseGadget
+                sourceClauseIndex sourceClause).length)
+            rest firstTail
+        rcases secondMember with secondHead | secondTail
+        · have secondValid :=
+            clauseMetadataFor_valid
+              sourceClauseIndex figureNineClauseStart
+              sourceClause secondHead
+          rw [secondValid.2.1] at sourceIndicesEqual
+          omega
+        · exact
+            induction
+              (sourceClauseIndex := sourceClauseIndex + 1)
+              (figureNineClauseStart :=
+                figureNineClauseStart +
+                  (PeriodicOneInThreePositioned.clauseGadget
+                    sourceClauseIndex sourceClause).length)
+              firstTail secondTail
+
+/-- The `(source block, local clause)` keys of the complete metadata
+enumeration are pairwise distinct. -/
+theorem formulaClauseMetadataFrom_keys_nodup
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable)) :
+    ((formulaClauseMetadataFrom
+      sourceClauseIndex figureNineClauseStart sourceClauses).map
+        ClauseMetadata.key).Nodup := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart with
+  | nil =>
+      simp [formulaClauseMetadataFrom]
+  | cons sourceClause rest induction =>
+      rw [formulaClauseMetadataFrom, List.map_append,
+        List.nodup_append]
+      refine
+        ⟨clauseMetadataFor_keys_nodup
+            sourceClauseIndex figureNineClauseStart sourceClause,
+          induction
+            (sourceClauseIndex := sourceClauseIndex + 1)
+            (figureNineClauseStart :=
+              figureNineClauseStart +
+                (PeriodicOneInThreePositioned.clauseGadget
+                  sourceClauseIndex sourceClause).length),
+          ?_⟩
+      intro headKey headKeyMember tailKey tailKeyMember
+      rcases List.mem_map.mp headKeyMember with
+        ⟨headMetadata, headMetadataMember, headKeyEqual⟩
+      rcases List.mem_map.mp tailKeyMember with
+        ⟨tailMetadata, tailMetadataMember, tailKeyEqual⟩
+      have headValid :=
+        clauseMetadataFor_valid
+          sourceClauseIndex figureNineClauseStart
+          sourceClause headMetadataMember
+      have tailBound :=
+        formulaClauseMetadataFrom_sourceClauseIndex_le
+          (sourceClauseIndex + 1)
+          (figureNineClauseStart +
+            (PeriodicOneInThreePositioned.clauseGadget
+              sourceClauseIndex sourceClause).length)
+          rest tailMetadataMember
+      intro keysEqual
+      have sourceIndicesEqual :
+          headMetadata.sourceClauseIndex =
+            tailMetadata.sourceClauseIndex := by
+        exact congrArg Prod.fst
+          (headKeyEqual.trans
+            (keysEqual.trans tailKeyEqual.symm))
+      rw [headValid.2.1] at sourceIndicesEqual
+      omega
+
+/-- Complete composed metadata keys are pairwise distinct. -/
+theorem formulaClauseMetadata_keys_nodup
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable) :
+    ((formulaClauseMetadata source).map
+        ClauseMetadata.key).Nodup := by
+  exact formulaClauseMetadataFrom_keys_nodup
+    0 0 source.clauses
+
+/-- In the complete metadata list, equal original source indices identify
+the same source clause and Figure 9 block start. -/
+theorem formulaClauseMetadata_sourceBlock_eq
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {firstMetadata secondMetadata : ClauseMetadata Variable}
+    (firstMember :
+      firstMetadata ∈ formulaClauseMetadata source)
+    (secondMember :
+      secondMetadata ∈ formulaClauseMetadata source)
+    (sourceIndicesEqual :
+      firstMetadata.sourceClauseIndex =
+        secondMetadata.sourceClauseIndex) :
+    firstMetadata.sourceClause = secondMetadata.sourceClause ∧
+      firstMetadata.figureNineClauseStart =
+        secondMetadata.figureNineClauseStart := by
+  exact formulaClauseMetadataFrom_sourceBlock_eq
+    0 0 source.clauses firstMember secondMember sourceIndicesEqual
+
+/-- Equal source-block/local-clause keys returned by two metadata lookups
+force the two global final-clause indices to be equal. -/
+theorem formulaClauseMetadata_lookup_key_injective
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {firstMetadata secondMetadata : ClauseMetadata Variable}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstLookup :
+      (formulaClauseMetadata source)[firstClauseIndex]? =
+        some firstMetadata)
+    (secondLookup :
+      (formulaClauseMetadata source)[secondClauseIndex]? =
+        some secondMetadata)
+    (keysEqual : firstMetadata.key = secondMetadata.key) :
+    firstClauseIndex = secondClauseIndex := by
+  have firstKeyLookup :
+      ((formulaClauseMetadata source).map
+        ClauseMetadata.key)[firstClauseIndex]? =
+          some firstMetadata.key := by
+    rw [List.getElem?_map, firstLookup]
+    rfl
+  have secondKeyLookup :
+      ((formulaClauseMetadata source).map
+        ClauseMetadata.key)[secondClauseIndex]? =
+          some secondMetadata.key := by
+    rw [List.getElem?_map, secondLookup]
+    rfl
+  rcases List.getElem?_eq_some_iff.mp firstKeyLookup with
+    ⟨firstIndexLt, firstKeyAt⟩
+  rcases List.getElem?_eq_some_iff.mp secondKeyLookup with
+    ⟨secondIndexLt, secondKeyAt⟩
+  have keyValuesEqual :
+      ((formulaClauseMetadata source).map
+        ClauseMetadata.key)[firstClauseIndex]'firstIndexLt =
+      ((formulaClauseMetadata source).map
+        ClauseMetadata.key)[secondClauseIndex]'secondIndexLt := by
+    rw [firstKeyAt, secondKeyAt, keysEqual]
+  exact
+    ((formulaClauseMetadata_keys_nodup source).getElem_inj_iff
+      (hi := firstIndexLt) (hj := secondIndexLt)).mp keyValuesEqual
 
 /-- Every global metadata entry retains a genuine original source-clause
 membership and a genuine local composed-clause membership. -/

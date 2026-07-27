@@ -2068,12 +2068,14 @@ The representation choices for this target are:
   indexes the actual two-stage positioned formula one original source block
   at a time.  Every final clause is linked to its original source clause, the
   global start of its Figure 9 block, and its exact local occurrence in the
-  certified composed drawing.
+  certified composed drawing.  The resulting source-block/local-clause keys
+  are proved globally unique.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean)
   uses that index to select one route from the appropriate certified
   `72 × 72` composed neighborhood for every final incidence.  Every genuine
   selected route has its exact displayed endpoints, is orthogonal, and is
-  continuously simple.
+  continuously simple; distinct incidences in the same original source block
+  satisfy the complete pairwise continuous-separation predicate.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
