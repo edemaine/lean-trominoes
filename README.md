@@ -2112,6 +2112,11 @@ The representation choices for this target are:
   rectangle between its two physical nodes.  The bound survives final
   planar-SAT renaming, and separated rectangles immediately give complete
   contact-free separation of all selected route pairs.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierSupportGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierSupportGeometry.lean)
+  identifies a carrier's fixed normal coordinate with its translated source
+  segment line, scaled by twenty and shifted by the port coordinate six.
+  Hence parallel retained links on different source rows or columns have
+  strictly separated physical rectangles.
 - [`LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingSameCarrierSeparation.lean)
   turns strict carrier order into route separation for every pair of
   distinct links on one carrier.  The later lens lies inside the earlier
