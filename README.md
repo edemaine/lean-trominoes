@@ -389,6 +389,12 @@ The representation choices for this target are:
   global output incidence.  Every selected local route is proved orthogonal
   for width-three, atom-distinct sources; source-variable incidences still
   require a prefix inherited from the preceding drawing.
+  [`LeanTrominoes/PeriodicOneInThreePositionedNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreePositionedNormalizedLocalRoutes.lean)
+  translates those selected routes into the canonical periodic
+  clause-anchor gauge.  Every genuine route has its exact generated-clause
+  start, its exact local boundary or auxiliary endpoint, and an
+  orthogonality certificate, exposing the endpoint used by the forthcoming
+  inherited-route splice.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -402,6 +408,11 @@ The representation choices for this target are:
   selects the corresponding certified unit-elimination route at every
   global output incidence and proves all such local routes orthogonal under
   the same width-three and atom-distinct hypotheses.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean)
+  supplies the analogous canonical-gauge endpoints and orthogonality
+  theorem for unit elimination.  Its inherited-variable endpoints are the
+  precise splice boundary, while its new auxiliary endpoints are already
+  final.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final
