@@ -111,7 +111,8 @@ theorem instantiatedAngularFanDrawing_isValid
       (targetPosition :=
         angularFanLocalVariablePosition
           sourcePlacement atom)
-  · exact copy_injective atom
+  · intro first _firstMember second _secondMember equal
+    exact copy_injective atom equal
   · exact angularFanLocalVariablePosition_copy
       sourcePlacement atom
   · exact angularFanDrawing_isValid count fits

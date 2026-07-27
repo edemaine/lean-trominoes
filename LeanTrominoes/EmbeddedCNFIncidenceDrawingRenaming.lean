@@ -78,14 +78,62 @@ theorem rename_incidences_length
   rw [incidences_rename]
   simp
 
-/-- Injective renaming maps the distinct formula-variable list pointwise. -/
+/-- Deduplication commutes with a map that is injective on the input list.
+This local form avoids imposing constraints on values absent from a finite
+drawing. -/
+theorem dedup_map_of_injective_on
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    (variableMap : Source → Target)
+    (source : List Source)
+    (injectiveOn :
+      ∀ first ∈ source, ∀ second ∈ source,
+        variableMap first = variableMap second →
+          first = second) :
+    (source.map variableMap).dedup =
+      source.dedup.map variableMap := by
+  induction source with
+  | nil => rfl
+  | cons head tail induction =>
+      have tailInjective :
+          ∀ first ∈ tail, ∀ second ∈ tail,
+            variableMap first = variableMap second →
+              first = second := by
+        intro first firstMember second secondMember equal
+        exact injectiveOn first (by simp [firstMember])
+          second (by simp [secondMember]) equal
+      by_cases headMember : head ∈ tail
+      · have mappedHeadMember :
+            variableMap head ∈ tail.map variableMap :=
+          List.mem_map.mpr ⟨head, headMember, rfl⟩
+        simp [headMember, mappedHeadMember,
+          induction tailInjective]
+      · have mappedHeadNotMember :
+            variableMap head ∉ tail.map variableMap := by
+          intro mappedHeadMember
+          rcases List.mem_map.mp mappedHeadMember with
+            ⟨other, otherMember, equal⟩
+          have headEqual :
+              head = other :=
+            injectiveOn head (by simp) other
+              (by simp [otherMember]) equal.symm
+          exact headMember (headEqual ▸ otherMember)
+        simp [headMember, mappedHeadNotMember,
+          induction tailInjective]
+
+/-- Renaming that is injective on the variables actually present maps the
+distinct formula-variable list pointwise. -/
 theorem variableVertices_rename
     {Source Target : Type*}
     [DecidableEq Source] [DecidableEq Target]
     (drawing : EmbeddedCNFIncidenceDrawing Source)
     (variableMap : Source → Target)
     (targetPosition : Target → Cell)
-    (injective : Function.Injective variableMap) :
+    (injectiveOn :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          variableMap first = variableMap second →
+            first = second) :
     (drawing.rename variableMap targetPosition).variableVertices =
       drawing.variableVertices.map variableMap := by
   unfold variableVertices
@@ -101,8 +149,14 @@ theorem variableVertices_rename
           clause.literals.map Prod.fst).map variableMap := by
     simp [List.map_flatMap, List.map_map,
       Function.comp_def]
-  rw [flattened,
-    List.dedup_map_of_injective injective]
+  rw [flattened]
+  apply dedup_map_of_injective_on
+  intro first firstMember second secondMember equal
+  exact injectiveOn first (by
+      simpa [variableVertices] using firstMember)
+    second (by
+      simpa [variableVertices] using secondMember)
+    equal
 
 /-- If renamed variables retain their positions, the entire graph-vertex
 position list is definitionally unchanged after simplification. -/
@@ -112,7 +166,11 @@ theorem vertexPositions_rename
     (drawing : EmbeddedCNFIncidenceDrawing Source)
     (variableMap : Source → Target)
     (targetPosition : Target → Cell)
-    (injective : Function.Injective variableMap)
+    (injectiveOn :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          variableMap first = variableMap second →
+            first = second)
     (positionsMatch :
       ∀ atom, targetPosition (variableMap atom) =
         drawing.variablePosition atom) :
@@ -120,7 +178,7 @@ theorem vertexPositions_rename
       drawing.vertexPositions := by
   rw [vertexPositions, vertexPositions,
     variableVertices_rename
-      drawing variableMap targetPosition injective]
+      drawing variableMap targetPosition injectiveOn]
   simp only [EmbeddedCNFIncidenceDrawing.rename,
     List.map_map, Function.comp_def]
   simp_rw [positionsMatch]
@@ -262,7 +320,11 @@ theorem isPlanar_rename
     {drawing : EmbeddedCNFIncidenceDrawing Source}
     (variableMap : Source → Target)
     (targetPosition : Target → Cell)
-    (injective : Function.Injective variableMap)
+    (injectiveOn :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          variableMap first = variableMap second →
+            first = second)
     (positionsMatch :
       ∀ atom, targetPosition (variableMap atom) =
         drawing.variablePosition atom)
@@ -270,7 +332,7 @@ theorem isPlanar_rename
     (drawing.rename variableMap targetPosition).IsPlanar := by
   have verticesEqual :=
     vertexPositions_rename drawing variableMap
-      targetPosition injective positionsMatch
+      targetPosition injectiveOn positionsMatch
   constructor
   · intro renamedIndex
     let originalIndex : Fin drawing.incidences.length :=
@@ -378,7 +440,11 @@ theorem isValid_rename
     {drawing : EmbeddedCNFIncidenceDrawing Source}
     (variableMap : Source → Target)
     (targetPosition : Target → Cell)
-    (injective : Function.Injective variableMap)
+    (injectiveOn :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          variableMap first = variableMap second →
+            first = second)
     (positionsMatch :
       ∀ atom, targetPosition (variableMap atom) =
         drawing.variablePosition atom)
@@ -388,7 +454,7 @@ theorem isValid_rename
       positionsMatch valid.1,
     isOrthogonal_rename variableMap targetPosition valid.2.1,
     isPlanar_rename variableMap targetPosition
-      injective positionsMatch valid.2.2⟩
+      injectiveOn positionsMatch valid.2.2⟩
 
 end EmbeddedCNFIncidenceDrawing
 end PlanarThreeSAT

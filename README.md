@@ -1408,9 +1408,10 @@ The representation choices for this target are:
   providing the finite geometric kernel for each angular variable fan.
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingRenaming.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingRenaming.lean)
   transports a complete finite incidence-drawing certificate through an
-  injective logical variable renaming whose target placement preserves the
-  source coordinates.  Incidence order and routes remain unchanged, while
-  injectivity preserves the deduplicated graph-vertex list.
+  logical variable renaming that is injective on the variables actually
+  occurring in the drawing and whose target placement preserves their source
+  coordinates.  Incidence order and routes remain unchanged; unused template
+  roles impose no artificial injectivity obligation.
 - [`LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean`](LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean)
   renames a certified angular fan's ports to the actual
   `copy atom port` variables and translates it into the selected positioned
