@@ -132,6 +132,42 @@ theorem occurrenceThreeStrandRoute_endpoints
     · exact clauseEndpoints.1
     · exact clauseEndpoints.2
 
+/-- Every listed point of a coordinated route belongs to its variable
+endpoint block, a corridor block, or its lifted clause endpoint block. -/
+theorem occurrenceThreeStrandRoute_points_bounded
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {presentation : source.PlanarIncidencePresentation placement}
+    (fans : RibbonEndpointFanSystem presentation)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (color : WireColor) {point : Cell}
+    (member : point ∈ fans.occurrenceThreeStrandRoute entry color) :
+    InRibbonMacrocell (placement.position entry.1.1) point ∨
+      (∃ center ∈ occurrenceUnitSourceRoute presentation entry,
+        InRibbonMacrocell center point) ∨
+      let data := occurrenceSpliceData presentation entry
+      InRibbonMacrocell
+        (PositionedPeriodicCNF.variableToClauseTarget
+          placement data.positionedClause data.tagged.1)
+        point := by
+  unfold occurrenceThreeStrandRoute at member
+  rcases mem_joinAtEndpoint member with
+      prefixMember | clauseMember
+  · rcases mem_joinAtEndpoint prefixMember with
+        variableMember | coreMember
+    · exact Or.inl
+        (fans.variableStubPointsBounded
+          entry color variableMember)
+    · exact Or.inr
+        (Or.inl
+          (occurrenceRibbonCorridorCore_points_bounded
+            presentation entry color coreMember))
+  · exact Or.inr
+      (Or.inr
+        (fans.clauseStubPointsBounded
+          entry color clauseMember))
+
 /-- Joining a coordinated fan system to a continuously planar source
 corridor preserves rectilinearity. -/
 theorem occurrenceThreeStrandRoute_orthogonal

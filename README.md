@@ -1542,6 +1542,10 @@ The representation choices for this target are:
   colored strands; five endpoint-containing pair types form the exact local
   interface still to prove.  Once supplied, strict separation composes across
   both endpoint joins to separate the complete corrected routes.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFanSystemSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFanSystemSeparation.lean)
+  lifts the same five obligations to an arbitrary coordinated fan system.
+  Together with unconditional core separation, they imply strict separation
+  of every pair of distinct complete colored routes selected by that system.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouting.lean)
   makes the factor-two padded construction the final normalized corrected
   routing candidate.  Pointwise corrected-route bounds combine with the
@@ -1610,8 +1614,8 @@ The representation choices for this target are:
   gadget and corridor endpoints, orthogonality, and containment in the
   endpoint macrocell.  Any such system composes with the certified ribbon
   cores to give the endpoint and orthogonality portions of a
-  `ThreeStrandRouting`; its global pairwise separation certificate remains a
-  distinct obligation.
+  `ThreeStrandRouting`, and every resulting route point retains an explicit
+  endpoint-or-corridor macrocell owner.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonRouting.lean)
   joins the two certified block-local endpoint fans to each corrected
   corridor core.  The complete route is proved to have the exact endpoints
