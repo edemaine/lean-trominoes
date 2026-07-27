@@ -2136,6 +2136,11 @@ The representation choices for this target are:
   distinct links on one carrier.  The later lens lies inside the earlier
   lens's terminal boundary; adjacent links may share the boundary port, but
   both drawings certify that contact as an advertised route endpoint.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierCarrierSeparation.lean)
+  combines same-carrier order with different-key continuous parallel
+  separation.  Thus every pair of distinct nonperpendicular carrier lenses
+  has separated selected routes, isolating perpendicular carriers as the
+  exact remaining carrier-pair obligation.
 - [`LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean)
   adapts the fixed corner-equality template to one syntactic route bend.
   Genuine incoming and outgoing segments determine their compass ports; a
