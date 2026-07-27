@@ -142,11 +142,11 @@ theorem drawingPlanarSAT_crossComponentRoutesSeparated_of_components
   have firstMetadataEqual :
       firstMetadata' = firstMetadata := by
     rw [firstLookup] at firstLookup'
-    exact Option.some.inj firstLookup'
+    exact Option.some.inj firstLookup'.symm
   have secondMetadataEqual :
       secondMetadata' = secondMetadata := by
     rw [secondLookup] at secondLookup'
-    exact Option.some.inj secondLookup'
+    exact Option.some.inj secondLookup'.symm
   subst firstMetadata'
   subst secondMetadata'
   have firstLocalLiteralMember :

@@ -258,11 +258,17 @@ theorem RoutePointsSatisfy.of_members
     ⟨incidenceIndex, incidenceEqual⟩
   have pointBounded :=
     bounded incidenceIndex point
+  apply pointBounded
   change
-    point ∈ drawing.routeAt incidence →
-      predicate point at pointBounded
-  exact pointBounded
-    (by simpa [incidence] using pointMember)
+    point ∈
+      drawing.routes
+        (drawing.incidenceAt incidenceIndex).clauseIndex
+        (drawing.incidenceAt incidenceIndex).literalIndex
+  have incidenceAtEqual :
+      drawing.incidenceAt incidenceIndex = incidence :=
+    incidenceEqual
+  rw [incidenceAtEqual]
+  exact pointMember
 
 /-- Logical variable renaming leaves all route-point bounds unchanged. -/
 theorem RoutePointsSatisfy.rename
@@ -364,10 +370,11 @@ theorem straightIncidenceDrawing_routePointsSatisfy
         (straightIncidenceDrawing
           formula variablePosition).incidences :=
     List.get_mem _ incidenceIndex
+  change incidence ∈ embeddedCNFIncidences formula
+    at incidenceMember
   have indexedMembers :=
     (mem_embeddedCNFIncidences_iff formula incidence).mp
-      (by simpa [incidence, straightIncidenceDrawing] using
-        incidenceMember)
+      incidenceMember
   have clauseLookup :=
     (List.mem_zipIdx_iff_getElem?).mp indexedMembers.1
   have literalLookup :=
@@ -376,9 +383,8 @@ theorem straightIncidenceDrawing_routePointsSatisfy
     point ∈
       straightIncidenceRoutes formula variablePosition
         incidence.clauseIndex incidence.literalIndex at pointMember
-  simp only [straightIncidenceRoutes, clauseLookup,
-    literalLookup, straightIncidenceRoute,
-    List.mem_cons, List.mem_singleton] at pointMember
+  simp [straightIncidenceRoutes, clauseLookup,
+    literalLookup, straightIncidenceRoute] at pointMember
   rcases pointMember with pointEqual | pointEqual
   · subst point
     exact clausesBounded incidence.clause

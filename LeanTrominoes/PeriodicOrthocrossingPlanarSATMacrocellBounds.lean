@@ -82,12 +82,16 @@ theorem planarSATMacrocellRouteRectangles_separated
       (planarSATMacrocellRouteUpper secondCenter) := by
   rcases firstCenter with ⟨firstX, firstY⟩
   rcases secondCenter with ⟨secondX, secondY⟩
-  simp only [Prod.mk.injEq, not_and_or] at different
+  have differentCoordinates : firstX ≠ secondX ∨ firstY ≠ secondY := by
+    by_cases differentX : firstX ≠ secondX
+    · exact Or.inl differentX
+    · exact Or.inr fun equalY =>
+        different (Prod.ext (not_ne_iff.mp differentX) equalY)
   simp only [ClosedGridRectanglesSeparated,
     planarSATMacrocellRouteLower,
     planarSATMacrocellRouteUpper,
     planarMacroScale, Cell.add, Cell.scale]
-  rcases different with differentX | differentY
+  rcases differentCoordinates with differentX | differentY
   · rcases lt_or_gt_of_ne differentX with less | greater
     · exact Or.inl (by omega)
     · exact Or.inr (Or.inl (by omega))
@@ -141,7 +145,8 @@ theorem routedClausePortStraightIncidenceDrawing_routePoints_bounded
     (literals : List (DuplicatorArm × Bool)) :
     (routedClausePortStraightIncidenceDrawing literals).RoutePointsSatisfy
       InStandardPlanarSATMacrocell := by
-  apply straightIncidenceDrawing_routePointsSatisfy
+  apply
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.straightIncidenceDrawing_routePointsSatisfy
   · intro clause clauseMember
     simp only [routedClausePortFormula, List.mem_singleton] at clauseMember
     subst clause
@@ -433,8 +438,7 @@ theorem localRoutes_avoidEachOther_of_macrocellCenters_ne
       ((secondMetadata.source.incidenceDrawing formula).routes
         secondMetadata.source.localClauseIndex secondLiteralIndex) := by
   apply
-    EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
-      |>.toRoutesAvoidEachOther
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther
   apply routesStrictlyAvoidEachOther_of_inPlanarSATMacrocells
   · intro point pointMember
     exact firstMetadata.localRoutePoints_inPlanarSATMacrocell
