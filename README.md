@@ -2078,6 +2078,11 @@ The representation choices for this target are:
   selected route has its exact displayed endpoints, is orthogonal, and is
   continuously simple; distinct incidences in the same original source block
   satisfy the complete pairwise continuous-separation predicate.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean)
+  transports those selected routes into each final clause's canonical
+  periodic anchor gauge.  The normalized family has exact periodic clause
+  and local splice endpoints, remains orthogonal, and preserves continuous
+  route simplicity.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
