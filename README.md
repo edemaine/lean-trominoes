@@ -384,6 +384,11 @@ The representation choices for this target are:
   presentation index, and local generated-clause index, allowing global
   route lookup to select the certified local drawing without assuming a
   fixed block size.
+  [`LeanTrominoes/PeriodicOneInThreePositionedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreePositionedLocalRoutes.lean)
+  uses that index to select the exact certified Figure 9 route at every
+  global output incidence.  Every selected local route is proved orthogonal
+  for width-three, atom-distinct sources; source-variable incidences still
+  require a prefix inherited from the preceding drawing.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -393,6 +398,10 @@ The representation choices for this target are:
   supplies the analogous lossless index for the variable-size
   unit-elimination blocks, retaining both source and local generated-clause
   memberships at every flattened output index.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedLocalRoutes.lean)
+  selects the corresponding certified unit-elimination route at every
+  global output incidence and proves all such local routes orthogonal under
+  the same width-three and atom-distinct hypotheses.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final
