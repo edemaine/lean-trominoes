@@ -36,6 +36,47 @@ theorem
     (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routePointsInExpandedSquare
       formula wellFormed degree isLocal clausesNonempty)
 
+/-- Every hypothetical final continuous segment contact has one of the 25
+relative translations in the doubled neighboring block. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_relativeTranslate_mem_doubleNeighbor_of_interiorsMeet
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    (firstMember :
+      firstIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    (secondMember :
+      secondIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    {firstShift secondShift : Cell}
+    (meet :
+      GridSegment.InteriorsMeet
+        (firstIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation firstShift))
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift))) :
+    Cell.sub firstShift secondShift ∈
+      PeriodicGridDrawing.doubleNeighborTranslations := by
+  exact
+    PeriodicGridDrawing.relativeTranslate_isDoubleNeighbor_of_interiorsMeet
+      (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_segmentEndpointsInExpandedSquare
+        formula wellFormed degree isLocal clausesNonempty)
+      firstMember secondMember meet
+
 /-- A hypothetical contact involving at least one final noncarrier segment
 has a neighboring relative lattice translation. -/
 theorem

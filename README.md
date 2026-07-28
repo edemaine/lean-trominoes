@@ -2574,8 +2574,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedContactTranslationBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedContactTranslationBounds.lean)
   combines those half-open bounds with the all-route halo bound.  Any
   continuous contact involving at least one noncarrier segment is reduced to
-  the nine neighboring relative translations; only carrier--carrier contacts
-  can require the full 25-shift analysis.
+  the nine neighboring relative translations, while every contact is reduced
+  to the doubled `5 × 5` neighboring block.  Thus only carrier--carrier
+  contacts can require the full 25-shift analysis.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceTranslation.lean)
   defines one physical period-translation action for all five planar-SAT
   clause-source families, including bends, routed vertex sites, external
