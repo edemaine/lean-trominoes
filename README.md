@@ -2523,7 +2523,7 @@ The representation choices for this target are:
   proves that clause-anchor normalization reduces every route point in a
   crossover, bend, routed-clause, or routed-variable component to its
   coordinatewise period residue.  All normalized non-carrier route points
-  therefore lie in the closed canonical square.
+  therefore lie in the half-open canonical square.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierRouteBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierRouteBounds.lean)
   proves that consecutive retained carrier nodes are separated by less than
   one physical period along their common axis.  Together with the equality
@@ -2552,6 +2552,11 @@ The representation choices for this target are:
   translated final and physical segments.  The two incidence indexings
   determine each other, so its anchor-adjusted finite occurrence key is equal
   exactly when the original periodic segment-occurrence key is equal.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierSegmentBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierSegmentBounds.lean)
+  transfers the noncarrier route-point residue theorem through that
+  occurrence bridge.  Every final segment represented by crossover, bend,
+  routed-clause, or routed-variable metadata has both endpoints in the
+  half-open fundamental square.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
