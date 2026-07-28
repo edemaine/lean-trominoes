@@ -2411,6 +2411,11 @@ The representation choices for this target are:
   identify the same lens.  Rectangle separation handles every nonadjacent
   pair; consecutive lenses remain distinct because their clauses lie strictly
   inside the eight-cell-clearance spans on opposite sides of the shared port.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATCarrierNoncarrierClausePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATCarrierNoncarrierClausePositions.lean)
+  separates carrier-lens clause positions from all non-carrier component
+  clauses.  Disjoint macrocells use rectangle bounds; an overlapping
+  component is incident, so complementary carrier-boundary certificates force
+  any common point to be a variable port excluded by local planarity.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
