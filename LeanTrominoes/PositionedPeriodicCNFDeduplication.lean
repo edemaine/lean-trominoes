@@ -36,6 +36,18 @@ def deduplicateByLiterals
   ⟨source.erase.clauses.dedup.map fun clause =>
     ⟨source.representativeClausePosition clause, clause⟩⟩
 
+/-- Positioned clause deduplication produces no duplicate positioned
+clauses, because projecting literals recovers the duplicate-free erased
+clause list. -/
+theorem deduplicateByLiterals_clauses_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable) :
+    source.deduplicateByLiterals.clauses.Nodup := by
+  unfold deduplicateByLiterals
+  apply source.erase.clauses.nodup_dedup.map_on
+  intro first _ second _ equal
+  exact congrArg PositionedPeriodicClause.literals equal
+
 /-- Erasing the positioned deduplication is exactly ordinary list
 deduplication of the periodic clauses. -/
 @[simp]

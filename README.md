@@ -304,7 +304,9 @@ The representation choices for this target are:
   retains the source clause, literal index, sign, and atom behind every
   incidence protoedge.  Forgetting this metadata is proved to reproduce the
   graph's edge list in exactly the same global order, so routed endpoints can
-  be attached back to their SAT meaning.
+  be attached back to their SAT meaning.  The flattened metadata list is
+  duplicate-free, and two genuine incidences with equal clause and literal
+  presentation indices are equal.
   [`LeanTrominoes/PeriodicCNFPlanarVertexGadgets.lean`](LeanTrominoes/PeriodicCNFPlanarVertexGadgets.lean)
   groups routed source endpoints into the original signed clauses and routed
   target endpoints into Figure 8(a) variable duplicators.  Clause sites are
@@ -510,7 +512,7 @@ The representation choices for this target are:
   removes repeated periodic clause orbits from neighboring-block
   presentations while retaining one geometric representative.  Erasure is
   exactly the generic semantic deduplication, so all of those invariants
-  transfer.
+  transfer; the retained positioned clause list is itself duplicate-free.
   [`LeanTrominoes/PositionedPeriodicCNFDeduplicationRoutes.lean`](LeanTrominoes/PositionedPeriodicCNFDeduplicationRoutes.lean)
   transports finite geometric incidence routes through that changed clause
   indexing.  It also proves that normalizing every source clause and its
@@ -2536,10 +2538,11 @@ The representation choices for this target are:
   anchor-adjusted lattice translation.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSegmentOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSegmentOccurrences.lean)
   refines the quotient-to-finite bridge to indexed segment occurrences,
-  preserving both the global incidence index and the within-route segment
-  index and proving exact equality of the translated final and physical
-  segments.  Its anchor-adjusted physical occurrence key is equal exactly
-  when the original periodic segment-occurrence key is equal.
+  preserving the final and retained-finite flat incidence indices together
+  with the within-route segment index, and proving exact equality of the
+  translated final and physical segments.  The two incidence indexings
+  determine each other, so its anchor-adjusted finite occurrence key is equal
+  exactly when the original periodic segment-occurrence key is equal.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.

@@ -141,6 +141,9 @@ structure FinalGaugedRouteOccurrenceWitness
     metadataIndex =
       (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
         formula).representativeClauseIndex finalClause.literals
+  normalizedLiteralsEq :
+    metadataGaugedNormalizedClause formula metadata =
+      finalClause.literals
   metadataLookup :
     (retainedDrawingPlanarSATClauseMetadata
       formula)[metadataIndex]? = some metadata
@@ -326,6 +329,10 @@ theorem
     metadata := metadata
     metadataIndex := metadataIndex
     representativeIndexEq := rfl
+    normalizedLiteralsEq := by
+      exact
+        (congrArg PositionedPeriodicClause.literals
+          sourceClauseEq).trans sourceClauseLiterals
     metadataLookup := metadataLookup'
     literal := literal
     literalMember := literalMember

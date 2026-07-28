@@ -121,6 +121,8 @@ structure FinalGaugedRouteCoordinates
         (WrappedPeriodicPlanarSATVariable Variable) × Nat
   taggedLiteralMember :
     taggedLiteral ∈ taggedClause.1.literals.zipIdx
+  taggedLiteralIndexEq :
+    taggedLiteral.2 = finalIncidence.1.literalIndex
   finalRouteEq :
     taggedRoute.1 =
       retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
@@ -170,6 +172,7 @@ theorem exists_finalGaugedRouteCoordinates
     taggedClauseIndexEq := rfl
     taggedLiteral := taggedLiteral
     taggedLiteralMember := ?_
+    taggedLiteralIndexEq := rfl
     finalRouteEq := ?_
   }⟩
   · simpa only [finalGaugedIncidences] using
@@ -215,6 +218,8 @@ structure FinalGaugedSegmentOccurrenceWitness
         (WrappedPeriodicPlanarSATVariable Variable) × Nat
   taggedLiteralMember :
     taggedLiteral ∈ taggedClause.1.literals.zipIdx
+  taggedLiteralIndexEq :
+    taggedLiteral.2 = finalIncidence.1.literalIndex
   finalRouteEq :
     finalRoute =
       retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
@@ -222,6 +227,14 @@ structure FinalGaugedSegmentOccurrenceWitness
   routeWitness :
     FinalGaugedRouteOccurrenceWitness
       formula taggedClause.2 taggedLiteral.2 shift
+  physicalIncidenceIndex : Nat
+  physicalIncidenceMember :
+    (metadataPhysicalIncidence
+        routeWitness.metadata routeWitness.metadataIndex
+        routeWitness.literal taggedLiteral.2,
+      physicalIncidenceIndex) ∈
+      (retainedDrawingPlanarSATLocalIncidenceDrawing
+        formula).incidences.zipIdx
   physicalSegment : GridSegment
   physicalSegmentMember :
     (physicalSegment, indexed.segmentIndex) ∈
@@ -297,6 +310,19 @@ theorem
   rcases exists_segment_of_translatePolyline_eq
       taggedSegmentMember routeOccurrenceEq with
     ⟨physicalSegment, physicalSegmentMember, segmentEq⟩
+  rcases List.mem_iff_getElem.mp routeWitness.incidenceMember with
+    ⟨physicalIncidenceIndex, physicalIncidenceIndexLt,
+      physicalIncidenceEq⟩
+  have physicalIncidenceMember :
+      (metadataPhysicalIncidence
+          routeWitness.metadata routeWitness.metadataIndex
+          routeWitness.literal coordinates.taggedLiteral.2,
+        physicalIncidenceIndex) ∈
+        (retainedDrawingPlanarSATLocalIncidenceDrawing
+          formula).incidences.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨physicalIncidenceIndexLt, physicalIncidenceEq⟩
   refine ⟨{
     finalRoute := taggedRoute.1
     finalRouteMember := ?_
@@ -308,8 +334,11 @@ theorem
     taggedClauseIndexEq := coordinates.taggedClauseIndexEq
     taggedLiteral := coordinates.taggedLiteral
     taggedLiteralMember := coordinates.taggedLiteralMember
+    taggedLiteralIndexEq := coordinates.taggedLiteralIndexEq
     finalRouteEq := coordinates.finalRouteEq
     routeWitness := routeWitness
+    physicalIncidenceIndex := physicalIncidenceIndex
+    physicalIncidenceMember := physicalIncidenceMember
     physicalSegment := physicalSegment
     physicalSegmentMember := ?_
     segmentEq := ?_
@@ -330,16 +359,15 @@ def FinalGaugedSegmentOccurrenceWitness.physicalKey
     (witness :
       FinalGaugedSegmentOccurrenceWitness formula indexed shift) :
     Nat × Nat × Cell :=
-  (witness.finalIncidence.2, indexed.segmentIndex,
+  (witness.physicalIncidenceIndex, indexed.segmentIndex,
     Cell.sub shift
       (PeriodicCNF.clauseAnchor
         (metadataGaugedPositionedClause
           formula witness.routeWitness.metadata).literals))
 
-/-- Equal final flat-incidence indices select the same retained physical
-clause metadata, even though route normalization has changed the clause and
-literal presentation coordinates. -/
-private theorem metadata_eq_of_finalIncidenceIndex_eq
+/-- Equal final flat indices select the same metadata-rich final
+incidence. -/
+private theorem finalIncidence_eq_of_index_eq
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     {firstIndexed secondIndexed : IndexedGridSegment}
@@ -352,18 +380,36 @@ private theorem metadata_eq_of_finalIncidenceIndex_eq
         formula secondIndexed secondShift)
     (indexEq :
       first.finalIncidence.2 = second.finalIncidence.2) :
-    first.routeWitness.metadata = second.routeWitness.metadata := by
+    first.finalIncidence.1 = second.finalIncidence.1 := by
   have firstIncidenceLookup :=
     (List.mem_zipIdx_iff_getElem?).mp
       first.finalIncidenceMember
   have secondIncidenceLookup :=
     (List.mem_zipIdx_iff_getElem?).mp
       second.finalIncidenceMember
-  have incidenceValueEq :
-      first.finalIncidence.1 = second.finalIncidence.1 := by
-    rw [indexEq] at firstIncidenceLookup
-    exact Option.some.inj
-      (firstIncidenceLookup.symm.trans secondIncidenceLookup)
+  rw [indexEq] at firstIncidenceLookup
+  exact Option.some.inj
+    (firstIncidenceLookup.symm.trans secondIncidenceLookup)
+
+/-- Equal final flat-incidence indices select the same representative
+physical metadata index. -/
+private theorem metadataIndex_eq_of_finalIncidenceIndex_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (indexEq :
+      first.finalIncidence.2 = second.finalIncidence.2) :
+    first.routeWitness.metadataIndex =
+      second.routeWitness.metadataIndex := by
+  have incidenceValueEq :=
+    finalIncidence_eq_of_index_eq first second indexEq
   have clauseIndexEq :
       first.taggedClause.2 = second.taggedClause.2 := by
     exact first.taggedClauseIndexEq.trans
@@ -387,12 +433,30 @@ private theorem metadata_eq_of_finalIncidenceIndex_eq
             (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
               formula).clauses[clauseIndex]?)
           clauseIndexEq).trans secondClauseLookup))
-  have metadataIndexEq :
-      first.routeWitness.metadataIndex =
-        second.routeWitness.metadataIndex := by
-    rw [first.routeWitness.representativeIndexEq,
-      second.routeWitness.representativeIndexEq,
-      finalClauseEq]
+  rw [first.routeWitness.representativeIndexEq,
+    second.routeWitness.representativeIndexEq,
+    finalClauseEq]
+
+/-- Equal final flat-incidence indices select the same retained physical
+clause metadata, even though route normalization has changed the clause and
+literal presentation coordinates. -/
+private theorem metadata_eq_of_finalIncidenceIndex_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (indexEq :
+      first.finalIncidence.2 = second.finalIncidence.2) :
+    first.routeWitness.metadata = second.routeWitness.metadata := by
+  have metadataIndexEq :=
+    metadataIndex_eq_of_finalIncidenceIndex_eq
+      first second indexEq
   have firstMetadataLookup :=
     first.routeWitness.metadataLookup
   have secondMetadataLookup :=
@@ -400,6 +464,290 @@ private theorem metadata_eq_of_finalIncidenceIndex_eq
   rw [metadataIndexEq] at firstMetadataLookup
   exact Option.some.inj
     (firstMetadataLookup.symm.trans secondMetadataLookup)
+
+/-- Equal final flat-incidence indices select the same metadata-rich
+incidence in the retained finite drawing. -/
+private theorem physicalIncidence_eq_of_finalIncidenceIndex_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (indexEq :
+      first.finalIncidence.2 = second.finalIncidence.2) :
+    metadataPhysicalIncidence
+        first.routeWitness.metadata
+        first.routeWitness.metadataIndex
+        first.routeWitness.literal first.taggedLiteral.2 =
+      metadataPhysicalIncidence
+        second.routeWitness.metadata
+        second.routeWitness.metadataIndex
+        second.routeWitness.literal second.taggedLiteral.2 := by
+  have finalIncidenceEq :=
+    finalIncidence_eq_of_index_eq first second indexEq
+  have metadataIndexEq :=
+    metadataIndex_eq_of_finalIncidenceIndex_eq
+      first second indexEq
+  have metadataEq :=
+    metadata_eq_of_finalIncidenceIndex_eq
+      first second indexEq
+  have literalIndexEq :
+      first.taggedLiteral.2 = second.taggedLiteral.2 :=
+    first.taggedLiteralIndexEq.trans
+      ((congrArg CNFIncidence.literalIndex finalIncidenceEq).trans
+        second.taggedLiteralIndexEq.symm)
+  have firstLiteralLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      first.routeWitness.literalMember
+  have secondLiteralLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      second.routeWitness.literalMember
+  have literalLookupEq :
+      first.routeWitness.metadata.clause.literals[
+          first.taggedLiteral.2]? =
+        second.routeWitness.metadata.clause.literals[
+          second.taggedLiteral.2]? := by
+    calc
+      first.routeWitness.metadata.clause.literals[
+            first.taggedLiteral.2]? =
+          second.routeWitness.metadata.clause.literals[
+            first.taggedLiteral.2]? :=
+        congrArg
+          (fun metadata :
+            DrawingPlanarSATClauseMetadata Variable =>
+              metadata.clause.literals[first.taggedLiteral.2]?)
+          metadataEq
+      _ =
+          second.routeWitness.metadata.clause.literals[
+            second.taggedLiteral.2]? :=
+        congrArg
+          (fun literalIndex =>
+            second.routeWitness.metadata.clause.literals[
+              literalIndex]?)
+          literalIndexEq
+  have literalEq :
+      first.routeWitness.literal =
+        second.routeWitness.literal := by
+    exact Option.some.inj
+      (firstLiteralLookup.symm.trans
+        (literalLookupEq.trans secondLiteralLookup))
+  simp only [metadataPhysicalIncidence, EmbeddedCNFIncidence.mk.injEq]
+  exact ⟨congrArg DrawingPlanarSATClauseMetadata.clause metadataEq,
+    metadataIndexEq, literalEq, literalIndexEq⟩
+
+/-- Equal final flat-incidence indices select the same flat incidence index
+in the retained finite drawing. -/
+private theorem physicalIncidenceIndex_eq_of_finalIncidenceIndex_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (indexEq :
+      first.finalIncidence.2 = second.finalIncidence.2) :
+    first.physicalIncidenceIndex =
+      second.physicalIncidenceIndex := by
+  have physicalIncidenceEq :=
+    physicalIncidence_eq_of_finalIncidenceIndex_eq
+      first second indexEq
+  have firstLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      first.physicalIncidenceMember
+  have secondLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      second.physicalIncidenceMember
+  have firstLookup' :
+      (retainedDrawingPlanarSATLocalIncidenceDrawing formula).incidences[
+          first.physicalIncidenceIndex]? =
+        some
+          (metadataPhysicalIncidence
+            second.routeWitness.metadata
+            second.routeWitness.metadataIndex
+            second.routeWitness.literal second.taggedLiteral.2) :=
+    firstLookup.trans (congrArg some physicalIncidenceEq)
+  exact List.Nodup.index_eq_of_getElem?_eq_some
+    (embeddedCNFIncidences_nodup
+      (retainedDrawingPlanarSATLocalIncidenceDrawing formula).formula)
+    firstLookup' secondLookup
+
+/-- Equal retained finite incidence indices recover equal final flat
+incidence indices. -/
+private theorem finalIncidenceIndex_eq_of_physicalIncidenceIndex_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (physicalIndexEq :
+      first.physicalIncidenceIndex =
+        second.physicalIncidenceIndex) :
+    first.finalIncidence.2 = second.finalIncidence.2 := by
+  have firstPhysicalLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      first.physicalIncidenceMember
+  have secondPhysicalLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      second.physicalIncidenceMember
+  have physicalIncidenceEq :
+      metadataPhysicalIncidence
+          first.routeWitness.metadata
+          first.routeWitness.metadataIndex
+          first.routeWitness.literal first.taggedLiteral.2 =
+        metadataPhysicalIncidence
+          second.routeWitness.metadata
+          second.routeWitness.metadataIndex
+          second.routeWitness.literal second.taggedLiteral.2 := by
+    rw [physicalIndexEq] at firstPhysicalLookup
+    exact Option.some.inj
+      (firstPhysicalLookup.symm.trans secondPhysicalLookup)
+  have metadataIndexEq :
+      first.routeWitness.metadataIndex =
+        second.routeWitness.metadataIndex := by
+    exact congrArg EmbeddedCNFIncidence.clauseIndex
+      physicalIncidenceEq
+  have firstMetadataLookup :=
+    first.routeWitness.metadataLookup
+  have secondMetadataLookup :=
+    second.routeWitness.metadataLookup
+  have metadataEq :
+      first.routeWitness.metadata =
+        second.routeWitness.metadata := by
+    rw [metadataIndexEq] at firstMetadataLookup
+    exact Option.some.inj
+      (firstMetadataLookup.symm.trans secondMetadataLookup)
+  have finalLiteralsEq :
+      first.routeWitness.finalClause.literals =
+        second.routeWitness.finalClause.literals :=
+    first.routeWitness.normalizedLiteralsEq.symm.trans
+      ((congrArg
+        (metadataGaugedNormalizedClause formula)
+        metadataEq).trans
+        second.routeWitness.normalizedLiteralsEq)
+  let source :=
+    retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula
+  have firstFinalClauseMember :
+      first.routeWitness.finalClause ∈
+        source.deduplicateByLiterals.clauses := by
+    apply List.mem_iff_getElem?.mpr
+    exact
+      ⟨first.taggedClause.2,
+        by
+          simpa only [source,
+            retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+            using first.routeWitness.finalClauseLookup⟩
+  have secondFinalClauseMember :
+      second.routeWitness.finalClause ∈
+        source.deduplicateByLiterals.clauses := by
+    apply List.mem_iff_getElem?.mpr
+    exact
+      ⟨second.taggedClause.2,
+        by
+          simpa only [source,
+            retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+            using second.routeWitness.finalClauseLookup⟩
+  have firstRepresentative :=
+    PositionedPeriodicCNF.eq_representative_of_mem_deduplicateByLiterals
+      source first.routeWitness.finalClause firstFinalClauseMember
+  have secondRepresentative :=
+    PositionedPeriodicCNF.eq_representative_of_mem_deduplicateByLiterals
+      source second.routeWitness.finalClause secondFinalClauseMember
+  have finalClauseEq :
+      first.routeWitness.finalClause =
+        second.routeWitness.finalClause := by
+    calc
+      first.routeWitness.finalClause =
+          ⟨source.representativeClausePosition
+              first.routeWitness.finalClause.literals,
+            first.routeWitness.finalClause.literals⟩ :=
+        firstRepresentative
+      _ =
+          ⟨source.representativeClausePosition
+              second.routeWitness.finalClause.literals,
+            second.routeWitness.finalClause.literals⟩ := by
+        rw [finalLiteralsEq]
+      _ = second.routeWitness.finalClause :=
+        secondRepresentative.symm
+  have firstFinalClauseLookup :
+      source.deduplicateByLiterals.clauses[
+          first.taggedClause.2]? =
+        some second.routeWitness.finalClause := by
+    simpa only [source,
+      retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+      using
+        first.routeWitness.finalClauseLookup.trans
+          (congrArg some finalClauseEq)
+  have secondFinalClauseLookup :
+      source.deduplicateByLiterals.clauses[
+          second.taggedClause.2]? =
+        some second.routeWitness.finalClause := by
+    simpa only [source,
+      retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+      using second.routeWitness.finalClauseLookup
+  have clauseIndexEq :
+      first.taggedClause.2 = second.taggedClause.2 :=
+    List.Nodup.index_eq_of_getElem?_eq_some
+      (PositionedPeriodicCNF.deduplicateByLiterals_clauses_nodup
+        source)
+      firstFinalClauseLookup secondFinalClauseLookup
+  have taggedLiteralIndexEq :
+      first.taggedLiteral.2 = second.taggedLiteral.2 :=
+    congrArg EmbeddedCNFIncidence.literalIndex
+      physicalIncidenceEq
+  have finalClauseCoordinateEq :
+      first.finalIncidence.1.clauseIndex =
+        second.finalIncidence.1.clauseIndex :=
+    first.taggedClauseIndexEq.symm.trans
+      (clauseIndexEq.trans second.taggedClauseIndexEq)
+  have finalLiteralCoordinateEq :
+      first.finalIncidence.1.literalIndex =
+        second.finalIncidence.1.literalIndex :=
+    first.taggedLiteralIndexEq.symm.trans
+      (taggedLiteralIndexEq.trans
+        second.taggedLiteralIndexEq)
+  have finalIncidenceEq :
+      first.finalIncidence.1 = second.finalIncidence.1 := by
+    apply PeriodicCNF.incidence_eq_of_indices_eq
+      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).erase
+    · exact List.fst_mem_of_mem_zipIdx
+        first.finalIncidenceMember
+    · exact List.fst_mem_of_mem_zipIdx
+        second.finalIncidenceMember
+    · exact finalClauseCoordinateEq
+    · exact finalLiteralCoordinateEq
+  have firstFinalLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      first.finalIncidenceMember
+  have secondFinalLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp
+      second.finalIncidenceMember
+  have firstFinalLookup' :
+      (finalGaugedIncidences formula)[first.finalIncidence.2]? =
+        some second.finalIncidence.1 :=
+    firstFinalLookup.trans (congrArg some finalIncidenceEq)
+  exact List.Nodup.index_eq_of_getElem?_eq_some
+    (by
+      simpa only [finalGaugedIncidences] using
+        PeriodicCNF.incidencesWithMetadata_nodup
+          (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+            formula).erase)
+    firstFinalLookup' secondFinalLookup
 
 /-- The anchor-adjusted physical occurrence key preserves and reflects the
 identity of a final periodic segment occurrence. -/
@@ -422,9 +770,14 @@ theorem
           secondIndexed secondShift := by
   constructor
   · intro physicalKeyEq
+    have physicalIncidenceIndexEq :
+        first.physicalIncidenceIndex =
+          second.physicalIncidenceIndex :=
+      congrArg Prod.fst physicalKeyEq
     have incidenceIndexEq :
         first.finalIncidence.2 = second.finalIncidence.2 :=
-      congrArg Prod.fst physicalKeyEq
+      finalIncidenceIndex_eq_of_physicalIncidenceIndex_eq
+        first second physicalIncidenceIndexEq
     have segmentIndexEq :
         firstIndexed.segmentIndex =
           secondIndexed.segmentIndex :=
@@ -473,6 +826,11 @@ theorem
         first.finalIncidence.2 = second.finalIncidence.2 :=
       first.finalIncidenceIndexEq.trans
         (routeIndexEq.trans second.finalIncidenceIndexEq.symm)
+    have physicalIncidenceIndexEq :
+        first.physicalIncidenceIndex =
+          second.physicalIncidenceIndex :=
+      physicalIncidenceIndex_eq_of_finalIncidenceIndex_eq
+        first second incidenceIndexEq
     have metadataEq :=
       metadata_eq_of_finalIncidenceIndex_eq
         first second incidenceIndexEq
@@ -488,7 +846,9 @@ theorem
       rw [metadataEq, shiftEq]
     simp only [FinalGaugedSegmentOccurrenceWitness.physicalKey,
       Prod.mk.injEq]
-    exact ⟨incidenceIndexEq, segmentIndexEq, adjustedShiftEq⟩
+    exact
+      ⟨physicalIncidenceIndexEq,
+        segmentIndexEq, adjustedShiftEq⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes

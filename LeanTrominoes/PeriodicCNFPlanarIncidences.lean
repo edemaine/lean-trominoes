@@ -64,6 +64,116 @@ def incidencesWithMetadata {Variable : Type*}
       ⟨taggedClause.2, taggedClause.1,
         taggedLiteral.2, taggedLiteral.1⟩
 
+/-- Presentation indices make the flattened periodic incidence metadata
+duplicate-free, even when clauses or literals repeat as values. -/
+theorem incidencesWithMetadata_nodup
+    {Variable : Type*}
+    (formula : PeriodicCNF Variable) :
+    (incidencesWithMetadata formula).Nodup := by
+  have clauseIndicesPairwise :
+      formula.clauses.zipIdx.Pairwise
+        (fun first second => first.2 ≠ second.2) := by
+    rw [← List.pairwise_map]
+    exact List.nodup_zipIdx_map_snd formula.clauses
+  rw [incidencesWithMetadata, List.nodup_flatMap]
+  constructor
+  · intro taggedClause _
+    have taggedLiteralsNodup :
+        taggedClause.1.zipIdx.Nodup :=
+      (List.nodup_zipIdx_map_snd
+        taggedClause.1).of_map Prod.snd
+    apply taggedLiteralsNodup.map_on
+    intro first firstMember second secondMember equal
+    have indexEqual :
+        first.2 = second.2 :=
+      congrArg CNFIncidence.literalIndex equal
+    have firstLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp firstMember
+    have secondLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp secondMember
+    have valueEqual : first.1 = second.1 := by
+      rw [indexEqual] at firstLookup
+      exact Option.some.inj
+        (firstLookup.symm.trans secondLookup)
+    exact Prod.ext valueEqual indexEqual
+  · exact clauseIndicesPairwise.imp fun
+      {first second} clauseIndexNe => by
+        change List.Disjoint _ _
+        rw [List.disjoint_left]
+        intro incidence firstMember secondMember
+        rcases List.mem_map.mp firstMember with
+          ⟨firstLiteral, _, incidenceEqual⟩
+        rcases List.mem_map.mp secondMember with
+          ⟨secondLiteral, _, incidenceEqual'⟩
+        exact clauseIndexNe
+          (congrArg CNFIncidence.clauseIndex
+            (incidenceEqual.trans incidenceEqual'.symm))
+
+/-- Membership in the flattened periodic incidence list is exactly
+membership at both indexed presentation levels. -/
+theorem mem_incidencesWithMetadata_iff
+    {Variable : Type*}
+    (formula : PeriodicCNF Variable)
+    (incidence : CNFIncidence Variable) :
+    incidence ∈ incidencesWithMetadata formula ↔
+      (incidence.clause, incidence.clauseIndex) ∈
+          formula.clauses.zipIdx ∧
+        (incidence.literal, incidence.literalIndex) ∈
+          incidence.clause.zipIdx := by
+  constructor
+  · intro incidenceMember
+    rcases List.mem_flatMap.mp incidenceMember with
+      ⟨taggedClause, taggedClauseMember, incidenceMember⟩
+    rcases List.mem_map.mp incidenceMember with
+      ⟨taggedLiteral, taggedLiteralMember, incidenceEqual⟩
+    subst incidence
+    exact ⟨taggedClauseMember, taggedLiteralMember⟩
+  · rintro ⟨clauseMember, literalMember⟩
+    apply List.mem_flatMap.mpr
+    refine
+      ⟨(incidence.clause, incidence.clauseIndex),
+        clauseMember, ?_⟩
+    exact List.mem_map.mpr
+      ⟨(incidence.literal, incidence.literalIndex),
+        literalMember, by cases incidence; rfl⟩
+
+/-- Two genuine periodic incidences with the same clause and literal
+presentation indices are the same metadata-rich occurrence. -/
+theorem incidence_eq_of_indices_eq
+    {Variable : Type*}
+    (formula : PeriodicCNF Variable)
+    {first second : CNFIncidence Variable}
+    (firstMember : first ∈ incidencesWithMetadata formula)
+    (secondMember : second ∈ incidencesWithMetadata formula)
+    (clauseIndexEqual :
+      first.clauseIndex = second.clauseIndex)
+    (literalIndexEqual :
+      first.literalIndex = second.literalIndex) :
+    first = second := by
+  have firstMembers :=
+    (mem_incidencesWithMetadata_iff formula first).mp firstMember
+  have secondMembers :=
+    (mem_incidencesWithMetadata_iff formula second).mp secondMember
+  have firstClauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp firstMembers.1
+  have secondClauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp secondMembers.1
+  have clauseEqual : first.clause = second.clause := by
+    rw [clauseIndexEqual] at firstClauseLookup
+    exact Option.some.inj
+      (firstClauseLookup.symm.trans secondClauseLookup)
+  have firstLiteralLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp firstMembers.2
+  have secondLiteralLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp secondMembers.2
+  have literalEqual : first.literal = second.literal := by
+    rw [clauseEqual, literalIndexEqual] at firstLiteralLookup
+    exact Option.some.inj
+      (firstLiteralLookup.symm.trans secondLiteralLookup)
+  cases first
+  cases second
+  simp_all
+
 /-- Forgetting the metadata yields exactly the protoedge presentation used
 by `incidenceGraph`, in the same order. -/
 theorem incidencesWithMetadata_edges
