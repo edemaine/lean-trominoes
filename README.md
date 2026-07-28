@@ -2382,6 +2382,11 @@ The representation choices for this target are:
   proves uniqueness of the `20 × 20` macrocell representation and classifies
   the four genuine carrier-port coordinates.  Carrier ports, crossover
   internals, and routed-variable centers are pairwise separated locally.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATVariableVertices.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATVariableVertices.lean)
+  classifies every variable used by the retained formula as a retained
+  carrier node, routed-variable center, or internal variable of a retained
+  halo crossing.  The proof first classifies each local gadget and then
+  lifts the result through retained clause metadata.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
