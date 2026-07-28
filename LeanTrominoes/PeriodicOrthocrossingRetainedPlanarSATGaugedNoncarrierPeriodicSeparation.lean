@@ -191,6 +191,55 @@ theorem
     witness.routeWitness.metadataLookup] using
       witness.physicalSegmentMember
 
+/-- Translating a witness's finite physical segment by a source period
+translate puts it on the correspondingly translated local source route. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.physicalSegment_periodTranslate_mem_sourceRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift : Cell}
+    (witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift)
+    (sourceShift : Cell) :
+    (witness.physicalSegment.translate
+        (carrierMacroPeriodTranslation
+          formula.incidenceGraph sourceShift),
+      indexed.segmentIndex) ∈
+      (gridPolylineSegments
+        (((witness.routeWitness.metadata.source.periodTranslate
+          formula sourceShift).incidenceDrawing formula).routes
+            witness.routeWitness.metadata.source.localClauseIndex
+            witness.taggedLiteral.2)).zipIdx := by
+  let offset :=
+    carrierMacroPeriodTranslation
+      formula.incidenceGraph sourceShift
+  rw [
+    DrawingPlanarSATClauseSource.incidenceDrawing_routes_periodTranslate]
+  change
+    (witness.physicalSegment.translate offset,
+        indexed.segmentIndex) ∈
+      (gridPolylineSegments
+        (translatePolyline offset
+          ((witness.routeWitness.metadata.source.incidenceDrawing
+            formula).routes
+              witness.routeWitness.metadata.source.localClauseIndex
+              witness.taggedLiteral.2))).zipIdx
+  rw [show translatePolyline offset
+        ((witness.routeWitness.metadata.source.incidenceDrawing
+          formula).routes
+            witness.routeWitness.metadata.source.localClauseIndex
+            witness.taggedLiteral.2) =
+      ((witness.routeWitness.metadata.source.incidenceDrawing
+        formula).routes
+          witness.routeWitness.metadata.source.localClauseIndex
+          witness.taggedLiteral.2).map (Cell.add offset) by rfl,
+    EmbeddedCNFIncidenceDrawing.gridPolylineSegments_map_add,
+    List.zipIdx_map]
+  exact List.mem_map.mpr
+    ⟨(witness.physicalSegment, indexed.segmentIndex),
+      witness.physicalSegment_mem_sourceRoute, rfl⟩
+
 /-- Translating a segment first by a difference of lattice shifts and then
 by the second shift equals translating it directly by the first shift. -/
 theorem segment_translate_placement_sub_add
@@ -211,6 +260,139 @@ theorem segment_translate_placement_sub_add
     PeriodicVariablePlacement.translation,
     Cell.scale, Cell.add, Cell.sub]
   congr 1 <;> apply Prod.ext <;> simp <;> ring
+
+/-- Translating a segment by a source reindexing and then by the remaining
+physical shift equals translating it directly by the physical shift. -/
+theorem segment_translate_placement_add_sub
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable)
+    (segment : GridSegment)
+    (physicalShift reindexShift : Cell) :
+    (segment.translate
+        (placement.translation reindexShift)).translate
+        (placement.translation
+          (Cell.sub physicalShift reindexShift)) =
+      segment.translate (placement.translation physicalShift) := by
+  rcases segment with
+    ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+  rcases physicalShift with ⟨physicalX, physicalY⟩
+  rcases reindexShift with ⟨reindexX, reindexY⟩
+  simp only [GridSegment.translate,
+    PeriodicVariablePlacement.translation,
+    Cell.scale, Cell.add, Cell.sub]
+  congr 1 <;> apply Prod.ext <;> simp <;> ring
+
+/-- An avoidance certificate between two independently translated local
+sources transfers to the final periodic occurrences when the remaining
+external shifts agree. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_two_periodTranslate_localRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstSourceShift secondSourceShift : Cell)
+    (commonShiftEq :
+      Cell.sub first.physicalShift firstSourceShift =
+        Cell.sub second.physicalShift secondSourceShift)
+    (routeAvoid :
+      EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        ((((first.routeWitness.metadata.source.periodTranslate formula
+          firstSourceShift).incidenceDrawing formula).routes
+            first.routeWitness.metadata.source.localClauseIndex
+            first.taggedLiteral.2))
+        ((((second.routeWitness.metadata.source.periodTranslate formula
+          secondSourceShift).incidenceDrawing formula).routes
+            second.routeWitness.metadata.source.localClauseIndex
+            second.taggedLiteral.2))) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  let firstOffset :=
+    carrierMacroPeriodTranslation
+      formula.incidenceGraph firstSourceShift
+  let secondOffset :=
+    carrierMacroPeriodTranslation
+      formula.incidenceGraph secondSourceShift
+  have rawDisjoint :
+      ¬GridSegment.InteriorsMeet
+        (first.physicalSegment.translate firstOffset)
+        (second.physicalSegment.translate secondOffset) :=
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther.taggedSegments_interiorsDisjoint
+      routeAvoid
+      (by simpa only [firstOffset] using
+        (first.physicalSegment_periodTranslate_mem_sourceRoute
+          firstSourceShift))
+      (by simpa only [secondOffset] using
+        (second.physicalSegment_periodTranslate_mem_sourceRoute
+          secondSourceShift))
+  intro meet
+  let firstRepresentative :=
+    first.toCommonShiftRepresentative
+  let secondRepresentative :=
+    second.toCommonShiftRepresentative
+  rw [firstRepresentative.segmentEq,
+    secondRepresentative.segmentEq] at meet
+  change
+    GridSegment.InteriorsMeet
+      (first.physicalSegment.translate
+        ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          formula).translation first.physicalShift))
+      (second.physicalSegment.translate
+        ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          formula).translation second.physicalShift)) at meet
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  have firstOffsetEq :
+      firstOffset =
+        placement.translation firstSourceShift := by
+    exact
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula firstSourceShift).symm
+  have secondOffsetEq :
+      secondOffset =
+        placement.translation secondSourceShift := by
+    exact
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula secondSourceShift).symm
+  have firstAlignedEq :
+      (first.physicalSegment.translate firstOffset).translate
+          (placement.translation
+            (Cell.sub first.physicalShift firstSourceShift)) =
+        first.physicalSegment.translate
+          (placement.translation first.physicalShift) := by
+    rw [firstOffsetEq]
+    exact segment_translate_placement_add_sub
+      placement first.physicalSegment
+      first.physicalShift firstSourceShift
+  have secondAlignedEq :
+      (second.physicalSegment.translate secondOffset).translate
+          (placement.translation
+            (Cell.sub second.physicalShift secondSourceShift)) =
+        second.physicalSegment.translate
+          (placement.translation second.physicalShift) := by
+    rw [secondOffsetEq]
+    exact segment_translate_placement_add_sub
+      placement second.physicalSegment
+      second.physicalShift secondSourceShift
+  rw [← firstAlignedEq, ← secondAlignedEq,
+    ← commonShiftEq] at meet
+  exact rawDisjoint
+    ((GridSegment.interiorsMeet_translate_both_iff
+      (first.physicalSegment.translate firstOffset)
+      (second.physicalSegment.translate secondOffset)
+      (placement.translation
+        (Cell.sub first.physicalShift firstSourceShift))).mp meet)
 
 /-- Any avoidance certificate between the physically translated first local
 route and the second local route transfers to the corresponding final
