@@ -146,5 +146,28 @@ theorem retainedDrawingCompleteCarrierLinks_keys_ne_of_perpendicular
     rw [supportEqual] at firstVertical
     exact firstVertical.2 secondHorizontal.1
 
+/-- Every genuine crossing of neighboring source occurrences is explicitly
+present in the retained 5×5 crossing orbit. -/
+theorem orientedCrossingHalo_subset_retainedCrossings
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal) :
+    orientedCrossingHalo graph ⊆ retainedCrossings graph := by
+  intro record recordMem
+  have sound := orientedCrossingHalo_sound graph recordMem
+  have pointBounds :=
+    drawing_neighbor_occurrence_point_in_retention_square
+      wellFormed degree isLocal sound.1 sound.2.2.1
+        sound.2.2.2.2.2.2.2.1
+  exact
+    mem_retainedCrossings_of_periodNormalize_mem_of_shift_mem
+      graph record
+      (periodNormalize_mem_orientedCrossings
+        wellFormed degree isLocal recordMem)
+      (crossingPeriodShift_mem_retentionShifts
+        graph record pointBounds)
+
 end PeriodicOrthocrossing
 end LeanTrominoes

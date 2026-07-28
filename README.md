@@ -2340,7 +2340,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierCore.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierCore.lean)
   uses zero-shift ownership to recover a neighboring first source occurrence
   for every selected link.  It also proves that perpendicular selected links
-  necessarily have different physical occurrence keys.
+  necessarily have different physical occurrence keys, and that every
+  genuine neighboring-halo crossing occurs in the retained 5×5 orbit.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
