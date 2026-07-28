@@ -2667,6 +2667,15 @@ The representation choices for this target are:
   one site; equal duplicator arms reconstruct the same translated active
   link, while distinct arms reuse the finite duplicator-star route
   separation certificate.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierAnchorGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierAnchorGeometry.lean)
+  develops the carrier-side anchor geometry needed for the remaining
+  periodic pairs.  It identifies a gauged carrier clause's lattice anchor
+  with the coordinatewise period quotient of its first carrier position,
+  proves that subtracting this anchor puts the first carrier drawing point
+  in the fundamental square, and keeps its supporting segment occurrence
+  inside the neighboring `3 × 3` window.  The anchor-normalized link is
+  consequently retained in the raw carrier window; the selected carrier
+  family continues to enforce its separate zero-owner convention.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
