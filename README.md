@@ -2524,6 +2524,11 @@ The representation choices for this target are:
   exposes the representative route selected by anchor-zero clause
   deduplication, providing the quotient-to-finite bridge for periodic
   planarity.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteOccurrences.lean)
+  specializes that bridge to the final retained drawing.  Every translated
+  final incidence route now carries a genuine incidence of the certified
+  finite retained drawing whose physical route is equal after the exact
+  anchor-adjusted lattice translation.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
