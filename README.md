@@ -2342,6 +2342,9 @@ The representation choices for this target are:
   for every selected link.  It also proves that perpendicular selected links
   necessarily have different physical occurrence keys, and that every
   genuine neighboring-halo crossing occurs in the retained 5×5 orbit.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierGeometry.lean)
+  reconstructs the exact horizontal-first retained crossing record forced by
+  any overlap of a horizontal and vertical selected lens rectangle.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
