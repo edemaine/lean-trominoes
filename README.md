@@ -2337,6 +2337,10 @@ The representation choices for this target are:
   combines same-key chain order with different-key parallel separation.
   Every pair of distinct nonperpendicular selected carrier lenses has
   separated genuine routes, leaving exactly the perpendicular case.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierCore.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierCore.lean)
+  uses zero-shift ownership to recover a neighboring first source occurrence
+  for every selected link.  It also proves that perpendicular selected links
+  necessarily have different physical occurrence keys.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
