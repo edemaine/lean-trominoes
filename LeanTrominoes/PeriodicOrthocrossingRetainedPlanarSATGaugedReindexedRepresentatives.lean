@@ -42,10 +42,13 @@ structure FinalGaugedSegmentMetadataReindexing
   targetLiteralMember :
     (targetLiteral, witness.taggedLiteral.2) ∈
       targetMetadata.clause.literals.zipIdx
-  targetSourceEq :
-    targetMetadata.source =
-      witness.routeWitness.metadata.source.periodTranslate
-        formula reindexShift
+  targetComponentEq :
+    targetMetadata.source.component =
+      (witness.routeWitness.metadata.source.periodTranslate
+        formula reindexShift).component
+  targetLocalClauseIndexEq :
+    targetMetadata.source.localClauseIndex =
+      witness.routeWitness.metadata.source.localClauseIndex
 
 /-- The physical placement period is exactly the refined macro-period used
 by source translation. -/
@@ -178,11 +181,35 @@ theorem
       formula reindexing.targetMetadata
         reindexing.targetMetadataIndex
         reindexing.targetLiteral witness.taggedLiteral.2
-        reindexing.targetMetadataLookup,
-      reindexing.targetSourceEq,
-      DrawingPlanarSATClauseSource.localClauseIndex_periodTranslate,
-      DrawingPlanarSATClauseSource.incidenceDrawing_routes_periodTranslate,
-      sourceRouteEq]
+        reindexing.targetMetadataLookup]
+    calc
+      (reindexing.targetMetadata.source.incidenceDrawing formula).routes
+            reindexing.targetMetadata.source.localClauseIndex
+            witness.taggedLiteral.2 =
+          ((sourceMetadata.source.periodTranslate
+            formula reindexShift).incidenceDrawing formula).routes
+            sourceMetadata.source.localClauseIndex
+            witness.taggedLiteral.2 := by
+        rw [reindexing.targetLocalClauseIndexEq]
+        have drawingEq :=
+          DrawingPlanarSATClauseSource.incidenceDrawing_eq_of_component_eq
+            formula reindexing.targetMetadata.source
+              (sourceMetadata.source.periodTranslate
+                formula reindexShift)
+              reindexing.targetComponentEq
+        rw [drawingEq]
+      _ =
+          translatePolyline offset
+            ((sourceMetadata.source.incidenceDrawing formula).routes
+              sourceMetadata.source.localClauseIndex
+              witness.taggedLiteral.2) := by
+        rw [
+          DrawingPlanarSATClauseSource.incidenceDrawing_routes_periodTranslate]
+      _ =
+          translatePolyline offset
+            ((retainedDrawingPlanarSATLocalIncidenceDrawing
+              formula).routeAt sourceIncidence) := by
+        rw [sourceRouteEq]
   let targetSegment := witness.physicalSegment.translate offset
   have targetSegmentMember :
       (targetSegment, indexed.segmentIndex) ∈

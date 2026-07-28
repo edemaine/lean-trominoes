@@ -2593,16 +2593,18 @@ The representation choices for this target are:
   physical shift, finite retained planarity immediately transfers their
   continuous separation back to the periodic quotient.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexedRepresentatives.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexedRepresentatives.lean)
-  turns a translated retained-metadata lookup at unchanged local clause and
-  literal indices into that common-shift representative automatically.  It
-  preserves the within-route segment index and balances source translation
-  against the external occurrence shift, so orbit proofs only need to supply
-  the appropriate retained metadata entry.
+  turns a component-equivalent retained-metadata lookup at unchanged local
+  clause and literal indices into that common-shift representative
+  automatically.  It preserves the within-route segment index and balances
+  source translation against the external occurrence shift, while permitting
+  enumeration-only source fields to change at the retained-window boundary.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAutomaticReindexing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAutomaticReindexing.lean)
-  discharges that metadata-entry obligation from translated component
-  membership alone.  It transfers the original local clause/literal indices,
-  recovers the translated global metadata lookup, and produces the finite
-  common-shift segment representative used by the planarity transfer.
+  discharges that metadata-entry obligation from retained membership of
+  either the literal translated source or any source with the same geometric
+  component and local clause index.  This covers routed-variable arms whose
+  global per-site enumeration index changes near a retained-window boundary,
+  and produces the finite common-shift representative used by planarity
+  transfer.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.

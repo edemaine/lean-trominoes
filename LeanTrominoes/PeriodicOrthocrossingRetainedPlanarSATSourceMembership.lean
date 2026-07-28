@@ -64,6 +64,20 @@ def clauseFormula
   | .routedVariable _ _ _ link _ =>
       drawingPlanarSATRoutedVariableFormulaAt link
 
+/-- The local clause family is determined by the geometric component; source
+enumeration indices such as a routed-variable arm's global list index do not
+affect it. -/
+theorem clauseFormula_eq_of_component_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (first second : DrawingPlanarSATClauseSource Variable)
+    (componentEq : first.component = second.component) :
+    first.clauseFormula formula =
+      second.clauseFormula formula := by
+  cases first <;> cases second <;>
+    simp_all [DrawingPlanarSATClauseSource.component,
+      clauseFormula]
+
 end DrawingPlanarSATClauseSource
 
 namespace DrawingPlanarSATClauseMetadata
