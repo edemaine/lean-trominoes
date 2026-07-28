@@ -2229,6 +2229,11 @@ The representation choices for this target are:
   filters them by the zero-shift ownership rule.  The selected physical links
   are duplicate-free, remain on one segment-occurrence key, and their
   equality clauses are satisfied by every carrier assignment.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean)
+  defines common period translation for crossing records, boundaries,
+  terminals, carrier nodes, and equality links.  Crossing normalization is
+  invariant under this action, carrier-node offsets add the common shift, and
+  normalized equality links are unchanged.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
