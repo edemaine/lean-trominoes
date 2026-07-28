@@ -2596,6 +2596,11 @@ The representation choices for this target are:
   preserves the within-route segment index and balances source translation
   against the external occurrence shift, so orbit proofs only need to supply
   the appropriate retained metadata entry.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAutomaticReindexing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAutomaticReindexing.lean)
+  discharges that metadata-entry obligation from translated component
+  membership alone.  It transfers the original local clause/literal indices,
+  recovers the translated global metadata lookup, and produces the finite
+  common-shift segment representative used by the planarity transfer.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
