@@ -2578,6 +2578,12 @@ The representation choices for this target are:
   reindexed as distinct genuine retained-drawing segments at one common
   physical shift, finite retained planarity immediately transfers their
   continuous separation back to the periodic quotient.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexedRepresentatives.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexedRepresentatives.lean)
+  turns a translated retained-metadata lookup at unchanged local clause and
+  literal indices into that common-shift representative automatically.  It
+  preserves the within-route segment index and balances source translation
+  against the external occurrence shift, so orbit proofs only need to supply
+  the appropriate retained metadata entry.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
