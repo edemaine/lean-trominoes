@@ -2439,6 +2439,12 @@ The representation choices for this target are:
   clause-orbit deduplication.  The resulting periodic incidence drawing has
   a graph-level exact-endpoint certificate; quotient planarity is kept as the
   next geometric obligation.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariablePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariablePositions.lean)
+  gives each retained periodic routed-SAT protovariable a canonical
+  translation-zero finite lift.  Every variable surviving wrapping and
+  clause-orbit deduplication has a valid lift, so finite geometric
+  injectivity proves that the variable-position prefix of the final periodic
+  incidence drawing is duplicate-free.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
