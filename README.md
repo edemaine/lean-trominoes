@@ -2675,7 +2675,9 @@ The representation choices for this target are:
   in the fundamental square, and keeps its supporting segment occurrence
   inside the neighboring `3 × 3` window.  The anchor-normalized link is
   consequently retained in the raw carrier window; the selected carrier
-  family continues to enforce its separate zero-owner convention.
+  family continues to enforce its separate zero-owner convention.  More
+  precisely, the normalized link is selected exactly when the source anchor
+  is zero; its representative-owner shift is otherwise the negative anchor.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.

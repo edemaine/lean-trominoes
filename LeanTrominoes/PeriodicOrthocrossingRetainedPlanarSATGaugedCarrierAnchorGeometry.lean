@@ -615,5 +615,103 @@ theorem
         wellFormed degree isLocal valid nonempty
         link localClauseIndex sourceEq
 
+/-- Negation of a lattice cell is zero exactly when the cell is zero. -/
+@[simp]
+theorem Cell.neg_eq_zero_iff (cell : Cell) :
+    Cell.neg cell = (0, 0) ↔ cell = (0, 0) := by
+  rcases cell with ⟨horizontal, vertical⟩
+  simp only [Cell.neg, Cell.sub, Prod.mk.injEq]
+  constructor
+  · rintro ⟨horizontalEq, verticalEq⟩
+    constructor <;> omega
+  · rintro ⟨horizontalEq, verticalEq⟩
+    subst horizontal
+    subst vertical
+    norm_num
+
+/-- The representative-owner shift of an anchor-normalized selected carrier
+link is the negative of the clause anchor. -/
+theorem
+    DrawingPlanarSATClauseMetadata.carrier_anchorNormalize_representativeShift
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (link : EqualityLink CarrierNode)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      metadata.source = .carrier link localClauseIndex) :
+    carrierLinkRepresentativeShift formula.incidenceGraph
+        (carrierLinkPeriodTranslate formula.incidenceGraph link
+          (Cell.neg
+            (PeriodicCNF.clauseAnchor
+              (metadataGaugedPositionedClause
+                formula metadata).literals))) =
+      Cell.neg
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause
+            formula metadata).literals) := by
+  have validData :=
+    (metadata.retainedValid_iff_sourceMember_and_localClauseMember
+      formula).mp valid
+  have linkMember :
+      link ∈ retainedDrawingCompleteCarrierLinks
+        formula.incidenceGraph := by
+    have sourceMember := validData.1
+    rw [sourceEq] at sourceMember
+    exact sourceMember
+  have representative :=
+    ((mem_retainedDrawingCompleteCarrierLinks_iff
+      formula.incidenceGraph link).mp linkMember).2
+  change
+    carrierLinkRepresentativeShift formula.incidenceGraph link =
+      (0, 0)
+    at representative
+  rw [carrierLinkRepresentativeShift_periodTranslate]
+  rw [representative]
+  rcases
+      PeriodicCNF.clauseAnchor
+        (metadataGaugedPositionedClause formula metadata).literals with
+    ⟨anchorX, anchorY⟩
+  simp [Cell.add]
+
+/-- Anchor normalization remains in the selected carrier family exactly in
+the zero-anchor case.  For a nonzero anchor it remains geometrically present
+in the raw retained window but is not the unique zero-owner representative. -/
+theorem
+    DrawingPlanarSATClauseMetadata.carrier_anchorNormalize_mem_iff_anchor_eq_zero
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (link : EqualityLink CarrierNode)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      metadata.source = .carrier link localClauseIndex) :
+    carrierLinkPeriodTranslate formula.incidenceGraph link
+          (Cell.neg
+            (PeriodicCNF.clauseAnchor
+              (metadataGaugedPositionedClause
+                formula metadata).literals)) ∈
+        retainedDrawingCompleteCarrierLinks formula.incidenceGraph ↔
+      PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause formula metadata).literals =
+        (0, 0) := by
+  rw [mem_retainedDrawingCompleteCarrierLinks_iff]
+  have rawMember :=
+    metadata.carrier_anchorNormalize_mem_raw
+      wellFormed degree isLocal valid nonempty
+      link localClauseIndex sourceEq
+  rw [and_iff_right rawMember]
+  unfold CarrierLinkIsRepresentative
+  rw [
+    metadata.carrier_anchorNormalize_representativeShift
+      valid link localClauseIndex sourceEq,
+    Cell.neg_eq_zero_iff]
+
 end PeriodicOrthocrossing
 end LeanTrominoes
