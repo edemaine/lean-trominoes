@@ -2287,6 +2287,10 @@ The representation choices for this target are:
   upgrades those orientations to exact component interfaces.  Every selected
   lens exposes the expected compass port at a crossover or segment terminal,
   and reconstructs the same macrocell origin as that adjacent component.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierWireIncidenceDrawings.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierWireIncidenceDrawings.lean)
+  embeds each selected retained lens into the final planar-SAT variable type.
+  Its indexed formula and full drawing validity are certified together with
+  external-side and endpoint-only-contact facts at both carrier boundaries.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
