@@ -2311,6 +2311,10 @@ The representation choices for this target are:
   handles all four shared incoming/outgoing and first/second endpoint cases.
   Genuine selected-lens routes avoid genuine routes of every incident
   certified bend-corner drawing.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBoundingBox.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBoundingBox.lean)
+  fixes each selected link's forward axis direction and explicit narrow
+  rectangle.  Its renamed route points stay inside that rectangle, so
+  separated rectangles give strict selected-lens route separation.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
