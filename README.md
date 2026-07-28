@@ -2319,6 +2319,10 @@ The representation choices for this target are:
   proves common-axis agreement for retained nodes and transfers strict
   consecutive-pair order to the selected family: two distinct links with one
   carrier key have nonoverlapping axial intervals in one of the two orders.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedSameCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedSameCarrierSeparation.lean)
+  separates distinct selected lenses sharing one carrier.  Nonadjacent links
+  have strictly separated rectangles; adjacent links use complementary
+  boundaries at their common node and permit only advertised endpoint contact.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
