@@ -111,10 +111,10 @@ theorem
       drawingArm boundaryArm
       (routedVariableOrigin formula site)).rename _ _
 
-/-- Genuine routes of a selected retained lens avoid routes of any active
+/-- Genuine routes of a raw retained lens avoid routes of any active
 variable arm at a macrocell incident to that lens. -/
 theorem
-    retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_incidentAtSite
+    retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_raw_incidentAtSite
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     (wellFormed :
@@ -125,7 +125,7 @@ theorem
       (PeriodicCNF.incidenceGraph formula).IsLocal)
     {carrierLink : EqualityLink CarrierNode}
     (carrierLinkMember :
-      carrierLink ∈ retainedDrawingCompleteCarrierLinks
+      carrierLink ∈ retainedDrawingCompleteCarrierLinksRaw
         (PeriodicCNF.incidenceGraph formula))
     {site : VariableRouteSite Variable}
     {occurrence : CNFRouteOccurrence Variable}
@@ -169,14 +169,14 @@ theorem
           routedClauseIndex routedLiteralIndex) := by
   rcases incident with firstEqual | secondEqual
   · have interface :=
-      retainedDrawingCompleteCarrierLink_first_targetTerminalInterface
+      retainedDrawingCompleteCarrierLinkRaw_first_targetTerminalInterface
         wellFormed degree isLocal carrierLinkMember
         site occurrenceMember firstEqual
     have carrierBounded :=
-      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideFirst
+      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideFirst_of_raw
         wellFormed degree isLocal carrierLinkMember
     have carrierContacts :=
-      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routeContactsAt_first
+      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routeContactsAt_first_of_raw
         wellFormed degree isLocal carrierLinkMember
     rw [interface.1, interface.2] at carrierBounded carrierContacts
     exact
@@ -196,14 +196,14 @@ theorem
         carrierClauseMember carrierLiteralMember
         routedClauseMember routedLiteralMember
   · have interface :=
-      retainedDrawingCompleteCarrierLink_second_targetTerminalInterface
+      retainedDrawingCompleteCarrierLinkRaw_second_targetTerminalInterface
         wellFormed degree isLocal carrierLinkMember
         site occurrenceMember secondEqual
     have carrierBounded :=
-      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideSecond
+      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideSecond_of_raw
         wellFormed degree isLocal carrierLinkMember
     have carrierContacts :=
-      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routeContactsAt_second
+      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routeContactsAt_second_of_raw
         wellFormed degree isLocal carrierLinkMember
     rw [interface.1, interface.2] at carrierBounded carrierContacts
     exact
@@ -223,10 +223,11 @@ theorem
         carrierClauseMember carrierLiteralMember
         routedClauseMember routedLiteralMember
 
-/-- Every selected retained carrier route avoids every route of a represented
-routed-variable component. -/
+/-- Every raw retained carrier route whose source translate lies in the
+neighbor window avoids every route of a represented routed-variable
+component. -/
 theorem
-    retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther
+    retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_raw
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     (wellFormed :
@@ -237,8 +238,10 @@ theorem
       (PeriodicCNF.incidenceGraph formula).IsLocal)
     {carrierLink : EqualityLink CarrierNode}
     (carrierLinkMember :
-      carrierLink ∈ retainedDrawingCompleteCarrierLinks
+      carrierLink ∈ retainedDrawingCompleteCarrierLinksRaw
         (PeriodicCNF.incidenceGraph formula))
+    (firstTranslateNeighbor :
+      IsNeighborTranslation carrierLink.first.translate)
     {site : VariableRouteSite Variable}
     {drawingArm : DuplicatorArm}
     {routedLink : EqualityLink (PlanarSATNode Variable)}
@@ -299,28 +302,29 @@ theorem
           (liftedIncidenceVertexPosition
             formula (.variable site.1) site.2))
   · exact
-      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_rectanglesSeparated
+      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_raw_rectanglesSeparated
         wellFormed degree isLocal carrierLinkMember
         carrierClauseMember carrierLiteralMember
         (drawingPlanarSATRoutedVariableIncidenceDrawing_routePoints_bounded
           formula site drawingArm routedLink)
         routedClauseMember routedLiteralMember rectanglesSeparated
   · rcases
-      retainedDrawingCompleteCarrierLink_exists_targetOccurrence_of_variableMacrocell_overlap
-        wellFormed degree isLocal carrierLinkMember site
+      retainedDrawingCompleteCarrierLinkRaw_exists_targetOccurrence_of_variableMacrocell_overlap
+        wellFormed degree isLocal carrierLinkMember firstTranslateNeighbor site
         representedOccurrenceMem rectanglesSeparated with
       ⟨occurrence, occurrenceMember, incident⟩
     exact
-      retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_incidentAtSite
+      retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_raw_incidentAtSite
         wellFormed degree isLocal carrierLinkMember
         occurrenceMember drawingArm routedLink incident
         carrierClauseMember carrierLiteralMember
         routedClauseMember routedLiteralMember
 
-/-- Every selected retained carrier route avoids every route of a represented
-routed source-clause component. -/
+/-- Every raw retained carrier route whose source translate lies in the
+neighbor window avoids every route of a represented routed source-clause
+component. -/
 theorem
-    retainedDrawingPlanarSATCarrierRoutedClauseRoutesAvoidEachOther
+    retainedDrawingPlanarSATCarrierRoutedClauseRoutesAvoidEachOther_of_raw
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     (wellFormed :
@@ -331,8 +335,10 @@ theorem
       (PeriodicCNF.incidenceGraph formula).IsLocal)
     {carrierLink : EqualityLink CarrierNode}
     (carrierLinkMember :
-      carrierLink ∈ retainedDrawingCompleteCarrierLinks
+      carrierLink ∈ retainedDrawingCompleteCarrierLinksRaw
         (PeriodicCNF.incidenceGraph formula))
+    (firstTranslateNeighbor :
+      IsNeighborTranslation carrierLink.first.translate)
     {site : ClauseRouteSite}
     {representedOccurrence : CNFRouteOccurrence Variable}
     (representedOccurrenceMember :
@@ -381,23 +387,204 @@ theorem
           (liftedIncidenceVertexPosition
             formula (.clause site.1) site.2))
   · exact
-      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_rectanglesSeparated
+      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_raw_rectanglesSeparated
         wellFormed degree isLocal carrierLinkMember
         carrierClauseMember carrierLiteralMember
         (drawingPlanarSATRoutedClauseIncidenceDrawing_routePoints_bounded
           formula site)
         routedClauseMember routedLiteralMember rectanglesSeparated
   · rcases
-      retainedDrawingCompleteCarrierLink_exists_sourceOccurrence_of_clauseMacrocell_overlap
-        wellFormed degree isLocal carrierLinkMember site
+      retainedDrawingCompleteCarrierLinkRaw_exists_sourceOccurrence_of_clauseMacrocell_overlap
+        wellFormed degree isLocal carrierLinkMember firstTranslateNeighbor site
         representedOccurrenceMember rectanglesSeparated with
       ⟨occurrence, occurrenceMember, incident⟩
     exact
-      retainedDrawingPlanarSATCarrierRoutedClauseRoutesAvoidEachOther_of_incident
+      retainedDrawingPlanarSATCarrierRoutedClauseRoutesAvoidEachOther_of_raw_incident
         wellFormed degree isLocal carrierLinkMember
         occurrenceMember incident
         carrierClauseMember carrierLiteralMember
         routedClauseMember routedLiteralMember
+
+/-! ## Selected-representative compatibility wrappers -/
+
+theorem
+    retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_incidentAtSite
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {carrierLink : EqualityLink CarrierNode}
+    (carrierLinkMember :
+      carrierLink ∈ retainedDrawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula))
+    {site : VariableRouteSite Variable}
+    {occurrence : CNFRouteOccurrence Variable}
+    (occurrenceMember :
+      occurrence ∈ variableRouteOccurrencesAt formula site)
+    (drawingArm : DuplicatorArm)
+    (routedLink : EqualityLink (PlanarSATNode Variable))
+    (incident :
+      CarrierLinkIncidentToTargetTerminal
+        formula carrierLink occurrence)
+    {carrierClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {carrierClauseIndex : Nat}
+    (carrierClauseMember :
+      (carrierClause, carrierClauseIndex) ∈
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula carrierLink).formula.zipIdx)
+    {carrierLiteral : PlanarSATVariable Variable × Bool}
+    {carrierLiteralIndex : Nat}
+    (carrierLiteralMember :
+      (carrierLiteral, carrierLiteralIndex) ∈
+        carrierClause.literals.zipIdx)
+    {routedClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {routedClauseIndex : Nat}
+    (routedClauseMember :
+      (routedClause, routedClauseIndex) ∈
+        (drawingPlanarSATRoutedVariableIncidenceDrawing
+          formula site drawingArm routedLink).formula.zipIdx)
+    {routedLiteral : PlanarSATVariable Variable × Bool}
+    {routedLiteralIndex : Nat}
+    (routedLiteralMember :
+      (routedLiteral, routedLiteralIndex) ∈
+        routedClause.literals.zipIdx) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      ((drawingPlanarSATCarrierLensIncidenceDrawing
+        formula carrierLink).routes
+          carrierClauseIndex carrierLiteralIndex)
+      ((drawingPlanarSATRoutedVariableIncidenceDrawing
+        formula site drawingArm routedLink).routes
+          routedClauseIndex routedLiteralIndex) :=
+  retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_raw_incidentAtSite
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        formula.incidenceGraph carrierLink).mp carrierLinkMember).1
+      occurrenceMember drawingArm routedLink incident
+      carrierClauseMember carrierLiteralMember
+      routedClauseMember routedLiteralMember
+
+theorem
+    retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {carrierLink : EqualityLink CarrierNode}
+    (carrierLinkMember :
+      carrierLink ∈ retainedDrawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula))
+    {site : VariableRouteSite Variable}
+    {drawingArm : DuplicatorArm}
+    {routedLink : EqualityLink (PlanarSATNode Variable)}
+    (routedLinkMember :
+      routedLink ∈ routedVariableLinksAt formula site)
+    {carrierClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {carrierClauseIndex : Nat}
+    (carrierClauseMember :
+      (carrierClause, carrierClauseIndex) ∈
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula carrierLink).formula.zipIdx)
+    {carrierLiteral : PlanarSATVariable Variable × Bool}
+    {carrierLiteralIndex : Nat}
+    (carrierLiteralMember :
+      (carrierLiteral, carrierLiteralIndex) ∈
+        carrierClause.literals.zipIdx)
+    {routedClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {routedClauseIndex : Nat}
+    (routedClauseMember :
+      (routedClause, routedClauseIndex) ∈
+        (drawingPlanarSATRoutedVariableIncidenceDrawing
+          formula site drawingArm routedLink).formula.zipIdx)
+    {routedLiteral : PlanarSATVariable Variable × Bool}
+    {routedLiteralIndex : Nat}
+    (routedLiteralMember :
+      (routedLiteral, routedLiteralIndex) ∈
+        routedClause.literals.zipIdx) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      ((drawingPlanarSATCarrierLensIncidenceDrawing
+        formula carrierLink).routes
+          carrierClauseIndex carrierLiteralIndex)
+      ((drawingPlanarSATRoutedVariableIncidenceDrawing
+        formula site drawingArm routedLink).routes
+          routedClauseIndex routedLiteralIndex) :=
+  retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_raw
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        formula.incidenceGraph carrierLink).mp carrierLinkMember).1
+      (retainedDrawingCompleteCarrierLink_first_translate_neighbor
+        formula.incidenceGraph carrierLinkMember)
+      routedLinkMember carrierClauseMember carrierLiteralMember
+      routedClauseMember routedLiteralMember
+
+theorem
+    retainedDrawingPlanarSATCarrierRoutedClauseRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {carrierLink : EqualityLink CarrierNode}
+    (carrierLinkMember :
+      carrierLink ∈ retainedDrawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula))
+    {site : ClauseRouteSite}
+    {representedOccurrence : CNFRouteOccurrence Variable}
+    (representedOccurrenceMember :
+      representedOccurrence ∈ clauseRouteOccurrencesAt formula site)
+    {carrierClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {carrierClauseIndex : Nat}
+    (carrierClauseMember :
+      (carrierClause, carrierClauseIndex) ∈
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula carrierLink).formula.zipIdx)
+    {carrierLiteral : PlanarSATVariable Variable × Bool}
+    {carrierLiteralIndex : Nat}
+    (carrierLiteralMember :
+      (carrierLiteral, carrierLiteralIndex) ∈
+        carrierClause.literals.zipIdx)
+    {routedClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {routedClauseIndex : Nat}
+    (routedClauseMember :
+      (routedClause, routedClauseIndex) ∈
+        (drawingPlanarSATRoutedClauseIncidenceDrawing
+          formula site).formula.zipIdx)
+    {routedLiteral : PlanarSATVariable Variable × Bool}
+    {routedLiteralIndex : Nat}
+    (routedLiteralMember :
+      (routedLiteral, routedLiteralIndex) ∈
+        routedClause.literals.zipIdx) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      ((drawingPlanarSATCarrierLensIncidenceDrawing
+        formula carrierLink).routes
+          carrierClauseIndex carrierLiteralIndex)
+      ((drawingPlanarSATRoutedClauseIncidenceDrawing
+        formula site).routes
+          routedClauseIndex routedLiteralIndex) :=
+  retainedDrawingPlanarSATCarrierRoutedClauseRoutesAvoidEachOther_of_raw
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        formula.incidenceGraph carrierLink).mp carrierLinkMember).1
+      (retainedDrawingCompleteCarrierLink_first_translate_neighbor
+        formula.incidenceGraph carrierLinkMember)
+      representedOccurrenceMember carrierClauseMember carrierLiteralMember
+      routedClauseMember routedLiteralMember
 
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -60,17 +60,20 @@ theorem drawingSegmentTerminal_routeEndpoint_of_drawingPoint_eq_liftedVertex
         bendPoint).elim
   · exact terminalEndpoint
 
-/-- If a selected retained lens overlaps the macrocell of a lifted declared
-vertex, one of its endpoints is a segment terminal at that vertex. -/
+/-- If a raw retained lens whose source translate lies in the neighbor
+window overlaps the macrocell of a lifted declared vertex, one of its
+endpoints is a segment terminal at that vertex. -/
 theorem
-    retainedDrawingCompleteCarrierLink_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
+    retainedDrawingCompleteCarrierLinkRaw_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    (firstTranslateNeighbor :
+      IsNeighborTranslation link.first.translate)
     {vertex : Vertex}
     (vertexMem : vertex ∈ graph.vertices)
     (vertexTranslate : Cell)
@@ -99,17 +102,13 @@ theorem
       ((drawing graph).vertexPosition graph vertex)
       ((drawing graph).periodTranslation vertexTranslate)
   have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   have firstIndexedMem :
       link.first.indexed ∈ (drawing graph).indexedSegments :=
     retainedCarrierNode_indexed_mem graph endpoints.1
-  have firstTranslateNeighbor :
-      IsNeighborTranslation link.first.translate :=
-    retainedDrawingCompleteCarrierLink_first_translate_neighbor
-      graph linkMem
   have centerContains :
       (link.first.supportingSegment graph).Contains center :=
-    retainedDrawingCompleteCarrierLink_supportingSegment_contains_of_macrocell_overlap
+    retainedDrawingCompleteCarrierLinkRaw_supportingSegment_contains_of_macrocell_overlap
       wellFormed degree isLocal linkMem center notSeparated
   rcases
       GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
@@ -140,7 +139,7 @@ theorem
           CarrierNode.carrierKey_eq_indexed_translate,
           SegmentTerminal.carrierKey]
       have incident :=
-        retainedDrawingCompleteCarrierLink_incidentToTerminal_of_key_eq_of_overlap
+        retainedDrawingCompleteCarrierLinkRaw_incidentToTerminal_of_key_eq_of_overlap
           wellFormed degree isLocal linkMem terminalMem keyEqual
           (by simpa [terminalPoint] using notSeparated)
       exact ⟨terminal, terminalMem, terminalPoint, incident⟩
@@ -162,7 +161,7 @@ theorem
           CarrierNode.carrierKey_eq_indexed_translate,
           SegmentTerminal.carrierKey]
       have incident :=
-        retainedDrawingCompleteCarrierLink_incidentToTerminal_of_key_eq_of_overlap
+        retainedDrawingCompleteCarrierLinkRaw_incidentToTerminal_of_key_eq_of_overlap
           wellFormed degree isLocal linkMem terminalMem keyEqual
           (by simpa [terminalPoint] using notSeparated)
       exact ⟨terminal, terminalMem, terminalPoint, incident⟩
@@ -322,7 +321,7 @@ theorem CNFRouteOccurrence.mem_variableRouteOccurrencesAt_of_mem_drawing
 /-- Overlap with a represented routed-variable macrocell forces incidence
 to the target terminal of some route occurrence at that site. -/
 theorem
-    retainedDrawingCompleteCarrierLink_exists_targetOccurrence_of_variableMacrocell_overlap
+    retainedDrawingCompleteCarrierLinkRaw_exists_targetOccurrence_of_variableMacrocell_overlap
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     (wellFormed :
@@ -333,8 +332,10 @@ theorem
       (PeriodicCNF.incidenceGraph formula).IsLocal)
     {link : EqualityLink CarrierNode}
     (linkMem :
-      link ∈ retainedDrawingCompleteCarrierLinks
+      link ∈ retainedDrawingCompleteCarrierLinksRaw
         (PeriodicCNF.incidenceGraph formula))
+    (firstTranslateNeighbor :
+      IsNeighborTranslation link.first.translate)
     (site : VariableRouteSite Variable)
     {representedOccurrence : CNFRouteOccurrence Variable}
     (representedOccurrenceMem :
@@ -377,8 +378,9 @@ theorem
       CNFRouteOccurrence.variableOccurrence] using
         representedTargetMem
   rcases
-      retainedDrawingCompleteCarrierLink_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
-        wellFormed degree isLocal linkMem siteVertexMem site.2
+      retainedDrawingCompleteCarrierLinkRaw_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
+        wellFormed degree isLocal linkMem firstTranslateNeighbor
+        siteVertexMem site.2
         notSeparated with
     ⟨terminal, terminalMem, terminalPoint, linkIncident⟩
   rcases
@@ -469,7 +471,7 @@ theorem
 /-- Overlap with a represented routed-clause macrocell forces incidence to
 the source terminal of some route occurrence at that site. -/
 theorem
-    retainedDrawingCompleteCarrierLink_exists_sourceOccurrence_of_clauseMacrocell_overlap
+    retainedDrawingCompleteCarrierLinkRaw_exists_sourceOccurrence_of_clauseMacrocell_overlap
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     (wellFormed :
@@ -480,8 +482,10 @@ theorem
       (PeriodicCNF.incidenceGraph formula).IsLocal)
     {link : EqualityLink CarrierNode}
     (linkMem :
-      link ∈ retainedDrawingCompleteCarrierLinks
+      link ∈ retainedDrawingCompleteCarrierLinksRaw
         (PeriodicCNF.incidenceGraph formula))
+    (firstTranslateNeighbor :
+      IsNeighborTranslation link.first.translate)
     (site : ClauseRouteSite)
     {representedOccurrence : CNFRouteOccurrence Variable}
     (representedOccurrenceMem :
@@ -530,8 +534,9 @@ theorem
       CNFRouteOccurrence.clauseOccurrence] using
         representedSourceMem
   rcases
-      retainedDrawingCompleteCarrierLink_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
-        wellFormed degree isLocal linkMem siteVertexMem site.2
+      retainedDrawingCompleteCarrierLinkRaw_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
+        wellFormed degree isLocal linkMem firstTranslateNeighbor
+        siteVertexMem site.2
         notSeparated with
     ⟨terminal, terminalMem, terminalPoint, linkIncident⟩
   rcases
@@ -618,6 +623,134 @@ theorem
       liftedDrawingVertexPosition_eq
         graph targetVertexMem siteVertexMem liftedEq
     cases impossible.1
+
+/-! ## Selected-representative compatibility wrappers -/
+
+theorem
+    retainedDrawingCompleteCarrierLink_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {vertex : Vertex}
+    (vertexMem : vertex ∈ graph.vertices)
+    (vertexTranslate : Cell)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower
+          (Cell.add
+            ((drawing graph).vertexPosition graph vertex)
+            ((drawing graph).periodTranslation vertexTranslate)))
+        (planarSATMacrocellRouteUpper
+          (Cell.add
+            ((drawing graph).vertexPosition graph vertex)
+            ((drawing graph).periodTranslation vertexTranslate)))) :
+    ∃ terminal,
+      terminal ∈ drawingSegmentTerminals graph ∧
+        terminal.drawingPoint graph =
+          Cell.add
+            ((drawing graph).vertexPosition graph vertex)
+            ((drawing graph).periodTranslation vertexTranslate) ∧
+        (link.first = .terminal terminal ∨
+          link.second = .terminal terminal) :=
+  retainedDrawingCompleteCarrierLinkRaw_incidentToTerminalAtLiftedVertex_of_macrocell_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      (retainedDrawingCompleteCarrierLink_first_translate_neighbor
+        graph linkMem)
+      vertexMem vertexTranslate notSeparated
+
+theorem
+    retainedDrawingCompleteCarrierLink_exists_targetOccurrence_of_variableMacrocell_overlap
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula))
+    (site : VariableRouteSite Variable)
+    {representedOccurrence : CNFRouteOccurrence Variable}
+    (representedOccurrenceMem :
+      representedOccurrence ∈
+        variableRouteOccurrencesAt formula site)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower
+          (PeriodicCNF.incidenceGraph formula) link)
+        (drawingCompleteCarrierLinkRectangleUpper
+          (PeriodicCNF.incidenceGraph formula) link)
+        (planarSATMacrocellRouteLower
+          (liftedIncidenceVertexPosition
+            formula (.variable site.1) site.2))
+        (planarSATMacrocellRouteUpper
+          (liftedIncidenceVertexPosition
+            formula (.variable site.1) site.2))) :
+    ∃ occurrence,
+      occurrence ∈ variableRouteOccurrencesAt formula site ∧
+        CarrierLinkIncidentToTargetTerminal
+          formula link occurrence :=
+  retainedDrawingCompleteCarrierLinkRaw_exists_targetOccurrence_of_variableMacrocell_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        formula.incidenceGraph link).mp linkMem).1
+      (retainedDrawingCompleteCarrierLink_first_translate_neighbor
+        formula.incidenceGraph linkMem)
+      site representedOccurrenceMem notSeparated
+
+theorem
+    retainedDrawingCompleteCarrierLink_exists_sourceOccurrence_of_clauseMacrocell_overlap
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinks
+        (PeriodicCNF.incidenceGraph formula))
+    (site : ClauseRouteSite)
+    {representedOccurrence : CNFRouteOccurrence Variable}
+    (representedOccurrenceMem :
+      representedOccurrence ∈
+        clauseRouteOccurrencesAt formula site)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower
+          (PeriodicCNF.incidenceGraph formula) link)
+        (drawingCompleteCarrierLinkRectangleUpper
+          (PeriodicCNF.incidenceGraph formula) link)
+        (planarSATMacrocellRouteLower
+          (liftedIncidenceVertexPosition
+            formula (.clause site.1) site.2))
+        (planarSATMacrocellRouteUpper
+          (liftedIncidenceVertexPosition
+            formula (.clause site.1) site.2))) :
+    ∃ occurrence,
+      occurrence ∈ clauseRouteOccurrencesAt formula site ∧
+        CarrierLinkIncidentToSourceTerminal
+          formula link occurrence :=
+  retainedDrawingCompleteCarrierLinkRaw_exists_sourceOccurrence_of_clauseMacrocell_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        formula.incidenceGraph link).mp linkMem).1
+      (retainedDrawingCompleteCarrierLink_first_translate_neighbor
+        formula.incidenceGraph linkMem)
+      site representedOccurrenceMem notSeparated
 
 end PeriodicOrthocrossing
 end LeanTrominoes
