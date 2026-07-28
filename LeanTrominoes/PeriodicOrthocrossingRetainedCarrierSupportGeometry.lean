@@ -170,8 +170,51 @@ theorem retainedCarrierNode_supportingSegment_eq_of_carrierKey_eq
   simp [CarrierNode.supportingSegment,
     occurrenceEqual.1, occurrenceEqual.2]
 
-/-- A horizontal selected retained link stays within its source occurrence's
+/-- A horizontal raw retained link stays within its source occurrence's
 axial corridor. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_horizontal_support_bounded
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    (horizontal : link.first.isHorizontal = true) :
+    planarMacroScale *
+          min (link.first.supportingSegment graph).start.1
+            (link.first.supportingSegment graph).finish.1 +
+        11 ≤
+      (link.first.position graph).1 ∧
+    (link.second.position graph).1 ≤
+      planarMacroScale *
+          max (link.first.supportingSegment graph).start.1
+            (link.first.supportingSegment graph).finish.1 +
+        1 := by
+  have endpoints :=
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
+  have commonKey :=
+    retainedDrawingCompleteCarrierLinksRaw_common_key graph linkMem
+  have supportEqual :=
+    retainedCarrierNode_supportingSegment_eq_of_carrierKey_eq
+      endpoints.1 endpoints.2 commonKey
+  have secondHorizontal :=
+    (retainedDrawingCompleteCarrierLinkRaw_first_isHorizontal_iff_second
+      wellFormed degree isLocal linkMem).mp horizontal
+  have firstBounds :=
+    retainedCarrierNode_orderCoordinate_support_bounded
+      wellFormed degree isLocal endpoints.1
+  have secondBounds :=
+    retainedCarrierNode_orderCoordinate_support_bounded
+      wellFormed degree isLocal endpoints.2
+  constructor
+  · simpa [CarrierNode.supportLowerCoordinate,
+      CarrierNode.orderCoordinate, horizontal] using firstBounds.1
+  · simpa [CarrierNode.supportUpperCoordinate,
+      CarrierNode.orderCoordinate, secondHorizontal,
+      ← supportEqual] using secondBounds.2
+
+/-- The horizontal support bound for selected representatives. -/
 theorem retainedDrawingCompleteCarrierLink_horizontal_support_bounded
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
@@ -190,17 +233,46 @@ theorem retainedDrawingCompleteCarrierLink_horizontal_support_bounded
       planarMacroScale *
           max (link.first.supportingSegment graph).start.1
             (link.first.supportingSegment graph).finish.1 +
+        1 :=
+  retainedDrawingCompleteCarrierLinkRaw_horizontal_support_bounded
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 horizontal
+
+/-- A vertical raw retained link stays within its source occurrence's axial
+corridor. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_vertical_support_bounded
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    (vertical : ¬link.first.isHorizontal = true) :
+    planarMacroScale *
+          min (link.first.supportingSegment graph).start.2
+            (link.first.supportingSegment graph).finish.2 +
+        11 ≤
+      (link.first.position graph).2 ∧
+    (link.second.position graph).2 ≤
+      planarMacroScale *
+          max (link.first.supportingSegment graph).start.2
+            (link.first.supportingSegment graph).finish.2 +
         1 := by
   have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   have commonKey :=
-    retainedDrawingCompleteCarrierLinks_common_key graph linkMem
+    retainedDrawingCompleteCarrierLinksRaw_common_key graph linkMem
   have supportEqual :=
     retainedCarrierNode_supportingSegment_eq_of_carrierKey_eq
       endpoints.1 endpoints.2 commonKey
-  have secondHorizontal :=
-    (retainedDrawingCompleteCarrierLink_first_isHorizontal_iff_second
-      wellFormed degree isLocal linkMem).mp horizontal
+  have secondVertical :
+      ¬link.second.isHorizontal = true := by
+    exact fun secondHorizontal =>
+      vertical
+        ((retainedDrawingCompleteCarrierLinkRaw_first_isHorizontal_iff_second
+          wellFormed degree isLocal linkMem).mpr secondHorizontal)
   have firstBounds :=
     retainedCarrierNode_orderCoordinate_support_bounded
       wellFormed degree isLocal endpoints.1
@@ -209,13 +281,12 @@ theorem retainedDrawingCompleteCarrierLink_horizontal_support_bounded
       wellFormed degree isLocal endpoints.2
   constructor
   · simpa [CarrierNode.supportLowerCoordinate,
-      CarrierNode.orderCoordinate, horizontal] using firstBounds.1
+      CarrierNode.orderCoordinate, vertical] using firstBounds.1
   · simpa [CarrierNode.supportUpperCoordinate,
-      CarrierNode.orderCoordinate, secondHorizontal,
+      CarrierNode.orderCoordinate, secondVertical,
       ← supportEqual] using secondBounds.2
 
-/-- A vertical selected retained link stays within its source occurrence's
-axial corridor. -/
+/-- The vertical support bound for selected representatives. -/
 theorem retainedDrawingCompleteCarrierLink_vertical_support_bounded
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
@@ -234,32 +305,11 @@ theorem retainedDrawingCompleteCarrierLink_vertical_support_bounded
       planarMacroScale *
           max (link.first.supportingSegment graph).start.2
             (link.first.supportingSegment graph).finish.2 +
-        1 := by
-  have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
-  have commonKey :=
-    retainedDrawingCompleteCarrierLinks_common_key graph linkMem
-  have supportEqual :=
-    retainedCarrierNode_supportingSegment_eq_of_carrierKey_eq
-      endpoints.1 endpoints.2 commonKey
-  have secondVertical :
-      ¬link.second.isHorizontal = true := by
-    exact fun secondHorizontal =>
-      vertical
-        ((retainedDrawingCompleteCarrierLink_first_isHorizontal_iff_second
-          wellFormed degree isLocal linkMem).mpr secondHorizontal)
-  have firstBounds :=
-    retainedCarrierNode_orderCoordinate_support_bounded
-      wellFormed degree isLocal endpoints.1
-  have secondBounds :=
-    retainedCarrierNode_orderCoordinate_support_bounded
-      wellFormed degree isLocal endpoints.2
-  constructor
-  · simpa [CarrierNode.supportLowerCoordinate,
-      CarrierNode.orderCoordinate, vertical] using firstBounds.1
-  · simpa [CarrierNode.supportUpperCoordinate,
-      CarrierNode.orderCoordinate, secondVertical,
-      ← supportEqual] using secondBounds.2
+        1 :=
+  retainedDrawingCompleteCarrierLinkRaw_vertical_support_bounded
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 vertical
 
 /-- A retained node's physical normal coordinate is its translated source
 line scaled by twenty and shifted by six. -/
