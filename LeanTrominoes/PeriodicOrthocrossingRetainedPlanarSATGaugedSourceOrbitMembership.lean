@@ -914,5 +914,105 @@ theorem DrawingPlanarSATClauseSource.exists_retainedTarget_periodTranslate
           sourceMember occurrence occurrenceMember linkFirstEq
           shift translatedNeighbor
 
+/-- The metadata behind every final segment witness names a retained source
+component. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.source_retainedComponentMember
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift : Cell}
+    (witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift) :
+    witness.routeWitness.metadata.source.RetainedComponentMember
+      formula := by
+  have metadataMember :
+      witness.routeWitness.metadata ∈
+        retainedDrawingPlanarSATClauseMetadata formula :=
+    List.mem_iff_getElem?.mpr
+      ⟨witness.routeWitness.metadataIndex,
+        witness.routeWitness.metadataLookup⟩
+  have metadataValid :
+      witness.routeWitness.metadata.RetainedValid formula :=
+    retainedDrawingPlanarSATClauseMetadata_valid
+      formula metadataMember
+  exact
+    (witness.routeWitness.metadata
+      |>.retainedValid_iff_sourceMember_and_localClauseMember
+        formula).mp metadataValid |>.1
+
+/-- Once the source orbit condition is known, a final segment can be
+reindexed automatically to the corresponding adjusted finite-drawing
+translate. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.exists_commonShiftRepresentative_of_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift reindexShift : Cell}
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift)
+    (condition :
+      witness.routeWitness.metadata.source.RetainedOrbitCondition
+        formula reindexShift) :
+    Nonempty
+      (FinalGaugedSegmentCommonShiftRepresentative
+        formula indexed shift
+          (Cell.sub witness.physicalShift reindexShift)) := by
+  rcases
+      witness.routeWitness.metadata.source
+        |>.exists_retainedTarget_periodTranslate
+          formula degree
+          witness.source_retainedComponentMember
+          reindexShift condition with
+    ⟨targetSource, targetMember,
+      targetComponentEq, targetLocalClauseIndexEq⟩
+  exact
+    witness.exists_commonShiftRepresentative_of_targetSource
+      targetSource targetMember targetComponentEq
+      targetLocalClauseIndexEq
+
+/-- For a pair of final occurrences, an orbit condition for translating the
+first source by the difference of the physical shifts gives two
+representatives in one common finite-drawing translate while leaving the
+second source fixed. -/
+theorem
+    exists_commonShiftRepresentative_pair_of_first_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (condition :
+      first.routeWitness.metadata.source.RetainedOrbitCondition
+        formula
+        (Cell.sub first.physicalShift second.physicalShift)) :
+    Nonempty
+      (FinalGaugedSegmentCommonShiftRepresentative
+          formula firstIndexed firstShift second.physicalShift ×
+        FinalGaugedSegmentCommonShiftRepresentative
+          formula secondIndexed secondShift second.physicalShift) := by
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_retainedTarget_periodTranslate
+          formula degree first.source_retainedComponentMember
+          (Cell.sub first.physicalShift second.physicalShift)
+          condition with
+    ⟨targetSource, targetMember,
+      targetComponentEq, targetLocalClauseIndexEq⟩
+  exact
+    exists_commonShiftRepresentative_pair_reindex_first_by_physicalShift
+      first second targetSource targetMember
+      targetComponentEq targetLocalClauseIndexEq
+
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -2623,7 +2623,9 @@ The representation choices for this target are:
   the target site's three active arms, yielding a retained translated source
   even when sorting assigns that arm a different local presentation index.
   A uniform orbit condition then packages the five family-specific premises
-  and returns a retained component-equivalent translated source.
+  and returns a retained component-equivalent translated source.  Final
+  segment witnesses consume this condition directly to align one occurrence
+  with another at a common finite-drawing shift.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
