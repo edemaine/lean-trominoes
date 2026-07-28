@@ -2396,6 +2396,11 @@ The representation choices for this target are:
   drawing.  Macrocell uniqueness handles the carrier, routed-variable, and
   internal-crossover families uniformly and separates the three local
   coordinate tables.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalVertexDistinctness.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalVertexDistinctness.lean)
+  extracts local vertex distinctness from each component's planarity
+  certificate: clause positions are locally injective, local variables
+  avoid local clauses, and equal clause positions in one component identify
+  the same local clause index.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
