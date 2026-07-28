@@ -2658,6 +2658,15 @@ The representation choices for this target are:
   exact component alignment, except for distinct routed-variable arms at
   the same translated variable site; cross-family center coincidences are
   excluded without enlarging the retained window.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierPeriodicSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierPeriodicSeparation.lean)
+  turns that translated-center classification into continuous periodic
+  separation for every pair of retained noncarrier segment occurrences.
+  Unequal aligned centers are separated by their planar-SAT macrocells.
+  Equal centers either give exact translated component alignment, which
+  transfers finite retained planarity, or two routed-variable sources at
+  one site; equal duplicator arms reconstruct the same translated active
+  link, while distinct arms reuse the finite duplicator-star route
+  separation certificate.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
