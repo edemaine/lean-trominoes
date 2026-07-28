@@ -2536,6 +2536,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSameRouteSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSameRouteSeparation.lean)
+  converts that simplicity certificate to the global indexed-segment
+  language, excluding continuous overlap and endpoint contact between
+  distinct segments of one periodic route occurrence.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
