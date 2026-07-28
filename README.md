@@ -2406,6 +2406,11 @@ The representation choices for this target are:
   their geometric component by position.  Standard macrocell bounds identify
   the center; center uniqueness and the fixed routed-variable arm coordinates
   identify the component at that center.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATCarrierClausePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATCarrierClausePositions.lean)
+  proves that equal clause positions in retained straight-carrier lenses
+  identify the same lens.  Rectangle separation handles every nonadjacent
+  pair; consecutive lenses remain distinct because their clauses lie strictly
+  inside the eight-cell-clearance spans on opposite sides of the shared port.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
