@@ -2315,6 +2315,10 @@ The representation choices for this target are:
   fixes each selected link's forward axis direction and explicit narrow
   rectangle.  Its renamed route points stay inside that rectangle, so
   separated rectangles give strict selected-lens route separation.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean)
+  proves common-axis agreement for retained nodes and transfers strict
+  consecutive-pair order to the selected family: two distinct links with one
+  carrier key have nonoverlapping axial intervals in one of the two orders.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
