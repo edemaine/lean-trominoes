@@ -2557,6 +2557,11 @@ The representation choices for this target are:
   occurrence bridge.  Every final segment represented by crossover, bend,
   routed-clause, or routed-variable metadata has both endpoints in the
   half-open fundamental square.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedContactTranslationBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedContactTranslationBounds.lean)
+  combines those half-open bounds with the all-route halo bound.  Any
+  continuous contact involving at least one noncarrier segment is reduced to
+  the nine neighboring relative translations; only carrier--carrier contacts
+  can require the full 25-shift analysis.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
