@@ -113,5 +113,99 @@ theorem
       translatedClauseMember' translatedLiteralMember
       second secondValid secondLiteralMember secondNotCarrier
 
+/-- Two independently translated metadata routes avoid one another when the
+first becomes a neighboring raw carrier and the second translated
+noncarrier source remains in the retained component family. -/
+theorem
+    DrawingPlanarSATClauseMetadata.two_periodTranslate_localRoutes_avoidEachOther_of_raw_carrier
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (first second : DrawingPlanarSATClauseMetadata Variable)
+    (firstValid : first.RetainedValid formula)
+    (secondValid : second.RetainedValid formula)
+    (firstShift secondShift : Cell)
+    (link : EqualityLink CarrierNode)
+    (localClauseIndex : Nat)
+    (firstSourceEq :
+      first.source = .carrier link localClauseIndex)
+    (translatedLinkMember :
+      carrierLinkPeriodTranslate formula.incidenceGraph link firstShift ∈
+        retainedDrawingCompleteCarrierLinksRaw
+          formula.incidenceGraph)
+    (translatedFirstNeighbor :
+      IsNeighborTranslation
+        ((carrierLinkPeriodTranslate formula.incidenceGraph
+          link firstShift).first.translate))
+    (translatedSecondMember :
+      (second.source.periodTranslate formula secondShift)
+        |>.RetainedComponentMember formula)
+    {firstLiteral secondLiteral :
+      PlanarSATVariable Variable × Bool}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        first.clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        second.clause.literals.zipIdx)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.source.component = .carrier secondLink) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (((first.source.periodTranslate formula firstShift).incidenceDrawing
+        formula).routes
+          first.source.localClauseIndex firstLiteralIndex)
+      (((second.source.periodTranslate formula secondShift).incidenceDrawing
+        formula).routes
+          second.source.localClauseIndex secondLiteralIndex) := by
+  have secondLocalClauseMember :
+      (second.clause, second.source.localClauseIndex) ∈
+        (second.source.clauseFormula formula).zipIdx :=
+    (second.retainedValid_iff_sourceMember_and_localClauseMember
+      formula).mp secondValid |>.2
+  rcases
+      second.source.exists_periodTranslatedClauseLiteral
+        formula secondShift second.clause secondLocalClauseMember
+        secondLiteral secondLiteralIndex secondLiteralMember with
+    ⟨translatedSecondClause, translatedSecondLiteral,
+      translatedSecondClauseMember,
+      translatedSecondLiteralMember⟩
+  let translatedSecond :
+      DrawingPlanarSATClauseMetadata Variable :=
+    ⟨translatedSecondClause,
+      second.source.periodTranslate formula secondShift⟩
+  have translatedSecondValid :
+      translatedSecond.RetainedValid formula := by
+    apply
+      (translatedSecond
+        |>.retainedValid_iff_sourceMember_and_localClauseMember
+          formula).mpr
+    exact ⟨translatedSecondMember,
+      translatedSecondClauseMember⟩
+  have translatedSecondNotCarrier :
+      ¬∃ secondLink,
+        translatedSecond.source.component = .carrier secondLink := by
+    rintro ⟨secondLink, translatedCarrier⟩
+    apply secondNotCarrier
+    rcases second with ⟨secondClause, secondSource⟩
+    cases secondSource <;>
+      simp_all [translatedSecond,
+        DrawingPlanarSATClauseSource.periodTranslate,
+        DrawingPlanarSATClauseSource.component]
+  have avoid :=
+    first.periodTranslate_localRoutes_avoidEachOther_of_raw_carrier
+      wellFormed degree isLocal translatedSecond
+      firstValid translatedSecondValid firstShift
+      link localClauseIndex firstSourceEq
+      translatedLinkMember translatedFirstNeighbor
+      firstLiteralMember translatedSecondLiteralMember
+      translatedSecondNotCarrier
+  simpa only [translatedSecond,
+    DrawingPlanarSATClauseSource.localClauseIndex_periodTranslate] using
+      avoid
+
 end PeriodicOrthocrossing
 end LeanTrominoes
