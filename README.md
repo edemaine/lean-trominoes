@@ -2425,6 +2425,11 @@ The representation choices for this target are:
   combines the three component pairings to prove global clause-position
   injectivity.  Equal nonempty clause positions identify the component, its
   local clause index, and finally the unique retained global clause index.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGlobalVariableClausePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGlobalVariableClausePositions.lean)
+  proves that no retained variable position is a retained clause position.
+  Non-carrier components use fixed local coordinates; carrier components use
+  rectangle separation, certified shared-port boundaries, and the clearance
+  between consecutive equality lenses.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
