@@ -122,6 +122,19 @@ theorem anchorReindex_commonShift_pair
   rcases secondShift with ⟨secondX, secondY⟩
   simp [Cell.sub]
 
+/-- Keeping the second finite source unchanged determines the anchor to
+which the first source must be moved. -/
+theorem anchorReindex_commonShift_keep_second
+    {firstShift secondShift secondAnchor : Cell} :
+    Cell.sub firstShift
+        (Cell.add (Cell.sub firstShift secondShift) secondAnchor) =
+      Cell.sub secondShift secondAnchor := by
+  rcases firstShift with ⟨firstX, firstY⟩
+  rcases secondShift with ⟨secondX, secondY⟩
+  rcases secondAnchor with ⟨anchorX, anchorY⟩
+  simp only [Cell.add, Cell.sub]
+  apply Prod.ext <;> simp <;> ring
+
 /-- Package the remaining orbit obligations for two final occurrences.
 It is enough to retain a component-equivalent first source at anchor
 `firstShift - secondShift` and a component-equivalent second source at
@@ -179,6 +192,55 @@ theorem exists_commonShiftRepresentative_pair_at_relative_and_zero
   rw [common.1] at firstRepresentative
   rw [common.2] at secondRepresentative
   exact ⟨firstRepresentative, secondRepresentative⟩
+
+/-- A one-sided form is often more convenient for orbit closure: leave the
+second occurrence at its existing finite representative, and reindex only
+the first source to the relative external shift plus the second source
+anchor. -/
+theorem exists_commonShiftRepresentative_pair_reindex_first
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstTargetSource : DrawingPlanarSATClauseSource Variable)
+    (firstTargetMember :
+      firstTargetSource.RetainedComponentMember formula)
+    (firstTargetComponentEq :
+      firstTargetSource.component =
+        (first.routeWitness.metadata.source.periodTranslate
+          formula
+          (first.anchorReindexShift
+            (Cell.add (Cell.sub firstShift secondShift)
+              second.sourceClauseAnchor))).component)
+    (firstTargetLocalClauseIndexEq :
+      firstTargetSource.localClauseIndex =
+        first.routeWitness.metadata.source.localClauseIndex) :
+    Nonempty
+      (FinalGaugedSegmentCommonShiftRepresentative
+          formula firstIndexed firstShift second.physicalShift ×
+        FinalGaugedSegmentCommonShiftRepresentative
+          formula secondIndexed secondShift second.physicalShift) := by
+  rcases first.exists_commonShiftRepresentative_at_anchor
+      (Cell.add (Cell.sub firstShift secondShift)
+        second.sourceClauseAnchor)
+      firstTargetSource firstTargetMember
+      firstTargetComponentEq firstTargetLocalClauseIndexEq with
+    ⟨firstRepresentative⟩
+  have common :=
+    anchorReindex_commonShift_keep_second
+      (firstShift := firstShift)
+      (secondShift := secondShift)
+      (secondAnchor := second.sourceClauseAnchor)
+  rw [common] at firstRepresentative
+  rw [second.physicalShift_eq]
+  exact ⟨firstRepresentative,
+    second.toCommonShiftRepresentative⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes
