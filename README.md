@@ -2278,6 +2278,11 @@ The representation choices for this target are:
   clearance for every adjacent pair.  Raw links and their selected zero-shift
   representatives therefore instantiate the certified equality-lens drawing,
   with exact formula, endpoint positions, orthogonality, and finite planarity.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierInterfaces.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierInterfaces.lean)
+  identifies every selected-lens endpoint orientation.  A lens beginning at a
+  crossover boundary leaves only through its right or bottom port, one ending
+  there enters only through its left or top port, and a terminal occurs at the
+  lower or upper end dictated by its segment endpoint.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
