@@ -2391,6 +2391,11 @@ The representation choices for this target are:
   proves that retained carrier nodes have distinct refined positions.
   Equal local ports make their supporting segments overlap in one continuous
   lane; lane uniqueness and strict carrier order then identify the nodes.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATVariablePositionInjectivity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATVariablePositionInjectivity.lean)
+  proves position injectivity for every variable used by the retained SAT
+  drawing.  Macrocell uniqueness handles the carrier, routed-variable, and
+  internal-crossover families uniformly and separates the three local
+  coordinate tables.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
