@@ -2616,6 +2616,9 @@ The representation choices for this target are:
   carriers, bends, and routed clauses reuse their exact translated sources;
   routed-variable arms may change only their finite per-site presentation
   index while preserving the translated component and local clause index.
+  It also proves neighboring-window closure for route occurrences, bends,
+  routed sites, and crossover records whose two translated carriers remain
+  among the nine neighboring occurrences.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
