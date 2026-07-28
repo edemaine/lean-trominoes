@@ -2474,6 +2474,11 @@ The representation choices for this target are:
   routed-variable gadgets.  Equal fundamental-domain residues identify the
   same non-carrier clause orbit after periodic normalization, opaque wrapping,
   and the canonical variable gauge.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierClauseSignatures.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierClauseSignatures.lean)
+  extracts a rigid modulo-ten signature from every retained carrier clause.
+  Equal residues recover its axis, implication index, and first carrier-node
+  position modulo the drawing period; exact first nodes uniquely determine
+  their raw retained links.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
