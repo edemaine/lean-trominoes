@@ -2605,6 +2605,12 @@ The representation choices for this target are:
   global per-site enumeration index changes near a retained-window boundary,
   and produces the finite common-shift representative used by planarity
   transfer.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAnchorReindexing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAnchorReindexing.lean)
+  chooses source translations by their desired canonically gauged clause
+  anchors.  Reindexing two final occurrences to anchors equal to their
+  relative external shift and zero places both finite representatives at the
+  second occurrence's external shift, reducing the remaining orbit proof to
+  family-by-family retained component membership.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
