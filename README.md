@@ -2269,6 +2269,10 @@ The representation choices for this target are:
   records and boundary coordinates, places every retained boundary strictly
   between its occurrence terminals, and concludes that each sorted retained
   chain is pairwise strictly ordered.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierGeometry.lean)
+  transfers common-axis geometry to retained carrier nodes: every node lies
+  on its supporting occurrence, its axis tag is exact, and nodes with one key
+  share a refined support line whose axial coordinates are all `1 mod 10`.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
