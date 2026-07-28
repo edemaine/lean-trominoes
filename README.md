@@ -2321,6 +2321,11 @@ The representation choices for this target are:
   macrocell onto the carrier's exact source row or column and into its axial
   interval, supplying the common proximity interface for the remaining
   carrier-to-component cases.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalProximity.lean)
+  proves the reusable terminal half of that proximity argument.  A source
+  terminal is a strict retained-chain extreme at local axial coordinate
+  `11` or `1`; hence a selected lens on the same occurrence can overlap the
+  terminal macrocell only when the terminal is one of its endpoints.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverProximity.lean)
   proves the matched-carrier half of crossover proximity.  If a selected
   horizontal or vertical link uses the corresponding source occurrence of a
