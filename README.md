@@ -2327,6 +2327,20 @@ The representation choices for this target are:
   terminal is a strict retained-chain extreme at local axial coordinate
   `11` or `1`; hence a selected lens on the same occurrence can overlap the
   terminal macrocell only when the terminal is one of its endpoints.
+- [`LeanTrominoes/PeriodicOrthocrossingDrawingVertexAvoidance.lean`](LeanTrominoes/PeriodicOrthocrossingDrawingVertexAvoidance.lean)
+  proves that the constructed orthogonal drawing meets every lifted graph
+  vertex only at route endpoints: no translated indexed segment contains a
+  lifted vertex in its relative interior.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentProximity.lean)
+  uses vertex avoidance to classify every retained-carrier overlap with a
+  routed variable or clause macrocell.  The carrier must end at an external
+  route terminal, which is lifted back to a metadata-rich CNF occurrence at
+  the exact variable or clause site.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentAllSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentAllSeparation.lean)
+  observes that each active duplicator arm lies inside all three external
+  fanout boundaries.  Combining this finite gadget fact with terminal
+  proximity and disjoint-macrocell separation proves route avoidance for
+  every selected carrier/routed-variable and carrier/routed-clause pair.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
