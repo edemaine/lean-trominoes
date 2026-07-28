@@ -2628,6 +2628,13 @@ The representation choices for this target are:
   and returns a retained component-equivalent translated source.  Final
   segment witnesses consume this condition directly to align one occurrence
   with another at a common finite-drawing shift.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSourceOrbitNecessity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSourceOrbitNecessity.lean)
+  proves the converse for exact or component-equivalent source translates.
+  Membership of a translated crossover, carrier, bend, routed-clause site, or
+  routed-variable arm recovers the corresponding orbit condition; for
+  variable arms, equality of the translated first terminal recovers the
+  neighboring route-occurrence coordinate even if the finite arm index
+  changes.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexingInjectivity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexingInjectivity.lean)
   proves that source reindexing cannot collapse distinct periodic segment
   occurrences.  Equality of the target finite incidence and within-route
@@ -2635,6 +2642,11 @@ The representation choices for this target are:
   index, and external shift, hence equality of the original occurrence keys.
   The resulting transfer theorem turns any first-source orbit condition into
   continuous separation by finite retained planarity.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean)
+  packages the common aligned-component case.  When translating the first
+  source by the physical-shift difference identifies the second retained
+  component, orbit necessity and reindexing injectivity immediately transfer
+  finite continuous separation to the periodic pair.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
