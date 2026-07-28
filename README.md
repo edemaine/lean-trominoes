@@ -2264,10 +2264,11 @@ The representation choices for this target are:
   fixes a neighboring occurrence key; the other boundary then satisfies the
   retained-shift bound, while terminal endpoints remain explicitly listed.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierOrder.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierOrder.lean)
-  starts the strict-order transfer for retained carrier chains.  It preserves
-  the horizontal/vertical orientation of translated crossings and proves that
-  a retained physical occurrence together with its crossing point uniquely
-  determines the full crossing record.
+  transfers strict coordinate order to the retained carrier chains.  It
+  preserves crossing orientation, proves uniqueness of retained crossing
+  records and boundary coordinates, places every retained boundary strictly
+  between its occurrence terminals, and concludes that each sorted retained
+  chain is pairwise strictly ordered.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
