@@ -817,5 +817,102 @@ theorem
     sourceMember.2.2 translatedSiteMember
     targetArmIndex translatedLinkMember
 
+/-- Family-specific sufficient data for realizing a physical source
+translation inside the retained finite component family.  Carrier links are
+the exceptional family: because only one orbit representative is retained,
+their condition records exact selected-link membership rather than a
+neighboring-window bound. -/
+def DrawingPlanarSATClauseSource.RetainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (shift : Cell) : Prop :=
+  let graph := PeriodicCNF.incidenceGraph formula
+  match source with
+  | .crossover crossing _ =>
+      IsNeighborTranslation
+          (Cell.add crossing.firstTranslate shift) ∧
+        IsNeighborTranslation
+          (Cell.add crossing.secondTranslate shift)
+  | .carrier link _ =>
+      carrierLinkPeriodTranslate graph link shift ∈
+        retainedDrawingCompleteCarrierLinks graph
+  | .bend routeBend _ =>
+      IsNeighborTranslation
+        (Cell.add routeBend.translate shift)
+  | .routedClause site =>
+      IsNeighborTranslation (Cell.add site.2 shift)
+  | .routedVariable site _ _ link _ =>
+      ∃ occurrence ∈ variableRouteOccurrencesAt formula site,
+        link.first =
+            .carrier (.terminal
+              (occurrence.targetTerminal formula)) ∧
+          IsNeighborTranslation
+            (Cell.add occurrence.translate shift)
+
+/-- The family-specific orbit condition always supplies a retained source
+with the exact translated component and unchanged local clause index.
+Enumeration-only fields, notably a routed-variable arm index, may change. -/
+theorem DrawingPlanarSATClauseSource.exists_retainedTarget_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (sourceMember : source.RetainedComponentMember formula)
+    (shift : Cell)
+    (condition :
+      source.RetainedOrbitCondition formula shift) :
+    ∃ targetSource : DrawingPlanarSATClauseSource Variable,
+      targetSource.RetainedComponentMember formula ∧
+        targetSource.component =
+          (source.periodTranslate formula shift).component ∧
+        targetSource.localClauseIndex =
+          source.localClauseIndex := by
+  cases source with
+  | crossover crossing localClauseIndex =>
+      refine
+        ⟨.crossover
+            (crossing.periodTranslate formula.incidenceGraph shift)
+            localClauseIndex,
+          ?_, rfl, rfl⟩
+      exact
+        crossoverSource_periodTranslate_retainedComponentMember_of_neighbors
+          formula crossing localClauseIndex sourceMember shift
+          condition.1 condition.2
+  | carrier link localClauseIndex =>
+      exact
+        ⟨.carrier
+            (carrierLinkPeriodTranslate
+              formula.incidenceGraph link shift)
+            localClauseIndex,
+          condition, rfl, rfl⟩
+  | bend routeBend localClauseIndex =>
+      refine
+        ⟨.bend (routeBend.periodTranslate shift)
+            localClauseIndex,
+          ?_, rfl, rfl⟩
+      exact
+        bendSource_periodTranslate_retainedComponentMember_of_neighbor
+          formula routeBend localClauseIndex sourceMember shift
+          condition
+  | routedClause site =>
+      refine
+        ⟨.routedClause
+            (clauseRouteSitePeriodTranslate site shift),
+          ?_, rfl, rfl⟩
+      exact
+        routedClauseSource_periodTranslate_retainedComponentMember_of_neighbor
+          formula site sourceMember shift condition
+  | routedVariable site armIndex arm link localClauseIndex =>
+      rcases condition with
+        ⟨occurrence, occurrenceMember,
+          linkFirstEq, translatedNeighbor⟩
+      exact
+        exists_retainedTargetSource_routedVariable_periodTranslate_of_neighbor
+          formula degree site armIndex arm link localClauseIndex
+          sourceMember occurrence occurrenceMember linkFirstEq
+          shift translatedNeighbor
+
 end PeriodicOrthocrossing
 end LeanTrominoes

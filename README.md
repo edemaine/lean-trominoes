@@ -2622,6 +2622,8 @@ The representation choices for this target are:
   degree-three bound guarantees that the translated terminal remains among
   the target site's three active arms, yielding a retained translated source
   even when sorting assigns that arm a different local presentation index.
+  A uniform orbit condition then packages the five family-specific premises
+  and returns a retained component-equivalent translated source.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
