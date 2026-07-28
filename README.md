@@ -2678,6 +2678,13 @@ The representation choices for this target are:
   family continues to enforce its separate zero-owner convention.  More
   precisely, the normalized link is selected exactly when the source anchor
   is zero; its representative-owner shift is otherwise the negative anchor.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierOrbitOwnership.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierOrbitOwnership.lean)
+  exposes the carrier zero-owner rule through the source-reindexing API.  A
+  selected carrier link remains selected after period translation exactly
+  when that translation is zero.  Accordingly, a final carrier occurrence
+  satisfies the generic retained-orbit condition for a target physical shift
+  exactly when it already has that physical shift; nonzero-shift carrier
+  pairs must use the direct periodic carrier geometry.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
