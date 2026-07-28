@@ -2396,6 +2396,11 @@ The representation choices for this target are:
   drawing.  Macrocell uniqueness handles the carrier, routed-variable, and
   internal-crossover families uniformly and separates the three local
   coordinate tables.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATNoncarrierVariableClausePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATNoncarrierVariableClausePositions.lean)
+  proves that retained variable positions avoid every non-carrier clause
+  position.  Fixed local-coordinate tables settle the direct cases; drawing
+  center separation handles the few coordinates reused by different
+  macrocell kinds.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalVertexDistinctness.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalVertexDistinctness.lean)
   extracts local vertex distinctness from each component's planarity
   certificate: clause positions are locally injective, local variables
