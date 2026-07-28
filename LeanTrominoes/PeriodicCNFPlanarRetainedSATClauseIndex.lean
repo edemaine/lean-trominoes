@@ -255,6 +255,39 @@ theorem retainedDrawingPlanarSATClauseMetadata_valid
     crossoverMember, carrierMember, bendMember,
     routedClauseMember] using metadataMember
 
+/-- The retained metadata enumeration is exhaustive: every component/local
+clause witness satisfying `RetainedValid` occurs in the list. -/
+theorem DrawingPlanarSATClauseMetadata.mem_retained_of_retainedValid
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula) :
+    metadata ∈ retainedDrawingPlanarSATClauseMetadata formula := by
+  rcases metadata with ⟨clause, source⟩
+  cases source <;>
+    simp_all [DrawingPlanarSATClauseMetadata.RetainedValid,
+      retainedDrawingPlanarSATClauseMetadata,
+      drawingPlanarSATCrossoverClauseMetadata,
+      drawingPlanarSATCrossoverClauseMetadataFor,
+      retainedDrawingPlanarSATCarrierClauseMetadata,
+      drawingPlanarSATCarrierClauseMetadataFor,
+      drawingPlanarSATBendClauseMetadata,
+      drawingPlanarSATBendClauseMetadataFor,
+      drawingPlanarSATRoutedClauseMetadata,
+      drawingPlanarSATRoutedVariableClauseMetadata,
+      drawingPlanarSATRoutedVariableClauseMetadataFor]
+
+/-- Membership in the retained metadata enumeration is exactly retained
+component validity. -/
+theorem DrawingPlanarSATClauseMetadata.mem_retained_iff_retainedValid
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (metadata : DrawingPlanarSATClauseMetadata Variable) :
+    metadata ∈ retainedDrawingPlanarSATClauseMetadata formula ↔
+      metadata.RetainedValid formula :=
+  ⟨retainedDrawingPlanarSATClauseMetadata_valid formula,
+    metadata.mem_retained_of_retainedValid formula⟩
+
 /-- Looking up a retained formula clause returns metadata carrying that exact
 clause. -/
 theorem retainedDrawingPlanarSATClauseMetadata_lookup
