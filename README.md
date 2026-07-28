@@ -2291,6 +2291,10 @@ The representation choices for this target are:
   embeds each selected retained lens into the final planar-SAT variable type.
   Its indexed formula and full drawing validity are certified together with
   external-side and endpoint-only-contact facts at both carrier boundaries.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverSeparation.lean)
+  matches those external lens boundaries with the internal boundaries of an
+  incident crossover.  The generic boundary separator proves that every
+  genuine selected-lens route avoids every genuine crossover route.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
