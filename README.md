@@ -2299,6 +2299,10 @@ The representation choices for this target are:
   matches either endpoint of a selected retained lens with the exact fanout
   arm and macrocell origin of an incident routed-variable target or
   routed-clause source component.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentSeparation.lean)
+  applies the common-boundary separator at those interfaces.  Genuine routes
+  of a selected retained lens avoid genuine routes of both incident
+  routed-variable arms and routed-clause sources.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
