@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATSourceMembership
 import LeanTrominoes.PeriodicOrthocrossingPlanarSATSourceRouteTranslation
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATVariableGauge
 
 /-!
 # Clause shape under planar-SAT source translation
@@ -123,6 +124,409 @@ theorem DrawingPlanarSATClauseSource.exists_periodTranslatedClauseLiteral
     (source.clauseFormula_arityProfile_periodTranslate formula shift)
     sourceClause source.localClauseIndex sourceClauseMember
     sourceLiteral literalIndex sourceLiteralMember
+
+/-! ## Exact literal and anchor translation -/
+
+/-- Translate every kind of finite planar-SAT variable to the same physical
+period occurrence. -/
+def PlanarSATVariable.periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (input : PlanarSATVariable Variable) (shift : Cell) :
+    PlanarSATVariable Variable :=
+  match input with
+  | .inl node =>
+      .inl (node.periodTranslate
+        (PeriodicCNF.incidenceGraph formula) shift)
+  | .inr (crossing, internal) =>
+      .inr
+        (crossing.periodTranslate
+          (PeriodicCNF.incidenceGraph formula) shift, internal)
+
+@[simp]
+theorem CNFRouteOccurrence.sourceTerminal_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) (shift : Cell) :
+    (occurrence.periodTranslate shift).sourceTerminal formula =
+      (occurrence.sourceTerminal formula).periodTranslate shift := by
+  rfl
+
+@[simp]
+theorem CNFRouteOccurrence.incidence_periodTranslate
+    {Variable : Type*}
+    (occurrence : CNFRouteOccurrence Variable) (shift : Cell) :
+    (occurrence.periodTranslate shift).incidence =
+      occurrence.incidence := by
+  rfl
+
+@[simp]
+theorem RouteBend.equalityLink_first_periodTranslate
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (routeBend : RouteBend) (shift : Cell) :
+    ((routeBend.periodTranslate shift).equalityLink graph).first =
+      (routeBend.equalityLink graph).first.periodTranslate
+        graph shift := by
+  rfl
+
+@[simp]
+theorem RouteBend.equalityLink_second_periodTranslate
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (routeBend : RouteBend) (shift : Cell) :
+    ((routeBend.periodTranslate shift).equalityLink graph).second =
+      (routeBend.equalityLink graph).second.periodTranslate
+        graph shift := by
+  rfl
+
+@[simp]
+theorem PlanarSATVariable.periodTranslate_planarSATCoreVariableMap
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (input :
+      Sum CarrierNode (CrossingRecord × CrossoverInternal))
+    (shift : Cell) :
+    (planarSATCoreVariableMap input).periodTranslate
+        formula shift =
+      planarSATCoreVariableMap
+        (match input with
+        | .inl node =>
+            .inl (node.periodTranslate
+              (PeriodicCNF.incidenceGraph formula) shift)
+        | .inr (crossing, internal) =>
+            .inr
+              (crossing.periodTranslate
+                (PeriodicCNF.incidenceGraph formula) shift,
+                internal)) := by
+  rcases input with node | ⟨crossing, internal⟩
+  · rfl
+  · rfl
+
+@[simp]
+theorem PlanarSATVariable.periodTranslate_planarSATExternalVariableMap
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (node : PlanarSATNode Variable)
+    (shift : Cell) :
+    (planarSATExternalVariableMap node).periodTranslate
+        formula shift =
+      planarSATExternalVariableMap
+        (node.periodTranslate
+          (PeriodicCNF.incidenceGraph formula) shift) := by
+  rfl
+
+@[simp]
+theorem PlanarSATVariable.periodTranslate_scopedCrossoverVariableMap
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (crossing : CrossingRecord)
+    (input : CrossoverVariable)
+    (shift : Cell) :
+    (planarSATCoreVariableMap
+      (scopedCrossoverVariableMap crossing
+        (carrierNodeCrossingPorts crossing) input)).periodTranslate
+          formula shift =
+      planarSATCoreVariableMap
+        (scopedCrossoverVariableMap
+          (crossing.periodTranslate
+            (PeriodicCNF.incidenceGraph formula) shift)
+          (carrierNodeCrossingPorts
+            (crossing.periodTranslate
+              (PeriodicCNF.incidenceGraph formula) shift))
+          input) := by
+  cases input <;>
+    simp [PlanarSATVariable.periodTranslate,
+      planarSATCoreVariableMap,
+      scopedCrossoverVariableMap,
+      carrierNodeCrossingPorts,
+      PlanarSATNode.periodTranslate,
+      CarrierNode.periodTranslate,
+      CrossingBoundary.periodTranslate]
+
+@[simp]
+theorem scopedCrossoverVariableMap_periodTranslate
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (crossing : CrossingRecord)
+    (input : CrossoverVariable)
+    (shift : Cell) :
+    scopedCrossoverVariableMap
+        (crossing.periodTranslate graph shift)
+        (carrierNodeCrossingPorts
+          (crossing.periodTranslate graph shift))
+        input =
+      (match
+        scopedCrossoverVariableMap crossing
+          (carrierNodeCrossingPorts crossing) input with
+      | .inl node =>
+          .inl (node.periodTranslate graph shift)
+      | .inr (sourceCrossing, internal) =>
+          .inr
+            (sourceCrossing.periodTranslate graph shift,
+              internal)) := by
+  cases input <;>
+    simp [scopedCrossoverVariableMap,
+      carrierNodeCrossingPorts,
+      CarrierNode.periodTranslate,
+      CrossingBoundary.periodTranslate]
+
+/-- Period translation acts pointwise on the variables of every clause in a
+source formula, without changing the clause presentation order. -/
+theorem
+    DrawingPlanarSATClauseSource.clauseFormula_literals_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (shift : Cell) :
+    ((source.periodTranslate formula shift).clauseFormula
+      formula).map EmbeddedClause.literals =
+      (source.clauseFormula formula).map fun clause =>
+        clause.literals.map fun literal =>
+          (literal.1.periodTranslate formula shift,
+            literal.2) := by
+  cases source <;>
+    simp [DrawingPlanarSATClauseSource.periodTranslate,
+      DrawingPlanarSATClauseSource.clauseFormula,
+      drawingPlanarSATCrossoverFormulaAt,
+      drawingPlanarSATCarrierFormulaAt,
+      drawingPlanarSATBendFormulaAt,
+      drawingPlanarSATRoutedVariableFormulaAt,
+      scopedCrossoverInstance, instantiateFormula,
+      crossoverFormula,
+      equalityInstance, routedClauseAt,
+      clauseRouteOccurrencesAt_periodTranslate,
+      EmbeddedClause.rename, EmbeddedClause.place,
+      EmbeddedClause.map, List.map_map, Function.comp_def,
+      PlanarSATNode.periodTranslate,
+      planarSATNodeLinkPeriodTranslate,
+      CarrierNode.periodTranslate]
+
+/-- Clauses at one unchanged local index have exactly pointwise translated
+literal lists. -/
+theorem DrawingPlanarSATClauseSource.clauseLiterals_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (shift : Cell)
+    (sourceClause targetClause :
+      EmbeddedClause (PlanarSATVariable Variable))
+    (sourceMember :
+      (sourceClause, source.localClauseIndex) ∈
+        (source.clauseFormula formula).zipIdx)
+    (targetMember :
+      (targetClause,
+          (source.periodTranslate formula shift).localClauseIndex) ∈
+        ((source.periodTranslate formula shift).clauseFormula
+          formula).zipIdx) :
+    targetClause.literals =
+      sourceClause.literals.map fun literal =>
+        (literal.1.periodTranslate formula shift,
+          literal.2) := by
+  have sourceLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp sourceMember
+  have targetLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp targetMember
+  rw [DrawingPlanarSATClauseSource.localClauseIndex_periodTranslate]
+    at targetLookup
+  have formulaEq :=
+    source.clauseFormula_literals_periodTranslate formula shift
+  have lookupEq :=
+    congrArg
+      (fun clauses => clauses[source.localClauseIndex]?)
+      formulaEq
+  simp only [List.getElem?_map, sourceLookup, targetLookup,
+    Option.map_some] at lookupEq
+  exact Option.some.inj lookupEq
+
+/-- Periodic normalization preserves the variable prototype and adds the
+physical source shift to its offset. -/
+theorem normalizePlanarSATVariable_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (input : PlanarSATVariable Variable)
+    (shift : Cell) :
+    normalizePlanarSATVariable formula
+        (input.periodTranslate formula shift) =
+      ((normalizePlanarSATVariable formula input).1,
+        Cell.add
+          (normalizePlanarSATVariable formula input).2 shift) := by
+  rcases input with node | ⟨crossing, internal⟩
+  · cases node with
+    | carrier carrier =>
+        cases carrier with
+        | boundary boundary =>
+            change
+              (PeriodicPlanarSATVariable.boundary
+                  ((boundary.periodTranslate
+                    formula.incidenceGraph shift).periodNormalize
+                      formula.incidenceGraph),
+                crossingPeriodShift formula.incidenceGraph
+                  (boundary.crossing.periodTranslate
+                    formula.incidenceGraph shift)) =
+              (PeriodicPlanarSATVariable.boundary
+                  (boundary.periodNormalize
+                    formula.incidenceGraph),
+                Cell.add
+                  (crossingPeriodShift
+                    formula.incidenceGraph boundary.crossing)
+                  shift)
+            rw [CrossingBoundary.periodNormalize_periodTranslate,
+              crossingPeriodShift_periodTranslate]
+        | terminal terminal =>
+            rcases terminal with
+              ⟨indexed, translate, endpoint⟩
+            rfl
+    | atom site =>
+        rcases site with ⟨atom, translate⟩
+        rfl
+  · simp [PlanarSATVariable.periodTranslate,
+      normalizePlanarSATVariable,
+      CrossingRecord.periodNormalize_periodTranslate,
+      crossingPeriodShift_periodTranslate]
+
+/-- Canonically gauged periodic literal associated with one finite planar-SAT
+literal. -/
+def gaugedPeriodicPlanarSATLiteral
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (literal : PlanarSATVariable Variable × Bool) :
+    PeriodicLiteral
+      (WrappedPeriodicPlanarSATVariable Variable) :=
+  (wrapPeriodicPlanarSATLiteral
+    (periodicizePlanarSATLiteral formula literal)).variableGauge
+      (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+
+/-- Canonical variable gauging commutes with source translation: the atom and
+truth value stay fixed, while the literal offset gains the common shift. -/
+theorem gaugedPeriodicPlanarSATLiteral_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (literal : PlanarSATVariable Variable × Bool)
+    (shift : Cell) :
+    gaugedPeriodicPlanarSATLiteral formula
+        (literal.1.periodTranslate formula shift,
+          literal.2) =
+      let source :=
+        gaugedPeriodicPlanarSATLiteral formula literal
+      ⟨source.atom, Cell.add source.offset shift,
+        source.value⟩ := by
+  rcases literal with ⟨input, value⟩
+  simp [gaugedPeriodicPlanarSATLiteral,
+    periodicizePlanarSATLiteral,
+    wrapPeriodicPlanarSATLiteral,
+    PeriodicLiteral.variableGauge,
+    normalizePlanarSATVariable_periodTranslate]
+  rcases normalizePlanarSATVariable formula input with
+    ⟨atom, ⟨offsetX, offsetY⟩⟩
+  rcases shift with ⟨shiftX, shiftY⟩
+  rcases
+    retainedDrawingWrappedPeriodicPlanarSATVariableGauge
+      formula ⟨atom⟩ with
+    ⟨gaugeX, gaugeY⟩
+  simp [Cell.add]
+  constructor <;> ring
+
+/-- Canonically gauged periodic clause associated with one finite planar-SAT
+clause. -/
+def gaugedPeriodicPlanarSATClause
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clause : EmbeddedClause (PlanarSATVariable Variable)) :
+    PeriodicClause
+      (WrappedPeriodicPlanarSATVariable Variable) :=
+  PeriodicClause.variableGauge
+    (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+    (wrapPeriodicPlanarSATClause
+      (periodicizePlanarSATClause formula clause))
+
+/-- At an unchanged local source index, the canonically gauged target clause
+is the pointwise period translate of the source clause. -/
+theorem DrawingPlanarSATClauseSource.gaugedClause_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (shift : Cell)
+    (sourceClause targetClause :
+      EmbeddedClause (PlanarSATVariable Variable))
+    (sourceMember :
+      (sourceClause, source.localClauseIndex) ∈
+        (source.clauseFormula formula).zipIdx)
+    (targetMember :
+      (targetClause,
+          (source.periodTranslate formula shift).localClauseIndex) ∈
+        ((source.periodTranslate formula shift).clauseFormula
+          formula).zipIdx) :
+    gaugedPeriodicPlanarSATClause formula targetClause =
+      (gaugedPeriodicPlanarSATClause
+        formula sourceClause).map
+          fun literal =>
+            ⟨literal.atom, Cell.add literal.offset shift,
+              literal.value⟩ := by
+  simp only [gaugedPeriodicPlanarSATClause,
+    periodicizePlanarSATClause,
+    wrapPeriodicPlanarSATClause,
+    PeriodicClause.variableGauge]
+  simp only [List.map_map]
+  rw [source.clauseLiterals_periodTranslate
+    formula shift sourceClause targetClause
+    sourceMember targetMember]
+  simp only [List.map_map]
+  apply List.map_congr_left
+  intro literal literalMember
+  exact gaugedPeriodicPlanarSATLiteral_periodTranslate
+    formula literal shift
+
+/-- Translating every literal of a nonempty periodic clause translates its
+anchor by the same amount. -/
+theorem clauseAnchor_map_periodTranslate
+    {Variable : Type*}
+    (clause : PeriodicClause Variable)
+    (shift : Cell)
+    (nonempty : clause ≠ []) :
+    PeriodicCNF.clauseAnchor
+        (clause.map fun literal =>
+          ⟨literal.atom, Cell.add literal.offset shift,
+            literal.value⟩) =
+      Cell.add (PeriodicCNF.clauseAnchor clause) shift := by
+  cases clause with
+  | nil => exact False.elim (nonempty rfl)
+  | cons first rest =>
+      simp [PeriodicCNF.clauseAnchor]
+
+/-- The canonically gauged clause anchor is equivariant under physical source
+translation. -/
+theorem DrawingPlanarSATClauseSource.clauseAnchor_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (shift : Cell)
+    (sourceClause targetClause :
+      EmbeddedClause (PlanarSATVariable Variable))
+    (sourceMember :
+      (sourceClause, source.localClauseIndex) ∈
+        (source.clauseFormula formula).zipIdx)
+    (targetMember :
+      (targetClause,
+          (source.periodTranslate formula shift).localClauseIndex) ∈
+        ((source.periodTranslate formula shift).clauseFormula
+          formula).zipIdx)
+    (nonempty : sourceClause.literals ≠ []) :
+    PeriodicCNF.clauseAnchor
+        (gaugedPeriodicPlanarSATClause formula targetClause) =
+      Cell.add
+        (PeriodicCNF.clauseAnchor
+          (gaugedPeriodicPlanarSATClause
+            formula sourceClause))
+        shift := by
+  rw [source.gaugedClause_periodTranslate
+    formula shift sourceClause targetClause
+    sourceMember targetMember]
+  apply clauseAnchor_map_periodTranslate
+  simpa [gaugedPeriodicPlanarSATClause,
+    periodicizePlanarSATClause,
+    wrapPeriodicPlanarSATClause,
+    PeriodicClause.variableGauge] using nonempty
 
 end PeriodicOrthocrossing
 end LeanTrominoes

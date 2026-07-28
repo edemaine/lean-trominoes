@@ -2274,10 +2274,12 @@ The representation choices for this target are:
   conjunction exactly characterizes the retained metadata enumeration and
   yields a concrete global lookup for any such local source witness.
 - [`LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceClauseTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceClauseTranslation.lean)
-  proves that source period translation preserves the ordered clause-arity
-  profile of every gadget family.  Consequently, any valid local clause and
-  literal indices select counterparts at the same indices in the translated
-  source.
+  proves that source period translation preserves both the ordered
+  clause-arity profile and the exact translated literal list of every gadget
+  family.  Consequently, valid clause and literal indices select same-index
+  counterparts; after periodic normalization and canonical variable gauging,
+  every literal offset—and hence every nonempty clause anchor—gains exactly
+  the source translation.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean)
   defines common period translation for crossing records, boundaries,
   terminals, carrier nodes, and equality links.  Crossing normalization is
