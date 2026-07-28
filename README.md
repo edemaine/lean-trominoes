@@ -2508,6 +2508,11 @@ The representation choices for this target are:
   crossover, bend, routed-clause, or routed-variable component to its
   coordinatewise period residue.  All normalized non-carrier route points
   therefore lie in the closed canonical square.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierRouteBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierRouteBounds.lean)
+  proves that consecutive retained carrier nodes are separated by less than
+  one physical period along their common axis.  Together with the equality
+  lens's fixed transverse width, this places every clause-anchor-normalized
+  carrier route point in the open neighboring-period square `(-P, 2P)²`.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
