@@ -2568,6 +2568,11 @@ The representation choices for this target are:
   nodes, equality links, and source components.  It proves exact translation
   laws for drawing-grid centers and refined macrocell origins, providing the
   common language needed to reindex finite representatives.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceRouteTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceRouteTranslation.lean)
+  proves the action is geometric: at unchanged local clause and literal
+  indices, every crossover, carrier lens, bend corner, routed-clause ray, and
+  routed-variable arm is exactly the pointwise refined-period translate of
+  its original local route.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCommonShiftRepresentatives.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCommonShiftRepresentatives.lean)
   isolates the remaining orbit interface.  If two final occurrences are
   reindexed as distinct genuine retained-drawing segments at one common
