@@ -2345,6 +2345,12 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierGeometry.lean)
   reconstructs the exact horizontal-first retained crossing record forced by
   any overlap of a horizontal and vertical selected lens rectangle.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPerpendicularCarrierSeparation.lean)
+  observes that such an overlap would force the selected horizontal link to
+  join the crossover's left and right ports, exactly the internal pair omitted
+  from every carrier chain.  Thus perpendicular lens rectangles are strictly
+  separated; together with the parallel and same-carrier cases, all genuine
+  routes of distinct selected carrier lenses avoid one another.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
