@@ -2283,6 +2283,10 @@ The representation choices for this target are:
   crossover boundary leaves only through its right or bottom port, one ending
   there enters only through its left or top port, and a terminal occurs at the
   lower or upper end dictated by its segment endpoint.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPortGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPortGeometry.lean)
+  upgrades those orientations to exact component interfaces.  Every selected
+  lens exposes the expected compass port at a crossover or segment terminal,
+  and reconstructs the same macrocell origin as that adjacent component.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
