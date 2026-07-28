@@ -178,6 +178,20 @@ theorem variableGauge_satisfiable_iff
         (variableGauge_literal_holds_iff
           gauge assignment translate literal).mpr literalHolds⟩
 
+/-- Variable gauging changes only occurrence offsets, not the ordered list
+of variable prototypes appearing in a periodic presentation. -/
+@[simp]
+theorem variableOccurrences_variableGauge
+    {Variable : Type*}
+    (source : PeriodicCNF Variable)
+    (gauge : Variable → Cell) :
+    (source.variableGauge gauge).variableOccurrences =
+      source.variableOccurrences := by
+  simp [variableGauge, variableOccurrences,
+    PeriodicClause.variableGauge,
+    PeriodicLiteral.variableGauge,
+    List.flatMap_map, List.map_map, Function.comp_def]
+
 end PeriodicCNF
 
 namespace PositionedPeriodicCNF

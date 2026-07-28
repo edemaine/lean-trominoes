@@ -2457,6 +2457,12 @@ The representation choices for this target are:
   endpoints, the final graph-level route certificate is reassembled, and
   the gauged, wrapped, normalized, deduplicated source remains
   equisatisfiable with the retained periodic formula.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedVariablePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedVariablePositions.lean)
+  proves the variable geometry of that quotient.  Strictly interior
+  macrocell coordinates put every gauged variable in the open fundamental
+  square; a neighboring finite lift of each terminal lets retained finite
+  injectivity prove that the final variable-position prefix is
+  duplicate-free.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
