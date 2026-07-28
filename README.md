@@ -2153,6 +2153,12 @@ The representation choices for this target are:
   separation.  Thus every pair of distinct nonperpendicular carrier lenses
   has separated selected routes, isolating perpendicular carriers as the
   exact remaining carrier-pair obligation.
+- [`LeanTrominoes/PeriodicOrthocrossingPerpendicularCarrierGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingPerpendicularCarrierGeometry.lean)
+  reconstructs source geometry from any putative overlap of a horizontal and
+  a vertical retained lens.  The links have different occurrence keys, their
+  narrow physical rectangles force the translated source intervals to cross
+  properly, and the resulting exact indexed-segment/translation record is
+  proved to belong to the retained crossing halo.
 - [`LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingBendCornerGeometry.lean)
   adapts the fixed corner-equality template to one syntactic route bend.
   Genuine incoming and outgoing segments determine their compass ports; a
