@@ -35,6 +35,21 @@ theorem add_left_injective (offset : Cell) : Function.Injective (add offset) := 
   simp only [add, Prod.mk.injEq] at equality ⊢
   exact ⟨Int.add_left_cancel equality.1, Int.add_left_cancel equality.2⟩
 
+/-- Subtracting a fixed cell is injective. -/
+theorem sub_right_injective (offset : Cell) :
+    Function.Injective (fun cell => sub cell offset) := by
+  rintro ⟨x₁, y₁⟩ ⟨x₂, y₂⟩ equality
+  simp only [sub, Prod.mk.injEq] at equality ⊢
+  constructor
+  · calc
+      x₁ = x₁ - offset.1 + offset.1 := (Int.sub_add_cancel _ _).symm
+      _ = x₂ - offset.1 + offset.1 := congrArg (fun value => value + offset.1) equality.1
+      _ = x₂ := Int.sub_add_cancel _ _
+  · calc
+      y₁ = y₁ - offset.2 + offset.2 := (Int.sub_add_cancel _ _).symm
+      _ = y₂ - offset.2 + offset.2 := congrArg (fun value => value + offset.2) equality.2
+      _ = y₂ := Int.sub_add_cancel _ _
+
 end Cell
 
 /-- A polyomino is a finite set of integer-lattice cells. Connectivity is not

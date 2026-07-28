@@ -129,8 +129,18 @@ structure FinalGaugedRouteOccurrenceWitness
     (formula : PeriodicCNF Variable)
     (clauseIndex literalIndex : Nat)
     (shift : Cell) where
+  finalClause :
+    PositionedPeriodicClause
+      (WrappedPeriodicPlanarSATVariable Variable)
+  finalClauseLookup :
+    (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula).clauses[clauseIndex]? = some finalClause
   metadata : DrawingPlanarSATClauseMetadata Variable
   metadataIndex : Nat
+  representativeIndexEq :
+    metadataIndex =
+      (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).representativeClauseIndex finalClause.literals
   metadataLookup :
     (retainedDrawingPlanarSATClauseMetadata
       formula)[metadataIndex]? = some metadata
@@ -311,8 +321,11 @@ theorem
       incidence, metadataPhysicalIncidence,
       EmbeddedCNFIncidenceDrawing.routeAt]
   refine ⟨{
+    finalClause := retainedClause
+    finalClauseLookup := retainedClauseLookup
     metadata := metadata
     metadataIndex := metadataIndex
+    representativeIndexEq := rfl
     metadataLookup := metadataLookup'
     literal := literal
     literalMember := literalMember

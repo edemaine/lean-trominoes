@@ -560,6 +560,11 @@ The representation choices for this target are:
   vertex placement furthermore separate its endpoints, so its polyline has
   at least one segment.  This is the splice interface used by the planar 3DM
   gadget assembly.
+  [`LeanTrominoes/PositionedPeriodicCNFTaggedRouteLookup.lean`](LeanTrominoes/PositionedPeriodicCNFTaggedRouteLookup.lean)
+  additionally recovers the metadata-rich incidence, positioned clause, and
+  positioned literal belonging to a route tagged by its global flat-list
+  index.  This preserves the occurrence identity needed when normalized
+  periodic routes are transferred back to a finite drawing.
   [`LeanTrominoes/PositionedPeriodicCNFOrthogonalIncidenceRoutes.lean`](LeanTrominoes/PositionedPeriodicCNFOrthogonalIncidenceRoutes.lean)
   supplies a total canonical Manhattan detour for every positioned literal
   incidence.  Fresh detour coordinates make all four segments nondegenerate
@@ -2531,8 +2536,10 @@ The representation choices for this target are:
   anchor-adjusted lattice translation.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSegmentOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSegmentOccurrences.lean)
   refines the quotient-to-finite bridge to indexed segment occurrences,
-  preserving the within-route segment index and proving exact equality of
-  the translated final and physical segments.
+  preserving both the global incidence index and the within-route segment
+  index and proving exact equality of the translated final and physical
+  segments.  Its anchor-adjusted physical occurrence key is equal exactly
+  when the original periodic segment-occurrence key is equal.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
