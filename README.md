@@ -2234,6 +2234,11 @@ The representation choices for this target are:
   terminals, carrier nodes, and equality links.  Crossing normalization is
   invariant under this action, carrier-node offsets add the common shift, and
   normalized equality links are unchanged.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierRepresentativeTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierRepresentativeTranslation.lean)
+  translates a physical carrier link by the inverse of its owner shift.  The
+  result has zero representative shift and the same normalized equality link;
+  its selected boundary is exactly the canonical normalized boundary (or its
+  selected direct terminal has translation zero).
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
