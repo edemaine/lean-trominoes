@@ -2248,6 +2248,11 @@ The representation choices for this target are:
   translation: positions move by one macro-period vector, while axis, relative
   order, crossover-site identity, and positioned link construction are
   preserved.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierRetentionBounds.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierRetentionBounds.lean)
+  bounds every point on a neighboring segment occurrence between drawing
+  periods `-2` and `3`.  Its extracted period shift therefore lies in the
+  retained `5 × 5` window, and any such physical crossing can be reconstructed
+  exactly from its canonical normalization and retained shift.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
