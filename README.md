@@ -2479,6 +2479,11 @@ The representation choices for this target are:
   Equal residues recover its axis, implication index, and first carrier-node
   position modulo the drawing period; exact first nodes uniquely determine
   their raw retained links.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierClauseOrbits.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierClauseOrbits.lean)
+  proves the corresponding carrier-clause orbit theorem.  A translation
+  covariance lemma for raw retained chains moves terminal-start links to
+  translation zero, where adjacency identifies the complete normalized link;
+  equal residues therefore yield the same gauged periodic clause.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
