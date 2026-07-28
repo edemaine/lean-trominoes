@@ -2503,6 +2503,11 @@ The representation choices for this target are:
   packages the final vertex bounds with the transported exact route
   endpoints.  The resulting gauged, anchor-normalized, clause-deduplicated
   incidence drawing is compatible with its periodic incidence graph.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierRouteBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierRouteBounds.lean)
+  proves that clause-anchor normalization reduces every route point in a
+  crossover, bend, routed-clause, or routed-variable component to its
+  coordinatewise period residue.  All normalized non-carrier route points
+  therefore lie in the closed canonical square.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
