@@ -2239,6 +2239,11 @@ The representation choices for this target are:
   routed-variable components unchanged.  It proves the exact componentwise
   satisfaction interface and extends compatible route and atom assignments
   through the retained core.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedSATClauseIndex.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedSATClauseIndex.lean)
+  indexes the retained formula by the same five geometric component kinds,
+  with carrier validity changed to selected retained-link membership.
+  Projecting its metadata recovers the retained clause list exactly, and
+  every genuine clause lookup returns valid local-source data.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean)
   defines common period translation for crossing records, boundaries,
   terminals, carrier nodes, and equality links.  Crossing normalization is
