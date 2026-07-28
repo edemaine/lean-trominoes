@@ -2253,6 +2253,11 @@ The representation choices for this target are:
   periods `-2` and `3`.  Its extracted period shift therefore lies in the
   retained `5 × 5` window, and any such physical crossing can be reconstructed
   exactly from its canonical normalization and retained shift.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedBoundaryGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedBoundaryGeometry.lean)
+  lifts canonical crossing soundness across the period action.  Every retained
+  boundary names a listed indexed segment and an interior point of its exact
+  physical occurrence, and both properties persist under any further common
+  translation.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
