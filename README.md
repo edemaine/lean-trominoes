@@ -2321,6 +2321,11 @@ The representation choices for this target are:
   macrocell onto the carrier's exact source row or column and into its axial
   interval, supplying the common proximity interface for the remaining
   carrier-to-component cases.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverProximity.lean)
+  proves the matched-carrier half of crossover proximity.  If a selected
+  horizontal or vertical link uses the corresponding source occurrence of a
+  retained crossing, overlap with that crossing's macrocell forces one link
+  endpoint to be one of the crossing's two carrier ports.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean)
   proves common-axis agreement for retained nodes and transfers strict
   consecutive-pair order to the selected family: two distinct links with one
