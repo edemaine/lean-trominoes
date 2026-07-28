@@ -2647,6 +2647,13 @@ The representation choices for this target are:
   source by the physical-shift difference identifies the second retained
   component, orbit necessity and reindexing injectivity immediately transfer
   finite continuous separation to the periodic pair.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
+  extends macrocell-center uniqueness beyond the finite retained window.
+  An arbitrary period translate of an enumerated crossing, route bend,
+  routed-clause site, or routed-variable site is identified by its physical
+  center against a retained occurrence.  Crossing normalization and
+  translation-erased bend geometry avoid any assumption that the translated
+  occurrence itself belongs to the bounded halo.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
