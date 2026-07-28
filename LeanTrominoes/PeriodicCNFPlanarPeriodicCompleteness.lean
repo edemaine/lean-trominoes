@@ -87,6 +87,30 @@ theorem incidenceRouteAssignment_translated
               incidence.edge.offset)
       rw [Cell.add_assoc]
 
+/-- Translating a normalized crossover boundary by its extracted period
+shift recovers the same route occurrence as the original halo boundary. -/
+theorem translateRouteOccurrenceKey_periodNormalize_boundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (translate : Cell) (boundary : CrossingBoundary) :
+    translateRouteOccurrenceKey
+        (Cell.add translate
+          (crossingPeriodShift graph boundary.crossing))
+        (CarrierNode.boundary
+          (boundary.periodNormalize graph)).routeKey =
+      translateRouteOccurrenceKey translate
+        (CarrierNode.boundary boundary).routeKey := by
+  rcases boundary with ⟨crossing, side⟩
+  cases side <;>
+    apply Prod.ext <;>
+    simp [translateRouteOccurrenceKey,
+      CarrierNode.routeKey, CarrierNode.carrierKey,
+      segmentCarrierRouteKey, CrossingBoundary.periodNormalize,
+      CrossingBoundary.carrierKey,
+      PeriodicGridDrawing.SegmentOccurrenceKey,
+      CrossingRecord.periodNormalize, crossingPeriodShift,
+      Cell.add, Cell.sub]
+
 /-- At every translate, finite routed completeness provides a satisfying
 assignment whose external values are the shifted source's route and atom
 values. -/
@@ -166,13 +190,15 @@ theorem translatedDrawingPlanarSATExtension_external
     (exists_translatedDrawingPlanarSATFormula_holds
       formula assignment sourceHolds translate)).2 node
 
-/-- Assemble global route and atom values with one independently chosen
-crossover-internal extension in every translated block. -/
+/-- Assemble global route and atom values with the canonical local crossover
+extension at every physical crossing.  Because the internal truth-table
+choice depends only on the two crossing signals, halo copies identified by
+periodic normalization receive identical values. -/
 noncomputable def periodicPlanarSATAssignment
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (assignment : Variable → Cell → Bool)
-    (sourceHolds : formula.Satisfies assignment) :
+    (_sourceHolds : formula.Satisfies assignment) :
     PeriodicPlanarSATVariable Variable → Cell → Bool
   | .terminal indexed _endpoint, cell =>
       incidenceRouteAssignment formula assignment
@@ -183,76 +209,192 @@ noncomputable def periodicPlanarSATAssignment
           (CarrierNode.boundary boundary).routeKey)
   | .atom atom, cell =>
       assignment atom cell
-  | .crossoverInternal internal, cell =>
-      translatedDrawingPlanarSATExtension
-        formula assignment sourceHolds cell (.inr internal)
+  | .crossoverInternal (crossing, internal), cell =>
+      canonicalCrossoverAssignment
+        (incidenceRouteAssignment formula assignment
+          (translateRouteOccurrenceKey cell
+            (CarrierNode.boundary
+              ⟨crossing, .left⟩).routeKey))
+        (incidenceRouteAssignment formula assignment
+          (translateRouteOccurrenceKey cell
+            (CarrierNode.boundary
+              ⟨crossing, .top⟩).routeKey))
+        internal.toVariable
 
-/-- At each translate, the finite assignment induced by the assembled
-periodic assignment is exactly the chosen satisfying finite extension. -/
-theorem planarSATFiniteAssignmentAt_periodicPlanarSATAssignment
+/-- At each translate, the induced assignment agrees with the shifted source
+assignment on every external carrier and atom node. -/
+theorem planarSATFiniteAssignmentAt_periodicPlanarSATAssignment_external
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (assignment : Variable → Cell → Bool)
+    (sourceHolds : formula.Satisfies assignment)
+    (translate : Cell) (node : PlanarSATNode Variable) :
+    planarSATFiniteAssignmentAt
+        formula
+        (periodicPlanarSATAssignment
+          formula assignment sourceHolds)
+        translate (.inl node) =
+      routedPlanarSATExternalAssignment
+        (incidenceRouteAssignment formula
+          (translatedSourceAssignment assignment translate))
+        (incidenceAtomAssignment
+          (translatedSourceAssignment assignment translate))
+        node := by
+  cases node with
+  | atom site =>
+      rcases site with ⟨atom, cell⟩
+      rfl
+  | carrier carrierNode =>
+      cases carrierNode with
+      | terminal terminal =>
+          change
+            incidenceRouteAssignment formula assignment
+                (terminal.indexed.routeIndex,
+                  Cell.add translate terminal.translate) =
+              incidenceRouteAssignment formula
+                (translatedSourceAssignment assignment translate)
+                terminal.routeKey
+          exact
+            (incidenceRouteAssignment_translated
+              formula assignment translate terminal.routeKey).symm
+      | boundary boundary =>
+          change
+            incidenceRouteAssignment formula assignment
+                (translateRouteOccurrenceKey
+                  (Cell.add translate
+                    (crossingPeriodShift
+                      (PeriodicCNF.incidenceGraph formula)
+                      boundary.crossing))
+                  (CarrierNode.boundary
+                    (boundary.periodNormalize
+                      (PeriodicCNF.incidenceGraph formula))).routeKey) =
+              incidenceRouteAssignment formula
+                (translatedSourceAssignment assignment translate)
+                (CarrierNode.boundary boundary).routeKey
+          rw [translateRouteOccurrenceKey_periodNormalize_boundary]
+          exact
+            (incidenceRouteAssignment_translated
+              formula assignment translate
+              (CarrierNode.boundary boundary).routeKey).symm
+
+/-- The induced finite assignment restricts on the route core to the
+canonical complete-core assignment for the shifted route signals. -/
+theorem planarSATFiniteAssignmentAt_periodicPlanarSATAssignment_core
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (assignment : Variable → Cell → Bool)
     (sourceHolds : formula.Satisfies assignment)
     (translate : Cell) :
-    planarSATFiniteAssignmentAt
+    planarSATFiniteAssignmentAt formula
+          (periodicPlanarSATAssignment
+            formula assignment sourceHolds)
+          translate ∘
+        planarSATCoreVariableMap =
+      canonicalRoutePlanarCoreAssignment
+        (incidenceRouteAssignment formula
+          (translatedSourceAssignment assignment translate)) := by
+  funext input
+  cases input with
+  | inl carrier =>
+      exact
+        planarSATFiniteAssignmentAt_periodicPlanarSATAssignment_external
+          formula assignment sourceHolds translate (.carrier carrier)
+  | inr internal =>
+      rcases internal with ⟨crossing, internal⟩
+      change
+        canonicalCrossoverAssignment
+            (incidenceRouteAssignment formula assignment
+              (translateRouteOccurrenceKey
+                (Cell.add translate
+                  (crossingPeriodShift
+                    (PeriodicCNF.incidenceGraph formula) crossing))
+                (CarrierNode.boundary
+                  ⟨crossing.periodNormalize
+                    (PeriodicCNF.incidenceGraph formula),
+                    .left⟩).routeKey))
+            (incidenceRouteAssignment formula assignment
+              (translateRouteOccurrenceKey
+                (Cell.add translate
+                  (crossingPeriodShift
+                    (PeriodicCNF.incidenceGraph formula) crossing))
+                (CarrierNode.boundary
+                  ⟨crossing.periodNormalize
+                    (PeriodicCNF.incidenceGraph formula),
+                    .top⟩).routeKey))
+            internal.toVariable =
+          canonicalCrossoverAssignment
+            (incidenceRouteAssignment formula
+              (translatedSourceAssignment assignment translate)
+              (CarrierNode.boundary
+                ⟨crossing, .left⟩).routeKey)
+            (incidenceRouteAssignment formula
+              (translatedSourceAssignment assignment translate)
+              (CarrierNode.boundary
+                ⟨crossing, .top⟩).routeKey)
+            internal.toVariable
+      have leftKey :=
+        translateRouteOccurrenceKey_periodNormalize_boundary
+          (PeriodicCNF.incidenceGraph formula) translate
+          (⟨crossing, .left⟩ : CrossingBoundary)
+      have topKey :=
+        translateRouteOccurrenceKey_periodNormalize_boundary
+          (PeriodicCNF.incidenceGraph formula) translate
+          (⟨crossing, .top⟩ : CrossingBoundary)
+      simp only [CrossingBoundary.periodNormalize] at leftKey topKey
+      rw [leftKey, topKey,
+        incidenceRouteAssignment_translated,
+        incidenceRouteAssignment_translated]
+
+/-- Every finite translated block induced by the assembled periodic
+assignment satisfies the routed planar SAT formula. -/
+theorem planarSATFiniteAssignmentAt_periodicPlanarSATAssignment_holds
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (assignment : Variable → Cell → Bool)
+    (sourceHolds : formula.Satisfies assignment)
+    (translate : Cell) :
+    FormulaHolds
+      (planarSATFiniteAssignmentAt formula
         (periodicPlanarSATAssignment
           formula assignment sourceHolds)
-        translate =
-      translatedDrawingPlanarSATExtension
-        formula assignment sourceHolds translate := by
-  funext inputVariable
-  cases inputVariable with
-  | inr internal =>
-      simp [planarSATFiniteAssignmentAt,
-        normalizePlanarSATVariable,
-        periodicPlanarSATAssignment, Cell.add]
-  | inl node =>
-      cases node with
-      | atom site =>
-          rcases site with ⟨atom, cell⟩
-          rw [translatedDrawingPlanarSATExtension_external
-            formula assignment sourceHolds translate
-            (.atom (atom, cell))]
-          rfl
-      | carrier carrierNode =>
-          cases carrierNode with
-          | terminal terminal =>
-              rw [translatedDrawingPlanarSATExtension_external
-                formula assignment sourceHolds translate
-                (.carrier (.terminal terminal))]
-              change
-                incidenceRouteAssignment formula assignment
-                    (terminal.indexed.routeIndex,
-                      Cell.add translate terminal.translate) =
-                  incidenceRouteAssignment formula
-                    (translatedSourceAssignment
-                      assignment translate)
-                    terminal.routeKey
-              exact
-                (incidenceRouteAssignment_translated
-                  formula assignment translate
-                  terminal.routeKey).symm
-          | boundary boundary =>
-              rw [translatedDrawingPlanarSATExtension_external
-                formula assignment sourceHolds translate
-                (.carrier (.boundary boundary))]
-              change
-                incidenceRouteAssignment formula assignment
-                    (translateRouteOccurrenceKey
-                      (Cell.add translate (0, 0))
-                      (CarrierNode.boundary boundary).routeKey) =
-                  incidenceRouteAssignment formula
-                    (translatedSourceAssignment
-                      assignment translate)
-                    (CarrierNode.boundary boundary).routeKey
-              rw [show Cell.add translate (0, 0) = translate by
-                rcases translate with ⟨x, y⟩
-                simp [Cell.add]]
-              exact
-                (incidenceRouteAssignment_translated
-                  formula assignment translate
-                  (CarrierNode.boundary boundary).routeKey).symm
+        translate)
+      (drawingPlanarSATFormula formula) := by
+  let shifted :=
+    translatedSourceAssignment assignment translate
+  apply
+    (drawingPlanarSATFormula_holds_iff formula
+      (planarSATFiniteAssignmentAt formula
+        (periodicPlanarSATAssignment
+          formula assignment sourceHolds)
+        translate)).mpr
+  have externalRestriction :
+      planarSATFiniteAssignmentAt formula
+            (periodicPlanarSATAssignment
+              formula assignment sourceHolds)
+            translate ∘
+          planarSATExternalVariableMap =
+        routedPlanarSATExternalAssignment
+          (incidenceRouteAssignment formula shifted)
+          (incidenceAtomAssignment shifted) := by
+    funext node
+    exact
+      planarSATFiniteAssignmentAt_periodicPlanarSATAssignment_external
+        formula assignment sourceHolds translate node
+  refine ⟨?_, ?_, ?_⟩
+  · rw [
+      planarSATFiniteAssignmentAt_periodicPlanarSATAssignment_core
+        formula assignment sourceHolds translate]
+    exact canonicalRoutePlanarCoreAssignment_holds
+      (PeriodicCNF.incidenceGraph formula)
+      (incidenceRouteAssignment formula shifted)
+  · rw [externalRestriction]
+    exact drawingRoutedClauseFormula_holds_incidenceAssignment
+      formula shifted
+      (translatedSourceAssignment_satisfies
+        formula assignment sourceHolds translate)
+  · rw [externalRestriction]
+    exact drawingRoutedVariableFormula_holds_incidenceAssignment
+      formula shifted
 
 /-- Periodic completeness: every satisfying source assignment induces a
 satisfying assignment of the genuine periodic routed planar SAT formula. -/
@@ -270,10 +412,9 @@ theorem drawingPeriodicPlanarSATFormula_satisfies_of_satisfies
       (periodicPlanarSATAssignment
         formula assignment sourceHolds)).mpr
   intro translate
-  rw [planarSATFiniteAssignmentAt_periodicPlanarSATAssignment
-    formula assignment sourceHolds translate]
-  exact translatedDrawingPlanarSATExtension_holds
-    formula assignment sourceHolds translate
+  exact
+    planarSATFiniteAssignmentAt_periodicPlanarSATAssignment_holds
+      formula assignment sourceHolds translate
 
 /-- Satisfiability is preserved by periodic routed planarization. -/
 theorem drawingPeriodicPlanarSATFormula_satisfiable_of_satisfiable

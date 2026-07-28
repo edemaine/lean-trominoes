@@ -74,7 +74,9 @@ theorem periodicize_routedClauseAt
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (site : ClauseRouteSite) :
-    PeriodicEquality.periodicizeClause normalizePlanarSATNode
+    PeriodicEquality.periodicizeClause
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula))
         (routedClauseAt formula site) =
       (((PeriodicCNF.incidencesWithMetadata formula).zipIdx.filter
         fun taggedIncidence =>
@@ -94,7 +96,9 @@ theorem anchorNormalized_routedClauseAt
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (site : ClauseRouteSite) :
-    (PeriodicEquality.periodicizeClause normalizePlanarSATNode
+    (PeriodicEquality.periodicizeClause
+      (normalizePlanarSATNode
+        (PeriodicCNF.incidenceGraph formula))
       (routedClauseAt formula site)).anchorNormalize =
       (((PeriodicCNF.incidencesWithMetadata formula).zipIdx.filter
         fun taggedIncidence =>
@@ -111,7 +115,8 @@ def normalizedRoutedClauseClauses
     List (PeriodicClause (PeriodicPlanarSATVariable Variable)) :=
   ((drawingRoutedClauseFormula formula).map
     (PeriodicEquality.periodicizeClause
-      normalizePlanarSATNode)).map
+      (normalizePlanarSATNode
+        (PeriodicCNF.incidenceGraph formula)))).map
         PeriodicClause.anchorNormalize
 
 /-- Every normalized routed source clause is the zero-offset prototype for
@@ -432,8 +437,8 @@ def normalizedRouteWireAndClauseFormula
         (PeriodicCNF.incidenceGraph formula))).clauses ++
     (deduplicatedNormalizedRoutedClauseFormula formula).clauses⟩
 
-/-- A listed routed source terminal has at most six route-wire occurrences
-and one routed-clause literal, for a sharp total of seven. -/
+/-- A listed routed source terminal has at most thirty-six route-wire
+occurrences and one routed-clause literal. -/
 theorem normalizedRouteWireAndClauseFormula_sourceTerminal_count_le_seven
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
@@ -495,7 +500,9 @@ theorem
     have linkRaw :
         link ∈
           (drawingRoutedVariableLinks formula).map
-            (PeriodicEquality.normalizeLink normalizePlanarSATNode) :=
+            (PeriodicEquality.normalizeLink
+              (normalizePlanarSATNode
+                (PeriodicCNF.incidenceGraph formula))) :=
       List.mem_dedup.mp linkMem
     rcases List.mem_map.mp linkRaw with
       ⟨source, sourceMem, linkEq⟩
@@ -529,7 +536,7 @@ def normalizedExternalPlanarSATFormula
     (deduplicatedNormalizedRoutedVariableFormula formula).clauses⟩
 
 /-- The complete normalized external family uses a routed source terminal at
-most seven times. -/
+most thirty-seven times. -/
 theorem
     normalizedExternalPlanarSATFormula_sourceTerminal_count_le_seven
     {Variable : Type*} [DecidableEq Variable]
@@ -564,7 +571,7 @@ theorem
   omega
 
 /-- The complete normalized external family uses a routed target terminal at
-most eight times. -/
+most thirty-eight times. -/
 theorem
     normalizedExternalPlanarSATFormula_targetTerminal_count_le_eight
     {Variable : Type*} [DecidableEq Variable]

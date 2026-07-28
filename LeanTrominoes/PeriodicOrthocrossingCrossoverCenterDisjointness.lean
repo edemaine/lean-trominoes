@@ -741,17 +741,18 @@ theorem horizontalSegment_translate_not_interiorContains_endpoint
       ((GridSegment.isVertical_translate _ _).mp
         translatedVertical).2 horizontal.1
 
-/-- The reserved port row at height three contains no canonical crossover
-center. -/
-theorem orientedCrossing_point_snd_ne_three
+/-- No periodic copy of the reserved port row at height three contains a
+retained crossover center. -/
+theorem orientedCrossing_point_snd_ne_portRow
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     {crossing : CrossingRecord}
-    (crossingMem : crossing ∈ orientedCrossings graph) :
-    crossing.point.2 ≠ 3 := by
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
+    (translate : Int) :
+    crossing.point.2 ≠
+      3 + (drawing graph).gridSize * translate := by
   intro pointYBase
-  have sound := orientedCrossings_sound graph crossingMem
-  have canonical := sound.2.2.2.2.1
+  have sound := orientedCrossingHalo_sound graph crossingMem
   rcases exists_classifiedSegment_of_drawing_mem sound.1 with
     ⟨taggedRoute, taggedRouteMem,
       taggedClassified, taggedClassifiedMem, firstEq⟩
@@ -782,7 +783,7 @@ theorem orientedCrossing_point_snd_ne_three
           crossing.firstTranslate)).InteriorContains
         crossing.point := by
     simpa [CrossingRecord.firstSegment, firstEq] using
-      canonical.2.2.1
+      sound.2.2.2.2.2.2.2.1
   have pointY :
       crossing.point.2 =
         taggedClassified.1.segment.start.2 +
@@ -814,7 +815,7 @@ theorem orientedCrossing_point_snd_ne_three
           (drawing graph).gridSize := by
     simpa [drawing_gridSize] using laneBounds
   have lanePeriodicEqual :
-      (3 : Int) + (drawing graph).gridSize * 0 =
+      (3 : Int) + (drawing graph).gridSize * translate =
         horizontalLaneBase taggedClassified.1.role +
           (drawing graph).gridSize *
             (horizontalLaneCellShift taggedRoute.1.1
@@ -832,8 +833,19 @@ theorem orientedCrossing_point_snd_ne_three
       horizontalLaneBase, edgeTrack] <;>
     omega
 
-/-- A proper crossover cannot occur at either endpoint of any translated
-horizontal classified route segment. -/
+/-- The fundamental-copy port row is the zero-translation special case. -/
+theorem orientedCrossing_point_snd_ne_three
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossingHalo graph) :
+    crossing.point.2 ≠ 3 := by
+  simpa using
+    orientedCrossing_point_snd_ne_portRow
+      (graph := graph) crossingMem 0
+
+/-- A retained proper crossover cannot occur at either endpoint of any
+translated horizontal classified route segment. -/
 theorem orientedCrossing_point_ne_horizontal_classified_endpoint
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
@@ -841,7 +853,7 @@ theorem orientedCrossing_point_ne_horizontal_classified_endpoint
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {crossing : CrossingRecord}
-    (crossingMem : crossing ∈ orientedCrossings graph)
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
     {edge : PeriodicEdge Vertex}
     {edgeIndex : Nat}
     (edgeMem : (edge, edgeIndex) ∈ graph.edges.zipIdx)
@@ -859,8 +871,7 @@ theorem orientedCrossing_point_ne_horizontal_classified_endpoint
           | .start => classified.1.segment.start
           | .finish => classified.1.segment.finish) := by
   intro pointEq
-  have sound := orientedCrossings_sound graph crossingMem
-  have canonical := sound.2.2.2.2.1
+  have sound := orientedCrossingHalo_sound graph crossingMem
   rcases exists_classifiedSegment_of_drawing_mem sound.1 with
     ⟨crossingRoute, crossingRouteMem,
       crossingClassified, crossingClassifiedMem, firstEq⟩
@@ -894,7 +905,7 @@ theorem orientedCrossing_point_ne_horizontal_classified_endpoint
           crossing.firstTranslate)).InteriorContains
         crossing.point := by
     simpa [CrossingRecord.firstSegment, firstEq] using
-      canonical.2.2.1
+      sound.2.2.2.2.2.2.2.1
   have crossingPointY :
       crossing.point.2 =
         crossingClassified.1.segment.start.2 +
@@ -1028,7 +1039,7 @@ theorem orientedCrossing_point_ne_horizontal_classified_endpoint
     | finish =>
         simpa [GridSegment.translate] using endpointEven.2
 
-/-- A canonical crossover center cannot coincide with the center of any
+/-- A retained crossover center cannot coincide with the center of any
 enumerated route bend. -/
 theorem orientedCrossing_point_ne_drawingRouteBend_drawingPoint
     {Vertex : Type*} [DecidableEq Vertex]
@@ -1037,7 +1048,7 @@ theorem orientedCrossing_point_ne_drawingRouteBend_drawingPoint
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {crossing : CrossingRecord}
-    (crossingMem : crossing ∈ orientedCrossings graph)
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
     {routeBend : RouteBend}
     (routeBendMem : routeBend ∈ drawingRouteBends graph) :
     crossing.point ≠ routeBend.drawingPoint graph := by
@@ -1119,51 +1130,18 @@ theorem orientedCrossing_point_ne_drawingRouteBend_drawingPoint
             outgoingPlacementIndexEq
             incomingVertical' outgoingVertical' with
         ⟨port, placementKindEq⟩
-      have placementListMem :
-          placement ∈
-            routeBendCenterPlacements graph edge edgeIndex :=
-        List.fst_mem_of_mem_zipIdx placementMem
-      have placementValid :=
-        routeBendCenterPlacements_kind_valid
-          edgeMem placementListMem
-      have sound := orientedCrossings_sound graph crossingMem
-      have canonical := sound.2.2.2.2.1
-      have crossingBounds :
-          0 ≤ crossing.point.1 ∧
-            crossing.point.1 < (drawing graph).gridSize ∧
-            0 ≤ crossing.point.2 ∧
-            crossing.point.2 < (drawing graph).gridSize := by
-        simpa [InFundamentalDrawingSquare, drawing_gridSize] using
-          canonical.1
-      have placementBounds :
-          0 ≤ (placement.kind.position graph).1 ∧
-            (placement.kind.position graph).1 <
-              (drawing graph).gridSize ∧
-            0 ≤ (placement.kind.position graph).2 ∧
-            (placement.kind.position graph).2 <
-              (drawing graph).gridSize := by
-        simpa [drawing_gridSize] using
-          RouteBendCenterKind.position_in_fundamental
-            wellFormed degree placementValid
-      have normalizedPointEq :
-          Cell.add crossing.point
-              ((drawing graph).periodTranslation (0, 0)) =
-            Cell.add
-              (placement.kind.position graph)
-              ((drawing graph).periodTranslation
-                (Cell.add routeBend.translate
-                  placement.offset)) := by
-        simpa [PeriodicGridDrawing.periodTranslation,
-          Cell.add, Cell.scale] using pointEq.trans placementPointEq
-      have pointBaseEq :=
-        ((drawing graph).translatedHalfOpenPositions_eq
-          crossingBounds placementBounds normalizedPointEq).1
-      apply orientedCrossing_point_snd_ne_three crossingMem
-      rw [pointBaseEq, placementKindEq]
-      rfl
+      apply
+        orientedCrossing_point_snd_ne_portRow crossingMem
+          (Cell.add routeBend.translate placement.offset).2
+      have pointYEq :=
+        congrArg Prod.snd (pointEq.trans placementPointEq)
+      rw [placementKindEq] at pointYEq
+      simpa [RouteBendCenterKind.position,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.add, Cell.scale] using pointYEq
 
 set_option maxRecDepth 4000 in
-/-- A canonical crossover center cannot coincide with any lifted declared
+/-- A retained crossover center cannot coincide with any lifted declared
 graph-vertex position. -/
 theorem orientedCrossing_point_ne_liftedVertexPosition
     {Vertex : Type*} [DecidableEq Vertex]
@@ -1171,7 +1149,7 @@ theorem orientedCrossing_point_ne_liftedVertexPosition
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     {crossing : CrossingRecord}
-    (crossingMem : crossing ∈ orientedCrossings graph)
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
     {vertex : Vertex}
     (vertexMem : vertex ∈ graph.vertices)
     (vertexTranslate : Cell) :
@@ -1180,45 +1158,7 @@ theorem orientedCrossing_point_ne_liftedVertexPosition
         ((drawing graph).vertexPosition graph vertex)
         ((drawing graph).periodTranslation vertexTranslate) := by
   intro pointEqual
-  have sound := orientedCrossings_sound graph crossingMem
-  have canonical := sound.2.2.2.2.1
-  have crossingBounds :
-      0 ≤ crossing.point.1 ∧
-        crossing.point.1 < (drawing graph).gridSize ∧
-        0 ≤ crossing.point.2 ∧
-        crossing.point.2 < (drawing graph).gridSize := by
-    simpa [InFundamentalDrawingSquare, drawing_gridSize] using
-      canonical.1
-  have vertexBoundsOpen :=
-    drawing_vertexPosition_in_fundamental_square
-      graph vertexMem
-  have vertexBounds :
-      0 ≤ ((drawing graph).vertexPosition graph vertex).1 ∧
-        ((drawing graph).vertexPosition graph vertex).1 <
-          (drawing graph).gridSize ∧
-        0 ≤ ((drawing graph).vertexPosition graph vertex).2 ∧
-        ((drawing graph).vertexPosition graph vertex).2 <
-          (drawing graph).gridSize := by
-    exact
-      ⟨le_of_lt vertexBoundsOpen.1,
-        vertexBoundsOpen.2.1,
-        le_of_lt vertexBoundsOpen.2.2.1,
-        vertexBoundsOpen.2.2.2⟩
-  have normalizedEqual :
-      Cell.add crossing.point
-          ((drawing graph).periodTranslation (0, 0)) =
-        Cell.add
-          ((drawing graph).vertexPosition graph vertex)
-          ((drawing graph).periodTranslation vertexTranslate) := by
-    simpa [PeriodicGridDrawing.periodTranslation,
-      Cell.add, Cell.scale] using pointEqual
-  have normalizedUnique :=
-    PeriodicGridDrawing.translatedHalfOpenPositions_eq
-      (drawing graph) crossingBounds vertexBounds normalizedEqual
-  have pointBaseEqual :
-      crossing.point =
-        (drawing graph).vertexPosition graph vertex :=
-    normalizedUnique.1
+  have sound := orientedCrossingHalo_sound graph crossingMem
   rcases exists_classifiedSegment_of_drawing_mem
       sound.1 with
     ⟨taggedRoute, taggedRouteMem,
@@ -1250,7 +1190,7 @@ theorem orientedCrossing_point_ne_liftedVertexPosition
           crossing.firstTranslate)).InteriorContains
         crossing.point := by
     simpa [CrossingRecord.firstSegment, firstEq] using
-      canonical.2.2.1
+      sound.2.2.2.2.2.2.2.1
   have pointY :
       crossing.point.2 =
         taggedClassified.1.segment.start.2 +
@@ -1267,10 +1207,12 @@ theorem orientedCrossing_point_ne_liftedVertexPosition
     classifiedSegment_horizontal_lane
       classifiedMem horizontalRole
   have pointYBase :
-      crossing.point.2 = 2 := by
-    rw [pointBaseEqual,
+      crossing.point.2 =
+        2 + (drawing graph).gridSize * vertexTranslate.2 := by
+    rw [pointEqual,
       drawing_vertexPosition_of_mem graph vertexMem]
-    rfl
+    simp [PeriodicGridDrawing.periodTranslation,
+      vertexPosition, Cell.add, Cell.scale]
   have laneBounds :=
     horizontalLaneBase_bounds edgeMem classifiedMem horizontalRole
   have twoBounds :
@@ -1286,7 +1228,8 @@ theorem orientedCrossing_point_ne_liftedVertexPosition
           (drawing graph).gridSize := by
     simpa [drawing_gridSize] using laneBounds
   have lanePeriodicEqual :
-      (2 : Int) + (drawing graph).gridSize * 0 =
+      (2 : Int) +
+          (drawing graph).gridSize * vertexTranslate.2 =
         horizontalLaneBase taggedClassified.1.role +
           (drawing graph).gridSize *
             (horizontalLaneCellShift taggedRoute.1.1
@@ -1346,13 +1289,15 @@ theorem orientedCrossing_point_ne_liftedVertexPosition
     simpa [drawing_gridSize] using midpointBounds
   have pointXBase :
       crossing.point.1 =
-        vertexX (graph.vertices.idxOf vertex) := by
-    rw [pointBaseEqual,
+        vertexX (graph.vertices.idxOf vertex) +
+          (drawing graph).gridSize * vertexTranslate.1 := by
+    rw [pointEqual,
       drawing_vertexPosition_of_mem graph vertexMem]
-    rfl
+    simp [PeriodicGridDrawing.periodTranslation,
+      vertexPosition, Cell.add, Cell.scale]
   have midpointPeriodicEqual :
       vertexX (graph.vertices.idxOf vertex) +
-          (drawing graph).gridSize * 0 =
+          (drawing graph).gridSize * vertexTranslate.1 =
         fanoutMidpointBase graph taggedClassified.1.role +
           (drawing graph).gridSize *
             ((horizontalFanoutCellShift taggedRoute.1.1

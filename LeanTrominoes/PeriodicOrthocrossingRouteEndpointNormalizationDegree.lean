@@ -334,7 +334,9 @@ theorem normalizedRouteBendLink_not_incident_sourceTerminal
       link ∈
         (drawingRouteBendLinks
           (PeriodicCNF.incidenceGraph formula)).map
-            (PeriodicEquality.normalizeLink normalizeCarrierNode)) :
+            (PeriodicEquality.normalizeLink
+              (normalizeCarrierNode
+                (PeriodicCNF.incidenceGraph formula)))) :
     ¬(link.first =
           .terminal (occurrence.sourceTerminal formula).indexed .start ∨
       link.second =
@@ -369,7 +371,9 @@ theorem normalizedRouteBendLink_not_incident_targetTerminal
       link ∈
         (drawingRouteBendLinks
           (PeriodicCNF.incidenceGraph formula)).map
-            (PeriodicEquality.normalizeLink normalizeCarrierNode)) :
+            (PeriodicEquality.normalizeLink
+              (normalizeCarrierNode
+                (PeriodicCNF.incidenceGraph formula)))) :
     ¬(link.first =
           .terminal (occurrence.targetTerminal formula).indexed .finish ∨
       link.second =
@@ -422,7 +426,9 @@ theorem deduplicatedNormalizedRouteBendLinks_sourceTerminal_count_eq_zero
       link ∈
         (drawingRouteBendLinks
           (PeriodicCNF.incidenceGraph formula)).map
-            (PeriodicEquality.normalizeLink normalizeCarrierNode) :=
+            (PeriodicEquality.normalizeLink
+              (normalizeCarrierNode
+                (PeriodicCNF.incidenceGraph formula))) :=
     List.mem_dedup.mp linkMem
   apply normalizedRouteBendLink_not_incident_sourceTerminal
     formula occurrence linkRaw
@@ -450,7 +456,9 @@ theorem deduplicatedNormalizedRouteBendLinks_targetTerminal_count_eq_zero
       link ∈
         (drawingRouteBendLinks
           (PeriodicCNF.incidenceGraph formula)).map
-            (PeriodicEquality.normalizeLink normalizeCarrierNode) :=
+            (PeriodicEquality.normalizeLink
+              (normalizeCarrierNode
+                (PeriodicCNF.incidenceGraph formula))) :=
     List.mem_dedup.mp linkMem
   apply normalizedRouteBendLink_not_incident_targetTerminal
     formula occurrenceMem linkRaw
@@ -502,7 +510,8 @@ theorem deduplicatedNormalizedRouteBendFormula_targetTerminal_count_eq_zero
       formula occurrenceMem]
 
 /-- At a routed source endpoint, the normalized route wire has only its
-complete-carrier contribution and therefore at most six occurrences. -/
+complete-carrier contribution and therefore at most thirty-six
+occurrences. -/
 theorem normalizedRouteWireFormula_sourceTerminal_count_le_six
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
@@ -531,7 +540,7 @@ theorem normalizedRouteWireFormula_sourceTerminal_count_le_six
   unfold PeriodicCNF.variableOccurrences at carrierLe bendZero
   omega
 
-/-- The same six-occurrence route-wire bound holds at a routed target
+/-- The same thirty-six-occurrence route-wire bound holds at a routed target
 endpoint. -/
 theorem normalizedRouteWireFormula_targetTerminal_count_le_six
     {Variable : Type*} [DecidableEq Variable]

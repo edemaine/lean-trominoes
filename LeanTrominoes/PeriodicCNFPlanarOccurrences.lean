@@ -140,12 +140,12 @@ theorem drawingCarrierNodeCrossoverFormula_occurrencesAtMostEight
     crossoverFamily, scopedCrossoverInstance,
     carrierNodeScopedCrossoverVariableMap] using
     instantiateFamily_occurrencesAtMost_of_jointly_injective
-      8 (orientedCrossings graph)
+      8 (orientedCrossingHalo graph)
       (fun site =>
         scopedCrossoverVariableMap site
           (carrierNodeCrossingPorts site))
       crossingMacroOrigin 1 crossoverFormula
-      (orientedCrossings_nodup graph)
+      (orientedCrossingHalo_nodup graph)
       carrierNodeScopedCrossoverVariableMap_injective
       crossoverFormula_occurrencesAtMostEight
 
@@ -165,12 +165,12 @@ theorem drawingCarrierNodeCrossoverFormula_external_count_le_two
     crossoverFamily, scopedCrossoverInstance,
     carrierNodeScopedCrossoverVariableMap] using
     instantiateFamily_occurrence_count_le_of_jointly_injective
-      2 (orientedCrossings graph)
+      2 (orientedCrossingHalo graph)
       (fun site =>
         scopedCrossoverVariableMap site
           (carrierNodeCrossingPorts site))
       crossingMacroOrigin 1 crossoverFormula
-      (orientedCrossings_nodup graph)
+      (orientedCrossingHalo_nodup graph)
       carrierNodeScopedCrossoverVariableMap_injective
       (.inl node)
       (by
@@ -1370,11 +1370,18 @@ theorem drawingCarrierNodeCrossoverFormula_terminal_count_eq_zero
   apply @List.count_eq_zero_of_not_mem
     (Sum CarrierNode (CrossingRecord × CrossoverInternal))
     instBEqOfDecidableEq (by infer_instance)
-  simp [drawingCarrierNodeCrossoverFormula,
-    crossoverFamily, scopedCrossoverInstance,
-    scopedCrossoverVariableMap, carrierNodeCrossingPorts]
-  intro crossing crossingMem horizontal source sourceMem
-  cases source <;> simp
+  rw [drawingCarrierNodeCrossoverFormula, crossoverFamily,
+    embeddedVariableOccurrences_flatMap]
+  intro terminalMem
+  rcases List.mem_flatMap.mp terminalMem with
+    ⟨crossing, _crossingMem, terminalMem⟩
+  rw [scopedCrossoverInstance,
+    embeddedVariableOccurrences_instantiateFormula] at terminalMem
+  rcases List.mem_map.mp terminalMem with
+    ⟨source, _sourceMem, sourceEq⟩
+  cases source <;>
+    simp [scopedCrossoverVariableMap,
+      carrierNodeCrossingPorts] at sourceEq
 
 /-- A segment terminal therefore receives only the route-wire part of the
 core's six-occurrence budget. -/

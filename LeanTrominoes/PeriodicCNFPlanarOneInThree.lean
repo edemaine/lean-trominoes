@@ -43,37 +43,40 @@ def drawingPlanarOneInThreeFormula
 /-- Normalize a finite Figure 9 variable into a periodic proto-variable and
 literal offset. -/
 def normalizePlanarOneInThreeVariable
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (inputVariable :
       OneInThreeVariable (PlanarSATVariable Variable)) :
     PeriodicPlanarOneInThreeVariable Variable × Cell :=
   match inputVariable with
   | .inl original =>
-      let normalized := normalizePlanarSATVariable original
+      let normalized := normalizePlanarSATVariable formula original
       (.inl normalized.1, normalized.2)
   | .inr auxiliary =>
       (.inr auxiliary, (0, 0))
 
 /-- Periodicize one literal of the positioned exact-one block. -/
 def periodicizePlanarOneInThreeLiteral
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (literal :
       OneInThreeVariable (PlanarSATVariable Variable) × Bool) :
     PeriodicLiteral
       (PeriodicPlanarOneInThreeVariable Variable) :=
   let normalized :=
-    normalizePlanarOneInThreeVariable literal.1
+    normalizePlanarOneInThreeVariable formula literal.1
   ⟨normalized.1, normalized.2, literal.2⟩
 
 /-- Periodicize one positioned exact-one clause. -/
 def periodicizePlanarOneInThreeClause
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (clause :
       EmbeddedClause
         (OneInThreeVariable (PlanarSATVariable Variable))) :
     PeriodicClause
       (PeriodicPlanarOneInThreeVariable Variable) :=
-  clause.literals.map periodicizePlanarOneInThreeLiteral
+  clause.literals.map (periodicizePlanarOneInThreeLiteral formula)
 
 /-- The genuine periodic exact-one formula obtained from the routed planar
 SAT block and the positioned Figure 9 replacement. -/
@@ -83,12 +86,13 @@ def drawingPeriodicPlanarOneInThreeFormula
     PeriodicCNF
       (PeriodicPlanarOneInThreeVariable Variable) :=
   ⟨(drawingPlanarOneInThreeFormula formula).map
-    periodicizePlanarOneInThreeClause⟩
+    (periodicizePlanarOneInThreeClause formula)⟩
 
 /-- Restrict a plane-wide periodic exact-one assignment to the explicit
 variables of one translated finite Figure 9 block. -/
 def planarOneInThreeFiniteAssignmentAt
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (assignment :
       PeriodicPlanarOneInThreeVariable Variable →
         Cell → Bool)
@@ -96,14 +100,15 @@ def planarOneInThreeFiniteAssignmentAt
     OneInThreeVariable (PlanarSATVariable Variable) → Bool :=
   fun inputVariable =>
     let normalized :=
-      normalizePlanarOneInThreeVariable inputVariable
+      normalizePlanarOneInThreeVariable formula inputVariable
     assignment normalized.1
       (Cell.add translate normalized.2)
 
 /-- Periodicizing one positioned exact-one clause preserves its truth value
 under the induced finite assignment. -/
 theorem periodicizePlanarOneInThreeClause_holds_iff
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (assignment :
       PeriodicPlanarOneInThreeVariable Variable →
         Cell → Bool)
@@ -112,10 +117,10 @@ theorem periodicizePlanarOneInThreeClause_holds_iff
       EmbeddedClause
         (OneInThreeVariable (PlanarSATVariable Variable))) :
     PeriodicOneInThree.ClauseHolds assignment translate
-        (periodicizePlanarOneInThreeClause clause) ↔
+        (periodicizePlanarOneInThreeClause formula clause) ↔
       PlanarOneInThree.ClauseHolds
         (planarOneInThreeFiniteAssignmentAt
-          assignment translate)
+          formula assignment translate)
         clause := by
   simp [PeriodicOneInThree.ClauseHolds,
     PeriodicOneInThree.clauseValues,
@@ -128,7 +133,8 @@ theorem periodicizePlanarOneInThreeClause_holds_iff
 /-- Periodicizing an arbitrary positioned exact-one formula is equivalent to
 satisfying that finite formula independently at every translate. -/
 theorem periodicizePlanarOneInThreeFormula_satisfies_iff
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (finiteFormula :
       List
         (EmbeddedClause
@@ -138,20 +144,20 @@ theorem periodicizePlanarOneInThreeFormula_satisfies_iff
         Cell → Bool) :
     PeriodicOneInThree.Satisfies
         ⟨finiteFormula.map
-          periodicizePlanarOneInThreeClause⟩
+          (periodicizePlanarOneInThreeClause formula)⟩
         assignment ↔
       ∀ translate,
         PlanarOneInThree.FormulaHolds
           (planarOneInThreeFiniteAssignmentAt
-            assignment translate)
+            formula assignment translate)
           finiteFormula := by
   constructor
   · intro satisfies translate clause clauseMem
     apply
       (periodicizePlanarOneInThreeClause_holds_iff
-        assignment translate clause).mp
+        formula assignment translate clause).mp
     exact satisfies translate
-      (periodicizePlanarOneInThreeClause clause)
+      (periodicizePlanarOneInThreeClause formula clause)
       (List.mem_map.mpr ⟨clause, clauseMem, rfl⟩)
   · intro finiteHolds translate periodicClause
       periodicClauseMem
@@ -160,7 +166,7 @@ theorem periodicizePlanarOneInThreeFormula_satisfies_iff
     subst periodicClause
     apply
       (periodicizePlanarOneInThreeClause_holds_iff
-        assignment translate clause).mpr
+        formula assignment translate clause).mpr
     exact finiteHolds translate clause clauseMem
 
 /-- Exact per-translate semantics of the genuine periodic positioned
@@ -177,10 +183,10 @@ theorem drawingPeriodicPlanarOneInThreeFormula_satisfies_iff
       ∀ translate,
         PlanarOneInThree.FormulaHolds
           (planarOneInThreeFiniteAssignmentAt
-            assignment translate)
+            formula assignment translate)
           (drawingPlanarOneInThreeFormula formula) := by
   exact periodicizePlanarOneInThreeFormula_satisfies_iff
-    (drawingPlanarOneInThreeFormula formula) assignment
+    formula (drawingPlanarOneInThreeFormula formula) assignment
 
 end PeriodicOrthocrossing
 end LeanTrominoes

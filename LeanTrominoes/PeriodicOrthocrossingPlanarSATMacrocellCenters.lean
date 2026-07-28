@@ -134,12 +134,12 @@ theorem orientedCrossing_eq_of_point_eq
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {first second : CrossingRecord}
-    (firstMem : first ∈ orientedCrossings graph)
-    (secondMem : second ∈ orientedCrossings graph)
+    (firstMem : first ∈ orientedCrossingHalo graph)
+    (secondMem : second ∈ orientedCrossingHalo graph)
     (pointEqual : first.point = second.point) :
     first = second := by
-  have firstSound := orientedCrossings_sound graph firstMem
-  have secondSound := orientedCrossings_sound graph secondMem
+  have firstSound := orientedCrossingHalo_sound graph firstMem
+  have secondSound := orientedCrossingHalo_sound graph secondMem
   have firstOccurrenceEqual :
       PeriodicGridDrawing.SegmentOccurrenceKey
           first.first first.firstTranslate =
@@ -152,10 +152,10 @@ theorem orientedCrossing_eq_of_point_eq
         second.first secondSound.1
         first.firstTranslate second.firstTranslate first.point
         occurrenceDifferent
-        firstSound.2.2.2.2.1.2.2.1
+        firstSound.2.2.2.2.2.2.2.1
         (by
           rw [pointEqual]
-          exact secondSound.2.2.2.2.1.2.2.1)
+          exact secondSound.2.2.2.2.2.2.2.1)
     have firstHorizontal :=
       firstSound.2.2.2.2.2.1
     have secondHorizontal :=

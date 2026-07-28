@@ -19,7 +19,8 @@ open PlanarThreeSAT
 /-- Extend a periodic routed SAT assignment with Figure 9 auxiliaries,
 choosing the auxiliary values independently in each translated block. -/
 def extendPeriodicPlanarOneInThreeAssignment
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (assignment :
       PeriodicPlanarSATVariable Variable → Cell → Bool) :
     PeriodicPlanarOneInThreeVariable Variable →
@@ -28,21 +29,23 @@ def extendPeriodicPlanarOneInThreeAssignment
       assignment original cell
   | .inr auxiliary, cell =>
       PlanarOneInThree.extendAssignment
-        (planarSATFiniteAssignmentAt assignment cell)
+        (planarSATFiniteAssignmentAt formula assignment cell)
         (.inr auxiliary)
 
 /-- The finite assignment induced from the plane-wide extension is exactly
 the finite Figure 9 extension of the corresponding routed block. -/
 theorem planarOneInThreeFiniteAssignmentAt_extend
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (assignment :
       PeriodicPlanarSATVariable Variable → Cell → Bool)
     (translate : Cell) :
     planarOneInThreeFiniteAssignmentAt
-        (extendPeriodicPlanarOneInThreeAssignment assignment)
+        formula
+        (extendPeriodicPlanarOneInThreeAssignment formula assignment)
         translate =
       PlanarOneInThree.extendAssignment
-        (planarSATFiniteAssignmentAt assignment translate) := by
+        (planarSATFiniteAssignmentAt formula assignment translate) := by
   funext inputVariable
   cases inputVariable with
   | inl original =>
@@ -105,12 +108,12 @@ theorem drawingPeriodicPlanarOneInThreeFormula_satisfies_of_planarSAT
     PeriodicOneInThree.Satisfies
       (drawingPeriodicPlanarOneInThreeFormula formula)
       (extendPeriodicPlanarOneInThreeAssignment
-        assignment) := by
+        formula assignment) := by
   apply
     (drawingPeriodicPlanarOneInThreeFormula_satisfies_iff
       formula
       (extendPeriodicPlanarOneInThreeAssignment
-        assignment)).mpr
+        formula assignment)).mpr
   have finitePlanarHolds :=
     (drawingPeriodicPlanarSATFormula_satisfies_iff
       formula assignment).mp planarHolds
@@ -122,11 +125,11 @@ theorem drawingPeriodicPlanarOneInThreeFormula_satisfies_of_planarSAT
       drawingPlanarSATFormula_widthAtMostThree
         formula sourceWidth
   intro translate
-  rw [planarOneInThreeFiniteAssignmentAt_extend]
+  rw [planarOneInThreeFiniteAssignmentAt_extend formula]
   exact PlanarOneInThree.formula_complete
     (drawingPlanarSATFormula formula)
     finiteWidth
-    (planarSATFiniteAssignmentAt assignment translate)
+    (planarSATFiniteAssignmentAt formula assignment translate)
     (finitePlanarHolds translate)
 
 /-- Restrict a periodic positioned exact-one assignment to its normalized
@@ -141,17 +144,19 @@ def restrictPeriodicPlanarOneInThreeAssignment
 
 /-- Finite restriction commutes with the two periodicization maps. -/
 theorem planarSATFiniteAssignmentAt_restrict
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (assignment :
       PeriodicPlanarOneInThreeVariable Variable →
         Cell → Bool)
     (translate : Cell) :
     planarSATFiniteAssignmentAt
+        formula
         (restrictPeriodicPlanarOneInThreeAssignment assignment)
         translate =
       PlanarOneInThree.restrictAssignment
         (planarOneInThreeFiniteAssignmentAt
-          assignment translate) := by
+          formula assignment translate) := by
   funext original
   cases original with
   | inl node =>
@@ -199,12 +204,12 @@ theorem drawingPeriodicPlanarSATFormula_satisfies_of_oneInThree
       drawingPlanarSATFormula_widthAtMostThree
         formula sourceWidth
   intro translate
-  rw [planarSATFiniteAssignmentAt_restrict]
+  rw [planarSATFiniteAssignmentAt_restrict formula]
   exact PlanarOneInThree.formula_sound
     (drawingPlanarSATFormula formula)
     finiteWidth
     (planarOneInThreeFiniteAssignmentAt
-      assignment translate)
+      formula assignment translate)
     (finiteOneInThreeHolds translate)
 
 /-- The periodic positioned Figure 9 replacement preserves satisfiability
@@ -224,7 +229,7 @@ theorem drawingPeriodicPlanarOneInThreeFormula_satisfiable_iff_planarSAT
           formula sourceWidth assignment oneInThreeHolds⟩
   · rintro ⟨assignment, planarHolds⟩
     exact
-      ⟨extendPeriodicPlanarOneInThreeAssignment assignment,
+      ⟨extendPeriodicPlanarOneInThreeAssignment formula assignment,
         drawingPeriodicPlanarOneInThreeFormula_satisfies_of_planarSAT
           formula sourceWidth assignment planarHolds⟩
 

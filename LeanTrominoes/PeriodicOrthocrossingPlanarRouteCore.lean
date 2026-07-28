@@ -31,7 +31,7 @@ def drawingCarrierNodeCrossoverFormula
     (graph : PeriodicGraph Vertex) :
     List (EmbeddedClause
       (Sum CarrierNode (CrossingRecord × CrossoverInternal))) :=
-  crossoverFamily (orientedCrossings graph)
+  crossoverFamily (orientedCrossingHalo graph)
     carrierNodeCrossingPorts crossingMacroOrigin 1
 
 /-- Scope every complete route-wire variable into the external summand used
@@ -87,6 +87,83 @@ theorem drawingRoutePlanarCoreFormula_holds_iff
     formulaHolds_route_append_iff,
     scopedDrawingRouteWireFormula_holds_iff]
 
+/-- The canonical complete-core assignment determined by the two route
+signals crossing at each site.  Its internal values depend only on those
+signals, so periodic copies of the same physical crossover agree. -/
+noncomputable def canonicalRoutePlanarCoreAssignment
+    (routeAssignment : RouteOccurrenceKey → Bool) :
+    Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool
+  | .inl node => routeAssignment node.routeKey
+  | .inr (crossing, internal) =>
+      canonicalCrossoverAssignment
+        (routeAssignment
+          (CarrierNode.boundary
+            ⟨crossing, .left⟩).routeKey)
+        (routeAssignment
+          (CarrierNode.boundary
+            ⟨crossing, .top⟩).routeKey)
+        internal.toVariable
+
+/-- The canonical complete-core assignment satisfies every crossover and
+route-wire clause. -/
+theorem canonicalRoutePlanarCoreAssignment_holds
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (routeAssignment : RouteOccurrenceKey → Bool) :
+    FormulaHolds
+      (canonicalRoutePlanarCoreAssignment routeAssignment)
+      (drawingRoutePlanarCoreFormula graph) := by
+  apply
+    (drawingRoutePlanarCoreFormula_holds_iff graph
+      (canonicalRoutePlanarCoreAssignment routeAssignment)).mpr
+  constructor
+  · apply
+      (crossoverFamily_holds_iff
+        (canonicalRoutePlanarCoreAssignment routeAssignment)
+        (orientedCrossingHalo graph)
+        carrierNodeCrossingPorts crossingMacroOrigin 1).mpr
+    intro crossing crossingMem
+    have canonicalHolds :=
+      canonicalCrossoverAssignment_holds
+        (routeAssignment
+          (CarrierNode.boundary
+            ⟨crossing, .left⟩).routeKey)
+        (routeAssignment
+          (CarrierNode.boundary
+            ⟨crossing, .top⟩).routeKey)
+    suffices
+        canonicalRoutePlanarCoreAssignment routeAssignment ∘
+            scopedCrossoverVariableMap crossing
+              (carrierNodeCrossingPorts crossing) =
+          canonicalCrossoverAssignment
+            (routeAssignment
+              (CarrierNode.boundary
+                ⟨crossing, .left⟩).routeKey)
+            (routeAssignment
+              (CarrierNode.boundary
+                ⟨crossing, .top⟩).routeKey) by
+      rw [this]
+      exact canonicalHolds
+    funext input
+    cases input <;> simp [
+        canonicalRoutePlanarCoreAssignment,
+        scopedCrossoverVariableMap,
+        carrierNodeCrossingPorts,
+        CrossoverInternal.toVariable,
+        CrossingBoundary.carrierKey,
+        CarrierNode.routeKey,
+        CarrierNode.carrierKey,
+        segmentCarrierRouteKey]
+  · have routeHolds :=
+      drawingRouteWireFormula_holds graph routeAssignment
+    have restriction :
+        canonicalRoutePlanarCoreAssignment routeAssignment ∘ Sum.inl =
+          routeAssignment ∘ CarrierNode.routeKey := by
+      funext node
+      rfl
+    rw [restriction]
+    exact routeHolds
+
 /-- Every value assignment to translated routes extends through all complete
 wires and all fresh crossover internals, while retaining the requested value
 at every carrier node. -/
@@ -102,7 +179,7 @@ theorem exists_drawingRoutePlanarCoreFormula_holds_of_routeAssignment
   let carrierAssignment : CarrierNode → Bool :=
     routeAssignment ∘ CarrierNode.routeKey
   have boundaryLaws :
-      ∀ crossing ∈ orientedCrossings graph,
+      ∀ crossing ∈ orientedCrossingHalo graph,
         carrierAssignment
             (carrierNodeCrossingPorts crossing).aLeft =
             carrierAssignment
@@ -115,10 +192,10 @@ theorem exists_drawingRoutePlanarCoreFormula_holds_of_routeAssignment
     exact ⟨rfl, rfl⟩
   have crossoverExtension :
       CrossoverFamilyExtends carrierAssignment
-        (orientedCrossings graph)
+        (orientedCrossingHalo graph)
         carrierNodeCrossingPorts crossingMacroOrigin 1 :=
     (crossoverFamilyExtends_iff carrierAssignment
-      (orientedCrossings graph)
+      (orientedCrossingHalo graph)
       carrierNodeCrossingPorts crossingMacroOrigin 1).mpr
         boundaryLaws
   rcases crossoverExtension with ⟨internal, crossoverHolds⟩
@@ -149,7 +226,7 @@ theorem drawingRoutePlanarCoreFormula_boundary_laws
       Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool)
     (holds : FormulaHolds assignment
       (drawingRoutePlanarCoreFormula graph)) :
-    (∀ crossing ∈ orientedCrossings graph,
+    (∀ crossing ∈ orientedCrossingHalo graph,
       assignment
           (.inl (.boundary ⟨crossing, .left⟩)) =
           assignment
@@ -169,7 +246,7 @@ theorem drawingRoutePlanarCoreFormula_boundary_laws
   constructor
   · simpa [carrierNodeCrossingPorts] using
       crossoverFamily_boundary_eq assignment
-        (orientedCrossings graph)
+        (orientedCrossingHalo graph)
         carrierNodeCrossingPorts crossingMacroOrigin 1
         components.1
   · have wireComponents :

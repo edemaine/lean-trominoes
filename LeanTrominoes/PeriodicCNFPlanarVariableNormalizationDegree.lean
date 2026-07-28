@@ -11,15 +11,26 @@ set_option maxHeartbeats 800000
 
 /-- Periodic normalization of the external routed SAT nodes. -/
 def normalizePlanarSATNode
-    {Variable : Type*}
+    {Variable Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (node : PlanarSATNode Variable) :
     PeriodicPlanarSATVariable Variable × Cell :=
-  normalizePlanarSATVariable (.inl node)
+  match node with
+  | .carrier (.terminal terminal) =>
+      (.terminal terminal.indexed terminal.endpoint,
+        terminal.translate)
+  | .carrier (.boundary boundary) =>
+      (.boundary (boundary.periodNormalize graph),
+        crossingPeriodShift graph boundary.crossing)
+  | .atom (atom, translate) =>
+      (.atom atom, translate)
 
 @[simp]
 theorem normalizePlanarSATNode_terminal
-    {Variable : Type*} (terminal : SegmentTerminal) :
-    (normalizePlanarSATNode
+    {Variable Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (terminal : SegmentTerminal) :
+    (normalizePlanarSATNode graph
         (PlanarSATNode.carrier (.terminal terminal)) :
       PeriodicPlanarSATVariable Variable × Cell) =
         (.terminal terminal.indexed terminal.endpoint,
@@ -27,16 +38,21 @@ theorem normalizePlanarSATNode_terminal
 
 @[simp]
 theorem normalizePlanarSATNode_boundary
-    {Variable : Type*} (boundary : CrossingBoundary) :
-    (normalizePlanarSATNode
+    {Variable Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (boundary : CrossingBoundary) :
+    (normalizePlanarSATNode graph
         (PlanarSATNode.carrier (.boundary boundary)) :
       PeriodicPlanarSATVariable Variable × Cell) =
-        (.boundary boundary, (0, 0)) := rfl
+        (.boundary (boundary.periodNormalize graph),
+          crossingPeriodShift graph boundary.crossing) := rfl
 
 @[simp]
 theorem normalizePlanarSATNode_atom
-    {Variable : Type*} (atom : Variable) (translate : Cell) :
-    normalizePlanarSATNode (.atom (atom, translate)) =
+    {Variable Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (atom : Variable) (translate : Cell) :
+    normalizePlanarSATNode graph (.atom (atom, translate)) =
       (.atom atom, translate) := rfl
 
 /-- Two represented route occurrences with the same global edge index have
@@ -115,7 +131,9 @@ theorem normalizeRoutedVariableLink_eq_of_witness
       link.first =
         .carrier (.terminal (occurrence.targetTerminal formula)))
     (secondEq : link.second = .atom site) :
-    PeriodicEquality.normalizeLink normalizePlanarSATNode link =
+    PeriodicEquality.normalizeLink
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula)) link =
       ⟨.terminal (occurrence.targetTerminal formula).indexed .finish,
         .atom occurrence.incidence.literal.atom,
         occurrence.edge.offset⟩ := by
@@ -144,11 +162,15 @@ theorem normalizedDrawingRoutedVariableLink_eq_of_terminal_incident
     (firstMem :
       first ∈
         (drawingRoutedVariableLinks formula).map
-          (PeriodicEquality.normalizeLink normalizePlanarSATNode))
+          (PeriodicEquality.normalizeLink
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula))))
     (secondMem :
       second ∈
         (drawingRoutedVariableLinks formula).map
-          (PeriodicEquality.normalizeLink normalizePlanarSATNode))
+          (PeriodicEquality.normalizeLink
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula))))
     (firstIncident :
       first.first = .terminal indexed .finish ∨
         first.second = .terminal indexed .finish)
@@ -220,7 +242,9 @@ theorem normalizedRoutedVariableLink_not_both_terminal
     (linkMem :
       link ∈
         (drawingRoutedVariableLinks formula).map
-          (PeriodicEquality.normalizeLink normalizePlanarSATNode)) :
+          (PeriodicEquality.normalizeLink
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula)))) :
     ¬(link.first = .terminal indexed .finish ∧
       link.second = .terminal indexed .finish) := by
   rcases List.mem_map.mp linkMem with
@@ -244,7 +268,9 @@ def deduplicatedNormalizedRoutedVariableLinks
     List (PeriodicEquality.NormalizedLink
       (PeriodicPlanarSATVariable Variable)) :=
   ((drawingRoutedVariableLinks formula).map
-    (PeriodicEquality.normalizeLink normalizePlanarSATNode)).dedup
+    (PeriodicEquality.normalizeLink
+      (normalizePlanarSATNode
+        (PeriodicCNF.incidenceGraph formula)))).dedup
 
 /-- Every target terminal prototype is incident to at most one normalized
 active variable arm. -/
@@ -258,7 +284,9 @@ theorem
         (.terminal indexed .finish) ≤ 1 := by
   let rawLinks :=
     (drawingRoutedVariableLinks formula).map
-      (PeriodicEquality.normalizeLink normalizePlanarSATNode)
+      (PeriodicEquality.normalizeLink
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula)))
   let links := rawLinks.dedup
   let target : PeriodicPlanarSATVariable Variable :=
     .terminal indexed .finish
@@ -326,7 +354,9 @@ def deduplicatedNormalizedRoutedVariableFormula
     (formula : PeriodicCNF Variable) :
     PeriodicCNF (PeriodicPlanarSATVariable Variable) :=
   PeriodicEquality.deduplicatedNormalizedFormula
-    normalizePlanarSATNode (drawingRoutedVariableLinks formula)
+    (normalizePlanarSATNode
+      (PeriodicCNF.incidenceGraph formula))
+    (drawingRoutedVariableLinks formula)
 
 /-- Periodic normalization and clause deduplication leave at most the two
 implication literals of one active arm at each target terminal prototype. -/
@@ -406,6 +436,23 @@ theorem embedPeriodicCarrierFormula_terminal_count
       periodicCarrierNodeToPlanarSATVariable_injective
       (.terminal indexed endpoint)
 
+theorem embedPeriodicCarrierFormula_boundary_count
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF PeriodicCarrierNode)
+    (boundary : CrossingBoundary) :
+    (embedPeriodicCarrierFormula
+      (Variable := Variable) source).variableOccurrences.count
+        (.boundary boundary) =
+      source.variableOccurrences.count
+        (.boundary boundary) := by
+  rw [embedPeriodicCarrierFormula_variableOccurrences]
+  exact
+    List.count_map_of_injective
+      source.variableOccurrences
+      periodicCarrierNodeToPlanarSATVariable
+      periodicCarrierNodeToPlanarSATVariable_injective
+      (.boundary boundary)
+
 /-- The periodically normalized route wire followed by the periodically
 normalized active variable arms. -/
 def normalizedRouteWireAndVariableFormula
@@ -418,9 +465,8 @@ def normalizedRouteWireAndVariableFormula
         (PeriodicCNF.incidenceGraph formula))).clauses ++
     (deduplicatedNormalizedRoutedVariableFormula formula).clauses⟩
 
-/-- A routed target terminal has at most six normalized route-wire
-occurrences and two normalized active-arm occurrences, meeting the final
-degree-eight budget. -/
+/-- A routed target terminal has at most thirty-six normalized route-wire
+occurrences and two normalized active-arm occurrences. -/
 theorem
     normalizedRouteWireAndVariableFormula_targetTerminal_count_le_eight
     {Variable : Type*} [DecidableEq Variable]

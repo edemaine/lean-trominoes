@@ -97,7 +97,7 @@ theorem crossingBoundary_terminal_indexed_translate_eq_of_carrierKey_eq
     boundary.indexed = terminal.indexed ∧
       boundary.translate = terminal.translate := by
   have boundaryData :=
-    drawingCrossingBoundary_indexed_mem_and_translate_mem
+    drawingCrossingBoundary_indexed_mem_and_translate_neighbor
       graph boundaryMem
   have terminalData :=
     drawingSegmentTerminal_indexed_mem graph terminalMem
@@ -119,24 +119,39 @@ theorem drawingCrossingBoundary_point_data
     (graph : PeriodicGraph Vertex)
     {boundary : CrossingBoundary}
     (boundaryMem : boundary ∈ drawingCrossingBoundaries graph) :
-    InFundamentalDrawingSquare graph boundary.crossing.point ∧
+    IsNeighborTranslation boundary.translate ∧
       (boundary.indexed.segment.translate
         ((drawing graph).periodTranslation boundary.translate)).InteriorContains
           boundary.crossing.point := by
   rcases List.mem_flatMap.mp boundaryMem with
     ⟨crossing, crossingMem, boundaryMem⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false] at boundaryMem
-  have sound := orientedCrossings_sound graph crossingMem
-  have canonical := sound.2.2.2.2.1
+  have sound := orientedCrossingHalo_sound graph
+    (orientedCrossings_subset_orientedCrossingHalo graph crossingMem)
   rcases boundaryMem with
     boundaryEq | boundaryEq | boundaryEq | boundaryEq <;>
       subst boundary
-  · exact ⟨canonical.1, canonical.2.2.1⟩
-  · exact ⟨canonical.1, canonical.2.2.1⟩
-  · exact ⟨canonical.1, canonical.2.2.2.1⟩
-  · exact ⟨canonical.1, canonical.2.2.2.1⟩
+  · exact ⟨sound.2.2.1, sound.2.2.2.2.2.2.2.1⟩
+  · exact ⟨sound.2.2.1, sound.2.2.2.2.2.2.2.1⟩
+  · exact ⟨sound.2.2.2.1, sound.2.2.2.2.2.2.2.2.1⟩
+  · exact ⟨sound.2.2.2.1, sound.2.2.2.2.2.2.2.2.1⟩
 
 theorem drawingCrossingBoundary_crossing_mem
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {boundary : CrossingBoundary}
+    (boundaryMem : boundary ∈ drawingCrossingBoundaries graph) :
+    boundary.crossing ∈ orientedCrossingHalo graph := by
+  rcases List.mem_flatMap.mp boundaryMem with
+    ⟨crossing, crossingMem, boundaryMem⟩
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at boundaryMem
+  rcases boundaryMem with
+    boundaryEq | boundaryEq | boundaryEq | boundaryEq <;>
+      subst boundary <;>
+      exact orientedCrossings_subset_orientedCrossingHalo
+        graph crossingMem
+
+theorem drawingCrossingBoundary_crossing_mem_orientedCrossings
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex)
     {boundary : CrossingBoundary}
@@ -230,7 +245,7 @@ theorem terminal_boundary_orderCoordinate_extreme
     drawingCrossingBoundary_point_data graph boundaryMem
   have crossingMem :=
     drawingCrossingBoundary_crossing_mem graph boundaryMem
-  have sound := orientedCrossings_sound graph crossingMem
+  have sound := orientedCrossingHalo_sound graph crossingMem
   rcases axisAligned with horizontal | vertical
   · rw [carrierNode_terminal_orderCoordinate_horizontal
       graph terminal horizontal]
@@ -282,14 +297,14 @@ theorem terminal_boundary_orderCoordinate_extreme
           have crossingVertical :
               crossing.second.segment.IsVertical :=
             (GridSegment.isVertical_translate _ _).mp
-              sound.2.2.2.2.2.2
+              sound.2.2.2.2.2.2.1
           rw [carrierData.1] at crossingVertical
           exact (crossingVertical.2 horizontal.1).elim
         · simp only [CrossingBoundary.indexed] at carrierData
           have crossingVertical :
               crossing.second.segment.IsVertical :=
             (GridSegment.isVertical_translate _ _).mp
-              sound.2.2.2.2.2.2
+              sound.2.2.2.2.2.2.1
           rw [carrierData.1] at crossingVertical
           exact (crossingVertical.2 horizontal.1).elim
   · rw [carrierNode_terminal_orderCoordinate_vertical

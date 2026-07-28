@@ -115,8 +115,8 @@ theorem carrierNode_eq_of_commonCarrier_orderCoordinate_eq
               drawingCrossingBoundary_crossing_mem
                 graph firstBoundaryMem
             have different :=
-              (orientedCrossings_sound
-                graph crossingMem).2.2.2.2.1.2.1
+              (orientedCrossingHalo_sound
+                graph crossingMem).2.2.2.2.1
             cases firstSide <;> cases secondSide
             · rfl
             · simp [CarrierNode.orderCoordinate,

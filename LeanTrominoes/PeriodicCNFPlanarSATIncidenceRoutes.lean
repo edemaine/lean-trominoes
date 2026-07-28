@@ -61,7 +61,8 @@ theorem drawingPlanarSATStraightIncidenceRoutes_physicalRoutesMatch
 route family's physical endpoints whenever the placement realizes the
 literal periodicization at the same points. -/
 theorem positionPeriodicizedPlanarSATFormula_physicalRoutesMatch
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (finiteFormula :
       List (EmbeddedClause (PlanarSATVariable Variable)))
     (variablePosition : PlanarSATVariable Variable → Cell)
@@ -75,10 +76,10 @@ theorem positionPeriodicizedPlanarSATFormula_physicalRoutesMatch
     (literalPositionsMatch :
       ∀ literal,
         placement.literalPosition
-            (periodicizePlanarSATLiteral literal) =
+            (periodicizePlanarSATLiteral formula literal) =
           variablePosition literal.1) :
     PositionedPeriodicCNF.PhysicalIncidenceRoutesMatch
-      (positionPeriodicizedPlanarSATFormula finiteFormula)
+      (positionPeriodicizedPlanarSATFormula formula finiteFormula)
       placement routes := by
   intro positionedClause clauseIndex positionedClauseMember
     periodicLiteral literalIndex periodicLiteralMember
@@ -86,7 +87,7 @@ theorem positionPeriodicizedPlanarSATFormula_physicalRoutesMatch
     (positionedClause, clauseIndex) ∈
       (finiteFormula.map fun clause =>
         ⟨clause.position,
-          periodicizePlanarSATClause clause⟩).zipIdx
+          periodicizePlanarSATClause formula clause⟩).zipIdx
     at positionedClauseMember
   rw [List.zipIdx_map] at positionedClauseMember
   rcases List.mem_map.mp positionedClauseMember with
@@ -98,14 +99,14 @@ theorem positionPeriodicizedPlanarSATFormula_physicalRoutesMatch
   have positionedClauseValueEqual :
       positionedClause =
         ⟨taggedClause.1.position,
-          periodicizePlanarSATClause taggedClause.1⟩ := by
+          periodicizePlanarSATClause formula taggedClause.1⟩ := by
     exact (congrArg Prod.fst positionedClauseEqual).symm
   subst clauseIndex
   subst positionedClause
   change
     (periodicLiteral, literalIndex) ∈
       (taggedClause.1.literals.map
-        periodicizePlanarSATLiteral).zipIdx
+        (periodicizePlanarSATLiteral formula)).zipIdx
     at periodicLiteralMember
   rw [List.zipIdx_map] at periodicLiteralMember
   rcases List.mem_map.mp periodicLiteralMember with
@@ -116,7 +117,7 @@ theorem positionPeriodicizedPlanarSATFormula_physicalRoutesMatch
     congrArg Prod.snd periodicLiteralEqual
   have periodicLiteralValueEqual :
       periodicLiteral =
-        periodicizePlanarSATLiteral taggedLiteral.1 := by
+        periodicizePlanarSATLiteral formula taggedLiteral.1 := by
     exact (congrArg Prod.fst periodicLiteralEqual).symm
   subst literalIndex
   subst periodicLiteral
@@ -142,6 +143,7 @@ theorem drawingPositionedPeriodicPlanarSATFormula_physicalRoutesMatch
       (drawingPeriodicPlanarSATPlacement formula) routes := by
   exact
     positionPeriodicizedPlanarSATFormula_physicalRoutesMatch
+      formula
       (drawingPlanarSATFormula formula)
       (drawingPlanarSATVariablePosition formula)
       (drawingPeriodicPlanarSATPlacement formula)

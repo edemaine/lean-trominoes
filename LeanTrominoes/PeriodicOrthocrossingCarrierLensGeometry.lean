@@ -55,7 +55,7 @@ theorem carrierNode_indexed_mem
         unfold drawingCarrierNodes at nodeMem
         simpa using nodeMem
       exact
-        (drawingCrossingBoundary_indexed_mem_and_translate_mem
+        (drawingCrossingBoundary_indexed_mem_and_translate_neighbor
           graph boundaryMem).1
   | terminal terminal =>
       have terminalMem :
@@ -182,7 +182,7 @@ theorem carrierNode_isHorizontal_iff
         simpa using nodeMem
       have crossingMem :=
         drawingCrossingBoundary_crossing_mem graph boundaryMem
-      have sound := orientedCrossings_sound graph crossingMem
+      have sound := orientedCrossingHalo_sound graph crossingMem
       cases boundary with
       | mk crossing side =>
           cases side
@@ -209,14 +209,14 @@ theorem carrierNode_isHorizontal_iff
               false_iff]
             have vertical :=
               (GridSegment.isVertical_translate _ _).mp
-                sound.2.2.2.2.2.2
+                sound.2.2.2.2.2.2.1
             exact fun horizontal => vertical.2 horizontal.1
           · simp only [CarrierNode.isHorizontal, CarrierNode.indexed,
               CrossingBoundary.indexed, Bool.false_eq_true,
               false_iff]
             have vertical :=
               (GridSegment.isVertical_translate _ _).mp
-                sound.2.2.2.2.2.2
+                sound.2.2.2.2.2.2.1
             exact fun horizontal => vertical.2 horizontal.1
 
 /-- Every carrier port has perpendicular coordinate six and axial coordinate
@@ -312,15 +312,15 @@ theorem orientedCrossing_eq_of_firstOccurrence_eq_of_point_eq
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {first second : CrossingRecord}
-    (firstMem : first ∈ orientedCrossings graph)
-    (secondMem : second ∈ orientedCrossings graph)
+    (firstMem : first ∈ orientedCrossingHalo graph)
+    (secondMem : second ∈ orientedCrossingHalo graph)
     (firstIndexedEqual : first.first = second.first)
     (firstTranslateEqual :
       first.firstTranslate = second.firstTranslate)
     (pointEqual : first.point = second.point) :
     first = second := by
-  have firstSound := orientedCrossings_sound graph firstMem
-  have secondSound := orientedCrossings_sound graph secondMem
+  have firstSound := orientedCrossingHalo_sound graph firstMem
+  have secondSound := orientedCrossingHalo_sound graph secondMem
   have secondKeyEqual :
       PeriodicGridDrawing.SegmentOccurrenceKey
           first.second first.secondTranslate =
@@ -333,14 +333,14 @@ theorem orientedCrossing_eq_of_firstOccurrence_eq_of_point_eq
         second.second secondSound.2.1
         first.secondTranslate second.secondTranslate first.point
         keyDifferent
-        firstSound.2.2.2.2.1.2.2.2.1
+        firstSound.2.2.2.2.2.2.2.2.1
         (by
           rw [pointEqual]
-          exact secondSound.2.2.2.2.1.2.2.2.1)
+          exact secondSound.2.2.2.2.2.2.2.2.1)
     have firstVertical :=
-      firstSound.2.2.2.2.2.2
+      firstSound.2.2.2.2.2.2.1
     have secondVertical :=
-      secondSound.2.2.2.2.2.2
+      secondSound.2.2.2.2.2.2.1
     rcases proper.2.2 with horizontalVertical | verticalHorizontal
     · exact firstVertical.2 horizontalVertical.1.1
     · exact secondVertical.2 verticalHorizontal.2.1
@@ -355,7 +355,7 @@ theorem orientedCrossing_eq_of_firstOccurrence_eq_of_point_eq
     congrArg (fun key => key.2.2) secondKeyEqual
   cases first
   cases second
-  simp_all
+  congr
 
 /-- Two canonical crossings sharing their vertical occurrence and crossing
 point are the same complete crossing record. -/
@@ -366,15 +366,15 @@ theorem orientedCrossing_eq_of_secondOccurrence_eq_of_point_eq
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {first second : CrossingRecord}
-    (firstMem : first ∈ orientedCrossings graph)
-    (secondMem : second ∈ orientedCrossings graph)
+    (firstMem : first ∈ orientedCrossingHalo graph)
+    (secondMem : second ∈ orientedCrossingHalo graph)
     (secondIndexedEqual : first.second = second.second)
     (secondTranslateEqual :
       first.secondTranslate = second.secondTranslate)
     (pointEqual : first.point = second.point) :
     first = second := by
-  have firstSound := orientedCrossings_sound graph firstMem
-  have secondSound := orientedCrossings_sound graph secondMem
+  have firstSound := orientedCrossingHalo_sound graph firstMem
+  have secondSound := orientedCrossingHalo_sound graph secondMem
   have firstKeyEqual :
       PeriodicGridDrawing.SegmentOccurrenceKey
           first.first first.firstTranslate =
@@ -387,10 +387,10 @@ theorem orientedCrossing_eq_of_secondOccurrence_eq_of_point_eq
         second.first secondSound.1
         first.firstTranslate second.firstTranslate first.point
         keyDifferent
-        firstSound.2.2.2.2.1.2.2.1
+        firstSound.2.2.2.2.2.2.2.1
         (by
           rw [pointEqual]
-          exact secondSound.2.2.2.2.1.2.2.1)
+          exact secondSound.2.2.2.2.2.2.2.1)
     have firstHorizontal :=
       firstSound.2.2.2.2.2.1
     have secondHorizontal :=
@@ -409,7 +409,7 @@ theorem orientedCrossing_eq_of_secondOccurrence_eq_of_point_eq
     congrArg (fun key => key.2.2) firstKeyEqual
   cases first
   cases second
-  simp_all
+  congr
 
 /-- Crossing points on one horizontal occurrence have the same second
 coordinate. -/
@@ -417,21 +417,21 @@ theorem orientedCrossing_point_snd_eq_of_firstOccurrence_eq
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex)
     {first second : CrossingRecord}
-    (firstMem : first ∈ orientedCrossings graph)
-    (secondMem : second ∈ orientedCrossings graph)
+    (firstMem : first ∈ orientedCrossingHalo graph)
+    (secondMem : second ∈ orientedCrossingHalo graph)
     (indexedEqual : first.first = second.first)
     (translateEqual :
       first.firstTranslate = second.firstTranslate) :
     first.point.2 = second.point.2 := by
-  have firstSound := orientedCrossings_sound graph firstMem
-  have secondSound := orientedCrossings_sound graph secondMem
+  have firstSound := orientedCrossingHalo_sound graph firstMem
+  have secondSound := orientedCrossingHalo_sound graph secondMem
   have firstCoordinate :=
     GridSegment.snd_eq_start_of_interiorContains_horizontal
-      firstSound.2.2.2.2.1.2.2.1
+      firstSound.2.2.2.2.2.2.2.1
       firstSound.2.2.2.2.2.1
   have secondCoordinate :=
     GridSegment.snd_eq_start_of_interiorContains_horizontal
-      secondSound.2.2.2.2.1.2.2.1
+      secondSound.2.2.2.2.2.2.2.1
       secondSound.2.2.2.2.2.1
   simp [CrossingRecord.firstSegment,
     indexedEqual, translateEqual] at firstCoordinate
@@ -443,22 +443,22 @@ theorem orientedCrossing_point_fst_eq_of_secondOccurrence_eq
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex)
     {first second : CrossingRecord}
-    (firstMem : first ∈ orientedCrossings graph)
-    (secondMem : second ∈ orientedCrossings graph)
+    (firstMem : first ∈ orientedCrossingHalo graph)
+    (secondMem : second ∈ orientedCrossingHalo graph)
     (indexedEqual : first.second = second.second)
     (translateEqual :
       first.secondTranslate = second.secondTranslate) :
     first.point.1 = second.point.1 := by
-  have firstSound := orientedCrossings_sound graph firstMem
-  have secondSound := orientedCrossings_sound graph secondMem
+  have firstSound := orientedCrossingHalo_sound graph firstMem
+  have secondSound := orientedCrossingHalo_sound graph secondMem
   have firstCoordinate :=
     GridSegment.fst_eq_start_of_interiorContains_vertical
-      firstSound.2.2.2.2.1.2.2.2.1
-      firstSound.2.2.2.2.2.2
+      firstSound.2.2.2.2.2.2.2.2.1
+      firstSound.2.2.2.2.2.2.1
   have secondCoordinate :=
     GridSegment.fst_eq_start_of_interiorContains_vertical
-      secondSound.2.2.2.2.1.2.2.2.1
-      secondSound.2.2.2.2.2.2
+      secondSound.2.2.2.2.2.2.2.2.1
+      secondSound.2.2.2.2.2.2.1
   simp [CrossingRecord.secondSegment,
     indexedEqual, translateEqual] at firstCoordinate
   exact firstCoordinate.trans secondCoordinate.symm
@@ -494,9 +494,9 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
   have secondCrossingMem :=
     drawingCrossingBoundary_crossing_mem graph secondMem
   have firstSound :=
-    orientedCrossings_sound graph firstCrossingMem
+    orientedCrossingHalo_sound graph firstCrossingMem
   have secondSound :=
-    orientedCrossings_sound graph secondCrossingMem
+    orientedCrossingHalo_sound graph secondCrossingMem
   intro coordinateEqual
   cases first with
   | mk firstCrossing firstSide =>
@@ -531,7 +531,7 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
                 firstSound.2.2.2.2.2.1
             have secondVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                secondSound.2.2.2.2.2.2
+                secondSound.2.2.2.2.2.2.1
             simp [CarrierNode.indexed,
               CrossingBoundary.indexed] at occurrenceEqual
             rw [occurrenceEqual.1] at firstHorizontal
@@ -541,7 +541,7 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
                 firstSound.2.2.2.2.2.1
             have secondVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                secondSound.2.2.2.2.2.2
+                secondSound.2.2.2.2.2.2.1
             simp [CarrierNode.indexed,
               CrossingBoundary.indexed] at occurrenceEqual
             rw [occurrenceEqual.1] at firstHorizontal
@@ -574,7 +574,7 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
                 firstSound.2.2.2.2.2.1
             have secondVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                secondSound.2.2.2.2.2.2
+                secondSound.2.2.2.2.2.2.1
             simp [CarrierNode.indexed,
               CrossingBoundary.indexed] at occurrenceEqual
             rw [occurrenceEqual.1] at firstHorizontal
@@ -584,14 +584,14 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
                 firstSound.2.2.2.2.2.1
             have secondVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                secondSound.2.2.2.2.2.2
+                secondSound.2.2.2.2.2.2.1
             simp [CarrierNode.indexed,
               CrossingBoundary.indexed] at occurrenceEqual
             rw [occurrenceEqual.1] at firstHorizontal
             exact secondVertical.2 firstHorizontal.1
           · have firstVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                firstSound.2.2.2.2.2.2
+                firstSound.2.2.2.2.2.2.1
             have secondHorizontal :=
               (GridSegment.isHorizontal_translate _ _).mp
                 secondSound.2.2.2.2.2.1
@@ -601,7 +601,7 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
             exact firstVertical.2 secondHorizontal.1
           · have firstVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                firstSound.2.2.2.2.2.2
+                firstSound.2.2.2.2.2.2.1
             have secondHorizontal :=
               (GridSegment.isHorizontal_translate _ _).mp
                 secondSound.2.2.2.2.2.1
@@ -634,7 +634,7 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
             omega
           · have firstVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                firstSound.2.2.2.2.2.2
+                firstSound.2.2.2.2.2.2.1
             have secondHorizontal :=
               (GridSegment.isHorizontal_translate _ _).mp
                 secondSound.2.2.2.2.2.1
@@ -644,7 +644,7 @@ theorem crossingBoundary_orderCoordinate_ne_of_common_carrier
             exact firstVertical.2 secondHorizontal.1
           · have firstVertical :=
               (GridSegment.isVertical_translate _ _).mp
-                firstSound.2.2.2.2.2.2
+                firstSound.2.2.2.2.2.2.1
             have secondHorizontal :=
               (GridSegment.isHorizontal_translate _ _).mp
                 secondSound.2.2.2.2.2.1

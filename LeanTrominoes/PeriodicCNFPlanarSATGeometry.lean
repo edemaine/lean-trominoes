@@ -39,6 +39,92 @@ def drawingPlanarSATVariablePosition
         (CrossoverVariable.position
           (crossoverInternalVariable internal))
 
+/-- Normalizing a crossing and then adding its semantic-period translation
+recovers the original crossover macrocell origin. -/
+theorem crossingMacroOrigin_periodNormalize_translation
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (crossing : CrossingRecord) :
+    Cell.add
+        (crossingMacroOrigin
+          (crossing.periodNormalize
+            (PeriodicCNF.incidenceGraph formula)))
+        ((drawingPeriodicPlanarSATPlacement formula).translation
+          (crossingPeriodShift
+            (PeriodicCNF.incidenceGraph formula) crossing)) =
+      crossingMacroOrigin crossing := by
+  have pointEq :=
+    periodNormalize_point_add_shift
+      (PeriodicCNF.incidenceGraph formula) crossing
+  apply Prod.ext
+  · have firstEq := congrArg Prod.fst pointEq
+    simp [crossingMacroOrigin,
+      drawingPeriodicPlanarSATPlacement,
+      PeriodicVariablePlacement.translation,
+      PeriodicGridDrawing.periodTranslation,
+      drawing_gridSize, planarMacroScale,
+      Cell.add, Cell.scale] at firstEq ⊢
+    calc
+      20 * (crossing.periodNormalize
+              (PeriodicCNF.incidenceGraph formula)).point.1 +
+            20 * (drawingGridSize
+              (PeriodicCNF.incidenceGraph formula) : Int) *
+              (crossingPeriodShift
+                (PeriodicCNF.incidenceGraph formula) crossing).1 =
+          20 * ((crossing.periodNormalize
+              (PeriodicCNF.incidenceGraph formula)).point.1 +
+            (drawingGridSize
+              (PeriodicCNF.incidenceGraph formula) : Int) *
+              (crossingPeriodShift
+                (PeriodicCNF.incidenceGraph formula) crossing).1) := by
+            ring
+      _ = 20 * crossing.point.1 := by rw [firstEq]
+  · have secondEq := congrArg Prod.snd pointEq
+    simp [crossingMacroOrigin,
+      drawingPeriodicPlanarSATPlacement,
+      PeriodicVariablePlacement.translation,
+      PeriodicGridDrawing.periodTranslation,
+      drawing_gridSize, planarMacroScale,
+      Cell.add, Cell.scale] at secondEq ⊢
+    calc
+      20 * (crossing.periodNormalize
+              (PeriodicCNF.incidenceGraph formula)).point.2 +
+            20 * (drawingGridSize
+              (PeriodicCNF.incidenceGraph formula) : Int) *
+              (crossingPeriodShift
+                (PeriodicCNF.incidenceGraph formula) crossing).2 =
+          20 * ((crossing.periodNormalize
+              (PeriodicCNF.incidenceGraph formula)).point.2 +
+            (drawingGridSize
+              (PeriodicCNF.incidenceGraph formula) : Int) *
+              (crossingPeriodShift
+                (PeriodicCNF.incidenceGraph formula) crossing).2) := by
+            ring
+      _ = 20 * crossing.point.2 := by rw [secondEq]
+
+/-- The same reconstruction law after adding any fixed local position inside
+the crossover macrocell. -/
+theorem crossingLocalPosition_periodNormalize_translation
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (crossing : CrossingRecord) (localPosition : Cell) :
+    Cell.add
+        (Cell.add
+          (crossingMacroOrigin
+            (crossing.periodNormalize
+              (PeriodicCNF.incidenceGraph formula)))
+          localPosition)
+        ((drawingPeriodicPlanarSATPlacement formula).translation
+          (crossingPeriodShift
+            (PeriodicCNF.incidenceGraph formula) crossing)) =
+      Cell.add (crossingMacroOrigin crossing) localPosition := by
+  have originEq :=
+    crossingMacroOrigin_periodNormalize_translation formula crossing
+  apply Prod.ext
+  · have firstEq := congrArg Prod.fst originEq
+    simpa [Cell.add, add_assoc, add_left_comm, add_comm] using firstEq
+  · have secondEq := congrArg Prod.snd originEq
+    simpa [Cell.add, add_assoc, add_left_comm, add_comm] using secondEq
+
 /-- Normalizing a finite routed variable preserves its physical drawing
 position: its explicit neighboring translate becomes exactly the periodic
 literal translation. -/
@@ -48,9 +134,9 @@ theorem normalizePlanarSATVariable_position
     (inputVariable : PlanarSATVariable Variable) :
     Cell.add
         ((drawingPeriodicPlanarSATPlacement formula).position
-          (normalizePlanarSATVariable inputVariable).1)
+          (normalizePlanarSATVariable formula inputVariable).1)
         ((drawingPeriodicPlanarSATPlacement formula).translation
-          (normalizePlanarSATVariable inputVariable).2) =
+          (normalizePlanarSATVariable formula inputVariable).2) =
       drawingPlanarSATVariablePosition formula inputVariable := by
   let graph := PeriodicCNF.incidenceGraph formula
   cases inputVariable with
@@ -60,12 +146,15 @@ theorem normalizePlanarSATVariable_position
           cases carrier with
           | boundary boundary =>
               rw [drawingPlanarSATVariablePosition]
-              simp [normalizePlanarSATVariable,
+              simpa [normalizePlanarSATVariable,
                 drawingPeriodicPlanarSATPlacement,
                 drawingPeriodicPlanarSATVariablePosition,
                 CarrierNode.position,
-                PeriodicVariablePlacement.translation,
-                Cell.add, Cell.scale]
+                CrossingBoundary.periodNormalize,
+                CrossingBoundary.position] using
+                crossingLocalPosition_periodNormalize_translation
+                  formula boundary.crossing
+                  boundary.side.localPosition
           | terminal terminal =>
               rcases terminal with
                 ⟨indexed, ⟨translateX, translateY⟩, endpoint⟩
@@ -101,11 +190,14 @@ theorem normalizePlanarSATVariable_position
   | inr internal =>
       rcases internal with ⟨crossing, internal⟩
       rw [drawingPlanarSATVariablePosition]
-      simp [normalizePlanarSATVariable,
+      simpa [normalizePlanarSATVariable,
         drawingPeriodicPlanarSATPlacement,
         drawingPeriodicPlanarSATVariablePosition,
-        PeriodicVariablePlacement.translation,
-        Cell.add, Cell.scale]
+        CrossingBoundary.periodNormalize] using
+        crossingLocalPosition_periodNormalize_translation
+          formula crossing
+          (CrossoverVariable.position
+            (crossoverInternalVariable internal))
 
 /-- Equivalent literal-level form of
 `normalizePlanarSATVariable_position`. -/
@@ -114,7 +206,7 @@ theorem periodicizePlanarSATLiteral_position
     (formula : PeriodicCNF Variable)
     (literal : PlanarSATVariable Variable × Bool) :
     (drawingPeriodicPlanarSATPlacement formula).literalPosition
-        (periodicizePlanarSATLiteral literal) =
+        (periodicizePlanarSATLiteral formula literal) =
       drawingPlanarSATVariablePosition formula literal.1 := by
   exact normalizePlanarSATVariable_position formula literal.1
 
@@ -129,7 +221,7 @@ def normalizePlanarSATIncidenceRoute
   let placement := drawingPeriodicPlanarSATPlacement formula
   let anchor :=
     PeriodicCNF.clauseAnchor
-      (periodicizePlanarSATClause clause)
+      (periodicizePlanarSATClause formula clause)
   route.map fun point =>
     Cell.sub point (placement.translation anchor)
 
@@ -147,7 +239,7 @@ theorem normalizePlanarSATIncidenceRoute_head?
         (PositionedPeriodicCNF.canonicalClausePosition
           (drawingPeriodicPlanarSATPlacement formula)
           ⟨clause.position,
-            periodicizePlanarSATClause clause⟩) := by
+            periodicizePlanarSATClause formula clause⟩) := by
   simp [normalizePlanarSATIncidenceRoute, routeHead,
     PositionedPeriodicCNF.canonicalClausePosition]
 
@@ -186,12 +278,12 @@ theorem normalizePlanarSATIncidenceRoute_getLast?
       some
         (Cell.add
           ((drawingPeriodicPlanarSATPlacement formula).position
-            (periodicizePlanarSATLiteral literal).atom)
+            (periodicizePlanarSATLiteral formula literal).atom)
           ((drawingPeriodicPlanarSATPlacement formula).translation
             (Cell.sub
-              (periodicizePlanarSATLiteral literal).offset
+              (periodicizePlanarSATLiteral formula literal).offset
               (PeriodicCNF.clauseAnchor
-                (periodicizePlanarSATClause clause))))) := by
+                (periodicizePlanarSATClause formula clause))))) := by
   rw [← periodicizePlanarSATLiteral_position formula literal]
     at routeLast
   simp only [normalizePlanarSATIncidenceRoute,
@@ -199,9 +291,9 @@ theorem normalizePlanarSATIncidenceRoute_getLast?
   exact congrArg some
     (literalPosition_sub_anchor
       (drawingPeriodicPlanarSATPlacement formula)
-      (periodicizePlanarSATLiteral literal)
+      (periodicizePlanarSATLiteral formula literal)
       (PeriodicCNF.clauseAnchor
-        (periodicizePlanarSATClause clause)))
+        (periodicizePlanarSATClause formula clause)))
 
 end PeriodicOrthocrossing
 end LeanTrominoes

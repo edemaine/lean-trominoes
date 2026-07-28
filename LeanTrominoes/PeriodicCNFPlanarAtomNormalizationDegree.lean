@@ -69,11 +69,15 @@ theorem normalizedRoutedVariableLink_eq_of_routeIndex_eq
     (firstMem :
       first ∈
         (drawingRoutedVariableLinks formula).map
-          (PeriodicEquality.normalizeLink normalizePlanarSATNode))
+          (PeriodicEquality.normalizeLink
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula))))
     (secondMem :
       second ∈
         (drawingRoutedVariableLinks formula).map
-          (PeriodicEquality.normalizeLink normalizePlanarSATNode))
+          (PeriodicEquality.normalizeLink
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula))))
     (routeIndexEq :
       normalizedRoutedVariableLinkRouteIndex first =
         normalizedRoutedVariableLinkRouteIndex second) :
@@ -189,7 +193,9 @@ theorem
         (.atom atom) ≤ 3 := by
   let rawLinks :=
     (drawingRoutedVariableLinks formula).map
-      (PeriodicEquality.normalizeLink normalizePlanarSATNode)
+      (PeriodicEquality.normalizeLink
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula)))
   let links := rawLinks.dedup
   let target : PeriodicPlanarSATVariable Variable := .atom atom
   let incidentLinks :=

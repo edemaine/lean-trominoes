@@ -1,5 +1,7 @@
 import LeanTrominoes.PeriodicOrthocrossingCarrierTerminalDegree
 import LeanTrominoes.PeriodicEqualityNormalization
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 /-!
 # Periodic degree of normalized complete-carrier equalities
@@ -22,7 +24,7 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
 
-set_option maxHeartbeats 800000
+set_option maxHeartbeats 2000000
 
 /-- Carrier-node names after explicit segment translations have been moved
 to periodic literal offsets. -/
@@ -81,33 +83,92 @@ theorem SegmentTerminal.eq_of_fields_eq
   cases second
   simp_all
 
-/-- Periodic normalization restricted to complete-carrier variables. -/
+/-- Periodic normalization restricted to complete-carrier variables.
+Halo crossover sites are reduced to their canonical crossing records, while
+their common lattice shift is retained as the variable offset. -/
 def normalizeCarrierNode
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (node : CarrierNode) : PeriodicCarrierNode × Cell :=
   match node with
   | .terminal terminal =>
       (.terminal terminal.indexed terminal.endpoint,
         terminal.translate)
   | .boundary boundary =>
-      (.boundary boundary, (0, 0))
+      (.boundary (boundary.periodNormalize graph),
+        crossingPeriodShift graph boundary.crossing)
 
 @[simp]
 theorem normalizeCarrierNode_terminal
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (terminal : SegmentTerminal) :
-    normalizeCarrierNode (.terminal terminal) =
+    normalizeCarrierNode graph (.terminal terminal) =
       (.terminal terminal.indexed terminal.endpoint,
         terminal.translate) := rfl
 
 @[simp]
 theorem normalizeCarrierNode_boundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (boundary : CrossingBoundary) :
-    normalizeCarrierNode (.boundary boundary) =
-      (.boundary boundary, (0, 0)) := rfl
+    normalizeCarrierNode graph (.boundary boundary) =
+      (.boundary (boundary.periodNormalize graph),
+        crossingPeriodShift graph boundary.crossing) := rfl
+
+@[simp]
+theorem CrossingBoundary.periodNormalize_indexed
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (boundary : CrossingBoundary) :
+    (boundary.periodNormalize graph).indexed = boundary.indexed := by
+  cases boundary with
+  | mk crossing side =>
+      cases side <;> rfl
+
+/-- A retained physical boundary normalizes to one of the at most two
+canonical crossing translations of its carrier segment. -/
+theorem crossingBoundary_periodNormalize_translate_mem
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {boundary : CrossingBoundary}
+    (boundaryMem : boundary ∈ drawingCrossingBoundaries graph) :
+    (boundary.periodNormalize graph).translate ∈
+      segmentCrossingTranslations graph
+        (boundary.periodNormalize graph).indexed := by
+  have crossingMem :=
+    drawingCrossingBoundary_crossing_mem graph boundaryMem
+  have normalizedMem :=
+    periodNormalize_mem_orientedCrossings
+      wellFormed degree isLocal crossingMem
+  have normalizedSound :=
+    orientedCrossings_sound graph normalizedMem
+  apply (mem_segmentCrossingTranslations_iff graph _ _).mpr
+  cases boundary with
+  | mk crossing side =>
+      cases side
+      · exact ⟨normalizedSound.2.2.1,
+          ⟨crossing.periodNormalize graph, normalizedMem,
+            Or.inl ⟨rfl, rfl⟩⟩⟩
+      · exact ⟨normalizedSound.2.2.1,
+          ⟨crossing.periodNormalize graph, normalizedMem,
+            Or.inl ⟨rfl, rfl⟩⟩⟩
+      · exact ⟨normalizedSound.2.2.2.1,
+          ⟨crossing.periodNormalize graph, normalizedMem,
+            Or.inr ⟨rfl, rfl⟩⟩⟩
+      · exact ⟨normalizedSound.2.2.2.1,
+          ⟨crossing.periodNormalize graph, normalizedMem,
+            Or.inr ⟨rfl, rfl⟩⟩⟩
 
 theorem normalizeCarrierNode_fst_eq_terminal_iff
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (node : CarrierNode)
     (indexed : IndexedGridSegment) (endpoint : SegmentEnd) :
-    (normalizeCarrierNode node).1 =
+    (normalizeCarrierNode graph node).1 =
         .terminal indexed endpoint ↔
       ∃ translate,
         node = .terminal ⟨indexed, translate, endpoint⟩ := by
@@ -220,28 +281,32 @@ theorem completeCarrierLinks_eq_of_terminal_incident
     firstMem secondMem firstIncident secondIncident
 
 theorem normalizeLink_first_eq_terminal_iff
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (link : EqualityLink CarrierNode)
     (indexed : IndexedGridSegment) (endpoint : SegmentEnd) :
     (PeriodicEquality.normalizeLink
-        normalizeCarrierNode link).first =
+        (normalizeCarrierNode graph) link).first =
           .terminal indexed endpoint ↔
       ∃ translate,
         link.first =
           .terminal ⟨indexed, translate, endpoint⟩ := by
   exact normalizeCarrierNode_fst_eq_terminal_iff
-    link.first indexed endpoint
+    graph link.first indexed endpoint
 
 theorem normalizeLink_second_eq_terminal_iff
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (link : EqualityLink CarrierNode)
     (indexed : IndexedGridSegment) (endpoint : SegmentEnd) :
     (PeriodicEquality.normalizeLink
-        normalizeCarrierNode link).second =
+        (normalizeCarrierNode graph) link).second =
           .terminal indexed endpoint ↔
       ∃ translate,
         link.second =
           .terminal ⟨indexed, translate, endpoint⟩ := by
   exact normalizeCarrierNode_fst_eq_terminal_iff
-    link.second indexed endpoint
+    graph link.second indexed endpoint
 
 theorem drawingCompleteCarrierLink_mem_terminal_chain
     {Vertex : Type*} [DecidableEq Vertex]
@@ -446,10 +511,12 @@ theorem normalizedTerminalLinkClass_of_second
   simp [normalizedTerminalLinkClass, firstNe]
 
 theorem normalizedLink_incident_terminal_iff
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
     (link : EqualityLink CarrierNode)
     (indexed : IndexedGridSegment) (endpoint : SegmentEnd) :
     let normalized :=
-      PeriodicEquality.normalizeLink normalizeCarrierNode link
+      PeriodicEquality.normalizeLink (normalizeCarrierNode graph) link
     normalized.first = .terminal indexed endpoint ∨
         normalized.second = .terminal indexed endpoint ↔
       ∃ translate,
@@ -461,37 +528,40 @@ theorem normalizedLink_incident_terminal_iff
   · intro incident
     rcases incident with incident | incident
     · rcases (normalizeLink_first_eq_terminal_iff
-        link indexed endpoint).mp incident with
+        graph link indexed endpoint).mp incident with
         ⟨translate, terminalEq⟩
       exact ⟨translate, Or.inl terminalEq⟩
     · rcases (normalizeLink_second_eq_terminal_iff
-        link indexed endpoint).mp incident with
+        graph link indexed endpoint).mp incident with
         ⟨translate, terminalEq⟩
       exact ⟨translate, Or.inr terminalEq⟩
   · rintro ⟨translate, incident⟩
     rcases incident with incident | incident
     · exact Or.inl ((normalizeLink_first_eq_terminal_iff
-        link indexed endpoint).mpr ⟨translate, incident⟩)
+        graph link indexed endpoint).mpr ⟨translate, incident⟩)
     · exact Or.inr ((normalizeLink_second_eq_terminal_iff
-        link indexed endpoint).mpr ⟨translate, incident⟩)
+        graph link indexed endpoint).mpr ⟨translate, incident⟩)
 
 theorem normalizedTerminalLinkClass_mem
     {Vertex : Type*} [DecidableEq Vertex]
-    (graph : PeriodicGraph Vertex)
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
     (indexed : IndexedGridSegment) (endpoint : SegmentEnd)
     {link : EqualityLink CarrierNode}
     (linkMem : link ∈ drawingCompleteCarrierLinks graph)
     (incident :
       let normalized :=
-        PeriodicEquality.normalizeLink normalizeCarrierNode link
+        PeriodicEquality.normalizeLink (normalizeCarrierNode graph) link
       normalized.first = .terminal indexed endpoint ∨
         normalized.second = .terminal indexed endpoint) :
     normalizedTerminalLinkClass (.terminal indexed endpoint)
-        (PeriodicEquality.normalizeLink normalizeCarrierNode link) ∈
+        (PeriodicEquality.normalizeLink (normalizeCarrierNode graph) link) ∈
       none ::
         (segmentCrossingTranslations graph indexed).toList.map some := by
   rcases (normalizedLink_incident_terminal_iff
-    link indexed endpoint).mp incident with
+    graph link indexed endpoint).mp incident with
     ⟨translate, sourceIncident⟩
   let terminal : SegmentTerminal :=
     ⟨indexed, translate, endpoint⟩
@@ -525,10 +595,11 @@ theorem normalizedTerminalLinkClass_mem
           crossingBoundary_terminal_indexed_translate_eq_of_carrierKey_eq
             graph boundaryMem terminalMem keyEq
         have crossingTranslateMem :=
-          (drawingCrossingBoundary_indexed_mem_and_translate_mem
-            graph boundaryMem).2
-        rw [carrierData.1] at crossingTranslateMem
-        change boundary.translate ∈
+          crossingBoundary_periodNormalize_translate_mem
+            wellFormed degree isLocal boundaryMem
+        rw [CrossingBoundary.periodNormalize_indexed,
+          carrierData.1] at crossingTranslateMem
+        change (boundary.periodNormalize graph).translate ∈
           segmentCrossingTranslations graph indexed
             at crossingTranslateMem
         simp [normalizedTerminalLinkClass,
@@ -557,10 +628,11 @@ theorem normalizedTerminalLinkClass_mem
           crossingBoundary_terminal_indexed_translate_eq_of_carrierKey_eq
             graph boundaryMem terminalMem keyEq
         have crossingTranslateMem :=
-          (drawingCrossingBoundary_indexed_mem_and_translate_mem
-            graph boundaryMem).2
-        rw [carrierData.1] at crossingTranslateMem
-        change boundary.translate ∈
+          crossingBoundary_periodNormalize_translate_mem
+            wellFormed degree isLocal boundaryMem
+        rw [CrossingBoundary.periodNormalize_indexed,
+          carrierData.1] at crossingTranslateMem
+        change (boundary.periodNormalize graph).translate ∈
           segmentCrossingTranslations graph indexed
             at crossingTranslateMem
         simp [normalizedTerminalLinkClass,
@@ -568,6 +640,31 @@ theorem normalizedTerminalLinkClass_mem
           normalizeCarrierNode, periodicCarrierNodeClass,
           secondEq, otherEq,
           crossingTranslateMem]
+
+theorem drawingCrossingBoundary_periodNormalize_eq_self
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {boundary : CrossingBoundary}
+    (boundaryMem : boundary ∈ drawingCrossingBoundaries graph) :
+    boundary.periodNormalize graph = boundary := by
+  cases boundary with
+  | mk crossing side =>
+      simp [CrossingBoundary.periodNormalize,
+        periodNormalize_eq_self_of_mem_orientedCrossings graph
+          (drawingCrossingBoundary_crossing_mem_orientedCrossings
+            graph boundaryMem)]
+
+theorem drawingCrossingBoundary_periodShift_eq_zero
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {boundary : CrossingBoundary}
+    (boundaryMem : boundary ∈ drawingCrossingBoundaries graph) :
+    crossingPeriodShift graph boundary.crossing = (0, 0) := by
+  exact crossingPeriodShift_eq_zero_of_inFundamental graph
+    boundary.crossing
+    ((orientedCrossings_sound graph
+      (drawingCrossingBoundary_crossing_mem_orientedCrossings
+        graph boundaryMem)).2.2.2.2.1.1)
 
 theorem normalizedTerminalLinkClass_some_eq_terminal_translate
     {Vertex : Type*} [DecidableEq Vertex]
@@ -584,13 +681,15 @@ theorem normalizedTerminalLinkClass_some_eq_terminal_translate
     (classEq :
       normalizedTerminalLinkClass (.terminal indexed endpoint)
           (PeriodicEquality.normalizeLink
-            normalizeCarrierNode link) =
+            (normalizeCarrierNode graph) link) =
         some classTranslate) :
     translate = classTranslate := by
   let terminal : SegmentTerminal :=
     ⟨indexed, translate, endpoint⟩
   have common :=
     drawingCompleteCarrierLinks_common_key graph linkMem
+  have endpoints :=
+    drawingCompleteCarrierLink_endpoints_mem graph linkMem
   rcases sourceIncident with firstEq | secondEq
   · cases otherEq : link.second with
     | terminal other =>
@@ -599,6 +698,11 @@ theorem normalizedTerminalLinkClass_some_eq_terminal_translate
           normalizeCarrierNode, periodicCarrierNodeClass,
           firstEq, otherEq] at classEq
     | boundary boundary =>
+        have boundaryMem :
+            boundary ∈ drawingCrossingBoundaries graph := by
+          rw [otherEq] at endpoints
+          unfold drawingCarrierNodes at endpoints
+          simpa using endpoints.2
         have keyEq :
             terminal.carrierKey = boundary.carrierKey := by
           rw [firstEq, otherEq] at common
@@ -611,10 +715,13 @@ theorem normalizedTerminalLinkClass_some_eq_terminal_translate
               (keyEq.trans
                 (CrossingBoundary.carrierKey_eq_indexed_translate
                   boundary))
+        have normalizeEq :=
+          drawingCrossingBoundary_periodNormalize_eq_self
+            graph boundaryMem
         simp [normalizedTerminalLinkClass,
           PeriodicEquality.normalizeLink,
           normalizeCarrierNode, periodicCarrierNodeClass,
-          firstEq, otherEq] at classEq
+          firstEq, otherEq, normalizeEq] at classEq
         exact translateEq.trans classEq
   · cases otherEq : link.first with
     | terminal other =>
@@ -623,6 +730,11 @@ theorem normalizedTerminalLinkClass_some_eq_terminal_translate
           normalizeCarrierNode, periodicCarrierNodeClass,
           secondEq, otherEq] at classEq
     | boundary boundary =>
+        have boundaryMem :
+            boundary ∈ drawingCrossingBoundaries graph := by
+          rw [otherEq] at endpoints
+          unfold drawingCarrierNodes at endpoints
+          simpa using endpoints.1
         have keyEq :
             boundary.carrierKey = terminal.carrierKey := by
           rw [otherEq, secondEq] at common
@@ -634,10 +746,13 @@ theorem normalizedTerminalLinkClass_some_eq_terminal_translate
             congrArg (fun key => key.2.2)
               ((CrossingBoundary.carrierKey_eq_indexed_translate
                 boundary).symm.trans keyEq)
+        have normalizeEq :=
+          drawingCrossingBoundary_periodNormalize_eq_self
+            graph boundaryMem
         simp [normalizedTerminalLinkClass,
           PeriodicEquality.normalizeLink,
           normalizeCarrierNode, periodicCarrierNodeClass,
-          secondEq, otherEq] at classEq
+          secondEq, otherEq, normalizeEq] at classEq
         exact translateEq.symm.trans classEq
 
 theorem normalizeLink_eq_terminalDirectNormalizedLink_of_class_none
@@ -651,17 +766,17 @@ theorem normalizeLink_eq_terminalDirectNormalizedLink_of_class_none
     (linkMem : link ∈ drawingCompleteCarrierLinks graph)
     (incident :
       let normalized :=
-        PeriodicEquality.normalizeLink normalizeCarrierNode link
+        PeriodicEquality.normalizeLink (normalizeCarrierNode graph) link
       normalized.first = .terminal indexed endpoint ∨
         normalized.second = .terminal indexed endpoint)
     (classEq :
       normalizedTerminalLinkClass (.terminal indexed endpoint)
           (PeriodicEquality.normalizeLink
-            normalizeCarrierNode link) = none) :
-    PeriodicEquality.normalizeLink normalizeCarrierNode link =
+            (normalizeCarrierNode graph) link) = none) :
+    PeriodicEquality.normalizeLink (normalizeCarrierNode graph) link =
       terminalDirectNormalizedLink indexed endpoint := by
   rcases (normalizedLink_incident_terminal_iff
-    link indexed endpoint).mp incident with
+    graph link indexed endpoint).mp incident with
     ⟨translate, sourceIncident⟩
   let terminal : SegmentTerminal :=
     ⟨indexed, translate, endpoint⟩
@@ -787,11 +902,13 @@ theorem normalizedTerminalLinkClass_injective_on_incident
     (firstMem :
       first ∈
         (drawingCompleteCarrierLinks graph).map
-          (PeriodicEquality.normalizeLink normalizeCarrierNode))
+          (PeriodicEquality.normalizeLink
+            (normalizeCarrierNode graph)))
     (secondMem :
       second ∈
         (drawingCompleteCarrierLinks graph).map
-          (PeriodicEquality.normalizeLink normalizeCarrierNode))
+          (PeriodicEquality.normalizeLink
+            (normalizeCarrierNode graph)))
     (firstIncident :
       first.first = .terminal indexed endpoint ∨
         first.second = .terminal indexed endpoint)
@@ -811,20 +928,20 @@ theorem normalizedTerminalLinkClass_injective_on_incident
   subst first
   subst second
   rcases (normalizedLink_incident_terminal_iff
-    firstSource indexed endpoint).mp firstIncident with
+    graph firstSource indexed endpoint).mp firstIncident with
     ⟨firstTranslate, firstSourceIncident⟩
   rcases (normalizedLink_incident_terminal_iff
-    secondSource indexed endpoint).mp secondIncident with
+    graph secondSource indexed endpoint).mp secondIncident with
     ⟨secondTranslate, secondSourceIncident⟩
   cases firstClass :
       normalizedTerminalLinkClass (.terminal indexed endpoint)
         (PeriodicEquality.normalizeLink
-          normalizeCarrierNode firstSource) with
+          (normalizeCarrierNode graph) firstSource) with
   | none =>
       have secondClass :
           normalizedTerminalLinkClass (.terminal indexed endpoint)
               (PeriodicEquality.normalizeLink
-                normalizeCarrierNode secondSource) = none := by
+                (normalizeCarrierNode graph) secondSource) = none := by
         rw [← classEq]
         exact firstClass
       rw [normalizeLink_eq_terminalDirectNormalizedLink_of_class_none
@@ -837,7 +954,7 @@ theorem normalizedTerminalLinkClass_injective_on_incident
       have secondClass :
           normalizedTerminalLinkClass (.terminal indexed endpoint)
               (PeriodicEquality.normalizeLink
-                normalizeCarrierNode secondSource) =
+                (normalizeCarrierNode graph) secondSource) =
             some classTranslate := by
         rw [← classEq]
         exact firstClass
@@ -885,7 +1002,7 @@ theorem normalizedCompleteCarrierLink_not_both_terminal
     (linkMem :
       link ∈
         (drawingCompleteCarrierLinks graph).map
-          (PeriodicEquality.normalizeLink normalizeCarrierNode)) :
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph))) :
     ¬(link.first = .terminal indexed endpoint ∧
       link.second = .terminal indexed endpoint) := by
   rcases List.mem_map.mp linkMem with
@@ -893,10 +1010,10 @@ theorem normalizedCompleteCarrierLink_not_both_terminal
   subst link
   rintro ⟨firstEq, secondEq⟩
   rcases (normalizeLink_first_eq_terminal_iff
-    source indexed endpoint).mp firstEq with
+    graph source indexed endpoint).mp firstEq with
     ⟨firstTranslate, sourceFirstEq⟩
   rcases (normalizeLink_second_eq_terminal_iff
-    source indexed endpoint).mp secondEq with
+    graph source indexed endpoint).mp secondEq with
     ⟨secondTranslate, sourceSecondEq⟩
   have common :=
     drawingCompleteCarrierLinks_common_key graph sourceMem
@@ -922,7 +1039,7 @@ def deduplicatedNormalizedCompleteCarrierLinks
     (graph : PeriodicGraph Vertex) :
     List (PeriodicEquality.NormalizedLink PeriodicCarrierNode) :=
   ((drawingCompleteCarrierLinks graph).map
-    (PeriodicEquality.normalizeLink normalizeCarrierNode)).dedup
+    (PeriodicEquality.normalizeLink (normalizeCarrierNode graph))).dedup
 
 @[simp]
 theorem normalizedLinkIncident_eq_true_iff
@@ -980,7 +1097,7 @@ theorem deduplicatedNormalizedCompleteCarrierLinks_terminal_count_le_three
         (.terminal indexed endpoint) ≤ 3 := by
   let rawLinks :=
     (drawingCompleteCarrierLinks graph).map
-      (PeriodicEquality.normalizeLink normalizeCarrierNode)
+      (PeriodicEquality.normalizeLink (normalizeCarrierNode graph))
   let links := rawLinks.dedup
   let target : PeriodicCarrierNode :=
     .terminal indexed endpoint
@@ -1041,23 +1158,25 @@ theorem deduplicatedNormalizedCompleteCarrierLinks_terminal_count_le_three
     apply List.mem_toFinset.mpr
     change link ∈
       (drawingCompleteCarrierLinks graph).map
-        (PeriodicEquality.normalizeLink normalizeCarrierNode) at linkRaw
+        (PeriodicEquality.normalizeLink
+          (normalizeCarrierNode graph)) at linkRaw
     rcases List.mem_map.mp linkRaw with
       ⟨source, sourceMem, sourceEq⟩
     subst link
     change
       (PeriodicEquality.normalizeLink
-          normalizeCarrierNode source).first =
+          (normalizeCarrierNode graph) source).first =
             .terminal indexed endpoint ∨
         (PeriodicEquality.normalizeLink
-          normalizeCarrierNode source).second =
+          (normalizeCarrierNode graph) source).second =
             .terminal indexed endpoint at linkIncident
     have classMem :=
       normalizedTerminalLinkClass_mem
-        graph indexed endpoint sourceMem linkIncident
+        wellFormed degree isLocal indexed endpoint
+          sourceMem linkIncident
     change normalizedTerminalLinkClass target
       (PeriodicEquality.normalizeLink
-        normalizeCarrierNode source) ∈ classes at classMem
+        (normalizeCarrierNode graph) source) ∈ classes at classMem
     exact classMem
   have classLengthLe :
       (incidentLinks.map
@@ -1088,12 +1207,147 @@ theorem deduplicatedNormalizedCompleteCarrierLinks_terminal_count_le_three
       graph indexed endpoint (by
         simpa [rawLinks] using linkRaw)
 
+theorem normalizedLinkEndpoints_map_normalizeLink
+    {Source Target : Type*}
+    (normalize : Source → Target × Cell)
+    (links : List (EqualityLink Source)) :
+    PeriodicEquality.normalizedLinkEndpoints
+        (links.map (PeriodicEquality.normalizeLink normalize)) =
+      (equalityLinkEndpoints links).map
+        (fun node => (normalize node).1) := by
+  unfold PeriodicEquality.normalizedLinkEndpoints equalityLinkEndpoints
+  induction links with
+  | nil =>
+      rfl
+  | cons link links induction =>
+      simp only [List.map_cons, List.flatMap_cons, List.map_append]
+      rw [induction]
+      rfl
+
+theorem List.count_map_eq_count_of_fiber_on
+    {Source Target : Type*}
+    [DecidableEq Source] [DecidableEq Target]
+    (items : List Source) (mapItem : Source → Target)
+    (source : Source) (target : Target)
+    (fiber :
+      ∀ item ∈ items,
+        mapItem item = target ↔ item = source) :
+    (items.map mapItem).count target =
+      items.count source := by
+  induction items with
+  | nil =>
+      simp
+  | cons item items induction =>
+      have itemFiber := fiber item (by simp)
+      have tailFiber :
+          ∀ tailItem ∈ items,
+            mapItem tailItem = target ↔ tailItem = source := by
+        intro tailItem tailItemMem
+        exact fiber tailItem (by simp [tailItemMem])
+      by_cases itemEq : item = source
+      · subst item
+        have mappedEq : mapItem source = target :=
+          itemFiber.mpr rfl
+        simp [mappedEq, induction tailFiber]
+      · have mappedNe : mapItem item ≠ target := by
+          intro mappedEq
+          exact itemEq (itemFiber.mp mappedEq)
+        simp [mappedNe, itemEq, induction tailFiber]
+
+theorem normalizeCarrierNode_fst_eq_boundary_iff_of_mem_drawingCarrierNodes
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {node : CarrierNode}
+    (nodeMem : node ∈ drawingCarrierNodes graph)
+    (boundary : CrossingBoundary) :
+    (normalizeCarrierNode graph node).1 = .boundary boundary ↔
+      node = .boundary boundary := by
+  cases node with
+  | terminal terminal =>
+      simp [normalizeCarrierNode]
+  | boundary sourceBoundary =>
+      have sourceBoundaryMem :
+          sourceBoundary ∈ drawingCrossingBoundaries graph := by
+        unfold drawingCarrierNodes at nodeMem
+        simpa using nodeMem
+      have normalizeEq :=
+        drawingCrossingBoundary_periodNormalize_eq_self
+          graph sourceBoundaryMem
+      simp [normalizeCarrierNode, normalizeEq]
+
+theorem drawingCompleteCarrierEndpoints_mem_drawingCarrierNodes
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {node : CarrierNode}
+    (nodeMem :
+      node ∈
+        equalityLinkEndpoints
+          (drawingCompleteCarrierLinks graph)) :
+    node ∈ drawingCarrierNodes graph := by
+  rcases List.mem_flatMap.mp nodeMem with
+    ⟨link, linkMem, endpointMem⟩
+  have endpoints :=
+    drawingCompleteCarrierLink_endpoints_mem graph linkMem
+  simp only [List.mem_cons, List.not_mem_nil, or_false]
+    at endpointMem
+  rcases endpointMem with endpointEq | endpointEq
+  · simpa [endpointEq] using endpoints.1
+  · simpa [endpointEq] using endpoints.2
+
+/-- Canonical crossing boundaries retain the physical degree-two endpoint
+bound after graph-aware periodic normalization. -/
+theorem normalizedCompleteCarrierLinks_boundary_count_le_two
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (boundary : CrossingBoundary) :
+    (PeriodicEquality.normalizedLinkEndpoints
+      ((drawingCompleteCarrierLinks graph).map
+        (PeriodicEquality.normalizeLink
+          (normalizeCarrierNode graph)))).count
+        (.boundary boundary) ≤ 2 := by
+  rw [normalizedLinkEndpoints_map_normalizeLink]
+  rw [List.count_map_eq_count_of_fiber_on
+    (equalityLinkEndpoints
+      (drawingCompleteCarrierLinks graph))
+    (fun node => (normalizeCarrierNode graph node).1)
+    (.boundary boundary)
+    (.boundary boundary)]
+  · exact
+      drawingCompleteCarrierLinks_endpoint_count_le_two
+        graph (.boundary boundary)
+  · intro node nodeMem
+    exact
+      normalizeCarrierNode_fst_eq_boundary_iff_of_mem_drawingCarrierNodes
+        graph
+        (drawingCompleteCarrierEndpoints_mem_drawingCarrierNodes
+          graph nodeMem)
+        boundary
+
+/-- Link deduplication cannot increase canonical-boundary multiplicity. -/
+theorem deduplicatedNormalizedCompleteCarrierLinks_boundary_count_le_two
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (boundary : CrossingBoundary) :
+    (PeriodicEquality.normalizedLinkEndpoints
+      (deduplicatedNormalizedCompleteCarrierLinks graph)).count
+        (.boundary boundary) ≤ 2 := by
+  apply le_trans ?_
+    (normalizedCompleteCarrierLinks_boundary_count_le_two
+      graph boundary)
+  exact (List.dedup_sublist
+      ((drawingCompleteCarrierLinks graph).map
+        (PeriodicEquality.normalizeLink
+          (normalizeCarrierNode graph)))).flatMap
+    (fun link =>
+      [link.first, link.second])
+    |>.subperm.count_le _
+
 def deduplicatedNormalizedCompleteCarrierFormula
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) :
     PeriodicCNF PeriodicCarrierNode :=
   PeriodicEquality.deduplicatedNormalizedFormula
-    normalizeCarrierNode (drawingCompleteCarrierLinks graph)
+    (normalizeCarrierNode graph) (drawingCompleteCarrierLinks graph)
 
 /-- After periodic normalization and clause deduplication, complete straight
 carrier equalities use a terminal prototype at most six times. -/
@@ -1117,6 +1371,27 @@ theorem deduplicatedNormalizedCompleteCarrierFormula_terminal_count_le_six
   have endpointDegree :=
     deduplicatedNormalizedCompleteCarrierLinks_terminal_count_le_three
       wellFormed degree isLocal indexedMem endpoint
+  omega
+
+/-- Complete straight-carrier equalities use a canonical crossing-boundary
+prototype at most four times after periodic normalization and clause
+deduplication. -/
+theorem deduplicatedNormalizedCompleteCarrierFormula_boundary_count_le_four
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (boundary : CrossingBoundary) :
+    (deduplicatedNormalizedCompleteCarrierFormula
+      graph).variableOccurrences.count
+        (.boundary boundary) ≤ 4 := by
+  unfold deduplicatedNormalizedCompleteCarrierFormula
+  rw [PeriodicEquality.deduplicatedNormalizedFormula_occurrence_count]
+  change
+    2 * (PeriodicEquality.normalizedLinkEndpoints
+      (deduplicatedNormalizedCompleteCarrierLinks graph)).count
+        (.boundary boundary) ≤ 4
+  have endpointDegree :=
+    deduplicatedNormalizedCompleteCarrierLinks_boundary_count_le_two
+      graph boundary
   omega
 
 end PeriodicOrthocrossing

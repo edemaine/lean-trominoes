@@ -248,21 +248,25 @@ def drawingPeriodicPlanarSATVariablePosition
 /-- Attach the original embedded clause positions while periodicizing their
 literals. -/
 def positionPeriodicizedPlanarSATFormula
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (finiteFormula :
       List (EmbeddedClause (PlanarSATVariable Variable))) :
     PositionedPeriodicCNF
       (PeriodicPlanarSATVariable Variable) :=
   ⟨finiteFormula.map fun clause =>
-    ⟨clause.position, periodicizePlanarSATClause clause⟩⟩
+    ⟨clause.position, periodicizePlanarSATClause formula clause⟩⟩
 
 @[simp]
 theorem positionPeriodicizedPlanarSATFormula_erase
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (finiteFormula :
       List (EmbeddedClause (PlanarSATVariable Variable))) :
-    (positionPeriodicizedPlanarSATFormula finiteFormula).erase =
-      ⟨finiteFormula.map periodicizePlanarSATClause⟩ := by
+    (positionPeriodicizedPlanarSATFormula
+      formula finiteFormula).erase =
+      ⟨finiteFormula.map
+        (periodicizePlanarSATClause formula)⟩ := by
   simp [positionPeriodicizedPlanarSATFormula,
     PositionedPeriodicCNF.erase,
     List.map_map, Function.comp_def]
@@ -275,7 +279,7 @@ def drawingPositionedPeriodicPlanarSATFormula
     PositionedPeriodicCNF
       (PeriodicPlanarSATVariable Variable) :=
   positionPeriodicizedPlanarSATFormula
-    (drawingPlanarSATFormula formula)
+    formula (drawingPlanarSATFormula formula)
 
 @[simp]
 theorem drawingPositionedPeriodicPlanarSATFormula_erase
@@ -284,7 +288,7 @@ theorem drawingPositionedPeriodicPlanarSATFormula_erase
     (drawingPositionedPeriodicPlanarSATFormula formula).erase =
       drawingPeriodicPlanarSATFormula formula := by
   exact positionPeriodicizedPlanarSATFormula_erase
-    (drawingPlanarSATFormula formula)
+    formula (drawingPlanarSATFormula formula)
 
 /-- Put the positioned routed formula behind the same opaque variable
 wrapper used by the semantic occurrence-splitting layer. -/

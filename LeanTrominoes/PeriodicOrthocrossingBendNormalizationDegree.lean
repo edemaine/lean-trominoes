@@ -113,9 +113,9 @@ theorem drawingRouteBends_eraseTranslation_eq_of_identity_eq
 theorem RouteBend.normalize_equalityLink_eq_eraseTranslation
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
-    PeriodicEquality.normalizeLink normalizeCarrierNode
+    PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
         (routeBend.equalityLink graph) =
-      PeriodicEquality.normalizeLink normalizeCarrierNode
+      PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
         (routeBend.eraseTranslation.equalityLink graph) := by
   rcases routeBend with
     ⟨routeIndex, incomingSegmentIndex, translate,
@@ -129,7 +129,7 @@ theorem RouteBend.normalize_equalityLink_eq_eraseTranslation
 theorem RouteBend.normalize_equalityLink_first
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
-    (PeriodicEquality.normalizeLink normalizeCarrierNode
+    (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
       (routeBend.equalityLink graph)).first =
         .terminal routeBend.incomingTerminal.indexed .finish := by
   rfl
@@ -138,7 +138,7 @@ theorem RouteBend.normalize_equalityLink_first
 theorem RouteBend.normalize_equalityLink_second
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
-    (PeriodicEquality.normalizeLink normalizeCarrierNode
+    (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
       (routeBend.equalityLink graph)).second =
         .terminal routeBend.outgoingTerminal.indexed .start := by
   rfl
@@ -147,7 +147,7 @@ theorem RouteBend.normalize_equalityLink_second
 theorem RouteBend.normalize_equalityLink_relativeOffset
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) (routeBend : RouteBend) :
-    (PeriodicEquality.normalizeLink normalizeCarrierNode
+    (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
       (routeBend.equalityLink graph)).relativeOffset = (0, 0) := by
   rcases routeBend with
     ⟨routeIndex, incomingSegmentIndex, translate,
@@ -168,11 +168,11 @@ theorem normalizedDrawingRouteBendLink_eq_of_terminal_incident
     (firstMem :
       first ∈
         (drawingRouteBendLinks graph).map
-          (PeriodicEquality.normalizeLink normalizeCarrierNode))
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)))
     (secondMem :
       second ∈
         (drawingRouteBendLinks graph).map
-          (PeriodicEquality.normalizeLink normalizeCarrierNode))
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)))
     (firstIncident :
       first.first = .terminal indexed endpoint ∨
         first.second = .terminal indexed endpoint)
@@ -201,14 +201,14 @@ theorem normalizedDrawingRouteBendLink_eq_of_terminal_incident
   cases endpoint with
   | start =>
       have firstIncident' :
-          (PeriodicEquality.normalizeLink normalizeCarrierNode
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
             (firstBend.equalityLink graph)).second =
               .terminal indexed .start := by
         rcases firstIncident with firstIncident | firstIncident
         · simp at firstIncident
         · exact firstIncident
       have secondIncident' :
-          (PeriodicEquality.normalizeLink normalizeCarrierNode
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
             (secondBend.equalityLink graph)).second =
               .terminal indexed .start := by
         rcases secondIncident with secondIncident | secondIncident
@@ -239,14 +239,14 @@ theorem normalizedDrawingRouteBendLink_eq_of_terminal_incident
         eraseEq]
   | finish =>
       have firstIncident' :
-          (PeriodicEquality.normalizeLink normalizeCarrierNode
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
             (firstBend.equalityLink graph)).first =
               .terminal indexed .finish := by
         rcases firstIncident with firstIncident | firstIncident
         · exact firstIncident
         · simp at firstIncident
       have secondIncident' :
-          (PeriodicEquality.normalizeLink normalizeCarrierNode
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph)
             (secondBend.equalityLink graph)).first =
               .terminal indexed .finish := by
         rcases secondIncident with secondIncident | secondIncident
@@ -286,7 +286,7 @@ theorem normalizedRouteBendLink_not_both_terminal
     (linkMem :
       link ∈
         (drawingRouteBendLinks graph).map
-          (PeriodicEquality.normalizeLink normalizeCarrierNode)) :
+          (PeriodicEquality.normalizeLink (normalizeCarrierNode graph))) :
     ¬(link.first = .terminal indexed endpoint ∧
       link.second = .terminal indexed endpoint) := by
   rcases List.mem_map.mp linkMem with
@@ -305,7 +305,7 @@ def deduplicatedNormalizedRouteBendLinks
     (graph : PeriodicGraph Vertex) :
     List (PeriodicEquality.NormalizedLink PeriodicCarrierNode) :=
   ((drawingRouteBendLinks graph).map
-    (PeriodicEquality.normalizeLink normalizeCarrierNode)).dedup
+    (PeriodicEquality.normalizeLink (normalizeCarrierNode graph))).dedup
 
 /-- Every terminal prototype is incident to at most one normalized bend
 link. -/
@@ -318,7 +318,7 @@ theorem deduplicatedNormalizedRouteBendLinks_terminal_count_le_one
         (.terminal indexed endpoint) ≤ 1 := by
   let rawLinks :=
     (drawingRouteBendLinks graph).map
-      (PeriodicEquality.normalizeLink normalizeCarrierNode)
+      (PeriodicEquality.normalizeLink (normalizeCarrierNode graph))
   let links := rawLinks.dedup
   let target : PeriodicCarrierNode :=
     .terminal indexed endpoint
@@ -390,7 +390,7 @@ def deduplicatedNormalizedRouteBendFormula
     (graph : PeriodicGraph Vertex) :
     PeriodicCNF PeriodicCarrierNode :=
   PeriodicEquality.deduplicatedNormalizedFormula
-    normalizeCarrierNode (drawingRouteBendLinks graph)
+    (normalizeCarrierNode graph) (drawingRouteBendLinks graph)
 
 /-- After periodic normalization and clause deduplication, bend equalities
 use a terminal prototype at most twice. -/

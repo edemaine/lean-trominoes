@@ -83,13 +83,15 @@ theorem CrossingBoundary.crossing_mem_orientedCrossings
     {boundary : CrossingBoundary}
     (boundaryMem :
       boundary ∈ drawingCrossingBoundaries graph) :
-    boundary.crossing ∈ orientedCrossings graph := by
+    boundary.crossing ∈ orientedCrossingHalo graph := by
   rcases List.mem_flatMap.mp boundaryMem with
     ⟨crossing, crossingMem, boundaryMem⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false] at boundaryMem
   rcases boundaryMem with
     boundaryEq | boundaryEq | boundaryEq | boundaryEq <;>
-      subst boundary <;> exact crossingMem
+      subst boundary <;>
+      exact orientedCrossings_subset_orientedCrossingHalo
+        graph crossingMem
 
 /-- At one canonical crossover, two boundary nodes on the same segment
 carrier have equal values. -/
@@ -99,7 +101,7 @@ theorem crossingBoundary_assignment_eq_of_common_carrier
     (assignment :
       Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool)
     (crossingLaws :
-      ∀ crossing ∈ orientedCrossings graph,
+      ∀ crossing ∈ orientedCrossingHalo graph,
         assignment
             (.inl (.boundary ⟨crossing, .left⟩)) =
             assignment
@@ -109,7 +111,7 @@ theorem crossingBoundary_assignment_eq_of_common_carrier
             assignment
               (.inl (.boundary ⟨crossing, .bottom⟩)))
     (crossing : CrossingRecord)
-    (crossingMem : crossing ∈ orientedCrossings graph)
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
     (firstSide secondSide : CrossingSide)
     (commonCarrier :
       (CrossingBoundary.mk crossing firstSide).carrierKey =
@@ -120,7 +122,7 @@ theorem crossingBoundary_assignment_eq_of_common_carrier
         (.inl (.boundary ⟨crossing, secondSide⟩)) := by
   have laws := crossingLaws crossing crossingMem
   have different :=
-    (orientedCrossings_sound graph crossingMem).2.2.2.2.1.2.1
+    (orientedCrossingHalo_sound graph crossingMem).2.2.2.2.1
   cases firstSide <;> cases secondSide <;>
     simp only [CrossingBoundary.carrierKey] at commonCarrier
   · rfl
@@ -149,7 +151,7 @@ theorem completeCarrierConsecutivePair_assignment_eq
     (assignment :
       Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool)
     (crossingLaws :
-      ∀ crossing ∈ orientedCrossings graph,
+      ∀ crossing ∈ orientedCrossingHalo graph,
         assignment
             (.inl (.boundary ⟨crossing, .left⟩)) =
             assignment
@@ -224,7 +226,7 @@ theorem completeCarrierNodes_assignment_eq
     (assignment :
       Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool)
     (crossingLaws :
-      ∀ crossing ∈ orientedCrossings graph,
+      ∀ crossing ∈ orientedCrossingHalo graph,
         assignment
             (.inl (.boundary ⟨crossing, .left⟩)) =
             assignment
@@ -258,7 +260,7 @@ theorem segmentOccurrenceTerminals_assignment_eq
     (assignment :
       Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool)
     (crossingLaws :
-      ∀ crossing ∈ orientedCrossings graph,
+      ∀ crossing ∈ orientedCrossingHalo graph,
         assignment
             (.inl (.boundary ⟨crossing, .left⟩)) =
             assignment

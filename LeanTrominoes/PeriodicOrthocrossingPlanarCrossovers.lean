@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicOrthocrossingCanonical
+import LeanTrominoes.PeriodicOrthocrossingCrossingNormalization
 import LeanTrominoes.PlanarThreeSATFamilyExtensions
 
 /-!
@@ -29,6 +29,14 @@ structure CrossingBoundary where
   side : CrossingSide
   deriving DecidableEq, Repr
 
+/-- Normalize a physical crossover boundary to its canonical crossing site,
+preserving which of the four ports it names. -/
+def CrossingBoundary.periodNormalize
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (boundary : CrossingBoundary) : CrossingBoundary :=
+  ⟨boundary.crossing.periodNormalize graph, boundary.side⟩
+
 /-- The paper uses a common factor 20 to accommodate both Figure 8
 macrocells. -/
 def planarMacroScale : Int := 20
@@ -51,7 +59,7 @@ def drawingCrossoverFormula
     (graph : PeriodicGraph Vertex) :
     List (EmbeddedClause
       (Sum CrossingBoundary (CrossingRecord × CrossoverInternal))) :=
-  crossoverFamily (orientedCrossings graph)
+  crossoverFamily (orientedCrossingHalo graph)
     crossingPorts crossingMacroOrigin 1
 
 /-- An assignment to the four external variables of every crossing extends
@@ -60,7 +68,7 @@ def DrawingCrossoversExtend
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex)
     (assignment : CrossingBoundary → Bool) : Prop :=
-  CrossoverFamilyExtends assignment (orientedCrossings graph)
+  CrossoverFamilyExtends assignment (orientedCrossingHalo graph)
     crossingPorts crossingMacroOrigin 1
 
 /-- The drawing's complete crossover family extends exactly when each
@@ -70,13 +78,13 @@ theorem drawingCrossoversExtend_iff
     (graph : PeriodicGraph Vertex)
     (assignment : CrossingBoundary → Bool) :
     DrawingCrossoversExtend graph assignment ↔
-      ∀ crossing ∈ orientedCrossings graph,
+      ∀ crossing ∈ orientedCrossingHalo graph,
         assignment ⟨crossing, .left⟩ =
             assignment ⟨crossing, .right⟩ ∧
           assignment ⟨crossing, .top⟩ =
             assignment ⟨crossing, .bottom⟩ := by
   exact crossoverFamilyExtends_iff assignment
-    (orientedCrossings graph)
+    (orientedCrossingHalo graph)
     crossingPorts crossingMacroOrigin 1
 
 /-- The occurrence key of the carrier passing through a crossing boundary.
@@ -119,13 +127,13 @@ theorem drawingCrossoverFormula_boundary_eq
     (assignment :
       Sum CrossingBoundary (CrossingRecord × CrossoverInternal) → Bool)
     (holds : FormulaHolds assignment (drawingCrossoverFormula graph)) :
-    ∀ crossing ∈ orientedCrossings graph,
+    ∀ crossing ∈ orientedCrossingHalo graph,
       assignment (.inl ⟨crossing, .left⟩) =
           assignment (.inl ⟨crossing, .right⟩) ∧
         assignment (.inl ⟨crossing, .top⟩) =
           assignment (.inl ⟨crossing, .bottom⟩) := by
   exact crossoverFamily_boundary_eq assignment
-    (orientedCrossings graph)
+    (orientedCrossingHalo graph)
     crossingPorts crossingMacroOrigin 1 holds
 
 end PeriodicOrthocrossing

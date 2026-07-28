@@ -252,6 +252,66 @@ theorem exists_crossover_holds_of_boundary_eq
     upperRight lowerRight aInnerRight, holds, ?_⟩
   simp [crossoverAssignment]
 
+/-- A fixed satisfying crossover assignment for one horizontal and one
+vertical signal.  Choosing it from the truth-table certificate makes the
+internal values depend only on the two signals, not on the name or position
+of a particular crossover copy. -/
+noncomputable def canonicalCrossoverAssignment
+    (horizontal vertical : Bool) : CrossoverVariable → Bool :=
+  Classical.choose
+    (exists_crossover_holds_of_boundary_eq
+      (aLeft := horizontal) (aRight := horizontal)
+      (bTop := vertical) (bBottom := vertical) rfl rfl)
+
+theorem canonicalCrossoverAssignment_holds
+    (horizontal vertical : Bool) :
+    CrossoverHolds
+      (canonicalCrossoverAssignment horizontal vertical) :=
+  (Classical.choose_spec
+    (exists_crossover_holds_of_boundary_eq
+      (aLeft := horizontal) (aRight := horizontal)
+      (bTop := vertical) (bBottom := vertical) rfl rfl)).1
+
+@[simp]
+theorem canonicalCrossoverAssignment_aLeft
+    (horizontal vertical : Bool) :
+    canonicalCrossoverAssignment horizontal vertical .aLeft =
+      horizontal :=
+  (Classical.choose_spec
+    (exists_crossover_holds_of_boundary_eq
+      (aLeft := horizontal) (aRight := horizontal)
+      (bTop := vertical) (bBottom := vertical) rfl rfl)).2.1
+
+@[simp]
+theorem canonicalCrossoverAssignment_aRight
+    (horizontal vertical : Bool) :
+    canonicalCrossoverAssignment horizontal vertical .aRight =
+      horizontal :=
+  (Classical.choose_spec
+    (exists_crossover_holds_of_boundary_eq
+      (aLeft := horizontal) (aRight := horizontal)
+      (bTop := vertical) (bBottom := vertical) rfl rfl)).2.2.1
+
+@[simp]
+theorem canonicalCrossoverAssignment_bTop
+    (horizontal vertical : Bool) :
+    canonicalCrossoverAssignment horizontal vertical .bTop =
+      vertical :=
+  (Classical.choose_spec
+    (exists_crossover_holds_of_boundary_eq
+      (aLeft := horizontal) (aRight := horizontal)
+      (bTop := vertical) (bBottom := vertical) rfl rfl)).2.2.2.1
+
+@[simp]
+theorem canonicalCrossoverAssignment_bBottom
+    (horizontal vertical : Bool) :
+    canonicalCrossoverAssignment horizontal vertical .bBottom =
+      vertical :=
+  (Classical.choose_spec
+    (exists_crossover_holds_of_boundary_eq
+      (aLeft := horizontal) (aRight := horizontal)
+      (bTop := vertical) (bBottom := vertical) rfl rfl)).2.2.2.2
+
 /-! ## Variable duplicator -/
 
 /-- The center and three ports of Figure 8(a). -/

@@ -97,7 +97,7 @@ def DrawingPlanarSATClauseMetadata.Valid
   let graph := PeriodicCNF.incidenceGraph formula
   match metadata.source with
   | .crossover crossing localClauseIndex =>
-      crossing ∈ orientedCrossings graph ∧
+      crossing ∈ orientedCrossingHalo graph ∧
         (metadata.clause, localClauseIndex) ∈
           (drawingPlanarSATCrossoverFormulaAt
             (Variable := Variable) crossing).zipIdx
@@ -136,7 +136,8 @@ def drawingPlanarSATCrossoverClauseMetadata
     {Variable Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) :
     List (DrawingPlanarSATClauseMetadata Variable) :=
-  (orientedCrossings graph).flatMap drawingPlanarSATCrossoverClauseMetadataFor
+  (orientedCrossingHalo graph).flatMap
+    drawingPlanarSATCrossoverClauseMetadataFor
 
 @[simp] theorem drawingPlanarSATCrossoverClauseMetadataFor_clauses
     {Variable : Type*}
@@ -168,7 +169,7 @@ theorem drawingPlanarSATCrossoverClauseMetadataFor_valid
     (crossing : CrossingRecord)
     (crossingMember :
       crossing ∈
-        orientedCrossings
+        orientedCrossingHalo
           (PeriodicCNF.incidenceGraph formula))
     {metadata : DrawingPlanarSATClauseMetadata Variable}
     (metadataMember :
@@ -180,8 +181,13 @@ theorem drawingPlanarSATCrossoverClauseMetadataFor_valid
   rcases List.mem_map.mp metadataMember with
     ⟨taggedClause, taggedClauseMember, metadataEqual⟩
   subst metadata
-  simpa [DrawingPlanarSATClauseMetadata.Valid] using
-    And.intro crossingMember taggedClauseMember
+  change crossing ∈
+      orientedCrossingHalo
+        (PeriodicCNF.incidenceGraph formula) ∧
+    taggedClause ∈
+      (drawingPlanarSATCrossoverFormulaAt
+        (Variable := Variable) crossing).zipIdx
+  exact ⟨crossingMember, taggedClauseMember⟩
 
 theorem drawingPlanarSATCrossoverClauseMetadata_valid
     {Variable : Type*} [DecidableEq Variable]

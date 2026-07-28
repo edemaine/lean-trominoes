@@ -64,7 +64,7 @@ theorem drawingCompleteCarrierLink_first_boundary_side
         unfold drawingCarrierNodes at firstData
         simpa using firstData.1
       have crossingMem :=
-        drawingCrossingBoundary_crossing_mem
+        drawingCrossingBoundary_crossing_mem_orientedCrossings
           graph boundaryMem
       have siblingBoundaryMem :
           siblingBoundary ∈
@@ -144,7 +144,7 @@ theorem drawingCompleteCarrierLink_first_boundary_side
         unfold drawingCarrierNodes at firstData
         simpa using firstData.1
       have crossingMem :=
-        drawingCrossingBoundary_crossing_mem
+        drawingCrossingBoundary_crossing_mem_orientedCrossings
           graph boundaryMem
       have siblingBoundaryMem :
           siblingBoundary ∈
@@ -253,7 +253,7 @@ theorem drawingCompleteCarrierLink_second_boundary_side
         unfold drawingCarrierNodes at secondData
         simpa using secondData.1
       have crossingMem :=
-        drawingCrossingBoundary_crossing_mem
+        drawingCrossingBoundary_crossing_mem_orientedCrossings
           graph boundaryMem
       have siblingBoundaryMem :
           siblingBoundary ∈
@@ -338,7 +338,7 @@ theorem drawingCompleteCarrierLink_second_boundary_side
         unfold drawingCarrierNodes at secondData
         simpa using secondData.1
       have crossingMem :=
-        drawingCrossingBoundary_crossing_mem
+        drawingCrossingBoundary_crossing_mem_orientedCrossings
           graph boundaryMem
       have siblingBoundaryMem :
           siblingBoundary ∈

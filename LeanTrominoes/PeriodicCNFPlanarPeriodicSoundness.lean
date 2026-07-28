@@ -237,7 +237,7 @@ theorem satisfies_of_drawingPeriodicPlanarSATFormula_satisfies
     drawingPlanarSATFormula_source_clause_holds
       formula occurrences
       (planarSATFiniteAssignmentAt
-        assignment blockTranslate)
+        formula assignment blockTranslate)
       (finiteHolds blockTranslate)
       taggedClause taggedClauseMem
       (0, 0)

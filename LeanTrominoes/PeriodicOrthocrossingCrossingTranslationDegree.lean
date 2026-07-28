@@ -102,38 +102,26 @@ theorem CrossingBoundary.carrierKey_eq_indexed_translate
   case mk crossing side =>
     cases side <;> rfl
 
-theorem drawingCrossingBoundary_indexed_mem_and_translate_mem
+theorem drawingCrossingBoundary_indexed_mem_and_translate_neighbor
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex)
     {boundary : CrossingBoundary}
     (boundaryMem : boundary ∈ drawingCrossingBoundaries graph) :
     boundary.indexed ∈ (drawing graph).indexedSegments ∧
-      boundary.translate ∈
-        segmentCrossingTranslations graph boundary.indexed := by
+      IsNeighborTranslation boundary.translate := by
   rcases List.mem_flatMap.mp boundaryMem with
     ⟨record, recordMem, boundaryMem⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false]
     at boundaryMem
-  have sound := orientedCrossings_sound graph recordMem
+  have sound := orientedCrossingHalo_sound graph
+    (orientedCrossings_subset_orientedCrossingHalo graph recordMem)
   rcases boundaryMem with
     boundaryEq | boundaryEq | boundaryEq | boundaryEq <;>
       subst boundary
-  · refine ⟨sound.1, ?_⟩
-    apply (mem_segmentCrossingTranslations_iff
-      graph record.first record.firstTranslate).mpr
-    exact ⟨sound.2.2.1, record, recordMem, Or.inl ⟨rfl, rfl⟩⟩
-  · refine ⟨sound.1, ?_⟩
-    apply (mem_segmentCrossingTranslations_iff
-      graph record.first record.firstTranslate).mpr
-    exact ⟨sound.2.2.1, record, recordMem, Or.inl ⟨rfl, rfl⟩⟩
-  · refine ⟨sound.2.1, ?_⟩
-    apply (mem_segmentCrossingTranslations_iff
-      graph record.second record.secondTranslate).mpr
-    exact ⟨sound.2.2.2.1, record, recordMem, Or.inr ⟨rfl, rfl⟩⟩
-  · refine ⟨sound.2.1, ?_⟩
-    apply (mem_segmentCrossingTranslations_iff
-      graph record.second record.secondTranslate).mpr
-    exact ⟨sound.2.2.2.1, record, recordMem, Or.inr ⟨rfl, rfl⟩⟩
+  · exact ⟨sound.1, sound.2.2.1⟩
+  · exact ⟨sound.1, sound.2.2.1⟩
+  · exact ⟨sound.2.1, sound.2.2.2.1⟩
+  · exact ⟨sound.2.1, sound.2.2.2.1⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes

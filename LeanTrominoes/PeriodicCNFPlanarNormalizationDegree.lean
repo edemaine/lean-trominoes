@@ -46,24 +46,20 @@ theorem
           (componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_terminal_count_le_eight
             wellFormed degree isLocal indexed endpoint)
   | boundary boundary =>
-      rw [
-        ← deduplicatedWrappedDrawingPeriodicPlanarSATFormula_count
-          formula (.boundary boundary)]
       exact
-        deduplicatedWrappedDrawingPeriodicPlanarSATFormula_boundary_count_le_eight
-          occurrences boundary
+        outputLe.trans
+          ((componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_boundary_count_le_six
+            wellFormed degree isLocal boundary).trans (by omega))
   | atom atom =>
       exact
         outputLe.trans
           ((componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_atom_count_le_six
             occurrences atom).trans (by omega))
   | crossoverInternal internal =>
-      rw [
-        ← deduplicatedWrappedDrawingPeriodicPlanarSATFormula_count
-          formula (.crossoverInternal internal)]
       exact
-        deduplicatedWrappedDrawingPeriodicPlanarSATFormula_crossoverInternal_count_le_eight
-          occurrences internal
+        outputLe.trans
+          (componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_crossoverInternal_count_le_eight
+            wellFormed degree isLocal internal)
 
 theorem
     deduplicatedWrappedDrawingPeriodicPlanarSATFormula_occurrencesAtMostEight

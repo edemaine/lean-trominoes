@@ -277,8 +277,8 @@ theorem drawingPlanarSATCrossoverClauseMetadata_keys_nodup
     DrawingPlanarSATClauseSource.localClauseIndex,
     List.map_flatMap, List.map_map, Function.comp_def] using
     (componentClauseKeyBlocks_nodup
-      (orientedCrossings graph)
-      (orientedCrossings_nodup graph)
+      (orientedCrossingHalo graph)
+      (orientedCrossingHalo_nodup graph)
       DrawingPlanarSATComponent.crossover
       (fun {_ _} equal =>
         DrawingPlanarSATComponent.crossover.inj equal)

@@ -139,6 +139,19 @@ inductive CrossoverInternal
   | aInnerRight
   deriving DecidableEq, Repr, Fintype
 
+/-- Regard one of the nine internal-variable names as a variable of the
+fixed crossover truth table. -/
+def CrossoverInternal.toVariable : CrossoverInternal → CrossoverVariable
+  | .aInnerLeft => .aInnerLeft
+  | .upperLeft => .upperLeft
+  | .lowerLeft => .lowerLeft
+  | .bInnerTop => .bInnerTop
+  | .center => .center
+  | .bInnerBottom => .bInnerBottom
+  | .upperRight => .upperRight
+  | .lowerRight => .lowerRight
+  | .aInnerRight => .aInnerRight
+
 /-- Rename the fixed crossover variables into supplied boundary variables and
 fresh local internal variables. -/
 def crossoverVariableMap {Variable : Type*}

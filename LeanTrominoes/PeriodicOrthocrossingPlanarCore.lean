@@ -130,7 +130,7 @@ theorem drawingPlanarCoreFormula_boundary_laws
       Sum CrossingBoundary (CrossingRecord × CrossoverInternal) → Bool)
     (holds : FormulaHolds assignment
       (drawingPlanarCoreFormula graph)) :
-    (∀ crossing ∈ orientedCrossings graph,
+    (∀ crossing ∈ orientedCrossingHalo graph,
       assignment (.inl ⟨crossing, .left⟩) =
           assignment (.inl ⟨crossing, .right⟩) ∧
         assignment (.inl ⟨crossing, .top⟩) =

@@ -246,7 +246,7 @@ theorem constructedRouteTerminals_assignment_eq
     (assignment :
       Sum CarrierNode (CrossingRecord × CrossoverInternal) → Bool)
     (crossingLaws :
-      ∀ crossing ∈ orientedCrossings graph,
+      ∀ crossing ∈ orientedCrossingHalo graph,
         assignment
             (.inl (.boundary ⟨crossing, .left⟩)) =
             assignment

@@ -101,13 +101,15 @@ open PlanarThreeSAT
 set_option maxHeartbeats 800000
 
 theorem periodicizePlanarSATClause_external_rename
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (clause : EmbeddedClause (PlanarSATNode Variable)) :
-    periodicizePlanarSATClause
+    periodicizePlanarSATClause formula
         (clause.rename
           (@planarSATExternalVariableMap Variable)) =
       PeriodicEquality.periodicizeClause
-        normalizePlanarSATNode clause := by
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula)) clause := by
   rcases clause with ⟨position, literals⟩
   simp [periodicizePlanarSATClause,
     periodicizePlanarSATLiteral,
@@ -117,12 +119,19 @@ theorem periodicizePlanarSATClause_external_rename
     planarSATExternalVariableMap,
     normalizePlanarSATNode,
     List.map_map, Function.comp_def]
+  intro node
+  cases node with
+  | carrier carrier =>
+      cases carrier <;>
+        simp [normalizePlanarSATVariable, normalizePlanarSATNode]
+  | atom atom =>
+      simp [normalizePlanarSATVariable, normalizePlanarSATNode]
 
 theorem normalizedScopedDrawingRoutedClauseFormula_eq
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     ((scopedDrawingRoutedClauseFormula formula).map
-      periodicizePlanarSATClause).map
+      (periodicizePlanarSATClause formula)).map
         PeriodicClause.anchorNormalize =
       normalizedRoutedClauseClauses formula := by
   unfold scopedDrawingRoutedClauseFormula
@@ -131,16 +140,17 @@ theorem normalizedScopedDrawingRoutedClauseFormula_eq
   apply List.map_congr_left
   intro clause _clauseMem
   exact congrArg PeriodicClause.anchorNormalize
-    (periodicizePlanarSATClause_external_rename clause)
+    (periodicizePlanarSATClause_external_rename formula clause)
 
 theorem normalizedScopedDrawingRoutedVariableFormula_eq
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     ((scopedDrawingRoutedVariableFormula formula).map
-      periodicizePlanarSATClause).map
+      (periodicizePlanarSATClause formula)).map
         PeriodicClause.anchorNormalize =
       PeriodicEquality.normalizedFormulaClauses
-        normalizePlanarSATNode
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula))
         (drawingRoutedVariableLinks formula) := by
   unfold scopedDrawingRoutedVariableFormula
     PeriodicEquality.normalizedFormulaClauses
@@ -149,14 +159,14 @@ theorem normalizedScopedDrawingRoutedVariableFormula_eq
   apply List.map_congr_left
   intro clause _clauseMem
   exact congrArg PeriodicClause.anchorNormalize
-    (periodicizePlanarSATClause_external_rename clause)
+    (periodicizePlanarSATClause_external_rename formula clause)
 
 def normalizedScopedDrawingPlanarSATCoreClauses
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     List (PeriodicClause (PeriodicPlanarSATVariable Variable)) :=
   ((scopedDrawingPlanarSATCore formula).map
-    periodicizePlanarSATClause).map
+    (periodicizePlanarSATClause formula)).map
       PeriodicClause.anchorNormalize
 
 theorem drawingPeriodicPlanarSATFormula_anchorNormalize_clauses
@@ -167,7 +177,8 @@ theorem drawingPeriodicPlanarSATFormula_anchorNormalize_clauses
       normalizedScopedDrawingPlanarSATCoreClauses formula ++
         normalizedRoutedClauseClauses formula ++
           PeriodicEquality.normalizedFormulaClauses
-            normalizePlanarSATNode
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula))
             (drawingRoutedVariableLinks formula) := by
   unfold drawingPeriodicPlanarSATFormula
     drawingPlanarSATFormula
@@ -194,9 +205,10 @@ theorem embedPeriodicCarrierFormula_clauses
   rfl
 
 theorem periodicizePlanarSATClause_carrier_core_rename
-    {Variable : Type*}
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
     (clause : EmbeddedClause CarrierNode) :
-    periodicizePlanarSATClause
+    periodicizePlanarSATClause formula
       ((clause.rename fun node =>
         (Sum.inl node :
           Sum CarrierNode
@@ -204,7 +216,8 @@ theorem periodicizePlanarSATClause_carrier_core_rename
         (@planarSATCoreVariableMap Variable)) =
       embedPeriodicCarrierClause
         (PeriodicEquality.periodicizeClause
-          normalizeCarrierNode clause) := by
+          (normalizeCarrierNode
+            (PeriodicCNF.incidenceGraph formula)) clause) := by
   rcases clause with ⟨position, literals⟩
   simp only [periodicizePlanarSATClause,
     periodicizePlanarSATLiteral,
@@ -246,7 +259,7 @@ def normalizedScopedDrawingCrossoverClauses
     (PeriodicCNF.incidenceGraph formula)).map fun clause =>
       clause.rename
         (@planarSATCoreVariableMap Variable)).map
-          periodicizePlanarSATClause).map
+          (periodicizePlanarSATClause formula)).map
             PeriodicClause.anchorNormalize
 
 def embeddedNormalizedCompleteCarrierClauses
@@ -254,7 +267,8 @@ def embeddedNormalizedCompleteCarrierClauses
     (formula : PeriodicCNF Variable) :
     List (PeriodicClause (PeriodicPlanarSATVariable Variable)) :=
   (PeriodicEquality.normalizedFormulaClauses
-    normalizeCarrierNode
+    (normalizeCarrierNode
+      (PeriodicCNF.incidenceGraph formula))
     (drawingCompleteCarrierLinks
       (PeriodicCNF.incidenceGraph formula))).map
         (@embedPeriodicCarrierClause Variable)
@@ -264,7 +278,8 @@ def embeddedNormalizedRouteBendClauses
     (formula : PeriodicCNF Variable) :
     List (PeriodicClause (PeriodicPlanarSATVariable Variable)) :=
   (PeriodicEquality.normalizedFormulaClauses
-    normalizeCarrierNode
+    (normalizeCarrierNode
+      (PeriodicCNF.incidenceGraph formula))
     (drawingRouteBendLinks
       (PeriodicCNF.incidenceGraph formula))).map
         (@embedPeriodicCarrierClause Variable)
@@ -283,7 +298,7 @@ theorem normalizedScopedDrawingRouteWireFormula_eq
       (PeriodicCNF.incidenceGraph formula)).map fun clause =>
         clause.rename
           (@planarSATCoreVariableMap Variable)).map
-            periodicizePlanarSATClause).map
+            (periodicizePlanarSATClause formula)).map
               PeriodicClause.anchorNormalize =
       normalizedEmbeddedRouteWireClauses formula := by
   unfold scopedDrawingRouteWireFormula
@@ -303,11 +318,12 @@ theorem normalizedScopedDrawingRouteWireFormula_eq
         (fun periodicClause =>
           PeriodicClause.anchorNormalize periodicClause)
         (periodicizePlanarSATClause_carrier_core_rename
-          (Variable := Variable) clause)).trans
+          formula clause)).trans
         (embedPeriodicCarrierClause_anchorNormalize
           (Variable := Variable)
           (PeriodicEquality.periodicizeClause
-            normalizeCarrierNode clause)).symm
+            (normalizeCarrierNode
+              (PeriodicCNF.incidenceGraph formula)) clause)).symm
   · apply List.map_congr_left
     intro clause _clauseMem
     exact
@@ -315,11 +331,12 @@ theorem normalizedScopedDrawingRouteWireFormula_eq
         (fun periodicClause =>
           PeriodicClause.anchorNormalize periodicClause)
         (periodicizePlanarSATClause_carrier_core_rename
-          (Variable := Variable) clause)).trans
+          formula clause)).trans
         (embedPeriodicCarrierClause_anchorNormalize
           (Variable := Variable)
           (PeriodicEquality.periodicizeClause
-            normalizeCarrierNode clause)).symm
+            (normalizeCarrierNode
+              (PeriodicCNF.incidenceGraph formula)) clause)).symm
 
 theorem normalizedScopedDrawingPlanarSATCoreClauses_eq
     {Variable : Type*} [DecidableEq Variable]
@@ -373,7 +390,8 @@ def normalizedDrawingPlanarSATComponents
     embeddedNormalizedRouteBendClauses formula,
     normalizedRoutedClauseClauses formula,
     PeriodicEquality.normalizedFormulaClauses
-      normalizePlanarSATNode
+      (normalizePlanarSATNode
+        (PeriodicCNF.incidenceGraph formula))
       (drawingRoutedVariableLinks formula)]
 
 theorem drawingPeriodicPlanarSATFormula_anchorNormalize_components
@@ -401,7 +419,8 @@ theorem drawingPeriodicPlanarSATFormula_anchorNormalize_five_components
           (embeddedNormalizedRouteBendClauses formula ++
             (normalizedRoutedClauseClauses formula ++
               PeriodicEquality.normalizedFormulaClauses
-                normalizePlanarSATNode
+                (normalizePlanarSATNode
+                  (PeriodicCNF.incidenceGraph formula))
                 (drawingRoutedVariableLinks formula)))) := by
   rw [
     drawingPeriodicPlanarSATFormula_anchorNormalize_clauses,
@@ -466,7 +485,8 @@ def componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
       ((embeddedNormalizedRouteBendClauses formula).dedup ++
         ((normalizedRoutedClauseClauses formula).dedup ++
           (PeriodicEquality.normalizedFormulaClauses
-            normalizePlanarSATNode
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula))
             (drawingRoutedVariableLinks formula)).dedup)))⟩
 
 theorem PeriodicCNF.five_component_occurrence_count
@@ -509,7 +529,8 @@ theorem
           formula).dedup⟩).count atom +
       (PeriodicCNF.variableOccurrences
         ⟨(PeriodicEquality.normalizedFormulaClauses
-          normalizePlanarSATNode
+          (normalizePlanarSATNode
+            (PeriodicCNF.incidenceGraph formula))
           (drawingRoutedVariableLinks formula)).dedup⟩).count atom))) := by
   unfold componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula
   exact
@@ -519,7 +540,8 @@ theorem
       (embeddedNormalizedRouteBendClauses formula).dedup
       (normalizedRoutedClauseClauses formula).dedup
       (PeriodicEquality.normalizedFormulaClauses
-        normalizePlanarSATNode
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula))
         (drawingRoutedVariableLinks formula)).dedup
       atom
 
@@ -544,7 +566,8 @@ theorem
           formula).dedup⟩).count (.atom atom) +
       (PeriodicCNF.variableOccurrences
         ⟨(PeriodicEquality.normalizedFormulaClauses
-          normalizePlanarSATNode
+          (normalizePlanarSATNode
+            (PeriodicCNF.incidenceGraph formula))
           (drawingRoutedVariableLinks formula)).dedup⟩).count
             (.atom atom)))) :=
   componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_occurrence_count
@@ -572,7 +595,8 @@ theorem
           formula).dedup⟩).count (.terminal indexed endpoint) +
       (PeriodicCNF.variableOccurrences
         ⟨(PeriodicEquality.normalizedFormulaClauses
-          normalizePlanarSATNode
+          (normalizePlanarSATNode
+            (PeriodicCNF.incidenceGraph formula))
           (drawingRoutedVariableLinks formula)).dedup⟩).count
             (.terminal indexed endpoint)))) :=
   componentwiseDeduplicatedDrawingPeriodicPlanarSATFormula_occurrence_count
@@ -599,7 +623,8 @@ theorem
       (embeddedNormalizedRouteBendClauses formula)
       (normalizedRoutedClauseClauses formula)
       (PeriodicEquality.normalizedFormulaClauses
-        normalizePlanarSATNode
+        (normalizePlanarSATNode
+          (PeriodicCNF.incidenceGraph formula))
         (drawingRoutedVariableLinks formula))
 
 end PeriodicOrthocrossing

@@ -103,7 +103,9 @@ theorem
   have linkRaw :
       link ∈
         (drawingRoutedVariableLinks formula).map
-          (PeriodicEquality.normalizeLink normalizePlanarSATNode) :=
+          (PeriodicEquality.normalizeLink
+            (normalizePlanarSATNode
+              (PeriodicCNF.incidenceGraph formula))) :=
     List.mem_dedup.mp linkMem
   rcases List.mem_map.mp linkRaw with
     ⟨source, sourceMem, linkEq⟩
@@ -201,7 +203,8 @@ theorem
       have variableZero :
           (PeriodicCNF.variableOccurrences
             ⟨(PeriodicEquality.normalizedFormulaClauses
-              normalizePlanarSATNode
+              (normalizePlanarSATNode
+                (PeriodicCNF.incidenceGraph formula))
               (drawingRoutedVariableLinks formula)).dedup⟩).count
                 (.terminal indexed .start) = 0 := by
         exact
@@ -260,7 +263,8 @@ theorem
       have variableLe :
           (PeriodicCNF.variableOccurrences
             ⟨(PeriodicEquality.normalizedFormulaClauses
-              normalizePlanarSATNode
+              (normalizePlanarSATNode
+                (PeriodicCNF.incidenceGraph formula))
               (drawingRoutedVariableLinks formula)).dedup⟩).count
                 (.terminal indexed .finish) ≤ 2 := by
         exact
@@ -291,7 +295,8 @@ theorem
       · have variableZero :
             (PeriodicCNF.variableOccurrences
               ⟨(PeriodicEquality.normalizedFormulaClauses
-                normalizePlanarSATNode
+                (normalizePlanarSATNode
+                  (PeriodicCNF.incidenceGraph formula))
                 (drawingRoutedVariableLinks formula)).dedup⟩).count
                   (.terminal indexed .finish) = 0 := by
           apply List.count_eq_zero_of_not_mem

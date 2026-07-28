@@ -55,7 +55,7 @@ theorem drawingCarrierNodeCrossoverFormula_widthAtMostThree
     FormulaWidthAtMost 3
       (drawingCarrierNodeCrossoverFormula graph) := by
   exact crossoverFamily_widthAtMostThree
-    (orientedCrossings graph)
+    (orientedCrossingHalo graph)
     carrierNodeCrossingPorts crossingMacroOrigin 1
 
 /-- Scoping route variables into the crossover sum preserves width. -/
