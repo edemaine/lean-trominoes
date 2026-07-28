@@ -2224,6 +2224,11 @@ The representation choices for this target are:
   the finite `3 × 3` halo window from being mistaken for an edge of the
   infinite carrier, while proving that every retained boundary normalizes to
   a listed canonical boundary.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierLinks.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierLinks.lean)
+  builds sorted carrier chains through all retained halo crossings and then
+  filters them by the zero-shift ownership rule.  The selected physical links
+  are duplicate-free, remain on one segment-occurrence key, and their
+  equality clauses are satisfied by every carrier assignment.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
