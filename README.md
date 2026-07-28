@@ -2499,6 +2499,10 @@ The representation choices for this target are:
   with variable and clause injectivity proves that the complete final
   incidence-vertex list is duplicate-free and lies in the open fundamental
   square.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedDrawingCompatibility.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedDrawingCompatibility.lean)
+  packages the final vertex bounds with the transported exact route
+  endpoints.  The resulting gauged, anchor-normalized, clause-deduplicated
+  incidence drawing is compatible with its periodic incidence graph.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
