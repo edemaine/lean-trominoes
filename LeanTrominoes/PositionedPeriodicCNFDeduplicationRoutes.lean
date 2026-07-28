@@ -349,6 +349,46 @@ theorem exists_representativeClause
   rw [positionedLookup]
   rfl
 
+/-- If a source clause position determines its erased literal list, then
+retaining the first representative of each literal list also retains
+pairwise-distinct clause positions. -/
+theorem deduplicateByLiterals_clausePositions_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePositionDeterminesLiterals :
+      ∀ first ∈ source.clauses, ∀ second ∈ source.clauses,
+        first.position = second.position →
+          first.literals = second.literals) :
+    (source.deduplicateByLiterals.clauses.map
+      PositionedPeriodicClause.position).Nodup := by
+  rw [deduplicateByLiterals, List.map_map]
+  apply source.erase.clauses.nodup_dedup.map_on
+  intro first firstMember second secondMember positionEqual
+  have firstSourceMember : first ∈ source.erase.clauses :=
+    by simpa using firstMember
+  have secondSourceMember : second ∈ source.erase.clauses :=
+    by simpa using secondMember
+  rcases exists_representativeClause source first firstSourceMember with
+    ⟨firstClause, firstLookup, firstLiterals, firstPosition⟩
+  rcases exists_representativeClause source second secondSourceMember with
+    ⟨secondClause, secondLookup, secondLiterals, secondPosition⟩
+  have firstClauseMember : firstClause ∈ source.clauses := by
+    exact List.mem_iff_getElem.mpr
+      ⟨source.representativeClauseIndex first,
+        (List.getElem?_eq_some_iff.mp firstLookup).1,
+        (List.getElem?_eq_some_iff.mp firstLookup).2⟩
+  have secondClauseMember : secondClause ∈ source.clauses := by
+    exact List.mem_iff_getElem.mpr
+      ⟨source.representativeClauseIndex second,
+        (List.getElem?_eq_some_iff.mp secondLookup).1,
+        (List.getElem?_eq_some_iff.mp secondLookup).2⟩
+  have clausesEqual :=
+    sourcePositionDeterminesLiterals
+      firstClause firstClauseMember secondClause secondClauseMember
+      (firstPosition.trans (positionEqual.trans secondPosition.symm))
+  exact firstLiterals.symm.trans
+    (clausesEqual.trans secondLiterals)
+
 /-- A retained positioned clause has the representative position prescribed
 by its erased literal list. -/
 theorem eq_representative_of_mem_deduplicateByLiterals
