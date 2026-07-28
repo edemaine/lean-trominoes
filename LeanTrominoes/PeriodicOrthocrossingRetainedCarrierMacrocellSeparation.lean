@@ -173,5 +173,111 @@ theorem
   simp only [planarMacroScale] at normal notSeparated ⊢
   omega
 
+/-- Macrocell overlap places the macrocell center on the selected link's
+underlying drawing-grid segment occurrence. -/
+theorem
+    retainedDrawingCompleteCarrierLink_supportingSegment_contains_of_macrocell_overlap
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (center : Cell)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower center)
+        (planarSATMacrocellRouteUpper center)) :
+    (link.first.supportingSegment graph).Contains center := by
+  let support := link.first.supportingSegment graph
+  have endpoints :=
+    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+  have firstAligned :
+      link.first.indexed.segment.IsAxisAligned :=
+    drawing_isOrthogonal wellFormed isLocal degree
+      link.first.indexed
+      (retainedCarrierNode_indexed_mem graph endpoints.1)
+  by_cases horizontal : link.first.isHorizontal = true
+  · have storedHorizontal :
+        link.first.indexed.segment.IsHorizontal :=
+      (retainedCarrierNode_isHorizontal_iff
+        graph endpoints.1 firstAligned).mp horizontal
+    have supportHorizontal : support.IsHorizontal :=
+      (GridSegment.isHorizontal_translate _ _).mpr
+        storedHorizontal
+    have overlapData :=
+      retainedDrawingCompleteCarrierLink_horizontal_macrocell_overlap_data
+        wellFormed degree isLocal linkMem horizontal
+        center notSeparated
+    have supportBounds :=
+      retainedDrawingCompleteCarrierLink_horizontal_support_bounded
+        wellFormed degree isLocal linkMem horizontal
+    simp only [planarMacroScale] at overlapData supportBounds
+    have axialBounds :
+        min support.start.1 support.finish.1 ≤ center.1 ∧
+          center.1 ≤ max support.start.1 support.finish.1 := by
+      change
+        min (link.first.supportingSegment graph).start.1
+            (link.first.supportingSegment graph).finish.1 ≤ center.1 ∧
+          center.1 ≤
+            max (link.first.supportingSegment graph).start.1
+              (link.first.supportingSegment graph).finish.1
+      constructor <;> omega
+    unfold GridSegment.Contains
+    apply Or.inl
+    refine ⟨supportHorizontal, overlapData.1.symm, ?_⟩
+    unfold GridSegment.Between
+    rcases le_total support.start.1 support.finish.1 with
+      forward | backward
+    · exact Or.inl (by
+        rw [min_eq_left forward, max_eq_right forward] at axialBounds
+        exact axialBounds)
+    · exact Or.inr (by
+        rw [min_eq_right backward, max_eq_left backward] at axialBounds
+        exact axialBounds)
+  · have storedVertical :
+        link.first.indexed.segment.IsVertical :=
+      firstAligned.resolve_left fun storedHorizontal =>
+        horizontal
+          ((retainedCarrierNode_isHorizontal_iff
+            graph endpoints.1 firstAligned).mpr storedHorizontal)
+    have supportVertical : support.IsVertical :=
+      (GridSegment.isVertical_translate _ _).mpr
+        storedVertical
+    have overlapData :=
+      retainedDrawingCompleteCarrierLink_vertical_macrocell_overlap_data
+        wellFormed degree isLocal linkMem horizontal
+        center notSeparated
+    have supportBounds :=
+      retainedDrawingCompleteCarrierLink_vertical_support_bounded
+        wellFormed degree isLocal linkMem horizontal
+    simp only [planarMacroScale] at overlapData supportBounds
+    have axialBounds :
+        min support.start.2 support.finish.2 ≤ center.2 ∧
+          center.2 ≤ max support.start.2 support.finish.2 := by
+      change
+        min (link.first.supportingSegment graph).start.2
+            (link.first.supportingSegment graph).finish.2 ≤ center.2 ∧
+          center.2 ≤
+            max (link.first.supportingSegment graph).start.2
+              (link.first.supportingSegment graph).finish.2
+      constructor <;> omega
+    unfold GridSegment.Contains
+    apply Or.inr
+    refine ⟨supportVertical, overlapData.1.symm, ?_⟩
+    unfold GridSegment.Between
+    rcases le_total support.start.2 support.finish.2 with
+      forward | backward
+    · exact Or.inl (by
+        rw [min_eq_left forward, max_eq_right forward] at axialBounds
+        exact axialBounds)
+    · exact Or.inr (by
+        rw [min_eq_right backward, max_eq_left backward] at axialBounds
+        exact axialBounds)
+
 end PeriodicOrthocrossing
 end LeanTrominoes

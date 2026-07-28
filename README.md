@@ -2319,13 +2319,21 @@ The representation choices for this target are:
   separates a selected carrier route from any non-carrier route in a
   disjoint standard macrocell.  Conversely, rectangle overlap forces that
   macrocell onto the carrier's exact source row or column and into its axial
-  interval, supplying the common proximity interface for the remaining
+  interval—equivalently, its center lies on the exact translated supporting
+  segment—supplying the common proximity interface for the remaining
   carrier-to-component cases.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalProximity.lean)
   proves the reusable terminal half of that proximity argument.  A source
   terminal is a strict retained-chain extreme at local axial coordinate
   `11` or `1`; hence a selected lens on the same occurrence can overlap the
   terminal macrocell only when the terminal is one of its endpoints.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
+  classifies neighboring segment terminals as internal bend terminals or
+  external graph endpoints and proves their exact lifted drawing points.
+  Continuous lane uniqueness and the reserved port row then show that a
+  bend macrocell can overlap a selected carrier only at a genuinely incident
+  terminal.  Together with rectangle separation, this proves route avoidance
+  for every selected carrier–bend pair.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverProximity.lean)
   proves the matched-carrier half of crossover proximity.  If a selected
   horizontal or vertical link uses the corresponding source occurrence of a
