@@ -723,6 +723,11 @@ The representation choices for this target are:
   overlap and adds an executable exact-interior check.  Together the expanded
   checks certify continuous planarity of periodic drawings with genuine
   boundary-crossing edges.
+  [`LeanTrominoes/PeriodicGridDrawingMixedContinuousBounds.lean`](LeanTrominoes/PeriodicGridDrawingMixedContinuousBounds.lean)
+  sharpens that continuous-contact bound when either segment stays in the
+  half-open fundamental square.  Even if the other segment uses the full
+  one-cell halo, a meeting can then occur only at one of the nine neighboring
+  relative translations.
   [`LeanTrominoes/PeriodicGridDrawingEndpointContacts.lean`](LeanTrominoes/PeriodicGridDrawingEndpointContacts.lean)
   closes the remaining contact loophole needed before ribbon thickening.
   Distinct lifted listed route points may coincide only when both are outer
