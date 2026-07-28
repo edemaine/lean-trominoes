@@ -2562,6 +2562,12 @@ The representation choices for this target are:
   continuous contact involving at least one noncarrier segment is reduced to
   the nine neighboring relative translations; only carrier--carrier contacts
   can require the full 25-shift analysis.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceTranslation.lean)
+  defines one physical period-translation action for all five planar-SAT
+  clause-source families, including bends, routed vertex sites, external
+  nodes, equality links, and source components.  It proves exact translation
+  laws for drawing-grid centers and refined macrocell origins, providing the
+  common language needed to reindex finite representatives.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCommonShiftRepresentatives.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCommonShiftRepresentatives.lean)
   isolates the remaining orbit interface.  If two final occurrences are
   reindexed as distinct genuine retained-drawing segments at one common
