@@ -2323,6 +2323,10 @@ The representation choices for this target are:
   separates distinct selected lenses sharing one carrier.  Nonadjacent links
   have strictly separated rectangles; adjacent links use complementary
   boundaries at their common node and permit only advertised endpoint contact.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierSupportGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierSupportGeometry.lean)
+  bounds halo-only boundary nodes using strict containment in their translated
+  source segments, and reuses the terminal endpoint bound.  Selected links
+  therefore remain in their source axial corridors with the exact normal line.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
