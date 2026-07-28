@@ -2326,6 +2326,12 @@ The representation choices for this target are:
   horizontal or vertical link uses the corresponding source occurrence of a
   retained crossing, overlap with that crossing's macrocell forces one link
   endpoint to be one of the crossing's two carrier ports.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCrossoverGeometry.lean)
+  uses continuous lane uniqueness to show that any crossover macrocell
+  overlapping a selected horizontal or vertical lens lies on that lens's
+  source occurrence.  The matched-carrier theorem then forces genuine
+  endpoint incidence, completing route avoidance for every selected
+  carrier–crossover pair.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean)
   proves common-axis agreement for retained nodes and transfers strict
   consecutive-pair order to the selected family: two distinct links with one
