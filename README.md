@@ -2533,6 +2533,9 @@ The representation choices for this target are:
   refines the quotient-to-finite bridge to indexed segment occurrences,
   preserving the within-route segment index and proving exact equality of
   the translated final and physical segments.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
+  transfers finite retained route simplicity through the occurrence bridge,
+  proving that every route stored in the final periodic quotient is simple.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
