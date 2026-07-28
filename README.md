@@ -2352,6 +2352,24 @@ The representation choices for this target are:
   fanout boundaries.  Combining this finite gadget fact with terminal
   proximity and disjoint-macrocell separation proves route avoidance for
   every selected carrier/routed-variable and carrier/routed-clause pair.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalIncidenceDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalIncidenceDrawing.lean)
+  selects the certified local drawing named by each retained metadata entry.
+  The assembled retained formula has exact incidence endpoints, while each
+  selected component retains orthogonality, route simplicity, and continuous
+  local planarity.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATComponentSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATComponentSeparation.lean)
+  packages carrier–carrier, carrier–crossover, carrier–bend,
+  carrier–variable, and carrier–clause separation at the metadata level, then
+  combines them with the existing non-carrier macrocell theorem to separate
+  every pair of distinct retained components.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATClauseKeys.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATClauseKeys.lean)
+  proves that the retained five-family metadata has duplicate-free
+  component/local-clause keys.  Equal keys returned by global lookups
+  therefore identify the same retained formula clause index.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGlobalRouteSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGlobalRouteSeparation.lean)
+  lifts component separation and key injectivity to the assembled incidence
+  drawing.  Every retained route is simple, and every two distinct globally
+  indexed incidences satisfy complete continuous route separation.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
