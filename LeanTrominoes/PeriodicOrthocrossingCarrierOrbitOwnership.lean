@@ -1,20 +1,20 @@
-import LeanTrominoes.PeriodicOrthocrossingPlanarTerminals
+import LeanTrominoes.PeriodicOrthocrossingCarrierTranslationCore
 
 /-!
 # Periodic ownership of retained carrier links
 
-The crossing halo is an enumeration window: it contains physical translates
-needed to see every local interaction, but its outer edge is not a boundary of
-the infinite periodic carrier.  Consequently, simply replacing the canonical
-crossing list in every finite carrier chain by the whole halo can create
-truncation-edge links.
+Any finite crossing window is only an enumeration device: its outer edge is
+not a boundary of the infinite periodic carrier.  Consequently, simply
+replacing the canonical crossing list in every finite carrier chain by a
+window can create truncation-edge links.
 
-This file separates the two roles.  `retainedCrossingBoundaries` supplies the
-physical split points, while `carrierLinkRepresentativeShift` chooses the
-periodic cell that owns a prospective carrier link.  A link with a boundary is
-owned by its first boundary along the carrier, or by its only boundary when a
-terminal comes first.  A direct terminal-to-terminal link is owned by the
-translation of its first terminal.
+This file separates the two roles.  `retainedCrossingBoundaries` supplies a
+fixed `5 × 5` orbit window around every canonical crossing, while
+`carrierLinkRepresentativeShift` chooses the periodic cell that owns a
+prospective carrier link.  A link with a boundary is owned by its first
+boundary along the carrier, or by its only boundary when a terminal comes
+first.  A direct terminal-to-terminal link is owned by the translation of its
+first terminal.
 -/
 
 namespace LeanTrominoes
@@ -22,11 +22,49 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
 
-/-- All four physical boundary variables at every retained halo crossing. -/
+/-- The five period coordinates sufficient to retain every crossing on a
+neighboring occurrence whose owner crossing is canonical. -/
+def carrierCrossingRetentionCoordinates : List Int :=
+  [-2, -1, 0, 1, 2]
+
+/-- The corresponding `5 × 5` window of common period shifts. -/
+def carrierCrossingRetentionShifts : List Cell :=
+  carrierCrossingRetentionCoordinates.flatMap fun horizontal =>
+    carrierCrossingRetentionCoordinates.map fun vertical =>
+      (horizontal, vertical)
+
+@[simp]
+theorem mem_carrierCrossingRetentionCoordinates_iff
+    (coordinate : Int) :
+    coordinate ∈ carrierCrossingRetentionCoordinates ↔
+      coordinate = -2 ∨ coordinate = -1 ∨ coordinate = 0 ∨
+        coordinate = 1 ∨ coordinate = 2 := by
+  simp [carrierCrossingRetentionCoordinates]
+
+@[simp]
+theorem mem_carrierCrossingRetentionShifts_iff
+    (shift : Cell) :
+    shift ∈ carrierCrossingRetentionShifts ↔
+      (shift.1 = -2 ∨ shift.1 = -1 ∨ shift.1 = 0 ∨
+          shift.1 = 1 ∨ shift.1 = 2) ∧
+        (shift.2 = -2 ∨ shift.2 = -1 ∨ shift.2 = 0 ∨
+          shift.2 = 1 ∨ shift.2 = 2) := by
+  rcases shift with ⟨horizontal, vertical⟩
+  simp [carrierCrossingRetentionShifts] <;> aesop
+
+/-- The bounded physical orbit of every canonical oriented crossing. -/
+def retainedCrossings
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) : List CrossingRecord :=
+  (orientedCrossings graph).flatMap fun crossing =>
+    carrierCrossingRetentionShifts.map fun shift =>
+      crossing.periodTranslate graph shift
+
+/-- All four physical boundary variables at every retained orbit crossing. -/
 def retainedCrossingBoundaries
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex) : List CrossingBoundary :=
-  (orientedCrossingHalo graph).flatMap fun crossing =>
+  (retainedCrossings graph).flatMap fun crossing =>
     [⟨crossing, .left⟩, ⟨crossing, .right⟩,
       ⟨crossing, .top⟩, ⟨crossing, .bottom⟩]
 
@@ -40,19 +78,27 @@ theorem drawingCrossingBoundaries_subset_retainedCrossingBoundaries
   intro boundary boundaryMem
   rcases List.mem_flatMap.mp boundaryMem with
     ⟨crossing, crossingMem, boundaryMem⟩
+  have retainedCrossingMem :
+      crossing ∈ retainedCrossings graph := by
+    apply List.mem_flatMap.mpr
+    refine ⟨crossing, crossingMem, ?_⟩
+    apply List.mem_map.mpr
+    refine ⟨(0, 0), ?_, ?_⟩
+    · simp
+    · simp
   apply List.mem_flatMap.mpr
   exact ⟨crossing,
-    orientedCrossings_subset_orientedCrossingHalo graph crossingMem,
-    boundaryMem⟩
+    retainedCrossingMem, boundaryMem⟩
 
-/-- A retained physical boundary remembers a genuine halo crossing. -/
+/-- A retained physical boundary remembers a crossing in the bounded
+canonical orbit window. -/
 theorem retainedCrossingBoundary_crossing_mem
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex)
     {boundary : CrossingBoundary}
     (boundaryMem :
       boundary ∈ retainedCrossingBoundaries graph) :
-    boundary.crossing ∈ orientedCrossingHalo graph := by
+    boundary.crossing ∈ retainedCrossings graph := by
   rcases List.mem_flatMap.mp boundaryMem with
     ⟨crossing, crossingMem, boundaryMem⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false] at boundaryMem
@@ -64,10 +110,7 @@ theorem retainedCrossingBoundary_crossing_mem
 boundary with the same port side. -/
 theorem retainedCrossingBoundary_periodNormalize_mem
     {Vertex : Type*} [DecidableEq Vertex]
-    {graph : PeriodicGraph Vertex}
-    (wellFormed : graph.IsWellFormed)
-    (degree : graph.DegreeAtMost 3)
-    (isLocal : graph.IsLocal)
+    (graph : PeriodicGraph Vertex)
     {boundary : CrossingBoundary}
     (boundaryMem :
       boundary ∈ retainedCrossingBoundaries graph) :
@@ -75,9 +118,18 @@ theorem retainedCrossingBoundary_periodNormalize_mem
       drawingCrossingBoundaries graph := by
   have crossingMem :=
     retainedCrossingBoundary_crossing_mem graph boundaryMem
-  have normalizedMem :=
-    periodNormalize_mem_orientedCrossings
-      wellFormed degree isLocal crossingMem
+  rcases List.mem_flatMap.mp crossingMem with
+    ⟨canonical, canonicalMem, translatedMem⟩
+  rcases List.mem_map.mp translatedMem with
+    ⟨shift, _shiftMem, crossingEq⟩
+  have normalizedMem :
+      boundary.crossing.periodNormalize graph ∈
+        orientedCrossings graph := by
+    rw [← crossingEq,
+      CrossingRecord.periodNormalize_periodTranslate,
+      periodNormalize_eq_self_of_mem_orientedCrossings
+        graph canonicalMem]
+    exact canonicalMem
   rcases boundary with ⟨crossing, side⟩
   apply List.mem_flatMap.mpr
   refine ⟨crossing.periodNormalize graph, normalizedMem, ?_⟩
