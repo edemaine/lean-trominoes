@@ -294,5 +294,639 @@ theorem orientedCrossing_periodTranslate_eq_of_point_eq
       graph second,
     normalizedEq, periodShiftEq]
 
+/-- A retained crossover center cannot coincide with an arbitrary period
+translate of an enumerated route-bend center.  The bend's classified
+adjacent segments and normalized center placement come from its finite
+representative; only their occurrence coordinate is translated. -/
+theorem
+    orientedCrossing_point_ne_drawingRouteBend_periodTranslate_drawingPoint
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
+    {routeBend : RouteBend}
+    (routeBendMem : routeBend ∈ drawingRouteBends graph)
+    (shift : Cell) :
+    crossing.point ≠
+      (routeBend.periodTranslate shift).drawingPoint graph := by
+  intro pointEq
+  rcases drawingRouteBend_adjacentClassifiedSegments
+      graph routeBendMem with
+    ⟨edge, edgeIndex, incoming, outgoing,
+      edgeMem, incomingMem, outgoingMem,
+      routeIndexEq, incomingIndexEq, outgoingIndexEq,
+      incomingSegmentEq, outgoingSegmentEq⟩
+  have geometry :=
+    drawingRouteBend_cornerGeometry
+      wellFormed degree isLocal routeBendMem
+  rcases geometry.incomingAligned with
+    incomingHorizontal | incomingVertical
+  · have incomingHorizontal' :
+        incoming.1.segment.IsHorizontal := by
+      rw [incomingSegmentEq]
+      exact incomingHorizontal
+    apply
+      orientedCrossing_point_ne_horizontal_classified_endpoint
+        wellFormed degree isLocal crossingMem
+        edgeMem incomingMem incomingHorizontal'
+        (Cell.add routeBend.translate shift) .finish
+    rw [incomingSegmentEq]
+    simpa [RouteBend.drawingPoint,
+      RouteBend.periodTranslate] using pointEq
+  · rcases geometry.outgoingAligned with
+      outgoingHorizontal | outgoingVertical
+    · have outgoingHorizontal' :
+          outgoing.1.segment.IsHorizontal := by
+        rw [outgoingSegmentEq]
+        exact outgoingHorizontal
+      apply
+        orientedCrossing_point_ne_horizontal_classified_endpoint
+          wellFormed degree isLocal crossingMem
+          edgeMem outgoingMem outgoingHorizontal'
+          (Cell.add routeBend.translate shift) .start
+      rw [outgoingSegmentEq]
+      simpa [RouteBend.drawingPoint,
+        RouteBend.periodTranslate] using pointEq
+    · have incomingVertical' :
+          incoming.1.segment.IsVertical := by
+        rw [incomingSegmentEq]
+        exact incomingVertical
+      have outgoingVertical' :
+          outgoing.1.segment.IsVertical := by
+        rw [outgoingSegmentEq]
+        exact outgoingVertical
+      rcases drawingRouteBend_centerPlacement
+          graph isLocal routeBendMem with
+        ⟨placementEdge, placementEdgeIndex,
+          placement, placementIndex,
+          placementEdgeMem, placementMem,
+          placementRouteIndexEq, placementIndexEq,
+          placementPointEq⟩
+      have edgeIndexEq :
+          placementEdgeIndex = edgeIndex := by
+        rw [← placementRouteIndexEq, ← routeIndexEq]
+      have taggedEdgeEq :
+          (placementEdge, placementEdgeIndex) =
+            (edge, edgeIndex) :=
+        tagged_eq_of_mem_zipIdx_of_snd_eq
+          placementEdgeMem edgeMem edgeIndexEq
+      have placementEdgeEq :
+          placementEdge = edge :=
+        congrArg Prod.fst taggedEdgeEq
+      subst placementEdge
+      rw [edgeIndexEq] at placementMem
+      have incomingPlacementIndexEq :
+          incoming.2 = placementIndex := by
+        omega
+      have outgoingPlacementIndexEq :
+          outgoing.2 = placementIndex + 1 := by
+        omega
+      rcases
+          routeBendCenterPlacement_kind_port_of_adjacent_vertical
+            graph edge edgeIndex placementMem
+            incomingMem outgoingMem
+            incomingPlacementIndexEq
+            outgoingPlacementIndexEq
+            incomingVertical' outgoingVertical' with
+        ⟨port, placementKindEq⟩
+      apply
+        orientedCrossing_point_snd_ne_portRow crossingMem
+          (Cell.add
+            (Cell.add routeBend.translate shift)
+            placement.offset).2
+      have translatedPlacementPointEq :
+          (routeBend.periodTranslate shift).drawingPoint graph =
+            Cell.add
+              (placement.kind.position graph)
+              ((drawing graph).periodTranslation
+                (Cell.add
+                  (Cell.add routeBend.translate shift)
+                  placement.offset)) := by
+        rw [RouteBend.drawingPoint_periodTranslate,
+          placementPointEq]
+        rcases placement.kind.position graph with
+          ⟨positionX, positionY⟩
+        rcases routeBend.translate with
+          ⟨translateX, translateY⟩
+        rcases shift with ⟨shiftX, shiftY⟩
+        rcases placement.offset with ⟨offsetX, offsetY⟩
+        simp [PeriodicGridDrawing.periodTranslation,
+          Cell.add, Cell.scale]
+        constructor <;> ring
+      have pointYEq :=
+        congrArg Prod.snd
+          (pointEq.trans translatedPlacementPointEq)
+      rw [placementKindEq] at pointYEq
+      simpa [RouteBendCenterKind.position,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.add, Cell.scale] using pointYEq
+
+/-- Cancel one drawing-period translation from the left side of a physical
+point equality. -/
+theorem point_eq_add_periodTranslation_neg_of_add_periodTranslation_eq
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (first second shift : Cell)
+    (equal :
+      Cell.add first ((drawing graph).periodTranslation shift) =
+        second) :
+    first =
+      Cell.add second
+        ((drawing graph).periodTranslation
+          (Cell.sub (0, 0) shift)) := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  rcases shift with ⟨shiftX, shiftY⟩
+  simp only [PeriodicGridDrawing.periodTranslation,
+    Cell.add, Cell.sub, Cell.scale, Prod.mk.injEq] at equal ⊢
+  constructor
+  · linear_combination equal.1
+  · linear_combination equal.2
+
+set_option maxHeartbeats 1200000 in
+/-- If an arbitrary translate of one retained noncarrier component and a
+second retained noncarrier component have the same macrocell center, then
+the components align exactly, except that two routed-variable arms may share
+their translated variable site. -/
+theorem
+    retainedNoncarrierComponents_periodTranslate_eq_or_routedVariable_of_center_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (first second : DrawingPlanarSATClauseMetadata Variable)
+    (firstValid : first.RetainedValid formula)
+    (secondValid : second.RetainedValid formula)
+    (shift center : Cell)
+    (firstCenterEq :
+      ((first.source.periodTranslate formula shift).component
+        |>.macrocellCenter formula) = some center)
+    (secondCenterEq :
+      second.source.component.macrocellCenter formula = some center) :
+    second.source.component =
+        (first.source.periodTranslate formula shift).component ∨
+      ∃ site firstArm firstLink secondArm secondLink,
+        (first.source.periodTranslate formula shift).component =
+            .routedVariable site firstArm firstLink ∧
+          second.source.component =
+            .routedVariable site secondArm secondLink := by
+  let graph := PeriodicCNF.incidenceGraph formula
+  rcases first with ⟨firstClause, firstSource⟩
+  rcases second with ⟨secondClause, secondSource⟩
+  cases firstSource with
+  | carrier firstLink firstIndex =>
+      simp [DrawingPlanarSATClauseSource.periodTranslate,
+        DrawingPlanarSATClauseSource.component,
+        DrawingPlanarSATComponent.macrocellCenter] at firstCenterEq
+  | crossover firstCrossing firstIndex =>
+      cases secondSource with
+      | carrier secondLink secondIndex =>
+          simp [DrawingPlanarSATClauseSource.component,
+            DrawingPlanarSATComponent.macrocellCenter] at secondCenterEq
+      | crossover secondCrossing secondIndex =>
+          left
+          have pointEq :
+              (firstCrossing.periodTranslate graph shift).point =
+                secondCrossing.point := by
+            apply Option.some.inj
+            simpa [DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have crossingEq :=
+            orientedCrossing_periodTranslate_eq_of_point_eq
+              wellFormed degree isLocal
+              firstValid.1 secondValid.1 shift pointEq
+          simp only [DrawingPlanarSATClauseSource.periodTranslate,
+            DrawingPlanarSATClauseSource.component]
+          congr 1
+          exact crossingEq.symm
+      | bend secondBend secondIndex =>
+          exfalso
+          have pointEq :
+              (firstCrossing.periodTranslate graph shift).point =
+                secondBend.drawingPoint graph := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have backEq :
+              firstCrossing.point =
+                (secondBend.periodTranslate
+                  (Cell.sub (0, 0) shift)).drawingPoint graph := by
+            have cancelled :=
+              point_eq_add_periodTranslation_neg_of_add_periodTranslation_eq
+                graph firstCrossing.point
+                  (secondBend.drawingPoint graph) shift
+                  (by
+                    simpa [CrossingRecord.periodTranslate] using pointEq)
+            rw [RouteBend.drawingPoint_periodTranslate]
+            exact cancelled
+          exact
+            (orientedCrossing_point_ne_drawingRouteBend_periodTranslate_drawingPoint
+              wellFormed degree isLocal firstValid.1
+              (List.mem_dedup.mp secondValid.1)
+              (Cell.sub (0, 0) shift))
+              backEq
+      | routedClause secondSite =>
+          exfalso
+          have pointEq :
+              (firstCrossing.periodTranslate graph shift).point =
+                liftedIncidenceVertexPosition formula
+                  (.clause secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have backEq :
+              firstCrossing.point =
+                liftedIncidenceVertexPosition formula
+                  (.clause secondSite.1)
+                  (Cell.add secondSite.2
+                    (Cell.sub (0, 0) shift)) := by
+            have cancelled :=
+              point_eq_add_periodTranslation_neg_of_add_periodTranslation_eq
+                graph firstCrossing.point
+                  (liftedIncidenceVertexPosition formula
+                    (.clause secondSite.1) secondSite.2)
+                  shift
+                  (by
+                    simpa [CrossingRecord.periodTranslate] using pointEq)
+            rw [liftedIncidenceVertexPosition_periodTranslate]
+            exact cancelled
+          exact
+            (orientedCrossing_point_ne_liftedVertexPosition
+              wellFormed degree firstValid.1
+              (drawingClauseRouteSite_vertex_mem
+                formula secondValid.1)
+              (Cell.add secondSite.2
+                (Cell.sub (0, 0) shift)))
+              (by simpa [liftedIncidenceVertexPosition] using backEq)
+      | routedVariable secondSite secondArmIndex secondArm secondLink
+          secondIndex =>
+          exfalso
+          have pointEq :
+              (firstCrossing.periodTranslate graph shift).point =
+                liftedIncidenceVertexPosition formula
+                  (.variable secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have backEq :
+              firstCrossing.point =
+                liftedIncidenceVertexPosition formula
+                  (.variable secondSite.1)
+                  (Cell.add secondSite.2
+                    (Cell.sub (0, 0) shift)) := by
+            have cancelled :=
+              point_eq_add_periodTranslation_neg_of_add_periodTranslation_eq
+                graph firstCrossing.point
+                  (liftedIncidenceVertexPosition formula
+                    (.variable secondSite.1) secondSite.2)
+                  shift
+                  (by
+                    simpa [CrossingRecord.periodTranslate] using pointEq)
+            rw [liftedIncidenceVertexPosition_periodTranslate]
+            exact cancelled
+          exact
+            (orientedCrossing_point_ne_liftedVertexPosition
+              wellFormed degree firstValid.1
+              (drawingVariableRouteSite_vertex_mem
+                formula secondValid.1)
+              (Cell.add secondSite.2
+                (Cell.sub (0, 0) shift)))
+              (by simpa [liftedIncidenceVertexPosition] using backEq)
+  | bend firstBend firstIndex =>
+      cases secondSource with
+      | carrier secondLink secondIndex =>
+          simp [DrawingPlanarSATClauseSource.component,
+            DrawingPlanarSATComponent.macrocellCenter] at secondCenterEq
+      | crossover secondCrossing secondIndex =>
+          exfalso
+          have pointEq :
+              (firstBend.periodTranslate shift).drawingPoint graph =
+                secondCrossing.point := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          exact
+            (orientedCrossing_point_ne_drawingRouteBend_periodTranslate_drawingPoint
+              wellFormed degree isLocal secondValid.1
+              (List.mem_dedup.mp firstValid.1) shift)
+              pointEq.symm
+      | bend secondBend secondIndex =>
+          left
+          have pointEq :
+              (firstBend.periodTranslate shift).drawingPoint graph =
+                secondBend.drawingPoint graph := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have bendEq :=
+            drawingRouteBend_periodTranslate_eq_of_drawingPoint_eq
+              graph wellFormed degree isLocal
+              (List.mem_dedup.mp firstValid.1)
+              (List.mem_dedup.mp secondValid.1)
+              shift pointEq
+          simp only [DrawingPlanarSATClauseSource.periodTranslate,
+            DrawingPlanarSATClauseSource.component]
+          congr 1
+          exact bendEq.symm
+      | routedClause secondSite =>
+          exfalso
+          have pointEq :
+              (firstBend.periodTranslate shift).drawingPoint graph =
+                liftedIncidenceVertexPosition formula
+                  (.clause secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have backEq :
+              firstBend.drawingPoint graph =
+                liftedIncidenceVertexPosition formula
+                  (.clause secondSite.1)
+                  (Cell.add secondSite.2
+                    (Cell.sub (0, 0) shift)) := by
+            have cancelled :=
+              point_eq_add_periodTranslation_neg_of_add_periodTranslation_eq
+                graph (firstBend.drawingPoint graph)
+                  (liftedIncidenceVertexPosition formula
+                    (.clause secondSite.1) secondSite.2)
+                  shift
+                  (by
+                    simpa only [RouteBend.drawingPoint_periodTranslate]
+                      using pointEq)
+            rw [liftedIncidenceVertexPosition_periodTranslate]
+            exact cancelled
+          exact
+            (drawingRouteBend_drawingPoint_ne_liftedVertexPosition
+              wellFormed degree isLocal
+              (drawingClauseRouteSite_vertex_mem
+                formula secondValid.1)
+              (Cell.add secondSite.2
+                (Cell.sub (0, 0) shift))
+              (List.mem_dedup.mp firstValid.1))
+              (by simpa [liftedIncidenceVertexPosition] using backEq)
+      | routedVariable secondSite secondArmIndex secondArm secondLink
+          secondIndex =>
+          exfalso
+          have pointEq :
+              (firstBend.periodTranslate shift).drawingPoint graph =
+                liftedIncidenceVertexPosition formula
+                  (.variable secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have backEq :
+              firstBend.drawingPoint graph =
+                liftedIncidenceVertexPosition formula
+                  (.variable secondSite.1)
+                  (Cell.add secondSite.2
+                    (Cell.sub (0, 0) shift)) := by
+            have cancelled :=
+              point_eq_add_periodTranslation_neg_of_add_periodTranslation_eq
+                graph (firstBend.drawingPoint graph)
+                  (liftedIncidenceVertexPosition formula
+                    (.variable secondSite.1) secondSite.2)
+                  shift
+                  (by
+                    simpa only [RouteBend.drawingPoint_periodTranslate]
+                      using pointEq)
+            rw [liftedIncidenceVertexPosition_periodTranslate]
+            exact cancelled
+          exact
+            (drawingRouteBend_drawingPoint_ne_liftedVertexPosition
+              wellFormed degree isLocal
+              (drawingVariableRouteSite_vertex_mem
+                formula secondValid.1)
+              (Cell.add secondSite.2
+                (Cell.sub (0, 0) shift))
+              (List.mem_dedup.mp firstValid.1))
+              (by simpa [liftedIncidenceVertexPosition] using backEq)
+  | routedClause firstSite =>
+      cases secondSource with
+      | carrier secondLink secondIndex =>
+          simp [DrawingPlanarSATClauseSource.component,
+            DrawingPlanarSATComponent.macrocellCenter] at secondCenterEq
+      | crossover secondCrossing secondIndex =>
+          exfalso
+          have pointEq :
+              liftedIncidenceVertexPosition formula
+                  (.clause firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                secondCrossing.point := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          exact
+            (orientedCrossing_point_ne_liftedVertexPosition
+              wellFormed degree secondValid.1
+              (drawingClauseRouteSite_vertex_mem
+                formula firstValid.1)
+              (Cell.add firstSite.2 shift))
+              (by
+                simpa [liftedIncidenceVertexPosition] using pointEq.symm)
+      | bend secondBend secondIndex =>
+          exfalso
+          have pointEq :
+              liftedIncidenceVertexPosition formula
+                  (.clause firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                secondBend.drawingPoint graph := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          exact
+            (drawingRouteBend_drawingPoint_ne_liftedVertexPosition
+              wellFormed degree isLocal
+              (drawingClauseRouteSite_vertex_mem
+                formula firstValid.1)
+              (Cell.add firstSite.2 shift)
+              (List.mem_dedup.mp secondValid.1))
+              (by
+                simpa [liftedIncidenceVertexPosition] using pointEq.symm)
+      | routedClause secondSite =>
+          left
+          have positionEq :
+              liftedIncidenceVertexPosition formula
+                  (.clause firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                liftedIncidenceVertexPosition formula
+                  (.clause secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have siteEq :=
+            clauseRouteSitePeriodTranslate_eq_of_liftedPosition_eq
+              formula firstValid.1 secondValid.1 shift positionEq
+          simp only [DrawingPlanarSATClauseSource.periodTranslate,
+            DrawingPlanarSATClauseSource.component]
+          congr 1
+          exact siteEq.symm
+      | routedVariable secondSite secondArmIndex secondArm secondLink
+          secondIndex =>
+          exfalso
+          have positionEq :
+              liftedIncidenceVertexPosition formula
+                  (.clause firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                liftedIncidenceVertexPosition formula
+                  (.variable secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have impossible :=
+            liftedDrawingVertexPosition_eq graph
+              (drawingClauseRouteSite_vertex_mem
+                formula firstValid.1)
+              (drawingVariableRouteSite_vertex_mem
+                formula secondValid.1)
+              positionEq
+          cases impossible.1
+  | routedVariable firstSite firstArmIndex firstArm firstLink firstIndex =>
+      cases secondSource with
+      | carrier secondLink secondIndex =>
+          simp [DrawingPlanarSATClauseSource.component,
+            DrawingPlanarSATComponent.macrocellCenter] at secondCenterEq
+      | crossover secondCrossing secondIndex =>
+          exfalso
+          have pointEq :
+              liftedIncidenceVertexPosition formula
+                  (.variable firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                secondCrossing.point := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          exact
+            (orientedCrossing_point_ne_liftedVertexPosition
+              wellFormed degree secondValid.1
+              (drawingVariableRouteSite_vertex_mem
+                formula firstValid.1)
+              (Cell.add firstSite.2 shift))
+              (by
+                simpa [liftedIncidenceVertexPosition] using pointEq.symm)
+      | bend secondBend secondIndex =>
+          exfalso
+          have pointEq :
+              liftedIncidenceVertexPosition formula
+                  (.variable firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                secondBend.drawingPoint graph := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          exact
+            (drawingRouteBend_drawingPoint_ne_liftedVertexPosition
+              wellFormed degree isLocal
+              (drawingVariableRouteSite_vertex_mem
+                formula firstValid.1)
+              (Cell.add firstSite.2 shift)
+              (List.mem_dedup.mp secondValid.1))
+              (by
+                simpa [liftedIncidenceVertexPosition] using pointEq.symm)
+      | routedClause secondSite =>
+          exfalso
+          have positionEq :
+              liftedIncidenceVertexPosition formula
+                  (.variable firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                liftedIncidenceVertexPosition formula
+                  (.clause secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have impossible :=
+            liftedDrawingVertexPosition_eq graph
+              (drawingVariableRouteSite_vertex_mem
+                formula firstValid.1)
+              (drawingClauseRouteSite_vertex_mem
+                formula secondValid.1)
+              positionEq
+          cases impossible.1
+      | routedVariable secondSite secondArmIndex secondArm secondLink
+          secondIndex =>
+          right
+          have positionEq :
+              liftedIncidenceVertexPosition formula
+                  (.variable firstSite.1)
+                  (Cell.add firstSite.2 shift) =
+                liftedIncidenceVertexPosition formula
+                  (.variable secondSite.1) secondSite.2 := by
+            apply Option.some.inj
+            simpa [graph, clauseRouteSitePeriodTranslate,
+              variableRouteSitePeriodTranslate,
+              DrawingPlanarSATClauseSource.periodTranslate,
+              DrawingPlanarSATClauseSource.component,
+              DrawingPlanarSATComponent.macrocellCenter] using
+                firstCenterEq.trans secondCenterEq.symm
+          have siteEq :=
+            variableRouteSitePeriodTranslate_eq_of_liftedPosition_eq
+              formula firstValid.1 secondValid.1 shift positionEq
+          refine
+            ⟨variableRouteSitePeriodTranslate firstSite shift,
+              firstArm,
+              planarSATNodeLinkPeriodTranslate graph firstLink shift,
+              secondArm, secondLink, ?_, ?_⟩
+          · rfl
+          · simp only [siteEq,
+              DrawingPlanarSATClauseSource.component]
+
 end PeriodicOrthocrossing
 end LeanTrominoes
