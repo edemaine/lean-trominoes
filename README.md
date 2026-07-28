@@ -2233,6 +2233,12 @@ The representation choices for this target are:
   filters them by the zero-shift ownership rule.  The selected physical links
   are duplicate-free, remain on one segment-occurrence key, and their
   equality clauses are satisfied by every carrier assignment.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFormula.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFormula.lean)
+  replaces only the canonical straight-carrier clauses by their selected
+  retained representatives, leaving crossover, bend, routed-clause, and
+  routed-variable components unchanged.  It proves the exact componentwise
+  satisfaction interface and extends compatible route and atom assignments
+  through the retained core.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean)
   defines common period translation for crossing records, boundaries,
   terminals, carrier nodes, and equality links.  Crossing normalization is
