@@ -2611,6 +2611,11 @@ The representation choices for this target are:
   relative external shift and zero places both finite representatives at the
   second occurrence's external shift, reducing the remaining orbit proof to
   family-by-family retained component membership.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSourceOrbitMembership.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSourceOrbitMembership.lean)
+  packages that family-by-family membership interface.  Crossovers,
+  carriers, bends, and routed clauses reuse their exact translated sources;
+  routed-variable arms may change only their finite per-site presentation
+  index while preserving the translated component and local clause index.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
