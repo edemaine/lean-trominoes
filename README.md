@@ -2333,6 +2333,10 @@ The representation choices for this target are:
   combines those corridor bounds with continuous source-interior disjointness.
   Horizontal or vertical selected links on distinct occurrence keys have
   strictly separated lens rectangles, including collinear occurrences.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCarrierSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierCarrierSeparation.lean)
+  combines same-key chain order with different-key parallel separation.
+  Every pair of distinct nonperpendicular selected carrier lenses has
+  separated genuine routes, leaving exactly the perpendicular case.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
