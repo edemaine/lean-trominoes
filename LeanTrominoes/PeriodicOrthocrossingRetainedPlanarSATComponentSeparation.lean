@@ -196,6 +196,119 @@ theorem
           firstClauseMember firstLiteralMember
           secondClauseMember secondLiteralMember
 
+/-- A raw retained carrier whose source translate lies in the neighbor
+window avoids every retained-valid non-carrier component.  Unlike the
+selected-representative theorem above, this form keeps the carrier clause
+membership explicit, so it also applies after translating a selected
+carrier out of the retained representative list. -/
+theorem
+    retainedDrawingPlanarSATRawCarrier_routesAvoidEachOther_of_second_not_carrier
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {carrierLink : EqualityLink CarrierNode}
+    (carrierLinkMember :
+      carrierLink ∈ retainedDrawingCompleteCarrierLinksRaw
+        (PeriodicCNF.incidenceGraph formula))
+    (firstTranslateNeighbor :
+      IsNeighborTranslation carrierLink.first.translate)
+    {carrierClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {carrierClauseIndex : Nat}
+    (carrierClauseMember :
+      (carrierClause, carrierClauseIndex) ∈
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula carrierLink).formula.zipIdx)
+    {carrierLiteral : PlanarSATVariable Variable × Bool}
+    {carrierLiteralIndex : Nat}
+    (carrierLiteralMember :
+      (carrierLiteral, carrierLiteralIndex) ∈
+        carrierClause.literals.zipIdx)
+    (second : DrawingPlanarSATClauseMetadata Variable)
+    (secondValid : second.RetainedValid formula)
+    {secondLiteral : PlanarSATVariable Variable × Bool}
+    {secondLiteralIndex : Nat}
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        second.clause.literals.zipIdx)
+    (secondNotCarrier :
+      ¬∃ link, second.source.component = .carrier link) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      ((drawingPlanarSATCarrierLensIncidenceDrawing
+        formula carrierLink).routes
+          carrierClauseIndex carrierLiteralIndex)
+      ((second.source.incidenceDrawing formula).routes
+        second.source.localClauseIndex secondLiteralIndex) := by
+  rcases second with ⟨secondClause, secondSource⟩
+  cases secondSource with
+  | crossover crossing secondClauseIndex =>
+      have secondClauseMember :=
+        (⟨secondClause, .crossover crossing secondClauseIndex⟩ :
+          DrawingPlanarSATClauseMetadata Variable)
+          |>.retainedLocalClauseMember
+            wellFormed degree isLocal secondValid
+      exact
+        retainedDrawingPlanarSATCarrierCrossoverRoutesAvoidEachOther_of_raw
+          wellFormed degree isLocal carrierLinkMember secondValid.1
+          carrierClauseMember carrierLiteralMember
+          secondClauseMember secondLiteralMember
+  | carrier secondLink secondClauseIndex =>
+      exact False.elim (secondNotCarrier ⟨secondLink, rfl⟩)
+  | bend routeBend secondClauseIndex =>
+      have secondClauseMember :=
+        (⟨secondClause, .bend routeBend secondClauseIndex⟩ :
+          DrawingPlanarSATClauseMetadata Variable)
+          |>.retainedLocalClauseMember
+            wellFormed degree isLocal secondValid
+      exact
+        retainedDrawingPlanarSATCarrierBendRoutesAvoidEachOther_of_raw
+          wellFormed degree isLocal carrierLinkMember
+          firstTranslateNeighbor secondValid.1
+          carrierClauseMember carrierLiteralMember
+          secondClauseMember secondLiteralMember
+  | routedClause site =>
+      have secondClauseMember :=
+        (⟨secondClause, .routedClause site⟩ :
+          DrawingPlanarSATClauseMetadata Variable)
+          |>.retainedLocalClauseMember
+            wellFormed degree isLocal secondValid
+      have literalAtSite :
+          (secondLiteral, secondLiteralIndex) ∈
+            ((routedClauseAt formula site).rename
+              planarSATExternalVariableMap).literals.zipIdx := by
+        rw [secondValid.2] at secondLiteralMember
+        exact secondLiteralMember
+      rcases
+          exists_clauseRouteOccurrence_of_routedClauseLiteralMember
+            formula site literalAtSite with
+        ⟨occurrence, occurrenceMember⟩
+      exact
+        retainedDrawingPlanarSATCarrierRoutedClauseRoutesAvoidEachOther_of_raw
+          wellFormed degree isLocal carrierLinkMember
+          firstTranslateNeighbor occurrenceMember
+          carrierClauseMember carrierLiteralMember
+          secondClauseMember secondLiteralMember
+  | routedVariable site armIndex arm routedLink secondClauseIndex =>
+      have secondClauseMember :=
+        (⟨secondClause,
+            .routedVariable site armIndex arm
+              routedLink secondClauseIndex⟩ :
+          DrawingPlanarSATClauseMetadata Variable)
+          |>.retainedLocalClauseMember
+            wellFormed degree isLocal secondValid
+      exact
+        retainedDrawingPlanarSATCarrierRoutedVariableRoutesAvoidEachOther_of_raw
+          wellFormed degree isLocal carrierLinkMember
+          firstTranslateNeighbor
+          (List.fst_mem_of_mem_zipIdx secondValid.2.1)
+          carrierClauseMember carrierLiteralMember
+          secondClauseMember secondLiteralMember
+
 /-- Every distinct pair involving at least one retained carrier component
 has continuously separated routes. -/
 theorem retainedDrawingPlanarSATMetadata_carrierRoutesAvoidEachOther
