@@ -2493,6 +2493,12 @@ The representation choices for this target are:
   transfers the global orbit classification through first-representative
   clause deduplication.  Thus the final retained stored clause positions
   are duplicate-free.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedVertexPositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedVertexPositions.lean)
+  rules out every variable–clause collision in the periodic quotient,
+  including translated crossover–bend contacts.  Combining this separation
+  with variable and clause injectivity proves that the complete final
+  incidence-vertex list is duplicate-free and lies in the open fundamental
+  square.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
