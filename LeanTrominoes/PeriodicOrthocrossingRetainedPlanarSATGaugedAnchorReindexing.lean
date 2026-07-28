@@ -135,6 +135,36 @@ theorem anchorReindex_commonShift_keep_second
   simp only [Cell.add, Cell.sub]
   apply Prod.ext <;> simp <;> ring
 
+/-- The anchor-directed translation that keeps the second representative
+fixed is exactly the difference between the two existing physical shifts. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.anchorReindexShift_keep_second_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift) :
+    first.anchorReindexShift
+        (Cell.add (Cell.sub firstShift secondShift)
+          second.sourceClauseAnchor) =
+      Cell.sub first.physicalShift second.physicalShift := by
+  rcases firstShift with ⟨firstX, firstY⟩
+  rcases secondShift with ⟨secondX, secondY⟩
+  rcases firstAnchorEq : first.sourceClauseAnchor with
+    ⟨firstAnchorX, firstAnchorY⟩
+  rcases secondAnchorEq : second.sourceClauseAnchor with
+    ⟨secondAnchorX, secondAnchorY⟩
+  simp only [
+    FinalGaugedSegmentOccurrenceWitness.anchorReindexShift,
+    FinalGaugedSegmentOccurrenceWitness.physicalShift_eq,
+    firstAnchorEq, secondAnchorEq, Cell.add, Cell.sub]
+  apply Prod.ext <;> simp <;> ring
+
 /-- Package the remaining orbit obligations for two final occurrences.
 It is enough to retain a component-equivalent first source at anchor
 `firstShift - secondShift` and a component-equivalent second source at
@@ -241,6 +271,43 @@ theorem exists_commonShiftRepresentative_pair_reindex_first
   rw [second.physicalShift_eq]
   exact ⟨firstRepresentative,
     second.toCommonShiftRepresentative⟩
+
+/-- The one-sided reindexing bridge stated directly in the coordinates used
+by contact bounds: translate the first finite source by the difference of
+the two physical shifts and leave the second source unchanged. -/
+theorem exists_commonShiftRepresentative_pair_reindex_first_by_physicalShift
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstTargetSource : DrawingPlanarSATClauseSource Variable)
+    (firstTargetMember :
+      firstTargetSource.RetainedComponentMember formula)
+    (firstTargetComponentEq :
+      firstTargetSource.component =
+        (first.routeWitness.metadata.source.periodTranslate
+          formula
+          (Cell.sub first.physicalShift
+            second.physicalShift)).component)
+    (firstTargetLocalClauseIndexEq :
+      firstTargetSource.localClauseIndex =
+        first.routeWitness.metadata.source.localClauseIndex) :
+    Nonempty
+      (FinalGaugedSegmentCommonShiftRepresentative
+          formula firstIndexed firstShift second.physicalShift ×
+        FinalGaugedSegmentCommonShiftRepresentative
+          formula secondIndexed secondShift second.physicalShift) := by
+  apply exists_commonShiftRepresentative_pair_reindex_first
+    first second firstTargetSource firstTargetMember
+  · rw [first.anchorReindexShift_keep_second_eq second]
+    exact firstTargetComponentEq
+  · exact firstTargetLocalClauseIndexEq
 
 end PeriodicOrthocrossing
 end LeanTrominoes
