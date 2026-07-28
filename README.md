@@ -1496,6 +1496,10 @@ The representation choices for this target are:
   extracts route simplicity and pairwise continuous separation from those
   finite-index certificates using ordinary clause/literal membership data,
   which is the form needed by global assembly proofs.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingIndexedSegmentSeparation.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingIndexedSegmentSeparation.lean)
+  repackages finite planarity for flat `zipIdx` incidence and segment
+  occurrences: differing incidence or within-route indices imply disjoint
+  continuous segment interiors.
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingMapPoints.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingMapPoints.lean)
   proves a generic transport theorem for complete finite drawing
   certificates under any injective point map preserving axis alignment,
@@ -2550,6 +2554,10 @@ The representation choices for this target are:
   converts that simplicity certificate to the global indexed-segment
   language, excluding continuous overlap and endpoint contact between
   distinct segments of one periodic route occurrence.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSamePhysicalShiftSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSamePhysicalShiftSeparation.lean)
+  transfers the full finite planarity certificate to any two distinct final
+  segment occurrences with the same anchor-adjusted physical shift, proving
+  that their continuous interiors remain disjoint in the periodic lift.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.

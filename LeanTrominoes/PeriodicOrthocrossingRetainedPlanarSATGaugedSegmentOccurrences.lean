@@ -348,6 +348,21 @@ theorem
       physicalSegmentMember
   · simpa [metadataPhysicalRouteOccurrence] using segmentEq
 
+/-- The finite retained drawing translate represented by a final periodic
+segment occurrence after undoing clause-anchor normalization. -/
+def FinalGaugedSegmentOccurrenceWitness.physicalShift
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift : Cell}
+    (witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift) :
+    Cell :=
+  Cell.sub shift
+    (PeriodicCNF.clauseAnchor
+      (metadataGaugedPositionedClause
+        formula witness.routeWitness.metadata).literals)
+
 /-- The occurrence key of the corresponding segment in the translated
 finite retained drawing.  Clause-anchor normalization changes only the
 translation component of the final periodic occurrence key. -/
@@ -360,10 +375,7 @@ def FinalGaugedSegmentOccurrenceWitness.physicalKey
       FinalGaugedSegmentOccurrenceWitness formula indexed shift) :
     Nat × Nat × Cell :=
   (witness.physicalIncidenceIndex, indexed.segmentIndex,
-    Cell.sub shift
-      (PeriodicCNF.clauseAnchor
-        (metadataGaugedPositionedClause
-          formula witness.routeWitness.metadata).literals))
+    witness.physicalShift)
 
 /-- Equal final flat indices select the same metadata-rich final
 incidence. -/
