@@ -322,6 +322,269 @@ theorem variableRouteSitePeriodTranslate_mem_drawing_of_occurrence
     variableRouteSitePeriodTranslate, Cell.add]
   constructor <;> ring
 
+/-- The target terminal of a metadata-rich route occurrence translates
+without changing its indexed segment or endpoint. -/
+@[simp]
+theorem CNFRouteOccurrence.targetTerminal_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrence : CNFRouteOccurrence Variable) (shift : Cell) :
+    (occurrence.periodTranslate shift).targetTerminal formula =
+      (occurrence.targetTerminal formula).periodTranslate shift := by
+  rfl
+
+/-- Translating a metadata-rich route occurrence translates its lifted
+variable endpoint site by the same drawing-period shift. -/
+@[simp]
+theorem CNFRouteOccurrence.variableOccurrence_periodTranslate
+    {Variable : Type*}
+    (occurrence : CNFRouteOccurrence Variable) (shift : Cell) :
+    (occurrence.periodTranslate shift).variableOccurrence =
+      variableRouteSitePeriodTranslate
+        occurrence.variableOccurrence shift := by
+  rcases occurrence with ⟨incidence, edgeIndex, translate⟩
+  rcases translate with ⟨translateX, translateY⟩
+  rcases shift with ⟨shiftX, shiftY⟩
+  simp [CNFRouteOccurrence.variableOccurrence,
+    CNFRouteOccurrence.periodTranslate, CNFRouteOccurrence.edge,
+    variableRouteSitePeriodTranslate, Cell.add]
+  constructor <;> ring
+
+/-- Translating a routed-variable site translates the two clause positions
+of each fixed duplicator arm by the refined drawing period. -/
+theorem routedVariableEqualityPositions_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    (arm : DuplicatorArm) (shift : Cell) :
+    routedVariableEqualityPositions formula
+        (variableRouteSitePeriodTranslate site shift) arm =
+      EqualityPositions.periodTranslate
+        (routedVariableEqualityPositions formula site arm)
+        (carrierMacroPeriodTranslation
+          (PeriodicCNF.incidenceGraph formula) shift) := by
+  cases arm <;>
+    simp [routedVariableEqualityPositions,
+      EqualityPositions.periodTranslate,
+      routedVariableOrigin_periodTranslate,
+      duplicatorArmEqualityPositions,
+      Cell.add] <;>
+    constructor <;> constructor <;> ring
+
+/-- A graph degree bound recovers the source formula's variable-occurrence
+bound. -/
+theorem occurrencesAtMost_of_incidenceGraph_degreeAtMost
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {bound : Nat}
+    (degree : formula.incidenceGraph.DegreeAtMost bound) :
+    formula.OccurrencesAtMost bound := by
+  intro atom
+  rw [← PeriodicCNF.incidenceGraph_variable_degree]
+  exact degree (.variable atom)
+
+/-- Every active routed-variable link exposes the metadata-rich route
+occurrence that supplies its first terminal endpoint. -/
+theorem exists_routeOccurrence_of_routedVariableLinkMember
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    {link : EqualityLink (PlanarSATNode Variable)}
+    {armIndex : Nat}
+    (linkMember :
+      (link, armIndex) ∈
+        (routedVariableLinksAt formula site).zipIdx) :
+    ∃ occurrence ∈ variableRouteOccurrencesAt formula site,
+      link.first =
+        .carrier (.terminal
+          (occurrence.targetTerminal formula)) := by
+  have rawLinkMember :
+      link ∈ routedVariableLinksAt formula site :=
+    List.fst_mem_of_mem_zipIdx linkMember
+  rcases List.mem_map.mp rawLinkMember with
+    ⟨taggedNode, taggedNodeMember, linkEq⟩
+  have nodeMember :
+      taggedNode.1 ∈ routedVariableNodes formula site :=
+    List.mem_of_mem_take
+      (List.fst_mem_of_mem_zipIdx taggedNodeMember)
+  rcases
+      (mem_routedVariableNodes_iff
+        formula site taggedNode.1).mp nodeMember with
+    ⟨occurrence, occurrenceMember, nodeEq⟩
+  refine ⟨occurrence, occurrenceMember, ?_⟩
+  rw [← linkEq]
+  exact nodeEq
+
+/-- Membership determines all fields of a routed-variable link from its first
+endpoint and site. -/
+theorem routedVariableLink_eq_of_member
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    {link : EqualityLink (PlanarSATNode Variable)}
+    (linkMember : link ∈ routedVariableLinksAt formula site) :
+    link =
+      ⟨link.first, .atom site,
+        routedVariableEqualityPositions formula site
+          link.first.duplicatorArm⟩ := by
+  rcases List.mem_map.mp linkMember with
+    ⟨taggedNode, taggedNodeMember, linkEq⟩
+  rw [← linkEq]
+
+/-- At a degree-at-most-three site, every listed routed-variable node occurs
+among the three active links, at some finite presentation index. -/
+theorem exists_routedVariableLinkIndex_of_nodeMember
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (occurrences : formula.OccurrencesAtMost 3)
+    (site : VariableRouteSite Variable)
+    (node : PlanarSATNode Variable)
+    (nodeMember : node ∈ routedVariableNodes formula site) :
+    ∃ armIndex : Nat,
+      ((⟨node, .atom site,
+          routedVariableEqualityPositions formula site
+            node.duplicatorArm⟩ :
+          EqualityLink (PlanarSATNode Variable)),
+        armIndex) ∈
+        (routedVariableLinksAt formula site).zipIdx := by
+  have nodesLengthLe :
+      (routedVariableNodes formula site).length ≤ 3 := by
+    calc
+      (routedVariableNodes formula site).length ≤
+          ((variableRouteOccurrencesAt formula site).map fun occurrence =>
+            (PlanarSATNode.carrier
+              (.terminal (occurrence.targetTerminal formula)) :
+              PlanarSATNode Variable)).length :=
+        List.Sublist.length_le (List.dedup_sublist _)
+      _ ≤ 3 := by
+        simpa using
+          variableRouteOccurrencesAt_length_le_three
+            formula occurrences site
+  have nodeTakeMember :
+      node ∈ (routedVariableNodes formula site).take 3 := by
+    rw [List.take_of_length_le nodesLengthLe]
+    exact nodeMember
+  rcases List.mem_iff_getElem.mp nodeTakeMember with
+    ⟨armIndex, armIndexLt, nodeLookup⟩
+  have taggedNodeMember :
+      (node, armIndex) ∈
+        ((routedVariableNodes formula site).take 3).zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨armIndexLt, nodeLookup⟩
+  have doubleTaggedNodeMember :
+      ((node, armIndex), armIndex) ∈
+        ((routedVariableNodes formula site).take 3).zipIdx.zipIdx := by
+    apply (List.mem_zipIdx_iff_getElem?).mpr
+    have lookup :=
+      (List.mem_zipIdx_iff_getElem?).mp taggedNodeMember
+    simp [List.getElem?_zipIdx, lookup]
+  refine ⟨armIndex, ?_⟩
+  unfold routedVariableLinksAt
+  rw [List.zipIdx_map]
+  apply List.mem_map.mpr
+  exact
+    ⟨((node, armIndex), armIndex),
+      doubleTaggedNodeMember, rfl⟩
+
+/-- Translating the route occurrence behind an active routed-variable link
+puts the exact translated link into the translated site's active family,
+possibly at a different finite presentation index. -/
+theorem exists_routedVariableLinkIndex_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (site : VariableRouteSite Variable)
+    (link : EqualityLink (PlanarSATNode Variable))
+    (armIndex : Nat)
+    (linkMember :
+      (link, armIndex) ∈
+        (routedVariableLinksAt formula site).zipIdx)
+    (occurrence : CNFRouteOccurrence Variable)
+    (occurrenceMember :
+      occurrence ∈ variableRouteOccurrencesAt formula site)
+    (linkFirstEq :
+      link.first =
+        .carrier (.terminal
+          (occurrence.targetTerminal formula)))
+    (shift : Cell)
+    (translatedNeighbor :
+      IsNeighborTranslation
+        (Cell.add occurrence.translate shift)) :
+    ∃ targetArmIndex : Nat,
+      (planarSATNodeLinkPeriodTranslate
+          formula.incidenceGraph link shift,
+        targetArmIndex) ∈
+          (routedVariableLinksAt formula
+            (variableRouteSitePeriodTranslate site shift)).zipIdx := by
+  let targetSite :=
+    variableRouteSitePeriodTranslate site shift
+  let targetOccurrence := occurrence.periodTranslate shift
+  let targetNode : PlanarSATNode Variable :=
+    .carrier (.terminal
+      (targetOccurrence.targetTerminal formula))
+  have occurrenceData :=
+    variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+      formula site occurrenceMember
+  have targetOccurrenceMember :
+      targetOccurrence ∈ drawingCNFRouteOccurrences formula :=
+    occurrence.periodTranslate_mem_drawing_of_neighbor
+      occurrenceData.1 shift translatedNeighbor
+  have targetOccurrenceSiteEq :
+      targetOccurrence.variableOccurrence = targetSite := by
+    simpa only [targetOccurrence, targetSite,
+        CNFRouteOccurrence.variableOccurrence_periodTranslate] using
+      congrArg
+        (fun sourceSite =>
+          variableRouteSitePeriodTranslate sourceSite shift)
+        occurrenceData.2
+  have targetOccurrenceAtMember :
+      targetOccurrence ∈
+        variableRouteOccurrencesAt formula targetSite := by
+    simp [variableRouteOccurrencesAt,
+      targetOccurrenceMember, targetOccurrenceSiteEq]
+  have targetNodeMember :
+      targetNode ∈ routedVariableNodes formula targetSite := by
+    apply (mem_routedVariableNodes_iff
+      formula targetSite targetNode).mpr
+    exact
+      ⟨targetOccurrence, targetOccurrenceAtMember, rfl⟩
+  rcases exists_routedVariableLinkIndex_of_nodeMember
+      formula
+      (occurrencesAtMost_of_incidenceGraph_degreeAtMost degree)
+      targetSite targetNode targetNodeMember with
+    ⟨targetArmIndex, targetLinkMember⟩
+  refine ⟨targetArmIndex, ?_⟩
+  have sourceLinkEq :
+      link =
+        ⟨link.first, .atom site,
+          routedVariableEqualityPositions formula site
+            link.first.duplicatorArm⟩ :=
+    routedVariableLink_eq_of_member
+      formula site (List.fst_mem_of_mem_zipIdx linkMember)
+  have targetNodeEq :
+      targetNode =
+        link.first.periodTranslate formula.incidenceGraph shift := by
+    rw [linkFirstEq]
+    rfl
+  have targetLinkEq :
+      (⟨targetNode, .atom targetSite,
+          routedVariableEqualityPositions formula targetSite
+            targetNode.duplicatorArm⟩ :
+        EqualityLink (PlanarSATNode Variable)) =
+        planarSATNodeLinkPeriodTranslate
+          formula.incidenceGraph link shift := by
+    rw [sourceLinkEq]
+    unfold planarSATNodeLinkPeriodTranslate
+    rw [targetNodeEq]
+    dsimp only [targetSite]
+    rw [PlanarSATNode.duplicatorArm_periodTranslate,
+      routedVariableEqualityPositions_periodTranslate]
+    rfl
+  rw [← targetLinkEq]
+  exact targetLinkMember
+
 /-- A translated crossover source is retained as soon as its translated
 crossing record belongs to the retained crossing halo. -/
 theorem crossoverSource_periodTranslate_retainedComponentMember
@@ -497,6 +760,62 @@ theorem exists_retainedTargetSource_routedVariable_periodTranslate
         planarSATNodeLinkPeriodTranslate,
         PlanarSATNode.duplicatorArm_periodTranslate] using
           sourceArmEq⟩
+
+/-- A retained routed-variable source has a retained translated
+representative whenever the route occurrence supplying its first endpoint
+stays in the neighboring block.  The representative may use the target
+site's new finite presentation index. -/
+theorem
+    exists_retainedTargetSource_routedVariable_periodTranslate_of_neighbor
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (site : VariableRouteSite Variable)
+    (armIndex : Nat)
+    (arm : DuplicatorArm)
+    (link : EqualityLink (PlanarSATNode Variable))
+    (localClauseIndex : Nat)
+    (sourceMember :
+      (DrawingPlanarSATClauseSource.routedVariable
+        site armIndex arm link localClauseIndex)
+        |>.RetainedComponentMember formula)
+    (occurrence : CNFRouteOccurrence Variable)
+    (occurrenceMember :
+      occurrence ∈ variableRouteOccurrencesAt formula site)
+    (linkFirstEq :
+      link.first =
+        .carrier (.terminal
+          (occurrence.targetTerminal formula)))
+    (shift : Cell)
+    (translatedNeighbor :
+      IsNeighborTranslation
+        (Cell.add occurrence.translate shift)) :
+    ∃ targetSource : DrawingPlanarSATClauseSource Variable,
+      targetSource.RetainedComponentMember formula ∧
+        targetSource.component =
+          ((DrawingPlanarSATClauseSource.routedVariable
+              site armIndex arm link localClauseIndex).periodTranslate
+            formula shift).component ∧
+        targetSource.localClauseIndex = localClauseIndex := by
+  have occurrenceData :=
+    variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+      formula site occurrenceMember
+  have translatedSiteMember :
+      variableRouteSitePeriodTranslate site shift ∈
+        drawingVariableRouteSites formula :=
+    variableRouteSitePeriodTranslate_mem_drawing_of_occurrence
+      site occurrence occurrenceData.1 occurrenceData.2
+      shift translatedNeighbor
+  rcases exists_routedVariableLinkIndex_periodTranslate
+      formula degree site link armIndex sourceMember.2.1
+      occurrence occurrenceMember linkFirstEq shift
+      translatedNeighbor with
+    ⟨targetArmIndex, translatedLinkMember⟩
+  exact exists_retainedTargetSource_routedVariable_periodTranslate
+    formula site armIndex arm link localClauseIndex shift
+    sourceMember.2.2 translatedSiteMember
+    targetArmIndex translatedLinkMember
 
 end PeriodicOrthocrossing
 end LeanTrominoes

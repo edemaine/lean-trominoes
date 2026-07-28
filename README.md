@@ -2618,7 +2618,10 @@ The representation choices for this target are:
   index while preserving the translated component and local clause index.
   It also proves neighboring-window closure for route occurrences, bends,
   routed sites, and crossover records whose two translated carriers remain
-  among the nine neighboring occurrences.
+  among the nine neighboring occurrences.  For routed-variable sources, the
+  degree-three bound guarantees that the translated terminal remains among
+  the target site's three active arms, yielding a retained translated source
+  even when sorting assigns that arm a different local presentation index.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
