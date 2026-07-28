@@ -2218,6 +2218,12 @@ The representation choices for this target are:
   contain canonical crossings.  Hence every terminal prototype has normalized
   link-endpoint degree at most three and occurs at most six times in the
   deduplicated periodic equality formula.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierOrbitOwnership.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierOrbitOwnership.lean)
+  separates retained halo split points from periodic carrier-link
+  representatives.  Its zero-shift ownership rule prevents the outer edge of
+  the finite `3 × 3` halo window from being mistaken for an edge of the
+  infinite carrier, while proving that every retained boundary normalizes to
+  a listed canonical boundary.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
