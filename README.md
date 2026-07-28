@@ -2416,6 +2416,10 @@ The representation choices for this target are:
   clauses.  Disjoint macrocells use rectangle bounds; an overlapping
   component is incident, so complementary carrier-boundary certificates force
   any common point to be a variable port excluded by local planarity.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGlobalClausePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGlobalClausePositions.lean)
+  combines the three component pairings to prove global clause-position
+  injectivity.  Equal nonempty clause positions identify the component, its
+  local clause index, and finally the unique retained global clause index.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
