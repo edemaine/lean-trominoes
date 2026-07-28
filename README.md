@@ -2401,6 +2401,11 @@ The representation choices for this target are:
   certificate: clause positions are locally injective, local variables
   avoid local clauses, and equal clause positions in one component identify
   the same local clause index.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATNoncarrierClausePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATNoncarrierClausePositions.lean)
+  proves that nonempty retained clauses in non-carrier components identify
+  their geometric component by position.  Standard macrocell bounds identify
+  the center; center uniqueness and the fixed routed-variable arm coordinates
+  identify the component at that center.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
