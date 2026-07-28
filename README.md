@@ -2433,6 +2433,12 @@ The representation choices for this target are:
   Non-carrier components use fixed local coordinates; carrier components use
   rectangle separation, certified shared-port boundaries, and the clearance
   between consecutive equality lenses.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPeriodicization.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPeriodicization.lean)
+  transports the planar retained finite block through periodic variable
+  normalization, opaque wrapping, clause-anchor normalization, and
+  clause-orbit deduplication.  The resulting periodic incidence drawing has
+  a graph-level exact-endpoint certificate; quotient planarity is kept as the
+  next geometric obligation.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
