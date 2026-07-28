@@ -42,6 +42,14 @@ structure FinalGaugedSegmentMetadataReindexing
   targetLiteralMember :
     (targetLiteral, witness.taggedLiteral.2) ∈
       targetMetadata.clause.literals.zipIdx
+  targetPhysicalIncidenceIndex : Nat
+  targetPhysicalIncidenceMember :
+    (metadataPhysicalIncidence
+        targetMetadata targetMetadataIndex
+        targetLiteral witness.taggedLiteral.2,
+      targetPhysicalIncidenceIndex) ∈
+      (retainedDrawingPlanarSATLocalIncidenceDrawing
+        formula).incidences.zipIdx
   targetComponentEq :
     targetMetadata.source.component =
       (witness.routeWitness.metadata.source.periodTranslate
@@ -111,10 +119,10 @@ private theorem retainedLocalRoute_eq_sourceRoute
     EmbeddedCNFIncidenceDrawing.routeAt,
     metadataLookup]
 
-/-- Any translated retained-metadata witness yields a finite representative
-at the correspondingly adjusted common physical shift. -/
-theorem
-    FinalGaugedSegmentMetadataReindexing.exists_commonShiftRepresentative
+/-- The finite representative determined by a translated retained-metadata
+witness, at the correspondingly adjusted common physical shift. -/
+def
+    FinalGaugedSegmentMetadataReindexing.toCommonShiftRepresentative
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     {indexed : IndexedGridSegment}
@@ -123,10 +131,9 @@ theorem
       FinalGaugedSegmentOccurrenceWitness formula indexed shift}
     (reindexing :
       FinalGaugedSegmentMetadataReindexing witness reindexShift) :
-    Nonempty
-      (FinalGaugedSegmentCommonShiftRepresentative
-        formula indexed shift
-          (Cell.sub witness.physicalShift reindexShift)) := by
+    FinalGaugedSegmentCommonShiftRepresentative
+      formula indexed shift
+        (Cell.sub witness.physicalShift reindexShift) := by
   let sourceMetadata := witness.routeWitness.metadata
   let sourceIncidence :=
     metadataPhysicalIncidence
@@ -136,28 +143,14 @@ theorem
     metadataPhysicalIncidence
       reindexing.targetMetadata reindexing.targetMetadataIndex
       reindexing.targetLiteral witness.taggedLiteral.2
-  have targetIncidenceMem :
-      targetIncidence ∈
-        (retainedDrawingPlanarSATLocalIncidenceDrawing
-          formula).incidences := by
-    exact metadataPhysicalIncidence_mem
-      formula reindexing.targetMetadata
-      reindexing.targetMetadataIndex
-      reindexing.targetLiteral witness.taggedLiteral.2
-      reindexing.targetMetadataLookup
-      reindexing.targetLiteralMember
-  rcases List.mem_iff_getElem.mp targetIncidenceMem with
-    ⟨targetIncidenceIndex, targetIncidenceIndexLt,
-      targetIncidenceAtEq⟩
+  let targetIncidenceIndex :=
+    reindexing.targetPhysicalIncidenceIndex
   have targetIncidenceMember :
       (targetIncidence, targetIncidenceIndex) ∈
         (retainedDrawingPlanarSATLocalIncidenceDrawing
           formula).incidences.zipIdx := by
-    rw [List.mem_zipIdx_iff_getElem?,
-      List.getElem?_eq_some_iff]
-    exact
-      ⟨targetIncidenceIndexLt,
-        targetIncidenceAtEq⟩
+    simpa only [targetIncidence, targetIncidenceIndex] using
+      reindexing.targetPhysicalIncidenceMember
   let offset :=
     carrierMacroPeriodTranslation
       (PeriodicCNF.incidenceGraph formula) reindexShift
@@ -261,14 +254,14 @@ theorem
       placement witness.physicalSegment
       witness.physicalShift reindexShift
   let original := witness.toCommonShiftRepresentative
-  refine ⟨{
+  refine {
     physicalIncidence := targetIncidence
     physicalIncidenceIndex := targetIncidenceIndex
     physicalIncidenceMember := targetIncidenceMember
     physicalSegment := targetSegment
     physicalSegmentMember := targetSegmentMember
     segmentEq := ?_
-  }⟩
+  }
   calc
     indexed.segment.translate
           ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
@@ -283,6 +276,57 @@ theorem
           (placement.translation
             (Cell.sub witness.physicalShift reindexShift)) :=
       targetPhysicalEq.symm
+
+@[simp]
+theorem
+    FinalGaugedSegmentMetadataReindexing.toCommonShiftRepresentative_physicalIncidence
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift reindexShift : Cell}
+    {witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift}
+    (reindexing :
+      FinalGaugedSegmentMetadataReindexing witness reindexShift) :
+    reindexing.toCommonShiftRepresentative.physicalIncidence =
+      metadataPhysicalIncidence
+        reindexing.targetMetadata
+        reindexing.targetMetadataIndex
+        reindexing.targetLiteral witness.taggedLiteral.2 := by
+  rfl
+
+@[simp]
+theorem
+    FinalGaugedSegmentMetadataReindexing.toCommonShiftRepresentative_physicalIncidenceIndex
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift reindexShift : Cell}
+    {witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift}
+    (reindexing :
+      FinalGaugedSegmentMetadataReindexing witness reindexShift) :
+    reindexing.toCommonShiftRepresentative.physicalIncidenceIndex =
+      reindexing.targetPhysicalIncidenceIndex := by
+  rfl
+
+/-- Any translated retained-metadata witness yields a finite representative
+at the correspondingly adjusted common physical shift. -/
+theorem
+    FinalGaugedSegmentMetadataReindexing.exists_commonShiftRepresentative
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift reindexShift : Cell}
+    {witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift}
+    (reindexing :
+      FinalGaugedSegmentMetadataReindexing witness reindexShift) :
+    Nonempty
+      (FinalGaugedSegmentCommonShiftRepresentative
+        formula indexed shift
+          (Cell.sub witness.physicalShift reindexShift)) :=
+  ⟨reindexing.toCommonShiftRepresentative⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes

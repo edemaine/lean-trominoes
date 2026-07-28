@@ -2628,6 +2628,13 @@ The representation choices for this target are:
   and returns a retained component-equivalent translated source.  Final
   segment witnesses consume this condition directly to align one occurrence
   with another at a common finite-drawing shift.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexingInjectivity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedReindexingInjectivity.lean)
+  proves that source reindexing cannot collapse distinct periodic segment
+  occurrences.  Equality of the target finite incidence and within-route
+  segment index recovers equality of the normalized final clause, literal
+  index, and external shift, hence equality of the original occurrence keys.
+  The resulting transfer theorem turns any first-source orbit condition into
+  continuous separation by finite retained planarity.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.

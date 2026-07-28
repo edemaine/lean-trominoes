@@ -16,6 +16,38 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
 
+/-- Choose the unique flat finite-drawing index of a metadata-rich physical
+incidence. -/
+private theorem exists_metadataPhysicalIncidenceIndex
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (metadataIndex : Nat)
+    (literal : PlanarSATVariable Variable × Bool)
+    (literalIndex : Nat)
+    (metadataLookup :
+      (retainedDrawingPlanarSATClauseMetadata formula)[
+          metadataIndex]? = some metadata)
+    (literalMember :
+      (literal, literalIndex) ∈
+        metadata.clause.literals.zipIdx) :
+    ∃ physicalIncidenceIndex : Nat,
+      (metadataPhysicalIncidence
+          metadata metadataIndex literal literalIndex,
+        physicalIncidenceIndex) ∈
+        (retainedDrawingPlanarSATLocalIncidenceDrawing
+          formula).incidences.zipIdx := by
+  have incidenceMember :=
+    metadataPhysicalIncidence_mem
+      formula metadata metadataIndex literal literalIndex
+      metadataLookup literalMember
+  rcases List.mem_iff_getElem.mp incidenceMember with
+    ⟨physicalIncidenceIndex, indexLt, lookup⟩
+  refine ⟨physicalIncidenceIndex, ?_⟩
+  rw [List.mem_zipIdx_iff_getElem?,
+    List.getElem?_eq_some_iff]
+  exact ⟨indexLt, lookup⟩
+
 /-- Retained membership of a translated source automatically produces all
 metadata, clause, and literal fields needed to reindex a final segment
 occurrence. -/
@@ -64,12 +96,22 @@ theorem
       formula targetSource targetClause translatedSourceMember
       targetLocalClauseMember with
     ⟨targetMetadataIndex, targetMetadataLookup⟩
+  rcases exists_metadataPhysicalIncidenceIndex
+      formula ⟨targetClause, targetSource⟩
+      targetMetadataIndex targetLiteral witness.taggedLiteral.2
+      targetMetadataLookup targetLiteralMember with
+    ⟨targetPhysicalIncidenceIndex,
+      targetPhysicalIncidenceMember⟩
   exact ⟨{
     targetMetadata := ⟨targetClause, targetSource⟩
     targetMetadataIndex := targetMetadataIndex
     targetMetadataLookup := targetMetadataLookup
     targetLiteral := targetLiteral
     targetLiteralMember := targetLiteralMember
+    targetPhysicalIncidenceIndex :=
+      targetPhysicalIncidenceIndex
+    targetPhysicalIncidenceMember :=
+      targetPhysicalIncidenceMember
     targetComponentEq := rfl
     targetLocalClauseIndexEq :=
       DrawingPlanarSATClauseSource.localClauseIndex_periodTranslate
@@ -170,12 +212,22 @@ theorem
       formula targetSource targetClause targetSourceMember
       targetLocalClauseMember with
     ⟨targetMetadataIndex, targetMetadataLookup⟩
+  rcases exists_metadataPhysicalIncidenceIndex
+      formula ⟨targetClause, targetSource⟩
+      targetMetadataIndex targetLiteral witness.taggedLiteral.2
+      targetMetadataLookup targetLiteralMember with
+    ⟨targetPhysicalIncidenceIndex,
+      targetPhysicalIncidenceMember⟩
   exact ⟨{
     targetMetadata := ⟨targetClause, targetSource⟩
     targetMetadataIndex := targetMetadataIndex
     targetMetadataLookup := targetMetadataLookup
     targetLiteral := targetLiteral
     targetLiteralMember := targetLiteralMember
+    targetPhysicalIncidenceIndex :=
+      targetPhysicalIncidenceIndex
+    targetPhysicalIncidenceMember :=
+      targetPhysicalIncidenceMember
     targetComponentEq := targetComponentEq
     targetLocalClauseIndexEq := targetLocalClauseIndexEq
   }⟩
