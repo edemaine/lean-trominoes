@@ -161,6 +161,42 @@ theorem vertexPositionsCoveredByRoutes_of_routesMatch
         rw [incidenceAtEqual]
         simpa [routeAt, ← pointEqual] using endpointMember
 
+/-- Injectivity on used variables, duplicate-free clause positions, and
+cross-part position separation imply duplicate-free global graph-vertex
+positions. -/
+theorem vertexPositions_nodup_of_parts
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (variableInjective :
+      ∀ first ∈ drawing.variableVertices,
+        ∀ second ∈ drawing.variableVertices,
+          drawing.variablePosition first =
+              drawing.variablePosition second →
+            first = second)
+    (clausePositionsNodup :
+      (drawing.formula.map EmbeddedClause.position).Nodup)
+    (variableClauseDisjoint :
+      ∀ atom ∈ drawing.variableVertices,
+        ∀ clause ∈ drawing.formula,
+          drawing.variablePosition atom ≠ clause.position) :
+    drawing.vertexPositions.Nodup := by
+  rw [vertexPositions]
+  have variableVerticesNodup : drawing.variableVertices.Nodup := by
+    exact List.nodup_dedup _
+  apply
+    (variableVerticesNodup.map_on variableInjective).append
+      clausePositionsNodup
+  rw [List.disjoint_left]
+  intro point variablePoint clausePoint
+  rcases List.mem_map.mp variablePoint with
+    ⟨atom, variableMember, pointEqual⟩
+  rcases List.mem_map.mp clausePoint with
+    ⟨clause, clauseMember, clauseEqual⟩
+  exact
+    variableClauseDisjoint
+      atom variableMember clause clauseMember
+      (pointEqual.trans clauseEqual.symm)
+
 end EmbeddedCNFIncidenceDrawing
 
 end PlanarThreeSAT

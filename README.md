@@ -2378,6 +2378,10 @@ The representation choices for this target are:
   proves a reusable endpoint-coverage principle: exact incidence endpoints
   cover every vertex of a formula with no empty clauses, after which route
   simplicity and pairwise route separation imply vertex/interior avoidance.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATVertexPositionGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATVertexPositionGeometry.lean)
+  proves uniqueness of the `20 × 20` macrocell representation and classifies
+  the four genuine carrier-port coordinates.  Carrier ports, crossover
+  internals, and routed-variable centers are pairwise separated locally.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
