@@ -2303,6 +2303,10 @@ The representation choices for this target are:
   applies the common-boundary separator at those interfaces.  Genuine routes
   of a selected retained lens avoid genuine routes of both incident
   routed-variable arms and routed-clause sources.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendComponentGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendComponentGeometry.lean)
+  identifies the port and macrocell origin shared by a selected retained lens
+  and either the incoming or outgoing terminal of an incident route-bend
+  corner.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
