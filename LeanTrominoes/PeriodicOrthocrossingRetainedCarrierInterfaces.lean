@@ -546,8 +546,39 @@ theorem retainedCompleteCarrierLink_terminal_orientation
       omega
     · exact secondEq
 
-/-- A selected retained link incident to a terminal has the corresponding
+/-- A raw retained link incident to a terminal has the corresponding
 lower/upper endpoint orientation. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_terminal_orientation
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {terminal : SegmentTerminal}
+    (terminalMem : terminal ∈ drawingSegmentTerminals graph)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    (incident :
+      link.first = .terminal terminal ∨
+        link.second = .terminal terminal) :
+    if terminal.IsLower then
+      link.first = .terminal terminal
+    else
+      link.second = .terminal terminal := by
+  rcases List.mem_flatMap.mp linkMem with
+    ⟨key, _keyMem, chainMem⟩
+  have common :=
+    retainedCompleteCarrierLinks_common_key graph key chainMem
+  have keyEq : key = terminal.carrierKey := by
+    rcases incident with incident | incident
+    · simpa [incident, CarrierNode.carrierKey] using common.1.symm
+    · simpa [incident, CarrierNode.carrierKey] using common.2.symm
+  apply retainedCompleteCarrierLink_terminal_orientation
+    wellFormed degree isLocal terminalMem
+  · simpa [keyEq] using chainMem
+  · exact incident
+
+/-- The terminal-orientation theorem for selected representatives. -/
 theorem retainedDrawingCompleteCarrierLink_terminal_orientation
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
@@ -564,22 +595,11 @@ theorem retainedDrawingCompleteCarrierLink_terminal_orientation
     if terminal.IsLower then
       link.first = .terminal terminal
     else
-      link.second = .terminal terminal := by
-  have rawMem :=
-    ((mem_retainedDrawingCompleteCarrierLinks_iff
-      graph link).mp linkMem).1
-  rcases List.mem_flatMap.mp rawMem with
-    ⟨key, _keyMem, chainMem⟩
-  have common :=
-    retainedCompleteCarrierLinks_common_key graph key chainMem
-  have keyEq : key = terminal.carrierKey := by
-    rcases incident with incident | incident
-    · simpa [incident, CarrierNode.carrierKey] using common.1.symm
-    · simpa [incident, CarrierNode.carrierKey] using common.2.symm
-  apply retainedCompleteCarrierLink_terminal_orientation
+      link.second = .terminal terminal :=
+  retainedDrawingCompleteCarrierLinkRaw_terminal_orientation
     wellFormed degree isLocal terminalMem
-  · simpa [keyEq] using chainMem
-  · exact incident
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 incident
 
 end PeriodicOrthocrossing
 end LeanTrominoes

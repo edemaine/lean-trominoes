@@ -2,11 +2,11 @@ import LeanTrominoes.PeriodicOrthocrossingRetainedCarrierMacrocellSeparation
 import LeanTrominoes.PeriodicOrthocrossingRetainedCarrierInterfaces
 
 /-!
-# Selected retained carriers near source-segment terminals
+# Retained carriers near source-segment terminals
 
 The first or last terminal of a source occurrence is a strict extreme of
 its retained carrier chain.  Its refined axial coordinate is respectively
-`20 * center + 11` or `20 * center + 1`.  Consequently, if a selected lens
+`20 * center + 11` or `20 * center + 1`.  Consequently, if a retained lens
 on that occurrence overlaps the terminal's standard macrocell, the terminal
 must be one of the lens endpoints.
 -/
@@ -67,10 +67,10 @@ theorem retainedVerticalTerminal_orderCoordinate
       sameX] <;>
     split_ifs <;> omega
 
-/-- If a selected retained lens lies on a terminal's source occurrence and
+/-- If a raw retained lens lies on a terminal's source occurrence and
 overlaps the terminal macrocell, one of its endpoints is that terminal. -/
 theorem
-    retainedDrawingCompleteCarrierLink_incidentToTerminal_of_key_eq_of_overlap
+    retainedDrawingCompleteCarrierLinkRaw_incidentToTerminal_of_key_eq_of_overlap
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -78,7 +78,7 @@ theorem
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
     (linkMem :
-      link ∈ retainedDrawingCompleteCarrierLinks graph)
+      link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (terminalMem : terminal ∈ drawingSegmentTerminals graph)
     (keyEqual :
@@ -100,9 +100,9 @@ theorem
     exact List.mem_append_left _
       (List.mem_map.mpr ⟨terminal, terminalMem, rfl⟩)
   have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   have commonKey :=
-    retainedDrawingCompleteCarrierLinks_common_key graph linkMem
+    retainedDrawingCompleteCarrierLinksRaw_common_key graph linkMem
   have firstKey :
       link.first.carrierKey = terminalNode.carrierKey := by
     simpa [terminalNode, CarrierNode.carrierKey] using keyEqual
@@ -148,7 +148,7 @@ theorem
       simpa [CarrierNode.orderCoordinate, secondHorizontal] using
         secondTerminalAxis.2.1
     have overlapData :=
-      retainedDrawingCompleteCarrierLink_horizontal_macrocell_overlap_data
+      retainedDrawingCompleteCarrierLinkRaw_horizontal_macrocell_overlap_data
         wellFormed degree isLocal linkMem horizontal
         (terminal.drawingPoint graph) notSeparated
     have firstUpper :
@@ -218,7 +218,7 @@ theorem
       simpa [CarrierNode.orderCoordinate, secondVertical] using
         secondTerminalAxis.2.1
     have overlapData :=
-      retainedDrawingCompleteCarrierLink_vertical_macrocell_overlap_data
+      retainedDrawingCompleteCarrierLinkRaw_vertical_macrocell_overlap_data
         wellFormed degree isLocal linkMem horizontal
         (terminal.drawingPoint graph) notSeparated
     have firstUpper :
@@ -260,6 +260,37 @@ theorem
         rw [if_neg lower] at terminalCoordinate
         simp only [planarMacroScale] at secondMod secondLower terminalCoordinate extreme
         omega
+
+/-- The matched-terminal incidence theorem for selected representatives. -/
+theorem
+    retainedDrawingCompleteCarrierLink_incidentToTerminal_of_key_eq_of_overlap
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (terminalMem : terminal ∈ drawingSegmentTerminals graph)
+    (keyEqual :
+      link.first.carrierKey = terminal.carrierKey)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower
+          (terminal.drawingPoint graph))
+        (planarSATMacrocellRouteUpper
+          (terminal.drawingPoint graph))) :
+    link.first = .terminal terminal ∨
+      link.second = .terminal terminal :=
+  retainedDrawingCompleteCarrierLinkRaw_incidentToTerminal_of_key_eq_of_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      terminalMem keyEqual notSeparated
 
 end PeriodicOrthocrossing
 end LeanTrominoes

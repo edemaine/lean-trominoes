@@ -193,20 +193,20 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_boundary
       ((mem_retainedDrawingCompleteCarrierLinks_iff
         graph link).mp linkMem).1 secondEqual
 
-/-- Every terminal endpoint of a selected retained link is one of the
+/-- Every terminal endpoint of a raw retained link is one of the
 drawing's segment terminals. -/
-theorem retainedDrawingCompleteCarrierLink_terminal_mem
+theorem retainedDrawingCompleteCarrierLinkRaw_terminal_mem
     {Vertex : Type*} [DecidableEq Vertex]
     (graph : PeriodicGraph Vertex)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (incident :
       link.first = .terminal terminal ∨
         link.second = .terminal terminal) :
     terminal ∈ drawingSegmentTerminals graph := by
   have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   rcases incident with incident | incident
   · rw [incident] at endpoints
     rcases List.mem_append.mp endpoints.1 with
@@ -219,36 +219,36 @@ theorem retainedDrawingCompleteCarrierLink_terminal_mem
     · simpa using terminalMem
     · simp at boundaryMem
 
-/-- The endpoints of every selected retained link are distinct. -/
-theorem retainedDrawingCompleteCarrierLink_endpoints_ne
+/-- The endpoints of every raw retained link are distinct. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_endpoints_ne
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph) :
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph) :
     link.first ≠ link.second :=
-  (retainedDrawingCompleteCarrierLink_lensGeometry
+  (retainedDrawingCompleteCarrierLinkRaw_lensGeometry
     wellFormed degree isLocal linkMem).different
 
-/-- A terminal endpoint of a selected retained link belongs to a genuine
+/-- A terminal endpoint of a raw retained link belongs to a genuine
 orthogonal source segment. -/
-theorem retainedDrawingCompleteCarrierLink_terminal_axisAligned
+theorem retainedDrawingCompleteCarrierLinkRaw_terminal_axisAligned
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (incident :
       link.first = .terminal terminal ∨
         link.second = .terminal terminal) :
     terminal.indexed.segment.IsAxisAligned := by
   have terminalMem :=
-    retainedDrawingCompleteCarrierLink_terminal_mem
+    retainedDrawingCompleteCarrierLinkRaw_terminal_mem
       graph linkMem incident
   exact
     drawing_isOrthogonal wellFormed isLocal degree
@@ -256,81 +256,81 @@ theorem retainedDrawingCompleteCarrierLink_terminal_axisAligned
       (drawingSegmentTerminal_indexed_mem
         graph terminalMem).1
 
-/-- A first terminal endpoint of a selected retained link is lower. -/
-theorem retainedDrawingCompleteCarrierLink_first_terminal_isLower
+/-- A first terminal endpoint of a raw retained link is lower. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_first_terminal_isLower
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (firstEqual : link.first = .terminal terminal) :
     terminal.IsLower := by
   have terminalMem :=
-    retainedDrawingCompleteCarrierLink_terminal_mem
+    retainedDrawingCompleteCarrierLinkRaw_terminal_mem
       graph linkMem (Or.inl firstEqual)
   have oriented :=
-    retainedDrawingCompleteCarrierLink_terminal_orientation
+    retainedDrawingCompleteCarrierLinkRaw_terminal_orientation
       wellFormed degree isLocal terminalMem linkMem
         (Or.inl firstEqual)
   by_contra notLower
   rw [if_neg notLower] at oriented
   exact
-    (retainedDrawingCompleteCarrierLink_endpoints_ne
+    (retainedDrawingCompleteCarrierLinkRaw_endpoints_ne
       wellFormed degree isLocal linkMem)
       (firstEqual.trans oriented.symm)
 
-/-- A second terminal endpoint of a selected retained link is upper. -/
-theorem retainedDrawingCompleteCarrierLink_second_terminal_not_isLower
+/-- A second terminal endpoint of a raw retained link is upper. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_second_terminal_not_isLower
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (secondEqual : link.second = .terminal terminal) :
     ¬terminal.IsLower := by
   intro lower
   have terminalMem :=
-    retainedDrawingCompleteCarrierLink_terminal_mem
+    retainedDrawingCompleteCarrierLinkRaw_terminal_mem
       graph linkMem (Or.inr secondEqual)
   have oriented :=
-    retainedDrawingCompleteCarrierLink_terminal_orientation
+    retainedDrawingCompleteCarrierLinkRaw_terminal_orientation
       wellFormed degree isLocal terminalMem linkMem
         (Or.inr secondEqual)
   rw [if_pos lower] at oriented
   exact
-    (retainedDrawingCompleteCarrierLink_endpoints_ne
+    (retainedDrawingCompleteCarrierLinkRaw_endpoints_ne
       wellFormed degree isLocal linkMem)
       (oriented.trans secondEqual.symm)
 
 /-- At a first retained terminal endpoint, the computed compass port is the
 terminal's increasing-coordinate carrier port. -/
-theorem retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_terminal
+theorem retainedDrawingCompleteCarrierLinkRaw_firstCarrierPort_eq_terminal
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (firstEqual : link.first = .terminal terminal) :
     EqualityLink.firstCarrierPort
         (CarrierNode.position graph) link =
       terminal.carrierPort := by
   have lower :=
-    retainedDrawingCompleteCarrierLink_first_terminal_isLower
+    retainedDrawingCompleteCarrierLinkRaw_first_terminal_isLower
       wellFormed degree isLocal linkMem firstEqual
   have aligned :=
-    retainedDrawingCompleteCarrierLink_terminal_axisAligned
+    retainedDrawingCompleteCarrierLinkRaw_terminal_axisAligned
       wellFormed degree isLocal linkMem (Or.inl firstEqual)
   have clearance :=
-    retainedDrawingCompleteCarrierLink_hasForwardClearance
+    retainedDrawingCompleteCarrierLinkRaw_hasForwardClearance
       wellFormed degree isLocal linkMem
   rw [firstEqual] at clearance
   rcases aligned with horizontal | vertical
@@ -367,22 +367,22 @@ theorem retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_terminal
 
 /-- At a second retained terminal endpoint, the terminal source segment is
 horizontal exactly when the first carrier node has the horizontal tag. -/
-theorem retainedDrawingCompleteCarrierLink_second_terminal_horizontal_iff
+theorem retainedDrawingCompleteCarrierLinkRaw_second_terminal_horizontal_iff
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (secondEqual : link.second = .terminal terminal) :
     link.first.isHorizontal = true ↔
       terminal.indexed.segment.IsHorizontal := by
   have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   have common :=
-    retainedDrawingCompleteCarrierLinks_common_key graph linkMem
+    retainedDrawingCompleteCarrierLinksRaw_common_key graph linkMem
   have terminalMem :
       CarrierNode.terminal terminal ∈ retainedDrawingCarrierNodes graph := by
     simpa [secondEqual] using endpoints.2
@@ -422,30 +422,30 @@ theorem retainedDrawingCompleteCarrierLink_second_terminal_horizontal_iff
 
 /-- At a second retained terminal endpoint, the computed compass port is the
 terminal's increasing-coordinate carrier port. -/
-theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_terminal
+theorem retainedDrawingCompleteCarrierLinkRaw_secondCarrierPort_eq_terminal
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (secondEqual : link.second = .terminal terminal) :
     EqualityLink.secondCarrierPort
         (CarrierNode.position graph) link =
       terminal.carrierPort := by
   have notLower :=
-    retainedDrawingCompleteCarrierLink_second_terminal_not_isLower
+    retainedDrawingCompleteCarrierLinkRaw_second_terminal_not_isLower
       wellFormed degree isLocal linkMem secondEqual
   have aligned :=
-    retainedDrawingCompleteCarrierLink_terminal_axisAligned
+    retainedDrawingCompleteCarrierLinkRaw_terminal_axisAligned
       wellFormed degree isLocal linkMem (Or.inr secondEqual)
   have horizontalIff :=
-    retainedDrawingCompleteCarrierLink_second_terminal_horizontal_iff
+    retainedDrawingCompleteCarrierLinkRaw_second_terminal_horizontal_iff
       wellFormed degree isLocal linkMem secondEqual
   have clearance :=
-    retainedDrawingCompleteCarrierLink_hasForwardClearance
+    retainedDrawingCompleteCarrierLinkRaw_hasForwardClearance
       wellFormed degree isLocal linkMem
   by_cases horizontalTag : link.first.isHorizontal = true
   · have horizontal : terminal.indexed.segment.IsHorizontal :=
@@ -598,24 +598,24 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_boundary
 
 /-- The first lens macrocell origin at a retained terminal is exactly its
 scaled drawing cell. -/
-theorem retainedDrawingCompleteCarrierLink_firstCarrierMacroOrigin_eq_terminal
+theorem retainedDrawingCompleteCarrierLinkRaw_firstCarrierMacroOrigin_eq_terminal
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (firstEqual : link.first = .terminal terminal) :
     EqualityLink.firstCarrierMacroOrigin
         (CarrierNode.position graph) link =
       Cell.scale planarMacroScale (terminal.drawingPoint graph) := by
   have portEqual :=
-    retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_terminal
+    retainedDrawingCompleteCarrierLinkRaw_firstCarrierPort_eq_terminal
       wellFormed degree isLocal linkMem firstEqual
   have aligned :=
-    retainedDrawingCompleteCarrierLink_terminal_axisAligned
+    retainedDrawingCompleteCarrierLinkRaw_terminal_axisAligned
       wellFormed degree isLocal linkMem (Or.inl firstEqual)
   have reconstruct :=
     EqualityLink.add_firstCarrierMacroOrigin_portPosition
@@ -637,27 +637,27 @@ theorem retainedDrawingCompleteCarrierLink_firstCarrierMacroOrigin_eq_terminal
 
 /-- The second lens macrocell origin at a retained terminal is exactly its
 scaled drawing cell. -/
-theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_terminal
+theorem retainedDrawingCompleteCarrierLinkRaw_secondCarrierMacroOrigin_eq_terminal
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {terminal : SegmentTerminal}
     (secondEqual : link.second = .terminal terminal) :
     EqualityLink.secondCarrierMacroOrigin
         (CarrierNode.position graph) link =
       Cell.scale planarMacroScale (terminal.drawingPoint graph) := by
   have geometry :=
-    retainedDrawingCompleteCarrierLink_lensGeometry
+    retainedDrawingCompleteCarrierLinkRaw_lensGeometry
       wellFormed degree isLocal linkMem
   have portEqual :=
-    retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_terminal
+    retainedDrawingCompleteCarrierLinkRaw_secondCarrierPort_eq_terminal
       wellFormed degree isLocal linkMem secondEqual
   have aligned :=
-    retainedDrawingCompleteCarrierLink_terminal_axisAligned
+    retainedDrawingCompleteCarrierLinkRaw_terminal_axisAligned
       wellFormed degree isLocal linkMem (Or.inr secondEqual)
   have reconstruct :=
     EqualityLink.add_secondCarrierMacroOrigin_portPosition geometry
@@ -675,6 +675,187 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_terminal
     at reconstruct
   rw [terminal.carrierPort_position aligned] at reconstruct
   exact Cell.add_right_injective _ reconstruct
+
+/-! ## Selected-representative compatibility wrappers -/
+
+/-- Terminal membership for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_terminal_mem
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (incident :
+      link.first = .terminal terminal ∨
+        link.second = .terminal terminal) :
+    terminal ∈ drawingSegmentTerminals graph :=
+  retainedDrawingCompleteCarrierLinkRaw_terminal_mem graph
+    ((mem_retainedDrawingCompleteCarrierLinks_iff
+      graph link).mp linkMem).1 incident
+
+/-- Endpoint distinctness for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_endpoints_ne
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph) :
+    link.first ≠ link.second :=
+  retainedDrawingCompleteCarrierLinkRaw_endpoints_ne
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+
+/-- Terminal-axis alignment for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_terminal_axisAligned
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (incident :
+      link.first = .terminal terminal ∨
+        link.second = .terminal terminal) :
+    terminal.indexed.segment.IsAxisAligned :=
+  retainedDrawingCompleteCarrierLinkRaw_terminal_axisAligned
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 incident
+
+/-- First-terminal orientation for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_first_terminal_isLower
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (firstEqual : link.first = .terminal terminal) :
+    terminal.IsLower :=
+  retainedDrawingCompleteCarrierLinkRaw_first_terminal_isLower
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 firstEqual
+
+/-- Second-terminal orientation for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_second_terminal_not_isLower
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (secondEqual : link.second = .terminal terminal) :
+    ¬terminal.IsLower :=
+  retainedDrawingCompleteCarrierLinkRaw_second_terminal_not_isLower
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 secondEqual
+
+/-- First-terminal port identity for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_terminal
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (firstEqual : link.first = .terminal terminal) :
+    EqualityLink.firstCarrierPort
+        (CarrierNode.position graph) link =
+      terminal.carrierPort :=
+  retainedDrawingCompleteCarrierLinkRaw_firstCarrierPort_eq_terminal
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 firstEqual
+
+/-- Second-terminal axis identity for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_second_terminal_horizontal_iff
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (secondEqual : link.second = .terminal terminal) :
+    link.first.isHorizontal = true ↔
+      terminal.indexed.segment.IsHorizontal :=
+  retainedDrawingCompleteCarrierLinkRaw_second_terminal_horizontal_iff
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 secondEqual
+
+/-- Second-terminal port identity for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_terminal
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (secondEqual : link.second = .terminal terminal) :
+    EqualityLink.secondCarrierPort
+        (CarrierNode.position graph) link =
+      terminal.carrierPort :=
+  retainedDrawingCompleteCarrierLinkRaw_secondCarrierPort_eq_terminal
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 secondEqual
+
+/-- First-terminal macrocell-origin identity for selected
+representatives. -/
+theorem retainedDrawingCompleteCarrierLink_firstCarrierMacroOrigin_eq_terminal
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (firstEqual : link.first = .terminal terminal) :
+    EqualityLink.firstCarrierMacroOrigin
+        (CarrierNode.position graph) link =
+      Cell.scale planarMacroScale (terminal.drawingPoint graph) :=
+  retainedDrawingCompleteCarrierLinkRaw_firstCarrierMacroOrigin_eq_terminal
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 firstEqual
+
+/-- Second-terminal macrocell-origin identity for selected
+representatives. -/
+theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_terminal
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {terminal : SegmentTerminal}
+    (secondEqual : link.second = .terminal terminal) :
+    EqualityLink.secondCarrierMacroOrigin
+        (CarrierNode.position graph) link =
+      Cell.scale planarMacroScale (terminal.drawingPoint graph) :=
+  retainedDrawingCompleteCarrierLinkRaw_secondCarrierMacroOrigin_eq_terminal
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 secondEqual
 
 end PeriodicOrthocrossing
 end LeanTrominoes

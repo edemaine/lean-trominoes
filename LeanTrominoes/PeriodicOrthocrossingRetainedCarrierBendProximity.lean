@@ -1167,10 +1167,11 @@ theorem drawingSegmentTerminal_eq_routeBend_terminal_of_drawingPoint_eq
           (List.mem_dedup.mp routeBendMem))
         endpointAtBend).elim
 
-/-- If a selected retained carrier lens overlaps a bend macrocell, the lens
-is incident to one of that bend's two terminals. -/
+/-- If a raw retained carrier lens whose source translate lies in the
+neighbor window overlaps a bend macrocell, the lens is incident to one of
+that bend's two terminals. -/
 theorem
-    retainedDrawingCompleteCarrierLink_incidentToRouteBend_of_macrocell_overlap
+    retainedDrawingCompleteCarrierLinkRaw_incidentToRouteBend_of_macrocell_overlap
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -1178,7 +1179,9 @@ theorem
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
     (linkMem :
-      link ∈ retainedDrawingCompleteCarrierLinks graph)
+      link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    (firstTranslateNeighbor :
+      IsNeighborTranslation link.first.translate)
     {routeBend : RouteBend}
     (routeBendMem :
       routeBend ∈ (drawingRouteBends graph).dedup)
@@ -1192,14 +1195,10 @@ theorem
           (routeBend.drawingPoint graph))) :
     CarrierLinkIncidentToRouteBend link routeBend := by
   have linkEndpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   have firstIndexedMem :
       link.first.indexed ∈ (drawing graph).indexedSegments :=
     retainedCarrierNode_indexed_mem graph linkEndpoints.1
-  have firstTranslateNeighbor :
-      IsNeighborTranslation link.first.translate :=
-    retainedDrawingCompleteCarrierLink_first_translate_neighbor
-      graph linkMem
   have bendTerminalMem :=
     drawingRouteBend_terminals_mem_drawingSegmentTerminals
       graph routeBendMem
@@ -1212,7 +1211,7 @@ theorem
         CarrierLinkIncidentToRouteBend link routeBend := by
     intro terminal terminalMem terminalPointEq keyEq
     have linkTerminal :=
-      retainedDrawingCompleteCarrierLink_incidentToTerminal_of_key_eq_of_overlap
+      retainedDrawingCompleteCarrierLinkRaw_incidentToTerminal_of_key_eq_of_overlap
         wellFormed degree isLocal linkMem terminalMem keyEq
         (by simpa [terminalPointEq] using notSeparated)
     have bendTerminal :=
@@ -1229,7 +1228,7 @@ theorem
       · exact Or.inr (Or.inl firstEq)
       · exact Or.inr (Or.inr (Or.inr secondEq))
   have centerContains :=
-    retainedDrawingCompleteCarrierLink_supportingSegment_contains_of_macrocell_overlap
+    retainedDrawingCompleteCarrierLinkRaw_supportingSegment_contains_of_macrocell_overlap
       wellFormed degree isLocal linkMem
       (routeBend.drawingPoint graph) notSeparated
   rcases
@@ -1402,9 +1401,128 @@ theorem
       exact incidentOfTerminal terminal terminalMem
         terminalPointEq keyEq
 
-/-- Every selected retained carrier route avoids every route of every bend
-corner component, whether the carrier is incident to the bend or geometrically
-separated from its macrocell. -/
+/-- The bend-overlap incidence theorem for selected representatives. -/
+theorem
+    retainedDrawingCompleteCarrierLink_incidentToRouteBend_of_macrocell_overlap
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {routeBend : RouteBend}
+    (routeBendMem :
+      routeBend ∈ (drawingRouteBends graph).dedup)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower
+          (routeBend.drawingPoint graph))
+        (planarSATMacrocellRouteUpper
+          (routeBend.drawingPoint graph))) :
+    CarrierLinkIncidentToRouteBend link routeBend :=
+  retainedDrawingCompleteCarrierLinkRaw_incidentToRouteBend_of_macrocell_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      (retainedDrawingCompleteCarrierLink_first_translate_neighbor
+        graph linkMem)
+      routeBendMem notSeparated
+
+/-- Every raw retained carrier route whose source translate lies in the
+neighbor window avoids every route of every bend corner component, whether
+the carrier is incident to the bend or geometrically separated from its
+macrocell. -/
+theorem
+    retainedDrawingPlanarSATCarrierBendRoutesAvoidEachOther_of_raw
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMember :
+      link ∈ retainedDrawingCompleteCarrierLinksRaw
+        (PeriodicCNF.incidenceGraph formula))
+    (firstTranslateNeighbor :
+      IsNeighborTranslation link.first.translate)
+    {routeBend : RouteBend}
+    (routeBendMember :
+      routeBend ∈
+        (drawingRouteBends
+          (PeriodicCNF.incidenceGraph formula)).dedup)
+    {carrierClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {carrierClauseIndex : Nat}
+    (carrierClauseMember :
+      (carrierClause, carrierClauseIndex) ∈
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula link).formula.zipIdx)
+    {carrierLiteral : PlanarSATVariable Variable × Bool}
+    {carrierLiteralIndex : Nat}
+    (carrierLiteralMember :
+      (carrierLiteral, carrierLiteralIndex) ∈
+        carrierClause.literals.zipIdx)
+    {bendClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {bendClauseIndex : Nat}
+    (bendClauseMember :
+      (bendClause, bendClauseIndex) ∈
+        (drawingPlanarSATBendCornerIncidenceDrawing
+          formula routeBend).formula.zipIdx)
+    {bendLiteral : PlanarSATVariable Variable × Bool}
+    {bendLiteralIndex : Nat}
+    (bendLiteralMember :
+      (bendLiteral, bendLiteralIndex) ∈
+        bendClause.literals.zipIdx) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      ((drawingPlanarSATCarrierLensIncidenceDrawing
+        formula link).routes
+          carrierClauseIndex carrierLiteralIndex)
+      ((drawingPlanarSATBendCornerIncidenceDrawing
+        formula routeBend).routes
+          bendClauseIndex bendLiteralIndex) := by
+  by_cases incident :
+      CarrierLinkIncidentToRouteBend link routeBend
+  · exact
+      retainedDrawingPlanarSATCarrierBendRoutesAvoidEachOther_of_raw_incident
+        wellFormed degree isLocal linkMember routeBendMember incident
+        carrierClauseMember carrierLiteralMember
+        bendClauseMember bendLiteralMember
+  · have rectanglesSeparated :
+        ClosedGridRectanglesSeparated
+          (drawingCompleteCarrierLinkRectangleLower
+            (PeriodicCNF.incidenceGraph formula) link)
+          (drawingCompleteCarrierLinkRectangleUpper
+            (PeriodicCNF.incidenceGraph formula) link)
+          (planarSATMacrocellRouteLower
+            (routeBend.drawingPoint
+              (PeriodicCNF.incidenceGraph formula)))
+          (planarSATMacrocellRouteUpper
+            (routeBend.drawingPoint
+              (PeriodicCNF.incidenceGraph formula))) := by
+      by_contra notSeparated
+      exact incident
+        (retainedDrawingCompleteCarrierLinkRaw_incidentToRouteBend_of_macrocell_overlap
+          wellFormed degree isLocal linkMember firstTranslateNeighbor
+          routeBendMember
+          notSeparated)
+    exact
+      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_raw_rectanglesSeparated
+        wellFormed degree isLocal linkMember
+        carrierClauseMember carrierLiteralMember
+        (drawingPlanarSATBendCornerIncidenceDrawing_routePoints_bounded
+          formula routeBend)
+        bendClauseMember bendLiteralMember
+        rectanglesSeparated
+
+/-- The all-bend route-separation theorem for selected representatives. -/
 theorem
     retainedDrawingPlanarSATCarrierBendRoutesAvoidEachOther
     {Variable : Type*} [DecidableEq Variable]
@@ -1454,39 +1572,15 @@ theorem
           carrierClauseIndex carrierLiteralIndex)
       ((drawingPlanarSATBendCornerIncidenceDrawing
         formula routeBend).routes
-          bendClauseIndex bendLiteralIndex) := by
-  by_cases incident :
-      CarrierLinkIncidentToRouteBend link routeBend
-  · exact
-      retainedDrawingPlanarSATCarrierBendRoutesAvoidEachOther_of_incident
-        wellFormed degree isLocal linkMember routeBendMember incident
-        carrierClauseMember carrierLiteralMember
-        bendClauseMember bendLiteralMember
-  · have rectanglesSeparated :
-        ClosedGridRectanglesSeparated
-          (drawingCompleteCarrierLinkRectangleLower
-            (PeriodicCNF.incidenceGraph formula) link)
-          (drawingCompleteCarrierLinkRectangleUpper
-            (PeriodicCNF.incidenceGraph formula) link)
-          (planarSATMacrocellRouteLower
-            (routeBend.drawingPoint
-              (PeriodicCNF.incidenceGraph formula)))
-          (planarSATMacrocellRouteUpper
-            (routeBend.drawingPoint
-              (PeriodicCNF.incidenceGraph formula))) := by
-      by_contra notSeparated
-      exact incident
-        (retainedDrawingCompleteCarrierLink_incidentToRouteBend_of_macrocell_overlap
-          wellFormed degree isLocal linkMember routeBendMember
-          notSeparated)
-    exact
-      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_rectanglesSeparated
-        wellFormed degree isLocal linkMember
-        carrierClauseMember carrierLiteralMember
-        (drawingPlanarSATBendCornerIncidenceDrawing_routePoints_bounded
-          formula routeBend)
-        bendClauseMember bendLiteralMember
-        rectanglesSeparated
+          bendClauseIndex bendLiteralIndex) :=
+  retainedDrawingPlanarSATCarrierBendRoutesAvoidEachOther_of_raw
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        formula.incidenceGraph link).mp linkMember).1
+      (retainedDrawingCompleteCarrierLink_first_translate_neighbor
+        formula.incidenceGraph linkMember)
+      routeBendMember carrierClauseMember carrierLiteralMember
+      bendClauseMember bendLiteralMember
 
 end PeriodicOrthocrossing
 end LeanTrominoes
