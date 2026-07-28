@@ -2273,6 +2273,11 @@ The representation choices for this target are:
   transfers common-axis geometry to retained carrier nodes: every node lies
   on its supporting occurrence, its axis tag is exact, and nodes with one key
   share a refined support line whose axial coordinates are all `1 mod 10`.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierLensGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierLensGeometry.lean)
+  turns strict retained order and the common axial residue into forward
+  clearance for every adjacent pair.  Raw links and their selected zero-shift
+  representatives therefore instantiate the certified equality-lens drawing,
+  with exact formula, endpoint positions, orthogonality, and finite planarity.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
