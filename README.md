@@ -2451,6 +2451,12 @@ The representation choices for this target are:
   clause-orbit deduplication has a valid lift, so finite geometric
   injectivity proves that the variable-position prefix of the final periodic
   incidence drawing is duplicate-free.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATVariableGauge.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATVariableGauge.lean)
+  applies the canonical per-variable period gauge before clause-anchor
+  normalization.  The transported retained routes keep their exact physical
+  endpoints, the final graph-level route certificate is reassembled, and
+  the gauged, wrapped, normalized, deduplicated source remains
+  equisatisfiable with the retained periodic formula.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
