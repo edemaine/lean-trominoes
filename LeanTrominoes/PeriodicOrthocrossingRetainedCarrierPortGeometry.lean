@@ -17,26 +17,26 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
-/-- At a first retained crossover-boundary endpoint, the lens's computed
+/-- At a first raw retained crossover-boundary endpoint, the lens's computed
 compass port is exactly that boundary side's crossover port. -/
-theorem retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_boundary
+theorem retainedDrawingCompleteCarrierLinkRaw_firstCarrierPort_eq_boundary
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {boundary : CrossingBoundary}
     (firstEqual : link.first = .boundary boundary) :
     EqualityLink.firstCarrierPort
         (CarrierNode.position graph) link =
       boundary.side.carrierPort := by
   have sideClass :=
-    retainedDrawingCompleteCarrierLink_first_boundary_side
+    retainedDrawingCompleteCarrierLinkRaw_first_boundary_side
       wellFormed degree isLocal linkMem firstEqual
   have clearance :=
-    retainedDrawingCompleteCarrierLink_hasForwardClearance
+    retainedDrawingCompleteCarrierLinkRaw_hasForwardClearance
       wellFormed degree isLocal linkMem
   rcases boundary with ⟨crossing, side⟩
   cases side with
@@ -79,9 +79,8 @@ theorem retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_boundary
         CrossingSide.carrierPort,
         AxisDirection.firstCarrierPort]
 
-/-- At a second retained crossover-boundary endpoint, the lens's computed
-compass port is exactly that boundary side's crossover port. -/
-theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_boundary
+/-- The first-boundary port identity for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_boundary
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -90,18 +89,38 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_boundary
     {link : EqualityLink CarrierNode}
     (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
     {boundary : CrossingBoundary}
+    (firstEqual : link.first = .boundary boundary) :
+    EqualityLink.firstCarrierPort
+        (CarrierNode.position graph) link =
+      boundary.side.carrierPort :=
+  retainedDrawingCompleteCarrierLinkRaw_firstCarrierPort_eq_boundary
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 firstEqual
+
+/-- At a second raw retained crossover-boundary endpoint, the lens's
+computed compass port is exactly that boundary side's crossover port. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_secondCarrierPort_eq_boundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    {boundary : CrossingBoundary}
     (secondEqual : link.second = .boundary boundary) :
     EqualityLink.secondCarrierPort
         (CarrierNode.position graph) link =
       boundary.side.carrierPort := by
   have sideClass :=
-    retainedDrawingCompleteCarrierLink_second_boundary_side
+    retainedDrawingCompleteCarrierLinkRaw_second_boundary_side
       wellFormed degree isLocal linkMem secondEqual
   have horizontalIff :=
-    retainedDrawingCompleteCarrierLink_first_isHorizontal_iff_second
+    retainedDrawingCompleteCarrierLinkRaw_first_isHorizontal_iff_second
       wellFormed degree isLocal linkMem
   have clearance :=
-    retainedDrawingCompleteCarrierLink_hasForwardClearance
+    retainedDrawingCompleteCarrierLinkRaw_hasForwardClearance
       wellFormed degree isLocal linkMem
   rcases boundary with ⟨crossing, side⟩
   cases side with
@@ -154,6 +173,25 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_boundary
         clearance.1, yLt, yNe,
         CrossingSide.carrierPort,
         AxisDirection.secondCarrierPort]
+
+/-- The second-boundary port identity for selected representatives. -/
+theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_boundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {boundary : CrossingBoundary}
+    (secondEqual : link.second = .boundary boundary) :
+    EqualityLink.secondCarrierPort
+        (CarrierNode.position graph) link =
+      boundary.side.carrierPort :=
+  retainedDrawingCompleteCarrierLinkRaw_secondCarrierPort_eq_boundary
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 secondEqual
 
 /-- Every terminal endpoint of a selected retained link is one of the
 drawing's segment terminals. -/
@@ -448,23 +486,23 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_terminal
       SegmentTerminal.carrierPort, notHorizontal, notLower,
       AxisDirection.secondCarrierPort, secondEqual]
 
-/-- The first lens macrocell origin at a retained crossover boundary is the
-crossover's actual macrocell origin. -/
-theorem retainedDrawingCompleteCarrierLink_firstCarrierMacroOrigin_eq_boundary
+/-- The first lens macrocell origin at a raw retained crossover boundary is
+the crossover's actual macrocell origin. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_firstCarrierMacroOrigin_eq_boundary
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
     (degree : graph.DegreeAtMost 3)
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
-    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     {boundary : CrossingBoundary}
     (firstEqual : link.first = .boundary boundary) :
     EqualityLink.firstCarrierMacroOrigin
         (CarrierNode.position graph) link =
       crossingMacroOrigin boundary.crossing := by
   have portEqual :=
-    retainedDrawingCompleteCarrierLink_firstCarrierPort_eq_boundary
+    retainedDrawingCompleteCarrierLinkRaw_firstCarrierPort_eq_boundary
       wellFormed degree isLocal linkMem firstEqual
   have reconstruct :=
     EqualityLink.add_firstCarrierMacroOrigin_portPosition
@@ -482,9 +520,9 @@ theorem retainedDrawingCompleteCarrierLink_firstCarrierMacroOrigin_eq_boundary
   rw [boundary.side.carrierPort_position] at reconstruct
   exact Cell.add_right_injective _ reconstruct
 
-/-- The second lens macrocell origin at a retained crossover boundary is the
-crossover's actual macrocell origin. -/
-theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_boundary
+/-- The first-boundary macrocell-origin identity for selected
+representatives. -/
+theorem retainedDrawingCompleteCarrierLink_firstCarrierMacroOrigin_eq_boundary
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -493,15 +531,35 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_boundary
     {link : EqualityLink CarrierNode}
     (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
     {boundary : CrossingBoundary}
+    (firstEqual : link.first = .boundary boundary) :
+    EqualityLink.firstCarrierMacroOrigin
+        (CarrierNode.position graph) link =
+      crossingMacroOrigin boundary.crossing :=
+  retainedDrawingCompleteCarrierLinkRaw_firstCarrierMacroOrigin_eq_boundary
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 firstEqual
+
+/-- The second lens macrocell origin at a raw retained crossover boundary is
+the crossover's actual macrocell origin. -/
+theorem retainedDrawingCompleteCarrierLinkRaw_secondCarrierMacroOrigin_eq_boundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    {boundary : CrossingBoundary}
     (secondEqual : link.second = .boundary boundary) :
     EqualityLink.secondCarrierMacroOrigin
         (CarrierNode.position graph) link =
       crossingMacroOrigin boundary.crossing := by
   have geometry :=
-    retainedDrawingCompleteCarrierLink_lensGeometry
+    retainedDrawingCompleteCarrierLinkRaw_lensGeometry
       wellFormed degree isLocal linkMem
   have portEqual :=
-    retainedDrawingCompleteCarrierLink_secondCarrierPort_eq_boundary
+    retainedDrawingCompleteCarrierLinkRaw_secondCarrierPort_eq_boundary
       wellFormed degree isLocal linkMem secondEqual
   have reconstruct :=
     EqualityLink.add_secondCarrierMacroOrigin_portPosition geometry
@@ -517,6 +575,26 @@ theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_boundary
     at reconstruct
   rw [boundary.side.carrierPort_position] at reconstruct
   exact Cell.add_right_injective _ reconstruct
+
+/-- The second-boundary macrocell-origin identity for selected
+representatives. -/
+theorem retainedDrawingCompleteCarrierLink_secondCarrierMacroOrigin_eq_boundary
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem : link ∈ retainedDrawingCompleteCarrierLinks graph)
+    {boundary : CrossingBoundary}
+    (secondEqual : link.second = .boundary boundary) :
+    EqualityLink.secondCarrierMacroOrigin
+        (CarrierNode.position graph) link =
+      crossingMacroOrigin boundary.crossing :=
+  retainedDrawingCompleteCarrierLinkRaw_secondCarrierMacroOrigin_eq_boundary
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1 secondEqual
 
 /-- The first lens macrocell origin at a retained terminal is exactly its
 scaled drawing cell. -/

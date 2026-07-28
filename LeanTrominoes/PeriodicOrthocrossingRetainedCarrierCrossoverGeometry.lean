@@ -4,9 +4,9 @@ import LeanTrominoes.PeriodicOrthocrossingRetainedPerpendicularCarrierCore
 import LeanTrominoes.PeriodicOrthocrossingRetainedCarrierCrossoverSeparation
 
 /-!
-# Selected retained carriers versus arbitrary crossovers
+# Retained carriers versus arbitrary crossovers
 
-Macrocell overlap puts a selected carrier on the row or column of the
+Macrocell overlap puts a retained carrier on the row or column of the
 crossover center.  Its source interval then has continuously overlapping
 interior with the corresponding crossing occurrence.  Continuous lane
 uniqueness identifies the occurrence key, after which the matched-key
@@ -20,10 +20,10 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
-/-- Horizontal macrocell overlap identifies the selected carrier with the
+/-- Horizontal macrocell overlap identifies a raw retained carrier with the
 crossing's horizontal source occurrence. -/
 theorem
-    retainedDrawingCompleteCarrierLink_horizontal_key_eq_of_crossover_overlap
+    retainedDrawingCompleteCarrierLinkRaw_horizontal_key_eq_of_crossover_overlap
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -31,7 +31,7 @@ theorem
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
     (linkMem :
-      link ∈ retainedDrawingCompleteCarrierLinks graph)
+      link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     (horizontal : link.first.isHorizontal = true)
     {crossing : CrossingRecord}
     (crossingMem : crossing ∈ orientedCrossingHalo graph)
@@ -46,7 +46,7 @@ theorem
         ⟨crossing, .left⟩).carrierKey := by
   let support := link.first.supportingSegment graph
   have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   have firstAligned :
       link.first.indexed.segment.IsAxisAligned :=
     drawing_isOrthogonal wellFormed isLocal degree
@@ -61,11 +61,11 @@ theorem
       (GridSegment.isHorizontal_translate _ _).mpr
         storedHorizontal
   have overlapData :=
-    retainedDrawingCompleteCarrierLink_horizontal_macrocell_overlap_data
+    retainedDrawingCompleteCarrierLinkRaw_horizontal_macrocell_overlap_data
       wellFormed degree isLocal linkMem horizontal
       crossing.point notSeparated
   have supportBounds :=
-    retainedDrawingCompleteCarrierLink_horizontal_support_bounded
+    retainedDrawingCompleteCarrierLinkRaw_horizontal_support_bounded
       wellFormed degree isLocal linkMem horizontal
   simp only [planarMacroScale] at overlapData supportBounds
   have pointInSupport :
@@ -184,10 +184,10 @@ theorem
           ⟨crossing, .left⟩).carrierKey := by
       rfl
 
-/-- Vertical macrocell overlap identifies the selected carrier with the
-crossing's vertical source occurrence. -/
+/-- The horizontal crossover-key identification theorem for selected
+representatives. -/
 theorem
-    retainedDrawingCompleteCarrierLink_vertical_key_eq_of_crossover_overlap
+    retainedDrawingCompleteCarrierLink_horizontal_key_eq_of_crossover_overlap
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -196,6 +196,36 @@ theorem
     {link : EqualityLink CarrierNode}
     (linkMem :
       link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (horizontal : link.first.isHorizontal = true)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower crossing.point)
+        (planarSATMacrocellRouteUpper crossing.point)) :
+    link.first.carrierKey =
+      (CarrierNode.boundary
+        ⟨crossing, .left⟩).carrierKey :=
+  retainedDrawingCompleteCarrierLinkRaw_horizontal_key_eq_of_crossover_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      horizontal crossingMem notSeparated
+
+/-- Vertical macrocell overlap identifies a raw retained carrier with the
+crossing's vertical source occurrence. -/
+theorem
+    retainedDrawingCompleteCarrierLinkRaw_vertical_key_eq_of_crossover_overlap
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     (vertical : ¬link.first.isHorizontal = true)
     {crossing : CrossingRecord}
     (crossingMem : crossing ∈ orientedCrossingHalo graph)
@@ -210,7 +240,7 @@ theorem
         ⟨crossing, .top⟩).carrierKey := by
   let support := link.first.supportingSegment graph
   have endpoints :=
-    retainedDrawingCompleteCarrierLink_endpoints_mem graph linkMem
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem graph linkMem
   have firstAligned :
       link.first.indexed.segment.IsAxisAligned :=
     drawing_isOrthogonal wellFormed isLocal degree
@@ -227,11 +257,11 @@ theorem
       (GridSegment.isVertical_translate _ _).mpr
         storedVertical
   have overlapData :=
-    retainedDrawingCompleteCarrierLink_vertical_macrocell_overlap_data
+    retainedDrawingCompleteCarrierLinkRaw_vertical_macrocell_overlap_data
       wellFormed degree isLocal linkMem vertical
       crossing.point notSeparated
   have supportBounds :=
-    retainedDrawingCompleteCarrierLink_vertical_support_bounded
+    retainedDrawingCompleteCarrierLinkRaw_vertical_support_bounded
       wellFormed degree isLocal linkMem vertical
   simp only [planarMacroScale] at overlapData supportBounds
   have pointInSupport :
@@ -351,8 +381,78 @@ theorem
           ⟨crossing, .top⟩).carrierKey := by
       rfl
 
-/-- Overlap between a selected retained carrier lens and any enumerated
+/-- The vertical crossover-key identification theorem for selected
+representatives. -/
+theorem
+    retainedDrawingCompleteCarrierLink_vertical_key_eq_of_crossover_overlap
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (vertical : ¬link.first.isHorizontal = true)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower crossing.point)
+        (planarSATMacrocellRouteUpper crossing.point)) :
+    link.first.carrierKey =
+      (CarrierNode.boundary
+        ⟨crossing, .top⟩).carrierKey :=
+  retainedDrawingCompleteCarrierLinkRaw_vertical_key_eq_of_crossover_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      vertical crossingMem notSeparated
+
+/-- Overlap between a raw retained carrier lens and any enumerated
 crossover macrocell forces endpoint incidence. -/
+theorem
+    retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_overlap
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ orientedCrossingHalo graph)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower crossing.point)
+        (planarSATMacrocellRouteUpper crossing.point)) :
+    CarrierLinkIncidentToCrossover link crossing := by
+  have retainedMem :
+      crossing ∈ retainedCrossings graph :=
+    orientedCrossingHalo_subset_retainedCrossings
+      wellFormed degree isLocal crossingMem
+  by_cases horizontal : link.first.isHorizontal = true
+  · exact
+      retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_horizontal_key_eq
+        wellFormed degree isLocal linkMem horizontal retainedMem
+        (retainedDrawingCompleteCarrierLinkRaw_horizontal_key_eq_of_crossover_overlap
+          wellFormed degree isLocal linkMem horizontal
+          crossingMem notSeparated)
+        notSeparated
+  · exact
+      retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_vertical_key_eq
+        wellFormed degree isLocal linkMem horizontal retainedMem
+        (retainedDrawingCompleteCarrierLinkRaw_vertical_key_eq_of_crossover_overlap
+          wellFormed degree isLocal linkMem horizontal
+          crossingMem notSeparated)
+        notSeparated
+
+/-- The overlap-incidence theorem for selected representatives. -/
 theorem
     retainedDrawingCompleteCarrierLink_incidentToCrossover_of_overlap
     {Vertex : Type*} [DecidableEq Vertex]
@@ -371,31 +471,97 @@ theorem
         (drawingCompleteCarrierLinkRectangleUpper graph link)
         (planarSATMacrocellRouteLower crossing.point)
         (planarSATMacrocellRouteUpper crossing.point)) :
-    CarrierLinkIncidentToCrossover link crossing := by
-  have retainedMem :
-      crossing ∈ retainedCrossings graph :=
-    orientedCrossingHalo_subset_retainedCrossings
-      wellFormed degree isLocal crossingMem
-  by_cases horizontal : link.first.isHorizontal = true
-  · exact
-      retainedDrawingCompleteCarrierLink_incidentToCrossover_of_horizontal_key_eq
-        wellFormed degree isLocal linkMem horizontal retainedMem
-        (retainedDrawingCompleteCarrierLink_horizontal_key_eq_of_crossover_overlap
-          wellFormed degree isLocal linkMem horizontal
-          crossingMem notSeparated)
-        notSeparated
-  · exact
-      retainedDrawingCompleteCarrierLink_incidentToCrossover_of_vertical_key_eq
-        wellFormed degree isLocal linkMem horizontal retainedMem
-        (retainedDrawingCompleteCarrierLink_vertical_key_eq_of_crossover_overlap
-          wellFormed degree isLocal linkMem horizontal
-          crossingMem notSeparated)
-        notSeparated
+    CarrierLinkIncidentToCrossover link crossing :=
+  retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_overlap
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      crossingMem notSeparated
 
-/-- Every route of a selected retained carrier lens avoids every route of
+/-- Every route of a raw retained carrier lens avoids every route of
 every enumerated crossover drawing.  Overlap can happen only at a genuine
 carrier endpoint of that crossover; all other pairs occupy separated
 rectangles. -/
+theorem
+    retainedDrawingPlanarSATCarrierCrossoverRoutesAvoidEachOther_of_raw
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {carrierLink : EqualityLink CarrierNode}
+    (carrierLinkMember :
+      carrierLink ∈ retainedDrawingCompleteCarrierLinksRaw
+        (PeriodicCNF.incidenceGraph formula))
+    {crossing : CrossingRecord}
+    (crossingMember :
+      crossing ∈ orientedCrossingHalo
+        (PeriodicCNF.incidenceGraph formula))
+    {carrierClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {carrierClauseIndex : Nat}
+    (carrierClauseMember :
+      (carrierClause, carrierClauseIndex) ∈
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula carrierLink).formula.zipIdx)
+    {carrierLiteral : PlanarSATVariable Variable × Bool}
+    {carrierLiteralIndex : Nat}
+    (carrierLiteralMember :
+      (carrierLiteral, carrierLiteralIndex) ∈
+        carrierClause.literals.zipIdx)
+    {crossoverClause :
+      EmbeddedClause (PlanarSATVariable Variable)}
+    {crossoverClauseIndex : Nat}
+    (crossoverClauseMember :
+      (crossoverClause, crossoverClauseIndex) ∈
+        (drawingPlanarSATCrossoverIncidenceDrawing
+          formula crossing).formula.zipIdx)
+    {crossoverLiteral : PlanarSATVariable Variable × Bool}
+    {crossoverLiteralIndex : Nat}
+    (crossoverLiteralMember :
+      (crossoverLiteral, crossoverLiteralIndex) ∈
+        crossoverClause.literals.zipIdx) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      ((drawingPlanarSATCarrierLensIncidenceDrawing
+        formula carrierLink).routes
+          carrierClauseIndex carrierLiteralIndex)
+      ((drawingPlanarSATCrossoverIncidenceDrawing
+        formula crossing).routes
+          crossoverClauseIndex crossoverLiteralIndex) := by
+  by_cases incident :
+      CarrierLinkIncidentToCrossover carrierLink crossing
+  · exact
+      retainedDrawingPlanarSATCarrierCrossoverRoutesAvoidEachOther_of_raw_incident
+        wellFormed degree isLocal carrierLinkMember incident
+        carrierClauseMember carrierLiteralMember
+        crossoverClauseMember crossoverLiteralMember
+  · have rectanglesSeparated :
+        ClosedGridRectanglesSeparated
+          (drawingCompleteCarrierLinkRectangleLower
+            (PeriodicCNF.incidenceGraph formula) carrierLink)
+          (drawingCompleteCarrierLinkRectangleUpper
+            (PeriodicCNF.incidenceGraph formula) carrierLink)
+          (planarSATMacrocellRouteLower crossing.point)
+          (planarSATMacrocellRouteUpper crossing.point) := by
+      by_contra notSeparated
+      exact incident
+        (retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_overlap
+          wellFormed degree isLocal carrierLinkMember crossingMember
+          notSeparated)
+    exact
+      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_raw_rectanglesSeparated
+        wellFormed degree isLocal carrierLinkMember
+        carrierClauseMember carrierLiteralMember
+        (drawingPlanarSATCrossoverIncidenceDrawing_routePoints_bounded
+          formula crossing)
+        crossoverClauseMember crossoverLiteralMember
+        rectanglesSeparated
+
+/-- The all-crossover route-separation theorem for selected
+representatives. -/
 theorem
     retainedDrawingPlanarSATCarrierCrossoverRoutesAvoidEachOther
     {Variable : Type*} [DecidableEq Variable]
@@ -444,35 +610,13 @@ theorem
           carrierClauseIndex carrierLiteralIndex)
       ((drawingPlanarSATCrossoverIncidenceDrawing
         formula crossing).routes
-          crossoverClauseIndex crossoverLiteralIndex) := by
-  by_cases incident :
-      CarrierLinkIncidentToCrossover carrierLink crossing
-  · exact
-      retainedDrawingPlanarSATCarrierCrossoverRoutesAvoidEachOther_of_incident
-        wellFormed degree isLocal carrierLinkMember incident
-        carrierClauseMember carrierLiteralMember
-        crossoverClauseMember crossoverLiteralMember
-  · have rectanglesSeparated :
-        ClosedGridRectanglesSeparated
-          (drawingCompleteCarrierLinkRectangleLower
-            (PeriodicCNF.incidenceGraph formula) carrierLink)
-          (drawingCompleteCarrierLinkRectangleUpper
-            (PeriodicCNF.incidenceGraph formula) carrierLink)
-          (planarSATMacrocellRouteLower crossing.point)
-          (planarSATMacrocellRouteUpper crossing.point) := by
-      by_contra notSeparated
-      exact incident
-        (retainedDrawingCompleteCarrierLink_incidentToCrossover_of_overlap
-          wellFormed degree isLocal carrierLinkMember crossingMember
-          notSeparated)
-    exact
-      retainedDrawingPlanarSATCarrierRoute_avoids_macrocell_of_rectanglesSeparated
-        wellFormed degree isLocal carrierLinkMember
-        carrierClauseMember carrierLiteralMember
-        (drawingPlanarSATCrossoverIncidenceDrawing_routePoints_bounded
-          formula crossing)
-        crossoverClauseMember crossoverLiteralMember
-        rectanglesSeparated
+          crossoverClauseIndex crossoverLiteralIndex) :=
+  retainedDrawingPlanarSATCarrierCrossoverRoutesAvoidEachOther_of_raw
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        formula.incidenceGraph carrierLink).mp carrierLinkMember).1
+      crossingMember carrierClauseMember carrierLiteralMember
+      crossoverClauseMember crossoverLiteralMember
 
 end PeriodicOrthocrossing
 end LeanTrominoes

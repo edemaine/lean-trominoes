@@ -18,11 +18,11 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
-/-- A selected horizontal link on a retained crossover's horizontal source
+/-- A raw retained horizontal link on a retained crossover's horizontal source
 occurrence is incident to that crossover whenever their rectangles are not
 separated. -/
 theorem
-    retainedDrawingCompleteCarrierLink_incidentToCrossover_of_horizontal_key_eq
+    retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_horizontal_key_eq
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -30,7 +30,7 @@ theorem
     (isLocal : graph.IsLocal)
     {link : EqualityLink CarrierNode}
     (linkMem :
-      link ∈ retainedDrawingCompleteCarrierLinks graph)
+      link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     (horizontal : link.first.isHorizontal = true)
     {crossing : CrossingRecord}
     (crossingMem : crossing ∈ retainedCrossings graph)
@@ -72,13 +72,10 @@ theorem
       (List.mem_map.mpr
         ⟨rightBoundary, rightBoundaryMem, rfl⟩)
   have overlapData :=
-    retainedDrawingCompleteCarrierLink_horizontal_macrocell_overlap_data
+    retainedDrawingCompleteCarrierLinkRaw_horizontal_macrocell_overlap_data
       wellFormed degree isLocal linkMem horizontal
       crossing.point notSeparated
-  have linkRaw :=
-    ((mem_retainedDrawingCompleteCarrierLinks_iff
-      graph link).mp linkMem).1
-  rcases List.mem_flatMap.mp linkRaw with
+  rcases List.mem_flatMap.mp linkMem with
     ⟨key, _keyMem, linkInChain⟩
   have common :=
     retainedCompleteCarrierLinks_common_key
@@ -242,11 +239,10 @@ theorem
       simpa [leftNode, leftBoundary, carrierNodePairLink] using
         leftEqual.symm
 
-/-- A selected vertical link on a retained crossover's vertical source
-occurrence is incident to that crossover whenever their rectangles are not
-separated. -/
+/-- The horizontal matched-key incidence theorem for selected
+representatives. -/
 theorem
-    retainedDrawingCompleteCarrierLink_incidentToCrossover_of_vertical_key_eq
+    retainedDrawingCompleteCarrierLink_incidentToCrossover_of_horizontal_key_eq
     {Vertex : Type*} [DecidableEq Vertex]
     {graph : PeriodicGraph Vertex}
     (wellFormed : graph.IsWellFormed)
@@ -255,6 +251,39 @@ theorem
     {link : EqualityLink CarrierNode}
     (linkMem :
       link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (horizontal : link.first.isHorizontal = true)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ retainedCrossings graph)
+    (keyEqual :
+      link.first.carrierKey =
+        (CarrierNode.boundary
+          ⟨crossing, .left⟩).carrierKey)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower crossing.point)
+        (planarSATMacrocellRouteUpper crossing.point)) :
+    CarrierLinkIncidentToCrossover link crossing :=
+  retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_horizontal_key_eq
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      horizontal crossingMem keyEqual notSeparated
+
+/-- A raw retained vertical link on a retained crossover's vertical source
+occurrence is incident to that crossover whenever their rectangles are not
+separated. -/
+theorem
+    retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_vertical_key_eq
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinksRaw graph)
     (vertical : ¬link.first.isHorizontal = true)
     {crossing : CrossingRecord}
     (crossingMem : crossing ∈ retainedCrossings graph)
@@ -296,13 +325,10 @@ theorem
       (List.mem_map.mpr
         ⟨bottomBoundary, bottomBoundaryMem, rfl⟩)
   have overlapData :=
-    retainedDrawingCompleteCarrierLink_vertical_macrocell_overlap_data
+    retainedDrawingCompleteCarrierLinkRaw_vertical_macrocell_overlap_data
       wellFormed degree isLocal linkMem vertical
       crossing.point notSeparated
-  have linkRaw :=
-    ((mem_retainedDrawingCompleteCarrierLinks_iff
-      graph link).mp linkMem).1
-  rcases List.mem_flatMap.mp linkRaw with
+  rcases List.mem_flatMap.mp linkMem with
     ⟨key, _keyMem, linkInChain⟩
   have common :=
     retainedCompleteCarrierLinks_common_key
@@ -469,6 +495,38 @@ theorem
       refine ⟨.top, Or.inl ?_⟩
       simpa [topNode, topBoundary, carrierNodePairLink] using
         topEqual.symm
+
+/-- The vertical matched-key incidence theorem for selected
+representatives. -/
+theorem
+    retainedDrawingCompleteCarrierLink_incidentToCrossover_of_vertical_key_eq
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinks graph)
+    (vertical : ¬link.first.isHorizontal = true)
+    {crossing : CrossingRecord}
+    (crossingMem : crossing ∈ retainedCrossings graph)
+    (keyEqual :
+      link.first.carrierKey =
+        (CarrierNode.boundary
+          ⟨crossing, .top⟩).carrierKey)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower graph link)
+        (drawingCompleteCarrierLinkRectangleUpper graph link)
+        (planarSATMacrocellRouteLower crossing.point)
+        (planarSATMacrocellRouteUpper crossing.point)) :
+    CarrierLinkIncidentToCrossover link crossing :=
+  retainedDrawingCompleteCarrierLinkRaw_incidentToCrossover_of_vertical_key_eq
+    wellFormed degree isLocal
+      ((mem_retainedDrawingCompleteCarrierLinks_iff
+        graph link).mp linkMem).1
+      vertical crossingMem keyEqual notSeparated
 
 end PeriodicOrthocrossing
 end LeanTrominoes
