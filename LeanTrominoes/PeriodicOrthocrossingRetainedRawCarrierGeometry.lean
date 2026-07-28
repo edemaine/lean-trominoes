@@ -15,6 +15,32 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
 
+/-- A raw retained carrier lens draws the same two-clause equality block as
+the selected representative interface. -/
+@[simp] theorem
+    retainedDrawingPlanarSATCarrierLensIncidenceDrawing_formula_of_raw
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {link : EqualityLink CarrierNode}
+    (linkMem :
+      link ∈ retainedDrawingCompleteCarrierLinksRaw
+        formula.incidenceGraph) :
+    (drawingPlanarSATCarrierLensIncidenceDrawing formula link).formula =
+      drawingPlanarSATCarrierFormulaAt
+        (Variable := Variable) link := by
+  rw [drawingPlanarSATCarrierLensIncidenceDrawing,
+    EmbeddedCNFIncidenceDrawing.rename,
+    EqualityLink.lensDrawing_formula
+      (retainedDrawingCompleteCarrierLinkRaw_lensGeometry
+        wellFormed degree isLocal linkMem)]
+  simp [drawingPlanarSATCarrierFormulaAt,
+    planarSATCarrierVariableMap, EmbeddedClause.rename,
+    EmbeddedClause.map, List.map_map, Function.comp_def,
+    planarSATCoreVariableMap]
+
 /-- A raw retained link advances east or north according to its carrier
 axis. -/
 theorem retainedDrawingCompleteCarrierLinkRaw_carrierDirection_eq_axis
