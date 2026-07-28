@@ -2370,6 +2370,10 @@ The representation choices for this target are:
   lifts component separation and key injectivity to the assembled incidence
   drawing.  Every retained route is simple, and every two distinct globally
   indexed incidences satisfy complete continuous route separation.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATFinitePlanarity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATFinitePlanarity.lean)
+  reduces complete finite planarity of the retained drawing exactly to its
+  two remaining vertex conditions: vertices avoid route interiors, and
+  global vertex positions are duplicate-free.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.

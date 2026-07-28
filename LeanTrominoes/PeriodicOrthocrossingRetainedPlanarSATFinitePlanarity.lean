@@ -1,0 +1,53 @@
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGlobalRouteSeparation
+
+/-!
+# Residual finite planarity for the retained planar SAT drawing
+
+The retained assembly already has simple routes and pairwise continuous
+route separation.  This file isolates the exact remaining geometric
+obligation: graph vertices must avoid genuine route interiors, and all graph
+vertex positions must be distinct.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicOrthocrossing
+
+open PlanarThreeSAT
+
+/-- The two vertex-separation fields still needed after global retained-route
+separation has been established. -/
+def RetainedDrawingPlanarSATVertexSeparation
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) : Prop :=
+  (retainedDrawingPlanarSATLocalIncidenceDrawing
+      formula).VerticesAvoidRouteInteriors ∧
+    (retainedDrawingPlanarSATLocalIncidenceDrawing
+      formula).vertexPositions.Nodup
+
+/-- Complete finite planarity of the retained drawing is equivalent to its
+two residual vertex-separation fields. -/
+theorem
+    retainedDrawingPlanarSATLocalIncidenceDrawing_isPlanar_iff_vertexSeparation
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal) :
+    (retainedDrawingPlanarSATLocalIncidenceDrawing formula).IsPlanar ↔
+      RetainedDrawingPlanarSATVertexSeparation formula := by
+  constructor
+  · intro planar
+    exact planar.2.2
+  · rintro ⟨verticesAvoid, verticesNodup⟩
+    exact
+      ⟨retainedDrawingPlanarSATLocalIncidenceDrawing_routesAreSimple
+          formula wellFormed degree isLocal,
+        retainedDrawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
+          formula wellFormed degree isLocal,
+        verticesAvoid, verticesNodup⟩
+
+end PeriodicOrthocrossing
+end LeanTrominoes
