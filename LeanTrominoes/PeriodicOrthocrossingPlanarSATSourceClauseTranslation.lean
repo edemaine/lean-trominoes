@@ -477,6 +477,72 @@ theorem DrawingPlanarSATClauseSource.gaugedClause_periodTranslate
   exact gaugedPeriodicPlanarSATLiteral_periodTranslate
     formula literal shift
 
+/-- Adding one common physical period shift to every literal offset does not
+change the anchor-normalized clause orbit representative. -/
+theorem PeriodicClause.anchorNormalize_map_periodTranslate
+    {Variable : Type*}
+    (clause : PeriodicClause Variable)
+    (shift : Cell) :
+    PeriodicClause.anchorNormalize
+        (clause.map fun literal =>
+          (⟨literal.atom, Cell.add literal.offset shift,
+            literal.value⟩ : PeriodicLiteral Variable)) =
+      PeriodicClause.anchorNormalize clause := by
+  cases clause with
+  | nil =>
+      rfl
+  | cons first rest =>
+      have anchorEq :
+          PeriodicCNF.clauseAnchor
+              ((first :: rest).map fun literal =>
+                (⟨literal.atom,
+                    Cell.add literal.offset shift,
+                    literal.value⟩ :
+                  PeriodicLiteral Variable)) =
+            Cell.add
+              (PeriodicCNF.clauseAnchor (first :: rest))
+              shift := by
+        simp [PeriodicCNF.clauseAnchor]
+      simp only [PeriodicClause.anchorNormalize,
+        anchorEq, List.map_map]
+      apply List.map_congr_left
+      intro literal literalMember
+      rcases literal with
+        ⟨literalAtom, ⟨literalX, literalY⟩, literalValue⟩
+      rcases shift with ⟨shiftX, shiftY⟩
+      simp [PeriodicLiteral.anchorNormalize,
+        Cell.add, Cell.sub]
+
+/-- At unchanged local clause index, physical source translation leaves the
+anchor-normalized canonically gauged clause exactly unchanged. -/
+theorem
+    DrawingPlanarSATClauseSource.anchorNormalizedGaugedClause_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (shift : Cell)
+    (sourceClause targetClause :
+      EmbeddedClause (PlanarSATVariable Variable))
+    (sourceMember :
+      (sourceClause, source.localClauseIndex) ∈
+        (source.clauseFormula formula).zipIdx)
+    (targetMember :
+      (targetClause,
+          (source.periodTranslate formula shift).localClauseIndex) ∈
+        ((source.periodTranslate formula shift).clauseFormula
+          formula).zipIdx) :
+    (gaugedPeriodicPlanarSATClause
+        formula targetClause).anchorNormalize =
+      (gaugedPeriodicPlanarSATClause
+        formula sourceClause).anchorNormalize := by
+  rw [source.gaugedClause_periodTranslate
+    formula shift sourceClause targetClause
+    sourceMember targetMember]
+  exact
+    PeriodicClause.anchorNormalize_map_periodTranslate
+      (gaugedPeriodicPlanarSATClause formula sourceClause)
+      shift
+
 /-- Translating every literal of a nonempty periodic clause translates its
 anchor by the same amount. -/
 theorem clauseAnchor_map_periodTranslate

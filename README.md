@@ -2604,7 +2604,9 @@ The representation choices for this target are:
   component and local clause index.  This covers routed-variable arms whose
   global per-site enumeration index changes near a retained-window boundary,
   and produces the finite common-shift representative used by planarity
-  transfer.
+  transfer.  Reindexing also preserves the anchor-normalized gauged clause
+  exactly and adds its physical shift to the pre-normalization clause anchor,
+  providing the two invariants needed to preserve occurrence identity.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAnchorReindexing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAnchorReindexing.lean)
   chooses source translations by their desired canonically gauged clause
   anchors.  Reindexing two final occurrences to anchors equal to their

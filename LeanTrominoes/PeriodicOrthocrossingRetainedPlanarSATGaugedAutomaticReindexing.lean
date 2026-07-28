@@ -211,5 +211,181 @@ theorem
     ⟨reindexing⟩
   exact reindexing.exists_commonShiftRepresentative
 
+/-- Reindexing through a physically translated source preserves the
+anchor-normalized canonically gauged clause.  This is the clause-orbit
+identity later used to show that reindexing cannot collapse two distinct
+final segment occurrences. -/
+theorem
+    FinalGaugedSegmentMetadataReindexing.target_normalizedClause_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift reindexShift : Cell}
+    {witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift}
+    (reindexing :
+      FinalGaugedSegmentMetadataReindexing
+        witness reindexShift) :
+    metadataGaugedNormalizedClause
+        formula reindexing.targetMetadata =
+      metadataGaugedNormalizedClause
+        formula witness.routeWitness.metadata := by
+  let sourceMetadata := witness.routeWitness.metadata
+  let translatedSource :=
+    sourceMetadata.source.periodTranslate formula reindexShift
+  have sourceMetadataMember :
+      sourceMetadata ∈
+        retainedDrawingPlanarSATClauseMetadata formula :=
+    List.mem_iff_getElem?.mpr
+      ⟨witness.routeWitness.metadataIndex,
+        witness.routeWitness.metadataLookup⟩
+  have sourceValid : sourceMetadata.RetainedValid formula :=
+    retainedDrawingPlanarSATClauseMetadata_valid
+      formula sourceMetadataMember
+  have sourceLocalClauseMember :
+      (sourceMetadata.clause,
+          sourceMetadata.source.localClauseIndex) ∈
+        (sourceMetadata.source.clauseFormula formula).zipIdx :=
+    (sourceMetadata
+      |>.retainedValid_iff_sourceMember_and_localClauseMember
+        formula).mp sourceValid |>.2
+  have targetMetadataMember :
+      reindexing.targetMetadata ∈
+        retainedDrawingPlanarSATClauseMetadata formula :=
+    List.mem_iff_getElem?.mpr
+      ⟨reindexing.targetMetadataIndex,
+        reindexing.targetMetadataLookup⟩
+  have targetValid :
+      reindexing.targetMetadata.RetainedValid formula :=
+    retainedDrawingPlanarSATClauseMetadata_valid
+      formula targetMetadataMember
+  have targetLocalClauseMember :
+      (reindexing.targetMetadata.clause,
+          reindexing.targetMetadata.source.localClauseIndex) ∈
+        (reindexing.targetMetadata.source.clauseFormula
+          formula).zipIdx :=
+    (reindexing.targetMetadata
+      |>.retainedValid_iff_sourceMember_and_localClauseMember
+        formula).mp targetValid |>.2
+  have targetFormulaEq :
+      reindexing.targetMetadata.source.clauseFormula formula =
+        translatedSource.clauseFormula formula :=
+    reindexing.targetMetadata.source.clauseFormula_eq_of_component_eq
+      formula translatedSource reindexing.targetComponentEq
+  have translatedTargetMember :
+      (reindexing.targetMetadata.clause,
+          translatedSource.localClauseIndex) ∈
+        (translatedSource.clauseFormula formula).zipIdx := by
+    rw [← targetFormulaEq]
+    have translatedIndexEq :
+        translatedSource.localClauseIndex =
+          reindexing.targetMetadata.source.localClauseIndex := by
+      change
+        (sourceMetadata.source.periodTranslate
+            formula reindexShift).localClauseIndex =
+          reindexing.targetMetadata.source.localClauseIndex
+      rw [DrawingPlanarSATClauseSource.localClauseIndex_periodTranslate,
+        ← reindexing.targetLocalClauseIndexEq]
+    rw [translatedIndexEq]
+    exact targetLocalClauseMember
+  simpa only [metadataGaugedNormalizedClause,
+      gaugedPeriodicPlanarSATClause, sourceMetadata,
+      translatedSource] using
+    sourceMetadata.source
+      |>.anchorNormalizedGaugedClause_periodTranslate
+        formula reindexShift sourceMetadata.clause
+        reindexing.targetMetadata.clause
+        sourceLocalClauseMember translatedTargetMember
+
+/-- The target metadata clause anchor is the source metadata clause anchor
+plus the physical source-reindexing shift. -/
+theorem
+    FinalGaugedSegmentMetadataReindexing.target_clauseAnchor_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift reindexShift : Cell}
+    {witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift}
+    (reindexing :
+      FinalGaugedSegmentMetadataReindexing
+        witness reindexShift)
+    (sourceClauseNonempty :
+      witness.routeWitness.metadata.clause.literals ≠ []) :
+    PeriodicCNF.clauseAnchor
+        (metadataGaugedPositionedClause
+          formula reindexing.targetMetadata).literals =
+      Cell.add
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause
+            formula witness.routeWitness.metadata).literals)
+        reindexShift := by
+  let sourceMetadata := witness.routeWitness.metadata
+  let translatedSource :=
+    sourceMetadata.source.periodTranslate formula reindexShift
+  have sourceMetadataMember :
+      sourceMetadata ∈
+        retainedDrawingPlanarSATClauseMetadata formula :=
+    List.mem_iff_getElem?.mpr
+      ⟨witness.routeWitness.metadataIndex,
+        witness.routeWitness.metadataLookup⟩
+  have sourceValid : sourceMetadata.RetainedValid formula :=
+    retainedDrawingPlanarSATClauseMetadata_valid
+      formula sourceMetadataMember
+  have sourceLocalClauseMember :
+      (sourceMetadata.clause,
+          sourceMetadata.source.localClauseIndex) ∈
+        (sourceMetadata.source.clauseFormula formula).zipIdx :=
+    (sourceMetadata
+      |>.retainedValid_iff_sourceMember_and_localClauseMember
+        formula).mp sourceValid |>.2
+  have targetMetadataMember :
+      reindexing.targetMetadata ∈
+        retainedDrawingPlanarSATClauseMetadata formula :=
+    List.mem_iff_getElem?.mpr
+      ⟨reindexing.targetMetadataIndex,
+        reindexing.targetMetadataLookup⟩
+  have targetValid :
+      reindexing.targetMetadata.RetainedValid formula :=
+    retainedDrawingPlanarSATClauseMetadata_valid
+      formula targetMetadataMember
+  have targetLocalClauseMember :
+      (reindexing.targetMetadata.clause,
+          reindexing.targetMetadata.source.localClauseIndex) ∈
+        (reindexing.targetMetadata.source.clauseFormula
+          formula).zipIdx :=
+    (reindexing.targetMetadata
+      |>.retainedValid_iff_sourceMember_and_localClauseMember
+        formula).mp targetValid |>.2
+  have targetFormulaEq :
+      reindexing.targetMetadata.source.clauseFormula formula =
+        translatedSource.clauseFormula formula :=
+    reindexing.targetMetadata.source.clauseFormula_eq_of_component_eq
+      formula translatedSource reindexing.targetComponentEq
+  have translatedTargetMember :
+      (reindexing.targetMetadata.clause,
+          translatedSource.localClauseIndex) ∈
+        (translatedSource.clauseFormula formula).zipIdx := by
+    rw [← targetFormulaEq]
+    have translatedIndexEq :
+        translatedSource.localClauseIndex =
+          reindexing.targetMetadata.source.localClauseIndex := by
+      change
+        (sourceMetadata.source.periodTranslate
+            formula reindexShift).localClauseIndex =
+          reindexing.targetMetadata.source.localClauseIndex
+      rw [DrawingPlanarSATClauseSource.localClauseIndex_periodTranslate,
+        ← reindexing.targetLocalClauseIndexEq]
+    rw [translatedIndexEq]
+    exact targetLocalClauseMember
+  simpa only [metadataGaugedPositionedClause,
+      gaugedPeriodicPlanarSATClause, sourceMetadata,
+      translatedSource] using
+    sourceMetadata.source.clauseAnchor_periodTranslate
+      formula reindexShift sourceMetadata.clause
+      reindexing.targetMetadata.clause
+      sourceLocalClauseMember translatedTargetMember
+      (by simpa only [sourceMetadata] using sourceClauseNonempty)
+
 end PeriodicOrthocrossing
 end LeanTrominoes
