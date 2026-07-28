@@ -2268,6 +2268,11 @@ The representation choices for this target are:
   membership in the metadata enumeration is equivalent to valid
   component/local-clause source data.  Every genuine clause lookup therefore
   returns valid local-source data.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATSourceMembership.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATSourceMembership.lean)
+  separates retained source validity into physical component membership and
+  same-index membership in the component's local clause family.  Their
+  conjunction exactly characterizes the retained metadata enumeration and
+  yields a concrete global lookup for any such local source witness.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean)
   defines common period translation for crossing records, boundaries,
   terminals, carrier nodes, and equality links.  Crossing normalization is
