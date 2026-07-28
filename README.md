@@ -2371,9 +2371,12 @@ The representation choices for this target are:
   drawing.  Every retained route is simple, and every two distinct globally
   indexed incidences satisfy complete continuous route separation.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATFinitePlanarity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATFinitePlanarity.lean)
-  reduces complete finite planarity of the retained drawing exactly to its
-  two remaining vertex conditions: vertices avoid route interiors, and
-  global vertex positions are duplicate-free.
+  first reduces complete finite planarity of the retained drawing exactly to
+  its two remaining vertex conditions.  Endpoint coverage discharges
+  vertex/interior avoidance, while used-variable injectivity, global
+  clause-position injectivity, and cross-part separation prove that all graph
+  vertex positions are duplicate-free.  The module then assembles the
+  complete finite `IsPlanar` certificate.
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingVertexCoverage.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingVertexCoverage.lean)
   proves a reusable endpoint-coverage principle: exact incidence endpoints
   cover every vertex of a formula with no empty clauses, after which route

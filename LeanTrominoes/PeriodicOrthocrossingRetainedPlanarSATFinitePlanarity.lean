@@ -1,4 +1,6 @@
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGlobalRouteSeparation
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGlobalClausePositions
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGlobalVariableClausePositions
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingVertexCoverage
 
 /-!
@@ -80,6 +82,55 @@ theorem
       formula wellFormed degree isLocal)
     (retainedDrawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
       formula wellFormed degree isLocal)
+
+/-- The assembled retained drawing has no coincident graph vertices. -/
+theorem
+    retainedDrawingPlanarSATLocalIncidenceDrawing_vertexPositions_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDrawingPlanarSATLocalIncidenceDrawing
+      formula).vertexPositions.Nodup := by
+  exact
+    EmbeddedCNFIncidenceDrawing.vertexPositions_nodup_of_parts
+      (retainedDrawingPlanarSATLocalIncidenceDrawing formula)
+      (retainedDrawingPlanarSATLocalIncidenceDrawing_variablePosition_injective
+        formula wellFormed degree isLocal)
+      (retainedDrawingPlanarSATLocalIncidenceDrawing_clausePositions_nodup
+        formula wellFormed degree isLocal clausesNonempty)
+      (retainedDrawingPlanarSATLocalIncidenceDrawing_variableClauseDisjoint
+        formula wellFormed degree isLocal)
+
+/-- The retained finite incidence drawing is continuously planar. -/
+theorem retainedDrawingPlanarSATLocalIncidenceDrawing_isPlanar
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDrawingPlanarSATLocalIncidenceDrawing formula).IsPlanar := by
+  rw [
+    retainedDrawingPlanarSATLocalIncidenceDrawing_isPlanar_iff_vertexSeparation
+      formula wellFormed degree isLocal]
+  exact
+    ⟨retainedDrawingPlanarSATLocalIncidenceDrawing_verticesAvoidRouteInteriors
+        formula wellFormed degree isLocal clausesNonempty,
+      retainedDrawingPlanarSATLocalIncidenceDrawing_vertexPositions_nodup
+        formula wellFormed degree isLocal clausesNonempty⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes
