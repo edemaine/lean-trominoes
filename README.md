@@ -2518,6 +2518,12 @@ The representation choices for this target are:
   metadata lookup, clause-anchor normalization, and first-representative
   clause deduplication.  The final gauged periodic incidence drawing thus
   satisfies `RoutePointsInExpandedSquare`.
+- [`LeanTrominoes/PositionedPeriodicCNFRouteOccurrenceNormalization.lean`](LeanTrominoes/PositionedPeriodicCNFRouteOccurrenceNormalization.lean)
+  proves that lifting an anchor-normalized route at lattice shift `s` is
+  exactly the original physical route lifted at `s - anchor`.  It also
+  exposes the representative route selected by anchor-zero clause
+  deduplication, providing the quotient-to-finite bridge for periodic
+  planarity.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
