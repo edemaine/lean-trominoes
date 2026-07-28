@@ -522,6 +522,7 @@ import LeanTrominoes.PartrecSubtract
 import LeanTrominoes.PartrecSubtractSpace
 import LeanTrominoes.PartrecUnpair
 import LeanTrominoes.PartrecUnpairSpace
+import LeanTrominoes.EmbeddedCNFIncidenceDrawingVertexCoverage
 import LeanTrominoes.OccurrenceSplitRingDrawing
 import LeanTrominoes.OccurrenceSplitRingCycleDrawing
 import LeanTrominoes.PeriodicEightOccurrenceSplit

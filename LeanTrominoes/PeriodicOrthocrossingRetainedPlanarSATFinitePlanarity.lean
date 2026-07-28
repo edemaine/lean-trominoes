@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGlobalRouteSeparation
+import LeanTrominoes.EmbeddedCNFIncidenceDrawingVertexCoverage
 
 /-!
 # Residual finite planarity for the retained planar SAT drawing
@@ -48,6 +49,37 @@ theorem
         retainedDrawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
           formula wellFormed degree isLocal,
         verticesAvoid, verticesNodup⟩
+
+/-- If every retained clause is incident to a literal, exact endpoints and
+the completed global route separation discharge vertex/interior avoidance. -/
+theorem
+    retainedDrawingPlanarSATLocalIncidenceDrawing_verticesAvoidRouteInteriors
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDrawingPlanarSATLocalIncidenceDrawing
+      formula).VerticesAvoidRouteInteriors := by
+  let drawing :=
+    retainedDrawingPlanarSATLocalIncidenceDrawing formula
+  have covered : drawing.VertexPositionsCoveredByRoutes := by
+    apply drawing.vertexPositionsCoveredByRoutes_of_routesMatch
+      (retainedDrawingPlanarSATLocalIncidenceDrawing_routesMatch
+        formula wellFormed degree isLocal)
+    simpa [drawing] using clausesNonempty
+  exact drawing.verticesAvoidRouteInteriors_of_covered
+    covered
+    (retainedDrawingPlanarSATLocalIncidenceDrawing_routesAreSimple
+      formula wellFormed degree isLocal)
+    (retainedDrawingPlanarSATLocalIncidenceDrawing_routesAvoidEachOther
+      formula wellFormed degree isLocal)
 
 end PeriodicOrthocrossing
 end LeanTrominoes

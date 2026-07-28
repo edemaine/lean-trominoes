@@ -2374,6 +2374,10 @@ The representation choices for this target are:
   reduces complete finite planarity of the retained drawing exactly to its
   two remaining vertex conditions: vertices avoid route interiors, and
   global vertex positions are duplicate-free.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingVertexCoverage.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingVertexCoverage.lean)
+  proves a reusable endpoint-coverage principle: exact incidence endpoints
+  cover every vertex of a formula with no empty clauses, after which route
+  simplicity and pairwise route separation imply vertex/interior avoidance.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
