@@ -2273,6 +2273,11 @@ The representation choices for this target are:
   same-index membership in the component's local clause family.  Their
   conjunction exactly characterizes the retained metadata enumeration and
   yields a concrete global lookup for any such local source witness.
+- [`LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceClauseTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingPlanarSATSourceClauseTranslation.lean)
+  proves that source period translation preserves the ordered clause-arity
+  profile of every gadget family.  Consequently, any valid local clause and
+  literal indices select counterparts at the same indices in the translated
+  source.
 - [`LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTranslation.lean)
   defines common period translation for crossing records, boundaries,
   terminals, carrier nodes, and equality links.  Crossing normalization is
