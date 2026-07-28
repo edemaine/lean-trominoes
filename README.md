@@ -2469,6 +2469,11 @@ The representation choices for this target are:
   macrocell gadgets keep the clause and its first literal in the same period
   cell; strict local-coordinate bounds then put every deduplicated clause
   position in the open fundamental square.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierClauseOrbits.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierClauseOrbits.lean)
+  classifies the clause offsets in crossover, bend, routed-clause, and
+  routed-variable gadgets.  Equal fundamental-domain residues identify the
+  same non-carrier clause orbit after periodic normalization, opaque wrapping,
+  and the canonical variable gauge.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
