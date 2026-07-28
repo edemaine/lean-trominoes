@@ -2463,6 +2463,12 @@ The representation choices for this target are:
   square; a neighboring finite lift of each terminal lets retained finite
   injectivity prove that the final variable-position prefix is
   duplicate-free.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedClausePositions.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedClausePositions.lean)
+  identifies each retained clause's canonical quotient position with the
+  coordinatewise residue of its finite drawing position.  Carrier and
+  macrocell gadgets keep the clause and its first literal in the same period
+  cell; strict local-coordinate bounds then put every deduplicated clause
+  position in the open fundamental square.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
