@@ -2258,6 +2258,11 @@ The representation choices for this target are:
   boundary names a listed indexed segment and an interior point of its exact
   physical occurrence, and both properties persist under any further common
   translation.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierCorrectionEndpoints.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierCorrectionEndpoints.lean)
+  proves that representative correction keeps both endpoints of every raw
+  retained carrier link inside the retained enumeration.  The canonical owner
+  fixes a neighboring occurrence key; the other boundary then satisfies the
+  retained-shift bound, while terminal endpoints remain explicitly listed.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
