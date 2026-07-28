@@ -2489,6 +2489,10 @@ The representation choices for this target are:
   in a 20-cell macrocell.  Combining this obstruction with both same-kind
   classifications proves that an equal clause-position residue determines
   one gauged normalized clause across all retained gadget families.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedClausePositionInjectivity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedClausePositionInjectivity.lean)
+  transfers the global orbit classification through first-representative
+  clause deduplication.  Thus the final retained stored clause positions
+  are duplicate-free.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
