@@ -2307,6 +2307,10 @@ The representation choices for this target are:
   identifies the port and macrocell origin shared by a selected retained lens
   and either the incoming or outgoing terminal of an incident route-bend
   corner.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendSeparation.lean)
+  handles all four shared incoming/outgoing and first/second endpoint cases.
+  Genuine selected-lens routes avoid genuine routes of every incident
+  certified bend-corner drawing.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
