@@ -2484,6 +2484,11 @@ The representation choices for this target are:
   covariance lemma for raw retained chains moves terminal-start links to
   translation zero, where adjacency identifies the complete normalized link;
   equal residues therefore yield the same gauged periodic clause.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedClauseOrbits.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedClauseOrbits.lean)
+  separates carrier and non-carrier clause orbits using their exact offsets
+  in a 20-cell macrocell.  Combining this obstruction with both same-kind
+  classifications proves that an equal clause-position residue determines
+  one gauged normalized clause across all retained gadget families.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
