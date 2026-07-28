@@ -2326,7 +2326,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierSupportGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierSupportGeometry.lean)
   bounds halo-only boundary nodes using strict containment in their translated
   source segments, and reuses the terminal endpoint bound.  Selected links
-  therefore remain in their source axial corridors with the exact normal line.
+  therefore remain in their source axial corridors with the exact normal line;
+  different normal lines or disjoint source intervals separate their explicit
+  lens rectangles.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,

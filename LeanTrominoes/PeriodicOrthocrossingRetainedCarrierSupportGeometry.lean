@@ -329,5 +329,202 @@ theorem retainedCarrierNode_position_normalCoordinate
     simp only [Cell.add, Cell.scale, planarMacroScale]
     omega
 
+/-- Horizontal selected links whose source intervals have disjoint open
+interiors have strictly separated physical rectangles. -/
+theorem
+    retainedDrawingCompleteCarrierLink_rectanglesSeparated_of_horizontal_support_disjoint
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {firstLink secondLink : EqualityLink CarrierNode}
+    (firstMem :
+      firstLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (secondMem :
+      secondLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (firstHorizontal : firstLink.first.isHorizontal = true)
+    (secondHorizontal : secondLink.first.isHorizontal = true)
+    (disjoint :
+      ¬GridSegment.OpenIntervalsOverlap
+        (firstLink.first.supportingSegment graph).start.1
+        (firstLink.first.supportingSegment graph).finish.1
+        (secondLink.first.supportingSegment graph).start.1
+        (secondLink.first.supportingSegment graph).finish.1) :
+    ClosedGridRectanglesSeparated
+      (drawingCompleteCarrierLinkRectangleLower graph firstLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph firstLink)
+      (drawingCompleteCarrierLinkRectangleLower graph secondLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph secondLink) := by
+  have firstBounds :=
+    retainedDrawingCompleteCarrierLink_horizontal_support_bounded
+      wellFormed degree isLocal firstMem firstHorizontal
+  have secondBounds :=
+    retainedDrawingCompleteCarrierLink_horizontal_support_bounded
+      wellFormed degree isLocal secondMem secondHorizontal
+  simp only [planarMacroScale] at firstBounds secondBounds
+  unfold GridSegment.OpenIntervalsOverlap at disjoint
+  have separated :
+      max (firstLink.first.supportingSegment graph).start.1
+            (firstLink.first.supportingSegment graph).finish.1 ≤
+          min (secondLink.first.supportingSegment graph).start.1
+            (secondLink.first.supportingSegment graph).finish.1 ∨
+        max (secondLink.first.supportingSegment graph).start.1
+            (secondLink.first.supportingSegment graph).finish.1 ≤
+          min (firstLink.first.supportingSegment graph).start.1
+            (firstLink.first.supportingSegment graph).finish.1 := by
+    omega
+  unfold drawingCompleteCarrierLinkRectangleLower
+    drawingCompleteCarrierLinkRectangleUpper
+    ClosedGridRectanglesSeparated
+  simp only [firstHorizontal, secondHorizontal, if_true]
+  rcases separated with firstBefore | secondBefore
+  · exact Or.inl (by omega)
+  · exact Or.inr (Or.inl (by omega))
+
+/-- Vertical selected links whose source intervals have disjoint open
+interiors have strictly separated physical rectangles. -/
+theorem
+    retainedDrawingCompleteCarrierLink_rectanglesSeparated_of_vertical_support_disjoint
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {firstLink secondLink : EqualityLink CarrierNode}
+    (firstMem :
+      firstLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (secondMem :
+      secondLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (firstVertical : ¬firstLink.first.isHorizontal = true)
+    (secondVertical : ¬secondLink.first.isHorizontal = true)
+    (disjoint :
+      ¬GridSegment.OpenIntervalsOverlap
+        (firstLink.first.supportingSegment graph).start.2
+        (firstLink.first.supportingSegment graph).finish.2
+        (secondLink.first.supportingSegment graph).start.2
+        (secondLink.first.supportingSegment graph).finish.2) :
+    ClosedGridRectanglesSeparated
+      (drawingCompleteCarrierLinkRectangleLower graph firstLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph firstLink)
+      (drawingCompleteCarrierLinkRectangleLower graph secondLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph secondLink) := by
+  have firstBounds :=
+    retainedDrawingCompleteCarrierLink_vertical_support_bounded
+      wellFormed degree isLocal firstMem firstVertical
+  have secondBounds :=
+    retainedDrawingCompleteCarrierLink_vertical_support_bounded
+      wellFormed degree isLocal secondMem secondVertical
+  simp only [planarMacroScale] at firstBounds secondBounds
+  unfold GridSegment.OpenIntervalsOverlap at disjoint
+  have separated :
+      max (firstLink.first.supportingSegment graph).start.2
+            (firstLink.first.supportingSegment graph).finish.2 ≤
+          min (secondLink.first.supportingSegment graph).start.2
+            (secondLink.first.supportingSegment graph).finish.2 ∨
+        max (secondLink.first.supportingSegment graph).start.2
+            (secondLink.first.supportingSegment graph).finish.2 ≤
+          min (firstLink.first.supportingSegment graph).start.2
+            (firstLink.first.supportingSegment graph).finish.2 := by
+    omega
+  unfold drawingCompleteCarrierLinkRectangleLower
+    drawingCompleteCarrierLinkRectangleUpper
+    ClosedGridRectanglesSeparated
+  simp only [firstVertical, secondVertical,
+    Bool.false_eq_true, if_false]
+  rcases separated with firstBefore | secondBefore
+  · exact Or.inr (Or.inr (Or.inl (by omega)))
+  · exact Or.inr (Or.inr (Or.inr (by omega)))
+
+/-- Horizontal selected links on different source rows have strictly
+separated physical rectangles. -/
+theorem
+    retainedDrawingCompleteCarrierLink_rectanglesSeparated_of_horizontal_normal_ne
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {firstLink secondLink : EqualityLink CarrierNode}
+    (firstMem :
+      firstLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (secondMem :
+      secondLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (firstHorizontal : firstLink.first.isHorizontal = true)
+    (secondHorizontal : secondLink.first.isHorizontal = true)
+    (normalDifferent :
+      (firstLink.first.supportingSegment graph).start.2 ≠
+        (secondLink.first.supportingSegment graph).start.2) :
+    ClosedGridRectanglesSeparated
+      (drawingCompleteCarrierLinkRectangleLower graph firstLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph firstLink)
+      (drawingCompleteCarrierLinkRectangleLower graph secondLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph secondLink) := by
+  have firstEndpoints :=
+    retainedDrawingCompleteCarrierLink_endpoints_mem graph firstMem
+  have secondEndpoints :=
+    retainedDrawingCompleteCarrierLink_endpoints_mem graph secondMem
+  have firstNormal :=
+    retainedCarrierNode_position_normalCoordinate
+      wellFormed degree isLocal firstEndpoints.1
+  have secondNormal :=
+    retainedCarrierNode_position_normalCoordinate
+      wellFormed degree isLocal secondEndpoints.1
+  rw [if_pos firstHorizontal] at firstNormal
+  rw [if_pos secondHorizontal] at secondNormal
+  simp only [planarMacroScale] at firstNormal secondNormal
+  unfold drawingCompleteCarrierLinkRectangleLower
+    drawingCompleteCarrierLinkRectangleUpper
+    ClosedGridRectanglesSeparated
+  simp only [firstHorizontal, if_pos, secondHorizontal]
+  rcases lt_or_gt_of_ne normalDifferent with lower | higher
+  · exact Or.inr (Or.inr (Or.inl (by omega)))
+  · exact Or.inr (Or.inr (Or.inr (by omega)))
+
+/-- Vertical selected links on different source columns have strictly
+separated physical rectangles. -/
+theorem
+    retainedDrawingCompleteCarrierLink_rectanglesSeparated_of_vertical_normal_ne
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    {firstLink secondLink : EqualityLink CarrierNode}
+    (firstMem :
+      firstLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (secondMem :
+      secondLink ∈ retainedDrawingCompleteCarrierLinks graph)
+    (firstVertical : ¬firstLink.first.isHorizontal = true)
+    (secondVertical : ¬secondLink.first.isHorizontal = true)
+    (normalDifferent :
+      (firstLink.first.supportingSegment graph).start.1 ≠
+        (secondLink.first.supportingSegment graph).start.1) :
+    ClosedGridRectanglesSeparated
+      (drawingCompleteCarrierLinkRectangleLower graph firstLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph firstLink)
+      (drawingCompleteCarrierLinkRectangleLower graph secondLink)
+      (drawingCompleteCarrierLinkRectangleUpper graph secondLink) := by
+  have firstEndpoints :=
+    retainedDrawingCompleteCarrierLink_endpoints_mem graph firstMem
+  have secondEndpoints :=
+    retainedDrawingCompleteCarrierLink_endpoints_mem graph secondMem
+  have firstNormal :=
+    retainedCarrierNode_position_normalCoordinate
+      wellFormed degree isLocal firstEndpoints.1
+  have secondNormal :=
+    retainedCarrierNode_position_normalCoordinate
+      wellFormed degree isLocal secondEndpoints.1
+  rw [if_neg firstVertical] at firstNormal
+  rw [if_neg secondVertical] at secondNormal
+  simp only [planarMacroScale] at firstNormal secondNormal
+  unfold drawingCompleteCarrierLinkRectangleLower
+    drawingCompleteCarrierLinkRectangleUpper
+    ClosedGridRectanglesSeparated
+  simp [firstVertical, secondVertical]
+  rcases lt_or_gt_of_ne normalDifferent with lower | higher
+  · exact Or.inl (by omega)
+  · exact Or.inr (Or.inl (by omega))
+
 end PeriodicOrthocrossing
 end LeanTrominoes
