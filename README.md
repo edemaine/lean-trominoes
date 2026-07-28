@@ -2295,6 +2295,10 @@ The representation choices for this target are:
   matches those external lens boundaries with the internal boundaries of an
   incident crossover.  The generic boundary separator proves that every
   genuine selected-lens route avoids every genuine crossover route.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierTerminalComponentGeometry.lean)
+  matches either endpoint of a selected retained lens with the exact fanout
+  arm and macrocell origin of an incident routed-variable target or
+  routed-clause source component.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
