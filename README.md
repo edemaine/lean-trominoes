@@ -2315,6 +2315,12 @@ The representation choices for this target are:
   fixes each selected link's forward axis direction and explicit narrow
   rectangle.  Its renamed route points stay inside that rectangle, so
   separated rectangles give strict selected-lens route separation.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierMacrocellSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierMacrocellSeparation.lean)
+  separates a selected carrier route from any non-carrier route in a
+  disjoint standard macrocell.  Conversely, rectangle overlap forces that
+  macrocell onto the carrier's exact source row or column and into its axial
+  interval, supplying the common proximity interface for the remaining
+  carrier-to-component cases.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPairOrder.lean)
   proves common-axis agreement for retained nodes and transfers strict
   consecutive-pair order to the selected family: two distinct links with one
