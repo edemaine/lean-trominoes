@@ -2239,6 +2239,11 @@ The representation choices for this target are:
   result has zero representative shift and the same normalized equality link;
   its selected boundary is exactly the canonical normalized boundary (or its
   selected direct terminal has translation zero).
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierTranslationGeometry.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierTranslationGeometry.lean)
+  proves covariance of refined carrier geometry under a common drawing-period
+  translation: positions move by one macro-period vector, while axis, relative
+  order, crossover-site identity, and positioned link construction are
+  preserved.
 - [`LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingBendNormalizationDegree.lean)
   performs the corresponding periodic quotient for route-bend equalities.
   Erasing a bend record's explicit translation preserves its normalized link,
