@@ -519,6 +519,12 @@ The representation choices for this target are:
   matching literal route.  The transported family is proved to satisfy every
   periodic incidence endpoint, and compatibility is reduced to finite
   distinctness and fundamental-square bounds for the retained vertices.
+  [`LeanTrominoes/PositionedPeriodicCNFVariableGauge.lean`](LeanTrominoes/PositionedPeriodicCNFVariableGauge.lean)
+  moves each periodic protovariable by an independently chosen lattice
+  period while compensating every literal offset.  Periodic satisfiability
+  and all physical literal and raw-route endpoints are unchanged.  A
+  canonical quotient gauge reduces stored variable coordinates modulo the
+  period and supplies the corresponding fundamental-square bounds.
   [`LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean`](LeanTrominoes/PeriodicCNFPlanarSATDeduplication.lean)
   first puts every routed clause orbit in its canonical anchor gauge, then
   removes exact duplicates and wraps its variables.  Normalizing before
