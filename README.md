@@ -2562,6 +2562,11 @@ The representation choices for this target are:
   continuous contact involving at least one noncarrier segment is reduced to
   the nine neighboring relative translations; only carrier--carrier contacts
   can require the full 25-shift analysis.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCommonShiftRepresentatives.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedCommonShiftRepresentatives.lean)
+  isolates the remaining orbit interface.  If two final occurrences are
+  reindexed as distinct genuine retained-drawing segments at one common
+  physical shift, finite retained planarity immediately transfers their
+  continuous separation back to the periodic quotient.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteSimplicity.lean)
   transfers finite retained route simplicity through the occurrence bridge,
   proving that every route stored in the final periodic quotient is simple.
