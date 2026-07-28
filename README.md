@@ -2387,6 +2387,10 @@ The representation choices for this target are:
   carrier node, routed-variable center, or internal variable of a retained
   halo crossing.  The proof first classifies each local gadget and then
   lifts the result through retained clause metadata.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPositionInjectivity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPositionInjectivity.lean)
+  proves that retained carrier nodes have distinct refined positions.
+  Equal local ports make their supporting segments overlap in one continuous
+  lane; lane uniqueness and strict carrier order then identify the nodes.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
