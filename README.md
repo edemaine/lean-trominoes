@@ -2529,6 +2529,10 @@ The representation choices for this target are:
   final incidence route now carries a genuine incidence of the certified
   finite retained drawing whose physical route is equal after the exact
   anchor-adjusted lattice translation.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSegmentOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSegmentOccurrences.lean)
+  refines the quotient-to-finite bridge to indexed segment occurrences,
+  preserving the within-route segment index and proving exact equality of
+  the translated final and physical segments.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
