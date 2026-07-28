@@ -2513,6 +2513,11 @@ The representation choices for this target are:
   one physical period along their common axis.  Together with the equality
   lens's fixed transverse width, this places every clause-anchor-normalized
   carrier route point in the open neighboring-period square `(-P, 2P)²`.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRouteBounds.lean)
+  combines the carrier and non-carrier bounds and transports them through
+  metadata lookup, clause-anchor normalization, and first-representative
+  clause deduplication.  The final gauged periodic incidence drawing thus
+  satisfies `RoutePointsInExpandedSquare`.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
