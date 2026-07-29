@@ -1535,6 +1535,14 @@ The representation choices for this target are:
   matchings and abstract incidence orientations exactly with satisfiability
   of the original local 3SAT-3 source.  This completes the nongeometric 3DM
   endpoint; the retained exact-one planarity certificate remains geometric.
+- [`LeanTrominoes/OrthogonalPolylineSymmetries.lean`](LeanTrominoes/OrthogonalPolylineSymmetries.lean)
+  centralizes the facts that translation and route reversal preserve
+  rectilinearity, formerly embedded in the later 3DM-contraction layer.
+- [`LeanTrominoes/OrthogonalPolylineTailReplacement.lean`](LeanTrominoes/OrthogonalPolylineTailReplacement.lean)
+  provides the reverse dual of route-head replacement.  It preserves the
+  clause-side endpoint while replacing a route's variable-side tail at its
+  old penultimate point, and proves the resulting endpoint and orthogonality
+  laws needed to splice coordinated Figure 7 fans into retained routes.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
