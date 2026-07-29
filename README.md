@@ -2566,6 +2566,14 @@ The representation choices for this target are:
   translated final and physical segments.  The two incidence indexings
   determine each other, so its anchor-adjusted finite occurrence key is equal
   exactly when the original periodic segment-occurrence key is equal.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointOccurrences.lean)
+  performs the analogous transfer for every listed route point.  The
+  same-indexed physical point has the exact translated coordinate and route
+  length, so outer-endpoint status is preserved; a fixed first-segment
+  witness proves that the anchor-adjusted physical point key is equal exactly
+  when the final periodic route-point occurrence key is equal.  This is the
+  quotient interface needed to rule out hidden bend-to-bend contacts before
+  ribbon thickening.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierSegmentBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierSegmentBounds.lean)
   transfers the noncarrier route-point residue theorem through that
   occurrence bridge.  Every final segment represented by crossover, bend,

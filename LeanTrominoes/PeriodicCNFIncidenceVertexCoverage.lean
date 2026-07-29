@@ -73,6 +73,44 @@ theorem edgeRoutesHaveSegments_of_compatible_of_loopless
       | cons second rest =>
           simp
 
+/-- Every stored route of a compatible loopless drawing contains at least
+one genuine segment.  This is the route-list form of
+`edgeRoutesHaveSegments_of_compatible_of_loopless`, useful when downstream
+geometry starts from a stored route rather than a graph edge. -/
+theorem route_length_ge_two_of_compatible_of_loopless
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing)
+    (compatible : drawing.IsCompatible graph)
+    (loopless : EdgesAreLoopless graph)
+    {route : List Cell}
+    (routeMember : route ∈ drawing.edgeRoutes) :
+    2 ≤ route.length := by
+  rcases List.mem_iff_get.mp routeMember with
+    ⟨routeIndex, routeLookup⟩
+  have edgeIndexLt :
+      routeIndex.val < graph.edges.length := by
+    rw [← compatible.2.2.1]
+    exact routeIndex.isLt
+  let edgeIndex : Fin graph.edges.length :=
+    ⟨routeIndex.val, edgeIndexLt⟩
+  let edge := graph.edges.get edgeIndex
+  have taggedEdgeMember :
+      (edge, routeIndex.val) ∈ graph.edges.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨edgeIndexLt, rfl⟩
+  have routeLength :=
+    edgeRoutesHaveSegments_of_compatible_of_loopless
+      graph drawing compatible loopless
+      (edge, routeIndex.val) taggedEdgeMember
+  have selectedRouteEq :
+      drawing.edgeRoute routeIndex.val = route := by
+    unfold PeriodicGridDrawing.edgeRoute
+    rw [List.getD_eq_getElem _ _ routeIndex.isLt]
+    exact routeLookup
+  simpa only [selectedRouteEq] using routeLength
+
 end PeriodicGridDrawing
 
 namespace PeriodicCNF
