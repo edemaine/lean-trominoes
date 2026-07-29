@@ -2012,6 +2012,13 @@ The representation choices for this target are:
   gate endpoints, rectilinearity, macrocell containment, and pairwise strict
   separation.  The same module records the semantic clause ports in uniform
   physical-lane order.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseLocalGates.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseLocalGates.lean)
+  shifts the small clause core downward within its macrocell to reserve a
+  protected upper annulus, then supplies simultaneous two- and
+  three-terminal physical-lane routes from the reflected outer gates to the
+  exact core ports.  Lean exhaustively certifies their endpoints,
+  rectilinearity, simplicity, bounds, pairwise strict separation, and
+  endpoint-only contact with every route of the clause-core drawing.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

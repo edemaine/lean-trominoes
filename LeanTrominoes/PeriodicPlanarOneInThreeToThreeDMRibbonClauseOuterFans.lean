@@ -167,9 +167,9 @@ theorem lanePorts :
         (lanePort .left .blue)],
       [(lanePort .right .red), (lanePort .right .green),
         (lanePort .right .blue)]) =
-      ([(54, 52), (62, 52), (70, 52)],
-        [(70, 76), (62, 76), (54, 76)],
-        [(78, 56), (78, 64), (78, 72)]) := by
+      ([(54, 60), (62, 60), (70, 60)],
+        [(70, 84), (62, 84), (54, 84)],
+        [(78, 64), (78, 72), (78, 80)]) := by
   rfl
 
 /-- Reflected and reversed route from a physical ribbon entry to the

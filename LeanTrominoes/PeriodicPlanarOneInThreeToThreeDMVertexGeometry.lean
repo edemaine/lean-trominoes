@@ -24,14 +24,16 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 open Gadget PlanarThreeDM
 
 /-- A fixed refinement large enough for every complete variable site and
-clause core.  Both gadgets are centered around `(64, 64)`, matching the
-ribbon-macrocell center inside the same refined block.  The legacy lane
-offsets remain distinct interior points for the prototype routing. -/
+clause core.  The variable gadget is centered around `(64, 64)`.  The
+smaller clause core is shifted eight cells downward, reserving a protected
+strip above its three top ports for the coordinated ribbon fan.  Both remain
+strictly inside the same refined block.  The legacy lane offsets remain
+distinct interior points for the prototype routing. -/
 def standardThreeStrandLayout : ThreeStrandLayout where
   factor := 128
   factorPositive := by decide
   variableOffset := (20, 64)
-  clauseOffset := (50, 52)
+  clauseOffset := (50, 60)
   laneOffset
     | .red => (96, 96)
     | .green => (100, 100)
