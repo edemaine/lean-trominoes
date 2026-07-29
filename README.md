@@ -3610,6 +3610,11 @@ The representation choices for this target are:
   In particular, each output occurrence slot maps to the identical source
   slot, even though the gadget distributes source literals among different
   generated clauses and negates its second and third inputs.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsOriginalOccurrenceOrder.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsOriginalOccurrenceOrder.lean)
+  gives unit elimination the analogous pairing.  Unit literals move,
+  negated, into the first generated ternary clause while non-unit clauses
+  lift pointwise; in both cases the ordered output occurrence slots coincide
+  exactly with the ordered source slots.
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean)
   proves that every generated triple reference names an element in the
   corresponding finite typed red, green, or blue list.  In particular,
