@@ -2722,6 +2722,11 @@ The representation choices for this target are:
   raw equality link on a neighboring physical carrier translates to a
   selected zero-owner representative, so the finite selected formula can
   recover all equalities needed along neighboring periodic carrier chains.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPeriodicSoundness.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierPeriodicSoundness.lean)
+  performs that recovery under a satisfying periodic assignment.  Evaluation
+  of translated physical carrier nodes is proved covariant with the
+  finite-block translate, and each selected representative equality is
+  transported back to its original raw neighboring link.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
