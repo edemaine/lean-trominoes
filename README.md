@@ -616,6 +616,11 @@ The representation choices for this target are:
   proves that position- and period-preserving variable renaming reuses a
   canonical route family verbatim, retaining pointwise clause/literal
   endpoints and orthogonality.
+  [`LeanTrominoes/PositionedPeriodicCNFVariableRouteOrderRenaming.lean`](LeanTrominoes/PositionedPeriodicCNFVariableRouteOrderRenaming.lean)
+  proves that injective variable renaming maps tagged occurrences without
+  changing their clause/literal presentation indices.  Bijective renaming
+  therefore preserves clockwise variable-route order, and every target
+  incidence can be recovered from its source incidence at the same indices.
   [`LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicing.lean`](LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicing.lean)
   packages orthogonal suffixes from arbitrary local gadget splice points to
   canonical periodic literal endpoints.  Its generic join theorem combines
@@ -3612,6 +3617,13 @@ The representation choices for this target are:
   endpoints and orthogonality.  The file also proves the assembled drawing's
   complete `RoutesMatch` and `IsOrthogonal` predicates; proving that drawing
   globally planar remains the next geometric obligation.
+- [`LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeNoUnitsVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeNoUnitsVariableRouteOrder.lean)
+  carries clockwise variable-route order through the opaque Figure 9 wrapper
+  and final unit-elimination splice.  A wrapped variable with a third
+  occurrence is proved to be an embedded source variable, whose inherited
+  Figure 9 routes have at least three points; the degree-three-scoped
+  terminal-direction theorem then proves that the final unit-free routes
+  follow syntactic occurrence order clockwise.
 - [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreeDistinctness.lean)
   threads the local atom-distinctness certificates through opaque wrapping
   and unit elimination, then specializes them to the angular hardness
