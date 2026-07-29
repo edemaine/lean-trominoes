@@ -112,6 +112,61 @@ theorem EmbeddedCNFIncidenceDrawing.embeddedRoute_isSimple_of_members
   rw [incidenceAtEqual] at selected
   exact selected
 
+/-- Extract axis alignment for one segment of a genuine
+presentation-indexed incidence route from the drawing's orthogonality
+certificate. -/
+theorem EmbeddedCNFIncidenceDrawing.embeddedSegment_isAxisAligned_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (orthogonal : drawing.IsOrthogonal)
+    {clause : EmbeddedClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ drawing.formula.zipIdx)
+    {literal : Variable × Bool}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {segment : GridSegment}
+    (segmentMember :
+      segment ∈
+        gridPolylineSegments
+          (drawing.routes clauseIndex literalIndex)) :
+    segment.IsAxisAligned := by
+  let incidence : EmbeddedCNFIncidence Variable :=
+    ⟨clause, clauseIndex, literal, literalIndex⟩
+  have incidenceMember :
+      incidence ∈ drawing.incidences :=
+    (mem_embeddedCNFIncidences_iff
+      drawing.formula incidence).mpr
+        ⟨clauseMember, literalMember⟩
+  rcases List.mem_iff_get.mp incidenceMember with
+    ⟨incidenceIndex, incidenceEqual⟩
+  rcases List.mem_iff_get.mp segmentMember with
+    ⟨segmentIndex, segmentEqual⟩
+  have incidenceAtEqual :
+      drawing.incidenceAt incidenceIndex = incidence :=
+    incidenceEqual
+  have routeEq :
+      drawing.routeAt (drawing.incidenceAt incidenceIndex) =
+        drawing.routes clauseIndex literalIndex := by
+    rw [incidenceAtEqual]
+    rfl
+  have selected := orthogonal incidenceIndex
+  change
+    ∀ segmentIndex :
+        Fin
+          (gridPolylineSegments
+            (drawing.routeAt
+              (drawing.incidenceAt incidenceIndex))).length,
+      ((gridPolylineSegments
+        (drawing.routeAt
+          (drawing.incidenceAt incidenceIndex))).get
+            segmentIndex).IsAxisAligned at selected
+  rw [routeEq] at selected
+  have aligned := selected segmentIndex
+  simpa only [segmentEqual] using aligned
+
 /-- Extract continuous separation for two distinct genuine
 presentation-indexed incidences from a finite drawing's indexed planarity
 certificate. -/
