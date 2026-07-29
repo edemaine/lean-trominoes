@@ -2770,6 +2770,12 @@ The representation choices for this target are:
   and crossover-internal cases all have degree at most eight, and the bound
   transfers through global clause deduplication to the unwrapped retained
   planar-SAT formula.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedDegree.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedDegree.lean)
+  proves that gauged wrapping is injective on anchor-normalized clause
+  representatives, so it commutes with clause-orbit deduplication.  The final
+  canonically gauged positioned formula therefore has exactly the unwrapped
+  occurrence list behind the opaque variable wrapper and retains the
+  degree-eight bound.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
