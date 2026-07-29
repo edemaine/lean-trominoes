@@ -27,6 +27,244 @@ def VertexPositionsCoveredBySegmentEndpoints
             (indexed.segment.translate
               (drawing.periodTranslation translate)).finish
 
+/-- Every listed protovertex is an endpoint of at least one listed
+protoedge. -/
+def EveryVertexIncident {Vertex : Type*}
+    (graph : PeriodicGraph Vertex) : Prop :=
+  ∀ vertex ∈ graph.vertices,
+    ∃ taggedEdge ∈ graph.edges.zipIdx,
+      taggedEdge.1.source = vertex ∨ taggedEdge.1.target = vertex
+
+/-- Every protoedge route contains at least one genuine segment. -/
+def EdgeRoutesHaveSegments {Vertex : Type*}
+    (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ taggedEdge ∈ graph.edges.zipIdx,
+    2 ≤ (drawing.edgeRoute taggedEdge.2).length
+
+/-- No listed protoedge has the same prototype vertex at both ends. -/
+def EdgesAreLoopless {Vertex : Type*}
+    (graph : PeriodicGraph Vertex) : Prop :=
+  ∀ edge ∈ graph.edges, edge.source ≠ edge.target
+
+/-- Compatibility makes the stored position lookup an actual member of the
+drawing's position list. -/
+theorem IsCompatible.vertexPosition_mem
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {drawing : PeriodicGridDrawing}
+    (compatible : drawing.IsCompatible graph)
+    {vertex : Vertex}
+    (vertexMember : vertex ∈ graph.vertices) :
+    drawing.vertexPosition graph vertex ∈ drawing.vertexPositions := by
+  have vertexIndexLt :
+      graph.vertices.idxOf vertex < graph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr vertexMember
+  have positionIndexLt :
+      graph.vertices.idxOf vertex < drawing.vertexPositions.length := by
+    rwa [compatible.2.1]
+  unfold vertexPosition
+  rw [List.getD_eq_getElem _ _ positionIndexLt]
+  exact List.getElem_mem positionIndexLt
+
+/-- Distinct listed protovertices have distinct compatible drawing
+positions. -/
+theorem IsCompatible.vertexPosition_injective_on
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {drawing : PeriodicGridDrawing}
+    (compatible : drawing.IsCompatible graph)
+    {first second : Vertex}
+    (firstMember : first ∈ graph.vertices)
+    (secondMember : second ∈ graph.vertices)
+    (equal :
+      drawing.vertexPosition graph first =
+        drawing.vertexPosition graph second) :
+    first = second := by
+  have firstIndexLt :
+      graph.vertices.idxOf first < graph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr firstMember
+  have secondIndexLt :
+      graph.vertices.idxOf second < graph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr secondMember
+  have firstPositionLt :
+      graph.vertices.idxOf first < drawing.vertexPositions.length := by
+    rwa [compatible.2.1]
+  have secondPositionLt :
+      graph.vertices.idxOf second < drawing.vertexPositions.length := by
+    rwa [compatible.2.1]
+  unfold vertexPosition at equal
+  rw [List.getD_eq_getElem _ _ firstPositionLt,
+    List.getD_eq_getElem _ _ secondPositionLt] at equal
+  have indicesEqual :
+      graph.vertices.idxOf first =
+        graph.vertices.idxOf second :=
+    (compatible.2.2.2.1.getElem_inj_iff).mp equal
+  calc
+    first =
+        graph.vertices[
+          graph.vertices.idxOf first]'firstIndexLt :=
+      (List.idxOf_get firstIndexLt).symm
+    _ =
+        graph.vertices[
+          graph.vertices.idxOf second]'secondIndexLt := by
+      congr
+    _ = second :=
+      List.idxOf_get secondIndexLt
+
+/-- A route selected by a tagged graph edge occurs at that same index in a
+compatible drawing's flat route list. -/
+private theorem edgeRoute_mem_zipIdx
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {drawing : PeriodicGridDrawing}
+    (compatible : drawing.IsCompatible graph)
+    {taggedEdge : PeriodicEdge Vertex × Nat}
+    (edgeMember : taggedEdge ∈ graph.edges.zipIdx) :
+    (drawing.edgeRoute taggedEdge.2, taggedEdge.2) ∈
+      drawing.edgeRoutes.zipIdx := by
+  have edgeIndexLt :
+      taggedEdge.2 < graph.edges.length :=
+    List.snd_lt_of_mem_zipIdx edgeMember
+  have routeIndexLt :
+      taggedEdge.2 < drawing.edgeRoutes.length := by
+    rwa [compatible.2.2.1]
+  rw [List.mem_zipIdx_iff_getElem?,
+    List.getElem?_eq_some_iff]
+  refine ⟨routeIndexLt, ?_⟩
+  unfold edgeRoute
+  rw [List.getD_eq_getElem _ _ routeIndexLt]
+
+/-- Incidence and nondegeneracy convert exact compatible route endpoints
+into endpoint coverage of every stored graph vertex. -/
+theorem vertexPositionsCoveredBySegmentEndpoints_of_compatible
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing)
+    (compatible : drawing.IsCompatible graph)
+    (incident : EveryVertexIncident graph)
+    (routesHaveSegments : EdgeRoutesHaveSegments graph drawing) :
+    drawing.VertexPositionsCoveredBySegmentEndpoints := by
+  intro vertexPosition vertexPositionMember
+  rcases List.mem_iff_get.mp vertexPositionMember with
+    ⟨positionIndex, positionAt⟩
+  have graphIndexLt :
+      positionIndex.val < graph.vertices.length := by
+    rw [← compatible.2.1]
+    exact positionIndex.isLt
+  let graphIndex : Fin graph.vertices.length :=
+    ⟨positionIndex.val, graphIndexLt⟩
+  let vertex := graph.vertices.get graphIndex
+  have vertexMember : vertex ∈ graph.vertices :=
+    List.get_mem graph.vertices graphIndex
+  have vertexIndexEq :
+      graph.vertices.idxOf vertex = graphIndex.val := by
+    exact compatible.1.1.idxOf_getElem graphIndex.val graphIndexLt
+  have vertexPositionEq :
+      drawing.vertexPosition graph vertex = vertexPosition := by
+    unfold PeriodicGridDrawing.vertexPosition
+    rw [vertexIndexEq,
+      List.getD_eq_getElem _ _ positionIndex.isLt]
+    exact positionAt
+  rcases incident vertex vertexMember with
+    ⟨taggedEdge, taggedEdgeMember, source | target⟩
+  · have routeMember :=
+      edgeRoute_mem_zipIdx compatible taggedEdgeMember
+    have endpoints :=
+      compatible.2.2.2.2.2 taggedEdge taggedEdgeMember
+    have sourceMember :
+        drawing.vertexPosition graph taggedEdge.1.source ∈
+          drawing.edgeRoute taggedEdge.2 :=
+      List.mem_of_mem_head? (by simp [endpoints.1])
+    rcases
+        PeriodicOrthocrossing.exists_segment_endpoint_of_mem
+          (routesHaveSegments taggedEdge taggedEdgeMember)
+          sourceMember with
+      ⟨segment, segmentMember, endpoint⟩
+    rcases List.mem_iff_get.mp segmentMember with
+      ⟨segmentIndex, segmentAt⟩
+    let indexed : IndexedGridSegment :=
+      ⟨taggedEdge.2, segmentIndex, segment⟩
+    have indexedMember : indexed ∈ drawing.indexedSegments := by
+      have member :=
+        indexedSegment_mem_of_route_mem routeMember segmentIndex
+      rw [segmentAt] at member
+      simpa only [indexed] using member
+    refine ⟨indexed, indexedMember, (0, 0), ?_⟩
+    have pointEq :
+        vertexPosition =
+          drawing.vertexPosition graph taggedEdge.1.source := by
+      rw [source]
+      exact vertexPositionEq.symm
+    rcases endpoint with endpoint | endpoint
+    · left
+      simpa [indexed, GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.scale, Cell.add] using pointEq.trans endpoint
+    · right
+      simpa [indexed, GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.scale, Cell.add] using pointEq.trans endpoint
+  · have routeMember :=
+      edgeRoute_mem_zipIdx compatible taggedEdgeMember
+    have endpoints :=
+      compatible.2.2.2.2.2 taggedEdge taggedEdgeMember
+    have targetMember :
+        Cell.add
+            (drawing.vertexPosition graph taggedEdge.1.target)
+            (drawing.periodTranslation taggedEdge.1.offset) ∈
+          drawing.edgeRoute taggedEdge.2 :=
+      mem_of_getLast?_eq_some endpoints.2
+    rcases
+        PeriodicOrthocrossing.exists_segment_endpoint_of_mem
+          (routesHaveSegments taggedEdge taggedEdgeMember)
+          targetMember with
+      ⟨segment, segmentMember, endpoint⟩
+    rcases List.mem_iff_get.mp segmentMember with
+      ⟨segmentIndex, segmentAt⟩
+    let indexed : IndexedGridSegment :=
+      ⟨taggedEdge.2, segmentIndex, segment⟩
+    have indexedMember : indexed ∈ drawing.indexedSegments := by
+      have member :=
+        indexedSegment_mem_of_route_mem routeMember segmentIndex
+      rw [segmentAt] at member
+      simpa only [indexed] using member
+    let reverseOffset : Cell :=
+      (-taggedEdge.1.offset.1, -taggedEdge.1.offset.2)
+    refine ⟨indexed, indexedMember, reverseOffset, ?_⟩
+    have pointEq :
+        vertexPosition =
+          drawing.vertexPosition graph taggedEdge.1.target := by
+      rw [target]
+      exact vertexPositionEq.symm
+    rcases taggedEdge.1.offset with ⟨offsetX, offsetY⟩
+    rcases segment with ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+    simp only [PeriodicGridDrawing.periodTranslation,
+      Cell.scale, Cell.add, Prod.mk.injEq] at endpoint
+    rcases endpoint with endpoint | endpoint
+    · left
+      rw [pointEq]
+      apply Prod.ext
+      · dsimp [reverseOffset, indexed, GridSegment.translate,
+          PeriodicGridDrawing.periodTranslation, Cell.scale, Cell.add]
+        rw [← endpoint.1]
+        ring
+      · dsimp [reverseOffset, indexed, GridSegment.translate,
+          PeriodicGridDrawing.periodTranslation, Cell.scale, Cell.add]
+        rw [← endpoint.2]
+        ring
+    · right
+      rw [pointEq]
+      apply Prod.ext
+      · dsimp [reverseOffset, indexed, GridSegment.translate,
+          PeriodicGridDrawing.periodTranslation, Cell.scale, Cell.add]
+        rw [← endpoint.1]
+        ring
+      · dsimp [reverseOffset, indexed, GridSegment.translate,
+          PeriodicGridDrawing.periodTranslation, Cell.scale, Cell.add]
+        rw [← endpoint.2]
+        ring
+
 /-- Translating a covered segment occurrence and its endpoint by the same
 additional period preserves the endpoint equation. -/
 private theorem add_periodTranslation_eq_translated_endpoint
