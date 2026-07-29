@@ -2063,6 +2063,11 @@ The representation choices for this target are:
   Source planarity then supplies genuine, pairwise distinct directions,
   reducing clause-fan compatibility to the one clockwise condition for a
   ternary clause; binary clauses are automatic.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseRouteOrder.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseRouteOrder.lean)
+  connects that condition to the final unit-elimination route family.
+  Ternary routes leave their stored clause south/west/east, so the incoming
+  fan directions are north/east/west in clockwise order; binary clauses have
+  no right terminal.  Thus every source clause fan is compatible.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean)
   identifies the finite coordinated-fan ports and physical lanes with the
   occurrence-level variable ports, clause ports, and corridor lanes.  The

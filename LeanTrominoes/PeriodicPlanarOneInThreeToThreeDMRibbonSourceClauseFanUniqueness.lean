@@ -20,7 +20,9 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PlanarThreeDM
 
-private theorem occurrenceLiteralIndex_eq_indexedLiteralIndex
+/-- The occurrence-table literal index agrees with the selected
+metadata-rich incidence index. -/
+theorem occurrenceLiteralIndex_eq_indexedLiteralIndex
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
