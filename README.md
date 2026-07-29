@@ -1609,8 +1609,8 @@ The representation choices for this target are:
   applies that interface to the final gauged, wrapped, and orbit-deduplicated
   planar-SAT routes.  It defines the scaled rasterized incidence drawing and
   proves exact canonical endpoints and orthogonality for every genuine
-  route.  Proving that these staircases preserve global planar separation is
-  the next geometric layer.
+  route.  Unit subdivision below turns this orthogonal drawing into a
+  presentation satisfying the project's integer-grid planarity predicate.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
@@ -1739,6 +1739,13 @@ The representation choices for this target are:
   every consecutive pair is exactly one genuine cardinal step.  This is the
   discrete interface used to assemble certified ribbon-turn templates across
   adjacent 128-by-128 macrocells.
+- [`LeanTrominoes/PeriodicGridDrawingUnitSubdivision.lean`](LeanTrominoes/PeriodicGridDrawingUnitSubdivision.lean)
+  applies ordered unit subdivision to every route in a periodic grid
+  drawing.  Compatibility and orthogonality are preserved.  Because a
+  genuine unit axis segment contains no integer lattice point in its
+  relative interior, every subdivided orthogonal drawing automatically
+  satisfies the route-interior and vertex-interior obligations of
+  `PeriodicGridDrawing.IsPlanar`.
 - [`LeanTrominoes/OrthogonalPolylineEndpointDirections.lean`](LeanTrominoes/OrthogonalPolylineEndpointDirections.lean)
   exposes total first- and last-edge direction lookups for unit orthogonal
   polylines.  Every route with at least one edge receives genuine cardinal
