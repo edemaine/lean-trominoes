@@ -2035,6 +2035,11 @@ The representation choices for this target are:
   entering one lifted clause target.  It detects the optional right terminal,
   activates every represented group, and recovers each genuine incoming
   direction under the explicit one-occurrence-per-terminal condition.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanUniqueness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanUniqueness.lean)
+  discharges that terminal condition for every width-three source.  It
+  normalizes lifted clause targets into a canonical fundamental-domain
+  vertex and period translate, then combines vertex uniqueness, the
+  width-three literal bound, and occurrence-slot uniqueness.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
