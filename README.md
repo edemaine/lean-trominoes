@@ -3604,6 +3604,12 @@ The representation choices for this target are:
   twice, any degree-three output variable must be an embedded source
   variable; only inherited variable fans therefore need their cyclic order
   transported.
+- [`LeanTrominoes/PeriodicOneInThreeOriginalOccurrenceOrder.lean`](LeanTrominoes/PeriodicOneInThreeOriginalOccurrenceOrder.lean)
+  gives the Figure 7 transformation an explicit order-preserving pairing
+  between embedded output occurrences and their tagged source occurrences.
+  In particular, each output occurrence slot maps to the identical source
+  slot, even though the gadget distributes source literals among different
+  generated clauses and negates its second and third inputs.
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean)
   proves that every generated triple reference names an element in the
   corresponding finite typed red, green, or blue list.  In particular,
