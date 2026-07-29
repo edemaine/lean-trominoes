@@ -80,6 +80,44 @@ theorem polylineLastDirection_translatePolyline
         simp [PeriodicOrthocrossing.translatePolyline]]
   rw [polylineFirstDirection_translatePolyline]
 
+/-! Positive uniform scaling changes neither endpoint direction. -/
+
+@[simp]
+theorem polylineFirstDirection_scalePolyline
+    (factor : Int) (positive : 0 < factor)
+    (points : List Cell) :
+    polylineFirstDirection (scalePolyline factor points) =
+      polylineFirstDirection points := by
+  cases points with
+  | nil => rfl
+  | cons first rest =>
+      cases rest with
+      | nil => rfl
+      | cons second rest =>
+          rcases first with ⟨firstX, firstY⟩
+          rcases second with ⟨secondX, secondY⟩
+          simp only [scalePolyline_cons]
+          change
+            between
+                (factor * firstX, factor * firstY)
+                (factor * secondX, factor * secondY) =
+              between (firstX, firstY) (secondX, secondY)
+          simp [between, positive.ne',
+            Int.mul_lt_mul_left positive]
+
+@[simp]
+theorem polylineLastDirection_scalePolyline
+    (factor : Int) (positive : 0 < factor)
+    (points : List Cell) :
+    polylineLastDirection (scalePolyline factor points) =
+      polylineLastDirection points := by
+  unfold polylineLastDirection
+  rw [show
+    (scalePolyline factor points).reverse =
+      scalePolyline factor points.reverse by
+        simp [scalePolyline]]
+  rw [polylineFirstDirection_scalePolyline factor positive]
+
 @[simp]
 theorem polylineLastDirection_reverse
     (points : List Cell) :

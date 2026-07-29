@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineHeadReplacement
+import LeanTrominoes.OrthogonalPolylineEndpointDirections
 import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints
 import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
@@ -166,6 +167,37 @@ theorem inheritedSourceRoute_orthogonal
         sourceRoute) := by
   apply orthogonalPolyline_translate
   exact orthogonalPolyline_scale sourceOrthogonal (by decide)
+
+/-- Refinement and anchor-gauge translation preserve the direction in which
+an inherited route enters its source variable. -/
+@[simp]
+theorem inheritedSourceRoute_lastDirection
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    (sourceRoute : List Cell) :
+    AxisDirection.polylineLastDirection
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceRoute) =
+      AxisDirection.polylineLastDirection sourceRoute := by
+  rw [show
+    inheritedSourceRoute
+        outputPlacement sourcePlacement sourceClause generatedClause
+        sourceRoute =
+      PeriodicOrthocrossing.translatePolyline
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement sourceClause generatedClause)
+        (scalePolyline gadgetScale sourceRoute) by
+      rfl]
+  rw [AxisDirection.polylineLastDirection_translatePolyline]
+  exact
+    AxisDirection.polylineLastDirection_scalePolyline
+      gadgetScale (by decide) sourceRoute
 
 /-- Scaling and changing the anchor gauge carry a source route's first exit
 to the correspondingly transformed point. -/

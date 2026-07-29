@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineJoin
+import LeanTrominoes.OrthogonalPolylineEndpointDirections
 import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicOneInThreePositionedInheritedEndpoints
 import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
@@ -184,6 +185,37 @@ theorem inheritedSourceRoute_orthogonal
   apply orthogonalPolyline_translate
   exact orthogonalPolyline_scale sourceOrthogonal (by decide)
 
+/-- Refinement and anchor-gauge translation preserve the direction in which
+an inherited route enters its source variable. -/
+@[simp]
+theorem inheritedSourceRoute_lastDirection
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeVariable Variable))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause (OneInThreeVariable Variable))
+    (sourceRoute : List Cell) :
+    AxisDirection.polylineLastDirection
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceRoute) =
+      AxisDirection.polylineLastDirection sourceRoute := by
+  rw [show
+    inheritedSourceRoute
+        outputPlacement sourcePlacement sourceClause generatedClause
+        sourceRoute =
+      PeriodicOrthocrossing.translatePolyline
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement sourceClause generatedClause)
+        (scalePolyline PlanarOneInThree.gadgetScale sourceRoute) by
+      rfl]
+  rw [AxisDirection.polylineLastDirection_translatePolyline]
+  exact
+    AxisDirection.polylineLastDirection_scalePolyline
+      PlanarOneInThree.gadgetScale (by decide) sourceRoute
+
 /-- Connect a Figure 9 boundary port to the refined and gauge-transformed
 source incidence route. -/
 def inheritedRouteSuffix
@@ -206,6 +238,55 @@ def inheritedRouteSuffix
     (inheritedSourceRoute
       outputPlacement sourcePlacement sourceClause generatedClause
       sourceRoute)
+
+/-- Attaching the Figure 9 boundary connector leaves the inherited source
+route's final direction unchanged. -/
+theorem inheritedRouteSuffix_lastDirection
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeVariable Variable))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause (OneInThreeVariable Variable))
+    (sourceLiteralIndex : Nat)
+    (sourceRoute : List Cell)
+    (sourceHead :
+      sourceRoute.head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            sourcePlacement sourceClause))
+    (sourceLength : 2 ≤ sourceRoute.length) :
+    AxisDirection.polylineLastDirection
+        (inheritedRouteSuffix
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceLiteralIndex sourceRoute) =
+      AxisDirection.polylineLastDirection sourceRoute := by
+  rw [show
+    inheritedRouteSuffix
+        outputPlacement sourcePlacement sourceClause generatedClause
+        sourceLiteralIndex sourceRoute =
+      joinAtEndpoint
+        (PositionedPeriodicCNF.orthogonalDetour
+          (normalizedSourcePort outputPlacement sourceClause
+            generatedClause sourceLiteralIndex)
+          (normalizedSourceClausePosition outputPlacement sourceClause
+            generatedClause))
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceRoute) by
+      rfl]
+  rw [AxisDirection.polylineLastDirection_joinAtEndpoint
+    (by simp)
+    (inheritedSourceRoute_head?
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute sourceHead)
+    (by
+      simpa [inheritedSourceRoute,
+        PeriodicOrthocrossing.translatePolyline,
+        scalePolyline] using sourceLength)]
+  exact inheritedSourceRoute_lastDirection
+    outputPlacement sourcePlacement sourceClause generatedClause sourceRoute
 
 /-- A certified source route yields a boundary-to-variable Figure 9 suffix
 with exact canonical endpoints and preserved orthogonality. -/
