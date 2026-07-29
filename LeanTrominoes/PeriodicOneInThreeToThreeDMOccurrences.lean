@@ -120,6 +120,20 @@ theorem occurrencesOf_length {Variable : Type*} [DecidableEq Variable]
       · simp [same, induction]
       · simp [same, induction]
 
+/-- Reaching the third occurrence slot certifies that the variable really
+occurs at least three times. -/
+theorem three_le_variableOccurrences_count_of_occurrenceAt_third
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) (atom : Variable)
+    (tagged : TaggedOccurrence Variable)
+    (lookup : occurrenceAt source atom .third = some tagged) :
+    3 ≤ (PeriodicCNF.variableOccurrences source).count atom := by
+  rw [occurrenceAt, List.getElem?_eq_some_iff] at lookup
+  rcases lookup with ⟨indexLt, _⟩
+  rw [← occurrencesOf_length]
+  simp only [OccurrenceSlot.index] at indexLt
+  omega
+
 /-- Any member of a list of length at most three occupies one of the three
 enumerated occurrence slots. -/
 theorem exists_slot_getElem?_eq_some {α : Type*} (values : List α)

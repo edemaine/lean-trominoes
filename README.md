@@ -3595,8 +3595,15 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMOccurrences.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMOccurrences.lean)
   proves the occurrence-slot bookkeeping: tagged clause/literal positions are
   duplicate-free, filtering by atom has exactly the ordinary occurrence
-  count, and the occurrence-three bound assigns every tagged literal to one
-  unique pair of complementary variable ports.
+  count, reaching the third slot certifies at least three occurrences, and
+  the occurrence-three bound assigns every tagged literal to one unique pair
+  of complementary variable ports.
+- [`LeanTrominoes/PeriodicOneInThreeToThreeDMDegreeThreeOriginal.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMDegreeThreeOriginal.lean)
+  combines that third-slot lower bound with the occurrence accounting of both
+  exact-one transformations.  Because every fresh auxiliary occurs at most
+  twice, any degree-three output variable must be an embedded source
+  variable; only inherited variable fans therefore need their cyclic order
+  transported.
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean)
   proves that every generated triple reference names an element in the
   corresponding finite typed red, green, or blue list.  In particular,
