@@ -1543,6 +1543,11 @@ The representation choices for this target are:
   clause-side endpoint while replacing a route's variable-side tail at its
   old penultimate point, and proves the resulting endpoint and orthogonality
   laws needed to splice coordinated Figure 7 fans into retained routes.
+- [`LeanTrominoes/OctilinearRayStaircase.lean`](LeanTrominoes/OctilinearRayStaircase.lean)
+  gives every axis or 45-degree compass ray a narrow rectilinear
+  rasterization.  Axis rays remain direct and diagonal rays alternate unit
+  horizontal and vertical steps; Lean proves exact endpoints, preservation
+  of the compass classification, and orthogonality for all eight directions.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
