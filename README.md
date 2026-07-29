@@ -1519,6 +1519,15 @@ The representation choices for this target are:
   Figure 9 adapter and completes its fresh local incidences.  Every genuine
   raw exact-one route has exact canonical endpoints, is orthogonal, and
   records the first exit needed by the later unit-elimination splice.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeWrappedRoutes.lean)
+  transports those routes through the exact-one formula's opaque variable
+  wrapper without changing their polylines, preserving canonical endpoints,
+  orthogonality, and first exits.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsRoutes.lean)
+  completes the unit-elimination splice and packages the final retained,
+  unit-free exact-one route family.  Its assembled periodic incidence drawing
+  matches every graph edge and is orthogonal; global planarity remains tied
+  to the coordinated copied-source boundary fans.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
