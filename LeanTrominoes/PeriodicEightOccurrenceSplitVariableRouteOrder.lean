@@ -21,7 +21,7 @@ open PeriodicThreeSATThree
 
 /-- Presentation-order occurrence lookup is independent of the chosen
 correct equality decision procedure. -/
-private theorem occurrenceAt_eq_of_decidableEq
+theorem occurrenceAt_eq_of_decidableEq
     {Variable : Type*}
     (firstEq secondEq : DecidableEq Variable)
     (source : PeriodicCNF Variable)

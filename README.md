@@ -3588,6 +3588,14 @@ The representation choices for this target are:
   canonical endpoints and orthogonality.  Its generic source-port Manhattan
   connectors isolate the remaining noncrossing clause-boundary-fan
   obligation.
+- [`LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeVariableRouteOrder.lean)
+  proves every genuine fixed-eight source route is nondegenerate, using the
+  angular spoke suffix for copied incidences and the certified local Figure 7
+  drawing for ring incidences.  It specializes the fixed-eight clockwise
+  route-order theorem to the hardness pipeline and proves that the concrete
+  raw Figure 9 splice preserves every inherited terminal direction.  Together
+  with the generic Figure 9 transport theorem, this is the compositional
+  certificate carrying variable order across the first exact-one layer.
 - [`LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarFixedEightOneInThreeWrappedRoutes.lean)
   transports that complete route family through the pipeline's opaque
   variable wrapper without changing any polyline.  The wrapped Figure 9
