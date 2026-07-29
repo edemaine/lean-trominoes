@@ -2019,6 +2019,12 @@ The representation choices for this target are:
   exact core ports.  Lean exhaustively certifies their endpoints,
   rectilinearity, simplicity, bounds, pairwise strict separation, and
   endpoint-only contact with every route of the clause-core drawing.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseCoordinatedFans.lean)
+  joins the reflected outer fans to those local clause gates.  The resulting
+  complete physical strands run from direction-dependent ribbon entries to
+  exact clause-core ports; Lean certifies their geometry, simplicity,
+  macrocell bounds, pairwise strict separation, and endpoint-only contact
+  with the finite clause core.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
