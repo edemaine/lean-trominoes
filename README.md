@@ -2053,6 +2053,11 @@ The representation choices for this target are:
   discharges that terminal condition for every width-three source.  It
   combines the common clause index, the width-three literal bound, and
   occurrence-slot uniqueness.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanOrder.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanOrder.lean)
+  reifies every active clause-terminal group as its source occurrence.
+  Source planarity then supplies genuine, pairwise distinct directions,
+  reducing clause-fan compatibility to the one clockwise condition for a
+  ternary clause; binary clauses are automatic.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean)
   identifies the finite coordinated-fan ports and physical lanes with the
   occurrence-level variable ports, clause ports, and corridor lanes.  The
