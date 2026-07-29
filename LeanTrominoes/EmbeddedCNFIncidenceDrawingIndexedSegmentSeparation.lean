@@ -15,6 +15,56 @@ namespace LeanTrominoes
 namespace PlanarThreeSAT
 namespace EmbeddedCNFIncidenceDrawing
 
+/-- Complete route avoidance keeps the relative interior of a selected
+first segment away from both endpoints of a selected second segment.  This
+statement remains meaningful when the second segment is diagonal. -/
+theorem RoutesAvoidEachOther.taggedSegments_endpointsAvoidInterior
+    {firstRoute secondRoute : List Cell}
+    (avoid : RoutesAvoidEachOther firstRoute secondRoute)
+    {firstSegment secondSegment : GridSegment × Nat}
+    (firstMember :
+      firstSegment ∈ (gridPolylineSegments firstRoute).zipIdx)
+    (secondMember :
+      secondSegment ∈ (gridPolylineSegments secondRoute).zipIdx)
+    {point : Cell}
+    (firstContains : firstSegment.1.InteriorContains point) :
+    point ≠ secondSegment.1.start ∧
+      point ≠ secondSegment.1.finish := by
+  have firstIndexLt :
+      firstSegment.2 < (gridPolylineSegments firstRoute).length :=
+    List.snd_lt_of_mem_zipIdx firstMember
+  let firstIndex : Fin (gridPolylineSegments firstRoute).length :=
+    ⟨firstSegment.2, firstIndexLt⟩
+  have firstAt :
+      (gridPolylineSegments firstRoute).get firstIndex =
+        firstSegment.1 :=
+    (List.getElem?_eq_some_iff.mp
+      ((List.mem_zipIdx_iff_getElem?).mp firstMember)).2
+  have endpoints :=
+    gridPolylineSegments_endpoints_mem
+      (List.fst_mem_of_mem_zipIdx secondMember)
+  constructor
+  · intro pointEq
+    have startMember : point ∈ secondRoute := by
+      rw [pointEq]
+      exact endpoints.1
+    rcases List.mem_iff_get.mp startMember with
+      ⟨pointIndex, pointAt⟩
+    exact
+      (avoid.2.2.1 pointIndex firstIndex)
+        (by
+          simpa only [pointAt, firstAt] using firstContains)
+  · intro pointEq
+    have finishMember : point ∈ secondRoute := by
+      rw [pointEq]
+      exact endpoints.2
+    rcases List.mem_iff_get.mp finishMember with
+      ⟨pointIndex, pointAt⟩
+    exact
+      (avoid.2.2.1 pointIndex firstIndex)
+        (by
+          simpa only [pointAt, firstAt] using firstContains)
+
 /-- Two distinct flat segment occurrences in a finite planar incidence
 drawing have disjoint continuous interiors. -/
 theorem taggedSegments_interiorsDisjoint
@@ -339,6 +389,125 @@ theorem taggedSegments_avoidsInterior
           (by
             simpa only [finitePointAt,
               firstSegmentAt] using firstContains)
+
+/-- For two distinct flat segment occurrences in a finite planar incidence
+drawing, the relative interior of the first avoids both endpoints of the
+second, including endpoints of diagonal segments. -/
+theorem taggedSegments_endpointsAvoidInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (planar : drawing.IsPlanar)
+    {firstIncidence secondIncidence :
+      EmbeddedCNFIncidence Variable × Nat}
+    (firstIncidenceMember :
+      firstIncidence ∈ drawing.incidences.zipIdx)
+    (secondIncidenceMember :
+      secondIncidence ∈ drawing.incidences.zipIdx)
+    {firstSegment secondSegment : GridSegment × Nat}
+    (firstSegmentMember :
+      firstSegment ∈
+        (gridPolylineSegments
+          (drawing.routeAt firstIncidence.1)).zipIdx)
+    (secondSegmentMember :
+      secondSegment ∈
+        (gridPolylineSegments
+          (drawing.routeAt secondIncidence.1)).zipIdx)
+    (different :
+      firstIncidence.2 ≠ secondIncidence.2 ∨
+        firstSegment.2 ≠ secondSegment.2)
+    {point : Cell}
+    (firstContains :
+      firstSegment.1.InteriorContains point) :
+    point ≠ secondSegment.1.start ∧
+      point ≠ secondSegment.1.finish := by
+  have firstIncidenceIndexLt :
+      firstIncidence.2 < drawing.incidences.length :=
+    List.snd_lt_of_mem_zipIdx firstIncidenceMember
+  have secondIncidenceIndexLt :
+      secondIncidence.2 < drawing.incidences.length :=
+    List.snd_lt_of_mem_zipIdx secondIncidenceMember
+  let firstIncidenceIndex :
+      Fin drawing.incidences.length :=
+    ⟨firstIncidence.2, firstIncidenceIndexLt⟩
+  let secondIncidenceIndex :
+      Fin drawing.incidences.length :=
+    ⟨secondIncidence.2, secondIncidenceIndexLt⟩
+  have firstIncidenceAt :
+      drawing.incidenceAt firstIncidenceIndex =
+        firstIncidence.1 :=
+    (List.getElem?_eq_some_iff.mp
+      ((List.mem_zipIdx_iff_getElem?).mp
+        firstIncidenceMember)).2
+  have secondIncidenceAt :
+      drawing.incidenceAt secondIncidenceIndex =
+        secondIncidence.1 :=
+    (List.getElem?_eq_some_iff.mp
+      ((List.mem_zipIdx_iff_getElem?).mp
+        secondIncidenceMember)).2
+  by_cases incidenceIndexEq :
+      firstIncidence.2 = secondIncidence.2
+  · have finiteIncidenceIndexEq :
+        firstIncidenceIndex = secondIncidenceIndex :=
+      Fin.ext incidenceIndexEq
+    have incidenceEq :
+        firstIncidence.1 = secondIncidence.1 := by
+      rw [← firstIncidenceAt, ← secondIncidenceAt,
+        finiteIncidenceIndexEq]
+    have segmentIndexNe :
+        firstSegment.2 ≠ secondSegment.2 := by
+      rcases different with incidenceIndexNe | segmentIndexNe
+      · exact False.elim (incidenceIndexNe incidenceIndexEq)
+      · exact segmentIndexNe
+    have simple := planar.1 firstIncidenceIndex
+    change
+      LocalIncidenceDrawing.RouteIsSimple
+        (drawing.routeAt
+          (drawing.incidenceAt firstIncidenceIndex))
+      at simple
+    rw [firstIncidenceAt] at simple
+    have secondSegmentMember' :
+        secondSegment.1 ∈
+          gridPolylineSegments
+            (drawing.routeAt firstIncidence.1) :=
+      List.fst_mem_of_mem_zipIdx
+        (by simpa only [incidenceEq] using secondSegmentMember)
+    have endpoints :=
+      gridPolylineSegments_endpoints_mem secondSegmentMember'
+    have firstSegmentMember' :
+        firstSegment.1 ∈
+          gridPolylineSegments
+            (drawing.routeAt firstIncidence.1) :=
+      List.fst_mem_of_mem_zipIdx firstSegmentMember
+    constructor
+    · intro pointEq
+      subst point
+      exact
+        (simple.2.1 secondSegment.1.start endpoints.1
+          firstSegment.1 firstSegmentMember') firstContains
+    · intro pointEq
+      subst point
+      exact
+        (simple.2.1 secondSegment.1.finish endpoints.2
+          firstSegment.1 firstSegmentMember') firstContains
+  · have finiteIncidenceIndexNe :
+        firstIncidenceIndex ≠ secondIncidenceIndex := by
+      intro equal
+      exact incidenceIndexEq (congrArg Fin.val equal)
+    have separated :=
+      planar.2.1
+        firstIncidenceIndex secondIncidenceIndex
+        finiteIncidenceIndexNe
+    change
+      RoutesAvoidEachOther
+        (drawing.routeAt
+          (drawing.incidenceAt firstIncidenceIndex))
+        (drawing.routeAt
+          (drawing.incidenceAt secondIncidenceIndex))
+      at separated
+    rw [firstIncidenceAt, secondIncidenceAt] at separated
+    exact
+      separated.taggedSegments_endpointsAvoidInterior
+        firstSegmentMember secondSegmentMember firstContains
 
 end EmbeddedCNFIncidenceDrawing
 end PlanarThreeSAT

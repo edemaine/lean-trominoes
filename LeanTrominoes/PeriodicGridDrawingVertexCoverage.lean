@@ -27,6 +27,27 @@ def VertexPositionsCoveredBySegmentEndpoints
             (indexed.segment.translate
               (drawing.periodTranslation translate)).finish
 
+/-- The relative interior of each lifted segment avoids both endpoints of
+every distinct lifted segment occurrence.  Unlike `RoutesAvoidInteriors`,
+this predicate still records endpoint separation when the second segment
+is diagonal. -/
+def SegmentEndpointsAvoidInteriors
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ first ∈ drawing.indexedSegments,
+    ∀ second ∈ drawing.indexedSegments,
+      ∀ firstTranslate secondTranslate point,
+        SegmentOccurrenceKey first firstTranslate ≠
+            SegmentOccurrenceKey second secondTranslate →
+          (first.segment.translate
+              (drawing.periodTranslation firstTranslate)).InteriorContains
+            point →
+          point ≠
+              (second.segment.translate
+                (drawing.periodTranslation secondTranslate)).start ∧
+            point ≠
+              (second.segment.translate
+                (drawing.periodTranslation secondTranslate)).finish
+
 /-- Every listed protovertex is an endpoint of at least one listed
 protoedge. -/
 def EveryVertexIncident {Vertex : Type*}
@@ -356,6 +377,76 @@ theorem verticesAvoidRouteInteriors_of_endpointCoverage
     · rw [endpointFinish]
       exact
         GridSegment.contains_finish_of_axisAligned translatedAligned
+  · have keyEq :
+        SegmentOccurrenceKey indexed routeTranslate =
+          SegmentOccurrenceKey covering liftedCoverTranslate :=
+      not_ne_iff.mp different
+    have routeIndexEq :
+        indexed.routeIndex = covering.routeIndex :=
+      congrArg (fun key => key.1) keyEq
+    have segmentIndexEq :
+        indexed.segmentIndex = covering.segmentIndex :=
+      congrArg (fun key => key.2.1) keyEq
+    have translateEq :
+        routeTranslate = liftedCoverTranslate :=
+      congrArg (fun key => key.2.2) keyEq
+    have indexedEq : indexed = covering :=
+      eq_of_mem_indexedSegments_of_indices_eq
+        indexedMember coveringMember routeIndexEq segmentIndexEq
+    subst covering
+    rw [← translateEq] at liftedEndpoint
+    rcases liftedEndpoint with endpointStart | endpointFinish
+    · rw [endpointStart] at interior
+      exact
+        GridSegment.not_interiorContains_start
+          (indexed.segment.translate
+            (drawing.periodTranslation routeTranslate)) interior
+    · rw [endpointFinish] at interior
+      exact
+        GridSegment.not_interiorContains_finish
+          (indexed.segment.translate
+            (drawing.periodTranslation routeTranslate)) interior
+
+/-- Endpoint coverage and endpoint-aware segment separation imply global
+vertex/interior avoidance without assuming that every covering segment is
+axis-aligned. -/
+theorem
+    verticesAvoidRouteInteriors_of_endpointCoverage_of_segmentEndpointsAvoidInteriors
+    (drawing : PeriodicGridDrawing)
+    (covered : drawing.VertexPositionsCoveredBySegmentEndpoints)
+    (endpointsAvoid : drawing.SegmentEndpointsAvoidInteriors) :
+    drawing.VerticesAvoidRouteInteriors := by
+  intro vertexPosition vertexMember indexed indexedMember
+    vertexTranslate routeTranslate interior
+  rcases covered vertexPosition vertexMember with
+    ⟨covering, coveringMember, coverTranslate, endpoint⟩
+  let liftedCoverTranslate : Cell :=
+    Cell.add coverTranslate vertexTranslate
+  have liftedEndpoint :
+      Cell.add vertexPosition
+          (drawing.periodTranslation vertexTranslate) =
+            (covering.segment.translate
+              (drawing.periodTranslation liftedCoverTranslate)).start ∨
+        Cell.add vertexPosition
+          (drawing.periodTranslation vertexTranslate) =
+            (covering.segment.translate
+              (drawing.periodTranslation liftedCoverTranslate)).finish := by
+    exact
+      add_periodTranslation_eq_translated_endpoint
+        drawing covering.segment coverTranslate vertexTranslate
+        vertexPosition endpoint
+  by_cases different :
+      SegmentOccurrenceKey indexed routeTranslate ≠
+        SegmentOccurrenceKey covering liftedCoverTranslate
+  · have avoids :=
+      endpointsAvoid indexed indexedMember
+        covering coveringMember routeTranslate liftedCoverTranslate
+        (Cell.add vertexPosition
+          (drawing.periodTranslation vertexTranslate))
+        different interior
+    rcases liftedEndpoint with endpointStart | endpointFinish
+    · exact avoids.1 endpointStart
+    · exact avoids.2 endpointFinish
   · have keyEq :
         SegmentOccurrenceKey indexed routeTranslate =
           SegmentOccurrenceKey covering liftedCoverTranslate :=
