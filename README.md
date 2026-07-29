@@ -2689,6 +2689,12 @@ The representation choices for this target are:
   perpendicular axes, distinct parallel physical keys, and one physical
   carrier; the last case separates distinct raw links and reindexes an
   exactly aligned link.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointNoncarrierContacts.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointNoncarrierContacts.lean)
+  proves endpoint-only contact for every pair of final noncarrier
+  route-point occurrences.  Unequal translated macrocell centers give
+  strict local-route avoidance; equal centers give component reindexing
+  except for distinct routed-variable arms, whose certified local routes
+  already avoid one another.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
