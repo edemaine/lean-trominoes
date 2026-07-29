@@ -3475,6 +3475,149 @@ theorem
         relativeNeighbor
     simpa [Cell.sub] using sumMember
 
+/-- Final carrier segment interiors avoid every closed routed-clause segment
+occurrence, including endpoint-only contacts. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_carrier_routedClause
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    (firstMember :
+      firstIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (site : ClauseRouteSite)
+    (secondSourceEq :
+      second.routeWitness.metadata.source = .routedClause site)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    ¬(secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).Contains point := by
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  have siteMember :
+      site ∈ drawingClauseRouteSites formula := by
+    have sourceMember := second.source_retainedComponentMember
+    rw [secondSourceEq] at sourceMember
+    exact sourceMember
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have secondNonempty :
+      second.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := second.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have secondCenterEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some
+          (liftedIncidenceVertexPosition
+            formula (.clause site.1) site.2) := by
+    rw [secondSourceEq]
+    rfl
+  have secondAnchorEq :
+      second.sourceClauseAnchor = site.2 := by
+    simpa only [
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (second.routeWitness.metadata
+        |>.sourceClauseAnchor_eq_liftedVertexTranslate
+          wellFormed degree isLocal second.metadata_retainedValid
+          secondNonempty (.clause site.1)
+          (drawingClauseRouteSite_vertex_mem formula siteMember)
+          site.2 secondCenterEq)
+  refine
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_carrier_noncarrier_of_balanced_source_coordinate
+      formula wellFormed degree isLocal first second
+      link firstComponentEq secondNotCarrier (0, 0) ?_ ?_
+      point firstContains
+  · intro adjustment adjustmentNeighbor
+    rw [secondSourceEq]
+    change
+      IsNeighborTranslation
+        (Cell.add site.2
+          (Cell.add
+            (Cell.neg second.sourceClauseAnchor)
+            adjustment))
+    have translatedSiteEq :
+        Cell.add site.2
+            (Cell.add
+              (Cell.neg second.sourceClauseAnchor)
+              adjustment) =
+          adjustment := by
+      rw [secondAnchorEq]
+      rcases site.2 with ⟨siteX, siteY⟩
+      rcases adjustment with
+        ⟨adjustmentX, adjustmentY⟩
+      simp [Cell.add, Cell.neg, Cell.sub]
+    rw [translatedSiteEq]
+    simpa [Cell.add] using adjustmentNeighbor
+  · intro contactPoint contactFirst contactSecond
+    rcases
+        first.routeWitness.metadata.source
+          |>.exists_eq_carrier_of_component_eq
+            link firstComponentEq with
+      ⟨localClauseIndex, firstSourceEq⟩
+    have firstBaseNeighbor :
+        IsNeighborTranslation
+          (Cell.add link.first.translate
+            (Cell.neg first.sourceClauseAnchor)) := by
+      simpa only [
+        FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor,
+        carrierLinkPeriodTranslate_first,
+        CarrierNode.translate_periodTranslate] using
+        (first.routeWitness.metadata
+          |>.carrier_first_anchorNormalize_translate_neighbor
+            wellFormed degree isLocal first.metadata_retainedValid
+            firstNonempty link localClauseIndex firstSourceEq)
+    have firstEndpointBounds :=
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_segmentEndpointsInExpandedSquare
+        formula wellFormed degree isLocal clausesNonempty
+        firstIndexed firstMember
+    have secondEndpointBounds :=
+      second.endpointsInHalfOpenFundamentalSquare_of_not_carrier
+        formula wellFormed degree isLocal clausesNonempty
+        secondNotCarrier
+    have relativeNeighbor :
+        IsNeighborTranslation (Cell.sub firstShift secondShift) := by
+      exact
+        (mem_neighborTranslations_iff _).mp
+          (PeriodicGridDrawing.relativeTranslate_isNeighbor_of_endpointContact_of_secondHalfOpen
+            firstEndpointBounds secondEndpointBounds
+            contactFirst contactSecond)
+    have sumMember :=
+      firstBaseNeighbor.add_mem_doubleNeighborTranslations
+        relativeNeighbor
+    simpa [Cell.sub] using sumMember
+
 /-- Carrier--crossover separation reduces to doubled-halo bounds from the
 anchor-normalized carrier occurrence to both anchor-normalized crossing
 occurrences.  The two crossing occurrences remain coupled by one source
