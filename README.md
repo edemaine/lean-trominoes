@@ -1641,6 +1641,14 @@ The representation choices for this target are:
   checkpoint on its source ray, independently of the ray's length; the
   certificate lifts from all eleven primitive slopes to supported segments,
   nondegenerate polylines, and scaled incidence routes.
+- [`LeanTrominoes/RetainedTerminalDirections.lean`](LeanTrominoes/RetainedTerminalDirections.lean)
+  reverses those clause-to-variable rays into the terminal vectors used by
+  the angular occurrence sort.  It classifies the eight compass directions
+  and three exceptional routed-clause directions with positive lengths,
+  assigns their exact east-first ranks, and proves that the integer
+  cross-product comparator agrees with those ranks for arbitrary positive
+  multiples.  Every nondegenerate retained-ray polyline therefore has a
+  classified terminal vector in this finite vocabulary.
 - [`LeanTrominoes/RetainedEmbeddedCNFIncidenceDrawing.lean`](LeanTrominoes/RetainedEmbeddedCNFIncidenceDrawing.lean)
   packages that segment condition over every genuine route of a finite
   embedded CNF.  The certificate follows from octilinearity, is preserved by
@@ -1660,6 +1668,12 @@ The representation choices for this target are:
   genuine route in the gauged, wrapped, and orbit-deduplicated drawing to a
   translate of a retained finite route, so every final segment has one of
   the eleven rasterizable slopes.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirections.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirections.lean)
+  combines retained-ray transport with compatibility and looplessness to
+  prove that every genuine final retained route has at least one segment and
+  that its backwards terminal vector belongs to the exact eleven-direction
+  vocabulary.  This supplies the finite angular data needed to construct the
+  local order-preserving adapter into Figure 7's consecutive compass gates.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
