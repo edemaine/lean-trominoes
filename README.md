@@ -498,6 +498,10 @@ The representation choices for this target are:
   proves that completing either transformation's inherited suffix family and
   prepending its normalized local clause route preserves the inherited
   variable-side terminal direction.
+  [`LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirectionTransport.lean`](LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirectionTransport.lean)
+  combines those splice lemmas with exact selector provenance to prove the
+  concrete terminal-direction preservation hypotheses used by the abstract
+  occurrence-order transport theorem for both transformations.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean)
   proves that every ternary output clause starts its literal-indexed routes
   toward south, west, and east.  Anchor normalization and arbitrary inherited
