@@ -1965,6 +1965,13 @@ The representation choices for this target are:
   without duplicates; their outgoing or incoming cardinal directions are
   proved genuine and pairwise distinct.  Variable families are additionally
   bounded by the three available occurrence slots.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonLaneAssignment.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonLaneAssignment.lean)
+  separates semantic 3DM colors from the three physical tracks of a source
+  ribbon.  The fixed-red, fixed-blue, and fixed-green connector kinds select
+  the three cyclic lane permutations required by the top, left, and right
+  clause terminals.  The assignment is proved bijective, puts every
+  connector's fixed color on the outermost lane, and makes all three clause
+  attachment orders agree with one uniform physical-lane order.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanFinite.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanFinite.lean)
   erases one variable endpoint neighborhood to its finite connector kinds,
   polarities, and outgoing cardinal directions, while retaining its exact
