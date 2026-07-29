@@ -1582,6 +1582,13 @@ The representation choices for this target are:
   limits the three-point route requirement to embedded source variables, so
   the final retained unit-free routes satisfy the variable-fan rotation
   premise used by the planar 3DM ribbon construction.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsRibbonOrders.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsRibbonOrders.lean)
+  pairs that variable rotation with the canonical ternary clause-exit order
+  supplied by unit elimination, and records the final width-three bound.
+  Together with the existing occurrence-three and arity promises, this gives
+  every discrete premise of the generic coordinated source-fan theorem;
+  constructing the halo-bounded ribbon-ready presentation is now the
+  remaining geometric obligation.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean)
   names the normalized periodic 3DM target of the retained fixed-eight
   exact-one pipeline.  It proves the target well-formed, proves that every
