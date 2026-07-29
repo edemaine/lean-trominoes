@@ -2664,6 +2664,12 @@ The representation choices for this target are:
   index, and external shift, hence equality of the original occurrence keys.
   The resulting transfer theorem turns any first-source orbit condition into
   continuous separation by finite retained planarity.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointReindexingInjectivity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointReindexingInjectivity.lean)
+  proves the corresponding identity theorem for route points.  The
+  first-segment witness recovers the original route and external shift, while
+  the retained point index completes the occurrence key; consequently any
+  first-source orbit condition transfers finite endpoint-only contact to the
+  original periodic pair.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean)
   packages the common aligned-component case.  When translating the first
   source by the physical-shift difference identifies the second retained
