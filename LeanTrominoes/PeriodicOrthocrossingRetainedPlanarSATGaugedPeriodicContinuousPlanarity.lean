@@ -94,6 +94,85 @@ theorem
           site armIndex arm routedLink localClauseIndex sourceEq
           occurrence occurrenceMember linkFirstEq
 
+/-- A final carrier occurrence's relative interior avoids every closed final
+noncarrier occurrence. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_carrier_noncarrier
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    (firstMember :
+      firstIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    ¬(secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).Contains point := by
+  generalize sourceEq :
+    second.routeWitness.metadata.source = source
+  cases source with
+  | crossover crossing localClauseIndex =>
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_carrier_crossover
+          formula wellFormed degree isLocal first second
+          link firstComponentEq crossing localClauseIndex sourceEq
+          firstContains
+  | carrier secondLink localClauseIndex =>
+      exact False.elim
+        (secondNotCarrier
+          ⟨secondLink, by
+            rw [sourceEq]
+            rfl⟩)
+  | bend routeBend localClauseIndex =>
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_carrier_bend
+          formula wellFormed degree isLocal first second
+          link firstComponentEq routeBend localClauseIndex sourceEq
+          firstContains
+  | routedClause site =>
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_carrier_routedClause
+          formula wellFormed degree isLocal clausesNonempty
+          firstMember first second link firstComponentEq site sourceEq
+          firstContains
+  | routedVariable site armIndex arm routedLink localClauseIndex =>
+      have sourceMember := second.source_retainedComponentMember
+      rw [sourceEq] at sourceMember
+      rcases
+          exists_routeOccurrence_of_routedVariableLinkMember
+            formula site sourceMember.2.1 with
+        ⟨occurrence, occurrenceMember, linkFirstEq⟩
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_carrier_routedVariable
+          formula wellFormed degree isLocal first second
+          link firstComponentEq
+          site armIndex arm routedLink localClauseIndex sourceEq
+          occurrence occurrenceMember linkFirstEq firstContains
+
 /-- Every pair of distinct final segment occurrences has disjoint relative
 interiors. -/
 theorem
