@@ -228,5 +228,78 @@ theorem
   · simpa only [reindexShift] using routeAvoid
   · exact firstContains
 
+/-- Final carrier occurrences on different aligned physical keys and a
+common source axis also satisfy endpoint separation. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carriers_parallel_key_ne
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstLink secondLink : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier firstLink)
+    (secondComponentEq :
+      second.routeWitness.metadata.source.component = .carrier secondLink)
+    (notPerpendicular :
+      ¬CarrierLinksPerpendicular
+        (carrierLinkPeriodTranslate formula.incidenceGraph firstLink
+          (Cell.sub first.physicalShift second.physicalShift))
+        secondLink)
+    (keyDifferent :
+      (carrierLinkPeriodTranslate formula.incidenceGraph firstLink
+        (Cell.sub first.physicalShift
+          second.physicalShift)).first.carrierKey ≠
+        secondLink.first.carrierKey)
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  let reindexShift :=
+    Cell.sub first.physicalShift second.physicalShift
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq firstLink firstComponentEq with
+    ⟨firstClauseIndex, firstSourceEq⟩
+  rcases
+      second.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq secondLink secondComponentEq with
+    ⟨secondClauseIndex, secondSourceEq⟩
+  have routeAvoid :=
+    first.routeWitness.metadata
+      |>.periodTranslate_localRoutes_avoidEachOther_of_carrier_parallel_key_ne
+        wellFormed degree isLocal second.routeWitness.metadata
+        first.metadata_retainedValid second.metadata_retainedValid
+        reindexShift firstLink secondLink
+        firstClauseIndex secondClauseIndex
+        firstSourceEq secondSourceEq
+        (by simpa only [reindexShift] using notPerpendicular)
+        (by simpa only [reindexShift] using keyDifferent)
+        first.routeWitness.literalMember
+        second.routeWitness.literalMember
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_periodTranslate_localRoutesAvoidEachOther
+      formula first second
+  · simpa only [reindexShift] using routeAvoid
+  · exact firstContains
+
 end PeriodicOrthocrossing
 end LeanTrominoes
