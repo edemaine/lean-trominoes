@@ -1674,6 +1674,11 @@ The representation choices for this target are:
   that its backwards terminal vector belongs to the exact eleven-direction
   vocabulary.  This supplies the finite angular data needed to construct the
   local order-preserving adapter into Figure 7's consecutive compass gates.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirectionOrder.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirectionOrder.lean)
+  attaches that eleven-direction classification to every genuine occurrence
+  and every indexed entry of the retained angular occurrence lists.  Earlier
+  entries receive nondecreasing east-first direction ranks, exposing the
+  order-preserving boundary correspondence needed by the local adapter.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
