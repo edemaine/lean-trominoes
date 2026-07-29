@@ -172,5 +172,78 @@ theorem
       ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
         formula).translation commonShift)).mp meet)
 
+/-- Two distinct finite retained segments represented at one common shift
+also satisfy the asymmetric interior-versus-closed avoidance condition in
+the final periodic lift. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_commonShiftRepresentatives_avoidsInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift commonShift : Cell}
+    (first :
+      FinalGaugedSegmentCommonShiftRepresentative
+        formula firstIndexed firstShift commonShift)
+    (second :
+      FinalGaugedSegmentCommonShiftRepresentative
+        formula secondIndexed secondShift commonShift)
+    (finiteDifferent :
+      first.physicalIncidenceIndex ≠
+          second.physicalIncidenceIndex ∨
+        firstIndexed.segmentIndex ≠
+          secondIndexed.segmentIndex)
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    ¬(secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).Contains point := by
+  have rawPhysicalAvoid :
+      ∀ {rawPoint : Cell},
+        first.physicalSegment.InteriorContains rawPoint →
+          ¬second.physicalSegment.Contains rawPoint :=
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.taggedSegments_avoidsInterior
+      (retainedDrawingPlanarSATLocalIncidenceDrawing formula)
+      (retainedDrawingPlanarSATLocalIncidenceDrawing_isPlanar
+        formula wellFormed degree isLocal clausesNonempty)
+      first.physicalIncidenceMember
+      second.physicalIncidenceMember
+      first.physicalSegmentMember
+      second.physicalSegmentMember
+      finiteDifferent
+  intro secondContains
+  rw [first.segmentEq] at firstContains
+  rw [second.segmentEq] at secondContains
+  let offset :=
+    (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+      formula).translation commonShift
+  let normalizedPoint := Cell.sub point offset
+  have normalizedFirst :
+      first.physicalSegment.InteriorContains normalizedPoint := by
+    apply
+      (PeriodicGridDrawing.interiorContains_translate_iff
+        first.physicalSegment offset normalizedPoint).mp
+    simpa [offset, normalizedPoint, Cell.add, Cell.sub] using
+      firstContains
+  have normalizedSecond :
+      second.physicalSegment.Contains normalizedPoint := by
+    apply
+      (PeriodicGridDrawing.contains_translate_iff
+        second.physicalSegment offset normalizedPoint).mp
+    simpa [offset, normalizedPoint, Cell.add, Cell.sub] using
+      secondContains
+  exact rawPhysicalAvoid normalizedFirst normalizedSecond
+
 end PeriodicOrthocrossing
 end LeanTrominoes

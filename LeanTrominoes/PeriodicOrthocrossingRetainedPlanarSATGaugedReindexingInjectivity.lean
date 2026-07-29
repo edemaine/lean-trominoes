@@ -398,6 +398,72 @@ theorem
             finiteDifferent_of_segmentOccurrenceKey_ne
               second reindexing sourceClauseNonempty different)
 
+/-- Reindexing a distinct first occurrence to the second occurrence's
+physical shift transfers finite asymmetric interior avoidance back to the
+original periodic pair. -/
+theorem
+    FinalGaugedSegmentMetadataReindexing.avoidsInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      formula.incidenceGraph.IsWellFormed)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal :
+      formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    {first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift}
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (reindexing :
+      FinalGaugedSegmentMetadataReindexing first
+        (Cell.sub first.physicalShift second.physicalShift))
+    (sourceClauseNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [])
+    (different :
+      PeriodicGridDrawing.SegmentOccurrenceKey
+          firstIndexed firstShift ≠
+        PeriodicGridDrawing.SegmentOccurrenceKey
+          secondIndexed secondShift)
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    ¬(secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).Contains point := by
+  have commonShiftEq :
+      Cell.sub first.physicalShift
+          (Cell.sub first.physicalShift second.physicalShift) =
+        second.physicalShift := by
+    rcases first.physicalShift with ⟨firstX, firstY⟩
+    rcases second.physicalShift with ⟨secondX, secondY⟩
+    simp [Cell.sub]
+  let firstRepresentative :=
+    castCommonShiftRepresentative commonShiftEq
+      reindexing.toCommonShiftRepresentative
+  exact
+    retainedDeduplicatedGaugedWrappedDrawing_commonShiftRepresentatives_avoidsInterior
+      formula wellFormed degree isLocal clausesNonempty
+      firstRepresentative
+      second.toCommonShiftRepresentative
+      (by
+        simpa only [firstRepresentative,
+          castCommonShiftRepresentative_physicalIncidenceIndex,
+          FinalGaugedSegmentOccurrenceWitness.toCommonShiftRepresentative]
+          using
+            finiteDifferent_of_segmentOccurrenceKey_ne
+              second reindexing sourceClauseNonempty different)
+      point firstContains
+
 /-- The uniform retained source-orbit condition is sufficient to transfer
 finite retained planarity to a distinct pair of final periodic segment
 occurrences. -/
@@ -470,6 +536,80 @@ theorem
       (clausesNonempty
         first.routeWitness.metadata.clause sourceClauseMember)
       different
+
+/-- The uniform retained source-orbit condition also transfers asymmetric
+interior-versus-closed avoidance to a distinct pair of final periodic
+segment occurrences. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_first_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      formula.incidenceGraph.IsWellFormed)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal :
+      formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (condition :
+      first.routeWitness.metadata.source.RetainedOrbitCondition
+        formula
+        (Cell.sub first.physicalShift second.physicalShift))
+    (different :
+      PeriodicGridDrawing.SegmentOccurrenceKey
+          firstIndexed firstShift ≠
+        PeriodicGridDrawing.SegmentOccurrenceKey
+          secondIndexed secondShift)
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    ¬(secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).Contains point := by
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_retainedTarget_periodTranslate
+          formula degree first.source_retainedComponentMember
+          (Cell.sub first.physicalShift second.physicalShift)
+          condition with
+    ⟨targetSource, targetMember,
+      targetComponentEq, targetLocalClauseIndexEq⟩
+  rcases first.exists_metadataReindexing_of_targetSource
+      targetSource targetMember targetComponentEq
+      targetLocalClauseIndexEq with
+    ⟨reindexing⟩
+  have sourceMetadataMember :
+      first.routeWitness.metadata ∈
+        retainedDrawingPlanarSATClauseMetadata formula :=
+    List.mem_iff_getElem?.mpr
+      ⟨first.routeWitness.metadataIndex,
+        first.routeWitness.metadataLookup⟩
+  have sourceClauseMember :
+      first.routeWitness.metadata.clause ∈
+        retainedDrawingPlanarSATFormula formula := by
+    rw [← retainedDrawingPlanarSATClauseMetadata_clauses]
+    exact List.mem_map.mpr
+      ⟨first.routeWitness.metadata,
+        sourceMetadataMember, rfl⟩
+  exact
+    FinalGaugedSegmentMetadataReindexing.avoidsInterior
+      formula wellFormed degree isLocal clausesNonempty
+      second reindexing
+      (clausesNonempty
+        first.routeWitness.metadata.clause sourceClauseMember)
+      different point firstContains
 
 end PeriodicOrthocrossing
 end LeanTrominoes
