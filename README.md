@@ -2736,6 +2736,11 @@ The representation choices for this target are:
   at every block translate.  Alternating those equalities with retained
   segment propagation proves that the first and last terminals of every
   neighboring constructed incidence route have one value.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedVariableSoundness.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedVariableSoundness.lean)
+  specializes complete-route propagation to every metadata-rich CNF
+  incidence occurrence.  Under the occurrence-three premise, the unchanged
+  variable duplicator then equates each routed clause terminal with the
+  corresponding central periodic atom occurrence.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
