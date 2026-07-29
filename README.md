@@ -1972,6 +1972,14 @@ The representation choices for this target are:
   old independently selected green and blue elbows already cross, so the
   remaining fan construction must coordinate colors even before coordinating
   distinct occurrences.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableLocalGates.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableLocalGates.lean)
+  coordinates each of the six variable connector patterns into the same
+  kind-independent RGB gate triple above its occurrence slot.  Exhaustive
+  finite certificates prove exact port and gate endpoints, rectilinearity,
+  standard-macrocell containment, and strict separation across every choice
+  of colors and active slot patterns.  The remaining variable-side task is
+  therefore reduced to connecting these standardized gates to the distinct
+  direction-dependent ribbon exits.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
