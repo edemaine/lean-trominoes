@@ -2036,6 +2036,12 @@ The representation choices for this target are:
   occurrence.  It proves that the record has exactly the source variable's
   active prefix and agrees with the source connector kind, literal polarity,
   and outgoing incidence direction on every active occurrence slot.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableFanOrder.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableFanOrder.lean)
+  identifies the finite fan's active prefix with the source occurrence
+  prefix and reifies each active slot as its actual occurrence.  Source
+  planarity then supplies genuine, pairwise distinct directions
+  automatically, reducing variable-fan compatibility to the one clockwise
+  condition for variables with exactly three occurrences.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFans.lean)
   instantiates the finite clause-fan record from all source occurrences
   entering one lifted clause target.  It detects the optional right terminal,

@@ -55,6 +55,16 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 
 namespace VariableOuterFanData
 
+/-- The slot-indexed validity predicate is equivalently genuine,
+duplicate-free membership of the displayed active direction list. -/
+theorem isValid_iff_activeDirections
+    (data : VariableOuterFanData) :
+    data.IsValid ↔
+      (∀ direction ∈ data.activeDirections,
+          direction.IsGenuine) ∧
+        data.activeDirections.Nodup := by
+  native_decide +revert
+
 /-- Membership in the 28-entry variable-fan table is exactly validity plus
 the one cyclic-order condition needed in the three-slot case. -/
 theorem isClockwiseCompatible_iff
