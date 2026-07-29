@@ -1580,6 +1580,13 @@ The representation choices for this target are:
   translation and logical renaming in both directions, and has a
   membership-style interface.  The direct routed-clause star is certified
   separately from its three exceptional primitive vectors.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalRetainedRays.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalRetainedRays.lean)
+  proves the combined certificate for every metadata-selected local
+  planar-SAT component.  Carrier lenses and bend corners inherit
+  orthogonality, crossovers and variable arms inherit their compass
+  certificates, and routed clauses use the three exceptional slopes; the
+  cases assemble into a certificate for the complete retained finite
+  incidence drawing.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
