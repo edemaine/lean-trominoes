@@ -2713,6 +2713,10 @@ The representation choices for this target are:
   noncarrier--noncarrier cases.  The complete final periodic incidence
   drawing consequently satisfies `RoutePointsMeetOnlyAtEndpoints`, ruling
   out hidden bend crossings before ribbon thickening.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRibbonReady.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRibbonReady.lean)
+  combines continuous planarity with endpoint-only route-point contacts.
+  Thus the complete final gauged periodic incidence drawing satisfies
+  `IsRibbonReady`, the geometric interface consumed by ribbon thickening.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
