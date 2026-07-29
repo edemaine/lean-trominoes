@@ -1552,6 +1552,15 @@ The representation choices for this target are:
   joins those segment rasterizations along an arbitrary octilinear polyline.
   It preserves both outer endpoints, yields a certified orthogonal route, and
   lifts uniformly to scaled incidence-route families.
+- [`LeanTrominoes/OctilinearEmbeddedCNFIncidenceDrawing.lean`](LeanTrominoes/OctilinearEmbeddedCNFIncidenceDrawing.lean)
+  packages octilinearity for every genuine route of a finite embedded CNF.
+  The certificate follows automatically from orthogonality, follows for a
+  direct drawing from its eight-direction terminal certificate, and is
+  preserved in both directions by logical renaming and by coordinate
+  translation.  This covers retained carriers, bends, crossovers, and
+  variable arms.  Routed source-clause rays additionally use three fixed
+  non-compass slopes, which the next rasterization layer must handle
+  explicitly.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
