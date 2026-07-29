@@ -346,6 +346,73 @@ theorem liftedDrawingVertexPosition_translate_neighbor_of_macrocellSegment_meets
       macrocellStart macrocellFinish rectanglesSeparated)
       meet
 
+/-- Translation by a fixed cell is injective on grid segments. -/
+theorem GridSegment.translate_injective (offset : Cell) :
+    Function.Injective (fun segment : GridSegment =>
+      segment.translate offset) := by
+  intro first second translatedEq
+  rcases first with
+    ⟨⟨firstStartX, firstStartY⟩,
+      ⟨firstFinishX, firstFinishY⟩⟩
+  rcases second with
+    ⟨⟨secondStartX, secondStartY⟩,
+      ⟨secondFinishX, secondFinishY⟩⟩
+  rcases offset with ⟨offsetX, offsetY⟩
+  simp only [GridSegment.translate, Cell.add,
+    GridSegment.mk.injEq, Prod.mk.injEq] at translatedEq ⊢
+  omega
+
+/-- The final indexed carrier segment is already the finite physical
+segment with its source clause anchor removed.  This is the source
+normalization whose endpoints retain the final expanded-square bound. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.indexedSegment_eq_anchorNormalizedPhysical
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift : Cell}
+    (witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift) :
+    indexed.segment =
+      witness.physicalSegment.translate
+        (carrierMacroPeriodTranslation formula.incidenceGraph
+          (Cell.neg witness.sourceClauseAnchor)) := by
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  have sourceShiftEq :
+      Cell.sub witness.physicalShift shift =
+        Cell.neg witness.sourceClauseAnchor := by
+    rcases shift with ⟨shiftX, shiftY⟩
+    simp [FinalGaugedSegmentOccurrenceWitness.physicalShift_eq,
+      Cell.sub, Cell.neg]
+  have normalizedThenShift :=
+    segment_translate_placement_sub_add
+      placement witness.physicalSegment witness.physicalShift shift
+  rw [sourceShiftEq] at normalizedThenShift
+  have normalizedEq :
+      indexed.segment =
+        witness.physicalSegment.translate
+          (placement.translation
+            (Cell.neg witness.sourceClauseAnchor)) := by
+    apply GridSegment.translate_injective
+      (placement.translation shift)
+    change
+      indexed.segment.translate (placement.translation shift) =
+        (witness.physicalSegment.translate
+          (placement.translation
+            (Cell.neg witness.sourceClauseAnchor))).translate
+              (placement.translation shift)
+    rw [normalizedThenShift]
+    exact witness.segmentEq
+  have offsetEq :
+      placement.translation
+          (Cell.neg witness.sourceClauseAnchor) =
+        carrierMacroPeriodTranslation formula.incidenceGraph
+          (Cell.neg witness.sourceClauseAnchor) :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+      formula (Cell.neg witness.sourceClauseAnchor)
+  simpa only [offsetEq] using normalizedEq
+
 /-- Undo the two quotient gauges in a final contact, then cancel the carrier's
 common physical translate.  The result is a contact between the carrier's
 original finite segment and the noncarrier segment translated by exactly the
@@ -420,6 +487,106 @@ theorem
     retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
       formula sourceShift
   simpa only [sourceShift, offsetEq] using aligned
+
+/-- Cancel the carrier's final lattice translate while keeping its indexed
+segment anchor-normalized.  The other physical source is then shifted by its
+physical shift minus the carrier's final shift. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.anchorAlignedPhysical_interiorsMeet_of_final
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (meet :
+      GridSegment.InteriorsMeet
+        (firstIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation firstShift))
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift))) :
+    GridSegment.InteriorsMeet
+      firstIndexed.segment
+      (second.physicalSegment.translate
+        (carrierMacroPeriodTranslation formula.incidenceGraph
+          (Cell.sub second.physicalShift firstShift))) := by
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  let relativePhysicalShift :=
+    Cell.sub second.physicalShift first.physicalShift
+  let anchorShift := Cell.neg first.sourceClauseAnchor
+  let targetShift := Cell.sub second.physicalShift firstShift
+  have alignedPhysical :
+      GridSegment.InteriorsMeet
+        first.physicalSegment
+        (second.physicalSegment.translate
+          (placement.translation relativePhysicalShift)) := by
+    have aligned :=
+      first.alignedPhysicalSegments_interiorsMeet_of_final second meet
+    have offsetEq :
+        placement.translation relativePhysicalShift =
+          carrierMacroPeriodTranslation formula.incidenceGraph
+            relativePhysicalShift :=
+      retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula relativePhysicalShift
+    simpa only [relativePhysicalShift, offsetEq] using aligned
+  have shiftedMeet :
+      GridSegment.InteriorsMeet
+        (first.physicalSegment.translate
+          (placement.translation anchorShift))
+        ((second.physicalSegment.translate
+          (placement.translation relativePhysicalShift)).translate
+            (placement.translation anchorShift)) :=
+    (GridSegment.interiorsMeet_translate_both_iff
+      first.physicalSegment
+      (second.physicalSegment.translate
+        (placement.translation relativePhysicalShift))
+      (placement.translation anchorShift)).mpr alignedPhysical
+  have relativeShiftEq :
+      Cell.sub targetShift anchorShift = relativePhysicalShift := by
+    rcases firstShift with ⟨firstX, firstY⟩
+    rcases second.physicalShift with ⟨secondX, secondY⟩
+    rcases first.sourceClauseAnchor with ⟨anchorX, anchorY⟩
+    simp only [targetShift, anchorShift, relativePhysicalShift,
+      FinalGaugedSegmentOccurrenceWitness.physicalShift_eq,
+      Cell.sub, Cell.neg, Prod.mk.injEq]
+    constructor <;> ring
+  have secondShiftedEq :
+      (second.physicalSegment.translate
+        (placement.translation relativePhysicalShift)).translate
+          (placement.translation anchorShift) =
+        second.physicalSegment.translate
+          (placement.translation targetShift) := by
+    have translated :=
+      segment_translate_placement_sub_add
+        placement second.physicalSegment targetShift anchorShift
+    rwa [relativeShiftEq] at translated
+  have firstEq :
+      first.physicalSegment.translate
+          (placement.translation anchorShift) =
+        firstIndexed.segment := by
+    rw [first.indexedSegment_eq_anchorNormalizedPhysical]
+    have offsetEq :
+        placement.translation anchorShift =
+          carrierMacroPeriodTranslation formula.incidenceGraph
+            anchorShift :=
+      retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula anchorShift
+    simp only [anchorShift, offsetEq]
+  have targetOffsetEq :
+      placement.translation targetShift =
+        carrierMacroPeriodTranslation formula.incidenceGraph
+          targetShift :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+      formula targetShift
+  simpa only [firstEq, secondShiftedEq, targetShift,
+    targetOffsetEq] using shiftedMeet
 
 /-- A retained carrier metadata source supplies the raw-link membership and
 neighboring first occurrence required by the finite carrier separation API. -/
