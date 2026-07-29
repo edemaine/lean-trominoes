@@ -71,5 +71,30 @@ theorem exists_commonRoute_of_mem_indexedSegments_of_routeIndex_eq
     ⟨firstRoute, firstRouteMember,
       firstSegmentMember, secondSegmentMember⟩
 
+/-- The route and within-route indices uniquely determine a member of the
+global indexed-segment list. -/
+theorem eq_of_mem_indexedSegments_of_indices_eq
+    {drawing : PeriodicGridDrawing}
+    {first second : IndexedGridSegment}
+    (firstMember : first ∈ drawing.indexedSegments)
+    (secondMember : second ∈ drawing.indexedSegments)
+    (routeIndexEq : first.routeIndex = second.routeIndex)
+    (segmentIndexEq : first.segmentIndex = second.segmentIndex) :
+    first = second := by
+  rcases
+      exists_commonRoute_of_mem_indexedSegments_of_routeIndex_eq
+        firstMember secondMember routeIndexEq with
+    ⟨route, _, firstSegmentMember, secondSegmentMember⟩
+  have firstLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp firstSegmentMember
+  have secondLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp secondSegmentMember
+  have segmentEq : first.segment = second.segment := by
+    rw [segmentIndexEq, secondLookup] at firstLookup
+    exact Option.some.inj firstLookup.symm
+  cases first
+  cases second
+  simp_all
+
 end PeriodicGridDrawing
 end LeanTrominoes
