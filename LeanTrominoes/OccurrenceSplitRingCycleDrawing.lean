@@ -65,7 +65,7 @@ def periodicCycleClause
       (0, 0), literal.2⟩
 
 /-- The semantic separator implication cycle is exactly the erased local
-cycle template in its deliberately reversed presentation. -/
+cycle template in its separator-cut presentation. -/
 theorem cycleClausesFor_eq_cycleFormula
     {Variable : Type*} (atom : Variable) :
     PeriodicEightOccurrenceSplit.cycleClausesFor atom =

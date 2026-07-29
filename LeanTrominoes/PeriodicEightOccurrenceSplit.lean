@@ -109,13 +109,13 @@ def occurrenceClauses {Variable : Type*}
   source.clauses.zipIdx.map fun taggedClause =>
     occurrenceClause occurrencePorts taggedClause.2 taggedClause.1
 
-/-- The full separator implication cycle of one source atom.  Reversing its
-clause presentation makes the outgoing clockwise implication precede the
-incoming implication at every real source port. -/
+/-- The full separator implication cycle of one source atom.  Its cut
+presentation makes the incoming implication precede the outgoing implication
+at every real source port. -/
 def cycleClausesFor {Variable : Type*}
     (atom : Variable) :
     List (PeriodicClause (ThreeOccurrenceVariable Variable)) :=
-  (PeriodicThreeSATThree.cycleClauses (copies atom)).reverse
+  PeriodicThreeSATThree.cycleClauses (copies atom)
 
 /-- One fixed implication ring for every source atom that occurs. -/
 def allCycleClauses {Variable : Type*} [DecidableEq Variable]
@@ -183,8 +183,7 @@ theorem cycleClausesFor_areLocal
   intro clause clauseMember
   exact
     PeriodicThreeSATThree.cycleClauses_areLocal
-      (copies atom) clause
-      (List.mem_reverse.mp clauseMember)
+      (copies atom) clause clauseMember
 
 /-- Fixed-eight occurrence splitting preserves the paper's locality
 condition. -/
@@ -219,8 +218,7 @@ theorem cycleClausesFor_widthAtMostThree
   intro clause clauseMember
   exact
     PeriodicThreeSATThree.cycleClauses_widthAtMostThree
-      (copies atom) clause
-      (List.mem_reverse.mp clauseMember)
+      (copies atom) clause clauseMember
 
 /-- Fixed-eight occurrence splitting preserves a width-three bound. -/
 theorem formula_widthAtMostThree
@@ -335,15 +333,11 @@ theorem cycleClausesFor_complete
           assignment cell atom first first rest
           firstOriginal firstOriginal restOriginal
       intro clause clauseMember
-      have clauseMember' :
-          clause ∈
-            (PeriodicThreeSATThree.cycleFrom
-              first first rest).reverse := by
-        simpa [cycleClausesFor, copiesEqual,
-          PeriodicThreeSATThree.cycleClauses] using
-          clauseMember
       exact complete clause
-        (List.mem_reverse.mp clauseMember')
+        (by
+          simpa [cycleClausesFor, copiesEqual,
+            PeriodicThreeSATThree.cycleClauses] using
+            clauseMember)
 
 /-- Extending any satisfying source assignment satisfies the complete
 fixed-slot split. -/
@@ -423,8 +417,7 @@ theorem restrictAssignment_eq_copy
         exact
           ⟨atom, atomMember,
             by
-              apply List.mem_reverse.mpr
-              simpa [copiesEqual] using clauseMember⟩
+              simpa [cycleClausesFor, copiesEqual] using clauseMember⟩
       have occurrenceEqualFirst :=
         PeriodicThreeSATThree.cycleClauses_value_eq_first
           assignment cell first rest cycleSatisfies

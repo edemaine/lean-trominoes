@@ -98,19 +98,6 @@ theorem copies_nodup {Variable : Type*} (atom : Variable) :
     native_decide
   exact verticesNodup.map (ringCopy_injective atom)
 
-/-- Reversing the outer clause list merely permutes the flattened variable
-occurrence list. -/
-theorem variableOccurrences_reverse_perm
-    {Variable : Type*}
-    (clauses : List (PeriodicClause Variable)) :
-    List.Perm
-      (PeriodicCNF.variableOccurrences
-        (PeriodicCNF.mk clauses.reverse))
-      (PeriodicCNF.variableOccurrences
-        (PeriodicCNF.mk clauses)) := by
-  unfold PeriodicCNF.variableOccurrences
-  exact (List.reverse_perm clauses).flatMap_right _
-
 /-- Every literal in one fixed implication ring belongs to the atom whose
 copy list generated that ring. -/
 theorem cycleClausesFor_occurrences_fst
@@ -135,24 +122,15 @@ theorem cycleClausesFor_occurrences_fst
           (copiesEqual ▸
             List.mem_cons_of_mem first occurrenceMember)
       intro occurrence occurrenceMember
-      have occurrenceMember' :
-          occurrence ∈
-            PeriodicCNF.variableOccurrences
-              (PeriodicCNF.mk
-                (PeriodicThreeSATThree.cycleFrom
-                  first first rest)) := by
-        apply
-          (variableOccurrences_reverse_perm
-            (PeriodicThreeSATThree.cycleFrom
-              first first rest)).mem_iff.mp
-        simpa [cycleClausesFor, copiesEqual,
-          PeriodicThreeSATThree.cycleClauses] using
-          occurrenceMember
       exact
         PeriodicThreeSATThree.cycleFrom_occurrences_fst
           atom first first rest
           firstOriginal firstOriginal restOriginal
-          occurrence occurrenceMember'
+          occurrence
+          (by
+            simpa [cycleClausesFor, copiesEqual,
+              PeriodicThreeSATThree.cycleClauses] using
+              occurrenceMember)
 
 /-- A copy belonging to another source atom has count zero in this ring. -/
 theorem cycleClausesFor_count_eq_zero_of_fst_ne
@@ -197,9 +175,6 @@ theorem cyclesFor_count_le
               (PeriodicCNF.mk
                 (cycleClausesFor atom))).count occurrence ≤ 2 := by
           rw [cycleClausesFor]
-          rw [(variableOccurrences_reverse_perm
-            (PeriodicThreeSATThree.cycleClauses
-              (copies atom))).count occurrence]
           exact
             PeriodicThreeSATThree.cycleClauses_count_le_two
               (copies atom) (copies_nodup atom) occurrence

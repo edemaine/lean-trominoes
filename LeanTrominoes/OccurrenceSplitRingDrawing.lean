@@ -11,10 +11,11 @@ incidences, so its degree is three.
 The semantic occurrence order consumed later by the 3DM construction is
 linear, whereas the implication ring is cyclic.  We therefore insert one
 degree-two separator copy between the northeast and east source ports.  It
-is the unique cut in the reversed implication-clause presentation: at every
-real port, the copied source incidence is followed by the clockwise and then
-counterclockwise ring incidences.  This remains a constant-size version of
-Figure 7 and works even when all eight source ports are occupied.
+is the unique cut in the implication-clause presentation: at every real
+port, the copied source incidence is followed by the incoming and then
+outgoing ring incidences.  In the drawing's axis convention these three
+terminal directions are clockwise.  This remains a constant-size version
+of Figure 7 and works even when all eight source ports are occupied.
 
 This file records the resulting worst-case local geometry explicitly.
 Diagonal old rays enter the corner copies through an L-shaped orthogonal
@@ -81,11 +82,11 @@ def RingVertex.next : RingVertex → RingVertex
   | .port .north => .port .northeast
   | .port .northeast => .separator
 
-/-- Clause presentation reverses the directed cycle.  Thus the outgoing
-clockwise implication is encountered before the incoming one at every real
-port; only the degree-two separator straddles the list boundary. -/
+/-- Clause presentation follows the directed cycle from its separator cut.
+Thus the incoming implication is encountered before the outgoing one at
+every real port; only the degree-two separator straddles the list boundary. -/
 def presentedCycleVertices : List RingVertex :=
-  cycleVertices.reverse
+  cycleVertices
 
 /-- Occurrence-copy positions on the boundary of the inner square, after a
 factor-two refinement that makes room for the separator. -/
@@ -140,7 +141,7 @@ def cycleClause (vertex : RingVertex) : EmbeddedClause RingVertex where
   position := cycleClausePosition vertex
   literals := [(vertex, false), (vertex.next, true)]
 
-/-- Reversed presentation of the nine implication clauses. -/
+/-- Separator-cut presentation of the nine implication clauses. -/
 def cycleFormula : List (EmbeddedClause RingVertex) :=
   presentedCycleVertices.map cycleClause
 

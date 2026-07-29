@@ -1690,10 +1690,11 @@ The representation choices for this target are:
   encodes the worst-case degree-eight neighborhood of Figure 7.  Eight
   source-port copies and one degree-two separator lie on an inner square,
   nine implication clauses occupy their cyclic gaps, and the four diagonal
-  old rays bend outside the ring.  The separator cuts the reversed clause
-  presentation so that every real degree-three copy has its copied source
-  occurrence first, its clockwise ring edge second, and its counterclockwise
-  ring edge third.  Finite computation certifies all 26 incidences
+  old rays bend outside the ring.  The separator cuts the clause presentation
+  so that every real degree-three copy has its copied source occurrence
+  first, its incoming ring edge second, and its outgoing ring edge third;
+  their terminal directions are clockwise in Lean's axis convention.
+  Finite computation certifies all 26 incidences
   simultaneously: exact endpoints, orthogonality, and continuous planarity.
   This is the local kernel for the geometry-ordered occurrence-splitting
   substitution.
@@ -3294,6 +3295,12 @@ The representation choices for this target are:
   the semantic fixed-eight cycle for any renamed source atom.  A general
   translation-invariance theorem for embedded CNF drawings then places this
   complete certificate at every input-dependent ring macrocell.
+- [`LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean`](LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean)
+  filters the local implication incidences at each ring vertex in syntactic
+  order.  Every real port has exactly two cycle incidences, the separator
+  remains degree two, and finite computation certifies that a port's source
+  spoke followed by those two incidences leaves the variable in clockwise
+  cardinal order.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleDrawing.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleDrawing.lean)
   identifies each positioned atom cycle definitionally with that translated
   template: local compass ports are renamed to the corresponding fixed
