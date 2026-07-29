@@ -1988,6 +1988,14 @@ The representation choices for this target are:
   macrocell and protected-frame bounds, and strict separation of every pair
   of active colored strands.  This makes the required cyclic-order invariant
   explicit at the remaining source-presentation boundary.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean)
+  joins each connector-dependent gate route to its selected cyclic outer
+  route.  Finite interface checks show that the two pieces meet only at the
+  advertised gate and that different pieces are contact-free; the resulting
+  complete variable stubs have exact gadget-port and ribbon-exit endpoints,
+  are rectilinear, bounded, simple, and pairwise strictly separated.  Their
+  sole remaining premise is the now-explicit clockwise compatibility of the
+  source occurrence directions.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
