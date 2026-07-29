@@ -1548,6 +1548,10 @@ The representation choices for this target are:
   rasterization.  Axis rays remain direct and diagonal rays alternate unit
   horizontal and vertical steps; Lean proves exact endpoints, preservation
   of the compass classification, and orthogonality for all eight directions.
+- [`LeanTrominoes/OctilinearPolylineRasterization.lean`](LeanTrominoes/OctilinearPolylineRasterization.lean)
+  joins those segment rasterizations along an arbitrary octilinear polyline.
+  It preserves both outer endpoints, yields a certified orthogonal route, and
+  lifts uniformly to scaled incidence-route families.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
