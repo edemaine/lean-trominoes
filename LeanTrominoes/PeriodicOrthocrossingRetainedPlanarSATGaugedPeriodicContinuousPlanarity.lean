@@ -2,6 +2,8 @@ import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierNoncarri
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierParallelSeparation
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedCarrierPerpendicularSeparation
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierPeriodicSeparation
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedDrawingCompatibility
+import LeanTrominoes.PeriodicCNFIncidenceVertexCoverage
 
 /-!
 # Continuous planarity of the final gauged periodic drawing
@@ -17,6 +19,154 @@ namespace PeriodicOrthocrossing
 open PlanarThreeSAT
 
 set_option maxHeartbeats 1200000
+
+private theorem wrapPeriodicPlanarSATFormula_clausesNonempty
+    {Original : Type*}
+    (source : PeriodicCNF Original)
+    (clausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause ∈ (wrapPeriodicPlanarSATFormula source).clauses,
+      clause ≠ [] := by
+  intro clause clauseMember
+  unfold wrapPeriodicPlanarSATFormula at clauseMember
+  rcases List.mem_map.mp clauseMember with
+    ⟨sourceClause, sourceClauseMember, rfl⟩
+  intro empty
+  apply clausesNonempty sourceClause sourceClauseMember
+  apply List.length_eq_zero_iff.mp
+  have lengthZero := congrArg List.length empty
+  simpa [wrapPeriodicPlanarSATClause] using lengthZero
+
+private theorem PeriodicCNF.variableGauge_clausesNonempty
+    {Variable : Type*}
+    (source : PeriodicCNF Variable)
+    (gauge : Variable → Cell)
+    (clausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause ∈ (source.variableGauge gauge).clauses,
+      clause ≠ [] := by
+  intro clause clauseMember
+  unfold PeriodicCNF.variableGauge at clauseMember
+  rcases List.mem_map.mp clauseMember with
+    ⟨sourceClause, sourceClauseMember, rfl⟩
+  intro empty
+  apply clausesNonempty sourceClause sourceClauseMember
+  apply List.length_eq_zero_iff.mp
+  have lengthZero := congrArg List.length empty
+  simpa using lengthZero
+
+private theorem PeriodicCNF.anchorNormalize_clausesNonempty
+    {Variable : Type*}
+    (source : PeriodicCNF Variable)
+    (clausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause ∈ source.anchorNormalize.clauses,
+      clause ≠ [] := by
+  intro clause clauseMember
+  unfold PeriodicCNF.anchorNormalize at clauseMember
+  rcases List.mem_map.mp clauseMember with
+    ⟨sourceClause, sourceClauseMember, rfl⟩
+  intro empty
+  apply clausesNonempty sourceClause sourceClauseMember
+  apply List.length_eq_zero_iff.mp
+  have lengthZero := congrArg List.length empty
+  simpa using lengthZero
+
+/-- The final gauging, anchor normalization, wrapping, and deduplication
+pipeline preserves nonemptiness of every retained clause. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_clausesNonempty
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    ∀ clause ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).erase.clauses,
+      clause ≠ [] := by
+  have periodicNonempty :
+      ∀ clause ∈
+          (retainedDrawingPeriodicPlanarSATFormula formula).clauses,
+        clause ≠ [] := by
+    intro clause clauseMember
+    unfold retainedDrawingPeriodicPlanarSATFormula at clauseMember
+    rcases List.mem_map.mp clauseMember with
+      ⟨embeddedClause, embeddedClauseMember, rfl⟩
+    intro empty
+    apply clausesNonempty embeddedClause embeddedClauseMember
+    apply List.length_eq_zero_iff.mp
+    have lengthZero := congrArg List.length empty
+    simpa [periodicizePlanarSATClause] using lengthZero
+  have wrappedNonempty :
+      ∀ clause ∈
+          (retainedWrappedDrawingPositionedPeriodicPlanarSATFormula
+            formula).erase.clauses,
+        clause ≠ [] := by
+    rw [retainedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
+    exact
+      wrapPeriodicPlanarSATFormula_clausesNonempty
+        (retainedDrawingPeriodicPlanarSATFormula formula)
+        periodicNonempty
+  have gaugedNonempty :
+      ∀ clause ∈
+          (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+            formula).erase.clauses,
+        clause ≠ [] := by
+    rw [retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula,
+      PositionedPeriodicCNF.erase_variableGauge]
+    exact
+      PeriodicCNF.variableGauge_clausesNonempty
+        (retainedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).erase
+        (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+        wrappedNonempty
+  have anchorNormalizedNonempty :
+      ∀ clause ∈
+          (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+            formula).erase.clauses,
+        clause ≠ [] := by
+    rw [
+      retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula,
+      PositionedPeriodicCNF.erase_anchorNormalize]
+    exact
+      PeriodicCNF.anchorNormalize_clausesNonempty
+        (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).erase
+        gaugedNonempty
+  intro clause clauseMember
+  apply anchorNormalizedNonempty clause
+  rw [
+    ← PositionedPeriodicCNF.clause_mem_erase_deduplicateByLiterals_iff,
+    ← retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+  exact clauseMember
+
+/-- Exact endpoints cover every graph vertex of the final gauged periodic
+incidence drawing. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_vertexPositionsCoveredBySegmentEndpoints
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+      formula).VertexPositionsCoveredBySegmentEndpoints := by
+  apply
+    PeriodicCNF.incidenceDrawing_vertexPositionsCoveredBySegmentEndpoints
+      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).erase
+      (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+        formula)
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_isCompatible
+        formula wellFormed degree isLocal clausesNonempty
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_clausesNonempty
+        formula clausesNonempty
 
 /-- A final carrier occurrence has disjoint interior from every final
 noncarrier occurrence. -/
