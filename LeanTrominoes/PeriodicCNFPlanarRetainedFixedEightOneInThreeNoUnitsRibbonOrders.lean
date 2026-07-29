@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsVariableRouteOrder
+import LeanTrominoes.PeriodicCNFPlanarRetainedFixedEightThreeDM
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanRouteOrder
 
 /-!
@@ -94,6 +95,103 @@ theorem
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
   · exact
+      retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_ternaryClauseRoutesInUnitEliminationOrder
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+
+/-- The retained variable-route order, transferred to an explicitly chosen
+decidable equality on the generated endpoint variables. -/
+theorem
+    retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_variableRoutesInOccurrenceOrderFor
+    {Variable : Type*} [DecidableEq Variable]
+    (finalDecEq :
+      DecidableEq (RetainedFixedEightOneInThreeVariable Variable))
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    @PositionedPeriodicCNF.VariableRoutesInOccurrenceOrder
+      (RetainedFixedEightOneInThreeVariable Variable)
+      finalDecEq
+      (retainedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        source)
+      (retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) := by
+  apply
+    @PositionedPeriodicCNF.variableRoutesInOccurrenceOrder_of_decidableEq
+      (RetainedFixedEightOneInThreeVariable Variable)
+      (Classical.decEq _) finalDecEq
+      (retainedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        source)
+      (retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+  exact
+    PeriodicOneInThreeNoUnitsPositioned.variableRoutesInOccurrenceOrder_classical
+      (retainedFixedEightPositionedPeriodicPlanarOneInThreeFormula source)
+      (retainedFixedEightPeriodicPlanarOneInThreeIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedFixedEightPeriodicPlanarOneInThreeIncidenceRoutes_variableRoutesInOccurrenceOrder
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_preservesDegreeThreeOriginalRouteTerminalDirections
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+
+/-- A ribbon-ready presentation using the retained route family has
+coordinated clockwise variable and clause source fans. -/
+theorem
+    retainedFixedEightPeriodicPlanarOneInThreeNoUnits_sourceRibbonFansClockwiseCompatible
+    {Variable : Type*} [DecidableEq Variable]
+    [finalDecEq :
+      DecidableEq (RetainedFixedEightOneInThreeVariable Variable)]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (presentation :
+      (retainedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        source).HaloBoundedRibbonReadyIncidencePresentation
+          (retainedFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement source))
+    (routesEq :
+      presentation.toPlanarIncidencePresentation.routes =
+        retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty) :
+    PeriodicPlanarOneInThreeToThreeDM.SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation := by
+  apply
+    PeriodicPlanarOneInThreeToThreeDM.sourceRibbonFansClockwiseCompatible_of_routeOrders
+      (presentation := presentation)
+  · exact
+      retainedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula_widthAtMostThree
+        source
+  · exact
+      retainedFixedEightPeriodicOneInThreeNoUnits_occurrencesAtMostThreeFor
+        finalDecEq source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+  · exact
+      retainedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula_arityTwoOrThree
+        source
+  · apply
+      PeriodicPlanarOneInThreeToThreeDM.sourceVariableDirectionsInOccurrenceOrder_of_routes
+        presentation.toPlanarIncidencePresentation
+    rw [routesEq]
+    exact
+      retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_variableRoutesInOccurrenceOrderFor
+        finalDecEq source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+  · rw [routesEq]
+    exact
       retainedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_ternaryClauseRoutesInUnitEliminationOrder
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty

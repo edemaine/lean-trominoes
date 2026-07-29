@@ -1585,10 +1585,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsRibbonOrders.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsRibbonOrders.lean)
   pairs that variable rotation with the canonical ternary clause-exit order
   supplied by unit elimination, and records the final width-three bound.
-  Together with the existing occurrence-three and arity promises, this gives
-  every discrete premise of the generic coordinated source-fan theorem;
-  constructing the halo-bounded ribbon-ready presentation is now the
-  remaining geometric obligation.
+  Equality-independent promise transport then combines those facts with the
+  occurrence-three and arity promises: every ribbon-ready presentation using
+  these routes has the complete coordinated source-fan clockwise certificate.
+  Constructing that presentation is now the remaining geometric obligation.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean)
   names the normalized periodic 3DM target of the retained fixed-eight
   exact-one pipeline.  It proves the target well-formed, proves that every
