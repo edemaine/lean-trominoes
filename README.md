@@ -1514,6 +1514,11 @@ The representation choices for this target are:
   final formula is equisatisfiable with the original local 3SAT-3 source, has
   only binary or ternary clauses, retains occurrence degree at most three and
   atom-distinct clauses, and has a positive refined period.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeRoutes.lean)
+  carries the retained angular-spliced source routes through the positioned
+  Figure 9 adapter and completes its fresh local incidences.  Every genuine
+  raw exact-one route has exact canonical endpoints, is orthogonal, and
+  records the first exit needed by the later unit-elimination splice.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
