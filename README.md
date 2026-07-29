@@ -1561,6 +1561,13 @@ The representation choices for this target are:
   variable arms.  Routed source-clause rays additionally use three fixed
   non-compass slopes, which the next rasterization layer must handle
   explicitly.
+- [`LeanTrominoes/RoutedClauseRayStaircase.lean`](LeanTrominoes/RoutedClauseRayStaircase.lean)
+  supplies that exceptional rasterization for the three routed-clause slopes
+  `(-9, -4)`, `(-4, 1)`, and `(1, -4)`.  Each fixed balanced unit-step block
+  is orthogonal and returns exactly to its original straight ray; repeated
+  blocks therefore preserve exact endpoints while remaining in a narrow
+  corridor.  An executable classifier recognizes every positive multiple
+  and recovers its arm and exact repeat count.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
