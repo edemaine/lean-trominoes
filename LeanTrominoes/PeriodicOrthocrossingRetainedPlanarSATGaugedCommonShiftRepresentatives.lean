@@ -21,6 +21,43 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
 
+/-- Translating both segments by one offset preserves the fact that the
+first segment's interior avoids both endpoints of the second. -/
+theorem endpointsAvoidInterior_translate_both
+    (first second : GridSegment)
+    (offset point : Cell)
+    (rawAvoid :
+      ∀ {rawPoint : Cell},
+        first.InteriorContains rawPoint →
+          rawPoint ≠ second.start ∧
+            rawPoint ≠ second.finish)
+    (firstContains :
+      (first.translate offset).InteriorContains point) :
+    point ≠ (second.translate offset).start ∧
+      point ≠ (second.translate offset).finish := by
+  let normalizedPoint := Cell.sub point offset
+  have normalizedFirst :
+      first.InteriorContains normalizedPoint := by
+    apply
+      (PeriodicGridDrawing.interiorContains_translate_iff
+        first offset normalizedPoint).mp
+    simpa [normalizedPoint, Cell.add, Cell.sub] using
+      firstContains
+  have normalizedAvoid := rawAvoid normalizedFirst
+  constructor
+  · intro pointEq
+    apply normalizedAvoid.1
+    have normalizedEq :=
+      congrArg (fun endpoint => Cell.sub endpoint offset) pointEq
+    simpa [normalizedPoint, GridSegment.translate,
+      Cell.add, Cell.sub] using normalizedEq
+  · intro pointEq
+    apply normalizedAvoid.2
+    have normalizedEq :=
+      congrArg (fun endpoint => Cell.sub endpoint offset) pointEq
+    simpa [normalizedPoint, GridSegment.translate,
+      Cell.add, Cell.sub] using normalizedEq
+
 /-- A final periodic segment occurrence represented by one genuine segment
 of the finite retained drawing at a prescribed common lattice shift. -/
 structure FinalGaugedSegmentCommonShiftRepresentative
@@ -244,6 +281,72 @@ theorem
     simpa [offset, normalizedPoint, Cell.add, Cell.sub] using
       secondContains
   exact rawPhysicalAvoid normalizedFirst normalizedSecond
+
+/-- Two distinct retained segments represented at one common physical
+shift preserve endpoint avoidance in the final periodic lift.  This is the
+endpoint-sensitive companion to `commonShiftRepresentatives_avoidsInterior`
+and remains informative for diagonal second segments. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_commonShiftRepresentatives_endpointsAvoidInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift commonShift : Cell}
+    (first :
+      FinalGaugedSegmentCommonShiftRepresentative
+        formula firstIndexed firstShift commonShift)
+    (second :
+      FinalGaugedSegmentCommonShiftRepresentative
+        formula secondIndexed secondShift commonShift)
+    (finiteDifferent :
+      first.physicalIncidenceIndex ≠
+          second.physicalIncidenceIndex ∨
+        firstIndexed.segmentIndex ≠
+          secondIndexed.segmentIndex)
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  have rawPhysicalAvoid :
+      ∀ {rawPoint : Cell},
+        first.physicalSegment.InteriorContains rawPoint →
+          rawPoint ≠ second.physicalSegment.start ∧
+            rawPoint ≠ second.physicalSegment.finish :=
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.taggedSegments_endpointsAvoidInterior
+      (retainedDrawingPlanarSATLocalIncidenceDrawing formula)
+      (retainedDrawingPlanarSATLocalIncidenceDrawing_isPlanar
+        formula wellFormed degree isLocal clausesNonempty)
+      first.physicalIncidenceMember
+      second.physicalIncidenceMember
+      first.physicalSegmentMember
+      second.physicalSegmentMember
+      finiteDifferent
+  rw [first.segmentEq] at firstContains
+  rw [second.segmentEq]
+  exact
+    endpointsAvoidInterior_translate_both
+      first.physicalSegment second.physicalSegment
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+        formula).translation commonShift)
+      point rawPhysicalAvoid firstContains
 
 end PeriodicOrthocrossing
 end LeanTrominoes
