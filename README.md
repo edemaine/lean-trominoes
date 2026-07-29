@@ -2741,6 +2741,12 @@ The representation choices for this target are:
   incidence occurrence.  Under the occurrence-three premise, the unchanged
   variable duplicator then equates each routed clause terminal with the
   corresponding central periodic atom occurrence.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedPeriodicSoundness.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedPeriodicSoundness.lean)
+  reconstructs every original periodic source clause from the retained routed
+  clauses and recovered central atom values.  It also proves retained
+  completeness using the canonical periodic route assignment, establishing
+  exact satisfiability preservation for well-formed local degree-three
+  incidence graphs with at most three occurrences per source variable.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
