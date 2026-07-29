@@ -1501,6 +1501,13 @@ The representation choices for this target are:
   equisatisfiable with the original local 3SAT-3 source, retains width three,
   has at most three occurrences per output variable, and has a positive
   uniformly refined drawing period.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitRoutes.lean)
+  instantiates the generic angular Figure 7 route splice at that same retained
+  formula.  The complete positioned split drawing has exact periodic
+  incidence endpoints and is orthogonal.  Its canonical copied-source
+  prefixes intentionally make no noncrossing claim; replacing those prefixes
+  by geometry inherited from the retained planar drawing is the remaining
+  global planarity obligation.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
