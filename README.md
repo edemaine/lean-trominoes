@@ -2764,6 +2764,12 @@ The representation choices for this target are:
   retained straight-carrier family.  It also proves that global clause
   deduplication can only reduce occurrences relative to separately
   deduplicating these five normalized components.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedNormalizationDegree.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedNormalizationDegree.lean)
+  combines the retained carrier degree-four theorem with the existing four
+  noncarrier component bounds.  Terminal, crossing-boundary, central-atom,
+  and crossover-internal cases all have degree at most eight, and the bound
+  transfers through global clause deduplication to the unwrapped retained
+  planar-SAT formula.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
