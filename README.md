@@ -1574,6 +1574,12 @@ The representation choices for this target are:
   soundness, preservation under positive integral scaling, exact endpoints,
   and orthogonality after rasterizing supported segments, polylines, and
   whole incidence-route families.
+- [`LeanTrominoes/RetainedRayRasterizationCorridor.lean`](LeanTrominoes/RetainedRayRasterizationCorridor.lean)
+  gives the staircase construction a uniform quantitative bound.  Every
+  listed rasterized point lies within coordinate radius nine of an exact
+  checkpoint on its source ray, independently of the ray's length; the
+  certificate lifts from all eleven primitive slopes to supported segments,
+  nondegenerate polylines, and scaled incidence routes.
 - [`LeanTrominoes/RetainedEmbeddedCNFIncidenceDrawing.lean`](LeanTrominoes/RetainedEmbeddedCNFIncidenceDrawing.lean)
   packages that segment condition over every genuine route of a finite
   embedded CNF.  The certificate follows from octilinearity, is preserved by
