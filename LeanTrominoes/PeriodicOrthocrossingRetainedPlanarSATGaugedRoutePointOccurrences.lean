@@ -69,6 +69,43 @@ def firstSegmentForRoutePoint
   segmentIndex := 0
   segment := segment
 
+/-- The final periodic drawing and its positioned placement use the same
+physical translation for every lattice shift. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_periodTranslation_eq_placement
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (shift : Cell) :
+    (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+        formula).periodTranslation shift =
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+        formula).translation shift := by
+  let drawing :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+      formula
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  have periodPositive : 0 < placement.period := by
+    simpa [placement,
+      retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement,
+      wrappedDrawingPeriodicPlanarSATPlacement] using
+      drawingPeriodicPlanarSATPlacement_period_pos formula
+  have gridSizeEq : drawing.gridSize = placement.period := by
+    simpa [drawing, placement,
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing]
+      using
+        PositionedPeriodicCNF.incidenceDrawing_gridSize
+          (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+            formula)
+          (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+          (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+            formula)
+          periodPositive
+  change
+    Cell.scale (drawing.gridSize : Int) shift =
+      Cell.scale (placement.period : Int) shift
+  rw [gridSizeEq]
+
 /-- A final listed route-point occurrence and its same-indexed point in one
 translated finite retained route.  The first segment witness supplies an
 injective bridge between final and physical route-occurrence identities. -/
@@ -118,8 +155,8 @@ structure FinalGaugedRoutePointOccurrenceWitness
       indexed.routeLength
   pointEq :
     Cell.add indexed.point
-        ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-          formula).translation shift) =
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation shift) =
       Cell.add physicalPoint
         ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
           formula).translation segmentWitness.physicalShift)
@@ -286,6 +323,7 @@ theorem
   }⟩
   simpa [metadataPhysicalRouteOccurrence,
     FinalGaugedSegmentOccurrenceWitness.physicalShift,
+    retainedDeduplicatedGaugedWrappedDrawing_periodTranslation_eq_placement,
     Cell.add, add_comm] using pointEq
 
 /-- The corresponding finite route point, retaining the original

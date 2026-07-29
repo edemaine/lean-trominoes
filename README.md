@@ -1505,6 +1505,10 @@ The representation choices for this target are:
   repackages finite planarity for flat `zipIdx` incidence and segment
   occurrences: differing incidence or within-route indices imply disjoint
   continuous segment interiors.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingIndexedRoutePointSeparation.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingIndexedRoutePointSeparation.lean)
+  transfers the finite endpoint-only contact certificate to indexed route
+  points: a listed point geometrically equal to the head or last point is
+  certified as an outer route endpoint.
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingMapPoints.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingMapPoints.lean)
   proves a generic transport theorem for complete finite drawing
   certificates under any injective point map preserving axis alignment,
@@ -2705,6 +2709,11 @@ The representation choices for this target are:
   transfers the full finite planarity certificate to any two distinct final
   segment occurrences with the same anchor-adjusted physical shift, proving
   that their continuous interiors remain disjoint in the periodic lift.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSamePhysicalShiftRoutePointContacts.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedSamePhysicalShiftRoutePointContacts.lean)
+  proves the route-point analogue for a common anchor-adjusted physical
+  shift.  Equal lifted coordinates on distinct final point occurrences force
+  both points to be outer route endpoints, using finite route nondegeneracy,
+  `Nodup`, and the retained drawing's endpoint-only contact certificate.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierBendProximity.lean)
   classifies neighboring segment terminals as internal bend terminals or
   external graph endpoints and proves their exact lifted drawing points.
