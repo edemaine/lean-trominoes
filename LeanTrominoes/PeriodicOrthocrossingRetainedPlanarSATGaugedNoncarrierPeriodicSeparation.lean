@@ -596,6 +596,134 @@ theorem
       secondContains
   exact rawAvoid normalizedFirst normalizedSecond
 
+/-- An avoidance certificate between two independently translated local
+sources also transfers endpoint separation.  This retains useful
+information when the selected second segment is diagonal. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_two_periodTranslate_localRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstSourceShift secondSourceShift : Cell)
+    (commonShiftEq :
+      Cell.sub first.physicalShift firstSourceShift =
+        Cell.sub second.physicalShift secondSourceShift)
+    (routeAvoid :
+      EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        ((((first.routeWitness.metadata.source.periodTranslate formula
+          firstSourceShift).incidenceDrawing formula).routes
+            first.routeWitness.metadata.source.localClauseIndex
+            first.taggedLiteral.2))
+        ((((second.routeWitness.metadata.source.periodTranslate formula
+          secondSourceShift).incidenceDrawing formula).routes
+            second.routeWitness.metadata.source.localClauseIndex
+            second.taggedLiteral.2)))
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  let firstOffset :=
+    carrierMacroPeriodTranslation
+      formula.incidenceGraph firstSourceShift
+  let secondOffset :=
+    carrierMacroPeriodTranslation
+      formula.incidenceGraph secondSourceShift
+  have rawAvoid :
+      ∀ {rawPoint : Cell},
+        (first.physicalSegment.translate firstOffset).InteriorContains
+            rawPoint →
+          rawPoint ≠
+              (second.physicalSegment.translate secondOffset).start ∧
+            rawPoint ≠
+              (second.physicalSegment.translate secondOffset).finish :=
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther.taggedSegments_endpointsAvoidInterior
+      routeAvoid
+      (by simpa only [firstOffset] using
+        (first.physicalSegment_periodTranslate_mem_sourceRoute
+          firstSourceShift))
+      (by simpa only [secondOffset] using
+        (second.physicalSegment_periodTranslate_mem_sourceRoute
+          secondSourceShift))
+  let firstRepresentative :=
+    first.toCommonShiftRepresentative
+  let secondRepresentative :=
+    second.toCommonShiftRepresentative
+  rw [firstRepresentative.segmentEq] at firstContains
+  rw [secondRepresentative.segmentEq]
+  change
+    (first.physicalSegment.translate
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+        formula).translation first.physicalShift)).InteriorContains
+      point at firstContains
+  change
+    point ≠
+        (second.physicalSegment.translate
+          ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+            formula).translation second.physicalShift)).start ∧
+      point ≠
+        (second.physicalSegment.translate
+          ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+            formula).translation second.physicalShift)).finish
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  have firstOffsetEq :
+      firstOffset =
+        placement.translation firstSourceShift := by
+    exact
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula firstSourceShift).symm
+  have secondOffsetEq :
+      secondOffset =
+        placement.translation secondSourceShift := by
+    exact
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula secondSourceShift).symm
+  have firstAlignedEq :
+      (first.physicalSegment.translate firstOffset).translate
+          (placement.translation
+            (Cell.sub first.physicalShift firstSourceShift)) =
+        first.physicalSegment.translate
+          (placement.translation first.physicalShift) := by
+    rw [firstOffsetEq]
+    exact segment_translate_placement_add_sub
+      placement first.physicalSegment
+      first.physicalShift firstSourceShift
+  have secondAlignedEq :
+      (second.physicalSegment.translate secondOffset).translate
+          (placement.translation
+            (Cell.sub second.physicalShift secondSourceShift)) =
+        second.physicalSegment.translate
+          (placement.translation second.physicalShift) := by
+    rw [secondOffsetEq]
+    exact segment_translate_placement_add_sub
+      placement second.physicalSegment
+      second.physicalShift secondSourceShift
+  rw [← firstAlignedEq] at firstContains
+  rw [← secondAlignedEq, ← commonShiftEq]
+  exact
+    endpointsAvoidInterior_translate_both
+      (first.physicalSegment.translate firstOffset)
+      (second.physicalSegment.translate secondOffset)
+      (placement.translation
+        (Cell.sub first.physicalShift firstSourceShift))
+      point rawAvoid firstContains
+
 /-- Any avoidance certificate between the physically translated first local
 route and the second local route transfers to the corresponding final
 periodic segment occurrences. -/
@@ -840,6 +968,133 @@ theorem
     simpa [commonOffset, normalizedPoint, Cell.add, Cell.sub] using
       secondContains
   exact rawAvoid normalizedFirst normalizedSecond
+
+/-- A physically translated local-route avoidance certificate also
+transfers endpoint separation to the final periodic occurrences. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_periodTranslate_localRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (routeAvoid :
+      EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        ((((first.routeWitness.metadata.source.periodTranslate formula
+          (Cell.sub first.physicalShift second.physicalShift))
+            |>.incidenceDrawing formula).routes
+              first.routeWitness.metadata.source.localClauseIndex
+              first.taggedLiteral.2))
+        ((second.routeWitness.metadata.source.incidenceDrawing formula).routes
+          second.routeWitness.metadata.source.localClauseIndex
+          second.taggedLiteral.2))
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  let reindexShift :=
+    Cell.sub first.physicalShift second.physicalShift
+  let offset :=
+    carrierMacroPeriodTranslation formula.incidenceGraph reindexShift
+  have firstTranslatedMember :
+      (first.physicalSegment.translate offset,
+          firstIndexed.segmentIndex) ∈
+        (gridPolylineSegments
+          (((first.routeWitness.metadata.source.periodTranslate
+            formula reindexShift).incidenceDrawing formula).routes
+              first.routeWitness.metadata.source.localClauseIndex
+              first.taggedLiteral.2)).zipIdx := by
+    rw [
+      DrawingPlanarSATClauseSource.incidenceDrawing_routes_periodTranslate]
+    change
+      (first.physicalSegment.translate offset,
+          firstIndexed.segmentIndex) ∈
+        (gridPolylineSegments
+          (translatePolyline offset
+            ((first.routeWitness.metadata.source.incidenceDrawing
+              formula).routes
+                first.routeWitness.metadata.source.localClauseIndex
+                first.taggedLiteral.2))).zipIdx
+    rw [show translatePolyline offset
+          ((first.routeWitness.metadata.source.incidenceDrawing
+            formula).routes
+              first.routeWitness.metadata.source.localClauseIndex
+              first.taggedLiteral.2) =
+        ((first.routeWitness.metadata.source.incidenceDrawing
+          formula).routes
+            first.routeWitness.metadata.source.localClauseIndex
+            first.taggedLiteral.2).map (Cell.add offset) by rfl,
+      EmbeddedCNFIncidenceDrawing.gridPolylineSegments_map_add,
+      List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(first.physicalSegment, firstIndexed.segmentIndex),
+        first.physicalSegment_mem_sourceRoute, rfl⟩
+  have rawAvoid :
+      ∀ {rawPoint : Cell},
+        (first.physicalSegment.translate offset).InteriorContains
+            rawPoint →
+          rawPoint ≠ second.physicalSegment.start ∧
+            rawPoint ≠ second.physicalSegment.finish :=
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther.taggedSegments_endpointsAvoidInterior
+      (by simpa only [reindexShift] using routeAvoid)
+      firstTranslatedMember second.physicalSegment_mem_sourceRoute
+  let firstRepresentative :=
+    first.toCommonShiftRepresentative
+  let secondRepresentative :=
+    second.toCommonShiftRepresentative
+  rw [firstRepresentative.segmentEq] at firstContains
+  rw [secondRepresentative.segmentEq]
+  change
+    (first.physicalSegment.translate
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+        formula).translation first.physicalShift)).InteriorContains
+      point at firstContains
+  change
+    point ≠
+        (second.physicalSegment.translate
+          ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+            formula).translation second.physicalShift)).start ∧
+      point ≠
+        (second.physicalSegment.translate
+          ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+            formula).translation second.physicalShift)).finish
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  have offsetEq :
+      offset = placement.translation reindexShift := by
+    exact
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula reindexShift).symm
+  have firstAlignedEq :
+      (first.physicalSegment.translate offset).translate
+          (placement.translation second.physicalShift) =
+        first.physicalSegment.translate
+          (placement.translation first.physicalShift) := by
+    rw [offsetEq]
+    exact segment_translate_placement_sub_add
+      placement first.physicalSegment
+      first.physicalShift second.physicalShift
+  rw [← firstAlignedEq] at firstContains
+  exact
+    endpointsAvoidInterior_translate_both
+      (first.physicalSegment.translate offset)
+      second.physicalSegment
+      (placement.translation second.physicalShift)
+      point rawAvoid firstContains
 
 /-- If the aligned macrocell centers of two final noncarrier segment
 occurrences differ, macrocell separation rules out continuous contact. -/
