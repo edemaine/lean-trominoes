@@ -1508,6 +1508,12 @@ The representation choices for this target are:
   prefixes intentionally make no noncrossing claim; replacing those prefixes
   by geometry inherited from the retained planar drawing is the remaining
   global planarity obligation.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositioned.lean)
+  threads the retained fixed-eight formula through the positioned Figure 9
+  exact-one reduction, opaque wrapping, and unit-clause elimination.  The
+  final formula is equisatisfiable with the original local 3SAT-3 source, has
+  only binary or ternary clauses, retains occurrence degree at most three and
+  atom-distinct clauses, and has a positive refined period.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
