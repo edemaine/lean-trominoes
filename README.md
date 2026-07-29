@@ -483,6 +483,11 @@ The representation choices for this target are:
   suffix family.  Any canonical orthogonal source route family with certified
   first exits can therefore be lifted through unit elimination; the concrete
   wrapped Figure 9 family supplies that additional certificate.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean)
+  proves that every ternary output clause starts its literal-indexed routes
+  toward south, west, and east.  Anchor normalization and arbitrary inherited
+  suffix splicing preserve that rotation order, isolating it from the
+  earlier long-route geometry.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreePlacements.lean)
   carries canonical protovariable positions and the physical drawing period
   through occurrence splitting, Figure 9, its opaque wrapper, and final
