@@ -738,6 +738,177 @@ theorem
   simpa [drawingPeriodicPlanarSATPlacement,
     planarMacroScale, Cell.scale] using quotientEq
 
+/-- Dividing a translated half-open representative by the drawing period
+recovers its lattice translation coordinatewise. -/
+theorem PeriodicGridDrawing.translatedHalfOpenPosition_ediv
+    (drawing : PeriodicGridDrawing)
+    {base shift : Cell}
+    (baseBounds :
+      0 ≤ base.1 ∧ base.1 < drawing.gridSize ∧
+        0 ≤ base.2 ∧ base.2 < drawing.gridSize) :
+    ((Cell.add base (drawing.periodTranslation shift)).1 /
+        drawing.gridSize,
+      (Cell.add base (drawing.periodTranslation shift)).2 /
+        drawing.gridSize) =
+      shift := by
+  have periodNe : (drawing.gridSize : Int) ≠ 0 := by
+    have periodPositive : 0 < drawing.gridSize :=
+      Nat.zero_lt_succ drawing.gridSizePred
+    exact_mod_cast periodPositive.ne'
+  have horizontalBaseQuotient :
+      base.1 / (drawing.gridSize : Int) = 0 :=
+    Int.ediv_eq_zero_of_lt baseBounds.1 baseBounds.2.1
+  have verticalBaseQuotient :
+      base.2 / (drawing.gridSize : Int) = 0 :=
+    Int.ediv_eq_zero_of_lt baseBounds.2.2.1 baseBounds.2.2.2
+  apply Prod.ext
+  · simp only [Cell.add,
+      PeriodicGridDrawing.periodTranslation, Cell.scale]
+    rw [mul_comm, Int.add_mul_ediv_right _ _ periodNe,
+      horizontalBaseQuotient]
+    simp
+  · simp only [Cell.add,
+      PeriodicGridDrawing.periodTranslation, Cell.scale]
+    rw [mul_comm, Int.add_mul_ediv_right _ _ periodNe,
+      verticalBaseQuotient]
+    simp
+
+/-- Every semantic bend-center placement of a local protoedge crosses at
+most one period boundary. -/
+theorem routeBendCenterPlacement_offset_neighbor
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (isLocal : graph.IsLocal)
+    {edge : PeriodicEdge Vertex}
+    {edgeIndex : Nat}
+    (edgeMember : (edge, edgeIndex) ∈ graph.edges.zipIdx)
+    {placement : RouteBendCenterPlacement Vertex}
+    (placementMember :
+      placement ∈ routeBendCenterPlacements graph edge edgeIndex) :
+    IsNeighborTranslation placement.offset := by
+  have edgeLocal : edge.span ≤ 1 :=
+    isLocal edge (List.fst_mem_of_mem_zipIdx edgeMember)
+  rcases offset_eq_of_span_le_one edge edgeLocal with
+    offset | offset | offset | offset | offset
+  all_goals
+    simp [routeBendCenterPlacements, offset] at placementMember
+  all_goals
+    aesop (config := { warnOnNonterminal := false }) <;>
+      simp [IsNeighborTranslation]
+
+/-- Gauging a retained bend clause by its source-clause anchor leaves the
+route occurrence at the inverse of its semantic boundary offset, hence in
+the neighboring route halo. -/
+theorem DrawingPlanarSATClauseMetadata.bend_anchorNormalize_translate_neighbor
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (routeBend : RouteBend)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      metadata.source = .bend routeBend localClauseIndex) :
+    IsNeighborTranslation
+      (Cell.add routeBend.translate
+        (Cell.neg
+          (PeriodicCNF.clauseAnchor
+            (metadataGaugedPositionedClause formula metadata).literals))) := by
+  let graph := formula.incidenceGraph
+  have valid' := valid
+  unfold DrawingPlanarSATClauseMetadata.RetainedValid at valid'
+  rw [sourceEq] at valid'
+  have routeBendMember :
+      routeBend ∈ drawingRouteBends graph :=
+    List.mem_dedup.mp valid'.1
+  rcases drawingRouteBend_centerPlacement
+      graph isLocal routeBendMember with
+    ⟨edge, edgeIndex, placement, placementIndex,
+      edgeMember, placementMember, _routeIndexEq,
+      _placementIndexEq, pointEq⟩
+  have placementListMember :
+      placement ∈ routeBendCenterPlacements graph edge edgeIndex :=
+    List.fst_mem_of_mem_zipIdx placementMember
+  have placementValid :
+      placement.kind.Valid graph :=
+    routeBendCenterPlacements_kind_valid
+      edgeMember placementListMember
+  have placementBounds :=
+    RouteBendCenterKind.position_in_fundamental
+      wellFormed degree placementValid
+  have centerEq :
+      metadata.source.component.macrocellCenter formula =
+        some (routeBend.drawingPoint graph) := by
+    rw [sourceEq]
+    rfl
+  have anchorEq :=
+    metadata.sourceClauseAnchor_eq_macrocellCenter_ediv
+      wellFormed degree isLocal valid
+      (routeBend.drawingPoint graph) centerEq nonempty
+  have pointQuotient :
+      ((routeBend.drawingPoint graph).1 / drawingGridSize graph,
+        (routeBend.drawingPoint graph).2 / drawingGridSize graph) =
+        Cell.add routeBend.translate placement.offset := by
+    rw [pointEq]
+    simpa [drawing_gridSize] using
+      (PeriodicGridDrawing.translatedHalfOpenPosition_ediv
+        (drawing graph) placementBounds)
+  have normalizedTranslateEq :
+      Cell.add routeBend.translate
+          (Cell.neg
+            (PeriodicCNF.clauseAnchor
+              (metadataGaugedPositionedClause formula metadata).literals)) =
+        Cell.neg placement.offset := by
+    rw [anchorEq, pointQuotient]
+    rcases routeBend.translate with ⟨routeX, routeY⟩
+    rcases placement.offset with ⟨offsetX, offsetY⟩
+    simp [Cell.add, Cell.neg, Cell.sub]
+  rw [normalizedTranslateEq]
+  exact
+    (routeBendCenterPlacement_offset_neighbor
+      isLocal edgeMember placementListMember).neg
+
+/-- The anchor-normalized representative of every retained bend source is
+itself retained in the finite neighboring bend family. -/
+theorem DrawingPlanarSATClauseMetadata.bend_anchorNormalize_retainedComponentMember
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (routeBend : RouteBend)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      metadata.source = .bend routeBend localClauseIndex) :
+    (metadata.source.periodTranslate formula
+      (Cell.neg
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause formula metadata).literals))
+        |>.RetainedComponentMember formula) := by
+  have sourceMember :
+      (DrawingPlanarSATClauseSource.bend
+        routeBend localClauseIndex).RetainedComponentMember formula := by
+    have valid' := valid
+    unfold DrawingPlanarSATClauseMetadata.RetainedValid at valid'
+    rw [sourceEq] at valid'
+    exact valid'.1
+  rw [sourceEq]
+  exact
+    bendSource_periodTranslate_retainedComponentMember_of_neighbor
+      formula routeBend localClauseIndex sourceMember
+      (Cell.neg
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause formula metadata).literals))
+      (metadata.bend_anchorNormalize_translate_neighbor
+        wellFormed degree isLocal valid nonempty
+        routeBend localClauseIndex sourceEq)
+
 /-- A contact with an anchor-normalized final carrier segment forces a
 translated routed-clause source to remain in the neighboring retained
 site family. -/
