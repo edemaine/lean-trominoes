@@ -27,6 +27,14 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
 
+/-- Short opaque name for the final retained periodic CNF. -/
+def retainedPlanarSATFormula
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    PeriodicCNF (WrappedPeriodicPlanarSATVariable Variable) :=
+  (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+    source).erase
+
 /-- The complete logical and geometric contract delivered by retained
 planarization before fixed-eight occurrence splitting. -/
 structure RetainedPlanarSATCertificate
@@ -39,19 +47,14 @@ structure RetainedPlanarSATCertificate
   graphIsLocal :
     source.incidenceGraph.IsLocal
   sourceSatisfiableIff :
-    (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-      source).erase.Satisfiable ↔
+    (retainedPlanarSATFormula source).Satisfiable ↔
       source.Satisfiable
   widthAtMostThree :
-    (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-      source).erase.WidthAtMost 3
+    (retainedPlanarSATFormula source).WidthAtMost 3
   occurrencesAtMostEight :
-    (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-      source).erase.OccurrencesAtMost 8
+    (retainedPlanarSATFormula source).OccurrencesAtMost 8
   clausesNonempty :
-    ∀ clause ∈
-        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-          source).erase.clauses,
+    ∀ clause ∈ (retainedPlanarSATFormula source).clauses,
       clause ≠ []
   drawingCompatible :
     (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
@@ -95,18 +98,22 @@ theorem retainedPlanarSATCertificate
     graphWellFormed := graphWellFormed
     graphDegreeAtMostThree := graphDegree
     graphIsLocal := graphLocal
-    sourceSatisfiableIff :=
-      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_source_satisfiable_iff
-        source graphWellFormed graphDegree graphLocal sourceOccurrences
-    widthAtMostThree :=
-      retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_widthAtMostThree
-        source sourceWidth
-    occurrencesAtMostEight :=
-      retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_occurrencesAtMostEight
-        graphWellFormed graphDegree graphLocal sourceOccurrences
-    clausesNonempty :=
-      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_clausesNonempty_of_source
-        source sourceClausesNonempty
+    sourceSatisfiableIff := by
+      simpa only [retainedPlanarSATFormula] using
+        retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_source_satisfiable_iff
+          source graphWellFormed graphDegree graphLocal sourceOccurrences
+    widthAtMostThree := by
+      simpa only [retainedPlanarSATFormula] using
+        retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_widthAtMostThree
+          source sourceWidth
+    occurrencesAtMostEight := by
+      simpa only [retainedPlanarSATFormula] using
+        retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_occurrencesAtMostEight
+          graphWellFormed graphDegree graphLocal sourceOccurrences
+    clausesNonempty := by
+      simpa only [retainedPlanarSATFormula] using
+        retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_clausesNonempty_of_source
+          source sourceClausesNonempty
     drawingCompatible :=
       retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_isCompatible
         source graphWellFormed graphDegree graphLocal

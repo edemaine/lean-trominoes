@@ -1494,6 +1494,13 @@ The representation choices for this target are:
   lie in the one-cell halo.  The certificate intentionally leaves
   orthogonality to the subsequent fixed-eight occurrence split, because the
   unsplit Figure 8 terminal rays also use 45-degree diagonals.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplit.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplit.lean)
+  sorts the final retained incidence routes by terminal angle, assigns their
+  at-most-eight occurrences injectively to the fixed Figure 7 compass ports,
+  and applies the generic occurrence split.  The positioned result remains
+  equisatisfiable with the original local 3SAT-3 source, retains width three,
+  has at most three occurrences per output variable, and has a positive
+  uniformly refined drawing period.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
