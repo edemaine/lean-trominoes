@@ -167,6 +167,185 @@ theorem liftedDrawingVertexPosition_translate_neighbor_of_macrocellPoint_inExpan
       periodPositive baseBounds.2.2.1 baseBounds.2.2.2
       centerBounds.2.2.1 centerBounds.2.2.2 verticalEq
 
+/-- A segment in the refined expanded square cannot meet a segment in the
+macrocell of a non-neighboring lifted vertex.  This continuous formulation
+avoids choosing an integer intersection point: separated closed endpoint
+boxes directly contradict `InteriorsMeet`. -/
+theorem liftedDrawingVertexPosition_translate_neighbor_of_macrocellSegment_meets_expanded
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {vertex : Vertex}
+    (vertexMember : vertex ∈ graph.vertices)
+    (translate : Cell)
+    (expandedSegment macrocellSegment : GridSegment)
+    (expandedStart :
+      let period : Int :=
+        planarMacroScale * drawingGridSize graph;
+      -period < expandedSegment.start.1 ∧
+        expandedSegment.start.1 < 2 * period ∧
+        -period < expandedSegment.start.2 ∧
+        expandedSegment.start.2 < 2 * period)
+    (expandedFinish :
+      let period : Int :=
+        planarMacroScale * drawingGridSize graph;
+      -period < expandedSegment.finish.1 ∧
+        expandedSegment.finish.1 < 2 * period ∧
+        -period < expandedSegment.finish.2 ∧
+        expandedSegment.finish.2 < 2 * period)
+    (macrocellStart :
+      InPlanarSATMacrocell
+        (Cell.add
+          ((drawing graph).vertexPosition graph vertex)
+          ((drawing graph).periodTranslation translate))
+        macrocellSegment.start)
+    (macrocellFinish :
+      InPlanarSATMacrocell
+        (Cell.add
+          ((drawing graph).vertexPosition graph vertex)
+          ((drawing graph).periodTranslation translate))
+        macrocellSegment.finish)
+    (meet :
+      GridSegment.InteriorsMeet expandedSegment macrocellSegment) :
+    IsNeighborTranslation translate := by
+  let period : Int := drawingGridSize graph
+  let refinedPeriod : Int := planarMacroScale * period
+  let center :=
+    Cell.add
+      ((drawing graph).vertexPosition graph vertex)
+      ((drawing graph).periodTranslation translate)
+  let expandedLower : Cell :=
+    (-refinedPeriod + 1, -refinedPeriod + 1)
+  let expandedUpper : Cell :=
+    (2 * refinedPeriod - 1, 2 * refinedPeriod - 1)
+  have periodPositive : 0 < period := by
+    dsimp only [period]
+    exact_mod_cast drawingGridSize_pos graph
+  have baseBounds :=
+    drawing_vertexPosition_in_fundamental_square graph vertexMember
+  change
+    0 < ((drawing graph).vertexPosition graph vertex).1 ∧
+      ((drawing graph).vertexPosition graph vertex).1 < period ∧
+      0 < ((drawing graph).vertexPosition graph vertex).2 ∧
+      ((drawing graph).vertexPosition graph vertex).2 < period at baseBounds
+  have centerHorizontal :
+      center.1 =
+        ((drawing graph).vertexPosition graph vertex).1 +
+          period * translate.1 := by
+    simp [center, period,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale]
+  have centerVertical :
+      center.2 =
+        ((drawing graph).vertexPosition graph vertex).2 +
+          period * translate.2 := by
+    simp [center, period,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale]
+  by_contra notNeighbor
+  have translateOutside :
+      translate.1 ≤ -2 ∨ 2 ≤ translate.1 ∨
+        translate.2 ≤ -2 ∨ 2 ≤ translate.2 := by
+    rcases translate with ⟨horizontal, vertical⟩
+    simp only [IsNeighborTranslation] at notNeighbor
+    omega
+  have rectanglesSeparated :
+      ClosedGridRectanglesSeparated
+        expandedLower expandedUpper
+        (planarSATMacrocellRouteLower center)
+        (planarSATMacrocellRouteUpper center) := by
+    rcases translateOutside with
+        horizontalLow | horizontalHigh | verticalLow | verticalHigh
+    · have nonnegative :
+          0 ≤ period * (-translate.1 - 2) :=
+        mul_nonneg (le_of_lt periodPositive) (by omega)
+      have productUpper :
+          period * translate.1 ≤ -2 * period := by
+        nlinarith
+      have centerUpper : center.1 ≤ -period - 1 := by
+        rw [centerHorizontal]
+        have baseUpperInt :
+            ((drawing graph).vertexPosition graph vertex).1 ≤
+              period - 1 := by
+          omega
+        omega
+      apply Or.inr
+      apply Or.inl
+      simp only [expandedLower,
+        planarSATMacrocellRouteUpper,
+        refinedPeriod, planarMacroScale,
+        Cell.add, Cell.scale]
+      omega
+    · have nonnegative :
+          0 ≤ period * (translate.1 - 2) :=
+        mul_nonneg (le_of_lt periodPositive) (by omega)
+      have productLower :
+          2 * period ≤ period * translate.1 := by
+        nlinarith
+      have centerLower : 2 * period + 1 ≤ center.1 := by
+        rw [centerHorizontal]
+        omega
+      apply Or.inl
+      simp only [expandedUpper,
+        planarSATMacrocellRouteLower,
+        refinedPeriod, planarMacroScale,
+        Cell.scale]
+      omega
+    · have nonnegative :
+          0 ≤ period * (-translate.2 - 2) :=
+        mul_nonneg (le_of_lt periodPositive) (by omega)
+      have productUpper :
+          period * translate.2 ≤ -2 * period := by
+        nlinarith
+      have centerUpper : center.2 ≤ -period - 1 := by
+        rw [centerVertical]
+        have baseUpperInt :
+            ((drawing graph).vertexPosition graph vertex).2 ≤
+              period - 1 := by
+          omega
+        omega
+      apply Or.inr
+      apply Or.inr
+      apply Or.inr
+      simp only [expandedLower,
+        planarSATMacrocellRouteUpper,
+        refinedPeriod, planarMacroScale,
+        Cell.add, Cell.scale]
+      omega
+    · have nonnegative :
+          0 ≤ period * (translate.2 - 2) :=
+        mul_nonneg (le_of_lt periodPositive) (by omega)
+      have productLower :
+          2 * period ≤ period * translate.2 := by
+        nlinarith
+      have centerLower : 2 * period + 1 ≤ center.2 := by
+        rw [centerVertical]
+        omega
+      apply Or.inr
+      apply Or.inr
+      apply Or.inl
+      simp only [expandedUpper,
+        planarSATMacrocellRouteLower,
+        refinedPeriod, planarMacroScale,
+        Cell.scale]
+      omega
+  have expandedStartBounded :
+      InClosedGridRectangle
+        expandedLower expandedUpper expandedSegment.start := by
+    simp only [InClosedGridRectangle, expandedLower,
+      expandedUpper, refinedPeriod, period] at expandedStart ⊢
+    omega
+  have expandedFinishBounded :
+      InClosedGridRectangle
+        expandedLower expandedUpper expandedSegment.finish := by
+    simp only [InClosedGridRectangle, expandedLower,
+      expandedUpper, refinedPeriod, period] at expandedFinish ⊢
+    omega
+  exact
+    (not_interiorsMeet_of_inClosedGridRectangles_of_separated
+      expandedStartBounded expandedFinishBounded
+      macrocellStart macrocellFinish rectanglesSeparated)
+      meet
+
 /-- Undo the two quotient gauges in a final contact, then cancel the carrier's
 common physical translate.  The result is a contact between the carrier's
 original finite segment and the noncarrier segment translated by exactly the
