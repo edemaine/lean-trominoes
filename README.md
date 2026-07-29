@@ -2040,6 +2040,11 @@ The representation choices for this target are:
   normalizes lifted clause targets into a canonical fundamental-domain
   vertex and period translate, then combines vertex uniqueness, the
   width-three literal bound, and occurrence-slot uniqueness.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean)
+  identifies the finite coordinated-fan ports and physical lanes with the
+  occurrence-level variable ports, clause ports, and corridor lanes.  The
+  variable result applies to every occurrence represented by one shared
+  source-variable fan.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
