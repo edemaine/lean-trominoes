@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMClauseTerminalIncidences
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMThreeStrandRouting
 
 /-!
 # Physical ribbon lanes for the planar 3DM reduction
@@ -155,6 +156,35 @@ theorem occurrenceRibbonLaneForColor_injective
     Function.Injective
       (occurrenceRibbonLaneForColor source atom slot) :=
   (occurrenceConnectorKind source atom slot).ribbonLaneForColor_injective
+
+/-- Physical lane selected by one packaged active occurrence strand. -/
+def routedRibbonLane
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (entry : ActiveOccurrenceEntry source)
+    (color : WireColor) : WireColor :=
+  occurrenceRibbonLaneForColor
+    source entry.1.1 entry.1.2 color
+
+/-- Semantic colors remain distinct within a packaged occurrence. -/
+theorem routedRibbonLane_injective
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (entry : ActiveOccurrenceEntry source) :
+    Function.Injective (routedRibbonLane source entry) :=
+  occurrenceRibbonLaneForColor_injective
+    source entry.1.1 entry.1.2
+
+@[simp]
+theorem routedRibbonLane_eq_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (entry : ActiveOccurrenceEntry source)
+    (first second : WireColor) :
+    routedRibbonLane source entry first =
+        routedRibbonLane source entry second ↔
+      first = second :=
+  (routedRibbonLane_injective source entry).eq_iff
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

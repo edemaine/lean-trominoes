@@ -104,7 +104,8 @@ theorem occurrenceRibbonCorridorCore_points_bounded
       | cons second rest =>
           have bounded :=
             ribbonCorridorCore_points_bounded
-              color first second rest
+              (routedRibbonLane source.erase entry color)
+              first second rest
               (by
                 simpa [occurrenceRibbonCorridorCore,
                   routeEquation] using member)

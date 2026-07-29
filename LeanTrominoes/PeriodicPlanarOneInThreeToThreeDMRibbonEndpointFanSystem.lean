@@ -47,12 +47,14 @@ structure RibbonEndpointFanSystem
               standardThreeStrandLayout entry.1.1)
             (routedVariablePortPosition source.erase entry color)) ∧
         (variableStub entry color).getLast? =
-          some (ribbonCorridorRouteStart color
+          some (ribbonCorridorRouteStart
+            (routedRibbonLane source.erase entry color)
             (occurrenceUnitSourceRoute presentation entry))
   clauseStubEndpoints :
     ∀ entry color,
-      (clauseStub entry color).head? =
-          some (ribbonCorridorRouteEnd color
+        (clauseStub entry color).head? =
+          some (ribbonCorridorRouteEnd
+            (routedRibbonLane source.erase entry color)
             (occurrenceUnitSourceRoute presentation entry)) ∧
         (clauseStub entry color).getLast? =
           some (routedClauseTargetPosition source.erase

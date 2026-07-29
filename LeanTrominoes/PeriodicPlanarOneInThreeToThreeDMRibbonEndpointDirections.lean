@@ -187,12 +187,13 @@ theorem occurrenceRibbonCorridorRouteStart_eq
     (presentation : source.PlanarIncidencePresentation placement)
     (entry : ActiveOccurrenceEntry source.erase)
     (color : WireColor) :
-    ribbonCorridorRouteStart color
+    ribbonCorridorRouteStart
+        (routedRibbonLane source.erase entry color)
         (occurrenceUnitSourceRoute presentation entry) =
       ribbonMacrocellExit
         (placement.position entry.1.1)
         (occurrenceSourceVariableDirection presentation entry)
-        color := by
+        (routedRibbonLane source.erase entry color) := by
   let data := occurrenceSpliceData presentation entry
   let points := occurrenceUnitSourceRoute presentation entry
   have length :=
@@ -234,13 +235,14 @@ theorem occurrenceRibbonCorridorRouteEnd_eq
     (entry : ActiveOccurrenceEntry source.erase)
     (color : WireColor) :
     let data := occurrenceSpliceData presentation entry
-    ribbonCorridorRouteEnd color
+    ribbonCorridorRouteEnd
+        (routedRibbonLane source.erase entry color)
         (occurrenceUnitSourceRoute presentation entry) =
       ribbonMacrocellEntry
         (PositionedPeriodicCNF.variableToClauseTarget
           placement data.positionedClause data.tagged.1)
         (occurrenceSourceClauseDirection presentation entry)
-        color := by
+        (routedRibbonLane source.erase entry color) := by
   let data := occurrenceSpliceData presentation entry
   let points := occurrenceUnitSourceRoute presentation entry
   have length :=
@@ -251,7 +253,8 @@ theorem occurrenceRibbonCorridorRouteEnd_eq
     occurrenceUnitSourceRoute_endpoints presentation entry
   rcases
       ribbonCorridorRouteEnd_eq_entry_last
-        color length unitSteps with
+        (routedRibbonLane source.erase entry color)
+        length unitSteps with
     ⟨leading, before, last, pointsEquation, boundaryEq⟩
   have lastEq :
       last =

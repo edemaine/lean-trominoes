@@ -1971,7 +1971,9 @@ The representation choices for this target are:
   the three cyclic lane permutations required by the top, left, and right
   clause terminals.  The assignment is proved bijective, puts every
   connector's fixed color on the outermost lane, and makes all three clause
-  attachment orders agree with one uniform physical-lane order.
+  attachment orders agree with one uniform physical-lane order.  The
+  occurrence-level corridor, endpoint, bounds, and separation APIs all route
+  a semantic color through this connector-dependent lane assignment.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanFinite.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanFinite.lean)
   erases one variable endpoint neighborhood to its finite connector kinds,
   polarities, and outgoing cardinal directions, while retaining its exact
@@ -3792,9 +3794,10 @@ The representation choices for this target are:
   coordinate bookkeeping, but its diagonal shifts are not used as a
   noncrossing theorem: bends require the corrected ribbon construction below.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridors.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridors.lean)
-  instantiates the corrected normal-offset construction for the three 3DM
-  colors at lane distances `40`, `44`, and `48` inside each `128`-cell
-  refinement corridor.  Every genuine rebased source incidence is proved
+  instantiates the corrected normal-offset construction at physical lane
+  distances `40`, `44`, and `48` inside each `128`-cell refinement corridor,
+  after applying the occurrence's semantic-color lane permutation.  Every
+  genuine rebased source incidence is proved
   nondegenerate, and each resulting central lane has exact computed
   variable/clause-side endpoints and is orthogonal.  Noncrossing endpoint
   fans into the finite gadgets remain separate from this central-corridor

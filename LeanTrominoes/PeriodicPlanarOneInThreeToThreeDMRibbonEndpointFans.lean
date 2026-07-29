@@ -349,7 +349,7 @@ noncomputable def occurrenceRibbonVariableStub
     (standardVariableRibbonFan
       (occurrenceVariableRibbonFanPort source.erase entry color)
       (occurrenceSourceVariableDirection presentation entry)
-      color)
+      (routedRibbonLane source.erase entry color))
 
 /-- Translated clause-side fan from the final ribbon macrocell boundary to
 the finite clause terminal in its referenced periodic translate. -/
@@ -368,7 +368,7 @@ noncomputable def occurrenceRibbonClauseStub
     (ribbonMacrocellOrigin target)
     (standardClauseRibbonFan
       (occurrenceSourceClauseDirection presentation entry)
-      color
+      (routedRibbonLane source.erase entry color)
       (occurrenceClauseRibbonFanPort source.erase entry color))
 
 /-- The translated variable fan has exactly the finite variable port and
@@ -388,7 +388,8 @@ theorem occurrenceRibbonVariableStub_endpoints
           (routedVariablePortPosition source.erase entry color)) ∧
       (occurrenceRibbonVariableStub
         presentation entry color).getLast? =
-        some (ribbonCorridorRouteStart color
+        some (ribbonCorridorRouteStart
+          (routedRibbonLane source.erase entry color)
           (occurrenceUnitSourceRoute presentation entry)) := by
   constructor
   · simp [occurrenceRibbonVariableStub,
@@ -414,7 +415,8 @@ theorem occurrenceRibbonClauseStub_endpoints
     (color : WireColor) :
     (occurrenceRibbonClauseStub
         presentation entry color).head? =
-        some (ribbonCorridorRouteEnd color
+        some (ribbonCorridorRouteEnd
+          (routedRibbonLane source.erase entry color)
           (occurrenceUnitSourceRoute presentation entry)) ∧
       (occurrenceRibbonClauseStub
         presentation entry color).getLast? =
@@ -451,7 +453,7 @@ theorem occurrenceRibbonVariableStub_orthogonal
     (standardVariableRibbonFan_orthogonal
       (occurrenceVariableRibbonFanPort source.erase entry color)
       (occurrenceSourceVariableDirection presentation entry)
-      color).translate
+      (routedRibbonLane source.erase entry color)).translate
         (ribbonMacrocellOrigin (placement.position entry.1.1))
 
 /-- Translating the local clause fan preserves rectilinearity. -/
@@ -468,7 +470,7 @@ theorem occurrenceRibbonClauseStub_orthogonal
   exact
     (standardClauseRibbonFan_orthogonal
       (occurrenceSourceClauseDirection presentation entry)
-      color
+      (routedRibbonLane source.erase entry color)
       (occurrenceClauseRibbonFanPort source.erase entry color)).translate
         (ribbonMacrocellOrigin
           (PositionedPeriodicCNF.variableToClauseTarget

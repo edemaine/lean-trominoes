@@ -514,7 +514,8 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_length_ge_three
         presentation.toContinuousPlanarIncidencePresentation first)
       (occurrenceUnitSourceRoute_hasNoImmediateReversal
         presentation.toContinuousPlanarIncidencePresentation second)
-      firstColor secondColor
+      (routedRibbonLane source.erase first firstColor)
+      (routedRibbonLane source.erase second secondColor)
 
 /-- Colored corridor cores belonging to any two unequal active occurrences
 are strictly separated, including the one-edge singleton-core cases. -/
@@ -535,6 +536,10 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_ne
   let planar := presentation.toPlanarIncidencePresentation
   let firstRoute := occurrenceUnitSourceRoute planar first
   let secondRoute := occurrenceUnitSourceRoute planar second
+  let firstLane :=
+    routedRibbonLane source.erase first firstColor
+  let secondLane :=
+    routedRibbonLane source.erase second secondColor
   have meetOnly :
       RoutesMeetOnlyAtEndpoints firstRoute secondRoute := by
     simpa [firstRoute, secondRoute, planar] using
@@ -572,8 +577,10 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_ne
         presentation.toContinuousPlanarIncidencePresentation second
   change
     RoutesStrictlyAvoidEachOther
-      (ribbonCorridorCore firstColor firstRoute)
-      (ribbonCorridorCore secondColor secondRoute)
+      (ribbonCorridorCore
+        firstLane firstRoute)
+      (ribbonCorridorCore
+        secondLane secondRoute)
   cases firstEquation : firstRoute with
   | nil =>
       simp [firstEquation] at firstLength
@@ -639,7 +646,7 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_ne
                             sourceRibbonPairCores_strictlyAvoidEachOther
                               firstUnit secondUnit
                               directionsDifferent
-                              firstColor secondColor
+                              firstLane secondLane
                       | cons secondThird secondRest =>
                           simpa [firstEquation, secondEquation,
                             ribbonCorridorCore,
@@ -662,7 +669,7 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_ne
                               (by
                                 simpa [secondEquation] using
                                   secondNoReversal)
-                              firstColor secondColor
+                              firstLane secondLane
                   | cons firstThird firstRest =>
                       cases secondRest with
                       | nil =>
@@ -687,7 +694,7 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_ne
                               (by
                                 simpa [firstEquation] using
                                   firstNoReversal)
-                              secondColor firstColor).symm
+                              secondLane firstLane).symm
                       | cons secondThird secondRest =>
                           simpa [firstEquation, secondEquation] using
                             sourceRibbonCorridorCores_strictlyAvoidEachOther
@@ -696,7 +703,7 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther_of_ne
                               (by simp [secondEquation])
                               firstUnitSteps secondUnitSteps
                               firstNoReversal secondNoReversal
-                              firstColor secondColor
+                              firstLane secondLane
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

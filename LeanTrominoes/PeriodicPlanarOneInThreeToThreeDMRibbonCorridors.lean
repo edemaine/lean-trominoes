@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineRibbon
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonLaneAssignment
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVertexGeometry
 
 /-!
@@ -87,7 +88,8 @@ noncomputable def occurrenceRibbonLane
     (color : WireColor) : List Cell :=
   ribbonPolyline
     standardThreeStrandLayout.factor
-    (standardRibbonLaneDistance color)
+    (standardRibbonLaneDistance
+      (routedRibbonLane source.erase entry color))
     (occurrenceSourceRoute presentation entry)
 
 /-- The computed refined endpoint of a colored lane at the variable side. -/
@@ -100,7 +102,8 @@ noncomputable def occurrenceRibbonStart
     (color : WireColor) : Cell :=
   ribbonPolylineStart
     standardThreeStrandLayout.factor
-    (standardRibbonLaneDistance color)
+    (standardRibbonLaneDistance
+      (routedRibbonLane source.erase entry color))
     (occurrenceSourceRoute presentation entry)
 
 /-- The computed refined endpoint of a colored lane at the clause side. -/
@@ -113,7 +116,8 @@ noncomputable def occurrenceRibbonEnd
     (color : WireColor) : Cell :=
   ribbonPolylineEnd
     standardThreeStrandLayout.factor
-    (standardRibbonLaneDistance color)
+    (standardRibbonLaneDistance
+      (routedRibbonLane source.erase entry color))
     (occurrenceSourceRoute presentation entry)
 
 /-- Exact outer endpoints of one central ribbon lane. -/
@@ -137,10 +141,12 @@ theorem occurrenceRibbonLane_endpoints
   exact
     ⟨ribbonPolyline_head?_eq_some_start
         standardThreeStrandLayout.factor
-        (standardRibbonLaneDistance color) nonempty,
+        (standardRibbonLaneDistance
+          (routedRibbonLane source.erase entry color)) nonempty,
       ribbonPolyline_getLast?_eq_some_end
         standardThreeStrandLayout.factor
-        (standardRibbonLaneDistance color) nonempty⟩
+        (standardRibbonLaneDistance
+          (routedRibbonLane source.erase entry color)) nonempty⟩
 
 /-- The corrected central colored lane is rectilinear. -/
 theorem occurrenceRibbonLane_orthogonal
@@ -154,7 +160,8 @@ theorem occurrenceRibbonLane_orthogonal
       (occurrenceRibbonLane presentation entry color) := by
   apply ribbonPolyline_orthogonal
     standardThreeStrandLayout.factorPositive
-    (standardRibbonLaneDistance_positive color)
+    (standardRibbonLaneDistance_positive
+      (routedRibbonLane source.erase entry color))
   exact
     presentation.variableToClauseRoute_orthogonal
       (occurrenceSpliceData presentation entry).indexedMember

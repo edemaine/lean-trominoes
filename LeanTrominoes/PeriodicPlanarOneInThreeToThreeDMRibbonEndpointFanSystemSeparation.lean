@@ -113,7 +113,8 @@ theorem occurrenceThreeStrandRoutes_strictlyAvoidEachOther
         (fans.variableStub first firstColor)
         (occurrenceRibbonCorridorCore
           planar first firstColor)).getLast? =
-        some (ribbonCorridorRouteEnd firstColor
+        some (ribbonCorridorRouteEnd
+          (routedRibbonLane source.erase first firstColor)
           (occurrenceUnitSourceRoute planar first)) :=
     joinAtEndpoint_getLast?
       firstVariableEndpoints.2
@@ -124,7 +125,8 @@ theorem occurrenceThreeStrandRoutes_strictlyAvoidEachOther
         (fans.variableStub second secondColor)
         (occurrenceRibbonCorridorCore
           planar second secondColor)).getLast? =
-        some (ribbonCorridorRouteEnd secondColor
+        some (ribbonCorridorRouteEnd
+          (routedRibbonLane source.erase second secondColor)
           (occurrenceUnitSourceRoute planar second)) :=
     joinAtEndpoint_getLast?
       secondVariableEndpoints.2

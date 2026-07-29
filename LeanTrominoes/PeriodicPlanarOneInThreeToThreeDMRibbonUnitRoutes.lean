@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridorAssembly
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridorSeparation
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonLaneAssignment
 import LeanTrominoes.PeriodicGridDrawingNoImmediateReversal
 import LeanTrominoes.OrthogonalPolylineUnitSubdivisionSimplicity
 
@@ -260,7 +261,7 @@ theorem occurrenceUnitSourceRoute_endpoints
     exact data.routeLast
 
 /-- The endpoint-certified macrocell core assigned to one occurrence and
-color. -/
+semantic color.  The connector kind first selects its physical lane. -/
 noncomputable def occurrenceRibbonCorridorCore
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
@@ -268,10 +269,12 @@ noncomputable def occurrenceRibbonCorridorCore
     (presentation : source.PlanarIncidencePresentation placement)
     (entry : ActiveOccurrenceEntry source.erase)
     (color : WireColor) : List Cell :=
-  ribbonCorridorCore color
+  ribbonCorridorCore
+    (routedRibbonLane source.erase entry color)
     (occurrenceUnitSourceRoute presentation entry)
 
-/-- Exact half-edge-boundary endpoints of the occurrence's colored core. -/
+/-- Exact half-edge-boundary endpoints of the occurrence's semantic strand,
+on its connector-dependent physical lane. -/
 theorem occurrenceRibbonCorridorCore_endpoints
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
@@ -281,14 +284,17 @@ theorem occurrenceRibbonCorridorCore_endpoints
     (color : WireColor) :
     (occurrenceRibbonCorridorCore
         presentation entry color).head? =
-        some (ribbonCorridorRouteStart color
+        some (ribbonCorridorRouteStart
+          (routedRibbonLane source.erase entry color)
           (occurrenceUnitSourceRoute presentation entry)) ∧
       (occurrenceRibbonCorridorCore
         presentation entry color).getLast? =
-        some (ribbonCorridorRouteEnd color
+        some (ribbonCorridorRouteEnd
+          (routedRibbonLane source.erase entry color)
           (occurrenceUnitSourceRoute presentation entry)) := by
   exact
-    ribbonCorridorCore_endpoints_of_length_ge_two color
+    ribbonCorridorCore_endpoints_of_length_ge_two
+      (routedRibbonLane source.erase entry color)
       (occurrenceUnitSourceRoute_length presentation entry)
       (occurrenceUnitSourceRoute_unitSteps presentation entry)
 
@@ -308,7 +314,8 @@ theorem occurrenceRibbonCorridorCore_orthogonal_of_noImmediateReversal
       (occurrenceRibbonCorridorCore
         presentation entry color) := by
   exact
-    ribbonCorridorCore_orthogonal_of_length_ge_two color
+    ribbonCorridorCore_orthogonal_of_length_ge_two
+      (routedRibbonLane source.erase entry color)
       (occurrenceUnitSourceRoute_length presentation entry)
       (occurrenceUnitSourceRoute_unitSteps presentation entry)
       noReversal
@@ -369,7 +376,9 @@ theorem occurrenceRibbonCorridorCores_strictlyAvoidEachOther
           simpa [occurrenceRibbonCorridorCore,
             points, pointsEquation] using
             ribbonCorridorCores_strictlyAvoidEachOther
-              colorsDifferent first second rest
+              ((routedRibbonLane_injective
+                source.erase entry).ne colorsDifferent)
+              first second rest
               (by
                 simpa [points, pointsEquation] using
                   occurrenceUnitSourceRoute_unitSteps
