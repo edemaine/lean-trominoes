@@ -2005,6 +2005,13 @@ The representation choices for this target are:
   rectilinear, bounded, simple, and pairwise strictly separated.  Their sole
   remaining premise is the now-explicit clockwise compatibility of the source
   occurrence directions.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean)
+  packages the active top/left or top/left/right clause terminals and reuses
+  the 28 certified variable outer-fan templates by vertical reflection and
+  route reversal.  Finite certificates prove exact physical-lane entry and
+  gate endpoints, rectilinearity, macrocell containment, and pairwise strict
+  separation.  The same module records the semantic clause ports in uniform
+  physical-lane order.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
