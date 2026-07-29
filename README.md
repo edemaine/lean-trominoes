@@ -2747,6 +2747,11 @@ The representation choices for this target are:
   completeness using the canonical periodic route assignment, establishing
   exact satisfiability preservation for well-formed local degree-three
   incidence graphs with at most three occurrences per source variable.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFinalCorrectness.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFinalCorrectness.lean)
+  transports that equivalence through variable wrapping, canonical variable
+  and clause gauges, and clause-orbit deduplication.  The final positioned
+  retained planar formula is therefore satisfiable exactly when the original
+  periodic CNF is satisfiable.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
