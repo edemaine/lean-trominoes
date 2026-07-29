@@ -696,6 +696,48 @@ theorem
     drawingPeriodicPlanarSATPlacement,
     planarMacroScale]
 
+/-- For any retained noncarrier clause, the source-clause anchor is the
+coordinatewise drawing-period quotient of its component's macrocell center.
+Thus the gauging translation normalizes the entire component occurrence, not
+just the chosen clause position. -/
+theorem
+    DrawingPlanarSATClauseMetadata.sourceClauseAnchor_eq_macrocellCenter_ediv
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (center : Cell)
+    (centerEq :
+      metadata.source.component.macrocellCenter formula = some center)
+    (nonempty : metadata.clause.literals ≠ []) :
+    PeriodicCNF.clauseAnchor
+        (metadataGaugedPositionedClause formula metadata).literals =
+      (center.1 / drawingGridSize formula.incidenceGraph,
+        center.2 / drawingGridSize formula.incidenceGraph) := by
+  have clauseBounded :=
+    metadata.retainedClausePosition_in_macrocell
+      wellFormed degree isLocal valid center centerEq nonempty
+  have centerBounded :
+      InPlanarSATMacrocell center
+        (Cell.scale planarMacroScale center) := by
+    rcases center with ⟨centerX, centerY⟩
+    norm_num [InPlanarSATMacrocell,
+      planarSATMacrocellRouteLower,
+      planarSATMacrocellRouteUpper,
+      InClosedGridRectangle, Cell.add, Cell.scale,
+      planarMacroScale]
+  have quotientEq :=
+    macrocellQuotient_eq
+      (periodFactor := drawingGridSize formula.incidenceGraph)
+      clauseBounded centerBounded
+  rw [metadata.sourceClauseAnchor_eq_position_ediv
+    wellFormed degree isLocal valid nonempty]
+  simpa [drawingPeriodicPlanarSATPlacement,
+    planarMacroScale, Cell.scale] using quotientEq
+
 /-- A contact with an anchor-normalized final carrier segment forces a
 translated routed-clause source to remain in the neighboring retained
 site family. -/
