@@ -1727,6 +1727,11 @@ The representation choices for this target are:
   proves that periodic translations and copied-route splicing preserve the
   certified terminal directions of local Figure 7 spokes and implication
   routes.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockIndex.lean)
+  proves that filtering the flattened implication suffix preserves the two
+  local cycle indices in order, shifted by the atom's unique block origin,
+  and that those shifted indices retrieve the corresponding positioned
+  Figure 7 routes.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean)
   assigns a chosen rotation order to the eight clockwise Figure 7 ports.
   Whenever every per-variable occurrence list has length at most eight, the
