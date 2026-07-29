@@ -579,6 +579,11 @@ The representation choices for this target are:
   complete route family.  It derives the assembled periodic drawing's
   graph-level `RoutesMatch` and `IsOrthogonal` predicates, keeping vertex
   separation and planarity as explicit independent obligations.
+  [`LeanTrominoes/PositionedPeriodicCNFCanonicalOrthogonalPlanarization.lean`](LeanTrominoes/PositionedPeriodicCNFCanonicalOrthogonalPlanarization.lean)
+  transfers the route-independent vertex geometry from any compatible
+  reference drawing, then unit-subdivides a canonical orthogonal route
+  family.  The result is packaged as a complete compatible, orthogonal, and
+  planar positioned incidence presentation.
   [`LeanTrominoes/PositionedPeriodicCNFCanonicalRouteRenaming.lean`](LeanTrominoes/PositionedPeriodicCNFCanonicalRouteRenaming.lean)
   proves that position- and period-preserving variable renaming reuses a
   canonical route family verbatim, retaining pointwise clause/literal
@@ -1611,6 +1616,11 @@ The representation choices for this target are:
   proves exact canonical endpoints and orthogonality for every genuine
   route.  Unit subdivision below turns this orthogonal drawing into a
   presentation satisfying the project's integer-grid planarity predicate.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPlanarizedDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPlanarizedDrawing.lean)
+  transfers compatibility from the positively scaled retained reference
+  drawing to the rasterized route family and applies ordered unit
+  subdivision.  It packages the resulting scaled drawing as a complete
+  `PlanarIncidencePresentation` of the retained planar-SAT incidence graph.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
