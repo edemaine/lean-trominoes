@@ -21,6 +21,81 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 1200000
 
+/-- Undo the two quotient gauges in a final contact, then cancel the carrier's
+common physical translate.  The result is a contact between the carrier's
+original finite segment and the noncarrier segment translated by exactly the
+source shift used by the halo-closure reduction below. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.alignedPhysicalSegments_interiorsMeet_of_final
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (meet :
+      GridSegment.InteriorsMeet
+        (firstIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation firstShift))
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift))) :
+    GridSegment.InteriorsMeet
+      first.physicalSegment
+      (second.physicalSegment.translate
+        (carrierMacroPeriodTranslation formula.incidenceGraph
+          (Cell.sub second.physicalShift first.physicalShift))) := by
+  let firstRepresentative :=
+    first.toCommonShiftRepresentative
+  let secondRepresentative :=
+    second.toCommonShiftRepresentative
+  rw [firstRepresentative.segmentEq,
+    secondRepresentative.segmentEq] at meet
+  change
+    GridSegment.InteriorsMeet
+      (first.physicalSegment.translate
+        ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          formula).translation first.physicalShift))
+      (second.physicalSegment.translate
+        ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          formula).translation second.physicalShift)) at meet
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  let sourceShift :=
+    Cell.sub second.physicalShift first.physicalShift
+  have secondAlignedEq :
+      (second.physicalSegment.translate
+        (placement.translation sourceShift)).translate
+          (placement.translation first.physicalShift) =
+        second.physicalSegment.translate
+          (placement.translation second.physicalShift) := by
+    exact segment_translate_placement_sub_add
+      placement second.physicalSegment
+      second.physicalShift first.physicalShift
+  rw [← secondAlignedEq] at meet
+  have aligned :
+      GridSegment.InteriorsMeet
+        first.physicalSegment
+        (second.physicalSegment.translate
+          (placement.translation sourceShift)) :=
+    (GridSegment.interiorsMeet_translate_both_iff
+      first.physicalSegment
+      (second.physicalSegment.translate
+        (placement.translation sourceShift))
+      (placement.translation first.physicalShift)).mp meet
+  have offsetEq :
+      placement.translation sourceShift =
+        carrierMacroPeriodTranslation
+          formula.incidenceGraph sourceShift :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+      formula sourceShift
+  simpa only [sourceShift, offsetEq] using aligned
+
 /-- A retained carrier metadata source supplies the raw-link membership and
 neighboring first occurrence required by the finite carrier separation API. -/
 theorem
