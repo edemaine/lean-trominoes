@@ -773,6 +773,79 @@ theorem PeriodicGridDrawing.translatedHalfOpenPosition_ediv
       verticalBaseQuotient]
     simp
 
+/-- The coordinatewise period quotient of a lifted incidence-graph vertex
+is exactly its occurrence translation. -/
+theorem liftedIncidenceVertexPosition_ediv
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {vertex : CNFVertex Variable}
+    (vertexMember : vertex ∈ formula.incidenceGraph.vertices)
+    (translate : Cell) :
+    ((liftedIncidenceVertexPosition formula vertex translate).1 /
+        drawingGridSize formula.incidenceGraph,
+      (liftedIncidenceVertexPosition formula vertex translate).2 /
+        drawingGridSize formula.incidenceGraph) =
+      translate := by
+  have vertexBounds :=
+    drawing_vertexPosition_in_fundamental_square
+      formula.incidenceGraph vertexMember
+  have halfOpenBounds :
+      0 ≤ ((drawing formula.incidenceGraph).vertexPosition
+          formula.incidenceGraph vertex).1 ∧
+        ((drawing formula.incidenceGraph).vertexPosition
+            formula.incidenceGraph vertex).1 <
+          (drawing formula.incidenceGraph).gridSize ∧
+        0 ≤ ((drawing formula.incidenceGraph).vertexPosition
+          formula.incidenceGraph vertex).2 ∧
+        ((drawing formula.incidenceGraph).vertexPosition
+            formula.incidenceGraph vertex).2 <
+          (drawing formula.incidenceGraph).gridSize := by
+    simpa [drawing_gridSize] using
+      ⟨le_of_lt vertexBounds.1, vertexBounds.2.1,
+        le_of_lt vertexBounds.2.2.1, vertexBounds.2.2.2⟩
+  simpa [liftedIncidenceVertexPosition, drawing_gridSize] using
+    (PeriodicGridDrawing.translatedHalfOpenPosition_ediv
+      (drawing formula.incidenceGraph) halfOpenBounds)
+
+/-- If a noncarrier component is centered at a lifted incidence-graph
+vertex, its clause anchor is the occurrence translation of that vertex. -/
+theorem
+    DrawingPlanarSATClauseMetadata.sourceClauseAnchor_eq_liftedVertexTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (vertex : CNFVertex Variable)
+    (vertexMember : vertex ∈ formula.incidenceGraph.vertices)
+    (translate : Cell)
+    (centerEq :
+      metadata.source.component.macrocellCenter formula =
+        some
+          (liftedIncidenceVertexPosition formula vertex translate)) :
+    PeriodicCNF.clauseAnchor
+        (metadataGaugedPositionedClause formula metadata).literals =
+      translate := by
+  rw [metadata.sourceClauseAnchor_eq_macrocellCenter_ediv
+    wellFormed degree isLocal valid
+    (liftedIncidenceVertexPosition formula vertex translate)
+    centerEq nonempty]
+  exact liftedIncidenceVertexPosition_ediv
+    formula vertexMember translate
+
+/-- A local protoedge offset is one of the nine neighboring translations. -/
+theorem PeriodicEdge.offset_neighbor_of_local
+    {Vertex : Type*}
+    (edge : PeriodicEdge Vertex)
+    (edgeLocal : edge.span ≤ 1) :
+    IsNeighborTranslation edge.offset := by
+  rcases offset_eq_of_span_le_one edge edgeLocal with
+    offset | offset | offset | offset | offset <;>
+    simp [offset, IsNeighborTranslation]
+
 /-- Every semantic bend-center placement of a local protoedge crosses at
 most one period boundary. -/
 theorem routeBendCenterPlacement_offset_neighbor
@@ -975,6 +1048,196 @@ theorem
   apply crossoverSource_periodTranslate_retainedComponentMember
   rw [CrossingRecord.periodTranslate_neg_shift_eq_periodNormalize]
   exact normalizedMember
+
+/-- A retained routed-clause source is centered at its lifted clause site,
+so anchor normalization moves that site to the zero occurrence and keeps it
+in the retained neighboring site family. -/
+theorem
+    DrawingPlanarSATClauseMetadata.routedClause_anchorNormalize_retainedComponentMember
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (site : ClauseRouteSite)
+    (sourceEq : metadata.source = .routedClause site) :
+    (metadata.source.periodTranslate formula
+      (Cell.neg
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause formula metadata).literals))
+        |>.RetainedComponentMember formula) := by
+  have valid' := valid
+  unfold DrawingPlanarSATClauseMetadata.RetainedValid at valid'
+  rw [sourceEq] at valid'
+  have centerEq :
+      metadata.source.component.macrocellCenter formula =
+        some
+          (liftedIncidenceVertexPosition
+            formula (.clause site.1) site.2) := by
+    rw [sourceEq]
+    rfl
+  have anchorEq :=
+    metadata.sourceClauseAnchor_eq_liftedVertexTranslate
+      wellFormed degree isLocal valid nonempty
+      (.clause site.1)
+      (drawingClauseRouteSite_vertex_mem formula valid'.1)
+      site.2 centerEq
+  rw [sourceEq, anchorEq]
+  apply
+    routedClauseSource_periodTranslate_retainedComponentMember_of_neighbor
+      formula site valid'.1 (Cell.neg site.2)
+  rcases site.2 with ⟨siteX, siteY⟩
+  simp [Cell.add, Cell.neg, Cell.sub, IsNeighborTranslation]
+
+/-- Anchor normalization of a retained routed-variable arm leaves its
+witnessing route occurrence at the inverse local protoedge offset.  This is
+the neighboring orbit condition needed to reindex the arm, even when the
+sorted arm index itself changes. -/
+theorem
+    DrawingPlanarSATClauseMetadata.routedVariable_anchorNormalize_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (site : VariableRouteSite Variable)
+    (armIndex : Nat)
+    (arm : DuplicatorArm)
+    (link : EqualityLink (PlanarSATNode Variable))
+    (localClauseIndex : Nat)
+    (sourceEq :
+      metadata.source =
+        .routedVariable site armIndex arm link localClauseIndex) :
+    metadata.source.RetainedOrbitCondition formula
+      (Cell.neg
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause formula metadata).literals)) := by
+  have valid' := valid
+  unfold DrawingPlanarSATClauseMetadata.RetainedValid at valid'
+  rw [sourceEq] at valid'
+  rcases
+      exists_routeOccurrence_of_routedVariableLinkMember
+        formula site valid'.2.1 with
+    ⟨occurrence, occurrenceMember, linkFirstEq⟩
+  have occurrenceData :=
+    variableRouteOccurrencesAt_mem_drawing_and_variableOccurrence
+      formula site occurrenceMember
+  have centerEq :
+      metadata.source.component.macrocellCenter formula =
+        some
+          (liftedIncidenceVertexPosition
+            formula (.variable site.1) site.2) := by
+    rw [sourceEq]
+    rfl
+  have anchorEq :=
+    metadata.sourceClauseAnchor_eq_liftedVertexTranslate
+      wellFormed degree isLocal valid nonempty
+      (.variable site.1)
+      (drawingVariableRouteSite_vertex_mem formula valid'.1)
+      site.2 centerEq
+  rw [sourceEq, anchorEq]
+  refine ⟨occurrence, occurrenceMember, linkFirstEq, ?_⟩
+  have siteTranslateEq :
+      Cell.add occurrence.translate occurrence.edge.offset = site.2 :=
+    congrArg Prod.snd occurrenceData.2
+  have edgeMember :=
+    occurrence.taggedEdge_mem formula occurrenceData.1
+  have edgeLocal : occurrence.edge.span ≤ 1 :=
+    isLocal occurrence.edge
+      (List.fst_mem_of_mem_zipIdx edgeMember)
+  have offsetNeighbor :
+      IsNeighborTranslation occurrence.edge.offset :=
+    PeriodicEdge.offset_neighbor_of_local
+      occurrence.edge edgeLocal
+  have normalizedTranslateEq :
+      Cell.add occurrence.translate (Cell.neg site.2) =
+        Cell.neg occurrence.edge.offset := by
+    rw [← siteTranslateEq]
+    rcases occurrence.translate with ⟨translateX, translateY⟩
+    rcases occurrence.edge.offset with ⟨offsetX, offsetY⟩
+    simp [Cell.add, Cell.neg, Cell.sub]
+  rw [normalizedTranslateEq]
+  exact offsetNeighbor.neg
+
+/-- Every retained noncarrier source satisfies its family-specific orbit
+condition after subtracting its source-clause anchor.  Exact translated
+membership handles crossovers, bends, and routed clauses; routed-variable
+arms use the occurrence witness above because their sorted arm index may
+change. -/
+theorem
+    DrawingPlanarSATClauseMetadata.noncarrier_anchorNormalize_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (notCarrier :
+      ¬∃ link,
+        metadata.source.component =
+          DrawingPlanarSATComponent.carrier link) :
+    metadata.source.RetainedOrbitCondition formula
+      (Cell.neg
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause formula metadata).literals)) := by
+  let anchorShift :=
+    Cell.neg
+      (PeriodicCNF.clauseAnchor
+        (metadataGaugedPositionedClause formula metadata).literals)
+  have sourceMember :
+      metadata.source.RetainedComponentMember formula :=
+    (metadata.retainedValid_iff_sourceMember_and_localClauseMember
+      formula).mp valid |>.1
+  cases sourceEq : metadata.source with
+  | crossover crossing localClauseIndex =>
+      rw [← sourceEq]
+      change metadata.source.RetainedOrbitCondition formula anchorShift
+      apply
+        metadata.source.retainedOrbitCondition_of_periodTranslate_mem
+          formula sourceMember anchorShift
+      simpa only [anchorShift] using
+        (metadata.crossover_anchorNormalize_retainedComponentMember
+          wellFormed degree isLocal valid nonempty
+          crossing localClauseIndex sourceEq)
+  | carrier link localClauseIndex =>
+      exfalso
+      apply notCarrier
+      refine ⟨link, ?_⟩
+      rw [sourceEq]
+      rfl
+  | bend routeBend localClauseIndex =>
+      rw [← sourceEq]
+      change metadata.source.RetainedOrbitCondition formula anchorShift
+      apply
+        metadata.source.retainedOrbitCondition_of_periodTranslate_mem
+          formula sourceMember anchorShift
+      simpa only [anchorShift] using
+        (metadata.bend_anchorNormalize_retainedComponentMember
+          wellFormed degree isLocal valid nonempty
+          routeBend localClauseIndex sourceEq)
+  | routedClause site =>
+      rw [← sourceEq]
+      change metadata.source.RetainedOrbitCondition formula anchorShift
+      apply
+        metadata.source.retainedOrbitCondition_of_periodTranslate_mem
+          formula sourceMember anchorShift
+      simpa only [anchorShift] using
+        (metadata.routedClause_anchorNormalize_retainedComponentMember
+          wellFormed degree isLocal valid nonempty site sourceEq)
+  | routedVariable site armIndex arm link localClauseIndex =>
+      rw [← sourceEq]
+      simpa only [anchorShift] using
+        (metadata.routedVariable_anchorNormalize_retainedOrbitCondition
+          wellFormed degree isLocal valid nonempty
+          site armIndex arm link localClauseIndex sourceEq)
 
 /-- A contact with an anchor-normalized final carrier segment forces a
 translated routed-clause source to remain in the neighboring retained
