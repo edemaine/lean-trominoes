@@ -1718,6 +1718,11 @@ The representation choices for this target are:
   copies create no variable-order obligation.  It also splits every complete
   three-slot occurrence lookup into exactly one copied-source occurrence
   followed by the two shifted cycle occurrences in presentation order.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitCycleOccurrenceIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCycleOccurrenceIndex.lean)
+  identifies the clause/literal indices of a renamed semantic implication
+  ring with the corresponding finite embedded-cycle incidences.  Filtering
+  any real port copy therefore recovers exactly the two local indices used
+  by the clockwise-direction certificate.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean)
   assigns a chosen rotation order to the eight clockwise Figure 7 ports.
   Whenever every per-variable occurrence list has length at most eight, the
