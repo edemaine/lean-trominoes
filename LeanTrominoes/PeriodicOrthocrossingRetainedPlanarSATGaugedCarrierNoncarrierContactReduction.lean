@@ -1236,6 +1236,151 @@ theorem
   · simpa only [firstEq] using alignedFirst
   · simpa only [targetShift, targetOffsetEq] using alignedSecond
 
+/-- Cancel a carrier occurrence's final lattice translate at a literal
+endpoint equality.  This does not use closed segment containment, so it also
+applies when the translated noncarrier segment is diagonal. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.exists_anchorAlignedPhysical_endpointEquality_of_final
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point)
+    (endpointEq :
+      point =
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)).start ∨
+        point =
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)).finish) :
+    ∃ alignedPoint,
+      firstIndexed.segment.InteriorContains alignedPoint ∧
+        (alignedPoint =
+            (second.physicalSegment.translate
+              (carrierMacroPeriodTranslation formula.incidenceGraph
+                (Cell.sub second.physicalShift firstShift))).start ∨
+          alignedPoint =
+            (second.physicalSegment.translate
+              (carrierMacroPeriodTranslation formula.incidenceGraph
+                (Cell.sub second.physicalShift firstShift))).finish) := by
+  let firstRepresentative :=
+    first.toCommonShiftRepresentative
+  let secondRepresentative :=
+    second.toCommonShiftRepresentative
+  rw [firstRepresentative.segmentEq] at firstContains
+  rw [secondRepresentative.segmentEq] at endpointEq
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  change
+    (first.physicalSegment.translate
+      (placement.translation first.physicalShift)).InteriorContains
+        point at firstContains
+  change
+    point =
+        (second.physicalSegment.translate
+          (placement.translation second.physicalShift)).start ∨
+      point =
+        (second.physicalSegment.translate
+          (placement.translation second.physicalShift)).finish at endpointEq
+  let anchorShift := Cell.neg first.sourceClauseAnchor
+  let targetShift := Cell.sub second.physicalShift firstShift
+  have firstRemainingEq :
+      Cell.sub first.physicalShift anchorShift = firstShift := by
+    rcases firstShift with ⟨firstX, firstY⟩
+    rcases first.sourceClauseAnchor with ⟨anchorX, anchorY⟩
+    simp [FinalGaugedSegmentOccurrenceWitness.physicalShift_eq,
+      anchorShift, Cell.sub, Cell.neg]
+  have secondRemainingEq :
+      Cell.sub second.physicalShift targetShift = firstShift := by
+    rcases firstShift with ⟨firstX, firstY⟩
+    simp only [targetShift, Cell.sub, Prod.mk.injEq]
+    constructor <;> omega
+  have firstAlignedEq :
+      (first.physicalSegment.translate
+        (placement.translation anchorShift)).translate
+          (placement.translation firstShift) =
+        first.physicalSegment.translate
+          (placement.translation first.physicalShift) := by
+    simpa only [firstRemainingEq] using
+      (segment_translate_placement_add_sub
+        placement first.physicalSegment
+        first.physicalShift anchorShift)
+  have secondAlignedEq :
+      (second.physicalSegment.translate
+        (placement.translation targetShift)).translate
+          (placement.translation firstShift) =
+        second.physicalSegment.translate
+          (placement.translation second.physicalShift) := by
+    simpa only [secondRemainingEq] using
+      (segment_translate_placement_add_sub
+        placement second.physicalSegment
+        second.physicalShift targetShift)
+  rw [← firstAlignedEq] at firstContains
+  rw [← secondAlignedEq] at endpointEq
+  let commonOffset := placement.translation firstShift
+  let alignedPoint := Cell.sub point commonOffset
+  have alignedFirst :
+      (first.physicalSegment.translate
+        (placement.translation anchorShift)).InteriorContains
+          alignedPoint := by
+    apply
+      (PeriodicGridDrawing.interiorContains_translate_iff
+        (first.physicalSegment.translate
+          (placement.translation anchorShift))
+        commonOffset alignedPoint).mp
+    simpa [commonOffset, alignedPoint, Cell.add, Cell.sub] using
+      firstContains
+  have alignedEndpointEq :
+      alignedPoint =
+          (second.physicalSegment.translate
+            (placement.translation targetShift)).start ∨
+        alignedPoint =
+          (second.physicalSegment.translate
+            (placement.translation targetShift)).finish := by
+    rcases endpointEq with endpointEq | endpointEq
+    · apply Or.inl
+      rcases point with ⟨pointX, pointY⟩
+      simp only [alignedPoint, commonOffset, GridSegment.translate,
+        Cell.sub, Cell.add, Prod.mk.injEq] at endpointEq ⊢
+      constructor <;> omega
+    · apply Or.inr
+      rcases point with ⟨pointX, pointY⟩
+      simp only [alignedPoint, commonOffset, GridSegment.translate,
+        Cell.sub, Cell.add, Prod.mk.injEq] at endpointEq ⊢
+      constructor <;> omega
+  have firstEq :
+      first.physicalSegment.translate
+          (placement.translation anchorShift) =
+        firstIndexed.segment := by
+    rw [first.indexedSegment_eq_anchorNormalizedPhysical]
+    have offsetEq :
+        placement.translation anchorShift =
+          carrierMacroPeriodTranslation formula.incidenceGraph
+            anchorShift :=
+      retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+        formula anchorShift
+    simp only [anchorShift, offsetEq]
+  have targetOffsetEq :
+      placement.translation targetShift =
+        carrierMacroPeriodTranslation formula.incidenceGraph
+          targetShift :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_translation_eq_carrierMacro
+      formula targetShift
+  refine ⟨alignedPoint, ?_, ?_⟩
+  · simpa only [firstEq] using alignedFirst
+  · simpa only [targetShift, targetOffsetEq] using alignedEndpointEq
+
 /-- Cancel a carrier occurrence's final lattice translate at the reverse
 asymmetric endpoint contact.  The resulting common point lies in the closed
 carrier segment and in the relative interior of the translated noncarrier
@@ -1627,6 +1772,136 @@ theorem
   have secondPointBounded :=
     inClosedGridRectangle_of_segment_contains
       secondBounds.1 secondBounds.2 alignedSecond
+  have notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower
+          graph translatedLink)
+        (drawingCompleteCarrierLinkRectangleUpper
+          graph translatedLink)
+        (planarSATMacrocellRouteLower
+          (Cell.add center
+            ((drawing graph).periodTranslation sourceShift)))
+        (planarSATMacrocellRouteUpper
+          (Cell.add center
+            ((drawing graph).periodTranslation sourceShift))) := by
+    intro separated
+    exact
+      (ne_of_inClosedGridRectangles_of_separated
+        firstPointBounded secondPointBounded separated)
+      rfl
+  exact
+    retainedDrawingCompleteCarrierLinkRaw_supportingSegment_contains_of_macrocell_overlap
+      wellFormed degree isLocal translatedLinkMember
+      (Cell.add center
+        ((drawing graph).periodTranslation sourceShift))
+      notSeparated
+
+/-- At a literal carrier-interior/noncarrier-endpoint equality, the
+anchor-normalized carrier supporting segment still passes through the
+translated center of the noncarrier macrocell, without requiring the
+noncarrier segment to be axis-aligned. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_endpointEquality
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (center : Cell)
+    (centerEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some center)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point)
+    (endpointEq :
+      point =
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)).start ∨
+        point =
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)).finish) :
+    let graph := formula.incidenceGraph
+    let anchorShift := Cell.neg first.sourceClauseAnchor
+    let sourceShift := Cell.sub second.physicalShift firstShift
+    let translatedLink :=
+      carrierLinkPeriodTranslate graph link anchorShift
+    (translatedLink.first.supportingSegment graph).Contains
+      (Cell.add center
+        ((drawing graph).periodTranslation sourceShift)) := by
+  let graph := formula.incidenceGraph
+  let anchorShift := Cell.neg first.sourceClauseAnchor
+  let sourceShift := Cell.sub second.physicalShift firstShift
+  let translatedLink :=
+    carrierLinkPeriodTranslate graph link anchorShift
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          link firstComponentEq with
+    ⟨localClauseIndex, firstSourceEq⟩
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have translatedLinkMember :
+      translatedLink ∈
+        retainedDrawingCompleteCarrierLinksRaw graph := by
+    simpa only [translatedLink, graph, anchorShift,
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (first.routeWitness.metadata
+        |>.carrier_anchorNormalize_mem_raw
+          wellFormed degree isLocal first.metadata_retainedValid
+          firstNonempty link localClauseIndex firstSourceEq)
+  have firstBounds :=
+    first.indexedSegment_endpoints_in_anchorNormalizedCarrierRectangle
+      wellFormed degree isLocal link firstComponentEq
+  have secondBounds :=
+    second.translatedPhysicalSegment_endpoints_in_macrocell
+      wellFormed degree isLocal secondNotCarrier
+      center centerEq sourceShift
+  rcases
+      first.exists_anchorAlignedPhysical_endpointEquality_of_final
+        second firstContains endpointEq with
+    ⟨alignedPoint, alignedFirst, alignedEndpoint⟩
+  have firstPointBounded :=
+    inClosedGridRectangle_of_segment_contains
+      firstBounds.1 firstBounds.2
+      (GridSegment.contains_of_interiorContains alignedFirst)
+  have secondPointBounded :
+      InClosedGridRectangle
+        (planarSATMacrocellRouteLower
+          (Cell.add center
+            ((drawing graph).periodTranslation sourceShift)))
+        (planarSATMacrocellRouteUpper
+          (Cell.add center
+            ((drawing graph).periodTranslation sourceShift)))
+        alignedPoint := by
+    rcases alignedEndpoint with startEq | finishEq
+    · rw [startEq]
+      exact secondBounds.1
+    · rw [finishEq]
+      exact secondBounds.2
   have notSeparated :
       ¬ClosedGridRectanglesSeparated
         (drawingCompleteCarrierLinkRectangleLower
@@ -4895,6 +5170,154 @@ theorem
           (PeriodicGridDrawing.relativeTranslate_isNeighbor_of_endpointContact_of_secondHalfOpen
             firstEndpointBounds secondEndpointBounds
             contactFirst contactSecond)
+    have sumMember :=
+      firstBaseNeighbor.add_mem_doubleNeighborTranslations
+        relativeNeighbor
+    simpa [Cell.sub] using sumMember
+
+/-- Final carrier segment interiors avoid both endpoints of every
+routed-clause segment occurrence, including a diagonal stored segment. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_routedClause
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    (firstMember :
+      firstIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (site : ClauseRouteSite)
+    (secondSourceEq :
+      second.routeWitness.metadata.source = .routedClause site)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  have siteMember :
+      site ∈ drawingClauseRouteSites formula := by
+    have sourceMember := second.source_retainedComponentMember
+    rw [secondSourceEq] at sourceMember
+    exact sourceMember
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have secondNonempty :
+      second.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := second.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have secondCenterEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some
+          (liftedIncidenceVertexPosition
+            formula (.clause site.1) site.2) := by
+    rw [secondSourceEq]
+    rfl
+  have secondAnchorEq :
+      second.sourceClauseAnchor = site.2 := by
+    simpa only [
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (second.routeWitness.metadata
+        |>.sourceClauseAnchor_eq_liftedVertexTranslate
+          wellFormed degree isLocal second.metadata_retainedValid
+          secondNonempty (.clause site.1)
+          (drawingClauseRouteSite_vertex_mem formula siteMember)
+          site.2 secondCenterEq)
+  refine
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_noncarrier_of_balanced_source_coordinate
+      formula wellFormed degree isLocal first second
+      link firstComponentEq secondNotCarrier (0, 0) ?_ ?_
+      point firstContains
+  · intro adjustment adjustmentNeighbor
+    rw [secondSourceEq]
+    change
+      IsNeighborTranslation
+        (Cell.add site.2
+          (Cell.add
+            (Cell.neg second.sourceClauseAnchor)
+            adjustment))
+    have translatedSiteEq :
+        Cell.add site.2
+            (Cell.add
+              (Cell.neg second.sourceClauseAnchor)
+              adjustment) =
+          adjustment := by
+      rw [secondAnchorEq]
+      rcases site.2 with ⟨siteX, siteY⟩
+      rcases adjustment with
+        ⟨adjustmentX, adjustmentY⟩
+      simp [Cell.add, Cell.neg, Cell.sub]
+    rw [translatedSiteEq]
+    simpa [Cell.add] using adjustmentNeighbor
+  · intro contactPoint contactFirst endpointEq
+    rcases
+        first.routeWitness.metadata.source
+          |>.exists_eq_carrier_of_component_eq
+            link firstComponentEq with
+      ⟨localClauseIndex, firstSourceEq⟩
+    have firstBaseNeighbor :
+        IsNeighborTranslation
+          (Cell.add link.first.translate
+            (Cell.neg first.sourceClauseAnchor)) := by
+      simpa only [
+        FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor,
+        carrierLinkPeriodTranslate_first,
+        CarrierNode.translate_periodTranslate] using
+        (first.routeWitness.metadata
+          |>.carrier_first_anchorNormalize_translate_neighbor
+            wellFormed degree isLocal first.metadata_retainedValid
+            firstNonempty link localClauseIndex firstSourceEq)
+    have firstEndpointBounds :=
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_segmentEndpointsInExpandedSquare
+        formula wellFormed degree isLocal clausesNonempty
+        firstIndexed firstMember
+    have secondEndpointBounds :=
+      second.endpointsInHalfOpenFundamentalSquare_of_not_carrier
+        formula wellFormed degree isLocal clausesNonempty
+        secondNotCarrier
+    have relativeNeighbor :
+        IsNeighborTranslation (Cell.sub firstShift secondShift) := by
+      exact
+        (mem_neighborTranslations_iff _).mp
+          (PeriodicGridDrawing.relativeTranslate_isNeighbor_of_endpointEquality_of_secondHalfOpen
+            firstEndpointBounds secondEndpointBounds
+            contactFirst endpointEq)
     have sumMember :=
       firstBaseNeighbor.add_mem_doubleNeighborTranslations
         relativeNeighbor
