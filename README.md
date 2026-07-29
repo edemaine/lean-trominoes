@@ -1723,6 +1723,10 @@ The representation choices for this target are:
   ring with the corresponding finite embedded-cycle incidences.  Filtering
   any real port copy therefore recovers exactly the two local indices used
   by the clockwise-direction certificate.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitRouteTerminalDirections.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitRouteTerminalDirections.lean)
+  proves that periodic translations and copied-route splicing preserve the
+  certified terminal directions of local Figure 7 spokes and implication
+  routes.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean)
   assigns a chosen rotation order to the eight clockwise Figure 7 ports.
   Whenever every per-variable occurrence list has length at most eight, the
