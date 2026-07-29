@@ -82,6 +82,31 @@ theorem ne_of_inClosedGridRectangles_of_separated
   rcases separated with separated | separated |
       separated | separated <;> omega
 
+/-- Closed containment in an axis-aligned segment whose endpoints lie in a
+closed rectangle keeps the contained point in that rectangle. -/
+theorem inClosedGridRectangle_of_segment_contains
+    {lower upper point : Cell}
+    {segment : GridSegment}
+    (startBounded :
+      InClosedGridRectangle lower upper segment.start)
+    (finishBounded :
+      InClosedGridRectangle lower upper segment.finish)
+    (contains : segment.Contains point) :
+    InClosedGridRectangle lower upper point := by
+  rcases lower with ⟨lowerX, lowerY⟩
+  rcases upper with ⟨upperX, upperY⟩
+  rcases point with ⟨pointX, pointY⟩
+  rcases segment with
+    ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+  simp only [InClosedGridRectangle] at startBounded finishBounded ⊢
+  simp only [GridSegment.Contains, GridSegment.IsHorizontal,
+    GridSegment.IsVertical, GridSegment.Between] at contains
+  rcases contains with
+      ⟨horizontal, same, between⟩ |
+      ⟨vertical, same, between⟩ <;>
+    rcases between with between | between <;>
+    omega
+
 /-- A point in one closed rectangle cannot lie in the relative interior of
 an axis-aligned segment whose endpoints lie in a separated rectangle. -/
 theorem not_interiorContains_of_inClosedGridRectangles_of_separated
