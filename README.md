@@ -2578,6 +2578,11 @@ The representation choices for this target are:
   when the final periodic route-point occurrence key is equal.  This is the
   quotient interface needed to rule out hidden bend-to-bend contacts before
   ribbon thickening.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCommonShiftRepresentatives.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCommonShiftRepresentatives.lean)
+  isolates a same-shift finite representative for an indexed final route
+  point.  Two distinct finite point indices represented at one common shift
+  can coincide only at outer endpoints, by retained route simplicity and the
+  finite endpoint-contact certificate.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierSegmentBounds.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedNoncarrierSegmentBounds.lean)
   transfers the noncarrier route-point residue theorem through that
   occurrence bridge.  Every final segment represented by crossover, bend,
@@ -2611,6 +2616,10 @@ The representation choices for this target are:
   automatically.  It preserves the within-route segment index and balances
   source translation against the external occurrence shift, while permitting
   enumeration-only source fields to change at the retained-window boundary.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointReindexedRepresentatives.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointReindexedRepresentatives.lean)
+  lifts the same source reindexing to whole routes.  It preserves the selected
+  point index, route length, endpoint status, and lifted coordinate while
+  moving the point representative to the adjusted common physical shift.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAutomaticReindexing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedAutomaticReindexing.lean)
   discharges that metadata-entry obligation from retained membership of
   either the literal translated source or any source with the same geometric

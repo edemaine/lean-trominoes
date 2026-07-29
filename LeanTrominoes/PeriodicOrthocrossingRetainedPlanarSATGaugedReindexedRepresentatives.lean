@@ -119,6 +119,83 @@ private theorem retainedLocalRoute_eq_sourceRoute
     EmbeddedCNFIncidenceDrawing.routeAt,
     metadataLookup]
 
+/-- Reindexing retained metadata translates the entire selected finite
+route, not merely the segment used to construct the occurrence witness. -/
+theorem
+    FinalGaugedSegmentMetadataReindexing.targetRoute_eq_translate
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {indexed : IndexedGridSegment}
+    {shift reindexShift : Cell}
+    {witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift}
+    (reindexing :
+      FinalGaugedSegmentMetadataReindexing witness reindexShift) :
+    (retainedDrawingPlanarSATLocalIncidenceDrawing formula).routeAt
+        (metadataPhysicalIncidence
+          reindexing.targetMetadata
+          reindexing.targetMetadataIndex
+          reindexing.targetLiteral witness.taggedLiteral.2) =
+      translatePolyline
+        (carrierMacroPeriodTranslation
+          (PeriodicCNF.incidenceGraph formula) reindexShift)
+        ((retainedDrawingPlanarSATLocalIncidenceDrawing formula).routeAt
+          (metadataPhysicalIncidence
+            witness.routeWitness.metadata
+            witness.routeWitness.metadataIndex
+            witness.routeWitness.literal
+            witness.taggedLiteral.2)) := by
+  let sourceMetadata := witness.routeWitness.metadata
+  let sourceIncidence :=
+    metadataPhysicalIncidence
+      sourceMetadata witness.routeWitness.metadataIndex
+      witness.routeWitness.literal witness.taggedLiteral.2
+  let offset :=
+    carrierMacroPeriodTranslation
+      (PeriodicCNF.incidenceGraph formula) reindexShift
+  have sourceRouteEq :
+      (retainedDrawingPlanarSATLocalIncidenceDrawing formula).routeAt
+          sourceIncidence =
+        (sourceMetadata.source.incidenceDrawing formula).routes
+          sourceMetadata.source.localClauseIndex
+          witness.taggedLiteral.2 := by
+    exact retainedLocalRoute_eq_sourceRoute
+      formula sourceMetadata witness.routeWitness.metadataIndex
+      witness.routeWitness.literal witness.taggedLiteral.2
+      witness.routeWitness.metadataLookup
+  rw [retainedLocalRoute_eq_sourceRoute
+    formula reindexing.targetMetadata
+      reindexing.targetMetadataIndex
+      reindexing.targetLiteral witness.taggedLiteral.2
+      reindexing.targetMetadataLookup]
+  calc
+    (reindexing.targetMetadata.source.incidenceDrawing formula).routes
+          reindexing.targetMetadata.source.localClauseIndex
+          witness.taggedLiteral.2 =
+        ((sourceMetadata.source.periodTranslate
+          formula reindexShift).incidenceDrawing formula).routes
+          sourceMetadata.source.localClauseIndex
+          witness.taggedLiteral.2 := by
+      rw [reindexing.targetLocalClauseIndexEq]
+      have drawingEq :=
+        DrawingPlanarSATClauseSource.incidenceDrawing_eq_of_component_eq
+          formula reindexing.targetMetadata.source
+            (sourceMetadata.source.periodTranslate formula reindexShift)
+            reindexing.targetComponentEq
+      rw [drawingEq]
+    _ =
+        translatePolyline offset
+          ((sourceMetadata.source.incidenceDrawing formula).routes
+            sourceMetadata.source.localClauseIndex
+            witness.taggedLiteral.2) := by
+      rw [
+        DrawingPlanarSATClauseSource.incidenceDrawing_routes_periodTranslate]
+    _ =
+        translatePolyline offset
+          ((retainedDrawingPlanarSATLocalIncidenceDrawing
+            formula).routeAt sourceIncidence) := by
+      rw [sourceRouteEq]
+
 /-- The finite representative determined by a translated retained-metadata
 witness, at the correspondingly adjusted common physical shift. -/
 def
