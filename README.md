@@ -1496,9 +1496,11 @@ The representation choices for this target are:
   equisatisfiable with its source, has width at most three and occurrence
   degree at most eight, has no empty clauses, and carries a compatible,
   continuously planar, endpoint-clean incidence drawing whose route points
-  lie in the one-cell halo.  The certificate intentionally leaves
-  orthogonality to the subsequent fixed-eight occurrence split, because the
-  unsplit Figure 8 terminal rays also use 45-degree diagonals.
+  lie in the one-cell halo.  It now also contains a compatible orthogonal
+  presentation obtained by retained-ray rasterization and unit subdivision.
+  The original continuously planar drawing remains the geometric source for
+  the subsequent fixed-eight occurrence split, because the unsplit Figure 8
+  terminal rays also use 45-degree diagonals.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplit.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplit.lean)
   sorts the final retained incidence routes by terminal angle, assigns their
   at-most-eight occurrences injectively to the fixed Figure 7 compass ports,

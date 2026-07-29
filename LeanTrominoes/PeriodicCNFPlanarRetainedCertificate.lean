@@ -5,6 +5,7 @@ import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedDegree
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedDrawingCompatibility
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedRibbonReady
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedRouteBounds
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATPlanarizedDrawing
 
 /-!
 # Final certificate for retained periodic planar SAT
@@ -67,6 +68,13 @@ structure RetainedPlanarSATCertificate
   routePointsInside :
     (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
       source).RoutePointsInExpandedSquare
+  planarIncidencePresentation :
+    Nonempty
+      (PositionedPeriodicCNF.PlanarIncidencePresentation
+        ((retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          source).scale 1)
+        ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          source).scale 1))
 
 /-- Every local width-three, three-occurrence CNF with no empty clause has
 the complete retained planar-SAT certificate. -/
@@ -126,6 +134,10 @@ theorem retainedPlanarSATCertificate
       retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routePointsInExpandedSquare
         source graphWellFormed graphDegree graphLocal
           retainedClausesNonempty
+    planarIncidencePresentation :=
+      ⟨retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATPlanarIncidencePresentation
+        (by omega) source graphWellFormed graphDegree graphLocal
+          retainedClausesNonempty⟩
   }
 
 end PeriodicOrthocrossing
