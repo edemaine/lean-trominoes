@@ -1568,6 +1568,12 @@ The representation choices for this target are:
   blocks therefore preserve exact endpoints while remaining in a narrow
   corridor.  An executable classifier recognizes every positive multiple
   and recovers its arm and exact repeat count.
+- [`LeanTrominoes/RetainedRayRasterization.lean`](LeanTrominoes/RetainedRayRasterization.lean)
+  unifies the eight compass directions and the three routed-clause slopes
+  into one executable retained-ray classifier.  Lean proves classification
+  soundness, preservation under positive integral scaling, exact endpoints,
+  and orthogonality after rasterizing supported segments, polylines, and
+  whole incidence-route families.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
