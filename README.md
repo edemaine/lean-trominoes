@@ -432,8 +432,9 @@ The representation choices for this target are:
   refinement and translates it from the source clause's anchor gauge to the
   generated clause's gauge.  A boundary-port connector then yields exact
   canonical endpoints and orthogonality for one complete inherited suffix;
-  its generic Manhattan connector is the remaining piece to replace by a
-  noncrossing clause-boundary fan.
+  replacing that clause-side prefix preserves the source route's final
+  direction.  Its generic Manhattan connector is the remaining piece to
+  replace by a noncrossing clause-boundary fan.
   [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean)
   packages those per-incidence splices into the total inherited-suffix
   interface.  Any source route family with pointwise canonical endpoints and
@@ -477,12 +478,17 @@ The representation choices for this target are:
   scales and translates the corresponding source incidence route through
   the `6 × 6` unit-elimination refinement, removes its obsolete clause
   endpoint, and connects the boundary port directly to its transformed first
-  exit.  Exact canonical endpoints and orthogonality are preserved.
+  exit.  Exact canonical endpoints, orthogonality, and the source route's
+  final direction are preserved.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
   packages those per-incidence splices into a total proof-backed inherited
   suffix family.  Any canonical orthogonal source route family with certified
   first exits can therefore be lifted through unit elimination; the concrete
   wrapped Figure 9 family supplies that additional certificate.
+  [`LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean`](LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean)
+  proves that completing either transformation's inherited suffix family and
+  prepending its normalized local clause route preserves the inherited
+  variable-side terminal direction.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean)
   proves that every ternary output clause starts its literal-indexed routes
   toward south, west, and east.  Anchor normalization and arbitrary inherited
@@ -598,12 +604,19 @@ The representation choices for this target are:
   canonical periodic literal endpoints.  Its generic join theorem combines
   such a suffix with a normalized local clause route while preserving both
   outer endpoints and orthogonality.
+  [`LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicingEndpointDirections.lean`](LeanTrominoes/PositionedPeriodicCNFLocalRouteSplicingEndpointDirections.lean)
+  shows that sum-family completion leaves inherited routes verbatim and that
+  adjoining any local prefix preserves a nondegenerate suffix's final
+  direction.
   [`LeanTrominoes/OrthogonalPolylineHeadReplacement.lean`](LeanTrominoes/OrthogonalPolylineHeadReplacement.lean)
   supports the complementary source-side operation: replace a route's old
   first point by a certified prefix ending at the first point of its nonempty
   tail.  The replacement preserves the far endpoint and orthogonality, which
   lets coordinated gadget fans attach to distinct source-route exits instead
   of converging again at the replaced vertex.
+  [`LeanTrominoes/OrthogonalPolylineHeadReplacementEndpointDirections.lean`](LeanTrominoes/OrthogonalPolylineHeadReplacementEndpointDirections.lean)
+  proves that this source-side prefix replacement also preserves the final
+  direction of every route with at least three points.
   [`LeanTrominoes/EmbeddedCNFIncidenceRouteExits.lean`](LeanTrominoes/EmbeddedCNFIncidenceRouteExits.lean)
   proves that every genuine route in a valid finite embedded drawing has
   such a first exit: its clause and variable endpoints belong to opposite

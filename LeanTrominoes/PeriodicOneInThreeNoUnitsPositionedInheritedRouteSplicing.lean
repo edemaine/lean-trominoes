@@ -1,5 +1,6 @@
 import LeanTrominoes.OrthogonalPolylineHeadReplacement
 import LeanTrominoes.OrthogonalPolylineEndpointDirections
+import LeanTrominoes.OrthogonalPolylineHeadReplacementEndpointDirections
 import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints
 import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
@@ -252,6 +253,60 @@ def inheritedRouteSuffix
         generatedClause sourceLiteralIndex)
       (polylineFirstExit transformed))
     transformed
+
+/-- Replacing the transformed source route's clause-side prefix leaves its
+variable-side terminal direction unchanged on every route with at least
+three points. -/
+theorem inheritedRouteSuffix_lastDirection
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    (sourceLiteralIndex : Nat)
+    (sourceRoute : List Cell)
+    (sourceLength : 3 ≤ sourceRoute.length) :
+    AxisDirection.polylineLastDirection
+        (inheritedRouteSuffix
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceLiteralIndex sourceRoute) =
+      AxisDirection.polylineLastDirection sourceRoute := by
+  let transformed :=
+    inheritedSourceRoute
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute
+  have transformedLength : 3 ≤ transformed.length := by
+    simpa [transformed, inheritedSourceRoute,
+      PeriodicOrthocrossing.translatePolyline,
+      scalePolyline] using sourceLength
+  have tailNonempty :
+      ∃ exit, transformed.tail.head? = some exit := by
+    rcases transformed with _ | ⟨first, rest⟩
+    · simp at transformedLength
+    · rcases rest with _ | ⟨second, rest⟩
+      · simp at transformedLength
+      · exact ⟨second, rfl⟩
+  have tailHead :=
+    polylineFirstExit_spec tailNonempty
+  rw [show
+    inheritedRouteSuffix
+        outputPlacement sourcePlacement sourceClause generatedClause
+        sourceLiteralIndex sourceRoute =
+      replacePolylineHead
+        (PositionedPeriodicCNF.orthogonalDetour
+          (normalizedSourcePort outputPlacement sourceClause
+            generatedClause sourceLiteralIndex)
+          (polylineFirstExit transformed))
+        transformed by
+      rfl]
+  rw [AxisDirection.polylineLastDirection_replacePolylineHead
+    (PositionedPeriodicCNF.orthogonalDetour_getLast? _ _)
+    tailHead transformedLength]
+  exact inheritedSourceRoute_lastDirection
+    outputPlacement sourcePlacement sourceClause generatedClause
+    sourceRoute
 
 theorem inheritedRouteSuffix_valid
     {Variable : Type*}
