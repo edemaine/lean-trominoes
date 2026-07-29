@@ -427,6 +427,10 @@ The representation choices for this target are:
   recovers the genuine source incidence behind every inherited output
   incidence and identifies its normalized local endpoint as the corresponding
   index-selected boundary port in the generated clause's anchor gauge.
+  [`LeanTrominoes/PeriodicOneInThreePositionedOriginalOccurrenceProvenance.lean`](LeanTrominoes/PeriodicOneInThreePositionedOriginalOccurrenceProvenance.lean)
+  synchronizes those flattened metadata indices with the explicit
+  order-preserving Figure 7 occurrence pairs, certifying the exact source
+  clause and literal presentation indices of every inherited incidence.
   [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteSplicing.lean)
   scales an inherited source incidence route by the `12 × 12` Figure 9
   refinement and translates it from the source clause's anchor gauge to the
@@ -439,8 +443,8 @@ The representation choices for this target are:
   packages those per-incidence splices into the total inherited-suffix
   interface.  Any source route family with pointwise canonical endpoints and
   orthogonality now induces all inherited Figure 9 suffixes, with a
-  proof-backed selector recovering the exact source clause and literal
-  presentation indices.
+  proof-backed selector carrying the corresponding source-occurrence
+  provenance certificate.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified

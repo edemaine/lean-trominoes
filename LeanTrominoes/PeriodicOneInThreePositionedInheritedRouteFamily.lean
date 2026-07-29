@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicOneInThreePositionedAuxiliaryEndpoints
 import LeanTrominoes.PeriodicOneInThreePositionedInheritedRouteSplicing
+import LeanTrominoes.PeriodicOneInThreePositionedOriginalOccurrenceProvenance
 
 /-!
 # Complete inherited Figure 9 route families
@@ -49,6 +50,11 @@ structure InheritedIncidenceData
       normalizedSourcePort
         (placement source sourcePlacement)
         sourceClause generatedClause sourceLiteralIndex
+  originalOccurrencePair :
+    ((generatedLiteral, clauseIndex, literalIndex),
+      (sourceLiteral, sourceClauseIndex, sourceLiteralIndex)) ∈
+        PeriodicOneInThree.formulaOriginalOccurrencePairs
+          source.erase sourceLiteral.atom
 
 /-- Select inherited-incidence data whenever such data exists. -/
 noncomputable def inheritedIncidenceData?
@@ -96,9 +102,13 @@ theorem inheritedIncidenceData?_of_members
       source sourcePlacement sourceWidth sourceDistinct
       clauseMember literalMember sourceAtom literalSource with
     ⟨metadata, sourceLiteral, sourceLiteralIndex,
-      _metadataLookup, metadataClause, sourceClauseMember,
+      metadataLookup, metadataClause, sourceClauseMember,
       sourceLiteralMember, sourceLiteralAtom,
       literalOffset, localEndpoint⟩
+  have metadataLiteralMember :
+      (literal, literalIndex) ∈
+        metadata.clause.literals.zipIdx := by
+    simpa [metadataClause] using literalMember
   have literalAtom :
       literal.atom = .inl sourceLiteral.atom := by
     rw [literalSource, sourceLiteralAtom]
@@ -118,7 +128,12 @@ theorem inheritedIncidenceData?_of_members
       literalAtom := literalAtom
       literalOffset := literalOffset
       localEndpoint := by
-        simpa [metadataClause] using localEndpoint }
+        simpa [metadataClause] using localEndpoint
+      originalOccurrencePair :=
+        originalOccurrencePair_of_formulaMetadataLookup
+          source sourceWidth sourceDistinct sourceLiteral.atom
+          metadataLookup metadataLiteralMember
+          sourceLiteralMember literalAtom rfl }
   have existsData :
       Nonempty
         (InheritedIncidenceData
