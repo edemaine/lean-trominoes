@@ -2012,6 +2012,12 @@ The representation choices for this target are:
   gate endpoints, rectilinearity, macrocell containment, and pairwise strict
   separation.  The same module records the semantic clause ports in uniform
   physical-lane order.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFanClockwiseOrder.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFanClockwiseOrder.lean)
+  characterizes membership in the 28 finite endpoint-fan templates by a
+  four-way clockwise rank.  One- and two-incidence fans require only genuine,
+  distinct directions; three-incidence variable and clause fans add exactly
+  one cyclic-order condition, stated respectively in occurrence-slot and
+  literal order.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseLocalGates.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseLocalGates.lean)
   shifts the small clause core downward within its macrocell to reserve a
   protected upper annulus, then supplies simultaneous two- and
