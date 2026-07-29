@@ -1219,6 +1219,74 @@ theorem
   · simpa only [reindexShift] using routeAvoid
   · exact firstContains
 
+/-- If the aligned macrocell centers of two final noncarrier segment
+occurrences differ, macrocell separation also keeps the first interior
+away from both endpoints of the second segment. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_noncarrier_macrocellCenters_ne
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      formula.incidenceGraph.IsWellFormed)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal :
+      formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstCenter secondCenter : Cell)
+    (firstCenterEq :
+      first.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some firstCenter)
+    (secondCenterEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some secondCenter)
+    (centersDifferent :
+      Cell.add firstCenter
+          ((drawing formula.incidenceGraph).periodTranslation
+            (Cell.sub first.physicalShift second.physicalShift)) ≠
+        secondCenter)
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  let reindexShift :=
+    Cell.sub first.physicalShift second.physicalShift
+  have routeAvoid :=
+    first.routeWitness.metadata
+      |>.periodTranslate_localRoutes_avoidEachOther_of_macrocellCenters_ne
+        wellFormed degree isLocal
+        second.routeWitness.metadata
+        first.metadata_retainedValid
+        second.metadata_retainedValid
+        firstCenter secondCenter reindexShift
+        firstCenterEq secondCenterEq
+        first.routeWitness.literalMember
+        second.routeWitness.literalMember
+        (by simpa only [reindexShift] using centersDifferent)
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_periodTranslate_localRoutesAvoidEachOther
+      formula first second
+  · simpa only [reindexShift] using routeAvoid
+  · exact firstContains
+
 /-- At one translated routed-variable site, an active source link and an
 active target link using the same physical duplicator arm are the same
 complete translated link. -/
@@ -1850,6 +1918,134 @@ theorem
         · exact firstContains
   · apply
       retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_noncarrier_macrocellCenters_ne
+        formula wellFormed degree isLocal first second
+        firstCenter secondCenter firstCenterEq secondCenterEq
+    · simpa only [reindexShift] using centersEqual
+    · exact firstContains
+
+/-- Any two distinct final occurrences selected from noncarrier local
+components keep the relative interior of the first away from both
+endpoints of the second, including diagonal second segments. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_noncarriers
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstNotCarrier :
+      ¬∃ link,
+        first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ link,
+        second.routeWitness.metadata.source.component = .carrier link)
+    (different :
+      PeriodicGridDrawing.SegmentOccurrenceKey
+          firstIndexed firstShift ≠
+        PeriodicGridDrawing.SegmentOccurrenceKey
+          secondIndexed secondShift)
+    (point : Cell)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  let reindexShift :=
+    Cell.sub first.physicalShift second.physicalShift
+  rcases
+      first.routeWitness.metadata.source.component
+        |>.exists_macrocellCenter_of_not_carrier
+          formula firstNotCarrier with
+    ⟨firstCenter, firstCenterEq⟩
+  rcases
+      second.routeWitness.metadata.source.component
+        |>.exists_macrocellCenter_of_not_carrier
+          formula secondNotCarrier with
+    ⟨secondCenter, secondCenterEq⟩
+  by_cases centersEqual :
+      Cell.add firstCenter
+          ((drawing formula.incidenceGraph).periodTranslation
+            reindexShift) =
+        secondCenter
+  · have firstTranslatedCenterEq :
+        ((first.routeWitness.metadata.source.periodTranslate
+            formula reindexShift).component
+          |>.macrocellCenter formula) =
+          some secondCenter := by
+      rw [DrawingPlanarSATClauseSource.component_periodTranslate,
+        DrawingPlanarSATComponent.macrocellCenter_periodTranslate,
+        firstCenterEq]
+      exact congrArg some centersEqual
+    have classification :=
+      retainedNoncarrierComponents_periodTranslate_eq_or_routedVariable_of_center_eq
+        formula wellFormed degree isLocal
+        first.routeWitness.metadata second.routeWitness.metadata
+        first.metadata_retainedValid second.metadata_retainedValid
+        reindexShift secondCenter
+        firstTranslatedCenterEq secondCenterEq
+    rcases classification with componentAlignment | exception
+    · apply
+        retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_first_component_aligns_second
+          formula wellFormed degree isLocal clausesNonempty
+          first second
+      · simpa only [reindexShift] using componentAlignment
+      · exact different
+      · exact firstContains
+    · rcases exception with
+        ⟨site, firstArm, firstLink, secondArm, secondLink,
+          firstComponentEq, secondComponentEq⟩
+      by_cases armsEqual : firstArm = secondArm
+      · subst secondArm
+        have componentAlignment :=
+          first.routeWitness.metadata
+            |>.periodTranslate_component_eq_of_routedVariable_same_arm
+              wellFormed degree second.routeWitness.metadata
+              first.metadata_retainedValid
+              second.metadata_retainedValid
+              reindexShift site firstArm firstLink secondLink
+              firstComponentEq secondComponentEq
+        apply
+          retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_first_component_aligns_second
+            formula wellFormed degree isLocal clausesNonempty
+            first second
+        · simpa only [reindexShift] using componentAlignment
+        · exact different
+        · exact firstContains
+      · have routeAvoid :=
+          first.routeWitness.metadata
+            |>.periodTranslate_localRoutes_avoidEachOther_of_routedVariable_arms_ne
+              second.routeWitness.metadata
+              first.metadata_retainedValid
+              second.metadata_retainedValid
+              reindexShift site firstArm secondArm firstLink secondLink
+              firstComponentEq secondComponentEq armsEqual
+              first.routeWitness.literalMember
+              second.routeWitness.literalMember
+        apply
+          retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_periodTranslate_localRoutesAvoidEachOther
+            formula first second
+        · simpa only [reindexShift] using routeAvoid
+        · exact firstContains
+  · apply
+      retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_noncarrier_macrocellCenters_ne
         formula wellFormed degree isLocal first second
         firstCenter secondCenter firstCenterEq secondCenterEq
     · simpa only [reindexShift] using centersEqual
