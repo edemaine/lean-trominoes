@@ -1697,6 +1697,150 @@ theorem
     CarrierNode.translate_periodTranslate, Cell.sub,
     Cell.add, Cell.neg, add_assoc] using relativeNeighbor
 
+/-- An asymmetric carrier-interior/noncarrier-closed contact inside a lifted
+vertex macrocell gives the same neighboring source-coordinate bound. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.carrier_liftedVertex_relative_neighbor_of_endpointContact
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (vertex : CNFVertex Variable)
+    (vertexMember : vertex ∈ formula.incidenceGraph.vertices)
+    (vertexTranslate : Cell)
+    (centerEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some
+          (liftedIncidenceVertexPosition
+            formula vertex vertexTranslate))
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point)
+    (secondContains :
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).Contains point) :
+    IsNeighborTranslation
+      (Cell.sub
+        (Cell.add link.first.translate
+          (Cell.neg first.sourceClauseAnchor))
+        (Cell.add vertexTranslate
+          (Cell.sub second.physicalShift firstShift))) := by
+  let graph := formula.incidenceGraph
+  let anchorShift := Cell.neg first.sourceClauseAnchor
+  let sourceShift := Cell.sub second.physicalShift firstShift
+  let targetVertexTranslate :=
+    Cell.add vertexTranslate sourceShift
+  let translatedLink :=
+    carrierLinkPeriodTranslate graph link anchorShift
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          link firstComponentEq with
+    ⟨localClauseIndex, firstSourceEq⟩
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have translatedLinkMember :
+      translatedLink ∈
+        retainedDrawingCompleteCarrierLinksRaw graph := by
+    simpa only [translatedLink, graph, anchorShift,
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (first.routeWitness.metadata
+        |>.carrier_anchorNormalize_mem_raw
+          wellFormed degree isLocal first.metadata_retainedValid
+          firstNonempty link localClauseIndex firstSourceEq)
+  have targetCenterEq :
+      Cell.add
+          (liftedIncidenceVertexPosition
+            formula vertex vertexTranslate)
+          ((drawing graph).periodTranslation sourceShift) =
+        liftedIncidenceVertexPosition
+          formula vertex targetVertexTranslate := by
+    exact
+      (liftedIncidenceVertexPosition_periodTranslate
+        formula vertex vertexTranslate sourceShift).symm
+  have centerContains :
+      translatedLink.first.supportingSegment graph |>.Contains
+        (liftedIncidenceVertexPosition
+          formula vertex targetVertexTranslate) := by
+    rw [← targetCenterEq]
+    simpa only [graph, anchorShift, sourceShift, translatedLink] using
+      (first.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_endpointContact
+        formula wellFormed degree isLocal second
+        link firstComponentEq secondNotCarrier
+        (liftedIncidenceVertexPosition
+          formula vertex vertexTranslate)
+        centerEq firstContains secondContains)
+  let relative :=
+    Cell.sub translatedLink.first.translate targetVertexTranslate
+  have normalizedContains :
+      (translatedLink.first.indexed.segment.translate
+          ((drawing graph).periodTranslation relative)).Contains
+        ((drawing graph).vertexPosition graph vertex) := by
+    have shifted :=
+      segment_periodTranslate_sub_contains
+        graph translatedLink.first.indexed.segment
+        translatedLink.first.translate targetVertexTranslate
+        (liftedIncidenceVertexPosition
+          formula vertex targetVertexTranslate)
+        (by
+          simpa [CarrierNode.supportingSegment] using
+            centerContains)
+    dsimp only [graph] at shifted ⊢
+    simpa [relative, liftedIncidenceVertexPosition,
+      Cell.sub, PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale] using shifted
+  have translatedEndpoints :=
+    retainedDrawingCompleteCarrierLinkRaw_endpoints_mem
+      graph translatedLinkMember
+  have indexedMember :
+      translatedLink.first.indexed ∈
+        (drawing graph).indexedSegments :=
+    retainedCarrierNode_indexed_mem graph translatedEndpoints.1
+  have relativeNeighbor :
+      IsNeighborTranslation relative :=
+    drawing_occurrence_translate_isNeighbor_of_contains
+      wellFormed degree isLocal indexedMember
+      (by
+        have bounds :=
+          drawing_vertexPosition_in_fundamental_square
+            graph vertexMember
+        unfold
+          PeriodicGridDrawing.PositionInFundamentalSquare at bounds
+        unfold InFundamentalDrawingSquare
+        simpa only [graph, drawing_gridSize] using
+          And.intro (le_of_lt bounds.1)
+            (And.intro bounds.2.1
+              (And.intro (le_of_lt bounds.2.2.1)
+                bounds.2.2.2)))
+      normalizedContains
+  simpa [relative, translatedLink, targetVertexTranslate,
+    anchorShift, sourceShift, graph,
+    CarrierNode.translate_periodTranslate, Cell.sub,
+    Cell.add, Cell.neg, add_assoc] using relativeNeighbor
+
 /-- The final gauged drawing has exactly the refined planar-SAT period used
 by the macrocell contact bounds. -/
 theorem
