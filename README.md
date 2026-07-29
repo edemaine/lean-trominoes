@@ -1485,6 +1485,15 @@ The representation choices for this target are:
   proves the entire 2D conjunct conditionally on the isolated
   `NormalizedOrientationCoREHard` interface.  Establishing that source
   interface remains the 2D hardness gap.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCertificate.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCertificate.lean)
+  packages the complete retained planar-SAT endpoint behind the standard
+  local 3SAT-3 hypotheses (and source-clause nonemptiness).  The output is
+  equisatisfiable with its source, has width at most three and occurrence
+  degree at most eight, has no empty clauses, and carries a compatible,
+  continuously planar, endpoint-clean incidence drawing whose route points
+  lie in the one-cell halo.  The certificate intentionally leaves
+  orthogonality to the subsequent fixed-eight occurrence split, because the
+  unsplit Figure 8 terminal rays also use 45-degree diagonals.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
