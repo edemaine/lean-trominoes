@@ -86,6 +86,26 @@ theorem occurrenceSourceVariableDirection_eq_sourceRoute
       (occurrenceSourceRoute_length presentation entry)
       (occurrenceSourceRoute_orthogonal presentation entry)
 
+/-- Rebasing and reversing a stored clause-to-variable route makes the
+source variable direction the opposite of the stored route's final
+direction. -/
+theorem occurrenceSourceVariableDirection_eq_storedRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    let data := occurrenceSpliceData presentation entry
+    occurrenceSourceVariableDirection presentation entry =
+      (AxisDirection.polylineLastDirection
+        (presentation.routes data.indexed.1.clauseIndex
+          data.indexed.1.literalIndex)).opposite := by
+  let data := occurrenceSpliceData presentation entry
+  rw [occurrenceSourceVariableDirection_eq_sourceRoute]
+  simp [occurrenceSourceRoute,
+    PositionedPeriodicCNF.PlanarIncidencePresentation.variableToClauseRoute,
+    AxisDirection.polylineLastDirection]
+
 /-- Unit subdivision does not change the direction in which the selected
 source route enters its clause endpoint. -/
 theorem occurrenceSourceClauseDirection_eq_sourceRoute
