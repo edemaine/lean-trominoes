@@ -19,6 +19,34 @@ condition used by the coordinated source stub system.
 -/
 
 namespace LeanTrominoes
+
+namespace PositionedPeriodicCNF
+
+/-- At every degree-three variable, stored clause-to-variable route endings
+induce clockwise outgoing directions in syntactic occurrence order. -/
+def VariableRoutesInOccurrenceOrder
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes) : Prop :=
+  ∀ (atom : Variable)
+    (first second third :
+      PeriodicPlanarOneInThreeToThreeDM.TaggedOccurrence Variable),
+    PeriodicPlanarOneInThreeToThreeDM.occurrenceAt
+        source.erase atom .first = some first →
+    PeriodicPlanarOneInThreeToThreeDM.occurrenceAt
+        source.erase atom .second = some second →
+    PeriodicPlanarOneInThreeToThreeDM.occurrenceAt
+        source.erase atom .third = some third →
+    AxisDirection.InClockwiseOrder
+      (AxisDirection.polylineLastDirection
+        (routes first.2.1 first.2.2)).opposite
+      (AxisDirection.polylineLastDirection
+        (routes second.2.1 second.2.2)).opposite
+      (AxisDirection.polylineLastDirection
+        (routes third.2.1 third.2.2)).opposite
+
+end PositionedPeriodicCNF
+
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open PlanarThreeDM PeriodicOrthocrossing
@@ -40,6 +68,78 @@ def SourceVariableDirectionsInOccurrenceOrder
       (occurrenceSourceVariableDirection presentation first)
       (occurrenceSourceVariableDirection presentation second)
       (occurrenceSourceVariableDirection presentation third)
+
+/-- The route-level terminal-direction invariant induces the corresponding
+condition on the rebased variable-to-clause routes of a planar
+presentation. -/
+theorem sourceVariableDirectionsInOccurrenceOrder_of_routes
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (ordered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes) :
+    SourceVariableDirectionsInOccurrenceOrder presentation := by
+  intro first second third
+    firstSlot secondSlot thirdSlot
+    firstSecondAtom firstThirdAtom
+  let firstData := occurrenceSpliceData presentation first
+  let secondData := occurrenceSpliceData presentation second
+  let thirdData := occurrenceSpliceData presentation third
+  have firstLookup :
+      PeriodicPlanarOneInThreeToThreeDM.occurrenceAt
+          source.erase first.1.1 .first =
+        some firstData.tagged := by
+    simpa [firstSlot] using firstData.occurrenceLookup
+  have secondLookup :
+      PeriodicPlanarOneInThreeToThreeDM.occurrenceAt
+          source.erase first.1.1 .second =
+        some secondData.tagged := by
+    simpa [firstSecondAtom, secondSlot] using
+      secondData.occurrenceLookup
+  have thirdLookup :
+      PeriodicPlanarOneInThreeToThreeDM.occurrenceAt
+          source.erase first.1.1 .third =
+        some thirdData.tagged := by
+    simpa [firstThirdAtom, thirdSlot] using
+      thirdData.occurrenceLookup
+  have clockwise :=
+    ordered first.1.1 firstData.tagged secondData.tagged thirdData.tagged
+      firstLookup secondLookup thirdLookup
+  have firstClauseIndex :
+      firstData.indexed.1.clauseIndex = firstData.tagged.2.1 := by
+    simpa [incidenceTaggedOccurrence] using
+      congrArg (fun tagged => tagged.2.1) firstData.metadataEq
+  have firstLiteralIndex :
+      firstData.indexed.1.literalIndex = firstData.tagged.2.2 := by
+    simpa [incidenceTaggedOccurrence] using
+      congrArg (fun tagged => tagged.2.2) firstData.metadataEq
+  have secondClauseIndex :
+      secondData.indexed.1.clauseIndex = secondData.tagged.2.1 := by
+    simpa [incidenceTaggedOccurrence] using
+      congrArg (fun tagged => tagged.2.1) secondData.metadataEq
+  have secondLiteralIndex :
+      secondData.indexed.1.literalIndex = secondData.tagged.2.2 := by
+    simpa [incidenceTaggedOccurrence] using
+      congrArg (fun tagged => tagged.2.2) secondData.metadataEq
+  have thirdClauseIndex :
+      thirdData.indexed.1.clauseIndex = thirdData.tagged.2.1 := by
+    simpa [incidenceTaggedOccurrence] using
+      congrArg (fun tagged => tagged.2.1) thirdData.metadataEq
+  have thirdLiteralIndex :
+      thirdData.indexed.1.literalIndex = thirdData.tagged.2.2 := by
+    simpa [incidenceTaggedOccurrence] using
+      congrArg (fun tagged => tagged.2.2) thirdData.metadataEq
+  rw [occurrenceSourceVariableDirection_eq_storedRoute
+      presentation first,
+    occurrenceSourceVariableDirection_eq_storedRoute
+      presentation second,
+    occurrenceSourceVariableDirection_eq_storedRoute
+      presentation third,
+    firstClauseIndex, firstLiteralIndex,
+    secondClauseIndex, secondLiteralIndex,
+    thirdClauseIndex, thirdLiteralIndex]
+  exact clockwise
 
 /-- The source variable rotation invariant discharges every finite
 variable-fan table lookup. -/

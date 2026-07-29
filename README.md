@@ -2069,11 +2069,13 @@ The representation choices for this target are:
   fan directions are north/east/west in clockwise order; binary clauses have
   no right terminal.  Thus every source clause fan is compatible.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanRouteOrder.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanRouteOrder.lean)
-  isolates the remaining variable-side route invariant: at a degree-three
-  variable, the outgoing directions follow occurrence slots
-  `first`/`second`/`third` clockwise.  It proves that this invariant and the
-  unit-elimination clause order together discharge the single compatibility
-  premise required by the coordinated source endpoint-fan system.
+  isolates the remaining variable-side invariant both on stored route
+  endings and on rebased outgoing directions: at a degree-three variable,
+  they follow occurrence slots `first`/`second`/`third` clockwise.  It
+  transfers the route form to planar presentations and proves that this
+  invariant and the unit-elimination clause order together discharge the
+  single compatibility premise required by the coordinated source
+  endpoint-fan system.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean)
   identifies the finite coordinated-fan ports and physical lanes with the
   occurrence-level variable ports, clause ports, and corridor lanes.  The
