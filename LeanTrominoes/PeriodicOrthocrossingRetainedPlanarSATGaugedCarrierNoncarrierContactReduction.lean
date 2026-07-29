@@ -6075,6 +6075,260 @@ theorem
   rw [desiredEq]
   exact relativeClose
 
+/-- Reverse endpoint-aware bend--carrier separation follows from the same
+doubled-halo bound to the bend occurrence. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_bend_carrier_of_contact_close
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (routeBend : RouteBend)
+    (localClauseIndex : Nat)
+    (secondSourceEq :
+      second.routeWitness.metadata.source =
+        .bend routeBend localClauseIndex)
+    (contactClose :
+      ∀ contactPoint,
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).InteriorContains
+              contactPoint →
+          (firstIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation firstShift)).Contains contactPoint →
+            Cell.sub
+                (Cell.add
+                  (Cell.add link.first.translate
+                    (Cell.neg first.sourceClauseAnchor))
+                  (Cell.sub firstShift secondShift))
+                (Cell.add routeBend.translate
+                  (Cell.neg second.sourceClauseAnchor)) ∈
+              PeriodicGridDrawing.doubleNeighborTranslations)
+    (secondContains :
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).InteriorContains point) :
+    ¬(firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).Contains point := by
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  refine
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_noncarrier_carrier_of_balanced_source_coordinate
+      formula wellFormed degree isLocal first second
+      link firstComponentEq secondNotCarrier
+      (Cell.add routeBend.translate
+        (Cell.neg second.sourceClauseAnchor))
+      ?_ contactClose point secondContains
+  intro adjustment adjustmentNeighbor
+  rw [secondSourceEq]
+  change
+    IsNeighborTranslation
+      (Cell.add routeBend.translate
+        (Cell.add
+          (Cell.neg second.sourceClauseAnchor)
+          adjustment))
+  simpa [Cell.add, add_assoc] using adjustmentNeighbor
+
+/-- Bend segment interiors avoid closed carrier segment occurrences at
+arbitrary quotient translates. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_bend_carrier
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (routeBend : RouteBend)
+    (localClauseIndex : Nat)
+    (secondSourceEq :
+      second.routeWitness.metadata.source =
+        .bend routeBend localClauseIndex)
+    (secondContains :
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).InteriorContains point) :
+    ¬(firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).Contains point := by
+  let graph := formula.incidenceGraph
+  let anchorShift := Cell.neg first.sourceClauseAnchor
+  let sourceShift := Cell.sub second.physicalShift firstShift
+  let translatedLink :=
+    carrierLinkPeriodTranslate graph link anchorShift
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  have routeBendMember :
+      routeBend ∈ (drawingRouteBends graph).dedup := by
+    have sourceMember := second.source_retainedComponentMember
+    rw [secondSourceEq] at sourceMember
+    exact sourceMember
+  have centerEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some (routeBend.drawingPoint graph) := by
+    rw [secondSourceEq]
+    rfl
+  have incomingTerminalMember :=
+    (drawingRouteBend_terminals_mem_drawingSegmentTerminals
+      graph routeBendMember).1
+  have incomingIndexedMember :
+      routeBend.incomingTerminal.indexed ∈
+        (drawing graph).indexedSegments :=
+    (drawingSegmentTerminal_indexed_mem
+      graph incomingTerminalMember).1
+  have incomingAxisAligned :
+      routeBend.incomingTerminal.indexed.segment.IsAxisAligned :=
+    drawing_isOrthogonal wellFormed isLocal degree
+      routeBend.incomingTerminal.indexed incomingIndexedMember
+  let translatedIncoming :=
+    routeBend.incomingTerminal.periodTranslate sourceShift
+  have targetPointEq :
+      translatedIncoming.drawingPoint graph =
+        Cell.add (routeBend.drawingPoint graph)
+          ((drawing graph).periodTranslation sourceShift) := by
+    simp only [translatedIncoming, SegmentTerminal.periodTranslate,
+      RouteBend.incomingTerminal, SegmentTerminal.drawingPoint,
+      GridSegment.translate]
+    rw [periodTranslation_add]
+    apply Prod.ext <;>
+      simp [RouteBend.drawingPoint, Cell.add] <;>
+      omega
+  have translatedIncomingContains :
+      (translatedIncoming.indexed.segment.translate
+        ((drawing graph).periodTranslation
+          translatedIncoming.translate)).Contains
+        (translatedIncoming.drawingPoint graph) := by
+    exact
+      SegmentTerminal.segment_contains_drawingPoint_of_axisAligned
+        graph translatedIncoming
+        (by
+          simpa [translatedIncoming,
+            SegmentTerminal.periodTranslate] using
+            incomingAxisAligned)
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          link firstComponentEq with
+    ⟨firstLocalClauseIndex, firstSourceEq⟩
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have translatedLinkMember :
+      translatedLink ∈
+        retainedDrawingCompleteCarrierLinksRaw graph := by
+    simpa only [translatedLink, graph, anchorShift,
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (first.routeWitness.metadata
+        |>.carrier_anchorNormalize_mem_raw
+          wellFormed degree isLocal first.metadata_retainedValid
+          firstNonempty link firstLocalClauseIndex firstSourceEq)
+  have carrierIndexedMember :
+      translatedLink.first.indexed ∈
+        (drawing graph).indexedSegments :=
+    retainedCarrierNode_indexed_mem graph
+      (retainedDrawingCompleteCarrierLinkRaw_endpoints_mem
+        graph translatedLinkMember).1
+  have endpointBounds :
+      (drawing graph).SegmentEndpointsInExpandedSquare := by
+    intro indexed indexedMember
+    have bounds :=
+      drawing_indexedSegment_endpoints_inExpandedDrawingSquare
+        wellFormed degree isLocal indexedMember
+    simpa [PeriodicGridDrawing.PositionInExpandedSquare,
+      InExpandedDrawingSquare, drawing_gridSize] using bounds
+  refine
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_bend_carrier_of_contact_close
+      formula wellFormed degree isLocal first second
+      link firstComponentEq routeBend localClauseIndex secondSourceEq
+      ?_ secondContains
+  intro contactPoint contactSecond contactFirst
+  have carrierContains :=
+    first.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_reverseEndpointContact
+      formula wellFormed degree isLocal second
+      link firstComponentEq secondNotCarrier
+      (routeBend.drawingPoint graph) centerEq
+      (point := contactPoint) contactFirst contactSecond
+  have relativeClose :
+      Cell.sub translatedLink.first.translate
+          translatedIncoming.translate ∈
+        PeriodicGridDrawing.doubleNeighborTranslations := by
+    exact
+      PeriodicGridDrawing.relativeTranslate_isDoubleNeighbor_of_contains
+        endpointBounds carrierIndexedMember
+        (by
+          simpa [translatedIncoming,
+            SegmentTerminal.periodTranslate] using
+            incomingIndexedMember)
+        (by
+          rw [targetPointEq]
+          simpa [graph, anchorShift, sourceShift, translatedLink,
+            CarrierNode.supportingSegment] using
+              carrierContains)
+        translatedIncomingContains
+  have desiredEq :
+      Cell.sub
+          (Cell.add
+            (Cell.add link.first.translate
+              (Cell.neg first.sourceClauseAnchor))
+            (Cell.sub firstShift secondShift))
+          (Cell.add routeBend.translate
+            (Cell.neg second.sourceClauseAnchor)) =
+        Cell.sub translatedLink.first.translate
+          translatedIncoming.translate := by
+    have translatedLinkTranslateEq :
+        translatedLink.first.translate =
+          Cell.add link.first.translate anchorShift := by
+      simp [translatedLink, carrierLinkPeriodTranslate_first,
+        CarrierNode.translate_periodTranslate]
+    rw [translatedLinkTranslateEq]
+    simp only [translatedIncoming, SegmentTerminal.periodTranslate]
+    simp only [sourceShift]
+    rw [second.physicalShift_eq]
+    apply Prod.ext <;>
+      simp [RouteBend.incomingTerminal, anchorShift,
+        Cell.sub, Cell.add, Cell.neg] <;>
+      ring
+  rw [desiredEq]
+  exact relativeClose
+
 /-- Carrier--routed-variable separation has the same one-coordinate
 reduction, using any route occurrence that represents the selected arm.
 The orbit-condition bridge above permits the arm's finite presentation index
