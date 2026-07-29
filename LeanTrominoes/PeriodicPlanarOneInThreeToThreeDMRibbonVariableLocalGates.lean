@@ -11,11 +11,11 @@ three routes are continuously disjoint.
 
 Every route for slot `s` is a translation by `32 * s` of one finite table.
 The tables for adjacent slots occupy disjoint vertical strips.  Consequently
-all active occurrence colors reach a common, kind-independent interface:
+all active occurrence colors reach a common physical-lane interface:
 
-* red at `(20 + 32s, 108)`;
-* green at `(24 + 32s, 108)`; and
-* blue at `(28 + 32s, 108)`.
+* the red lane at `(20 + 32s, 108)`;
+* the green lane at `(24 + 32s, 108)`; and
+* the blue lane at `(28 + 32s, 108)`.
 
 A later finite construction connects these gates to the direction-dependent
 ribbon-macrocell boundary.
@@ -28,7 +28,7 @@ open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
 
-/-- Kind-independent gate above one occurrence module. -/
+/-- Kind-independent physical-lane gate above one occurrence module. -/
 def standardVariableOuterGate
     (slot : VariableSiteSlot)
     (color : WireColor) : Cell :=
@@ -47,34 +47,34 @@ def standardVariableLocalGateRouteAtFirst
     (color : WireColor) : List Cell :=
   match kind, polarity, color with
   | .fixedRed, false, .red =>
-      [(32, 76), (20, 76), (20, 108)]
+      [(32, 76), (28, 76), (28, 108)]
   | .fixedRed, false, .green =>
-      [(22, 80), (24, 80), (24, 108)]
+      [(22, 80), (20, 80), (20, 108)]
   | .fixedRed, false, .blue =>
-      [(26, 80), (28, 80), (28, 108)]
+      [(26, 80), (24, 80), (24, 108)]
   | .fixedRed, true, .red =>
-      [(24, 76), (24, 98), (22, 98), (22, 100),
-        (20, 100), (20, 108)]
+      [(24, 76), (28, 76), (28, 108)]
   | .fixedRed, true, .green =>
-      [(34, 80), (34, 98), (26, 98), (26, 100),
-        (24, 100), (24, 108)]
+      [(34, 80), (34, 79), (33, 79), (33, 78),
+        (31, 78), (31, 74), (21, 74), (21, 77),
+        (20, 77), (20, 108)]
   | .fixedRed, true, .blue =>
-      [(30, 80), (32, 80), (32, 78), (36, 78),
-        (36, 100), (28, 100), (28, 108)]
+      [(30, 80), (30, 78), (29, 78), (29, 75),
+        (23, 75), (23, 77), (24, 77), (24, 108)]
   | .fixedGreen, false, .red =>
-      [(16, 64), (20, 64), (20, 108)]
+      [(16, 64), (24, 64), (24, 108)]
   | .fixedGreen, false, .green =>
-      [(32, 72), (32, 98), (26, 98), (26, 100),
-        (24, 100), (24, 108)]
+      [(32, 72), (28, 72), (28, 108)]
   | .fixedGreen, false, .blue =>
-      [(16, 72), (14, 72), (14, 62), (34, 62),
-        (34, 100), (28, 100), (28, 108)]
+      [(16, 72), (20, 72), (20, 108)]
   | .fixedGreen, true, .red =>
-      [(40, 64), (20, 64), (20, 108)]
+      [(40, 64), (22, 64), (22, 100), (24, 100),
+        (24, 108)]
   | .fixedGreen, true, .green =>
-      [(24, 72), (24, 108)]
+      [(24, 72), (28, 72), (28, 108)]
   | .fixedGreen, true, .blue =>
-      [(40, 72), (28, 72), (28, 108)]
+      [(40, 72), (42, 72), (42, 62), (20, 62),
+        (20, 108)]
   | .fixedBlue, false, .red =>
       [(16, 64), (20, 64), (20, 108)]
   | .fixedBlue, false, .green =>
@@ -100,7 +100,7 @@ def standardVariableLocalGateRoute
   translatePolyline (variableModuleOrigin slot)
     (standardVariableLocalGateRouteAtFirst kind polarity color)
 
-/-- Every local gate route ends at the standardized gate. -/
+/-- Every semantic-color route ends at its assigned physical-lane gate. -/
 @[simp]
 theorem standardVariableLocalGateRoute_getLast?
     (slot : VariableSiteSlot)
@@ -109,7 +109,9 @@ theorem standardVariableLocalGateRoute_getLast?
     (color : WireColor) :
     (standardVariableLocalGateRoute
       slot kind polarity color).getLast? =
-        some (standardVariableOuterGate slot color) := by
+        some
+          (standardVariableOuterGate
+            slot (kind.ribbonLaneForColor color)) := by
   cases slot <;> cases kind <;> cases polarity <;> cases color <;>
     native_decide
 

@@ -1983,12 +1983,11 @@ The representation choices for this target are:
   distinct occurrences.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableLocalGates.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableLocalGates.lean)
   coordinates each of the six variable connector patterns into the same
-  kind-independent RGB gate triple above its occurrence slot.  Exhaustive
-  finite certificates prove exact port and gate endpoints, rectilinearity,
-  standard-macrocell containment, and strict separation across every choice
-  of colors and active slot patterns.  The remaining variable-side task is
-  therefore reduced to connecting these standardized gates to the distinct
-  direction-dependent ribbon exits.
+  kind-independent physical-lane gate triple above its occurrence slot,
+  applying the connector's semantic-color permutation along the way.
+  Exhaustive finite certificates prove exact port and gate endpoints,
+  rectilinearity, standard-macrocell containment, and strict separation
+  across every choice of colors and active slot patterns.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableOuterFans.lean)
   enumerates all 28 cyclically admissible families of one, two, or three
   distinct variable-side exit directions and supplies a simultaneous
@@ -2002,9 +2001,10 @@ The representation choices for this target are:
   route.  Finite interface checks show that the two pieces meet only at the
   advertised gate and that different pieces are contact-free; the resulting
   complete variable stubs have exact gadget-port and ribbon-exit endpoints,
-  are rectilinear, bounded, simple, and pairwise strictly separated.  Their
-  sole remaining premise is the now-explicit clockwise compatibility of the
-  source occurrence directions.
+  with each semantic color ending on its assigned physical lane.  They are
+  rectilinear, bounded, simple, and pairwise strictly separated.  Their sole
+  remaining premise is the now-explicit clockwise compatibility of the source
+  occurrence directions.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

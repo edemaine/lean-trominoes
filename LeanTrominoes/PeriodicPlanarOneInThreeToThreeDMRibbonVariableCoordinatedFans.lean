@@ -47,7 +47,8 @@ theorem standardVariableLocalGateRoute_strictlyAvoids_outerRoute :
         outer.SlotActive localSlot →
         outer.SlotActive outerSlot →
         ∀ kind polarity localColor outerColor,
-          (localSlot, localColor) ≠ (outerSlot, outerColor) →
+          (localSlot, kind.ribbonLaneForColor localColor) ≠
+            (outerSlot, outerColor) →
           RoutesStrictlyAvoidEachOther
             (standardVariableLocalGateRoute
               localSlot kind polarity localColor)
@@ -64,7 +65,8 @@ theorem joinedVariableGateOuterRoute_simple :
             (joinAtEndpoint
               (standardVariableLocalGateRoute
                 slot kind polarity color)
-              (outer.outerRoute slot color)) := by
+              (outer.outerRoute
+                slot (kind.ribbonLaneForColor color))) := by
   native_decide
 
 namespace VariableRibbonFanData
@@ -102,7 +104,8 @@ def coordinatedRoute
   joinAtEndpoint
     (standardVariableLocalGateRoute
       slot (data.kind slot) (data.polarity slot) color)
-    (data.outerData.outerRoute slot color)
+    (data.outerData.outerRoute
+      slot ((data.kind slot).ribbonLaneForColor color))
 
 /-- The joined route begins at the exact selected connector port. -/
 @[simp]
@@ -128,14 +131,17 @@ theorem coordinatedRoute_getLast?
     (data.coordinatedRoute slot color).getLast? =
       some
         (standardRibbonMacrocellExit
-          (data.direction slot) color) := by
+          (data.direction slot)
+          ((data.kind slot).ribbonLaneForColor color)) := by
   apply joinAtEndpoint_getLast?
   · exact standardVariableLocalGateRoute_getLast?
       slot (data.kind slot) (data.polarity slot) color
   · exact VariableOuterFanData.outerRoute_head?
-      data.outerData compatible slot active color
+      data.outerData compatible slot active
+      ((data.kind slot).ribbonLaneForColor color)
   · exact VariableOuterFanData.outerRoute_getLast?
-      data.outerData compatible slot active color
+      data.outerData compatible slot active
+      ((data.kind slot).ribbonLaneForColor color)
 
 /-- Every complete coordinated variable route is rectilinear. -/
 theorem coordinatedRoute_orthogonal
@@ -149,11 +155,13 @@ theorem coordinatedRoute_orthogonal
     (standardVariableLocalGateRoute_orthogonal
       slot (data.kind slot) (data.polarity slot) color).joinAtEndpoint
   · exact VariableOuterFanData.outerRoute_orthogonal
-      data.outerData compatible slot active color
+      data.outerData compatible slot active
+      ((data.kind slot).ribbonLaneForColor color)
   · exact standardVariableLocalGateRoute_getLast?
       slot (data.kind slot) (data.polarity slot) color
   · exact VariableOuterFanData.outerRoute_head?
-      data.outerData compatible slot active color
+      data.outerData compatible slot active
+      ((data.kind slot).ribbonLaneForColor color)
 
 /-- Every listed point of a complete coordinated variable route remains in
 the standard ribbon macrocell. -/
@@ -172,7 +180,8 @@ theorem coordinatedRoute_points_bounded
       color point localMember
   · exact VariableOuterFanData.outerRoute_points_bounded
       data.outerData compatible
-      slot active color point outerMember
+      slot active ((data.kind slot).ribbonLaneForColor color)
+      point outerMember
 
 /-- Each complete coordinated variable route is geometrically simple. -/
 theorem coordinatedRoute_simple
@@ -202,6 +211,19 @@ theorem coordinatedRoutes_strictlyAvoidEachOther
       (data.coordinatedRoute firstSlot firstColor)
       (data.coordinatedRoute secondSlot secondColor) := by
   let outer := data.outerData
+  have physicalDifferent :
+      (firstSlot,
+          (data.kind firstSlot).ribbonLaneForColor firstColor) ≠
+        (secondSlot,
+          (data.kind secondSlot).ribbonLaneForColor secondColor) := by
+    intro equal
+    apply different
+    have slotsEqual : firstSlot = secondSlot :=
+      congrArg Prod.fst equal
+    subst secondSlot
+    exact congrArg (fun color => (firstSlot, color))
+      ((data.kind firstSlot).ribbonLaneForColor_injective
+        (congrArg Prod.snd equal))
   have localLocal :
       RoutesStrictlyAvoidEachOther
         (standardVariableLocalGateRoute
@@ -218,15 +240,22 @@ theorem coordinatedRoutes_strictlyAvoidEachOther
         (standardVariableLocalGateRoute
           firstSlot (data.kind firstSlot)
           (data.polarity firstSlot) firstColor)
-        (outer.outerRoute secondSlot secondColor) :=
+        (outer.outerRoute secondSlot
+          ((data.kind secondSlot).ribbonLaneForColor
+            secondColor)) :=
     standardVariableLocalGateRoute_strictlyAvoids_outerRoute
       outer compatible firstSlot secondSlot
       firstActive secondActive
       (data.kind firstSlot) (data.polarity firstSlot)
-      firstColor secondColor different
+      firstColor
+      ((data.kind secondSlot).ribbonLaneForColor
+        secondColor)
+      physicalDifferent
   have outerLocal :
       RoutesStrictlyAvoidEachOther
-        (outer.outerRoute firstSlot firstColor)
+        (outer.outerRoute firstSlot
+          ((data.kind firstSlot).ribbonLaneForColor
+            firstColor))
         (standardVariableLocalGateRoute
           secondSlot (data.kind secondSlot)
           (data.polarity secondSlot) secondColor) :=
@@ -234,30 +263,40 @@ theorem coordinatedRoutes_strictlyAvoidEachOther
       outer compatible secondSlot firstSlot
       secondActive firstActive
       (data.kind secondSlot) (data.polarity secondSlot)
-      secondColor firstColor
-      (Ne.symm different)).symm
+      secondColor
+      ((data.kind firstSlot).ribbonLaneForColor
+        firstColor)
+      (Ne.symm physicalDifferent)).symm
   have outerOuter :
       RoutesStrictlyAvoidEachOther
-        (outer.outerRoute firstSlot firstColor)
-        (outer.outerRoute secondSlot secondColor) :=
+        (outer.outerRoute firstSlot
+          ((data.kind firstSlot).ribbonLaneForColor
+            firstColor))
+        (outer.outerRoute secondSlot
+          ((data.kind secondSlot).ribbonLaneForColor
+            secondColor)) :=
     outer.outerRoutes_strictlyAvoidEachOther
       compatible firstSlot secondSlot
       firstActive secondActive
-      firstColor secondColor different
+      ((data.kind firstSlot).ribbonLaneForColor firstColor)
+      ((data.kind secondSlot).ribbonLaneForColor secondColor)
+      physicalDifferent
   have firstJoinedAvoidsSecondLocal :=
     localLocal.join_left outerLocal
       (standardVariableLocalGateRoute_getLast?
         firstSlot (data.kind firstSlot)
         (data.polarity firstSlot) firstColor)
       (outer.outerRoute_head?
-        compatible firstSlot firstActive firstColor)
+        compatible firstSlot firstActive
+        ((data.kind firstSlot).ribbonLaneForColor firstColor))
   have firstJoinedAvoidsSecondOuter :=
     localOuter.join_left outerOuter
       (standardVariableLocalGateRoute_getLast?
         firstSlot (data.kind firstSlot)
         (data.polarity firstSlot) firstColor)
       (outer.outerRoute_head?
-        compatible firstSlot firstActive firstColor)
+        compatible firstSlot firstActive
+        ((data.kind firstSlot).ribbonLaneForColor firstColor))
   exact
     firstJoinedAvoidsSecondLocal.join_right
       firstJoinedAvoidsSecondOuter
@@ -265,7 +304,8 @@ theorem coordinatedRoutes_strictlyAvoidEachOther
         secondSlot (data.kind secondSlot)
         (data.polarity secondSlot) secondColor)
       (outer.outerRoute_head?
-        compatible secondSlot secondActive secondColor)
+        compatible secondSlot secondActive
+        ((data.kind secondSlot).ribbonLaneForColor secondColor))
 
 end VariableRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM
