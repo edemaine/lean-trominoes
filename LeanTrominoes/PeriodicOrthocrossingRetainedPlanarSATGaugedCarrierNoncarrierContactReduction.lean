@@ -1165,9 +1165,9 @@ theorem
       anchorShift, Cell.sub, Cell.neg]
   have secondRemainingEq :
       Cell.sub second.physicalShift targetShift = firstShift := by
-    rcases second.physicalShift with ⟨secondX, secondY⟩
     rcases firstShift with ⟨firstX, firstY⟩
-    simp [targetShift, Cell.sub]
+    simp only [targetShift, Cell.sub, Prod.mk.injEq]
+    constructor <;> omega
   have firstAlignedEq :
       (first.physicalSegment.translate
         (placement.translation anchorShift)).translate
@@ -2837,6 +2837,78 @@ theorem
       commonShiftEq routeAvoid
   exact firstContains
 
+/-- The common-shift raw-carrier bridge also supplies the reverse ordered
+avoidance condition: the noncarrier relative interior avoids the closed
+carrier segment. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_noncarrier_carrier_of_common_raw_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstSourceShift secondSourceShift : Cell)
+    (commonShiftEq :
+      Cell.sub first.physicalShift firstSourceShift =
+        Cell.sub second.physicalShift secondSourceShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (translatedLinkMember :
+      carrierLinkPeriodTranslate formula.incidenceGraph link
+          firstSourceShift ∈
+        retainedDrawingCompleteCarrierLinksRaw
+          formula.incidenceGraph)
+    (translatedFirstNeighbor :
+      IsNeighborTranslation
+        ((carrierLinkPeriodTranslate formula.incidenceGraph link
+          firstSourceShift).first.translate))
+    (translatedSecondCondition :
+      second.routeWitness.metadata.source.RetainedOrbitCondition
+        formula secondSourceShift)
+    (point : Cell)
+    (secondContains :
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)).InteriorContains point) :
+    ¬(firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).Contains point := by
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          link firstComponentEq with
+    ⟨localClauseIndex, firstSourceEq⟩
+  have routeAvoid :=
+    first.routeWitness.metadata
+      |>.two_periodTranslate_localRoutes_avoidEachOther_of_raw_carrier_retainedOrbitCondition
+        wellFormed degree isLocal second.routeWitness.metadata
+        first.metadata_retainedValid second.metadata_retainedValid
+        firstSourceShift secondSourceShift
+        link localClauseIndex firstSourceEq
+        translatedLinkMember translatedFirstNeighbor
+        translatedSecondCondition
+        first.routeWitness.literalMember
+        second.routeWitness.literalMember secondNotCarrier
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_two_periodTranslate_localRoutesAvoidEachOther
+      formula second first secondSourceShift firstSourceShift
+      commonShiftEq.symm
+      (EmbeddedCNFIncidenceDrawing.routesAvoidEachOther_comm routeAvoid)
+  exact secondContains
+
 /-- A bounded relative displacement between one carrier occurrence
 coordinate and one noncarrier source coordinate is enough for periodic
 separation.  The displacement is split between the two finite sources, so
@@ -4250,11 +4322,6 @@ theorem
         some crossing.point := by
     rw [secondSourceEq]
     rfl
-  have carrierContains :=
-    first.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_endpointContact
-      formula wellFormed degree isLocal second
-      link firstComponentEq secondNotCarrier
-      crossing.point centerEq
   have firstInteriorContains :
       (translatedCrossing.firstSegment graph).InteriorContains
         translatedCrossing.point := by
@@ -4313,6 +4380,12 @@ theorem
       link firstComponentEq crossing localClauseIndex secondSourceEq
       ?_ firstContains
   intro contactPoint contactFirst contactSecond
+  have carrierContains :=
+    first.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_endpointContact
+      formula wellFormed degree isLocal second
+      link firstComponentEq secondNotCarrier
+      crossing.point centerEq
+      (point := contactPoint) contactFirst contactSecond
   have carrierContainsTranslated :
       (translatedLink.first.indexed.segment.translate
         ((drawing graph).periodTranslation
@@ -4321,7 +4394,7 @@ theorem
     simpa [translatedCrossing, CrossingRecord.periodTranslate,
       graph, anchorShift, sourceShift, translatedLink,
       CarrierNode.supportingSegment] using
-        carrierContains contactFirst contactSecond
+        carrierContains
   have firstRelativeClose :
       Cell.sub translatedLink.first.translate
           translatedCrossing.firstTranslate ∈
@@ -4765,11 +4838,6 @@ theorem
         some (routeBend.drawingPoint graph) := by
     rw [secondSourceEq]
     rfl
-  have carrierContains :=
-    first.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_endpointContact
-      formula wellFormed degree isLocal second
-      link firstComponentEq secondNotCarrier
-      (routeBend.drawingPoint graph) centerEq
   have incomingTerminalMember :=
     (drawingRouteBend_terminals_mem_drawingSegmentTerminals
       graph routeBendMember).1
@@ -4847,6 +4915,12 @@ theorem
       link firstComponentEq routeBend localClauseIndex secondSourceEq
       ?_ firstContains
   intro contactPoint contactFirst contactSecond
+  have carrierContains :=
+    first.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_endpointContact
+      formula wellFormed degree isLocal second
+      link firstComponentEq secondNotCarrier
+      (routeBend.drawingPoint graph) centerEq
+      (point := contactPoint) contactFirst contactSecond
   have relativeClose :
       Cell.sub translatedLink.first.translate
           translatedIncoming.translate ∈
@@ -4862,7 +4936,7 @@ theorem
           rw [targetPointEq]
           simpa [graph, anchorShift, sourceShift, translatedLink,
             CarrierNode.supportingSegment] using
-              carrierContains contactFirst contactSecond)
+              carrierContains)
         translatedIncomingContains
   have desiredEq :
       Cell.sub
