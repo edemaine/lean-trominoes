@@ -2702,6 +2702,17 @@ The representation choices for this target are:
   strict local-route avoidance; equal centers give component reindexing
   except for distinct routed-variable arms, whose certified local routes
   already avoid one another.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCarrierNoncarrierContacts.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCarrierNoncarrierContacts.lean)
+  proves endpoint-only contact between final carrier and noncarrier route
+  points.  The bend, routed-clause, and routed-variable cases balance one
+  source occurrence; the crossover case balances its two coupled segment
+  occurrences.  In every case, point equality supplies the same
+  supporting-segment proximity certificate as continuous contact.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointContacts.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointContacts.lean)
+  assembles carrier--carrier, carrier--noncarrier, and
+  noncarrier--noncarrier cases.  The complete final periodic incidence
+  drawing consequently satisfies `RoutePointsMeetOnlyAtEndpoints`, ruling
+  out hidden bend crossings before ribbon thickening.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
