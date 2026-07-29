@@ -2758,6 +2758,12 @@ The representation choices for this target are:
   periodic normalization.  Consequently every normalized carrier prototype
   is incident to at most two retained equality links and occurs at most four
   times in the deduplicated retained straight-carrier formula.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedNormalizationComponents.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedNormalizationComponents.lean)
+  decomposes the retained periodic planar-SAT formula into the unchanged
+  crossover, bend, routed-clause, and routed-variable families plus the new
+  retained straight-carrier family.  It also proves that global clause
+  deduplication can only reduce occurrences relative to separately
+  deduplicating these five normalized components.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
