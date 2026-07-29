@@ -2776,6 +2776,11 @@ The representation choices for this target are:
   canonically gauged positioned formula therefore has exactly the unwrapped
   occurrence list behind the opaque variable wrapper and retains the
   degree-eight bound.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedWidth.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedWidth.lean)
+  proves width three for every retained finite component, its periodicized
+  formula, and the final wrapped, variable-gauged, anchor-normalized,
+  clause-deduplicated positioned source.  Retaining selected carrier links
+  changes no arity because they use the same binary equality template.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
