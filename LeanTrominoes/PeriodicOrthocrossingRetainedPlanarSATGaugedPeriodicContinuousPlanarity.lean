@@ -323,6 +323,91 @@ theorem
           site armIndex arm routedLink localClauseIndex sourceEq
           occurrence occurrenceMember linkFirstEq firstContains
 
+/-- A final carrier occurrence's relative interior avoids both endpoints
+of every final noncarrier occurrence, including diagonal noncarrier
+segments. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_noncarrier
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    (firstMember :
+      firstIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  generalize sourceEq :
+    second.routeWitness.metadata.source = source
+  cases source with
+  | crossover crossing localClauseIndex =>
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_crossover
+          formula wellFormed degree isLocal first second
+          link firstComponentEq crossing localClauseIndex sourceEq
+          firstContains
+  | carrier secondLink localClauseIndex =>
+      exact False.elim
+        (secondNotCarrier
+          ⟨secondLink, by
+            rw [sourceEq]
+            rfl⟩)
+  | bend routeBend localClauseIndex =>
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_bend
+          formula wellFormed degree isLocal first second
+          link firstComponentEq routeBend localClauseIndex sourceEq
+          firstContains
+  | routedClause site =>
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_routedClause
+          formula wellFormed degree isLocal clausesNonempty
+          firstMember first second link firstComponentEq site sourceEq
+          firstContains
+  | routedVariable site armIndex arm routedLink localClauseIndex =>
+      have sourceMember := second.source_retainedComponentMember
+      rw [sourceEq] at sourceMember
+      rcases
+          exists_routeOccurrence_of_routedVariableLinkMember
+            formula site sourceMember.2.1 with
+        ⟨occurrence, occurrenceMember, linkFirstEq⟩
+      exact
+        retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_routedVariable
+          formula wellFormed degree isLocal first second
+          link firstComponentEq
+          site armIndex arm routedLink localClauseIndex sourceEq
+          occurrence occurrenceMember linkFirstEq firstContains
+
 /-- Every final noncarrier occurrence's relative interior avoids each closed
 final carrier occurrence. -/
 theorem
@@ -501,6 +586,128 @@ theorem
           first second firstCarrier secondCarrier different
           point firstContains
 
+/-- The relative interior of every final segment occurrence avoids both
+endpoints of every distinct final segment occurrence. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    (firstMember :
+      firstIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    (secondMember :
+      secondIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    {firstShift secondShift point : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (different :
+      PeriodicGridDrawing.SegmentOccurrenceKey
+          firstIndexed firstShift ≠
+        PeriodicGridDrawing.SegmentOccurrenceKey
+          secondIndexed secondShift)
+    (firstContains :
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift)).InteriorContains point) :
+    point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).start ∧
+      point ≠
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)).finish := by
+  by_cases firstCarrier :
+      ∃ firstLink,
+        first.routeWitness.metadata.source.component =
+          .carrier firstLink
+  · rcases firstCarrier with ⟨firstLink, firstComponentEq⟩
+    by_cases secondCarrier :
+        ∃ secondLink,
+          second.routeWitness.metadata.source.component =
+            .carrier secondLink
+    · rcases secondCarrier with ⟨secondLink, secondComponentEq⟩
+      let translatedFirstLink :=
+        carrierLinkPeriodTranslate formula.incidenceGraph firstLink
+          (Cell.sub first.physicalShift second.physicalShift)
+      by_cases perpendicular :
+          CarrierLinksPerpendicular translatedFirstLink secondLink
+      · exact
+          retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carriers_perpendicular
+            formula wellFormed degree isLocal first second
+            firstLink secondLink firstComponentEq secondComponentEq
+            (by simpa only [translatedFirstLink] using perpendicular)
+            point firstContains
+      · by_cases samePhysicalKey :
+          translatedFirstLink.first.carrierKey =
+            secondLink.first.carrierKey
+        · exact
+            retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carriers_same_physical_key
+              formula wellFormed degree isLocal clausesNonempty
+              first second firstLink secondLink
+              firstComponentEq secondComponentEq
+              (by simpa only [translatedFirstLink] using samePhysicalKey)
+              different point firstContains
+        · exact
+            retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carriers_parallel_key_ne
+              formula wellFormed degree isLocal first second
+              firstLink secondLink firstComponentEq secondComponentEq
+              (by simpa only [translatedFirstLink] using perpendicular)
+              (by simpa only [translatedFirstLink] using samePhysicalKey)
+              point firstContains
+    · exact
+        retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_carrier_noncarrier
+          formula wellFormed degree isLocal clausesNonempty
+          firstMember first second firstLink firstComponentEq secondCarrier
+          firstContains
+  · by_cases secondCarrier :
+      ∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink
+    · rcases secondCarrier with ⟨secondLink, secondComponentEq⟩
+      have avoids :=
+        retainedDeduplicatedGaugedWrappedDrawing_avoidsInterior_of_noncarrier_carrier
+          formula wellFormed degree isLocal clausesNonempty
+          secondMember second first secondLink secondComponentEq firstCarrier
+          firstContains
+      have secondAligned :
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)).IsAxisAligned :=
+        (GridSegment.isAxisAligned_translate _ _).mpr
+          (second.indexedSegment_isAxisAligned_of_carrier
+            wellFormed degree isLocal secondLink secondComponentEq)
+      constructor
+      · intro pointEq
+        apply avoids
+        rw [pointEq]
+        exact
+          GridSegment.contains_start_of_axisAligned secondAligned
+      · intro pointEq
+        apply avoids
+        rw [pointEq]
+        exact
+          GridSegment.contains_finish_of_axisAligned secondAligned
+    · exact
+        retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior_of_noncarriers
+          formula wellFormed degree isLocal clausesNonempty
+          first second firstCarrier secondCarrier different
+          point firstContains
+
 /-- The final gauged periodic incidence drawing has globally ordered
 interior-versus-closed route separation. -/
 theorem
@@ -532,6 +739,63 @@ theorem
       formula wellFormed degree isLocal clausesNonempty
       firstMember secondMember firstWitness secondWitness
       different firstContains
+
+/-- The final gauged periodic incidence drawing has globally ordered
+interior-versus-endpoint separation, including for diagonal target
+segments. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_segmentEndpointsAvoidInteriors
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+      formula).SegmentEndpointsAvoidInteriors := by
+  intro first firstMember second secondMember
+    firstShift secondShift point different firstContains
+  rcases
+      exists_retainedPhysicalSegment_of_finalSegmentOccurrence
+        formula wellFormed degree isLocal clausesNonempty
+        first firstMember firstShift with
+    ⟨firstWitness⟩
+  rcases
+      exists_retainedPhysicalSegment_of_finalSegmentOccurrence
+        formula wellFormed degree isLocal clausesNonempty
+        second secondMember secondShift with
+    ⟨secondWitness⟩
+  exact
+    retainedDeduplicatedGaugedWrappedDrawing_endpointsAvoidInterior
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstWitness secondWitness
+      different firstContains
+
+/-- No lifted graph vertex lies in the relative interior of a final route
+segment.  Endpoint-aware separation is needed here because a retained
+straight incidence route may be diagonal. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_verticesAvoidRouteInteriors
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+      formula).VerticesAvoidRouteInteriors := by
+  apply
+    PeriodicGridDrawing.verticesAvoidRouteInteriors_of_endpointCoverage_of_segmentEndpointsAvoidInteriors
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_vertexPositionsCoveredBySegmentEndpoints
+        formula wellFormed degree isLocal clausesNonempty
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_segmentEndpointsAvoidInteriors
+        formula wellFormed degree isLocal clausesNonempty
 
 /-- Every pair of distinct final segment occurrences has disjoint relative
 interiors. -/
@@ -659,6 +923,48 @@ theorem
     retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint
       formula wellFormed degree isLocal clausesNonempty
       firstMember secondMember firstWitness secondWitness different
+
+/-- The final gauged periodic incidence drawing is planar. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_isPlanar
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+      formula).IsPlanar := by
+  constructor
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesAvoidInteriors
+        formula wellFormed degree isLocal clausesNonempty
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_verticesAvoidRouteInteriors
+        formula wellFormed degree isLocal clausesNonempty
+
+/-- The final gauged periodic incidence drawing is continuously planar. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_isContinuouslyPlanar
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ []) :
+    (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+      formula).IsContinuouslyPlanar := by
+  constructor
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_isPlanar
+        formula wellFormed degree isLocal clausesNonempty
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesHaveDisjointInteriors
+        formula wellFormed degree isLocal clausesNonempty
 
 end PeriodicOrthocrossing
 end LeanTrominoes
