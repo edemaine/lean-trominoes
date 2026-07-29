@@ -2752,6 +2752,12 @@ The representation choices for this target are:
   and clause gauges, and clause-orbit deduplication.  The final positioned
   retained planar formula is therefore satisfiable exactly when the original
   periodic CNF is satisfiable.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierNormalizationDegree.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierNormalizationDegree.lean)
+  proves that every retained physical carrier node has at most one selected
+  predecessor and successor, then lifts both uniqueness statements through
+  periodic normalization.  Consequently every normalized carrier prototype
+  is incident to at most two retained equality links and occurs at most four
+  times in the deduplicated retained straight-carrier formula.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
