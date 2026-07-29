@@ -1732,6 +1732,13 @@ The representation choices for this target are:
   local cycle indices in order, shifted by the atom's unique block origin,
   and that those shifted indices retrieve the corresponding positioned
   Figure 7 routes.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitVariableRouteOrder.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitVariableRouteOrder.lean)
+  combines copied-source provenance, global ring-block indexing, and the
+  local Figure 7 direction certificate.  Every degree-three split variable's
+  actual angular-spliced routes therefore end in clockwise occurrence order:
+  copied source spoke first, incoming ring incidence second, and outgoing
+  ring incidence third.  The result applies to arbitrary certified boundary
+  prefixes and specializes to the concrete canonical route family.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean)
   assigns a chosen rotation order to the eight clockwise Figure 7 ports.
   Whenever every per-variable occurrence list has length at most eight, the
