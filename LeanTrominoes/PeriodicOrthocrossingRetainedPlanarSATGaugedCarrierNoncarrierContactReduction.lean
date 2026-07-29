@@ -1327,6 +1327,133 @@ theorem
           wellFormed degree isLocal valid nonempty
           site armIndex arm link localClauseIndex sourceEq)
 
+/-- The raw-carrier route-separation API also accepts the uniform
+noncarrier orbit condition.  The condition may choose a different retained
+source presentation with the same translated component; this is essential
+for routed-variable arms whose sorted finite index changes at a halo
+boundary. -/
+theorem
+    DrawingPlanarSATClauseMetadata.two_periodTranslate_localRoutes_avoidEachOther_of_raw_carrier_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (first second : DrawingPlanarSATClauseMetadata Variable)
+    (firstValid : first.RetainedValid formula)
+    (secondValid : second.RetainedValid formula)
+    (firstShift secondShift : Cell)
+    (link : EqualityLink CarrierNode)
+    (localClauseIndex : Nat)
+    (firstSourceEq :
+      first.source = .carrier link localClauseIndex)
+    (translatedLinkMember :
+      carrierLinkPeriodTranslate formula.incidenceGraph link firstShift ∈
+        retainedDrawingCompleteCarrierLinksRaw
+          formula.incidenceGraph)
+    (translatedFirstNeighbor :
+      IsNeighborTranslation
+        ((carrierLinkPeriodTranslate formula.incidenceGraph
+          link firstShift).first.translate))
+    (secondCondition :
+      second.source.RetainedOrbitCondition formula secondShift)
+    {firstLiteral secondLiteral :
+      PlanarSATVariable Variable × Bool}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        first.clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        second.clause.literals.zipIdx)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.source.component = .carrier secondLink) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (((first.source.periodTranslate formula firstShift).incidenceDrawing
+        formula).routes
+          first.source.localClauseIndex firstLiteralIndex)
+      (((second.source.periodTranslate formula secondShift).incidenceDrawing
+        formula).routes
+          second.source.localClauseIndex secondLiteralIndex) := by
+  have secondSourceMember :
+      second.source.RetainedComponentMember formula :=
+    (second.retainedValid_iff_sourceMember_and_localClauseMember
+      formula).mp secondValid |>.1
+  rcases
+      second.source.exists_retainedTarget_periodTranslate
+        formula degree secondSourceMember secondShift
+        secondCondition with
+    ⟨targetSource, targetSourceMember,
+      targetComponentEq, targetLocalClauseIndexEq⟩
+  have secondLocalClauseMember :
+      (second.clause, second.source.localClauseIndex) ∈
+        (second.source.clauseFormula formula).zipIdx :=
+    (second.retainedValid_iff_sourceMember_and_localClauseMember
+      formula).mp secondValid |>.2
+  rcases
+      second.source.exists_periodTranslatedClauseLiteral
+        formula secondShift second.clause secondLocalClauseMember
+        secondLiteral secondLiteralIndex secondLiteralMember with
+    ⟨targetClause, targetLiteral,
+      translatedClauseMember, targetLiteralMember⟩
+  let translatedSource :=
+    second.source.periodTranslate formula secondShift
+  let targetMetadata :
+      DrawingPlanarSATClauseMetadata Variable :=
+    ⟨targetClause, targetSource⟩
+  have targetFormulaEq :
+      targetSource.clauseFormula formula =
+        translatedSource.clauseFormula formula :=
+    targetSource.clauseFormula_eq_of_component_eq
+      formula translatedSource targetComponentEq
+  have translatedLocalClauseIndexEq :
+      translatedSource.localClauseIndex =
+        second.source.localClauseIndex :=
+    DrawingPlanarSATClauseSource.localClauseIndex_periodTranslate
+      formula second.source secondShift
+  have targetClauseMember :
+      (targetClause, targetSource.localClauseIndex) ∈
+        (targetSource.clauseFormula formula).zipIdx := by
+    rw [targetFormulaEq, targetLocalClauseIndexEq,
+      ← translatedLocalClauseIndexEq]
+    exact translatedClauseMember
+  have targetValid :
+      targetMetadata.RetainedValid formula := by
+    apply
+      (targetMetadata
+        |>.retainedValid_iff_sourceMember_and_localClauseMember
+          formula).mpr
+    exact ⟨targetSourceMember, targetClauseMember⟩
+  have targetNotCarrier :
+      ¬∃ targetLink,
+        targetMetadata.source.component = .carrier targetLink := by
+    rintro ⟨targetLink, targetCarrierEq⟩
+    apply secondNotCarrier
+    have translatedCarrierEq :
+        translatedSource.component = .carrier targetLink :=
+      targetComponentEq.symm.trans targetCarrierEq
+    rcases second with ⟨secondClause, secondSource⟩
+    cases secondSource <;>
+      simp_all [translatedSource,
+        DrawingPlanarSATClauseSource.periodTranslate,
+        DrawingPlanarSATClauseSource.component]
+  have avoid :=
+    first.periodTranslate_localRoutes_avoidEachOther_of_raw_carrier
+      wellFormed degree isLocal targetMetadata
+      firstValid targetValid firstShift
+      link localClauseIndex firstSourceEq
+      translatedLinkMember translatedFirstNeighbor
+      firstLiteralMember targetLiteralMember targetNotCarrier
+  have targetDrawingEq :
+      targetSource.incidenceDrawing formula =
+        translatedSource.incidenceDrawing formula :=
+    targetSource.incidenceDrawing_eq_of_component_eq
+      formula translatedSource targetComponentEq
+  simpa only [targetMetadata, targetDrawingEq,
+    targetLocalClauseIndexEq, translatedSource,
+    translatedLocalClauseIndexEq] using avoid
+
 /-- A contact with an anchor-normalized final carrier segment forces a
 translated routed-clause source to remain in the neighboring retained
 site family. -/
@@ -1476,6 +1603,75 @@ theorem
       retainedDrawingCompleteCarrierLink_first_translate_neighbor
         formula.incidenceGraph selectedMember⟩
 
+/-- The common-shift raw-carrier bridge with component-equivalent
+noncarrier reindexing.  A noncarrier orbit condition is enough even when its
+literal translated source is absent from the finite enumeration. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_common_raw_retainedOrbitCondition
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (firstSourceShift secondSourceShift : Cell)
+    (commonShiftEq :
+      Cell.sub first.physicalShift firstSourceShift =
+        Cell.sub second.physicalShift secondSourceShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (translatedLinkMember :
+      carrierLinkPeriodTranslate formula.incidenceGraph link
+          firstSourceShift ∈
+        retainedDrawingCompleteCarrierLinksRaw
+          formula.incidenceGraph)
+    (translatedFirstNeighbor :
+      IsNeighborTranslation
+        ((carrierLinkPeriodTranslate formula.incidenceGraph link
+          firstSourceShift).first.translate))
+    (translatedSecondCondition :
+      second.routeWitness.metadata.source.RetainedOrbitCondition
+        formula secondSourceShift) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          link firstComponentEq with
+    ⟨localClauseIndex, firstSourceEq⟩
+  have routeAvoid :=
+    first.routeWitness.metadata
+      |>.two_periodTranslate_localRoutes_avoidEachOther_of_raw_carrier_retainedOrbitCondition
+        wellFormed degree isLocal second.routeWitness.metadata
+        first.metadata_retainedValid second.metadata_retainedValid
+        firstSourceShift secondSourceShift
+        link localClauseIndex firstSourceEq
+        translatedLinkMember translatedFirstNeighbor
+        translatedSecondCondition
+        first.routeWitness.literalMember
+        second.routeWitness.literalMember secondNotCarrier
+  exact
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_two_periodTranslate_localRoutesAvoidEachOther
+      formula first second firstSourceShift secondSourceShift
+      commonShiftEq routeAvoid
+
 /-- A bounded relative displacement between one carrier occurrence
 coordinate and one noncarrier source coordinate is enough for periodic
 separation.  The displacement is split between the two finite sources, so
@@ -1510,11 +1706,11 @@ theorem
     (secondClosure :
       ∀ adjustment,
         IsNeighborTranslation (Cell.add secondBase adjustment) →
-          (second.routeWitness.metadata.source.periodTranslate formula
+          second.routeWitness.metadata.source.RetainedOrbitCondition
+            formula
             (Cell.add
               (Cell.neg second.sourceClauseAnchor)
-              adjustment)
-              |>.RetainedComponentMember formula))
+              adjustment))
     (contactClose :
       GridSegment.InteriorsMeet
           (firstIndexed.segment.translate
@@ -1574,9 +1770,9 @@ theorem
     retainedDrawingCompleteCarrierLinkRaw_periodTranslate_mem
       wellFormed degree isLocal carrierData.1
       firstSourceShift carrierData.2 targetFirstNeighbor
-  have translatedSecondMember :
-      (second.routeWitness.metadata.source.periodTranslate
-        formula secondSourceShift).RetainedComponentMember formula := by
+  have translatedSecondCondition :
+      second.routeWitness.metadata.source.RetainedOrbitCondition
+        formula secondSourceShift := by
     exact secondClosure secondAdjustment translatedSecondNeighbor
   have commonShiftEq :
       Cell.sub first.physicalShift firstSourceShift =
@@ -1596,12 +1792,12 @@ theorem
       Cell.sub, Cell.add, Cell.neg, Prod.mk.injEq] at adjustmentDifference ⊢
     constructor <;> omega
   exact
-    (retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_common_raw
+    (retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_common_raw_retainedOrbitCondition
       formula wellFormed degree isLocal first second
       firstSourceShift secondSourceShift commonShiftEq
       link firstComponentEq secondNotCarrier
       translatedLinkMember targetFirstNeighbor
-      translatedSecondMember)
+      translatedSecondCondition)
       meet
 
 /-- Anchor-normalizing the carrier source and translating the noncarrier
@@ -1789,9 +1985,12 @@ theorem
       link firstComponentEq secondNotCarrier (0, 0)
   · intro adjustment adjustmentNeighbor
     rw [secondSourceEq]
-    apply
-      routedClauseSource_periodTranslate_retainedComponentMember_of_neighbor
-        formula site siteMember
+    change
+      IsNeighborTranslation
+        (Cell.add site.2
+          (Cell.add
+            (Cell.neg second.sourceClauseAnchor)
+            adjustment))
     have translatedSiteEq :
         Cell.add site.2
             (Cell.add
@@ -1841,6 +2040,160 @@ theorem
       firstBaseNeighbor.add_mem_doubleNeighborTranslations
         relativeNeighbor
     simpa [Cell.sub] using sumMember
+
+/-- Carrier--bend separation reduces to a doubled-halo bound between the
+anchor-normalized carrier occurrence and the anchor-normalized bend route
+occurrence. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_bend_of_contact_close
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (routeBend : RouteBend)
+    (localClauseIndex : Nat)
+    (secondSourceEq :
+      second.routeWitness.metadata.source =
+        .bend routeBend localClauseIndex)
+    (contactClose :
+      GridSegment.InteriorsMeet
+          (firstIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation firstShift))
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)) →
+        Cell.sub
+            (Cell.add
+              (Cell.add link.first.translate
+                (Cell.neg first.sourceClauseAnchor))
+              (Cell.sub firstShift secondShift))
+            (Cell.add routeBend.translate
+              (Cell.neg second.sourceClauseAnchor)) ∈
+          PeriodicGridDrawing.doubleNeighborTranslations) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_balanced_source_coordinate
+      formula wellFormed degree isLocal first second
+      link firstComponentEq secondNotCarrier
+      (Cell.add routeBend.translate
+        (Cell.neg second.sourceClauseAnchor))
+  · intro adjustment adjustmentNeighbor
+    rw [secondSourceEq]
+    change
+      IsNeighborTranslation
+        (Cell.add routeBend.translate
+          (Cell.add
+            (Cell.neg second.sourceClauseAnchor)
+            adjustment))
+    simpa [Cell.add, add_assoc] using adjustmentNeighbor
+  · exact contactClose
+
+/-- Carrier--routed-variable separation has the same one-coordinate
+reduction, using any route occurrence that represents the selected arm.
+The orbit-condition bridge above permits the arm's finite presentation index
+to change after balancing. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_routedVariable_of_contact_close
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (carrierLink : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component =
+        .carrier carrierLink)
+    (site : VariableRouteSite Variable)
+    (armIndex : Nat)
+    (arm : DuplicatorArm)
+    (routedLink : EqualityLink (PlanarSATNode Variable))
+    (localClauseIndex : Nat)
+    (secondSourceEq :
+      second.routeWitness.metadata.source =
+        .routedVariable site armIndex arm routedLink
+          localClauseIndex)
+    (occurrence : CNFRouteOccurrence Variable)
+    (occurrenceMember :
+      occurrence ∈ variableRouteOccurrencesAt formula site)
+    (linkFirstEq :
+      routedLink.first =
+        .carrier (.terminal
+          (occurrence.targetTerminal formula)))
+    (contactClose :
+      GridSegment.InteriorsMeet
+          (firstIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation firstShift))
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)) →
+        Cell.sub
+            (Cell.add
+              (Cell.add carrierLink.first.translate
+                (Cell.neg first.sourceClauseAnchor))
+              (Cell.sub firstShift secondShift))
+            (Cell.add occurrence.translate
+              (Cell.neg second.sourceClauseAnchor)) ∈
+          PeriodicGridDrawing.doubleNeighborTranslations) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_balanced_source_coordinate
+      formula wellFormed degree isLocal first second
+      carrierLink firstComponentEq secondNotCarrier
+      (Cell.add occurrence.translate
+        (Cell.neg second.sourceClauseAnchor))
+  · intro adjustment adjustmentNeighbor
+    rw [secondSourceEq]
+    refine ⟨occurrence, occurrenceMember, linkFirstEq, ?_⟩
+    simpa [Cell.add, add_assoc] using adjustmentNeighbor
+  · exact contactClose
 
 /-- If a hypothetical final carrier--noncarrier contact keeps the physically
 aligned noncarrier source in the retained halo, finite raw-carrier planarity
