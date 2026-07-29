@@ -52,6 +52,94 @@ theorem fundamental_translate_shift_is_neighbor
     omega
   omega
 
+/-- Any integral displacement of at most two cells can be split between two
+neighboring representatives.  This is the one-dimensional balancing fact
+behind moving both sides of a periodic contact into the retained halo. -/
+theorem exists_neighbor_coordinates_of_difference_le_two
+    {difference : Int}
+    (lower : -2 ≤ difference)
+    (upper : difference ≤ 2) :
+    ∃ first second : Int,
+      (first = -1 ∨ first = 0 ∨ first = 1) ∧
+        (second = -1 ∨ second = 0 ∨ second = 1) ∧
+        first - second = difference := by
+  have possibilities :
+      difference = -2 ∨ difference = -1 ∨ difference = 0 ∨
+        difference = 1 ∨ difference = 2 := by
+    omega
+  rcases possibilities with
+      differenceEq | differenceEq | differenceEq |
+        differenceEq | differenceEq
+  · exact ⟨-1, 1, by simp, by simp, by omega⟩
+  · exact ⟨-1, 0, by simp, by simp, by omega⟩
+  · exact ⟨0, 0, by simp, by simp, by omega⟩
+  · exact ⟨1, 0, by simp, by simp, by omega⟩
+  · exact ⟨1, -1, by simp, by simp, by omega⟩
+
+/-- If two source coordinates differ by at most two lattice cells after
+physical alignment, their source shifts can be adjusted while preserving
+that alignment so that both translated source coordinates are neighboring.
+
+The returned equation is oriented for a common external translate:
+`firstAdjustment - secondAdjustment = relative`. -/
+theorem exists_neighbor_balancing_adjustments
+    (firstBase secondBase relative : Cell)
+    (close :
+      Cell.sub (Cell.add firstBase relative) secondBase ∈
+        PeriodicGridDrawing.doubleNeighborTranslations) :
+    ∃ firstAdjustment secondAdjustment : Cell,
+      Cell.sub firstAdjustment secondAdjustment = relative ∧
+        IsNeighborTranslation
+          (Cell.add firstBase firstAdjustment) ∧
+        IsNeighborTranslation
+          (Cell.add secondBase secondAdjustment) := by
+  have closeBounds :=
+    (PeriodicGridDrawing.mem_doubleNeighborTranslations_iff
+      (Cell.sub (Cell.add firstBase relative) secondBase)).mp close
+  rcases
+      exists_neighbor_coordinates_of_difference_le_two
+        closeBounds.1.1 closeBounds.1.2 with
+    ⟨firstX, secondX, firstXNeighbor, secondXNeighbor,
+      horizontalDifference⟩
+  rcases
+      exists_neighbor_coordinates_of_difference_le_two
+        closeBounds.2.1 closeBounds.2.2 with
+    ⟨firstY, secondY, firstYNeighbor, secondYNeighbor,
+      verticalDifference⟩
+  let firstTarget : Cell := (firstX, firstY)
+  let secondTarget : Cell := (secondX, secondY)
+  let firstAdjustment := Cell.sub firstTarget firstBase
+  let secondAdjustment := Cell.sub secondTarget secondBase
+  refine ⟨firstAdjustment, secondAdjustment, ?_, ?_, ?_⟩
+  · rcases firstBase with ⟨firstBaseX, firstBaseY⟩
+    rcases secondBase with ⟨secondBaseX, secondBaseY⟩
+    rcases relative with ⟨relativeX, relativeY⟩
+    simp only [firstAdjustment, secondAdjustment, firstTarget,
+      secondTarget, Cell.sub, Cell.add, Prod.mk.injEq] at horizontalDifference verticalDifference ⊢
+    constructor <;> omega
+  · simpa [firstAdjustment, firstTarget, Cell.add, Cell.sub,
+      IsNeighborTranslation] using
+        And.intro firstXNeighbor firstYNeighbor
+  · simpa [secondAdjustment, secondTarget, Cell.add, Cell.sub,
+      IsNeighborTranslation] using
+        And.intro secondXNeighbor secondYNeighbor
+
+/-- The sum of two neighboring lattice translations belongs to the
+twenty-five-element doubled halo. -/
+theorem IsNeighborTranslation.add_mem_doubleNeighborTranslations
+    {first second : Cell}
+    (firstNeighbor : IsNeighborTranslation first)
+    (secondNeighbor : IsNeighborTranslation second) :
+    Cell.add first second ∈
+      PeriodicGridDrawing.doubleNeighborTranslations := by
+  apply
+    (PeriodicGridDrawing.mem_doubleNeighborTranslations_iff
+      (Cell.add first second)).mpr
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [IsNeighborTranslation, Cell.add] at firstNeighbor secondNeighbor ⊢
+  omega
+
 /-- A lifted constructed-drawing vertex that still lies in the open
 one-cell halo must use one of the nine neighboring lattice translations. -/
 theorem liftedDrawingVertexPosition_translate_neighbor_of_inExpanded
@@ -1388,6 +1476,134 @@ theorem
       retainedDrawingCompleteCarrierLink_first_translate_neighbor
         formula.incidenceGraph selectedMember⟩
 
+/-- A bounded relative displacement between one carrier occurrence
+coordinate and one noncarrier source coordinate is enough for periodic
+separation.  The displacement is split between the two finite sources, so
+neither source is required to absorb the entire quotient translation.
+
+The noncarrier family supplies only its one-coordinate closure rule.  Bends,
+routed clauses, and routed-variable arms all have this form; crossovers need
+the analogous two-coordinate balancing argument. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_balanced_source_coordinate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (secondBase : Cell)
+    (secondClosure :
+      ∀ adjustment,
+        IsNeighborTranslation (Cell.add secondBase adjustment) →
+          (second.routeWitness.metadata.source.periodTranslate formula
+            (Cell.add
+              (Cell.neg second.sourceClauseAnchor)
+              adjustment)
+              |>.RetainedComponentMember formula))
+    (contactClose :
+      GridSegment.InteriorsMeet
+          (firstIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation firstShift))
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)) →
+        Cell.sub
+            (Cell.add
+              (Cell.add link.first.translate
+                (Cell.neg first.sourceClauseAnchor))
+              (Cell.sub firstShift secondShift))
+            secondBase ∈
+          PeriodicGridDrawing.doubleNeighborTranslations) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  let firstBase :=
+    Cell.add link.first.translate
+      (Cell.neg first.sourceClauseAnchor)
+  let relative := Cell.sub firstShift secondShift
+  intro meet
+  rcases
+      exists_neighbor_balancing_adjustments
+        firstBase secondBase relative
+        (by simpa only [firstBase, relative] using contactClose meet) with
+    ⟨firstAdjustment, secondAdjustment,
+      adjustmentDifference,
+      translatedFirstNeighbor,
+      translatedSecondNeighbor⟩
+  let firstSourceShift :=
+    Cell.add (Cell.neg first.sourceClauseAnchor)
+      firstAdjustment
+  let secondSourceShift :=
+    Cell.add (Cell.neg second.sourceClauseAnchor)
+      secondAdjustment
+  have carrierData :=
+    first.carrier_source_raw_and_neighbor link firstComponentEq
+  have targetFirstNeighbor :
+      IsNeighborTranslation
+        ((carrierLinkPeriodTranslate formula.incidenceGraph
+          link firstSourceShift).first.translate) := by
+    simpa [firstBase, firstSourceShift,
+      CarrierNode.translate_periodTranslate,
+      Cell.add, Cell.neg, Cell.sub, add_assoc] using
+        translatedFirstNeighbor
+  have translatedLinkMember :
+      carrierLinkPeriodTranslate formula.incidenceGraph
+          link firstSourceShift ∈
+        retainedDrawingCompleteCarrierLinksRaw
+          formula.incidenceGraph :=
+    retainedDrawingCompleteCarrierLinkRaw_periodTranslate_mem
+      wellFormed degree isLocal carrierData.1
+      firstSourceShift carrierData.2 targetFirstNeighbor
+  have translatedSecondMember :
+      (second.routeWitness.metadata.source.periodTranslate
+        formula secondSourceShift).RetainedComponentMember formula := by
+    exact secondClosure secondAdjustment translatedSecondNeighbor
+  have commonShiftEq :
+      Cell.sub first.physicalShift firstSourceShift =
+        Cell.sub second.physicalShift secondSourceShift := by
+    rcases firstShift with ⟨firstX, firstY⟩
+    rcases secondShift with ⟨secondX, secondY⟩
+    rcases first.sourceClauseAnchor with
+      ⟨firstAnchorX, firstAnchorY⟩
+    rcases second.sourceClauseAnchor with
+      ⟨secondAnchorX, secondAnchorY⟩
+    rcases firstAdjustment with
+      ⟨firstAdjustmentX, firstAdjustmentY⟩
+    rcases secondAdjustment with
+      ⟨secondAdjustmentX, secondAdjustmentY⟩
+    simp only [FinalGaugedSegmentOccurrenceWitness.physicalShift_eq,
+      firstSourceShift, secondSourceShift, relative,
+      Cell.sub, Cell.add, Cell.neg, Prod.mk.injEq] at adjustmentDifference ⊢
+    constructor <;> omega
+  exact
+    (retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_common_raw
+      formula wellFormed degree isLocal first second
+      firstSourceShift secondSourceShift commonShiftEq
+      link firstComponentEq secondNotCarrier
+      translatedLinkMember targetFirstNeighbor
+      translatedSecondMember)
+      meet
+
 /-- Anchor-normalizing the carrier source and translating the noncarrier
 source by its physical shift minus the carrier's final shift leaves the same
 external translate on both finite routes.  Retention of that translated
@@ -1532,15 +1748,99 @@ theorem
     rintro ⟨secondLink, componentEq⟩
     rw [secondSourceEq] at componentEq
     simp [DrawingPlanarSATClauseSource.component] at componentEq
+  have siteMember :
+      site ∈ drawingClauseRouteSites formula := by
+    have sourceMember := second.source_retainedComponentMember
+    rw [secondSourceEq] at sourceMember
+    exact sourceMember
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have secondNonempty :
+      second.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := second.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have secondCenterEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some
+          (liftedIncidenceVertexPosition
+            formula (.clause site.1) site.2) := by
+    rw [secondSourceEq]
+    rfl
+  have secondAnchorEq :
+      second.sourceClauseAnchor = site.2 := by
+    simpa only [
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (second.routeWitness.metadata
+        |>.sourceClauseAnchor_eq_liftedVertexTranslate
+          wellFormed degree isLocal second.metadata_retainedValid
+          secondNonempty (.clause site.1)
+          (drawingClauseRouteSite_vertex_mem formula siteMember)
+          site.2 secondCenterEq)
   apply
-    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_anchor_carrier_noncarrier_of_contact_retained
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_balanced_source_coordinate
       formula wellFormed degree isLocal first second
-      link firstComponentEq secondNotCarrier
-  intro meet
-  exact
-    FinalGaugedSegmentOccurrenceWitness.translated_routedClause_retained_of_contact
-      formula wellFormed degree isLocal clausesNonempty
-      firstMember first second site secondSourceEq meet
+      link firstComponentEq secondNotCarrier (0, 0)
+  · intro adjustment adjustmentNeighbor
+    rw [secondSourceEq]
+    apply
+      routedClauseSource_periodTranslate_retainedComponentMember_of_neighbor
+        formula site siteMember
+    have translatedSiteEq :
+        Cell.add site.2
+            (Cell.add
+              (Cell.neg second.sourceClauseAnchor)
+              adjustment) =
+          adjustment := by
+      rw [secondAnchorEq]
+      rcases site.2 with ⟨siteX, siteY⟩
+      rcases adjustment with
+        ⟨adjustmentX, adjustmentY⟩
+      simp [Cell.add, Cell.neg, Cell.sub]
+    rw [translatedSiteEq]
+    simpa [Cell.add] using adjustmentNeighbor
+  · intro meet
+    rcases
+        first.routeWitness.metadata.source
+          |>.exists_eq_carrier_of_component_eq
+            link firstComponentEq with
+      ⟨localClauseIndex, firstSourceEq⟩
+    have firstBaseNeighbor :
+        IsNeighborTranslation
+          (Cell.add link.first.translate
+            (Cell.neg first.sourceClauseAnchor)) := by
+      simpa only [
+        FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor,
+        carrierLinkPeriodTranslate_first,
+        CarrierNode.translate_periodTranslate] using
+        (first.routeWitness.metadata
+          |>.carrier_first_anchorNormalize_translate_neighbor
+            wellFormed degree isLocal first.metadata_retainedValid
+            firstNonempty link localClauseIndex firstSourceEq)
+    have firstEndpointBounds :=
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_segmentEndpointsInExpandedSquare
+        formula wellFormed degree isLocal clausesNonempty
+        firstIndexed firstMember
+    have secondEndpointBounds :=
+      second.endpointsInHalfOpenFundamentalSquare_of_not_carrier
+        formula wellFormed degree isLocal clausesNonempty
+        secondNotCarrier
+    have relativeNeighbor :
+        IsNeighborTranslation (Cell.sub firstShift secondShift) := by
+      exact
+        (mem_neighborTranslations_iff _).mp
+          (PeriodicGridDrawing.relativeTranslate_isNeighbor_of_interiorsMeet_of_secondHalfOpen
+            firstEndpointBounds secondEndpointBounds meet)
+    have sumMember :=
+      firstBaseNeighbor.add_mem_doubleNeighborTranslations
+        relativeNeighbor
+    simpa [Cell.sub] using sumMember
 
 /-- If a hypothetical final carrier--noncarrier contact keeps the physically
 aligned noncarrier source in the retained halo, finite raw-carrier planarity
