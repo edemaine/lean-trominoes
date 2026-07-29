@@ -909,6 +909,73 @@ theorem DrawingPlanarSATClauseMetadata.bend_anchorNormalize_retainedComponentMem
         wellFormed degree isLocal valid nonempty
         routeBend localClauseIndex sourceEq)
 
+/-- A retained crossover clause uses its crossing point as macrocell center,
+so its source-clause anchor is exactly the crossing's extracted period
+shift. -/
+theorem DrawingPlanarSATClauseMetadata.crossover_sourceClauseAnchor_eq_periodShift
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (crossing : CrossingRecord)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      metadata.source = .crossover crossing localClauseIndex) :
+    PeriodicCNF.clauseAnchor
+        (metadataGaugedPositionedClause formula metadata).literals =
+      crossingPeriodShift formula.incidenceGraph crossing := by
+  have centerEq :
+      metadata.source.component.macrocellCenter formula =
+        some crossing.point := by
+    rw [sourceEq]
+    rfl
+  simpa [crossingPeriodShift] using
+    (metadata.sourceClauseAnchor_eq_macrocellCenter_ediv
+      wellFormed degree isLocal valid crossing.point centerEq nonempty)
+
+/-- Anchor-normalizing a retained crossover source is exactly periodic
+normalization of its crossing record, which is a canonical oriented
+crossing and hence remains in the retained crossing halo. -/
+theorem
+    DrawingPlanarSATClauseMetadata.crossover_anchorNormalize_retainedComponentMember
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    (nonempty : metadata.clause.literals ≠ [])
+    (crossing : CrossingRecord)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      metadata.source = .crossover crossing localClauseIndex) :
+    (metadata.source.periodTranslate formula
+      (Cell.neg
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause formula metadata).literals))
+        |>.RetainedComponentMember formula) := by
+  let graph := formula.incidenceGraph
+  have valid' := valid
+  unfold DrawingPlanarSATClauseMetadata.RetainedValid at valid'
+  rw [sourceEq] at valid'
+  have normalizedMember :
+      crossing.periodNormalize graph ∈ orientedCrossingHalo graph :=
+    orientedCrossings_subset_orientedCrossingHalo graph
+      (periodNormalize_mem_orientedCrossings
+        wellFormed degree isLocal valid'.1)
+  rw [sourceEq,
+    metadata.crossover_sourceClauseAnchor_eq_periodShift
+      wellFormed degree isLocal valid nonempty
+      crossing localClauseIndex sourceEq]
+  apply crossoverSource_periodTranslate_retainedComponentMember
+  rw [CrossingRecord.periodTranslate_neg_shift_eq_periodNormalize]
+  exact normalizedMember
+
 /-- A contact with an anchor-normalized final carrier segment forces a
 translated routed-clause source to remain in the neighboring retained
 site family. -/
