@@ -1574,6 +1574,12 @@ The representation choices for this target are:
   soundness, preservation under positive integral scaling, exact endpoints,
   and orthogonality after rasterizing supported segments, polylines, and
   whole incidence-route families.
+- [`LeanTrominoes/RetainedEmbeddedCNFIncidenceDrawing.lean`](LeanTrominoes/RetainedEmbeddedCNFIncidenceDrawing.lean)
+  packages that segment condition over every genuine route of a finite
+  embedded CNF.  The certificate follows from octilinearity, is preserved by
+  translation and logical renaming in both directions, and has a
+  membership-style interface.  The direct routed-clause star is certified
+  separately from its three exceptional primitive vectors.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
