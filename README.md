@@ -1587,6 +1587,12 @@ The representation choices for this target are:
   certificates, and routed clauses use the three exceptional slopes; the
   cases assemble into a certificate for the complete retained finite
   incidence drawing.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRetainedRays.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRetainedRays.lean)
+  transports that finite certificate through the actual periodic quotient
+  bookkeeping.  The quotient-to-finite occurrence witness reduces every
+  genuine route in the gauged, wrapped, and orbit-deduplicated drawing to a
+  translate of a retained finite route, so every final segment has one of
+  the eleven rasterizable slopes.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
