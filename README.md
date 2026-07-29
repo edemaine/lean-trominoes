@@ -2045,6 +2045,11 @@ The representation choices for this target are:
   occurrence-level variable ports, clause ports, and corridor lanes.  The
   variable result applies to every occurrence represented by one shared
   source-variable fan.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedStubs.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedStubs.lean)
+  translates those finite fans into their actual source macrocells.  Given
+  the explicit clockwise-order obligation, it proves exact global
+  endpoints, rectilinearity, and macrocell containment, and packages the
+  result as a `RibbonEndpointFanSystem`.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
