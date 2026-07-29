@@ -54,9 +54,11 @@ theorem
   rcases
       exists_retainedPhysicalIncidence_of_finalRouteOccurrence
         formula wellFormed degree isLocal clausesNonempty
-        taggedClause taggedClauseMember
+      taggedClause taggedClauseMember
         taggedLiteral taggedLiteralMember (0, 0) with
     ⟨witness⟩
+  let drawing :=
+    retainedDrawingPlanarSATLocalIncidenceDrawing formula
   have finiteRetained :=
     retainedDrawingPlanarSATLocalIncidenceDrawing_routesRetainedRay
       formula wellFormed degree isLocal
@@ -66,18 +68,50 @@ theorem
     finiteRetained incidenceIndex
   simp only [EmbeddedCNFIncidenceDrawing.incidenceAt] at localRetained
   rw [incidenceEqual] at localRetained
+  let physicalOffset :=
+    (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+      formula).translation
+      (Cell.sub (0, 0)
+        (PeriodicCNF.clauseAnchor
+          (metadataGaugedPositionedClause
+            formula witness.metadata).literals))
   have translatedLocal :
       RetainedRayPolyline
-        (metadataPhysicalRouteOccurrence
-          formula witness.metadata witness.metadataIndex
-          witness.literal taggedLiteral.2 (0, 0)) := by
-    unfold metadataPhysicalRouteOccurrence
-    exact localRetained.translate _
-  rw [← witness.routeEq] at translatedLocal
-  simpa [finalGaugedRouteOccurrence,
-    translatePolyline,
-    PeriodicVariablePlacement.translation,
-    Cell.scale, Cell.add] using translatedLocal
+        (translatePolyline physicalOffset
+          (drawing.routeAt
+            (metadataPhysicalIncidence
+              witness.metadata witness.metadataIndex
+              witness.literal taggedLiteral.2))) := by
+    exact localRetained.translate physicalOffset
+  have occurrenceEq := witness.routeEq
+  unfold finalGaugedRouteOccurrence
+    metadataPhysicalRouteOccurrence at occurrenceEq
+  have zeroTranslation :
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+        formula).translation (0, 0) = (0, 0) := by
+    simp [PeriodicVariablePlacement.translation, Cell.scale]
+  rw [zeroTranslation] at occurrenceEq
+  have translatePolyline_zero (points : List Cell) :
+      translatePolyline (0, 0) points = points := by
+    induction points with
+    | nil => rfl
+    | cons point points induction =>
+        change
+          List.map (Cell.add (0, 0)) points = points at induction
+        simp only [translatePolyline, List.map_cons]
+        rw [induction]
+        simp [Cell.add]
+  rw [translatePolyline_zero] at occurrenceEq
+  change
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+        formula taggedClause.2 taggedLiteral.2 =
+      translatePolyline physicalOffset
+        (drawing.routeAt
+          (metadataPhysicalIncidence
+            witness.metadata witness.metadataIndex
+            witness.literal taggedLiteral.2)) at occurrenceEq
+  rw [occurrenceEq]
+  exact translatedLocal
 
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -1593,6 +1593,18 @@ The representation choices for this target are:
   genuine route in the gauged, wrapped, and orbit-deduplicated drawing to a
   translate of a retained finite route, so every final segment has one of
   the eleven rasterizable slopes.
+- [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
+  packages canonical incidence endpoints together with the retained-ray
+  condition.  Positive integral scaling and executable staircase
+  rasterization then preserve the exact scaled endpoints and produce a
+  canonical orthogonal route family for the unchanged logical incidence
+  graph.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATRasterizedDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATRasterizedDrawing.lean)
+  applies that interface to the final gauged, wrapped, and orbit-deduplicated
+  planar-SAT routes.  It defines the scaled rasterized incidence drawing and
+  proves exact canonical endpoints and orthogonality for every genuine
+  route.  Proving that these staircases preserve global planar separation is
+  the next geometric layer.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
