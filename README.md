@@ -1575,6 +1575,13 @@ The representation choices for this target are:
   unit-free exact-one route family.  Its assembled periodic incidence drawing
   matches every graph edge and is orthogonal; global planarity remains tied
   to the coordinated copied-source boundary fans.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean)
+  proves that the retained fixed-eight source routes follow syntactic
+  occurrence order clockwise, then carries that invariant through Figure 9,
+  opaque wrapping, and unit elimination.  Third-occurrence provenance again
+  limits the three-point route requirement to embedded source variables, so
+  the final retained unit-free routes satisfy the variable-fan rotation
+  premise used by the planar 3DM ribbon construction.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean)
   names the normalized periodic 3DM target of the retained fixed-eight
   exact-one pipeline.  It proves the target well-formed, proves that every
@@ -3714,6 +3721,11 @@ The representation choices for this target are:
   through unit elimination.  For unit elimination, a weaker certificate
   scoped to source atoms with a third occurrence is sufficient, so
   degree-at-most-two auxiliaries require no irrelevant length hypothesis.
+- [`LeanTrominoes/PeriodicOneInThreeWrappedVariableRouteOrderTransport.lean`](LeanTrominoes/PeriodicOneInThreeWrappedVariableRouteOrderTransport.lean)
+  composes Figure 9 route-order transport with the opaque variable wrapper
+  and packages the analogous unit-elimination result behind equality-instance
+  independent interfaces.  It also proves that any wrapped variable reaching
+  the third occurrence slot wraps an embedded Figure 9 source variable.
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean)
   proves that every generated triple reference names an element in the
   corresponding finite typed red, green, or blue list.  In particular,
