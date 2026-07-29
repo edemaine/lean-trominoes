@@ -2670,6 +2670,13 @@ The representation choices for this target are:
   the retained point index completes the occurrence key; consequently any
   first-source orbit condition transfers finite endpoint-only contact to the
   original periodic pair.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointLocalRouteAvoidance.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointLocalRouteAvoidance.lean)
+  transfers the endpoint-contact clause of a component-level
+  `RoutesAvoidEachOther` certificate through the final route-point
+  occurrence witnesses.  The two source components may be translated
+  independently provided their remaining physical shifts agree, so the
+  component geometry already used for continuous planarity can be reused
+  without weakening its stronger listed-point conclusion.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean)
   packages the common aligned-component case.  When translating the first
   source by the physical-shift difference identifies the second retained
