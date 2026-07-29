@@ -2717,6 +2717,11 @@ The representation choices for this target are:
   combines continuous planarity with endpoint-only route-point contacts.
   Thus the complete final gauged periodic incidence drawing satisfies
   `IsRibbonReady`, the geometric interface consumed by ribbon thickening.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierRepresentativeMembership.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierRepresentativeMembership.lean)
+  proves the semantic ownership bridge for retained carrier wires.  Every
+  raw equality link on a neighboring physical carrier translates to a
+  selected zero-owner representative, so the finite selected formula can
+  recover all equalities needed along neighboring periodic carrier chains.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
