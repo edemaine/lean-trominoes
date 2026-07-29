@@ -1711,6 +1711,13 @@ The representation choices for this target are:
   accounting.  A selected compass copy occurs at most once in the copied
   source clauses, while its fixed implication ring contributes at most two
   occurrences, so every output variable occurs at most three times.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitDegreeThreeOriginal.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitDegreeThreeOriginal.lean)
+  uses the two-occurrence cycle bound to classify every output variable that
+  reaches its third occurrence slot.  It must be the selected real port copy
+  of a genuine tagged source occurrence, so the separator and all unselected
+  copies create no variable-order obligation.  It also splits every complete
+  three-slot occurrence lookup into exactly one copied-source occurrence
+  followed by the two shifted cycle occurrences in presentation order.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPortAssignment.lean)
   assigns a chosen rotation order to the eight clockwise Figure 7 ports.
   Whenever every per-variable occurrence list has length at most eight, the
