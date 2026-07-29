@@ -1965,6 +1965,13 @@ The representation choices for this target are:
   without duplicates; their outgoing or incoming cardinal directions are
   proved genuine and pairwise distinct.  Variable families are additionally
   bounded by the three available occurrence slots.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanFinite.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanFinite.lean)
+  erases one variable endpoint neighborhood to its finite connector kinds,
+  polarities, and outgoing cardinal directions, while retaining its exact
+  routed RGB ports.  A certified one-occurrence counterexample shows that the
+  old independently selected green and blue elbows already cross, so the
+  remaining fan construction must coordinate colors even before coordinating
+  distinct occurrences.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
