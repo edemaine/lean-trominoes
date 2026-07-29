@@ -1528,6 +1528,13 @@ The representation choices for this target are:
   unit-free exact-one route family.  Its assembled periodic incidence drawing
   matches every graph edge and is orthogonal; global planarity remains tied
   to the coordinated copied-source boundary fans.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDM.lean)
+  names the normalized periodic 3DM target of the retained fixed-eight
+  exact-one pipeline.  It proves the target well-formed, proves that every
+  colored element has degree two or three, and identifies both perfect
+  matchings and abstract incidence orientations exactly with satisfiability
+  of the original local 3SAT-3 source.  This completes the nongeometric 3DM
+  endpoint; the retained exact-one planarity certificate remains geometric.
 - [`LeanTrominoes/PlanarThreeSATGadgets.lean`](LeanTrominoes/PlanarThreeSATGadgets.lean)
   records the positioned clauses and literal signs of both Figure 8
   primitives.  Exhaustive Lean certificates prove that the duplicator copies
