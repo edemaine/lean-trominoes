@@ -588,6 +588,227 @@ theorem
   simpa only [firstEq, secondShiftedEq, targetShift,
     targetOffsetEq] using shiftedMeet
 
+/-- Translating a noncarrier witness's physical segment translates both
+endpoint macrocell certificates by the same drawing-period shift. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.translatedPhysicalSegment_endpoints_in_macrocell
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {indexed : IndexedGridSegment}
+    {shift : Cell}
+    (witness :
+      FinalGaugedSegmentOccurrenceWitness formula indexed shift)
+    (notCarrier :
+      ¬∃ link,
+        witness.routeWitness.metadata.source.component =
+          DrawingPlanarSATComponent.carrier link)
+    (center : Cell)
+    (centerEq :
+      witness.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some center)
+    (sourceShift : Cell) :
+    let translatedSegment :=
+      witness.physicalSegment.translate
+        (carrierMacroPeriodTranslation formula.incidenceGraph sourceShift)
+    InPlanarSATMacrocell
+        (Cell.add center
+          ((drawing formula.incidenceGraph).periodTranslation sourceShift))
+        translatedSegment.start ∧
+      InPlanarSATMacrocell
+        (Cell.add center
+          ((drawing formula.incidenceGraph).periodTranslation sourceShift))
+        translatedSegment.finish := by
+  have valid :=
+    witness.routeWitness.metadata
+      |>.valid_of_retainedValid_of_not_carrier
+        witness.metadata_retainedValid notCarrier
+  have endpointMembers :=
+    gridPolylineSegments_endpoints_mem
+      (List.fst_mem_of_mem_zipIdx
+        witness.physicalSegment_mem_sourceRoute)
+  have startBounded :=
+    witness.routeWitness.metadata.localRoutePoints_inPlanarSATMacrocell
+      wellFormed degree isLocal valid center centerEq
+      witness.routeWitness.literalMember endpointMembers.1
+  have finishBounded :=
+    witness.routeWitness.metadata.localRoutePoints_inPlanarSATMacrocell
+      wellFormed degree isLocal valid center centerEq
+      witness.routeWitness.literalMember endpointMembers.2
+  have translatedStart :=
+    inPlanarSATMacrocell_translate
+      (shift := sourceShift)
+      (drawingGridSize formula.incidenceGraph) startBounded
+  have translatedFinish :=
+    inPlanarSATMacrocell_translate
+      (shift := sourceShift)
+      (drawingGridSize formula.incidenceGraph) finishBounded
+  constructor
+  · simpa [GridSegment.translate,
+      carrierMacroPeriodTranslation,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale, planarMacroScale,
+      add_comm, mul_assoc, mul_comm, mul_left_comm] using translatedStart
+  · simpa [GridSegment.translate,
+      carrierMacroPeriodTranslation,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale, planarMacroScale,
+      add_comm, mul_assoc, mul_comm, mul_left_comm] using translatedFinish
+
+/-- The final gauged drawing has exactly the refined planar-SAT period used
+by the macrocell contact bounds. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_gridSize_int
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+      formula).gridSize : Int) =
+      planarMacroScale * drawingGridSize formula.incidenceGraph := by
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  have periodPositive : 0 < placement.period := by
+    simpa [placement,
+      retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement,
+      wrappedDrawingPeriodicPlanarSATPlacement] using
+      drawingPeriodicPlanarSATPlacement_period_pos formula
+  have gridSizeEq :
+      (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+        formula).gridSize =
+        placement.period := by
+    simpa [
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing]
+      using
+        PositionedPeriodicCNF.incidenceDrawing_gridSize
+          (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+            formula)
+          placement
+          (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+            formula)
+          periodPositive
+  rw [gridSizeEq]
+  simp [placement,
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement,
+    wrappedDrawingPeriodicPlanarSATPlacement,
+    drawingPeriodicPlanarSATPlacement,
+    planarMacroScale]
+
+/-- A contact with an anchor-normalized final carrier segment forces a
+translated routed-clause source to remain in the neighboring retained
+site family. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.translated_routedClause_retained_of_contact
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    (firstMember :
+      firstIndexed ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).indexedSegments)
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (site : ClauseRouteSite)
+    (secondSourceEq :
+      second.routeWitness.metadata.source = .routedClause site)
+    (meet :
+      GridSegment.InteriorsMeet
+        (firstIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation firstShift))
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift))) :
+    (second.routeWitness.metadata.source.periodTranslate formula
+      (Cell.sub second.physicalShift firstShift)
+        |>.RetainedComponentMember formula) := by
+  let graph := formula.incidenceGraph
+  let sourceShift := Cell.sub second.physicalShift firstShift
+  have secondNotCarrier :
+      ¬∃ link,
+        second.routeWitness.metadata.source.component =
+          DrawingPlanarSATComponent.carrier link := by
+    rintro ⟨link, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  have siteMember :
+      site ∈ drawingClauseRouteSites formula := by
+    have sourceMember := second.source_retainedComponentMember
+    rw [secondSourceEq] at sourceMember
+    exact sourceMember
+  have centerEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some
+          (liftedIncidenceVertexPosition
+            formula (.clause site.1) site.2) := by
+    rw [secondSourceEq]
+    rfl
+  have translatedEndpoints :=
+    second.translatedPhysicalSegment_endpoints_in_macrocell
+      wellFormed degree isLocal secondNotCarrier
+      (liftedIncidenceVertexPosition
+        formula (.clause site.1) site.2)
+      centerEq sourceShift
+  rw [liftedIncidenceVertexPosition_add_periodTranslation
+    formula (.clause site.1) site.2 sourceShift] at translatedEndpoints
+  have finalEndpointBounds :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_segmentEndpointsInExpandedSquare
+      formula wellFormed degree isLocal clausesNonempty
+      firstIndexed firstMember
+  have expandedStart :
+      let period : Int :=
+        planarMacroScale * drawingGridSize graph;
+      -period < firstIndexed.segment.start.1 ∧
+        firstIndexed.segment.start.1 < 2 * period ∧
+        -period < firstIndexed.segment.start.2 ∧
+        firstIndexed.segment.start.2 < 2 * period := by
+    simpa only [PeriodicGridDrawing.PositionInExpandedSquare,
+      graph,
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_gridSize_int]
+      using finalEndpointBounds.1
+  have expandedFinish :
+      let period : Int :=
+        planarMacroScale * drawingGridSize graph;
+      -period < firstIndexed.segment.finish.1 ∧
+        firstIndexed.segment.finish.1 < 2 * period ∧
+        -period < firstIndexed.segment.finish.2 ∧
+        firstIndexed.segment.finish.2 < 2 * period := by
+    simpa only [PeriodicGridDrawing.PositionInExpandedSquare,
+      graph,
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_gridSize_int]
+      using finalEndpointBounds.2
+  have aligned :=
+    first.anchorAlignedPhysical_interiorsMeet_of_final second meet
+  have translatedNeighbor :
+      IsNeighborTranslation (Cell.add site.2 sourceShift) := by
+    exact
+      liftedDrawingVertexPosition_translate_neighbor_of_macrocellSegment_meets_expanded
+        graph
+        (drawingClauseRouteSite_vertex_mem formula siteMember)
+        (Cell.add site.2 sourceShift)
+        firstIndexed.segment
+        (second.physicalSegment.translate
+          (carrierMacroPeriodTranslation graph sourceShift))
+        expandedStart expandedFinish
+        translatedEndpoints.1 translatedEndpoints.2 aligned
+  rw [secondSourceEq]
+  exact
+    routedClauseSource_periodTranslate_retainedComponentMember_of_neighbor
+      formula site siteMember sourceShift translatedNeighbor
+
 /-- A retained carrier metadata source supplies the raw-link membership and
 neighboring first occurrence required by the finite carrier separation API. -/
 theorem
