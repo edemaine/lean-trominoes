@@ -2726,7 +2726,11 @@ The representation choices for this target are:
   performs that recovery under a satisfying periodic assignment.  Evaluation
   of translated physical carrier nodes is proved covariant with the
   finite-block translate, and each selected representative equality is
-  transported back to its original raw neighboring link.
+  transported back to its original raw neighboring link.  Canonical
+  crossover laws are likewise transported to every retained physical
+  crossover; together these two cases make every retained carrier chain
+  constant and equate the start and finish terminals of every neighboring
+  segment occurrence.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
