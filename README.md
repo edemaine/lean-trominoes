@@ -1980,6 +1980,14 @@ The representation choices for this target are:
   of colors and active slot patterns.  The remaining variable-side task is
   therefore reduced to connecting these standardized gates to the distinct
   direction-dependent ribbon exits.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableOuterFans.lean)
+  enumerates all 28 cyclically admissible families of one, two, or three
+  distinct variable-side exit directions and supplies a simultaneous
+  annular RGB router for each.  Lean exhaustively certifies the generated
+  tables' exact standardized-gate and ribbon-exit endpoints, rectilinearity,
+  macrocell and protected-frame bounds, and strict separation of every pair
+  of active colored strands.  This makes the required cyclic-order invariant
+  explicit at the remaining source-presentation boundary.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
