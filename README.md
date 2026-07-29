@@ -2781,6 +2781,12 @@ The representation choices for this target are:
   formula, and the final wrapped, variable-gauged, anchor-normalized,
   clause-deduplicated positioned source.  Retaining selected carrier links
   changes no arity because they use the same binary equality template.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedNonempty.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedNonempty.lean)
+  proves that source-clause nonemptiness is the only extra structural premise
+  needed by the retained planarity construction.  Fixed crossover and
+  equality components are intrinsically nonempty, while each routed source
+  clause has exactly its source arity; the property survives every final
+  wrapper, gauge, normalization, and deduplication step.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
