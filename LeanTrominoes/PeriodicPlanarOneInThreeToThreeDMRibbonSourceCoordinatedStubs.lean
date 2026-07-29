@@ -29,7 +29,8 @@ def SourceRibbonFansClockwiseCompatible
       (sourceVariableRibbonFanData presentation entry).IsClockwiseCompatible) ∧
     ∀ entry : ActiveOccurrenceEntry source.erase,
       (sourceClauseRibbonFanData presentation
-        (occurrenceSourceClauseTarget presentation entry))
+        (occurrenceClauseIndex source.erase
+          entry.1.1 entry.1.2))
         |>.IsClockwiseCompatible
 
 /-- The coordinated variable fan for one occurrence, translated into its
@@ -57,7 +58,9 @@ noncomputable def occurrenceCoordinatedRibbonClauseStub
     (entry : ActiveOccurrenceEntry source.erase)
     (color : WireColor) : List Cell :=
   let target := occurrenceSourceClauseTarget presentation entry
-  let data := sourceClauseRibbonFanData presentation target
+  let clauseIndex :=
+    occurrenceClauseIndex source.erase entry.1.1 entry.1.2
+  let data := sourceClauseRibbonFanData presentation clauseIndex
   translatePolyline
     (ribbonMacrocellOrigin target)
     (data.coordinatedRoute
@@ -159,16 +162,19 @@ theorem occurrenceCoordinatedRibbonClauseStub_endpoints
           (constructedClauseOrigin source standardThreeStrandLayout)
           entry color) := by
   let target := occurrenceSourceClauseTarget presentation entry
-  let data := sourceClauseRibbonFanData presentation target
+  let clauseIndex :=
+    occurrenceClauseIndex source.erase entry.1.1 entry.1.2
+  let data := sourceClauseRibbonFanData presentation clauseIndex
   let group := occurrenceClauseTerminalGroup source.erase entry
   let lane := routedRibbonLane source.erase entry color
   have member :
       entry ∈
-        activeClauseTargetOccurrenceEntries presentation target :=
-    entry.mem_activeClauseTargetOccurrenceEntries presentation
+        activeClauseOccurrenceEntries
+          source.erase clauseIndex :=
+    entry.mem_activeClauseOccurrenceEntries
   have active : data.GroupActive group :=
     ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
-      presentation target entry member
+      presentation clauseIndex entry member
   have dataCompatible : data.IsClockwiseCompatible :=
     compatible.2 entry
   constructor
@@ -245,16 +251,19 @@ theorem occurrenceCoordinatedRibbonClauseStub_orthogonal
       (occurrenceCoordinatedRibbonClauseStub
         presentation entry color) := by
   let target := occurrenceSourceClauseTarget presentation entry
-  let data := sourceClauseRibbonFanData presentation target
+  let clauseIndex :=
+    occurrenceClauseIndex source.erase entry.1.1 entry.1.2
+  let data := sourceClauseRibbonFanData presentation clauseIndex
   let group := occurrenceClauseTerminalGroup source.erase entry
   let lane := routedRibbonLane source.erase entry color
   have member :
       entry ∈
-        activeClauseTargetOccurrenceEntries presentation target :=
-    entry.mem_activeClauseTargetOccurrenceEntries presentation
+        activeClauseOccurrenceEntries
+          source.erase clauseIndex :=
+    entry.mem_activeClauseOccurrenceEntries
   have active : data.GroupActive group :=
     ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
-      presentation target entry member
+      presentation clauseIndex entry member
   exact
     (ClauseRibbonFanData.coordinatedRoute_orthogonal
       data (compatible.2 entry) group active lane).translate
@@ -309,16 +318,19 @@ theorem occurrenceCoordinatedRibbonClauseStub_points_bounded
         placement data.positionedClause data.tagged.1)
       point := by
   let target := occurrenceSourceClauseTarget presentation entry
-  let data := sourceClauseRibbonFanData presentation target
+  let clauseIndex :=
+    occurrenceClauseIndex source.erase entry.1.1 entry.1.2
+  let data := sourceClauseRibbonFanData presentation clauseIndex
   let group := occurrenceClauseTerminalGroup source.erase entry
   let lane := routedRibbonLane source.erase entry color
-  have targetMember :
+  have clauseMember :
       entry ∈
-        activeClauseTargetOccurrenceEntries presentation target :=
-    entry.mem_activeClauseTargetOccurrenceEntries presentation
+        activeClauseOccurrenceEntries
+          source.erase clauseIndex :=
+    entry.mem_activeClauseOccurrenceEntries
   have active : data.GroupActive group :=
     ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
-      presentation target entry targetMember
+      presentation clauseIndex entry clauseMember
   unfold occurrenceCoordinatedRibbonClauseStub
     PeriodicOrthocrossing.translatePolyline at member
   rcases List.mem_map.mp member with

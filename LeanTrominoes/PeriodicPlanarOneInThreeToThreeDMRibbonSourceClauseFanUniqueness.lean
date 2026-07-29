@@ -1,130 +1,24 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFans
-import LeanTrominoes.PeriodicOrthocrossingPlanarSATMacrocellCenters
 
 /-!
-# Uniqueness of source clause-fan terminal groups
+# Uniqueness of clause-orbit fan terminal groups
 
 The source clause-fan adapter looks up one incoming direction for each of
 the top, left, and right terminal groups.  This file proves that lookup is
 unambiguous for every width-three positioned periodic CNF presentation.
 
-Each source endpoint is first normalized as a canonical clause vertex in
-the open fundamental square plus an integral period translate.  Equality of
-two lifted targets identifies their canonical clause vertices.  Width at
-most three then makes the terminal group identify the literal index, and
-the existing occurrence-slot uniqueness theorem identifies the active
-source entries.
+Membership in one clause-orbit family already identifies the clause index.
+Width at most three makes the terminal group identify the literal index,
+and the existing occurrence-slot uniqueness theorem then identifies the
+active source entries.  No equality between base routes' absolute clause
+targets is assumed: different literal offsets are handled by translating
+one common clause-orbit fan.
 -/
 
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PlanarThreeDM
-open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
-open PeriodicOrthocrossing
-
-private theorem occurrenceClauseVertex_member
-    {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (entry : ActiveOccurrenceEntry source.erase) :
-    let data := occurrenceSpliceData presentation entry
-    CNFVertex.clause data.indexed.1.clauseIndex ∈
-      source.erase.incidenceGraph.vertices := by
-  let data := occurrenceSpliceData presentation entry
-  have edgeMember :=
-    PeriodicCNF.tagged_incidence_edge_mem
-      source.erase data.indexedMember
-  exact
-    (presentation.compatible.1.2 data.indexed.1.edge
-      (List.fst_mem_of_mem_zipIdx edgeMember)).1
-
-/-- A source occurrence's clause target is the canonical clause vertex
-translated by the semantic rebasing offset of its stored incidence. -/
-theorem occurrenceSourceClauseTarget_eq_liftedClauseVertex
-    {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (entry : ActiveOccurrenceEntry source.erase) :
-    let data := occurrenceSpliceData presentation entry
-    let drawing :=
-      PositionedPeriodicCNF.incidenceDrawing
-        source placement presentation.routes
-    occurrenceSourceClauseTarget presentation entry =
-      Cell.add
-        (PositionedPeriodicCNF.incidenceVertexPositionAt
-          source placement (.clause data.indexed.1.clauseIndex))
-        (drawing.periodTranslation
-          (PositionedPeriodicCNF.variableToClauseTranslate
-            data.indexed.1)) := by
-  let data := occurrenceSpliceData presentation entry
-  let drawing :=
-    PositionedPeriodicCNF.incidenceDrawing
-      source placement presentation.routes
-  have endpoints :=
-    presentation.route_endpoints_of_tagged data.indexedMember
-  have periodTranslationEq (offset : Cell) :
-      drawing.periodTranslation offset =
-        placement.translation offset := by
-    unfold drawing PeriodicGridDrawing.periodTranslation
-      PeriodicVariablePlacement.translation
-    rw [PositionedPeriodicCNF.incidenceDrawing_gridSize
-      source placement presentation.routes
-      presentation.periodPositive]
-  have computed :
-      (presentation.variableToClauseRoute
-        data.indexed.1).getLast? =
-      some
-        (Cell.add
-          (PositionedPeriodicCNF.incidenceVertexPositionAt
-            source placement
-              (.clause data.indexed.1.clauseIndex))
-          (drawing.periodTranslation
-            (PositionedPeriodicCNF.variableToClauseTranslate
-              data.indexed.1))) := by
-    simp only [
-      PositionedPeriodicCNF.PlanarIncidencePresentation.variableToClauseRoute,
-      translatePolyline, List.getLast?_map, List.getLast?_reverse,
-      endpoints.1, Option.map_some]
-    rw [periodTranslationEq]
-    simp [PositionedPeriodicCNF.variableToClauseTranslate,
-      Cell.add, add_comm]
-  apply Option.some.inj
-  exact data.routeLast.symm.trans computed
-
-private theorem occurrenceClauseVertex_in_fundamentalSquare
-    {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (entry : ActiveOccurrenceEntry source.erase) :
-    let data := occurrenceSpliceData presentation entry
-    let drawing :=
-      PositionedPeriodicCNF.incidenceDrawing
-        source placement presentation.routes
-    drawing.PositionInFundamentalSquare
-      (PositionedPeriodicCNF.incidenceVertexPositionAt
-        source placement (.clause data.indexed.1.clauseIndex)) := by
-  let data := occurrenceSpliceData presentation entry
-  let drawing :=
-    PositionedPeriodicCNF.incidenceDrawing
-      source placement presentation.routes
-  have member :
-      CNFVertex.clause data.indexed.1.clauseIndex ∈
-        source.erase.incidenceGraph.vertices :=
-    occurrenceClauseVertex_member presentation entry
-  have lookup :=
-    PositionedPeriodicCNF.incidenceDrawing_vertexPosition_of_mem
-      source placement presentation.routes member
-  change
-    drawing.PositionInFundamentalSquare
-      (PositionedPeriodicCNF.incidenceVertexPositionAt
-        source placement (.clause data.indexed.1.clauseIndex))
-  rw [← lookup]
-  exact presentation.compatible.2.2.2.2.1 _
-    (presentation.vertexPosition_mem member)
 
 private theorem occurrenceLiteralIndex_eq_indexedLiteralIndex
     {Variable : Type*} [DecidableEq Variable]
@@ -232,90 +126,37 @@ private theorem activeOccurrenceEntry_eq_of_indexedIncidence_eq
   apply Subtype.ext
   exact Prod.ext atomEqual slotEqual
 
-/-- Width at most three proves the terminal-group uniqueness contract used
-by the source clause-fan adapter. -/
-theorem sourceClauseTargetTerminalGroupsUnique_of_widthAtMostThree
+/-- Width at most three proves the clause-orbit terminal-group uniqueness
+contract used by the source clause-fan adapter. -/
+theorem sourceClauseTerminalGroupsUnique_of_widthAtMostThree
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3) :
-    SourceClauseTargetTerminalGroupsUnique presentation := by
-  intro target first second firstMember secondMember groupEqual
+    SourceClauseTerminalGroupsUnique presentation := by
+  intro clauseIndex first second firstMember secondMember groupEqual
   let firstData := occurrenceSpliceData presentation first
   let secondData := occurrenceSpliceData presentation second
-  let drawing :=
-    PositionedPeriodicCNF.incidenceDrawing
-      source placement presentation.routes
-  have targetsEqual :
-      occurrenceSourceClauseTarget presentation first =
-        occurrenceSourceClauseTarget presentation second :=
-    ((mem_activeClauseTargetOccurrenceEntries_iff
-      presentation target first).mp firstMember).trans
-      ((mem_activeClauseTargetOccurrenceEntries_iff
-        presentation target second).mp secondMember).symm
-  have liftedEqual :
-      Cell.add
-          (PositionedPeriodicCNF.incidenceVertexPositionAt
-            source placement
-              (.clause firstData.indexed.1.clauseIndex))
-          (drawing.periodTranslation
-            (PositionedPeriodicCNF.variableToClauseTranslate
-              firstData.indexed.1)) =
-        Cell.add
-          (PositionedPeriodicCNF.incidenceVertexPositionAt
-            source placement
-              (.clause secondData.indexed.1.clauseIndex))
-          (drawing.periodTranslation
-            (PositionedPeriodicCNF.variableToClauseTranslate
-              secondData.indexed.1)) := by
-    rw [← occurrenceSourceClauseTarget_eq_liftedClauseVertex
-      presentation first,
-      ← occurrenceSourceClauseTarget_eq_liftedClauseVertex
-        presentation second]
-    exact targetsEqual
-  have baseEqual :=
-    (PeriodicGridDrawing.translatedFundamentalPositions_eq
-      drawing
-      (occurrenceClauseVertex_in_fundamentalSquare
-        presentation first)
-      (occurrenceClauseVertex_in_fundamentalSquare
-        presentation second)
-      liftedEqual).1
-  have firstClauseMember :
-      CNFVertex.clause firstData.indexed.1.clauseIndex ∈
-        source.erase.incidenceGraph.vertices :=
-    occurrenceClauseVertex_member presentation first
-  have secondClauseMember :
-      CNFVertex.clause secondData.indexed.1.clauseIndex ∈
-        source.erase.incidenceGraph.vertices :=
-    occurrenceClauseVertex_member presentation second
-  have baseEqual' :
-      PositionedPeriodicCNF.incidenceVertexPositionAt
-          source placement
-            (.clause firstData.indexed.1.clauseIndex) =
-        PositionedPeriodicCNF.incidenceVertexPositionAt
-          source placement
-            (.clause secondData.indexed.1.clauseIndex) := by
-    simpa [firstData, secondData] using baseEqual
-  have firstLookup :=
-    PositionedPeriodicCNF.incidenceDrawing_vertexPosition_of_mem
-      source placement presentation.routes firstClauseMember
-  have secondLookup :=
-    PositionedPeriodicCNF.incidenceDrawing_vertexPosition_of_mem
-      source placement presentation.routes secondClauseMember
-  have clauseVertexEqual :
-      (CNFVertex.clause firstData.indexed.1.clauseIndex :
-          CNFVertex Variable) =
-        CNFVertex.clause secondData.indexed.1.clauseIndex := by
-    apply presentation.vertexPosition_injective_on
-      firstClauseMember secondClauseMember
-    rw [firstLookup, secondLookup]
-    exact baseEqual'
   have clauseIndexEqual :
       firstData.indexed.1.clauseIndex =
         secondData.indexed.1.clauseIndex := by
-    exact CNFVertex.clause.inj clauseVertexEqual
+    calc
+      firstData.indexed.1.clauseIndex =
+          occurrenceClauseIndex source.erase
+            first.1.1 first.1.2 :=
+        (occurrenceClauseIndex_eq_indexedClauseIndex
+          presentation first).symm
+      _ = clauseIndex :=
+        (mem_activeClauseOccurrenceEntries_iff
+          source.erase clauseIndex first).mp firstMember
+      _ = occurrenceClauseIndex source.erase
+            second.1.1 second.1.2 :=
+        ((mem_activeClauseOccurrenceEntries_iff
+          source.erase clauseIndex second).mp secondMember).symm
+      _ = secondData.indexed.1.clauseIndex :=
+        occurrenceClauseIndex_eq_indexedClauseIndex
+          presentation second
   have indexedGroupsEqual :
       terminalGroupOfLiteralIndex firstData.indexed.1.literalIndex =
         terminalGroupOfLiteralIndex secondData.indexed.1.literalIndex := by
@@ -352,24 +193,25 @@ theorem sourceClauseTargetTerminalGroupsUnique_of_widthAtMostThree
 namespace ClauseRibbonFanData
 
 /-- Width three directly supplies the exact source direction recorded for
-an occurrence at a selected lifted clause target. -/
+an occurrence in a selected clause orbit. -/
 theorem sourceClauseRibbonFanData_direction_of_widthAtMostThree
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
-    (target : Cell)
+    (clauseIndex : Nat)
     (entry : ActiveOccurrenceEntry source.erase)
     (member :
-      entry ∈ activeClauseTargetOccurrenceEntries presentation target) :
-    (sourceClauseRibbonFanData presentation target).direction
+      entry ∈ activeClauseOccurrenceEntries
+        source.erase clauseIndex) :
+    (sourceClauseRibbonFanData presentation clauseIndex).direction
         (occurrenceClauseTerminalGroup source.erase entry) =
       occurrenceSourceClauseDirection presentation entry :=
   sourceClauseRibbonFanData_direction presentation
-    (sourceClauseTargetTerminalGroupsUnique_of_widthAtMostThree
+    (sourceClauseTerminalGroupsUnique_of_widthAtMostThree
       presentation width)
-    target entry member
+    clauseIndex entry member
 
 /-- Occurrence-specific convenience form of the width-three direction
 lookup theorem. -/
@@ -381,11 +223,12 @@ theorem sourceClauseRibbonFanData_direction_at_occurrence_of_widthAtMostThree
     (width : source.erase.WidthAtMost 3)
     (entry : ActiveOccurrenceEntry source.erase) :
     (sourceClauseRibbonFanData presentation
-        (occurrenceSourceClauseTarget presentation entry)).direction
+        (occurrenceClauseIndex source.erase
+          entry.1.1 entry.1.2)).direction
         (occurrenceClauseTerminalGroup source.erase entry) =
       occurrenceSourceClauseDirection presentation entry :=
   sourceClauseRibbonFanData_direction_at_occurrence presentation
-    (sourceClauseTargetTerminalGroupsUnique_of_widthAtMostThree
+    (sourceClauseTerminalGroupsUnique_of_widthAtMostThree
       presentation width)
     entry
 

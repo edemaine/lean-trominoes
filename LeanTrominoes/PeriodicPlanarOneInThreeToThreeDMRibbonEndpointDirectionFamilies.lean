@@ -6,9 +6,10 @@ import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSep
 The endpoint fans at one source vertex must be chosen together: separate
 one-bend choices for individual strands need not form a planar fan.  This
 file packages the finite occurrence families seen at a source variable and
-at one lifted clause target.  Their endpoint directions are genuine and
+in one finite clause orbit.  Their endpoint directions are genuine and
 duplicate-free, exactly the combinatorial input needed by a coordinated
-local fan template.
+local fan template.  The clause-orbit fan is translated to the distinct
+physical clause copies selected by literal offsets.
 -/
 
 namespace LeanTrominoes
@@ -171,69 +172,84 @@ noncomputable def occurrenceSourceClauseTarget
   PositionedPeriodicCNF.variableToClauseTarget
     placement data.positionedClause data.tagged.1
 
-/-- All active occurrences whose source routes reach one lifted clause
-target. -/
-noncomputable def activeClauseTargetOccurrenceEntries
-    {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (target : Cell) :
-    List (ActiveOccurrenceEntry source.erase) :=
-  (occurrenceEntries source.erase).attach.filter fun entry =>
-    occurrenceSourceClauseTarget presentation entry = target
-
-/-- Membership in a clause-target family is exactly equality of the lifted
-source-grid target. -/
-theorem mem_activeClauseTargetOccurrenceEntries_iff
-    {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (target : Cell)
-    (entry : ActiveOccurrenceEntry source.erase) :
-    entry ∈ activeClauseTargetOccurrenceEntries presentation target ↔
-      occurrenceSourceClauseTarget presentation entry = target := by
-  simp [activeClauseTargetOccurrenceEntries]
-
-/-- Every active occurrence appears in the family at its own lifted clause
-target. -/
-theorem ActiveOccurrenceEntry.mem_activeClauseTargetOccurrenceEntries
+/-- The finite clause-orbit index attached to an active occurrence agrees
+with the metadata-rich incidence selected by its splice data. -/
+theorem occurrenceClauseIndex_eq_indexedClauseIndex
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
     (entry : ActiveOccurrenceEntry source.erase) :
+    let data := occurrenceSpliceData presentation entry
+    occurrenceClauseIndex source.erase entry.1.1 entry.1.2 =
+      data.indexed.1.clauseIndex := by
+  let data := occurrenceSpliceData presentation entry
+  calc
+    occurrenceClauseIndex source.erase entry.1.1 entry.1.2 =
+        data.tagged.2.1 :=
+      occurrenceClauseIndex_of_occurrenceAt
+        source.erase entry.1.1 entry.1.2
+        data.tagged data.occurrenceLookup
+    _ = data.indexed.1.clauseIndex := by
+      simpa [incidenceTaggedOccurrence] using
+        congrArg (fun tagged => tagged.2.1) data.metadataEq.symm
+
+/-- All active occurrences belonging to one finite clause orbit.  Different
+literal offsets merely translate the same fan to different physical copies,
+so the orbit index—not a base route's absolute endpoint—is the correct
+finite grouping key. -/
+def activeClauseOccurrenceEntries
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat) :
+    List (ActiveOccurrenceEntry source) :=
+  (occurrenceEntries source).attach.filter fun entry =>
+    occurrenceClauseIndex source entry.1.1 entry.1.2 = clauseIndex
+
+/-- Membership in a clause-orbit family is exactly equality of the stored
+clause index. -/
+theorem mem_activeClauseOccurrenceEntries_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (entry : ActiveOccurrenceEntry source) :
+    entry ∈ activeClauseOccurrenceEntries source clauseIndex ↔
+      occurrenceClauseIndex source entry.1.1 entry.1.2 =
+        clauseIndex := by
+  simp [activeClauseOccurrenceEntries]
+
+/-- Every active occurrence appears in the family of its source clause
+orbit. -/
+theorem ActiveOccurrenceEntry.mem_activeClauseOccurrenceEntries
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (entry : ActiveOccurrenceEntry source) :
     entry ∈
-      activeClauseTargetOccurrenceEntries presentation
-        (occurrenceSourceClauseTarget presentation entry) :=
-  (mem_activeClauseTargetOccurrenceEntries_iff
-    presentation _ entry).mpr rfl
+      activeClauseOccurrenceEntries source
+        (occurrenceClauseIndex source entry.1.1 entry.1.2) :=
+  (mem_activeClauseOccurrenceEntries_iff source _ entry).mpr rfl
 
-/-- A clause-target occurrence family contains no duplicate entries. -/
-theorem activeClauseTargetOccurrenceEntries_nodup
+/-- A clause-orbit occurrence family contains no duplicate entries. -/
+theorem activeClauseOccurrenceEntries_nodup
     {Variable : Type*} [DecidableEq Variable]
-    {source : PositionedPeriodicCNF Variable}
-    {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement)
-    (target : Cell) :
-    (activeClauseTargetOccurrenceEntries
-      presentation target).Nodup := by
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat) :
+    (activeClauseOccurrenceEntries source clauseIndex).Nodup := by
   exact
-    (occurrenceEntries_nodup source.erase).attach.filter _
+    (occurrenceEntries_nodup source).attach.filter _
 
-/-- Cardinal directions of all occurrence routes entering one lifted clause
-target. -/
+/-- Cardinal directions of all occurrence routes entering translated copies
+of one clause orbit. -/
 noncomputable def clauseRibbonEndpointDirections
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
-    (target : Cell) :
+    (clauseIndex : Nat) :
     List AxisDirection :=
-  (activeClauseTargetOccurrenceEntries
-      presentation.toPlanarIncidencePresentation target).map fun entry =>
+  (activeClauseOccurrenceEntries
+      source.erase clauseIndex).map fun entry =>
     occurrenceSourceClauseDirection
       presentation.toPlanarIncidencePresentation entry
 
@@ -245,9 +261,9 @@ theorem clauseRibbonEndpointDirections_genuine
     {placement : PeriodicVariablePlacement Variable}
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
-    (target : Cell) :
+    (clauseIndex : Nat) :
     ∀ direction ∈
-        clauseRibbonEndpointDirections presentation target,
+        clauseRibbonEndpointDirections presentation clauseIndex,
       direction.IsGenuine := by
   intro direction member
   rcases List.mem_map.mp member with
@@ -263,34 +279,46 @@ theorem clauseRibbonEndpointDirections_nodup
     {placement : PeriodicVariablePlacement Variable}
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
-    (target : Cell) :
+    (clauseIndex : Nat) :
     (clauseRibbonEndpointDirections
-      presentation target).Nodup := by
+      presentation clauseIndex).Nodup := by
   unfold clauseRibbonEndpointDirections
   apply
-    (activeClauseTargetOccurrenceEntries_nodup
-      presentation.toPlanarIncidencePresentation target).map_on
+    (activeClauseOccurrenceEntries_nodup
+      source.erase clauseIndex).map_on
   intro first firstMember second secondMember directionsEqual
   by_contra different
-  have firstTarget :=
-    (mem_activeClauseTargetOccurrenceEntries_iff
-      presentation.toPlanarIncidencePresentation target first).mp
+  have firstClause :=
+    (mem_activeClauseOccurrenceEntries_iff
+      source.erase clauseIndex first).mp
         firstMember
-  have secondTarget :=
-    (mem_activeClauseTargetOccurrenceEntries_iff
-      presentation.toPlanarIncidencePresentation target second).mp
+  have secondClause :=
+    (mem_activeClauseOccurrenceEntries_iff
+      source.erase clauseIndex second).mp
         secondMember
-  have targetsEqual :
-      occurrenceSourceClauseTarget
-          presentation.toPlanarIncidencePresentation first =
-        occurrenceSourceClauseTarget
-          presentation.toPlanarIncidencePresentation second :=
-    firstTarget.trans secondTarget.symm
   have directionsDifferent :=
-    occurrenceSourceClauseDirections_ne_of_same_target
+    occurrenceSourceClauseDirections_ne_of_same_clause
       presentation different
       (by
-        simpa [occurrenceSourceClauseTarget] using targetsEqual)
+        let planar :=
+          presentation.toPlanarIncidencePresentation
+        let firstData := occurrenceSpliceData planar first
+        let secondData := occurrenceSpliceData planar second
+        change
+          firstData.indexed.1.clauseIndex =
+            secondData.indexed.1.clauseIndex
+        calc
+          firstData.indexed.1.clauseIndex =
+              occurrenceClauseIndex source.erase
+                first.1.1 first.1.2 :=
+            (occurrenceClauseIndex_eq_indexedClauseIndex
+              planar first).symm
+          _ = occurrenceClauseIndex source.erase
+                second.1.1 second.1.2 :=
+            firstClause.trans secondClause.symm
+          _ = secondData.indexed.1.clauseIndex :=
+            occurrenceClauseIndex_eq_indexedClauseIndex
+              planar second)
   exact directionsDifferent directionsEqual
 
 end PeriodicPlanarOneInThreeToThreeDM

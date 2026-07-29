@@ -1956,15 +1956,17 @@ The representation choices for this target are:
   specializes endpoint-direction separation to the active exact-one
   incidences.  Unequal occurrences sharing any unitized start leave in
   different directions (in particular, so do occurrences of one variable),
-  and unequal occurrences sharing one lifted clause endpoint enter in
-  different directions.  These are the finite direction constraints
-  available to the remaining noncrossing endpoint-fan construction.
+  while unequal incidences of one clause orbit enter every translated clause
+  copy in different directions.  Translation invariance connects those
+  directions to the stored routes at their common canonical clause vertex.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean)
   packages the coordinated local inputs needed by that construction.
-  Occurrences at one variable and at one lifted clause target are enumerated
+  Occurrences at one variable and in one finite clause orbit are enumerated
   without duplicates; their outgoing or incoming cardinal directions are
-  proved genuine and pairwise distinct.  Variable families are additionally
-  bounded by the three available occurrence slots.
+  proved genuine and pairwise distinct.  Grouping clause incidences by orbit
+  correctly allows different literal offsets, whose physical fans are
+  period translates.  Variable families are additionally bounded by the
+  three available occurrence slots.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonLaneAssignment.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonLaneAssignment.lean)
   separates semantic 3DM colors from the three physical tracks of a source
   ribbon.  The fixed-red, fixed-blue, and fixed-green connector kinds select
@@ -2044,24 +2046,23 @@ The representation choices for this target are:
   condition for variables with exactly three occurrences.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFans.lean)
   instantiates the finite clause-fan record from all source occurrences
-  entering one lifted clause target.  It detects the optional right terminal,
+  belonging to one clause orbit.  It detects the optional right terminal,
   activates every represented group, and recovers each genuine incoming
   direction under the explicit one-occurrence-per-terminal condition.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanUniqueness.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFanUniqueness.lean)
   discharges that terminal condition for every width-three source.  It
-  normalizes lifted clause targets into a canonical fundamental-domain
-  vertex and period translate, then combines vertex uniqueness, the
-  width-three literal bound, and occurrence-slot uniqueness.
+  combines the common clause index, the width-three literal bound, and
+  occurrence-slot uniqueness.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanPorts.lean)
   identifies the finite coordinated-fan ports and physical lanes with the
   occurrence-level variable ports, clause ports, and corridor lanes.  The
   variable result applies to every occurrence represented by one shared
   source-variable fan.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedStubs.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedStubs.lean)
-  translates those finite fans into their actual source macrocells.  Given
-  the explicit clockwise-order obligation, it proves exact global
-  endpoints, rectilinearity, and macrocell containment, and packages the
-  result as a `RibbonEndpointFanSystem`.
+  translates the variable fans and each shared clause-orbit fan into their
+  actual source macrocells.  Given the explicit clockwise-order obligation,
+  it proves exact global endpoints, rectilinearity, and macrocell
+  containment, and packages the result as a `RibbonEndpointFanSystem`.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

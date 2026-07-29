@@ -2,17 +2,19 @@ import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonClauseCoordinatedFan
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies
 
 /-!
-# Source clause data for coordinated ribbon fans
+# Source clause-orbit data for coordinated ribbon fans
 
 The finite clause-fan tables are indexed by a `ClauseRibbonFanData`.  This
-file constructs that record from all active source occurrences entering one
-lifted clause target.
+file constructs that record from all active source occurrences belonging to
+one finite clause orbit.
 
 The construction detects whether the right terminal is present and looks up
 the genuine incoming direction belonging to each terminal group.  Correctness
 of the direction lookup uses the precise source-side condition still needed
-at this boundary: at one lifted clause target, at most one active occurrence
-may occupy each terminal group.
+at this boundary: in one clause orbit, at most one active occurrence may
+occupy each terminal group.  The resulting fan is translated independently
+to every physical copy of the clause, which correctly handles nonzero literal
+offsets.
 -/
 
 namespace LeanTrominoes
@@ -31,21 +33,21 @@ def occurrenceClauseTerminalGroup
   terminalGroupOfLiteralIndex
     (occurrenceLiteralIndex source entry.1.1 entry.1.2)
 
-/-- No two distinct source occurrences entering one lifted clause target
-occupy the same clause-terminal group. -/
-def SourceClauseTargetTerminalGroupsUnique
+/-- No two distinct source occurrences belonging to one clause orbit occupy
+the same clause-terminal group. -/
+def SourceClauseTerminalGroupsUnique
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
-    (presentation : source.PlanarIncidencePresentation placement) : Prop :=
-  ∀ target first second,
-    first ∈ activeClauseTargetOccurrenceEntries presentation target →
-    second ∈ activeClauseTargetOccurrenceEntries presentation target →
+    (_presentation : source.PlanarIncidencePresentation placement) : Prop :=
+  ∀ clauseIndex first second,
+    first ∈ activeClauseOccurrenceEntries source.erase clauseIndex →
+    second ∈ activeClauseOccurrenceEntries source.erase clauseIndex →
     occurrenceClauseTerminalGroup source.erase first =
         occurrenceClauseTerminalGroup source.erase second →
     first = second
 
-/-- Finite coordinated-fan data read from one lifted source clause target.
+/-- Finite coordinated-fan data read from one source clause orbit.
 
 The north fallback is observed only for an inactive terminal group. -/
 noncomputable def sourceClauseRibbonFanData
@@ -53,10 +55,10 @@ noncomputable def sourceClauseRibbonFanData
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
-    (target : Cell) :
+    (clauseIndex : Nat) :
     ClauseRibbonFanData :=
   let entries :=
-    activeClauseTargetOccurrenceEntries presentation target
+    activeClauseOccurrenceEntries source.erase clauseIndex
   {
     hasRight :=
       entries.any fun entry =>
@@ -107,31 +109,32 @@ private theorem find?_eq_some_of_mem_of_unique
 namespace ClauseRibbonFanData
 
 /-- The source record activates the right terminal exactly when some source
-occurrence at the lifted target occupies it. -/
+occurrence in the selected clause orbit occupies it. -/
 theorem sourceClauseRibbonFanData_hasRight_iff
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
-    (target : Cell) :
-    (sourceClauseRibbonFanData presentation target).hasRight = true ↔
+    (clauseIndex : Nat) :
+    (sourceClauseRibbonFanData presentation clauseIndex).hasRight = true ↔
       ∃ entry ∈
-          activeClauseTargetOccurrenceEntries presentation target,
+          activeClauseOccurrenceEntries source.erase clauseIndex,
         occurrenceClauseTerminalGroup source.erase entry = .right := by
   simp [sourceClauseRibbonFanData]
 
-/-- Every actual source occurrence at the lifted target occupies an active
-terminal group of the resulting finite fan. -/
+/-- Every actual source occurrence in the selected clause orbit occupies an
+active terminal group of the resulting finite fan. -/
 theorem sourceClauseRibbonFanData_groupActive
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
-    (target : Cell)
+    (clauseIndex : Nat)
     (entry : ActiveOccurrenceEntry source.erase)
     (member :
-      entry ∈ activeClauseTargetOccurrenceEntries presentation target) :
-    (sourceClauseRibbonFanData presentation target).GroupActive
+      entry ∈ activeClauseOccurrenceEntries
+        source.erase clauseIndex) :
+    (sourceClauseRibbonFanData presentation clauseIndex).GroupActive
       (occurrenceClauseTerminalGroup source.erase entry) := by
   cases groupEq :
       occurrenceClauseTerminalGroup source.erase entry with
@@ -143,30 +146,31 @@ theorem sourceClauseRibbonFanData_groupActive
       split <;> simp
   | right =>
       have hasRight :
-          (sourceClauseRibbonFanData presentation target).hasRight =
+          (sourceClauseRibbonFanData presentation clauseIndex).hasRight =
             true := by
         rw [sourceClauseRibbonFanData_hasRight_iff]
         exact ⟨entry, member, groupEq⟩
       simp [GroupActive, activeGroups, hasRight]
 
 /-- Under terminal-group uniqueness, the finite fan records the genuine
-incoming direction of every occurrence at its lifted target. -/
+incoming direction of every occurrence in its clause orbit. -/
 theorem sourceClauseRibbonFanData_direction
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
     (groupsUnique :
-      SourceClauseTargetTerminalGroupsUnique presentation)
-    (target : Cell)
+      SourceClauseTerminalGroupsUnique presentation)
+    (clauseIndex : Nat)
     (entry : ActiveOccurrenceEntry source.erase)
     (member :
-      entry ∈ activeClauseTargetOccurrenceEntries presentation target) :
-    (sourceClauseRibbonFanData presentation target).direction
+      entry ∈ activeClauseOccurrenceEntries
+        source.erase clauseIndex) :
+    (sourceClauseRibbonFanData presentation clauseIndex).direction
         (occurrenceClauseTerminalGroup source.erase entry) =
       occurrenceSourceClauseDirection presentation entry := by
   let entries :=
-    activeClauseTargetOccurrenceEntries presentation target
+    activeClauseOccurrenceEntries source.erase clauseIndex
   let group :=
     occurrenceClauseTerminalGroup source.erase entry
   let predicate := fun candidate : ActiveOccurrenceEntry source.erase =>
@@ -178,7 +182,7 @@ theorem sourceClauseRibbonFanData_direction
       ∀ candidate ∈ entries,
         predicate candidate = true → candidate = entry := by
     intro candidate candidateMember candidateTrue
-    apply groupsUnique target candidate entry candidateMember member
+    apply groupsUnique clauseIndex candidate entry candidateMember member
     simpa [predicate, group] using of_decide_eq_true candidateTrue
   have found :
       entries.find? predicate = some entry :=
@@ -186,7 +190,7 @@ theorem sourceClauseRibbonFanData_direction
       entries predicate entry member selectedTrue unique
   simp [sourceClauseRibbonFanData, entries, predicate, group, found]
 
-/-- The occurrence-specific form uses the target selected by that same
+/-- The occurrence-specific form uses the clause orbit selected by that same
 occurrence. -/
 theorem sourceClauseRibbonFanData_direction_at_occurrence
     {Variable : Type*} [DecidableEq Variable]
@@ -194,15 +198,17 @@ theorem sourceClauseRibbonFanData_direction_at_occurrence
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
     (groupsUnique :
-      SourceClauseTargetTerminalGroupsUnique presentation)
+      SourceClauseTerminalGroupsUnique presentation)
     (entry : ActiveOccurrenceEntry source.erase) :
     (sourceClauseRibbonFanData presentation
-        (occurrenceSourceClauseTarget presentation entry)).direction
+        (occurrenceClauseIndex source.erase
+          entry.1.1 entry.1.2)).direction
         (occurrenceClauseTerminalGroup source.erase entry) =
       occurrenceSourceClauseDirection presentation entry :=
   sourceClauseRibbonFanData_direction presentation groupsUnique
-    (occurrenceSourceClauseTarget presentation entry) entry
-    (entry.mem_activeClauseTargetOccurrenceEntries presentation)
+    (occurrenceClauseIndex source.erase
+      entry.1.1 entry.1.2) entry
+    entry.mem_activeClauseOccurrenceEntries
 
 end ClauseRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM

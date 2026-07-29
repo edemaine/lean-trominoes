@@ -102,6 +102,26 @@ theorem occurrenceSourceClauseDirection_eq_sourceRoute
       (occurrenceSourceRoute_length presentation entry)
       (occurrenceSourceRoute_orthogonal presentation entry)
 
+/-- The incoming direction of a rebased occurrence is the opposite of the
+direction in which its stored clause-to-variable route leaves the canonical
+clause vertex.  In particular, the semantic rebasing translation does not
+affect the clause-fan direction. -/
+theorem occurrenceSourceClauseDirection_eq_storedRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (entry : ActiveOccurrenceEntry source.erase) :
+    let data := occurrenceSpliceData presentation entry
+    occurrenceSourceClauseDirection presentation entry =
+      (AxisDirection.polylineFirstDirection
+        (presentation.routes data.indexed.1.clauseIndex
+          data.indexed.1.literalIndex)).opposite := by
+  let data := occurrenceSpliceData presentation entry
+  rw [occurrenceSourceClauseDirection_eq_sourceRoute]
+  simp [occurrenceSourceRoute,
+    PositionedPeriodicCNF.PlanarIncidencePresentation.variableToClauseRoute]
+
 /-- Removing a first point from a route containing at least three points
 does not change its advertised final ribbon boundary. -/
 theorem ribbonCorridorRouteEnd_cons_cons_cons

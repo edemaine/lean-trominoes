@@ -50,6 +50,43 @@ fallback on lists containing fewer than two points. -/
 def polylineLastDirection (points : List Cell) : AxisDirection :=
   (polylineFirstDirection points.reverse).opposite
 
+/-! Pointwise translation changes neither endpoint direction. -/
+
+@[simp]
+theorem polylineFirstDirection_translatePolyline
+    (offset : Cell) (points : List Cell) :
+    polylineFirstDirection
+        (PeriodicOrthocrossing.translatePolyline offset points) =
+      polylineFirstDirection points := by
+  cases points with
+  | nil => rfl
+  | cons first rest =>
+      cases rest with
+      | nil => rfl
+      | cons second rest =>
+          simp [PeriodicOrthocrossing.translatePolyline,
+            polylineFirstDirection, between_add_left]
+
+@[simp]
+theorem polylineLastDirection_translatePolyline
+    (offset : Cell) (points : List Cell) :
+    polylineLastDirection
+        (PeriodicOrthocrossing.translatePolyline offset points) =
+      polylineLastDirection points := by
+  unfold polylineLastDirection
+  rw [show
+    (PeriodicOrthocrossing.translatePolyline offset points).reverse =
+      PeriodicOrthocrossing.translatePolyline offset points.reverse by
+        simp [PeriodicOrthocrossing.translatePolyline]]
+  rw [polylineFirstDirection_translatePolyline]
+
+@[simp]
+theorem polylineLastDirection_reverse
+    (points : List Cell) :
+    polylineLastDirection points.reverse =
+      (polylineFirstDirection points).opposite := by
+  simp [polylineLastDirection]
+
 @[simp]
 theorem polylineFirstDirection_cons_cons
     (first second : Cell) (rest : List Cell) :

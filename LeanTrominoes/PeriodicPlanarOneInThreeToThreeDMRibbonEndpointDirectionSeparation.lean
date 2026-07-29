@@ -124,6 +124,134 @@ theorem occurrenceSourceVariableDirections_ne_of_same_variable
       (occurrenceSourceRoutes_avoidEachOther_of_ne
         presentation different)
 
+/-- Distinct incidences of one clause orbit enter every translated copy of
+that clause in different directions.  Their stored routes share the
+canonical clause endpoint; reversing and independently rebasing those routes
+changes neither incoming direction. -/
+theorem occurrenceSourceClauseDirections_ne_of_same_clause
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second)
+    (sameClause :
+      let planar := presentation.toPlanarIncidencePresentation
+      let firstData := occurrenceSpliceData planar first
+      let secondData := occurrenceSpliceData planar second
+      firstData.indexed.1.clauseIndex =
+        secondData.indexed.1.clauseIndex) :
+    occurrenceSourceClauseDirection
+        presentation.toPlanarIncidencePresentation first ≠
+      occurrenceSourceClauseDirection
+        presentation.toPlanarIncidencePresentation second := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let firstData := occurrenceSpliceData planar first
+  let secondData := occurrenceSpliceData planar second
+  let firstRoute :=
+    planar.routes firstData.indexed.1.clauseIndex
+      firstData.indexed.1.literalIndex
+  let secondRoute :=
+    planar.routes secondData.indexed.1.clauseIndex
+      secondData.indexed.1.literalIndex
+  have routeIndexDifferent :
+      firstData.indexed.2 ≠ secondData.indexed.2 := by
+    intro indexEqual
+    have firstLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp firstData.indexedMember
+    have secondLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp secondData.indexedMember
+    have incidenceEqual :
+        firstData.indexed.1 = secondData.indexed.1 := by
+      rw [indexEqual] at firstLookup
+      exact Option.some.inj (firstLookup.symm.trans secondLookup)
+    have keyEqual :
+        occurrenceSourceRouteKey planar first =
+          occurrenceSourceRouteKey planar second := by
+      change
+        (firstData.indexed.2,
+            PositionedPeriodicCNF.variableToClauseTranslate
+              firstData.indexed.1) =
+          (secondData.indexed.2,
+            PositionedPeriodicCNF.variableToClauseTranslate
+              secondData.indexed.1)
+      exact Prod.ext indexEqual
+        (congrArg
+          PositionedPeriodicCNF.variableToClauseTranslate
+          incidenceEqual)
+    exact different
+      (occurrenceSourceRouteKey_injective planar keyEqual)
+  have sameStart : firstRoute.head? = secondRoute.head? := by
+    have firstEndpoints :=
+      planar.route_endpoints_of_tagged firstData.indexedMember
+    have secondEndpoints :=
+      planar.route_endpoints_of_tagged secondData.indexedMember
+    calc
+      firstRoute.head? =
+          some
+            (PositionedPeriodicCNF.incidenceVertexPositionAt
+              source placement
+                (.clause firstData.indexed.1.clauseIndex)) := by
+        simpa [firstRoute] using firstEndpoints.1
+      _ =
+          some
+            (PositionedPeriodicCNF.incidenceVertexPositionAt
+              source placement
+                (.clause secondData.indexed.1.clauseIndex)) := by
+        rw [sameClause]
+      _ = secondRoute.head? := by
+        simpa [secondRoute] using secondEndpoints.1.symm
+  have avoid :
+      RoutesAvoidEachOther firstRoute secondRoute := by
+    let drawing :=
+      PositionedPeriodicCNF.incidenceDrawing
+        source placement planar.routes
+    have originalAvoid :=
+      PeriodicGridDrawing.routeOccurrences_avoidEachOther
+        (drawing := drawing)
+        presentation.continuouslyPlanar
+        presentation.endpointContacts
+        (planar.route_zipIdx_mem_of_tagged firstData.indexedMember)
+        (planar.route_zipIdx_mem_of_tagged secondData.indexedMember)
+        (planar.route_length_ge_two_of_tagged firstData.indexedMember)
+        (planar.route_length_ge_two_of_tagged secondData.indexedMember)
+        (planar.route_orthogonal_of_tagged firstData.indexedMember)
+        (planar.route_orthogonal_of_tagged secondData.indexedMember)
+        (0, 0) (0, 0)
+        (by simpa using routeIndexDifferent)
+    have zeroTranslation :
+        drawing.periodTranslation (0, 0) = (0, 0) := by
+      simp [drawing, PeriodicGridDrawing.periodTranslation,
+        Cell.scale]
+    rw [zeroTranslation] at originalAvoid
+    have mapZero (points : List Cell) :
+        points.map (Cell.add (0, 0)) = points := by
+      induction points with
+      | nil => rfl
+      | cons point rest induction =>
+          simp [Cell.add, induction]
+    rw [mapZero, mapZero] at originalAvoid
+    simpa [firstRoute, secondRoute] using originalAvoid
+  have firstDirectionsDifferent :
+      AxisDirection.polylineFirstDirection firstRoute ≠
+        AxisDirection.polylineFirstDirection secondRoute :=
+    polylineFirstDirections_ne_of_routesAvoidEachOther
+      (planar.route_length_ge_two_of_tagged
+        firstData.indexedMember)
+      (planar.route_length_ge_two_of_tagged
+        secondData.indexedMember)
+      (planar.route_orthogonal_of_tagged
+        firstData.indexedMember)
+      (planar.route_orthogonal_of_tagged
+        secondData.indexedMember)
+      sameStart avoid
+  rw [occurrenceSourceClauseDirection_eq_storedRoute,
+    occurrenceSourceClauseDirection_eq_storedRoute]
+  exact fun equal =>
+    firstDirectionsDifferent
+      (AxisDirection.opposite_injective equal)
+
 /-- Distinct active occurrences entering the same lifted clause endpoint do
 so in different cardinal directions. -/
 theorem occurrenceSourceClauseDirections_ne_of_same_target
