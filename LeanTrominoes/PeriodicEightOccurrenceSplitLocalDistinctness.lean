@@ -6,8 +6,8 @@ import LeanTrominoes.PlanarOneInThreeLocalDistinctness
 
 Collision-free compass ports make all copied source occurrences globally
 distinct.  Each copied clause is therefore atom-distinct.  The uniform
-eight-copy implication ring also has distinct endpoints on every one of its
-binary clauses.  Together these facts discharge the local distinctness
+separator-enhanced implication ring also has distinct endpoints on every one
+of its binary clauses.  Together these facts discharge the local distinctness
 hypothesis of the positioned Figure 9 drawings.
 -/
 
@@ -35,7 +35,7 @@ theorem occurrenceClauses_atomsNodup
     simpa [PeriodicCNF.variableOccurrences] using selectedNodup
   exact (List.nodup_flatMap.mp flattenedNodup).1
 
-/-- Every binary implication clause in one fixed eight-copy ring has
+/-- Every binary implication clause in one fixed separator-enhanced ring has
 distinct endpoints. -/
 theorem cycleClausesFor_atomsNodup
     {Variable : Type*} [DecidableEq Variable]
@@ -43,12 +43,13 @@ theorem cycleClausesFor_atomsNodup
     ∀ clause ∈ cycleClausesFor atom,
       (clause.map PeriodicLiteral.atom).Nodup := by
   intro clause clauseMember
-  simp [cycleClausesFor, copies, OccurrenceSplitRing.ports,
+  simp [cycleClausesFor, copies,
+    OccurrenceSplitRing.cycleVertices, ringCopy,
     PeriodicThreeSATThree.cycleClauses,
     PeriodicThreeSATThree.cycleFrom]
     at clauseMember
   rcases clauseMember with
-    rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
+    rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
     simp [PeriodicThreeSATThree.implicationClause,
       copy, portIndex]
 

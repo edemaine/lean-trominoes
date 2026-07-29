@@ -1688,18 +1688,23 @@ The representation choices for this target are:
   endpoints, orthogonality, and continuous planarity.
 - [`LeanTrominoes/OccurrenceSplitRingDrawing.lean`](LeanTrominoes/OccurrenceSplitRingDrawing.lean)
   encodes the worst-case degree-eight neighborhood of Figure 7.  Eight
-  occurrence copies lie on an inner square, the implication clauses occupy
-  its eight gaps, and the four diagonal old rays bend outside the ring.
-  Finite computation certifies all 24 incidences simultaneously: exact
-  endpoints, orthogonality, and continuous planarity.  This is the local
-  kernel for the geometry-ordered occurrence-splitting substitution.
+  source-port copies and one degree-two separator lie on an inner square,
+  nine implication clauses occupy their cyclic gaps, and the four diagonal
+  old rays bend outside the ring.  The separator cuts the reversed clause
+  presentation so that every real degree-three copy has its copied source
+  occurrence first, its clockwise ring edge second, and its counterclockwise
+  ring edge third.  Finite computation certifies all 26 incidences
+  simultaneously: exact endpoints, orthogonality, and continuous planarity.
+  This is the local kernel for the geometry-ordered occurrence-splitting
+  substitution.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplit.lean`](LeanTrominoes/PeriodicEightOccurrenceSplit.lean)
   gives that geometric kernel a matching periodic Boolean reduction.  Every
-  source occurrence selects one of eight compass copies, all eight copies
-  remain on the implication ring, and unused copies are harmless.  The
-  resulting formula is proved equisatisfiable for every slot assignment;
-  it also preserves width three and locality.  The geometric no-collision
-  condition is intentionally reserved for the degree-three certificate.
+  source occurrence selects one of eight compass copies, those copies and
+  the degree-two separator remain on the implication ring, and unused copies
+  are harmless.  The resulting formula is proved equisatisfiable for every
+  slot assignment; it also preserves width three and locality.  The geometric
+  no-collision condition is intentionally reserved for the degree-three
+  certificate.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitOccurrences.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitOccurrences.lean)
   isolates that no-collision condition and proves the promised degree
   accounting.  A selected compass copy occurs at most once in the copied
@@ -1739,9 +1744,10 @@ The representation choices for this target are:
   terminal rays, giving the local fan a direct combinatorial interface.
 - [`LeanTrominoes/OccurrenceSplitAngularFanDrawing.lean`](LeanTrominoes/OccurrenceSplitAngularFanDrawing.lean)
   extracts the first `n` east-first Figure 7 spokes together with the full
-  implication ring.  All nine possible sizes `0 ≤ n ≤ 8` are mechanically
-  certified for exact endpoints, orthogonality, and continuous planarity,
-  providing the finite geometric kernel for each angular variable fan.
+  separator-enhanced implication ring.  All nine possible sizes
+  `0 ≤ n ≤ 8` are mechanically certified for exact endpoints,
+  orthogonality, and continuous planarity, providing the finite geometric
+  kernel for each angular variable fan.
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingRenaming.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingRenaming.lean)
   transports a complete finite incidence-drawing certificate through an
   logical variable renaming that is injective on the variables actually
@@ -1751,11 +1757,11 @@ The representation choices for this target are:
   image-placement construction now derives those target coordinates
   automatically from any injective-on-occurrences variable map.
 - [`LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean`](LeanTrominoes/OccurrenceSplitAngularFanInstantiation.lean)
-  renames a certified angular fan's ports to the actual
-  `copy atom port` variables and translates it into the selected positioned
-  source-variable macrocell.  The resulting total variable placement is
-  proved identical to the semantic fixed-eight placement, and every fitting
-  instance inherits the full finite drawing certificate.
+  renames a certified angular fan's port and separator vertices via
+  `ringCopy` and translates it into the selected positioned source-variable
+  macrocell.  The resulting total variable placement is proved identical to
+  the semantic fixed-eight placement, and every fitting instance inherits
+  the full finite drawing certificate.
 - [`LeanTrominoes/OccurrenceSplitAngularFanBoundary.lean`](LeanTrominoes/OccurrenceSplitAngularFanBoundary.lean)
   exposes one positioned boundary point and one local route suffix for each
   angular occurrence index.  Every suffix is proved orthogonal with exact
@@ -3271,19 +3277,19 @@ The representation choices for this target are:
   the resulting fixed implication rings have degree three and remain
   satisfiable exactly when the planarized formula is.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplitPositioned.lean)
-  places those fixed rings in uniform `12 × 12` refinement macrocells using
+  places those fixed rings in uniform `24 × 24` refinement macrocells using
   the verified Figure 7 copy and implication-clause coordinates.  Erasing
   positions recovers exactly the semantic fixed-eight split, and the refined
   placement retains a positive drawing period.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitLocalDistinctness.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitLocalDistinctness.lean)
   proves that collision-free compass assignment makes every copied source
-  clause atom-distinct and that every binary clause of the eight-copy ring
-  has distinct endpoints.  The positioned fixed-eight output therefore
-  satisfies the local distinctness hypothesis needed by every Figure 9
-  drawing instance.
+  clause atom-distinct and that every binary clause of the nine-vertex
+  separator ring has distinct endpoints.  The positioned fixed-eight output
+  therefore satisfies the local distinctness hypothesis needed by every
+  Figure 9 drawing instance.
 - [`LeanTrominoes/OccurrenceSplitRingCycleDrawing.lean`](LeanTrominoes/OccurrenceSplitRingCycleDrawing.lean)
-  extracts the eight implication clauses as an independently indexed local
-  drawing.  Its sixteen routes have exhaustively verified endpoints,
+  extracts the nine implication clauses as an independently indexed local
+  drawing.  Its eighteen routes have exhaustively verified endpoints,
   orthogonality, and continuous planarity, and its erasure is definitionally
   the semantic fixed-eight cycle for any renamed source atom.  A general
   translation-invariance theorem for embedded CNF drawings then places this

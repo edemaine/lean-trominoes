@@ -6,10 +6,10 @@ import LeanTrominoes.PeriodicCNFPlanarEightOccurrenceSplitPositioned
 /-!
 # Instantiating an angular Figure 7 fan
 
-The certified angular fan uses the finite variable type `Port` and local
-coordinates.  This file renames its ports to the actual fixed-eight copies
-`copy atom port` and translates it to the macrocell of a positioned source
-variable.
+The certified angular fan uses the finite variable type `RingVertex` and
+local coordinates.  This file renames its real ports and separator to the
+actual implication-ring copies and translates it to the macrocell of a
+positioned source variable.
 
 The instantiated drawing's total variable placement is proved equal to the
 placement used by the semantic positioned occurrence split.  Thus its spoke
@@ -36,20 +36,32 @@ def angularFanLocalVariablePosition
     (occurrenceVariablePosition sourcePlacement occurrence)
     (macroOrigin sourcePlacement atom)
 
-/-- On copies of the selected source atom, the pulled-back placement is
-exactly the corresponding Figure 7 vertex. -/
+/-- On every ring copy of the selected source atom, the pulled-back
+placement is exactly the corresponding local ring vertex. -/
 @[simp]
-theorem angularFanLocalVariablePosition_copy
+theorem angularFanLocalVariablePosition_ringCopy
     {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
-    (atom : Variable) (port : Port) :
+    (atom : Variable) (vertex : RingVertex) :
     angularFanLocalVariablePosition sourcePlacement atom
-        (copy atom port) =
-      variablePosition port := by
-  rw [angularFanLocalVariablePosition,
-    occurrenceVariablePosition_copy]
-  apply Prod.ext <;>
-    simp [Cell.add, Cell.sub]
+        (ringCopy atom vertex) =
+      ringVariablePosition vertex := by
+  cases vertex with
+  | separator =>
+      apply Prod.ext <;>
+        simp [angularFanLocalVariablePosition,
+          occurrenceVariablePosition, ringCopy,
+          ringVertexOfIndex, ringVariablePosition,
+          separatorPosition, Cell.add, Cell.sub]
+  | port port =>
+      change
+        angularFanLocalVariablePosition sourcePlacement atom
+            (copy atom port) =
+          variablePosition port
+      rw [angularFanLocalVariablePosition,
+        occurrenceVariablePosition_copy]
+      apply Prod.ext <;>
+        simp [Cell.add, Cell.sub]
 
 /-- Rename the local port template to the actual copies of one source
 variable, without moving its geometry yet. -/
@@ -60,7 +72,7 @@ def renamedAngularFanDrawing
     EmbeddedCNFIncidenceDrawing
       (ThreeOccurrenceVariable Variable) :=
   (angularFanDrawing count).rename
-    (copy atom)
+    (ringCopy atom)
     (angularFanLocalVariablePosition sourcePlacement atom)
 
 /-- Place one renamed fan at the positioned macrocell of its source
@@ -107,15 +119,15 @@ theorem instantiatedAngularFanDrawing_isValid
       (offset := macroOrigin sourcePlacement atom)
   apply
     EmbeddedCNFIncidenceDrawing.isValid_rename
-      (variableMap := copy atom)
+      (variableMap := ringCopy atom)
       (targetPosition :=
         angularFanLocalVariablePosition
           sourcePlacement atom)
   · intro first _firstMember second _secondMember equal
-    exact copy_injective atom equal
-  · intro port _portMember
-    exact angularFanLocalVariablePosition_copy
-      sourcePlacement atom port
+    exact ringCopy_injective atom equal
+  · intro vertex _vertexMember
+    exact angularFanLocalVariablePosition_ringCopy
+      sourcePlacement atom vertex
   · exact angularFanDrawing_isValid count fits
 
 /-- The angular fan has exactly `count` selected spoke ports. -/
@@ -141,7 +153,7 @@ theorem renamedAngularFanDrawing_spokeClause_mem
     (atom : Variable) (count index : Nat)
     (indexLt : index < count) :
     (spokeClause (angularPortOfIndex index)).rename
-        (copy atom) ∈
+        (ringCopy atom) ∈
       (renamedAngularFanDrawing
         sourcePlacement atom count).formula := by
   apply List.mem_map.mpr
@@ -160,7 +172,7 @@ theorem renamedAngularFanSpokeClause_literals
     {Variable : Type*}
     (atom : Variable) (index : Nat) :
     ((spokeClause (angularPortOfIndex index)).rename
-      (copy atom)).literals =
+      (ringCopy atom)).literals =
         [(copy atom (angularPortOfIndex index), true)] := by
   rfl
 

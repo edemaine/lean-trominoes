@@ -3,8 +3,8 @@ import LeanTrominoes.PeriodicCNFPlanarEightOccurrenceSplit
 /-!
 # Positioned fixed-eight occurrence splitting
 
-This module places the fixed Figure 7 implication ring in a uniform
-`12 × 12` refinement macrocell around each source variable.  Its positioned
+This module places the separator-enhanced Figure 7 implication ring in a
+uniform `24 × 24` refinement macrocell around each source variable.  Its positioned
 formula erases exactly to the verified semantic fixed-eight construction,
 and its variable placement uses the certified local ring coordinates.
 -/
@@ -15,22 +15,23 @@ namespace PeriodicEightOccurrenceSplitPositioned
 open OccurrenceSplitRing
 open PeriodicThreeSATThree
 
-def refinementScale : Int := 12
+def refinementScale : Int := 24
 
 def macroOrigin {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (atom : Variable) : Cell :=
   Cell.sub
     (Cell.scale refinementScale (sourcePlacement.position atom))
-    (6, 6)
+    (12, 12)
 
 def occurrenceVariablePosition {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (occurrence : ThreeOccurrenceVariable Variable) : Cell :=
   Cell.add
     (macroOrigin sourcePlacement occurrence.1)
-    (OccurrenceSplitRing.variablePosition
-      (PeriodicEightOccurrenceSplit.portOfIndex occurrence.2.1))
+    (OccurrenceSplitRing.ringVariablePosition
+      (PeriodicEightOccurrenceSplit.ringVertexOfIndex
+        occurrence.2.1))
 
 def occurrenceClause {Variable : Type*}
     (occurrencePorts : PeriodicEightOccurrenceSplit.OccurrencePorts)
@@ -60,7 +61,8 @@ def cycleClause {Variable : Type*}
   position :=
     Cell.add (macroOrigin sourcePlacement atom)
       (OccurrenceSplitRing.cycleClausePosition
-        (ports.getD taggedClause.2 .northwest))
+        (presentedCycleVertices.getD
+          taggedClause.2 .separator))
   literals := taggedClause.1
 
 def cycleClausesFor {Variable : Type*}
@@ -144,7 +146,7 @@ theorem placement_period_pos {Variable : Type*}
     (sourcePeriodPositive : 0 < sourcePlacement.period) :
     0 < (placement sourcePlacement).period := by
   simpa [placement, refinementScale] using
-    Nat.mul_pos (by decide : 0 < 12) sourcePeriodPositive
+    Nat.mul_pos (by decide : 0 < 24) sourcePeriodPositive
 
 @[simp]
 theorem occurrenceVariablePosition_copy {Variable : Type*}
@@ -154,8 +156,7 @@ theorem occurrenceVariablePosition_copy {Variable : Type*}
         (PeriodicEightOccurrenceSplit.copy atom port) =
       Cell.add (macroOrigin sourcePlacement atom)
         (OccurrenceSplitRing.variablePosition port) := by
-  cases port <;>
-    rfl
+  cases port <;> rfl
 
 end PeriodicEightOccurrenceSplitPositioned
 

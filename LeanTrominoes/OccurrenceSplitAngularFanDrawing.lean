@@ -10,8 +10,8 @@ east-first angular enumeration.  The other Figure 7 copies remain in the
 implication ring but receive no copied source incidence.
 
 This file extracts exactly that finite local drawing: the selected spokes,
-in angular-list order, followed by the complete eight-copy implication ring.
-All nine possible sizes are mechanically certified for exact endpoints,
+in angular-list order, followed by the complete separator-enhanced implication
+ring.  All nine possible sizes are mechanically certified for exact endpoints,
 orthogonality, and continuous planarity.
 -/
 
@@ -27,7 +27,8 @@ def angularFanPorts (count : Nat) : List Port :=
   (List.range count).map angularPortOfIndex
 
 /-- Selected old incidences followed by the unchanged implication ring. -/
-def angularFanFormula (count : Nat) : List (EmbeddedClause Port) :=
+def angularFanFormula (count : Nat) :
+    List (EmbeddedClause RingVertex) :=
   (angularFanPorts count).map spokeClause ++ cycleFormula
 
 /-- Incidence routes parallel to `angularFanFormula`: selected Figure 7
@@ -42,20 +43,18 @@ def angularFanRoutes
       []
   else if
       clauseIndex <
-        (angularFanPorts count).length + ports.length then
-    cycleRoute
-      (ports.getD
-        (clauseIndex - (angularFanPorts count).length)
-        .northwest)
+        (angularFanPorts count).length + cycleFormula.length then
+    cycleRoutes
+      (clauseIndex - (angularFanPorts count).length)
       literalIndex
   else
     []
 
 /-- The local Figure 7 fan with exactly `count` copied source incidences. -/
 def angularFanDrawing (count : Nat) :
-    EmbeddedCNFIncidenceDrawing Port where
+    EmbeddedCNFIncidenceDrawing RingVertex where
   formula := angularFanFormula count
-  variablePosition := variablePosition
+  variablePosition := ringVariablePosition
   routes := angularFanRoutes count
 
 /-- Every fitting angular fan has exact endpoints, orthogonal routes, and

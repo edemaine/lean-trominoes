@@ -159,7 +159,7 @@ theorem retainedDrawingEightOccurrenceSplitFormula_satisfiable_iff
             (PeriodicCNF.incidenceGraph_isLocal sourceLocal)
             sourceOccurrences)
 
-/-- Positioned retained split, using the uniform `12 × 12` Figure 7
+/-- Positioned retained split, using the uniform `24 × 24` Figure 7
 refinement around each retained planar-SAT variable. -/
 def retainedDrawingEightOccurrenceSplitPositionedFormula
     {Variable : Type*} [DecidableEq Variable]

@@ -4,11 +4,15 @@ import LeanTrominoes.PeriodicThreeSATThreeCorrectness
 /-!
 # Fixed eight-slot periodic occurrence splitting
 
-The geometric Figure 7 neighborhood has one copy at every multiple of
-45 degrees.  Real source occurrences occupy their incident-ray slots; unused
-slots remain harmless degree-two variables on the implication cycle.
+The geometric Figure 7 neighborhood has one source copy at every multiple
+of 45 degrees, plus one degree-two separator copy.  Real source occurrences
+occupy their incident-ray slots; unused slots and the separator remain
+harmless degree-two variables on the implication cycle.
 
-Keeping all eight slots makes the geometry uniform across variable degrees.
+Keeping all eight source slots makes the geometry uniform across variable
+degrees.  The separator supplies a cut at which the cyclic implications can
+be presented linearly without reversing the clockwise occurrence order of
+any source copy.
 This file proves the semantic part independently of the eventual geometric
 slot classifier: every assignment of syntactic occurrences to compass slots
 gives an equisatisfiable formula.  The later degree proof will require that
@@ -42,11 +46,39 @@ def copy {Variable : Type*}
     ThreeOccurrenceVariable Variable :=
   (atom, portIndex port, 0)
 
-/-- All eight copies of one source atom in clockwise order. -/
+/-- Rename a local ring vertex to its source-port copy or the fresh
+degree-two separator copy. -/
+def ringCopy {Variable : Type*}
+    (atom : Variable) :
+    OccurrenceSplitRing.RingVertex →
+      ThreeOccurrenceVariable Variable
+  | .separator => (atom, 8, 0)
+  | .port port => copy atom port
+
+/-- Recover the geometric ring vertex from the numeric copy index.  Indices
+outside the eight source ports denote the separator. -/
+def ringVertexOfIndex : Nat → OccurrenceSplitRing.RingVertex
+  | 0 => .port .northwest
+  | 1 => .port .north
+  | 2 => .port .northeast
+  | 3 => .port .east
+  | 4 => .port .southeast
+  | 5 => .port .south
+  | 6 => .port .southwest
+  | 7 => .port .west
+  | _ => .separator
+
+@[simp]
+theorem ringVertexOfIndex_portIndex (port : Port) :
+    ringVertexOfIndex (portIndex port) = .port port := by
+  cases port <;> rfl
+
+/-- All nine implication-ring copies in clockwise order, cut at the
+separator. -/
 def copies {Variable : Type*}
     (atom : Variable) :
     List (ThreeOccurrenceVariable Variable) :=
-  ports.map (copy atom)
+  OccurrenceSplitRing.cycleVertices.map (ringCopy atom)
 
 /-- Replace one source literal by the copy in its selected compass slot. -/
 def occurrenceLiteral {Variable : Type*}
@@ -77,11 +109,13 @@ def occurrenceClauses {Variable : Type*}
   source.clauses.zipIdx.map fun taggedClause =>
     occurrenceClause occurrencePorts taggedClause.2 taggedClause.1
 
-/-- The full eight-copy implication cycle of one source atom. -/
+/-- The full separator implication cycle of one source atom.  Reversing its
+clause presentation makes the outgoing clockwise implication precede the
+incoming implication at every real source port. -/
 def cycleClausesFor {Variable : Type*}
     (atom : Variable) :
     List (PeriodicClause (ThreeOccurrenceVariable Variable)) :=
-  PeriodicThreeSATThree.cycleClauses (copies atom)
+  (PeriodicThreeSATThree.cycleClauses (copies atom)).reverse
 
 /-- One fixed implication ring for every source atom that occurs. -/
 def allCycleClauses {Variable : Type*} [DecidableEq Variable]
@@ -145,7 +179,12 @@ theorem cycleClausesFor_areLocal
     {Variable : Type*}
     (atom : Variable) :
     ∀ clause ∈ cycleClausesFor atom, clause.IsLocal :=
-  PeriodicThreeSATThree.cycleClauses_areLocal (copies atom)
+    by
+  intro clause clauseMember
+  exact
+    PeriodicThreeSATThree.cycleClauses_areLocal
+      (copies atom) clause
+      (List.mem_reverse.mp clauseMember)
 
 /-- Fixed-eight occurrence splitting preserves the paper's locality
 condition. -/
@@ -176,8 +215,12 @@ theorem cycleClausesFor_widthAtMostThree
     (atom : Variable) :
     ∀ clause ∈ cycleClausesFor atom,
       clause.WidthAtMost 3 :=
-  PeriodicThreeSATThree.cycleClauses_widthAtMostThree
-    (copies atom)
+    by
+  intro clause clauseMember
+  exact
+    PeriodicThreeSATThree.cycleClauses_widthAtMostThree
+      (copies atom) clause
+      (List.mem_reverse.mp clauseMember)
 
 /-- Fixed-eight occurrence splitting preserves a width-three bound. -/
 theorem formula_widthAtMostThree
@@ -262,9 +305,9 @@ theorem copy_fst
     (occurrenceMember : occurrence ∈ copies atom) :
     occurrence.1 = atom := by
   rcases List.mem_map.mp occurrenceMember with
-    ⟨port, portMember, occurrenceEqual⟩
+    ⟨vertex, vertexMember, occurrenceEqual⟩
   subst occurrence
-  rfl
+  cases vertex <;> rfl
 
 /-- Extending a source assignment satisfies the fixed implication ring. -/
 theorem cycleClausesFor_complete
@@ -287,11 +330,20 @@ theorem cycleClausesFor_complete
         exact copy_fst atom
           (copiesEqual ▸
             List.mem_cons_of_mem first occurrenceMember)
-      simpa [cycleClausesFor, copiesEqual,
-        PeriodicThreeSATThree.cycleClauses] using
+      have complete :=
         PeriodicThreeSATThree.cycleFrom_complete
           assignment cell atom first first rest
           firstOriginal firstOriginal restOriginal
+      intro clause clauseMember
+      have clauseMember' :
+          clause ∈
+            (PeriodicThreeSATThree.cycleFrom
+              first first rest).reverse := by
+        simpa [cycleClausesFor, copiesEqual,
+          PeriodicThreeSATThree.cycleClauses] using
+          clauseMember
+      exact complete clause
+        (List.mem_reverse.mp clauseMember')
 
 /-- Extending any satisfying source assignment satisfies the complete
 fixed-slot split. -/
@@ -328,9 +380,10 @@ theorem selected_copy_mem_copies
       copies literal.atom := by
   apply List.mem_map.mpr
   exact
-    ⟨occurrencePorts.port clauseIndex literalIndex,
-      by cases occurrencePorts.port clauseIndex literalIndex <;>
-        simp [ports],
+    ⟨.port (occurrencePorts.port clauseIndex literalIndex),
+      by
+        cases occurrencePorts.port clauseIndex literalIndex <;>
+          simp [OccurrenceSplitRing.cycleVertices],
       rfl⟩
 
 /-- A satisfying fixed ring makes its restriction agree with every selected
@@ -369,8 +422,9 @@ theorem restrictAssignment_eq_copy
         apply List.mem_flatMap.mpr
         exact
           ⟨atom, atomMember,
-            by simpa [cycleClausesFor, copiesEqual] using
-              clauseMember⟩
+            by
+              apply List.mem_reverse.mpr
+              simpa [copiesEqual] using clauseMember⟩
       have occurrenceEqualFirst :=
         PeriodicThreeSATThree.cycleClauses_value_eq_first
           assignment cell first rest cycleSatisfies

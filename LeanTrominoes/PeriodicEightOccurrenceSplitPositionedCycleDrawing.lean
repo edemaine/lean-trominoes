@@ -25,7 +25,7 @@ def positionedLocalCycleClause
     {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (atom : Variable)
-    (clause : EmbeddedClause Port) :
+    (clause : EmbeddedClause RingVertex) :
     PositionedPeriodicClause
       (ThreeOccurrenceVariable Variable) where
   position :=
@@ -66,19 +66,21 @@ theorem positionedCycleDrawing_isValid
       (macroOrigin sourcePlacement atom)).IsValid :=
   translatedCycleDrawing_isValid _
 
-/-- The refined placement of a fixed copy agrees with the translated local
-cycle drawing's variable vertex. -/
+/-- The refined placement of every source or separator copy agrees with the
+translated local cycle drawing's variable vertex. -/
 theorem placement_copy_eq_translatedCycleVariablePosition
     {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
-    (atom : Variable) (port : Port) :
+    (atom : Variable) (vertex : RingVertex) :
     (placement sourcePlacement).position
-        (PeriodicEightOccurrenceSplit.copy atom port) =
+        (PeriodicEightOccurrenceSplit.ringCopy atom vertex) =
       (translatedCycleDrawing
         (macroOrigin sourcePlacement atom)).variablePosition
-          port := by
-  cases port <;>
-    rfl
+          vertex := by
+  cases vertex with
+  | separator => rfl
+  | port port =>
+      cases port <;> rfl
 
 end PeriodicEightOccurrenceSplitPositioned
 end LeanTrominoes

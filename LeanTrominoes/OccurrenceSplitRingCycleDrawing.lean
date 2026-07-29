@@ -2,18 +2,19 @@ import LeanTrominoes.PeriodicEightOccurrenceSplit
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
 
 /-!
-# Certified implication-cycle subdrawing of Figure 7
+# Certified separator implication-cycle subdrawing of Figure 7
 
 The full fixed-eight drawing contains both the eight retained old incidences
 and the implication ring.  Route splicing needs the latter as an independently
 indexed local template, because copied source incidences are supplied by the
 surrounding planar drawing.
 
-This module packages exactly those eight implication clauses and their
-sixteen direct incidence routes.  Exhaustive verification proves exact
+This module packages exactly the nine implication clauses (including the
+degree-two separator) and their eighteen direct incidence routes.
+Exhaustive verification proves exact
 endpoints, orthogonality, and continuous planarity.  Its final theorem
 identifies the embedded local clauses definitionally with the semantic
-fixed-eight implication cycle after renaming ports to copies.
+eight-port implication cycle after renaming ring vertices to copies.
 -/
 
 namespace LeanTrominoes
@@ -21,23 +22,10 @@ namespace OccurrenceSplitRing
 
 open PlanarThreeSAT
 
-/-- The eight implication clauses, without the retained old incidences. -/
-def cycleFormula : List (EmbeddedClause Port) :=
-  ports.map cycleClause
-
-/-- Presentation-indexed incidence routes for the implication cycle. -/
-def cycleRoutes
-    (clauseIndex literalIndex : Nat) : List Cell :=
-  if clauseIndex < ports.length then
-    cycleRoute
-      (ports.getD clauseIndex .northwest) literalIndex
-  else
-    []
-
 /-- The implication ring as a standalone finite incidence drawing. -/
-def cycleDrawing : EmbeddedCNFIncidenceDrawing Port where
+def cycleDrawing : EmbeddedCNFIncidenceDrawing RingVertex where
   formula := cycleFormula
-  variablePosition := variablePosition
+  variablePosition := ringVariablePosition
   routes := cycleRoutes
 
 /-- The standalone implication ring has exact endpoints, orthogonal routes,
@@ -56,7 +44,7 @@ theorem cycleDrawing_isPlanar : cycleDrawing.IsPlanar :=
 
 /-- One implication ring placed at an arbitrary macrocell origin. -/
 def translatedCycleDrawing (offset : Cell) :
-    EmbeddedCNFIncidenceDrawing Port :=
+    EmbeddedCNFIncidenceDrawing RingVertex :=
   cycleDrawing.translate offset
 
 /-- Every translated implication ring inherits the complete local
@@ -66,18 +54,18 @@ theorem translatedCycleDrawing_isValid (offset : Cell) :
   EmbeddedCNFIncidenceDrawing.isValid_translate
     cycleDrawing_isValid offset
 
-/-- Rename one local implication clause to the eight fixed copies of a
-source atom and add the common zero periodic offset. -/
+/-- Rename one local implication clause to the eight source-port copies or
+the separator copy of a source atom, and add the common zero offset. -/
 def periodicCycleClause
     {Variable : Type*} (atom : Variable)
-    (clause : EmbeddedClause Port) :
+    (clause : EmbeddedClause RingVertex) :
     PeriodicClause (ThreeOccurrenceVariable Variable) :=
   clause.literals.map fun literal =>
-    ⟨PeriodicEightOccurrenceSplit.copy atom literal.1,
+    ⟨PeriodicEightOccurrenceSplit.ringCopy atom literal.1,
       (0, 0), literal.2⟩
 
-/-- The semantic fixed-eight implication cycle is exactly the erased local
-cycle template. -/
+/-- The semantic separator implication cycle is exactly the erased local
+cycle template in its deliberately reversed presentation. -/
 theorem cycleClausesFor_eq_cycleFormula
     {Variable : Type*} (atom : Variable) :
     PeriodicEightOccurrenceSplit.cycleClausesFor atom =

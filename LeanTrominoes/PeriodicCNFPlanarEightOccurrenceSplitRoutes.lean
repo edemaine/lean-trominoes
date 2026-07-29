@@ -102,7 +102,7 @@ theorem positionedCycleRoutes_physicalRoutesMatch
   change
     (positionedLiteral, literalIndex) ∈
       (taggedClause.1.literals.map fun literal =>
-        ⟨PeriodicEightOccurrenceSplit.copy
+        ⟨PeriodicEightOccurrenceSplit.ringCopy
             atom literal.1,
           (0, 0), literal.2⟩).zipIdx
     at literalMember
@@ -115,7 +115,7 @@ theorem positionedCycleRoutes_physicalRoutesMatch
     congrArg Prod.snd taggedLiteralEqual
   have positionedLiteralEqual :
       positionedLiteral =
-        ⟨PeriodicEightOccurrenceSplit.copy
+        ⟨PeriodicEightOccurrenceSplit.ringCopy
             atom taggedLiteral.1.1,
           (0, 0), taggedLiteral.1.2⟩ :=
     (congrArg Prod.fst taggedLiteralEqual).symm
@@ -212,7 +212,7 @@ theorem cycleClausesFor_literal_offset_eq_zero
   change
     (literal, literalIndex) ∈
       (taggedClause.1.literals.map fun sourceLiteral =>
-        ⟨PeriodicEightOccurrenceSplit.copy
+        ⟨PeriodicEightOccurrenceSplit.ringCopy
             atom sourceLiteral.1,
           (0, 0), sourceLiteral.2⟩).zipIdx
     at literalMember
@@ -222,7 +222,7 @@ theorem cycleClausesFor_literal_offset_eq_zero
       taggedLiteralEqual⟩
   have literalEqual :
       literal =
-        ⟨PeriodicEightOccurrenceSplit.copy
+        ⟨PeriodicEightOccurrenceSplit.ringCopy
             atom taggedLiteral.1.1,
           (0, 0), taggedLiteral.1.2⟩ :=
     (congrArg Prod.fst taggedLiteralEqual).symm
@@ -271,7 +271,7 @@ theorem positionedCycleRoutes_orthogonal
   change
     (literal, literalIndex) ∈
       (taggedClause.1.literals.map fun sourceLiteral =>
-        ⟨PeriodicEightOccurrenceSplit.copy
+        ⟨PeriodicEightOccurrenceSplit.ringCopy
             atom sourceLiteral.1,
           (0, 0), sourceLiteral.2⟩).zipIdx
     at literalMember
