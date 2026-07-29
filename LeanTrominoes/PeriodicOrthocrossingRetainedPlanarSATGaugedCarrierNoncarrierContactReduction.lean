@@ -21,6 +21,152 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 1200000
 
+/-- A fundamental coordinate plus an integral period translate can lie in
+the half-open three-cell window `[-P, 2P)` only for shifts `-1`, `0`, or
+`1`. -/
+theorem fundamental_translate_shift_is_neighbor
+    {period base shift lifted : Int}
+    (periodPositive : 0 < period)
+    (basePositive : 0 < base)
+    (baseUpper : base < period)
+    (liftedLower : -period ≤ lifted)
+    (liftedUpper : lifted < 2 * period)
+    (liftedEq : lifted = base + period * shift) :
+    shift = -1 ∨ shift = 0 ∨ shift = 1 := by
+  have notTooLow : ¬shift ≤ -2 := by
+    intro shiftLow
+    have nonnegative :
+        0 ≤ period * (-shift - 2) :=
+      mul_nonneg (le_of_lt periodPositive) (by omega)
+    have productUpper : period * shift ≤ -2 * period := by
+      nlinarith
+    omega
+  have notTooHigh : ¬2 ≤ shift := by
+    intro shiftHigh
+    have nonnegative :
+        0 ≤ period * (shift - 2) :=
+      mul_nonneg (le_of_lt periodPositive) (by omega)
+    have productLower : 2 * period ≤ period * shift := by
+      nlinarith
+    omega
+  omega
+
+/-- A lifted constructed-drawing vertex that still lies in the open
+one-cell halo must use one of the nine neighboring lattice translations. -/
+theorem liftedDrawingVertexPosition_translate_neighbor_of_inExpanded
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {vertex : Vertex}
+    (vertexMember : vertex ∈ graph.vertices)
+    (translate : Cell)
+    (inside :
+      InExpandedDrawingSquare graph
+        (Cell.add
+          ((drawing graph).vertexPosition graph vertex)
+          ((drawing graph).periodTranslation translate))) :
+    IsNeighborTranslation translate := by
+  let period : Int := drawingGridSize graph
+  let base := (drawing graph).vertexPosition graph vertex
+  let lifted :=
+    Cell.add base ((drawing graph).periodTranslation translate)
+  have periodPositive : 0 < period := by
+    dsimp only [period]
+    exact_mod_cast drawingGridSize_pos graph
+  have baseBounds :=
+    drawing_vertexPosition_in_fundamental_square graph vertexMember
+  change
+    0 < base.1 ∧ base.1 < period ∧
+      0 < base.2 ∧ base.2 < period at baseBounds
+  change
+    -period < lifted.1 ∧ lifted.1 < 2 * period ∧
+      -period < lifted.2 ∧ lifted.2 < 2 * period at inside
+  have horizontalEq :
+      base.1 = lifted.1 + period * (-translate.1) := by
+    simp [base, lifted, period,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale]
+  have verticalEq :
+      base.2 = lifted.2 + period * (-translate.2) := by
+    simp [base, lifted, period,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale]
+  have horizontalNegativeNeighbor :=
+    lane_shift_is_neighbor
+      periodPositive inside.1 inside.2.1
+      (le_of_lt baseBounds.1) baseBounds.2.1 horizontalEq
+  have verticalNegativeNeighbor :=
+    lane_shift_is_neighbor
+      periodPositive inside.2.2.1 inside.2.2.2
+      (le_of_lt baseBounds.2.2.1) baseBounds.2.2.2 verticalEq
+  constructor <;> omega
+
+/-- If a point of the macrocell around a lifted vertex lies in the refined
+open one-cell halo, then the vertex occurrence itself is neighboring.  The
+unused seven-cell macrocell margin makes the implication strict at both
+period boundaries. -/
+theorem liftedDrawingVertexPosition_translate_neighbor_of_macrocellPoint_inExpanded
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    {vertex : Vertex}
+    (vertexMember : vertex ∈ graph.vertices)
+    (translate : Cell)
+    (point : Cell)
+    (pointInMacrocell :
+      InPlanarSATMacrocell
+        (Cell.add
+          ((drawing graph).vertexPosition graph vertex)
+          ((drawing graph).periodTranslation translate))
+        point)
+    (pointInExpandedRefinement :
+      let period : Int :=
+        planarMacroScale * drawingGridSize graph;
+      -period < point.1 ∧ point.1 < 2 * period ∧
+        -period < point.2 ∧ point.2 < 2 * period) :
+    IsNeighborTranslation translate := by
+  let center :=
+    Cell.add
+      ((drawing graph).vertexPosition graph vertex)
+      ((drawing graph).periodTranslation translate)
+  let period : Int := drawingGridSize graph
+  have periodPositive : 0 < period := by
+    dsimp only [period]
+    exact_mod_cast drawingGridSize_pos graph
+  have centerBounds :
+      -period ≤ center.1 ∧ center.1 < 2 * period ∧
+        -period ≤ center.2 ∧ center.2 < 2 * period := by
+    change
+      InClosedGridRectangle
+        (planarSATMacrocellRouteLower center)
+        (planarSATMacrocellRouteUpper center) point at pointInMacrocell
+    simp only [InClosedGridRectangle,
+      planarSATMacrocellRouteLower,
+      planarSATMacrocellRouteUpper,
+      planarMacroScale, Cell.add, Cell.scale] at pointInMacrocell pointInExpandedRefinement
+    omega
+  have baseBounds :=
+    drawing_vertexPosition_in_fundamental_square graph vertexMember
+  have horizontalEq :
+      center.1 =
+        ((drawing graph).vertexPosition graph vertex).1 +
+          period * translate.1 := by
+    simp [center, period,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale]
+  have verticalEq :
+      center.2 =
+        ((drawing graph).vertexPosition graph vertex).2 +
+          period * translate.2 := by
+    simp [center, period,
+      PeriodicGridDrawing.periodTranslation,
+      Cell.add, Cell.scale]
+  constructor
+  · exact fundamental_translate_shift_is_neighbor
+      periodPositive baseBounds.1 baseBounds.2.1
+      centerBounds.1 centerBounds.2.1 horizontalEq
+  · exact fundamental_translate_shift_is_neighbor
+      periodPositive baseBounds.2.2.1 baseBounds.2.2.2
+      centerBounds.2.2.1 centerBounds.2.2.2 verticalEq
+
 /-- Undo the two quotient gauges in a final contact, then cancel the carrier's
 common physical translate.  The result is a contact between the carrier's
 original finite segment and the noncarrier segment translated by exactly the
