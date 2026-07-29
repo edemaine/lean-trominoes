@@ -478,6 +478,10 @@ The representation choices for this target are:
   lifts the inherited semantic classification through the flattened final
   formula and identifies each local endpoint with its exact source-clause
   boundary port.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedOriginalOccurrenceProvenance.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedOriginalOccurrenceProvenance.lean)
+  synchronizes the flattened unit-elimination metadata with its explicit
+  order-preserving occurrence pairs, certifying the selected source clause
+  and literal presentation indices.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteSplicing.lean)
   scales and translates the corresponding source incidence route through
   the `6 × 6` unit-elimination refinement, removes its obsolete clause
@@ -487,8 +491,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
   packages those per-incidence splices into a total proof-backed inherited
   suffix family.  Any canonical orthogonal source route family with certified
-  first exits can therefore be lifted through unit elimination; the concrete
-  wrapped Figure 9 family supplies that additional certificate.
+  first exits can therefore be lifted through unit elimination, with the
+  selector carrying source-occurrence provenance; the concrete wrapped
+  Figure 9 family supplies the first-exit certificate.
   [`LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean`](LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean)
   proves that completing either transformation's inherited suffix family and
   prepending its normalized local clause route preserves the inherited
