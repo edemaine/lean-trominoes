@@ -76,6 +76,32 @@ theorem exists_neighbor_coordinates_of_difference_le_two
   · exact ⟨1, 0, by simp, by simp, by omega⟩
   · exact ⟨1, -1, by simp, by simp, by omega⟩
 
+/-- Three coordinates with pairwise displacement at most two can be placed
+simultaneously in the neighboring interval while preserving both
+displacements from the first coordinate. -/
+theorem exists_three_neighbor_coordinates_of_pairwise_difference_le_two
+    {firstSecond firstThird : Int}
+    (firstSecondLower : -2 ≤ firstSecond)
+    (firstSecondUpper : firstSecond ≤ 2)
+    (firstThirdLower : -2 ≤ firstThird)
+    (firstThirdUpper : firstThird ≤ 2)
+    (secondThirdLower : -2 ≤ firstThird - firstSecond)
+    (secondThirdUpper : firstThird - firstSecond ≤ 2) :
+    ∃ first second third : Int,
+      (first = -1 ∨ first = 0 ∨ first = 1) ∧
+        (second = -1 ∨ second = 0 ∨ second = 1) ∧
+        (third = -1 ∨ third = 0 ∨ third = 1) ∧
+        first - second = firstSecond ∧
+        first - third = firstThird := by
+  let first :=
+    max (-1) (max (firstSecond - 1) (firstThird - 1))
+  let second := first - firstSecond
+  let third := first - firstThird
+  refine ⟨first, second, third, ?_, ?_, ?_, ?_, ?_⟩
+  all_goals
+    simp only [first, second, third, max_def]
+    split_ifs <;> omega
+
 /-- If two source coordinates differ by at most two lattice cells after
 physical alignment, their source shifts can be adjusted while preserving
 that alignment so that both translated source coordinates are neighboring.
@@ -124,6 +150,113 @@ theorem exists_neighbor_balancing_adjustments
       IsNeighborTranslation] using
         And.intro secondXNeighbor secondYNeighbor
 
+/-- The two-coordinate version of source balancing.  One adjustment is
+shared by two noncarrier occurrence coordinates, as required by a crossover
+record's horizontal and vertical source occurrences. -/
+theorem exists_neighbor_balancing_adjustments_two_second_bases
+    (firstBase secondBase thirdBase relative : Cell)
+    (firstSecondClose :
+      Cell.sub (Cell.add firstBase relative) secondBase ∈
+        PeriodicGridDrawing.doubleNeighborTranslations)
+    (firstThirdClose :
+      Cell.sub (Cell.add firstBase relative) thirdBase ∈
+        PeriodicGridDrawing.doubleNeighborTranslations)
+    (secondThirdClose :
+      Cell.sub secondBase thirdBase ∈
+        PeriodicGridDrawing.doubleNeighborTranslations) :
+    ∃ firstAdjustment secondAdjustment : Cell,
+      Cell.sub firstAdjustment secondAdjustment = relative ∧
+        IsNeighborTranslation
+          (Cell.add firstBase firstAdjustment) ∧
+        IsNeighborTranslation
+          (Cell.add secondBase secondAdjustment) ∧
+        IsNeighborTranslation
+          (Cell.add thirdBase secondAdjustment) := by
+  have firstSecondBounds :=
+    (PeriodicGridDrawing.mem_doubleNeighborTranslations_iff
+      (Cell.sub (Cell.add firstBase relative) secondBase)).mp
+      firstSecondClose
+  have firstThirdBounds :=
+    (PeriodicGridDrawing.mem_doubleNeighborTranslations_iff
+      (Cell.sub (Cell.add firstBase relative) thirdBase)).mp
+      firstThirdClose
+  have secondThirdBounds :=
+    (PeriodicGridDrawing.mem_doubleNeighborTranslations_iff
+      (Cell.sub secondBase thirdBase)).mp secondThirdClose
+  rcases
+      exists_three_neighbor_coordinates_of_pairwise_difference_le_two
+        firstSecondBounds.1.1 firstSecondBounds.1.2
+        firstThirdBounds.1.1 firstThirdBounds.1.2
+        (by
+          rcases firstBase with ⟨firstBaseX, firstBaseY⟩
+          rcases secondBase with ⟨secondBaseX, secondBaseY⟩
+          rcases thirdBase with ⟨thirdBaseX, thirdBaseY⟩
+          rcases relative with ⟨relativeX, relativeY⟩
+          simp only [Cell.sub, Cell.add] at firstSecondBounds firstThirdBounds secondThirdBounds ⊢
+          omega)
+        (by
+          rcases firstBase with ⟨firstBaseX, firstBaseY⟩
+          rcases secondBase with ⟨secondBaseX, secondBaseY⟩
+          rcases thirdBase with ⟨thirdBaseX, thirdBaseY⟩
+          rcases relative with ⟨relativeX, relativeY⟩
+          simp only [Cell.sub, Cell.add] at firstSecondBounds firstThirdBounds secondThirdBounds ⊢
+          omega) with
+    ⟨firstX, secondX, thirdX,
+      firstXNeighbor, secondXNeighbor, thirdXNeighbor,
+      firstSecondX, firstThirdX⟩
+  rcases
+      exists_three_neighbor_coordinates_of_pairwise_difference_le_two
+        firstSecondBounds.2.1 firstSecondBounds.2.2
+        firstThirdBounds.2.1 firstThirdBounds.2.2
+        (by
+          rcases firstBase with ⟨firstBaseX, firstBaseY⟩
+          rcases secondBase with ⟨secondBaseX, secondBaseY⟩
+          rcases thirdBase with ⟨thirdBaseX, thirdBaseY⟩
+          rcases relative with ⟨relativeX, relativeY⟩
+          simp only [Cell.sub, Cell.add] at firstSecondBounds firstThirdBounds secondThirdBounds ⊢
+          omega)
+        (by
+          rcases firstBase with ⟨firstBaseX, firstBaseY⟩
+          rcases secondBase with ⟨secondBaseX, secondBaseY⟩
+          rcases thirdBase with ⟨thirdBaseX, thirdBaseY⟩
+          rcases relative with ⟨relativeX, relativeY⟩
+          simp only [Cell.sub, Cell.add] at firstSecondBounds firstThirdBounds secondThirdBounds ⊢
+          omega) with
+    ⟨firstY, secondY, thirdY,
+      firstYNeighbor, secondYNeighbor, thirdYNeighbor,
+      firstSecondY, firstThirdY⟩
+  let firstTarget : Cell := (firstX, firstY)
+  let secondTarget : Cell := (secondX, secondY)
+  let firstAdjustment := Cell.sub firstTarget firstBase
+  let secondAdjustment := Cell.sub secondTarget secondBase
+  refine
+    ⟨firstAdjustment, secondAdjustment, ?_, ?_, ?_, ?_⟩
+  · rcases firstBase with ⟨firstBaseX, firstBaseY⟩
+    rcases secondBase with ⟨secondBaseX, secondBaseY⟩
+    rcases relative with ⟨relativeX, relativeY⟩
+    simp only [firstAdjustment, secondAdjustment,
+      firstTarget, secondTarget, Cell.sub, Cell.add,
+      Prod.mk.injEq] at firstSecondX firstSecondY ⊢
+    constructor <;> omega
+  · simpa [firstAdjustment, firstTarget, Cell.add,
+      Cell.sub, IsNeighborTranslation] using
+        And.intro firstXNeighbor firstYNeighbor
+  · simpa [secondAdjustment, secondTarget, Cell.add,
+      Cell.sub, IsNeighborTranslation] using
+        And.intro secondXNeighbor secondYNeighbor
+  · have thirdTargetEq :
+        Cell.add thirdBase secondAdjustment =
+          (thirdX, thirdY) := by
+      rcases firstBase with ⟨firstBaseX, firstBaseY⟩
+      rcases secondBase with ⟨secondBaseX, secondBaseY⟩
+      rcases thirdBase with ⟨thirdBaseX, thirdBaseY⟩
+      rcases relative with ⟨relativeX, relativeY⟩
+      simp only [secondAdjustment, secondTarget,
+        Cell.sub, Cell.add, Prod.mk.injEq] at firstSecondX firstThirdX firstSecondY firstThirdY ⊢
+      constructor <;> omega
+    rw [thirdTargetEq]
+    exact ⟨thirdXNeighbor, thirdYNeighbor⟩
+
 /-- The sum of two neighboring lattice translations belongs to the
 twenty-five-element doubled halo. -/
 theorem IsNeighborTranslation.add_mem_doubleNeighborTranslations
@@ -138,6 +271,22 @@ theorem IsNeighborTranslation.add_mem_doubleNeighborTranslations
   rcases first with ⟨firstX, firstY⟩
   rcases second with ⟨secondX, secondY⟩
   simp only [IsNeighborTranslation, Cell.add] at firstNeighbor secondNeighbor ⊢
+  omega
+
+/-- The difference of two neighboring lattice translations belongs to the
+twenty-five-element doubled halo. -/
+theorem IsNeighborTranslation.sub_mem_doubleNeighborTranslations
+    {first second : Cell}
+    (firstNeighbor : IsNeighborTranslation first)
+    (secondNeighbor : IsNeighborTranslation second) :
+    Cell.sub first second ∈
+      PeriodicGridDrawing.doubleNeighborTranslations := by
+  apply
+    (PeriodicGridDrawing.mem_doubleNeighborTranslations_iff
+      (Cell.sub first second)).mpr
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [IsNeighborTranslation, Cell.sub] at firstNeighbor secondNeighbor ⊢
   omega
 
 /-- A lifted constructed-drawing vertex that still lies in the open
@@ -1800,6 +1949,147 @@ theorem
       translatedSecondCondition)
       meet
 
+/-- Balanced raw-carrier separation when the noncarrier orbit condition has
+two occurrence coordinates sharing one source adjustment. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_balanced_two_source_coordinates
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (secondFirstBase secondSecondBase : Cell)
+    (secondBasesClose :
+      Cell.sub secondFirstBase secondSecondBase ∈
+        PeriodicGridDrawing.doubleNeighborTranslations)
+    (secondClosure :
+      ∀ adjustment,
+        IsNeighborTranslation
+            (Cell.add secondFirstBase adjustment) →
+          IsNeighborTranslation
+            (Cell.add secondSecondBase adjustment) →
+          second.routeWitness.metadata.source.RetainedOrbitCondition
+            formula
+            (Cell.add
+              (Cell.neg second.sourceClauseAnchor)
+              adjustment))
+    (contactClose :
+      GridSegment.InteriorsMeet
+          (firstIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation firstShift))
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)) →
+        Cell.sub
+            (Cell.add
+              (Cell.add link.first.translate
+                (Cell.neg first.sourceClauseAnchor))
+              (Cell.sub firstShift secondShift))
+            secondFirstBase ∈
+              PeriodicGridDrawing.doubleNeighborTranslations ∧
+          Cell.sub
+              (Cell.add
+                (Cell.add link.first.translate
+                  (Cell.neg first.sourceClauseAnchor))
+                (Cell.sub firstShift secondShift))
+              secondSecondBase ∈
+            PeriodicGridDrawing.doubleNeighborTranslations) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  let firstBase :=
+    Cell.add link.first.translate
+      (Cell.neg first.sourceClauseAnchor)
+  let relative := Cell.sub firstShift secondShift
+  intro meet
+  have contactBounds := contactClose meet
+  rcases
+      exists_neighbor_balancing_adjustments_two_second_bases
+        firstBase secondFirstBase secondSecondBase relative
+        (by simpa only [firstBase, relative] using contactBounds.1)
+        (by simpa only [firstBase, relative] using contactBounds.2)
+        secondBasesClose with
+    ⟨firstAdjustment, secondAdjustment,
+      adjustmentDifference,
+      translatedFirstNeighbor,
+      translatedSecondFirstNeighbor,
+      translatedSecondSecondNeighbor⟩
+  let firstSourceShift :=
+    Cell.add (Cell.neg first.sourceClauseAnchor)
+      firstAdjustment
+  let secondSourceShift :=
+    Cell.add (Cell.neg second.sourceClauseAnchor)
+      secondAdjustment
+  have carrierData :=
+    first.carrier_source_raw_and_neighbor link firstComponentEq
+  have targetFirstNeighbor :
+      IsNeighborTranslation
+        ((carrierLinkPeriodTranslate formula.incidenceGraph
+          link firstSourceShift).first.translate) := by
+    simpa [firstBase, firstSourceShift,
+      CarrierNode.translate_periodTranslate,
+      Cell.add, Cell.neg, Cell.sub, add_assoc] using
+        translatedFirstNeighbor
+  have translatedLinkMember :
+      carrierLinkPeriodTranslate formula.incidenceGraph
+          link firstSourceShift ∈
+        retainedDrawingCompleteCarrierLinksRaw
+          formula.incidenceGraph :=
+    retainedDrawingCompleteCarrierLinkRaw_periodTranslate_mem
+      wellFormed degree isLocal carrierData.1
+      firstSourceShift carrierData.2 targetFirstNeighbor
+  have translatedSecondCondition :
+      second.routeWitness.metadata.source.RetainedOrbitCondition
+        formula secondSourceShift := by
+    exact secondClosure secondAdjustment
+      translatedSecondFirstNeighbor
+      translatedSecondSecondNeighbor
+  have commonShiftEq :
+      Cell.sub first.physicalShift firstSourceShift =
+        Cell.sub second.physicalShift secondSourceShift := by
+    rcases firstShift with ⟨firstX, firstY⟩
+    rcases secondShift with ⟨secondX, secondY⟩
+    rcases first.sourceClauseAnchor with
+      ⟨firstAnchorX, firstAnchorY⟩
+    rcases second.sourceClauseAnchor with
+      ⟨secondAnchorX, secondAnchorY⟩
+    rcases firstAdjustment with
+      ⟨firstAdjustmentX, firstAdjustmentY⟩
+    rcases secondAdjustment with
+      ⟨secondAdjustmentX, secondAdjustmentY⟩
+    simp only [FinalGaugedSegmentOccurrenceWitness.physicalShift_eq,
+      firstSourceShift, secondSourceShift, relative,
+      Cell.sub, Cell.add, Cell.neg, Prod.mk.injEq] at adjustmentDifference ⊢
+    constructor <;> omega
+  exact
+    (retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_common_raw_retainedOrbitCondition
+      formula wellFormed degree isLocal first second
+      firstSourceShift secondSourceShift commonShiftEq
+      link firstComponentEq secondNotCarrier
+      translatedLinkMember targetFirstNeighbor
+      translatedSecondCondition)
+      meet
+
 /-- Anchor-normalizing the carrier source and translating the noncarrier
 source by its physical shift minus the carrier's final shift leaves the same
 external translate on both finite routes.  Retention of that translated
@@ -2040,6 +2330,121 @@ theorem
       firstBaseNeighbor.add_mem_doubleNeighborTranslations
         relativeNeighbor
     simpa [Cell.sub] using sumMember
+
+/-- Carrier--crossover separation reduces to doubled-halo bounds from the
+anchor-normalized carrier occurrence to both anchor-normalized crossing
+occurrences.  The two crossing occurrences remain coupled by one source
+translation. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_crossover_of_contact_close
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (crossing : CrossingRecord)
+    (localClauseIndex : Nat)
+    (secondSourceEq :
+      second.routeWitness.metadata.source =
+        .crossover crossing localClauseIndex)
+    (contactClose :
+      GridSegment.InteriorsMeet
+          (firstIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation firstShift))
+          (secondIndexed.segment.translate
+            ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+              formula).periodTranslation secondShift)) →
+        Cell.sub
+            (Cell.add
+              (Cell.add link.first.translate
+                (Cell.neg first.sourceClauseAnchor))
+              (Cell.sub firstShift secondShift))
+            (Cell.add crossing.firstTranslate
+              (Cell.neg second.sourceClauseAnchor)) ∈
+            PeriodicGridDrawing.doubleNeighborTranslations ∧
+          Cell.sub
+              (Cell.add
+                (Cell.add link.first.translate
+                  (Cell.neg first.sourceClauseAnchor))
+                (Cell.sub firstShift secondShift))
+              (Cell.add crossing.secondTranslate
+                (Cell.neg second.sourceClauseAnchor)) ∈
+            PeriodicGridDrawing.doubleNeighborTranslations) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  have secondNonempty :
+      second.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := second.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have normalizedCondition :
+      second.routeWitness.metadata.source.RetainedOrbitCondition
+        formula (Cell.neg second.sourceClauseAnchor) := by
+    simpa only [
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (second.routeWitness.metadata
+        |>.noncarrier_anchorNormalize_retainedOrbitCondition
+          wellFormed degree isLocal second.metadata_retainedValid
+          secondNonempty secondNotCarrier)
+  have normalizedNeighbors :
+      IsNeighborTranslation
+          (Cell.add crossing.firstTranslate
+            (Cell.neg second.sourceClauseAnchor)) ∧
+        IsNeighborTranslation
+          (Cell.add crossing.secondTranslate
+            (Cell.neg second.sourceClauseAnchor)) := by
+    rw [secondSourceEq] at normalizedCondition
+    exact normalizedCondition
+  have crossingBasesClose :
+      Cell.sub
+          (Cell.add crossing.firstTranslate
+            (Cell.neg second.sourceClauseAnchor))
+          (Cell.add crossing.secondTranslate
+            (Cell.neg second.sourceClauseAnchor)) ∈
+        PeriodicGridDrawing.doubleNeighborTranslations := by
+    exact
+      normalizedNeighbors.1.sub_mem_doubleNeighborTranslations
+        normalizedNeighbors.2
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_noncarrier_of_balanced_two_source_coordinates
+      formula wellFormed degree isLocal first second
+      link firstComponentEq secondNotCarrier
+      (Cell.add crossing.firstTranslate
+        (Cell.neg second.sourceClauseAnchor))
+      (Cell.add crossing.secondTranslate
+        (Cell.neg second.sourceClauseAnchor))
+      crossingBasesClose
+  · intro adjustment firstNeighbor secondNeighbor
+    rw [secondSourceEq]
+    constructor
+    · simpa [Cell.add, add_assoc] using firstNeighbor
+    · simpa [Cell.add, add_assoc] using secondNeighbor
+  · exact contactClose
 
 /-- Carrier--bend separation reduces to a doubled-halo bound between the
 anchor-normalized carrier occurrence and the anchor-normalized bend route
