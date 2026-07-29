@@ -21,6 +21,32 @@ def joinAtEndpoint {α : Type*}
     (first second : List α) : List α :=
   first ++ second.tail
 
+/-- A witnessed point after the head makes a route contain at least two
+points. -/
+theorem List.two_le_length_of_tail_head?_eq_some
+    {α : Type*} {route : List α} {second : α}
+    (tailHead : route.tail.head? = some second) :
+    2 ≤ route.length := by
+  cases route with
+  | nil =>
+      simp at tailHead
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp at tailHead
+      | cons second tail =>
+          simp
+
+/-- Joining two routes that each contain an edge produces at least three
+listed points. -/
+theorem joinAtEndpoint_length_ge_three
+    {α : Type*} {first second : List α}
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length) :
+    3 ≤ (joinAtEndpoint first second).length := by
+  simp only [joinAtEndpoint, List.length_append, List.length_tail]
+  omega
+
 /-- A nonempty first route determines the joined route's first endpoint. -/
 theorem joinAtEndpoint_head?
     {first second : List Cell} {source : Cell}

@@ -109,10 +109,34 @@ def PreservesOriginalRouteTerminalDirections
           source.erase atom →
       AxisDirection.polylineLastDirection
           (outputRoutes output.2.1 output.2.2) =
-        AxisDirection.polylineLastDirection
+      AxisDirection.polylineLastDirection
           (sourceRoutes sourceOccurrence.2.1 sourceOccurrence.2.2)
 
-theorem variableRoutesInOccurrenceOrder
+/-- Unit elimination only needs terminal-direction preservation for source
+atoms that actually reach the third occurrence slot.  This restricted
+predicate avoids imposing unnecessary geometric hypotheses on fresh
+Figure 9 auxiliaries of degree at most two. -/
+def PreservesDegreeThreeOriginalRouteTerminalDirections
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourceRoutes outputRoutes :
+      PositionedPeriodicCNF.IncidenceRoutes) : Prop :=
+  ∀ atom sourceThird,
+    PeriodicOneInThreeToThreeDM.occurrenceAt
+        source.erase atom .third = some sourceThird →
+    ∀ output sourceOccurrence,
+      (output, sourceOccurrence) ∈
+          PeriodicOneInThreeNoUnits.formulaOriginalOccurrencePairs
+            source.erase atom →
+        AxisDirection.polylineLastDirection
+            (outputRoutes output.2.1 output.2.2) =
+          AxisDirection.polylineLastDirection
+            (sourceRoutes
+              sourceOccurrence.2.1 sourceOccurrence.2.2)
+
+/-- Degree-three terminal-direction preservation is exactly sufficient to
+transport clockwise variable-route order through unit elimination. -/
+theorem variableRoutesInOccurrenceOrder_of_preservesDegreeThree
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
     (sourceRoutes outputRoutes :
@@ -120,7 +144,7 @@ theorem variableRoutesInOccurrenceOrder
     (sourceOrder :
       source.VariableRoutesInOccurrenceOrder sourceRoutes)
     (preserved :
-      PreservesOriginalRouteTerminalDirections
+      PreservesDegreeThreeOriginalRouteTerminalDirections
         source sourceRoutes outputRoutes) :
     (formula source).VariableRoutesInOccurrenceOrder outputRoutes := by
   intro outputAtom first second third
@@ -168,10 +192,31 @@ theorem variableRoutesInOccurrenceOrder
   have clockwise :=
     sourceOrder atom sourceFirst sourceSecond sourceThird
       sourceFirstLookup sourceSecondLookup sourceThirdLookup
-  rw [preserved atom first sourceFirst firstPair,
-    preserved atom second sourceSecond secondPair,
-    preserved atom third sourceThird thirdPair]
+  rw [preserved atom sourceThird sourceThirdLookup
+        first sourceFirst firstPair,
+    preserved atom sourceThird sourceThirdLookup
+      second sourceSecond secondPair,
+    preserved atom sourceThird sourceThirdLookup
+      third sourceThird thirdPair]
   exact clockwise
+
+/-- The unrestricted preservation certificate remains a convenient
+stronger interface when all source routes meet the same hypotheses. -/
+theorem variableRoutesInOccurrenceOrder
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourceRoutes outputRoutes :
+      PositionedPeriodicCNF.IncidenceRoutes)
+    (sourceOrder :
+      source.VariableRoutesInOccurrenceOrder sourceRoutes)
+    (preserved :
+      PreservesOriginalRouteTerminalDirections
+        source sourceRoutes outputRoutes) :
+    (formula source).VariableRoutesInOccurrenceOrder outputRoutes := by
+  apply variableRoutesInOccurrenceOrder_of_preservesDegreeThree
+    source sourceRoutes outputRoutes sourceOrder
+  intro atom sourceThird thirdLookup output sourceOccurrence pairMember
+  exact preserved atom output sourceOccurrence pairMember
 
 end PeriodicOneInThreeNoUnitsPositioned
 

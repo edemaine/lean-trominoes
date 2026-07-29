@@ -251,7 +251,8 @@ end PeriodicOneInThreePositioned
 
 namespace PeriodicOneInThreeNoUnitsPositioned
 
-theorem preservesOriginalRouteTerminalDirections_splicedRoutes
+private theorem
+    preservesOriginalRouteTerminalDirections_splicedRoutes_of
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
     (sourcePlacement : PeriodicVariablePlacement Variable)
@@ -292,21 +293,33 @@ theorem preservesOriginalRouteTerminalDirections_splicedRoutes
             (sourceRoutes
               sourceClauseIndex sourceLiteralIndex).tail.head? =
                 some exit)
+    (eligible : Variable → Prop)
     (sourceLength :
-      ∀ sourceClause sourceClauseIndex,
-        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
-        ∀ sourceLiteral sourceLiteralIndex,
-          (sourceLiteral, sourceLiteralIndex) ∈
-              sourceClause.literals.zipIdx →
-          3 ≤ (sourceRoutes
-            sourceClauseIndex sourceLiteralIndex).length) :
-    PreservesOriginalRouteTerminalDirections
-      source sourceRoutes
-      (splicedRoutes source sourcePlacement
-        (inheritedRouteSuffixes
-          source sourcePlacement sourceWidth sourceDistinct
-          sourceRoutes sourceEndpoints sourceOrthogonal sourceExits)) := by
-  intro atom output sourceOccurrence pairMember
+      ∀ atom,
+        eligible atom →
+        ∀ sourceClause sourceClauseIndex,
+          (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+          ∀ sourceLiteral sourceLiteralIndex,
+            (sourceLiteral, sourceLiteralIndex) ∈
+                sourceClause.literals.zipIdx →
+            sourceLiteral.atom = atom →
+            3 ≤ (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).length) :
+    ∀ atom output sourceOccurrence,
+      eligible atom →
+      (output, sourceOccurrence) ∈
+          PeriodicOneInThreeNoUnits.formulaOriginalOccurrencePairs
+            source.erase atom →
+      AxisDirection.polylineLastDirection
+          (splicedRoutes source sourcePlacement
+            (inheritedRouteSuffixes
+              source sourcePlacement sourceWidth sourceDistinct
+              sourceRoutes sourceEndpoints sourceOrthogonal sourceExits)
+            output.2.1 output.2.2) =
+        AxisDirection.polylineLastDirection
+          (sourceRoutes
+            sourceOccurrence.2.1 sourceOccurrence.2.2) := by
+  intro atom output sourceOccurrence atomEligible pairMember
   let pairs :=
     PeriodicOneInThreeNoUnits.formulaOriginalOccurrencePairs
       source.erase atom
@@ -419,14 +432,166 @@ theorem preservesOriginalRouteTerminalDirections_splicedRoutes
         (sourceRoutes
           data.sourceClauseIndex data.sourceLiteralIndex)
         (sourceLength
+          atom atomEligible
           data.sourceClause data.sourceClauseIndex
           data.sourceClauseMember
           data.sourceLiteral data.sourceLiteralIndex
-          data.sourceLiteralMember)
+          data.sourceLiteralMember dataAtom)
     _ = AxisDirection.polylineLastDirection
           (sourceRoutes
             sourceOccurrence.2.1 sourceOccurrence.2.2) := by
       rw [← sourceOccurrenceEq]
+
+/-- For degree-three source atoms, the unit-elimination splice preserves
+the terminal direction of every inherited route. -/
+theorem
+    preservesDegreeThreeOriginalRouteTerminalDirections_splicedRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (sourceEndpoints :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).head? =
+              some
+                (PositionedPeriodicCNF.canonicalClausePosition
+                  sourcePlacement sourceClause) ∧
+            (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).getLast? =
+              some
+                (PositionedPeriodicCNF.canonicalLiteralPosition
+                  sourcePlacement sourceClause sourceLiteral))
+    (sourceOrthogonal :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (sourceRoutes sourceClauseIndex sourceLiteralIndex))
+    (sourceExits :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          ∃ exit,
+            (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).tail.head? =
+                some exit)
+    (sourceLength :
+      ∀ atom sourceThird,
+        PeriodicOneInThreeToThreeDM.occurrenceAt
+            source.erase atom .third = some sourceThird →
+        ∀ sourceClause sourceClauseIndex,
+          (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+          ∀ sourceLiteral sourceLiteralIndex,
+            (sourceLiteral, sourceLiteralIndex) ∈
+                sourceClause.literals.zipIdx →
+            sourceLiteral.atom = atom →
+            3 ≤ (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).length) :
+    PreservesDegreeThreeOriginalRouteTerminalDirections
+      source sourceRoutes
+      (splicedRoutes source sourcePlacement
+        (inheritedRouteSuffixes
+          source sourcePlacement sourceWidth sourceDistinct
+          sourceRoutes sourceEndpoints sourceOrthogonal sourceExits)) := by
+  intro atom sourceThird thirdLookup output sourceOccurrence pairMember
+  apply
+    preservesOriginalRouteTerminalDirections_splicedRoutes_of
+      source sourcePlacement sourceWidth sourceDistinct
+      sourceRoutes sourceEndpoints sourceOrthogonal sourceExits
+      (fun atom =>
+        ∃ third,
+          PeriodicOneInThreeToThreeDM.occurrenceAt
+              source.erase atom .third = some third)
+      (fun atom degreeThree sourceClause sourceClauseIndex
+          sourceClauseMember sourceLiteral sourceLiteralIndex
+          sourceLiteralMember literalAtom =>
+        sourceLength atom degreeThree.choose degreeThree.choose_spec
+          sourceClause sourceClauseIndex sourceClauseMember
+          sourceLiteral sourceLiteralIndex sourceLiteralMember literalAtom)
+      atom output sourceOccurrence
+  · exact ⟨sourceThird, thirdLookup⟩
+  · exact pairMember
+
+/-- If every source route has at least three points, the unrestricted
+unit-elimination preservation certificate follows as before. -/
+theorem preservesOriginalRouteTerminalDirections_splicedRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (sourceEndpoints :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).head? =
+              some
+                (PositionedPeriodicCNF.canonicalClausePosition
+                  sourcePlacement sourceClause) ∧
+            (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).getLast? =
+              some
+                (PositionedPeriodicCNF.canonicalLiteralPosition
+                  sourcePlacement sourceClause sourceLiteral))
+    (sourceOrthogonal :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (sourceRoutes sourceClauseIndex sourceLiteralIndex))
+    (sourceExits :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          ∃ exit,
+            (sourceRoutes
+              sourceClauseIndex sourceLiteralIndex).tail.head? =
+                some exit)
+    (sourceLength :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          3 ≤ (sourceRoutes
+            sourceClauseIndex sourceLiteralIndex).length) :
+    PreservesOriginalRouteTerminalDirections
+      source sourceRoutes
+      (splicedRoutes source sourcePlacement
+        (inheritedRouteSuffixes
+          source sourcePlacement sourceWidth sourceDistinct
+          sourceRoutes sourceEndpoints sourceOrthogonal sourceExits)) := by
+  intro atom output sourceOccurrence pairMember
+  apply
+    preservesOriginalRouteTerminalDirections_splicedRoutes_of
+      source sourcePlacement sourceWidth sourceDistinct
+      sourceRoutes sourceEndpoints sourceOrthogonal sourceExits
+      (fun _ => True)
+      (fun _atom _eligible sourceClause sourceClauseIndex
+          sourceClauseMember sourceLiteral sourceLiteralIndex
+          sourceLiteralMember _literalAtom =>
+        sourceLength sourceClause sourceClauseIndex sourceClauseMember
+          sourceLiteral sourceLiteralIndex sourceLiteralMember)
+      atom output sourceOccurrence trivial pairMember
 
 end PeriodicOneInThreeNoUnitsPositioned
 end LeanTrominoes

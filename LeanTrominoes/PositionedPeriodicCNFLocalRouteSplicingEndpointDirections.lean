@@ -4,6 +4,27 @@ import LeanTrominoes.PositionedPeriodicCNFSumRouteSuffixes
 namespace LeanTrominoes
 namespace PositionedPeriodicCNF
 
+/-- Splicing two route pieces that each contain an edge leaves at least
+three listed points. -/
+theorem spliceLocalIncidenceRoutes_length_ge_three
+    (localRoutes : IncidenceRoutes)
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {splicePoint : Nat → Nat → Cell}
+    (suffixes :
+      CanonicalIncidenceRouteSuffixes
+        source placement splicePoint)
+    (clauseIndex literalIndex : Nat)
+    (localLength :
+      2 ≤ (localRoutes clauseIndex literalIndex).length)
+    (suffixLength :
+      2 ≤ (suffixes.routes clauseIndex literalIndex).length) :
+    3 ≤
+      (spliceLocalIncidenceRoutes localRoutes suffixes
+        clauseIndex literalIndex).length := by
+  exact joinAtEndpoint_length_ge_three localLength suffixLength
+
 /-- Completing a sum-typed suffix family leaves every inherited source
 suffix unchanged. -/
 theorem completeSumIncidenceRouteSuffixesRoutes_eq_inherited

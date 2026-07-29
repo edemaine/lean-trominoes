@@ -497,11 +497,15 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean`](LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean)
   proves that completing either transformation's inherited suffix family and
   prepending its normalized local clause route preserves the inherited
-  variable-side terminal direction.
+  variable-side terminal direction.  It also proves that a genuine Figure 9
+  inherited route has at least three listed points when both its local prefix
+  and inherited suffix contain an edge.
   [`LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirectionTransport.lean`](LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirectionTransport.lean)
   combines those splice lemmas with exact selector provenance to prove the
   concrete terminal-direction preservation hypotheses used by the abstract
-  occurrence-order transport theorem for both transformations.
+  occurrence-order transport theorem for both transformations.  Its unit-
+  elimination interface can restrict the three-point source-route hypothesis
+  to atoms that actually reach the third occurrence slot.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsClauseRouteOrder.lean)
   proves that every ternary output clause starts its literal-indexed routes
   toward south, west, and east.  Anchor normalization and arbitrary inherited
@@ -3695,7 +3699,9 @@ The representation choices for this target are:
   direction preservation predicate on paired inherited routes.  Once that
   predicate holds, the occurrence pairing and degree-three classification
   automatically carry clockwise variable-route order through Figure 7 and
-  through unit elimination.
+  through unit elimination.  For unit elimination, a weaker certificate
+  scoped to source atoms with a third occurrence is sufficient, so
+  degree-at-most-two auxiliaries require no irrelevant length hypothesis.
 - [`LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean`](LeanTrominoes/PeriodicOneInThreeToThreeDMWellFormed.lean)
   proves that every generated triple reference names an element in the
   corresponding finite typed red, green, or blue list.  In particular,
