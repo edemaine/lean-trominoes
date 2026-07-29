@@ -2030,6 +2030,11 @@ The representation choices for this target are:
   occurrence.  It proves that the record has exactly the source variable's
   active prefix and agrees with the source connector kind, literal polarity,
   and outgoing incidence direction on every active occurrence slot.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseFans.lean)
+  instantiates the finite clause-fan record from all source occurrences
+  entering one lifted clause target.  It detects the optional right terminal,
+  activates every represented group, and recovers each genuine incoming
+  direction under the explicit one-occurrence-per-terminal condition.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
