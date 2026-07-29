@@ -168,6 +168,72 @@ private theorem point_add_placement_add_sub
     Cell.scale, Cell.add, Cell.sub, Prod.mk.injEq]
   constructor <;> ring
 
+/-- Zero acts trivially on translated segment terminals. -/
+@[simp]
+private theorem SegmentTerminal.periodTranslate_zero
+    (terminal : SegmentTerminal) :
+    terminal.periodTranslate (0, 0) = terminal := by
+  rcases terminal with ⟨indexed, translate, endpoint⟩
+  simp [SegmentTerminal.periodTranslate, Cell.add]
+
+/-- Zero acts trivially on translated carrier nodes. -/
+@[simp]
+private theorem CarrierNode.periodTranslate_zero
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (node : CarrierNode) :
+    node.periodTranslate graph (0, 0) = node := by
+  cases node <;> simp [CarrierNode.periodTranslate]
+
+/-- Zero acts trivially on translated external planar-SAT nodes. -/
+@[simp]
+private theorem PlanarSATNode.periodTranslate_zero
+    {Variable Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (node : PlanarSATNode Variable) :
+    node.periodTranslate graph (0, 0) = node := by
+  cases node <;>
+    simp [PlanarSATNode.periodTranslate,
+      variableRouteSitePeriodTranslate, Cell.add]
+
+/-- Zero acts trivially on translated carrier links. -/
+@[simp]
+private theorem carrierLinkPeriodTranslate_zero
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (link : EqualityLink CarrierNode) :
+    carrierLinkPeriodTranslate graph link (0, 0) = link := by
+  rcases link with ⟨first, second, ⟨forward, backward⟩⟩
+  simp [carrierLinkPeriodTranslate,
+    EqualityPositions.periodTranslate,
+    carrierMacroPeriodTranslation, Cell.scale]
+
+/-- Zero acts trivially on translated planar-SAT-node links. -/
+@[simp]
+private theorem planarSATNodeLinkPeriodTranslate_zero
+    {Variable Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (link : EqualityLink (PlanarSATNode Variable)) :
+    planarSATNodeLinkPeriodTranslate graph link (0, 0) = link := by
+  rcases link with ⟨first, second, ⟨forward, backward⟩⟩
+  simp [planarSATNodeLinkPeriodTranslate,
+    EqualityPositions.periodTranslate,
+    carrierMacroPeriodTranslation, Cell.scale]
+
+/-- Zero acts trivially on every local planar-SAT source family. -/
+@[simp]
+private theorem DrawingPlanarSATClauseSource.periodTranslate_zero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable) :
+    source.periodTranslate formula (0, 0) = source := by
+  cases source <;>
+    simp [DrawingPlanarSATClauseSource.periodTranslate,
+      RouteBend.periodTranslate,
+      clauseRouteSitePeriodTranslate,
+      variableRouteSitePeriodTranslate,
+      Cell.add]
+
 /-- A translated local-route avoidance certificate transfers its
 endpoint-contact clause to the corresponding final periodic route points. -/
 theorem
@@ -396,6 +462,71 @@ theorem
       firstEndpoint
   · simpa only [IndexedRoutePoint.IsEndpoint, secondRouteLengthEq] using
       secondEndpoint
+
+/-- The common special case translates the first physical source by the
+difference of the two physical shifts and leaves the second source fixed. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePointsAreEndpoints_of_periodTranslate_localRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      formula.incidenceGraph.IsWellFormed)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal :
+      formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedRoutePoint}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedRoutePointOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedRoutePointOccurrenceWitness
+        formula secondIndexed secondShift)
+    (routeAvoid :
+      EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        ((((first.segmentWitness.routeWitness.metadata.source.periodTranslate
+          formula
+          (Cell.sub first.segmentWitness.physicalShift
+            second.segmentWitness.physicalShift))
+            |>.incidenceDrawing formula).routes
+              first.segmentWitness.routeWitness.metadata.source.localClauseIndex
+              first.segmentWitness.taggedLiteral.2))
+        ((second.segmentWitness.routeWitness.metadata.source.incidenceDrawing
+          formula).routes
+            second.segmentWitness.routeWitness.metadata.source.localClauseIndex
+            second.segmentWitness.taggedLiteral.2))
+    (equal :
+      Cell.add firstIndexed.point
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation firstShift) =
+        Cell.add secondIndexed.point
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)) :
+    firstIndexed.IsEndpoint ∧ secondIndexed.IsEndpoint := by
+  let reindexShift :=
+    Cell.sub first.segmentWitness.physicalShift
+      second.segmentWitness.physicalShift
+  have commonShiftEq :
+      Cell.sub first.segmentWitness.physicalShift reindexShift =
+        Cell.sub second.segmentWitness.physicalShift (0, 0) := by
+    generalize firstPhysicalEq :
+      first.segmentWitness.physicalShift = firstPhysical
+    generalize secondPhysicalEq :
+      second.segmentWitness.physicalShift = secondPhysical
+    rcases firstPhysical with ⟨firstX, firstY⟩
+    rcases secondPhysical with ⟨secondX, secondY⟩
+    simp [reindexShift, firstPhysicalEq, secondPhysicalEq, Cell.sub]
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_routePointsAreEndpoints_of_two_periodTranslate_localRoutesAvoidEachOther
+      formula wellFormed degree isLocal clausesNonempty
+      first second reindexShift (0, 0) commonShiftEq
+  · simpa [reindexShift,
+      DrawingPlanarSATClauseSource.periodTranslate_zero] using routeAvoid
+  · exact equal
 
 end PeriodicOrthocrossing
 end LeanTrominoes

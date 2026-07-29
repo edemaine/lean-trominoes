@@ -2681,7 +2681,14 @@ The representation choices for this target are:
   packages the common aligned-component case.  When translating the first
   source by the physical-shift difference identifies the second retained
   component, orbit necessity and reindexing injectivity immediately transfer
-  finite continuous separation to the periodic pair.
+  both finite continuous separation and endpoint-only route-point contact to
+  the periodic pair.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCarrierContacts.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCarrierContacts.lean)
+  proves endpoint-only contact for every pair of final carrier route-point
+  occurrences.  It reuses the continuous carrier classification into
+  perpendicular axes, distinct parallel physical keys, and one physical
+  carrier; the last case separates distinct raw links and reindexes an
+  exactly aligned link.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,

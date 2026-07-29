@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedReindexingInjectivity
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointReindexingInjectivity
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedSourceOrbitNecessity
 
 /-!
@@ -15,6 +16,65 @@ namespace LeanTrominoes
 namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT
+
+/-- Component equality after the physical-shift difference is sufficient
+for endpoint-only contact of distinct final periodic route-point
+occurrences. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePointsAreEndpoints_of_first_component_aligns_second
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      formula.incidenceGraph.IsWellFormed)
+    (degree :
+      formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal :
+      formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {firstIndexed secondIndexed : IndexedRoutePoint}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedRoutePointOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedRoutePointOccurrenceWitness
+        formula secondIndexed secondShift)
+    (componentAlignment :
+      second.segmentWitness.routeWitness.metadata.source.component =
+        (first.segmentWitness.routeWitness.metadata.source.periodTranslate
+          formula
+          (Cell.sub first.segmentWitness.physicalShift
+            second.segmentWitness.physicalShift)).component)
+    (different :
+      PeriodicGridDrawing.RoutePointOccurrenceKey
+          firstIndexed firstShift ≠
+        PeriodicGridDrawing.RoutePointOccurrenceKey
+          secondIndexed secondShift)
+    (equal :
+      Cell.add firstIndexed.point
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation firstShift) =
+        Cell.add secondIndexed.point
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift)) :
+    firstIndexed.IsEndpoint ∧ secondIndexed.IsEndpoint := by
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_routePointsAreEndpoints_of_first_retainedOrbitCondition
+      formula wellFormed degree isLocal clausesNonempty
+      first second
+  · exact
+      first.segmentWitness.routeWitness.metadata.source
+        |>.retainedOrbitCondition_of_retainedTarget
+          formula first.segmentWitness.source_retainedComponentMember
+          (Cell.sub first.segmentWitness.physicalShift
+            second.segmentWitness.physicalShift)
+          second.segmentWitness.routeWitness.metadata.source
+          second.segmentWitness.source_retainedComponentMember
+          componentAlignment
+  · exact different
+  · exact equal
 
 /-- Component equality after the physical-shift difference is sufficient
 for continuous separation of distinct final periodic segment occurrences. -/
