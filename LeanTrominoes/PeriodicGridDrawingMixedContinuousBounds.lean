@@ -570,6 +570,122 @@ theorem relativeTranslate_isNeighbor_of_endpointContact_of_secondHalfOpen
     (mem_neighborTranslations_iff _).mpr
       (isNeighborTranslation_sub_comm reverseNeighbor)
 
+/-- If a carrier-interior point is literally an endpoint of a translated
+half-open segment, the relative translation is neighboring even when that
+second segment is not axis-aligned. -/
+theorem relativeTranslate_isNeighbor_of_endpointEquality_of_secondHalfOpen
+    {drawing : PeriodicGridDrawing}
+    {first second : IndexedGridSegment}
+    (firstBounds :
+      drawing.PositionInExpandedSquare first.segment.start ∧
+        drawing.PositionInExpandedSquare first.segment.finish)
+    (secondBounds :
+      drawing.PositionInHalfOpenFundamentalSquare second.segment.start ∧
+        drawing.PositionInHalfOpenFundamentalSquare second.segment.finish)
+    {firstTranslate secondTranslate point : Cell}
+    (firstContains :
+      (first.segment.translate
+        (drawing.periodTranslation firstTranslate)).InteriorContains point)
+    (endpointEq :
+      point =
+          (second.segment.translate
+            (drawing.periodTranslation secondTranslate)).start ∨
+        point =
+          (second.segment.translate
+            (drawing.periodTranslation secondTranslate)).finish) :
+    Cell.sub firstTranslate secondTranslate ∈
+      neighborTranslations := by
+  let reverse := Cell.sub secondTranslate firstTranslate
+  let normalized := drawing.normalizePoint point firstTranslate
+  have normalizedFirst :
+      first.segment.InteriorContains normalized := by
+    simpa [Cell.sub, periodTranslation, Cell.scale,
+      GridSegment.translate, Cell.add] using
+      (interiorContains_normalize drawing first.segment
+        firstTranslate firstTranslate point).mp firstContains
+  have normalizedBounds :
+      drawing.PositionInExpandedSquare normalized := by
+    rcases firstBounds with ⟨firstStartBounds, firstFinishBounds⟩
+    rcases firstStartBounds with
+      ⟨firstStartXLower, firstStartXUpper,
+        firstStartYLower, firstStartYUpper⟩
+    rcases firstFinishBounds with
+      ⟨firstFinishXLower, firstFinishXUpper,
+        firstFinishYLower, firstFinishYUpper⟩
+    rcases normalizedFirst with
+        ⟨horizontal, sameY, betweenX⟩ |
+        ⟨vertical, sameX, betweenY⟩
+    · simp only [GridSegment.IsHorizontal] at horizontal
+      rcases betweenX with betweenX | betweenX <;>
+        exact ⟨by omega, by omega, by omega, by omega⟩
+    · simp only [GridSegment.IsVertical] at vertical
+      rcases betweenY with betweenY | betweenY <;>
+        exact ⟨by omega, by omega, by omega, by omega⟩
+  have periodPositive : (0 : Int) < drawing.gridSize := by
+    exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+  have reverseNeighbor : IsNeighborTranslation reverse := by
+    rcases normalizedBounds with
+      ⟨normalizedXLower, normalizedXUpper,
+        normalizedYLower, normalizedYUpper⟩
+    rcases endpointEq with endpointEq | endpointEq
+    · have normalizedEq :
+          normalized =
+            Cell.add second.segment.start
+              (drawing.periodTranslation reverse) := by
+        dsimp only [normalized, normalizePoint]
+        rw [endpointEq]
+        apply Prod.ext <;>
+          simp [reverse, GridSegment.translate,
+            periodTranslation, Cell.add, Cell.sub, Cell.scale] <;>
+          ring
+      rcases secondBounds.1 with
+        ⟨startXLower, startXUpper, startYLower, startYUpper⟩
+      have horizontalBounds :=
+        lane_shift_isNeighbor_of_halfOpen_expanded
+          periodPositive startXLower startXUpper
+          normalizedXLower normalizedXUpper
+          (by
+            simpa [periodTranslation, Cell.add, Cell.scale,
+              add_comm] using congrArg Prod.fst normalizedEq)
+      have verticalBounds :=
+        lane_shift_isNeighbor_of_halfOpen_expanded
+          periodPositive startYLower startYUpper
+          normalizedYLower normalizedYUpper
+          (by
+            simpa [periodTranslation, Cell.add, Cell.scale,
+              add_comm] using congrArg Prod.snd normalizedEq)
+      exact ⟨by omega, by omega⟩
+    · have normalizedEq :
+          normalized =
+            Cell.add second.segment.finish
+              (drawing.periodTranslation reverse) := by
+        dsimp only [normalized, normalizePoint]
+        rw [endpointEq]
+        apply Prod.ext <;>
+          simp [reverse, GridSegment.translate,
+            periodTranslation, Cell.add, Cell.sub, Cell.scale] <;>
+          ring
+      rcases secondBounds.2 with
+        ⟨finishXLower, finishXUpper, finishYLower, finishYUpper⟩
+      have horizontalBounds :=
+        lane_shift_isNeighbor_of_halfOpen_expanded
+          periodPositive finishXLower finishXUpper
+          normalizedXLower normalizedXUpper
+          (by
+            simpa [periodTranslation, Cell.add, Cell.scale,
+              add_comm] using congrArg Prod.fst normalizedEq)
+      have verticalBounds :=
+        lane_shift_isNeighbor_of_halfOpen_expanded
+          periodPositive finishYLower finishYUpper
+          normalizedYLower normalizedYUpper
+          (by
+            simpa [periodTranslation, Cell.add, Cell.scale,
+              add_comm] using congrArg Prod.snd normalizedEq)
+      exact ⟨by omega, by omega⟩
+  exact
+    (mem_neighborTranslations_iff _).mpr
+      (isNeighborTranslation_sub_comm reverseNeighbor)
+
 /-- The reverse asymmetric half-open-interior/halo-closed contact also has
 an ordinary neighboring relative translation. -/
 theorem relativeTranslate_isNeighbor_of_reverseEndpointContact_of_secondHalfOpen
