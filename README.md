@@ -2731,6 +2731,11 @@ The representation choices for this target are:
   crossover; together these two cases make every retained carrier chain
   constant and equate the start and finish terminals of every neighboring
   segment occurrence.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarRoutePeriodicSoundness.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarRoutePeriodicSoundness.lean)
+  extracts the unchanged bend equalities from the retained periodic formula
+  at every block translate.  Alternating those equalities with retained
+  segment propagation proves that the first and last terminals of every
+  neighboring constructed incidence route have one value.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTranslatedComponentCenters.lean)
   extends macrocell-center uniqueness beyond the finite retained window.
   An arbitrary period translate of an enumerated crossing, route bend,
