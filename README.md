@@ -2677,6 +2677,13 @@ The representation choices for this target are:
   independently provided their remaining physical shifts agree, so the
   component geometry already used for continuous planarity can be reused
   without weakening its stronger listed-point conclusion.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCarrierNoncarrierReduction.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedRoutePointCarrierNoncarrierReduction.lean)
+  develops the pointwise carrier--noncarrier reduction.  It cancels final
+  quotient shifts, bounds the carrier point in its anchor-normalized raw
+  lens rectangle and the noncarrier point in its translated macrocell, and
+  turns equality into the same corridor--macrocell overlap used by the
+  continuous proof.  A common-shift bridge then transfers the resulting raw
+  local-route certificate, including endpoint-only listed-point contact.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedComponentAlignmentSeparation.lean)
   packages the common aligned-component case.  When translating the first
   source by the physical-shift difference identifies the second retained
