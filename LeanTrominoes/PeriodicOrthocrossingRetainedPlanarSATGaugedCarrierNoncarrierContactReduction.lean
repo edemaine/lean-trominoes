@@ -289,6 +289,170 @@ theorem IsNeighborTranslation.sub_mem_doubleNeighborTranslations
   simp only [IsNeighborTranslation, Cell.sub] at firstNeighbor secondNeighbor ⊢
   omega
 
+/-- Closed betweenness between translated halo endpoints and a halo point
+also bounds the translation coordinate by two. -/
+theorem between_closed_shift_is_doubleNeighbor
+    {period first finish shift point : Int}
+    (periodPositive : 0 < period)
+    (firstLower : -period < first)
+    (firstUpper : first < 2 * period)
+    (finishLower : -period < finish)
+    (finishUpper : finish < 2 * period)
+    (pointLower : -period < point)
+    (pointUpper : point < 2 * period)
+    (between :
+      GridSegment.Between
+        (first + period * shift)
+        (finish + period * shift) point) :
+    -2 ≤ shift ∧ shift ≤ 2 := by
+  constructor
+  · by_contra tooLow
+    have shiftLow : shift ≤ -3 := by omega
+    have nonnegative :
+        0 ≤ period * (-shift - 3) :=
+      mul_nonneg (le_of_lt periodPositive) (by omega)
+    have productUpper :
+        period * shift ≤ -3 * period := by
+      nlinarith
+    unfold GridSegment.Between at between
+    rcases between with between | between <;> omega
+  · by_contra tooHigh
+    have shiftHigh : 3 ≤ shift := by omega
+    have nonnegative :
+        0 ≤ period * (shift - 3) :=
+      mul_nonneg (le_of_lt periodPositive) (by omega)
+    have productLower :
+        3 * period ≤ period * shift := by
+      nlinarith
+    unfold GridSegment.Between at between
+    rcases between with between | between <;> omega
+
+/-- If two halo-bounded closed segment occurrences share a point, their
+relative translation belongs to the doubled neighboring block. -/
+theorem
+    PeriodicGridDrawing.relativeTranslate_isDoubleNeighbor_of_contains
+    {drawing : PeriodicGridDrawing}
+    (endpointBounds : drawing.SegmentEndpointsInExpandedSquare)
+    {first second : IndexedGridSegment}
+    (firstMember : first ∈ drawing.indexedSegments)
+    (secondMember : second ∈ drawing.indexedSegments)
+    {firstTranslate secondTranslate point : Cell}
+    (firstContains :
+      (first.segment.translate
+        (drawing.periodTranslation firstTranslate)).Contains point)
+    (secondContains :
+      (second.segment.translate
+        (drawing.periodTranslation secondTranslate)).Contains point) :
+    Cell.sub firstTranslate secondTranslate ∈
+      PeriodicGridDrawing.doubleNeighborTranslations := by
+  let relative := Cell.sub firstTranslate secondTranslate
+  let normalized := drawing.normalizePoint point secondTranslate
+  have normalizedFirst :
+      (first.segment.translate
+        (drawing.periodTranslation relative)).Contains normalized :=
+    (PeriodicGridDrawing.contains_normalize drawing first.segment
+      firstTranslate secondTranslate point).mp firstContains
+  have normalizedSecond : second.segment.Contains normalized := by
+    simpa [Cell.sub, PeriodicGridDrawing.periodTranslation, Cell.scale,
+      GridSegment.translate, Cell.add] using
+      (PeriodicGridDrawing.contains_normalize drawing second.segment
+        secondTranslate secondTranslate point).mp secondContains
+  have normalizedBounds :
+      drawing.PositionInExpandedSquare normalized :=
+    PeriodicGridDrawing.expanded_of_contains
+      (endpointBounds second secondMember).1
+      (endpointBounds second secondMember).2
+      normalizedSecond
+  have periodPositive : (0 : Int) < drawing.gridSize := by
+    exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+  have firstBounds := endpointBounds first firstMember
+  apply
+    (PeriodicGridDrawing.mem_doubleNeighborTranslations_iff
+      relative).mpr
+  rcases firstBounds with ⟨startBounds, finishBounds⟩
+  rcases startBounds with
+    ⟨startXLower, startXUpper, startYLower, startYUpper⟩
+  rcases finishBounds with
+    ⟨finishXLower, finishXUpper, finishYLower, finishYUpper⟩
+  rcases normalizedBounds with
+    ⟨pointXLower, pointXUpper, pointYLower, pointYUpper⟩
+  rcases normalizedFirst with
+    ⟨horizontal, same, between⟩ |
+      ⟨vertical, same, between⟩
+  · have same' :
+        normalized.2 =
+          first.segment.start.2 +
+            drawing.gridSize * relative.2 := by
+      simpa [GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.add, Cell.scale, add_comm] using same
+    have between' :
+        GridSegment.Between
+          (first.segment.start.1 +
+            drawing.gridSize * relative.1)
+          (first.segment.finish.1 +
+            drawing.gridSize * relative.1)
+          normalized.1 := by
+      simpa [GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.add, Cell.scale, add_comm] using between
+    exact
+      ⟨between_closed_shift_is_doubleNeighbor periodPositive
+          startXLower startXUpper finishXLower finishXUpper
+          pointXLower pointXUpper between',
+        PeriodicGridDrawing.lane_shift_is_doubleNeighbor
+          periodPositive startYLower startYUpper
+          pointYLower pointYUpper same'⟩
+  · have same' :
+        normalized.1 =
+          first.segment.start.1 +
+            drawing.gridSize * relative.1 := by
+      simpa [GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.add, Cell.scale, add_comm] using same
+    have between' :
+        GridSegment.Between
+          (first.segment.start.2 +
+            drawing.gridSize * relative.2)
+          (first.segment.finish.2 +
+            drawing.gridSize * relative.2)
+          normalized.2 := by
+      simpa [GridSegment.translate,
+        PeriodicGridDrawing.periodTranslation,
+        Cell.add, Cell.scale, add_comm] using between
+    exact
+      ⟨PeriodicGridDrawing.lane_shift_is_doubleNeighbor
+          periodPositive startXLower startXUpper
+          pointXLower pointXUpper same',
+        between_closed_shift_is_doubleNeighbor periodPositive
+          startYLower startYUpper finishYLower finishYUpper
+          pointYLower pointYUpper between'⟩
+
+/-- A segment terminal's named drawing point lies on its segment occurrence,
+without requiring the occurrence itself to be one of the finite retained
+translations. -/
+theorem SegmentTerminal.segment_contains_drawingPoint_of_axisAligned
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (terminal : SegmentTerminal)
+    (axisAligned : terminal.indexed.segment.IsAxisAligned) :
+    (terminal.indexed.segment.translate
+        ((drawing graph).periodTranslation terminal.translate)).Contains
+      (terminal.drawingPoint graph) := by
+  have translatedAligned :
+      (terminal.indexed.segment.translate
+        ((drawing graph).periodTranslation
+          terminal.translate)).IsAxisAligned :=
+    (GridSegment.isAxisAligned_translate _ _).mpr axisAligned
+  generalize endpointEq : terminal.endpoint = endpoint
+  cases endpoint with
+  | start =>
+      simpa [SegmentTerminal.drawingPoint, endpointEq] using
+        GridSegment.contains_start_of_axisAligned translatedAligned
+  | finish =>
+      simpa [SegmentTerminal.drawingPoint, endpointEq] using
+        GridSegment.contains_finish_of_axisAligned translatedAligned
+
 /-- A lifted constructed-drawing vertex that still lies in the open
 one-cell halo must use one of the nine neighboring lattice translations. -/
 theorem liftedDrawingVertexPosition_translate_neighbor_of_inExpanded
@@ -1015,6 +1179,111 @@ theorem
       PeriodicGridDrawing.periodTranslation,
       Cell.add, Cell.scale, planarMacroScale,
       add_comm, mul_assoc, mul_comm, mul_left_comm] using translatedFinish
+
+/-- If an anchor-normalized carrier segment meets a translated noncarrier
+component, its supporting segment passes through the translated center of
+that component's macrocell. -/
+theorem
+    FinalGaugedSegmentOccurrenceWitness.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_contact
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink)
+    (center : Cell)
+    (centerEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some center)
+    (meet :
+      GridSegment.InteriorsMeet
+        (firstIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation firstShift))
+        (secondIndexed.segment.translate
+          ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+            formula).periodTranslation secondShift))) :
+    let graph := formula.incidenceGraph
+    let anchorShift := Cell.neg first.sourceClauseAnchor
+    let sourceShift := Cell.sub second.physicalShift firstShift
+    let translatedLink :=
+      carrierLinkPeriodTranslate graph link anchorShift
+    (translatedLink.first.supportingSegment graph).Contains
+      (Cell.add center
+        ((drawing graph).periodTranslation sourceShift)) := by
+  let graph := formula.incidenceGraph
+  let anchorShift := Cell.neg first.sourceClauseAnchor
+  let sourceShift := Cell.sub second.physicalShift firstShift
+  let translatedLink :=
+    carrierLinkPeriodTranslate graph link anchorShift
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          link firstComponentEq with
+    ⟨localClauseIndex, firstSourceEq⟩
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have translatedLinkMember :
+      translatedLink ∈
+        retainedDrawingCompleteCarrierLinksRaw graph := by
+    simpa only [translatedLink, graph, anchorShift,
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (first.routeWitness.metadata
+        |>.carrier_anchorNormalize_mem_raw
+          wellFormed degree isLocal first.metadata_retainedValid
+          firstNonempty link localClauseIndex firstSourceEq)
+  have firstBounds :=
+    first.indexedSegment_endpoints_in_anchorNormalizedCarrierRectangle
+      wellFormed degree isLocal link firstComponentEq
+  have secondBounds :=
+    second.translatedPhysicalSegment_endpoints_in_macrocell
+      wellFormed degree isLocal secondNotCarrier
+      center centerEq sourceShift
+  have aligned :=
+    first.anchorAlignedPhysical_interiorsMeet_of_final second meet
+  have notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        (drawingCompleteCarrierLinkRectangleLower
+          graph translatedLink)
+        (drawingCompleteCarrierLinkRectangleUpper
+          graph translatedLink)
+        (planarSATMacrocellRouteLower
+          (Cell.add center
+            ((drawing graph).periodTranslation sourceShift)))
+        (planarSATMacrocellRouteUpper
+          (Cell.add center
+            ((drawing graph).periodTranslation sourceShift))) := by
+    intro separated
+    exact
+      (not_interiorsMeet_of_inClosedGridRectangles_of_separated
+        firstBounds.1 firstBounds.2
+        secondBounds.1 secondBounds.2 separated)
+        aligned
+  exact
+    retainedDrawingCompleteCarrierLinkRaw_supportingSegment_contains_of_macrocell_overlap
+      wellFormed degree isLocal translatedLinkMember
+      (Cell.add center
+        ((drawing graph).periodTranslation sourceShift))
+      notSeparated
 
 /-- If an anchor-normalized carrier segment meets a translated component
 inside the macrocell of a lifted incidence-graph vertex, the carrier's first
@@ -2811,6 +3080,185 @@ theorem
             adjustment))
     simpa [Cell.add, add_assoc] using adjustmentNeighbor
   · exact contactClose
+
+/-- Every hypothetical carrier--bend contact satisfies the doubled-halo
+bound required above: both the carrier and an adjacent bend segment contain
+the translated bend point. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_bend
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {firstIndexed secondIndexed : IndexedGridSegment}
+    {firstShift secondShift : Cell}
+    (first :
+      FinalGaugedSegmentOccurrenceWitness
+        formula firstIndexed firstShift)
+    (second :
+      FinalGaugedSegmentOccurrenceWitness
+        formula secondIndexed secondShift)
+    (link : EqualityLink CarrierNode)
+    (firstComponentEq :
+      first.routeWitness.metadata.source.component = .carrier link)
+    (routeBend : RouteBend)
+    (localClauseIndex : Nat)
+    (secondSourceEq :
+      second.routeWitness.metadata.source =
+        .bend routeBend localClauseIndex) :
+    ¬GridSegment.InteriorsMeet
+      (firstIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation firstShift))
+      (secondIndexed.segment.translate
+        ((retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).periodTranslation secondShift)) := by
+  let graph := formula.incidenceGraph
+  let anchorShift := Cell.neg first.sourceClauseAnchor
+  let sourceShift := Cell.sub second.physicalShift firstShift
+  let translatedLink :=
+    carrierLinkPeriodTranslate graph link anchorShift
+  have secondNotCarrier :
+      ¬∃ secondLink,
+        second.routeWitness.metadata.source.component =
+          .carrier secondLink := by
+    rintro ⟨secondLink, componentEq⟩
+    rw [secondSourceEq] at componentEq
+    simp [DrawingPlanarSATClauseSource.component] at componentEq
+  have routeBendMember :
+      routeBend ∈ (drawingRouteBends graph).dedup := by
+    have sourceMember := second.source_retainedComponentMember
+    rw [secondSourceEq] at sourceMember
+    exact sourceMember
+  have centerEq :
+      second.routeWitness.metadata.source.component.macrocellCenter
+          formula =
+        some (routeBend.drawingPoint graph) := by
+    rw [secondSourceEq]
+    rfl
+  have carrierContains :=
+    first.anchorNormalizedCarrier_supportingSegment_contains_translatedMacrocellCenter_of_contact
+      formula wellFormed degree isLocal second
+      link firstComponentEq secondNotCarrier
+      (routeBend.drawingPoint graph) centerEq
+  have incomingTerminalMember :=
+    (drawingRouteBend_terminals_mem_drawingSegmentTerminals
+      graph routeBendMember).1
+  have incomingIndexedMember :
+      routeBend.incomingTerminal.indexed ∈
+        (drawing graph).indexedSegments :=
+    (drawingSegmentTerminal_indexed_mem
+      graph incomingTerminalMember).1
+  have incomingAxisAligned :
+      routeBend.incomingTerminal.indexed.segment.IsAxisAligned :=
+    drawing_isOrthogonal wellFormed isLocal degree
+      routeBend.incomingTerminal.indexed incomingIndexedMember
+  let translatedIncoming :=
+    routeBend.incomingTerminal.periodTranslate sourceShift
+  have targetPointEq :
+      translatedIncoming.drawingPoint graph =
+        Cell.add (routeBend.drawingPoint graph)
+          ((drawing graph).periodTranslation sourceShift) := by
+    simp only [translatedIncoming, SegmentTerminal.periodTranslate,
+      RouteBend.incomingTerminal, SegmentTerminal.drawingPoint,
+      GridSegment.translate]
+    rw [periodTranslation_add]
+    apply Prod.ext <;>
+      simp [RouteBend.drawingPoint, Cell.add] <;>
+      omega
+  have translatedIncomingContains :
+      (translatedIncoming.indexed.segment.translate
+        ((drawing graph).periodTranslation
+          translatedIncoming.translate)).Contains
+        (translatedIncoming.drawingPoint graph) := by
+    exact
+      SegmentTerminal.segment_contains_drawingPoint_of_axisAligned
+        graph translatedIncoming
+        (by
+          simpa [translatedIncoming,
+            SegmentTerminal.periodTranslate] using
+            incomingAxisAligned)
+  rcases
+      first.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          link firstComponentEq with
+    ⟨firstLocalClauseIndex, firstSourceEq⟩
+  have firstNonempty :
+      first.routeWitness.metadata.clause.literals ≠ [] := by
+    intro empty
+    have literalMember := first.routeWitness.literalMember
+    rw [empty] at literalMember
+    simp at literalMember
+  have translatedLinkMember :
+      translatedLink ∈
+        retainedDrawingCompleteCarrierLinksRaw graph := by
+    simpa only [translatedLink, graph, anchorShift,
+      FinalGaugedSegmentOccurrenceWitness.sourceClauseAnchor] using
+      (first.routeWitness.metadata
+        |>.carrier_anchorNormalize_mem_raw
+          wellFormed degree isLocal first.metadata_retainedValid
+          firstNonempty link firstLocalClauseIndex firstSourceEq)
+  have carrierIndexedMember :
+      translatedLink.first.indexed ∈
+        (drawing graph).indexedSegments :=
+    retainedCarrierNode_indexed_mem graph
+      (retainedDrawingCompleteCarrierLinkRaw_endpoints_mem
+        graph translatedLinkMember).1
+  have endpointBounds :
+      (drawing graph).SegmentEndpointsInExpandedSquare := by
+    intro indexed indexedMember
+    have bounds :=
+      drawing_indexedSegment_endpoints_inExpandedDrawingSquare
+        wellFormed degree isLocal indexedMember
+    simpa [PeriodicGridDrawing.PositionInExpandedSquare,
+      InExpandedDrawingSquare, drawing_gridSize] using bounds
+  apply
+    retainedDeduplicatedGaugedWrappedDrawing_interiorsDisjoint_of_carrier_bend_of_contact_close
+      formula wellFormed degree isLocal first second
+      link firstComponentEq routeBend localClauseIndex secondSourceEq
+  intro meet
+  have relativeClose :
+      Cell.sub translatedLink.first.translate
+          translatedIncoming.translate ∈
+        PeriodicGridDrawing.doubleNeighborTranslations := by
+    exact
+      PeriodicGridDrawing.relativeTranslate_isDoubleNeighbor_of_contains
+        endpointBounds carrierIndexedMember
+        (by
+          simpa [translatedIncoming,
+            SegmentTerminal.periodTranslate] using
+            incomingIndexedMember)
+        (by
+          rw [targetPointEq]
+          simpa [graph, anchorShift, sourceShift, translatedLink,
+            CarrierNode.supportingSegment] using carrierContains meet)
+        translatedIncomingContains
+  have desiredEq :
+      Cell.sub
+          (Cell.add
+            (Cell.add link.first.translate
+              (Cell.neg first.sourceClauseAnchor))
+            (Cell.sub firstShift secondShift))
+          (Cell.add routeBend.translate
+            (Cell.neg second.sourceClauseAnchor)) =
+        Cell.sub translatedLink.first.translate
+          translatedIncoming.translate := by
+    have translatedLinkTranslateEq :
+        translatedLink.first.translate =
+          Cell.add link.first.translate anchorShift := by
+      simp [translatedLink, carrierLinkPeriodTranslate_first,
+        CarrierNode.translate_periodTranslate]
+    rw [translatedLinkTranslateEq]
+    simp only [translatedIncoming, SegmentTerminal.periodTranslate]
+    simp only [sourceShift]
+    rw [second.physicalShift_eq]
+    apply Prod.ext <;>
+      simp [RouteBend.incomingTerminal, anchorShift,
+        Cell.sub, Cell.add, Cell.neg] <;>
+      ring
+  rw [desiredEq]
+  exact relativeClose
 
 /-- Carrier--routed-variable separation has the same one-coordinate
 reduction, using any route occurrence that represents the selected arm.
