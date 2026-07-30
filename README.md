@@ -1744,6 +1744,12 @@ The representation choices for this target are:
   encoding is injective, distinct active slots of every valid finite shape
   select distinct ports, and positive uniform refinement preserves those
   selections.
+- [`LeanTrominoes/RetainedAngularTerminalAdapterPortGeometry.lean`](LeanTrominoes/RetainedAngularTerminalAdapterPortGeometry.lean)
+  embeds the 88 adapter-port identities at every second lattice point of a
+  radius-22 square, enumerated clockwise from due east.  These coordinates
+  are injective, lie outside the radius-12 Figure 7 fan and inside the
+  radius-36 retained-terminal interface, and remain unchanged by positive
+  refinement.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
