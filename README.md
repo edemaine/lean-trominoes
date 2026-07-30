@@ -1838,6 +1838,13 @@ The representation choices for this target are:
   certified radius-264 fan-route heads.  Rounded square-boundary
   interpolation gives exact endpoints, orthogonality, and shell containment;
   coordinated pairwise rasterization remains the next splice subproblem.
+- [`LeanTrominoes/RetainedAngularFanOuterCollarSeparatedRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterCollarSeparatedRoutes.lean)
+  supplies that coordinated rasterization.  Neighboring-corridor crossing
+  lines handle nine direction families, while two compact unit-grid flow
+  certificates handle the corner-heavy right-arm and southwest families.
+  Finite certification proves exact endpoints, orthogonality, collar
+  containment, and strict continuous separation for every
+  order-compatible pair.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
