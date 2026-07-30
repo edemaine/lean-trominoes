@@ -1866,11 +1866,13 @@ The representation choices for this target are:
   genuine source occurrences select their exact classified route.  General
   separation of the arbitrary-length radial pieces remains the next layer.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
-  separates arbitrary-length radial lanes whose retained directions differ.
-  A finite table of integer half-planes, the uniform radius-nine staircase
-  corridor, and one exact angular-wrap case give strict continuous
-  separation for every pair of positive lengths.  Parallel nested lanes in
-  the same direction remain the final radial-family case.
+  separates every ordered pair of arbitrary-length radial lanes.  A finite
+  table of integer half-planes, the uniform radius-nine staircase corridor,
+  and one exact angular-wrap case handle distinct directions.  Exact
+  length-independent transverse staircase bands and radial gate thresholds
+  handle nested parallel lanes.  The profile-level theorem obtains direction
+  order, positive lengths, and strict same-direction radial order directly
+  from a duplicate-free angular terminal profile.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase

@@ -1634,5 +1634,58 @@ theorem retainedTerminalFanOuterRadialRoutes_strictlyAvoid
         firstSlot secondSlot
         (equalDirectionLengthsLt rfl) slotsLt
 
+/-- A duplicate-free angular terminal profile supplies every hypothesis
+needed to separate the radial routes selected by two ordered active slots. -/
+theorem RetainedAngularTerminalProfile.outerRadialRoutes_strictlyAvoid
+    (profile : RetainedAngularTerminalProfile)
+    (distinct : profile.GatesDistinct)
+    (center : Cell)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstLookup :
+      profile.terminals[firstSlot.val]? = some firstTerminal)
+    (secondLookup :
+      profile.terminals[secondSlot.val]? = some secondTerminal)
+    (slotsLt : firstSlot.val < secondSlot.val) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterRadialRoute
+        center firstTerminal firstSlot)
+      (retainedTerminalFanOuterRadialRoute
+        center secondTerminal secondSlot) := by
+  rcases List.getElem?_eq_some_iff.mp firstLookup with
+    ⟨firstLt, firstEq⟩
+  rcases List.getElem?_eq_some_iff.mp secondLookup with
+    ⟨secondLt, secondEq⟩
+  have directionsLe :
+      firstTerminal.1.angularRank ≤
+        secondTerminal.1.angularRank := by
+    have ordered :=
+      (List.pairwise_iff_getElem.mp profile.rankSorted)
+        firstSlot.val secondSlot.val
+        firstLt secondLt slotsLt
+    simpa [firstEq, secondEq] using ordered
+  have equalDirectionLengthsLt :
+      firstTerminal.1 = secondTerminal.1 →
+        firstTerminal.2 < secondTerminal.2 := by
+    intro directionsEqual
+    have concreteDirectionsEqual :
+        (profile.terminals[firstSlot.val]'firstLt).1 =
+          (profile.terminals[secondSlot.val]'secondLt).1 := by
+      simpa [firstEq, secondEq] using directionsEqual
+    have lengthsLt :=
+      profile.length_lt_of_lt_of_direction_eq distinct
+        firstSlot.val secondSlot.val
+        firstLt secondLt slotsLt concreteDirectionsEqual
+    simpa [firstEq, secondEq] using lengthsLt
+  exact retainedTerminalFanOuterRadialRoutes_strictlyAvoid
+    center firstTerminal.1 secondTerminal.1
+    firstTerminal.2 secondTerminal.2
+    firstSlot secondSlot directionsLe
+    (profile.length_positive_of_lookup
+      firstSlot firstTerminal firstLookup)
+    (profile.length_positive_of_lookup
+      secondSlot secondTerminal secondLookup)
+    equalDirectionLengthsLt slotsLt
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
