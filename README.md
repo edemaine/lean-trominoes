@@ -1916,6 +1916,11 @@ The representation choices for this target are:
   separation through the exact radius-288 joins.  Thus every two ordered
   active slots in a duplicate-free profile select strictly separated
   complete source-gate-to-Figure-7 routes.
+- [`LeanTrominoes/RetainedAngularFanOuterRouteFamily.lean`](LeanTrominoes/RetainedAngularFanOuterRouteFamily.lean)
+  packages those routes as the profile-ordered finite family of at most
+  eight active incidences.  Every indexed route has its exact source gate
+  and refined Figure 7 boundary endpoint and is orthogonal; duplicate-free
+  gates make the entire family pairwise strictly separated.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
