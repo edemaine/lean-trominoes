@@ -2139,6 +2139,11 @@ The representation choices for this target are:
   realizes the noncarrier orbit by a retained finite source with the exact
   final translated center, and rewrites final rectangle overlap directly in
   this anchor-normalized frame.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedDirectComponents.lean`](LeanTrominoes/RetainedFinalFlatNormalizedDirectComponents.lean)
+  transfers the oblique fan route's directness into that retained
+  anchor-normalized source.  The remaining finite component is therefore
+  classified, with all constructor witnesses intact, as exactly a
+  crossover, routed clause, or routed-variable arm.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
