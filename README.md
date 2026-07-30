@@ -1787,8 +1787,11 @@ The representation choices for this target are:
   certificate.  Flat route membership recovers the positioned incidence
   metadata needed for orthogonality, after which every point/segment and
   segment/segment pair in the two prefixes has separated integral endpoint
-  rectangles.  This is the quantitative prefix/prefix input for raster
-  clearance.
+  rectangles.  When the reference route's discarded final segment is
+  axis-aligned, its strict separation certificate supplies the last
+  rectangles and an exact `dropLast`/final-segment decomposition extends the
+  result to the complete reference route.  This is the quantitative
+  prefix/route input for raster clearance in every orthogonal-terminal case.
 - [`LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean`](LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean)
   instantiates the terminal-vector argument at the complete retained drawing.
   Its compatibility, endpoint-only route-contact, and final incidence-key
@@ -2039,7 +2042,9 @@ The representation choices for this target are:
   handles the singleton `dropLast` prefix of a two-point incidence route
   through point/segment rectangle separation.  Strict separation of two
   orthogonal source routes is also converted into the complete
-  point/segment and segment/segment rectangle certificate.
+  point/segment and segment/segment rectangle certificate, and certificates
+  for a route prefix and its final two-point segment recombine over the
+  complete route.
 - [`LeanTrominoes/RetainedAngularFanSourceRasterSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceRasterSeparation.lean)
   applies the rasterization lift to genuine flat-indexed routes of the final
   retained planar-SAT drawing.  Route membership recovers the corresponding

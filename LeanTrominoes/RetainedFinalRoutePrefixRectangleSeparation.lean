@@ -128,5 +128,82 @@ theorem
     SourcePolylineRectanglesSeparated.of_strictlyAvoid
       firstOrthogonal secondOrthogonal avoid
 
+/-- If the reference route's discarded final segment is axis-aligned, the
+prefix/prefix rectangle certificate extends across that last segment to the
+complete reference route. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_sourcePolylineRectanglesSeparated_of_finalSegmentAxisAligned
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondTarget : Cell}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headsDifferent : first.head? ≠ second.head?)
+    (firstHead : first.head? = some firstSource)
+    (secondLast : second.getLast? = some secondTarget)
+    (sourceNeTarget : firstSource ≠ secondTarget)
+    (finalSegmentAxisAligned :
+      (⟨polylineLastEntrance second, secondTarget⟩ :
+        GridSegment).IsAxisAligned) :
+    SourcePolylineRectanglesSeparated
+      first.dropLast second := by
+  have prefixSeparated :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefixes_sourcePolylineRectanglesSeparated
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent
+  have firstPrefixOrthogonal :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefixOrthogonal_of_mem_edgeRoutes
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember
+  have finalPolylineOrthogonal :
+      OrthogonalPolyline
+        [polylineLastEntrance second, secondTarget] := by
+    simpa [OrthogonalPolyline] using
+      finalSegmentAxisAligned
+  have finalAvoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherFinalSegment
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent firstHead secondLast
+      sourceNeTarget
+  have finalSeparated :
+      SourcePolylineRectanglesSeparated
+        first.dropLast
+        [polylineLastEntrance second, secondTarget] :=
+    SourcePolylineRectanglesSeparated.of_strictlyAvoid
+      firstPrefixOrthogonal finalPolylineOrthogonal
+      finalAvoid
+  have reverseTailExists :=
+    exists_reverse_tail_head?_of_two_le_length
+      second secondLength
+  have secondEntrance :
+      second.dropLast.getLast? =
+        some (polylineLastEntrance second) :=
+    dropLast_getLast?_of_reverse_tail_head?
+      (polylineLastEntrance_spec reverseTailExists)
+  exact
+    SourcePolylineRectanglesSeparated.of_dropLast_and_finalSegment
+      secondEntrance secondLast
+      prefixSeparated finalSeparated
+
 end PeriodicOrthocrossing
 end LeanTrominoes

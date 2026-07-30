@@ -558,6 +558,90 @@ theorem SourcePolylineRectanglesSeparated.of_strictlyAvoid
     SourceSegmentRectanglesSeparated.of_strictlyAvoid
       firstOrthogonal secondOrthogonal avoid⟩
 
+/-- Rectangle separation from a route's `dropLast` prefix and from its final
+two-point segment combines into separation from the complete route. -/
+theorem SourcePolylineRectanglesSeparated.of_dropLast_and_finalSegment
+    {first second : List Cell}
+    {entrance target : Cell}
+    (secondEntrance :
+      second.dropLast.getLast? = some entrance)
+    (secondTarget :
+      second.getLast? = some target)
+    (prefixSeparated :
+      SourcePolylineRectanglesSeparated
+        first second.dropLast)
+    (finalSeparated :
+      SourcePolylineRectanglesSeparated
+        first [entrance, target]) :
+    SourcePolylineRectanglesSeparated first second := by
+  have secondDropLastNonempty :
+      second.dropLast ≠ [] := by
+    intro empty
+    rw [empty] at secondEntrance
+    simp at secondEntrance
+  have secondDecomposition :
+      second.dropLast ++ [target] = second :=
+    List.dropLast_append_getLast? target secondTarget
+  have secondEntranceLastD :
+      second.dropLast.getLastD (0, 0) =
+        entrance := by
+    rw [List.getLastD_eq_getLast?, secondEntrance]
+    simp
+  have segmentDecomposition :
+      gridPolylineSegments second =
+        gridPolylineSegments second.dropLast ++
+          [⟨entrance, target⟩] := by
+    calc
+      gridPolylineSegments second =
+          gridPolylineSegments
+            (second.dropLast ++ [target]) := by
+        exact congrArg gridPolylineSegments
+          secondDecomposition.symm
+      _ =
+          gridPolylineSegments second.dropLast ++
+            [⟨second.dropLast.getLastD (0, 0),
+              target⟩] :=
+        gridPolylineSegments_append_singleton_of_ne_nil
+          second.dropLast (0, 0) target
+          secondDropLastNonempty
+      _ =
+          gridPolylineSegments second.dropLast ++
+            [⟨entrance, target⟩] := by
+        rw [secondEntranceLastD]
+  constructor
+  · intro firstPoint firstPointMember
+      secondSegment secondSegmentMember
+    rw [segmentDecomposition] at secondSegmentMember
+    rcases List.mem_append.mp secondSegmentMember with
+      prefixMember | finalMember
+    · exact
+        prefixSeparated.1 firstPoint firstPointMember
+          secondSegment prefixMember
+    · have secondSegmentEq :
+          secondSegment = ⟨entrance, target⟩ := by
+        simpa using finalMember
+      subst secondSegment
+      exact
+        finalSeparated.1 firstPoint firstPointMember
+          ⟨entrance, target⟩ (by
+            simp [gridPolylineSegments])
+  · intro firstSegment firstSegmentMember
+      secondSegment secondSegmentMember
+    rw [segmentDecomposition] at secondSegmentMember
+    rcases List.mem_append.mp secondSegmentMember with
+      prefixMember | finalMember
+    · exact
+        prefixSeparated.2 firstSegment firstSegmentMember
+          secondSegment prefixMember
+    · have secondSegmentEq :
+          secondSegment = ⟨entrance, target⟩ := by
+        simpa using finalMember
+      subst secondSegment
+      exact
+        finalSeparated.2 firstSegment firstSegmentMember
+          ⟨entrance, target⟩ (by
+            simp [gridPolylineSegments])
+
 /-- The rasterization-separation lift also covers a singleton first
 polyline.  This is essential for a two-point incidence route, whose
 `dropLast` prefix consists only of its clause endpoint. -/
