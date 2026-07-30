@@ -471,6 +471,124 @@ theorem
     (ne_of_inClosedGridRectangles_of_separated
       firstBounded secondBounded expandedSeparated) rfl
 
+/-- Every listed point of the first source has a separated singleton
+rectangle from every source segment of the second.  This is the missing
+provenance case when the first retained prefix is a singleton. -/
+def SourcePointSegmentRectanglesSeparated
+    (first second : List Cell) : Prop :=
+  ∀ firstPoint ∈ first,
+    ∀ secondSegment ∈ gridPolylineSegments second,
+      ClosedGridRectanglesSeparated
+        firstPoint firstPoint
+        secondSegment.coordinateLower secondSegment.coordinateUpper
+
+instance (first second : List Cell) :
+    Decidable
+      (SourcePointSegmentRectanglesSeparated first second) := by
+  unfold SourcePointSegmentRectanglesSeparated
+  infer_instance
+
+/-- Point/segment separation handles singleton first routes, while
+segment/segment separation handles every nondegenerate first route. -/
+def SourcePolylineRectanglesSeparated
+    (first second : List Cell) : Prop :=
+  SourcePointSegmentRectanglesSeparated first second ∧
+    SourceSegmentRectanglesSeparated first second
+
+instance (first second : List Cell) :
+    Decidable (SourcePolylineRectanglesSeparated first second) := by
+  unfold SourcePolylineRectanglesSeparated
+  infer_instance
+
+/-- The rasterization-separation lift also covers a singleton first
+polyline.  This is essential for a two-point incidence route, whose
+`dropLast` prefix consists only of its clause endpoint. -/
+theorem
+    unitSubdividedRasterizations_disjoint_of_sourcePolylineRectanglesSeparated
+    {factor : Nat}
+    (factorPositive : 0 < factor)
+    (clearance : 18 < factor)
+    (first second : List Cell)
+    (firstRetained : RetainedRayPolyline first)
+    (secondRetained : RetainedRayPolyline second)
+    (firstNonempty : first ≠ [])
+    (secondLength : 2 ≤ second.length)
+    (separated :
+      SourcePolylineRectanglesSeparated first second) :
+    ∀ point,
+      point ∈
+          AxisDirection.unitSubdividePolyline
+            (rasterizeRetainedPolyline
+              (scalePolyline factor first)) →
+        point ∈
+          AxisDirection.unitSubdividePolyline
+            (rasterizeRetainedPolyline
+              (scalePolyline factor second)) →
+        False := by
+  by_cases firstLength : 2 ≤ first.length
+  · exact
+      unitSubdividedRasterizations_disjoint_of_sourceSegmentRectanglesSeparated
+        factorPositive clearance first second
+        firstRetained secondRetained firstLength secondLength
+        separated.2
+  · have firstLengthPositive : 0 < first.length := by
+      exact List.length_pos_iff.mpr firstNonempty
+    have firstLengthOne : first.length = 1 := by
+      omega
+    rcases first with _ | ⟨firstPoint, rest⟩
+    · exact (firstNonempty rfl).elim
+    · have restEmpty : rest = [] := by
+        cases rest with
+        | nil => rfl
+        | cons secondPoint rest =>
+            simp at firstLengthOne
+      subst rest
+      intro point firstMember secondMember
+      have pointEq :
+          point = Cell.scale factor firstPoint := by
+        simpa [scalePolyline] using firstMember
+      have secondScaledRetained :=
+        secondRetained.scale factorPositive
+      have secondScaledLength :
+          2 ≤ (scalePolyline factor second).length := by
+        simpa [scalePolyline] using secondLength
+      rcases
+          unitSubdividedRasterizeRetainedPolyline_point_in_sourceRectangle
+            secondScaledRetained secondScaledLength secondMember with
+        ⟨secondScaledSegment, secondScaledMember, secondBounded⟩
+      rw [gridPolylineSegments_scalePolyline] at secondScaledMember
+      rcases List.mem_map.mp secondScaledMember with
+        ⟨secondSegment, secondSegmentMember, secondSegmentEq⟩
+      subst secondScaledSegment
+      have factorNonnegativeInt :
+          (0 : Int) ≤ factor := by
+        exact_mod_cast factorPositive.le
+      rw [GridSegment.coordinateLower_scale
+          factorNonnegativeInt,
+        GridSegment.coordinateUpper_scale
+          factorNonnegativeInt] at secondBounded
+      have firstBounded :
+          InClosedGridRectangle
+            (coordinateRadiusLower 9
+              (Cell.scale factor firstPoint))
+            (coordinateRadiusUpper 9
+              (Cell.scale factor firstPoint))
+            point := by
+        rw [pointEq]
+        exact
+          inClosedGridRectangle_coordinateRadius
+            (withinCoordinateRadius_refl 9
+              (Cell.scale factor firstPoint))
+      have expandedSeparated :=
+        ClosedGridRectanglesSeparated.scale_both_coordinateRadius
+          (radius := 9)
+          (separated.1 firstPoint (by simp)
+            secondSegment secondSegmentMember)
+          factorPositive (by omega)
+      exact
+        (ne_of_inClosedGridRectangles_of_separated
+          firstBounded secondBounded expandedSeparated) rfl
+
 /-- At the common factor `288`, pairwise source-segment rectangle separation
 discharges the exact prefix/route raster-disjointness premise used by the
 terminal checkpoint adapter. -/
@@ -498,6 +616,42 @@ theorem
       sourceRoute.dropLast referenceRoute
       sourceRetained.dropLast referenceRetained
       sourcePrefixLength referenceLength separated
+
+/-- The source-polyline certificate is the general factor-`288` bridge,
+including the singleton prefix of a two-point source incidence route. -/
+theorem
+    retainedTerminalRefinedUnitPrefixRoute_disjoint_of_sourcePolylineRectanglesSeparated
+    (sourceRoute referenceRoute : List Cell)
+    (sourceRetained : RetainedRayPolyline sourceRoute)
+    (referenceRetained : RetainedRayPolyline referenceRoute)
+    (sourceLength : 2 ≤ sourceRoute.length)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (separated :
+      SourcePolylineRectanglesSeparated
+        sourceRoute.dropLast referenceRoute) :
+    ∀ point,
+      point ∈
+          retainedTerminalRefinedUnitPrefixPolyline sourceRoute →
+        point ∈
+          retainedTerminalRefinedUnitPolyline referenceRoute →
+        False := by
+  have prefixNonempty : sourceRoute.dropLast ≠ [] := by
+    intro empty
+    have emptyLength := congrArg List.length empty
+    simp only [List.length_nil] at emptyLength
+    have dropLastLength :
+        sourceRoute.dropLast.length + 1 = sourceRoute.length := by
+      rw [List.length_dropLast]
+      omega
+    omega
+  simpa [retainedTerminalRefinedUnitPrefixPolyline,
+    retainedTerminalRefinedUnitPolyline] using
+    unitSubdividedRasterizations_disjoint_of_sourcePolylineRectanglesSeparated
+      (factor := retainedTerminalFanTotalRefinement)
+      (by native_decide) (by native_decide)
+      sourceRoute.dropLast referenceRoute
+      sourceRetained.dropLast referenceRetained
+      prefixNonempty referenceLength separated
 
 /-- Pairwise source-segment rectangle separation is therefore a sufficient
 finite geometric certificate for the mixed source-prefix corridor required
@@ -529,6 +683,35 @@ theorem
     retainedTerminalRefinedUnitPrefixRoute_disjoint_of_sourceSegmentRectanglesSeparated
       sourceRoute referenceRoute sourceRetained referenceRetained
       sourcePrefixLength referenceLength separated
+
+/-- The general point/segment plus segment/segment certificate discharges
+the terminal corridor for source routes of every allowed length. -/
+theorem
+    sourcePrefixCorridorSeparated_of_sourcePolylineRectanglesSeparated
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData)
+    (sourceRetained : RetainedRayPolyline sourceRoute)
+    (referenceRetained : RetainedRayPolyline referenceRoute)
+    (sourceLength : 2 ≤ sourceRoute.length)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (referenceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector referenceRoute) =
+        some referenceTerminal)
+    (separated :
+      SourcePolylineRectanglesSeparated
+        sourceRoute.dropLast referenceRoute) :
+    SourcePrefixCorridorSeparated
+      sourceRoute referenceRoute referenceTerminal.1 := by
+  apply
+    sourcePrefixCorridorSeparated_of_unitPrefixRouteDisjoint
+      sourceRoute referenceRoute referenceTerminal
+      sourceRetained referenceRetained
+      sourceLength referenceLength referenceClassified
+  exact
+    retainedTerminalRefinedUnitPrefixRoute_disjoint_of_sourcePolylineRectanglesSeparated
+      sourceRoute referenceRoute sourceRetained referenceRetained
+      sourceLength referenceLength separated
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

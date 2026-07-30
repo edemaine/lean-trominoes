@@ -2010,7 +2010,9 @@ The representation choices for this target are:
   segment retains its source-segment provenance.  Thus pairwise separation of
   integral source-segment rectangles survives any scale greater than `18`;
   at the common factor `288` this directly supplies the prefix/route
-  disjointness and terminal-corridor certificates.  Strict separation of two
+  disjointness and terminal-corridor certificates.  The lift separately
+  handles the singleton `dropLast` prefix of a two-point incidence route
+  through point/segment rectangle separation.  Strict separation of two
   orthogonal source routes is also converted into the required pairwise
   rectangle certificate.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
