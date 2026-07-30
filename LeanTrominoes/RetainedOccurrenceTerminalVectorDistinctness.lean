@@ -13,17 +13,80 @@ Two occurrences of one periodic variable may leave on the same retained
 ray, but the complete backwards terminal vectors still have to differ.
 This file derives that fact from the source drawing's endpoint-only contact
 certificate and the local syntactic condition that a clause does not repeat
-an atom.
+an incidence key `(atom, offset)`.
 
 The key argument aligns the two translated variable endpoints.  Equal
 terminal vectors then align the two penultimate route points.  Endpoint-only
 contact forces both penultimate points to be route heads, so both routes are
 single segments.  Their aligned clause endpoints are consequently equal.
 Uniqueness of representatives in the fundamental square identifies the
-clause, and atom distinctness inside that clause identifies the literal.
+clause.  Equality of the aligned direct routes also identifies the literal
+offset, so incidence-key distinctness inside that clause identifies the
+literal.  This weaker condition deliberately permits a periodic clause to
+mention the same atom at different offsets.
 -/
 
 namespace LeanTrominoes
+
+namespace PositionedPeriodicClause
+
+/-- No physical periodic incidence `(atom, offset)` is repeated within a
+positioned clause.  Literal polarity is intentionally irrelevant. -/
+irreducible_def IncidenceKeysNodup
+    {Variable : Type*} [DecidableEq Variable]
+    (clause : PositionedPeriodicClause Variable) : Prop :=
+  (clause.literals.map fun literal =>
+    (literal.atom, literal.offset)).Nodup
+
+end PositionedPeriodicClause
+
+namespace PositionedPeriodicCNF
+
+/-- Every positioned clause lists each physical periodic incidence at most
+once. -/
+irreducible_def AllIncidenceKeysNodup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable) : Prop :=
+  ∀ clause ∈ source.clauses, clause.IncidenceKeysNodup
+
+private theorem incidenceKeysNodup_of_atomsNodup
+    {Variable : Type*} [DecidableEq Variable]
+    (literals : List (PeriodicLiteral Variable))
+    (atomsNodup :
+      (literals.map PeriodicLiteral.atom).Nodup) :
+    (literals.map fun literal =>
+      (literal.atom, literal.offset)).Nodup := by
+  induction literals with
+  | nil =>
+      simp
+  | cons literal literals induction =>
+      simp only [List.map_cons, List.nodup_cons] at atomsNodup ⊢
+      constructor
+      · intro keyMember
+        apply atomsNodup.1
+        rcases List.mem_map.mp keyMember with
+          ⟨tailLiteral, tailMember, keyEqual⟩
+        exact List.mem_map.mpr
+          ⟨tailLiteral, tailMember,
+            congrArg Prod.fst keyEqual⟩
+      · exact induction atomsNodup.2
+
+/-- Atom distinctness is a stronger, convenient sufficient condition for
+incidence-key distinctness. -/
+theorem allIncidenceKeysNodup_of_allAtomsNodup
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    (atomsNodup : source.AllAtomsNodup) :
+    source.AllIncidenceKeysNodup := by
+  rw [AllIncidenceKeysNodup]
+  intro clause clauseMember
+  have distinct := atomsNodup clause clauseMember
+  unfold PositionedPeriodicClause.AtomsNodup at distinct
+  rw [PositionedPeriodicClause.IncidenceKeysNodup]
+  exact incidenceKeysNodup_of_atomsNodup clause.literals distinct
+
+end PositionedPeriodicCNF
+
 namespace PeriodicEightOccurrenceSplit
 
 open PeriodicOrthocrossing
@@ -181,8 +244,8 @@ private theorem align_of_terminal_vectors_equal
     Prod.mk.injEq] at equal ⊢
   constructor <;> ring_nf at equal ⊢ <;> omega
 
-/-- Endpoint-only contacts and per-clause atom distinctness make the full
-terminal vectors injective among occurrences of each variable. -/
+/-- Endpoint-only contacts and per-clause incidence-key distinctness make
+the full terminal vectors injective among occurrences of each variable. -/
 theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
@@ -195,7 +258,7 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
     (endpointContacts :
       (PositionedPeriodicCNF.incidenceDrawing
         source placement routes).RoutePointsMeetOnlyAtEndpoints)
-    (atomsNodup : source.AllAtomsNodup) :
+    (incidenceKeysNodup : source.AllIncidenceKeysNodup) :
     RetainedOccurrenceTerminalVectorsInjective
       source.erase routes := by
   intro atom first firstMember second secondMember vectorsEqual
@@ -472,7 +535,7 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
       congrArg Prod.fst alignedSourcesEqual
     have verticalEqual :=
       congrArg Prod.snd alignedSourcesEqual
-    simp only [Cell.add, Cell.neg,
+    simp only [Cell.add, Cell.neg, Cell.sub,
       PeriodicGridDrawing.periodTranslation, Cell.scale]
       at horizontalEqual verticalEqual
     have periodPositive : (0 : Int) < drawing.gridSize := by
@@ -512,6 +575,27 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
             | .variable _ => 0
             | .clause index => index)
           sourceVerticesEqual).trans secondClauseIndex)
+  have edgeOffsetsEqual :
+      firstTagged.1.edge.offset =
+        secondTagged.1.edge.offset := by
+    have horizontalEqual :=
+      congrArg Prod.fst alignedSourcesEqual
+    have verticalEqual :=
+      congrArg Prod.snd alignedSourcesEqual
+    rw [sourcePrototypePositionsEqual] at horizontalEqual verticalEqual
+    rcases firstOffsetEq : firstTagged.1.edge.offset with
+      ⟨firstOffsetX, firstOffsetY⟩
+    rcases secondOffsetEq : secondTagged.1.edge.offset with
+      ⟨secondOffsetX, secondOffsetY⟩
+    simp only [Cell.add, Cell.neg, Cell.sub,
+      PeriodicGridDrawing.periodTranslation, Cell.scale,
+      firstOffsetEq, secondOffsetEq]
+      at horizontalEqual verticalEqual
+    have periodPositive : (0 : Int) < drawing.gridSize := by
+      exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+    apply Prod.ext
+    · nlinarith
+    · nlinarith
   rcases
       PositionedPeriodicCNF.incidenceMetadata_of_tagged
         source firstTaggedMember with
@@ -546,12 +630,58 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
       congrArg (fun incidence : CNFIncidence Variable =>
         incidence.literal.atom) secondIncidenceEq
     exact literalAtomEqual.symm.trans secondTaggedAtom
+  have literalOffsetsEqual :
+      firstLiteral.offset = secondLiteral.offset := by
+    have taggedClausesEqual :
+        firstTagged.1.clause = secondTagged.1.clause := by
+      have firstClauseEq :
+          firstTagged.1.clause = firstClause.literals :=
+        congrArg (fun incidence : CNFIncidence Variable =>
+          incidence.clause) firstIncidenceEq
+      have secondClauseEq :
+          secondTagged.1.clause = firstClause.literals := by
+        simpa using
+          congrArg (fun incidence : CNFIncidence Variable =>
+            incidence.clause) secondIncidenceEq
+      exact firstClauseEq.trans secondClauseEq.symm
+    have taggedOffsetsEqual :
+        firstTagged.1.literal.offset =
+          secondTagged.1.literal.offset := by
+      have normalizedOffsetsEqual := edgeOffsetsEqual
+      simp only [CNFIncidence.edge_offset,
+        taggedClausesEqual] at normalizedOffsetsEqual
+      rcases firstLiteralOffsetEq :
+          firstTagged.1.literal.offset with
+        ⟨firstOffsetX, firstOffsetY⟩
+      rcases secondLiteralOffsetEq :
+          secondTagged.1.literal.offset with
+        ⟨secondOffsetX, secondOffsetY⟩
+      rcases PeriodicCNF.clauseAnchor secondTagged.1.clause with
+        ⟨anchorX, anchorY⟩
+      simp only [Cell.sub, Prod.mk.injEq,
+        firstLiteralOffsetEq, secondLiteralOffsetEq]
+        at normalizedOffsetsEqual
+      exact Prod.ext (by omega) (by omega)
+    have firstLiteralOffsetEqual :
+        firstTagged.1.literal.offset = firstLiteral.offset :=
+      congrArg (fun incidence : CNFIncidence Variable =>
+        incidence.literal.offset) firstIncidenceEq
+    have secondLiteralOffsetEqual :
+        secondTagged.1.literal.offset = secondLiteral.offset :=
+      congrArg (fun incidence : CNFIncidence Variable =>
+        incidence.literal.offset) secondIncidenceEq
+    exact firstLiteralOffsetEqual.symm.trans
+      (taggedOffsetsEqual.trans secondLiteralOffsetEqual)
   have literalIndicesEqual :
       first.2.2 = second.2.2 := by
-    have clauseAtomsNodup :=
-      atomsNodup firstClause
+    have clauseIncidenceKeysNodup :
+        firstClause.IncidenceKeysNodup := by
+      rw [PositionedPeriodicCNF.AllIncidenceKeysNodup]
+        at incidenceKeysNodup
+      exact incidenceKeysNodup firstClause
         (List.fst_mem_of_mem_zipIdx firstClauseMember)
-    unfold PositionedPeriodicClause.AtomsNodup at clauseAtomsNodup
+    rw [PositionedPeriodicClause.IncidenceKeysNodup]
+      at clauseIncidenceKeysNodup
     have firstIndexLt :
         firstTagged.1.literalIndex <
           firstClause.literals.length :=
@@ -560,11 +690,13 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
         secondTagged.1.literalIndex <
           firstClause.literals.length :=
       List.snd_lt_of_mem_zipIdx secondLiteralMember
-    have atomsEqualAtIndices :
-        (firstClause.literals.map PeriodicLiteral.atom)[
+    have keysEqualAtIndices :
+        (firstClause.literals.map fun literal =>
+          (literal.atom, literal.offset))[
             firstTagged.1.literalIndex]'(by
               simpa using firstIndexLt) =
-          (firstClause.literals.map PeriodicLiteral.atom)[
+          (firstClause.literals.map fun literal =>
+            (literal.atom, literal.offset))[
             secondTagged.1.literalIndex]'(by
               simpa using secondIndexLt) := by
       simp only [List.getElem_map]
@@ -581,12 +713,14 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
           ((List.mem_zipIdx_iff_getElem?).mp
             secondLiteralMember)).2
       rw [firstAt, secondAt]
-      exact firstAtom.trans secondAtom.symm
+      exact Prod.ext
+        (firstAtom.trans secondAtom.symm)
+        literalOffsetsEqual
     have taggedLiteralIndicesEqual :
         firstTagged.1.literalIndex =
           secondTagged.1.literalIndex :=
-      clauseAtomsNodup.getElem_inj_iff.mp
-        atomsEqualAtIndices
+      clauseIncidenceKeysNodup.getElem_inj_iff.mp
+        keysEqualAtIndices
     exact firstLiteralIndex.symm.trans
       (taggedLiteralIndicesEqual.trans secondLiteralIndex)
   apply copiesDifferent

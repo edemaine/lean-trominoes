@@ -1717,13 +1717,24 @@ The representation choices for this target are:
   terminal vectors implies duplicate-free angular profiles.
 - [`LeanTrominoes/RetainedOccurrenceTerminalVectorDistinctness.lean`](LeanTrominoes/RetainedOccurrenceTerminalVectorDistinctness.lean)
   derives that source-level terminal-vector injectivity from the actual
-  endpoint-only route-contact interface, compatibility, and per-clause atom
-  distinctness.  Equal vectors align the two penultimate points after undoing
-  their periodic endpoint shifts; endpoint-only contact forces the exceptional
-  direct-route case, where fundamental-square uniqueness identifies the
-  clause and local atom distinctness identifies the literal.  This leaves
-  only the retained formula's syntactic atom-distinctness certificate to
-  discharge before the generic gate-separation theorem applies.
+  endpoint-only route-contact interface, compatibility, and per-clause
+  incidence-key distinctness.  Equal vectors align the two penultimate points
+  after undoing their periodic endpoint shifts; endpoint-only contact forces
+  the exceptional direct-route case, where fundamental-square uniqueness
+  identifies the clause and the route alignment identifies the offset.
+  Uniqueness of `(atom, offset)` then identifies the literal.  This deliberately
+  permits legitimate periodic self-links whose two occurrences use different
+  offsets, and leaves only that weaker syntactic certificate to discharge
+  before the generic gate-separation theorem applies.
+- [`LeanTrominoes/RetainedSourceIncidenceDistinctness.lean`](LeanTrominoes/RetainedSourceIncidenceDistinctness.lean)
+  proves that every finite retained construction clause has distinct atoms
+  and transports this fact through periodicization.  It then establishes
+  generic incidence-key preservation under injective renaming, variable
+  gauging, clause-anchor normalization, and representative deduplication.
+- [`LeanTrominoes/RetainedFinalSourceIncidenceDistinctness.lean`](LeanTrominoes/RetainedFinalSourceIncidenceDistinctness.lean)
+  assembles those component and preservation results across the complete
+  retained-source bookkeeping pipeline, certifying the incidence-key
+  distinctness needed by the terminal-vector argument.
 - [`LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean`](LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean)
   identifies Figure 7's eight boundary sites with the east-first compass
   vectors of radius twelve around the scaled source-variable center.  It
