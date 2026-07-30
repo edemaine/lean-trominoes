@@ -138,6 +138,45 @@ theorem getLast?_ne_some_of_mem_dropLast_of_nodup
     List.disjoint_of_nodup_append appendedNodup
   exact disjoint member (by simp)
 
+/-- A simple route's final point is completely clear of the prefix obtained
+by deleting that point: it is neither a listed prefix point nor anywhere on
+an axis-aligned prefix segment. -/
+theorem routeIsSimple_dropLast_avoids_final_point
+    {route : List Cell} {finalPoint : Cell}
+    (simple : LocalIncidenceDrawing.RouteIsSimple route)
+    (finalPointEq : route.getLast? = some finalPoint) :
+    (∀ point ∈ route.dropLast, point ≠ finalPoint) ∧
+      ∀ segment ∈ gridPolylineSegments route.dropLast,
+        segment.IsAxisAligned →
+          ¬segment.Contains finalPoint := by
+  have pointAvoid :
+      ∀ point ∈ route.dropLast, point ≠ finalPoint := by
+    intro point pointMember equal
+    subst point
+    exact
+      (getLast?_ne_some_of_mem_dropLast_of_nodup
+        simple.1 pointMember)
+        finalPointEq
+  refine ⟨pointAvoid, ?_⟩
+  intro segment segmentMember _axisAligned contains
+  have segmentOriginal :
+      segment ∈ gridPolylineSegments route :=
+    gridPolylineSegments_dropLast_subset route segmentMember
+  rcases
+      GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+        contains with
+    interior | endpoint
+  · exact
+      (simple.2.1 finalPoint
+        (mem_of_getLast?_eq_some finalPointEq)
+        segment segmentOriginal)
+        interior
+  · have endpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    rcases endpoint with atStart | atFinish
+    · exact (pointAvoid segment.start endpoints.1) atStart.symm
+    · exact (pointAvoid segment.finish endpoints.2) atFinish.symm
+
 /-- Endpoint-only contact leaves no contact between final-point-deleted
 prefixes when both routes are simple and have different source endpoints. -/
 theorem noContact_dropLast_of_avoid_of_nodup_of_heads_ne

@@ -1,6 +1,7 @@
 import LeanTrominoes.RetainedAngularFanOuterLocalRoutes
 import LeanTrominoes.RetainedAngularFanSourceScaling
 import LeanTrominoes.ScaledPointNeighborhoodSeparation
+import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
 
 /-!
 # Separating a refined source prefix from a local outer fan
@@ -102,6 +103,33 @@ theorem
   simpa [combinedFactor, scalePolyline,
     List.map_map, Function.comp_def,
     Cell.scale_scale, Nat.cast_mul] using separated
+
+/-- Route simplicity supplies all clearance hypotheses when the local fan is
+centered at the source route's own final variable endpoint. -/
+theorem
+    retainedAngularFanSourceScaledPrefix_strictlyAvoids_ownOuterLocalRoute
+    {factor : Nat} (factorGreaterThanOne : 1 < factor)
+    (sourceRoute : List Cell)
+    (center : Cell)
+    (direction : RetainedTerminalDirection)
+    (slot : RetainedTerminalSlot)
+    (sourceSimple :
+      LocalIncidenceDrawing.RouteIsSimple sourceRoute)
+    (sourceFinal : sourceRoute.getLast? = some center) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor sourceRoute)).dropLast
+      (retainedTerminalFanOuterLocalRouteAt
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (Cell.scale factor center))
+        direction slot) := by
+  have clearance :=
+    routeIsSimple_dropLast_avoids_final_point
+      sourceSimple sourceFinal
+  exact
+    retainedAngularFanSourceScaledPrefix_strictlyAvoids_outerLocalRoute
+      factorGreaterThanOne sourceRoute center direction slot
+      clearance.1 clearance.2
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
