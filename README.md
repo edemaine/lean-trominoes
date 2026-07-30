@@ -800,6 +800,12 @@ The representation choices for this target are:
   proves that this strict form composes through endpoint joins on either
   side.  This is the form needed while tile endpoints become internal
   points of a recursively assembled corridor.
+  [`LeanTrominoes/OrthogonalPolylineLinearSeparation.lean`](LeanTrominoes/OrthogonalPolylineLinearSeparation.lean)
+  proves a complementary half-plane certificate: strict opposite-side
+  bounds for an integer linear functional imply complete continuous route
+  separation.  The proof covers perpendicular crossings, listed-point
+  contacts, and collinear open-interval overlap, enabling parametric
+  separation of arbitrary-length angular ray families.
   [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceSeparation.lean)
   identifies each active rebased source route by its stable drawing-route
   index and lattice translate, proves this key injective on active
