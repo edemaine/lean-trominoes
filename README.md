@@ -1738,6 +1738,12 @@ The representation choices for this target are:
   counting closer gates.  Validity proves every number is below eight and
   proves lane injectivity within each tied direction block; the assignment is
   unchanged by positive refinement.
+- [`LeanTrominoes/RetainedAngularTerminalAdapterPorts.lean`](LeanTrominoes/RetainedAngularTerminalAdapterPorts.lean)
+  combines the eleven retained angular directions with the eight radial
+  lanes into 88 fixed adapter-port identities.  The direction-and-lane
+  encoding is injective, distinct active slots of every valid finite shape
+  select distinct ports, and positive uniform refinement preserves those
+  selections.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
