@@ -1763,6 +1763,12 @@ The representation choices for this target are:
   radius-12 Figure 7 boundary sites.  Their endpoints are exact and the eight
   translated route point sets are pairwise disjoint.  The shape-dependent
   fan-facing sites lie on the separate radius-33 outer frame.
+- [`LeanTrominoes/RetainedAngularFanAnnulusDemands.lean`](LeanTrominoes/RetainedAngularFanAnnulusDemands.lean)
+  packages each active fan-side connection as an exact radius-33 outer
+  endpoint and radius-22 compass anchor.  Both endpoint families are
+  injective, their strict clockwise orders are proved equivalent to slot
+  order, and the complete finite demand is invariant under positive
+  refinement.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
