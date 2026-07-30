@@ -1927,6 +1927,12 @@ The representation choices for this target are:
   replacement of a route's old variable endpoint by a retained fan suffix.
   This is the source-prefix splice used before final orthogonal
   rasterization.
+- [`LeanTrominoes/RetainedAngularFanSourceSplice.lean`](LeanTrominoes/RetainedAngularFanSourceSplice.lean)
+  performs that splice on one classified retained source route at the
+  combined scale `288`.  It replaces the old variable endpoint by the exact
+  profile-selected outer fan route, rasterizes the retained result, and
+  proves the scaled clause endpoint, refined Figure 7 boundary endpoint,
+  and orthogonality.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase

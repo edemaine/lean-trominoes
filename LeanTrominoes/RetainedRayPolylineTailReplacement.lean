@@ -14,6 +14,40 @@ needed to certify that combined route.
 -/
 
 namespace LeanTrominoes
+
+/-- A list of length at least two has a genuine penultimate point, exposed
+as the head of the reversed tail. -/
+theorem exists_reverse_tail_head?_of_two_le_length
+    {α : Type*} (route : List α)
+    (routeLength : 2 ≤ route.length) :
+    ∃ entrance, route.reverse.tail.head? = some entrance := by
+  generalize reversedEq : route.reverse = reversed
+  cases reversed with
+  | nil =>
+      have routeEq : route = [] := by
+        simpa using congrArg List.reverse reversedEq
+      subst route
+      simp at routeLength
+  | cons target rest =>
+      cases rest with
+      | nil =>
+          have routeEq : route = [target] := by
+            simpa using congrArg List.reverse reversedEq
+          subst route
+          simp at routeLength
+      | cons entrance rest =>
+          exact ⟨entrance, rfl⟩
+
+/-- The reversed-tail view and the `dropLast` view expose the same
+penultimate point. -/
+theorem dropLast_getLast?_of_reverse_tail_head?
+    {α : Type*} {route : List α} {entrance : α}
+    (reverseTailHead :
+      route.reverse.tail.head? = some entrance) :
+    route.dropLast.getLast? = some entrance := by
+  rw [← List.head?_reverse]
+  simpa using reverseTailHead
+
 namespace PeriodicEightOccurrenceSplit
 
 /-- Segmentwise retained-ray membership is equivalently a chain condition
