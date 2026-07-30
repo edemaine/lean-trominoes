@@ -488,6 +488,48 @@ instance (first second : List Cell) :
   unfold SourcePointSegmentRectanglesSeparated
   infer_instance
 
+/-- Strict separation from an orthogonal second route implies separation of
+every first-route point rectangle from every second-route segment
+rectangle. -/
+theorem SourcePointSegmentRectanglesSeparated.of_strictlyAvoid
+    {first second : List Cell}
+    (secondOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline second)
+    (avoid :
+      RoutesStrictlyAvoidEachOther first second) :
+    SourcePointSegmentRectanglesSeparated first second := by
+  have secondAligned :=
+    (PeriodicOrthocrossing.orthogonalPolyline_iff_segments
+      second).mp secondOrthogonal
+  intro firstPoint firstPointMember
+    secondSegment secondSegmentMember
+  have secondEndpoints :=
+    gridPolylineSegments_endpoints_mem secondSegmentMember
+  have notContained :
+      ¬secondSegment.Contains firstPoint := by
+    intro contained
+    rcases
+        GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+          contained with
+      interior | endpoint
+    · exact
+        (avoid.2.1 firstPoint firstPointMember
+          secondSegment secondSegmentMember)
+          interior
+    · rcases endpoint with atStart | atFinish
+      · exact
+          (avoid.2.2.2 firstPoint firstPointMember
+            secondSegment.start secondEndpoints.1)
+            atStart
+      · exact
+          (avoid.2.2.2 firstPoint firstPointMember
+            secondSegment.finish secondEndpoints.2)
+            atFinish
+  exact
+    (secondSegment.coordinateRectangle_separated_point
+      (secondAligned secondSegment secondSegmentMember)
+      notContained).symm
+
 /-- Point/segment separation handles singleton first routes, while
 segment/segment separation handles every nondegenerate first route. -/
 def SourcePolylineRectanglesSeparated
@@ -499,6 +541,22 @@ instance (first second : List Cell) :
     Decidable (SourcePolylineRectanglesSeparated first second) := by
   unfold SourcePolylineRectanglesSeparated
   infer_instance
+
+/-- Strict separation of two orthogonal source routes supplies the complete
+point/segment and segment/segment rectangle certificate. -/
+theorem SourcePolylineRectanglesSeparated.of_strictlyAvoid
+    {first second : List Cell}
+    (firstOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline first)
+    (secondOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline second)
+    (avoid :
+      RoutesStrictlyAvoidEachOther first second) :
+    SourcePolylineRectanglesSeparated first second :=
+  ⟨SourcePointSegmentRectanglesSeparated.of_strictlyAvoid
+      secondOrthogonal avoid,
+    SourceSegmentRectanglesSeparated.of_strictlyAvoid
+      firstOrthogonal secondOrthogonal avoid⟩
 
 /-- The rasterization-separation lift also covers a singleton first
 polyline.  This is essential for a two-point incidence route, whose
