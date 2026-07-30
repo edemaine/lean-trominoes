@@ -1689,6 +1689,11 @@ The representation choices for this target are:
   direction.  This handles the stable angular ties intentionally present in
   Figure 8(b): equal-direction incidences remain separate radial splice data
   instead of collapsing to one gate.
+- [`LeanTrominoes/RetainedTerminalSplicePoint.lean`](LeanTrominoes/RetainedTerminalSplicePoint.lean)
+  identifies each classified `(direction, length)` datum with the actual
+  penultimate point of its source polyline.  Thus the overlapping old final
+  segment can be discarded and a new local suffix can attach at an exact,
+  nondegenerate radial splice point.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
