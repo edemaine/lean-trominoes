@@ -33,8 +33,9 @@ theorem retainedAngularFanSplicedBoundaryPolylines_strictlyAvoid
       retainedTerminalDirectionClassify
           (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
         some secondTerminal)
-    (originalAvoid :
-      RoutesStrictlyAvoidEachOther firstRoute secondRoute)
+    (sourcePrefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstRoute.dropLast secondRoute.dropLast)
     (firstPrefixAvoidSecondFan :
       RoutesStrictlyAvoidEachOther
         (scalePolyline retainedTerminalFanTotalRefinement
@@ -146,15 +147,20 @@ theorem retainedAngularFanSplicedBoundaryPolylines_strictlyAvoid
             secondCenter secondTerminal secondSlot).gate := by
     exact retainedTerminalFanOuterCompleteRoute_head?
       secondCenter secondTerminal secondSlot
-  have scaledOriginalAvoid :
-      RoutesStrictlyAvoidEachOther firstScaled secondScaled := by
-    exact originalAvoid.scalePolyline
-      (by
-        norm_num [retainedTerminalFanTotalRefinement,
-          PeriodicEightOccurrenceSplitPositioned.refinementScale,
-          retainedTerminalFanRoutingRefinement])
-  apply RoutesStrictlyAvoidEachOther.replace_tails
-    scaledOriginalAvoid
+  have scaledPrefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstScaled.dropLast secondScaled.dropLast := by
+    have scaled :=
+      sourcePrefixesAvoid.scalePolyline
+        (factor :=
+          (retainedTerminalFanTotalRefinement : Int))
+        (by
+          norm_num [retainedTerminalFanTotalRefinement,
+            PeriodicEightOccurrenceSplitPositioned.refinementScale,
+            retainedTerminalFanRoutingRefinement])
+    simpa [firstScaled, secondScaled, scalePolyline] using scaled
+  apply RoutesStrictlyAvoidEachOther.replace_tails_of_prefixes
+    scaledPrefixesAvoid
     (by simpa [firstScaled, secondFan, secondCenter] using
       firstPrefixAvoidSecondFan)
     (by simpa [firstFan, firstCenter, secondScaled] using

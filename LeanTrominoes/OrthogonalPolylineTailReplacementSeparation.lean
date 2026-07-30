@@ -189,6 +189,56 @@ theorem routesStrictlyAvoidEachOther_dropLast_of_avoid_of_nodup_of_heads_ne
     (noContact_dropLast_of_avoid_of_nodup_of_heads_ne
       avoid firstNodup secondNodup headsDifferent)
 
+/-- Simultaneous tail replacement preserves strict separation once all four
+prefix/suffix pairs are strictly separated. -/
+theorem RoutesStrictlyAvoidEachOther.replace_tails_of_prefixes
+    {first second firstReplacement secondReplacement : List Cell}
+    {firstMiddle secondMiddle : Cell}
+    (prefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        first.dropLast second.dropLast)
+    (firstPrefixAvoidSecondReplacement :
+      RoutesStrictlyAvoidEachOther
+        first.dropLast secondReplacement)
+    (firstReplacementAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement second.dropLast)
+    (replacementsAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement secondReplacement)
+    (firstEntrance :
+      first.dropLast.getLast? = some firstMiddle)
+    (firstReplacementHead :
+      firstReplacement.head? = some firstMiddle)
+    (secondEntrance :
+      second.dropLast.getLast? = some secondMiddle)
+    (secondReplacementHead :
+      secondReplacement.head? = some secondMiddle) :
+    RoutesStrictlyAvoidEachOther
+    (replacePolylineTail first firstReplacement)
+      (replacePolylineTail second secondReplacement) := by
+  rw [PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
+      first firstReplacement firstEntrance firstReplacementHead,
+    PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
+      second secondReplacement secondEntrance secondReplacementHead]
+  have joinedAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        (joinAtEndpoint first.dropLast firstReplacement)
+        second.dropLast :=
+    prefixesAvoid.join_left
+      firstReplacementAvoidSecondPrefix
+      firstEntrance firstReplacementHead
+  have joinedAvoidSecondReplacement :
+      RoutesStrictlyAvoidEachOther
+        (joinAtEndpoint first.dropLast firstReplacement)
+        secondReplacement :=
+    firstPrefixAvoidSecondReplacement.join_left
+      replacementsAvoid
+      firstEntrance firstReplacementHead
+  exact joinedAvoidSecondPrefix.join_right
+    joinedAvoidSecondReplacement
+    secondEntrance secondReplacementHead
+
 /-- Simultaneous tail replacement preserves strict separation once the
 four prefix/suffix pairs are strictly separated.
 
@@ -219,27 +269,12 @@ theorem RoutesStrictlyAvoidEachOther.replace_tails
       secondReplacement.head? = some secondMiddle) :
     RoutesStrictlyAvoidEachOther
       (replacePolylineTail first firstReplacement)
-      (replacePolylineTail second secondReplacement) := by
-  rw [PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
-      first firstReplacement firstEntrance firstReplacementHead,
-    PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
-      second secondReplacement secondEntrance secondReplacementHead]
-  have joinedAvoidSecondPrefix :
-      RoutesStrictlyAvoidEachOther
-        (joinAtEndpoint first.dropLast firstReplacement)
-        second.dropLast :=
-    (originalAvoid.dropLast_left.dropLast_right).join_left
-      firstReplacementAvoidSecondPrefix
-      firstEntrance firstReplacementHead
-  have joinedAvoidSecondReplacement :
-      RoutesStrictlyAvoidEachOther
-        (joinAtEndpoint first.dropLast firstReplacement)
-        secondReplacement :=
-    firstPrefixAvoidSecondReplacement.join_left
-      replacementsAvoid
-      firstEntrance firstReplacementHead
-  exact joinedAvoidSecondPrefix.join_right
-    joinedAvoidSecondReplacement
+      (replacePolylineTail second secondReplacement) :=
+  RoutesStrictlyAvoidEachOther.replace_tails_of_prefixes
+    (originalAvoid.dropLast_left.dropLast_right)
+    firstPrefixAvoidSecondReplacement
+    firstReplacementAvoidSecondPrefix replacementsAvoid
+    firstEntrance firstReplacementHead
     secondEntrance secondReplacementHead
 
 end EmbeddedCNFIncidenceDrawing
