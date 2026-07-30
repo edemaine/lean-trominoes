@@ -800,6 +800,11 @@ The representation choices for this target are:
   proves that this strict form composes through endpoint joins on either
   side.  This is the form needed while tile endpoints become internal
   points of a recursively assembled corridor.
+  [`LeanTrominoes/OrthogonalPolylineMiddleCoarsening.lean`](LeanTrominoes/OrthogonalPolylineMiddleCoarsening.lean)
+  proves that strict continuous separation survives removal of a listed
+  point lying inside one axis-aligned segment.  It accounts for the possible
+  crossing at the removed point as well as contacts with either resulting
+  open subsegment.
   [`LeanTrominoes/OrthogonalPolylineLinearSeparation.lean`](LeanTrominoes/OrthogonalPolylineLinearSeparation.lean)
   proves a complementary half-plane certificate: strict opposite-side
   bounds for an integer linear functional imply complete continuous route
