@@ -1853,6 +1853,12 @@ The representation choices for this target are:
   while endpoint, orthogonality, frame, and fan-interior certificates
   describe each complete route; translation positions the same adapter at
   any retained variable center.
+- [`LeanTrominoes/RetainedAngularFanOuterCompleteRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterCompleteRoutes.lean)
+  splices each source-gate-to-radius-288 radial lane to that positioned
+  finite adapter.  Positive profile entries select complete routes with
+  exact source-gate and Figure 7 endpoints and certified orthogonality, and
+  genuine source occurrences select their exact classified route.  General
+  separation of the arbitrary-length radial pieces remains the next layer.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
