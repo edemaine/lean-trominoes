@@ -3,10 +3,13 @@ import LeanTrominoes.PeriodicCNFPlanarEightOccurrenceSplit
 /-!
 # Positioned fixed-eight occurrence splitting
 
-This module places the separator-enhanced Figure 7 implication ring in a
-uniform `24 × 24` refinement macrocell around each source variable.  Its positioned
-formula erases exactly to the verified semantic fixed-eight construction,
-and its variable placement uses the certified local ring coordinates.
+This module places the separator-enhanced Figure 7 implication ring around
+each source variable after a uniform factor-36 refinement.  The local fan
+itself still occupies its certified `24 × 24` macrocell.  The extra margin
+puts all eleven retained terminal slopes on a common square interface, which
+is used by the planar annular adapter.  The positioned formula erases exactly
+to the verified semantic fixed-eight construction, and its variable placement
+uses the certified local ring coordinates.
 -/
 
 namespace LeanTrominoes
@@ -15,7 +18,7 @@ namespace PeriodicEightOccurrenceSplitPositioned
 open OccurrenceSplitRing
 open PeriodicThreeSATThree
 
-def refinementScale : Int := 24
+def refinementScale : Int := 36
 
 def macroOrigin {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
@@ -146,7 +149,7 @@ theorem placement_period_pos {Variable : Type*}
     (sourcePeriodPositive : 0 < sourcePlacement.period) :
     0 < (placement sourcePlacement).period := by
   simpa [placement, refinementScale] using
-    Nat.mul_pos (by decide : 0 < 24) sourcePeriodPositive
+    Nat.mul_pos (by decide : 0 < 36) sourcePeriodPositive
 
 @[simp]
 theorem occurrenceVariablePosition_copy {Variable : Type*}

@@ -1711,8 +1711,13 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean`](LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean)
   identifies Figure 7's eight boundary sites with the east-first compass
   vectors of radius twelve around the scaled source-variable center.  It
-  proves those sites distinct and proves every positive factor-24 retained
+  proves those sites distinct and proves every positive factor-36 retained
   splice gate lies strictly outside the local fan square.
+- [`LeanTrominoes/RetainedAngularTerminalInterfaceGeometry.lean`](LeanTrominoes/RetainedAngularTerminalInterfaceGeometry.lean)
+  uses the factor-36 refinement to put all eleven retained slopes on one
+  fixed radius-36 square.  Every unbounded scaled splice gate is proved to be
+  a positive radial multiple of its direction's fixed interface point,
+  reducing the remaining annular adapter to finite geometry.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase

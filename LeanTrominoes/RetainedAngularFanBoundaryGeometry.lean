@@ -9,7 +9,7 @@ around the uniformly scaled source-variable center.  Its eight boundary
 sites are exactly the east-first compass vectors of length twelve.
 
 This file exposes those centered coordinates and proves that every positive
-retained terminal gate after the factor-24 refinement lies strictly outside
+retained terminal gate after the factor-36 refinement lies strictly outside
 that square.  Thus an adapter route always runs from a certified exterior
 splice point to a distinct boundary site of the local fan.
 -/
@@ -110,7 +110,7 @@ theorem angularFanBoundaryPositionAt_eq_scaledCenter_add_offset
     refinementScale, Cell.add, Cell.scale] <;>
     ring
 
-/-- A positive retained terminal datum, after the factor-24 Figure 7
+/-- A positive retained terminal datum, after the factor-36 Figure 7
 refinement, reconstructs a splice point strictly outside the local
 coordinate-radius twelve square. -/
 theorem scaledRetainedTerminalSplicePoint_outside_fan
