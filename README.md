@@ -1933,6 +1933,11 @@ The representation choices for this target are:
   profile-selected outer fan route, rasterizes the retained result, and
   proves the scaled clause endpoint, refined Figure 7 boundary endpoint,
   and orthogonality.
+- [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
+  lifts the splice to a total clause/literal-indexed boundary-route family.
+  Genuine source incidences select their exact classified terminal data and
+  bounded angular slot, with certified scale-288 clause endpoints,
+  factor-eight Figure 7 boundary endpoints, and orthogonality.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
