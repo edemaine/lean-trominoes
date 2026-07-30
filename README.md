@@ -1995,7 +1995,10 @@ The representation choices for this target are:
   after rasterization and subdivision.  In particular, the scaled discarded
   final segment of a classified route rasterizes to its exact canonical
   forward retained ray, so each refined terminal checkpoint is an actual
-  point of that unit-grid route.
+  point of that unit-grid route.  These local membership facts lift to the
+  complete scaled route: disjointness of two canonical refined unit-grid
+  routes now implies the finite checkpoint-avoidance certificate and hence
+  the mixed source-prefix corridor separation needed by the angular fan.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
