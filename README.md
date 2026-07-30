@@ -1905,6 +1905,12 @@ The representation choices for this target are:
   local fan adapters.  Cardinal rasters are represented by one long segment;
   an explicit collinear coarsening certificate relates that direct segment
   to the same split geometry.
+- [`LeanTrominoes/RetainedAngularFanOuterCrossSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterCrossSeparation.lean)
+  proves both radial-versus-local separation orientations for ordered active
+  profile slots.  It transports positive cardinal routes through collinear
+  coarsening, handles the finite zero-block case separately, and uses
+  duplicate-free gates to exclude the sole obstructed equal-direction
+  ordering.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
