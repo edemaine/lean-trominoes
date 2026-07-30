@@ -2084,6 +2084,13 @@ The representation choices for this target are:
   certificates, automatically.  The finite source-polyline rectangle
   certificate then proves the directed scaled source-prefix versus complete
   outer-fan separation theorem without leaving a separate corridor premise.
+- [`LeanTrominoes/PolylineBoundingBoxRasterSeparation.lean`](LeanTrominoes/PolylineBoundingBoxRasterSeparation.lean)
+  converts containment in two separated closed rectangles into the complete
+  point/segment and segment/segment certificate required by factor-288
+  rasterization, without assuming that the reference route is orthogonal.
+  It specializes this fact both to the retained-terminal corridor and
+  directly to two genuine final retained routes, thereby closing every mixed
+  source-prefix/fan case whose route pieces occupy distinct bounding boxes.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
