@@ -1879,6 +1879,13 @@ The representation choices for this target are:
   stubs strictly avoid all order-compatible local fan routes in both
   orientations, and translation positions the certificates at any retained
   source center.
+- [`LeanTrominoes/RetainedAngularFanOuterRadialPrefixes.lean`](LeanTrominoes/RetainedAngularFanOuterRadialPrefixes.lean)
+  removes that last block from every nonempty radial raster.  Exact endpoint
+  and orthogonality theorems place the shortened route one primitive beyond
+  its lane port; monotonicity of compass and exceptional staircases then
+  proves the entire arbitrary-length prefix strictly outside a supporting
+  side of the radius-288 frame, hence strictly separated from every local
+  fan route.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
