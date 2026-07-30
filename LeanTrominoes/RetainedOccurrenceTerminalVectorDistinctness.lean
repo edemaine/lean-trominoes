@@ -33,7 +33,7 @@ namespace PositionedPeriodicClause
 /-- No physical periodic incidence `(atom, offset)` is repeated within a
 positioned clause.  Literal polarity is intentionally irrelevant. -/
 irreducible_def IncidenceKeysNodup
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*}
     (clause : PositionedPeriodicClause Variable) : Prop :=
   (clause.literals.map fun literal =>
     (literal.atom, literal.offset)).Nodup
@@ -45,7 +45,7 @@ namespace PositionedPeriodicCNF
 /-- Every positioned clause lists each physical periodic incidence at most
 once. -/
 irreducible_def AllIncidenceKeysNodup
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*}
     (source : PositionedPeriodicCNF Variable) : Prop :=
   ∀ clause ∈ source.clauses, clause.IncidenceKeysNodup
 
@@ -261,7 +261,18 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
     (incidenceKeysNodup : source.AllIncidenceKeysNodup) :
     RetainedOccurrenceTerminalVectorsInjective
       source.erase routes := by
-  intro atom first firstMember second secondMember vectorsEqual
+  intro first firstAllMember second secondAllMember
+    atomsEqual vectorsEqual
+  let atom := first.1
+  have firstMember :
+      first ∈ occurrenceVariables source.erase atom :=
+    (mem_occurrenceVariables_iff
+      source.erase atom first).mpr ⟨firstAllMember, rfl⟩
+  have secondMember :
+      second ∈ occurrenceVariables source.erase atom :=
+    (mem_occurrenceVariables_iff
+      source.erase atom second).mpr
+        ⟨secondAllMember, atomsEqual.symm⟩
   by_contra copiesDifferent
   rcases
       exists_taggedIncidence_of_mem_occurrenceVariables
@@ -328,11 +339,7 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
       rw [← firstLiteralIndex, ← secondLiteralIndex, taggedEqual]
     apply copiesDifferent
     apply Prod.ext
-    · exact
-        (occurrenceVariables_fst source.erase atom
-          firstMember).trans
-          (occurrenceVariables_fst source.erase atom
-            secondMember).symm
+    · exact atomsEqual
     · exact Prod.ext clauseIndicesEqual literalIndicesEqual
   have pointKeysDifferent :
       PeriodicGridDrawing.RoutePointOccurrenceKey
@@ -725,12 +732,33 @@ theorem retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
       (taggedLiteralIndicesEqual.trans secondLiteralIndex)
   apply copiesDifferent
   apply Prod.ext
-  · exact
-      (occurrenceVariables_fst source.erase atom
-        firstMember).trans
-        (occurrenceVariables_fst source.erase atom
-          secondMember).symm
+  · exact atomsEqual
   · exact Prod.ext clauseIndicesEqual literalIndicesEqual
+
+/-- Transport the endpoint-contact argument across a named presentation of
+the same positioned incidence drawing. -/
+theorem retainedOccurrenceTerminalVectorsInjective_of_drawing_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (drawing : PeriodicGridDrawing)
+    (drawingEq :
+      drawing =
+        PositionedPeriodicCNF.incidenceDrawing
+          source placement routes)
+    (compatible :
+      drawing.IsCompatible source.erase.incidenceGraph)
+    (endpointContacts :
+      drawing.RoutePointsMeetOnlyAtEndpoints)
+    (incidenceKeysNodup : source.AllIncidenceKeysNodup) :
+    RetainedOccurrenceTerminalVectorsInjective
+      source.erase routes := by
+  subst drawing
+  exact
+    retainedOccurrenceTerminalVectorsInjective_of_endpointContacts
+      source placement routes compatible endpointContacts
+      incidenceKeysNodup
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

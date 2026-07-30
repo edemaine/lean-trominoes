@@ -96,21 +96,36 @@ theorem
 physical incidence key twice within one clause. -/
 theorem
     retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_allIncidenceKeysNodup
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (wellFormed : formula.incidenceGraph.IsWellFormed)
     (degree : formula.incidenceGraph.DegreeAtMost 3)
     (isLocal : formula.incidenceGraph.IsLocal) :
-    let source :=
-      retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-        formula
-    source.deduplicateByLiterals.AllIncidenceKeysNodup := by
-  dsimp only
-  apply
-    PositionedPeriodicCNF.allIncidenceKeysNodup_deduplicateByLiterals
+    (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula).AllIncidenceKeysNodup := by
   exact
-    retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_allIncidenceKeysNodup
-      formula wellFormed degree isLocal
+    (congrArg
+      (fun source :
+          PositionedPeriodicCNF
+            (WrappedPeriodicPlanarSATVariable Variable) =>
+        source.AllIncidenceKeysNodup)
+      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_eq
+        formula)).mpr
+      (@PositionedPeriodicCNF.allIncidenceKeysNodup_deduplicateByLiterals
+        (WrappedPeriodicPlanarSATVariable Variable)
+        (fun first second =>
+          @instDecidableEqWrappedPeriodicVariable
+            (PeriodicPlanarSATVariable Variable)
+            (fun firstOriginal secondOriginal =>
+              @instDecidableEqPeriodicPlanarSATVariable
+                Variable variableDecidableEq
+                firstOriginal secondOriginal)
+            first second)
+        (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula)
+        (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_allIncidenceKeysNodup
+          formula wellFormed degree isLocal))
 
 end PeriodicOrthocrossing
 end LeanTrominoes

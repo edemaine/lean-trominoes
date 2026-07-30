@@ -1735,6 +1735,11 @@ The representation choices for this target are:
   assembles those component and preservation results across the complete
   retained-source bookkeeping pipeline, certifying the incidence-key
   distinctness needed by the terminal-vector argument.
+- [`LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean`](LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean)
+  instantiates the terminal-vector argument at the complete retained drawing.
+  Its compatibility, endpoint-only route-contact, and final incidence-key
+  certificates prove injectivity of same-variable terminal vectors and hence
+  duplicate-free radial splice gates for every fitted angular profile.
 - [`LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean`](LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean)
   identifies Figure 7's eight boundary sites with the east-first compass
   vectors of radius twelve around the scaled source-variable center.  It

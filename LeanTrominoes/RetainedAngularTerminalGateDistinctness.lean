@@ -148,19 +148,32 @@ theorem RetainedAngularTerminalProfile.scale_gatesDistinct
 
 /-! ## Obtaining gate distinctness from source terminal vectors -/
 
+/-- Membership in a per-atom occurrence list is membership in the complete
+occurrence list together with the expected source atom. -/
+theorem mem_occurrenceVariables_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable)
+    (copy : ThreeOccurrenceVariable Variable) :
+    copy ∈ occurrenceVariables source atom ↔
+      copy ∈ allOccurrenceVariables source ∧ copy.1 = atom := by
+  rw [occurrenceVariables_eq_filter]
+  simp
+
 /-- Source-level geometric condition sufficient for gate separation:
 genuine occurrences of one variable have different backwards terminal
 vectors.  The occurrence copies themselves retain their clause/literal
 presentation indices, so this condition remains meaningful when a clause
 contains syntactically equal literals. -/
 def RetainedOccurrenceTerminalVectorsInjective
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*}
     (source : PeriodicCNF Variable)
     (routes : PositionedPeriodicCNF.IncidenceRoutes) : Prop :=
-  ∀ atom first,
-    first ∈ occurrenceVariables source atom →
+  ∀ first,
+    first ∈ allOccurrenceVariables source →
       ∀ second,
-        second ∈ occurrenceVariables source atom →
+        second ∈ allOccurrenceVariables source →
+          first.1 = second.1 →
           occurrenceTerminalVector routes first =
               occurrenceTerminalVector routes second →
             first = second
@@ -207,7 +220,18 @@ theorem classifiedRetainedTerminalData_injective_on_occurrences
         classifiedRetainedTerminalData
           (occurrenceTerminalVector routes second)) :
     first = second := by
-  apply vectorsInjective atom first firstMember second secondMember
+  apply vectorsInjective
+    first
+    ((mem_occurrenceVariables_iff
+      source atom first).mp firstMember).1
+    second
+    ((mem_occurrenceVariables_iff
+      source atom second).mp secondMember).1
+  · exact
+      ((mem_occurrenceVariables_iff
+        source atom first).mp firstMember).2.trans
+        ((mem_occurrenceVariables_iff
+          source atom second).mp secondMember).2.symm
   rw [
     retainedTerminalVector_eq_scale_classifiedRetainedTerminalData
       (retained atom first firstMember),

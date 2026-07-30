@@ -116,6 +116,19 @@ def
   (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
     formula).deduplicateByLiterals
 
+/-- The final retained source is definitionally the deduplicated normalized
+source.  This named equation avoids re-elaborating the large construction
+when downstream proofs transport certificates across the definition. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula =
+      (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).deduplicateByLiterals :=
+  rfl
+
 /-- Variable gauging, anchor normalization, wrapping, and clause
 deduplication together preserve the retained periodic SAT semantics. -/
 theorem
@@ -165,6 +178,22 @@ def
     (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
     (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
       formula)
+
+/-- The named final drawing is exactly the positioned incidence drawing
+assembled from the final source, placement, and routes. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+        formula =
+      PositionedPeriodicCNF.incidenceDrawing
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula)
+        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+          formula) :=
+  rfl
 
 /-- The canonically gauged and transported routes have the exact endpoints
 of the final periodic incidence graph. -/
