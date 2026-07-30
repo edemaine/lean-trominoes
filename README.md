@@ -1794,6 +1794,12 @@ The representation choices for this target are:
   injective, their strict clockwise orders are proved equivalent to slot
   order, and the complete finite demand is invariant under positive
   refinement.
+- [`LeanTrominoes/RetainedAngularFanAnnulusRoutes.lean`](LeanTrominoes/RetainedAngularFanAnnulusRoutes.lean)
+  constructs an elementary finite orthogonal witness for every annular
+  demand.  Each route has exact radius-33 and radius-22 endpoints, and all
+  listed points remain inside the radius-36 interface and outside the
+  radius-21 square.  These individual witnesses share a radius-34 cut; the
+  coordinated router will replace that choice to obtain pairwise separation.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
