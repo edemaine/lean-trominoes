@@ -1703,6 +1703,11 @@ The representation choices for this target are:
   lifts that pointwise theorem through stable angular sorting: the scaled
   route family has the identical occurrence order, while its complete local
   profile is obtained by mapping only the terminal lengths.
+- [`LeanTrominoes/RetainedAngularTerminalGateDistinctness.lean`](LeanTrominoes/RetainedAngularTerminalGateDistinctness.lean)
+  proves that positive `(direction, length)` data are represented injectively
+  by their radial splice gates.  Thus the annular adapter can permit stable
+  equal-direction ties while asking precisely for duplicate-free gates, a
+  condition preserved by positive refinement.
 - [`LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean`](LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean)
   identifies Figure 7's eight boundary sites with the east-first compass
   vectors of radius twelve around the scaled source-variable center.  It
