@@ -2118,6 +2118,13 @@ The representation choices for this target are:
   classification then closes every directed noncarrier/noncarrier
   source-prefix/fan cross: distinct centers use macrocell separation, and an
   equal-center oblique fan forces the source into the singleton branch.
+- [`LeanTrominoes/RetainedFinalFlatRouteComponentCases.lean`](LeanTrominoes/RetainedFinalFlatRouteComponentCases.lean)
+  recovers the carrier/noncarrier dichotomy directly from flat route
+  membership and proves every carrier route remains fully orthogonal.
+  Its component-case reducer discharges carrier fan routes, all noncarrier
+  pairs, and separated carrier--macrocell pairs, isolating one exact local
+  obligation: a carrier source prefix against an oblique noncarrier fan whose
+  translated enclosing rectangles overlap.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
