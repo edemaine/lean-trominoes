@@ -1945,6 +1945,11 @@ The representation choices for this target are:
   joins each retained source-to-boundary route to the factor-eight local fan
   spoke.  Genuine source incidences thereby reach their exact copied-literal
   endpoints while preserving orthogonality.
+- [`LeanTrominoes/RetainedAngularFanCompleteRoutes.lean`](LeanTrominoes/RetainedAngularFanCompleteRoutes.lean)
+  assembles one total route family: retained fan splices for copied source
+  clauses and factor-eight certified Figure 7 routes for implication-cycle
+  clauses.  It also packages the matching refined positioned formula and
+  placement without changing the logical fixed-eight formula.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
