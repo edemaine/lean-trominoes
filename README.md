@@ -1733,6 +1733,11 @@ The representation choices for this target are:
   for exhaustive adapter search.  An executable validity predicate restricts
   that raw type to initial active slots with sorted directions and strict
   total radial orders; every duplicate-free concrete profile is proved valid.
+- [`LeanTrominoes/RetainedAngularTerminalLaneRanks.lean`](LeanTrominoes/RetainedAngularTerminalLaneRanks.lean)
+  converts the strict radial-order matrix into a zero-based lane number by
+  counting closer gates.  Validity proves every number is below eight and
+  proves lane injectivity within each tied direction block; the assignment is
+  unchanged by positive refinement.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
