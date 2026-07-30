@@ -2111,6 +2111,13 @@ The representation choices for this target are:
   separated whenever that translated carrier rectangle and the noncarrier
   macrocell rectangle are separated, leaving only genuine
   corridor--macrocell interface overlap.
+- [`LeanTrominoes/RetainedFinalFlatRouteShapeClassification.lean`](LeanTrominoes/RetainedFinalFlatRouteShapeClassification.lean)
+  restores component-sensitive route shape after quotient bookkeeping:
+  crossover, routed-clause, and routed-variable routes have singleton
+  prefixes, while bend routes remain fully orthogonal.  Translated-center
+  classification then closes every directed noncarrier/noncarrier
+  source-prefix/fan cross: distinct centers use macrocell separation, and an
+  equal-center oblique fan forces the source into the singleton branch.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
