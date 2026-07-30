@@ -2091,6 +2091,13 @@ The representation choices for this target are:
   It specializes this fact both to the retained-terminal corridor and
   directly to two genuine final retained routes, thereby closing every mixed
   source-prefix/fan case whose route pieces occupy distinct bounding boxes.
+- [`LeanTrominoes/RetainedFinalRouteMacrocellBounds.lean`](LeanTrominoes/RetainedFinalRouteMacrocellBounds.lean)
+  transfers the finite planar-SAT macrocell bound through clause-anchor
+  normalization and periodic translation for an entire final noncarrier
+  route occurrence.  Distinct translated component centers therefore give
+  the exact source-polyline rectangle certificate consumed by retained-ray
+  rasterization, reducing the remaining mixed cases to routes whose physical
+  components share an interface.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
