@@ -1921,6 +1921,11 @@ The representation choices for this target are:
   eight active incidences.  Every indexed route has its exact source gate
   and refined Figure 7 boundary endpoint and is orthogonal; duplicate-free
   gates make the entire family pairwise strictly separated.
+- [`LeanTrominoes/RetainedAngularFanOccurrenceOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanOccurrenceOuterSeparation.lean)
+  connects profile slots back to genuine retained source occurrences.
+  Two occurrences in strict angular-list order select their exact
+  classified replacement suffixes, and terminal-vector injectivity proves
+  those complete outer-fan routes strictly separated.
 - [`LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean`](LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean)
   proves that strict continuous separation is preserved by simultaneously
   replacing the tails of two routes.  Separation of the unchanged
