@@ -1684,6 +1684,11 @@ The representation choices for this target are:
   packages, for each retained source variable, the list's nondecreasing
   eleven-direction ranks together with its eight-slot bound.  This is the
   compact input interface for the forthcoming local adapter construction.
+- [`LeanTrominoes/RetainedAngularTerminalDataProfile.lean`](LeanTrominoes/RetainedAngularTerminalDataProfile.lean)
+  retains the positive primitive-block length alongside each sorted
+  direction.  This handles the stable angular ties intentionally present in
+  Figure 8(b): equal-direction incidences remain separate radial splice data
+  instead of collapsing to one gate.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
