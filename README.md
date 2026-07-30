@@ -1954,6 +1954,10 @@ The representation choices for this target are:
   proves canonical endpoints and orthogonality for every genuine route in
   that refined formula, separately transporting the copied-clause splice and
   scaled implication-cycle certificates.
+- [`LeanTrominoes/RetainedAngularFanDrawing.lean`](LeanTrominoes/RetainedAngularFanDrawing.lean)
+  instantiates the route certificates with the retained planar-SAT source and
+  packages the resulting family with canonical endpoints and pointwise
+  orthogonality.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
