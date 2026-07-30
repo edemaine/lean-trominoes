@@ -18,6 +18,7 @@ namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
 
 open OccurrenceSplitRing
+open PeriodicThreeSATThree
 
 /-- Positive retained direction/length pairs have distinct displacement
 vectors.  The finite proof also covers the three noncompass retained
@@ -144,6 +145,131 @@ theorem RetainedAngularTerminalProfile.scale_gatesDistinct
   constructor
   · exact equal.1
   · exact Nat.mul_left_cancel factorPositive equal.2
+
+/-! ## Obtaining gate distinctness from source terminal vectors -/
+
+/-- Source-level geometric condition sufficient for gate separation:
+genuine occurrences of one variable have different backwards terminal
+vectors.  The occurrence copies themselves retain their clause/literal
+presentation indices, so this condition remains meaningful when a clause
+contains syntactically equal literals. -/
+def RetainedOccurrenceTerminalVectorsInjective
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes) : Prop :=
+  ∀ atom first,
+    first ∈ occurrenceVariables source atom →
+      ∀ second,
+        second ∈ occurrenceVariables source atom →
+          occurrenceTerminalVector routes first =
+              occurrenceTerminalVector routes second →
+            first = second
+
+/-- On a retained ray, the total length-aware classifier reconstructs the
+original terminal vector exactly. -/
+theorem retainedTerminalVector_eq_scale_classifiedRetainedTerminalData
+    {vector : Cell}
+    (retained : RetainedTerminalRayVector vector) :
+    vector =
+      Cell.scale
+        (classifiedRetainedTerminalData vector).2
+        (classifiedRetainedTerminalData vector).1.primitive := by
+  have classifiedSome :
+      (retainedTerminalDirectionClassify vector).isSome :=
+    (retainedTerminalDirectionClassify_isSome_iff vector).2
+      retained
+  rcases Option.isSome_iff_exists.mp classifiedSome with
+    ⟨terminal, classified⟩
+  have dataEq :
+      classifiedRetainedTerminalData vector = terminal :=
+    classifiedRetainedTerminalData_eq_of_classified
+      classified
+  rw [dataEq]
+  exact (retainedTerminalDirectionClassify_sound classified).2
+
+/-- Injectivity of the actual terminal vectors transfers to the total
+length-aware terminal classifier on genuine occurrences. -/
+theorem classifiedRetainedTerminalData_injective_on_occurrences
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (retained :
+      RetainedOccurrenceTerminalCertificate source routes)
+    (vectorsInjective :
+      RetainedOccurrenceTerminalVectorsInjective source routes)
+    (atom : Variable)
+    {first second : ThreeOccurrenceVariable Variable}
+    (firstMember : first ∈ occurrenceVariables source atom)
+    (secondMember : second ∈ occurrenceVariables source atom)
+    (dataEqual :
+      classifiedRetainedTerminalData
+          (occurrenceTerminalVector routes first) =
+        classifiedRetainedTerminalData
+          (occurrenceTerminalVector routes second)) :
+    first = second := by
+  apply vectorsInjective atom first firstMember second secondMember
+  rw [
+    retainedTerminalVector_eq_scale_classifiedRetainedTerminalData
+      (retained atom first firstMember),
+    retainedTerminalVector_eq_scale_classifiedRetainedTerminalData
+      (retained atom second secondMember),
+    dataEqual]
+
+/-- Stable angular sorting preserves duplicate-freeness of occurrence
+copies. -/
+theorem angularOccurrenceVariables_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (atom : Variable) :
+    (angularOccurrenceVariables source routes atom).Nodup := by
+  exact
+    (angularOccurrenceVariables_perm source routes atom).nodup_iff.mpr
+      (occurrenceVariables_nodup source atom)
+
+/-- A retained source with injective same-variable terminal vectors has
+duplicate-free length-aware angular terminal data. -/
+theorem angularRetainedTerminalData_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (retained :
+      RetainedOccurrenceTerminalCertificate source routes)
+    (vectorsInjective :
+      RetainedOccurrenceTerminalVectorsInjective source routes)
+    (atom : Variable) :
+    (angularRetainedTerminalData source routes atom).Nodup := by
+  unfold angularRetainedTerminalData
+  apply (angularOccurrenceVariables_nodup source routes atom).map_on
+  intro first firstMember second secondMember dataEqual
+  apply classifiedRetainedTerminalData_injective_on_occurrences
+    source routes retained vectorsInjective atom
+  · exact
+      (angularOccurrenceVariables_perm
+        source routes atom).mem_iff.mp firstMember
+  · exact
+      (angularOccurrenceVariables_perm
+        source routes atom).mem_iff.mp secondMember
+  · exact dataEqual
+
+/-- The generic length-aware profile constructor inherits gate
+distinctness from source terminal-vector injectivity. -/
+theorem retainedAngularTerminalProfile_gatesDistinct
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (retained :
+      RetainedOccurrenceTerminalCertificate source routes)
+    (vectorsInjective :
+      RetainedOccurrenceTerminalVectorsInjective source routes)
+    (fits :
+      FitsEightSlots
+        (angularOccurrenceOrder source routes))
+    (atom : Variable) :
+    (retainedAngularTerminalProfile
+      source routes retained fits atom).GatesDistinct := by
+  exact angularRetainedTerminalData_nodup
+    source routes retained vectorsInjective atom
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -1707,7 +1707,9 @@ The representation choices for this target are:
   proves that positive `(direction, length)` data are represented injectively
   by their radial splice gates.  Thus the annular adapter can permit stable
   equal-direction ties while asking precisely for duplicate-free gates, a
-  condition preserved by positive refinement.
+  condition preserved by positive refinement.  It also isolates the
+  source-level geometric obligation: injectivity of genuine same-variable
+  terminal vectors implies duplicate-free angular profiles.
 - [`LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean`](LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean)
   identifies Figure 7's eight boundary sites with the east-first compass
   vectors of radius twelve around the scaled source-variable center.  It
