@@ -19,10 +19,10 @@ namespace PeriodicOrthocrossing
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
-/-- Two different stored routes of the final retained source have strictly
-separated `dropLast` prefixes whenever their clause-side endpoints differ. -/
+/-- Two different stored routes of the final retained source satisfy the
+complete finite route-avoidance predicate in the base periodic cell. -/
 theorem
-    retainedDeduplicatedGaugedWrappedDrawing_routePrefixes_strictlyAvoid
+    retainedDeduplicatedGaugedWrappedDrawing_routesAvoidEachOther
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (wellFormed : formula.incidenceGraph.IsWellFormed)
@@ -43,10 +43,8 @@ theorem
           formula).edgeRoutes.zipIdx)
     (firstLength : 2 ≤ first.length)
     (secondLength : 2 ≤ second.length)
-    (indicesDifferent : firstIndex ≠ secondIndex)
-    (headsDifferent : first.head? ≠ second.head?) :
-    RoutesStrictlyAvoidEachOther
-      first.dropLast second.dropLast := by
+    (indicesDifferent : firstIndex ≠ secondIndex) :
+    RoutesAvoidEachOther first second := by
   let drawing :=
     retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
       formula
@@ -76,9 +74,42 @@ theorem
       drawing.periodTranslation (0, 0) = (0, 0) := by
     simp [drawing, PeriodicGridDrawing.periodTranslation,
       Cell.scale]
-  have avoid : RoutesAvoidEachOther first second := by
-    rw [zeroTranslation, mapAddZero, mapAddZero] at translatedAvoid
-    exact translatedAvoid
+  rw [zeroTranslation, mapAddZero, mapAddZero] at translatedAvoid
+  exact translatedAvoid
+
+/-- Two different stored routes of the final retained source have strictly
+separated `dropLast` prefixes whenever their clause-side endpoints differ. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefixes_strictlyAvoid
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headsDifferent : first.head? ≠ second.head?) :
+    RoutesStrictlyAvoidEachOther
+      first.dropLast second.dropLast := by
+  have avoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routesAvoidEachOther
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent
   have firstSimple :=
     retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesAreSimple
       formula wellFormed degree isLocal clausesNonempty
@@ -90,6 +121,54 @@ theorem
   exact
     routesStrictlyAvoidEachOther_dropLast_of_avoid_of_nodup_of_heads_ne
       avoid firstSimple.1 secondSimple.1 headsDifferent
+
+/-- For two different final retained source routes, endpoint-only contact
+and simplicity clear the first retained prefix from the second route's
+variable endpoint whenever that endpoint differs from the first clause
+endpoint. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_avoids_otherFinal
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondFinal : Cell}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (firstHead : first.head? = some firstSource)
+    (secondLast : second.getLast? = some secondFinal)
+    (sourceNeFinal : firstSource ≠ secondFinal) :
+    (∀ point ∈ first.dropLast, point ≠ secondFinal) ∧
+      ∀ segment ∈ gridPolylineSegments first.dropLast,
+        segment.IsAxisAligned →
+          ¬segment.Contains secondFinal := by
+  have avoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routesAvoidEachOther
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent
+  have firstSimple :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesAreSimple
+      formula wellFormed degree isLocal clausesNonempty
+      first (List.fst_mem_of_mem_zipIdx firstMember)
+  exact
+    routePrefix_avoids_other_final_point_of_avoid
+      avoid firstSimple.1 firstHead secondLast sourceNeFinal
 
 end PeriodicOrthocrossing
 end LeanTrominoes

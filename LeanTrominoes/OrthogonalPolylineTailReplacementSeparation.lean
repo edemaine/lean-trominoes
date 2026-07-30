@@ -177,6 +177,71 @@ theorem routeIsSimple_dropLast_avoids_final_point
     · exact (pointAvoid segment.start endpoints.1) atStart.symm
     · exact (pointAvoid segment.finish endpoints.2) atFinish.symm
 
+/-- If two routes meet only at advertised endpoints and the first route's
+source differs from the second route's target, then deleting the first
+target leaves a prefix completely clear of the second target. -/
+theorem routePrefix_avoids_other_final_point_of_avoid
+    {first second : List Cell}
+    {firstSource secondFinal : Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (firstNodup : first.Nodup)
+    (firstHead : first.head? = some firstSource)
+    (secondLast : second.getLast? = some secondFinal)
+    (sourceNeFinal : firstSource ≠ secondFinal) :
+    (∀ point ∈ first.dropLast, point ≠ secondFinal) ∧
+      ∀ segment ∈ gridPolylineSegments first.dropLast,
+        segment.IsAxisAligned →
+          ¬segment.Contains secondFinal := by
+  have secondFinalMember : secondFinal ∈ second :=
+    mem_of_getLast?_eq_some secondLast
+  have pointAvoid :
+      ∀ point ∈ first.dropLast, point ≠ secondFinal := by
+    intro point pointMember equal
+    have firstOriginal : point ∈ first :=
+      List.mem_of_mem_dropLast pointMember
+    rcases List.mem_iff_get.mp firstOriginal with
+      ⟨firstIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp secondFinalMember with
+      ⟨secondIndex, secondEqual⟩
+    have indexedEqual :
+        first.get firstIndex = second.get secondIndex :=
+      firstEqual.trans (equal.trans secondEqual.symm)
+    have firstEndpoint :=
+      (avoid.2.2.2 firstIndex secondIndex indexedEqual).1
+    rcases firstEndpoint with atHead | atLast
+    · apply sourceNeFinal
+      apply Option.some.inj
+      rw [← firstHead, atHead, firstEqual, equal]
+    · have firstLastEq :
+          first.getLast? = some point := by
+        rw [atLast, firstEqual]
+      exact
+        (getLast?_ne_some_of_mem_dropLast_of_nodup
+          firstNodup pointMember)
+          firstLastEq
+  refine ⟨pointAvoid, ?_⟩
+  intro segment segmentMember _axisAligned contains
+  rcases
+      GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+        contains with
+    interior | endpoint
+  · have segmentOriginal :
+        segment ∈ gridPolylineSegments first :=
+      gridPolylineSegments_dropLast_subset first segmentMember
+    rcases List.mem_iff_get.mp segmentOriginal with
+      ⟨segmentIndex, segmentEqual⟩
+    rcases List.mem_iff_get.mp secondFinalMember with
+      ⟨secondIndex, secondEqual⟩
+    have interiorAvoid :=
+      avoid.2.2.1 secondIndex segmentIndex
+    rw [segmentEqual, secondEqual] at interiorAvoid
+    exact interiorAvoid interior
+  · have endpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    rcases endpoint with atStart | atFinish
+    · exact (pointAvoid segment.start endpoints.1) atStart.symm
+    · exact (pointAvoid segment.finish endpoints.2) atFinish.symm
+
 /-- Endpoint-only contact leaves no contact between final-point-deleted
 prefixes when both routes are simple and have different source endpoints. -/
 theorem noContact_dropLast_of_avoid_of_nodup_of_heads_ne

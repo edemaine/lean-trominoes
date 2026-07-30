@@ -2,6 +2,7 @@ import LeanTrominoes.RetainedAngularFanOuterLocalRoutes
 import LeanTrominoes.RetainedAngularFanSourceScaling
 import LeanTrominoes.ScaledPointNeighborhoodSeparation
 import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
+import LeanTrominoes.RetainedFinalRoutePrefixSeparation
 
 /-!
 # Separating a refined source prefix from a local outer fan
@@ -130,6 +131,57 @@ theorem
     retainedAngularFanSourceScaledPrefix_strictlyAvoids_outerLocalRoute
       factorGreaterThanOne sourceRoute center direction slot
       clearance.1 clearance.2
+
+/-- The final retained drawing's endpoint-contact certificates supply the
+clearance needed to separate one refined source prefix from the local fan
+at a different route's variable endpoint. -/
+theorem
+    retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterLocalRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈
+          PeriodicOrthocrossing.retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {factor : Nat} (factorGreaterThanOne : 1 < factor)
+    {firstRoute secondRoute : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondCenter : Cell}
+    (firstMember :
+      (firstRoute, firstIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (secondRoute, secondIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (firstHead : firstRoute.head? = some firstSource)
+    (secondLast : secondRoute.getLast? = some secondCenter)
+    (sourceNeCenter : firstSource ≠ secondCenter)
+    (secondDirection : RetainedTerminalDirection)
+    (secondSlot : RetainedTerminalSlot) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor firstRoute)).dropLast
+      (retainedTerminalFanOuterLocalRouteAt
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (Cell.scale factor secondCenter))
+        secondDirection secondSlot) := by
+  have clearance :=
+    PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawing_routePrefix_avoids_otherFinal
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent firstHead secondLast sourceNeCenter
+  exact
+    retainedAngularFanSourceScaledPrefix_strictlyAvoids_outerLocalRoute
+      factorGreaterThanOne firstRoute secondCenter
+      secondDirection secondSlot clearance.1 clearance.2
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
