@@ -1817,6 +1817,12 @@ The representation choices for this target are:
   looking that slot up recovers the same occurrence and exact classified
   terminal datum, and the extracted finite shape selects precisely the
   corresponding complete refined fan route.
+- [`LeanTrominoes/RetainedAngularFanSpliceInterface.lean`](LeanTrominoes/RetainedAngularFanSpliceInterface.lean)
+  fixes the combined source/router refinement at `36 * 8 = 288` and packages
+  the exact outer-adapter demand.  Its source gate is a radial multiple of a
+  radius-288 direction interface, its inner endpoint is the certified
+  radius-264 fan-route head, and genuine occurrence lookup selects the demand
+  carrying the occurrence's exact classified terminal datum.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
