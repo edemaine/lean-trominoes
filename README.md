@@ -1703,6 +1703,11 @@ The representation choices for this target are:
   lifts that pointwise theorem through stable angular sorting: the scaled
   route family has the identical occurrence order, while its complete local
   profile is obtained by mapping only the terminal lengths.
+- [`LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean`](LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean)
+  identifies Figure 7's eight boundary sites with the east-first compass
+  vectors of radius twelve around the scaled source-variable center.  It
+  proves those sites distinct and proves every positive factor-24 retained
+  splice gate lies strictly outside the local fan square.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
