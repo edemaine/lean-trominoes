@@ -15,20 +15,31 @@ the factor-eight Figure 7 boundary.
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
 
-/-- Rasterized source prefix with its former variable endpoint replaced by
-one complete outer fan route. -/
-def retainedAngularFanSplicedBoundaryRoute
+/-- Source polyline at the combined refinement with its former variable
+endpoint replaced by one complete outer fan route.  Keeping this
+pre-rasterized splice named makes its prefix/suffix decomposition available
+to the later separation proof. -/
+def retainedAngularFanSplicedBoundaryPolyline
     (route : List Cell)
     (terminal : RetainedTerminalData)
     (slot : RetainedTerminalSlot) : List Cell :=
   let center :=
     Cell.scale retainedTerminalFanTotalRefinement
       (route.getLastD (0, 0))
+  replacePolylineTail
+    (scalePolyline retainedTerminalFanTotalRefinement route)
+    (retainedTerminalFanOuterCompleteRoute
+      center terminal slot)
+
+/-- Rasterized source prefix with its former variable endpoint replaced by
+one complete outer fan route. -/
+def retainedAngularFanSplicedBoundaryRoute
+    (route : List Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot) : List Cell :=
   rasterizeRetainedPolyline
-    (replacePolylineTail
-      (scalePolyline retainedTerminalFanTotalRefinement route)
-      (retainedTerminalFanOuterCompleteRoute
-        center terminal slot))
+    (retainedAngularFanSplicedBoundaryPolyline
+      route terminal slot)
 
 /-- A classified genuine retained source route splices to its selected
 refined Figure 7 boundary with exact endpoints and orthogonality. -/
@@ -147,9 +158,11 @@ theorem retainedAngularFanSplicedBoundaryRoute_valid
       dropLastLast replacementHead
   exact ⟨by
       simpa [retainedAngularFanSplicedBoundaryRoute,
+        retainedAngularFanSplicedBoundaryPolyline,
         scaledRoute, center, replacement] using replacedHead,
     by
       simpa [retainedAngularFanSplicedBoundaryRoute,
+        retainedAngularFanSplicedBoundaryPolyline,
         scaledRoute, center, replacement] using replacedLast,
     rasterizeRetainedPolyline_orthogonal
       replacedRetained⟩

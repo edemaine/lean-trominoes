@@ -1940,10 +1940,11 @@ The representation choices for this target are:
   rasterization.
 - [`LeanTrominoes/RetainedAngularFanSourceSplice.lean`](LeanTrominoes/RetainedAngularFanSourceSplice.lean)
   performs that splice on one classified retained source route at the
-  combined scale `288`.  It replaces the old variable endpoint by the exact
-  profile-selected outer fan route, rasterizes the retained result, and
-  proves the scaled clause endpoint, refined Figure 7 boundary endpoint,
-  and orthogonality.
+  combined scale `288`.  It names the pre-rasterized source-prefix/fan-suffix
+  splice for compositional separation, replaces the old variable endpoint
+  by the exact profile-selected outer fan route, rasterizes the retained
+  result, and proves the scaled clause endpoint, refined Figure 7 boundary
+  endpoint, and orthogonality.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
