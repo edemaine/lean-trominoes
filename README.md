@@ -792,6 +792,11 @@ The representation choices for this target are:
   its own segment interiors at every listed point, and free of intersections
   between distinct segment interiors; together these are the finite
   `RouteIsSimple` certificate needed by unit subdivision.
+  [`LeanTrominoes/PeriodicGridDrawingRouteOccurrenceSeparation.lean`](LeanTrominoes/PeriodicGridDrawingRouteOccurrenceSeparation.lean)
+  extracts complete finite separation for distinct lifted occurrences of
+  possibly diagonal routes.  The stronger segment-endpoint/interior
+  certificate handles both directed listed-point cases, while continuous
+  planarity and endpoint-only contacts supply segment and point contacts.
   [`LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean`](LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean)
   proves that this finite separation certificate is preserved when both
   routes are traversed in reverse, as required by variable-to-clause routing.
