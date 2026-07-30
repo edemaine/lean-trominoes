@@ -2098,6 +2098,12 @@ The representation choices for this target are:
   the exact source-polyline rectangle certificate consumed by retained-ray
   rasterization, reducing the remaining mixed cases to routes whose physical
   components share an interface.
+- [`LeanTrominoes/RetainedFinalFlatRouteMacrocellBounds.lean`](LeanTrominoes/RetainedFinalFlatRouteMacrocellBounds.lean)
+  recovers that physical occurrence directly from flat final
+  `(route, routeIndex)` membership and packages every noncarrier route with
+  its translated macrocell center.  Two unequal centers automatically prove
+  the directed source-prefix/complete-route rectangle certificate and the
+  resulting scaled source-prefix versus outer-fan separation theorem.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
