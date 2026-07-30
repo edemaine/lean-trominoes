@@ -1690,21 +1690,24 @@ The representation choices for this target are:
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingOrthogonalPrefixes.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingOrthogonalPrefixes.lean)
   packages the complementary route-shape invariant needed for raster
   separation: every genuine route is orthogonal after removing its final
-  point.  The certificate follows from full drawing orthogonality, is
-  preserved in both directions by logical renaming and by translation, and
-  holds automatically for direct two-point incidence drawings because their
-  prefixes are singletons.
+  point.  It also packages the sharper dichotomy that every route is either
+  fully orthogonal or has a singleton prefix.  Both certificates follow from
+  full drawing orthogonality, are preserved in both directions by logical
+  renaming and by translation, and the singleton branch holds automatically
+  for direct two-point incidence drawings.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalOrthogonalPrefixes.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalOrthogonalPrefixes.lean)
-  proves the prefix invariant componentwise for the retained planar-SAT
+  proves both route-shape invariants componentwise for the retained planar-SAT
   construction.  Carrier lenses and bend corners are fully orthogonal, while
-  crossover, routed-variable, and routed source-clause components inherit
-  singleton prefixes from their direct route drawings.  The metadata lookup
-  then assembles the certificate for the complete finite drawing.
+  crossover, routed-variable, and routed source-clause components select the
+  singleton-prefix branch inherited from their direct route drawings.  The
+  metadata lookup then assembles both certificates for the complete finite
+  drawing.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedOrthogonalPrefixes.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedOrthogonalPrefixes.lean)
-  transports prefix orthogonality through gauging, clause-anchor
-  normalization, and orbit deduplication.  The quotient-to-finite occurrence
-  witness now certifies that every genuine route of the final retained
-  planar-SAT source is rectilinear before its possibly oblique last ray.
+  transports prefix orthogonality and the full-orthogonal-or-singleton
+  dichotomy through gauging, clause-anchor normalization, and orbit
+  deduplication.  The quotient-to-finite occurrence witness now certifies
+  both the rectilinear prefix of every genuine final route and the direct
+  shape of every route that is not fully rectilinear.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirections.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirections.lean)
   combines retained-ray transport with compatibility and looplessness to
   prove that every genuine final retained route has at least one segment and
@@ -1792,6 +1795,9 @@ The representation choices for this target are:
   rectangles and an exact `dropLast`/final-segment decomposition extends the
   result to the complete reference route.  This is the quantitative
   prefix/route input for raster clearance in every orthogonal-terminal case.
+  The transported route-shape dichotomy additionally proves that every
+  non-axis-aligned final segment belongs to a route whose deleted prefix has
+  length one, isolating the remaining oblique-terminal case to fan geometry.
 - [`LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean`](LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean)
   instantiates the terminal-vector argument at the complete retained drawing.
   Its compatibility, endpoint-only route-contact, and final incidence-key
