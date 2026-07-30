@@ -1981,9 +1981,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedTerminalEnvelopeCheckpoints.lean`](LeanTrominoes/RetainedTerminalEnvelopeCheckpoints.lean)
   proves that every lattice point contacting a retained terminal envelope
   becomes an exact primitive checkpoint on the discarded segment after the
-  common `288`-fold fan refinement.  The proof covers all eleven retained
-  directions and converts the resulting integer parameter into the
-  executable natural-number checkpoint predicate.
+  common `288`-fold fan refinement, and that every axis-aligned segment
+  contacting the envelope contains such a refined checkpoint.  The proofs
+  cover both orientations for all eleven retained directions and convert
+  their integer parameters into finite, decidable natural-number checkpoint
+  predicates.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
