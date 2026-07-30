@@ -1833,6 +1833,11 @@ The representation choices for this target are:
   translated retained-ray staircase joins every gate to its port with exact
   endpoints and orthogonality.  The canonical radial tie-break makes these
   parallel lanes advance in occurrence-slot order.
+- [`LeanTrominoes/RetainedAngularFanOuterCollarRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterCollarRoutes.lean)
+  fills the finite 24-layer collar from those radius-288 lane ports to the
+  certified radius-264 fan-route heads.  Rounded square-boundary
+  interpolation gives exact endpoints, orthogonality, and shell containment;
+  coordinated pairwise rasterization remains the next splice subproblem.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
