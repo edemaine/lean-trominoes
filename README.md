@@ -1756,6 +1756,11 @@ The representation choices for this target are:
   and occurrence slot; valid profiles select these frame sites in strictly
   clockwise slot order.  Together the two port assignments expose the finite
   same-direction permutation that the adapter router must realize.
+- [`LeanTrominoes/RetainedAngularFanAnchorRoutes.lean`](LeanTrominoes/RetainedAngularFanAnchorRoutes.lean)
+  identifies square-frame indices `0, 11, …, 77` with the eight radius-22
+  compass anchors and gives fixed orthogonal inward routes to the matching
+  radius-12 Figure 7 boundary sites.  Their endpoints are exact and the eight
+  translated route point sets are pairwise disjoint.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase

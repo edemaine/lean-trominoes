@@ -27,15 +27,15 @@ def retainedTerminalAdapterPortOffset
     (port : RetainedTerminalAdapterPort) : Cell :=
   let index : Int := port.val
   if port.val < 12 then
-    (22, -2 * index)
+    (22, 2 * index)
   else if port.val < 34 then
-    (44 - 2 * index, -22)
+    (44 - 2 * index, 22)
   else if port.val < 56 then
-    (-22, 2 * index - 88)
+    (-22, 88 - 2 * index)
   else if port.val < 78 then
-    (2 * index - 132, 22)
+    (2 * index - 132, -22)
   else
-    (22, 176 - 2 * index)
+    (22, 2 * index - 176)
 
 /-- Every adapter port lies exactly on the coordinate-radius-22 square. -/
 theorem retainedTerminalAdapterPortOffset_on_square :
