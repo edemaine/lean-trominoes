@@ -1807,6 +1807,10 @@ The representation choices for this target are:
   annular bounds, and strict continuous separation for every
   order-compatible pair among the 88 routes, then joins the pairwise
   separated scaled compass routes down to the refined Figure 7 boundary.
+- [`LeanTrominoes/RetainedAngularFanPositionedRoutes.lean`](LeanTrominoes/RetainedAngularFanPositionedRoutes.lean)
+  translates the complete finite router to an arbitrary variable center.
+  Exact fan-port and Figure 7 endpoints, orthogonality, shell bounds, and
+  strict continuous separation all survive the common translation.
 - [`LeanTrominoes/RetainedAngularTerminalSlotLookup.lean`](LeanTrominoes/RetainedAngularTerminalSlotLookup.lean)
   bridges source incidence identities to the finite router.  A genuine
   occurrence's index in the stable angular list is proved below eight,

@@ -323,6 +323,17 @@ theorem retainedTerminalFanRefinedRoute_points_outside_fan :
           (0, 0) point := by
   native_decide
 
+/-- Every listed point of a complete refined route remains inside the
+refined radius-33 outer frame. -/
+theorem retainedTerminalFanRefinedRoute_points_within_outer_frame :
+    ∀ (direction : RetainedTerminalDirection)
+      (slot : RetainedTerminalSlot) (point : Cell),
+      point ∈ retainedTerminalFanRefinedRoute direction slot →
+        WithinCoordinateRadius
+          (33 * retainedTerminalFanRoutingRefinement)
+          (0, 0) point := by
+  native_decide
+
 /-- Complete refined routes with order-compatible endpoints are strictly
 separated. -/
 theorem retainedTerminalFanRefinedRoutes_strictlyAvoidEachOther
