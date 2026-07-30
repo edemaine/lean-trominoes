@@ -2015,6 +2015,13 @@ The representation choices for this target are:
   through point/segment rectangle separation.  Strict separation of two
   orthogonal source routes is also converted into the required pairwise
   rectangle certificate.
+- [`LeanTrominoes/RetainedAngularFanSourceRasterSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceRasterSeparation.lean)
+  applies the rasterization lift to genuine flat-indexed routes of the final
+  retained planar-SAT drawing.  Route membership recovers the corresponding
+  positioned clause and literal metadata, hence both retained-ray
+  certificates, automatically.  The finite source-polyline rectangle
+  certificate then proves the directed scaled source-prefix versus complete
+  outer-fan separation theorem without leaving a separate corridor premise.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
