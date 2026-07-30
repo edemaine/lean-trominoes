@@ -1985,7 +1985,8 @@ The representation choices for this target are:
   contacting the envelope contains such a refined checkpoint.  The proofs
   cover both orientations for all eleven retained directions and convert
   their integer parameters into finite, decidable natural-number checkpoint
-  predicates.
+  predicates.  A combined source-prefix checkpoint-avoidance certificate is
+  proved sufficient for the mixed outer-corridor separation hypothesis.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and

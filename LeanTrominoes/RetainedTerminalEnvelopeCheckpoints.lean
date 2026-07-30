@@ -342,5 +342,61 @@ theorem
         refine ⟨288 * (centerX - sourceStartX), ?_, ?_, ?_⟩ <;>
           solve_terminal_axis_checkpoint
 
+/-- A finite source-prefix certificate saying that no scaled source vertex
+or source segment reaches a primitive checkpoint of the discarded retained
+terminal. -/
+def SourcePrefixAvoidsRetainedTerminalRefinedCheckpoints
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData) : Prop :=
+  (∀ point ∈ sourceRoute.dropLast,
+      ¬IsRetainedTerminalRefinedCheckpoint
+        referenceRoute referenceTerminal
+        (Cell.scale retainedTerminalFanTotalRefinement point)) ∧
+    ∀ segment ∈ gridPolylineSegments sourceRoute.dropLast,
+      ¬AxisSegmentContainsRetainedTerminalRefinedCheckpoint
+        segment referenceRoute referenceTerminal
+
+instance
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData) :
+    Decidable
+      (SourcePrefixAvoidsRetainedTerminalRefinedCheckpoints
+        sourceRoute referenceRoute referenceTerminal) := by
+  unfold SourcePrefixAvoidsRetainedTerminalRefinedCheckpoints
+  infer_instance
+
+/-- Avoiding all refined primitive checkpoints is sufficient for the mixed
+source-prefix corridor certificate used by the outer angular fan. -/
+theorem sourcePrefixCorridorSeparated_of_avoids_refinedCheckpoints
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (referenceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector referenceRoute) =
+        some referenceTerminal)
+    (avoids :
+      SourcePrefixAvoidsRetainedTerminalRefinedCheckpoints
+        sourceRoute referenceRoute referenceTerminal) :
+    SourcePrefixCorridorSeparated
+      sourceRoute referenceRoute referenceTerminal.1 := by
+  apply
+    (sourcePrefixCorridorSeparated_iff_no_terminalEnvelopeContacts
+      sourceRoute referenceRoute referenceTerminal.1).mpr
+  rcases avoids with ⟨pointAvoids, segmentAvoids⟩
+  constructor
+  · intro point pointMember contact
+    exact
+      pointAvoids point pointMember
+        (pointMeetsRetainedTerminalSegmentEnvelope_scale_isCheckpoint
+          referenceRoute referenceTerminal referenceLength
+          referenceClassified point contact)
+  · intro segment segmentMember _aligned contact
+    exact
+      segmentAvoids segment segmentMember
+        (axisSegmentMeetsRetainedTerminalSegmentEnvelope_scale_containsCheckpoint
+          segment referenceRoute referenceTerminal referenceLength
+          referenceClassified contact)
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
