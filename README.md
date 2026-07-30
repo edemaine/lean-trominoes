@@ -2003,6 +2003,16 @@ The representation choices for this target are:
   the angular fan.  This prefix/route form deliberately permits two incidence
   routes of one variable to share their final variable endpoint; a stronger
   complete-route disjointness wrapper is also available when applicable.
+- [`LeanTrominoes/RetainedRayRasterizationSeparation.lean`](LeanTrominoes/RetainedRayRasterizationSeparation.lean)
+  makes the rasterization clearance quantitative.  Every point introduced by
+  retained-ray rasterization and unit subdivision lies within radius nine of
+  the endpoint rectangle of a specific source segment, and every raster
+  segment retains its source-segment provenance.  Thus pairwise separation of
+  integral source-segment rectangles survives any scale greater than `18`;
+  at the common factor `288` this directly supplies the prefix/route
+  disjointness and terminal-corridor certificates.  Strict separation of two
+  orthogonal source routes is also converted into the required pairwise
+  rectangle certificate.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
