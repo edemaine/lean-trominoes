@@ -7,16 +7,20 @@ Radial lane rank separates gates that lie on the same retained ray, but those
 lanes need not occur in the same order as the source formula's stable angular
 occurrence list.  The Figure 7 boundary must use the latter order.
 
-We therefore define a second use of the same 88-site square frame.  A
-fan-facing port is indexed by retained direction and by the occurrence slot
-itself.  Valid shapes have nondecreasing direction ranks, so active
-fan-facing ports advance strictly clockwise with occurrence-slot order.
-Together with the radial adapter ports, these sites expose the finite
-within-direction permutation that the local router must realize.
+We therefore define a second 88-site square frame.  A fan-facing port is
+indexed by retained direction and by the occurrence slot itself.  The
+radius-33 square has exactly 264 unit boundary edges, so spacing its 88 ports
+three units apart gives a distinct outer boundary around the radius-22
+radial-lane and compass-anchor frame.  Valid shapes have nondecreasing
+direction ranks, so active fan-facing ports advance strictly clockwise with
+occurrence-slot order.
 -/
 
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
+
+/-- Coordinate radius of the occurrence-ordered fan-facing frame. -/
+def retainedTerminalFanFrameRadius : Nat := 33
 
 /-- Fan-facing square port for a retained direction and its occurrence slot. -/
 def retainedTerminalFanPort
@@ -66,6 +70,46 @@ theorem retainedTerminalFanPort_injective
     ⟨RetainedTerminalDirection.angularRank_injective
         directionsEqual,
       Fin.ext slotsEqual⟩
+
+/-- Clockwise radius-33 square coordinate of a fan-facing port, starting at
+`(33, 0)` and advancing by three lattice units per port. -/
+def retainedTerminalFanPortOffset
+    (port : RetainedTerminalAdapterPort) : Cell :=
+  let index : Int := port.val
+  if port.val < 12 then
+    (33, 3 * index)
+  else if port.val < 34 then
+    (66 - 3 * index, 33)
+  else if port.val < 56 then
+    (-33, 132 - 3 * index)
+  else if port.val < 78 then
+    (3 * index - 198, -33)
+  else
+    (33, 3 * index - 264)
+
+/-- Every fan-facing port lies exactly on the radius-33 square. -/
+theorem retainedTerminalFanPortOffset_on_square :
+    ∀ port : RetainedTerminalAdapterPort,
+      WithinCoordinateRadius
+          retainedTerminalFanFrameRadius
+          (0, 0)
+          (retainedTerminalFanPortOffset port) ∧
+        ¬ WithinCoordinateRadius 32 (0, 0)
+          (retainedTerminalFanPortOffset port) := by
+  native_decide
+
+/-- The fan-facing frame remains inside the common radius-36 retained-ray
+interface. -/
+theorem retainedTerminalFanPortOffset_within_interface :
+    ∀ port : RetainedTerminalAdapterPort,
+      WithinCoordinateRadius 36 (0, 0)
+        (retainedTerminalFanPortOffset port) := by
+  native_decide
+
+/-- Different fan-facing identities have different radius-33 coordinates. -/
+theorem retainedTerminalFanPortOffset_injective :
+    Function.Injective retainedTerminalFanPortOffset := by
+  native_decide
 
 /-- Fan-facing port selected by a shape slot.  Inactive slots select none. -/
 def RetainedAngularTerminalShape.fanPort
@@ -139,7 +183,7 @@ def RetainedAngularTerminalShape.fanPortOffset
     (slot : RetainedTerminalSlot) :
     Option Cell :=
   (shape.fanPort slot).map
-    retainedTerminalAdapterPortOffset
+    retainedTerminalFanPortOffset
 
 /-- Distinct active slots select distinct fan-facing frame coordinates. -/
 theorem RetainedAngularTerminalShape.fanPortOffset_injective_on_active
@@ -162,7 +206,7 @@ theorem RetainedAngularTerminalShape.fanPortOffset_injective_on_active
       shape.fanPort_eq_some second
         secondDirection secondDirectionEq] at offsetsEqual
   have portsEqual :=
-    retainedTerminalAdapterPortOffset_injective
+    retainedTerminalFanPortOffset_injective
       (Option.some.inj offsetsEqual)
   exact
     (retainedTerminalFanPort_injective portsEqual).2
@@ -191,7 +235,7 @@ def RetainedAngularTerminalProfile.fanPortOffset
     (slot : RetainedTerminalSlot) :
     Option Cell :=
   (profile.fanPort slot).map
-    retainedTerminalAdapterPortOffset
+    retainedTerminalFanPortOffset
 
 /-- Positive uniform refinement preserves every concrete fan-facing square
 coordinate. -/

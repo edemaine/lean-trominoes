@@ -1745,22 +1745,24 @@ The representation choices for this target are:
   select distinct ports, and positive uniform refinement preserves those
   selections.
 - [`LeanTrominoes/RetainedAngularTerminalAdapterPortGeometry.lean`](LeanTrominoes/RetainedAngularTerminalAdapterPortGeometry.lean)
-  embeds the 88 adapter-port identities at every second lattice point of a
-  radius-22 square, enumerated clockwise from due east.  These coordinates
-  are injective, lie outside the radius-12 Figure 7 fan and inside the
-  radius-36 retained-terminal interface, and remain unchanged by positive
-  refinement.
+  embeds the 88 radial-lane adapter identities at every second lattice point
+  of a radius-22 square, enumerated clockwise from due east.  These
+  coordinates are injective, lie outside the radius-12 Figure 7 fan and
+  inside the radius-36 retained-terminal interface, and remain unchanged by
+  positive refinement.
 - [`LeanTrominoes/RetainedAngularTerminalFanPorts.lean`](LeanTrominoes/RetainedAngularTerminalFanPorts.lean)
   distinguishes the radial lane order near tied source gates from the stable
   occurrence order required at Figure 7.  Its fan-facing port uses direction
-  and occurrence slot; valid profiles select these frame sites in strictly
-  clockwise slot order.  Together the two port assignments expose the finite
-  same-direction permutation that the adapter router must realize.
+  and occurrence slot on a distinct radius-33 square; valid profiles select
+  these outer-frame sites in strictly clockwise slot order.  Together the two
+  port assignments expose the finite same-direction permutation that the
+  adapter router must realize.
 - [`LeanTrominoes/RetainedAngularFanAnchorRoutes.lean`](LeanTrominoes/RetainedAngularFanAnchorRoutes.lean)
   identifies square-frame indices `0, 11, …, 77` with the eight radius-22
   compass anchors and gives fixed orthogonal inward routes to the matching
   radius-12 Figure 7 boundary sites.  Their endpoints are exact and the eight
-  translated route point sets are pairwise disjoint.
+  translated route point sets are pairwise disjoint.  The shape-dependent
+  fan-facing sites lie on the separate radius-33 outer frame.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
