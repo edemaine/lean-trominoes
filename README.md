@@ -2132,6 +2132,13 @@ The representation choices for this target are:
   recovered physical shifts, and failure of rectangle separation is
   preserved exactly.  This is the common-frame input expected by the
   retained carrier proximity API.
+- [`LeanTrominoes/RetainedFinalFlatAnchorNormalizedComponents.lean`](LeanTrominoes/RetainedFinalFlatAnchorNormalizedComponents.lean)
+  observes that flat routes already use external period shift zero, so their
+  physical shifts are precisely the negatives of their finite clause
+  anchors.  It packages the carrier as a neighboring raw retained link,
+  realizes the noncarrier orbit by a retained finite source with the exact
+  final translated center, and rewrites final rectangle overlap directly in
+  this anchor-normalized frame.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
