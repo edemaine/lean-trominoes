@@ -1,4 +1,5 @@
 import LeanTrominoes.RetainedAngularFanOuterCorridor
+import LeanTrominoes.ScaledPointNeighborhoodSeparation
 
 /-!
 # Aligning an outer fan corridor with its source terminal segment
@@ -35,6 +36,74 @@ instance (radius : Nat) (center : Cell)
         radius center terminal point) := by
   unfold InCoordinateSourceTerminalTube
   infer_instance
+
+/-- The refined source-terminal segment underlying an outer radial
+corridor, oriented from its old source gate to the variable center. -/
+def retainedTerminalFanSourceCorridorAxis
+    (center : Cell)
+    (terminal : RetainedTerminalData) :
+    GridSegment :=
+  ⟨Cell.add center
+      (Cell.scale
+        (retainedTerminalFanTotalRefinement * terminal.2)
+        terminal.1.primitive),
+    center⟩
+
+/-- A source-terminal checkpoint tube lies in the coordinate-radius
+expansion of its underlying segment's endpoint rectangle. -/
+theorem inCoordinateSourceTerminalTube_in_coordinateRectangle
+    {radius : Nat}
+    {center : Cell}
+    {terminal : RetainedTerminalData}
+    {point : Cell}
+    (bounded :
+      InCoordinateSourceTerminalTube
+        radius center terminal point) :
+    InClosedGridRectangle
+      (coordinateRadiusLower radius
+        (retainedTerminalFanSourceCorridorAxis
+          center terminal).coordinateLower)
+      (coordinateRadiusUpper radius
+        (retainedTerminalFanSourceCorridorAxis
+          center terminal).coordinateUpper)
+      point := by
+  rcases bounded with
+    ⟨index, indexBound, pointBound⟩
+  rcases pointBound.coordinate_bounds with
+    ⟨horizontal, vertical⟩
+  rcases center with ⟨centerX, centerY⟩
+  rcases point with ⟨pointX, pointY⟩
+  rcases terminal with ⟨direction, length⟩
+  cases direction with
+  | compass port =>
+      cases port <;>
+        simp [InClosedGridRectangle,
+          coordinateRadiusLower, coordinateRadiusUpper,
+          retainedTerminalFanSourceCorridorAxis,
+          GridSegment.coordinateLower,
+          GridSegment.coordinateUpper,
+          retainedTerminalFanTotalRefinement,
+          PeriodicEightOccurrenceSplitPositioned.refinementScale,
+          retainedTerminalFanRoutingRefinement,
+          RetainedTerminalDirection.primitive,
+          OccurrenceSplitRing.Port.unitVector,
+          Cell.add, Cell.scale] at indexBound horizontal vertical ⊢ <;>
+        omega
+  | routedClause arm =>
+      cases arm <;>
+        simp [InClosedGridRectangle,
+          coordinateRadiusLower, coordinateRadiusUpper,
+          retainedTerminalFanSourceCorridorAxis,
+          GridSegment.coordinateLower,
+          GridSegment.coordinateUpper,
+          retainedTerminalFanTotalRefinement,
+          PeriodicEightOccurrenceSplitPositioned.refinementScale,
+          retainedTerminalFanRoutingRefinement,
+          RetainedTerminalDirection.primitive,
+          routedClauseRayPrimitive,
+          Cell.add, Cell.sub, Cell.scale]
+          at indexBound horizontal vertical ⊢ <;>
+        omega
 
 /-- Every inward checkpoint used by the outer radial route is the same
 point as a source-terminal checkpoint indexed outward from the variable
