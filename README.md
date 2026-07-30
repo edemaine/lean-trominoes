@@ -1827,6 +1827,12 @@ The representation choices for this target are:
   radius-288 direction interface, its inner endpoint is the certified
   radius-264 fan-route head, and genuine occurrence lookup selects the demand
   carrying the occurrence's exact classified terminal datum.
+- [`LeanTrominoes/RetainedAngularFanOuterRadialRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterRadialRoutes.lean)
+  starts the outer adapter at each exact scaled source gate.  Eight-unit
+  tangential offsets select distinct radius-288 interface ports, and a
+  translated retained-ray staircase joins every gate to its port with exact
+  endpoints and orthogonality.  The canonical radial tie-break makes these
+  parallel lanes advance in occurrence-slot order.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
