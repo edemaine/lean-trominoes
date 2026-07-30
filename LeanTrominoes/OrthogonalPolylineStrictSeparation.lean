@@ -144,6 +144,22 @@ theorem RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther
         _ (List.get_mem _ secondIndex)
         equal).elim
 
+/-- Restricting the first route to one of its listed points preserves
+strict separation. -/
+theorem RoutesStrictlyAvoidEachOther.singleton_left
+    {first second : List Cell}
+    (strict : RoutesStrictlyAvoidEachOther first second)
+    {point : Cell}
+    (pointMember : point ∈ first) :
+    RoutesStrictlyAvoidEachOther [point] second := by
+  apply routesStrictlyAvoidEachOther_of_avoid_of_noContact
+    (strict.toRoutesAvoidEachOther.singleton_left pointMember)
+  intro firstPoint firstMember secondPoint secondMember
+  simp only [List.mem_singleton] at firstMember
+  subst firstPoint
+  exact strict.2.2.2 point pointMember
+    secondPoint secondMember
+
 /-- Contact-free route separation is symmetric. -/
 theorem RoutesStrictlyAvoidEachOther.symm
     {first second : List Cell}
@@ -166,6 +182,16 @@ theorem RoutesStrictlyAvoidEachOther.symm
       fun secondPoint secondMember firstPoint firstMember equal =>
         strict.2.2.2 firstPoint firstMember
           secondPoint secondMember equal.symm⟩
+
+/-- Restricting the second route to one of its listed points preserves
+strict separation. -/
+theorem RoutesStrictlyAvoidEachOther.singleton_right
+    {first second : List Cell}
+    (strict : RoutesStrictlyAvoidEachOther first second)
+    {point : Cell}
+    (pointMember : point ∈ second) :
+    RoutesStrictlyAvoidEachOther first [point] :=
+  strict.symm.singleton_left pointMember |>.symm
 
 /-- Positive uniform scaling preserves contact-free route separation. -/
 theorem RoutesStrictlyAvoidEachOther.scalePolyline

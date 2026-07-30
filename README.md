@@ -803,9 +803,10 @@ The representation choices for this target are:
   [`LeanTrominoes/OrthogonalPolylineStrictSeparation.lean`](LeanTrominoes/OrthogonalPolylineStrictSeparation.lean)
   strengthens the finite predicate to forbid all listed-point contact and
   proves that this strict form is preserved by positive uniform scaling and
-  composes through endpoint joins on either side.  This is the form needed
-  while tile endpoints become internal points of a recursively assembled
-  corridor.
+  composes through endpoint joins on either side.  Restricting either route
+  to one of its listed singleton points also preserves strict separation.
+  This is the form needed while tile endpoints become internal points of a
+  recursively assembled corridor.
   [`LeanTrominoes/OrthogonalPolylineMiddleCoarsening.lean`](LeanTrominoes/OrthogonalPolylineMiddleCoarsening.lean)
   proves that strict continuous separation survives removal of a listed
   point lying inside one axis-aligned segment.  It accounts for the possible
@@ -1971,7 +1972,9 @@ The representation choices for this target are:
   connects profile slots back to genuine retained source occurrences.
   Two occurrences in strict angular-list order select their exact
   classified replacement suffixes, and terminal-vector injectivity proves
-  those complete outer-fan routes strictly separated.
+  those complete outer-fan routes strictly separated.  The same theorem is
+  transported through any positive source-refinement factor, scaling radial
+  lengths while preserving slot order and complete fan/fan separation.
 - [`LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean`](LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean)
   proves that strict continuous separation is preserved by simultaneously
   replacing the tails of two routes.  Separation of the unchanged
@@ -1998,6 +2001,16 @@ The representation choices for this target are:
   separation and the exact classified gate equations discharge both endpoint
   joins, leaving only the two directed source-prefix/fan-suffix cross cases
   plus the already certified fan/fan case.
+- [`LeanTrominoes/RetainedAngularFanSourceScaling.lean`](LeanTrominoes/RetainedAngularFanSourceScaling.lean)
+  scales the retained source before inserting the fixed-size angular fans.
+  Positive refinement preserves the angular occurrence order and the logical
+  fixed-eight formula while multiplying the global source clearance.
+- [`LeanTrominoes/RetainedAngularFanSourceScaledSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceScaledSeparation.lean)
+  transports the simultaneous splice-separation interface through that
+  source-first refinement.  It additionally identifies every scaled
+  singleton prefix with the singleton containing its exact own-fan gate, so
+  restricting an existing complete fan/fan certificate discharges the
+  directed singleton-prefix-versus-other-fan cross case with no new geometry.
 - [`LeanTrominoes/RectangleLineEnvelope.lean`](LeanTrominoes/RectangleLineEnvelope.lean)
   gives the diagonal cross case an explicit closed-envelope contact
   predicate: a point must satisfy both the reference segment's coordinate

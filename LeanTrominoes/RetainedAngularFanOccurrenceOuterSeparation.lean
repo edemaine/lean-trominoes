@@ -84,5 +84,97 @@ theorem retainedOccurrenceOuterCompleteRoutes_strictlyAvoid
     firstLookup secondLookup
   simpa [firstSlot, secondSlot] using before
 
+/-- Positive source refinement preserves the complete outer-fan separation
+selected by two ordered genuine occurrences. -/
+theorem retainedOccurrenceScaledOuterCompleteRoutes_strictlyAvoid
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (retained :
+      RetainedOccurrenceTerminalCertificate source routes)
+    (vectorsInjective :
+      RetainedOccurrenceTerminalVectorsInjective source routes)
+    (fits :
+      FitsEightSlots
+        (angularOccurrenceOrder source routes))
+    {factor : Nat} (factorPositive : 0 < factor)
+    (atom : Variable)
+    (first second : ThreeOccurrenceVariable Variable)
+    (firstMember : first ∈ occurrenceVariables source atom)
+    (secondMember : second ∈ occurrenceVariables source atom)
+    (before :
+      (angularOccurrenceVariables source routes atom).idxOf first <
+        (angularOccurrenceVariables source routes atom).idxOf second)
+    (center : Cell) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterCompleteRoute center
+        (scaleRetainedTerminalData factor
+          (classifiedRetainedTerminalData
+            (occurrenceTerminalVector routes first)))
+        (retainedAngularTerminalSlot
+          source routes fits atom first firstMember))
+      (retainedTerminalFanOuterCompleteRoute center
+        (scaleRetainedTerminalData factor
+          (classifiedRetainedTerminalData
+            (occurrenceTerminalVector routes second)))
+        (retainedAngularTerminalSlot
+          source routes fits atom second secondMember)) := by
+  let profile :=
+    retainedAngularTerminalProfile
+      source routes retained fits atom
+  let firstSlot :=
+    retainedAngularTerminalSlot
+      source routes fits atom first firstMember
+  let secondSlot :=
+    retainedAngularTerminalSlot
+      source routes fits atom second secondMember
+  let firstTerminal :=
+    classifiedRetainedTerminalData
+      (occurrenceTerminalVector routes first)
+  let secondTerminal :=
+    classifiedRetainedTerminalData
+      (occurrenceTerminalVector routes second)
+  have distinct : profile.GatesDistinct := by
+    exact retainedAngularTerminalProfile_gatesDistinct
+      source routes retained vectorsInjective fits atom
+  have scaledDistinct :
+      (profile.scale factor factorPositive).GatesDistinct :=
+    profile.scale_gatesDistinct
+      factor factorPositive distinct
+  have firstLookup :
+      profile.terminals[firstSlot.val]? =
+        some firstTerminal := by
+    exact retainedAngularTerminalProfile_getElem_slot
+      source routes retained fits atom first firstMember
+  have secondLookup :
+      profile.terminals[secondSlot.val]? =
+        some secondTerminal := by
+    exact retainedAngularTerminalProfile_getElem_slot
+      source routes retained fits atom second secondMember
+  have firstScaledLookup :
+      (profile.scale factor
+        factorPositive).terminals[firstSlot.val]? =
+          some
+            (scaleRetainedTerminalData
+              factor firstTerminal) := by
+    simp [RetainedAngularTerminalProfile.scale_terminals,
+      firstLookup]
+  have secondScaledLookup :
+      (profile.scale factor
+        factorPositive).terminals[secondSlot.val]? =
+          some
+            (scaleRetainedTerminalData
+              factor secondTerminal) := by
+    simp [RetainedAngularTerminalProfile.scale_terminals,
+      secondLookup]
+  apply
+    (profile.scale factor
+      factorPositive).outerCompleteRoutes_strictlyAvoid
+        scaledDistinct center firstSlot secondSlot
+        (scaleRetainedTerminalData factor firstTerminal)
+        (scaleRetainedTerminalData factor secondTerminal)
+        firstScaledLookup secondScaledLookup
+  simpa [firstSlot, secondSlot] using before
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
