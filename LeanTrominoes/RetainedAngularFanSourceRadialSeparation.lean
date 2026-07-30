@@ -82,6 +82,169 @@ theorem retainedTerminalFanSourceCorridorAxis_eq_scale_finalSegment
     ring_nf <;>
     simp
 
+/-- Every radial-route point lies in the radius-65 expansion of the
+combined-scaled endpoint rectangle of its discarded source segment. -/
+theorem retainedTerminalFanOuterRadialRoute_point_in_scaledFinalSegmentRectangle
+    {factor : Nat}
+    (route : List Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (routeLength : 2 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some terminal)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        retainedTerminalFanOuterRadialRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor route).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor terminal)
+          slot) :
+    InClosedGridRectangle
+      (coordinateRadiusLower 65
+      (Cell.scale
+          (retainedTerminalFanTotalRefinement * factor)
+          (⟨polylineLastEntrance route,
+              route.getLastD (0, 0)⟩ :
+            GridSegment).coordinateLower))
+      (coordinateRadiusUpper 65
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * factor)
+          (⟨polylineLastEntrance route,
+              route.getLastD (0, 0)⟩ :
+            GridSegment).coordinateUpper))
+      point := by
+  have productNonnegativeInt :
+      (0 : Int) ≤
+        retainedTerminalFanTotalRefinement * factor := by
+    exact_mod_cast
+      Nat.zero_le
+        (retainedTerminalFanTotalRefinement * factor)
+  have checkpointBound :=
+    retainedTerminalFanOuterRadialRoute_point_in_tube
+      (Cell.scale retainedTerminalFanTotalRefinement
+        ((scalePolyline factor route).getLastD (0, 0)))
+      (scaleRetainedTerminalData factor terminal)
+      slot pointMember
+  have sourceBound :=
+    inCoordinateCheckpointTube_outerInward_to_sourceTerminal
+      65
+      (Cell.scale retainedTerminalFanTotalRefinement
+        ((scalePolyline factor route).getLastD (0, 0)))
+      (scaleRetainedTerminalData factor terminal)
+      slot checkpointBound
+  have rectangleBound :=
+    inCoordinateSourceTerminalTube_in_coordinateRectangle
+      sourceBound
+  rw [
+    retainedTerminalFanSourceCorridorAxis_eq_scale_finalSegment
+      route terminal routeLength classified,
+    GridSegment.coordinateLower_scale
+      productNonnegativeInt,
+    GridSegment.coordinateUpper_scale
+      productNonnegativeInt] at rectangleBound
+  exact rectangleBound
+
+/-- A source prefix is longitudinally separated from a discarded terminal
+segment when each listed point, and each axis-aligned segment that can
+participate in the orthogonal contact predicate, has a disjoint endpoint
+rectangle. -/
+def SourcePrefixRectangularlySeparated
+    (sourceRoute referenceRoute : List Cell) : Prop :=
+  let reference : GridSegment :=
+    ⟨polylineLastEntrance referenceRoute,
+      referenceRoute.getLastD (0, 0)⟩
+  (∀ point ∈ sourceRoute.dropLast,
+      ClosedGridRectanglesSeparated
+        point point
+        reference.coordinateLower reference.coordinateUpper) ∧
+    ∀ segment ∈ gridPolylineSegments sourceRoute.dropLast,
+      segment.IsAxisAligned →
+        ClosedGridRectanglesSeparated
+          segment.coordinateLower segment.coordinateUpper
+          reference.coordinateLower reference.coordinateUpper
+
+instance (sourceRoute referenceRoute : List Cell) :
+    Decidable
+      (SourcePrefixRectangularlySeparated
+        sourceRoute referenceRoute) := by
+  unfold SourcePrefixRectangularlySeparated
+  infer_instance
+
+/-- Longitudinal rectangle separation clears an outer radial route around
+an arbitrary retained terminal direction, including a diagonal one. -/
+theorem
+    retainedAngularFanSourceScaledPrefix_strictlyAvoids_outerRadialRoute_of_rectangleSeparated
+    {factor : Nat} (factorPositive : 0 < factor)
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData)
+    (referenceSlot : RetainedTerminalSlot)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (referenceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector referenceRoute) =
+        some referenceTerminal)
+    (sourceSeparated :
+      SourcePrefixRectangularlySeparated
+        sourceRoute referenceRoute) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor sourceRoute)).dropLast
+      (retainedTerminalFanOuterRadialRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          ((scalePolyline factor referenceRoute).getLastD (0, 0)))
+        (scaleRetainedTerminalData factor referenceTerminal)
+        referenceSlot) := by
+  let combinedFactor :=
+    retainedTerminalFanTotalRefinement * factor
+  let referenceSegment : GridSegment :=
+    ⟨polylineLastEntrance referenceRoute,
+      referenceRoute.getLastD (0, 0)⟩
+  have combinedPositive : 0 < combinedFactor := by
+    dsimp [combinedFactor]
+    exact Nat.mul_pos (by native_decide) factorPositive
+  have radiusLt : 65 < combinedFactor := by
+    dsimp [combinedFactor]
+    rw [retainedTerminalFanTotalRefinement_eq]
+    omega
+  change
+    (∀ point ∈ sourceRoute.dropLast,
+        ClosedGridRectanglesSeparated
+          point point
+          referenceSegment.coordinateLower
+          referenceSegment.coordinateUpper) ∧
+      (∀ segment ∈ gridPolylineSegments sourceRoute.dropLast,
+        segment.IsAxisAligned →
+          ClosedGridRectanglesSeparated
+            segment.coordinateLower segment.coordinateUpper
+            referenceSegment.coordinateLower
+            referenceSegment.coordinateUpper)
+    at sourceSeparated
+  have separated :=
+    routesStrictlyAvoidEachOther_scalePolyline_rectangleNeighborhood
+      (source := sourceRoute.dropLast)
+      (nearby :=
+        retainedTerminalFanOuterRadialRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor referenceRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor referenceTerminal)
+          referenceSlot)
+      (referenceLower := referenceSegment.coordinateLower)
+      (referenceUpper := referenceSegment.coordinateUpper)
+      combinedPositive radiusLt
+      sourceSeparated.1 sourceSeparated.2
+      (by
+        intro point pointMember
+        simpa [combinedFactor, referenceSegment] using
+          retainedTerminalFanOuterRadialRoute_point_in_scaledFinalSegmentRectangle
+            referenceRoute referenceTerminal referenceSlot
+            referenceLength referenceClassified pointMember)
+  simpa [combinedFactor, scalePolyline_scalePolyline_nat,
+    scalePolyline, List.map_map, Function.comp_def,
+    Cell.scale_scale, Nat.cast_mul] using separated
+
 /-- A source-first refined prefix strictly avoids the radial part of a
 second fan whenever the discarded final source segment is axis-aligned
 and was strictly separated before refinement. -/
@@ -121,10 +284,6 @@ theorem
   have combinedPositive : 0 < combinedFactor := by
     dsimp [combinedFactor]
     exact Nat.mul_pos (by native_decide) factorPositive
-  have productNonnegativeInt :
-      (0 : Int) ≤
-        retainedTerminalFanTotalRefinement * factor := by
-    exact_mod_cast combinedPositive.le
   have radiusLt : 65 < combinedFactor := by
     dsimp [combinedFactor]
     rw [retainedTerminalFanTotalRefinement_eq]
@@ -144,31 +303,10 @@ theorem
       (by simpa [referenceSegment] using sourceAvoids)
       (by
         intro point pointMember
-        have checkpointBound :=
-          retainedTerminalFanOuterRadialRoute_point_in_tube
-            (Cell.scale retainedTerminalFanTotalRefinement
-              ((scalePolyline factor referenceRoute).getLastD (0, 0)))
-            (scaleRetainedTerminalData factor referenceTerminal)
-            referenceSlot pointMember
-        have sourceBound :=
-          inCoordinateCheckpointTube_outerInward_to_sourceTerminal
-            65
-            (Cell.scale retainedTerminalFanTotalRefinement
-              ((scalePolyline factor referenceRoute).getLastD (0, 0)))
-            (scaleRetainedTerminalData factor referenceTerminal)
-            referenceSlot checkpointBound
-        have rectangleBound :=
-          inCoordinateSourceTerminalTube_in_coordinateRectangle
-            sourceBound
-        rw [
-          retainedTerminalFanSourceCorridorAxis_eq_scale_finalSegment
-            referenceRoute referenceTerminal referenceLength
-            referenceClassified,
-          GridSegment.coordinateLower_scale
-            productNonnegativeInt,
-          GridSegment.coordinateUpper_scale
-            productNonnegativeInt] at rectangleBound
-        simpa [combinedFactor, referenceSegment] using rectangleBound)
+        simpa [combinedFactor, referenceSegment] using
+          retainedTerminalFanOuterRadialRoute_point_in_scaledFinalSegmentRectangle
+            referenceRoute referenceTerminal referenceSlot
+            referenceLength referenceClassified pointMember)
   simpa [combinedFactor, scalePolyline_scalePolyline_nat,
     scalePolyline, List.map_map, Function.comp_def,
     Cell.scale_scale, Nat.cast_mul] using separated

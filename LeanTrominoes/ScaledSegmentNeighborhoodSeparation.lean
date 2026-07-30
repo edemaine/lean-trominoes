@@ -125,27 +125,33 @@ theorem ClosedGridRectanglesSeparated.scale_left_rectangle_radius
     rw [mul_add] at scaled
     omega
 
-/-- A finite source route strictly separated from an axis-aligned integral
-segment remains strictly separated, after scaling, from every route in a
-smaller coordinate-radius neighborhood of that scaled segment. -/
+/-- Pointwise and segmentwise rectangle separation from an arbitrary
+reference rectangle survives scaling and a smaller radius expansion.  This
+form does not require the reference itself to be axis-aligned. -/
 theorem
-    routesStrictlyAvoidEachOther_scalePolyline_axisAlignedSegmentNeighborhood
+    routesStrictlyAvoidEachOther_scalePolyline_rectangleNeighborhood
     {source nearby : List Cell}
-    {reference : GridSegment}
+    {referenceLower referenceUpper : Cell}
     {factor radius : Nat}
     (factorPositive : 0 < factor)
     (radiusLt : radius < factor)
-    (referenceAligned : reference.IsAxisAligned)
-    (sourceAvoids :
-      RoutesStrictlyAvoidEachOther
-        source [reference.start, reference.finish])
+    (sourcePointSeparated :
+      ∀ point ∈ source,
+        ClosedGridRectanglesSeparated
+          point point referenceLower referenceUpper)
+    (sourceSegmentSeparated :
+      ∀ segment ∈ gridPolylineSegments source,
+        segment.IsAxisAligned →
+          ClosedGridRectanglesSeparated
+            segment.coordinateLower segment.coordinateUpper
+            referenceLower referenceUpper)
     (nearbyBounded :
       ∀ point ∈ nearby,
         InClosedGridRectangle
           (coordinateRadiusLower radius
-            (Cell.scale factor reference.coordinateLower))
+            (Cell.scale factor referenceLower))
           (coordinateRadiusUpper radius
-            (Cell.scale factor reference.coordinateUpper))
+            (Cell.scale factor referenceUpper))
           point) :
     RoutesStrictlyAvoidEachOther
       (scalePolyline factor source) nearby := by
@@ -155,73 +161,6 @@ theorem
   have factorNonnegativeInt :
       (0 : Int) ≤ factor :=
     factorPositiveInt.le
-  have referenceMember :
-      reference ∈
-        gridPolylineSegments
-          [reference.start, reference.finish] := by
-    simp [gridPolylineSegments]
-  have sourcePointSeparated :
-      ∀ point ∈ source,
-        ClosedGridRectanglesSeparated
-          point point
-          reference.coordinateLower
-          reference.coordinateUpper := by
-    intro point pointMember
-    have notContained : ¬reference.Contains point := by
-      intro contains
-      rcases
-          GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
-            contains with
-        interior | endpoint
-      · exact
-          (sourceAvoids.2.1
-            point pointMember reference referenceMember)
-            interior
-      · rcases endpoint with atStart | atFinish
-        · exact
-            (sourceAvoids.2.2.2
-              point pointMember reference.start
-              (by simp))
-              atStart
-        · exact
-            (sourceAvoids.2.2.2
-              point pointMember reference.finish
-              (by simp))
-              atFinish
-    exact
-      (reference.coordinateRectangle_separated_point
-        referenceAligned notContained).symm
-  have sourceSegmentSeparated :
-      ∀ segment ∈ gridPolylineSegments source,
-        segment.IsAxisAligned →
-          ClosedGridRectanglesSeparated
-            segment.coordinateLower segment.coordinateUpper
-            reference.coordinateLower
-            reference.coordinateUpper := by
-    intro segment segmentMember segmentAligned
-    have endpoints :=
-      gridPolylineSegments_endpoints_mem segmentMember
-    exact
-      GridSegment.coordinateRectangles_separated_of_axisAligned
-        segmentAligned referenceAligned
-        (sourceAvoids.1
-          segment segmentMember reference referenceMember)
-        (sourceAvoids.2.1
-          segment.start endpoints.1 reference referenceMember)
-        (sourceAvoids.2.1
-          segment.finish endpoints.2 reference referenceMember)
-        (sourceAvoids.2.2.1
-          reference.start (by simp) segment segmentMember)
-        (sourceAvoids.2.2.1
-          reference.finish (by simp) segment segmentMember)
-        (sourceAvoids.2.2.2
-          segment.start endpoints.1 reference.start (by simp))
-        (sourceAvoids.2.2.2
-          segment.start endpoints.1 reference.finish (by simp))
-        (sourceAvoids.2.2.2
-          segment.finish endpoints.2 reference.start (by simp))
-        (sourceAvoids.2.2.2
-          segment.finish endpoints.2 reference.finish (by simp))
   unfold RoutesStrictlyAvoidEachOther
   rw [gridPolylineSegments_scalePolyline]
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -317,5 +256,101 @@ theorem
         (by exact ⟨le_rfl, le_rfl, le_rfl, le_rfl⟩)
         (nearbyBounded _ nearbyPointMember)
         separated
+
+/-- A finite source route strictly separated from an axis-aligned integral
+segment remains strictly separated, after scaling, from every route in a
+smaller coordinate-radius neighborhood of that scaled segment. -/
+theorem
+    routesStrictlyAvoidEachOther_scalePolyline_axisAlignedSegmentNeighborhood
+    {source nearby : List Cell}
+    {reference : GridSegment}
+    {factor radius : Nat}
+    (factorPositive : 0 < factor)
+    (radiusLt : radius < factor)
+    (referenceAligned : reference.IsAxisAligned)
+    (sourceAvoids :
+      RoutesStrictlyAvoidEachOther
+        source [reference.start, reference.finish])
+    (nearbyBounded :
+      ∀ point ∈ nearby,
+        InClosedGridRectangle
+          (coordinateRadiusLower radius
+            (Cell.scale factor reference.coordinateLower))
+          (coordinateRadiusUpper radius
+            (Cell.scale factor reference.coordinateUpper))
+          point) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline factor source) nearby := by
+  have referenceMember :
+      reference ∈
+        gridPolylineSegments
+          [reference.start, reference.finish] := by
+    simp [gridPolylineSegments]
+  have sourcePointSeparated :
+      ∀ point ∈ source,
+        ClosedGridRectanglesSeparated
+          point point
+          reference.coordinateLower
+          reference.coordinateUpper := by
+    intro point pointMember
+    have notContained : ¬reference.Contains point := by
+      intro contains
+      rcases
+          GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+            contains with
+        interior | endpoint
+      · exact
+          (sourceAvoids.2.1
+            point pointMember reference referenceMember)
+            interior
+      · rcases endpoint with atStart | atFinish
+        · exact
+            (sourceAvoids.2.2.2
+              point pointMember reference.start
+              (by simp))
+              atStart
+        · exact
+            (sourceAvoids.2.2.2
+              point pointMember reference.finish
+              (by simp))
+              atFinish
+    exact
+      (reference.coordinateRectangle_separated_point
+        referenceAligned notContained).symm
+  have sourceSegmentSeparated :
+      ∀ segment ∈ gridPolylineSegments source,
+        segment.IsAxisAligned →
+          ClosedGridRectanglesSeparated
+            segment.coordinateLower segment.coordinateUpper
+            reference.coordinateLower
+            reference.coordinateUpper := by
+    intro segment segmentMember segmentAligned
+    have endpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    exact
+      GridSegment.coordinateRectangles_separated_of_axisAligned
+        segmentAligned referenceAligned
+        (sourceAvoids.1
+          segment segmentMember reference referenceMember)
+        (sourceAvoids.2.1
+          segment.start endpoints.1 reference referenceMember)
+        (sourceAvoids.2.1
+          segment.finish endpoints.2 reference referenceMember)
+        (sourceAvoids.2.2.1
+          reference.start (by simp) segment segmentMember)
+        (sourceAvoids.2.2.1
+          reference.finish (by simp) segment segmentMember)
+        (sourceAvoids.2.2.2
+          segment.start endpoints.1 reference.start (by simp))
+        (sourceAvoids.2.2.2
+          segment.start endpoints.1 reference.finish (by simp))
+        (sourceAvoids.2.2.2
+          segment.finish endpoints.2 reference.start (by simp))
+        (sourceAvoids.2.2.2
+          segment.finish endpoints.2 reference.finish (by simp))
+  exact
+    routesStrictlyAvoidEachOther_scalePolyline_rectangleNeighborhood
+      factorPositive radiusLt
+      sourcePointSeparated sourceSegmentSeparated nearbyBounded
 
 end LeanTrominoes
