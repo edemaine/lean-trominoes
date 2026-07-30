@@ -1964,6 +1964,20 @@ The representation choices for this target are:
   separation and the exact classified gate equations discharge both endpoint
   joins, leaving only the two directed source-prefix/fan-suffix cross cases
   plus the already certified fan/fan case.
+- [`LeanTrominoes/RectangleLineEnvelope.lean`](LeanTrominoes/RectangleLineEnvelope.lean)
+  gives the diagonal cross case an explicit closed-envelope contact
+  predicate: a point must satisfy both the reference segment's coordinate
+  bounds and supporting-line equation, while an axis-aligned segment contact
+  is exactly rectangle overlap plus bracketing of that line.  The mixed
+  separating-axis predicates are proved to be the exact complements of
+  these contacts.
+- [`LeanTrominoes/RetainedTerminalSegmentEnvelope.lean`](LeanTrominoes/RetainedTerminalSegmentEnvelope.lean)
+  proves that the selected transverse functional is constant on every
+  classified retained terminal segment and specializes the envelope to the
+  discarded final segment.  It restates the remaining source-prefix corridor
+  certificate as a finite, decidable absence of point and axis-segment
+  contacts, without treating the axis-only `InteriorsMeet` predicate as
+  diagonal geometry.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
