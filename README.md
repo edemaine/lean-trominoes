@@ -1886,6 +1886,12 @@ The representation choices for this target are:
   proves the entire arbitrary-length prefix strictly outside a supporting
   side of the radius-288 frame, hence strictly separated from every local
   fan route.
+- [`LeanTrominoes/RetainedAngularFanOuterZeroRadialRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterZeroRadialRoutes.lean)
+  isolates the sole positive zero-block case: a length-one compass terminal.
+  Its radial route is exactly the finite tangential lane shift, whose
+  order-compatible interactions with local fan routes are exhaustively
+  certified; the excluded equal-direction case cannot occur in a
+  duplicate-free terminal profile.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
