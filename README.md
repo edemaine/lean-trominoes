@@ -804,7 +804,9 @@ The representation choices for this target are:
   proves that strict continuous separation survives removal of a listed
   point lying inside one axis-aligned segment.  It accounts for the possible
   crossing at the removed point as well as contacts with either resulting
-  open subsegment.
+  open subsegment.  Its join lemmas also extract separation of either
+  constituent route and support coarsening a trailing subdivided segment
+  inside a longer joined route.
   [`LeanTrominoes/OrthogonalPolylineLinearSeparation.lean`](LeanTrominoes/OrthogonalPolylineLinearSeparation.lean)
   proves a complementary half-plane certificate: strict opposite-side
   bounds for an integer linear functional imply complete continuous route
@@ -1897,6 +1899,12 @@ The representation choices for this target are:
   order-compatible interactions with local fan routes are exhaustively
   certified; the excluded equal-direction case cannot occur in a
   duplicate-free terminal profile.
+- [`LeanTrominoes/RetainedAngularFanOuterRadialDecomposition.lean`](LeanTrominoes/RetainedAngularFanOuterRadialDecomposition.lean)
+  splits the last primitive block from every positive diagonal or
+  routed-clause radial raster and proves the split route avoids the finite
+  local fan adapters.  Cardinal rasters are represented by one long segment;
+  an explicit collinear coarsening certificate relates that direct segment
+  to the same split geometry.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
