@@ -1730,7 +1730,9 @@ The representation choices for this target are:
   and a finite matrix of strict radial comparisons.  The shape preserves
   exactly the ordering information needed to separate stable same-ray ties,
   is unchanged by positive uniform refinement, and is a finite type suitable
-  for exhaustive adapter search.
+  for exhaustive adapter search.  An executable validity predicate restricts
+  that raw type to initial active slots with sorted directions and strict
+  total radial orders; every duplicate-free concrete profile is proved valid.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
