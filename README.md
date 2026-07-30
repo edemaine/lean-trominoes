@@ -2018,6 +2018,12 @@ The representation choices for this target are:
   fans as canonical orthogonal incidence routes.  Its concrete factor-four
   planar-SAT construction has positive period and erases to exactly the
   established retained fixed-eight logical formula.
+- [`LeanTrominoes/RetainedFinalSourceScaledSpliceSeparation.lean`](LeanTrominoes/RetainedFinalSourceScaledSpliceSeparation.lean)
+  packages the final route-shape reduction for separating two source-to-fan
+  splices.  Each directed cross case follows either from a singleton source
+  prefix or from an axis-aligned terminal on the other fan route; consequently
+  aligned/aligned and singleton/singleton pairs are complete, isolating only
+  the mixed aligned-prefix-versus-oblique-fan geometry.
 - [`LeanTrominoes/RectangleLineEnvelope.lean`](LeanTrominoes/RectangleLineEnvelope.lean)
   gives the diagonal cross case an explicit closed-envelope contact
   predicate: a point must satisfy both the reference segment's coordinate
