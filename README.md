@@ -1840,11 +1840,19 @@ The representation choices for this target are:
   coordinated pairwise rasterization remains the next splice subproblem.
 - [`LeanTrominoes/RetainedAngularFanOuterCollarSeparatedRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterCollarSeparatedRoutes.lean)
   supplies that coordinated rasterization.  Neighboring-corridor crossing
-  lines handle nine direction families, while two compact unit-grid flow
-  certificates handle the corner-heavy right-arm and southwest families.
+  lines handle nine direction families, while explicit nested tracks handle
+  the corner-heavy right-arm and southwest families without following the
+  inner frame before their own endpoints.
   Finite certification proves exact endpoints, orthogonality, collar
   containment, and strict continuous separation for every
   order-compatible pair.
+- [`LeanTrominoes/RetainedAngularFanOuterLocalRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterLocalRoutes.lean)
+  joins each separated collar route to its complete refined fan route,
+  producing a finite radius-288-to-Figure-7 adapter.  Exhaustive cross-piece
+  checks prove strict continuous separation of every order-compatible pair,
+  while endpoint, orthogonality, frame, and fan-interior certificates
+  describe each complete route; translation positions the same adapter at
+  any retained variable center.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
