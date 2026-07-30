@@ -170,5 +170,67 @@ theorem
     routePrefix_avoids_other_final_point_of_avoid
       avoid firstSimple.1 firstHead secondLast sourceNeFinal
 
+/-- The first retained prefix is strictly separated from the second route's
+discarded final source segment.  This is the exact unscaled corridor axis
+used by the replacement outer fan. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherFinalSegment
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondFinal : Cell}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headsDifferent : first.head? ≠ second.head?)
+    (firstHead : first.head? = some firstSource)
+    (secondLast : second.getLast? = some secondFinal)
+    (sourceNeFinal : firstSource ≠ secondFinal) :
+    RoutesStrictlyAvoidEachOther
+      first.dropLast
+      [polylineLastEntrance second, secondFinal] := by
+  have avoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routesAvoidEachOther
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent
+  have prefixesAvoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefixes_strictlyAvoid
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent
+  have finalClearance :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_avoids_otherFinal
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent firstHead secondLast sourceNeFinal
+  have reverseTailExists :=
+    exists_reverse_tail_head?_of_two_le_length
+      second secondLength
+  have entranceEq :
+      second.dropLast.getLast? =
+        some (polylineLastEntrance second) :=
+    dropLast_getLast?_of_reverse_tail_head?
+      (polylineLastEntrance_spec reverseTailExists)
+  exact
+    routesStrictlyAvoidEachOther_dropLast_finalSegment
+      avoid prefixesAvoid entranceEq secondLast
+      finalClearance.1
+
 end PeriodicOrthocrossing
 end LeanTrominoes
