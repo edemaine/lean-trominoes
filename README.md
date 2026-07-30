@@ -1807,6 +1807,12 @@ The representation choices for this target are:
   annular bounds, and strict continuous separation for every
   order-compatible pair among the 88 routes, then joins the pairwise
   separated scaled compass routes down to the refined Figure 7 boundary.
+- [`LeanTrominoes/RetainedAngularTerminalSlotLookup.lean`](LeanTrominoes/RetainedAngularTerminalSlotLookup.lean)
+  bridges source incidence identities to the finite router.  A genuine
+  occurrence's index in the stable angular list is proved below eight,
+  looking that slot up recovers the same occurrence and exact classified
+  terminal datum, and the extracted finite shape selects precisely the
+  corresponding complete refined fan route.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
