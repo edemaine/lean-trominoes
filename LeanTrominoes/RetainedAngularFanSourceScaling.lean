@@ -21,6 +21,31 @@ namespace PeriodicEightOccurrenceSplit
 
 open PeriodicThreeSATThree
 
+/-- Fixed source-first refinement used to clear the radius-845 retained
+terminal corridor before inserting the angular fans. -/
+def retainedAngularFanSourceClearanceFactor : Nat :=
+  4
+
+@[simp]
+theorem retainedAngularFanSourceClearanceFactor_eq :
+    retainedAngularFanSourceClearanceFactor = 4 := by
+  rfl
+
+theorem retainedAngularFanSourceClearanceFactor_gt_one :
+    1 < retainedAngularFanSourceClearanceFactor := by
+  native_decide
+
+theorem retainedAngularFanSourceClearanceFactor_pos :
+    0 < retainedAngularFanSourceClearanceFactor :=
+  lt_trans Nat.zero_lt_one
+    retainedAngularFanSourceClearanceFactor_gt_one
+
+theorem retainedAngularFanSourceClearanceFactor_clears_transverseBand :
+    845 <
+      retainedTerminalFanTotalRefinement *
+        retainedAngularFanSourceClearanceFactor := by
+  native_decide
+
 /-- Insert the retained angular fans after uniformly refining the source
 positioned formula, placement, and route family. -/
 def retainedAngularFanSourceScaledRefinedFormula

@@ -149,6 +149,70 @@ theorem canonicalLiteralPosition_scale
         (canonicalLiteralPosition placement clause literal) := by
   simp [canonicalLiteralPosition, Cell.scale_add]
 
+/-- Positive uniform scaling preserves canonical endpoints and retained-ray
+geometry before any staircase rasterization is applied. -/
+def scale
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {factor : Nat} (factorPositive : 0 < factor)
+    (family :
+      CanonicalRetainedRayIncidenceRoutes source placement) :
+    CanonicalRetainedRayIncidenceRoutes
+      (source.scale factor) (placement.scale factor) where
+  routes :=
+    scaleIncidenceRoutes factor family.routes
+  endpoints := by
+    intro scaledClause clauseIndex scaledClauseMember
+      literal literalIndex literalMember
+    rw [scale_clauses, List.zipIdx_map] at scaledClauseMember
+    rcases List.mem_map.mp scaledClauseMember with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual :
+        taggedClause.2 = clauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst clauseIndex
+    subst scaledClause
+    have sourceLiteralMember :
+        (literal, literalIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using literalMember
+    have sourceEndpoints :=
+      family.endpoints
+        taggedClause.1 taggedClause.2 taggedClauseMember
+        literal literalIndex sourceLiteralMember
+    constructor
+    · simpa [scaleIncidenceRoutes, scalePolyline,
+        sourceEndpoints.1]
+    · simpa [scaleIncidenceRoutes, scalePolyline,
+        sourceEndpoints.2]
+  retained := by
+    intro scaledClause clauseIndex scaledClauseMember
+      literal literalIndex literalMember
+    rw [scale_clauses, List.zipIdx_map] at scaledClauseMember
+    rcases List.mem_map.mp scaledClauseMember with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual :
+        taggedClause.2 = clauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst clauseIndex
+    subst scaledClause
+    have sourceLiteralMember :
+        (literal, literalIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using literalMember
+    exact
+      (family.retained
+        taggedClause.1 taggedClause.2 taggedClauseMember
+        literal literalIndex sourceLiteralMember).scale
+          factorPositive
+
 /-- Positive uniform scaling followed by retained-ray rasterization produces
 canonical orthogonal routes with the same scaled endpoints. -/
 def rasterize

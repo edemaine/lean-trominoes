@@ -2004,13 +2004,20 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanSourceScaling.lean`](LeanTrominoes/RetainedAngularFanSourceScaling.lean)
   scales the retained source before inserting the fixed-size angular fans.
   Positive refinement preserves the angular occurrence order and the logical
-  fixed-eight formula while multiplying the global source clearance.
+  fixed-eight formula while multiplying the global source clearance.  The
+  concrete factor `4` makes the scale-288 source clearance exceed the
+  radius-845 terminal corridor.
 - [`LeanTrominoes/RetainedAngularFanSourceScaledSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceScaledSeparation.lean)
   transports the simultaneous splice-separation interface through that
   source-first refinement.  It additionally identifies every scaled
   singleton prefix with the singleton containing its exact own-fan gate, so
   restricting an existing complete fan/fan certificate discharges the
   directed singleton-prefix-versus-other-fan cross case with no new geometry.
+- [`LeanTrominoes/RetainedAngularFanSourceScaledDrawing.lean`](LeanTrominoes/RetainedAngularFanSourceScaledDrawing.lean)
+  packages the source-first-scaled retained family and its unchanged local
+  fans as canonical orthogonal incidence routes.  Its concrete factor-four
+  planar-SAT construction has positive period and erases to exactly the
+  established retained fixed-eight logical formula.
 - [`LeanTrominoes/RectangleLineEnvelope.lean`](LeanTrominoes/RectangleLineEnvelope.lean)
   gives the diagonal cross case an explicit closed-envelope contact
   predicate: a point must satisfy both the reference segment's coordinate
@@ -2098,10 +2105,10 @@ The representation choices for this target are:
   orthogonality.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
-  condition.  Positive integral scaling and executable staircase
-  rasterization then preserve the exact scaled endpoints and produce a
-  canonical orthogonal route family for the unchanged logical incidence
-  graph.
+  condition.  Positive integral scaling preserves that complete certificate
+  before rasterization; executable staircase rasterization then preserves the
+  exact scaled endpoints and produces a canonical orthogonal route family
+  for the unchanged logical incidence graph.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATRasterizedDrawing.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATRasterizedDrawing.lean)
   applies that interface to the final gauged, wrapped, and orbit-deduplicated
   planar-SAT routes.  It defines the scaled rasterized incidence drawing and
