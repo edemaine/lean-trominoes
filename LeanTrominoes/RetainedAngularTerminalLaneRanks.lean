@@ -9,8 +9,8 @@ the number of gates strictly closer to the center.
 
 For a valid shape this rank lies in `0, …, 7`, increases along every true
 radial comparison, and is injective inside each equal-direction block.
-Consequently stable angular ties can select distinct physical lanes without
-remembering any unbounded source length.
+Consequently angular ties select distinct physical lanes in the same order
+as their occurrence slots, without remembering any unbounded source length.
 -/
 
 namespace LeanTrominoes
@@ -81,6 +81,24 @@ theorem RetainedAngularTerminalShape.radialRank_lt_of_radialLT
       ⟨first, firstInSecond, firstNotInFirst⟩
   exact Finset.card_lt_card strict
 
+/-- Inside one tied direction block, radial lane rank follows occurrence-slot
+order. -/
+theorem RetainedAngularTerminalShape.radialRank_lt_of_slot_lt
+    (shape : RetainedAngularTerminalShape)
+    (valid : shape.IsValid)
+    (first second : RetainedTerminalSlot)
+    (direction : RetainedTerminalDirection)
+    (slotsLt : first.val < second.val)
+    (firstDirection :
+      shape.direction first = some direction)
+    (secondDirection :
+      shape.direction second = some direction) :
+    shape.radialRank first < shape.radialRank second := by
+  apply shape.radialRank_lt_of_radialLT valid
+  exact valid.2.2.2.2.2.2
+    first second direction slotsLt
+    firstDirection secondDirection
+
 /-- Equal-direction active slots receive different radial lanes. -/
 theorem RetainedAngularTerminalShape.radialRank_injective_on_direction
     (shape : RetainedAngularTerminalShape)
@@ -95,7 +113,7 @@ theorem RetainedAngularTerminalShape.radialRank_injective_on_direction
       shape.radialRank first = shape.radialRank second) :
     first = second := by
   by_contra slotsNe
-  rcases valid.2.2.2.2.2
+  rcases valid.2.2.2.2.2.1
       first second direction
       firstDirection secondDirection slotsNe with
     firstSecond | secondFirst

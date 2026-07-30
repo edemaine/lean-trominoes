@@ -291,16 +291,15 @@ theorem
         true :=
     angularOccurrenceVariables_getElem_angleLE
       source routes atom first second firstLt secondLt before
-  rw [occurrenceAngleLE_eq_rankLE_of_classified
-    routes
-    (angularOccurrenceVariables source routes atom)[first]
-    (angularOccurrenceVariables source routes atom)[second]
-    firstClassified secondClassified] at ordered
   exact
     ⟨firstDirection, secondDirection,
       firstLength, secondLength,
       firstClassified, secondClassified,
-      of_decide_eq_true ordered⟩
+      occurrenceAngleLE_rank_le_of_classified
+        routes
+        (angularOccurrenceVariables source routes atom)[first]
+        (angularOccurrenceVariables source routes atom)[second]
+        firstClassified secondClassified ordered⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes

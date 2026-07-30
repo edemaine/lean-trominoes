@@ -3,11 +3,12 @@ import LeanTrominoes.RetainedAngularTerminalAdapterPortGeometry
 /-!
 # Fan-facing ports for retained angular terminals
 
-Radial lane rank separates gates that lie on the same retained ray, but those
-lanes need not occur in the same order as the source formula's stable angular
-occurrence list.  The Figure 7 boundary must use the latter order.
+Radial lane rank separates gates that lie on the same retained ray.  The
+radial tie-break now proves that those lanes advance in the same order as
+the source formula's angular occurrence slots.  The Figure 7 boundary uses
+the slot order directly.
 
-We therefore define a second 88-site square frame.  A fan-facing port is
+We define a second 88-site square frame.  A fan-facing port is
 indexed by retained direction and by the occurrence slot itself.  The
 radius-33 square has exactly 264 unit boundary edges, so spacing its 88 ports
 three units apart gives a distinct outer boundary around the radius-22

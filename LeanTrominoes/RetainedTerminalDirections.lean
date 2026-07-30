@@ -290,6 +290,39 @@ theorem terminalVectorAngleLE_uniform_scale
   terminalVectorAngleLE_scale
     factorPositive factorPositive first second
 
+/-- Squared terminal radius scales by the square of the common factor. -/
+theorem terminalVectorRadiusSq_scale
+    (factor : Int) (vector : Cell) :
+    terminalVectorRadiusSq (Cell.scale factor vector) =
+      factor * factor * terminalVectorRadiusSq vector := by
+  rcases vector with ⟨horizontal, vertical⟩
+  simp [terminalVectorRadiusSq, Cell.scale]
+  ring
+
+/-- Uniform positive scaling preserves the angle-and-radius comparator. -/
+theorem terminalVectorAngleRadialLE_uniform_scale
+    {factor : Int} (factorPositive : 0 < factor)
+    (first second : Cell) :
+    terminalVectorAngleRadialLE
+        (Cell.scale factor first)
+        (Cell.scale factor second) =
+      terminalVectorAngleRadialLE first second := by
+  apply Bool.eq_iff_iff.mpr
+  simp only [terminalVectorAngleRadialLE,
+    decide_eq_true_eq,
+    terminalVectorAngleLE_uniform_scale factorPositive,
+    terminalVectorRadiusSq_scale]
+  constructor
+  · rintro ⟨angle, radial⟩
+    refine ⟨angle, fun reverseAngle => ?_⟩
+    have scaled := radial reverseAngle
+    nlinarith [mul_pos factorPositive factorPositive]
+  · rintro ⟨angle, radial⟩
+    refine ⟨angle, fun reverseAngle => ?_⟩
+    have source := radial reverseAngle
+    exact mul_le_mul_of_nonneg_left source
+      (mul_nonneg factorPositive.le factorPositive.le)
+
 /-- The eleven primitive vectors themselves occur in their advertised
 east-first rank order. -/
 theorem terminalVectorAngleLE_primitive
@@ -353,9 +386,10 @@ theorem terminalVectorAngleLE_eq_rankLE_of_classified
     firstDirection secondDirection
     firstSound.1 secondSound.1
 
-/-- The occurrence comparator used by stable merge sort has the same finite
-rank interpretation whenever both selected route terminals are classified. -/
-theorem occurrenceAngleLE_eq_rankLE_of_classified
+/-- The radially tie-broken occurrence comparator can only order a
+classified terminal before another one when their angular ranks are
+nondecreasing. -/
+theorem occurrenceAngleLE_rank_le_of_classified
     {Variable : Type*}
     (routes : PositionedPeriodicCNF.IncidenceRoutes)
     (first second : ThreeOccurrenceVariable Variable)
@@ -369,13 +403,92 @@ theorem occurrenceAngleLE_eq_rankLE_of_classified
       retainedTerminalDirectionClassify
           (occurrenceTerminalVector routes second) =
         some (secondDirection, secondLength)) :
-    occurrenceAngleLE routes first second =
-      decide
-        (firstDirection.angularRank ≤
-          secondDirection.angularRank) := by
+    occurrenceAngleLE routes first second = true →
+      firstDirection.angularRank ≤
+        secondDirection.angularRank := by
+  intro ordered
+  have angular :
+      terminalVectorAngleLE
+          (occurrenceTerminalVector routes first)
+          (occurrenceTerminalVector routes second) = true := by
+    unfold occurrenceAngleLE
+      terminalVectorAngleRadialLE at ordered
+    exact (of_decide_eq_true ordered).1
+  rw [terminalVectorAngleLE_eq_rankLE_of_classified
+    firstClassified secondClassified] at angular
+  exact of_decide_eq_true angular
+
+/-- Inside one classified direction, the radially tie-broken occurrence
+comparator is exactly comparison of primitive-block lengths. -/
+theorem occurrenceAngleLE_iff_length_le_of_same_direction_classified
+    {Variable : Type*}
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (first second : ThreeOccurrenceVariable Variable)
+    {direction : RetainedTerminalDirection}
+    {firstLength secondLength : Nat}
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (occurrenceTerminalVector routes first) =
+        some (direction, firstLength))
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (occurrenceTerminalVector routes second) =
+        some (direction, secondLength)) :
+    occurrenceAngleLE routes first second = true ↔
+      firstLength ≤ secondLength := by
+  have firstSound :=
+    retainedTerminalDirectionClassify_sound firstClassified
+  have secondSound :=
+    retainedTerminalDirectionClassify_sound secondClassified
   unfold occurrenceAngleLE
-  exact terminalVectorAngleLE_eq_rankLE_of_classified
-    firstClassified secondClassified
+  rw [firstSound.2, secondSound.2]
+  simp only [terminalVectorAngleRadialLE,
+    terminalVectorAngleLE_scale_primitive
+      direction direction firstSound.1 secondSound.1,
+    terminalVectorAngleLE_scale_primitive
+      direction direction secondSound.1 firstSound.1,
+    le_refl, decide_true, true_implies,
+    true_and, decide_eq_true_eq]
+  rw [terminalVectorRadiusSq_scale,
+    terminalVectorRadiusSq_scale]
+  have primitivePositive :
+      0 < terminalVectorRadiusSq direction.primitive := by
+    cases direction with
+    | compass port =>
+        cases port <;>
+          native_decide
+    | routedClause arm =>
+        cases arm <;>
+          native_decide
+  constructor
+  · intro scaledSquares
+    have squares :
+        (firstLength : Int) * firstLength ≤
+          (secondLength : Int) * secondLength := by
+      apply le_of_mul_le_mul_right _ primitivePositive
+      simpa [mul_assoc] using scaledSquares
+    have castLengths :
+        (firstLength : Int) ≤ secondLength :=
+      (mul_self_le_mul_self_iff
+        (by positivity : (0 : Int) ≤ firstLength)
+        (by positivity : (0 : Int) ≤ secondLength)).mpr
+        squares
+    exact_mod_cast castLengths
+  · intro lengths
+    have castLengths :
+        (firstLength : Int) ≤ secondLength := by
+      exact_mod_cast lengths
+    have squares :
+        (firstLength : Int) * firstLength ≤
+          (secondLength : Int) * secondLength :=
+      (mul_self_le_mul_self_iff
+        (by positivity : (0 : Int) ≤ firstLength)
+        (by positivity : (0 : Int) ≤ secondLength)).mp
+        castLengths
+    have scaled :=
+      mul_le_mul_of_nonneg_right
+        squares primitivePositive.le
+    simpa [mul_assoc] using scaled
 
 /-- The backwards terminal vector of a nondegenerate retained-ray polyline
 belongs to the eleven-direction terminal vocabulary. -/

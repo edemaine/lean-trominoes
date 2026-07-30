@@ -16,7 +16,9 @@ only needs three finite facts about them:
 fixed slots.  It is a finite type, so later executable geometry can search
 all possible local inputs.  The extraction theorems below recover the exact
 direction and strict radial comparison of every active pair, and show that
-positive uniform refinement leaves the shape unchanged.
+positive uniform refinement leaves the shape unchanged.  The angular sort's
+radial tie-break further guarantees that slot order and radial order agree
+inside every equal-direction block.
 -/
 
 namespace LeanTrominoes
@@ -312,10 +314,26 @@ instance (shape : RetainedAngularTerminalShape) :
   unfold RetainedAngularTerminalShape.RadialTotalOnTies
   infer_instance
 
+/-- Earlier active slots on one retained ray are closer to the source
+endpoint. -/
+def RetainedAngularTerminalShape.RadialFollowsSlots
+    (shape : RetainedAngularTerminalShape) : Prop :=
+  ∀ first second direction,
+    first.val < second.val →
+    shape.direction first = some direction →
+    shape.direction second = some direction →
+    shape.radialLT first second = true
+
+instance (shape : RetainedAngularTerminalShape) :
+    Decidable shape.RadialFollowsSlots := by
+  unfold RetainedAngularTerminalShape.RadialFollowsSlots
+  infer_instance
+
 /-- Exact finite invariants obeyed by a shape extracted from a sorted
 duplicate-free profile.  Active slots form an initial segment, their
 directions are nondecreasing, and `radialLT` is a strict total order inside
-each equal-direction block and is unsupported outside such blocks. -/
+each equal-direction block, follows slot order there, and is unsupported
+outside such blocks. -/
 def RetainedAngularTerminalShape.IsValid
     (shape : RetainedAngularTerminalShape) : Prop :=
   shape.ActiveInitial ∧
@@ -323,7 +341,8 @@ def RetainedAngularTerminalShape.IsValid
     shape.RadialSupported ∧
     shape.RadialIrreflexive ∧
     shape.RadialTransitive ∧
-    shape.RadialTotalOnTies
+    shape.RadialTotalOnTies ∧
+    shape.RadialFollowsSlots
 
 instance (shape : RetainedAngularTerminalShape) :
     Decidable shape.IsValid := by
@@ -343,6 +362,7 @@ theorem RetainedAngularTerminalProfile.finiteShape_isValid
     RetainedAngularTerminalShape.RadialIrreflexive
     RetainedAngularTerminalShape.RadialTransitive
     RetainedAngularTerminalShape.RadialTotalOnTies
+    RetainedAngularTerminalShape.RadialFollowsSlots
   constructor
   · intro first second before secondActive
     rw [RetainedAngularTerminalShape.Active,
@@ -431,6 +451,7 @@ theorem RetainedAngularTerminalProfile.finiteShape_isValid
       ⟨firstLt, thirdLt,
         firstSecondDirection.trans secondThirdDirection,
         Nat.lt_trans firstSecondLength secondThirdLength⟩
+  constructor
   · intro first second direction firstDirectionEq
       secondDirectionEq slotsNe
     have firstActive :
@@ -462,6 +483,45 @@ theorem RetainedAngularTerminalProfile.finiteShape_isValid
     exact
       (Option.some.inj firstConcrete).symm.trans
         (Option.some.inj secondConcrete)
+  · intro first second direction before firstDirectionEq
+      secondDirectionEq
+    have firstActive :
+        profile.finiteShape.Active first := by
+      rw [RetainedAngularTerminalShape.Active,
+        firstDirectionEq]
+      simp
+    have secondActive :
+        profile.finiteShape.Active second := by
+      rw [RetainedAngularTerminalShape.Active,
+        secondDirectionEq]
+      simp
+    have firstLt :
+        first.val < profile.terminals.length :=
+      profile.finiteShape_direction_isSome_iff
+        first |>.mp firstActive
+    have secondLt :
+        second.val < profile.terminals.length :=
+      profile.finiteShape_direction_isSome_iff
+        second |>.mp secondActive
+    have firstConcrete :=
+      profile.finiteShape_direction_of_lt first firstLt
+    have secondConcrete :=
+      profile.finiteShape_direction_of_lt second secondLt
+    rw [firstDirectionEq] at firstConcrete
+    rw [secondDirectionEq] at secondConcrete
+    have directionsEqual :
+        (profile.terminals[first.val]'firstLt).1 =
+          (profile.terminals[second.val]'secondLt).1 :=
+      (Option.some.inj firstConcrete).symm.trans
+        (Option.some.inj secondConcrete)
+    apply
+      (profile.finiteShape_radialLT_eq_true_iff
+        first second).mpr
+    exact
+      ⟨firstLt, secondLt, directionsEqual,
+        profile.length_lt_of_lt_of_direction_eq
+          distinct first.val second.val firstLt secondLt
+          before directionsEqual⟩
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

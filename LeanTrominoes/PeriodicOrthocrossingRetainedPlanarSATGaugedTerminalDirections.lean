@@ -13,7 +13,7 @@ angular adapter.
 
 This is stronger than the previously established segmentwise retained-ray
 certificate: it extracts the concrete positive terminal direction and length
-seen by the stable angular occurrence sort.
+seen by the angular occurrence sort with its radial tie-break.
 -/
 
 namespace LeanTrominoes

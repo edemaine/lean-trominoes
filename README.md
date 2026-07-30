@@ -1691,9 +1691,10 @@ The representation choices for this target are:
   domain for the annular adapter.
 - [`LeanTrominoes/RetainedAngularTerminalDataProfile.lean`](LeanTrominoes/RetainedAngularTerminalDataProfile.lean)
   retains the positive primitive-block length alongside each sorted
-  direction.  This handles the stable angular ties intentionally present in
-  Figure 8(b): equal-direction incidences remain separate radial splice data
-  instead of collapsing to one gate.
+  direction.  Equal-direction incidences intentionally present in Figure
+  8(b) remain separate radial splice data instead of collapsing to one gate,
+  and their lengths are proved nondecreasing from the variable endpoint
+  outward.
 - [`LeanTrominoes/RetainedTerminalSplicePoint.lean`](LeanTrominoes/RetainedTerminalSplicePoint.lean)
   identifies each classified `(direction, length)` datum with the actual
   penultimate point of its source polyline.  Thus the overlapping old final
@@ -1705,14 +1706,17 @@ The representation choices for this target are:
   and carries the source splice point to the exact penultimate point of the
   scaled route.
 - [`LeanTrominoes/RetainedAngularTerminalDataScaling.lean`](LeanTrominoes/RetainedAngularTerminalDataScaling.lean)
-  lifts that pointwise theorem through stable angular sorting: the scaled
-  route family has the identical occurrence order, while its complete local
-  profile is obtained by mapping only the terminal lengths.
+  lifts that pointwise theorem through angular sorting with its radial
+  tie-break: the scaled route family has the identical occurrence order,
+  while its complete local profile is obtained by mapping only the terminal
+  lengths.
 - [`LeanTrominoes/RetainedAngularTerminalGateDistinctness.lean`](LeanTrominoes/RetainedAngularTerminalGateDistinctness.lean)
   proves that positive `(direction, length)` data are represented injectively
-  by their radial splice gates.  Thus the annular adapter can permit stable
+  by their radial splice gates.  Thus the annular adapter can permit
   equal-direction ties while asking precisely for duplicate-free gates, a
-  condition preserved by positive refinement.  It also isolates the
+  condition preserved by positive refinement; combined with the radial
+  tie-break, duplicate-freeness makes earlier tied slots strictly nearer the
+  variable.  The module also isolates the
   source-level geometric obligation: injectivity of genuine same-variable
   terminal vectors implies duplicate-free angular profiles.
 - [`LeanTrominoes/RetainedOccurrenceTerminalVectorDistinctness.lean`](LeanTrominoes/RetainedOccurrenceTerminalVectorDistinctness.lean)
@@ -1753,16 +1757,18 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularTerminalShape.lean`](LeanTrominoes/RetainedAngularTerminalShape.lean)
   reduces each length-aware profile to eight fixed optional direction slots
   and a finite matrix of strict radial comparisons.  The shape preserves
-  exactly the ordering information needed to separate stable same-ray ties,
+  exactly the ordering information needed to separate same-ray ties,
   is unchanged by positive uniform refinement, and is a finite type suitable
   for exhaustive adapter search.  An executable validity predicate restricts
   that raw type to initial active slots with sorted directions and strict
-  total radial orders; every duplicate-free concrete profile is proved valid.
+  total radial orders that follow slot order; every duplicate-free concrete
+  profile is proved valid.
 - [`LeanTrominoes/RetainedAngularTerminalLaneRanks.lean`](LeanTrominoes/RetainedAngularTerminalLaneRanks.lean)
   converts the strict radial-order matrix into a zero-based lane number by
   counting closer gates.  Validity proves every number is below eight and
-  proves lane injectivity within each tied direction block; the assignment is
-  unchanged by positive refinement.
+  proves both lane injectivity and strict lane growth with slot order within
+  each tied direction block; the assignment is unchanged by positive
+  refinement.
 - [`LeanTrominoes/RetainedAngularTerminalAdapterPorts.lean`](LeanTrominoes/RetainedAngularTerminalAdapterPorts.lean)
   combines the eleven retained angular directions with the eight radial
   lanes into 88 fixed adapter-port identities.  The direction-and-lane
@@ -1776,12 +1782,10 @@ The representation choices for this target are:
   inside the radius-36 retained-terminal interface, and remain unchanged by
   positive refinement.
 - [`LeanTrominoes/RetainedAngularTerminalFanPorts.lean`](LeanTrominoes/RetainedAngularTerminalFanPorts.lean)
-  distinguishes the radial lane order near tied source gates from the stable
-  occurrence order required at Figure 7.  Its fan-facing port uses direction
-  and occurrence slot on a distinct radius-33 square; valid profiles select
-  these outer-frame sites in strictly clockwise slot order.  Together the two
-  port assignments expose the finite same-direction permutation that the
-  adapter router must realize.
+  places direction-and-occurrence-slot fan ports on a distinct radius-33
+  square.  Valid profiles select these outer-frame sites in strictly
+  clockwise slot order, and the radial tie-break proves that this order is
+  compatible with the radial lanes near tied source gates.
 - [`LeanTrominoes/RetainedAngularFanAnchorRoutes.lean`](LeanTrominoes/RetainedAngularFanAnchorRoutes.lean)
   identifies square-frame indices `0, 11, …, 77` with the eight radius-22
   compass anchors and gives fixed orthogonal inward routes to the matching
@@ -1813,7 +1817,7 @@ The representation choices for this target are:
   strict continuous separation all survive the common translation.
 - [`LeanTrominoes/RetainedAngularTerminalSlotLookup.lean`](LeanTrominoes/RetainedAngularTerminalSlotLookup.lean)
   bridges source incidence identities to the finite router.  A genuine
-  occurrence's index in the stable angular list is proved below eight,
+  occurrence's index in the angular-and-radial list is proved below eight,
   looking that slot up recovers the same occurrence and exact classified
   terminal datum, and the extracted finite shape selects precisely the
   corresponding complete refined fan route.
@@ -1947,16 +1951,18 @@ The representation choices for this target are:
   preserves both terminal vectors' directions and complete terminal-port
   certificates.
 - [`LeanTrominoes/PeriodicThreeSATThreeAngularOrderSorted.lean`](LeanTrominoes/PeriodicThreeSATThreeAngularOrderSorted.lean)
-  proves that the arbitrary integer-ray polar comparator is total and
-  transitive, including its zero fallback.  Consequently each stable
-  merge-sorted occurrence list is pairwise ordered by its actual terminal
-  rays, providing the rotation-system fact needed by the noncrossing local
+  proves that the arbitrary integer-ray polar comparator and its squared-
+  radius tie-break are total and transitive, including the angle comparator's
+  zero fallback.  Consequently each merge-sorted occurrence list is pairwise
+  ordered by its actual terminal rays and from near to far within collinear
+  blocks, providing the rotation-system fact needed by the noncrossing local
   fan even when an incidence is not compass-aligned.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularFanOrder.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularFanOrder.lean)
   identifies each angular occurrence-list index with its east-first Figure 7
   port, cyclic port rank, and positioned split-copy vertex.  Increasing list
-  indices are also proved to follow the actual polar order of the source
-  terminal rays, giving the local fan a direct combinatorial interface.
+  indices are also proved to follow the actual polar-and-radial order of the
+  source terminal rays, giving the local fan a direct combinatorial
+  interface.
 - [`LeanTrominoes/OccurrenceSplitAngularFanDrawing.lean`](LeanTrominoes/OccurrenceSplitAngularFanDrawing.lean)
   extracts the first `n` east-first Figure 7 spokes together with the full
   separator-enhanced implication ring.  All nine possible sizes
@@ -2353,7 +2359,7 @@ The representation choices for this target are:
   packages compass-validity for finite embedded incidence drawings and
   exhaustively certifies every direct incidence of the fixed Figure 8(a)
   duplicator and Figure 8(b) crossover.  Collinear ties are allowed here
-  because the later stable angular split separates them into adjacent ports.
+  because the later angular split orders them radially into adjacent ports.
 - [`LeanTrominoes/PlanarThreeSATIncidencePlanarity.lean`](LeanTrominoes/PlanarThreeSATIncidencePlanarity.lean)
   records executable continuous-planarity certificates for the direct
   incidence drawings of both fixed Figure 8 templates, ready for the global
@@ -3487,7 +3493,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplit.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceSplit.lean)
   applies that degree bound to the routed angular occurrence order.  Its
   east-first compass enumeration matches the absolute starting ray of the
-  polar-angle sort and keeps collinear ties in adjacent slots.  Every local
+  polar-angle sort and keeps radially ordered collinear ties in adjacent
+  slots.  Every local
   width-three, occurrence-three source fits the eight Figure 7 compass slots;
   the resulting fixed implication rings have degree three and remain
   satisfiable exactly when the planarized formula is.
@@ -3746,10 +3753,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeSATThreeAngularOrder.lean`](LeanTrominoes/PeriodicThreeSATThreeAngularOrder.lean)
   handles the earlier unsplit routed source, whose crossover variables can
   have degree greater than four.  It sorts every genuine occurrence by the
-  polar angle of its full terminal ray, uses stable presentation order for
-  collinear ties, and proves that sorting preserves exactly the source
-  occurrences.  This supplies the cyclic order consumed by occurrence
-  splitting without prematurely asserting an orthogonal drawing.
+  polar angle of its full terminal ray, orders same-direction ties by
+  increasing squared radius, and proves that sorting preserves exactly the
+  source occurrences.  This supplies the cyclic and radial order consumed by
+  occurrence splitting without prematurely asserting an orthogonal drawing.
 - [`LeanTrominoes/PeriodicCNFPlanarAngularOneInThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarAngularOneInThreePositioned.lean)
   specializes the full positioned ordered pipeline to those terminal-ray
   angles.  It fixes the occurrence-split formula and placement, carries them

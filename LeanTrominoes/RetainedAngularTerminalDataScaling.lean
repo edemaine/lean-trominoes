@@ -4,7 +4,7 @@ import LeanTrominoes.RetainedTerminalScaling
 # Scaling retained angular terminal profiles
 
 Positive integral refinement changes physical coordinates but not the
-stable polar order of incidence occurrences.  This file lifts the
+polar-and-radial order of incidence occurrences.  This file lifts the
 pointwise retained-terminal scaling theorems across the actual angular
 occurrence list and across the compact local profile consumed by the
 fixed-eight adapter.
@@ -48,11 +48,11 @@ theorem occurrenceAngleLE_scaleIncidenceRoutes
   have factorPositiveInt : (0 : Int) < factor := by
     exact_mod_cast factorPositive
   simp [occurrenceAngleLE,
-    terminalVectorAngleLE_uniform_scale
+    terminalVectorAngleRadialLE_uniform_scale
       factorPositiveInt]
 
-/-- Stable angular sorting returns the identical occurrence list after
-positive uniform scaling. -/
+/-- Angular sorting, including its radial tie-break, returns the identical
+occurrence list after positive uniform scaling. -/
 theorem angularOccurrenceVariables_scaleIncidenceRoutes
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
@@ -141,6 +141,15 @@ def RetainedAngularTerminalProfile.scale
   rankSorted := by
     rw [List.pairwise_map]
     simpa using profile.rankSorted
+  tiesRadiallySorted := by
+    rw [List.pairwise_map]
+    exact profile.tiesRadiallySorted.imp fun
+      ordered directionsEqual => by
+        simpa only [scaleRetainedTerminalData_length] using
+          Nat.mul_le_mul_left factor
+            (ordered (by
+              simpa only [scaleRetainedTerminalData_direction]
+                using directionsEqual))
   lengthsPositive := by
     intro terminal terminalMember
     rcases List.mem_map.mp terminalMember with

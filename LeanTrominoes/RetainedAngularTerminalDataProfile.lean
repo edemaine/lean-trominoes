@@ -3,17 +3,19 @@ import LeanTrominoes.RetainedAngularDirectionProfile
 /-!
 # Length-aware retained angular terminal profiles
 
-Figure 8(b) intentionally contains stable angular ties: distinct incidences
-can approach one variable on the same retained ray.  A direction-only profile
+Figure 8(b) intentionally contains angular ties: distinct incidences can
+approach one variable on the same retained ray.  A direction-only profile
 therefore does not contain enough information to choose distinct splice
-points.
+points.  The angular occurrence order resolves such ties canonically from
+the variable endpoint outward.
 
 This file retains the positive primitive-block length returned by the exact
 terminal classifier.  The resulting local profile records an ordered list of
 `(direction, length)` pairs, proves nondecreasing direction ranks, proves
-every length positive, and retains the eight-slot bound.  Its natural splice
-point is the beginning of the final source segment, at the classified radial
-distance from the common variable endpoint.
+nondecreasing lengths inside each tied direction block, proves every length
+positive, and retains the eight-slot bound.  Its natural splice point is the
+beginning of the final source segment, at the classified radial distance
+from the common variable endpoint.
 -/
 
 namespace LeanTrominoes
@@ -170,6 +172,9 @@ structure RetainedAngularTerminalProfile where
   rankSorted :
     terminals.Pairwise fun first second =>
       first.1.angularRank ≤ second.1.angularRank
+  tiesRadiallySorted :
+    terminals.Pairwise fun first second =>
+      first.1 = second.1 → first.2 ≤ second.2
   lengthsPositive :
     ∀ terminal ∈ terminals, 0 < terminal.2
   fitsEight : terminals.length ≤ 8
@@ -197,6 +202,50 @@ def retainedAngularTerminalProfile
       at directionsSorted
     rw [List.pairwise_map] at directionsSorted
     exact directionsSorted
+  tiesRadiallySorted := by
+    rw [List.pairwise_iff_getElem]
+    intro first second firstLt secondLt before
+      directionsEqual
+    have firstAngularLt :
+        first <
+          (angularOccurrenceVariables
+            source routes atom).length := by
+      simpa [angularRetainedTerminalData] using firstLt
+    have secondAngularLt :
+        second <
+          (angularOccurrenceVariables
+            source routes atom).length := by
+      simpa [angularRetainedTerminalData] using secondLt
+    have firstClassified :=
+      angularRetainedTerminalData_getElem_classified
+        source routes certificate atom first firstAngularLt
+    have secondClassified :=
+      angularRetainedTerminalData_getElem_classified
+        source routes certificate atom second secondAngularLt
+    generalize firstDataEq :
+        (angularRetainedTerminalData
+          source routes atom)[first]'firstLt =
+            firstData at firstClassified directionsEqual ⊢
+    generalize secondDataEq :
+        (angularRetainedTerminalData
+          source routes atom)[second]'secondLt =
+            secondData at secondClassified directionsEqual ⊢
+    rcases firstData with ⟨firstDirection, firstLength⟩
+    rcases secondData with ⟨secondDirection, secondLength⟩
+    simp only at directionsEqual ⊢
+    subst secondDirection
+    apply
+      (occurrenceAngleLE_iff_length_le_of_same_direction_classified
+        routes
+        (angularOccurrenceVariables
+          source routes atom)[first]
+        (angularOccurrenceVariables
+          source routes atom)[second]
+        firstClassified secondClassified).mp
+    exact
+      angularOccurrenceVariables_getElem_angleLE
+        source routes atom first second
+        firstAngularLt secondAngularLt before
   lengthsPositive := by
     intro terminal terminalMember
     rcases List.mem_iff_getElem.mp terminalMember with

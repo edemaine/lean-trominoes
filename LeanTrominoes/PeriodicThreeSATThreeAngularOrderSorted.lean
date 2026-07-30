@@ -1,22 +1,26 @@
 import LeanTrominoes.PeriodicThreeSATThreeAngularOrder
 
 /-!
-# Sortedness of arbitrary terminal-ray angular orders
+# Sortedness of arbitrary terminal-ray angular-radial orders
 
-The semantic occurrence split uses stable merge sort with
-`terminalVectorAngleLE`.  Its permutation theorem alone is enough for the
-Boolean reduction, but the geometric fan also needs the resulting list to
-follow the actual cyclic order.
+The semantic occurrence split uses merge sort with
+`terminalVectorAngleRadialLE`.  Its permutation theorem alone is enough for
+the Boolean reduction, but the geometric fan also needs the resulting list
+to follow the actual cyclic order and to order collinear splice gates from
+the common endpoint outward.
 
-This file proves that the integer cross-product comparator is total and
-transitive.  The only substantive step is transitivity inside one half-plane.
+This file first proves that the integer cross-product angle comparator is
+total and transitive.  The only substantive step is transitivity inside one
+half-plane.
 If the middle vector is not on the boundary ray, the identity
 
 `b.y * cross(a,c) = cross(a,b) * c.y + a.y * cross(b,c)`
 
 transports the two assumed signs to the desired sign.  Boundary rays are
-handled separately.  The generic merge-sort theorem then gives pairwise
-angular sortedness of every extracted occurrence list.
+handled separately.  Lexicographically refining that total preorder by
+squared radius preserves totality and transitivity.  The generic merge-sort
+theorem then gives pairwise angular-radial sortedness of every extracted
+occurrence list.
 -/
 
 namespace LeanTrominoes
@@ -232,6 +236,73 @@ theorem terminalVectorAngleLE_total
       secondZero, firstUpper, secondUpper,
       terminalVectorCross] <;> ring_nf <;> omega
 
+/-- Refining equal angles by squared radius remains transitive. -/
+theorem terminalVectorAngleRadialLE_transitive
+    (first second third : Cell)
+    (firstSecond :
+      terminalVectorAngleRadialLE first second = true)
+    (secondThird :
+      terminalVectorAngleRadialLE second third = true) :
+    terminalVectorAngleRadialLE first third = true := by
+  simp only [terminalVectorAngleRadialLE,
+    decide_eq_true_eq] at firstSecond secondThird ⊢
+  refine
+    ⟨terminalVectorAngleLE_transitive
+        first second third firstSecond.1 secondThird.1,
+      ?_⟩
+  intro thirdFirst
+  have secondFirst :
+      terminalVectorAngleLE second first = true :=
+    terminalVectorAngleLE_transitive
+      second third first secondThird.1 thirdFirst
+  have thirdSecond :
+      terminalVectorAngleLE third second = true :=
+    terminalVectorAngleLE_transitive
+      third first second thirdFirst firstSecond.1
+  exact le_trans
+    (firstSecond.2 secondFirst)
+    (secondThird.2 thirdSecond)
+
+/-- Refining equal angles by squared radius remains total. -/
+theorem terminalVectorAngleRadialLE_total
+    (first second : Cell) :
+    (terminalVectorAngleRadialLE first second ||
+        terminalVectorAngleRadialLE second first) = true := by
+  have angleTotal :=
+    terminalVectorAngleLE_total first second
+  simp only [Bool.or_eq_true] at angleTotal ⊢
+  rcases angleTotal with firstSecond | secondFirst
+  · by_cases secondFirst :
+      terminalVectorAngleLE second first = true
+    · rcases le_total
+          (terminalVectorRadiusSq first)
+          (terminalVectorRadiusSq second) with
+        radiusLe | radiusGe
+      · left
+        simp [terminalVectorAngleRadialLE,
+          firstSecond, secondFirst, radiusLe]
+      · right
+        simp [terminalVectorAngleRadialLE,
+          firstSecond, secondFirst, radiusGe]
+    · left
+      simp [terminalVectorAngleRadialLE,
+        firstSecond, secondFirst]
+  · by_cases firstSecond :
+      terminalVectorAngleLE first second = true
+    · rcases le_total
+          (terminalVectorRadiusSq first)
+          (terminalVectorRadiusSq second) with
+        radiusLe | radiusGe
+      · left
+        simp [terminalVectorAngleRadialLE,
+          firstSecond, secondFirst, radiusLe]
+      · right
+        simp [terminalVectorAngleRadialLE,
+          firstSecond, secondFirst, radiusGe]
+    · right
+      simp [terminalVectorAngleRadialLE,
+        firstSecond, secondFirst]
+
 /-- Boolean occurrence comparison inherits transitivity from terminal
 vectors. -/
 theorem occurrenceAngleLE_transitive
@@ -243,7 +314,7 @@ theorem occurrenceAngleLE_transitive
     (secondThird :
       occurrenceAngleLE routes second third = true) :
     occurrenceAngleLE routes first third = true :=
-  terminalVectorAngleLE_transitive
+  terminalVectorAngleRadialLE_transitive
     (occurrenceTerminalVector routes first)
     (occurrenceTerminalVector routes second)
     (occurrenceTerminalVector routes third)
@@ -256,7 +327,7 @@ theorem occurrenceAngleLE_total
     (first second : ThreeOccurrenceVariable Variable) :
     (occurrenceAngleLE routes first second ||
         occurrenceAngleLE routes second first) = true :=
-  terminalVectorAngleLE_total
+  terminalVectorAngleRadialLE_total
     (occurrenceTerminalVector routes first)
     (occurrenceTerminalVector routes second)
 

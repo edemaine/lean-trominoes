@@ -12,7 +12,7 @@ rotation system used by the split.
 This file packages the finite property that every such direct incidence has
 one of the eight permitted terminal directions and verifies it exhaustively
 for both fixed Figure 8 templates.  Separation of collinear incidences is
-deliberately not required: stable angular sorting assigns those occurrences
+deliberately not required: angular sorting assigns those occurrences
 adjacent, distinct split ports.
 -/
 
@@ -204,7 +204,7 @@ def crossoverStraightIncidenceDrawing :
 
 /-- All Figure 8(b) incidences use the eight compass ray classes.  Several
 variables intentionally have repeated collinear rays; those are retained as
-stable angular ties. -/
+same-ray angular ties. -/
 theorem crossoverStraightIncidenceDrawing_terminalPortsValid :
     crossoverStraightIncidenceDrawing.TerminalPortsValid := by
   native_decide

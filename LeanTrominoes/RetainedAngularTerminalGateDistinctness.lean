@@ -1,12 +1,12 @@
 import LeanTrominoes.RetainedAngularTerminalDataScaling
 
 /-!
-# Distinct retained angular terminal gates
+# Distinct and radially ordered retained angular terminal gates
 
-Stable angular ties retain several incidences on one ray, so direction
-distinctness is deliberately too strong for the Figure 7 adapter.  The
-correct finite condition is that the full `(direction, length)` terminal
-data are duplicate-free.
+Angular ties retain several incidences on one ray, ordered from the source
+endpoint outward, so direction distinctness is deliberately too strong for
+the Figure 7 adapter.  The correct finite separation condition is that the
+full `(direction, length)` terminal data are duplicate-free.
 
 This file proves that positive retained terminal data are represented
 injectively by their radial splice points.  Consequently duplicate-free
@@ -111,11 +111,50 @@ theorem retainedTerminalSplicePoints_nodup_iff
       (positive second secondMember)
       equal
 
-/-- The separation condition needed by the annular adapter: stable angular
-ties are allowed, but their radial lengths must select different gates. -/
+/-- The separation condition needed by the annular adapter: angular ties are
+allowed, but their radial lengths must select different gates. -/
 def RetainedAngularTerminalProfile.GatesDistinct
     (profile : RetainedAngularTerminalProfile) : Prop :=
   profile.terminals.Nodup
+
+/-- In a duplicate-free profile, an earlier gate in the same direction is
+strictly closer to the common source endpoint. -/
+theorem RetainedAngularTerminalProfile.length_lt_of_lt_of_direction_eq
+    (profile : RetainedAngularTerminalProfile)
+    (distinct : profile.GatesDistinct)
+    (first second : Nat)
+    (firstLt : first < profile.terminals.length)
+    (secondLt : second < profile.terminals.length)
+    (before : first < second)
+    (directionsEqual :
+      (profile.terminals[first]'firstLt).1 =
+        (profile.terminals[second]'secondLt).1) :
+    (profile.terminals[first]'firstLt).2 <
+      (profile.terminals[second]'secondLt).2 := by
+  have lengthsLe :
+      (profile.terminals[first]'firstLt).2 ≤
+        (profile.terminals[second]'secondLt).2 :=
+    (List.pairwise_iff_getElem.mp
+      profile.tiesRadiallySorted)
+      first second firstLt secondLt before directionsEqual
+  apply Nat.lt_of_le_of_ne lengthsLe
+  intro lengthsEqual
+  have terminalsEqual :
+      profile.terminals[first]'firstLt =
+        profile.terminals[second]'secondLt :=
+    Prod.ext directionsEqual lengthsEqual
+  have indicesEqual :
+      (⟨first, firstLt⟩ :
+          Fin profile.terminals.length) =
+        ⟨second, secondLt⟩ :=
+    (List.nodup_iff_injective_getElem.mp distinct)
+      terminalsEqual
+  have valuesEqual : first = second :=
+    congrArg
+      (fun index : Fin profile.terminals.length =>
+        index.val)
+      indicesEqual
+  omega
 
 /-- Gate separation can equivalently be checked on the actual centered
 splice-point coordinates. -/

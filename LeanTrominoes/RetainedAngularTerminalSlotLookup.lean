@@ -6,7 +6,7 @@ import LeanTrominoes.RetainedAngularFanAnnulusRefinedRoutes
 The coordinated router is indexed by a bounded `Fin 8` slot, while source
 incidences are named by their atom and clause/literal presentation indices.
 This file supplies the exact bridge: a genuine occurrence is looked up in
-its stable angular list, the eight-occurrence bound packages that index as a
+its angular-and-radial list, the eight-occurrence bound packages that index as a
 slot, and the length-aware terminal profile is proved to contain the
 occurrence's classified terminal datum at that slot.
 -/
@@ -16,7 +16,7 @@ namespace PeriodicEightOccurrenceSplit
 
 open PeriodicThreeSATThree
 
-/-- Slot occupied by one genuine occurrence in its atom's stable angular
+/-- Slot occupied by one genuine occurrence in its atom's angular-and-radial
 list. -/
 def retainedAngularTerminalSlot
     {Variable : Type*} [DecidableEq Variable]

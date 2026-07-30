@@ -45,8 +45,7 @@ def terminalVectorCross (first second : Cell) : Int :=
 
 /-- Total polar-angle comparison for terminal vectors.  Nonzero rays are
 ordered counterclockwise from east; the zero fallback is placed last.
-Collinear rays compare equal, so stable merge sort retains their formula
-presentation order. -/
+Collinear rays compare equal. -/
 def terminalVectorAngleLE (first second : Cell) : Bool :=
   if first = (0, 0) then
     decide (second = (0, 0))
@@ -62,6 +61,23 @@ def terminalVectorAngleLE (first second : Cell) : Bool :=
   else
     decide (0 ≤ terminalVectorCross first second)
 
+/-- Squared radial distance of a terminal vector from its endpoint. -/
+def terminalVectorRadiusSq (vector : Cell) : Int :=
+  vector.1 * vector.1 + vector.2 * vector.2
+
+/-- Polar-angle comparison with a canonical radial tie-break.
+
+Collinear rays pointing in the same direction are ordered from their common
+endpoint outward.  This is the physical nesting order of their splice gates,
+so a later occurrence fan does not have to realize an arbitrary permutation
+inside a tied angular block. -/
+def terminalVectorAngleRadialLE (first second : Cell) : Bool :=
+  decide
+    (terminalVectorAngleLE first second = true ∧
+      (terminalVectorAngleLE second first = true →
+        terminalVectorRadiusSq first ≤
+          terminalVectorRadiusSq second))
+
 /-- Full terminal ray of the route named by one occurrence copy. -/
 def occurrenceTerminalVector
     {Variable : Type*}
@@ -74,11 +90,12 @@ def occurrenceAngleLE
     {Variable : Type*}
     (routes : PositionedPeriodicCNF.IncidenceRoutes)
     (first second : ThreeOccurrenceVariable Variable) : Bool :=
-  terminalVectorAngleLE
+  terminalVectorAngleRadialLE
     (occurrenceTerminalVector routes first)
     (occurrenceTerminalVector routes second)
 
-/-- Genuine copies sorted by their full terminal-ray angle. -/
+/-- Genuine copies sorted by full terminal-ray angle, with collinear ties
+ordered from the variable endpoint outward. -/
 def angularOccurrenceVariables
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
