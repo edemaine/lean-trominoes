@@ -1687,6 +1687,24 @@ The representation choices for this target are:
   genuine route in the gauged, wrapped, and orbit-deduplicated drawing to a
   translate of a retained finite route, so every final segment has one of
   the eleven rasterizable slopes.
+- [`LeanTrominoes/EmbeddedCNFIncidenceDrawingOrthogonalPrefixes.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingOrthogonalPrefixes.lean)
+  packages the complementary route-shape invariant needed for raster
+  separation: every genuine route is orthogonal after removing its final
+  point.  The certificate follows from full drawing orthogonality, is
+  preserved in both directions by logical renaming and by translation, and
+  holds automatically for direct two-point incidence drawings because their
+  prefixes are singletons.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalOrthogonalPrefixes.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATLocalOrthogonalPrefixes.lean)
+  proves the prefix invariant componentwise for the retained planar-SAT
+  construction.  Carrier lenses and bend corners are fully orthogonal, while
+  crossover, routed-variable, and routed source-clause components inherit
+  singleton prefixes from their direct route drawings.  The metadata lookup
+  then assembles the certificate for the complete finite drawing.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedOrthogonalPrefixes.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedOrthogonalPrefixes.lean)
+  transports prefix orthogonality through gauging, clause-anchor
+  normalization, and orbit deduplication.  The quotient-to-finite occurrence
+  witness now certifies that every genuine route of the final retained
+  planar-SAT source is rectilinear before its possibly oblique last ray.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirections.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirections.lean)
   combines retained-ray transport with compatibility and looplessness to
   prove that every genuine final retained route has at least one segment and
