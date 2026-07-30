@@ -1865,6 +1865,12 @@ The representation choices for this target are:
   exact source-gate and Figure 7 endpoints and certified orthogonality, and
   genuine source occurrences select their exact classified route.  General
   separation of the arbitrary-length radial pieces remains the next layer.
+- [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
+  separates arbitrary-length radial lanes whose retained directions differ.
+  A finite table of integer half-planes, the uniform radius-nine staircase
+  corridor, and one exact angular-wrap case give strict continuous
+  separation for every pair of positive lengths.  Parallel nested lanes in
+  the same direction remain the final radial-family case.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
