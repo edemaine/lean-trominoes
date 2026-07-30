@@ -1715,6 +1715,15 @@ The representation choices for this target are:
   condition preserved by positive refinement.  It also isolates the
   source-level geometric obligation: injectivity of genuine same-variable
   terminal vectors implies duplicate-free angular profiles.
+- [`LeanTrominoes/RetainedOccurrenceTerminalVectorDistinctness.lean`](LeanTrominoes/RetainedOccurrenceTerminalVectorDistinctness.lean)
+  derives that source-level terminal-vector injectivity from the actual
+  endpoint-only route-contact interface, compatibility, and per-clause atom
+  distinctness.  Equal vectors align the two penultimate points after undoing
+  their periodic endpoint shifts; endpoint-only contact forces the exceptional
+  direct-route case, where fundamental-square uniqueness identifies the
+  clause and local atom distinctness identifies the literal.  This leaves
+  only the retained formula's syntactic atom-distinctness certificate to
+  discharge before the generic gate-separation theorem applies.
 - [`LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean`](LeanTrominoes/RetainedAngularFanBoundaryGeometry.lean)
   identifies Figure 7's eight boundary sites with the east-first compass
   vectors of radius twelve around the scaled source-variable center.  It
