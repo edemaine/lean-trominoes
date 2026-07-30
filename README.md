@@ -1921,6 +1921,12 @@ The representation choices for this target are:
   eight active incidences.  Every indexed route has its exact source gate
   and refined Figure 7 boundary endpoint and is orthogonal; duplicate-free
   gates make the entire family pairwise strictly separated.
+- [`LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean`](LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean)
+  proves that strict continuous separation is preserved by simultaneously
+  replacing the tails of two routes.  Separation of the unchanged
+  `dropLast` prefixes follows from the original routes, reducing the new
+  geometry to exactly three cross/suffix cases before the four pieces are
+  reassembled compositionally.
 - [`LeanTrominoes/RetainedRayPolylineTailReplacement.lean`](LeanTrominoes/RetainedRayPolylineTailReplacement.lean)
   equips retained-ray polylines with a consecutive-point chain
   characterization, final-prefix and endpoint-join closure, and safe
