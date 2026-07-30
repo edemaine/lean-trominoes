@@ -1800,6 +1800,13 @@ The representation choices for this target are:
   listed points remain inside the radius-36 interface and outside the
   radius-21 square.  These individual witnesses share a radius-34 cut; the
   coordinated router will replace that choice to obtain pairwise separation.
+- [`LeanTrominoes/RetainedAngularFanAnnulusRefinedRoutes.lean`](LeanTrominoes/RetainedAngularFanAnnulusRefinedRoutes.lean)
+  gives that coordinated router after a fixed factor-eight local refinement.
+  Square-boundary interpolation constructs one finite orthogonal route for
+  each direction and occurrence slot.  Lean checks exact refined endpoints,
+  annular bounds, and strict continuous separation for every
+  order-compatible pair among the 88 routes, then joins the pairwise
+  separated scaled compass routes down to the refined Figure 7 boundary.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
