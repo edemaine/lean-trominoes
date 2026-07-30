@@ -1,6 +1,7 @@
 import LeanTrominoes.EmbeddedCNFIncidenceDrawing
 import LeanTrominoes.OrthogonalPolylineJoin
 import LeanTrominoes.PeriodicGridDrawingPointBounds
+import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicThreeDMContractionPlanarity
 
 /-!
@@ -165,6 +166,61 @@ theorem RoutesStrictlyAvoidEachOther.symm
       fun secondPoint secondMember firstPoint firstMember equal =>
         strict.2.2.2 firstPoint firstMember
           secondPoint secondMember equal.symm⟩
+
+/-- Positive uniform scaling preserves contact-free route separation. -/
+theorem RoutesStrictlyAvoidEachOther.scalePolyline
+    {first second : List Cell}
+    {factor : Int} (factorPositive : 0 < factor)
+    (strict : RoutesStrictlyAvoidEachOther first second) :
+    RoutesStrictlyAvoidEachOther
+      (LeanTrominoes.scalePolyline factor first)
+      (LeanTrominoes.scalePolyline factor second) := by
+  unfold RoutesStrictlyAvoidEachOther at strict ⊢
+  rw [gridPolylineSegments_scalePolyline,
+    gridPolylineSegments_scalePolyline]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro firstSegment firstMember secondSegment secondMember
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    intro meet
+    exact
+      strict.1 originalFirst originalFirstMember
+        originalSecond originalSecondMember
+        ((GridSegment.interiorsMeet_scale_iff
+          factorPositive originalFirst originalSecond).mp meet)
+  · intro firstPoint firstMember secondSegment secondMember
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    intro contains
+    exact
+      strict.2.1 originalFirst originalFirstMember
+        originalSecond originalSecondMember
+        ((GridSegment.interiorContains_scale_iff
+          factorPositive originalSecond originalFirst).mp contains)
+  · intro secondPoint secondMember firstSegment firstMember
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    intro contains
+    exact
+      strict.2.2.1 originalSecond originalSecondMember
+        originalFirst originalFirstMember
+        ((GridSegment.interiorContains_scale_iff
+          factorPositive originalFirst originalSecond).mp contains)
+  · intro firstPoint firstMember secondPoint secondMember equal
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    exact
+      strict.2.2.2 originalFirst originalFirstMember
+        originalSecond originalSecondMember
+        (Cell.scale_injective factorPositive.ne' equal)
 
 /-- Segment enumeration of `joinAtEndpoint` is exact when the advertised
 boundary points agree. -/

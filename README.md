@@ -797,9 +797,10 @@ The representation choices for this target are:
   routes are traversed in reverse, as required by variable-to-clause routing.
   [`LeanTrominoes/OrthogonalPolylineStrictSeparation.lean`](LeanTrominoes/OrthogonalPolylineStrictSeparation.lean)
   strengthens the finite predicate to forbid all listed-point contact and
-  proves that this strict form composes through endpoint joins on either
-  side.  This is the form needed while tile endpoints become internal
-  points of a recursively assembled corridor.
+  proves that this strict form is preserved by positive uniform scaling and
+  composes through endpoint joins on either side.  This is the form needed
+  while tile endpoints become internal points of a recursively assembled
+  corridor.
   [`LeanTrominoes/OrthogonalPolylineMiddleCoarsening.lean`](LeanTrominoes/OrthogonalPolylineMiddleCoarsening.lean)
   proves that strict continuous separation survives removal of a listed
   point lying inside one axis-aligned segment.  It accounts for the possible
@@ -1945,6 +1946,12 @@ The representation choices for this target are:
   by the exact profile-selected outer fan route, rasterizes the retained
   result, and proves the scaled clause endpoint, refined Figure 7 boundary
   endpoint, and orthogonality.
+- [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
+  applies simultaneous tail-replacement separation to two classified
+  retained splices.  Positive scaling supplies source/source separation and
+  the exact classified gate equations discharge both endpoint joins, leaving
+  only the two directed source-prefix/fan-suffix cross cases plus the already
+  certified fan/fan case.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
