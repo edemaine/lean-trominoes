@@ -2125,6 +2125,13 @@ The representation choices for this target are:
   pairs, and separated carrier--macrocell pairs, isolating one exact local
   obligation: a carrier source prefix against an oblique noncarrier fan whose
   translated enclosing rectangles overlap.
+- [`LeanTrominoes/RetainedFinalFlatCarrierMacrocellOverlapNormalization.lean`](LeanTrominoes/RetainedFinalFlatCarrierMacrocellOverlapNormalization.lean)
+  translates that final overlapping pair into the noncarrier occurrence's
+  physical frame.  The noncarrier macrocell returns to its finite center,
+  the carrier becomes the link translated by the difference of the two
+  recovered physical shifts, and failure of rectangle separation is
+  preserved exactly.  This is the common-frame input expected by the
+  retained carrier proximity API.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
