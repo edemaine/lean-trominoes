@@ -1694,6 +1694,11 @@ The representation choices for this target are:
   penultimate point of its source polyline.  Thus the overlapping old final
   segment can be discarded and a new local suffix can attach at an exact,
   nondegenerate radial splice point.
+- [`LeanTrominoes/RetainedTerminalScaling.lean`](LeanTrominoes/RetainedTerminalScaling.lean)
+  proves that positive integral refinement preserves each retained terminal
+  direction and its angular rank, multiplies only its primitive-block length,
+  and carries the source splice point to the exact penultimate point of the
+  scaled route.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
