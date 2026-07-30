@@ -1873,6 +1873,12 @@ The representation choices for this target are:
   handle nested parallel lanes.  The profile-level theorem obtains direction
   order, positive lengths, and strict same-direction radial order directly
   from a duplicate-free angular terminal profile.
+- [`LeanTrominoes/RetainedAngularFanOuterRadialFinalStubs.lean`](LeanTrominoes/RetainedAngularFanOuterRadialFinalStubs.lean)
+  isolates the last primitive raster block immediately outside each exact
+  radius-288 lane port.  Exhaustive finite certificates prove that these
+  stubs strictly avoid all order-compatible local fan routes in both
+  orientations, and translation positions the certificates at any retained
+  source center.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
