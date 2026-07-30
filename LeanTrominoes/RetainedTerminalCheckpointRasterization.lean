@@ -564,6 +564,26 @@ theorem sourcePoint_mem_unitSubdividedRasterizeRetainedPolyline
       mem_of_getLast?_eq_some
         (rasterizeRetainedSegment_getLast? sourceSegment)
 
+/-- Every listed source point of a nonempty retained polyline remains
+listed after rasterizing and unit-subdividing the whole polyline.  Unlike
+the segment-based form above, this also covers a singleton prefix. -/
+theorem sourcePoint_mem_unitSubdividedRasterizeRetainedPolyline_of_ne_nil
+    {points : List Cell}
+    (retained : RetainedRayPolyline points)
+    (nonempty : points ≠ [])
+    {point : Cell}
+    (pointMember : point ∈ points) :
+    point ∈
+      AxisDirection.unitSubdividePolyline
+        (rasterizeRetainedPolyline points) := by
+  rcases points with _ | ⟨first, rest⟩
+  · exact (nonempty rfl).elim
+  · rcases rest with _ | ⟨second, rest⟩
+    · simpa using pointMember
+    · exact
+        sourcePoint_mem_unitSubdividedRasterizeRetainedPolyline
+          retained (by simp) pointMember
+
 /-- A route with at least two points contains its exact final segment from
 `polylineLastEntrance` to its advertised last point. -/
 theorem finalGridSegment_mem
@@ -1077,6 +1097,16 @@ def retainedTerminalRefinedUnitPolyline
     (rasterizeRetainedPolyline
       (scalePolyline retainedTerminalFanTotalRefinement route))
 
+/-- Canonical unit-grid realization of the source prefix retained by the
+angular-fan splice.  Rasterizing `dropLast` before subdivision excludes the
+discarded terminal segment and, in particular, the shared variable endpoint
+at which distinct incidence routes are allowed to meet. -/
+def retainedTerminalRefinedUnitPrefixPolyline
+    (route : List Cell) : List Cell :=
+  AxisDirection.unitSubdividePolyline
+    (rasterizeRetainedPolyline
+      (scalePolyline retainedTerminalFanTotalRefinement route.dropLast))
+
 /-- Every source vertex survives in the canonical refined unit-grid
 realization. -/
 theorem scaledSourcePoint_mem_retainedTerminalRefinedUnitPolyline
@@ -1094,6 +1124,60 @@ theorem scaledSourcePoint_mem_retainedTerminalRefinedUnitPolyline
       (by simpa [scalePolyline] using routeLength)
   simpa [scalePolyline] using
     List.mem_map_of_mem pointMember
+
+/-- Every listed point of the retained source prefix survives in its
+canonical refined unit-grid realization. -/
+theorem
+    scaledSourcePrefixPoint_mem_retainedTerminalRefinedUnitPrefixPolyline
+    (route : List Cell)
+    (retained : RetainedRayPolyline route)
+    (routeLength : 2 ≤ route.length)
+    (point : Cell)
+    (pointMember : point ∈ route.dropLast) :
+    Cell.scale retainedTerminalFanTotalRefinement point ∈
+      retainedTerminalRefinedUnitPrefixPolyline route := by
+  unfold retainedTerminalRefinedUnitPrefixPolyline
+  apply
+    sourcePoint_mem_unitSubdividedRasterizeRetainedPolyline_of_ne_nil
+      ((retained.dropLast).scale (by native_decide))
+  · intro empty
+    have emptyLength :=
+      congrArg List.length empty
+    simp only [scalePolyline, List.length_map,
+      List.length_nil] at emptyLength
+    have dropLastLength :
+        route.dropLast.length + 1 = route.length := by
+      rw [List.length_dropLast]
+      omega
+    omega
+  · simpa [scalePolyline] using
+      List.mem_map_of_mem pointMember
+
+/-- Every point on an axis-aligned segment of the retained source prefix
+survives in its canonical refined unit-grid realization. -/
+theorem
+    scaledSourcePrefixSegmentPoint_mem_retainedTerminalRefinedUnitPrefixPolyline
+    (route : List Cell)
+    (retained : RetainedRayPolyline route)
+    (segment : GridSegment)
+    (segmentMember :
+      segment ∈ gridPolylineSegments route.dropLast)
+    (point : Cell)
+    (contains :
+      (segment.scale retainedTerminalFanTotalRefinement).Contains point) :
+    point ∈ retainedTerminalRefinedUnitPrefixPolyline route := by
+  have scaledMember :
+      segment.scale retainedTerminalFanTotalRefinement ∈
+        gridPolylineSegments
+          (scalePolyline retainedTerminalFanTotalRefinement
+            route.dropLast) := by
+    rw [gridPolylineSegments_scalePolyline]
+    exact List.mem_map_of_mem segmentMember
+  unfold retainedTerminalRefinedUnitPrefixPolyline
+  exact
+    axisSegmentPoint_mem_unitSubdividedRasterizeRetainedPolyline
+      ((retained.dropLast).scale (by native_decide))
+      scaledMember contains
 
 /-- Every refined checkpoint of a classified route's discarded terminal is
 also a point of the canonical refined unit-grid realization of the whole
@@ -1203,6 +1287,65 @@ theorem
           checkpointPoint
       exact ⟨index, indexBound, rfl⟩
 
+/-- Disjointness of the retained source-prefix rasterization from the
+reference route rasterization is the exact route-level condition needed for
+checkpoint avoidance.  Complete source routes may share their final variable
+endpoint, so this is the usable form for distinct incidences of one variable. -/
+theorem
+    sourcePrefixAvoidsRetainedTerminalRefinedCheckpoints_of_unitPrefixRouteDisjoint
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData)
+    (sourceRetained : RetainedRayPolyline sourceRoute)
+    (referenceRetained : RetainedRayPolyline referenceRoute)
+    (sourceLength : 2 ≤ sourceRoute.length)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (referenceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector referenceRoute) =
+        some referenceTerminal)
+    (disjoint :
+      ∀ point,
+        point ∈
+            retainedTerminalRefinedUnitPrefixPolyline sourceRoute →
+          point ∈
+            retainedTerminalRefinedUnitPolyline referenceRoute →
+          False) :
+    SourcePrefixAvoidsRetainedTerminalRefinedCheckpoints
+      sourceRoute referenceRoute referenceTerminal := by
+  constructor
+  · intro sourcePoint sourcePointMember checkpoint
+    apply disjoint
+      (Cell.scale retainedTerminalFanTotalRefinement sourcePoint)
+    · exact
+        scaledSourcePrefixPoint_mem_retainedTerminalRefinedUnitPrefixPolyline
+          sourceRoute sourceRetained sourceLength sourcePoint
+          sourcePointMember
+    · exact
+        retainedTerminalRefinedCheckpoint_mem_retainedTerminalRefinedUnitPolyline
+          referenceRoute referenceTerminal referenceRetained
+          referenceLength referenceClassified
+          (Cell.scale retainedTerminalFanTotalRefinement sourcePoint)
+          checkpoint
+  · intro sourceSegment sourceSegmentMember checkpoint
+    rcases checkpoint with
+      ⟨index, indexBound, sourceContains⟩
+    let checkpointPoint :=
+      Cell.add
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (referenceRoute.getLastD (0, 0)))
+        (Cell.scale index referenceTerminal.1.primitive)
+    apply disjoint checkpointPoint
+    · exact
+        scaledSourcePrefixSegmentPoint_mem_retainedTerminalRefinedUnitPrefixPolyline
+          sourceRoute sourceRetained sourceSegment sourceSegmentMember
+          checkpointPoint sourceContains
+    · apply
+        retainedTerminalRefinedCheckpoint_mem_retainedTerminalRefinedUnitPolyline
+          referenceRoute referenceTerminal referenceRetained
+          referenceLength referenceClassified
+          checkpointPoint
+      exact ⟨index, indexBound, rfl⟩
+
 /-- The strong no-shared-unit-route-points invariant directly discharges the
 remaining mixed source-prefix corridor premise. -/
 theorem sourcePrefixCorridorSeparated_of_unitRoutesDisjoint
@@ -1230,6 +1373,40 @@ theorem sourcePrefixCorridorSeparated_of_unitRoutesDisjoint
       referenceLength referenceClassified
   exact
     sourcePrefixAvoidsRetainedTerminalRefinedCheckpoints_of_unitRoutesDisjoint
+      sourceRoute referenceRoute referenceTerminal
+      sourceRetained referenceRetained
+      sourceLength referenceLength referenceClassified
+      disjoint
+
+/-- The exact no-shared-prefix/route-points invariant directly discharges
+the remaining mixed source-prefix corridor premise while permitting the two
+complete routes to share their final variable endpoint. -/
+theorem sourcePrefixCorridorSeparated_of_unitPrefixRouteDisjoint
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData)
+    (sourceRetained : RetainedRayPolyline sourceRoute)
+    (referenceRetained : RetainedRayPolyline referenceRoute)
+    (sourceLength : 2 ≤ sourceRoute.length)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (referenceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector referenceRoute) =
+        some referenceTerminal)
+    (disjoint :
+      ∀ point,
+        point ∈
+            retainedTerminalRefinedUnitPrefixPolyline sourceRoute →
+          point ∈
+            retainedTerminalRefinedUnitPolyline referenceRoute →
+          False) :
+    SourcePrefixCorridorSeparated
+      sourceRoute referenceRoute referenceTerminal.1 := by
+  apply
+    sourcePrefixCorridorSeparated_of_avoids_refinedCheckpoints
+      sourceRoute referenceRoute referenceTerminal
+      referenceLength referenceClassified
+  exact
+    sourcePrefixAvoidsRetainedTerminalRefinedCheckpoints_of_unitPrefixRouteDisjoint
       sourceRoute referenceRoute referenceTerminal
       sourceRetained referenceRetained
       sourceLength referenceLength referenceClassified

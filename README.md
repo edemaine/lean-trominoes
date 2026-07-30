@@ -1996,9 +1996,13 @@ The representation choices for this target are:
   final segment of a classified route rasterizes to its exact canonical
   forward retained ray, so each refined terminal checkpoint is an actual
   point of that unit-grid route.  These local membership facts lift to the
-  complete scaled route: disjointness of two canonical refined unit-grid
-  routes now implies the finite checkpoint-avoidance certificate and hence
-  the mixed source-prefix corridor separation needed by the angular fan.
+  complete scaled route.  The exact global adapter rasterizes the first
+  route's `dropLast` prefix separately and proves that its disjointness from
+  the second complete unit-grid route implies the finite checkpoint-avoidance
+  certificate and hence the mixed source-prefix corridor separation needed by
+  the angular fan.  This prefix/route form deliberately permits two incidence
+  routes of one variable to share their final variable endpoint; a stronger
+  complete-route disjointness wrapper is also available when applicable.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
