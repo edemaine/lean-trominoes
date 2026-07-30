@@ -1911,6 +1911,11 @@ The representation choices for this target are:
   coarsening, handles the finite zero-block case separately, and uses
   duplicate-free gates to exclude the sole obstructed equal-direction
   ordering.
+- [`LeanTrominoes/RetainedAngularFanOuterCompleteSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterCompleteSeparation.lean)
+  combines radial/radial, radial/local, local/radial, and local/local
+  separation through the exact radius-288 joins.  Thus every two ordered
+  active slots in a duplicate-free profile select strictly separated
+  complete source-gate-to-Figure-7 routes.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
