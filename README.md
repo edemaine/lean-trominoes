@@ -1758,6 +1758,12 @@ The representation choices for this target are:
   assembles those component and preservation results across the complete
   retained-source bookkeeping pipeline, certifying the incidence-key
   distinctness needed by the terminal-vector argument.
+- [`LeanTrominoes/RetainedFinalRoutePrefixSeparation.lean`](LeanTrominoes/RetainedFinalRoutePrefixSeparation.lean)
+  instantiates nonorthogonal route-occurrence separation and route simplicity
+  at the final retained drawing.  Two different stored incidences with
+  different clause endpoints therefore have strictly separated
+  final-point-deleted prefixes, exactly the source/source case needed before
+  angular-fan tail replacement.
 - [`LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean`](LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean)
   instantiates the terminal-vector argument at the complete retained drawing.
   Its compatibility, endpoint-only route-contact, and final incidence-key
