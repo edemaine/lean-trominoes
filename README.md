@@ -1921,6 +1921,12 @@ The representation choices for this target are:
   eight active incidences.  Every indexed route has its exact source gate
   and refined Figure 7 boundary endpoint and is orthogonal; duplicate-free
   gates make the entire family pairwise strictly separated.
+- [`LeanTrominoes/RetainedRayPolylineTailReplacement.lean`](LeanTrominoes/RetainedRayPolylineTailReplacement.lean)
+  equips retained-ray polylines with a consecutive-point chain
+  characterization, final-prefix and endpoint-join closure, and safe
+  replacement of a route's old variable endpoint by a retained fan suffix.
+  This is the source-prefix splice used before final orthogonal
+  rasterization.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
