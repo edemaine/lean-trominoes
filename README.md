@@ -1750,6 +1750,12 @@ The representation choices for this target are:
   are injective, lie outside the radius-12 Figure 7 fan and inside the
   radius-36 retained-terminal interface, and remain unchanged by positive
   refinement.
+- [`LeanTrominoes/RetainedAngularTerminalFanPorts.lean`](LeanTrominoes/RetainedAngularTerminalFanPorts.lean)
+  distinguishes the radial lane order near tied source gates from the stable
+  occurrence order required at Figure 7.  Its fan-facing port uses direction
+  and occurrence slot; valid profiles select these frame sites in strictly
+  clockwise slot order.  Together the two port assignments expose the finite
+  same-direction permutation that the adapter router must realize.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
