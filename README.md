@@ -2104,6 +2104,13 @@ The representation choices for this target are:
   its translated macrocell center.  Two unequal centers automatically prove
   the directed source-prefix/complete-route rectangle certificate and the
   resulting scaled source-prefix versus outer-fan separation theorem.
+- [`LeanTrominoes/RetainedFinalFlatCarrierRouteBounds.lean`](LeanTrominoes/RetainedFinalFlatCarrierRouteBounds.lean)
+  packages a flat carrier route with its retained equality lens and transfers
+  the lens's explicit narrow rectangle through clause-anchor normalization.
+  A carrier source prefix and noncarrier complete route are therefore
+  separated whenever that translated carrier rectangle and the noncarrier
+  macrocell rectangle are separated, leaving only genuine
+  corridor--macrocell interface overlap.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
