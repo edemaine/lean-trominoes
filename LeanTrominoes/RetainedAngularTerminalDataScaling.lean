@@ -71,6 +71,23 @@ theorem angularOccurrenceVariables_scaleIncidenceRoutes
     occurrenceAngleLE_scaleIncidenceRoutes
       factorPositive routes first second
 
+/-- Positive uniform scaling leaves the complete per-variable angular
+occurrence order unchanged. -/
+theorem angularOccurrenceOrder_scaleIncidenceRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    {factor : Nat} (factorPositive : 0 < factor)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes) :
+    angularOccurrenceOrder source
+        (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes) =
+      angularOccurrenceOrder source routes := by
+  unfold angularOccurrenceOrder
+  congr 1
+  funext atom
+  exact
+    angularOccurrenceVariables_scaleIncidenceRoutes
+      source factorPositive routes atom
+
 /-- The total terminal-data projection scales exactly whenever its source
 classification is certified. -/
 theorem classifiedRetainedTerminalData_scale_of_classified
@@ -129,6 +146,35 @@ theorem angularRetainedTerminalData_scaleIncidenceRoutes
   exact
     classifiedRetainedTerminalData_scale_of_classified
       factorPositive classified
+
+/-- Positive uniform scaling preserves the retained-terminal certificate for
+every syntactic occurrence. -/
+theorem RetainedOccurrenceTerminalCertificate.scaleIncidenceRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    {routes : PositionedPeriodicCNF.IncidenceRoutes}
+    (certificate :
+      RetainedOccurrenceTerminalCertificate source routes)
+    {factor : Nat} (factorPositive : 0 < factor) :
+    RetainedOccurrenceTerminalCertificate source
+      (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes) := by
+  intro atom copy copyMember
+  have retained :=
+    certificate atom copy copyMember
+  have classifiedSome :
+      (retainedTerminalDirectionClassify
+        (occurrenceTerminalVector routes copy)).isSome :=
+    (retainedTerminalDirectionClassify_isSome_iff _).2 retained
+  rcases Option.isSome_iff_exists.mp classifiedSome with
+    ⟨terminal, classified⟩
+  apply
+    (retainedTerminalDirectionClassify_isSome_iff _).1
+  rw [occurrenceTerminalVector_scaleIncidenceRoutes]
+  exact
+    Option.isSome_iff_exists.mpr
+      ⟨scaleRetainedTerminalData factor terminal,
+        retainedTerminalDirectionClassify_scale
+          factorPositive classified⟩
 
 /-- Scale every terminal in a compact local profile. -/
 def RetainedAngularTerminalProfile.scale
