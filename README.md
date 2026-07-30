@@ -1938,6 +1938,13 @@ The representation choices for this target are:
   Genuine source incidences select their exact classified terminal data and
   bounded angular slot, with certified scale-288 clause endpoints,
   factor-eight Figure 7 boundary endpoints, and orthogonality.
+- [`LeanTrominoes/OrthogonalPolylineScaling.lean`](LeanTrominoes/OrthogonalPolylineScaling.lean)
+  packages the reusable fact that positive integral scaling preserves
+  orthogonality of a polyline.
+- [`LeanTrominoes/RetainedAngularFanOccurrenceSplice.lean`](LeanTrominoes/RetainedAngularFanOccurrenceSplice.lean)
+  joins each retained source-to-boundary route to the factor-eight local fan
+  spoke.  Genuine source incidences thereby reach their exact copied-literal
+  endpoints while preserving orthogonality.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
