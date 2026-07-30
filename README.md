@@ -1725,6 +1725,12 @@ The representation choices for this target are:
   fixed radius-36 square.  Every unbounded scaled splice gate is proved to be
   a positive radial multiple of its direction's fixed interface point,
   reducing the remaining annular adapter to finite geometry.
+- [`LeanTrominoes/RetainedAngularTerminalShape.lean`](LeanTrominoes/RetainedAngularTerminalShape.lean)
+  reduces each length-aware profile to eight fixed optional direction slots
+  and a finite matrix of strict radial comparisons.  The shape preserves
+  exactly the ordering information needed to separate stable same-ray ties,
+  is unchanged by positive uniform refinement, and is a finite type suitable
+  for exhaustive adapter search.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase

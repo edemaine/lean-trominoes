@@ -56,6 +56,17 @@ theorem mem_retainedTerminalDirections
       cases arm <;>
         simp [retainedTerminalDirections]
 
+/-- The explicit catalog equips retained terminal directions with the
+finite instance used by exhaustive adapter search. -/
+instance : Fintype RetainedTerminalDirection :=
+  Fintype.ofList retainedTerminalDirections
+    mem_retainedTerminalDirections
+
+@[simp]
+theorem card_retainedTerminalDirection :
+    Fintype.card RetainedTerminalDirection = 11 := by
+  native_decide
+
 /-- Mapping the catalog to angular ranks produces exactly `0, …, 10`. -/
 @[simp]
 theorem retainedTerminalDirections_map_angularRank :
