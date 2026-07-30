@@ -1684,6 +1684,11 @@ The representation choices for this target are:
   packages, for each retained source variable, the list's nondecreasing
   eleven-direction ranks together with its eight-slot bound.  This is the
   compact input interface for the forthcoming local adapter construction.
+- [`LeanTrominoes/RetainedTerminalDirectionEnumeration.lean`](LeanTrominoes/RetainedTerminalDirectionEnumeration.lean)
+  enumerates the eleven retained terminal directions in exact east-first
+  angular-rank order.  The catalog is proved complete and duplicate-free,
+  and its ranks are proved to equal its indices, supplying the finite search
+  domain for the annular adapter.
 - [`LeanTrominoes/RetainedAngularTerminalDataProfile.lean`](LeanTrominoes/RetainedAngularTerminalDataProfile.lean)
   retains the positive primitive-block length alongside each sorted
   direction.  This handles the stable angular ties intentionally present in
