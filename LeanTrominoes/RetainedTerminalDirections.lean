@@ -278,6 +278,18 @@ private theorem terminalVectorAngleLE_scale
     constructor <;> intro crossNonnegative
   all_goals nlinarith
 
+/-- Uniform positive integral scaling does not change the polar-angle
+comparison of two terminal vectors. -/
+theorem terminalVectorAngleLE_uniform_scale
+    {factor : Int} (factorPositive : 0 < factor)
+    (first second : Cell) :
+    terminalVectorAngleLE
+        (Cell.scale factor first)
+        (Cell.scale factor second) =
+      terminalVectorAngleLE first second :=
+  terminalVectorAngleLE_scale
+    factorPositive factorPositive first second
+
 /-- The eleven primitive vectors themselves occur in their advertised
 east-first rank order. -/
 theorem terminalVectorAngleLE_primitive

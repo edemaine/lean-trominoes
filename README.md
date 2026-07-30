@@ -1699,6 +1699,10 @@ The representation choices for this target are:
   direction and its angular rank, multiplies only its primitive-block length,
   and carries the source splice point to the exact penultimate point of the
   scaled route.
+- [`LeanTrominoes/RetainedAngularTerminalDataScaling.lean`](LeanTrominoes/RetainedAngularTerminalDataScaling.lean)
+  lifts that pointwise theorem through stable angular sorting: the scaled
+  route family has the identical occurrence order, while its complete local
+  profile is obtained by mapping only the terminal lengths.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
