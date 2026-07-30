@@ -1987,6 +1987,15 @@ The representation choices for this target are:
   their integer parameters into finite, decidable natural-number checkpoint
   predicates.  A combined source-prefix checkpoint-avoidance certificate is
   proved sufficient for the mixed outer-corridor separation hypothesis.
+- [`LeanTrominoes/RetainedTerminalCheckpointRasterization.lean`](LeanTrominoes/RetainedTerminalCheckpointRasterization.lean)
+  connects those finite checkpoints to the executable route geometry.
+  Ordered unit subdivision lists every lattice point on an axis segment;
+  whole-polyline rasterization retains each source segment's rasterization;
+  and every primitive checkpoint of all eleven retained ray types is listed
+  after rasterization and subdivision.  In particular, the scaled discarded
+  final segment of a classified route rasterizes to its exact canonical
+  forward retained ray, so each refined terminal checkpoint is an actual
+  point of that unit-grid route.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
