@@ -1679,6 +1679,11 @@ The representation choices for this target are:
   and every indexed entry of the retained angular occurrence lists.  Earlier
   entries receive nondecreasing east-first direction ranks, exposing the
   order-preserving boundary correspondence needed by the local adapter.
+- [`LeanTrominoes/RetainedAngularDirectionProfile.lean`](LeanTrominoes/RetainedAngularDirectionProfile.lean)
+  projects classified terminal vectors to a total finite direction list and
+  packages, for each retained source variable, the list's nondecreasing
+  eleven-direction ranks together with its eight-slot bound.  This is the
+  compact input interface for the forthcoming local adapter construction.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
