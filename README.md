@@ -1978,6 +1978,12 @@ The representation choices for this target are:
   certificate as a finite, decidable absence of point and axis-segment
   contacts, without treating the axis-only `InteriorsMeet` predicate as
   diagonal geometry.
+- [`LeanTrominoes/RetainedTerminalEnvelopeCheckpoints.lean`](LeanTrominoes/RetainedTerminalEnvelopeCheckpoints.lean)
+  proves that every lattice point contacting a retained terminal envelope
+  becomes an exact primitive checkpoint on the discarded segment after the
+  common `288`-fold fan refinement.  The proof covers all eleven retained
+  directions and converts the resulting integer parameter into the
+  executable natural-number checkpoint predicate.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
