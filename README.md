@@ -1950,6 +1950,10 @@ The representation choices for this target are:
   clauses and factor-eight certified Figure 7 routes for implication-cycle
   clauses.  It also packages the matching refined positioned formula and
   placement without changing the logical fixed-eight formula.
+- [`LeanTrominoes/RetainedAngularFanCompleteRouteCertificates.lean`](LeanTrominoes/RetainedAngularFanCompleteRouteCertificates.lean)
+  proves canonical endpoints and orthogonality for every genuine route in
+  that refined formula, separately transporting the copied-clause splice and
+  scaled implication-cycle certificates.
 - [`LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean`](LeanTrominoes/PositionedPeriodicCNFRetainedRayRasterization.lean)
   packages canonical incidence endpoints together with the retained-ray
   condition.  Positive integral scaling and executable staircase
