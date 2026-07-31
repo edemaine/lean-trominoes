@@ -2182,7 +2182,11 @@ The representation choices for this target are:
   composition rule also permits each prefix/fan and fan/fan pair to meet at
   that common head, provided every such piece pair has ordinary continuous
   avoidance and no other listed contact.  This covers the shape of two
-  direct, two-point incidences leaving one clause source.
+  direct, two-point incidences leaving one clause source.  Its asymmetric
+  companion handles exactly one such source: one replacement fan may meet
+  the other retained prefix at their heads, and the single owning-head
+  equation transports that contact to the completed routes while every
+  other replacement-involving pair remains strictly separated.
 - [`LeanTrominoes/RetainedRayPolylineTailReplacement.lean`](LeanTrominoes/RetainedRayPolylineTailReplacement.lean)
   equips retained-ray polylines with a consecutive-point chain
   characterization, final-prefix and endpoint-join closure, and safe
