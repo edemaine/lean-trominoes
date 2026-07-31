@@ -375,6 +375,97 @@ theorem
   simpa [polylineLastEntrance, polylineFirstExit,
     firstFinal, secondFinal, List.getLastD_eq_getLast?] using separated
 
+/-- Two distinct final retained routes need not have different clause-side
+heads in order for their discarded terminal rectangles to be strictly
+separated.  Ordinary final-route planarity suffices when cross endpoints
+differ and the two retained prefixes are not both singletons. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_finalSegmentRectanglesSeparated_of_axisAligned_of_not_both_singletonPrefixes
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstLast secondLast : Cell}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (firstLastEq : first.getLast? = some firstLast)
+    (secondLastEq : second.getLast? = some secondLast)
+    (headLastNe : first.head? ≠ second.getLast?)
+    (lastHeadNe : first.getLast? ≠ second.head?)
+    (lastLastNe : first.getLast? ≠ second.getLast?)
+    (notBothSingleton :
+      ¬(first.dropLast.length = 1 ∧
+        second.dropLast.length = 1))
+    (firstAligned :
+      (⟨polylineLastEntrance first, firstLast⟩ :
+        GridSegment).IsAxisAligned)
+    (secondAligned :
+      (⟨polylineLastEntrance second, secondLast⟩ :
+        GridSegment).IsAxisAligned) :
+    ClosedGridRectanglesSeparated
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).coordinateUpper
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).coordinateUpper := by
+  have avoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routesAvoidEachOther
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent
+  have firstSimple :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesAreSimple
+      formula wellFormed degree isLocal clausesNonempty
+      first (List.fst_mem_of_mem_zipIdx firstMember)
+  have secondSimple :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesAreSimple
+      formula wellFormed degree isLocal clausesNonempty
+      second (List.fst_mem_of_mem_zipIdx secondMember)
+  have firstReverseTailExists :=
+    exists_reverse_tail_head?_of_two_le_length
+      first firstLength
+  have secondReverseTailExists :=
+    exists_reverse_tail_head?_of_two_le_length
+      second secondLength
+  have firstEntranceEq :
+      first.dropLast.getLast? =
+        some (polylineLastEntrance first) :=
+    dropLast_getLast?_of_reverse_tail_head?
+      (polylineLastEntrance_spec firstReverseTailExists)
+  have secondEntranceEq :
+      second.dropLast.getLast? =
+        some (polylineLastEntrance second) :=
+    dropLast_getLast?_of_reverse_tail_head?
+      (polylineLastEntrance_spec secondReverseTailExists)
+  have separated :=
+    finalSegment_coordinateRectanglesSeparated_of_avoid_of_not_both_singletonPrefixes
+      firstSimple.1 secondSimple.1 avoid
+      firstEntranceEq secondEntranceEq
+      firstLastEq secondLastEq
+      headLastNe lastHeadNe lastLastNe
+      notBothSingleton firstAligned secondAligned
+  simpa [List.getLastD_eq_getLast?,
+    firstLastEq, secondLastEq] using separated
+
 /-- For two different final retained routes with four distinct advertised
 endpoint pairs, axis-aligned last segments have separated integral endpoint
 rectangles. -/

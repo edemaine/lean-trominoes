@@ -2415,7 +2415,10 @@ The representation choices for this target are:
   route planarity becomes strict separation when all four advertised
   endpoint pairs differ; axis alignment then separates the two discarded
   terminal rectangles, hence the complete outer fans and finally the two
-  full source-to-boundary splices.
+  full source-to-boundary splices.  A head-aware companion permits the two
+  source routes to share their clause endpoint: cross endpoints must still
+  differ, but excluding two simultaneous singleton prefixes is enough to
+  recover strict terminal-rectangle and complete-outer-fan separation.
 - [`LeanTrominoes/RetainedFinalSharedCenterFanSeparation.lean`](LeanTrominoes/RetainedFinalSharedCenterFanSeparation.lean)
   closes the complementary shared-variable-center class.  Two distinct
   genuine occurrences ending at the same variable point select different
