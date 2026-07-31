@@ -2057,6 +2057,13 @@ The representation choices for this target are:
   retained carrier-lens or bend-corner witness for the fallback geometry.
   Failure is uniform within a genuine final clause, and any two failed
   literals recover the same canonical metadata representative.
+- [`LeanTrominoes/RetainedAngularFanFallbackPrefixLengths.lean`](LeanTrominoes/RetainedAngularFanFallbackPrefixLengths.lean)
+  checks the finite route tables behind that fallback.  Distinct literals in
+  one carrier clause cannot both use the lens's singleton prefix, while
+  every bend-corner prefix has length at least two.  Route-length
+  preservation through placement and final quotient normalization lifts
+  this dichotomy to failed choices at any two distinct genuine literals of
+  one final clause.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean)
   transports the raw prefix--spoke certificate through that same
   anchor-normalization shift.  Thus two successful final choices at
