@@ -224,5 +224,139 @@ theorem
         indicesDifferent sourceHead fanLast sourceNeCenter
         fanTerminal fanSlot fanClassified corridor
 
+/-- Once the two complete outer fans are separated, the unconditional
+directed source-prefix/fan theorem closes both cross orientations and hence
+separates the two complete source-to-boundary splices. -/
+theorem
+    retainedFinalSourceScaledSplicedBoundaryPolylines_strictlyAvoid
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈
+          PeriodicOrthocrossing.retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {factor : Nat} (factorGreaterThanOne : 1 < factor)
+    (clearance :
+      845 <
+        retainedTerminalFanTotalRefinement * factor)
+    {firstRoute secondRoute : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondSource firstCenter secondCenter : Cell}
+    (firstMember :
+      (firstRoute, firstIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (secondRoute, secondIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headsDifferent : firstRoute.head? ≠ secondRoute.head?)
+    (firstHead : firstRoute.head? = some firstSource)
+    (secondHead : secondRoute.head? = some secondSource)
+    (firstLast : firstRoute.getLast? = some firstCenter)
+    (secondLast : secondRoute.getLast? = some secondCenter)
+    (firstSourceNeSecondCenter : firstSource ≠ secondCenter)
+    (secondSourceNeFirstCenter : secondSource ≠ firstCenter)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (fansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor firstRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor secondRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedAngularFanSplicedBoundaryPolyline
+        (scalePolyline factor firstRoute)
+        (scaleRetainedTerminalData factor firstTerminal)
+        firstSlot)
+      (retainedAngularFanSplicedBoundaryPolyline
+        (scalePolyline factor secondRoute)
+        (scaleRetainedTerminalData factor secondTerminal)
+        secondSlot) := by
+  have sourcePrefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstRoute.dropLast secondRoute.dropLast :=
+    PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawing_routePrefixes_strictlyAvoid
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent
+  have firstPrefixAvoidSecondFan :=
+    retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute
+      formula wellFormed degree isLocal clausesNonempty
+      factorGreaterThanOne clearance
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent firstHead secondLast
+      firstSourceNeSecondCenter
+      firstTerminal secondTerminal firstSlot secondSlot
+      firstClassified secondClassified fansAvoid
+  have secondPrefixAvoidFirstFan :=
+    retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute
+      formula wellFormed degree isLocal clausesNonempty
+      factorGreaterThanOne clearance
+      secondMember firstMember secondLength firstLength
+      (Ne.symm indicesDifferent) (Ne.symm headsDifferent)
+      secondHead firstLast secondSourceNeFirstCenter
+      secondTerminal firstTerminal secondSlot firstSlot
+      secondClassified firstClassified fansAvoid.symm
+  have firstLastD :
+      firstRoute.getLastD (0, 0) = firstCenter := by
+    simp [List.getLastD_eq_getLast?, firstLast]
+  have secondLastD :
+      secondRoute.getLastD (0, 0) = secondCenter := by
+    simp [List.getLastD_eq_getLast?, secondLast]
+  have firstPrefixAvoidSecondFan' :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline factor firstRoute)).dropLast
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor secondRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot) := by
+    rw [scalePolyline_getLastD, secondLastD]
+    exact firstPrefixAvoidSecondFan
+  have secondPrefixAvoidFirstFan' :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline factor secondRoute)).dropLast
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor firstRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot) := by
+    rw [scalePolyline_getLastD, firstLastD]
+    exact secondPrefixAvoidFirstFan
+  exact
+    retainedAngularFanSourceScaledSplicedBoundaryPolylines_strictlyAvoid
+      (by omega)
+      firstRoute secondRoute firstTerminal secondTerminal
+      firstSlot secondSlot firstLength secondLength
+      firstClassified secondClassified sourcePrefixesAvoid
+      firstPrefixAvoidSecondFan'
+      secondPrefixAvoidFirstFan'.symm
+      fansAvoid
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
