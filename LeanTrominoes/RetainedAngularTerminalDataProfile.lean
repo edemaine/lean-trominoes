@@ -47,6 +47,22 @@ theorem classifiedRetainedTerminalData_eq_of_classified
       (direction, length) := by
   simp [classifiedRetainedTerminalData, classified]
 
+/-- On every certified retained terminal ray, the total length-aware
+projection is classified back to exactly itself. -/
+theorem retainedTerminalDirectionClassify_classifiedRetainedTerminalData
+    {vector : Cell}
+    (retained : RetainedTerminalRayVector vector) :
+    retainedTerminalDirectionClassify vector =
+      some (classifiedRetainedTerminalData vector) := by
+  have classifiedSome :
+      (retainedTerminalDirectionClassify vector).isSome :=
+    (retainedTerminalDirectionClassify_isSome_iff vector).2
+      retained
+  rcases Option.isSome_iff_exists.mp classifiedSome with
+    ⟨terminal, classified⟩
+  rw [classifiedRetainedTerminalData_eq_of_classified classified]
+  exact classified
+
 @[simp]
 theorem classifiedRetainedTerminalData_fst
     (vector : Cell) :

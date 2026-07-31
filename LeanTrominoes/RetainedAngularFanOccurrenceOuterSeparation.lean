@@ -84,6 +84,66 @@ theorem retainedOccurrenceOuterCompleteRoutes_strictlyAvoid
     firstLookup secondLookup
   simpa [firstSlot, secondSlot] using before
 
+/-- Any two distinct genuine occurrences of one variable select strictly
+separated complete outer-fan routes; the angular list itself chooses the
+orientation used by the ordered theorem. -/
+theorem retainedOccurrenceOuterCompleteRoutes_strictlyAvoid_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (retained :
+      RetainedOccurrenceTerminalCertificate source routes)
+    (vectorsInjective :
+      RetainedOccurrenceTerminalVectorsInjective source routes)
+    (fits :
+      FitsEightSlots
+        (angularOccurrenceOrder source routes))
+    (atom : Variable)
+    (first second : ThreeOccurrenceVariable Variable)
+    (firstMember : first ∈ occurrenceVariables source atom)
+    (secondMember : second ∈ occurrenceVariables source atom)
+    (different : first ≠ second)
+    (center : Cell) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterCompleteRoute center
+        (classifiedRetainedTerminalData
+          (occurrenceTerminalVector routes first))
+        (retainedAngularTerminalSlot
+          source routes fits atom first firstMember))
+      (retainedTerminalFanOuterCompleteRoute center
+        (classifiedRetainedTerminalData
+          (occurrenceTerminalVector routes second))
+        (retainedAngularTerminalSlot
+          source routes fits atom second secondMember)) := by
+  let ordered :=
+    angularOccurrenceVariables source routes atom
+  have firstOrdered : first ∈ ordered := by
+    exact
+      (angularOccurrenceVariables_perm
+        source routes atom).mem_iff.mpr firstMember
+  have secondOrdered : second ∈ ordered := by
+    exact
+      (angularOccurrenceVariables_perm
+        source routes atom).mem_iff.mpr secondMember
+  have indicesDifferent :
+      ordered.idxOf first ≠ ordered.idxOf second := by
+    intro equal
+    apply different
+    exact
+      idxOf_injective_on ordered
+        firstOrdered secondOrdered equal
+  rcases lt_or_gt_of_ne indicesDifferent with before | after
+  · exact
+      retainedOccurrenceOuterCompleteRoutes_strictlyAvoid
+        source routes retained vectorsInjective fits
+        atom first second firstMember secondMember
+        (by simpa [ordered] using before) center
+  · exact
+      (retainedOccurrenceOuterCompleteRoutes_strictlyAvoid
+        source routes retained vectorsInjective fits
+        atom second first secondMember firstMember
+        (by simpa [ordered] using after) center).symm
+
 /-- Positive source refinement preserves the complete outer-fan separation
 selected by two ordered genuine occurrences. -/
 theorem retainedOccurrenceScaledOuterCompleteRoutes_strictlyAvoid
@@ -175,6 +235,68 @@ theorem retainedOccurrenceScaledOuterCompleteRoutes_strictlyAvoid
         (scaleRetainedTerminalData factor secondTerminal)
         firstScaledLookup secondScaledLookup
   simpa [firstSlot, secondSlot] using before
+
+/-- Positive source refinement preserves order-free complete outer-fan
+separation for any two distinct genuine occurrences of one variable. -/
+theorem retainedOccurrenceScaledOuterCompleteRoutes_strictlyAvoid_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (retained :
+      RetainedOccurrenceTerminalCertificate source routes)
+    (vectorsInjective :
+      RetainedOccurrenceTerminalVectorsInjective source routes)
+    (fits :
+      FitsEightSlots
+        (angularOccurrenceOrder source routes))
+    {factor : Nat} (factorPositive : 0 < factor)
+    (atom : Variable)
+    (first second : ThreeOccurrenceVariable Variable)
+    (firstMember : first ∈ occurrenceVariables source atom)
+    (secondMember : second ∈ occurrenceVariables source atom)
+    (different : first ≠ second)
+    (center : Cell) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterCompleteRoute center
+        (scaleRetainedTerminalData factor
+          (classifiedRetainedTerminalData
+            (occurrenceTerminalVector routes first)))
+        (retainedAngularTerminalSlot
+          source routes fits atom first firstMember))
+      (retainedTerminalFanOuterCompleteRoute center
+        (scaleRetainedTerminalData factor
+          (classifiedRetainedTerminalData
+            (occurrenceTerminalVector routes second)))
+        (retainedAngularTerminalSlot
+          source routes fits atom second secondMember)) := by
+  let ordered :=
+    angularOccurrenceVariables source routes atom
+  have firstOrdered : first ∈ ordered := by
+    exact
+      (angularOccurrenceVariables_perm
+        source routes atom).mem_iff.mpr firstMember
+  have secondOrdered : second ∈ ordered := by
+    exact
+      (angularOccurrenceVariables_perm
+        source routes atom).mem_iff.mpr secondMember
+  have indicesDifferent :
+      ordered.idxOf first ≠ ordered.idxOf second := by
+    intro equal
+    apply different
+    exact
+      idxOf_injective_on ordered
+        firstOrdered secondOrdered equal
+  rcases lt_or_gt_of_ne indicesDifferent with before | after
+  · exact
+      retainedOccurrenceScaledOuterCompleteRoutes_strictlyAvoid
+        source routes retained vectorsInjective fits factorPositive
+        atom first second firstMember secondMember
+        (by simpa [ordered] using before) center
+  · exact
+      (retainedOccurrenceScaledOuterCompleteRoutes_strictlyAvoid
+        source routes retained vectorsInjective fits factorPositive
+        atom second first secondMember firstMember
+        (by simpa [ordered] using after) center).symm
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

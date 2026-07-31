@@ -1970,11 +1970,12 @@ The representation choices for this target are:
   gates make the entire family pairwise strictly separated.
 - [`LeanTrominoes/RetainedAngularFanOccurrenceOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanOccurrenceOuterSeparation.lean)
   connects profile slots back to genuine retained source occurrences.
-  Two occurrences in strict angular-list order select their exact
-  classified replacement suffixes, and terminal-vector injectivity proves
-  those complete outer-fan routes strictly separated.  The same theorem is
+  Two distinct occurrences select their exact classified replacement
+  suffixes; their positions in the duplicate-free angular list choose the
+  orientation automatically, and terminal-vector injectivity proves those
+  complete outer-fan routes strictly separated.  The same theorem is
   transported through any positive source-refinement factor, scaling radial
-  lengths while preserving slot order and complete fan/fan separation.
+  lengths while preserving complete fan/fan separation.
 - [`LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean`](LeanTrominoes/OrthogonalPolylineTailReplacementSeparation.lean)
   proves that strict continuous separation is preserved by simultaneously
   replacing the tails of two routes.  Separation of the unchanged
@@ -2205,8 +2206,15 @@ The representation choices for this target are:
   route planarity becomes strict separation when all four advertised
   endpoint pairs differ; axis alignment then separates the two discarded
   terminal rectangles, hence the complete outer fans and finally the two
-  full source-to-boundary splices.  The remaining fan/fan cases are exactly
-  those with a shared variable center or a non-axis-aligned terminal.
+  full source-to-boundary splices.
+- [`LeanTrominoes/RetainedFinalSharedCenterFanSeparation.lean`](LeanTrominoes/RetainedFinalSharedCenterFanSeparation.lean)
+  closes the complementary shared-variable-center class.  Two distinct
+  genuine occurrences ending at the same variable point select different
+  angular slots, so the order-free occurrence theorem separates their
+  complete outer fans; the unconditional prefix/fan cross theorem then
+  separates their full source-to-boundary splices.  This result includes
+  every certified oblique terminal direction and requires no axis-alignment
+  hypothesis.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
