@@ -1973,6 +1973,13 @@ The representation choices for this target are:
   certificates directly into the complete-route assembly, reducing the
   remaining same-clause geometry to the two escape--tail directions and
   tail--tail strict separation.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceCompleteTails.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCompleteTails.lean)
+  recovers the concrete two-point local route, factor-four fan center, scaled
+  terminal datum, coordinated escape, and complete tail from each direct
+  atlas index.  Finite checks prove those terminals exactly match the local
+  incidence geometry, have room for the escape, and select one common clause
+  gate for every pair of occurrence slots.  Thus a metadata-selected pair
+  now exposes only three concrete strict-separation premises.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
