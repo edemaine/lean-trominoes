@@ -2449,6 +2449,12 @@ The representation choices for this target are:
   source routes to share their clause endpoint: cross endpoints must still
   differ, but excluding two simultaneous singleton prefixes is enough to
   recover strict terminal-rectangle and complete-outer-fan separation.
+- [`LeanTrominoes/RetainedFinalEscapedOuterFanSeparation.lean`](LeanTrominoes/RetainedFinalEscapedOuterFanSeparation.lean)
+  reuses that shared-head terminal-rectangle certificate when the first fan
+  is the delayed-lane escape.  Thus a singleton escaped fallback and its
+  necessarily non-singleton ordinary partner have strictly separated fan
+  tails; restricting the escaped fan to its head also supplies the directed
+  singleton-prefix/ordinary-fan cross case.
 - [`LeanTrominoes/RetainedFinalSharedCenterFanSeparation.lean`](LeanTrominoes/RetainedFinalSharedCenterFanSeparation.lean)
   closes the complementary shared-variable-center class.  Two distinct
   genuine occurrences ending at the same variable point select different

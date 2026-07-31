@@ -1,5 +1,6 @@
 import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
 import LeanTrominoes.RetainedAngularFanSourceEscapedSplice
+import LeanTrominoes.RetainedAngularFanSourceScaledSeparation
 
 /-!
 # Separation of one escaped and one ordinary retained source splice
@@ -19,6 +20,64 @@ namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+/-- A singleton refined source prefix is the escaped fan's own head, so
+escaped/ordinary fan separation supplies the directed prefix/ordinary-fan
+cross case by restriction. -/
+theorem
+    retainedAngularFanSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute_of_singletonPrefix_of_escapedFansAvoid
+    {factor : Nat} (factorPositive : 0 < factor)
+    (sourceRoute : List Cell)
+    (sourceTerminal otherTerminal : RetainedTerminalData)
+    (sourceSlot otherSlot : RetainedTerminalSlot)
+    (otherCenter : Cell)
+    (sourceLength : 2 ≤ sourceRoute.length)
+    (sourceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector sourceRoute) =
+        some sourceTerminal)
+    (singletonPrefix : sourceRoute.dropLast.length = 1)
+    (fansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor sourceRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor sourceTerminal)
+          sourceSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          otherCenter otherTerminal otherSlot)) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor sourceRoute)).dropLast
+      (retainedTerminalFanOuterCompleteRoute
+        otherCenter otherTerminal otherSlot) := by
+  let sourceCenter :=
+    Cell.scale retainedTerminalFanTotalRefinement
+      ((scalePolyline factor sourceRoute).getLastD (0, 0))
+  let sourceScaledTerminal :=
+    scaleRetainedTerminalData factor sourceTerminal
+  let sourceGate :=
+    (retainedAngularFanOuterDemand
+      sourceCenter sourceScaledTerminal sourceSlot).gate
+  have prefixEq :
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor sourceRoute)).dropLast =
+          [sourceGate] := by
+    simpa [sourceCenter, sourceScaledTerminal, sourceGate] using
+      retainedAngularFanSourceScaledPrefix_eq_singleton_gate
+        factorPositive sourceRoute sourceTerminal sourceSlot
+        sourceLength sourceClassified singletonPrefix
+  have sourceGateMember :
+      sourceGate ∈
+        retainedTerminalFanOuterEscapedCompleteRoute
+          sourceCenter sourceScaledTerminal sourceSlot := by
+    exact List.mem_of_mem_head?
+      (retainedTerminalFanOuterEscapedCompleteRoute_head?
+        sourceCenter sourceScaledTerminal sourceSlot)
+  rw [prefixEq]
+  apply fansAvoid.singleton_left
+  simpa [sourceCenter, sourceScaledTerminal] using
+    sourceGateMember
 
 /-- Replacing a singleton-prefix route by its escaped fan and another route
 by its ordinary fan preserves common-head-only avoidance.  The escaped fan
