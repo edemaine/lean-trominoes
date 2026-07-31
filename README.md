@@ -2073,11 +2073,11 @@ The representation choices for this target are:
   defines the specialized final fixed-eight route family.  Successful direct
   choices replace the ordinary source-to-fan boundary piece by the
   coordinated complete route and then reuse the unchanged scaled Figure 7
-  occurrence suffix; failed choices, malformed indices, non-direct clauses,
-  and appended cycle clauses retain the established route exactly.  It also
-  names the corresponding delayed-lane occurrence splice for the exceptional
-  singleton fallback case, reusing the same source scaling, terminal data,
-  occurrence slot, and Figure 7 suffix.
+  occurrence suffix.  Failed choices whose discarded-final-point source
+  prefix is a singleton use the corresponding delayed-lane escaped occurrence
+  splice, reusing the same source scaling, terminal data, occurrence slot, and
+  Figure 7 suffix.  Other failed choices, malformed indices, non-direct
+  clauses, and appended cycle clauses retain the established route exactly.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
   proves that each validated coordinated prefix meets that unchanged suffix
   at exactly the same fan-boundary point.  The resulting substituted route
@@ -2113,10 +2113,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their
-  coordinated routes; failed choices and all appended implication-cycle
-  clauses use the established fallback.  The total family is packaged with
-  canonical endpoints and pointwise orthogonality, ready for the global
-  nonintersection proof.
+  coordinated routes; singleton-prefix failed choices use the escaped
+  fallback; other failed choices and all appended implication-cycle clauses
+  use the established fallback.  The total family is packaged with canonical
+  endpoints and pointwise orthogonality, ready for the global nonintersection
+  proof.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,

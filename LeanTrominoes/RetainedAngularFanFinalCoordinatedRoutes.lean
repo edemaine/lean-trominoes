@@ -24,6 +24,8 @@ open PeriodicEightOccurrenceSplit
 open PeriodicEightOccurrenceSplitPositioned
 open PeriodicThreeSATThree
 
+set_option maxHeartbeats 2000000
+
 /-- The final retained source before source-clearance scaling. -/
 def finalCoordinatedSource
     {Variable : Type*} [DecidableEq Variable]
@@ -150,9 +152,33 @@ def retainedFinalEscapedFallbackOccurrenceRoute
         (angularOccurrenceOrder source.erase routes)
         clause literal clauseIndex literalIndex))
 
+/-- Whether a failed direct-source choice needs the delayed-lane fallback:
+exactly when deleting its old variable endpoint leaves one source point. -/
+def retainedFinalFallbackUsesEscape
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex literalIndex : Nat) : Bool :=
+  decide
+    ((finalCoordinatedSourceRoutes
+      formula clauseIndex literalIndex).dropLast.length = 1)
+
+/-- Total scaled-source clause lookup used by both direct and fallback
+branches of the final router. -/
+def finalCoordinatedScaledClause?
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex : Nat) :
+    Option
+      (PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)) :=
+  ((finalCoordinatedSource formula).scale
+    retainedAngularFanSourceClearanceFactor).clauses[clauseIndex]?
+
 /-- Final source-scaled fixed-eight routes with direct copied incidences
-replaced by their coordinated choices.  Every failed choice or malformed
-scaled source lookup falls back to the established route family. -/
+replaced by their coordinated choices.  A failed choice with a singleton
+deleted-final-point source prefix uses the delayed-lane escaped fan; every
+other failed choice or malformed scaled source lookup uses the established
+route family. -/
 def retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
@@ -161,13 +187,25 @@ def retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
     match retainedFinalDirectSourceRouteChoice?
         formula clauseIndex literalIndex with
     | none =>
-        retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
-          formula clauseIndex literalIndex
+        if retainedFinalFallbackUsesEscape
+            formula clauseIndex literalIndex then
+          match finalCoordinatedScaledClause? formula clauseIndex with
+          | none =>
+              retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+                formula clauseIndex literalIndex
+          | some clause =>
+              match clause.literals[literalIndex]? with
+              | none =>
+                  retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+                    formula clauseIndex literalIndex
+              | some literal =>
+                  retainedFinalEscapedFallbackOccurrenceRoute
+                    formula clause literal clauseIndex literalIndex
+        else
+          retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+            formula clauseIndex literalIndex
     | some choice =>
-        match
-            ((finalCoordinatedSource formula).scale
-              retainedAngularFanSourceClearanceFactor).clauses[
-                clauseIndex]? with
+        match finalCoordinatedScaledClause? formula clauseIndex with
         | none =>
             retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
               formula clauseIndex literalIndex
@@ -181,21 +219,83 @@ def retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
                   formula choice clause literal
                   clauseIndex literalIndex
 
-/-- A failed direct-source choice leaves the established route unchanged. -/
+/-- A failed direct-source choice with a non-singleton deleted-final-point
+prefix leaves the established route unchanged. -/
 theorem
-    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_ne_one
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (clauseIndex literalIndex : Nat)
     (choiceNone :
       retainedFinalDirectSourceRouteChoice?
-          formula clauseIndex literalIndex = none) :
+          formula clauseIndex literalIndex = none)
+    (prefixLengthNe :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex literalIndex).dropLast.length ≠ 1) :
     retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
         formula clauseIndex literalIndex =
       retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
         formula clauseIndex literalIndex := by
-  simp [retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes,
-    choiceNone]
+  have routeLengthNe :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex literalIndex).length ≠ 2 := by
+    intro routeLength
+    apply prefixLengthNe
+    rw [List.length_dropLast, routeLength]
+  have escapeFalse :
+      retainedFinalFallbackUsesEscape
+        formula clauseIndex literalIndex = false := by
+    simp [retainedFinalFallbackUsesEscape, routeLengthNe]
+  unfold
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+  rw [choiceNone]
+  simp only
+  rw [escapeFalse]
+  simp
+
+/-- A failed direct-source choice with a singleton deleted-final-point
+prefix and genuine scaled-source lookups reduces to the delayed-lane
+escaped occurrence route. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex literalIndex : Nat)
+    (clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable))
+    (literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable))
+    (choiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex = none)
+    (prefixLength :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex literalIndex).dropLast.length = 1)
+    (clauseLookup :
+      finalCoordinatedScaledClause?
+        formula clauseIndex = some clause)
+    (literalLookup :
+      clause.literals[literalIndex]? = some literal) :
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex literalIndex =
+      retainedFinalEscapedFallbackOccurrenceRoute
+        formula clause literal clauseIndex literalIndex := by
+  have routeLength :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex literalIndex).length = 2 := by
+    rw [List.length_dropLast] at prefixLength
+    omega
+  have escapeTrue :
+      retainedFinalFallbackUsesEscape
+        formula clauseIndex literalIndex = true := by
+    simp [retainedFinalFallbackUsesEscape, routeLength]
+  unfold
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+  rw [choiceNone]
+  simp only
+  rw [escapeTrue, clauseLookup]
+  simp [literalLookup]
 
 /-- If the scaled copied-source clause lookup fails, the specialized family
 uses the established route regardless of the direct-choice result.  This is
@@ -206,9 +306,8 @@ theorem
     (formula : PeriodicCNF Variable)
     (clauseIndex literalIndex : Nat)
     (clauseNone :
-      ((finalCoordinatedSource formula).scale
-        retainedAngularFanSourceClearanceFactor).clauses[
-          clauseIndex]? = none) :
+      finalCoordinatedScaledClause?
+        formula clauseIndex = none) :
     retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
         formula clauseIndex literalIndex =
       retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
@@ -216,7 +315,7 @@ theorem
   unfold
     retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
   split
-  · rfl
+  · simp [clauseNone]
   · rw [clauseNone]
 
 /-- Successful selector and scaled source lookups reduce the specialized
@@ -236,9 +335,8 @@ theorem
       retainedFinalDirectSourceRouteChoice?
           formula clauseIndex literalIndex = some choice)
     (clauseLookup :
-      ((finalCoordinatedSource formula).scale
-        retainedAngularFanSourceClearanceFactor).clauses[
-          clauseIndex]? = some clause)
+      finalCoordinatedScaledClause?
+        formula clauseIndex = some clause)
     (literalLookup :
       clause.literals[literalIndex]? = some literal) :
     retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes

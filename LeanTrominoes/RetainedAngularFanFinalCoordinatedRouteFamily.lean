@@ -5,9 +5,11 @@ import LeanTrominoes.RetainedAngularFanFinalCoordinatedRouteValidity
 
 This file lifts validity of one selected direct occurrence splice to the
 entire final fixed-eight incidence family.  Copied source incidences use a
-validated direct route when the selector succeeds and otherwise retain the
-established source-scaled fan route.  Appended implication-cycle clauses
-always take the latter fallback.
+validated direct route when the selector succeeds.  A failed choice whose
+discarded-final-point source prefix is a singleton uses the delayed-lane
+escaped fan; other failed choices retain the established source-scaled fan
+route.  Appended implication-cycle clauses always take the established
+fallback.
 
 The resulting family has canonical endpoints and is pointwise orthogonal.
 It is therefore ready for the separate global route-separation proof.
@@ -22,7 +24,45 @@ open PeriodicThreeSATThree
 
 set_option maxHeartbeats 2000000
 
-private theorem coordinatedRoute_valid_of_choice_none
+private theorem finalCoordinatedScaledClause?_eq_some_of_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx) :
+    finalCoordinatedScaledClause? formula clauseIndex =
+      some
+        (clause.scale retainedAngularFanSourceClearanceFactor) := by
+  have clauseLookup :
+      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).clauses[clauseIndex]? = some clause :=
+    (List.mem_zipIdx_iff_getElem?
+      (x := (clause, clauseIndex))
+      (l :=
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses)).mp clauseMember
+  unfold finalCoordinatedScaledClause? finalCoordinatedSource
+  rw [PositionedPeriodicCNF.scale_clauses, List.getElem?_map,
+    clauseLookup]
+  rfl
+
+private theorem finalCoordinatedScaledClause?_eq_none_of_length_le
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (indexGe :
+      ((finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor).clauses.length ≤
+          clauseIndex) :
+    finalCoordinatedScaledClause? formula clauseIndex = none := by
+  exact List.getElem?_eq_none_iff.mpr indexGe
+
+private theorem coordinatedRoute_valid_of_choice_none_of_prefix_length_ne_one
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (sourceLocal : formula.IsLocal)
@@ -48,7 +88,10 @@ private theorem coordinatedRoute_valid_of_choice_none
       (literal, literalIndex) ∈ clause.literals.zipIdx)
     (choiceNone :
       retainedFinalDirectSourceRouteChoice?
-          formula clauseIndex literalIndex = none) :
+          formula clauseIndex literalIndex = none)
+    (prefixLengthNe :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex literalIndex).dropLast.length ≠ 1) :
     (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
       formula clauseIndex literalIndex).head? =
         some
@@ -67,8 +110,8 @@ private theorem coordinatedRoute_valid_of_choice_none
         (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
           formula clauseIndex literalIndex) := by
   rw [
-    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none
-      formula clauseIndex literalIndex choiceNone]
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_ne_one
+      formula clauseIndex literalIndex choiceNone prefixLengthNe]
   exact
     retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_valid
       formula sourceLocal sourceWidth sourceOccurrences
@@ -99,9 +142,8 @@ private theorem coordinatedRoute_valid_of_scaled_clause_none
     (literalMember :
       (literal, literalIndex) ∈ clause.literals.zipIdx)
     (scaledClauseNone :
-      ((retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-        formula).scale retainedAngularFanSourceClearanceFactor).clauses[
-          clauseIndex]? = none) :
+      finalCoordinatedScaledClause?
+        formula clauseIndex = none) :
     (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
       formula clauseIndex literalIndex).head? =
         some
@@ -280,42 +322,89 @@ theorem
         rw [rawScaledClauseEqual]
         exact sourceLiteralMember
       simpa using scaledLiteralMember
+    have scaledClauseLookup :
+        finalCoordinatedScaledClause?
+            formula baseIndex =
+          some
+            (rawClause.scale
+              retainedAngularFanSourceClearanceFactor) :=
+      finalCoordinatedScaledClause?_eq_some_of_mem
+        formula rawTaggedClauseMember
+    have literalLookup :
+        rawClause.literals[literalIndex]? =
+          some sourceLiteral :=
+      (List.mem_zipIdx_iff_getElem?).mp rawLiteralMember
+    have copiedClausePosition :
+        Cell.scale retainedTerminalFanTotalRefinement
+            (PositionedPeriodicCNF.canonicalClausePosition
+              placement
+              (rawClause.scale
+                retainedAngularFanSourceClearanceFactor)) =
+          Cell.scale retainedTerminalFanRoutingRefinement
+            (PositionedPeriodicCNF.canonicalClausePosition
+              (PeriodicEightOccurrenceSplitPositioned.placement
+                placement)
+              (occurrenceClause occurrencePorts
+                baseIndex
+                (rawClause.scale
+                  retainedAngularFanSourceClearanceFactor))) := by
+      rw [canonicalClausePosition_occurrenceClause,
+        Cell.scale_scale]
+      simp [retainedTerminalFanTotalRefinement_eq,
+        retainedTerminalFanRoutingRefinement,
+        PeriodicEightOccurrenceSplitPositioned.refinementScale]
     cases choiceLookup :
         retainedFinalDirectSourceRouteChoice?
           formula baseIndex literalIndex with
     | none =>
-        exact coordinatedRoute_valid_of_choice_none formula
-          sourceLocal sourceWidth sourceOccurrences
-          sourceClausesNonempty
-          (by
-            rw [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula,
-              retainedAngularFanSourceScaledRefinedFormula,
-              retainedAngularFanRefinedFormula,
-              PositionedPeriodicCNF.scale_clauses,
-              List.zipIdx_map]
-            exact List.mem_map.mpr
-              ⟨(baseClause, baseIndex),
-                taggedClauseMember, rfl⟩)
-          (by simpa using baseLiteralMember)
-          choiceLookup
-    | some choice =>
-        have scaledClauseLookup :=
-          (List.mem_zipIdx_iff_getElem?).mp
-            (show
+        by_cases prefixLength :
+            (finalCoordinatedSourceRoutes
+              formula baseIndex literalIndex).dropLast.length = 1
+        · rw [
+            retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_one
+              formula baseIndex literalIndex
               (rawClause.scale
-                  retainedAngularFanSourceClearanceFactor,
-                baseIndex) ∈
-                ((retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-                  formula).scale
-                    retainedAngularFanSourceClearanceFactor).clauses.zipIdx
-              by
-                rw [PositionedPeriodicCNF.scale_clauses,
+                retainedAngularFanSourceClearanceFactor)
+              sourceLiteral choiceLookup prefixLength
+              scaledClauseLookup literalLookup]
+          have escapedValid :=
+            retainedFinalEscapedFallbackOccurrenceRoute_valid
+              formula sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty
+              rawTaggedClauseMember rawLiteralMember
+          simp only [finalCoordinatedSource,
+            finalCoordinatedPlacement,
+            finalCoordinatedSourceRoutes] at escapedValid
+          constructor
+          · rw [escapedValid.1, copiedClausePosition,
+              copiedClauseEqualRaw]
+            simp [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
+              retainedAngularFanSourceScaledRefinedPlacement,
+              retainedAngularFanRefinedPlacement, placement]
+          constructor
+          · simpa [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
+              retainedAngularFanSourceScaledRefinedPlacement,
+              retainedAngularFanRefinedPlacement,
+              source, placement, routes, order, occurrencePorts,
+              copiedClauseEqualRaw, copiedLiteralEqual] using
+                escapedValid.2.1
+          · exact escapedValid.2.2
+        · exact
+            coordinatedRoute_valid_of_choice_none_of_prefix_length_ne_one
+              formula sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty
+              (by
+                rw [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula,
+                  retainedAngularFanSourceScaledRefinedFormula,
+                  retainedAngularFanRefinedFormula,
+                  PositionedPeriodicCNF.scale_clauses,
                   List.zipIdx_map]
                 exact List.mem_map.mpr
-                  ⟨(rawClause, baseIndex),
-                    rawTaggedClauseMember, rfl⟩)
-        have literalLookup :=
-          (List.mem_zipIdx_iff_getElem?).mp rawLiteralMember
+                  ⟨(baseClause, baseIndex),
+                    taggedClauseMember, rfl⟩)
+              (by simpa using baseLiteralMember)
+              choiceLookup prefixLength
+    | some choice =>
         rw [
           retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_some
             formula baseIndex literalIndex choice
@@ -327,25 +416,6 @@ theorem
             formula sourceLocal sourceWidth sourceOccurrences
             sourceClausesNonempty choice
             rawTaggedClauseMember rawLiteralMember choiceLookup
-        have copiedClausePosition :
-            Cell.scale retainedTerminalFanTotalRefinement
-                (PositionedPeriodicCNF.canonicalClausePosition
-                  placement
-                  (rawClause.scale
-                    retainedAngularFanSourceClearanceFactor)) =
-              Cell.scale retainedTerminalFanRoutingRefinement
-                (PositionedPeriodicCNF.canonicalClausePosition
-                  (PeriodicEightOccurrenceSplitPositioned.placement
-                    placement)
-                  (occurrenceClause occurrencePorts
-                    baseIndex
-                    (rawClause.scale
-                      retainedAngularFanSourceClearanceFactor))) := by
-          rw [canonicalClausePosition_occurrenceClause,
-            Cell.scale_scale]
-          simp [retainedTerminalFanTotalRefinement_eq,
-            retainedTerminalFanRoutingRefinement,
-            PeriodicEightOccurrenceSplitPositioned.refinementScale]
         constructor
         · rw [directValid.1, copiedClausePosition,
             copiedClauseEqualRaw]
@@ -365,8 +435,10 @@ theorem
       simpa [PeriodicEightOccurrenceSplitPositioned.occurrenceClauses,
         source] using occurrenceIndex
     have scaledClauseLookup :
-        source.clauses[baseIndex]? = none :=
-      List.getElem?_eq_none_iff.mpr sourceIndexGe
+        finalCoordinatedScaledClause?
+            formula baseIndex = none := by
+      apply finalCoordinatedScaledClause?_eq_none_of_length_le
+      simpa [source, finalCoordinatedSource] using sourceIndexGe
     exact coordinatedRoute_valid_of_scaled_clause_none formula
       sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty
