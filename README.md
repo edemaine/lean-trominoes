@@ -2220,13 +2220,17 @@ The representation choices for this target are:
   clause/literal incidences and the drawing's flat indexed route list.
   In the forward direction it returns the metadata incidence and physical
   route at one common index, allowing source-coordinate distinctness to
-  discharge flat-index distinctness.
+  discharge flat-index distinctness.  Compatibility also separates the
+  head of any genuine incidence route from the tail of any other genuine
+  incidence route: a clause lift cannot equal a periodically translated
+  variable lift.
 - [`LeanTrominoes/RetainedFinalPositionedOccurrenceSpliceSeparation.lean`](LeanTrominoes/RetainedFinalPositionedOccurrenceSpliceSeparation.lean)
   exposes shared-center splice separation directly at the positioned source
   interface.  It derives flat memberships and indices, route lengths,
-  classified endpoints, and distinct-index facts automatically, leaving
-  global route-pair assembly to supply only the two incidence memberships
-  and their physical endpoint relationships.
+  classified endpoints, distinct-index facts, and both source-versus-center
+  inequalities automatically, leaving global route-pair assembly to supply
+  only the two incidence memberships and their physical source/center
+  relationships.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and

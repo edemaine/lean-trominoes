@@ -166,6 +166,89 @@ theorem incidenceDrawing_vertexPosition_of_mem
   apply congrArg (incidenceVertexPositionAt source placement)
   exact List.idxOf_get indexLt
 
+/-- Compatibility alone makes every listed graph vertex position an actual
+member of the stored drawing-position list. -/
+theorem incidenceDrawing_vertexPosition_mem_of_compatible
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (compatible :
+      (incidenceDrawing source placement routes).IsCompatible
+        source.erase.incidenceGraph)
+    {vertex : CNFVertex Variable}
+    (vertexMember : vertex ∈ source.erase.incidenceGraph.vertices) :
+    (incidenceDrawing source placement routes).vertexPosition
+        source.erase.incidenceGraph vertex ∈
+      (incidenceDrawing source placement routes).vertexPositions := by
+  have indexLt :
+      source.erase.incidenceGraph.vertices.idxOf vertex <
+        source.erase.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr vertexMember
+  have positionIndexLt :
+      source.erase.incidenceGraph.vertices.idxOf vertex <
+        (incidenceDrawing source placement routes).vertexPositions.length := by
+    rwa [compatible.2.1]
+  unfold PeriodicGridDrawing.vertexPosition
+  rw [List.getD_eq_getElem _ _ positionIndexLt]
+  exact List.getElem_mem positionIndexLt
+
+/-- Compatibility makes stored drawing positions injective on the listed
+incidence-graph vertices. -/
+theorem incidenceDrawing_vertexPosition_injective_on_of_compatible
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (compatible :
+      (incidenceDrawing source placement routes).IsCompatible
+        source.erase.incidenceGraph)
+    {first second : CNFVertex Variable}
+    (firstMember :
+      first ∈ source.erase.incidenceGraph.vertices)
+    (secondMember :
+      second ∈ source.erase.incidenceGraph.vertices)
+    (equal :
+      (incidenceDrawing source placement routes).vertexPosition
+          source.erase.incidenceGraph first =
+        (incidenceDrawing source placement routes).vertexPosition
+          source.erase.incidenceGraph second) :
+    first = second := by
+  have firstIndexLt :
+      source.erase.incidenceGraph.vertices.idxOf first <
+        source.erase.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr firstMember
+  have secondIndexLt :
+      source.erase.incidenceGraph.vertices.idxOf second <
+        source.erase.incidenceGraph.vertices.length :=
+    List.idxOf_lt_length_iff.mpr secondMember
+  have firstPositionLt :
+      source.erase.incidenceGraph.vertices.idxOf first <
+        (incidenceDrawing source placement routes).vertexPositions.length := by
+    rwa [compatible.2.1]
+  have secondPositionLt :
+      source.erase.incidenceGraph.vertices.idxOf second <
+        (incidenceDrawing source placement routes).vertexPositions.length := by
+    rwa [compatible.2.1]
+  unfold PeriodicGridDrawing.vertexPosition at equal
+  rw [List.getD_eq_getElem _ _ firstPositionLt,
+    List.getD_eq_getElem _ _ secondPositionLt] at equal
+  have indicesEqual :
+      source.erase.incidenceGraph.vertices.idxOf first =
+        source.erase.incidenceGraph.vertices.idxOf second :=
+    (compatible.2.2.2.1.getElem_inj_iff).mp equal
+  calc
+    first =
+        source.erase.incidenceGraph.vertices[
+          source.erase.incidenceGraph.vertices.idxOf first]'firstIndexLt :=
+      (List.idxOf_get firstIndexLt).symm
+    _ =
+        source.erase.incidenceGraph.vertices[
+          source.erase.incidenceGraph.vertices.idxOf second]'secondIndexLt := by
+      congr
+    _ = second :=
+      List.idxOf_get secondIndexLt
+
 /-- Looking up a listed incidence vertex returns an actual member of the
 stored drawing-position list. -/
 theorem PlanarIncidencePresentation.vertexPosition_mem

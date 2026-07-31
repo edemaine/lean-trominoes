@@ -88,24 +88,6 @@ theorem
         PositionedPeriodicCNF.canonicalLiteralPosition
           (PeriodicOrthocrossing.retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
             formula)
-          secondClause secondLiteral)
-    (firstSourceNeCenter :
-      PositionedPeriodicCNF.canonicalClausePosition
-          (PeriodicOrthocrossing.retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-            formula)
-          firstClause ≠
-        PositionedPeriodicCNF.canonicalLiteralPosition
-          (PeriodicOrthocrossing.retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-            formula)
-          firstClause firstLiteral)
-    (secondSourceNeCenter :
-      PositionedPeriodicCNF.canonicalClausePosition
-          (PeriodicOrthocrossing.retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-            formula)
-          secondClause ≠
-        PositionedPeriodicCNF.canonicalLiteralPosition
-          (PeriodicOrthocrossing.retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-            formula)
           secondClause secondLiteral) :
     let routes :=
       PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
@@ -239,6 +221,51 @@ theorem
     PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_endpoints
       formula wellFormed degree isLocal
       secondClauseMember secondLiteralMember
+  have compatible :=
+    PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_isCompatible
+      formula wellFormed degree isLocal clausesNonempty
+  have firstHeadNeLast :=
+    @PositionedPeriodicCNF.route_head_ne_route_last_of_taggedIncidences
+      (PeriodicOrthocrossing.WrappedPeriodicPlanarSATVariable Variable)
+      (fun first second =>
+        @PeriodicOrthocrossing.instDecidableEqWrappedPeriodicVariable
+          (PeriodicOrthocrossing.PeriodicPlanarSATVariable Variable)
+          (fun firstOriginal secondOriginal =>
+            @PeriodicOrthocrossing.instDecidableEqPeriodicPlanarSATVariable
+              Variable variableDecidableEq
+              firstOriginal secondOriginal)
+          first second)
+      source placement routes compatible
+      _ _
+      firstIncidenceMember firstIncidenceMember
+  have secondHeadNeLast :=
+    @PositionedPeriodicCNF.route_head_ne_route_last_of_taggedIncidences
+      (PeriodicOrthocrossing.WrappedPeriodicPlanarSATVariable Variable)
+      (fun first second =>
+        @PeriodicOrthocrossing.instDecidableEqWrappedPeriodicVariable
+          (PeriodicOrthocrossing.PeriodicPlanarSATVariable Variable)
+          (fun firstOriginal secondOriginal =>
+            @PeriodicOrthocrossing.instDecidableEqPeriodicPlanarSATVariable
+              Variable variableDecidableEq
+              firstOriginal secondOriginal)
+          first second)
+      source placement routes compatible
+      _ _
+      secondIncidenceMember secondIncidenceMember
+  have firstSourceNeCenter :
+      PositionedPeriodicCNF.canonicalClausePosition
+          placement firstClause ≠
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          placement firstClause firstLiteral := by
+    rw [firstEndpoints.1, firstEndpoints.2] at firstHeadNeLast
+    simpa using firstHeadNeLast
+  have secondSourceNeCenter :
+      PositionedPeriodicCNF.canonicalClausePosition
+          placement secondClause ≠
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          placement secondClause secondLiteral := by
+    rw [secondEndpoints.1, secondEndpoints.2] at secondHeadNeLast
+    simpa using secondHeadNeLast
   have headsDifferent :
       (routes firstClauseIndex firstLiteralIndex).head? ≠
         (routes secondClauseIndex secondLiteralIndex).head? := by

@@ -38,6 +38,95 @@ theorem taggedRoute_mem_of_taggedIncidence
     ⟨taggedIncidence, taggedIncidenceMember,
       by cases taggedIncidence; rfl⟩
 
+/-- In any compatible positioned drawing, the head of one genuine incidence
+route cannot equal the tail of another.  The former is a clause-vertex lift
+and the latter is a variable-vertex lift, which remain distinct under every
+period translation. -/
+theorem route_head_ne_route_last_of_taggedIncidences
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (compatible :
+      (incidenceDrawing source placement routes).IsCompatible
+        source.erase.incidenceGraph)
+    {first second : CNFIncidence Variable × Nat}
+    (firstMember :
+      first ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx)
+    (secondMember :
+      second ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    (routes first.1.clauseIndex first.1.literalIndex).head? ≠
+      (routes second.1.clauseIndex second.1.literalIndex).getLast? := by
+  let drawing := incidenceDrawing source placement routes
+  have firstEdgeMember :=
+    PeriodicCNF.tagged_incidence_edge_mem
+      source.erase firstMember
+  have secondEdgeMember :=
+    PeriodicCNF.tagged_incidence_edge_mem
+      source.erase secondMember
+  have firstEndpointMembers :=
+    compatible.1.2 first.1.edge
+      (List.fst_mem_of_mem_zipIdx firstEdgeMember)
+  have secondEndpointMembers :=
+    compatible.1.2 second.1.edge
+      (List.fst_mem_of_mem_zipIdx secondEdgeMember)
+  have firstEndpoints :=
+    compatible.2.2.2.2.2
+      (first.1.edge, first.2) firstEdgeMember
+  have secondEndpoints :=
+    compatible.2.2.2.2.2
+      (second.1.edge, second.2) secondEdgeMember
+  rw [incidenceDrawing_edgeRoute_of_tagged
+      source placement routes firstMember] at firstEndpoints
+  rw [incidenceDrawing_edgeRoute_of_tagged
+      source placement routes secondMember] at secondEndpoints
+  have sourceMember :
+      first.1.edge.source ∈
+        source.erase.incidenceGraph.vertices :=
+    firstEndpointMembers.1
+  have targetMember :
+      second.1.edge.target ∈
+        source.erase.incidenceGraph.vertices :=
+    secondEndpointMembers.2
+  have sourcePositionMember :=
+    incidenceDrawing_vertexPosition_mem_of_compatible
+      source placement routes compatible sourceMember
+  have targetPositionMember :=
+    incidenceDrawing_vertexPosition_mem_of_compatible
+      source placement routes compatible targetMember
+  have sourceBounds :
+      drawing.PositionInFundamentalSquare
+        (drawing.vertexPosition
+          source.erase.incidenceGraph first.1.edge.source) :=
+    compatible.2.2.2.2.1 _
+      sourcePositionMember
+  have targetBounds :
+      drawing.PositionInFundamentalSquare
+        (drawing.vertexPosition
+          source.erase.incidenceGraph second.1.edge.target) :=
+    compatible.2.2.2.2.1 _
+      targetPositionMember
+  have sourceTargetDifferent :
+      drawing.vertexPosition
+          source.erase.incidenceGraph first.1.edge.source ≠
+        drawing.vertexPosition
+          source.erase.incidenceGraph second.1.edge.target := by
+    intro positionsEqual
+    have verticesEqual :=
+      incidenceDrawing_vertexPosition_injective_on_of_compatible
+        source placement routes compatible
+        sourceMember targetMember positionsEqual
+    simpa [CNFIncidence.edge, PeriodicCNF.incidenceEdge] using
+      verticesEqual
+  have liftedDifferent :=
+    fundamentalPosition_ne_translated
+      drawing (translate := second.1.edge.offset)
+      sourceBounds targetBounds sourceTargetDifferent
+  rw [firstEndpoints.1, secondEndpoints.2]
+  exact fun equal => liftedDifferent (Option.some.inj equal)
+
 /-- Every genuine positioned clause/literal incidence supplies both its
 metadata tag and its route at one common flat drawing index. -/
 theorem exists_taggedIncidenceRoute_of_positioned_members
