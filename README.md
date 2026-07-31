@@ -1986,7 +1986,11 @@ The representation choices for this target are:
   A parallel ordinary-avoidance theorem covers routes with a shared clause
   head: duplicate-freedom proves that this head is the only inherited contact,
   it remains an advertised endpoint after splicing, and positive uniform
-  scaling preserves the endpoint-only certificate.
+  scaling preserves the endpoint-only certificate.  The fully endpoint-aware
+  composition rule also permits each prefix/fan and fan/fan pair to meet at
+  that common head, provided every such piece pair has ordinary continuous
+  avoidance and no other listed contact.  This covers the shape of two
+  direct, two-point incidences leaving one clause source.
 - [`LeanTrominoes/RetainedRayPolylineTailReplacement.lean`](LeanTrominoes/RetainedRayPolylineTailReplacement.lean)
   equips retained-ray polylines with a consecutive-point chain
   characterization, final-prefix and endpoint-join closure, and safe
