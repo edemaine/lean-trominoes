@@ -2171,6 +2171,14 @@ The representation choices for this target are:
   all three normalized contact branches.  Consequently the exact final
   carrier and noncarrier route lists satisfy the complete continuous
   route-avoidance predicate at their shared local boundary.
+- [`LeanTrominoes/RetainedTerminalBoundaryCheckpointSeparation.lean`](LeanTrominoes/RetainedTerminalBoundaryCheckpointSeparation.lean)
+  sharpens that shared-boundary geometry to the factor-288 terminal
+  checkpoints used by the oblique raster corridor.  Exact checkpoints stay
+  on the refined inside, while points of an outside carrier segment stay on
+  the refined outside; their only possible contact is the scaled physical
+  port and hence one of the terminal endpoints.  Together with strict
+  source-prefix/route separation, these endpoint reductions prove the full
+  mixed source-prefix corridor certificate.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
