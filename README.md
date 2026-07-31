@@ -2166,6 +2166,11 @@ The representation choices for this target are:
   as a genuine raw-carrier or retained-noncarrier drawing route, ready for
   the carrier-boundary separation theorem without reconstructing finite
   incidence indices.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedContactSeparation.lean`](LeanTrominoes/RetainedFinalFlatNormalizedContactSeparation.lean)
+  instantiates the raw crossover and terminal carrier-interface theorems in
+  all three normalized contact branches.  Consequently the exact final
+  carrier and noncarrier route lists satisfy the complete continuous
+  route-avoidance predicate at their shared local boundary.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
