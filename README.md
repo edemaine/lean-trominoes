@@ -2171,6 +2171,12 @@ The representation choices for this target are:
   all three normalized contact branches.  Consequently the exact final
   carrier and noncarrier route lists satisfy the complete continuous
   route-avoidance predicate at their shared local boundary.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedBoundary.lean`](LeanTrominoes/RetainedFinalFlatNormalizedBoundary.lean)
+  preserves the stronger pointwise carrier-interface invariant through the
+  normalized route selections.  Each of the crossover, routed-clause, and
+  routed-variable contact branches now yields one explicit physical port
+  and origin, with the exact final carrier route outside and the exact final
+  noncarrier route inside that boundary.
 - [`LeanTrominoes/RetainedTerminalBoundaryCheckpointSeparation.lean`](LeanTrominoes/RetainedTerminalBoundaryCheckpointSeparation.lean)
   sharpens that shared-boundary geometry to the factor-288 terminal
   checkpoints used by the oblique raster corridor.  Exact checkpoints stay
