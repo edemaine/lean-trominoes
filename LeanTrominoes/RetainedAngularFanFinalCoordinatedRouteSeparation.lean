@@ -155,5 +155,92 @@ theorem retainedFinalCoordinatedDirectOccurrenceRoutes_separated
         simpa [source, placement, routes, firstSuffix, secondSuffix] using
           suffixesAvoid)
 
+/-- The same-clause separation theorem in the public total route-family
+interface: two successful final selectors reduce to their explicit
+coordinated occurrence routes. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choices_some
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choiceFirst choiceSecond : RetainedDirectSourceRouteChoice)
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (choiceFirstLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex firstLiteralIndex =
+        some choiceFirst)
+    (choiceSecondLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex secondLiteralIndex =
+        some choiceSecond)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    RoutesAvoidEachOther
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex firstLiteralIndex)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex secondLiteralIndex) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex firstLiteralIndex)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex secondLiteralIndex) := by
+  have scaledClauseMember :
+      (clause.scale retainedAngularFanSourceClearanceFactor, clauseIndex) ∈
+        ((finalCoordinatedSource formula).scale
+          retainedAngularFanSourceClearanceFactor).clauses.zipIdx := by
+    rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(clause, clauseIndex), clauseMember, rfl⟩
+  have scaledClauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp scaledClauseMember
+  have firstLiteralLookup :
+      (clause.scale retainedAngularFanSourceClearanceFactor).literals[
+          firstLiteralIndex]? =
+        some firstLiteral := by
+    simpa using
+      (List.mem_zipIdx_iff_getElem?).mp firstLiteralMember
+  have secondLiteralLookup :
+      (clause.scale retainedAngularFanSourceClearanceFactor).literals[
+          secondLiteralIndex]? =
+        some secondLiteral := by
+    simpa using
+      (List.mem_zipIdx_iff_getElem?).mp secondLiteralMember
+  rw [
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_some
+      formula clauseIndex firstLiteralIndex choiceFirst
+      (clause.scale retainedAngularFanSourceClearanceFactor)
+      firstLiteral choiceFirstLookup
+      scaledClauseLookup firstLiteralLookup,
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_some
+      formula clauseIndex secondLiteralIndex choiceSecond
+      (clause.scale retainedAngularFanSourceClearanceFactor)
+      secondLiteral choiceSecondLookup
+      scaledClauseLookup secondLiteralLookup]
+  exact
+    retainedFinalCoordinatedDirectOccurrenceRoutes_separated
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choiceFirst choiceSecond
+      clauseMember firstLiteralMember secondLiteralMember
+      choiceFirstLookup choiceSecondLookup literalIndicesDifferent
+
 end PeriodicOrthocrossing
 end LeanTrominoes

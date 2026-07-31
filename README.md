@@ -2077,7 +2077,8 @@ The representation choices for this target are:
   discharges all three suffix-involving premises of the endpoint-join
   separator.  Consequently, any two successful coordinated direct
   occurrences of one final clause avoid one another and can meet only at
-  their inherited common clause gate.
+  their inherited common clause gate.  The result is also exposed through
+  the public total incidence-route family for two successful selectors.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their
