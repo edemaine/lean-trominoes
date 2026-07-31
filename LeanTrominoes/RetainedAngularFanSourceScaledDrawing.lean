@@ -162,6 +162,228 @@ def retainedAngularFanSourceScaledCanonicalOrthogonalRoutesOfCertificates
       retained := retained }
     fits certificate lengths
 
+/-- Pointwise form of the source-scaled route certificate.  In contrast to
+projecting a large bundled concrete certificate, this theorem transports
+the five source facts independently and exposes only the one refined route
+currently under consideration. -/
+theorem retainedAngularFanSourceScaledSplicedIncidenceRoutes_valid
+    {Variable : Type*} [DecidableEq Variable]
+    {factor : Nat} (factorPositive : 0 < factor)
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (fits :
+      FitsEightSlots
+        (angularOccurrenceOrder source.erase routes))
+    (certificate :
+      RetainedOccurrenceTerminalCertificate
+        source.erase routes)
+    (endpoints :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          (routes clauseIndex literalIndex).head? =
+              some
+                (PositionedPeriodicCNF.canonicalClausePosition
+                  placement clause) ∧
+            (routes clauseIndex literalIndex).getLast? =
+              some
+                (PositionedPeriodicCNF.canonicalLiteralPosition
+                  placement clause literal))
+    (lengths :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          2 ≤ (routes clauseIndex literalIndex).length)
+    (retained :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          RetainedRayPolyline
+            (routes clauseIndex literalIndex))
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedAngularFanSourceScaledRefinedFormula
+          factor source placement routes).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    (retainedAngularFanSourceScaledSplicedIncidenceRoutes
+      factor source placement routes clauseIndex literalIndex).head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            (retainedAngularFanSourceScaledRefinedPlacement
+              factor placement)
+            clause) ∧
+      (retainedAngularFanSourceScaledSplicedIncidenceRoutes
+        factor source placement routes clauseIndex literalIndex).getLast? =
+          some
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              (retainedAngularFanSourceScaledRefinedPlacement
+                factor placement)
+              clause literal) ∧
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (retainedAngularFanSourceScaledSplicedIncidenceRoutes
+          factor source placement routes clauseIndex literalIndex) := by
+  have scaledFits :
+      FitsEightSlots
+        (angularOccurrenceOrder
+          (source.scale factor).erase
+          (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes)) := by
+    rw [PositionedPeriodicCNF.erase_scale,
+      angularOccurrenceOrder_scaleIncidenceRoutes
+        source.erase factorPositive routes]
+    exact fits
+  have scaledCertificate :
+      RetainedOccurrenceTerminalCertificate
+        (source.scale factor).erase
+        (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes) := by
+    simpa only [PositionedPeriodicCNF.erase_scale] using
+      certificate.scaleIncidenceRoutes factorPositive
+  have scaledEndpoints :
+      ∀ scaledClause scaledClauseIndex,
+        (scaledClause, scaledClauseIndex) ∈
+          (source.scale factor).clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              scaledClause.literals.zipIdx →
+          (PositionedPeriodicCNF.scaleIncidenceRoutes
+            factor routes
+            scaledClauseIndex sourceLiteralIndex).head? =
+              some
+                (PositionedPeriodicCNF.canonicalClausePosition
+                  (placement.scale factor) scaledClause) ∧
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              factor routes
+              scaledClauseIndex sourceLiteralIndex).getLast? =
+                some
+                  (PositionedPeriodicCNF.canonicalLiteralPosition
+                    (placement.scale factor)
+                    scaledClause sourceLiteral) := by
+    intro scaledClause scaledClauseIndex scaledClauseMember
+      sourceLiteral sourceLiteralIndex sourceLiteralMember
+    rw [PositionedPeriodicCNF.scale_clauses,
+      List.zipIdx_map] at scaledClauseMember
+    rcases List.mem_map.mp scaledClauseMember with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual :
+        taggedClause.2 = scaledClauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst scaledClauseIndex
+    subst scaledClause
+    have originalLiteralMember :
+        (sourceLiteral, sourceLiteralIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using sourceLiteralMember
+    have originalEndpoints :=
+      endpoints
+        taggedClause.1 taggedClause.2 taggedClauseMember
+        sourceLiteral sourceLiteralIndex originalLiteralMember
+    constructor
+    · simpa [PositionedPeriodicCNF.scaleIncidenceRoutes,
+        scalePolyline, originalEndpoints.1]
+    · simpa [PositionedPeriodicCNF.scaleIncidenceRoutes,
+        scalePolyline, originalEndpoints.2]
+  have scaledLengths :
+      ∀ scaledClause scaledClauseIndex,
+        (scaledClause, scaledClauseIndex) ∈
+          (source.scale factor).clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              scaledClause.literals.zipIdx →
+          2 ≤
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              factor routes
+              scaledClauseIndex sourceLiteralIndex).length := by
+    intro scaledClause scaledClauseIndex scaledClauseMember
+      sourceLiteral sourceLiteralIndex sourceLiteralMember
+    rw [PositionedPeriodicCNF.scale_clauses,
+      List.zipIdx_map] at scaledClauseMember
+    rcases List.mem_map.mp scaledClauseMember with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual :
+        taggedClause.2 = scaledClauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst scaledClauseIndex
+    subst scaledClause
+    have originalLiteralMember :
+        (sourceLiteral, sourceLiteralIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using sourceLiteralMember
+    simpa [PositionedPeriodicCNF.scaleIncidenceRoutes,
+      scalePolyline] using
+      lengths
+        taggedClause.1 taggedClause.2 taggedClauseMember
+        sourceLiteral sourceLiteralIndex originalLiteralMember
+  have scaledRetained :
+      ∀ scaledClause scaledClauseIndex,
+        (scaledClause, scaledClauseIndex) ∈
+          (source.scale factor).clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              scaledClause.literals.zipIdx →
+          RetainedRayPolyline
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              factor routes
+              scaledClauseIndex sourceLiteralIndex) := by
+    intro scaledClause scaledClauseIndex scaledClauseMember
+      sourceLiteral sourceLiteralIndex sourceLiteralMember
+    rw [PositionedPeriodicCNF.scale_clauses,
+      List.zipIdx_map] at scaledClauseMember
+    rcases List.mem_map.mp scaledClauseMember with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual :
+        taggedClause.2 = scaledClauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst scaledClauseIndex
+    subst scaledClause
+    have originalLiteralMember :
+        (sourceLiteral, sourceLiteralIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using sourceLiteralMember
+    exact
+      (retained
+        taggedClause.1 taggedClause.2 taggedClauseMember
+        sourceLiteral sourceLiteralIndex originalLiteralMember).scale
+          factorPositive
+  have refinedEndpoints :=
+    retainedAngularFanRefinedIncidenceRoutes_endpoints
+      (source.scale factor)
+      (placement.scale factor)
+      (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes)
+      scaledFits scaledCertificate scaledEndpoints scaledLengths
+      scaledRetained clauseMember literalMember
+  have refinedOrthogonal :=
+    retainedAngularFanRefinedIncidenceRoutes_orthogonal
+      (source.scale factor)
+      (placement.scale factor)
+      (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes)
+      scaledFits scaledCertificate scaledEndpoints scaledLengths
+      scaledRetained clauseMember literalMember
+  simpa [retainedAngularFanSourceScaledRefinedFormula,
+    retainedAngularFanSourceScaledRefinedPlacement,
+    retainedAngularFanSourceScaledSplicedIncidenceRoutes] using
+    ⟨refinedEndpoints.1, refinedEndpoints.2, refinedOrthogonal⟩
+
 end PeriodicEightOccurrenceSplit
 
 namespace PeriodicOrthocrossing
@@ -243,6 +465,106 @@ theorem
   simpa [retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement,
     wrappedDrawingPeriodicPlanarSATPlacement] using
     drawingPeriodicPlanarSATPlacement_period_pos source
+
+/-- Pointwise canonical endpoints and orthogonality for the established
+source-scaled fixed-eight routes.  Keeping this theorem separate from the
+bundled route family lets later route substitutions use the fallback
+certificate without unfolding that large package. -/
+theorem
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_valid
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+      source clauseIndex literalIndex).head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+              source)
+            clause) ∧
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        source clauseIndex literalIndex).getLast? =
+          some
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+                source)
+              clause literal) ∧
+      OrthogonalPolyline
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+          source clauseIndex literalIndex) := by
+  let sourceCertificate :=
+    retainedPlanarSATCertificate source
+      sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  let retainedClausesNonempty :=
+    retainedDrawingPlanarSATFormula_clausesNonempty_of_source
+      source sourceClausesNonempty
+  apply retainedAngularFanSourceScaledSplicedIncidenceRoutes_valid
+    retainedAngularFanSourceClearanceFactor_pos
+  · simpa [retainedDrawingAngularOccurrenceOrder,
+      retainedPlanarSATFormula] using
+      retainedDrawingAngularOccurrenceOrder_fitsEightSlots
+        sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATOccurrence_terminalCertificate
+        source
+        sourceCertificate.graphWellFormed
+        sourceCertificate.graphDegreeAtMostThree
+        sourceCertificate.graphIsLocal
+        retainedClausesNonempty
+  · intro sourceClause sourceClauseIndex sourceClauseMember
+      sourceLiteral sourceLiteralIndex sourceLiteralMember
+    exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_endpoints
+        source
+        sourceCertificate.graphWellFormed
+        sourceCertificate.graphDegreeAtMostThree
+        sourceCertificate.graphIsLocal
+        sourceClauseMember sourceLiteralMember
+  · intro sourceClause sourceClauseIndex sourceClauseMember
+      sourceLiteral sourceLiteralIndex sourceLiteralMember
+    exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_length_ge_two
+        source
+        sourceCertificate.graphWellFormed
+        sourceCertificate.graphDegreeAtMostThree
+        sourceCertificate.graphIsLocal
+        retainedClausesNonempty
+        sourceClauseMember sourceLiteralMember
+  · intro sourceClause sourceClauseIndex sourceClauseMember
+      sourceLiteral sourceLiteralIndex sourceLiteralMember
+    exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_retainedRay
+        source
+        sourceCertificate.graphWellFormed
+        sourceCertificate.graphDegreeAtMostThree
+        sourceCertificate.graphIsLocal
+        retainedClausesNonempty
+        (sourceClause, sourceClauseIndex) sourceClauseMember
+        (sourceLiteral, sourceLiteralIndex) sourceLiteralMember
+  · exact clauseMember
+  · exact literalMember
 
 /-- The concrete source-scaled retained fan construction, packaged with
 canonical endpoints and pointwise orthogonality. -/

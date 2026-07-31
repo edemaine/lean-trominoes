@@ -151,6 +151,28 @@ theorem
   simp [retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes,
     choiceNone]
 
+/-- If the scaled copied-source clause lookup fails, the specialized family
+uses the established route regardless of the direct-choice result.  This is
+the fallback taken by every appended implication-cycle clause. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_clause_none
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex literalIndex : Nat)
+    (clauseNone :
+      ((finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor).clauses[
+          clauseIndex]? = none) :
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex literalIndex =
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex literalIndex := by
+  unfold
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+  split
+  · rfl
+  · rw [clauseNone]
+
 /-- Successful selector and scaled source lookups reduce the specialized
 family to the explicit coordinated occurrence splice. -/
 theorem

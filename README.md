@@ -2027,6 +2027,13 @@ The representation choices for this target are:
   at exactly the same fan-boundary point.  The resulting substituted route
   therefore retains the canonical clause and copied-literal endpoints and
   remains orthogonal.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
+  lifts that local splice certificate to every incidence in the final
+  fixed-eight formula.  Successful direct copied-source choices use their
+  coordinated routes; failed choices and all appended implication-cycle
+  clauses use the established fallback.  The total family is packaged with
+  canonical endpoints and pointwise orthogonality, ready for the global
+  nonintersection proof.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
@@ -2140,7 +2147,10 @@ The representation choices for this target are:
   packages the source-first-scaled retained family and its unchanged local
   fans as canonical orthogonal incidence routes.  Its concrete factor-four
   planar-SAT construction has positive period and erases to exactly the
-  established retained fixed-eight logical formula.
+  established retained fixed-eight logical formula.  A separate pointwise
+  transport theorem exposes the established route's endpoints and
+  orthogonality without unfolding the large bundled certificate, which is
+  the fallback interface used by the final coordinated router.
 - [`LeanTrominoes/RetainedFinalSourceScaledSpliceSeparation.lean`](LeanTrominoes/RetainedFinalSourceScaledSpliceSeparation.lean)
   packages the final route-shape reduction for separating two source-to-fan
   splices.  Each directed cross case follows either from a singleton source
