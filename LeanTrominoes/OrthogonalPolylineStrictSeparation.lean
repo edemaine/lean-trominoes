@@ -74,6 +74,49 @@ theorem routesStrictlyAvoidEachOther_of_avoid_of_noContact
     rw [← secondEqual, ← firstEqual]
     exact avoid.2.2.1 secondIndex firstIndex
 
+/-- Ordinary endpoint-only route separation becomes contact-free when none
+of the two advertised endpoints of the first route equals either advertised
+endpoint of the second route. -/
+theorem routesStrictlyAvoidEachOther_of_avoid_of_endpoints_ne
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (headHeadNe : first.head? ≠ second.head?)
+    (headLastNe : first.head? ≠ second.getLast?)
+    (lastHeadNe : first.getLast? ≠ second.head?)
+    (lastLastNe : first.getLast? ≠ second.getLast?) :
+    RoutesStrictlyAvoidEachOther first second := by
+  apply routesStrictlyAvoidEachOther_of_avoid_of_noContact avoid
+  intro firstPoint firstMember secondPoint secondMember pointsEqual
+  rcases List.mem_iff_get.mp firstMember with
+    ⟨firstIndex, firstPointEqual⟩
+  rcases List.mem_iff_get.mp secondMember with
+    ⟨secondIndex, secondPointEqual⟩
+  have indexedEqual :
+      first.get firstIndex = second.get secondIndex :=
+    firstPointEqual.trans
+      (pointsEqual.trans secondPointEqual.symm)
+  have endpoints :=
+    avoid.2.2.2 firstIndex secondIndex indexedEqual
+  rw [firstPointEqual, secondPointEqual] at endpoints
+  rcases endpoints.1 with firstHead | firstLast <;>
+    rcases endpoints.2 with secondHead | secondLast
+  · exact
+      headHeadNe
+        (firstHead.trans
+          ((congrArg some pointsEqual).trans secondHead.symm))
+  · exact
+      headLastNe
+        (firstHead.trans
+          ((congrArg some pointsEqual).trans secondLast.symm))
+  · exact
+      lastHeadNe
+        (firstLast.trans
+          ((congrArg some pointsEqual).trans secondHead.symm))
+  · exact
+      lastLastNe
+        (firstLast.trans
+          ((congrArg some pointsEqual).trans secondLast.symm))
+
 /-- Restricting the first route to one of its listed points preserves
 ordinary route separation.  The resulting singleton has no segments. -/
 theorem RoutesAvoidEachOther.singleton_left

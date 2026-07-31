@@ -2199,6 +2199,14 @@ The representation choices for this target are:
   rectangles separated by one integral lattice unit therefore yield
   strictly separated complete outer fans after the factor-four source
   refinement.
+- [`LeanTrominoes/RetainedFinalOuterFanSeparation.lean`](LeanTrominoes/RetainedFinalOuterFanSeparation.lean)
+  derives that terminal-rectangle premise from the final retained drawing
+  itself for the broad axis-aligned, endpoint-distinct class.  Endpoint-only
+  route planarity becomes strict separation when all four advertised
+  endpoint pairs differ; axis alignment then separates the two discarded
+  terminal rectangles, hence the complete outer fans and finally the two
+  full source-to-boundary splices.  The remaining fan/fan cases are exactly
+  those with a shared variable center or a non-axis-aligned terminal.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and

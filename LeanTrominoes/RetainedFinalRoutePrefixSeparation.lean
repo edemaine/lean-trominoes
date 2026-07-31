@@ -77,6 +77,48 @@ theorem
   rw [zeroTranslation, mapAddZero, mapAddZero] at translatedAvoid
   exact translatedAvoid
 
+/-- Two different stored routes of the final retained source are completely
+contact-free when none of their advertised source and variable endpoints
+coincide. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routesStrictlyAvoidEachOther_of_endpoints_ne
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headHeadNe : first.head? ≠ second.head?)
+    (headLastNe : first.head? ≠ second.getLast?)
+    (lastHeadNe : first.getLast? ≠ second.head?)
+    (lastLastNe : first.getLast? ≠ second.getLast?) :
+    RoutesStrictlyAvoidEachOther first second := by
+  apply routesStrictlyAvoidEachOther_of_avoid_of_endpoints_ne
+  · exact
+      retainedDeduplicatedGaugedWrappedDrawing_routesAvoidEachOther
+        formula wellFormed degree isLocal clausesNonempty
+        firstMember secondMember firstLength secondLength
+        indicesDifferent
+  · exact headHeadNe
+  · exact headLastNe
+  · exact lastHeadNe
+  · exact lastLastNe
+
 /-- Two different stored routes of the final retained source have strictly
 separated `dropLast` prefixes whenever their clause-side endpoints differ. -/
 theorem

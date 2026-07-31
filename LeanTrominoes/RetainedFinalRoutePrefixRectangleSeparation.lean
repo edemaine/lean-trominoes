@@ -21,6 +21,120 @@ open PeriodicEightOccurrenceSplit
 
 set_option maxHeartbeats 2000000
 
+/-- Strict separation of two complete routes turns axis alignment of their
+discarded final segments into separation of the corresponding integral
+endpoint rectangles. -/
+theorem finalSegment_coordinateRectanglesSeparated_of_strictlyAvoid
+    {first second : List Cell}
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (firstAligned :
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
+    (secondAligned :
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
+    (strict :
+      RoutesStrictlyAvoidEachOther first second) :
+    ClosedGridRectanglesSeparated
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).coordinateUpper
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).coordinateUpper := by
+  let firstFinal : GridSegment :=
+    ⟨polylineLastEntrance first, first.getLastD (0, 0)⟩
+  let secondFinal : GridSegment :=
+    ⟨polylineLastEntrance second, second.getLastD (0, 0)⟩
+  have firstMember :
+      firstFinal ∈ gridPolylineSegments first := by
+    exact finalGridSegment_mem first firstLength
+  have secondMember :
+      secondFinal ∈ gridPolylineSegments second := by
+    exact finalGridSegment_mem second secondLength
+  have firstEndpoints :=
+    gridPolylineSegments_endpoints_mem firstMember
+  have secondEndpoints :=
+    gridPolylineSegments_endpoints_mem secondMember
+  exact
+    GridSegment.coordinateRectangles_separated_of_axisAligned
+      firstAligned secondAligned
+      (strict.1 firstFinal firstMember
+        secondFinal secondMember)
+      (strict.2.1 firstFinal.start firstEndpoints.1
+        secondFinal secondMember)
+      (strict.2.1 firstFinal.finish firstEndpoints.2
+        secondFinal secondMember)
+      (strict.2.2.1 secondFinal.start secondEndpoints.1
+        firstFinal firstMember)
+      (strict.2.2.1 secondFinal.finish secondEndpoints.2
+        firstFinal firstMember)
+      (strict.2.2.2 firstFinal.start firstEndpoints.1
+        secondFinal.start secondEndpoints.1)
+      (strict.2.2.2 firstFinal.start firstEndpoints.1
+        secondFinal.finish secondEndpoints.2)
+      (strict.2.2.2 firstFinal.finish firstEndpoints.2
+        secondFinal.start secondEndpoints.1)
+      (strict.2.2.2 firstFinal.finish firstEndpoints.2
+        secondFinal.finish secondEndpoints.2)
+
+/-- For two different final retained routes with four distinct advertised
+endpoint pairs, axis-aligned last segments have separated integral endpoint
+rectangles. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_finalSegmentRectanglesSeparated_of_axisAligned
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headHeadNe : first.head? ≠ second.head?)
+    (headLastNe : first.head? ≠ second.getLast?)
+    (lastHeadNe : first.getLast? ≠ second.head?)
+    (lastLastNe : first.getLast? ≠ second.getLast?)
+    (firstAligned :
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
+    (secondAligned :
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned) :
+    ClosedGridRectanglesSeparated
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance first,
+          first.getLastD (0, 0)⟩ : GridSegment).coordinateUpper
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance second,
+          second.getLastD (0, 0)⟩ : GridSegment).coordinateUpper := by
+  apply finalSegment_coordinateRectanglesSeparated_of_strictlyAvoid
+    firstLength secondLength firstAligned secondAligned
+  exact
+    retainedDeduplicatedGaugedWrappedDrawing_routesStrictlyAvoidEachOther_of_endpoints_ne
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headHeadNe headLastNe lastHeadNe lastLastNe
+
 /-- A flat route membership recovers the positioned incidence metadata
 needed to apply final route-prefix orthogonality. -/
 theorem
