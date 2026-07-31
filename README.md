@@ -2024,6 +2024,10 @@ The representation choices for this target are:
   singleton prefix with the singleton containing its exact own-fan gate, so
   restricting an existing complete fan/fan certificate discharges the
   directed singleton-prefix-versus-other-fan cross case with no new geometry.
+  For two singleton-prefix incidences, it further reduces ordinary planarity
+  of both completed splices to one ordinary fan/fan certificate whose listed
+  contacts occur only at the fan heads; the four prefix/fan piece cases then
+  follow by singleton restriction.
 - [`LeanTrominoes/RetainedAngularFanSourceScaledDrawing.lean`](LeanTrominoes/RetainedAngularFanSourceScaledDrawing.lean)
   packages the source-first-scaled retained family and its unchanged local
   fans as canonical orthogonal incidence routes.  Its concrete factor-four

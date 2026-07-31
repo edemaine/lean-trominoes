@@ -685,6 +685,55 @@ def RoutesMeetOnlyAtHeads
         first.head? = some firstPoint ∧
           second.head? = some secondPoint
 
+/-- Head-only listed contact is symmetric. -/
+theorem RoutesMeetOnlyAtHeads.symm
+    {first second : List Cell}
+    (contacts : RoutesMeetOnlyAtHeads first second) :
+    RoutesMeetOnlyAtHeads second first := by
+  intro secondPoint secondMember firstPoint firstMember equal
+  have heads :=
+    contacts firstPoint firstMember
+      secondPoint secondMember equal.symm
+  exact ⟨heads.2, heads.1⟩
+
+/-- Restricting the first route to its head preserves the head-only contact
+property. -/
+theorem RoutesMeetOnlyAtHeads.singleton_left
+    {first second : List Cell}
+    (contacts : RoutesMeetOnlyAtHeads first second)
+    {point : Cell}
+    (pointMember : point ∈ first) :
+    RoutesMeetOnlyAtHeads [point] second := by
+  intro firstPoint firstMember secondPoint secondMember equal
+  have firstPointEq : firstPoint = point := by
+    simpa only [List.mem_singleton] using firstMember
+  have pointEq : point = secondPoint :=
+    firstPointEq.symm.trans equal
+  have heads :=
+    contacts point pointMember secondPoint secondMember pointEq
+  exact ⟨by simpa [firstPointEq], heads.2⟩
+
+/-- Restricting the second route to its head preserves the head-only contact
+property. -/
+theorem RoutesMeetOnlyAtHeads.singleton_right
+    {first second : List Cell}
+    (contacts : RoutesMeetOnlyAtHeads first second)
+    {point : Cell}
+    (pointMember : point ∈ second) :
+    RoutesMeetOnlyAtHeads first [point] :=
+  (contacts.symm.singleton_left pointMember).symm
+
+/-- Restricting the second route to one of its listed points preserves
+ordinary route separation. -/
+theorem RoutesAvoidEachOther.singleton_right
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    {point : Cell}
+    (pointMember : point ∈ second) :
+    RoutesAvoidEachOther first [point] :=
+  routesAvoidEachOther_comm
+    ((routesAvoidEachOther_comm avoid).singleton_left pointMember)
+
 /-- Positive uniform scaling preserves ordinary endpoint-only route
 avoidance. -/
 theorem RoutesAvoidEachOther.scalePolyline

@@ -225,5 +225,203 @@ theorem
   simpa [sourceCenter, sourceScaledTerminal] using
     sourceGateMember
 
+/-- For two singleton-prefix incidences, one endpoint-aware fan/fan
+certificate supplies every piece-pair obligation for ordinary avoidance of
+the completed source-to-boundary splices.  This is the shared-clause form:
+all contacts inherited from the fan pair are permitted only at the common
+outer head. -/
+theorem
+    retainedAngularFanSourceScaledSplicedBoundaryPolylines_avoid_of_singletonPrefixes
+    {factor : Nat} (factorPositive : 0 < factor)
+    (firstRoute secondRoute : List Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (firstNodup : firstRoute.Nodup)
+    (secondNodup : secondRoute.Nodup)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (sourceRoutesAvoid :
+      RoutesAvoidEachOther firstRoute secondRoute)
+    (firstSingleton : firstRoute.dropLast.length = 1)
+    (secondSingleton : secondRoute.dropLast.length = 1)
+    (fansAvoid :
+      RoutesAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor firstRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor secondRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot))
+    (fanContactsAtHeads :
+      RoutesMeetOnlyAtHeads
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor firstRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor secondRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot)) :
+    RoutesAvoidEachOther
+      (retainedAngularFanSplicedBoundaryPolyline
+        (scalePolyline factor firstRoute)
+        (scaleRetainedTerminalData factor firstTerminal)
+        firstSlot)
+      (retainedAngularFanSplicedBoundaryPolyline
+        (scalePolyline factor secondRoute)
+        (scaleRetainedTerminalData factor secondTerminal)
+        secondSlot) := by
+  let firstScaled := scalePolyline factor firstRoute
+  let secondScaled := scalePolyline factor secondRoute
+  let firstRefined :=
+    scalePolyline retainedTerminalFanTotalRefinement firstScaled
+  let secondRefined :=
+    scalePolyline retainedTerminalFanTotalRefinement secondScaled
+  let firstCenter :=
+    Cell.scale retainedTerminalFanTotalRefinement
+      (firstScaled.getLastD (0, 0))
+  let secondCenter :=
+    Cell.scale retainedTerminalFanTotalRefinement
+      (secondScaled.getLastD (0, 0))
+  let firstScaledTerminal :=
+    scaleRetainedTerminalData factor firstTerminal
+  let secondScaledTerminal :=
+    scaleRetainedTerminalData factor secondTerminal
+  let firstGate :=
+    (retainedAngularFanOuterDemand
+      firstCenter firstScaledTerminal firstSlot).gate
+  let secondGate :=
+    (retainedAngularFanOuterDemand
+      secondCenter secondScaledTerminal secondSlot).gate
+  let firstFan :=
+    retainedTerminalFanOuterCompleteRoute
+      firstCenter firstScaledTerminal firstSlot
+  let secondFan :=
+    retainedTerminalFanOuterCompleteRoute
+      secondCenter secondScaledTerminal secondSlot
+  have firstPrefixEq :
+      firstRefined.dropLast = [firstGate] := by
+    simpa [firstRefined, firstScaled, firstCenter,
+      firstScaledTerminal, firstGate] using
+      retainedAngularFanSourceScaledPrefix_eq_singleton_gate
+        factorPositive firstRoute firstTerminal firstSlot
+        firstLength firstClassified firstSingleton
+  have secondPrefixEq :
+      secondRefined.dropLast = [secondGate] := by
+    simpa [secondRefined, secondScaled, secondCenter,
+      secondScaledTerminal, secondGate] using
+      retainedAngularFanSourceScaledPrefix_eq_singleton_gate
+        factorPositive secondRoute secondTerminal secondSlot
+        secondLength secondClassified secondSingleton
+  have firstFanHead :
+      firstFan.head? = some firstGate := by
+    exact retainedTerminalFanOuterCompleteRoute_head?
+      firstCenter firstScaledTerminal firstSlot
+  have secondFanHead :
+      secondFan.head? = some secondGate := by
+    exact retainedTerminalFanOuterCompleteRoute_head?
+      secondCenter secondScaledTerminal secondSlot
+  have firstGateMember : firstGate ∈ firstFan :=
+    List.mem_of_mem_head? firstFanHead
+  have secondGateMember : secondGate ∈ secondFan :=
+    List.mem_of_mem_head? secondFanHead
+  have concreteFansAvoid :
+      RoutesAvoidEachOther firstFan secondFan := by
+    simpa [firstFan, secondFan, firstCenter, secondCenter,
+      firstScaled, secondScaled, firstScaledTerminal,
+      secondScaledTerminal] using fansAvoid
+  have concreteFanContacts :
+      RoutesMeetOnlyAtHeads firstFan secondFan := by
+    simpa [firstFan, secondFan, firstCenter, secondCenter,
+      firstScaled, secondScaled, firstScaledTerminal,
+      secondScaledTerminal] using fanContactsAtHeads
+  have firstPrefixAvoidSecondFan :
+      RoutesAvoidEachOther firstRefined.dropLast secondFan := by
+    rw [firstPrefixEq]
+    exact concreteFansAvoid.singleton_left firstGateMember
+  have firstPrefixSecondFanContacts :
+      RoutesMeetOnlyAtHeads firstRefined.dropLast secondFan := by
+    rw [firstPrefixEq]
+    exact concreteFanContacts.singleton_left
+      firstGateMember
+  have firstFanAvoidSecondPrefix :
+      RoutesAvoidEachOther firstFan secondRefined.dropLast := by
+    rw [secondPrefixEq]
+    exact concreteFansAvoid.singleton_right secondGateMember
+  have firstFanSecondPrefixContacts :
+      RoutesMeetOnlyAtHeads firstFan secondRefined.dropLast := by
+    rw [secondPrefixEq]
+    exact concreteFanContacts.singleton_right
+      secondGateMember
+  have factorPositiveInt : (0 : Int) < factor := by
+    exact_mod_cast factorPositive
+  have refinementPositive :
+      (0 : Int) < retainedTerminalFanTotalRefinement := by
+    native_decide
+  have refinedRoutesAvoid :
+      RoutesAvoidEachOther firstRefined secondRefined := by
+    have scaledAvoid :=
+      sourceRoutesAvoid.scalePolyline factorPositiveInt
+    have refinedAvoid :=
+      scaledAvoid.scalePolyline refinementPositive
+    simpa [firstRefined, secondRefined,
+      firstScaled, secondScaled, scalePolyline] using refinedAvoid
+  have firstRefinedNodup : firstRefined.Nodup := by
+    exact
+      List.Nodup.map
+        (Cell.scale_injective refinementPositive.ne')
+        (List.Nodup.map
+          (Cell.scale_injective factorPositiveInt.ne')
+          firstNodup)
+  have secondRefinedNodup : secondRefined.Nodup := by
+    exact
+      List.Nodup.map
+        (Cell.scale_injective refinementPositive.ne')
+        (List.Nodup.map
+          (Cell.scale_injective factorPositiveInt.ne')
+          secondNodup)
+  have firstOuterHead :
+      firstRefined.dropLast.head? = firstFan.head? := by
+    rw [firstPrefixEq, firstFanHead]
+    simp
+  have secondOuterHead :
+      secondRefined.dropLast.head? = secondFan.head? := by
+    rw [secondPrefixEq, secondFanHead]
+    simp
+  have firstEntrance :
+      firstRefined.dropLast.getLast? = some firstGate := by
+    rw [firstPrefixEq]
+    simp
+  have secondEntrance :
+      secondRefined.dropLast.getLast? = some secondGate := by
+    rw [secondPrefixEq]
+    simp
+  have assembled :=
+    RoutesAvoidEachOther.replace_tails_of_all_head_avoiding_pieces
+      refinedRoutesAvoid firstRefinedNodup secondRefinedNodup
+      firstPrefixAvoidSecondFan firstPrefixSecondFanContacts
+      firstFanAvoidSecondPrefix firstFanSecondPrefixContacts
+      concreteFansAvoid concreteFanContacts
+      firstOuterHead secondOuterHead
+      firstEntrance firstFanHead secondEntrance secondFanHead
+  simpa [retainedAngularFanSplicedBoundaryPolyline,
+    firstRefined, secondRefined, firstScaled, secondScaled,
+    firstFan, secondFan, firstCenter, secondCenter,
+    firstScaledTerminal, secondScaledTerminal] using assembled
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
