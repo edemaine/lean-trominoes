@@ -2185,6 +2185,12 @@ The representation choices for this target are:
   port and hence one of the terminal endpoints.  Together with strict
   source-prefix/route separation, these endpoint reductions prove the full
   mixed source-prefix corridor certificate.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedCorridorSeparation.lean`](LeanTrominoes/RetainedFinalFlatNormalizedCorridorSeparation.lean)
+  combines the final drawing's strict prefix/full-route separation with the
+  normalized boundary and checkpoint bridge.  It discharges the last
+  overlapping carrier-prefix versus oblique noncarrier-fan case and closes
+  the component-case reducer, proving unconditional directed separation of
+  a final scaled source prefix from every other complete outer fan.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and

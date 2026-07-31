@@ -1,0 +1,228 @@
+import LeanTrominoes.RetainedFinalFlatNormalizedBoundary
+import LeanTrominoes.RetainedTerminalBoundaryCheckpointSeparation
+import LeanTrominoes.RetainedFinalFlatRouteComponentCases
+import LeanTrominoes.RetainedFinalRoutePrefixSeparation
+
+/-!
+# Closing normalized carrier--fan corridor separation
+
+The final drawing's ordinary route planarity and simplicity strictly
+separate one route's retained prefix from the other complete route.  At the
+single overlapping carrier--noncarrier component case, the normalized
+carrier boundary turns this strict separation into the exact refined
+terminal-checkpoint corridor certificate.
+
+This closes the callback left by the carrier/noncarrier component-case
+reducer.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicOrthocrossing
+
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+/-- The retained prefix of one final route is strictly separated from the
+other complete route under the same endpoint hypotheses used by the final
+source splice. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondFinal : Cell}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headsDifferent : first.head? ≠ second.head?)
+    (firstHead : first.head? = some firstSource)
+    (secondLast : second.getLast? = some secondFinal)
+    (sourceNeFinal : firstSource ≠ secondFinal) :
+    RoutesStrictlyAvoidEachOther first.dropLast second := by
+  have prefixesAvoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefixes_strictlyAvoid
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent
+  have finalSegmentAvoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherFinalSegment
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent firstHead secondLast sourceNeFinal
+  have reverseTailExists :=
+    exists_reverse_tail_head?_of_two_le_length
+      second secondLength
+  have entranceEq :
+      second.dropLast.getLast? =
+        some (polylineLastEntrance second) :=
+    dropLast_getLast?_of_reverse_tail_head?
+      (polylineLastEntrance_spec reverseTailExists)
+  have joined :=
+    prefixesAvoid.join_right
+      finalSegmentAvoid entranceEq (by simp)
+  have decomposition :
+      second.dropLast ++ [secondFinal] = second :=
+    List.dropLast_append_getLast?
+      secondFinal secondLast
+  simpa [joinAtEndpoint, decomposition] using joined
+
+end PeriodicOrthocrossing
+
+namespace PeriodicEightOccurrenceSplit
+
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+set_option maxHeartbeats 1600000
+
+/-- All component combinations of the final directed source-prefix versus
+other-fan cross case are strictly separated.  In the last overlapping
+carrier--oblique-fan case, normalized carrier-boundary checkpoint separation
+supplies the mixed corridor certificate. -/
+theorem
+    retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈
+          PeriodicOrthocrossing.retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {factor : Nat} (factorGreaterThanOne : 1 < factor)
+    (clearance :
+      845 <
+        retainedTerminalFanTotalRefinement * factor)
+    {sourceRoute fanRoute : List Cell}
+    {sourceIndex fanIndex : Nat}
+    {sourcePoint fanCenter : Cell}
+    (sourceMember :
+      (sourceRoute, sourceIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (fanMember :
+      (fanRoute, fanIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (sourceLength : 2 ≤ sourceRoute.length)
+    (fanLength : 2 ≤ fanRoute.length)
+    (indicesDifferent : sourceIndex ≠ fanIndex)
+    (headsDifferent : sourceRoute.head? ≠ fanRoute.head?)
+    (sourceHead : sourceRoute.head? = some sourcePoint)
+    (fanLast : fanRoute.getLast? = some fanCenter)
+    (sourceNeCenter : sourcePoint ≠ fanCenter)
+    (sourceTerminal fanTerminal : RetainedTerminalData)
+    (sourceSlot fanSlot : RetainedTerminalSlot)
+    (sourceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector sourceRoute) =
+        some sourceTerminal)
+    (fanClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector fanRoute) =
+        some fanTerminal)
+    (fansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor sourceRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor sourceTerminal)
+          sourceSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor fanRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor fanTerminal)
+          fanSlot)) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor sourceRoute)).dropLast
+      (retainedTerminalFanOuterCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (Cell.scale factor fanCenter))
+        (scaleRetainedTerminalData factor fanTerminal)
+        fanSlot) := by
+  apply
+    retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute_of_flatComponentCases
+      formula wellFormed degree isLocal clausesNonempty
+      factorGreaterThanOne clearance
+      sourceMember fanMember sourceLength fanLength
+      indicesDifferent headsDifferent sourceHead fanLast
+      sourceNeCenter
+      sourceTerminal fanTerminal sourceSlot fanSlot
+      sourceClassified fanClassified fansAvoid
+  intro sourceCarrier fanMacrocell rectanglesNotSeparated
+  by_cases fanAligned :
+      (⟨polylineLastEntrance fanRoute, fanCenter⟩ :
+        GridSegment).IsAxisAligned
+  · have separated :=
+      retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute_of_singleton_or_axisAligned
+        formula wellFormed degree isLocal clausesNonempty
+        factorGreaterThanOne
+        sourceMember fanMember sourceLength fanLength
+        indicesDifferent headsDifferent sourceHead fanLast
+        sourceNeCenter
+        sourceTerminal fanTerminal sourceSlot fanSlot
+        sourceClassified fanClassified
+        (Or.inr fanAligned) fansAvoid
+    have fanLastD :
+        fanRoute.getLastD (0, 0) = fanCenter := by
+      simp [List.getLastD_eq_getLast?, fanLast]
+    rw [scalePolyline_getLastD, fanLastD] at separated
+    exact separated
+  · rcases
+        fanMacrocell.exists_normalizedSource
+          formula wellFormed degree isLocal with
+      ⟨normalized⟩
+    have contact :=
+      sourceCarrier.normalizedContact_of_finalSegment_not_axisAligned
+        formula wellFormed degree isLocal
+        fanMacrocell normalized
+        fanLength fanLast fanAligned rectanglesNotSeparated
+    rcases
+        sourceCarrier.exists_normalizedCarrierBoundary
+          formula wellFormed degree isLocal
+          fanMacrocell normalized contact with
+      ⟨boundary⟩
+    have strictlyAvoid :=
+      PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherRoute
+        formula wellFormed degree isLocal clausesNonempty
+        sourceMember fanMember sourceLength fanLength
+        indicesDifferent headsDifferent sourceHead fanLast
+        sourceNeCenter
+    have corridor :
+        SourcePrefixCorridorSeparated
+          sourceRoute fanRoute fanTerminal.1 := by
+      apply
+        sourcePrefixCorridorSeparated_of_outside_insideCarrierBoundary
+          boundary.port boundary.origin
+          sourceRoute fanRoute fanTerminal fanLength fanClassified
+      · intro point pointMember
+        exact boundary.carrierOutside point
+          (List.mem_of_mem_dropLast pointMember)
+      · exact boundary.macrocellInside
+      · exact strictlyAvoid
+    exact
+      retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute_of_corridorSeparated
+        formula wellFormed degree isLocal clausesNonempty
+        factorGreaterThanOne clearance
+        sourceMember fanMember sourceLength fanLength
+        indicesDifferent sourceHead fanLast sourceNeCenter
+        fanTerminal fanSlot fanClassified corridor
+
+end PeriodicEightOccurrenceSplit
+end LeanTrominoes
