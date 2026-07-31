@@ -12,6 +12,116 @@ coordinates.
 namespace LeanTrominoes
 namespace PositionedPeriodicCNF
 
+/-- A tagged metadata incidence occurs at the same numeric index in the
+flat route list of the positioned incidence drawing. -/
+theorem taggedRoute_mem_of_taggedIncidence
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    {taggedIncidence : CNFIncidence Variable × Nat}
+    (taggedIncidenceMember :
+      taggedIncidence ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx) :
+    (routes taggedIncidence.1.clauseIndex
+        taggedIncidence.1.literalIndex,
+      taggedIncidence.2) ∈
+        (incidenceDrawing source placement routes).edgeRoutes.zipIdx := by
+  change
+    (routes taggedIncidence.1.clauseIndex
+        taggedIncidence.1.literalIndex,
+      taggedIncidence.2) ∈
+      (incidenceEdgeRoutes source routes).zipIdx
+  rw [incidenceEdgeRoutes_eq_metadata_map,
+    List.zipIdx_map]
+  exact List.mem_map.mpr
+    ⟨taggedIncidence, taggedIncidenceMember,
+      by cases taggedIncidence; rfl⟩
+
+/-- Every genuine positioned clause/literal incidence supplies both its
+metadata tag and its route at one common flat drawing index. -/
+theorem exists_taggedIncidenceRoute_of_positioned_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ routeIndex : Nat,
+      ((⟨clauseIndex, clause.literals, literalIndex, literal⟩ :
+          CNFIncidence Variable),
+        routeIndex) ∈
+          (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx ∧
+      (routes clauseIndex literalIndex, routeIndex) ∈
+          (incidenceDrawing source placement routes).edgeRoutes.zipIdx := by
+  let incidence : CNFIncidence Variable :=
+    ⟨clauseIndex, clause.literals, literalIndex, literal⟩
+  have erasedClauseMember :
+      (clause.literals, clauseIndex) ∈
+        source.erase.clauses.zipIdx := by
+    change
+      (clause.literals, clauseIndex) ∈
+        (source.clauses.map
+          PositionedPeriodicClause.literals).zipIdx
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(clause, clauseIndex), clauseMember, rfl⟩
+  have incidenceMember :
+      incidence ∈
+        PeriodicCNF.incidencesWithMetadata source.erase := by
+    exact
+      (PeriodicCNF.mem_incidencesWithMetadata_iff
+        source.erase incidence).mpr
+        ⟨erasedClauseMember, literalMember⟩
+  rcases List.mem_iff_get.mp incidenceMember with
+    ⟨incidenceIndex, incidenceLookup⟩
+  let taggedIncidence : CNFIncidence Variable × Nat :=
+    (incidence, incidenceIndex)
+  have taggedIncidenceMember :
+      taggedIncidence ∈
+        (PeriodicCNF.incidencesWithMetadata
+          source.erase).zipIdx := by
+    apply List.mem_zipIdx_iff_getElem?.mpr
+    simpa [taggedIncidence,
+      List.getElem?_eq_getElem incidenceIndex.isLt] using
+      congrArg some incidenceLookup
+  refine ⟨taggedIncidence.2, ?_, ?_⟩
+  · simpa [taggedIncidence, incidence] using
+      taggedIncidenceMember
+  · simpa [taggedIncidence, incidence] using
+      taggedRoute_mem_of_taggedIncidence
+        source placement routes taggedIncidenceMember
+
+/-- Every genuine positioned clause/literal incidence supplies its route
+with the corresponding flat drawing index. -/
+theorem exists_taggedRoute_of_positioned_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ routeIndex : Nat,
+      (routes clauseIndex literalIndex, routeIndex) ∈
+        (incidenceDrawing source placement routes).edgeRoutes.zipIdx := by
+  rcases
+      exists_taggedIncidenceRoute_of_positioned_members
+        source placement routes clauseMember literalMember with
+    ⟨routeIndex, _taggedIncidenceMember, routeMember⟩
+  exact ⟨routeIndex, routeMember⟩
+
 /-- A route occurrence tagged in the flat drawing list recovers the
 metadata-rich incidence at the same flat index and its two presentation
 coordinates. -/

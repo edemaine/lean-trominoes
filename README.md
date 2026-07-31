@@ -2215,6 +2215,18 @@ The representation choices for this target are:
   separates their full source-to-boundary splices.  This result includes
   every certified oblique terminal direction and requires no axis-alignment
   hypothesis.
+- [`LeanTrominoes/PositionedPeriodicCNFTaggedRouteLookup.lean`](LeanTrominoes/PositionedPeriodicCNFTaggedRouteLookup.lean)
+  now provides both directions of the bridge between genuine positioned
+  clause/literal incidences and the drawing's flat indexed route list.
+  In the forward direction it returns the metadata incidence and physical
+  route at one common index, allowing source-coordinate distinctness to
+  discharge flat-index distinctness.
+- [`LeanTrominoes/RetainedFinalPositionedOccurrenceSpliceSeparation.lean`](LeanTrominoes/RetainedFinalPositionedOccurrenceSpliceSeparation.lean)
+  exposes shared-center splice separation directly at the positioned source
+  interface.  It derives flat memberships and indices, route lengths,
+  classified endpoints, and distinct-index facts automatically, leaving
+  global route-pair assembly to supply only the two incidence memberships
+  and their physical endpoint relationships.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
