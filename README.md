@@ -2193,6 +2193,12 @@ The representation choices for this target are:
   a final scaled source prefix from every other complete outer fan.  Applying
   that result in both directions closes the complete pairwise splice theorem
   once separation of the two selected outer fans is supplied.
+- [`LeanTrominoes/RetainedAngularFanOuterSourceSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterSourceSeparation.lean)
+  bounds every complete outer fan in the radius-288 expansion of its
+  combined-scaled discarded source-terminal rectangle.  Two source terminal
+  rectangles separated by one integral lattice unit therefore yield
+  strictly separated complete outer fans after the factor-four source
+  refinement.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
