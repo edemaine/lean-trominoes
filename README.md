@@ -1983,6 +1983,10 @@ The representation choices for this target are:
   duplicate-freedom, and distinct source endpoints; positive scaling then
   preserves it.  Tail replacement reduces the new geometry to exactly three
   cross/suffix cases before the four pieces are reassembled compositionally.
+  A parallel ordinary-avoidance theorem covers routes with a shared clause
+  head: duplicate-freedom proves that this head is the only inherited contact,
+  it remains an advertised endpoint after splicing, and positive uniform
+  scaling preserves the endpoint-only certificate.
 - [`LeanTrominoes/RetainedRayPolylineTailReplacement.lean`](LeanTrominoes/RetainedRayPolylineTailReplacement.lean)
   equips retained-ray polylines with a consecutive-point chain
   characterization, final-prefix and endpoint-join closure, and safe
@@ -2001,7 +2005,9 @@ The representation choices for this target are:
   retained splices.  Positive scaling preserves strict source-prefix
   separation and the exact classified gate equations discharge both endpoint
   joins, leaving only the two directed source-prefix/fan-suffix cross cases
-  plus the already certified fan/fan case.
+  plus the already certified fan/fan case.  It also exposes the common-clause
+  variant, preserving the one legal shared source endpoint while keeping all
+  fan-involving pairs contact-free.
 - [`LeanTrominoes/RetainedAngularFanSourceScaling.lean`](LeanTrominoes/RetainedAngularFanSourceScaling.lean)
   scales the retained source before inserting the fixed-size angular fans.
   Positive refinement preserves the angular occurrence order and the logical

@@ -407,6 +407,446 @@ theorem routesStrictlyAvoidEachOther_dropLast_of_avoid_of_nodup_of_heads_ne
     (noContact_dropLast_of_avoid_of_nodup_of_heads_ne
       avoid firstNodup secondNodup headsDifferent)
 
+/-- A listed point of a duplicate-free route that survives deletion of the
+final point cannot be the original final endpoint.  If it is an advertised
+endpoint at all, it is therefore the head. -/
+theorem route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+    {route : List Cell} {point : Cell}
+    (nodup : route.Nodup)
+    (member : point ∈ route.dropLast)
+    (endpoint : RoutePointIsEndpoint route point) :
+    route.head? = some point := by
+  rcases endpoint with atHead | atLast
+  · exact atHead
+  · exact
+      (getLast?_ne_some_of_mem_dropLast_of_nodup
+        nodup member atLast).elim
+
+/-- A nonempty final-point-deleted prefix retains the original route's
+head. -/
+theorem dropLast_head?_eq_head?_of_ne_nil
+    {route : List Cell}
+    (prefixNonempty : route.dropLast ≠ []) :
+    route.dropLast.head? = route.head? := by
+  cases route with
+  | nil =>
+      simp at prefixNonempty
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp at prefixNonempty
+      | cons second tail =>
+          simp
+
+/-- Deleting the final point from two duplicate-free, endpoint-clean routes
+preserves ordinary route avoidance.  A surviving listed contact can only be
+the original head of each route, hence remains an advertised endpoint of
+both prefixes. -/
+theorem routesAvoidEachOther_dropLast_of_avoid_of_nodup
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (firstNodup : first.Nodup)
+    (secondNodup : second.Nodup) :
+    RoutesAvoidEachOther first.dropLast second.dropLast := by
+  unfold RoutesAvoidEachOther
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro firstIndex secondIndex
+    have firstMember :
+        (gridPolylineSegments first.dropLast).get firstIndex ∈
+          gridPolylineSegments first :=
+      gridPolylineSegments_dropLast_subset first
+        (List.get_mem _ firstIndex)
+    have secondMember :
+        (gridPolylineSegments second.dropLast).get secondIndex ∈
+          gridPolylineSegments second :=
+      gridPolylineSegments_dropLast_subset second
+        (List.get_mem _ secondIndex)
+    rcases List.mem_iff_get.mp firstMember with
+      ⟨firstOriginalIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp secondMember with
+      ⟨secondOriginalIndex, secondEqual⟩
+    rw [← firstEqual, ← secondEqual]
+    exact avoid.1 firstOriginalIndex secondOriginalIndex
+  · intro firstIndex secondIndex
+    have firstMember :
+        first.dropLast.get firstIndex ∈ first :=
+      List.mem_of_mem_dropLast (List.get_mem _ firstIndex)
+    have secondMember :
+        (gridPolylineSegments second.dropLast).get secondIndex ∈
+          gridPolylineSegments second :=
+      gridPolylineSegments_dropLast_subset second
+        (List.get_mem _ secondIndex)
+    rcases List.mem_iff_get.mp firstMember with
+      ⟨firstOriginalIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp secondMember with
+      ⟨secondOriginalIndex, secondEqual⟩
+    rw [← firstEqual, ← secondEqual]
+    exact avoid.2.1 firstOriginalIndex secondOriginalIndex
+  · intro secondIndex firstIndex
+    have secondMember :
+        second.dropLast.get secondIndex ∈ second :=
+      List.mem_of_mem_dropLast (List.get_mem _ secondIndex)
+    have firstMember :
+        (gridPolylineSegments first.dropLast).get firstIndex ∈
+          gridPolylineSegments first :=
+      gridPolylineSegments_dropLast_subset first
+        (List.get_mem _ firstIndex)
+    rcases List.mem_iff_get.mp secondMember with
+      ⟨secondOriginalIndex, secondEqual⟩
+    rcases List.mem_iff_get.mp firstMember with
+      ⟨firstOriginalIndex, firstEqual⟩
+    rw [← secondEqual, ← firstEqual]
+    exact avoid.2.2.1 secondOriginalIndex firstOriginalIndex
+  · intro firstIndex secondIndex equal
+    have firstMember :
+        first.dropLast.get firstIndex ∈ first.dropLast :=
+      List.get_mem _ firstIndex
+    have secondMember :
+        second.dropLast.get secondIndex ∈ second.dropLast :=
+      List.get_mem _ secondIndex
+    have firstOriginalMember :
+        first.dropLast.get firstIndex ∈ first :=
+      List.mem_of_mem_dropLast firstMember
+    have secondOriginalMember :
+        second.dropLast.get secondIndex ∈ second :=
+      List.mem_of_mem_dropLast secondMember
+    rcases List.mem_iff_get.mp firstOriginalMember with
+      ⟨firstOriginalIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp secondOriginalMember with
+      ⟨secondOriginalIndex, secondEqual⟩
+    have originalEqual :
+        first.get firstOriginalIndex =
+          second.get secondOriginalIndex := by
+      rw [firstEqual, secondEqual]
+      exact equal
+    have originalEndpoints :=
+      avoid.2.2.2 firstOriginalIndex secondOriginalIndex
+        originalEqual
+    rw [firstEqual, secondEqual] at originalEndpoints
+    constructor
+    · left
+      exact
+        (dropLast_head?_eq_head?_of_ne_nil
+          (route := first)
+          (List.ne_nil_of_mem firstMember)).trans
+          (route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+            firstNodup firstMember originalEndpoints.1)
+    · left
+      exact
+        (dropLast_head?_eq_head?_of_ne_nil
+          (route := second)
+          (List.ne_nil_of_mem secondMember)).trans
+          (route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+            secondNodup secondMember originalEndpoints.2)
+
+/-- Any contact between final-point-deleted prefixes of duplicate-free,
+endpoint-clean routes occurs at the retained head of both prefixes. -/
+theorem routePrefix_contactsAtHeads_of_avoid_of_nodup
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (firstNodup : first.Nodup)
+    (secondNodup : second.Nodup) :
+    ∀ firstPoint ∈ first.dropLast,
+      ∀ secondPoint ∈ second.dropLast,
+        firstPoint = secondPoint →
+          first.dropLast.head? = some firstPoint ∧
+            second.dropLast.head? = some secondPoint := by
+  intro firstPoint firstMember secondPoint secondMember equal
+  have firstOriginalMember :
+      firstPoint ∈ first :=
+    List.mem_of_mem_dropLast firstMember
+  have secondOriginalMember :
+      secondPoint ∈ second :=
+    List.mem_of_mem_dropLast secondMember
+  rcases List.mem_iff_get.mp firstOriginalMember with
+    ⟨firstIndex, firstIndexed⟩
+  rcases List.mem_iff_get.mp secondOriginalMember with
+    ⟨secondIndex, secondIndexed⟩
+  have indexedEqual :
+      first.get firstIndex = second.get secondIndex := by
+    rw [firstIndexed, secondIndexed]
+    exact equal
+  have endpoints :=
+    avoid.2.2.2 firstIndex secondIndex indexedEqual
+  rw [firstIndexed, secondIndexed] at endpoints
+  exact
+    ⟨(dropLast_head?_eq_head?_of_ne_nil
+        (route := first)
+        (List.ne_nil_of_mem firstMember)).trans
+        (route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+          firstNodup firstMember endpoints.1),
+      (dropLast_head?_eq_head?_of_ne_nil
+        (route := second)
+        (List.ne_nil_of_mem secondMember)).trans
+        (route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+          secondNodup secondMember endpoints.2)⟩
+
+/-- Membership-form introduction rule for ordinary route avoidance. -/
+theorem routesAvoidEachOther_of_mem
+    {first second : List Cell}
+    (segmentsAvoid :
+      ∀ firstSegment ∈ gridPolylineSegments first,
+        ∀ secondSegment ∈ gridPolylineSegments second,
+          ¬GridSegment.InteriorsMeet firstSegment secondSegment)
+    (firstPointsAvoid :
+      ∀ firstPoint ∈ first,
+        ∀ secondSegment ∈ gridPolylineSegments second,
+          ¬secondSegment.InteriorContains firstPoint)
+    (secondPointsAvoid :
+      ∀ secondPoint ∈ second,
+        ∀ firstSegment ∈ gridPolylineSegments first,
+          ¬firstSegment.InteriorContains secondPoint)
+    (contactsAtEndpoints :
+      ∀ firstPoint ∈ first,
+        ∀ secondPoint ∈ second,
+          firstPoint = secondPoint →
+            RoutePointIsEndpoint first firstPoint ∧
+              RoutePointIsEndpoint second secondPoint) :
+    RoutesAvoidEachOther first second := by
+  unfold RoutesAvoidEachOther
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro firstIndex secondIndex
+    exact
+      segmentsAvoid
+        _ (List.get_mem _ firstIndex)
+        _ (List.get_mem _ secondIndex)
+  · intro firstIndex secondIndex
+    exact
+      firstPointsAvoid
+        _ (List.get_mem _ firstIndex)
+        _ (List.get_mem _ secondIndex)
+  · intro secondIndex firstIndex
+    exact
+      secondPointsAvoid
+        _ (List.get_mem _ secondIndex)
+        _ (List.get_mem _ firstIndex)
+  · intro firstIndex secondIndex equal
+    exact
+      contactsAtEndpoints
+        _ (List.get_mem _ firstIndex)
+        _ (List.get_mem _ secondIndex) equal
+
+/-- Positive uniform scaling preserves ordinary endpoint-only route
+avoidance. -/
+theorem RoutesAvoidEachOther.scalePolyline
+    {first second : List Cell}
+    {factor : Int} (factorPositive : 0 < factor)
+    (avoid : RoutesAvoidEachOther first second) :
+    RoutesAvoidEachOther
+      (LeanTrominoes.scalePolyline factor first)
+      (LeanTrominoes.scalePolyline factor second) := by
+  apply routesAvoidEachOther_of_mem
+  · rw [gridPolylineSegments_scalePolyline,
+      gridPolylineSegments_scalePolyline]
+    intro firstSegment firstMember secondSegment secondMember
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    rcases List.mem_iff_get.mp originalFirstMember with
+      ⟨firstIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp originalSecondMember with
+      ⟨secondIndex, secondEqual⟩
+    intro meet
+    apply avoid.1 firstIndex secondIndex
+    rw [firstEqual, secondEqual]
+    exact
+      (GridSegment.interiorsMeet_scale_iff
+        factorPositive originalFirst originalSecond).mp meet
+  · rw [gridPolylineSegments_scalePolyline]
+    intro firstPoint firstMember secondSegment secondMember
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    rcases List.mem_iff_get.mp originalFirstMember with
+      ⟨firstIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp originalSecondMember with
+      ⟨secondIndex, secondEqual⟩
+    intro contains
+    apply avoid.2.1 firstIndex secondIndex
+    rw [firstEqual, secondEqual]
+    exact
+      (GridSegment.interiorContains_scale_iff
+        factorPositive originalSecond originalFirst).mp contains
+  · rw [gridPolylineSegments_scalePolyline]
+    intro secondPoint secondMember firstSegment firstMember
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    rcases List.mem_iff_get.mp originalSecondMember with
+      ⟨secondIndex, secondEqual⟩
+    rcases List.mem_iff_get.mp originalFirstMember with
+      ⟨firstIndex, firstEqual⟩
+    intro contains
+    apply avoid.2.2.1 secondIndex firstIndex
+    rw [secondEqual, firstEqual]
+    exact
+      (GridSegment.interiorContains_scale_iff
+        factorPositive originalFirst originalSecond).mp contains
+  · intro firstPoint firstMember secondPoint secondMember equal
+    rcases List.mem_map.mp firstMember with
+      ⟨originalFirst, originalFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨originalSecond, originalSecondMember, rfl⟩
+    rcases List.mem_iff_get.mp originalFirstMember with
+      ⟨firstIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp originalSecondMember with
+      ⟨secondIndex, secondEqual⟩
+    have originalEqual :
+        originalFirst = originalSecond :=
+      Cell.scale_injective factorPositive.ne' equal
+    have endpoints :=
+      avoid.2.2.2 firstIndex secondIndex
+        (firstEqual.trans
+          (originalEqual.trans secondEqual.symm))
+    rw [firstEqual, secondEqual] at endpoints
+    constructor
+    · rcases endpoints.1 with atHead | atLast
+      · left
+        simpa using
+          congrArg (Option.map (Cell.scale factor)) atHead
+      · right
+        simpa using
+          congrArg (Option.map (Cell.scale factor)) atLast
+    · rcases endpoints.2 with atHead | atLast
+      · left
+        simpa using
+          congrArg (Option.map (Cell.scale factor)) atHead
+      · right
+        simpa using
+          congrArg (Option.map (Cell.scale factor)) atLast
+
+/-- Join two replacement tails onto an ordinarily separated pair of
+prefixes.  All contacts inherited from the prefixes must be at their heads;
+the three pairs involving a replacement are contact-free. -/
+theorem RoutesAvoidEachOther.join_tails_of_prefixes
+    {first second firstReplacement secondReplacement : List Cell}
+    {firstMiddle secondMiddle : Cell}
+    (prefixesAvoid : RoutesAvoidEachOther first second)
+    (prefixContactsAtHeads :
+      ∀ firstPoint ∈ first,
+        ∀ secondPoint ∈ second,
+          firstPoint = secondPoint →
+            first.head? = some firstPoint ∧
+              second.head? = some secondPoint)
+    (firstPrefixAvoidSecondReplacement :
+      RoutesStrictlyAvoidEachOther
+        first secondReplacement)
+    (firstReplacementAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement second)
+    (replacementsAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement secondReplacement)
+    (firstEntrance :
+      first.getLast? = some firstMiddle)
+    (firstReplacementHead :
+      firstReplacement.head? = some firstMiddle)
+    (secondEntrance :
+      second.getLast? = some secondMiddle)
+    (secondReplacementHead :
+      secondReplacement.head? = some secondMiddle) :
+    RoutesAvoidEachOther
+      (joinAtEndpoint first firstReplacement)
+      (joinAtEndpoint second secondReplacement) := by
+  have firstSegments :=
+    gridPolylineSegments_joinAtEndpoint
+      firstEntrance firstReplacementHead
+  have secondSegments :=
+    gridPolylineSegments_joinAtEndpoint
+      secondEntrance secondReplacementHead
+  apply routesAvoidEachOther_of_mem
+  · intro firstSegment firstMember secondSegment secondMember
+    rw [firstSegments, List.mem_append] at firstMember
+    rw [secondSegments, List.mem_append] at secondMember
+    rcases firstMember with
+        firstPrefixMember | firstReplacementMember <;>
+      rcases secondMember with
+        secondPrefixMember | secondReplacementMember
+    · rcases List.mem_iff_get.mp firstPrefixMember with
+        ⟨firstPrefixIndex, firstEqual⟩
+      rcases List.mem_iff_get.mp secondPrefixMember with
+        ⟨secondPrefixIndex, secondEqual⟩
+      rw [← firstEqual, ← secondEqual]
+      exact prefixesAvoid.1 firstPrefixIndex secondPrefixIndex
+    · exact
+        firstPrefixAvoidSecondReplacement.1
+          _ firstPrefixMember _ secondReplacementMember
+    · exact
+        firstReplacementAvoidSecondPrefix.1
+          _ firstReplacementMember _ secondPrefixMember
+    · exact
+        replacementsAvoid.1
+          _ firstReplacementMember _ secondReplacementMember
+  · intro firstPoint firstMember secondSegment secondMember
+    rcases mem_joinAtEndpoint firstMember with
+        firstPrefixMember | firstReplacementMember <;>
+      rw [secondSegments, List.mem_append] at secondMember <;>
+    rcases secondMember with
+        secondPrefixMember | secondReplacementMember
+    · rcases List.mem_iff_get.mp firstPrefixMember with
+        ⟨firstPrefixIndex, firstEqual⟩
+      rcases List.mem_iff_get.mp secondPrefixMember with
+        ⟨secondPrefixIndex, secondEqual⟩
+      rw [← firstEqual, ← secondEqual]
+      exact prefixesAvoid.2.1 firstPrefixIndex secondPrefixIndex
+    · exact
+        firstPrefixAvoidSecondReplacement.2.1
+          _ firstPrefixMember _ secondReplacementMember
+    · exact
+        firstReplacementAvoidSecondPrefix.2.1
+          _ firstReplacementMember _ secondPrefixMember
+    · exact
+        replacementsAvoid.2.1
+          _ firstReplacementMember _ secondReplacementMember
+  · intro secondPoint secondMember firstSegment firstMember
+    rcases mem_joinAtEndpoint secondMember with
+        secondPrefixMember | secondReplacementMember <;>
+      rw [firstSegments, List.mem_append] at firstMember <;>
+    rcases firstMember with
+        firstPrefixMember | firstReplacementMember
+    · rcases List.mem_iff_get.mp secondPrefixMember with
+        ⟨secondPrefixIndex, secondEqual⟩
+      rcases List.mem_iff_get.mp firstPrefixMember with
+        ⟨firstPrefixIndex, firstEqual⟩
+      rw [← secondEqual, ← firstEqual]
+      exact prefixesAvoid.2.2.1 secondPrefixIndex firstPrefixIndex
+    · exact
+        firstReplacementAvoidSecondPrefix.2.2.1
+          _ secondPrefixMember _ firstReplacementMember
+    · exact
+        firstPrefixAvoidSecondReplacement.2.2.1
+          _ secondReplacementMember _ firstPrefixMember
+    · exact
+        replacementsAvoid.2.2.1
+          _ secondReplacementMember _ firstReplacementMember
+  · intro firstPoint firstMember secondPoint secondMember equal
+    rcases mem_joinAtEndpoint firstMember with
+        firstPrefixMember | firstReplacementMember
+    · rcases mem_joinAtEndpoint secondMember with
+        secondPrefixMember | secondReplacementMember
+      · have heads :=
+          prefixContactsAtHeads
+            _ firstPrefixMember _ secondPrefixMember equal
+        exact
+          ⟨Or.inl
+              (joinAtEndpoint_head? heads.1),
+            Or.inl
+              (joinAtEndpoint_head? heads.2)⟩
+      · exact
+          (firstPrefixAvoidSecondReplacement.2.2.2
+            _ firstPrefixMember _ secondReplacementMember equal).elim
+    · rcases mem_joinAtEndpoint secondMember with
+        secondPrefixMember | secondReplacementMember
+      · exact
+          (firstReplacementAvoidSecondPrefix.2.2.2
+            _ firstReplacementMember _ secondPrefixMember equal).elim
+      · exact
+          (replacementsAvoid.2.2.2
+            _ firstReplacementMember _ secondReplacementMember equal).elim
+
 /-- Simultaneous tail replacement preserves strict separation once all four
 prefix/suffix pairs are strictly separated. -/
 theorem RoutesStrictlyAvoidEachOther.replace_tails_of_prefixes
@@ -494,6 +934,54 @@ theorem RoutesStrictlyAvoidEachOther.replace_tails
     firstReplacementAvoidSecondPrefix replacementsAvoid
     firstEntrance firstReplacementHead
     secondEntrance secondReplacementHead
+
+/-- Simultaneous tail replacement preserves ordinary endpoint-only
+avoidance for duplicate-free original routes.  This is the common-clause
+counterpart of strict tail-replacement separation: a shared clause head is
+retained as the sole permitted contact, while every pair involving a new
+replacement suffix is contact-free. -/
+theorem RoutesAvoidEachOther.replace_tails
+    {first second firstReplacement secondReplacement : List Cell}
+    {firstMiddle secondMiddle : Cell}
+    (originalAvoid :
+      RoutesAvoidEachOther first second)
+    (firstNodup : first.Nodup)
+    (secondNodup : second.Nodup)
+    (firstPrefixAvoidSecondReplacement :
+      RoutesStrictlyAvoidEachOther
+        first.dropLast secondReplacement)
+    (firstReplacementAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement second.dropLast)
+    (replacementsAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement secondReplacement)
+    (firstEntrance :
+      first.dropLast.getLast? = some firstMiddle)
+    (firstReplacementHead :
+      firstReplacement.head? = some firstMiddle)
+    (secondEntrance :
+      second.dropLast.getLast? = some secondMiddle)
+    (secondReplacementHead :
+      secondReplacement.head? = some secondMiddle) :
+    RoutesAvoidEachOther
+      (replacePolylineTail first firstReplacement)
+      (replacePolylineTail second secondReplacement) := by
+  rw [PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
+      first firstReplacement firstEntrance firstReplacementHead,
+    PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
+      second secondReplacement secondEntrance secondReplacementHead]
+  exact
+    RoutesAvoidEachOther.join_tails_of_prefixes
+      (routesAvoidEachOther_dropLast_of_avoid_of_nodup
+        originalAvoid firstNodup secondNodup)
+      (routePrefix_contactsAtHeads_of_avoid_of_nodup
+        originalAvoid firstNodup secondNodup)
+      firstPrefixAvoidSecondReplacement
+      firstReplacementAvoidSecondPrefix
+      replacementsAvoid
+      firstEntrance firstReplacementHead
+      secondEntrance secondReplacementHead
 
 end EmbeddedCNFIncidenceDrawing
 end PlanarThreeSAT
