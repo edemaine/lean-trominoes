@@ -1799,6 +1799,11 @@ The representation choices for this target are:
   The transported route-shape dichotomy additionally proves that every
   non-axis-aligned final segment belongs to a route whose deleted prefix has
   length one, isolating the remaining oblique-terminal case to fan geometry.
+  A complementary generic lemma upgrades ordinary endpoint-contact planarity
+  to strict separation of two axis-aligned discarded-final-segment
+  rectangles whenever cross endpoints differ and the retained prefixes are
+  not both singletons.  This isolates common-head carrier and bend routes to
+  a finite route-length check.
 - [`LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean`](LeanTrominoes/RetainedFinalTerminalGateDistinctness.lean)
   instantiates the terminal-vector argument at the complete retained drawing.
   Its compatibility, endpoint-only route-contact, and final incidence-key

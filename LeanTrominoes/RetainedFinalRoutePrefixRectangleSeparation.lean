@@ -81,6 +81,300 @@ theorem finalSegment_coordinateRectanglesSeparated_of_strictlyAvoid
       (strict.2.2.2 firstFinal.finish firstEndpoints.2
         secondFinal.finish secondEndpoints.2)
 
+/-- A duplicate-free nonempty list whose head and last point coincide is a
+singleton. -/
+private theorem list_length_eq_one_of_nodup_of_head_last_eq
+    {α : Type*} {points : List α} {point : α}
+    (nodup : points.Nodup)
+    (headEq : points.head? = some point)
+    (lastEq : points.getLast? = some point) :
+    points.length = 1 := by
+  cases points with
+  | nil =>
+      simp at headEq
+  | cons head tail =>
+      simp only [List.head?_cons, Option.some.injEq] at headEq
+      subst head
+      by_cases tailEmpty : tail = []
+      · simp [tailEmpty]
+      · have tailLast : tail.getLast? = some point := by
+          rw [← List.getLast?_cons_of_ne_nil tailEmpty]
+          exact lastEq
+        exact
+          ((List.nodup_cons.mp nodup).1
+            (List.mem_of_getLast? tailLast)).elim
+
+/-- Ordinary route planarity also strictly separates the two discarded
+terminal segments when the routes have no cross-endpoint contact and their
+retained prefixes are not both singletons.  The latter condition rules out
+the only contact still permitted by ordinary planarity: both penultimate
+points being the common route head. -/
+theorem
+    finalSegment_coordinateRectanglesSeparated_of_avoid_of_not_both_singletonPrefixes
+    {first second : List Cell}
+    {firstEntrance secondEntrance firstLast secondLast : Cell}
+    (firstNodup : first.Nodup)
+    (secondNodup : second.Nodup)
+    (avoid : RoutesAvoidEachOther first second)
+    (firstEntranceEq :
+      first.dropLast.getLast? = some firstEntrance)
+    (secondEntranceEq :
+      second.dropLast.getLast? = some secondEntrance)
+    (firstLastEq : first.getLast? = some firstLast)
+    (secondLastEq : second.getLast? = some secondLast)
+    (headLastNe : first.head? ≠ second.getLast?)
+    (lastHeadNe : first.getLast? ≠ second.head?)
+    (lastLastNe : first.getLast? ≠ second.getLast?)
+    (notBothSingleton :
+      ¬(first.dropLast.length = 1 ∧
+        second.dropLast.length = 1))
+    (firstAligned :
+      (⟨firstEntrance, firstLast⟩ :
+        GridSegment).IsAxisAligned)
+    (secondAligned :
+      (⟨secondEntrance, secondLast⟩ :
+        GridSegment).IsAxisAligned) :
+    ClosedGridRectanglesSeparated
+      (⟨firstEntrance, firstLast⟩ :
+        GridSegment).coordinateLower
+      (⟨firstEntrance, firstLast⟩ :
+        GridSegment).coordinateUpper
+      (⟨secondEntrance, secondLast⟩ :
+        GridSegment).coordinateLower
+      (⟨secondEntrance, secondLast⟩ :
+        GridSegment).coordinateUpper := by
+  let firstFinal : GridSegment :=
+    ⟨firstEntrance, firstLast⟩
+  let secondFinal : GridSegment :=
+    ⟨secondEntrance, secondLast⟩
+  have firstDropNonempty : first.dropLast ≠ [] := by
+    intro empty
+    rw [empty] at firstEntranceEq
+    simp at firstEntranceEq
+  have secondDropNonempty : second.dropLast ≠ [] := by
+    intro empty
+    rw [empty] at secondEntranceEq
+    simp at secondEntranceEq
+  have firstDecomposition :
+      first.dropLast ++ [firstLast] = first :=
+    List.dropLast_append_getLast? firstLast firstLastEq
+  have secondDecomposition :
+      second.dropLast ++ [secondLast] = second :=
+    List.dropLast_append_getLast? secondLast secondLastEq
+  have firstEntranceLastD :
+      first.dropLast.getLastD (0, 0) = firstEntrance := by
+    rw [List.getLastD_eq_getLast?, firstEntranceEq]
+    simp
+  have secondEntranceLastD :
+      second.dropLast.getLastD (0, 0) = secondEntrance := by
+    rw [List.getLastD_eq_getLast?, secondEntranceEq]
+    simp
+  have firstFinalMember :
+      firstFinal ∈ gridPolylineSegments first := by
+    rw [← firstDecomposition,
+      gridPolylineSegments_append_singleton_of_ne_nil
+        first.dropLast (0, 0) firstLast firstDropNonempty,
+      List.mem_append]
+    apply Or.inr
+    simp only [List.mem_singleton]
+    simpa [firstFinal] using firstEntranceLastD.symm
+  have secondFinalMember :
+      secondFinal ∈ gridPolylineSegments second := by
+    rw [← secondDecomposition,
+      gridPolylineSegments_append_singleton_of_ne_nil
+        second.dropLast (0, 0) secondLast secondDropNonempty,
+      List.mem_append]
+    apply Or.inr
+    simp only [List.mem_singleton]
+    simpa [secondFinal] using secondEntranceLastD.symm
+  have firstEntranceMember :
+      firstEntrance ∈ first.dropLast :=
+    List.mem_of_getLast? firstEntranceEq
+  have secondEntranceMember :
+      secondEntrance ∈ second.dropLast :=
+    List.mem_of_getLast? secondEntranceEq
+  have firstPrefixNodup : first.dropLast.Nodup := by
+    have appended :
+        (first.dropLast ++ [firstLast]).Nodup := by
+      rw [firstDecomposition]
+      exact firstNodup
+    exact appended.of_append_left
+  have secondPrefixNodup : second.dropLast.Nodup := by
+    have appended :
+        (second.dropLast ++ [secondLast]).Nodup := by
+      rw [secondDecomposition]
+      exact secondNodup
+    exact appended.of_append_left
+  have firstFinalEndpoints :=
+    gridPolylineSegments_endpoints_mem firstFinalMember
+  have secondFinalEndpoints :=
+    gridPolylineSegments_endpoints_mem secondFinalMember
+  have contactsAtEndpoints :
+      ∀ {firstPoint secondPoint : Cell},
+        firstPoint ∈ first →
+        secondPoint ∈ second →
+        firstPoint = secondPoint →
+          RoutePointIsEndpoint first firstPoint ∧
+            RoutePointIsEndpoint second secondPoint := by
+    intro firstPoint secondPoint firstMember secondMember equal
+    rcases List.mem_iff_get.mp firstMember with
+      ⟨firstIndex, firstIndexed⟩
+    rcases List.mem_iff_get.mp secondMember with
+      ⟨secondIndex, secondIndexed⟩
+    have indexedEqual :
+        first.get firstIndex = second.get secondIndex := by
+      rw [firstIndexed, secondIndexed]
+      exact equal
+    have endpoints :=
+      avoid.2.2.2 firstIndex secondIndex indexedEqual
+    rw [firstIndexed, secondIndexed] at endpoints
+    exact endpoints
+  have finalRoutesStrict :
+      RoutesStrictlyAvoidEachOther
+        [firstEntrance, firstLast]
+        [secondEntrance, secondLast] := by
+    unfold RoutesStrictlyAvoidEachOther
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · intro firstSegment firstSegmentMember
+        secondSegment secondSegmentMember
+      have firstSegmentEq : firstSegment = firstFinal := by
+        simpa [gridPolylineSegments, firstFinal] using
+          firstSegmentMember
+      have secondSegmentEq : secondSegment = secondFinal := by
+        simpa [gridPolylineSegments, secondFinal] using
+          secondSegmentMember
+      subst firstSegment
+      subst secondSegment
+      exact avoid.segmentsAvoid_of_mem
+        firstFinal firstFinalMember secondFinal secondFinalMember
+    · intro firstPoint firstPointMember
+        secondSegment secondSegmentMember
+      have firstPointOriginal : firstPoint ∈ first := by
+        simp at firstPointMember
+        rcases firstPointMember with rfl | rfl
+        · exact List.mem_of_mem_dropLast firstEntranceMember
+        · exact firstFinalEndpoints.2
+      have secondSegmentEq : secondSegment = secondFinal := by
+        simpa [gridPolylineSegments, secondFinal] using
+          secondSegmentMember
+      subst secondSegment
+      exact avoid.firstPointsAvoid_of_mem
+        firstPoint firstPointOriginal secondFinal secondFinalMember
+    · intro secondPoint secondPointMember
+        firstSegment firstSegmentMember
+      have secondPointOriginal : secondPoint ∈ second := by
+        simp at secondPointMember
+        rcases secondPointMember with rfl | rfl
+        · exact List.mem_of_mem_dropLast secondEntranceMember
+        · exact secondFinalEndpoints.2
+      have firstSegmentEq : firstSegment = firstFinal := by
+        simpa [gridPolylineSegments, firstFinal] using
+          firstSegmentMember
+      subst firstSegment
+      exact avoid.secondPointsAvoid_of_mem
+        secondPoint secondPointOriginal firstFinal firstFinalMember
+    · intro firstPoint firstPointMember
+        secondPoint secondPointMember equal
+      simp at firstPointMember secondPointMember
+      rcases firstPointMember with
+        firstPointEq | firstPointEq
+      · rcases secondPointMember with
+          secondPointEq | secondPointEq
+        · have contact :
+              firstEntrance = secondEntrance := by
+            calc
+              firstEntrance = firstPoint := firstPointEq.symm
+              _ = secondPoint := equal
+              _ = secondEntrance := secondPointEq
+          have endpoints :=
+            contactsAtEndpoints
+              (List.mem_of_mem_dropLast firstEntranceMember)
+              (List.mem_of_mem_dropLast secondEntranceMember)
+              contact
+          have firstHead :
+              first.head? = some firstEntrance :=
+            route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+              firstNodup firstEntranceMember endpoints.1
+          have secondHead :
+              second.head? = some secondEntrance :=
+            route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+              secondNodup secondEntranceMember endpoints.2
+          have firstPrefixHead :
+              first.dropLast.head? = some firstEntrance :=
+            (dropLast_head?_eq_head?_of_ne_nil
+              (route := first)
+              (List.ne_nil_of_mem firstEntranceMember)).trans firstHead
+          have secondPrefixHead :
+              second.dropLast.head? = some secondEntrance :=
+            (dropLast_head?_eq_head?_of_ne_nil
+              (route := second)
+              (List.ne_nil_of_mem secondEntranceMember)).trans secondHead
+          apply notBothSingleton
+          exact
+            ⟨list_length_eq_one_of_nodup_of_head_last_eq
+                firstPrefixNodup firstPrefixHead firstEntranceEq,
+              list_length_eq_one_of_nodup_of_head_last_eq
+                secondPrefixNodup secondPrefixHead secondEntranceEq⟩
+        · have contact :
+              firstEntrance = secondLast := by
+            calc
+              firstEntrance = firstPoint := firstPointEq.symm
+              _ = secondPoint := equal
+              _ = secondLast := secondPointEq
+          have endpoints :=
+            contactsAtEndpoints
+              (List.mem_of_mem_dropLast firstEntranceMember)
+              secondFinalEndpoints.2 contact
+          have firstHead :
+              first.head? = some firstEntrance :=
+            route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+              firstNodup firstEntranceMember endpoints.1
+          exact headLastNe
+            (firstHead.trans
+              ((congrArg some contact).trans secondLastEq.symm))
+      · rcases secondPointMember with
+          secondPointEq | secondPointEq
+        · have contact :
+              firstLast = secondEntrance := by
+            calc
+              firstLast = firstPoint := firstPointEq.symm
+              _ = secondPoint := equal
+              _ = secondEntrance := secondPointEq
+          have endpoints :=
+            contactsAtEndpoints firstFinalEndpoints.2
+              (List.mem_of_mem_dropLast secondEntranceMember)
+              contact
+          have secondHead :
+              second.head? = some secondEntrance :=
+            route_head?_eq_some_of_mem_dropLast_of_nodup_of_endpoint
+              secondNodup secondEntranceMember endpoints.2
+          exact lastHeadNe
+            (firstLastEq.trans
+              ((congrArg some contact).trans secondHead.symm))
+        · have contact :
+              firstLast = secondLast := by
+            calc
+              firstLast = firstPoint := firstPointEq.symm
+              _ = secondPoint := equal
+              _ = secondLast := secondPointEq
+          exact lastLastNe
+            (firstLastEq.trans
+              ((congrArg some contact).trans secondLastEq.symm))
+  have separated :=
+    finalSegment_coordinateRectanglesSeparated_of_strictlyAvoid
+      (first := [firstEntrance, firstLast])
+      (second := [secondEntrance, secondLast])
+      (by simp) (by simp)
+      (by
+        simpa [polylineLastEntrance, polylineFirstExit,
+          firstFinal] using firstAligned)
+      (by
+        simpa [polylineLastEntrance, polylineFirstExit,
+          secondFinal] using secondAligned)
+      finalRoutesStrict
+  simpa [polylineLastEntrance, polylineFirstExit,
+    firstFinal, secondFinal, List.getLastD_eq_getLast?] using separated
+
 /-- For two different final retained routes with four distinct advertised
 endpoint pairs, axis-aligned last segments have separated integral endpoint
 rectangles. -/
