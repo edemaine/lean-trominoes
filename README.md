@@ -2258,7 +2258,16 @@ The representation choices for this target are:
   polylines are orthogonal, avoid each other, and meet only at their common
   clause head.  Because retained rasterization is the identity on these
   orthogonal carrier routes, the same certificate now holds for the actual
-  rasterized boundary routes.
+  rasterized boundary routes.  The theorem also carries both directed
+  boundary-splice/Figure-7-suffix separation facts through rasterization.
+- [`LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean)
+  joins the exceptional rasterized boundary pair to their unchanged Figure 7
+  suffixes.  The generic endpoint-join theorem combines head-only prefix
+  contact, both directed cross-suffix bounds, and suffix/suffix separation
+  into a completed occurrence-route certificate.  A separate public lookup
+  theorem identifies each genuine established route-family entry with its
+  explicit spliced occurrence route, keeping that definitional normalization
+  independent of the geometric certificate.
 - [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
   applies simultaneous tail-replacement separation to two classified
   retained splices.  Positive scaling preserves strict source-prefix
