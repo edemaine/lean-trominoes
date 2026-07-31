@@ -1929,6 +1929,12 @@ The representation choices for this target are:
   the direct component families use this layer through coordinated,
   clause-level escape certificates rather than treating the default escape
   as a planarity theorem.
+- [`LeanTrominoes/RetainedAngularFanOuterCoordinatedPrefixes.lean`](LeanTrominoes/RetainedAngularFanOuterCoordinatedPrefixes.lean)
+  isolates the only clause-specific part of those escape certificates.
+  A finite relative route selects the first two primitive blocks jointly at
+  a shared clause gate; a generic construction translates it, appends the
+  remaining 62 canonical blocks, and packages the result as the exact
+  64-block source escape required by the complete outer-fan route.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
