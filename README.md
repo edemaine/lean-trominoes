@@ -2213,6 +2213,13 @@ The representation choices for this target are:
   the occurrence lane, avoiding an immediate shared-clause tangency, while
   retaining the ordinary splice's exact clause endpoint, Figure 7 boundary
   endpoint, and orthogonality contract.
+- [`LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean)
+  packages the asymmetric same-clause tail replacement used by a singleton
+  failed-choice route against an ordinary non-singleton fallback.  The
+  escaped fan may meet the other retained source prefix only at their common
+  clause head; strict separation of the other three new piece pairs then
+  yields endpoint-only avoidance and common-head-only contact for both
+  complete pre-rasterized splices.
 - [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
   applies simultaneous tail-replacement separation to two classified
   retained splices.  Positive scaling preserves strict source-prefix
