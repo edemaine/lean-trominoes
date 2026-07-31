@@ -2055,6 +2055,12 @@ The representation choices for this target are:
   at exactly the same fan-boundary point.  The resulting substituted route
   therefore retains the canonical clause and copied-literal endpoints and
   remains orthogonal.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceSpokeIdentification.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceSpokeIdentification.lean)
+  identifies the selected occurrence slot with its exact angular-order
+  index and proves that a successful final choice's positioned certified
+  spoke is literally the unchanged scaled Figure 7 suffix.  The proof uses
+  their common validated boundary point and the fact that both routes are
+  translations of the same nonempty local spoke.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutePairs.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutePairs.lean)
   assembles the same-clause prefix certificate through the two validated
   Figure 7 endpoint joins.  Separation of the actual coordinated occurrence
