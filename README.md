@@ -2571,6 +2571,11 @@ The representation choices for this target are:
   identified with the corresponding route of the certified local fan.
   Periodically translated variants correctly lift the boundary and suffix to
   the neighboring occurrence named by a literal's anchor-relative offset.
+- [`LeanTrominoes/OccurrenceSplitAngularFanSpokeSeparation.lean`](LeanTrominoes/OccurrenceSplitAngularFanSpokeSeparation.lean)
+  certifies that distinct valid slots select contact-free Figure 7 spokes at
+  a common positioned occurrence origin.  Every spoke is also enclosed in
+  its translated `24 × 24` macrocell, so strictly separated occurrence
+  rectangles give contact-free spokes without any condition on their slots.
 - [`LeanTrominoes/OrthogonalPolylineJoin.lean`](LeanTrominoes/OrthogonalPolylineJoin.lean)
   joins independently certified route pieces at a shared endpoint while
   removing its duplicate list entry.  The joined route is proved to preserve
