@@ -24,7 +24,7 @@ open PeriodicEightOccurrenceSplitPositioned
 open PeriodicThreeSATThree
 
 /-- The final retained source before source-clearance scaling. -/
-private def finalCoordinatedSource
+def finalCoordinatedSource
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     PositionedPeriodicCNF
@@ -33,7 +33,7 @@ private def finalCoordinatedSource
     formula
 
 /-- The final retained source placement before source-clearance scaling. -/
-private def finalCoordinatedPlacement
+def finalCoordinatedPlacement
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     PeriodicVariablePlacement
@@ -41,7 +41,7 @@ private def finalCoordinatedPlacement
   retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
 
 /-- The final retained source route family before source-clearance scaling. -/
-private def finalCoordinatedSourceRoutes
+def finalCoordinatedSourceRoutes
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     PositionedPeriodicCNF.IncidenceRoutes :=

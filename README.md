@@ -2039,6 +2039,12 @@ The representation choices for this target are:
   at exactly the same fan-boundary point.  The resulting substituted route
   therefore retains the canonical clause and copied-literal endpoints and
   remains orthogonal.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutePairs.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutePairs.lean)
+  assembles the same-clause prefix certificate through the two validated
+  Figure 7 endpoint joins.  Separation of the actual coordinated occurrence
+  routes is reduced to exactly three strict suffix-involving interactions:
+  the two directed prefix--spoke pairs and the spoke--spoke pair; the only
+  possible remaining contact is their inherited common clause head.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their
