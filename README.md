@@ -2358,6 +2358,13 @@ The representation choices for this target are:
   certificates, automatically.  The finite source-polyline rectangle
   certificate then proves the directed scaled source-prefix versus complete
   outer-fan separation theorem without leaving a separate corridor premise.
+- [`LeanTrominoes/RetainedAngularFanSourceSpliceBounds.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceBounds.lean)
+  bounds every ordinary or escaped source/fan splice inside the radius-288
+  expansion of any rectangle containing its raw source route, and bounds
+  every factor-eight Figure 7 occurrence suffix inside radius 96 of its
+  refined canonical source center.  These reusable estimates reduce the two
+  cross-splice/suffix obligations for a completed fallback route pair to
+  separation of their original source-route rectangles.
 - [`LeanTrominoes/PolylineBoundingBoxRasterSeparation.lean`](LeanTrominoes/PolylineBoundingBoxRasterSeparation.lean)
   converts containment in two separated closed rectangles into the complete
   point/segment and segment/segment certificate required by factor-288
