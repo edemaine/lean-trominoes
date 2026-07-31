@@ -76,6 +76,63 @@ theorem
             center terminal slot
         simp [empty] at head)).symm
 
+/-- The independently rasterized escaped route is the coordinated
+construction specialized to its canonical one-route escape certificate. -/
+theorem
+    retainedTerminalFanOuterEscapedCompleteRoute_eq_coordinatedRasterized
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot) :
+    retainedTerminalFanOuterEscapedCompleteRoute center terminal slot =
+      retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+        center terminal slot
+        (retainedTerminalFanOuterRasterizedSourceEscapeCertificate
+          center terminal slot) := by
+  rfl
+
+/-- To separate a default escaped complete route from a fixed route, it is
+enough to check common-head-only avoidance for its first 64-block escape and
+strict separation for everything after the escape checkpoint. -/
+theorem
+    retainedTerminalFanOuterEscapedCompleteRoute_separated_from_of_escape_head_contact
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (other : List Cell)
+    (escapeAvoid :
+      RoutesAvoidEachOther
+        (retainedTerminalFanOuterRasterizedSourceEscapeCertificate
+          center terminal slot).route
+        other)
+    (escapeContactsAtHeads :
+      RoutesMeetOnlyAtHeads
+        (retainedTerminalFanOuterRasterizedSourceEscapeCertificate
+          center terminal slot).route
+        other)
+    (tailAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteTail
+          center terminal slot)
+        other) :
+    RoutesAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          center terminal slot)
+        other ∧
+      RoutesMeetOnlyAtHeads
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          center terminal slot)
+        other := by
+  rw [
+    retainedTerminalFanOuterEscapedCompleteRoute_eq_coordinatedRasterized,
+    retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_eq_escape_join_tail]
+  exact
+    escapeAvoid.join_left_of_head_contact
+      escapeContactsAtHeads tailAvoid
+      (retainedTerminalFanOuterRasterizedSourceEscapeCertificate
+        center terminal slot).last_eq
+      (retainedTerminalFanOuterCoordinatedEscapedCompleteTail_head?
+        center terminal slot)
+
 /-- Four pairwise piece certificates assemble two coordinated complete
 routes while preserving their common-head-only contact discipline. -/
 theorem

@@ -728,6 +728,70 @@ theorem RoutesMeetOnlyAtHeads.singleton_right
     RoutesMeetOnlyAtHeads first [point] :=
   (contacts.symm.singleton_left pointMember).symm
 
+/-- Joining a contact-free tail onto the first route preserves avoidance
+and any listed contact inherited from the first piece remains at the common
+outer head. -/
+theorem RoutesAvoidEachOther.join_left_of_head_contact
+    {first extra second : List Cell} {boundary : Cell}
+    (firstAvoid : RoutesAvoidEachOther first second)
+    (firstContactsAtHeads : RoutesMeetOnlyAtHeads first second)
+    (extraAvoid : RoutesStrictlyAvoidEachOther extra second)
+    (firstLast : first.getLast? = some boundary)
+    (extraHead : extra.head? = some boundary) :
+    RoutesAvoidEachOther (joinAtEndpoint first extra) second ∧
+      RoutesMeetOnlyAtHeads (joinAtEndpoint first extra) second := by
+  have joinedSegments :
+      gridPolylineSegments (joinAtEndpoint first extra) =
+        gridPolylineSegments first ++ gridPolylineSegments extra :=
+    gridPolylineSegments_joinAtEndpoint firstLast extraHead
+  have joinedAvoid :
+      RoutesAvoidEachOther (joinAtEndpoint first extra) second := by
+    apply routesAvoidEachOther_of_mem
+    · intro joinedSegment joinedMember secondSegment secondMember
+      rw [joinedSegments, List.mem_append] at joinedMember
+      rcases joinedMember with firstMember | extraMember
+      · exact firstAvoid.segmentsAvoid_of_mem
+          joinedSegment firstMember secondSegment secondMember
+      · exact extraAvoid.1
+          joinedSegment extraMember secondSegment secondMember
+    · intro joinedPoint joinedMember secondSegment secondMember
+      rcases mem_joinAtEndpoint joinedMember with
+        firstMember | extraMember
+      · exact firstAvoid.firstPointsAvoid_of_mem
+          joinedPoint firstMember secondSegment secondMember
+      · exact extraAvoid.2.1
+          joinedPoint extraMember secondSegment secondMember
+    · intro secondPoint secondMember joinedSegment joinedMember
+      rw [joinedSegments, List.mem_append] at joinedMember
+      rcases joinedMember with firstMember | extraMember
+      · exact firstAvoid.secondPointsAvoid_of_mem
+          secondPoint secondMember joinedSegment firstMember
+      · exact extraAvoid.2.2.1
+          secondPoint secondMember joinedSegment extraMember
+    · intro joinedPoint joinedMember secondPoint secondMember equal
+      rcases mem_joinAtEndpoint joinedMember with
+        firstMember | extraMember
+      · have heads :=
+          firstContactsAtHeads
+            joinedPoint firstMember secondPoint secondMember equal
+        exact
+          ⟨Or.inl (joinAtEndpoint_head? heads.1),
+            Or.inl heads.2⟩
+      · exact
+          (extraAvoid.2.2.2
+            joinedPoint extraMember secondPoint secondMember equal).elim
+  refine ⟨joinedAvoid, ?_⟩
+  intro joinedPoint joinedMember secondPoint secondMember equal
+  rcases mem_joinAtEndpoint joinedMember with
+    firstMember | extraMember
+  · have heads :=
+      firstContactsAtHeads
+        joinedPoint firstMember secondPoint secondMember equal
+    exact ⟨joinAtEndpoint_head? heads.1, heads.2⟩
+  · exact
+      (extraAvoid.2.2.2
+        joinedPoint extraMember secondPoint secondMember equal).elim
+
 /-- Restricting the second route to one of its listed points preserves
 ordinary route separation. -/
 theorem RoutesAvoidEachOther.singleton_right
