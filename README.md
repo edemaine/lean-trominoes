@@ -1996,6 +1996,15 @@ The representation choices for this target are:
   both continuous avoidance and common-head-only contact.  This is the
   physical-coordinate interface used when the specialized final router
   substitutes coordinated routes for ordinary same-clause fans.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceRouteChoice.lean`](LeanTrominoes/RetainedAngularFanDirectSourceRouteChoice.lean)
+  makes that substitution interface total and metadata-driven.  It checks
+  unbounded local clause and literal indices against the finite crossover,
+  duplicator-arm, and routed-clause atlases, records the component's physical
+  origin, and returns `none` for malformed or non-direct sources.  Genuine
+  retained direct metadata is proved to select an entry whose direction
+  exactly matches its positioned local incidence; every successful choice
+  also exposes exact translated endpoints and an orthogonality certificate
+  for its complete coordinated route.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
