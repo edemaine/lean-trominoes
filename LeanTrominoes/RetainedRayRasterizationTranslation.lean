@@ -38,6 +38,23 @@ namespace PeriodicEightOccurrenceSplit
 open OccurrenceSplitRing
 open PlanarThreeSAT
 
+/-- A common translation leaves a route's backwards terminal vector
+unchanged. -/
+theorem routeTerminalVector_translatePolyline
+    (offset : Cell) (route : List Cell) :
+    PeriodicThreeSATThree.routeTerminalVector
+        (translatePolyline offset route) =
+      PeriodicThreeSATThree.routeTerminalVector route := by
+  unfold translatePolyline PeriodicThreeSATThree.routeTerminalVector
+  rw [
+    EmbeddedCNFIncidenceDrawing.gridPolylineSegments_map_add,
+    List.getLast?_map]
+  cases (gridPolylineSegments route).getLast? with
+  | none => rfl
+  | some segment =>
+      apply Prod.ext <;>
+        simp [GridSegment.translate, Cell.add, Cell.sub]
+
 /-- A translated diagonal staircase is the same staircase based at the
 translated start. -/
 theorem diagonalStaircase_translatePolyline

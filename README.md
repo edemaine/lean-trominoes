@@ -1952,6 +1952,12 @@ The representation choices for this target are:
   entry per literal and that every selected entry has the route's exact
   classified terminal direction; routed clauses select the same certificate
   by their physical left, middle, or right arm.
+- [`LeanTrominoes/RetainedAngularFanDirectSourcePrefixSelections.lean`](LeanTrominoes/RetainedAngularFanDirectSourcePrefixSelections.lean)
+  turns retained planar-SAT clause metadata and a genuine literal index into
+  a typed atlas selection.  Crossover and routed-variable selections recover
+  their bounded local clause indices, while a routed source clause selects by
+  physical arm even for a reordered subset of its three ports; every case
+  carries equality with the positioned local route's classified direction.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,

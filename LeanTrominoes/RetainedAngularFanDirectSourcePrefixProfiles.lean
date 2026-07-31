@@ -2,6 +2,9 @@ import LeanTrominoes.RetainedAngularFanDirectSourcePrefixAtlas
 import LeanTrominoes.PlanarThreeSATTerminalPortCertificates
 import LeanTrominoes.PlanarThreeSATDuplicatorArmIncidenceDrawing
 import LeanTrominoes.PlanarThreeSATRoutedClauseIncidenceDrawing
+import LeanTrominoes.PeriodicOrthocrossingCrossoverIncidenceDrawing
+import LeanTrominoes.PeriodicOrthocrossingRoutedClauseIncidenceDrawing
+import LeanTrominoes.PeriodicOrthocrossingRoutedVariableIncidenceDrawing
 
 /-!
 # Matching the direct source atlas to local incidence profiles
@@ -18,6 +21,7 @@ namespace PeriodicEightOccurrenceSplit
 
 open PlanarThreeSAT
 open PeriodicThreeSATThree
+open PeriodicOrthocrossing
 
 /-- The fixed crossover clause selected by an atlas-local clause index. -/
 def retainedDirectCrossoverClauseAt
@@ -68,6 +72,37 @@ theorem retainedDirectCrossoverPrefixChoice_direction :
             clauseIndex.val literalIndex.val)) := by
   native_decide
 
+/-- Translation and logical renaming do not change the crossover atlas
+direction selected at an actual crossing macrocell. -/
+theorem retainedDirectCrossoverPrefixChoice_positionedDirection
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (crossing : CrossingRecord)
+    (clauseIndex : Fin 26)
+    (literalIndex :
+      Fin (retainedDirectSourcePrefixChoices
+        (.crossover clauseIndex)).length) :
+    (retainedDirectSourcePrefixChoiceAt
+      (.crossover clauseIndex) literalIndex).direction =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((drawingPlanarSATCrossoverIncidenceDrawing
+            formula crossing).routes
+              clauseIndex.val literalIndex.val)) := by
+  rw [retainedDirectCrossoverPrefixChoice_direction]
+  change
+    classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          (crossoverStraightIncidenceDrawing.routes
+            clauseIndex.val literalIndex.val)) =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          (translatePolyline
+            (crossingMacroOrigin crossing)
+            (crossoverStraightIncidenceDrawing.routes
+              clauseIndex.val literalIndex.val)))
+  rw [routeTerminalVector_translatePolyline]
+
 /-- Every duplicator-arm atlas profile has one entry for each literal of the
 corresponding implication clause. -/
 theorem retainedDirectDuplicatorPrefixChoices_length :
@@ -92,6 +127,39 @@ theorem retainedDirectDuplicatorPrefixChoice_direction :
           ((duplicatorArmStraightIncidenceDrawing arm).routes
             clauseIndex.val literalIndex.val)) := by
   native_decide
+
+/-- Translation and endpoint renaming do not change the duplicator-arm atlas
+direction selected at an actual routed-variable macrocell. -/
+theorem retainedDirectDuplicatorPrefixChoice_positionedDirection
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : VariableRouteSite Variable)
+    (arm : DuplicatorArm)
+    (link : EqualityLink (PlanarSATNode Variable))
+    (clauseIndex : Fin 2)
+    (literalIndex :
+      Fin (retainedDirectSourcePrefixChoices
+        (.duplicator arm clauseIndex)).length) :
+    (retainedDirectSourcePrefixChoiceAt
+      (.duplicator arm clauseIndex) literalIndex).direction =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((drawingPlanarSATRoutedVariableIncidenceDrawing
+            formula site arm link).routes
+              clauseIndex.val literalIndex.val)) := by
+  rw [retainedDirectDuplicatorPrefixChoice_direction]
+  change
+    classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((duplicatorArmStraightIncidenceDrawing arm).routes
+            clauseIndex.val literalIndex.val)) =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          (translatePolyline
+            (routedVariableOrigin formula site)
+            ((duplicatorArmStraightIncidenceDrawing arm).routes
+              clauseIndex.val literalIndex.val)))
+  rw [routeTerminalVector_translatePolyline]
 
 /-- The full routed-clause atlas contains its three possible physical arms. -/
 theorem retainedDirectRoutedClausePrefixChoices_length :
@@ -133,6 +201,66 @@ theorem retainedDirectRoutedClauseArmChoice_direction
       (retainedDirectRoutedClauseArmIndex arm)).direction =
         .routedClause arm := by
   cases arm <;> native_decide
+
+/-- The route at any valid presentation index in a routed source clause has
+the exceptional retained direction named by that literal's physical arm. -/
+theorem routedClausePortStraightIncidenceDrawing_direction
+    (literals : List (DuplicatorArm × Bool))
+    (literalIndex : Fin literals.length) :
+    classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((routedClausePortStraightIncidenceDrawing
+            literals).routes 0 literalIndex.val)) =
+      .routedClause (literals.get literalIndex).1 := by
+  generalize armEq :
+    (literals.get literalIndex).1 = arm
+  cases arm <;>
+    simp_all [routedClausePortStraightIncidenceDrawing,
+      routedClausePortFormula, straightIncidenceDrawing,
+      straightIncidenceRoutes, straightIncidenceRoute,
+      routeTerminalVector, gridPolylineSegments,
+      classifiedRetainedTerminalDirection,
+      retainedTerminalDirectionClassify,
+      DuplicatorArm.portPosition,
+      Cell.sub] <;>
+    native_decide
+
+/-- A genuine routed source-clause literal selects the atlas entry indexed
+by its physical arm, independently of the clause's literal presentation
+order. -/
+theorem retainedDirectRoutedClauseArmChoice_positionedDirection
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : ClauseRouteSite)
+    (literalIndex :
+      Fin (routedClausePortLiterals formula site).length) :
+    (retainedDirectSourcePrefixChoiceAt
+      .routedClause
+      (retainedDirectRoutedClauseArmIndex
+        ((routedClausePortLiterals formula site).get
+          literalIndex).1)).direction =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((drawingPlanarSATRoutedClauseIncidenceDrawing
+            formula site).routes 0 literalIndex.val)) := by
+  rw [retainedDirectRoutedClauseArmChoice_direction]
+  rw [←
+    routedClausePortStraightIncidenceDrawing_direction
+      (routedClausePortLiterals formula site) literalIndex]
+  change
+    classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((routedClausePortStraightIncidenceDrawing
+            (routedClausePortLiterals formula site)).routes
+              0 literalIndex.val)) =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          (translatePolyline
+            (routedClauseOrigin formula site)
+            ((routedClausePortStraightIncidenceDrawing
+              (routedClausePortLiterals formula site)).routes
+                0 literalIndex.val)))
+  rw [routeTerminalVector_translatePolyline]
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
