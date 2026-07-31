@@ -2045,6 +2045,12 @@ The representation choices for this target are:
   routes is reduced to exactly three strict suffix-involving interactions:
   the two directed prefix--spoke pairs and the spoke--spoke pair; the only
   possible remaining contact is their inherited common clause head.
+- [`LeanTrominoes/RetainedAngularFanFinalOccurrenceSuffixSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalOccurrenceSuffixSeparation.lean)
+  proves that different literal entries of one final retained clause have
+  different canonical source occurrence centers, using the canonical gauge,
+  valid-variable position injectivity, and incidence-key distinctness.
+  Their factor-36 Figure 7 macrocells, and hence their scaled spoke suffixes,
+  are therefore strictly separated.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their
