@@ -960,6 +960,67 @@ theorem RoutesAvoidEachOther.join_tails_of_prefixes
           (replacementsAvoid.2.2.2
             _ firstReplacementMember _ secondReplacementMember equal).elim
 
+/-- The same contact-free tail assembly preserves the stronger fact that
+the two completed routes can meet only at their inherited prefix heads. -/
+theorem RoutesAvoidEachOther.join_tails_of_prefixes_meet_only_at_heads
+    {first second firstReplacement secondReplacement : List Cell}
+    {firstMiddle secondMiddle : Cell}
+    (prefixesAvoid : RoutesAvoidEachOther first second)
+    (prefixContactsAtHeads :
+      RoutesMeetOnlyAtHeads first second)
+    (firstPrefixAvoidSecondReplacement :
+      RoutesStrictlyAvoidEachOther
+        first secondReplacement)
+    (firstReplacementAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement second)
+    (replacementsAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement secondReplacement)
+    (firstEntrance :
+      first.getLast? = some firstMiddle)
+    (firstReplacementHead :
+      firstReplacement.head? = some firstMiddle)
+    (secondEntrance :
+      second.getLast? = some secondMiddle)
+    (secondReplacementHead :
+      secondReplacement.head? = some secondMiddle) :
+    RoutesAvoidEachOther
+        (joinAtEndpoint first firstReplacement)
+        (joinAtEndpoint second secondReplacement) ∧
+      RoutesMeetOnlyAtHeads
+        (joinAtEndpoint first firstReplacement)
+        (joinAtEndpoint second secondReplacement) := by
+  refine
+    ⟨prefixesAvoid.join_tails_of_prefixes
+      prefixContactsAtHeads
+      firstPrefixAvoidSecondReplacement
+      firstReplacementAvoidSecondPrefix replacementsAvoid
+      firstEntrance firstReplacementHead
+      secondEntrance secondReplacementHead, ?_⟩
+  intro firstPoint firstMember secondPoint secondMember equal
+  rcases mem_joinAtEndpoint firstMember with
+      firstPrefixMember | firstReplacementMember
+  · rcases mem_joinAtEndpoint secondMember with
+      secondPrefixMember | secondReplacementMember
+    · have heads :=
+        prefixContactsAtHeads
+          _ firstPrefixMember _ secondPrefixMember equal
+      exact
+        ⟨joinAtEndpoint_head? heads.1,
+          joinAtEndpoint_head? heads.2⟩
+    · exact
+        (firstPrefixAvoidSecondReplacement.2.2.2
+          _ firstPrefixMember _ secondReplacementMember equal).elim
+  · rcases mem_joinAtEndpoint secondMember with
+      secondPrefixMember | secondReplacementMember
+    · exact
+        (firstReplacementAvoidSecondPrefix.2.2.2
+          _ firstReplacementMember _ secondPrefixMember equal).elim
+    · exact
+        (replacementsAvoid.2.2.2
+          _ firstReplacementMember _ secondReplacementMember equal).elim
+
 /-- Join two replacement tails when both the prefix pair and replacement
 pair may share their heads.  If each replacement head is also its prefix's
 outer head, either inherited head contact remains an advertised endpoint of

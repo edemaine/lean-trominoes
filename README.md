@@ -1935,6 +1935,12 @@ The representation choices for this target are:
   a shared clause gate; a generic construction translates it, appends the
   remaining 62 canonical blocks, and packages the result as the exact
   64-block source escape required by the complete outer-fan route.
+- [`LeanTrominoes/RetainedAngularFanOuterCoordinatedSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterCoordinatedSeparation.lean)
+  factors everything after that escape into one complete tail: the occurrence
+  lane shift, remaining radial raster, and local fan adapter.  A generic
+  assembly theorem reduces complete-route separation to the escape pair, two
+  directed escape--tail pairs, and the tail pair, while preserving the fact
+  that the common clause head is the only permitted contact.
 - [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
   proves that both retained-ray raster families and endpoint joins commute
   with translation.  It also transports ordinary continuous avoidance and
@@ -1963,7 +1969,10 @@ The representation choices for this target are:
   head-only-contact certificate to any shared clause gate.  It also packages
   those entries as the exact 64-block source-escape certificates for the two
   actual centers, lengths, and occurrence slots once their demand gates are
-  identified with that common clause gate.
+  identified with that common clause gate.  The pair interface feeds those
+  certificates directly into the complete-route assembly, reducing the
+  remaining same-clause geometry to the two escape--tail directions and
+  tail--tail strict separation.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,

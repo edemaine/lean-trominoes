@@ -1,4 +1,5 @@
 import LeanTrominoes.RetainedAngularFanDirectSourcePrefixProfiles
+import LeanTrominoes.RetainedAngularFanOuterCoordinatedSeparation
 import LeanTrominoes.PeriodicOrthocrossingPlanarSATLocalIncidenceDrawings
 import LeanTrominoes.PeriodicCNFPlanarRetainedSATClauseIndex
 
@@ -183,6 +184,124 @@ theorem
         secondSlot).gate
       selection.kind selection.firstIndex selection.secondIndex
       selection.indicesDifferent
+
+/-- Once the three contact-free pairs involving complete tails are supplied,
+the selected atlas escapes assemble into separated complete outer routes
+whose common clause gate is their only possible contact. -/
+theorem
+    RetainedDirectSourcePrefixPairSelection.coordinatedCompleteRoutes_separated
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {source : DrawingPlanarSATClauseSource Variable}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (selection :
+      RetainedDirectSourcePrefixPairSelection
+        formula source firstLiteralIndex secondLiteralIndex)
+    (firstCenter secondCenter : Cell)
+    (firstLength secondLength : Nat)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (gatesEqual :
+      (retainedAngularFanOuterDemand
+        firstCenter
+        ((retainedDirectSourcePrefixChoiceAt
+          selection.kind selection.firstIndex).direction,
+          firstLength)
+        firstSlot).gate =
+      (retainedAngularFanOuterDemand
+        secondCenter
+        ((retainedDirectSourcePrefixChoiceAt
+          selection.kind selection.secondIndex).direction,
+          secondLength)
+        secondSlot).gate)
+    (firstEscapeAvoidSecondTail :
+      RoutesStrictlyAvoidEachOther
+        (selection.firstEscapeCertificate
+          firstCenter firstLength firstSlot).route
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteTail
+          secondCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.secondIndex).direction,
+            secondLength)
+          secondSlot))
+    (firstTailAvoidSecondEscape :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteTail
+          firstCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.firstIndex).direction,
+            firstLength)
+          firstSlot)
+        (selection.secondEscapeCertificate
+          secondCenter secondLength secondSlot).route)
+    (tailsAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteTail
+          firstCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.firstIndex).direction,
+            firstLength)
+          firstSlot)
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteTail
+          secondCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.secondIndex).direction,
+            secondLength)
+          secondSlot)) :
+    RoutesAvoidEachOther
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+          firstCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.firstIndex).direction,
+            firstLength)
+          firstSlot
+          (selection.firstEscapeCertificate
+            firstCenter firstLength firstSlot))
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+          secondCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.secondIndex).direction,
+            secondLength)
+          secondSlot
+          (selection.secondEscapeCertificate
+            secondCenter secondLength secondSlot)) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+          firstCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.firstIndex).direction,
+            firstLength)
+          firstSlot
+          (selection.firstEscapeCertificate
+            firstCenter firstLength firstSlot))
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+          secondCenter
+          ((retainedDirectSourcePrefixChoiceAt
+            selection.kind selection.secondIndex).direction,
+            secondLength)
+          secondSlot
+          (selection.secondEscapeCertificate
+            secondCenter secondLength secondSlot)) := by
+  have escapesSeparated :=
+    selection.escapeCertificates_separated
+      firstCenter secondCenter firstLength secondLength
+      firstSlot secondSlot gatesEqual
+  exact
+    retainedTerminalFanOuterCoordinatedEscapedCompleteRoutes_separated
+      firstCenter secondCenter
+      ((retainedDirectSourcePrefixChoiceAt
+        selection.kind selection.firstIndex).direction,
+        firstLength)
+      ((retainedDirectSourcePrefixChoiceAt
+        selection.kind selection.secondIndex).direction,
+        secondLength)
+      firstSlot secondSlot
+      (selection.firstEscapeCertificate
+        firstCenter firstLength firstSlot)
+      (selection.secondEscapeCertificate
+        secondCenter secondLength secondSlot)
+      escapesSeparated.1 escapesSeparated.2
+      firstEscapeAvoidSecondTail
+      firstTailAvoidSecondEscape tailsAvoid
 
 /-- A genuine crossover-clause literal selects the atlas entry with its
 fixed local clause and literal indices. -/
