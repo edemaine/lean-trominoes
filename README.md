@@ -1958,6 +1958,9 @@ The representation choices for this target are:
   their bounded local clause indices, while a routed source clause selects by
   physical arm even for a reordered subset of its three ports; every case
   carries equality with the positioned local route's classified direction.
+  Its pair interface proves distinct literals select distinct entries of one
+  common profile and immediately transports the atlas's separation and
+  head-only-contact certificate to any shared clause gate.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,

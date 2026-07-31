@@ -192,6 +192,13 @@ def retainedDirectRoutedClauseArmIndex :
   | .middle => ⟨1, by native_decide⟩
   | .right => ⟨2, by native_decide⟩
 
+/-- The three physical arms occupy different routed-clause atlas entries. -/
+theorem retainedDirectRoutedClauseArmIndex_injective :
+    Function.Injective retainedDirectRoutedClauseArmIndex := by
+  intro first second equal
+  cases first <;> cases second <;>
+    simp_all [retainedDirectRoutedClauseArmIndex]
+
 /-- Selecting a routed entry by physical arm recovers that arm's retained
 terminal direction. -/
 theorem retainedDirectRoutedClauseArmChoice_direction

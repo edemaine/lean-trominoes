@@ -14,6 +14,7 @@ namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
 
 open PlanarThreeSAT
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicThreeSATThree
 open PeriodicOrthocrossing
 
@@ -32,6 +33,59 @@ structure RetainedDirectSourcePrefixSelection
         (routeTerminalVector
           ((source.incidenceDrawing formula).routes
             source.localClauseIndex literalIndex))
+
+/-- Two literals of one direct clause select two different entries of the
+same finite atlas profile. -/
+structure RetainedDirectSourcePrefixPairSelection
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (firstLiteralIndex secondLiteralIndex : Nat) where
+  kind : RetainedDirectClauseKind
+  firstIndex :
+    Fin (retainedDirectSourcePrefixChoices kind).length
+  secondIndex :
+    Fin (retainedDirectSourcePrefixChoices kind).length
+  indicesDifferent : firstIndex ≠ secondIndex
+  firstDirection_eq :
+    (retainedDirectSourcePrefixChoiceAt
+      kind firstIndex).direction =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((source.incidenceDrawing formula).routes
+            source.localClauseIndex firstLiteralIndex))
+  secondDirection_eq :
+    (retainedDirectSourcePrefixChoiceAt
+      kind secondIndex).direction =
+      classifiedRetainedTerminalDirection
+        (routeTerminalVector
+          ((source.incidenceDrawing formula).routes
+            source.localClauseIndex secondLiteralIndex))
+
+/-- A pair selected from genuine direct metadata imports the atlas's
+ordinary separation and head-only-contact certificate at any common gate. -/
+theorem RetainedDirectSourcePrefixPairSelection.positionedEscapes_separated
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {source : DrawingPlanarSATClauseSource Variable}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (selection :
+      RetainedDirectSourcePrefixPairSelection
+        formula source firstLiteralIndex secondLiteralIndex)
+    (gate : Cell) :
+    RoutesAvoidEachOther
+        (retainedDirectPositionedSourceEscapeRoute
+          gate selection.kind selection.firstIndex)
+        (retainedDirectPositionedSourceEscapeRoute
+          gate selection.kind selection.secondIndex) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedDirectPositionedSourceEscapeRoute
+          gate selection.kind selection.firstIndex)
+        (retainedDirectPositionedSourceEscapeRoute
+          gate selection.kind selection.secondIndex) :=
+  retainedDirectPositionedSourceEscapeRoutes_separated
+    gate selection.kind selection.firstIndex selection.secondIndex
+    selection.indicesDifferent
 
 /-- A genuine crossover-clause literal selects the atlas entry with its
 fixed local clause and literal indices. -/
@@ -107,6 +161,111 @@ theorem exists_retainedDirectSourcePrefixSelection_crossover
           clauseIndex, atlasIndex] using
           retainedDirectCrossoverPrefixChoice_positionedDirection
             formula crossing clauseIndex atlasIndex
+    }⟩
+
+/-- Distinct literals of one genuine crossover clause select distinct
+entries of its common local atlas profile. -/
+theorem exists_retainedDirectSourcePrefixPairSelection_crossover
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clause : EmbeddedClause (PlanarSATVariable Variable))
+    (crossing : CrossingRecord)
+    (localClauseIndex : Nat)
+    {firstLiteral secondLiteral :
+      PlanarSATVariable Variable × Bool}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (valid :
+      (⟨clause, .crossover crossing localClauseIndex⟩ :
+        DrawingPlanarSATClauseMetadata Variable).RetainedValid formula)
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        clause.literals.zipIdx)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    Nonempty
+      (RetainedDirectSourcePrefixPairSelection
+        formula (.crossover crossing localClauseIndex)
+        firstLiteralIndex secondLiteralIndex) := by
+  have localClauseIndexLt :
+      localClauseIndex < 26 := by
+    have indexLt :=
+      List.snd_lt_of_mem_zipIdx valid.2
+    simpa [drawingPlanarSATCrossoverFormulaAt,
+      scopedCrossoverInstance, instantiateFormula,
+      crossoverFormula] using indexLt
+  let clauseIndex : Fin 26 :=
+    ⟨localClauseIndex, localClauseIndexLt⟩
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp valid.2
+  have localFormulaIndexLt :
+      localClauseIndex <
+        (drawingPlanarSATCrossoverFormulaAt
+          (Variable := Variable) crossing).length :=
+    List.snd_lt_of_mem_zipIdx valid.2
+  have localClauseEq :
+      (drawingPlanarSATCrossoverFormulaAt
+        (Variable := Variable) crossing).get
+          ⟨localClauseIndex, localFormulaIndexLt⟩ =
+        clause := by
+    apply Option.some.inj
+    simpa [List.getElem?_eq_getElem,
+      localFormulaIndexLt] using clauseLookup
+  have clauseLiteralsLength :
+      clause.literals.length =
+        (retainedDirectCrossoverClauseAt
+          clauseIndex).literals.length := by
+    rw [← localClauseEq]
+    simp [drawingPlanarSATCrossoverFormulaAt,
+      scopedCrossoverInstance, instantiateFormula,
+      retainedDirectCrossoverClauseAt,
+      EmbeddedClause.place, EmbeddedClause.rename,
+      EmbeddedClause.map, clauseIndex]
+  have firstLiteralIndexLt :
+      firstLiteralIndex <
+        (retainedDirectSourcePrefixChoices
+          (.crossover clauseIndex)).length := by
+    rw [retainedDirectCrossoverPrefixChoices_length]
+    simpa [clauseLiteralsLength] using
+      List.snd_lt_of_mem_zipIdx firstLiteralMember
+  have secondLiteralIndexLt :
+      secondLiteralIndex <
+        (retainedDirectSourcePrefixChoices
+          (.crossover clauseIndex)).length := by
+    rw [retainedDirectCrossoverPrefixChoices_length]
+    simpa [clauseLiteralsLength] using
+      List.snd_lt_of_mem_zipIdx secondLiteralMember
+  let firstIndex :
+      Fin (retainedDirectSourcePrefixChoices
+        (.crossover clauseIndex)).length :=
+    ⟨firstLiteralIndex, firstLiteralIndexLt⟩
+  let secondIndex :
+      Fin (retainedDirectSourcePrefixChoices
+        (.crossover clauseIndex)).length :=
+    ⟨secondLiteralIndex, secondLiteralIndexLt⟩
+  exact
+    ⟨{
+      kind := .crossover clauseIndex
+      firstIndex := firstIndex
+      secondIndex := secondIndex
+      indicesDifferent := by
+        intro equal
+        exact literalIndicesDifferent
+          (congrArg Fin.val equal)
+      firstDirection_eq := by
+        simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+          DrawingPlanarSATClauseSource.localClauseIndex,
+          clauseIndex, firstIndex] using
+          retainedDirectCrossoverPrefixChoice_positionedDirection
+            formula crossing clauseIndex firstIndex
+      secondDirection_eq := by
+        simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+          DrawingPlanarSATClauseSource.localClauseIndex,
+          clauseIndex, secondIndex] using
+          retainedDirectCrossoverPrefixChoice_positionedDirection
+            formula crossing clauseIndex secondIndex
     }⟩
 
 /-- A genuine routed-variable implication literal selects the atlas entry
@@ -192,6 +351,117 @@ theorem exists_retainedDirectSourcePrefixSelection_routedVariable
             formula site arm link clauseIndex atlasIndex
     }⟩
 
+/-- Distinct literals of one routed-variable implication clause select
+distinct entries of its common arm-and-clause atlas profile. -/
+theorem exists_retainedDirectSourcePrefixPairSelection_routedVariable
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clause : EmbeddedClause (PlanarSATVariable Variable))
+    (site : VariableRouteSite Variable)
+    (armIndex : Nat)
+    (arm : DuplicatorArm)
+    (link : EqualityLink (PlanarSATNode Variable))
+    (localClauseIndex : Nat)
+    {firstLiteral secondLiteral :
+      PlanarSATVariable Variable × Bool}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (valid :
+      (⟨clause,
+        .routedVariable site armIndex arm link localClauseIndex⟩ :
+        DrawingPlanarSATClauseMetadata Variable).RetainedValid formula)
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        clause.literals.zipIdx)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    Nonempty
+      (RetainedDirectSourcePrefixPairSelection
+        formula
+        (.routedVariable
+          site armIndex arm link localClauseIndex)
+        firstLiteralIndex secondLiteralIndex) := by
+  have localClauseIndexLt :
+      localClauseIndex < 2 := by
+    have indexLt :=
+      List.snd_lt_of_mem_zipIdx valid.2.2.2
+    simpa [drawingPlanarSATRoutedVariableFormulaAt,
+      equalityInstance] using indexLt
+  let clauseIndex : Fin 2 :=
+    ⟨localClauseIndex, localClauseIndexLt⟩
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp valid.2.2.2
+  have localFormulaIndexLt :
+      localClauseIndex <
+        (drawingPlanarSATRoutedVariableFormulaAt
+          link).length :=
+    List.snd_lt_of_mem_zipIdx valid.2.2.2
+  have localClauseEq :
+      (drawingPlanarSATRoutedVariableFormulaAt
+        link).get
+          ⟨localClauseIndex, localFormulaIndexLt⟩ =
+        clause := by
+    apply Option.some.inj
+    simpa [List.getElem?_eq_getElem,
+      localFormulaIndexLt] using clauseLookup
+  have clauseLiteralsLength :
+      clause.literals.length =
+        (retainedDirectDuplicatorClauseAt
+          arm clauseIndex).literals.length := by
+    rw [← localClauseEq]
+    simp [drawingPlanarSATRoutedVariableFormulaAt,
+      retainedDirectDuplicatorClauseAt,
+      duplicatorArmFormula, equalityInstance,
+      EmbeddedClause.rename, EmbeddedClause.map,
+      clauseIndex]
+    interval_cases localClauseIndex <;> rfl
+  have firstLiteralIndexLt :
+      firstLiteralIndex <
+        (retainedDirectSourcePrefixChoices
+          (.duplicator arm clauseIndex)).length := by
+    rw [retainedDirectDuplicatorPrefixChoices_length]
+    simpa [clauseLiteralsLength] using
+      List.snd_lt_of_mem_zipIdx firstLiteralMember
+  have secondLiteralIndexLt :
+      secondLiteralIndex <
+        (retainedDirectSourcePrefixChoices
+          (.duplicator arm clauseIndex)).length := by
+    rw [retainedDirectDuplicatorPrefixChoices_length]
+    simpa [clauseLiteralsLength] using
+      List.snd_lt_of_mem_zipIdx secondLiteralMember
+  let firstIndex :
+      Fin (retainedDirectSourcePrefixChoices
+        (.duplicator arm clauseIndex)).length :=
+    ⟨firstLiteralIndex, firstLiteralIndexLt⟩
+  let secondIndex :
+      Fin (retainedDirectSourcePrefixChoices
+        (.duplicator arm clauseIndex)).length :=
+    ⟨secondLiteralIndex, secondLiteralIndexLt⟩
+  exact
+    ⟨{
+      kind := .duplicator arm clauseIndex
+      firstIndex := firstIndex
+      secondIndex := secondIndex
+      indicesDifferent := by
+        intro equal
+        exact literalIndicesDifferent
+          (congrArg Fin.val equal)
+      firstDirection_eq := by
+        simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+          DrawingPlanarSATClauseSource.localClauseIndex,
+          clauseIndex, firstIndex] using
+          retainedDirectDuplicatorPrefixChoice_positionedDirection
+            formula site arm link clauseIndex firstIndex
+      secondDirection_eq := by
+        simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+          DrawingPlanarSATClauseSource.localClauseIndex,
+          clauseIndex, secondIndex] using
+          retainedDirectDuplicatorPrefixChoice_positionedDirection
+            formula site arm link clauseIndex secondIndex
+    }⟩
+
 /-- A genuine routed source-clause literal selects the atlas entry named by
 its physical arm, even when the source clause presents only a subset of the
 three possible arms or lists them in another order. -/
@@ -241,6 +511,119 @@ theorem exists_retainedDirectSourcePrefixSelection_routedClause
             formula site portIndex
     }⟩
 
+/-- Distinct literals of one routed source clause have distinct physical
+arms and therefore select distinct entries of the common routed atlas. -/
+theorem exists_retainedDirectSourcePrefixPairSelection_routedClause
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (clause : EmbeddedClause (PlanarSATVariable Variable))
+    (site : ClauseRouteSite)
+    {firstLiteral secondLiteral :
+      PlanarSATVariable Variable × Bool}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (valid :
+      (⟨clause, .routedClause site⟩ :
+        DrawingPlanarSATClauseMetadata Variable).RetainedValid formula)
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        clause.literals.zipIdx)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    Nonempty
+      (RetainedDirectSourcePrefixPairSelection
+        formula (.routedClause site)
+        firstLiteralIndex secondLiteralIndex) := by
+  have clauseEq :
+      clause =
+        (routedClauseAt formula site).rename
+          planarSATExternalVariableMap := by
+    simpa using valid.2
+  have firstLiteralIndexLt :
+      firstLiteralIndex <
+        (routedClausePortLiterals formula site).length := by
+    have literalLt :=
+      List.snd_lt_of_mem_zipIdx firstLiteralMember
+    rw [clauseEq] at literalLt
+    simpa [routedClausePortLiterals, routedClauseAt,
+      EmbeddedClause.rename, EmbeddedClause.map] using literalLt
+  have secondLiteralIndexLt :
+      secondLiteralIndex <
+        (routedClausePortLiterals formula site).length := by
+    have literalLt :=
+      List.snd_lt_of_mem_zipIdx secondLiteralMember
+    rw [clauseEq] at literalLt
+    simpa [routedClausePortLiterals, routedClauseAt,
+      EmbeddedClause.rename, EmbeddedClause.map] using literalLt
+  let firstPortIndex :
+      Fin (routedClausePortLiterals formula site).length :=
+    ⟨firstLiteralIndex, firstLiteralIndexLt⟩
+  let secondPortIndex :
+      Fin (routedClausePortLiterals formula site).length :=
+    ⟨secondLiteralIndex, secondLiteralIndexLt⟩
+  let firstArm :=
+    ((routedClausePortLiterals formula site).get
+      firstPortIndex).1
+  let secondArm :=
+    ((routedClausePortLiterals formula site).get
+      secondPortIndex).1
+  have armsDifferent : firstArm ≠ secondArm := by
+    intro armsEqual
+    let firstMappedIndex :
+        Fin ((routedClausePortLiterals
+          formula site).map Prod.fst).length :=
+      ⟨firstLiteralIndex, by
+        simpa using firstLiteralIndexLt⟩
+    let secondMappedIndex :
+        Fin ((routedClausePortLiterals
+          formula site).map Prod.fst).length :=
+      ⟨secondLiteralIndex, by
+        simpa using secondLiteralIndexLt⟩
+    have mappedValuesEqual :
+        ((routedClausePortLiterals
+          formula site).map Prod.fst).get firstMappedIndex =
+        ((routedClausePortLiterals
+          formula site).map Prod.fst).get secondMappedIndex := by
+      simpa [firstMappedIndex, secondMappedIndex,
+        firstArm, secondArm, firstPortIndex,
+        secondPortIndex] using armsEqual
+    have mappedIndicesEqual :
+        firstMappedIndex = secondMappedIndex :=
+      (routedClausePortLiterals_ports_nodup
+        formula degree site).injective_get
+          mappedValuesEqual
+    exact literalIndicesDifferent
+      (congrArg Fin.val mappedIndicesEqual)
+  let firstIndex :=
+    retainedDirectRoutedClauseArmIndex firstArm
+  let secondIndex :=
+    retainedDirectRoutedClauseArmIndex secondArm
+  exact
+    ⟨{
+      kind := .routedClause
+      firstIndex := firstIndex
+      secondIndex := secondIndex
+      indicesDifferent := by
+        intro equal
+        exact armsDifferent
+          (retainedDirectRoutedClauseArmIndex_injective equal)
+      firstDirection_eq := by
+        simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+          DrawingPlanarSATClauseSource.localClauseIndex,
+          firstArm, firstPortIndex, firstIndex] using
+          retainedDirectRoutedClauseArmChoice_positionedDirection
+            formula site firstPortIndex
+      secondDirection_eq := by
+        simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+          DrawingPlanarSATClauseSource.localClauseIndex,
+          secondArm, secondPortIndex, secondIndex] using
+          retainedDirectRoutedClauseArmChoice_positionedDirection
+            formula site secondPortIndex
+    }⟩
+
 /-- The direct-source trichotomy emitted by normalized component analysis is
 enough to select a checked atlas entry for every genuine clause literal. -/
 theorem
@@ -284,6 +667,62 @@ theorem
       exists_retainedDirectSourcePrefixSelection_routedVariable
         formula clause site armIndex arm link localClauseIndex
         valid literalMember
+
+/-- The same direct-source trichotomy selects a separated pair of atlas
+entries for two distinct literals of one retained clause. -/
+theorem
+    DrawingPlanarSATClauseMetadata.exists_retainedDirectSourcePrefixPairSelection_of_directCases
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    {firstLiteral secondLiteral :
+      PlanarSATVariable Variable × Bool}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        metadata.clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        metadata.clause.literals.zipIdx)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex)
+    (directCases :
+      (∃ crossing localClauseIndex,
+          metadata.source =
+            .crossover crossing localClauseIndex) ∨
+        (∃ site,
+          metadata.source = .routedClause site) ∨
+        (∃ site armIndex arm link localClauseIndex,
+          metadata.source =
+            .routedVariable
+              site armIndex arm link localClauseIndex)) :
+    Nonempty
+      (RetainedDirectSourcePrefixPairSelection
+        formula metadata.source
+        firstLiteralIndex secondLiteralIndex) := by
+  rcases metadata with ⟨clause, source⟩
+  rcases directCases with
+      ⟨crossing, localClauseIndex, rfl⟩ |
+      ⟨⟨site, rfl⟩ |
+        ⟨site, armIndex, arm, link,
+          localClauseIndex, rfl⟩⟩
+  · exact
+      exists_retainedDirectSourcePrefixPairSelection_crossover
+        formula clause crossing localClauseIndex
+        valid firstLiteralMember secondLiteralMember
+        literalIndicesDifferent
+  · exact
+      exists_retainedDirectSourcePrefixPairSelection_routedClause
+        formula degree clause site valid
+        firstLiteralMember secondLiteralMember
+        literalIndicesDifferent
+  · exact
+      exists_retainedDirectSourcePrefixPairSelection_routedVariable
+        formula clause site armIndex arm link localClauseIndex
+        valid firstLiteralMember secondLiteralMember
+        literalIndicesDifferent
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
