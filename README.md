@@ -2930,6 +2930,11 @@ The representation choices for this target are:
   route each copied clause to its angular fan boundary.  Joining any such
   certified prefix with the translated local spoke is proved to give the
   copied literal's exact canonical endpoint while preserving orthogonality.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularSuffixSeparation.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularSuffixSeparation.lean)
+  identifies each clause-indexed Figure 7 macrocell origin with the
+  factor-36 refinement of its canonical source occurrence center.  Distinct
+  integer centers therefore have strictly separated `24 × 24` spoke
+  rectangles, both before and after any positive uniform refinement.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularSplicedRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularSplicedRoutes.lean)
   assembles those copied-incidence splices with every certified implication
   ring into one total route family for the final positioned split formula.
