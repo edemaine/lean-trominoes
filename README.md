@@ -1952,6 +1952,11 @@ The representation choices for this target are:
   reduces avoidance of any route on the opposite side to one pointwise
   linear lower bound, which is the certificate needed for the singleton
   equality-lens fallback.
+- [`LeanTrominoes/RetainedAngularFanEqualityLensSingletonGeometry.lean`](LeanTrominoes/RetainedAngularFanEqualityLensSingletonGeometry.lean)
+  classifies the two possible singleton-prefix routes in an equality lens
+  after arbitrary signed-axis placement.  Each has a cardinal terminal of
+  length at least two, while the other route in its clause remains on the
+  source gate's outward side under every natural scaling.
 - [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
   proves that both retained-ray raster families and endpoint joins commute
   with translation.  It also transports ordinary continuous avoidance and
