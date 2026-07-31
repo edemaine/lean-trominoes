@@ -1968,7 +1968,9 @@ The representation choices for this target are:
   absorbs a final zero-shift occurrence's clause-anchor translation into its
   carrier link, identifies the physical route with that anchor-normalized
   lens route, and lifts the complete escaped-fallback separation certificate
-  to the final retained route family.
+  to the final retained route family.  It also recovers the carrier
+  equality clause's two-literal bound and proves that every segment of the
+  translated final carrier occurrence remains axis-aligned.
 - [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
   proves that both retained-ray raster families and endpoint joins commute
   with translation.  It also transports ordinary continuous avoidance and
@@ -2243,6 +2245,15 @@ The representation choices for this target are:
   clause head; strict separation of the other three new piece pairs then
   yields endpoint-only avoidance and common-head-only contact for both
   complete pre-rasterized splices.
+- [`LeanTrominoes/RetainedAngularFanFinalFallbackSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackSpliceSeparation.lean)
+  discharges every premise of that asymmetric adapter for two distinct
+  literals of one genuine final clause.  Selector failure gives shared
+  carrier-or-bend witnesses; a singleton first prefix rules out the bend,
+  the equality-lens theorem controls the escaped-fan/partner-prefix contact,
+  and retained global planarity separates the old routes and discarded
+  terminal corridors.  The resulting escaped and ordinary pre-rasterized
+  boundary polylines avoid each other and meet only at their common clause
+  head.
 - [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
   applies simultaneous tail-replacement separation to two classified
   retained splices.  Positive scaling preserves strict source-prefix

@@ -154,6 +154,35 @@ theorem
     EmbeddedCNFIncidenceDrawing.routeAt,
     witness.metadataLookup]
 
+/-- A final occurrence represented by a bend route cannot have a singleton
+deleted-final-point prefix. -/
+theorem
+    finalGaugedRouteOccurrence_prefix_length_ne_one_of_bend_witness
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {clauseIndex literalIndex : Nat}
+    (witness :
+      FinalGaugedRouteOccurrenceWitness
+        formula clauseIndex literalIndex (0, 0))
+    (routeBend : RouteBend)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      witness.metadata.source =
+        .bend routeBend localClauseIndex) :
+    (finalGaugedRouteOccurrence
+      formula clauseIndex literalIndex (0, 0)).dropLast.length ≠ 1 := by
+  intro singleton
+  apply
+    drawingPlanarSATBendCornerIncidenceDrawing_prefix_length_ne_one
+      formula routeBend localClauseIndex literalIndex
+  have localSingleton :=
+    (finalGaugedRouteOccurrence_dropLast_length_eq_localRoute
+      formula witness).symm.trans singleton
+  simpa [sourceEq,
+    DrawingPlanarSATClauseSource.incidenceDrawing,
+    DrawingPlanarSATClauseSource.localClauseIndex] using
+      localSingleton
+
 /-- Two different literal occurrences represented by the same carrier or
 bend metadata cannot both have singleton final-point-deleted prefixes. -/
 theorem

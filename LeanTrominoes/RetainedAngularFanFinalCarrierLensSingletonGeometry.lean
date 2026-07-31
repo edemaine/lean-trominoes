@@ -20,6 +20,98 @@ open OccurrenceSplitRing
 
 namespace PeriodicOrthocrossing
 
+/-- Every genuine literal selected from carrier metadata is one of the two
+literal positions in its local equality clause. -/
+theorem
+    FinalGaugedRouteOccurrenceWitness.literalIndex_lt_two_of_carrier
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {clauseIndex literalIndex : Nat}
+    (witness :
+      FinalGaugedRouteOccurrenceWitness
+        formula clauseIndex literalIndex (0, 0))
+    (link : EqualityLink CarrierNode)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      witness.metadata.source =
+        .carrier link localClauseIndex) :
+    literalIndex < 2 := by
+  have valid := witness.metadata_retainedValid
+  unfold DrawingPlanarSATClauseMetadata.RetainedValid at valid
+  rw [sourceEq] at valid
+  have clauseLength :=
+    drawingPlanarSATCarrierFormulaAt_clause_literals_length
+      link (List.fst_mem_of_mem_zipIdx valid.2)
+  have indexLt :=
+    List.snd_lt_of_mem_zipIdx witness.literalMember
+  rw [clauseLength] at indexLt
+  exact indexLt
+
+/-- Every segment of a physical final occurrence represented by carrier
+metadata remains axis-aligned after its anchor-normalizing translation. -/
+theorem
+    FinalGaugedRouteOccurrenceWitness.routeSegments_axisAligned_of_carrier
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {clauseIndex literalIndex : Nat}
+    (witness :
+      FinalGaugedRouteOccurrenceWitness
+        formula clauseIndex literalIndex (0, 0))
+    (link : EqualityLink CarrierNode)
+    (localClauseIndex : Nat)
+    (sourceEq :
+      witness.metadata.source =
+        .carrier link localClauseIndex)
+    (segment : GridSegment)
+    (segmentMember :
+      segment ∈
+        gridPolylineSegments
+          (finalGaugedRouteOccurrence
+            formula clauseIndex literalIndex (0, 0))) :
+    segment.IsAxisAligned := by
+  have valid := witness.metadata_retainedValid
+  have valid' := valid
+  unfold DrawingPlanarSATClauseMetadata.RetainedValid at valid'
+  rw [sourceEq] at valid'
+  have orthogonal :
+      (drawingPlanarSATCarrierLensIncidenceDrawing
+        formula link).IsOrthogonal :=
+    (retainedDrawingPlanarSATCarrierLensIncidenceDrawing_isValid
+      wellFormed degree isLocal valid'.1).2.1
+  have clauseMember :
+      (witness.metadata.clause, localClauseIndex) ∈
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula link).formula.zipIdx := by
+    rw [
+      retainedDrawingPlanarSATCarrierLensIncidenceDrawing_formula
+        wellFormed degree isLocal valid'.1]
+    exact valid'.2
+  rw [witness.routeEq] at segmentMember
+  unfold metadataPhysicalRouteOccurrence translatePolyline
+    at segmentMember
+  rw [EmbeddedCNFIncidenceDrawing.gridPolylineSegments_map_add]
+    at segmentMember
+  rcases List.mem_map.mp segmentMember with
+    ⟨physicalSegment, physicalSegmentMember, segmentEq⟩
+  subst segment
+  apply
+    (GridSegment.isAxisAligned_translate _ _).mpr
+  apply
+    (drawingPlanarSATCarrierLensIncidenceDrawing formula link)
+      |>.embeddedSegment_isAxisAligned_of_members
+        orthogonal clauseMember witness.literalMember
+  simpa [retainedDrawingPlanarSATLocalIncidenceDrawing_routes,
+    retainedDrawingPlanarSATLocalIncidenceRoutes,
+    metadataPhysicalIncidence,
+    EmbeddedCNFIncidenceDrawing.routeAt,
+    witness.metadataLookup, sourceEq,
+    DrawingPlanarSATClauseSource.incidenceDrawing,
+    DrawingPlanarSATClauseSource.localClauseIndex] using
+      physicalSegmentMember
+
 /-- The carrier link underlying a zero-shift final route after absorbing the
 witness's physical anchor-normalization shift. -/
 def FinalGaugedRouteOccurrenceWitness.anchorNormalizedCarrierLink
