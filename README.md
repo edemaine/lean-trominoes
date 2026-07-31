@@ -2022,6 +2022,12 @@ The representation choices for this target are:
   selector fails closed unless that translated atlas route equals the actual
   deduplicated source route, so every successful final choice carries exact
   route equality and exact translated head and last-point formulas.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoicePairs.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoicePairs.lean)
+  inverts successful final choices to their canonical raw metadata
+  representative and atlas entry.  Choices at distinct literal indices of
+  one final clause therefore share one source and one anchor-normalization
+  offset; transporting the raw pair certificate proves their complete
+  coordinated routes avoid each other and meet only at their common heads.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutes.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutes.lean)
   defines the specialized final fixed-eight route family.  Successful direct
   choices replace the ordinary source-to-fan boundary piece by the
