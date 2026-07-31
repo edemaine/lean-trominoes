@@ -1956,7 +1956,10 @@ The representation choices for this target are:
   classifies the two possible singleton-prefix routes in an equality lens
   after arbitrary signed-axis placement.  Each has a cardinal terminal of
   length at least two, while the other route in its clause remains on the
-  source gate's outward side under every natural scaling.
+  source gate's outward side under every natural scaling.  It then checks the
+  finite 64-block escape geometry and combines it with the strict post-escape
+  half-plane bound, proving that the complete escaped fan and partner prefix
+  remain continuously separated and meet only at their common clause head.
 - [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
   proves that both retained-ray raster families and endpoint joins commute
   with translation.  It also transports ordinary continuous avoidance and
