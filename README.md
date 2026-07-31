@@ -2155,6 +2155,11 @@ The representation choices for this target are:
   exact local contact certificate: crossover boundary incidence,
   routed-clause source-terminal incidence, or routed-variable
   target-terminal incidence.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedRoutes.lean`](LeanTrominoes/RetainedFinalFlatNormalizedRoutes.lean)
+  identifies the final quotient route lists with routes of those exact
+  anchor-normalized finite drawings.  Carrier routes come from the raw
+  normalized equality lens, while noncarrier routes retain their local
+  clause and literal indices in the selected normalized source.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
