@@ -2012,7 +2012,10 @@ The representation choices for this target are:
   lifts the checked selector through clause-anchor normalization and
   representative-clause deduplication.  It recovers the retained metadata
   representative of a final clause and translates the chosen component
-  origin by the exact physical anchor shift used by the quotient route.
+  origin by the exact physical anchor shift used by the quotient route.  The
+  selector fails closed unless that translated atlas route equals the actual
+  deduplicated source route, so every successful final choice carries exact
+  route equality and exact translated head and last-point formulas.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutes.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutes.lean)
   defines the specialized final fixed-eight route family.  Successful direct
   choices replace the ordinary source-to-fan boundary piece by the
