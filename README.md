@@ -2231,13 +2231,16 @@ The representation choices for this target are:
   splice for compositional separation, replaces the old variable endpoint
   by the exact profile-selected outer fan route, rasterizes the retained
   result, and proves the scaled clause endpoint, refined Figure 7 boundary
-  endpoint, and orthogonality.
+  endpoint, and orthogonality.  When the source route was already
+  orthogonal, the pre-rasterized replacement splice is proved orthogonal
+  too.
 - [`LeanTrominoes/RetainedAngularFanSourceEscapedSplice.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSplice.lean)
   packages the delayed-lane outer fan as an alternative replacement tail.
   It follows the source terminal for 64 primitive blocks before selecting
   the occurrence lane, avoiding an immediate shared-clause tangency, while
   retaining the ordinary splice's exact clause endpoint, Figure 7 boundary
-  endpoint, and orthogonality contract.
+  endpoint, and orthogonality contract.  An additional pre-rasterization
+  theorem preserves orthogonality from an already orthogonal source route.
 - [`LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean)
   packages the asymmetric same-clause tail replacement used by a singleton
   failed-choice route against an ordinary non-singleton fallback.  The
@@ -2251,9 +2254,11 @@ The representation choices for this target are:
   carrier-or-bend witnesses; a singleton first prefix rules out the bend,
   the equality-lens theorem controls the escaped-fan/partner-prefix contact,
   and retained global planarity separates the old routes and discarded
-  terminal corridors.  The resulting escaped and ordinary pre-rasterized
-  boundary polylines avoid each other and meet only at their common clause
-  head.
+  terminal corridors.  The resulting escaped and ordinary boundary
+  polylines are orthogonal, avoid each other, and meet only at their common
+  clause head.  Because retained rasterization is the identity on these
+  orthogonal carrier routes, the same certificate now holds for the actual
+  rasterized boundary routes.
 - [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
   applies simultaneous tail-replacement separation to two classified
   retained splices.  Positive scaling preserves strict source-prefix
@@ -2322,8 +2327,9 @@ The representation choices for this target are:
   and every primitive checkpoint of all eleven retained ray types is listed
   after rasterization and subdivision.  In particular, the scaled discarded
   final segment of a classified route rasterizes to its exact canonical
-  forward retained ray, so each refined terminal checkpoint is an actual
-  point of that unit-grid route.  These local membership facts lift to the
+  forward retained ray, while a completely orthogonal retained polyline is
+  fixed pointwise by rasterization.  Thus each refined terminal checkpoint
+  is an actual point of that unit-grid route.  These local membership facts lift to the
   complete scaled route.  The exact global adapter rasterizes the first
   route's `dropLast` prefix separately and proves that its disjointness from
   the second complete unit-grid route implies the finite checkpoint-avoidance

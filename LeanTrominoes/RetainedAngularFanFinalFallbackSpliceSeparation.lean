@@ -106,6 +106,12 @@ theorem
         (retainedAngularFanEscapedSplicedBoundaryPolyline
           firstRoute firstTerminal firstSlot)
         (retainedAngularFanSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot) ∧
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (retainedAngularFanEscapedSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot) ∧
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (retainedAngularFanSplicedBoundaryPolyline
           secondRoute secondTerminal secondSlot) := by
   dsimp only
   let sourceCertificate :=
@@ -206,6 +212,26 @@ theorem
         secondLiteralIndex < 2 :=
       secondWitness.literalIndex_lt_two_of_carrier
         link localClauseIndex secondSourceEq
+    have firstRawOrthogonal :
+        PeriodicOrthocrossing.OrthogonalPolyline
+          firstRawRoute := by
+      rw [PeriodicOrthocrossing.orthogonalPolyline_iff_segments]
+      intro segment segmentMember
+      apply firstWitness.routeSegments_axisAligned_of_carrier
+        wellFormed degree isLocal
+        link localClauseIndex firstSourceEq
+      rw [← firstRawOccurrenceEq]
+      exact segmentMember
+    have secondRawOrthogonal :
+        PeriodicOrthocrossing.OrthogonalPolyline
+          secondRawRoute := by
+      rw [PeriodicOrthocrossing.orthogonalPolyline_iff_segments]
+      intro segment segmentMember
+      apply secondWitness.routeSegments_axisAligned_of_carrier
+        wellFormed degree isLocal
+        link localClauseIndex secondSourceEq
+      rw [← secondRawOccurrenceEq]
+      exact segmentMember
     have firstLength :
         2 ≤ firstRawRoute.length := by
       exact
@@ -575,10 +601,7 @@ theorem
         firstRoute.dropLast.length = 1 := by
       simpa [firstRoute, scalePolyline] using
         firstSingletonPrefix
-    simpa [firstRawRoute, secondRawRoute,
-      firstRawTerminal, secondRawTerminal,
-      firstSlot, secondSlot, firstRoute, secondRoute,
-      firstTerminal, secondTerminal] using
+    have separated :=
       retainedAngularFanEscapedOrdinarySplicedBoundaryPolylines_avoid_of_first_singletonPrefix
         firstRoute secondRoute firstTerminal secondTerminal
         firstSlot secondSlot
@@ -592,12 +615,136 @@ theorem
         (by
           simpa [firstRoute, secondRoute,
             firstTerminal, secondTerminal] using fansAvoid)
+    have firstRouteOrthogonal :
+        PeriodicOrthocrossing.OrthogonalPolyline firstRoute := by
+      exact
+        PeriodicOrthocrossing.OrthogonalPolyline.scalePolyline
+          firstRawOrthogonal
+          retainedAngularFanSourceClearanceFactor_pos
+    have secondRouteOrthogonal :
+        PeriodicOrthocrossing.OrthogonalPolyline secondRoute := by
+      exact
+        PeriodicOrthocrossing.OrthogonalPolyline.scalePolyline
+          secondRawOrthogonal
+          retainedAngularFanSourceClearanceFactor_pos
+    have firstSpliceOrthogonal :
+        PeriodicOrthocrossing.OrthogonalPolyline
+          (retainedAngularFanEscapedSplicedBoundaryPolyline
+            firstRoute firstTerminal firstSlot) :=
+      retainedAngularFanEscapedSplicedBoundaryPolyline_orthogonal
+        firstRoute firstTerminal firstSlot
+        firstRouteLength firstRouteClassified
+        firstRouteOrthogonal firstEscapeFits
+    have secondSpliceOrthogonal :
+        PeriodicOrthocrossing.OrthogonalPolyline
+          (retainedAngularFanSplicedBoundaryPolyline
+            secondRoute secondTerminal secondSlot) :=
+      retainedAngularFanSplicedBoundaryPolyline_orthogonal
+        secondRoute secondTerminal secondSlot
+        secondRouteLength secondRouteClassified
+        secondRouteOrthogonal
+    simpa [firstRawRoute, secondRawRoute,
+      firstRawTerminal, secondRawTerminal,
+      firstSlot, secondSlot, firstRoute, secondRoute,
+      firstTerminal, secondTerminal] using
+      ⟨separated.1, separated.2,
+        firstSpliceOrthogonal, secondSpliceOrthogonal⟩
   · exfalso
     apply
       finalGaugedRouteOccurrence_prefix_length_ne_one_of_bend_witness
         formula firstWitness routeBend localClauseIndex
         firstSourceEq
     simpa [← firstRawOccurrenceEq] using firstSingletonPrefix
+
+/-- The same exceptional pair is separated after retained rasterization.
+Carrier fallback routes and both fan replacements are already orthogonal,
+so the retained rasterizer is literally the identity in this branch. -/
+theorem
+    retainedFinalSameClauseEscapedOrdinarySplicedBoundaryRoutes_separated
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (indicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex firstLiteralIndex = none)
+    (firstSingletonPrefix :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex).dropLast.length = 1) :
+    let firstRawRoute :=
+      finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex
+    let secondRawRoute :=
+      finalCoordinatedSourceRoutes
+        formula clauseIndex secondLiteralIndex
+    let firstRawTerminal :=
+      classifiedRetainedTerminalData
+        (routeTerminalVector firstRawRoute)
+    let secondRawTerminal :=
+      classifiedRetainedTerminalData
+        (routeTerminalVector secondRawRoute)
+    let firstSlot :=
+      retainedFinalCoordinatedOccurrenceSlot
+        formula firstLiteral clauseIndex firstLiteralIndex
+    let secondSlot :=
+      retainedFinalCoordinatedOccurrenceSlot
+        formula secondLiteral clauseIndex secondLiteralIndex
+    let firstRoute :=
+      scalePolyline retainedAngularFanSourceClearanceFactor
+        firstRawRoute
+    let secondRoute :=
+      scalePolyline retainedAngularFanSourceClearanceFactor
+        secondRawRoute
+    let firstTerminal :=
+      scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor firstRawTerminal
+    let secondTerminal :=
+      scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor secondRawTerminal
+    RoutesAvoidEachOther
+        (retainedAngularFanEscapedSplicedBoundaryRoute
+          firstRoute firstTerminal firstSlot)
+        (retainedAngularFanSplicedBoundaryRoute
+          secondRoute secondTerminal secondSlot) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedAngularFanEscapedSplicedBoundaryRoute
+          firstRoute firstTerminal firstSlot)
+        (retainedAngularFanSplicedBoundaryRoute
+          secondRoute secondTerminal secondSlot) := by
+  dsimp only
+  rcases
+      retainedFinalSameClauseEscapedOrdinarySplicedBoundaryPolylines_separated
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember
+        firstLiteralMember secondLiteralMember indicesDifferent
+        firstChoiceNone firstSingletonPrefix with
+    ⟨avoid, contactsAtHeads,
+      firstOrthogonal, secondOrthogonal⟩
+  rw [retainedAngularFanEscapedSplicedBoundaryRoute,
+    rasterizeRetainedPolyline_eq_of_orthogonal firstOrthogonal,
+    retainedAngularFanSplicedBoundaryRoute,
+    rasterizeRetainedPolyline_eq_of_orthogonal secondOrthogonal]
+  exact ⟨avoid, contactsAtHeads⟩
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

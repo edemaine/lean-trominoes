@@ -387,6 +387,29 @@ theorem rasterizeRetainedSegment_eq_of_axisAligned
       simp [OccurrenceSplitRing.Port.unitVector,
         Cell.add, Cell.scale, lengthCast]
 
+/-- Retained rasterization is the identity on an already orthogonal
+polyline.  This lets axis-aligned exceptional routes reuse separation
+proved for their continuous source polylines without a clearance loss. -/
+theorem rasterizeRetainedPolyline_eq_of_orthogonal
+    {points : List Cell}
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points) :
+    rasterizeRetainedPolyline points = points := by
+  induction points using List.twoStepInduction with
+  | nil | singleton =>
+      rfl
+  | cons_cons first second rest _ tailInduction =>
+      have parts :=
+        (List.isChain_cons_cons.mp orthogonal :
+          (GridSegment.mk first second).IsAxisAligned ∧
+            PeriodicOrthocrossing.OrthogonalPolyline
+              (second :: rest))
+      rw [rasterizeRetainedPolyline_cons_cons,
+        rasterizeRetainedSegment_eq_of_axisAligned
+          (GridSegment.mk first second) parts.1,
+        tailInduction second parts.2]
+      simp [joinAtEndpoint]
+
 /-- Every segment introduced while rasterizing one source segment remains a
 segment of the rasterized whole source polyline. -/
 theorem rasterizeRetainedSegment_segment_mem_rasterizeRetainedPolyline
