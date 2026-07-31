@@ -2002,9 +2002,10 @@ The representation choices for this target are:
   duplicator-arm, and routed-clause atlases, records the component's physical
   origin, and returns `none` for malformed or non-direct sources.  Genuine
   retained direct metadata is proved to select an entry whose direction
-  exactly matches its positioned local incidence; every successful choice
-  also exposes exact translated endpoints and an orthogonality certificate
-  for its complete coordinated route.
+  exactly matches its positioned local incidence, and every successful
+  lookup is proved to represent that entire positioned local route.  Each
+  choice also exposes exact translated endpoints and an orthogonality
+  certificate for its complete coordinated route.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean)
   lifts the checked selector through clause-anchor normalization and
   representative-clause deduplication.  It recovers the retained metadata

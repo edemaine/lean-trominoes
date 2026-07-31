@@ -108,6 +108,113 @@ def RetainedDirectSourceRouteChoice.Matches
         ((source.incidenceDrawing formula).routes
           source.localClauseIndex literalIndex))
 
+/-- A successful choice identifies not just the terminal direction but the
+entire positioned local incidence route represented by its atlas entry. -/
+def RetainedDirectSourceRouteChoice.Represents
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (literalIndex : Nat)
+    (choice : RetainedDirectSourceRouteChoice) : Prop :=
+  translatePolyline choice.origin
+      (retainedDirectSourceLocalRouteAt choice.kind choice.index) =
+    (source.incidenceDrawing formula).routes
+      source.localClauseIndex literalIndex
+
+/-- Selecting a routed-clause atlas entry by physical arm recovers the
+actual local route, independently of the clause's literal order and signs. -/
+theorem retainedDirectRoutedClauseArmRoute_eq
+    (literals : List (DuplicatorArm × Bool))
+    (literalIndex : Fin literals.length) :
+    (routedClausePortStraightIncidenceDrawing
+        retainedDirectRoutedClauseRepresentativeLiterals).routes
+        0 (retainedDirectRoutedClauseArmIndex
+          (literals.get literalIndex).1).val =
+      (routedClausePortStraightIncidenceDrawing literals).routes
+        0 literalIndex.val := by
+  generalize armEq :
+    (literals.get literalIndex).1 = arm
+  cases arm <;>
+    simp_all [routedClausePortStraightIncidenceDrawing,
+      routedClausePortFormula, straightIncidenceDrawing,
+      straightIncidenceRoutes, straightIncidenceRoute,
+      retainedDirectRoutedClauseRepresentativeLiterals,
+      retainedDirectRoutedClauseArmIndex,
+      DuplicatorArm.portPosition]
+
+/-- Every successful total lookup represents the complete actual local
+incidence route selected by the source and presentation index. -/
+theorem retainedDirectSourceRouteChoice?_represents_of_eq_some
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source : DrawingPlanarSATClauseSource Variable)
+    (literalIndex : Nat)
+    (choice : RetainedDirectSourceRouteChoice)
+    (lookup :
+      retainedDirectSourceRouteChoice? formula source literalIndex =
+        some choice) :
+    choice.Represents formula source literalIndex := by
+  cases source with
+  | crossover crossing localClauseIndex =>
+      simp only [retainedDirectSourceRouteChoice?] at lookup
+      split at lookup
+      next localClauseIndexLt =>
+        split at lookup
+        next literalIndexLt =>
+          simp only [Option.some.injEq] at lookup
+          subst choice
+          simp [RetainedDirectSourceRouteChoice.Represents,
+            retainedDirectSourceLocalRouteAt,
+            DrawingPlanarSATClauseSource.incidenceDrawing,
+            DrawingPlanarSATClauseSource.localClauseIndex,
+            drawingPlanarSATCrossoverIncidenceDrawing,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate,
+            translatePolyline]
+        next => contradiction
+      next => contradiction
+  | carrier link localClauseIndex =>
+      simp [retainedDirectSourceRouteChoice?] at lookup
+  | bend routeBend localClauseIndex =>
+      simp [retainedDirectSourceRouteChoice?] at lookup
+  | routedClause site =>
+      simp only [retainedDirectSourceRouteChoice?] at lookup
+      split at lookup
+      next literalIndexLt =>
+        simp only [Option.some.injEq] at lookup
+        subst choice
+        simp only [RetainedDirectSourceRouteChoice.Represents,
+          retainedDirectSourceLocalRouteAt,
+          retainedDirectRoutedClauseArmIndex,
+          DrawingPlanarSATClauseSource.incidenceDrawing,
+          DrawingPlanarSATClauseSource.localClauseIndex,
+          drawingPlanarSATRoutedClauseIncidenceDrawing,
+          EmbeddedCNFIncidenceDrawing.translate,
+          translatePolyline]
+        apply congrArg (List.map (routedClauseOrigin formula site).add)
+        exact retainedDirectRoutedClauseArmRoute_eq
+          (routedClausePortLiterals formula site)
+          ⟨literalIndex, literalIndexLt⟩
+      next => contradiction
+  | routedVariable site armIndex arm link localClauseIndex =>
+      simp only [retainedDirectSourceRouteChoice?] at lookup
+      split at lookup
+      next localClauseIndexLt =>
+        split at lookup
+        next literalIndexLt =>
+          simp only [Option.some.injEq] at lookup
+          subst choice
+          simp [RetainedDirectSourceRouteChoice.Represents,
+            retainedDirectSourceLocalRouteAt,
+            DrawingPlanarSATClauseSource.incidenceDrawing,
+            DrawingPlanarSATClauseSource.localClauseIndex,
+            drawingPlanarSATRoutedVariableIncidenceDrawing,
+            EmbeddedCNFIncidenceDrawing.rename,
+            EmbeddedCNFIncidenceDrawing.translate,
+            translatePolyline]
+        next => contradiction
+      next => contradiction
+
 /-- Every genuine crossover literal makes the checked lookup succeed and
 selects its exact positioned terminal direction. -/
 theorem exists_retainedDirectSourceRouteChoice_crossover
