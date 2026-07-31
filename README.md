@@ -2008,6 +2008,12 @@ The representation choices for this target are:
   choice also exposes its exact fully scaled local head and fan-boundary
   endpoint, together with an orthogonality certificate for its complete
   coordinated route.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean)
+  centers the actual factor-eight Figure 7 spoke at every direct-source
+  atlas endpoint.  An exhaustive finite certificate proves both directed
+  interactions between one coordinated complete prefix and the other
+  literal's spoke are contact-free, for every distinct atlas pair and all
+  eight-by-eight occurrence-slot choices.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceRouteChoicePairs.lean`](LeanTrominoes/RetainedAngularFanDirectSourceRouteChoicePairs.lean)
   reconstructs one common finite-atlas pair from two independently checked
   choices for distinct literals of the same direct source.  Crossover and
