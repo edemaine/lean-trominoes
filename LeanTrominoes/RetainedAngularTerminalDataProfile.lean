@@ -63,6 +63,17 @@ theorem retainedTerminalDirectionClassify_classifiedRetainedTerminalData
   rw [classifiedRetainedTerminalData_eq_of_classified classified]
   exact classified
 
+/-- The total terminal-data projection has positive length on every
+retained terminal ray. -/
+theorem classifiedRetainedTerminalData_length_positive
+    {vector : Cell}
+    (retained : RetainedTerminalRayVector vector) :
+    0 < (classifiedRetainedTerminalData vector).2 := by
+  have classified :=
+    retainedTerminalDirectionClassify_classifiedRetainedTerminalData
+      retained
+  exact (retainedTerminalDirectionClassify_sound classified).1
+
 @[simp]
 theorem classifiedRetainedTerminalData_fst
     (vector : Cell) :

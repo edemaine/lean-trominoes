@@ -36,6 +36,134 @@ def retainedAngularFanSplicedOccurrenceRoute
         (angularOccurrenceOrder source.erase routes)
         clause literal clauseIndex literalIndex))
 
+/-- Any orthogonal source-to-boundary prefix can reuse the established
+scaled Figure 7 occurrence suffix.  Matching the two boundary endpoints is
+the only construction-specific obligation. -/
+theorem retainedAngularFanOccurrenceRoute_valid_of_prefix
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (boundaryPrefix : List Cell)
+    (sourcePoint : Cell)
+    (prefixHead :
+      boundaryPrefix.head? = some sourcePoint)
+    (prefixBoundary :
+      boundaryPrefix.getLast? =
+        (scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement
+            (angularOccurrenceOrder source.erase routes)
+            clause literal clauseIndex literalIndex)).head?)
+    (prefixOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline boundaryPrefix) :
+    let route :=
+      joinAtEndpoint boundaryPrefix
+        (scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement
+            (angularOccurrenceOrder source.erase routes)
+            clause literal clauseIndex literalIndex))
+    route.head? = some sourcePoint ∧
+      route.getLast? =
+        some
+          (Cell.scale retainedTerminalFanRoutingRefinement
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              (PeriodicEightOccurrenceSplitPositioned.placement
+                placement)
+              (PeriodicEightOccurrenceSplitPositioned.occurrenceClause
+                (occurrencePortsOfAngularOrder
+                  source.erase
+                  (angularOccurrenceOrder source.erase routes))
+                clauseIndex clause)
+              (occurrenceLiteral
+                (occurrencePortsOfAngularOrder
+                  source.erase
+                  (angularOccurrenceOrder source.erase routes))
+                clauseIndex literalIndex literal))) ∧
+      PeriodicOrthocrossing.OrthogonalPolyline route := by
+  dsimp only
+  let suffix :=
+    scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement
+        (angularOccurrenceOrder source.erase routes)
+        clause literal clauseIndex literalIndex)
+  have unscaledSuffixHead :=
+    angularOccurrenceSuffix_head?
+      placement
+      (angularOccurrenceOrder source.erase routes)
+      clause literal clauseIndex literalIndex
+  have suffixHead :
+      suffix.head? =
+        some
+          (Cell.scale retainedTerminalFanRoutingRefinement
+            (angularFanBoundaryPositionAt
+              placement literal.atom
+              (incidenceRelativeOffset clause literal)
+              (angularOccurrenceIndex
+                (angularOccurrenceOrder source.erase routes)
+                literal clauseIndex literalIndex))) := by
+    simpa [suffix] using congrArg
+      (Option.map
+        (Cell.scale retainedTerminalFanRoutingRefinement))
+      unscaledSuffixHead
+  have prefixLast :
+      boundaryPrefix.getLast? =
+        some
+          (Cell.scale retainedTerminalFanRoutingRefinement
+            (angularFanBoundaryPositionAt
+              placement literal.atom
+              (incidenceRelativeOffset clause literal)
+              (angularOccurrenceIndex
+                (angularOccurrenceOrder source.erase routes)
+                literal clauseIndex literalIndex))) :=
+    prefixBoundary.trans suffixHead
+  have unscaledSuffixLast :=
+    angularOccurrenceSuffix_getLast?
+      source placement
+      (angularOccurrenceOrder source.erase routes)
+      clauseMember literalMember
+  have suffixLast :
+      suffix.getLast? =
+        some
+          (Cell.scale retainedTerminalFanRoutingRefinement
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              (PeriodicEightOccurrenceSplitPositioned.placement
+                placement)
+              (PeriodicEightOccurrenceSplitPositioned.occurrenceClause
+                (occurrencePortsOfAngularOrder
+                  source.erase
+                  (angularOccurrenceOrder source.erase routes))
+                clauseIndex clause)
+              (occurrenceLiteral
+                (occurrencePortsOfAngularOrder
+                  source.erase
+                  (angularOccurrenceOrder source.erase routes))
+                clauseIndex literalIndex literal))) := by
+    simpa [suffix] using congrArg
+      (Option.map
+        (Cell.scale retainedTerminalFanRoutingRefinement))
+      unscaledSuffixLast
+  have suffixOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline suffix := by
+    exact
+      (angularOccurrenceSuffix_orthogonal
+        placement
+        (angularOccurrenceOrder source.erase routes)
+        clause literal clauseIndex literalIndex).scalePolyline
+          (by simp [retainedTerminalFanRoutingRefinement])
+  refine ⟨joinAtEndpoint_head? prefixHead, ?_, ?_⟩
+  · exact joinAtEndpoint_getLast?
+      prefixLast suffixHead suffixLast
+  · exact prefixOrthogonal.joinAtEndpoint
+      suffixOrthogonal prefixLast suffixHead
+
 /-- Every genuine retained occurrence splice starts at the scale-288 source
 clause, ends at the factor-eight copied literal, and is orthogonal. -/
 theorem retainedAngularFanSplicedOccurrenceRoute_valid

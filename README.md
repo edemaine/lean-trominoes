@@ -2074,12 +2074,18 @@ The representation choices for this target are:
   choices replace the ordinary source-to-fan boundary piece by the
   coordinated complete route and then reuse the unchanged scaled Figure 7
   occurrence suffix; failed choices, malformed indices, non-direct clauses,
-  and appended cycle clauses retain the established route exactly.
+  and appended cycle clauses retain the established route exactly.  It also
+  names the corresponding delayed-lane occurrence splice for the exceptional
+  singleton fallback case, reusing the same source scaling, terminal data,
+  occurrence slot, and Figure 7 suffix.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
   proves that each validated coordinated prefix meets that unchanged suffix
   at exactly the same fan-boundary point.  The resulting substituted route
   therefore retains the canonical clause and copied-literal endpoints and
-  remains orthogonal.
+  remains orthogonal.  It likewise validates the exceptional delayed-lane
+  fallback from its retained source certificate through the scaled terminal
+  classification and clearance bound, proving that the complete escaped
+  occurrence route has the same canonical endpoints and orthogonality.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceSpokeIdentification.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceSpokeIdentification.lean)
   identifies the selected occurrence slot with its exact angular-order
   index and proves that a successful final choice's positioned certified

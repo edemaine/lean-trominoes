@@ -1,4 +1,5 @@
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceRouteChoice
+import LeanTrominoes.RetainedAngularFanSourceEscapedSplice
 import LeanTrominoes.RetainedAngularFanSourceScaledDrawing
 
 /-!
@@ -99,6 +100,51 @@ def retainedFinalCoordinatedDirectOccurrenceRoute
       formula literal clauseIndex literalIndex
   joinAtEndpoint
     (choice.completeRoute slot)
+    (scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement
+        (angularOccurrenceOrder source.erase routes)
+        clause literal clauseIndex literalIndex))
+
+/-- One copied-source occurrence using the delayed-lane outer fan and the
+unchanged scaled Figure 7 occurrence suffix.  The raw retained route and
+its terminal data are source-scaled exactly as in the established family;
+only the outer fan waits 64 primitive blocks before selecting its lane. -/
+def retainedFinalEscapedFallbackOccurrenceRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable))
+    (literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable))
+    (clauseIndex literalIndex : Nat) :
+    List Cell :=
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let rawRoute :=
+    finalCoordinatedSourceRoutes formula
+      clauseIndex literalIndex
+  let rawTerminal :=
+    classifiedRetainedTerminalData
+      (routeTerminalVector rawRoute)
+  let slot :=
+    retainedFinalCoordinatedOccurrenceSlot
+      formula literal clauseIndex literalIndex
+  joinAtEndpoint
+    (retainedAngularFanEscapedSplicedBoundaryRoute
+      (scalePolyline retainedAngularFanSourceClearanceFactor
+        rawRoute)
+      (scaleRetainedTerminalData
+        retainedAngularFanSourceClearanceFactor rawTerminal)
+      slot)
     (scalePolyline retainedTerminalFanRoutingRefinement
       (angularOccurrenceSuffix placement
         (angularOccurrenceOrder source.erase routes)
