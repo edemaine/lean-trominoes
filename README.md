@@ -2160,6 +2160,12 @@ The representation choices for this target are:
   anchor-normalized finite drawings.  Carrier routes come from the raw
   normalized equality lens, while noncarrier routes retain their local
   clause and literal indices in the selected normalized source.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedRouteSelections.lean`](LeanTrominoes/RetainedFinalFlatNormalizedRouteSelections.lean)
+  transports the corresponding clause and literal witnesses into the actual
+  normalized incidence-drawing formulas.  Each final route is now packaged
+  as a genuine raw-carrier or retained-noncarrier drawing route, ready for
+  the carrier-boundary separation theorem without reconstructing finite
+  incidence indices.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and

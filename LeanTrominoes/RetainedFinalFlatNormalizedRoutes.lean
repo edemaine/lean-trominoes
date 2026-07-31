@@ -23,28 +23,26 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 1200000
 
-/-- A final flat carrier route is literally a route of its raw
+/-- Once the carrier source's local clause index is exposed, a final flat
+carrier route is literally the corresponding route of its raw
 anchor-normalized retained equality lens. -/
 theorem
-    FinalGaugedFlatCarrierRouteWitness.exists_route_eq_normalizedLink
+    FinalGaugedFlatCarrierRouteWitness.route_eq_normalizedLink_of_source_eq
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     {taggedRoute : List Cell × Nat}
     (carrier :
       FinalGaugedFlatCarrierRouteWitness
-        formula taggedRoute) :
-    ∃ localClauseIndex,
-      taggedRoute.1 =
-        (drawingPlanarSATCarrierLensIncidenceDrawing
-          formula carrier.normalizedLink).routes
-            localClauseIndex
-            carrier.coordinates.taggedLiteral.2 := by
-  rcases
-      carrier.routeWitness.metadata.source
-        |>.exists_eq_carrier_of_component_eq
-          carrier.link carrier.componentEq with
-    ⟨localClauseIndex, sourceEq⟩
-  refine ⟨localClauseIndex, ?_⟩
+        formula taggedRoute)
+    {localClauseIndex : Nat}
+    (sourceEq :
+      carrier.routeWitness.metadata.source =
+        .carrier carrier.link localClauseIndex) :
+    taggedRoute.1 =
+      (drawingPlanarSATCarrierLensIncidenceDrawing
+        formula carrier.normalizedLink).routes
+          localClauseIndex
+          carrier.coordinates.taggedLiteral.2 := by
   rw [carrier.finalRoute_eq_occurrence,
     carrier.routeWitness.routeEq]
   unfold metadataPhysicalRouteOccurrence
@@ -78,6 +76,31 @@ theorem
         carrier.routeWitness.physicalShift
         localClauseIndex
         carrier.coordinates.taggedLiteral.2).symm
+
+/-- A final flat carrier route is literally a route of its raw
+anchor-normalized retained equality lens. -/
+theorem
+    FinalGaugedFlatCarrierRouteWitness.exists_route_eq_normalizedLink
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {taggedRoute : List Cell × Nat}
+    (carrier :
+      FinalGaugedFlatCarrierRouteWitness
+        formula taggedRoute) :
+    ∃ localClauseIndex,
+      taggedRoute.1 =
+        (drawingPlanarSATCarrierLensIncidenceDrawing
+          formula carrier.normalizedLink).routes
+            localClauseIndex
+            carrier.coordinates.taggedLiteral.2 := by
+  rcases
+      carrier.routeWitness.metadata.source
+        |>.exists_eq_carrier_of_component_eq
+          carrier.link carrier.componentEq with
+    ⟨localClauseIndex, sourceEq⟩
+  exact
+    ⟨localClauseIndex,
+      carrier.route_eq_normalizedLink_of_source_eq sourceEq⟩
 
 /-- A final flat noncarrier route is literally the route with the same
 local clause and literal indices in its retained anchor-normalized source
