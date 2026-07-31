@@ -2005,6 +2005,17 @@ The representation choices for this target are:
   exactly matches its positioned local incidence; every successful choice
   also exposes exact translated endpoints and an orthogonality certificate
   for its complete coordinated route.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean)
+  lifts the checked selector through clause-anchor normalization and
+  representative-clause deduplication.  It recovers the retained metadata
+  representative of a final clause and translates the chosen component
+  origin by the exact physical anchor shift used by the quotient route.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutes.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRoutes.lean)
+  defines the specialized final fixed-eight route family.  Successful direct
+  choices replace the ordinary source-to-fan boundary piece by the
+  coordinated complete route and then reuse the unchanged scaled Figure 7
+  occurrence suffix; failed choices, malformed indices, non-direct clauses,
+  and appended cycle clauses retain the established route exactly.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
