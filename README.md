@@ -2149,6 +2149,12 @@ The representation choices for this target are:
   terminal component.  Routed-variable membership exposes its active
   target occurrence directly; a routed-clause literal supplies an original
   source occurrence that is transported into the normalized finite frame.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedCarrierContacts.lean`](LeanTrominoes/RetainedFinalFlatNormalizedCarrierContacts.lean)
+  applies the raw retained-carrier proximity theorems to an overlapping
+  normalized direct component.  The unresolved final pair now carries an
+  exact local contact certificate: crossover boundary incidence,
+  routed-clause source-terminal incidence, or routed-variable
+  target-terminal incidence.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
