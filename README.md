@@ -2200,6 +2200,12 @@ The representation choices for this target are:
   by the exact profile-selected outer fan route, rasterizes the retained
   result, and proves the scaled clause endpoint, refined Figure 7 boundary
   endpoint, and orthogonality.
+- [`LeanTrominoes/RetainedAngularFanSourceEscapedSplice.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSplice.lean)
+  packages the delayed-lane outer fan as an alternative replacement tail.
+  It follows the source terminal for 64 primitive blocks before selecting
+  the occurrence lane, avoiding an immediate shared-clause tangency, while
+  retaining the ordinary splice's exact clause endpoint, Figure 7 boundary
+  endpoint, and orthogonality contract.
 - [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
   applies simultaneous tail-replacement separation to two classified
   retained splices.  Positive scaling preserves strict source-prefix
