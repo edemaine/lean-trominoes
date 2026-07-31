@@ -2365,6 +2365,13 @@ The representation choices for this target are:
   refined canonical source center.  These reusable estimates reduce the two
   cross-splice/suffix obligations for a completed fallback route pair to
   separation of their original source-route rectangles.
+- [`LeanTrominoes/RetainedAngularFanEqualityLensSingletonSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanEqualityLensSingletonSpokeSeparation.lean)
+  proves both directed cross-splice/suffix obligations for the exceptional
+  singleton route in either clause of an arbitrarily oriented equality
+  lens.  The proof isolates exact narrow rectangles for the singleton route,
+  its partner route, and their opposite variable endpoints, scales their
+  integral gaps by the factor-four source clearance, and lifts the result
+  through the carrier-lens endpoint renaming.
 - [`LeanTrominoes/PolylineBoundingBoxRasterSeparation.lean`](LeanTrominoes/PolylineBoundingBoxRasterSeparation.lean)
   converts containment in two separated closed rectangles into the complete
   point/segment and segment/segment certificate required by factor-288
