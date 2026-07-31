@@ -453,6 +453,25 @@ def retainedDirectPositionedSourceEscapeRoute
   translatePolyline gate
     (retainedDirectSourcePrefixChoiceAt kind index).sourceEscapeRoute
 
+/-- Package a typed atlas entry as the complete 64-block escape at the gate
+determined by a center, positive terminal length, and occurrence slot. -/
+def retainedDirectSourceEscapeCertificateAt
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (center : Cell)
+    (length : Nat)
+    (slot : RetainedTerminalSlot) :
+    RetainedTerminalFanOuterSourceEscapeCertificate
+      center
+      ((retainedDirectSourcePrefixChoiceAt
+        kind index).direction, length)
+      slot :=
+  let choice :=
+    retainedDirectSourcePrefixChoiceAt kind index
+  choice.sourceEscapeCertificate center length slot
+    (retainedDirectSourcePrefixChoices_valid
+      kind choice (List.get_mem _ index))
+
 /-- The generic positioned source-escape construction is definitionally
 the atlas's origin route translated to its exact clause gate. -/
 theorem
@@ -477,6 +496,31 @@ theorem
     RetainedDirectSourcePrefixChoice.sourceEscapeRoute
   rw [translatePolyline_joinAtEndpoint]
   rw [RetainedRay.rasterize_translatePolyline]
+
+/-- The typed atlas certificate's route is exactly the origin atlas route
+translated to its determined clause gate. -/
+theorem retainedDirectSourceEscapeCertificateAt_route_eq_positioned
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (center : Cell)
+    (length : Nat)
+    (slot : RetainedTerminalSlot) :
+    (retainedDirectSourceEscapeCertificateAt
+      kind index center length slot).route =
+      retainedDirectPositionedSourceEscapeRoute
+        (retainedAngularFanOuterDemand center
+          ((retainedDirectSourcePrefixChoiceAt
+            kind index).direction, length)
+          slot).gate
+        kind index := by
+  exact
+    RetainedDirectSourcePrefixChoice.sourceEscapeCertificate_route_eq_translate
+      (retainedDirectSourcePrefixChoiceAt kind index)
+      center length slot
+      (retainedDirectSourcePrefixChoices_valid
+        kind
+        (retainedDirectSourcePrefixChoiceAt kind index)
+        (List.get_mem _ index))
 
 /-- The origin certificate transports to every common clause gate. -/
 theorem retainedDirectPositionedSourceEscapeRoutes_separated

@@ -87,6 +87,103 @@ theorem RetainedDirectSourcePrefixPairSelection.positionedEscapes_separated
     gate selection.kind selection.firstIndex selection.secondIndex
     selection.indicesDifferent
 
+/-- The first selected atlas entry packaged at its actual center, length,
+and occurrence slot. -/
+def RetainedDirectSourcePrefixPairSelection.firstEscapeCertificate
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {source : DrawingPlanarSATClauseSource Variable}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (selection :
+      RetainedDirectSourcePrefixPairSelection
+        formula source firstLiteralIndex secondLiteralIndex)
+    (center : Cell)
+    (length : Nat)
+    (slot : RetainedTerminalSlot) :
+    RetainedTerminalFanOuterSourceEscapeCertificate
+      center
+      ((retainedDirectSourcePrefixChoiceAt
+        selection.kind selection.firstIndex).direction, length)
+      slot :=
+  retainedDirectSourceEscapeCertificateAt
+    selection.kind selection.firstIndex center length slot
+
+/-- The second selected atlas entry packaged at its actual center, length,
+and occurrence slot. -/
+def RetainedDirectSourcePrefixPairSelection.secondEscapeCertificate
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {source : DrawingPlanarSATClauseSource Variable}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (selection :
+      RetainedDirectSourcePrefixPairSelection
+        formula source firstLiteralIndex secondLiteralIndex)
+    (center : Cell)
+    (length : Nat)
+    (slot : RetainedTerminalSlot) :
+    RetainedTerminalFanOuterSourceEscapeCertificate
+      center
+      ((retainedDirectSourcePrefixChoiceAt
+        selection.kind selection.secondIndex).direction, length)
+      slot :=
+  retainedDirectSourceEscapeCertificateAt
+    selection.kind selection.secondIndex center length slot
+
+/-- When the two actual demands have the common source-clause gate, their
+packaged 64-block escape certificates inherit the atlas's ordinary
+separation and head-only contact property. -/
+theorem
+    RetainedDirectSourcePrefixPairSelection.escapeCertificates_separated
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    {source : DrawingPlanarSATClauseSource Variable}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (selection :
+      RetainedDirectSourcePrefixPairSelection
+        formula source firstLiteralIndex secondLiteralIndex)
+    (firstCenter secondCenter : Cell)
+    (firstLength secondLength : Nat)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (gatesEqual :
+      (retainedAngularFanOuterDemand
+        firstCenter
+        ((retainedDirectSourcePrefixChoiceAt
+          selection.kind selection.firstIndex).direction,
+          firstLength)
+        firstSlot).gate =
+      (retainedAngularFanOuterDemand
+        secondCenter
+        ((retainedDirectSourcePrefixChoiceAt
+          selection.kind selection.secondIndex).direction,
+          secondLength)
+        secondSlot).gate) :
+    RoutesAvoidEachOther
+        (selection.firstEscapeCertificate
+          firstCenter firstLength firstSlot).route
+        (selection.secondEscapeCertificate
+          secondCenter secondLength secondSlot).route ∧
+      RoutesMeetOnlyAtHeads
+        (selection.firstEscapeCertificate
+          firstCenter firstLength firstSlot).route
+        (selection.secondEscapeCertificate
+          secondCenter secondLength secondSlot).route := by
+  unfold RetainedDirectSourcePrefixPairSelection.firstEscapeCertificate
+    RetainedDirectSourcePrefixPairSelection.secondEscapeCertificate
+  rw [
+    retainedDirectSourceEscapeCertificateAt_route_eq_positioned,
+    retainedDirectSourceEscapeCertificateAt_route_eq_positioned,
+    gatesEqual]
+  exact
+    retainedDirectPositionedSourceEscapeRoutes_separated
+      (retainedAngularFanOuterDemand
+        secondCenter
+        ((retainedDirectSourcePrefixChoiceAt
+          selection.kind selection.secondIndex).direction,
+          secondLength)
+        secondSlot).gate
+      selection.kind selection.firstIndex selection.secondIndex
+      selection.indicesDifferent
+
 /-- A genuine crossover-clause literal selects the atlas entry with its
 fixed local clause and literal indices. -/
 theorem exists_retainedDirectSourcePrefixSelection_crossover

@@ -1960,7 +1960,10 @@ The representation choices for this target are:
   carries equality with the positioned local route's classified direction.
   Its pair interface proves distinct literals select distinct entries of one
   common profile and immediately transports the atlas's separation and
-  head-only-contact certificate to any shared clause gate.
+  head-only-contact certificate to any shared clause gate.  It also packages
+  those entries as the exact 64-block source-escape certificates for the two
+  actual centers, lengths, and occurrence slots once their demand gates are
+  identified with that common clause gate.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
