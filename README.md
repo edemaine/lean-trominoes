@@ -1989,6 +1989,13 @@ The representation choices for this target are:
   metadata-selected direct-clause pair now yields separated coordinated
   complete routes with their shared clause gate as the only possible
   contact.
+- [`LeanTrominoes/RetainedAngularFanDirectSourcePositionedRoutes.lean`](LeanTrominoes/RetainedAngularFanDirectSourcePositionedRoutes.lean)
+  transports those local coordinated routes to an arbitrary direct
+  component origin.  Its combined translation records source scale four
+  followed by the full fan refinement, and translation invariance preserves
+  both continuous avoidance and common-head-only contact.  This is the
+  physical-coordinate interface used when the specialized final router
+  substitutes coordinated routes for ordinary same-clause fans.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
