@@ -2225,12 +2225,14 @@ The representation choices for this target are:
   incidence route: a clause lift cannot equal a periodically translated
   variable lift.
 - [`LeanTrominoes/RetainedFinalPositionedOccurrenceSpliceSeparation.lean`](LeanTrominoes/RetainedFinalPositionedOccurrenceSpliceSeparation.lean)
-  exposes shared-center splice separation directly at the positioned source
-  interface.  It derives flat memberships and indices, route lengths,
-  classified endpoints, distinct-index facts, and both source-versus-center
-  inequalities automatically, leaving global route-pair assembly to supply
-  only the two incidence memberships and their physical source/center
-  relationships.
+  exposes both completed splice separators directly at the positioned source
+  interface.  Shared-center occurrences may have arbitrary retained terminal
+  directions; distinct-center occurrences use the axis-aligned final-segment
+  case.  Both theorems derive flat memberships and indices, route lengths,
+  classified endpoints, distinct-index facts, and every clause-versus-variable
+  endpoint inequality automatically, leaving global route-pair assembly to
+  supply only the incidence memberships and the relevant physical
+  source/center case.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
