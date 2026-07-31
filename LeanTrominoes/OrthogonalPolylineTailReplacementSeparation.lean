@@ -685,6 +685,11 @@ def RoutesMeetOnlyAtHeads
         first.head? = some firstPoint ∧
           second.head? = some secondPoint
 
+instance (first second : List Cell) :
+    Decidable (RoutesMeetOnlyAtHeads first second) := by
+  unfold RoutesMeetOnlyAtHeads
+  infer_instance
+
 /-- Head-only listed contact is symmetric. -/
 theorem RoutesMeetOnlyAtHeads.symm
     {first second : List Cell}

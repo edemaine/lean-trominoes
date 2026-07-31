@@ -1935,6 +1935,12 @@ The representation choices for this target are:
   a shared clause gate; a generic construction translates it, appends the
   remaining 62 canonical blocks, and packages the result as the exact
   64-block source escape required by the complete outer-fan route.
+- [`LeanTrominoes/RetainedAngularFanDirectSourcePrefixAtlas.lean`](LeanTrominoes/RetainedAngularFanDirectSourcePrefixAtlas.lean)
+  gives the finite two-block choices for all 26 crossover clauses, both
+  clauses of each duplicator arm, and the routed three-arm source clause.
+  Executable certificates check every entry's endpoint and orthogonality and
+  prove that distinct 64-block escapes in each direct clause are continuously
+  separated and meet only at their shared head.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
