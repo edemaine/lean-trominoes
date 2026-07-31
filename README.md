@@ -2045,6 +2045,11 @@ The representation choices for this target are:
   other genuine literal of that clause therefore also has a successful
   checked choice, closing the selector-uniformity case needed by the total
   same-clause route-family proof.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceChoiceFailure.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceChoiceFailure.lean)
+  proves the complementary selector classification.  A genuine final-route
+  witness from any crossover, routed-clause, or routed-variable component
+  reconstructs a successful checked choice, so failure exposes a physical
+  retained carrier-lens or bend-corner witness for the fallback geometry.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean)
   transports the raw prefix--spoke certificate through that same
   anchor-normalization shift.  Thus two successful final choices at

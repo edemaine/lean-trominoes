@@ -24,6 +24,124 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 set_option maxHeartbeats 400000
 
+/-- A physical witness whose retained metadata comes from one of the three
+direct component families reconstructs a successful choice for the
+corresponding final route.  This is the witness-level converse needed to
+interpret failure of the checked final selector. -/
+theorem
+    exists_finalDirectSourceRouteChoice_of_witness_directCases
+    {Variable : Type*} [variableDecEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {clauseIndex literalIndex : Nat}
+    (witness :
+      FinalGaugedRouteOccurrenceWitness
+        formula clauseIndex literalIndex (0, 0))
+    (directCases :
+      (∃ crossing localClauseIndex,
+          witness.metadata.source =
+            .crossover crossing localClauseIndex) ∨
+        (∃ site,
+          witness.metadata.source = .routedClause site) ∨
+        (∃ site armIndex arm link localClauseIndex,
+          witness.metadata.source =
+            .routedVariable
+              site armIndex arm link localClauseIndex)) :
+    ∃ choice,
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex =
+        some choice := by
+  rcases
+      LeanTrominoes.PeriodicEightOccurrenceSplit.DrawingPlanarSATClauseMetadata.exists_retainedDirectSourceRouteChoice
+        witness.metadata
+        witness.metadata_retainedValid
+        witness.literalMember directCases with
+    ⟨rawChoice, rawLookup, _rawMatches⟩
+  let translation :=
+    retainedFinalDirectSourceMetadataTranslation
+      formula witness.metadata
+  let choice :=
+    rawChoice.translateOrigin translation
+  have rawRepresents :=
+    retainedDirectSourceRouteChoice?_represents_of_eq_some
+      formula witness.metadata.source literalIndex
+      rawChoice rawLookup
+  have localRouteEq :
+      (retainedDrawingPlanarSATLocalIncidenceDrawing formula).routeAt
+          (metadataPhysicalIncidence witness.metadata
+            witness.metadataIndex witness.literal
+            literalIndex) =
+        (witness.metadata.source.incidenceDrawing formula).routes
+          witness.metadata.source.localClauseIndex
+          literalIndex := by
+    simp [retainedDrawingPlanarSATLocalIncidenceDrawing_routes,
+      retainedDrawingPlanarSATLocalIncidenceRoutes,
+      metadataPhysicalIncidence,
+      EmbeddedCNFIncidenceDrawing.routeAt,
+      witness.metadataLookup]
+  have witnessRouteEq :
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+          formula clauseIndex literalIndex =
+        translatePolyline translation
+          ((witness.metadata.source.incidenceDrawing formula).routes
+            witness.metadata.source.localClauseIndex
+            literalIndex) := by
+    have routeEq := witness.routeEq
+    unfold finalGaugedRouteOccurrence
+      metadataPhysicalRouteOccurrence at routeEq
+    have zeroTranslation :
+        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          formula).translation (0, 0) = (0, 0) := by
+      simp [PeriodicVariablePlacement.translation, Cell.scale]
+    rw [zeroTranslation] at routeEq
+    have translatePolyline_zero (points : List Cell) :
+        translatePolyline (0, 0) points = points := by
+      induction points with
+      | nil => rfl
+      | cons point points induction =>
+          change
+            List.map (Cell.add (0, 0)) points = points at induction
+          simp only [translatePolyline, List.map_cons]
+          rw [induction]
+          simp [Cell.add]
+    rw [translatePolyline_zero] at routeEq
+    rw [localRouteEq] at routeEq
+    simpa [translation,
+      retainedFinalDirectSourceMetadataTranslation] using routeEq
+  have represents :
+      choice.RepresentsFinalRoute
+        formula clauseIndex literalIndex := by
+    unfold RetainedDirectSourceRouteChoice.RepresentsFinalRoute
+    rw [witnessRouteEq]
+    unfold choice RetainedDirectSourceRouteChoice.translateOrigin
+    simp only
+    rw [← rawRepresents]
+    rw [translatePolyline_add]
+    apply congrArg₂ translatePolyline
+    · rcases translation with ⟨tx, ty⟩
+      rcases rawChoice.origin with ⟨ox, oy⟩
+      simp [Cell.add]
+      constructor <;> ring
+    · rfl
+  have wrappedDecidableEqEq :
+      (@instDecidableEqWrappedPeriodicVariable
+          (PeriodicPlanarSATVariable Variable)
+          (@instDecidableEqPeriodicPlanarSATVariable
+            Variable variableDecEq)) =
+        (@drawingOrderedWrappedPeriodicPlanarSATVariableInstDecidableEq
+          Variable variableDecEq) := by
+    funext first second
+    exact Subsingleton.elim _ _
+  have representativeLookup :=
+    witness.representativeMetadataLookup
+  rw [wrappedDecidableEqEq] at representativeLookup
+  refine ⟨choice, ?_⟩
+  exact
+    retainedFinalDirectSourceRouteChoice_eq_some_of_lookups
+      formula clauseIndex literalIndex
+      witness.finalClause witness.metadata
+      rawChoice witness.finalClauseLookup
+      representativeLookup rawLookup represents
+
 /-- If the checked direct-source selector succeeds for one literal of a
 final clause, it succeeds for every genuine literal of that clause. -/
 theorem retainedFinalDirectSourceRouteChoice_exists_of_sameClause_choice_some
@@ -82,7 +200,7 @@ theorem retainedFinalDirectSourceRouteChoice_exists_of_sameClause_choice_some
   rcases retainedFinalDirectSourceRouteChoice_exists_raw
       formula clauseIndex firstLiteralIndex
       firstChoice firstChoiceLookup with
-    ⟨firstMetadata, firstRawChoice, firstMetadataLookup,
+    ⟨firstMetadata, _firstRawChoice, firstMetadataLookup,
       firstRawLookup, _firstChoiceEq⟩
   have finalClauseLookup :
       (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
@@ -108,9 +226,6 @@ theorem retainedFinalDirectSourceRouteChoice_exists_of_sameClause_choice_some
     funext first second
     exact Subsingleton.elim _ _
   rw [wrappedDecidableEqEq] at secondRepresentativeLookup
-  have finalRepresentativeLookup :=
-    secondWitness.representativeMetadataLookup
-  rw [wrappedDecidableEqEq] at finalRepresentativeLookup
   have firstRepresentativeLookup := firstMetadataLookup
   unfold retainedFinalDirectSourceMetadata? at firstRepresentativeLookup
   rw [finalClauseLookup] at firstRepresentativeLookup
@@ -141,86 +256,9 @@ theorem retainedFinalDirectSourceRouteChoice_exists_of_sameClause_choice_some
     | routedVariable site armIndex arm link localClauseIndex =>
         exact Or.inr (Or.inr
           ⟨site, armIndex, arm, link, localClauseIndex, rfl⟩)
-  rcases
-      LeanTrominoes.PeriodicEightOccurrenceSplit.DrawingPlanarSATClauseMetadata.exists_retainedDirectSourceRouteChoice
-        secondWitness.metadata
-        secondWitness.metadata_retainedValid
-        secondWitness.literalMember directCases with
-    ⟨secondRawChoice, secondRawLookup, _secondMatches⟩
-  let translation :=
-    retainedFinalDirectSourceMetadataTranslation
-      formula secondWitness.metadata
-  let secondChoice :=
-    secondRawChoice.translateOrigin translation
-  have rawRepresents :=
-    retainedDirectSourceRouteChoice?_represents_of_eq_some
-      formula secondWitness.metadata.source secondLiteralIndex
-      secondRawChoice secondRawLookup
-  have localRouteEq :
-      (retainedDrawingPlanarSATLocalIncidenceDrawing formula).routeAt
-          (metadataPhysicalIncidence secondWitness.metadata
-            secondWitness.metadataIndex secondWitness.literal
-            secondLiteralIndex) =
-        (secondWitness.metadata.source.incidenceDrawing formula).routes
-          secondWitness.metadata.source.localClauseIndex
-          secondLiteralIndex := by
-    simp [retainedDrawingPlanarSATLocalIncidenceDrawing_routes,
-      retainedDrawingPlanarSATLocalIncidenceRoutes,
-      metadataPhysicalIncidence,
-      EmbeddedCNFIncidenceDrawing.routeAt,
-      secondWitness.metadataLookup]
-  have witnessRouteEq :
-      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
-          formula clauseIndex secondLiteralIndex =
-        translatePolyline translation
-          ((secondWitness.metadata.source.incidenceDrawing formula).routes
-            secondWitness.metadata.source.localClauseIndex
-            secondLiteralIndex) := by
-    have routeEq := secondWitness.routeEq
-    unfold finalGaugedRouteOccurrence
-      metadataPhysicalRouteOccurrence at routeEq
-    have zeroTranslation :
-        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-          formula).translation (0, 0) = (0, 0) := by
-      simp [PeriodicVariablePlacement.translation, Cell.scale]
-    rw [zeroTranslation] at routeEq
-    have translatePolyline_zero (points : List Cell) :
-        translatePolyline (0, 0) points = points := by
-      induction points with
-      | nil => rfl
-      | cons point points induction =>
-          change
-            List.map (Cell.add (0, 0)) points = points at induction
-          simp only [translatePolyline, List.map_cons]
-          rw [induction]
-          simp [Cell.add]
-    rw [translatePolyline_zero] at routeEq
-    rw [localRouteEq] at routeEq
-    simpa [translation,
-      retainedFinalDirectSourceMetadataTranslation] using routeEq
-  have represents :
-      secondChoice.RepresentsFinalRoute
-        formula clauseIndex secondLiteralIndex := by
-    unfold RetainedDirectSourceRouteChoice.RepresentsFinalRoute
-    rw [witnessRouteEq]
-    unfold secondChoice RetainedDirectSourceRouteChoice.translateOrigin
-    simp only
-    rw [← rawRepresents]
-    rw [translatePolyline_add]
-    apply congrArg₂ translatePolyline
-    · rcases translation with ⟨tx, ty⟩
-      rcases secondRawChoice.origin with ⟨ox, oy⟩
-      simp [Cell.add]
-      constructor <;> ring
-    · rfl
-  refine ⟨secondChoice, ?_⟩
   exact
-    retainedFinalDirectSourceRouteChoice_eq_some_of_lookups
-      formula clauseIndex secondLiteralIndex
-      secondWitness.finalClause secondWitness.metadata
-      secondRawChoice secondWitness.finalClauseLookup
-      finalRepresentativeLookup
-      secondRawLookup represents
+    exists_finalDirectSourceRouteChoice_of_witness_directCases
+      formula secondWitness directCases
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
