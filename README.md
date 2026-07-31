@@ -1946,6 +1946,12 @@ The representation choices for this target are:
   assembly theorem reduces complete-route separation to the escape pair, two
   directed escape--tail pairs, and the tail pair, while preserving the fact
   that the common clause head is the only permitted contact.
+- [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
+  bounds every point of a cardinal escaped complete tail in the inward
+  half-plane 64 blocks beyond its source gate.  Its separation corollary
+  reduces avoidance of any route on the opposite side to one pointwise
+  linear lower bound, which is the certificate needed for the singleton
+  equality-lens fallback.
 - [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
   proves that both retained-ray raster families and endpoint joins commute
   with translation.  It also transports ordinary continuous avoidance and
