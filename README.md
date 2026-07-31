@@ -2022,6 +2022,11 @@ The representation choices for this target are:
   coordinated complete route and then reuse the unchanged scaled Figure 7
   occurrence suffix; failed choices, malformed indices, non-direct clauses,
   and appended cycle clauses retain the established route exactly.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
+  proves that each validated coordinated prefix meets that unchanged suffix
+  at exactly the same fan-boundary point.  The resulting substituted route
+  therefore retains the canonical clause and copied-literal endpoints and
+  remains orthogonal.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
