@@ -2433,6 +2433,12 @@ The representation choices for this target are:
   rectangles separated by one integral lattice unit therefore yield
   strictly separated complete outer fans after the factor-four source
   refinement.
+- [`LeanTrominoes/RetainedAngularFanOuterEscapedSourceSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedSourceSeparation.lean)
+  proves that delaying the lane shift preserves the ordinary radius-65
+  source-terminal corridor and hence the same radius-288 discarded-terminal
+  rectangle bound.  The existing rectangle-separation certificate therefore
+  separates escaped/ordinary and escaped/escaped complete fan pairs without
+  new global geometry.
 - [`LeanTrominoes/RetainedFinalOuterFanSeparation.lean`](LeanTrominoes/RetainedFinalOuterFanSeparation.lean)
   derives that terminal-rectangle premise from the final retained drawing
   itself for the broad axis-aligned, endpoint-distinct class.  Endpoint-only
