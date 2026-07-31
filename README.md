@@ -2073,6 +2073,11 @@ The representation choices for this target are:
   valid-variable position injectivity, and incidence-key distinctness.
   Their factor-36 Figure 7 macrocells, and hence their scaled spoke suffixes,
   are therefore strictly separated.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean)
+  discharges all three suffix-involving premises of the endpoint-join
+  separator.  Consequently, any two successful coordinated direct
+  occurrences of one final clause avoid one another and can meet only at
+  their inherited common clause gate.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their
