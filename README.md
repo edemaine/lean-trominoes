@@ -2039,6 +2039,12 @@ The representation choices for this target are:
   one final clause therefore share one source and one anchor-normalization
   offset; transporting the raw pair certificate proves their complete
   coordinated routes avoid each other and meet only at their common heads.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceChoiceUniformity.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceChoiceUniformity.lean)
+  proves that one successful direct-source choice determines a direct
+  canonical metadata representative for the entire final clause.  Every
+  other genuine literal of that clause therefore also has a successful
+  checked choice, closing the selector-uniformity case needed by the total
+  same-clause route-family proof.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean)
   transports the raw prefix--spoke certificate through that same
   anchor-normalization shift.  Thus two successful final choices at
