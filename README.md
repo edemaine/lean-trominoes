@@ -1980,6 +1980,15 @@ The representation choices for this target are:
   incidence geometry, have room for the escape, and select one common clause
   gate for every pair of occurrence slots.  Thus a metadata-selected pair
   now exposes only three concrete strict-separation premises.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceTailSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceTailSeparation.lean)
+  discharges those last three premises.  Computed linear extrema replace a
+  quadratic comparison of long staircase routes, while a four-normal
+  half-plane family covers the bisector, the tight `56 / 64` lane-clearance
+  case, and both ray boundaries.  A finite atlas-and-slot check certifies
+  both escape--tail directions and tail--tail separation, so a genuine
+  metadata-selected direct-clause pair now yields separated coordinated
+  complete routes with their shared clause gate as the only possible
+  contact.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
