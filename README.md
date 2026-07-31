@@ -1964,6 +1964,11 @@ The representation choices for this target are:
   transports that complete singleton-fallback certificate through the
   route-preserving endpoint and planar-SAT variable renamings, so it applies
   directly to every geometrically certified retained carrier lens.
+- [`LeanTrominoes/RetainedAngularFanFinalCarrierLensSingletonGeometry.lean`](LeanTrominoes/RetainedAngularFanFinalCarrierLensSingletonGeometry.lean)
+  absorbs a final zero-shift occurrence's clause-anchor translation into its
+  carrier link, identifies the physical route with that anchor-normalized
+  lens route, and lifts the complete escaped-fallback separation certificate
+  to the final retained route family.
 - [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
   proves that both retained-ray raster families and endpoint joins commute
   with translation.  It also transports ordinary continuous avoidance and
