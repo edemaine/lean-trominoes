@@ -2050,6 +2050,8 @@ The representation choices for this target are:
   witness from any crossover, routed-clause, or routed-variable component
   reconstructs a successful checked choice, so failure exposes a physical
   retained carrier-lens or bend-corner witness for the fallback geometry.
+  Failure is uniform within a genuine final clause, and any two failed
+  literals recover the same canonical metadata representative.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceSpokePairs.lean)
   transports the raw prefix--spoke certificate through that same
   anchor-normalization shift.  Thus two successful final choices at
