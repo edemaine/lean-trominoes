@@ -1960,6 +1960,10 @@ The representation choices for this target are:
   finite 64-block escape geometry and combines it with the strict post-escape
   half-plane bound, proving that the complete escaped fan and partner prefix
   remain continuously separated and meet only at their common clause head.
+- [`LeanTrominoes/RetainedAngularFanCarrierLensSingletonGeometry.lean`](LeanTrominoes/RetainedAngularFanCarrierLensSingletonGeometry.lean)
+  transports that complete singleton-fallback certificate through the
+  route-preserving endpoint and planar-SAT variable renamings, so it applies
+  directly to every geometrically certified retained carrier lens.
 - [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
   proves that both retained-ray raster families and endpoint joins commute
   with translation.  It also transports ordinary continuous avoidance and
