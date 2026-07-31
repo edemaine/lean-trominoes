@@ -2008,6 +2008,12 @@ The representation choices for this target are:
   choice also exposes its exact fully scaled local head and fan-boundary
   endpoint, together with an orthogonality certificate for its complete
   coordinated route.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceRouteChoicePairs.lean`](LeanTrominoes/RetainedAngularFanDirectSourceRouteChoicePairs.lean)
+  reconstructs one common finite-atlas pair from two independently checked
+  choices for distinct literals of the same direct source.  Crossover and
+  duplicator sources preserve distinct presentation indices directly;
+  routed-clause sources use duplicate-free physical ports.  In every case,
+  the two complete routes are separated and can meet only at their heads.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean)
   lifts the checked selector through clause-anchor normalization and
   representative-clause deduplication.  It recovers the retained metadata
