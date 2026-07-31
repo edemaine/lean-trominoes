@@ -2144,6 +2144,11 @@ The representation choices for this target are:
   anchor-normalized source.  The remaining finite component is therefore
   classified, with all constructor witnesses intact, as exactly a
   crossover, routed clause, or routed-variable arm.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedSourceOccurrences.lean`](LeanTrominoes/RetainedFinalFlatNormalizedSourceOccurrences.lean)
+  recovers a represented CNF route occurrence for either kind of normalized
+  terminal component.  Routed-variable membership exposes its active
+  target occurrence directly; a routed-clause literal supplies an original
+  source occurrence that is transported into the normalized finite frame.
 - [`LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean`](LeanTrominoes/RetainedAngularFanBoundaryRouteFamily.lean)
   lifts the splice to a total clause/literal-indexed boundary-route family.
   Genuine source incidences select their exact classified terminal data and
