@@ -1,5 +1,6 @@
 import LeanTrominoes.RetainedAngularFanOuterCoordinatedPrefixes
 import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
+import LeanTrominoes.RetainedRayRasterizationTranslation
 
 /-!
 # Finite coordinated-prefix atlas for direct clause components
@@ -409,6 +410,97 @@ theorem retainedDirectSourcePrefixChoices_sourceEscapes_separated :
     ∀ kind : RetainedDirectClauseKind,
       kind.SourceEscapesSeparated := by
   native_decide
+
+/-- Typed selection of one finite atlas entry. -/
+def retainedDirectSourcePrefixChoiceAt
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length) :
+    RetainedDirectSourcePrefixChoice :=
+  (retainedDirectSourcePrefixChoices kind).get index
+
+/-- Every typed atlas selection supplies the generic relative-prefix
+certificate. -/
+def retainedDirectSourcePrefixCertificateAt
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length) :
+    RetainedTerminalFanOuterRelativeCoordinatedPrefixCertificate
+      (retainedDirectSourcePrefixChoiceAt kind index).direction :=
+  let choice := retainedDirectSourcePrefixChoiceAt kind index
+  choice.certificate
+    (retainedDirectSourcePrefixChoices_valid
+      kind choice (List.get_mem _ index))
+
+/-- Turn one checked atlas choice into the positioned 64-block source
+escape consumed by the complete fan route. -/
+def RetainedDirectSourcePrefixChoice.sourceEscapeCertificate
+    (choice : RetainedDirectSourcePrefixChoice)
+    (center : Cell)
+    (length : Nat)
+    (slot : RetainedTerminalSlot)
+    (valid : choice.Valid) :
+    RetainedTerminalFanOuterSourceEscapeCertificate
+      center (choice.direction, length) slot :=
+  retainedTerminalFanOuterSourceEscapeCertificateOfCoordinatedPrefix
+    center (choice.direction, length) slot
+    (choice.certificate valid)
+
+/-- Position one origin-certified atlas escape at a shared clause gate. -/
+def retainedDirectPositionedSourceEscapeRoute
+    (gate : Cell)
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length) :
+    List Cell :=
+  translatePolyline gate
+    (retainedDirectSourcePrefixChoiceAt kind index).sourceEscapeRoute
+
+/-- The generic positioned source-escape construction is definitionally
+the atlas's origin route translated to its exact clause gate. -/
+theorem
+    RetainedDirectSourcePrefixChoice.sourceEscapeCertificate_route_eq_translate
+    (choice : RetainedDirectSourcePrefixChoice)
+    (center : Cell)
+    (length : Nat)
+    (slot : RetainedTerminalSlot)
+    (valid : choice.Valid) :
+    (choice.sourceEscapeCertificate
+      center length slot valid).route =
+        translatePolyline
+          (retainedAngularFanOuterDemand
+            center (choice.direction, length) slot).gate
+          choice.sourceEscapeRoute := by
+  unfold RetainedDirectSourcePrefixChoice.sourceEscapeCertificate
+    retainedTerminalFanOuterSourceEscapeCertificateOfCoordinatedPrefix
+    retainedTerminalFanOuterSourceEscapeRouteOfCoordinatedPrefix
+    retainedTerminalFanOuterPositionedCoordinatedPrefixRoute
+    retainedTerminalFanOuterCoordinatedPrefixPoint
+    RetainedDirectSourcePrefixChoice.certificate
+    RetainedDirectSourcePrefixChoice.sourceEscapeRoute
+  rw [translatePolyline_joinAtEndpoint]
+  rw [RetainedRay.rasterize_translatePolyline]
+
+/-- The origin certificate transports to every common clause gate. -/
+theorem retainedDirectPositionedSourceEscapeRoutes_separated
+    (gate : Cell)
+    (kind : RetainedDirectClauseKind)
+    (firstIndex secondIndex :
+      Fin (retainedDirectSourcePrefixChoices kind).length)
+    (different : firstIndex ≠ secondIndex) :
+    RoutesAvoidEachOther
+        (retainedDirectPositionedSourceEscapeRoute
+          gate kind firstIndex)
+        (retainedDirectPositionedSourceEscapeRoute
+          gate kind secondIndex) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedDirectPositionedSourceEscapeRoute
+          gate kind firstIndex)
+        (retainedDirectPositionedSourceEscapeRoute
+          gate kind secondIndex) := by
+  have separated :=
+    retainedDirectSourcePrefixChoices_sourceEscapes_separated
+      kind firstIndex secondIndex different
+  exact
+    ⟨separated.1.translate gate,
+      separated.2.translate gate⟩
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

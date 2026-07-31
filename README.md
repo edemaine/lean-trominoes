@@ -1935,12 +1935,23 @@ The representation choices for this target are:
   a shared clause gate; a generic construction translates it, appends the
   remaining 62 canonical blocks, and packages the result as the exact
   64-block source escape required by the complete outer-fan route.
+- [`LeanTrominoes/RetainedRayRasterizationTranslation.lean`](LeanTrominoes/RetainedRayRasterizationTranslation.lean)
+  proves that both retained-ray raster families and endpoint joins commute
+  with translation.  It also transports ordinary continuous avoidance and
+  head-only contact certificates, letting a finite source atlas proved at
+  the origin be reused at any shared clause gate.
 - [`LeanTrominoes/RetainedAngularFanDirectSourcePrefixAtlas.lean`](LeanTrominoes/RetainedAngularFanDirectSourcePrefixAtlas.lean)
   gives the finite two-block choices for all 26 crossover clauses, both
   clauses of each duplicator arm, and the routed three-arm source clause.
   Executable certificates check every entry's endpoint and orthogonality and
   prove that distinct 64-block escapes in each direct clause are continuously
   separated and meet only at their shared head.
+- [`LeanTrominoes/RetainedAngularFanDirectSourcePrefixProfiles.lean`](LeanTrominoes/RetainedAngularFanDirectSourcePrefixProfiles.lean)
+  matches that atlas to the construction's fixed local formulas.  Finite
+  checks prove that every crossover and duplicator-arm clause has exactly one
+  entry per literal and that every selected entry has the route's exact
+  classified terminal direction; routed clauses select the same certificate
+  by their physical left, middle, or right arm.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
