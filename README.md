@@ -2020,6 +2020,11 @@ The representation choices for this target are:
   duplicator sources preserve distinct presentation indices directly;
   routed-clause sources use duplicate-free physical ports.  In every case,
   the two complete routes are separated and can meet only at their heads.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceRouteChoiceSpokePairs.lean`](LeanTrominoes/RetainedAngularFanDirectSourceRouteChoiceSpokePairs.lean)
+  positions the certified Figure 7 spoke with each checked route choice.
+  For two distinct literals selected from the same raw direct source, it
+  proves both directed prefix--spoke interactions strictly avoid one
+  another after the common component-origin translation.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean)
   lifts the checked selector through clause-anchor normalization and
   representative-clause deduplication.  It recovers the retained metadata
