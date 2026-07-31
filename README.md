@@ -1920,13 +1920,15 @@ The representation choices for this target are:
   genuine source occurrences select their exact classified route.  General
   separation of the arbitrary-length radial pieces remains the next layer.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedRoutes.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedRoutes.lean)
-  corrects the shared-clause entrance geometry by following 64 primitive
-  blocks of the original terminal ray before applying the occurrence-lane
-  shift.  This exceeds the maximum 56-unit shift and prevents two compatible
-  angular rays from overlapping immediately after a common gate.  At the
-  concrete factor-four source scale the escape always fits; exact endpoint
+  splits off 64 primitive blocks of the original terminal ray before the
+  occurrence-lane shift.  This exceeds the maximum 56-unit shift, and at the
+  concrete factor-four source scale the escape always fits.  Exact endpoint
   and orthogonality theorems show that it rejoins the unchanged radial tail
   and preserves the radius-288 port and Figure 7 boundary endpoint.
+  Independent staircase escapes can still share their first grid step, so
+  the direct component families use this layer through coordinated,
+  clause-level escape certificates rather than treating the default escape
+  as a planarity theorem.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,

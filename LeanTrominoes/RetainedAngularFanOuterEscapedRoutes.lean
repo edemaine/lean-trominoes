@@ -9,12 +9,18 @@ variable center, but two direct incidences leaving one clause can have the
 same gate.  If their direction-specific lane steps agree, the two shifts can
 then overlap beyond the common head.
 
-This variant first follows 64 primitive blocks of the original inward ray,
-then applies the same lane shift, and finally follows the remaining original
-radial tail.  Sixty-four blocks exceed the maximum lane displacement of
-`8 * 7 = 56`.  At the concrete source scale four, even a unit compass
-terminal has 288 radial blocks outside the fixed fan interface, so the
-escape fits with ample room.
+This layer splits off the first 64 primitive blocks before the same lane
+shift and remaining radial tail.  Sixty-four blocks exceed the maximum lane
+displacement of `8 * 7 = 56`.  At the concrete source scale four, even a
+unit compass terminal has 288 radial blocks outside the fixed fan interface,
+so the escape fits with ample room.
+
+The default route below rasterizes that escape independently.  Its endpoint
+and orthogonality facts are useful, but independent rasterization is not by
+itself a shared-clause planarity certificate: some compass triples and
+routed-clause pairs choose the same first grid step.  Direct component
+families therefore supply coordinated escape prefixes through the certified
+interface developed below.
 -/
 
 namespace LeanTrominoes
@@ -307,6 +313,332 @@ theorem retainedTerminalFanOuterEscapedRadialRoute_orthogonal
         apply joinAtEndpoint_head?
         exact retainedTerminalFanOuterLaneShiftRouteAt_head?
           escapePoint terminal.1 slot)
+
+/-- A clause-level source escape supplies an orthogonal route from the
+common gate to the fixed checkpoint on this terminal ray.  Pairwise
+planarity belongs to the family that supplies several such certificates. -/
+structure RetainedTerminalFanOuterSourceEscapeCertificate
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot) where
+  route : List Cell
+  head_eq :
+    route.head? =
+      some
+        (retainedAngularFanOuterDemand
+          center terminal slot).gate
+  last_eq :
+    route.getLast? =
+      some
+        (retainedTerminalFanOuterSourceEscapePoint
+          center terminal slot)
+  orthogonal :
+    PeriodicOrthocrossing.OrthogonalPolyline route
+
+/-- Independent rasterization provides the canonical one-route escape
+certificate.  Shared-clause families may replace it with a coordinated
+route having the same endpoints. -/
+def retainedTerminalFanOuterRasterizedSourceEscapeCertificate
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot) :
+    RetainedTerminalFanOuterSourceEscapeCertificate
+      center terminal slot where
+  route :=
+    (retainedTerminalFanOuterSourceEscapeRay terminal).rasterize
+      (retainedAngularFanOuterDemand center terminal slot).gate
+  head_eq := RetainedRay.rasterize_head? _ _
+  last_eq := by
+    rw [RetainedRay.rasterize_getLast?]
+    rfl
+  orthogonal := RetainedRay.rasterize_orthogonal _ _
+
+/-- The part of an escaped radial route after its clause-coordinated source
+escape: select the occurrence lane and follow the remaining old raster. -/
+def retainedTerminalFanOuterEscapedShiftedTail
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot) : List Cell :=
+  let escapePoint :=
+    retainedTerminalFanOuterSourceEscapePoint center terminal slot
+  let shiftedEscapePoint :=
+    Cell.add escapePoint
+      (retainedTerminalFanOuterLaneOffset terminal.1 slot)
+  joinAtEndpoint
+    (retainedTerminalFanOuterLaneShiftRouteAt
+      escapePoint terminal.1 slot)
+    ((retainedTerminalFanOuterEscapedRemainingRay terminal).rasterize
+      shiftedEscapePoint)
+
+/-- The shifted tail starts where every certified source escape ends. -/
+@[simp]
+theorem retainedTerminalFanOuterEscapedShiftedTail_head?
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot) :
+    (retainedTerminalFanOuterEscapedShiftedTail
+      center terminal slot).head? =
+        some
+          (retainedTerminalFanOuterSourceEscapePoint
+            center terminal slot) := by
+  unfold retainedTerminalFanOuterEscapedShiftedTail
+  apply joinAtEndpoint_head?
+  exact retainedTerminalFanOuterLaneShiftRouteAt_head? _ _ _
+
+/-- The shifted tail reaches the unchanged radius-288 lane port. -/
+@[simp]
+theorem retainedTerminalFanOuterEscapedShiftedTail_getLast?
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (lengthPositive : 0 < terminal.2)
+    (escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength terminal) :
+    (retainedTerminalFanOuterEscapedShiftedTail
+      center terminal slot).getLast? =
+        some
+          (retainedTerminalFanOuterLanePort
+            center terminal.1 slot) := by
+  let gate :=
+    (retainedAngularFanOuterDemand center terminal slot).gate
+  let escapePoint :=
+    retainedTerminalFanOuterSourceEscapePoint center terminal slot
+  let shiftedEscapePoint :=
+    Cell.add escapePoint
+      (retainedTerminalFanOuterLaneOffset terminal.1 slot)
+  have escapePointEq :
+      escapePoint =
+        Cell.add gate
+          (retainedTerminalFanOuterSourceEscapeRay terminal).vector := by
+    rfl
+  have shiftedEscapePointEq :
+      shiftedEscapePoint =
+        Cell.add escapePoint
+          (retainedTerminalFanOuterLaneOffset terminal.1 slot) := by
+    rfl
+  have remainingLast :
+      ((retainedTerminalFanOuterEscapedRemainingRay terminal).rasterize
+        shiftedEscapePoint).getLast? =
+          some
+            (retainedTerminalFanOuterLanePort
+              center terminal.1 slot) := by
+    rw [RetainedRay.rasterize_getLast?]
+    have ordinaryLast :=
+      retainedTerminalFanOuterInwardRay_getLast?
+        center terminal slot lengthPositive
+    rw [RetainedRay.rasterize_getLast?] at ordinaryLast
+    apply congrArg some
+    calc
+      Cell.add shiftedEscapePoint
+          (retainedTerminalFanOuterEscapedRemainingRay terminal).vector =
+        Cell.add
+          (Cell.add gate
+            (retainedTerminalFanOuterLaneOffset terminal.1 slot))
+          (retainedTerminalFanOuterInwardRay terminal).vector := by
+            rw [shiftedEscapePointEq, escapePointEq]
+            rw [← retainedTerminalFanOuterEscapedRay_vectors_add
+              terminal escapeFits]
+            rcases gate with ⟨gateX, gateY⟩
+            rcases
+                (retainedTerminalFanOuterSourceEscapeRay terminal).vector with
+              ⟨escapeX, escapeY⟩
+            rcases
+                (retainedTerminalFanOuterEscapedRemainingRay terminal).vector with
+              ⟨remainingX, remainingY⟩
+            rcases retainedTerminalFanOuterLaneOffset terminal.1 slot with
+              ⟨offsetX, offsetY⟩
+            simp [Cell.add]
+            constructor <;> ring
+      _ = retainedTerminalFanOuterLanePort
+          center terminal.1 slot :=
+        Option.some.inj ordinaryLast
+  unfold retainedTerminalFanOuterEscapedShiftedTail
+  exact joinAtEndpoint_getLast?
+    (retainedTerminalFanOuterLaneShiftRouteAt_getLast?
+      escapePoint terminal.1 slot)
+    (RetainedRay.rasterize_head?
+      (retainedTerminalFanOuterEscapedRemainingRay terminal)
+      shiftedEscapePoint)
+    remainingLast
+
+/-- The shifted remainder is orthogonal independently of the selected
+clause-level escape. -/
+theorem retainedTerminalFanOuterEscapedShiftedTail_orthogonal
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (retainedTerminalFanOuterEscapedShiftedTail
+        center terminal slot) := by
+  let escapePoint :=
+    retainedTerminalFanOuterSourceEscapePoint center terminal slot
+  let shiftedEscapePoint :=
+    Cell.add escapePoint
+      (retainedTerminalFanOuterLaneOffset terminal.1 slot)
+  unfold retainedTerminalFanOuterEscapedShiftedTail
+  exact
+    (retainedTerminalFanOuterLaneShiftRouteAt_orthogonal
+      escapePoint terminal.1 slot).joinAtEndpoint
+      (RetainedRay.rasterize_orthogonal
+        (retainedTerminalFanOuterEscapedRemainingRay terminal)
+        shiftedEscapePoint)
+      (retainedTerminalFanOuterLaneShiftRouteAt_getLast?
+        escapePoint terminal.1 slot)
+      (RetainedRay.rasterize_head?
+        (retainedTerminalFanOuterEscapedRemainingRay terminal)
+        shiftedEscapePoint)
+
+/-- Use any certified clause-coordinated escape before the common shifted
+radial tail. -/
+def retainedTerminalFanOuterCoordinatedEscapedRadialRoute
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot) : List Cell :=
+  joinAtEndpoint escape.route
+    (retainedTerminalFanOuterEscapedShiftedTail
+      center terminal slot)
+
+@[simp]
+theorem retainedTerminalFanOuterCoordinatedEscapedRadialRoute_head?
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot) :
+    (retainedTerminalFanOuterCoordinatedEscapedRadialRoute
+      center terminal slot escape).head? =
+        some
+          (retainedAngularFanOuterDemand
+            center terminal slot).gate := by
+  exact joinAtEndpoint_head? escape.head_eq
+
+@[simp]
+theorem retainedTerminalFanOuterCoordinatedEscapedRadialRoute_getLast?
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot)
+    (lengthPositive : 0 < terminal.2)
+    (escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength terminal) :
+    (retainedTerminalFanOuterCoordinatedEscapedRadialRoute
+      center terminal slot escape).getLast? =
+        some
+          (retainedTerminalFanOuterLanePort
+            center terminal.1 slot) := by
+  exact joinAtEndpoint_getLast?
+    escape.last_eq
+    (retainedTerminalFanOuterEscapedShiftedTail_head?
+      center terminal slot)
+    (retainedTerminalFanOuterEscapedShiftedTail_getLast?
+      center terminal slot lengthPositive escapeFits)
+
+theorem retainedTerminalFanOuterCoordinatedEscapedRadialRoute_orthogonal
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (retainedTerminalFanOuterCoordinatedEscapedRadialRoute
+        center terminal slot escape) := by
+  exact escape.orthogonal.joinAtEndpoint
+    (retainedTerminalFanOuterEscapedShiftedTail_orthogonal
+      center terminal slot)
+    escape.last_eq
+    (retainedTerminalFanOuterEscapedShiftedTail_head?
+      center terminal slot)
+
+/-- A coordinated escape changes only the source-side prefix of the complete
+outer fan route. -/
+def retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot) : List Cell :=
+  joinAtEndpoint
+    (retainedTerminalFanOuterCoordinatedEscapedRadialRoute
+      center terminal slot escape)
+    (retainedTerminalFanOuterLocalRouteAt
+      center terminal.1 slot)
+
+@[simp]
+theorem retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_head?
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot) :
+    (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+      center terminal slot escape).head? =
+        some
+          (retainedAngularFanOuterDemand
+            center terminal slot).gate := by
+  exact joinAtEndpoint_head?
+    (retainedTerminalFanOuterCoordinatedEscapedRadialRoute_head?
+      center terminal slot escape)
+
+@[simp]
+theorem retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_getLast?
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot)
+    (lengthPositive : 0 < terminal.2)
+    (escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength terminal) :
+    (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+      center terminal slot escape).getLast? =
+        some
+          (Cell.add center
+            (Cell.scale retainedTerminalFanRoutingRefinement
+              (angularFanBoundaryOffset slot.val))) := by
+  exact joinAtEndpoint_getLast?
+    (retainedTerminalFanOuterCoordinatedEscapedRadialRoute_getLast?
+      center terminal slot escape lengthPositive escapeFits)
+    (retainedTerminalFanOuterLocalRouteAt_head?
+      center terminal.1 slot)
+    (retainedTerminalFanOuterLocalRouteAt_getLast?
+      center terminal.1 slot)
+
+theorem retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_orthogonal
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot)
+    (lengthPositive : 0 < terminal.2)
+    (escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength terminal) :
+    PeriodicOrthocrossing.OrthogonalPolyline
+      (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+        center terminal slot escape) := by
+  exact
+    (retainedTerminalFanOuterCoordinatedEscapedRadialRoute_orthogonal
+      center terminal slot escape).joinAtEndpoint
+      (retainedTerminalFanOuterLocalRouteAt_orthogonal
+        center terminal.1 slot)
+      (retainedTerminalFanOuterCoordinatedEscapedRadialRoute_getLast?
+        center terminal slot escape lengthPositive escapeFits)
+      (retainedTerminalFanOuterLocalRouteAt_head?
+        center terminal.1 slot)
 
 /-- Complete escaped route from a source gate to its unchanged Figure 7
 boundary occurrence. -/
