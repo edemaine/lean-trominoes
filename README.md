@@ -1978,8 +1978,9 @@ The representation choices for this target are:
   terminal datum, coordinated escape, and complete tail from each direct
   atlas index.  Finite checks prove those terminals exactly match the local
   incidence geometry, have room for the escape, and select one common clause
-  gate for every pair of occurrence slots.  Thus a metadata-selected pair
-  now exposes only three concrete strict-separation premises.
+  gate for every pair of occurrence slots.  The gate is also exactly the
+  fully refined factor-four local clause endpoint.  Thus a metadata-selected
+  pair now exposes only three concrete strict-separation premises.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceTailSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceTailSeparation.lean)
   discharges those last three premises.  Computed linear extrema replace a
   quadratic comparison of long staircase routes, while a four-normal
@@ -2004,8 +2005,9 @@ The representation choices for this target are:
   retained direct metadata is proved to select an entry whose direction
   exactly matches its positioned local incidence, and every successful
   lookup is proved to represent that entire positioned local route.  Each
-  choice also exposes exact translated endpoints and an orthogonality
-  certificate for its complete coordinated route.
+  choice also exposes its exact fully scaled local head and fan-boundary
+  endpoint, together with an orthogonality certificate for its complete
+  coordinated route.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoice.lean)
   lifts the checked selector through clause-anchor normalization and
   representative-clause deduplication.  It recovers the retained metadata

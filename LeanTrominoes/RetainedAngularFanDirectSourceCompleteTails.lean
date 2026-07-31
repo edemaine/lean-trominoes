@@ -175,6 +175,22 @@ theorem retainedDirectSourceFanDemand_gates_eq :
         secondSlot).gate := by
   native_decide
 
+/-- For every finite direct-source atlas entry, the common outer gate is
+exactly the fully refined clause endpoint of its factor-four local route. -/
+theorem retainedDirectSourceFanDemand_gate_eq_scaledLocalHead :
+    ∀ (kind : RetainedDirectClauseKind)
+      (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+      (slot : RetainedTerminalSlot),
+      (retainedAngularFanOuterDemand
+        (retainedDirectSourceFanCenterAt kind index)
+        (retainedDirectSourceFanTerminalAt kind index)
+        slot).gate =
+      Cell.scale retainedTerminalFanTotalRefinement
+        (Cell.scale 4
+          ((retainedDirectSourceLocalRouteAt kind index).headD
+            (0, 0))) := by
+  native_decide
+
 /-- A genuine metadata-selected literal pair needs only the three concrete
 strict tail interactions; all centers, terminal data, escapes, and the
 common gate are recovered from its atlas indices. -/

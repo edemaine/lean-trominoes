@@ -507,6 +507,27 @@ theorem RetainedDirectSourceRouteChoice.completeRoute_head?
     retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_head?,
     Option.map_some]
 
+/-- The positioned route head is the fully refined factor-four image of the
+represented local clause endpoint. -/
+theorem RetainedDirectSourceRouteChoice.completeRoute_head_eq_scaledLocalHead
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot) :
+    (choice.completeRoute slot).head? =
+      some
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (Cell.scale 4
+            (Cell.add choice.origin
+              ((retainedDirectSourceLocalRouteAt
+                choice.kind choice.index).headD (0, 0))))) := by
+  rw [choice.completeRoute_head?,
+    retainedDirectSourceFanDemand_gate_eq_scaledLocalHead]
+  rcases choice.origin with ⟨originX, originY⟩
+  rcases (retainedDirectSourceLocalRouteAt
+    choice.kind choice.index).headD (0, 0) with ⟨headX, headY⟩
+  simp [retainedDirectSourceFanPositioningOffset,
+    Cell.add, Cell.scale]
+  constructor <;> ring
+
 /-- A selected coordinated route ends at the unchanged translated Figure 7
 fan boundary for its occurrence slot. -/
 @[simp]
@@ -533,6 +554,40 @@ theorem RetainedDirectSourceRouteChoice.completeRoute_getLast?
       (retainedDirectSourceFanTerminalAt_escape_fits
         choice.kind choice.index),
     Option.map_some]
+
+/-- Specializing the generic last-point scaling law to the source-clearance
+factor gives an integer-typed rewrite for the concrete local route. -/
+private theorem scalePolyline_four_getLastD
+    (route : List Cell) :
+    (scalePolyline (4 : Int) route).getLastD (0, 0) =
+      Cell.scale 4 (route.getLastD (0, 0)) := by
+  simpa using scalePolyline_getLastD 4 route
+
+/-- The positioned route ends at the fully refined factor-four local
+variable endpoint plus the unchanged Figure 7 boundary offset. -/
+theorem
+    RetainedDirectSourceRouteChoice.completeRoute_getLast_eq_scaledLocalLast
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot) :
+    (choice.completeRoute slot).getLast? =
+      some
+        (Cell.add
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (Cell.scale 4
+              (Cell.add choice.origin
+                ((retainedDirectSourceLocalRouteAt
+                  choice.kind choice.index).getLastD (0, 0)))))
+          (Cell.scale retainedTerminalFanRoutingRefinement
+            (angularFanBoundaryOffset slot.val))) := by
+  rw [choice.completeRoute_getLast?]
+  unfold retainedDirectSourceFanPositioningOffset
+    retainedDirectSourceFanCenterAt
+  rw [scalePolyline_four_getLastD]
+  rcases choice.origin with ⟨originX, originY⟩
+  rcases (retainedDirectSourceLocalRouteAt
+    choice.kind choice.index).getLastD (0, 0) with ⟨lastX, lastY⟩
+  simp [Cell.add, Cell.scale]
+  constructor <;> ring
 
 /-- Every positioned coordinated direct-source route is orthogonal. -/
 theorem RetainedDirectSourceRouteChoice.completeRoute_orthogonal
