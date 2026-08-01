@@ -4389,7 +4389,10 @@ The representation choices for this target are:
   identifies each positioned atom cycle definitionally with that translated
   template: local compass ports are renamed to the corresponding fixed
   copies, and the refined variable placement agrees exactly with the
-  translated local vertices.
+  translated local vertices.  The renamed positioned ring now carries the
+  full finite validity certificate, and genuine positioned cycle routes
+  expose route simplicity and complete pairwise continuous separation
+  directly from the template.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleIndex.lean)
   carries each flattened cycle clause's source atom and local Figure 7 index
   in a parallel metadata list.  Projecting the metadata recovers the existing
