@@ -2166,6 +2166,12 @@ The representation choices for this target are:
   is orthogonal, and exposes the first exit required by unit elimination.
   This is the first downstream exact-one layer to consume the coordinated
   routes instead of the older angular-spliced fallback family.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean)
+  transports the coordinated raw Figure 9 formula, placement, and routes
+  through the exact-one variable wrapper.  The wrapper changes no geometry
+  or presentation indices, so generic renaming preserves canonical
+  endpoints, orthogonality, atom distinctness, width three, and the
+  first-exit certificate verbatim.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
