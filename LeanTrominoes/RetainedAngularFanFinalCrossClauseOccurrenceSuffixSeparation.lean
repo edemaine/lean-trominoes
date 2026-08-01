@@ -22,6 +22,133 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 set_option maxHeartbeats 2000000
 
+/-- Genuine incidences in different final source clauses that share a
+canonical variable center receive different coordinated occurrence slots. -/
+theorem
+    retainedFinalCrossClauseCoordinatedOccurrenceSlots_ne_of_sameCenter
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (clauseIndicesDifferent :
+      firstClauseIndex ≠ secondClauseIndex)
+    (centersEqual :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          firstClause firstLiteral =
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          secondClause secondLiteral) :
+    retainedFinalCoordinatedOccurrenceSlot
+        formula firstLiteral
+        firstClauseIndex firstLiteralIndex ≠
+      retainedFinalCoordinatedOccurrenceSlot
+        formula secondLiteral
+        secondClauseIndex secondLiteralIndex := by
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let order := angularOccurrenceOrder source.erase routes
+  have atomsEqual :
+      firstLiteral.atom = secondLiteral.atom :=
+    retainedFinalCanonicalLiteralPositions_eq_imp_atoms_eq
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember centersEqual
+  let firstOccurrence :
+      ThreeOccurrenceVariable
+        (WrappedPeriodicPlanarSATVariable Variable) :=
+    (firstLiteral.atom, firstClauseIndex, firstLiteralIndex)
+  let secondOccurrence :
+      ThreeOccurrenceVariable
+        (WrappedPeriodicPlanarSATVariable Variable) :=
+    (secondLiteral.atom, secondClauseIndex, secondLiteralIndex)
+  let ordered := order.copies firstLiteral.atom
+  have firstScaledClauseMember :
+      (firstClause.scale retainedAngularFanSourceClearanceFactor,
+          firstClauseIndex) ∈ source.clauses.zipIdx := by
+    dsimp only [source]
+    rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(firstClause, firstClauseIndex), firstClauseMember, rfl⟩
+  have secondScaledClauseMember :
+      (secondClause.scale retainedAngularFanSourceClearanceFactor,
+          secondClauseIndex) ∈ source.clauses.zipIdx := by
+    dsimp only [source]
+    rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(secondClause, secondClauseIndex), secondClauseMember, rfl⟩
+  have firstOccurrenceMember :
+      firstOccurrence ∈
+        occurrenceVariables source.erase firstLiteral.atom := by
+    exact occurrenceVariables_mem _
+      (taggedLiteral_mem_of_positioned_members
+        source firstScaledClauseMember firstLiteralMember)
+  have secondOccurrenceMember :
+      secondOccurrence ∈
+        occurrenceVariables source.erase firstLiteral.atom := by
+    simpa [secondOccurrence, atomsEqual] using
+      (occurrenceVariables_mem _
+        (taggedLiteral_mem_of_positioned_members
+          source secondScaledClauseMember secondLiteralMember))
+  have firstOrderedMember : firstOccurrence ∈ ordered :=
+    (order.mem_iff firstLiteral.atom firstOccurrence).mpr
+      firstOccurrenceMember
+  have secondOrderedMember : secondOccurrence ∈ ordered :=
+    (order.mem_iff firstLiteral.atom secondOccurrence).mpr
+      secondOccurrenceMember
+  have occurrencesDifferent :
+      firstOccurrence ≠ secondOccurrence := by
+    intro occurrencesEqual
+    apply clauseIndicesDifferent
+    exact congrArg (fun occurrence => occurrence.2.1)
+      occurrencesEqual
+  intro slotsEqual
+  apply occurrencesDifferent
+  apply idxOf_injective_on ordered
+    firstOrderedMember secondOrderedMember
+  have slotValuesEqual := congrArg Fin.val slotsEqual
+  have firstSlotVal :=
+    retainedFinalCoordinatedOccurrenceSlot_val
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty firstClauseMember firstLiteralMember
+  have secondSlotVal :=
+    retainedFinalCoordinatedOccurrenceSlot_val
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty secondClauseMember secondLiteralMember
+  simpa [source, routes, order, ordered,
+    firstOccurrence, secondOccurrence,
+    angularOccurrenceIndex, indexedOccurrence, atomsEqual,
+    finalCoordinatedSource, finalCoordinatedSourceRoutes,
+    firstSlotVal, secondSlotVal] using slotValuesEqual
+
 /-- Scaled Figure 7 suffixes belonging to different genuine final source
 clauses are contact-free, even when their canonical variable centers
 coincide. -/

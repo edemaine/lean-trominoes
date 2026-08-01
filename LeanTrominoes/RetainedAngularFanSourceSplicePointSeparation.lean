@@ -231,5 +231,135 @@ theorem
     prefixAvoid.join_left replacementAvoid
       routeEntrance replacementHead
 
+/-- A simple source splice also avoids a bounded neighborhood of its own
+final point whenever its replacement outer fan has been certified against
+that neighborhood.  This is the shared-center counterpart of the preceding
+other-endpoint clearance theorem. -/
+theorem
+    retainedAngularFanSplicedBoundaryPolyline_strictlyAvoids_ownPointNeighborhood_of_replacement
+    (route : List Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (finalPoint : Cell)
+    (nearby : List Cell)
+    (routeLength : 2 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some terminal)
+    (simple : LocalIncidenceDrawing.RouteIsSimple route)
+    (routeFinal : route.getLast? = some finalPoint)
+    (nearbyBounded :
+      ∀ point ∈ nearby,
+        InClosedGridRectangle
+          (coordinateRadiusLower 96
+            (Cell.scale
+              retainedTerminalFanTotalRefinement finalPoint))
+          (coordinateRadiusUpper 96
+            (Cell.scale
+              retainedTerminalFanTotalRefinement finalPoint))
+          point)
+    (replacementAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement finalPoint)
+          terminal slot)
+        nearby) :
+    RoutesStrictlyAvoidEachOther
+      (retainedAngularFanSplicedBoundaryPolyline
+        route terminal slot)
+      nearby := by
+  let refinedRoute :=
+    scalePolyline retainedTerminalFanTotalRefinement route
+  let center :=
+    Cell.scale retainedTerminalFanTotalRefinement finalPoint
+  let replacement :=
+    retainedTerminalFanOuterCompleteRoute center terminal slot
+  have routeLastD :
+      route.getLastD (0, 0) = finalPoint := by
+    rw [List.getLastD_eq_getLast?, routeFinal]
+    rfl
+  have prefixClearance :=
+    routeIsSimple_dropLast_avoids_final_point
+      simple routeFinal
+  have prefixAvoid :
+      RoutesStrictlyAvoidEachOther
+        refinedRoute.dropLast nearby := by
+    have separated :=
+      routesStrictlyAvoidEachOther_scalePolyline_rectangleNeighborhood
+        (source := route.dropLast)
+        (nearby := nearby)
+        (referenceLower := finalPoint)
+        (referenceUpper := finalPoint)
+        (factor := retainedTerminalFanTotalRefinement)
+        (radius := 96)
+        (by native_decide)
+        (by native_decide)
+        (fun point pointMember =>
+          closedGridSingletons_separated_of_ne
+            (prefixClearance.1 point pointMember))
+        (fun segment segmentMember aligned =>
+          segment.coordinateRectangle_separated_point
+            aligned
+            (prefixClearance.2
+              segment segmentMember aligned))
+        nearbyBounded
+    change
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          route).dropLast nearby
+    rw [scalePolyline_dropLast]
+    exact separated
+  have refinedLength : 2 ≤ refinedRoute.length := by
+    simpa [refinedRoute, scalePolyline] using routeLength
+  have reverseTailExists :
+      ∃ entrance, refinedRoute.reverse.tail.head? =
+        some entrance :=
+    exists_reverse_tail_head?_of_two_le_length
+      refinedRoute refinedLength
+  have lastEntranceEq :
+      polylineLastEntrance refinedRoute =
+        (retainedAngularFanOuterDemand
+          center terminal slot).gate := by
+    rw [show center =
+        Cell.scale retainedTerminalFanTotalRefinement
+          (route.getLastD (0, 0)) by
+      rw [routeLastD]]
+    exact
+      polylineLastEntrance_scalePolyline_eq_outerDemand_gate
+        routeLength classified slot
+  have routeEntrance :
+      refinedRoute.dropLast.getLast? =
+        some
+          (retainedAngularFanOuterDemand
+            center terminal slot).gate := by
+    apply dropLast_getLast?_of_reverse_tail_head?
+    rw [polylineLastEntrance_spec reverseTailExists,
+      lastEntranceEq]
+  have replacementHead :
+      replacement.head? =
+        some
+          (retainedAngularFanOuterDemand
+            center terminal slot).gate :=
+    retainedTerminalFanOuterCompleteRoute_head?
+      center terminal slot
+  rw [retainedAngularFanSplicedBoundaryPolyline,
+    show
+      Cell.scale retainedTerminalFanTotalRefinement
+          (route.getLastD (0, 0)) =
+        center by rw [routeLastD],
+    show
+      scalePolyline retainedTerminalFanTotalRefinement route =
+        refinedRoute by rfl,
+    show
+      retainedTerminalFanOuterCompleteRoute
+          center terminal slot =
+        replacement by rfl,
+    replacePolylineTail_eq_joinAtEndpoint_dropLast
+      refinedRoute replacement routeEntrance replacementHead]
+  exact
+    prefixAvoid.join_left replacementAvoid
+      routeEntrance replacementHead
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

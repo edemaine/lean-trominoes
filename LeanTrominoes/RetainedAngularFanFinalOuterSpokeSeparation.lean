@@ -23,6 +23,25 @@ def retainedTerminalFanCenteredFigure7Spoke
     ((spokeRoute (angularPortOfIndex slot.val)).map
       (Cell.add (-12, -12)))
 
+/-- Translating the centered spoke gives the positioned Figure 7 spoke
+used by the final fallback construction. -/
+theorem retainedTerminalFanCenteredFigure7Spoke_map_add
+    (center : Cell)
+    (slot : RetainedTerminalSlot) :
+    (retainedTerminalFanCenteredFigure7Spoke slot).map
+        (Cell.add center) =
+      retainedTerminalFanFigure7SpokeRouteAt center slot := by
+  unfold retainedTerminalFanCenteredFigure7Spoke
+    retainedTerminalFanFigure7SpokeRouteAt
+    PeriodicOrthocrossing.translatePolyline scalePolyline
+  simp only [List.map_map]
+  apply List.map_congr_left
+  intro point _pointMember
+  rcases center with ⟨centerX, centerY⟩
+  rcases point with ⟨pointX, pointY⟩
+  simp [Cell.add, Cell.sub, Cell.scale]
+  constructor <;> ring
+
 /-- A complete ordinary outer-fan route is contact-free from every
 different Figure 7 spoke in the same variable macrocell. -/
 theorem
@@ -189,6 +208,180 @@ theorem
         (0, 0) terminal firstSlot lengthPositive)
       (retainedTerminalFanOuterLocalRouteAt_head?
         (0, 0) terminal.1 firstSlot)
+
+/-- A positioned ordinary radial prefix avoids every positioned Figure 7
+spoke at the same macrocell center. -/
+theorem
+    retainedTerminalFanOuterRadialPrefix_strictlyAvoid_figure7SpokeRouteAt
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (radialLengthPositive :
+      0 < retainedTerminalFanOuterRadialLength terminal) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterRadialPrefix
+        center terminal firstSlot)
+      (retainedTerminalFanFigure7SpokeRouteAt
+        center secondSlot) := by
+  apply
+    (routesStrictlyAvoidEachOther_of_linear_separated
+      (retainedTerminalFanOuterSideNormal terminal.1)
+      (Cell.linearValue
+        (retainedTerminalFanOuterSideNormal terminal.1)
+        center + 288)
+      (fun point pointMember => by
+        rw [← retainedTerminalFanCenteredFigure7Spoke_map_add]
+          at pointMember
+        rcases List.mem_map.mp pointMember with
+          ⟨offset, offsetMember, rfl⟩
+        have upper :=
+          retainedTerminalFanCenteredFigure7Spoke_side_upper
+            terminal.1 secondSlot offset offsetMember
+        have linearAdd :
+            Cell.linearValue
+                (retainedTerminalFanOuterSideNormal terminal.1)
+                (Cell.add center offset) =
+              Cell.linearValue
+                  (retainedTerminalFanOuterSideNormal terminal.1)
+                  center +
+                Cell.linearValue
+                  (retainedTerminalFanOuterSideNormal terminal.1)
+                  offset := by
+          simp [Cell.linearValue, Cell.add]
+          ring
+        rw [linearAdd]
+        omega)
+      (retainedTerminalFanOuterRadialPrefix_side_lower
+        center terminal firstSlot radialLengthPositive)).symm
+
+/-- A positioned final radial stub avoids every positioned Figure 7 spoke
+at the same macrocell center. -/
+theorem
+    retainedTerminalFanOuterRadialFinalStubAt_strictlyAvoid_figure7SpokeRouteAt
+    (center : Cell)
+    (direction : RetainedTerminalDirection)
+    (firstSlot secondSlot : RetainedTerminalSlot) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterRadialFinalStubAt
+        center direction firstSlot)
+      (retainedTerminalFanFigure7SpokeRouteAt
+        center secondSlot) := by
+  have translated :=
+    (retainedTerminalFanOuterRadialFinalStub_strictlyAvoid_centeredFigure7Spoke
+      direction firstSlot secondSlot).map_add center
+  rw [show
+      (retainedTerminalFanOuterRadialFinalStub
+        direction firstSlot).map (Cell.add center) =
+          retainedTerminalFanOuterRadialFinalStubAt
+            center direction firstSlot by rfl,
+    retainedTerminalFanCenteredFigure7Spoke_map_add] at translated
+  exact translated
+
+/-- The explicitly split positioned radial route avoids every positioned
+Figure 7 spoke at the same center. -/
+theorem splitRadialRoute_strictlyAvoid_figure7SpokeRouteAt
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (radialLengthPositive :
+      0 < retainedTerminalFanOuterRadialLength terminal) :
+    RoutesStrictlyAvoidEachOther
+      (splitRadialRoute center terminal firstSlot)
+      (retainedTerminalFanFigure7SpokeRouteAt
+        center secondSlot) := by
+  unfold splitRadialRoute
+  exact
+    (retainedTerminalFanOuterRadialPrefix_strictlyAvoid_figure7SpokeRouteAt
+      center terminal firstSlot secondSlot
+      radialLengthPositive).join_left
+      (retainedTerminalFanOuterRadialFinalStubAt_strictlyAvoid_figure7SpokeRouteAt
+        center terminal.1 firstSlot secondSlot)
+      (retainedTerminalFanOuterRadialPrefix_getLast?
+        center terminal firstSlot radialLengthPositive)
+      (retainedTerminalFanOuterRadialFinalStubAt_head?
+        center terminal.1 firstSlot)
+
+/-- Every positive positioned ordinary radial route avoids every
+positioned Figure 7 spoke at the same center. -/
+theorem
+    retainedTerminalFanOuterRadialRoute_strictlyAvoid_figure7SpokeRouteAt
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (radialLengthPositive :
+      0 < retainedTerminalFanOuterRadialLength terminal) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterRadialRoute
+        center terminal firstSlot)
+      (retainedTerminalFanFigure7SpokeRouteAt
+        center secondSlot) := by
+  have splitAvoid :=
+    splitRadialRoute_strictlyAvoid_figure7SpokeRouteAt
+      center terminal firstSlot secondSlot radialLengthPositive
+  by_cases blocked : terminal.1.usesBlockedRaster
+  · rw [radialRoute_eq_split_of_usesBlockedRaster
+      center terminal firstSlot radialLengthPositive blocked]
+    exact splitAvoid
+  · rcases radialRoute_direct_coarsening
+      center terminal firstSlot radialLengthPositive blocked with
+      ⟨leading, first, middle, finish,
+        splitEq, radialEq, leadingLast, middleInterior⟩
+    rw [splitEq] at splitAvoid
+    rw [radialEq]
+    exact splitAvoid.coarsen_middle_after_join_left
+      leadingLast middleInterior
+
+/-- A positioned local outer-fan route avoids every different positioned
+Figure 7 spoke at the same center. -/
+theorem
+    retainedTerminalFanOuterLocalRouteAt_strictlyAvoid_otherFigure7SpokeRouteAt
+    (center : Cell)
+    (direction : RetainedTerminalDirection)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (slotsDifferent : firstSlot ≠ secondSlot) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterLocalRouteAt
+        center direction firstSlot)
+      (retainedTerminalFanFigure7SpokeRouteAt
+        center secondSlot) := by
+  have translated :=
+    (retainedTerminalFanOuterLocalRoute_strictlyAvoid_otherCenteredFigure7Spoke
+      direction firstSlot secondSlot slotsDifferent).map_add center
+  rw [show
+      (retainedTerminalFanOuterLocalRoute
+        direction firstSlot).map (Cell.add center) =
+          retainedTerminalFanOuterLocalRouteAt
+            center direction firstSlot by rfl,
+    retainedTerminalFanCenteredFigure7Spoke_map_add] at translated
+  exact translated
+
+/-- A complete positioned ordinary outer-fan route avoids every different
+positioned Figure 7 spoke at the same center. -/
+theorem
+    retainedTerminalFanOuterCompleteRoute_strictlyAvoid_otherFigure7SpokeRouteAt
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (lengthPositive : 0 < terminal.2)
+    (radialLengthPositive :
+      0 < retainedTerminalFanOuterRadialLength terminal)
+    (slotsDifferent : firstSlot ≠ secondSlot) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterCompleteRoute
+        center terminal firstSlot)
+      (retainedTerminalFanFigure7SpokeRouteAt
+        center secondSlot) := by
+  unfold retainedTerminalFanOuterCompleteRoute
+  exact
+    (retainedTerminalFanOuterRadialRoute_strictlyAvoid_figure7SpokeRouteAt
+      center terminal firstSlot secondSlot
+      radialLengthPositive).join_left
+      (retainedTerminalFanOuterLocalRouteAt_strictlyAvoid_otherFigure7SpokeRouteAt
+        center terminal.1 firstSlot secondSlot slotsDifferent)
+      (retainedTerminalFanOuterRadialRoute_getLast?
+        center terminal firstSlot lengthPositive)
+      (retainedTerminalFanOuterLocalRouteAt_head?
+        center terminal.1 firstSlot)
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
