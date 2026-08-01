@@ -1,0 +1,358 @@
+import LeanTrominoes.PeriodicEightOccurrenceSplitCycleMacrocellSeparation
+import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutes
+import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedVariablePositions
+
+/-!
+# Implication-cycle separation in the final coordinated fixed-eight family
+
+The generic Figure 7 macrocell theorem assumes that source positions are
+injective on variables that occur.  The final retained planar-SAT placement
+already has exactly that property for geometrically valid variables.  This
+file discharges the generic premise from the retained source certificate and
+then transports the resulting cycle-route separation through the source
+clearance and terminal-fan refinements used by the final coordinated family.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicThreeSATThree
+
+/-- Every atom in the duplicate-free source-variable list is a literal
+occurrence of the source formula. -/
+theorem sourceVariables_subset_variableOccurrences
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    ∀ ⦃atom⦄,
+      atom ∈ sourceVariables source →
+        atom ∈ source.variableOccurrences := by
+  intro atom atomMember
+  rw [sourceVariables, List.mem_dedup,
+    List.mem_map] at atomMember
+  rcases atomMember with
+    ⟨taggedLiteral, taggedLiteralMember, atomEqual⟩
+  rw [taggedLiterals, List.mem_flatMap]
+    at taggedLiteralMember
+  rcases taggedLiteralMember with
+    ⟨taggedClause, taggedClauseMember,
+      taggedLiteralMember⟩
+  rcases List.mem_map.mp taggedLiteralMember with
+    ⟨taggedClauseLiteral, taggedClauseLiteralMember,
+      taggedLiteralEqual⟩
+  unfold PeriodicCNF.variableOccurrences
+  apply List.mem_flatMap.mpr
+  refine
+    ⟨taggedClause.1,
+      List.fst_mem_of_mem_zipIdx taggedClauseMember, ?_⟩
+  apply List.mem_map.mpr
+  refine
+    ⟨taggedClauseLiteral.1,
+      List.fst_mem_of_mem_zipIdx taggedClauseLiteralMember, ?_⟩
+  rw [← atomEqual]
+  exact congrArg (fun tagged => tagged.1.atom)
+    taggedLiteralEqual
+
+end PeriodicThreeSATThree
+
+namespace PeriodicOrthocrossing
+
+open PeriodicEightOccurrenceSplit
+open PeriodicEightOccurrenceSplitPositioned
+open PeriodicThreeSATThree
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+set_option maxHeartbeats 2000000
+
+/-- Source-clearance scaling preserves injectivity of the final gauged
+placement on variables that actually occur in the retained source. -/
+theorem
+    retainedFinalCoordinatedScaledPlacement_position_injective_on_sourceVariables
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ []) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    ∀ {firstAtom secondAtom :
+        WrappedPeriodicPlanarSATVariable Variable},
+      firstAtom ∈ sourceVariables source.erase →
+        secondAtom ∈ sourceVariables source.erase →
+          placement.position firstAtom =
+              placement.position secondAtom →
+            firstAtom = secondAtom := by
+  dsimp only
+  intro firstAtom secondAtom
+    firstAtomMember secondAtomMember positionsEqual
+  let sourceCertificate :=
+    retainedPlanarSATCertificate formula
+      sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  have firstOccurrence :
+      firstAtom ∈
+        (finalCoordinatedSource formula).erase.variableOccurrences := by
+    apply sourceVariables_subset_variableOccurrences
+    simpa only [PositionedPeriodicCNF.erase_scale]
+      using firstAtomMember
+  have secondOccurrence :
+      secondAtom ∈
+        (finalCoordinatedSource formula).erase.variableOccurrences := by
+    apply sourceVariables_subset_variableOccurrences
+    simpa only [PositionedPeriodicCNF.erase_scale]
+      using secondAtomMember
+  have firstValid :
+      RetainedDrawingPeriodicPlanarSATVariableValid
+        formula firstAtom.original := by
+    exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSAT_variableOccurrences_valid
+        formula
+        sourceCertificate.graphWellFormed
+        sourceCertificate.graphDegreeAtMostThree
+        sourceCertificate.graphIsLocal
+        (by simpa [finalCoordinatedSource] using firstOccurrence)
+  have secondValid :
+      RetainedDrawingPeriodicPlanarSATVariableValid
+        formula secondAtom.original := by
+    exact
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSAT_variableOccurrences_valid
+        formula
+        sourceCertificate.graphWellFormed
+        sourceCertificate.graphDegreeAtMostThree
+        sourceCertificate.graphIsLocal
+        (by simpa [finalCoordinatedSource] using secondOccurrence)
+  apply
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_position_injective_of_valid
+      formula
+      sourceCertificate.graphWellFormed
+      sourceCertificate.graphDegreeAtMostThree
+      sourceCertificate.graphIsLocal
+      firstValid secondValid
+  apply Cell.scale_injective
+    (show
+      (retainedAngularFanSourceClearanceFactor : Int) ≠ 0 by
+      simp [retainedAngularFanSourceClearanceFactor])
+  simpa [finalCoordinatedPlacement] using positionsEqual
+
+/-- At an appended implication-clause index, the public coordinated family
+is definitionally the unchanged factor-eight Figure 7 route. -/
+theorem retainedFinalCoordinatedCycleRoute_eq_scaledAllCycleRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (cycleIndex literalIndex : Nat) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let occurrencePorts :=
+      occurrencePortsOfAngularOrder
+        source.erase
+        (angularOccurrenceOrder source.erase routes)
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula
+        ((occurrenceClauses source occurrencePorts).length +
+          cycleIndex)
+        literalIndex =
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (allCycleRoutes source placement
+          cycleIndex literalIndex) := by
+  dsimp only
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let occurrencePorts :=
+    occurrencePortsOfAngularOrder
+      source.erase
+      (angularOccurrenceOrder source.erase routes)
+  have clauseNone :
+      finalCoordinatedScaledClause? formula
+          ((occurrenceClauses source occurrencePorts).length +
+            cycleIndex) =
+        none := by
+    apply List.getElem?_eq_none_iff.mpr
+    simp [source, finalCoordinatedSource,
+      PeriodicEightOccurrenceSplitPositioned.occurrenceClauses]
+  rw [
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_clause_none
+      formula
+      ((occurrenceClauses source occurrencePorts).length +
+        cycleIndex)
+      literalIndex clauseNone]
+  exact
+    retainedAngularFanSplicedIncidenceRoutes_cycle
+      source
+      ((finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor)
+      routes cycleIndex literalIndex
+
+/-- The actual factor-eight implication routes used by the final retained
+fixed-eight construction are pairwise continuously separated. -/
+theorem retainedFinalSourceScaledAllCycleRoutes_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {firstCycleIndex secondCycleIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstCycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    (secondClauseMember :
+      (secondClause, secondCycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (incidencesDistinct :
+      firstCycleIndex ≠ secondCycleIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex) :
+    RoutesAvoidEachOther
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (allCycleRoutes
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          firstCycleIndex firstLiteralIndex))
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (allCycleRoutes
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          secondCycleIndex secondLiteralIndex)) := by
+  apply RoutesAvoidEachOther.scalePolyline
+    (show (0 : Int) < retainedTerminalFanRoutingRefinement by
+      simp [retainedTerminalFanRoutingRefinement])
+  apply allCycleRoutes_avoidEachOther
+    ((finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor)
+    ((finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor)
+  · exact
+      retainedFinalCoordinatedScaledPlacement_position_injective_on_sourceVariables
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+  · exact firstClauseMember
+  · exact secondClauseMember
+  · exact firstLiteralMember
+  · exact secondLiteralMember
+  · exact incidencesDistinct
+
+/-- Pairwise cycle-suffix separation in the public coordinated route-family
+interface, at the actual appended clause indices of the final formula. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_cycleRoutes_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {firstCycleIndex secondCycleIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstCycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    (secondClauseMember :
+      (secondClause, secondCycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (incidencesDistinct :
+      firstCycleIndex ≠ secondCycleIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let occurrencePorts :=
+      occurrencePortsOfAngularOrder
+        source.erase
+        (angularOccurrenceOrder source.erase routes)
+    RoutesAvoidEachOther
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula
+        ((occurrenceClauses source occurrencePorts).length +
+          firstCycleIndex)
+        firstLiteralIndex)
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula
+        ((occurrenceClauses source occurrencePorts).length +
+          secondCycleIndex)
+        secondLiteralIndex) := by
+  dsimp only
+  rw [
+    retainedFinalCoordinatedCycleRoute_eq_scaledAllCycleRoute
+      formula firstCycleIndex firstLiteralIndex,
+    retainedFinalCoordinatedCycleRoute_eq_scaledAllCycleRoute
+      formula secondCycleIndex secondLiteralIndex]
+  exact
+    retainedFinalSourceScaledAllCycleRoutes_avoidEachOther
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      incidencesDistinct
+
+end PeriodicOrthocrossing
+end LeanTrominoes

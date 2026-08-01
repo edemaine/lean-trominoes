@@ -2132,6 +2132,14 @@ The representation choices for this target are:
   valid-variable position injectivity, and incidence-key distinctness.
   Their factor-36 Figure 7 macrocells, and hence their scaled spoke suffixes,
   are therefore strictly separated.
+- [`LeanTrominoes/RetainedAngularFanFinalCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCycleSeparation.lean)
+  discharges occurring-variable position injectivity for the retained source
+  from its planar-SAT validity certificate.  It applies the generic
+  different-macrocell theorem after factor-4 source clearance, transports
+  avoidance through the factor-8 routing refinement, and identifies the
+  resulting routes with the actual appended implication-cycle lookups of the
+  public coordinated family.  Thus every distinct pair in the complete
+  cycle-clause suffix is continuously separated.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean)
   discharges all three suffix-involving premises of the endpoint-join
   separator.  Consequently, any two successful coordinated direct
