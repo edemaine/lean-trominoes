@@ -2509,6 +2509,11 @@ The representation choices for this target are:
   discarded axis-aligned final segment both avoid another integral endpoint,
   the complete ordinary splice strictly avoids every route in that endpoint's
   refined radius-96 neighborhood.
+- [`LeanTrominoes/RetainedAngularFanSourceEscapedSplicePointSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSplicePointSeparation.lean)
+  proves the same point-neighborhood theorem for the delayed-lane escaped
+  splice.  Its additional escape-fit premise selects the certified escaped
+  fan bound; the retained prefix and endpoint-clearance argument are shared
+  with the ordinary case.
 - [`LeanTrominoes/RetainedAngularFanEqualityLensSingletonSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanEqualityLensSingletonSpokeSeparation.lean)
   proves both directed cross-splice/suffix obligations for the exceptional
   singleton route in either clause of an arbitrarily oriented equality
