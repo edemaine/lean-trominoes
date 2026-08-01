@@ -414,5 +414,380 @@ theorem
       literal clauseIndex literalIndex center slot slotVal spokeEqual
       cycleClauseIndex cycleLiteralIndex
 
+/-- The established ordinary copied-source occurrence used by a failed
+direct choice avoids every route of its matching periodically lifted
+implication cycle. -/
+theorem
+    retainedFinalOrdinaryFallbackOccurrenceRoute_avoids_matchingCycleLift
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (choiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex = none)
+    (cycleClauseIndex cycleLiteralIndex : Nat)
+    (cycleClauseIndexLt :
+      cycleClauseIndex < presentedCycleVertices.length)
+    (cycleLiteralIndexLt : cycleLiteralIndex < 2) :
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    RoutesAvoidEachOther
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex literalIndex)
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (translatePolyline
+          ((PeriodicEightOccurrenceSplitPositioned.placement
+              placement).translation
+            (incidenceRelativeOffset
+              (clause.scale retainedAngularFanSourceClearanceFactor)
+              literal))
+          (positionedCycleRoutes placement literal.atom
+            cycleClauseIndex cycleLiteralIndex))) := by
+  dsimp only
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let rawRoute :=
+    finalCoordinatedSourceRoutes formula clauseIndex literalIndex
+  let rawTerminal :=
+    classifiedRetainedTerminalData
+      (routeTerminalVector rawRoute)
+  let route :=
+    scalePolyline retainedAngularFanSourceClearanceFactor rawRoute
+  let terminal :=
+    scaleRetainedTerminalData
+      retainedAngularFanSourceClearanceFactor rawTerminal
+  let sourcePoint :=
+    Cell.scale retainedAngularFanSourceClearanceFactor
+      (PositionedPeriodicCNF.canonicalClausePosition
+        (finalCoordinatedPlacement formula) clause)
+  let finalPoint :=
+    Cell.scale retainedAngularFanSourceClearanceFactor
+      (PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula) clause literal)
+  let center :=
+    Cell.scale retainedTerminalFanTotalRefinement finalPoint
+  let slot :=
+    retainedFinalCoordinatedOccurrenceSlot
+      formula literal clauseIndex literalIndex
+  have routeLength : 2 ≤ route.length := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledSourceRoute_length_ge_two
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have classified :
+      retainedTerminalDirectionClassify
+          (routeTerminalVector route) =
+        some terminal := by
+    simpa [route, terminal, rawRoute, rawTerminal] using
+      finalCoordinatedScaledSourceRoute_classified
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have simple : LocalIncidenceDrawing.RouteIsSimple route := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledSourceRoute_isSimple
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeHead : route.head? = some sourcePoint := by
+    simpa [route, rawRoute, sourcePoint] using
+      finalCoordinatedScaledSourceRoute_head
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeFinal : route.getLast? = some finalPoint := by
+    simpa [route, rawRoute, finalPoint] using
+      finalCoordinatedScaledSourceRoute_getLast?
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeOrthogonal : OrthogonalPolyline route := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledFallbackSourceRoute_orthogonal
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember choiceNone
+  have retained : RetainedRayPolyline route := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledSourceRoute_retainedRay
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength terminal := by
+    simpa [terminal, rawTerminal, rawRoute] using
+      finalCoordinatedScaledSourceRoute_escapeFits
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have radialLengthPositive :
+      0 < retainedTerminalFanOuterRadialLength terminal := by
+    have escapePositive :
+        0 < retainedTerminalFanOuterSourceEscapeLength := by
+      native_decide
+    omega
+  have spokeEqual :
+      retainedTerminalFanFigure7SpokeRouteAt center slot =
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement
+            (angularOccurrenceOrder source.erase routes)
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            literal clauseIndex literalIndex) := by
+    simpa [source, placement, routes,
+      finalPoint, center, slot] using
+      retainedFinalFallbackFigure7SpokeRouteAt_eq_occurrenceSuffix
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeEqual :
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex literalIndex =
+        retainedAngularFanSplicedOwnFigure7Route
+          route terminal slot finalPoint := by
+    rw [
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_explicitOccurrenceJoin
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember]
+    unfold retainedAngularFanSplicedOwnFigure7Route
+    rw [spokeEqual]
+  have cycleEqual :
+      retainedTerminalFanInnerCycleRoutesAt
+          center cycleClauseIndex cycleLiteralIndex =
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (translatePolyline
+            ((PeriodicEightOccurrenceSplitPositioned.placement
+                placement).translation
+              (incidenceRelativeOffset
+                (clause.scale retainedAngularFanSourceClearanceFactor)
+                literal))
+            (positionedCycleRoutes placement literal.atom
+              cycleClauseIndex cycleLiteralIndex)) := by
+    simpa [placement, finalPoint, center] using
+      retainedFinalFallbackInnerCycleRoutesAt_eq_matchingCycleLift
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+        cycleClauseIndex cycleLiteralIndex
+  rw [routeEqual, ← cycleEqual]
+  rw [
+    retainedTerminalFanInnerCycleRoutesAt_eq_innerCycleRouteAt
+      center cycleClauseIndex cycleLiteralIndex
+      cycleClauseIndexLt cycleLiteralIndexLt]
+  exact
+    retainedAngularFanSplicedOwnFigure7Route_avoids_innerCycleRouteAt
+      route terminal slot sourcePoint finalPoint
+      (presentedCycleVertices.getD
+        cycleClauseIndex .separator)
+      ⟨cycleLiteralIndex, cycleLiteralIndexLt⟩
+      routeLength classified simple routeHead routeFinal
+      routeOrthogonal retained radialLengthPositive
+
+/-- The delayed-lane copied-source occurrence used by the singleton failed
+direct branch avoids every route of its matching periodically lifted
+implication cycle. -/
+theorem
+    retainedFinalEscapedFallbackOccurrenceRoute_avoids_matchingCycleLift
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (choiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex = none)
+    (cycleClauseIndex cycleLiteralIndex : Nat)
+    (cycleClauseIndexLt :
+      cycleClauseIndex < presentedCycleVertices.length)
+    (cycleLiteralIndexLt : cycleLiteralIndex < 2) :
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    RoutesAvoidEachOther
+      (retainedFinalEscapedFallbackOccurrenceRoute
+        formula
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        literal clauseIndex literalIndex)
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (translatePolyline
+          ((PeriodicEightOccurrenceSplitPositioned.placement
+              placement).translation
+            (incidenceRelativeOffset
+              (clause.scale retainedAngularFanSourceClearanceFactor)
+              literal))
+          (positionedCycleRoutes placement literal.atom
+            cycleClauseIndex cycleLiteralIndex))) := by
+  dsimp only
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let rawRoute :=
+    finalCoordinatedSourceRoutes formula clauseIndex literalIndex
+  let rawTerminal :=
+    classifiedRetainedTerminalData
+      (routeTerminalVector rawRoute)
+  let route :=
+    scalePolyline retainedAngularFanSourceClearanceFactor rawRoute
+  let terminal :=
+    scaleRetainedTerminalData
+      retainedAngularFanSourceClearanceFactor rawTerminal
+  let sourcePoint :=
+    Cell.scale retainedAngularFanSourceClearanceFactor
+      (PositionedPeriodicCNF.canonicalClausePosition
+        (finalCoordinatedPlacement formula) clause)
+  let finalPoint :=
+    Cell.scale retainedAngularFanSourceClearanceFactor
+      (PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula) clause literal)
+  let center :=
+    Cell.scale retainedTerminalFanTotalRefinement finalPoint
+  let slot :=
+    retainedFinalCoordinatedOccurrenceSlot
+      formula literal clauseIndex literalIndex
+  have routeLength : 2 ≤ route.length := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledSourceRoute_length_ge_two
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have classified :
+      retainedTerminalDirectionClassify
+          (routeTerminalVector route) =
+        some terminal := by
+    simpa [route, terminal, rawRoute, rawTerminal] using
+      finalCoordinatedScaledSourceRoute_classified
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have simple : LocalIncidenceDrawing.RouteIsSimple route := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledSourceRoute_isSimple
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeHead : route.head? = some sourcePoint := by
+    simpa [route, rawRoute, sourcePoint] using
+      finalCoordinatedScaledSourceRoute_head
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeFinal : route.getLast? = some finalPoint := by
+    simpa [route, rawRoute, finalPoint] using
+      finalCoordinatedScaledSourceRoute_getLast?
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeOrthogonal : OrthogonalPolyline route := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledFallbackSourceRoute_orthogonal
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember choiceNone
+  have retained : RetainedRayPolyline route := by
+    simpa [route, rawRoute] using
+      finalCoordinatedScaledSourceRoute_retainedRay
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength terminal := by
+    simpa [terminal, rawTerminal, rawRoute] using
+      finalCoordinatedScaledSourceRoute_escapeFits
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have spokeEqual :
+      retainedTerminalFanFigure7SpokeRouteAt center slot =
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement
+            (angularOccurrenceOrder source.erase routes)
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            literal clauseIndex literalIndex) := by
+    simpa [source, placement, routes,
+      finalPoint, center, slot] using
+      retainedFinalFallbackFigure7SpokeRouteAt_eq_occurrenceSuffix
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  have routeEqual :
+      retainedFinalEscapedFallbackOccurrenceRoute
+          formula
+          (clause.scale retainedAngularFanSourceClearanceFactor)
+          literal clauseIndex literalIndex =
+        retainedAngularFanEscapedSplicedOwnFigure7Route
+          route terminal slot finalPoint := by
+    change
+      joinAtEndpoint
+          (retainedAngularFanEscapedSplicedBoundaryRoute
+            route terminal slot)
+          (scalePolyline retainedTerminalFanRoutingRefinement
+            (angularOccurrenceSuffix placement
+              (angularOccurrenceOrder source.erase routes)
+              (clause.scale retainedAngularFanSourceClearanceFactor)
+              literal clauseIndex literalIndex)) =
+        retainedAngularFanEscapedSplicedOwnFigure7Route
+          route terminal slot finalPoint
+    unfold retainedAngularFanEscapedSplicedOwnFigure7Route
+    rw [spokeEqual]
+  have cycleEqual :
+      retainedTerminalFanInnerCycleRoutesAt
+          center cycleClauseIndex cycleLiteralIndex =
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (translatePolyline
+            ((PeriodicEightOccurrenceSplitPositioned.placement
+                placement).translation
+              (incidenceRelativeOffset
+                (clause.scale retainedAngularFanSourceClearanceFactor)
+                literal))
+            (positionedCycleRoutes placement literal.atom
+              cycleClauseIndex cycleLiteralIndex)) := by
+    simpa [placement, finalPoint, center] using
+      retainedFinalFallbackInnerCycleRoutesAt_eq_matchingCycleLift
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+        cycleClauseIndex cycleLiteralIndex
+  rw [routeEqual, ← cycleEqual]
+  rw [
+    retainedTerminalFanInnerCycleRoutesAt_eq_innerCycleRouteAt
+      center cycleClauseIndex cycleLiteralIndex
+      cycleClauseIndexLt cycleLiteralIndexLt]
+  exact
+    retainedAngularFanEscapedSplicedOwnFigure7Route_avoids_innerCycleRouteAt
+      route terminal slot sourcePoint finalPoint
+      (presentedCycleVertices.getD
+        cycleClauseIndex .separator)
+      ⟨cycleLiteralIndex, cycleLiteralIndexLt⟩
+      routeLength classified simple routeHead routeFinal
+      routeOrthogonal retained escapeFits
+
 end PeriodicOrthocrossing
 end LeanTrominoes
