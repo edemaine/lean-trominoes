@@ -2041,6 +2041,12 @@ The representation choices for this target are:
   choice also exposes its exact fully scaled local head and fan-boundary
   endpoint, together with an orthogonality certificate for its complete
   coordinated route.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
+  exhaustively checks the missing inner-neighborhood interaction for all 33
+  direct clause shapes: every coordinated outer prefix is strictly
+  contact-free from every factor-eight implication route around its own
+  source-variable center.  Translation transports the certificate to each
+  metadata-selected retained component.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean)
   centers the actual factor-eight Figure 7 spoke at every direct-source
   atlas endpoint.  An exhaustive finite certificate proves both directed
