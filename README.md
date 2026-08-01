@@ -2141,9 +2141,9 @@ The representation choices for this target are:
   public coordinated family.  Positive scaling also preserves full route
   simplicity, so every cycle-suffix route is simple and every distinct pair
   in that complete suffix is continuously separated.  The same local/global
-  split proves that every explicit Figure 7 ring-copy vertex avoids every
-  cycle-route interior, and exposes the result at the final factor-8
-  placement and public coordinated route indices.
+  split proves that every Figure 7 ring-copy or implication-clause vertex
+  avoids every cycle-route interior, and exposes both results at the final
+  factor-8 placement and public coordinated route indices.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean)
   discharges all three suffix-involving premises of the endpoint-join
   separator.  Consequently, any two successful coordinated direct
@@ -4404,8 +4404,9 @@ The representation choices for this target are:
   copies, and the refined variable placement agrees exactly with the
   translated local vertices.  The renamed positioned ring now carries the
   full finite validity certificate, and genuine positioned cycle routes
-  expose route simplicity and complete pairwise continuous separation
-  directly from the template.
+  expose route simplicity, complete pairwise continuous separation, and
+  avoidance of every ring-variable and implication-clause vertex directly
+  from the template.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCycleIndex.lean)
   carries each flattened cycle clause's source atom and local Figure 7 index
   in a parallel metadata list.  Projecting the metadata recovers the existing
@@ -4425,9 +4426,10 @@ The representation choices for this target are:
   certificate proves complete pairwise continuous separation across the
   flattened cycle suffix whenever occurring source variables have injective
   positions.  The same argument bounds every ring variable in its inner
-  square and proves that each explicit ring-copy vertex avoids every
-  flattened cycle-route interior, using local Figure 7 planarity for its own
-  ring and macrocell separation for all other rings.
+  square, bounds every genuine implication-clause vertex there as well, and
+  proves that all such graph vertices avoid every flattened cycle-route
+  interior, using local Figure 7 planarity for their own ring and macrocell
+  separation for all other rings.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean)
   gives the copied source-clause prefix its matching lossless index bridge.
   Every transformed clause and literal recovers the original positioned

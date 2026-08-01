@@ -223,6 +223,118 @@ theorem positionedCycleRingVertex_avoidsRouteInterior
   rw [placement_copy_eq_translatedCycleVariablePosition]
   exact avoids
 
+/-- Every clause vertex of one positioned Figure 7 ring avoids the interior
+of every genuine route segment in that ring. -/
+theorem positionedCycleClauseVertex_avoidsRouteInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable)
+    {vertexClause routeClause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable Variable)}
+    {vertexClauseIndex routeClauseIndex : Nat}
+    (vertexClauseMember :
+      (vertexClause, vertexClauseIndex) ∈
+        (cycleClausesFor sourcePlacement atom).zipIdx)
+    (routeClauseMember :
+      (routeClause, routeClauseIndex) ∈
+        (cycleClausesFor sourcePlacement atom).zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ routeClause.literals.zipIdx)
+    {segment : GridSegment}
+    (segmentMember :
+      segment ∈ gridPolylineSegments
+        (positionedCycleRoutes sourcePlacement atom
+          routeClauseIndex literalIndex)) :
+    ¬segment.InteriorContains vertexClause.position := by
+  rw [cycleClausesFor_eq_cycleFormula,
+    List.zipIdx_map] at vertexClauseMember routeClauseMember
+  rcases List.mem_map.mp vertexClauseMember with
+    ⟨taggedVertexClause, taggedVertexClauseMember,
+      taggedVertexClauseEqual⟩
+  rcases List.mem_map.mp routeClauseMember with
+    ⟨taggedRouteClause, taggedRouteClauseMember,
+      taggedRouteClauseEqual⟩
+  have vertexClauseIndexEqual :
+      taggedVertexClause.2 = vertexClauseIndex :=
+    congrArg Prod.snd taggedVertexClauseEqual
+  have routeClauseIndexEqual :
+      taggedRouteClause.2 = routeClauseIndex :=
+    congrArg Prod.snd taggedRouteClauseEqual
+  have positionedVertexClauseEqual :
+      vertexClause =
+        positionedLocalCycleClause
+          sourcePlacement atom taggedVertexClause.1 :=
+    (congrArg Prod.fst taggedVertexClauseEqual).symm
+  have positionedRouteClauseEqual :
+      routeClause =
+        positionedLocalCycleClause
+          sourcePlacement atom taggedRouteClause.1 :=
+    (congrArg Prod.fst taggedRouteClauseEqual).symm
+  subst vertexClauseIndex
+  subst routeClauseIndex
+  subst vertexClause
+  subst routeClause
+  change
+    (literal, literalIndex) ∈
+      (taggedRouteClause.1.literals.map fun sourceLiteral =>
+        ⟨PeriodicEightOccurrenceSplit.ringCopy
+            atom sourceLiteral.1,
+          (0, 0), sourceLiteral.2⟩).zipIdx
+    at literalMember
+  rw [List.zipIdx_map] at literalMember
+  rcases List.mem_map.mp literalMember with
+    ⟨taggedLiteral, taggedLiteralMember,
+      taggedLiteralEqual⟩
+  have literalIndexEqual :
+      taggedLiteral.2 = literalIndex :=
+    congrArg Prod.snd taggedLiteralEqual
+  subst literalIndex
+  let offset := macroOrigin sourcePlacement atom
+  have translatedVertexClauseMember :
+      (taggedVertexClause.1.translate offset,
+          taggedVertexClause.2) ∈
+        (translatedCycleDrawing offset).formula.zipIdx := by
+    change
+      (taggedVertexClause.1.translate offset,
+          taggedVertexClause.2) ∈
+        (cycleFormula.map
+          (EmbeddedClause.translate offset)).zipIdx
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨taggedVertexClause, taggedVertexClauseMember, rfl⟩
+  have translatedRouteClauseMember :
+      (taggedRouteClause.1.translate offset,
+          taggedRouteClause.2) ∈
+        (translatedCycleDrawing offset).formula.zipIdx := by
+    change
+      (taggedRouteClause.1.translate offset,
+          taggedRouteClause.2) ∈
+        (cycleFormula.map
+          (EmbeddedClause.translate offset)).zipIdx
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨taggedRouteClause, taggedRouteClauseMember, rfl⟩
+  have translatedVertexMember :
+      (taggedVertexClause.1.translate offset).position ∈
+        (translatedCycleDrawing offset).vertexPositions := by
+    apply List.mem_append_right
+    exact List.mem_map.mpr
+      ⟨taggedVertexClause.1.translate offset,
+        List.fst_mem_of_mem_zipIdx translatedVertexClauseMember, rfl⟩
+  have avoids :=
+    (translatedCycleDrawing offset)
+      |>.embeddedVertex_avoidsRouteInterior_of_members
+        (translatedCycleDrawing_isValid offset).2.2
+        translatedVertexMember
+        translatedRouteClauseMember taggedLiteralMember segmentMember
+  simpa [positionedLocalCycleClause,
+    EmbeddedClause.translate, offset] using avoids
+
 /-- Every genuine route in a positioned implication ring is simple. -/
 theorem positionedCycleRoute_isSimple
     {Variable : Type*} [DecidableEq Variable]
