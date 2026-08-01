@@ -2138,8 +2138,9 @@ The representation choices for this target are:
   different-macrocell theorem after factor-4 source clearance, transports
   avoidance through the factor-8 routing refinement, and identifies the
   resulting routes with the actual appended implication-cycle lookups of the
-  public coordinated family.  Thus every distinct pair in the complete
-  cycle-clause suffix is continuously separated.
+  public coordinated family.  Positive scaling also preserves full route
+  simplicity, so every cycle-suffix route is simple and every distinct pair
+  in that complete suffix is continuously separated.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean)
   discharges all three suffix-involving premises of the endpoint-join
   separator.  Consequently, any two successful coordinated direct

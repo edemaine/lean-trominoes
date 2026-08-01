@@ -14,6 +14,34 @@ clearance and terminal-fan refinements used by the final coordinated family.
 -/
 
 namespace LeanTrominoes
+
+/-- Positive uniform scaling preserves the complete finite route-simplicity
+predicate. -/
+theorem routeIsSimple_scalePolyline
+    {route : List Cell}
+    {factor : Int} (factorPositive : 0 < factor)
+    (simple : LocalIncidenceDrawing.RouteIsSimple route) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (scalePolyline factor route) := by
+  let geometry :
+      PlanarThreeSAT.GridDrawingMap (Cell.scale factor) :=
+    { injective := Cell.scale_injective factorPositive.ne'
+      isAxisAligned := fun {segment} aligned => by
+        simpa [GridSegment.mapPoints, GridSegment.scale] using
+          (GridSegment.isAxisAligned_scale_iff
+            factorPositive segment).mpr aligned
+      interiorContains_iff := fun {segment point} => by
+        simpa [GridSegment.mapPoints, GridSegment.scale] using
+          GridSegment.interiorContains_scale_iff
+            factorPositive segment point
+      interiorsMeet_iff := fun {first second} => by
+        simpa [GridSegment.mapPoints, GridSegment.scale] using
+          GridSegment.interiorsMeet_scale_iff
+            factorPositive first second }
+  exact
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routeIsSimple_mapPoints
+      geometry simple
+
 namespace PeriodicThreeSATThree
 
 /-- Every atom in the duplicate-free source-variable list is a literal
@@ -197,6 +225,99 @@ theorem retainedFinalCoordinatedCycleRoute_eq_scaledAllCycleRoute
       ((finalCoordinatedPlacement formula).scale
         retainedAngularFanSourceClearanceFactor)
       routes cycleIndex literalIndex
+
+/-- Every factor-eight implication route used by the retained construction
+remains simple. -/
+theorem retainedFinalSourceScaledAllCycleRoute_isSimple
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {cycleIndex : Nat}
+    (clauseMember :
+      (clause, cycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (allCycleRoutes
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          cycleIndex literalIndex)) := by
+  apply routeIsSimple_scalePolyline
+    (show (0 : Int) < retainedTerminalFanRoutingRefinement by
+      simp [retainedTerminalFanRoutingRefinement])
+  exact
+    allCycleRoute_isSimple
+      ((finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor)
+      ((finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor)
+      clauseMember literalMember
+
+/-- Route simplicity in the public coordinated interface at an appended
+implication-clause index. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_cycleRoute_isSimple
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {cycleIndex : Nat}
+    (clauseMember :
+      (clause, cycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let occurrencePorts :=
+      occurrencePortsOfAngularOrder
+        source.erase
+        (angularOccurrenceOrder source.erase routes)
+    LocalIncidenceDrawing.RouteIsSimple
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula
+        ((occurrenceClauses source occurrencePorts).length +
+          cycleIndex)
+        literalIndex) := by
+  dsimp only
+  rw [
+    retainedFinalCoordinatedCycleRoute_eq_scaledAllCycleRoute
+      formula cycleIndex literalIndex]
+  exact
+    retainedFinalSourceScaledAllCycleRoute_isSimple
+      formula clauseMember literalMember
 
 /-- The actual factor-eight implication routes used by the final retained
 fixed-eight construction are pairwise continuously separated. -/
