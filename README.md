@@ -2144,6 +2144,9 @@ The representation choices for this target are:
   selector fail, the prefix-length dichotomy makes its route ordinary, and
   stored model equalities transfer the completed escaped/ordinary separation
   theorem to both total lookups without unfolding the geometric predicates.
+  The complementary failed-selector case with two non-singleton prefixes is
+  now exposed by the same interface, using two explicit ordinary occurrence
+  joins and the completed ordinary/ordinary separation theorem.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their

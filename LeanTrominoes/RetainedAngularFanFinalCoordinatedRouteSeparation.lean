@@ -580,5 +580,183 @@ def
       secondChoiceNone secondPrefixLength
       (Ne.symm literalIndicesDifferent)).symm
 
+private theorem
+    coordinatedFallbackRouteModels_of_choice_none_of_prefix_lengths_ne_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex firstLiteralIndex = none)
+    (firstPrefixLengthNeOne :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex).dropLast.length ≠ 1)
+    (secondPrefixLengthNeOne :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex secondLiteralIndex).dropLast.length ≠ 1) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let order :=
+      angularOccurrenceOrder source.erase routes
+    let scaledClause :=
+      clause.scale retainedAngularFanSourceClearanceFactor
+    let firstRawRoute :=
+      finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex
+    let secondRawRoute :=
+      finalCoordinatedSourceRoutes
+        formula clauseIndex secondLiteralIndex
+    let firstExplicit :=
+      joinAtEndpoint
+        (retainedAngularFanSplicedBoundaryRoute
+          (scalePolyline retainedAngularFanSourceClearanceFactor
+            firstRawRoute)
+          (scaleRetainedTerminalData
+            retainedAngularFanSourceClearanceFactor
+            (classifiedRetainedTerminalData
+              (routeTerminalVector firstRawRoute)))
+          (retainedFinalCoordinatedOccurrenceSlot
+            formula firstLiteral clauseIndex firstLiteralIndex))
+        (scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement order
+            scaledClause firstLiteral clauseIndex firstLiteralIndex))
+    let secondExplicit :=
+      joinAtEndpoint
+        (retainedAngularFanSplicedBoundaryRoute
+          (scalePolyline retainedAngularFanSourceClearanceFactor
+            secondRawRoute)
+          (scaleRetainedTerminalData
+            retainedAngularFanSourceClearanceFactor
+            (classifiedRetainedTerminalData
+              (routeTerminalVector secondRawRoute)))
+          (retainedFinalCoordinatedOccurrenceSlot
+            formula secondLiteral clauseIndex secondLiteralIndex))
+        (scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement order
+            scaledClause secondLiteral clauseIndex secondLiteralIndex))
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex firstLiteralIndex =
+      firstExplicit ∧
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex secondLiteralIndex =
+      secondExplicit := by
+  dsimp only
+  have finalClauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx := by
+    simpa [finalCoordinatedSource] using clauseMember
+  have secondChoiceNone :=
+    retainedFinalDirectSourceRouteChoice_eq_none_of_sameClause_choice_none
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember
+      firstLiteralMember secondLiteralMember firstChoiceNone
+  constructor
+  · exact
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_ne_one
+          formula clauseIndex firstLiteralIndex
+          firstChoiceNone firstPrefixLengthNeOne).trans
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_explicitOccurrenceJoin
+          formula sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty finalClauseMember firstLiteralMember)
+  · exact
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_ne_one
+          formula clauseIndex secondLiteralIndex
+          secondChoiceNone secondPrefixLengthNeOne).trans
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_explicitOccurrenceJoin
+          formula sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty finalClauseMember secondLiteralMember)
+
+/-- The public total route family separates the complementary failed-selector
+branch in which both source prefixes are non-singletons and therefore retain
+their ordinary outer fans. -/
+def
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choice_none_of_prefix_lengths_ne_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex firstLiteralIndex = none)
+    (firstPrefixLengthNeOne :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex).dropLast.length ≠ 1)
+    (secondPrefixLengthNeOne :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex secondLiteralIndex).dropLast.length ≠ 1)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    RoutesSeparatedAtHeads
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex firstLiteralIndex)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex secondLiteralIndex) := by
+  have finalClauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx := by
+    simpa [finalCoordinatedSource] using clauseMember
+  have modelEqualities :=
+    coordinatedFallbackRouteModels_of_choice_none_of_prefix_lengths_ne_one
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember
+      firstLiteralMember secondLiteralMember
+      firstChoiceNone firstPrefixLengthNeOne
+      secondPrefixLengthNeOne
+  have separated :=
+    retainedFinalSameClauseOrdinaryFallbackExplicitOccurrenceRoutes_separated
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty finalClauseMember
+      firstLiteralMember secondLiteralMember literalIndicesDifferent
+      firstChoiceNone firstPrefixLengthNeOne
+      secondPrefixLengthNeOne
+  exact
+    ⟨_, _, modelEqualities.1, modelEqualities.2,
+      separated.1, separated.2⟩
+
 end PeriodicOrthocrossing
 end LeanTrominoes
