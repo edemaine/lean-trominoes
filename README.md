@@ -2164,6 +2164,11 @@ The representation choices for this target are:
   direct, delayed-lane fallback, and ordinary retained copied-source routes
   therefore all reach their split variable with the same selected terminal
   direction.
+- [`LeanTrominoes/RetainedAngularFanSourceScaledVariableRouteOrder.lean`](LeanTrominoes/RetainedAngularFanSourceScaledVariableRouteOrder.lean)
+  compares the retained complete routes with the uniformly scaled canonical
+  Figure 7 family.  Copied-source routes share their final spoke and cycle
+  routes agree outright, so source-first refinement preserves the clockwise
+  first/second/third occurrence order at every degree-three split variable.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean)
   feeds the source-scaled coordinated fixed-eight formula, placement, and
   canonical route family into the generic positioned Figure 9 adapter.

@@ -1,6 +1,8 @@
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRouteValidity
 import LeanTrominoes.OrthogonalPolylineEndpointDirections
 import LeanTrominoes.PeriodicEightOccurrenceSplitRouteTerminalDirections
+import LeanTrominoes.PositionedPeriodicCNFDeduplicationTerminalPorts
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanRouteOrder
 
 /-!
 # Terminal directions of final coordinated occurrence routes
@@ -13,6 +15,88 @@ retained prefixes.
 -/
 
 namespace LeanTrominoes
+
+namespace PositionedPeriodicCNF
+
+/-- Clockwise variable-route order transfers between two route families
+whose terminal directions agree on every genuine positioned incidence. -/
+theorem VariableRoutesInOccurrenceOrder.of_memberwise_lastDirection_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {firstRoutes secondRoutes : IncidenceRoutes}
+    (ordered :
+      source.VariableRoutesInOccurrenceOrder firstRoutes)
+    (directions :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          AxisDirection.polylineLastDirection
+              (secondRoutes clauseIndex literalIndex) =
+            AxisDirection.polylineLastDirection
+              (firstRoutes clauseIndex literalIndex)) :
+    source.VariableRoutesInOccurrenceOrder secondRoutes := by
+  intro atom first second third
+    firstLookup secondLookup thirdLookup
+  have firstTaggedMember :=
+    (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
+      source.erase atom .first first firstLookup).1
+  have secondTaggedMember :=
+    (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
+      source.erase atom .second second secondLookup).1
+  have thirdTaggedMember :=
+    (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
+      source.erase atom .third third thirdLookup).1
+  rcases
+      exists_positionedOccurrence_of_tagged
+        source firstTaggedMember with
+    ⟨firstClause, firstClauseMember, firstLiteralMember⟩
+  rcases
+      exists_positionedOccurrence_of_tagged
+        source secondTaggedMember with
+    ⟨secondClause, secondClauseMember, secondLiteralMember⟩
+  rcases
+      exists_positionedOccurrence_of_tagged
+        source thirdTaggedMember with
+    ⟨thirdClause, thirdClauseMember, thirdLiteralMember⟩
+  rw [
+    directions firstClause first.2.1 firstClauseMember
+      first.1 first.2.2 firstLiteralMember,
+    directions secondClause second.2.1 secondClauseMember
+      second.1 second.2.2 secondLiteralMember,
+    directions thirdClause third.2.1 thirdClauseMember
+      third.1 third.2.2 thirdLiteralMember]
+  exact
+    ordered atom first second third
+      firstLookup secondLookup thirdLookup
+
+/-- Positive uniform coordinate scaling preserves clockwise variable-route
+order. -/
+theorem VariableRoutesInOccurrenceOrder.scale
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {routes : IncidenceRoutes}
+    (ordered :
+      source.VariableRoutesInOccurrenceOrder routes)
+    (factor : Nat)
+    (factorPositive : 0 < factor) :
+    (source.scale factor).VariableRoutesInOccurrenceOrder
+      (scaleIncidenceRoutes factor routes) := by
+  intro atom first second third
+    firstLookup secondLookup thirdLookup
+  have clockwise :=
+    ordered atom first second third
+      (by simpa using firstLookup)
+      (by simpa using secondLookup)
+      (by simpa using thirdLookup)
+  have factorPositiveInt : (0 : Int) < factor := by
+    exact_mod_cast factorPositive
+  simpa [scaleIncidenceRoutes,
+    AxisDirection.polylineLastDirection_scalePolyline
+      factor factorPositiveInt] using clockwise
+
+end PositionedPeriodicCNF
+
 namespace PeriodicEightOccurrenceSplit
 
 open PeriodicEightOccurrenceSplitPositioned
