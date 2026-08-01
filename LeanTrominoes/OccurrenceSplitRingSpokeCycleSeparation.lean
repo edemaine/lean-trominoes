@@ -43,6 +43,26 @@ theorem spokeRoute_avoids_cycleRoute
         SegmentInteriorsDisjoint, RoutePointsAvoidInteriors,
         RoutesMeetOnlyAtEndpoints, gridPolylineSegments]
 
+/-- A local old-incidence spoke avoids the total presentation-indexed cycle
+route lookup, including its empty out-of-range branch. -/
+theorem spokeRoute_avoids_cycleRoutes
+    (port : Port)
+    (clauseIndex literalIndex : Nat) :
+    RoutesAvoidEachOther
+      (spokeRoute port)
+      (cycleRoutes clauseIndex literalIndex) := by
+  unfold cycleRoutes
+  split
+  · exact
+      spokeRoute_avoids_cycleRoute
+        port
+        (presentedCycleVertices.getD
+          clauseIndex .separator)
+        literalIndex
+  · simp [RoutesAvoidEachOther,
+      SegmentInteriorsDisjoint, RoutePointsAvoidInteriors,
+      RoutesMeetOnlyAtEndpoints, gridPolylineSegments]
+
 /-- Positive uniform scaling preserves mixed Figure 7 spoke/cycle
 separation. -/
 theorem scaledSpokeRoute_avoids_scaledCycleRoute
