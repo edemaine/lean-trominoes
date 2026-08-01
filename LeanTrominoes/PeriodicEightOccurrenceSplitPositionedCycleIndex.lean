@@ -146,6 +146,27 @@ theorem allCycleClauseMetadata_valid
       sourcePlacement atom metadataMember
   simpa [valid.1] using valid.2
 
+/-- Every flattened metadata entry records an atom from the source formula's
+duplicate-free occurring-variable list. -/
+theorem allCycleClauseMetadata_atom_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {metadata : CycleClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈
+        allCycleClauseMetadata source sourcePlacement) :
+    metadata.atom ∈
+      PeriodicThreeSATThree.sourceVariables source.erase := by
+  rw [allCycleClauseMetadata,
+    List.mem_flatMap] at metadataMember
+  rcases metadataMember with
+    ⟨atom, atomMember, metadataMember⟩
+  have atomEqual :=
+    (cycleClauseMetadataFor_valid
+      sourcePlacement atom metadataMember).1
+  simpa [atomEqual] using atomMember
+
 /-- The `(source atom, local clause)` keys of the flattened cycle metadata
 are pairwise distinct. -/
 theorem allCycleClauseMetadata_keys_nodup
@@ -304,6 +325,27 @@ theorem allCycleClauseMetadata_lookup_valid
     ⟨metadata, metadataLookup, clauseEqual,
       allCycleClauseMetadata_valid
         source sourcePlacement metadataMember⟩
+
+/-- A successful flattened metadata lookup exposes that entry's source
+occurring-variable membership. -/
+theorem allCycleClauseMetadata_lookup_atom_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {metadata : CycleClauseMetadata Variable}
+    {cycleIndex : Nat}
+    (metadataLookup :
+      (allCycleClauseMetadata
+        source sourcePlacement)[cycleIndex]? =
+          some metadata) :
+    metadata.atom ∈
+      PeriodicThreeSATThree.sourceVariables source.erase := by
+  rcases List.getElem?_eq_some_iff.mp metadataLookup with
+    ⟨indexLt, metadataAt⟩
+  apply allCycleClauseMetadata_atom_mem
+    source sourcePlacement
+  rw [← metadataAt]
+  exact List.getElem_mem indexLt
 
 /-- The atom owning the cycle block at a flattened clause index, when that
 index is valid. -/

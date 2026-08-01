@@ -4404,8 +4404,14 @@ The representation choices for this target are:
   lifts the positioned Figure 7 certificate through that flattened metadata:
   every genuine cycle-suffix route is simple, and any two distinct routes in
   the same source atom's implication ring satisfy complete continuous
-  separation.  Different-atom separation remains a global macrocell
-  obligation.
+  separation.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitCycleMacrocellSeparation.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCycleMacrocellSeparation.lean)
+  bounds every local implication route inside its inner `12 × 12` Figure 7
+  square.  Distinct integer source positions put those squares in strictly
+  separated factor-36 macrocells; combining this geometry with the same-ring
+  certificate proves complete pairwise continuous separation across the
+  flattened cycle suffix whenever occurring source variables have injective
+  positions.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean)
   gives the copied source-clause prefix its matching lossless index bridge.
   Every transformed clause and literal recovers the original positioned
