@@ -2172,6 +2172,13 @@ The representation choices for this target are:
   or presentation indices, so generic renaming preserves canonical
   endpoints, orthogonality, atom distinctness, width three, and the
   first-exit certificate verbatim.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRoutes.lean)
+  applies positioned unit elimination to the wrapped coordinated Figure 9
+  routes.  The final unit-free exact-one formula has only binary or ternary
+  clauses and positive physical period; its complete route family has
+  canonical endpoints, is orthogonal, and realizes every incidence-graph
+  edge.  Thus the coordinated geometry is now threaded through the full
+  exact-one route pipeline.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
