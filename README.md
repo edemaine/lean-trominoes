@@ -4483,7 +4483,8 @@ The representation choices for this target are:
   proves that every clause produced by Figure 9 has distinct variable atoms,
   independently of repetitions in its source clause.  It also packages
   per-clause atom distinctness for positioned formulas and proves that
-  injective renaming and the unit-elimination replacement preserve it.
+  injective renaming, uniform coordinate scaling, and the unit-elimination
+  replacement preserve it.
 - [`LeanTrominoes/PlanarOneInThreeOccurrences.lean`](LeanTrominoes/PlanarOneInThreeOccurrences.lean)
   proves that adding Figure 9's positions does not change the underlying
   literal-occurrence list.  The periodic exact-one accounting therefore

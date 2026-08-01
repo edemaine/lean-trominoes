@@ -1,5 +1,6 @@
 import LeanTrominoes.PlanarOneInThreeFigureNineInstantiation
 import LeanTrominoes.PlanarOneInThreeNoUnitsInstantiation
+import LeanTrominoes.PositionedPeriodicCNFScaling
 
 /-!
 # Atom distinctness in the local exact-one replacements
@@ -59,6 +60,21 @@ theorem allAtomsNodup_rename
   rw [List.map_map]
   simpa [Function.comp_def] using
     sourceDistinct.map injective
+
+/-- Uniform coordinate scaling preserves per-clause atom distinctness,
+because it leaves every clause's literal list unchanged. -/
+theorem AllAtomsNodup.scale
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PositionedPeriodicCNF Variable}
+    (distinct : formula.AllAtomsNodup)
+    (factor : Nat) :
+    (formula.scale factor).AllAtomsNodup := by
+  intro scaledClause scaledClauseMember
+  rw [scale_clauses] at scaledClauseMember
+  rcases List.mem_map.mp scaledClauseMember with
+    ⟨clause, clauseMember, rfl⟩
+  simpa [PositionedPeriodicClause.AtomsNodup] using
+    distinct clause clauseMember
 
 end PositionedPeriodicCNF
 
