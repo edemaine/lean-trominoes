@@ -2047,6 +2047,11 @@ The representation choices for this target are:
   contact-free from every factor-eight implication route around its own
   source-variable center.  Translation transports the certificate to each
   metadata-selected retained component.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceCompleteCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCompleteCycleSeparation.lean)
+  combines the strict outer-prefix certificate with the terminal-contact
+  spoke/cycle certificate.  The complete joined direct occurrence therefore
+  avoids every implication route in its own Figure 7 ring, allowing only
+  the intended contact at its final ring vertex.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean)
   centers the actual factor-eight Figure 7 spoke at every direct-source
   atlas endpoint.  An exhaustive finite certificate proves both directed
