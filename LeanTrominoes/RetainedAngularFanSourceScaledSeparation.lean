@@ -102,6 +102,108 @@ theorem
   · exact firstFanAvoidSecondPrefix
   · exact fansAvoid
 
+/-- Source-first refinement also transports the common-clause splice
+certificate, preserving both ordinary avoidance and the fact that the shared
+source head is the only possible listed contact. -/
+theorem
+    retainedAngularFanSourceScaledSplicedBoundaryPolylines_separated
+    {factor : Nat} (factorPositive : 0 < factor)
+    (firstRoute secondRoute : List Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (firstNodup : firstRoute.Nodup)
+    (secondNodup : secondRoute.Nodup)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (sourceRoutesAvoid :
+      RoutesAvoidEachOther firstRoute secondRoute)
+    (firstPrefixAvoidSecondFan :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline factor firstRoute)).dropLast
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor secondRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot))
+    (firstFanAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor firstRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot)
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline factor secondRoute)).dropLast)
+    (fansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor firstRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor secondRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot)) :
+    RoutesAvoidEachOther
+        (retainedAngularFanSplicedBoundaryPolyline
+          (scalePolyline factor firstRoute)
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot)
+        (retainedAngularFanSplicedBoundaryPolyline
+          (scalePolyline factor secondRoute)
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedAngularFanSplicedBoundaryPolyline
+          (scalePolyline factor firstRoute)
+          (scaleRetainedTerminalData factor firstTerminal)
+          firstSlot)
+        (retainedAngularFanSplicedBoundaryPolyline
+          (scalePolyline factor secondRoute)
+          (scaleRetainedTerminalData factor secondTerminal)
+          secondSlot) := by
+  apply
+    retainedAngularFanSplicedBoundaryPolylines_separated
+      (scalePolyline factor firstRoute)
+      (scalePolyline factor secondRoute)
+      (scaleRetainedTerminalData factor firstTerminal)
+      (scaleRetainedTerminalData factor secondTerminal)
+      firstSlot secondSlot
+  · simpa [scalePolyline] using firstLength
+  · simpa [scalePolyline] using secondLength
+  · exact firstNodup.map
+      (Cell.scale_injective
+        (show (factor : Int) ≠ 0 by
+          exact_mod_cast factorPositive.ne'))
+  · exact secondNodup.map
+      (Cell.scale_injective
+        (show (factor : Int) ≠ 0 by
+          exact_mod_cast factorPositive.ne'))
+  · exact
+      routeTerminalVector_scale_classified
+        factorPositive firstClassified
+  · exact
+      routeTerminalVector_scale_classified
+        factorPositive secondClassified
+  · have factorPositiveInt : (0 : Int) < factor := by
+      exact_mod_cast factorPositive
+    simpa [scalePolyline] using
+      sourceRoutesAvoid.scalePolyline factorPositiveInt
+  · exact firstPrefixAvoidSecondFan
+  · exact firstFanAvoidSecondPrefix
+  · exact fansAvoid
+
 /-- A singleton source prefix remains a singleton after source-first and
 fan refinement, and its unique point is exactly its own outer-fan gate. -/
 theorem retainedAngularFanSourceScaledPrefix_eq_singleton_gate

@@ -473,5 +473,112 @@ theorem
       (retainedTerminalFanOuterLocalRouteAt_head?
         center scaledTerminal.1 secondSlot)
 
+/-- The shared-clause axis-aligned cross case.  The source routes may share
+their clause head; a non-singleton fan-route prefix ensures its discarded
+final segment starts elsewhere, so the head-aware source certificate still
+clears both the radial and local fan pieces. -/
+theorem
+    retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute_of_axisAligned_of_secondPrefix_length_ne_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈
+          PeriodicOrthocrossing.retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {factor : Nat} (factorGreaterThanOne : 1 < factor)
+    {firstRoute secondRoute : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondCenter : Cell}
+    (firstMember :
+      (firstRoute, firstIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (secondRoute, secondIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (firstHead : firstRoute.head? = some firstSource)
+    (secondLast : secondRoute.getLast? = some secondCenter)
+    (sourceNeCenter : firstSource ≠ secondCenter)
+    (secondPrefixLengthNeOne :
+      secondRoute.dropLast.length ≠ 1)
+    (secondTerminal : RetainedTerminalData)
+    (secondSlot : RetainedTerminalSlot)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (secondFinalSegmentAligned :
+      (⟨polylineLastEntrance secondRoute, secondCenter⟩ :
+        GridSegment).IsAxisAligned) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor firstRoute)).dropLast
+      (retainedTerminalFanOuterCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (Cell.scale factor secondCenter))
+        (scaleRetainedTerminalData factor secondTerminal)
+        secondSlot) := by
+  let center :=
+    Cell.scale retainedTerminalFanTotalRefinement
+      (Cell.scale factor secondCenter)
+  let scaledTerminal :=
+    scaleRetainedTerminalData factor secondTerminal
+  have factorPositive : 0 < factor := by
+    omega
+  have secondLastD :
+      secondRoute.getLastD (0, 0) = secondCenter := by
+    simp [List.getLastD_eq_getLast?, secondLast]
+  have sourceAvoids :=
+    PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherFinalSegment_of_secondPrefix_length_ne_one
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent firstHead secondLast sourceNeCenter
+      secondPrefixLengthNeOne
+  rw [← secondLastD] at secondFinalSegmentAligned
+  rw [← secondLastD] at sourceAvoids
+  have radialAvoid :=
+    retainedAngularFanSourceScaledPrefix_strictlyAvoids_outerRadialRoute_of_axisAligned
+      factorPositive firstRoute secondRoute secondTerminal secondSlot
+      secondLength secondClassified
+      secondFinalSegmentAligned sourceAvoids
+  have localAvoid :=
+    retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterLocalRoute
+      formula wellFormed degree isLocal clausesNonempty
+      factorGreaterThanOne firstMember secondMember
+      firstLength secondLength indicesDifferent firstHead secondLast
+      sourceNeCenter secondTerminal.1 secondSlot
+  have scaledLengthPositive : 0 < scaledTerminal.2 := by
+    exact scaleRetainedTerminalData_length_pos factorPositive
+      (retainedTerminalDirectionClassify_sound secondClassified).1
+  have radialAvoid' :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline factor firstRoute)).dropLast
+        (retainedTerminalFanOuterRadialRoute
+          center scaledTerminal secondSlot) := by
+    rw [scalePolyline_getLastD, secondLastD] at radialAvoid
+    simpa [center, scaledTerminal] using radialAvoid
+  have localAvoid' :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline factor firstRoute)).dropLast
+        (retainedTerminalFanOuterLocalRouteAt
+          center scaledTerminal.1 secondSlot) := by
+    simpa [center, scaledTerminal] using localAvoid
+  rw [retainedTerminalFanOuterCompleteRoute]
+  exact
+    radialAvoid'.join_right localAvoid'
+      (retainedTerminalFanOuterRadialRoute_getLast?
+        center scaledTerminal secondSlot scaledLengthPositive)
+      (retainedTerminalFanOuterLocalRouteAt_head?
+        center scaledTerminal.1 secondSlot)
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

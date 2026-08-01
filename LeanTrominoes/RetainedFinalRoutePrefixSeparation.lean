@@ -212,6 +212,145 @@ theorem
     routePrefix_avoids_other_final_point_of_avoid
       avoid firstSimple.1 firstHead secondLast sourceNeFinal
 
+/-- Complete route avoidance still separates the first retained prefix from
+the second final segment when the two prefixes may share their head, provided
+the second segment's entrance is not that shared head. -/
+private theorem
+    routesStrictlyAvoidEachOther_dropLast_finalSegment_of_head_contacts
+    {first second : List Cell}
+    {secondEntrance secondFinal : Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (prefixContacts :
+      RoutesMeetOnlyAtHeads first.dropLast second.dropLast)
+    (secondEntranceEq :
+      second.dropLast.getLast? = some secondEntrance)
+    (secondFinalEq :
+      second.getLast? = some secondFinal)
+    (firstPointsAvoidFinal :
+      ∀ point ∈ first.dropLast, point ≠ secondFinal)
+    (secondEntranceNotHead :
+      second.dropLast.head? ≠ some secondEntrance) :
+    RoutesStrictlyAvoidEachOther
+      first.dropLast [secondEntrance, secondFinal] := by
+  have secondDropNonempty : second.dropLast ≠ [] := by
+    intro empty
+    rw [empty] at secondEntranceEq
+    simp at secondEntranceEq
+  have secondDecomposition :
+      second.dropLast ++ [secondFinal] = second :=
+    List.dropLast_append_getLast?
+      secondFinal secondFinalEq
+  have secondEntranceLastD :
+      second.dropLast.getLastD (0, 0) =
+        secondEntrance := by
+    rw [List.getLastD_eq_getLast?, secondEntranceEq]
+    simp
+  let finalSegment : GridSegment :=
+    ⟨secondEntrance, secondFinal⟩
+  have finalSegmentMember :
+      finalSegment ∈ gridPolylineSegments second := by
+    rw [← secondDecomposition,
+      gridPolylineSegments_append_singleton_of_ne_nil
+        second.dropLast (0, 0) secondFinal
+        secondDropNonempty,
+      List.mem_append]
+    apply Or.inr
+    simp only [List.mem_singleton]
+    simpa [finalSegment] using secondEntranceLastD.symm
+  have secondEntranceMember :
+      secondEntrance ∈ second.dropLast :=
+    mem_of_getLast?_eq_some secondEntranceEq
+  have secondFinalMember :
+      secondFinal ∈ second :=
+    mem_of_getLast?_eq_some secondFinalEq
+  unfold RoutesStrictlyAvoidEachOther
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro firstSegment firstSegmentMember
+      terminalSegment terminalSegmentMember
+    have firstOriginal :=
+      gridPolylineSegments_dropLast_subset
+        first firstSegmentMember
+    have terminalSegmentEq :
+        terminalSegment = finalSegment := by
+      simpa [gridPolylineSegments, finalSegment] using
+        terminalSegmentMember
+    subst terminalSegment
+    rcases List.mem_iff_get.mp firstOriginal with
+      ⟨firstIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp finalSegmentMember with
+      ⟨secondIndex, secondEqual⟩
+    rw [← firstEqual, ← secondEqual]
+    exact avoid.1 firstIndex secondIndex
+  · intro firstPoint firstPointMember
+      terminalSegment terminalSegmentMember
+    have firstOriginal :=
+      List.mem_of_mem_dropLast firstPointMember
+    have terminalSegmentEq :
+        terminalSegment = finalSegment := by
+      simpa [gridPolylineSegments, finalSegment] using
+        terminalSegmentMember
+    subst terminalSegment
+    rcases List.mem_iff_get.mp firstOriginal with
+      ⟨firstIndex, firstEqual⟩
+    rcases List.mem_iff_get.mp finalSegmentMember with
+      ⟨secondIndex, secondEqual⟩
+    rw [← firstEqual, ← secondEqual]
+    exact avoid.2.1 firstIndex secondIndex
+  · intro terminalPoint terminalPointMember
+      firstSegment firstSegmentMember
+    have firstOriginal :=
+      gridPolylineSegments_dropLast_subset
+        first firstSegmentMember
+    rcases List.mem_iff_get.mp firstOriginal with
+      ⟨firstIndex, firstEqual⟩
+    have terminalPointOriginal :
+        terminalPoint ∈ second := by
+      simp at terminalPointMember
+      rcases terminalPointMember with rfl | rfl
+      · exact
+          List.mem_of_mem_dropLast
+            secondEntranceMember
+      · exact secondFinalMember
+    rcases List.mem_iff_get.mp terminalPointOriginal with
+      ⟨secondIndex, secondEqual⟩
+    rw [← secondEqual, ← firstEqual]
+    exact avoid.2.2.1 secondIndex firstIndex
+  · intro firstPoint firstPointMember
+      terminalPoint terminalPointMember
+    simp at terminalPointMember
+    rcases terminalPointMember with rfl | rfl
+    · intro equal
+      exact secondEntranceNotHead
+        (prefixContacts
+          firstPoint firstPointMember
+          terminalPoint secondEntranceMember equal).2
+    · exact
+        firstPointsAvoidFinal
+          firstPoint firstPointMember
+
+/-- A duplicate-free list whose head and last are the same named point is a
+singleton. -/
+private theorem list_length_eq_one_of_nodup_of_head_last_eq
+    {α : Type*} {points : List α} {point : α}
+    (nodup : points.Nodup)
+    (headEq : points.head? = some point)
+    (lastEq : points.getLast? = some point) :
+    points.length = 1 := by
+  cases points with
+  | nil =>
+      simp at headEq
+  | cons head tail =>
+      simp only [List.head?_cons, Option.some.injEq] at headEq
+      subst head
+      by_cases tailEmpty : tail = []
+      · simp [tailEmpty]
+      · have tailLast : tail.getLast? = some point := by
+          rw [← List.getLast?_cons_of_ne_nil tailEmpty]
+          exact lastEq
+        exact
+          ((List.nodup_cons.mp nodup).1
+            (List.mem_of_getLast? tailLast)).elim
+
 /-- The first retained prefix is strictly separated from the second route's
 discarded final source segment.  This is the exact unscaled corridor axis
 used by the replacement outer fan. -/
@@ -273,6 +412,92 @@ theorem
     routesStrictlyAvoidEachOther_dropLast_finalSegment
       avoid prefixesAvoid entranceEq secondLast
       finalClearance.1
+
+/-- The head-aware variant for two routes of one clause.  Their retained
+prefixes may meet at the common clause head, but a non-singleton second
+prefix puts its final-segment entrance elsewhere, so that legal contact
+cannot reach the discarded terminal segment. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherFinalSegment_of_secondPrefix_length_ne_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {first second : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondFinal : Cell}
+    (firstMember :
+      (first, firstIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (second, secondIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (firstHead : first.head? = some firstSource)
+    (secondLast : second.getLast? = some secondFinal)
+    (sourceNeFinal : firstSource ≠ secondFinal)
+    (secondPrefixLengthNeOne :
+      second.dropLast.length ≠ 1) :
+    RoutesStrictlyAvoidEachOther
+      first.dropLast
+      [polylineLastEntrance second, secondFinal] := by
+  have avoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routesAvoidEachOther
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent
+  have firstSimple :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesAreSimple
+      formula wellFormed degree isLocal clausesNonempty
+      first (List.fst_mem_of_mem_zipIdx firstMember)
+  have secondSimple :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing_routesAreSimple
+      formula wellFormed degree isLocal clausesNonempty
+      second (List.fst_mem_of_mem_zipIdx secondMember)
+  have prefixContacts :
+      RoutesMeetOnlyAtHeads first.dropLast second.dropLast :=
+    routePrefix_contactsAtHeads_of_avoid_of_nodup
+      avoid firstSimple.1 secondSimple.1
+  have finalClearance :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_avoids_otherFinal
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent firstHead secondLast sourceNeFinal
+  have reverseTailExists :=
+    exists_reverse_tail_head?_of_two_le_length
+      second secondLength
+  have entranceEq :
+      second.dropLast.getLast? =
+        some (polylineLastEntrance second) :=
+    dropLast_getLast?_of_reverse_tail_head?
+      (polylineLastEntrance_spec reverseTailExists)
+  have secondPrefixNodup : second.dropLast.Nodup := by
+    have appended :
+        (second.dropLast ++ [secondFinal]).Nodup := by
+      rw [List.dropLast_append_getLast?
+        secondFinal secondLast]
+      exact secondSimple.1
+    exact appended.of_append_left
+  have entranceNotHead :
+      second.dropLast.head? ≠
+        some (polylineLastEntrance second) := by
+    intro headEq
+    apply secondPrefixLengthNeOne
+    exact
+      list_length_eq_one_of_nodup_of_head_last_eq
+        secondPrefixNodup headEq entranceEq
+  exact
+    routesStrictlyAvoidEachOther_dropLast_finalSegment_of_head_contacts
+      avoid prefixContacts entranceEq secondLast
+      finalClearance.1 entranceNotHead
 
 end PeriodicOrthocrossing
 end LeanTrominoes

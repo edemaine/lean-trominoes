@@ -170,11 +170,11 @@ theorem retainedAngularFanSplicedBoundaryPolylines_strictlyAvoid
     firstEntrance firstFanHead secondEntrance secondFanHead
 
 /-- Two classified retained source/fan splices preserve ordinary
-endpoint-only avoidance when the original source routes may share a clause
-head.  Duplicate-freedom ensures that this head is the only contact retained
-by the source prefixes; all geometry involving either fan suffix remains
-strictly separated. -/
-theorem retainedAngularFanSplicedBoundaryPolylines_avoid
+endpoint-only avoidance and common-head-only contact when the original
+source routes may share a clause head.  Duplicate-freedom ensures that this
+head is the only contact retained by the source prefixes; all geometry
+involving either fan suffix remains strictly separated. -/
+theorem retainedAngularFanSplicedBoundaryPolylines_separated
     (firstRoute secondRoute : List Cell)
     (firstTerminal secondTerminal : RetainedTerminalData)
     (firstSlot secondSlot : RetainedTerminalSlot)
@@ -219,10 +219,15 @@ theorem retainedAngularFanSplicedBoundaryPolylines_avoid
             (secondRoute.getLastD (0, 0)))
           secondTerminal secondSlot)) :
     RoutesAvoidEachOther
-      (retainedAngularFanSplicedBoundaryPolyline
-        firstRoute firstTerminal firstSlot)
-      (retainedAngularFanSplicedBoundaryPolyline
-        secondRoute secondTerminal secondSlot) := by
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        (retainedAngularFanSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        (retainedAngularFanSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot) := by
   let firstScaled :=
     scalePolyline retainedTerminalFanTotalRefinement firstRoute
   let secondScaled :=
@@ -323,7 +328,7 @@ theorem retainedAngularFanSplicedBoundaryPolylines_avoid
       List.Nodup.map
         (Cell.scale_injective refinementPositive.ne')
         secondNodup
-  apply RoutesAvoidEachOther.replace_tails
+  apply RoutesAvoidEachOther.replace_tails_meet_only_at_heads
     scaledRoutesAvoid firstScaledNodup secondScaledNodup
     (by simpa [firstScaled, secondFan, secondCenter] using
       firstPrefixAvoidSecondFan)
@@ -332,6 +337,64 @@ theorem retainedAngularFanSplicedBoundaryPolylines_avoid
     (by simpa [firstFan, firstCenter, secondFan, secondCenter] using
       fansAvoid)
     firstEntrance firstFanHead secondEntrance secondFanHead
+
+/-- Avoidance-only projection of the stronger common-head splice
+certificate. -/
+theorem retainedAngularFanSplicedBoundaryPolylines_avoid
+    (firstRoute secondRoute : List Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (firstNodup : firstRoute.Nodup)
+    (secondNodup : secondRoute.Nodup)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (sourceRoutesAvoid :
+      RoutesAvoidEachOther firstRoute secondRoute)
+    (firstPrefixAvoidSecondFan :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          firstRoute).dropLast
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (secondRoute.getLastD (0, 0)))
+          secondTerminal secondSlot))
+    (firstFanAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (firstRoute.getLastD (0, 0)))
+          firstTerminal firstSlot)
+        (scalePolyline retainedTerminalFanTotalRefinement
+          secondRoute).dropLast)
+    (fansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (firstRoute.getLastD (0, 0)))
+          firstTerminal firstSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (secondRoute.getLastD (0, 0)))
+          secondTerminal secondSlot)) :
+    RoutesAvoidEachOther
+      (retainedAngularFanSplicedBoundaryPolyline
+        firstRoute firstTerminal firstSlot)
+      (retainedAngularFanSplicedBoundaryPolyline
+        secondRoute secondTerminal secondSlot) :=
+  (retainedAngularFanSplicedBoundaryPolylines_separated
+    firstRoute secondRoute firstTerminal secondTerminal
+    firstSlot secondSlot firstLength secondLength
+    firstNodup secondNodup firstClassified secondClassified
+    sourceRoutesAvoid firstPrefixAvoidSecondFan
+    firstFanAvoidSecondPrefix fansAvoid).1
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

@@ -1662,6 +1662,54 @@ theorem RoutesAvoidEachOther.replace_tails
       firstEntrance firstReplacementHead
       secondEntrance secondReplacementHead
 
+/-- The common-clause tail replacement also preserves the stronger
+common-head-only description of every listed contact. -/
+theorem RoutesAvoidEachOther.replace_tails_meet_only_at_heads
+    {first second firstReplacement secondReplacement : List Cell}
+    {firstMiddle secondMiddle : Cell}
+    (originalAvoid :
+      RoutesAvoidEachOther first second)
+    (firstNodup : first.Nodup)
+    (secondNodup : second.Nodup)
+    (firstPrefixAvoidSecondReplacement :
+      RoutesStrictlyAvoidEachOther
+        first.dropLast secondReplacement)
+    (firstReplacementAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement second.dropLast)
+    (replacementsAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement secondReplacement)
+    (firstEntrance :
+      first.dropLast.getLast? = some firstMiddle)
+    (firstReplacementHead :
+      firstReplacement.head? = some firstMiddle)
+    (secondEntrance :
+      second.dropLast.getLast? = some secondMiddle)
+    (secondReplacementHead :
+      secondReplacement.head? = some secondMiddle) :
+    RoutesAvoidEachOther
+        (replacePolylineTail first firstReplacement)
+        (replacePolylineTail second secondReplacement) ∧
+      RoutesMeetOnlyAtHeads
+        (replacePolylineTail first firstReplacement)
+        (replacePolylineTail second secondReplacement) := by
+  rw [PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
+      first firstReplacement firstEntrance firstReplacementHead,
+    PeriodicEightOccurrenceSplit.replacePolylineTail_eq_joinAtEndpoint_dropLast
+      second secondReplacement secondEntrance secondReplacementHead]
+  exact
+    RoutesAvoidEachOther.join_tails_of_prefixes_meet_only_at_heads
+      (routesAvoidEachOther_dropLast_of_avoid_of_nodup
+        originalAvoid firstNodup secondNodup)
+      (routePrefix_contactsAtHeads_of_avoid_of_nodup
+        originalAvoid firstNodup secondNodup)
+      firstPrefixAvoidSecondReplacement
+      firstReplacementAvoidSecondPrefix
+      replacementsAvoid
+      firstEntrance firstReplacementHead
+      secondEntrance secondReplacementHead
+
 /-- Simultaneous tail replacement preserves common-head avoidance when
 exactly the first replacement may meet the second retained prefix.  The
 single owning-head equation promotes that cross contact to the outer head of

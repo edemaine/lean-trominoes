@@ -1785,7 +1785,10 @@ The representation choices for this target are:
   at the final retained drawing.  Two different stored incidences with
   different clause endpoints therefore have strictly separated
   final-point-deleted prefixes, exactly the source/source case needed before
-  angular-fan tail replacement.
+  angular-fan tail replacement.  A head-aware variant also allows the two
+  routes to share their clause endpoint: if the second deleted prefix is not
+  a singleton, the first prefix still strictly avoids its discarded final
+  segment.
 - [`LeanTrominoes/RetainedFinalRoutePrefixRectangleSeparation.lean`](LeanTrominoes/RetainedFinalRoutePrefixRectangleSeparation.lean)
   combines that strict prefix separation with the transported prefix-shape
   certificate.  Flat route membership recovers the positioned incidence
@@ -2266,6 +2269,21 @@ The representation choices for this target are:
   orthogonal carrier routes, the same certificate now holds for the actual
   rasterized boundary routes.  The theorem also carries both directed
   boundary-splice/Figure-7-suffix separation facts through rasterization.
+- [`LeanTrominoes/RetainedAngularFanFinalFallbackOrthogonality.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackOrthogonality.lean)
+  transports finite bend-corner orthogonality through the physical
+  translation used by final route occurrences, complementing the carrier
+  certificate.  A single fallback interface now proves every failed-choice
+  carrier-or-bend route orthogonal without exposing which component family
+  supplied it.
+- [`LeanTrominoes/RetainedAngularFanFinalOrdinaryFallbackSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalOrdinaryFallbackSpliceSeparation.lean)
+  handles the complementary failed-choice branch in which both source
+  prefixes are non-singletons.  For two different literals in one genuine
+  final clause, carrier-or-bend orthogonality makes both discarded terminal
+  segments axis-aligned; retained planarity separates the complete outer
+  fans, and the head-aware splice theorem proves that the ordinary boundary
+  routes avoid each other except for their common clause head.  Because both
+  splices are orthogonal, the same certificate holds after retained
+  rasterization.
 - [`LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean)
   joins the exceptional rasterized boundary pair to their unchanged Figure 7
   suffixes.  The generic endpoint-join theorem combines head-only prefix
@@ -2281,7 +2299,8 @@ The representation choices for this target are:
   joins, leaving only the two directed source-prefix/fan-suffix cross cases
   plus the already certified fan/fan case.  It also exposes the common-clause
   variant, preserving the one legal shared source endpoint while keeping all
-  fan-involving pairs contact-free.
+  fan-involving pairs contact-free, and a stronger tail-replacement theorem
+  records both route avoidance and meet-only-at-heads simultaneously.
 - [`LeanTrominoes/RetainedAngularFanSourceScaling.lean`](LeanTrominoes/RetainedAngularFanSourceScaling.lean)
   scales the retained source before inserting the fixed-size angular fans.
   Positive refinement preserves the angular occurrence order and the logical
@@ -2297,7 +2316,9 @@ The representation choices for this target are:
   For two singleton-prefix incidences, it further reduces ordinary planarity
   of both completed splices to one ordinary fan/fan certificate whose listed
   contacts occur only at the fan heads; the four prefix/fan piece cases then
-  follow by singleton restriction.
+  follow by singleton restriction.  The common-clause certificate is also
+  transported through positive source scaling with both avoidance and
+  head-contact information intact.
 - [`LeanTrominoes/RetainedAngularFanSourceScaledDrawing.lean`](LeanTrominoes/RetainedAngularFanSourceScaledDrawing.lean)
   packages the source-first-scaled retained family and its unchanged local
   fans as canonical orthogonal incidence routes.  Its concrete factor-four
@@ -2311,7 +2332,9 @@ The representation choices for this target are:
   splices.  Each directed cross case follows either from a singleton source
   prefix or from an axis-aligned terminal on the other fan route; consequently
   aligned/aligned and singleton/singleton pairs are complete, isolating only
-  the mixed aligned-prefix-versus-oblique-fan geometry.
+  the mixed aligned-prefix-versus-oblique-fan geometry.  For shared-clause
+  routes it separately packages the non-singleton, axis-aligned case,
+  returning both avoidance and meet-only-at-heads for the completed splices.
 - [`LeanTrominoes/RectangleLineEnvelope.lean`](LeanTrominoes/RectangleLineEnvelope.lean)
   gives the diagonal cross case an explicit closed-envelope contact
   predicate: a point must satisfy both the reference segment's coordinate
