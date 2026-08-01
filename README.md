@@ -2175,6 +2175,11 @@ The representation choices for this target are:
   singleton fallbacks end in the same spoke, while all other copied routes
   and all cycle routes are unchanged; hence the coordinated family preserves
   the same clockwise variable occurrence order.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteLength.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteLength.lean)
+  proves that every source-scaled fallback route contains a genuine final
+  edge and transfers this nondegeneracy to the coordinated family using its
+  terminal-direction equality and orthogonality.  This is the remaining
+  local hypothesis needed to preserve route order through Figure 9.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean)
   feeds the source-scaled coordinated fixed-eight formula, placement, and
   canonical route family into the generic positioned Figure 9 adapter.
