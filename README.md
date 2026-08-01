@@ -4419,7 +4419,12 @@ The representation choices for this target are:
   positions that mixed certificate at an arbitrary source atom and periodic
   literal translate.  The occurrence spoke and its translated implication
   ring receive exactly the same macrocell offset; positive refinement
-  preserves their endpoint-only continuous avoidance.
+  preserves their endpoint-only continuous avoidance and the fact that any
+  contact occurs at the spoke's terminal ring vertex.
+- [`LeanTrominoes/OrthogonalPolylineTailEndpointContactSeparation.lean`](LeanTrominoes/OrthogonalPolylineTailEndpointContactSeparation.lean)
+  packages that asymmetric contact condition and proves the corresponding
+  composition rule: a strictly separated prefix can be joined to such a
+  tail-contacting final piece without losing ordinary route separation.
 - [`LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean`](LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean)
   filters the local implication incidences at each ring vertex in syntactic
   order.  Every real port has exactly two cycle incidences, the separator

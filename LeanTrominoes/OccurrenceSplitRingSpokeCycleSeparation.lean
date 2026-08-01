@@ -1,6 +1,6 @@
 import LeanTrominoes.OccurrenceSplitRingDrawing
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
-import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
+import LeanTrominoes.OrthogonalPolylineTailEndpointContactSeparation
 
 /-!
 # Separation between Figure 7 spokes and implication routes
@@ -62,6 +62,47 @@ theorem spokeRoute_avoids_cycleRoutes
   · simp [RoutesAvoidEachOther,
       SegmentInteriorsDisjoint, RoutePointsAvoidInteriors,
       RoutesMeetOnlyAtEndpoints, gridPolylineSegments]
+
+/-- Every listed contact between a local old-incidence spoke and a local
+implication route occurs at the spoke's ring-vertex tail. -/
+theorem spokeRoute_meets_cycleRoute_only_at_tail
+    (port : Port)
+    (vertex : RingVertex)
+    (literalIndex : Nat) :
+    RoutesMeetOnlyAtFirstTail
+      (spokeRoute port)
+      (cycleRoute vertex literalIndex) := by
+  rcases literalIndex with _ | literalIndex
+  · cases port <;>
+      cases vertex with
+      | separator => native_decide
+      | port cyclePort =>
+          cases cyclePort <;> native_decide
+  · rcases literalIndex with _ | literalIndex
+    · cases port <;>
+        cases vertex with
+        | separator => native_decide
+        | port cyclePort =>
+            cases cyclePort <;> native_decide
+    · simp [cycleRoute, RoutesMeetOnlyAtFirstTail]
+
+/-- The tail-contact certificate also covers the total
+presentation-indexed cycle lookup. -/
+theorem spokeRoute_meets_cycleRoutes_only_at_tail
+    (port : Port)
+    (clauseIndex literalIndex : Nat) :
+    RoutesMeetOnlyAtFirstTail
+      (spokeRoute port)
+      (cycleRoutes clauseIndex literalIndex) := by
+  unfold cycleRoutes
+  split
+  · exact
+      spokeRoute_meets_cycleRoute_only_at_tail
+        port
+        (presentedCycleVertices.getD
+          clauseIndex .separator)
+        literalIndex
+  · simp [RoutesMeetOnlyAtFirstTail]
 
 /-- Positive uniform scaling preserves mixed Figure 7 spoke/cycle
 separation. -/
