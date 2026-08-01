@@ -259,6 +259,25 @@ structure RoutesSeparatedAtHeads
 
 namespace RoutesSeparatedAtHeads
 
+/-- Package direct avoidance and common-head-only contact proofs using the
+public routes themselves as geometric models. -/
+def ofProofs
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (meetOnlyAtHeads : RoutesMeetOnlyAtHeads first second) :
+    RoutesSeparatedAtHeads first second :=
+  ⟨first, second, rfl, rfl, avoid, meetOnlyAtHeads⟩
+
+/-- A separated-at-heads certificate is symmetric in its two routes. -/
+def symm
+    {first second : List Cell}
+    (certificate : RoutesSeparatedAtHeads first second) :
+    RoutesSeparatedAtHeads second first :=
+  ⟨certificate.secondModel, certificate.firstModel,
+    certificate.secondEq, certificate.firstEq,
+    routesAvoidEachOther_comm certificate.modelsAvoid,
+    certificate.modelsMeetOnlyAtHeads.symm⟩
+
 /-- Recover avoidance of the public routes from the stored geometric
 models. -/
 theorem avoid
@@ -513,6 +532,53 @@ def
   exact
     ⟨_, _, modelEqualities.1, modelEqualities.2,
       separated.1, separated.2⟩
+
+/-- The symmetric exceptional branch: when the second failed-choice prefix
+is a singleton, reverse the literal order, use the escaped-first certificate,
+and then restore the public route order. -/
+def
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choice_none_of_second_prefix_length_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex secondLiteralIndex = none)
+    (secondPrefixLength :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex secondLiteralIndex).dropLast.length = 1)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    RoutesSeparatedAtHeads
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex firstLiteralIndex)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex secondLiteralIndex) :=
+  (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choice_none_of_prefix_length_one
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember
+      secondLiteralMember firstLiteralMember
+      secondChoiceNone secondPrefixLength
+      (Ne.symm literalIndicesDifferent)).symm
 
 end PeriodicOrthocrossing
 end LeanTrominoes
