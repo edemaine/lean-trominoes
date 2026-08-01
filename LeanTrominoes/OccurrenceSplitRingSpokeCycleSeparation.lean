@@ -1,0 +1,85 @@
+import LeanTrominoes.OccurrenceSplitRingDrawing
+import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
+import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
+
+/-!
+# Separation between Figure 7 spokes and implication routes
+
+The complete finite Figure 7 drawing certifies not only its implication
+cycle but also the eight old-incidence spokes entering that cycle.  This
+module exposes the mixed spoke/cycle consequence directly and transports it
+through the common scaling and translation used by the retained angular
+construction.
+-/
+
+namespace LeanTrominoes
+namespace OccurrenceSplitRing
+
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+/-- Every local old-incidence spoke and every local implication route satisfy
+the complete continuous two-route separation predicate. -/
+theorem spokeRoute_avoids_cycleRoute
+    (port : Port)
+    (vertex : RingVertex)
+    (literalIndex : Nat) :
+    RoutesAvoidEachOther
+      (spokeRoute port)
+      (cycleRoute vertex literalIndex) := by
+  rcases literalIndex with _ | literalIndex
+  · cases port <;>
+      cases vertex with
+      | separator => native_decide
+      | port cyclePort =>
+          cases cyclePort <;> native_decide
+  · rcases literalIndex with _ | literalIndex
+    · cases port <;>
+        cases vertex with
+        | separator => native_decide
+        | port cyclePort =>
+            cases cyclePort <;> native_decide
+    · change RoutesAvoidEachOther (spokeRoute port) []
+      simp [RoutesAvoidEachOther,
+        SegmentInteriorsDisjoint, RoutePointsAvoidInteriors,
+        RoutesMeetOnlyAtEndpoints, gridPolylineSegments]
+
+/-- Positive uniform scaling preserves mixed Figure 7 spoke/cycle
+separation. -/
+theorem scaledSpokeRoute_avoids_scaledCycleRoute
+    (factor : Int)
+    (factorPositive : 0 < factor)
+    (port : Port)
+    (vertex : RingVertex)
+    (literalIndex : Nat) :
+    RoutesAvoidEachOther
+      (scalePolyline factor (spokeRoute port))
+      (scalePolyline factor
+        (cycleRoute vertex literalIndex)) := by
+  exact
+    RoutesAvoidEachOther.scalePolyline factorPositive
+      (spokeRoute_avoids_cycleRoute
+        port vertex literalIndex)
+
+/-- A common translation preserves mixed scaled Figure 7 spoke/cycle
+separation. -/
+theorem translatedScaledSpokeRoute_avoids_translatedScaledCycleRoute
+    (factor : Int)
+    (factorPositive : 0 < factor)
+    (offset : Cell)
+    (port : Port)
+    (vertex : RingVertex)
+    (literalIndex : Nat) :
+    RoutesAvoidEachOther
+      ((scalePolyline factor (spokeRoute port)).map
+        (Cell.add offset))
+      ((scalePolyline factor
+          (cycleRoute vertex literalIndex)).map
+        (Cell.add offset)) := by
+  exact
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesAvoidEachOther_translate
+      (scaledSpokeRoute_avoids_scaledCycleRoute
+        factor factorPositive port vertex literalIndex)
+      offset
+
+end OccurrenceSplitRing
+end LeanTrominoes

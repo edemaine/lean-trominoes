@@ -4392,6 +4392,12 @@ The representation choices for this target are:
   the semantic fixed-eight cycle for any renamed source atom.  A general
   translation-invariance theorem for embedded CNF drawings then places this
   complete certificate at every input-dependent ring macrocell.
+- [`LeanTrominoes/OccurrenceSplitRingSpokeCycleSeparation.lean`](LeanTrominoes/OccurrenceSplitRingSpokeCycleSeparation.lean)
+  exposes the mixed part of the complete Figure 7 certificate: every old
+  incidence spoke continuously avoids every implication route, with only
+  advertised endpoint contacts permitted.  Positive scaling and a common
+  translation preserve this predicate, matching the geometry used by the
+  retained source-to-cycle splice.
 - [`LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean`](LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean)
   filters the local implication incidences at each ring vertex in syntactic
   order.  Every real port has exactly two cycle incidences, the separator
