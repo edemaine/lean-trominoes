@@ -123,10 +123,6 @@ noncomputable def
           source)
         (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
           source)) :=
-  let family :=
-    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitCanonicalOrthogonalRoutes
-      source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty
   PeriodicOneInThreePositioned.inheritedRouteSuffixes
     (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
       source)
@@ -136,7 +132,21 @@ noncomputable def
     (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_allAtomsNodup
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
-    family.routes family.endpoints family.orthogonal
+    (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+      source)
+    (fun _sourceClause _sourceClauseIndex sourceClauseMember
+        _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+      let valid :=
+        retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_valid
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty sourceClauseMember sourceLiteralMember
+      ⟨valid.1, valid.2.1⟩)
+    (fun _sourceClause _sourceClauseIndex sourceClauseMember
+        _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_valid
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+        sourceClauseMember sourceLiteralMember).2.2)
 
 /-- Complete local-plus-inherited raw Figure 9 routes over the coordinated
 fixed-eight family. -/

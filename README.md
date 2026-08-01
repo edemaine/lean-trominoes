@@ -2201,6 +2201,11 @@ The representation choices for this target are:
   canonical endpoints, is orthogonal, and realizes every incidence-graph
   edge.  Thus the coordinated geometry is now threaded through the full
   exact-one route pipeline.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean)
+  transports the coordinated clockwise variable-route order through Figure
+  9, opaque wrapping, and unit elimination.  It also proves the inherited
+  Figure 9 routes are long enough for both terminal-direction splice
+  certificates.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean)
   observes that the coordinated construction changes positions and routes
   but not the erased exact-one formula.  It transfers the width-three and
