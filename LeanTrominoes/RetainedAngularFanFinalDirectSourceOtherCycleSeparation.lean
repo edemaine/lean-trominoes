@@ -246,6 +246,80 @@ theorem
   · exact choice.figure7Spoke_point_in_sourceSegmentRectangle
       slot spokeMember
 
+/-- A lattice point outside a segment's endpoint rectangle is separated
+from that rectangle.  Unlike `coordinateRectangle_separated_point`, this
+fact does not require the segment itself to be axis-aligned. -/
+theorem GridSegment.coordinateRectangle_separated_point_of_not_in
+    {segment : GridSegment}
+    {point : Cell}
+    (outside :
+      ¬InClosedGridRectangle
+        segment.coordinateLower
+        segment.coordinateUpper
+        point) :
+    ClosedGridRectanglesSeparated
+      segment.coordinateLower
+      segment.coordinateUpper
+      point point := by
+  rcases segment with
+    ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+  rcases point with ⟨pointX, pointY⟩
+  simp only [GridSegment.coordinateLower,
+    GridSegment.coordinateUpper,
+    InClosedGridRectangle,
+    ClosedGridRectanglesSeparated] at outside ⊢
+  omega
+
+/-- After the final common refinement, a direct source route's radius-288
+rectangle is separated from the radius-48 neighborhood of every source
+point outside its original endpoint rectangle. -/
+theorem
+    RetainedDirectSourceRouteChoice.scaledSourceRectangle_separated_pointCycleRectangle
+    (choice : RetainedDirectSourceRouteChoice)
+    {point : Cell}
+    (outside :
+      ¬InClosedGridRectangle
+        choice.sourceSegment.coordinateLower
+        choice.sourceSegment.coordinateUpper
+        point) :
+    ClosedGridRectanglesSeparated
+      (coordinateRadiusLower 288
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          choice.sourceSegment.coordinateLower))
+      (coordinateRadiusUpper 288
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          choice.sourceSegment.coordinateUpper))
+      (coordinateRadiusLower 48
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          point))
+      (coordinateRadiusUpper 48
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          point)) := by
+  have separated :=
+    ClosedGridRectanglesSeparated.scale_both_coordinateRadius
+      (GridSegment.coordinateRectangle_separated_point_of_not_in
+        (segment := choice.sourceSegment) outside)
+      (factor := retainedTerminalFanTotalRefinement * 4)
+      (radius := 288)
+      (by native_decide)
+      (by native_decide)
+  norm_num [retainedTerminalFanTotalRefinement,
+    PeriodicEightOccurrenceSplitPositioned.refinementScale,
+    retainedTerminalFanRoutingRefinement] at separated ⊢
+  simp only [ClosedGridRectanglesSeparated,
+    coordinateRadiusLower, coordinateRadiusUpper,
+    Cell.scale] at separated ⊢
+  rcases separated with
+      forwardX | backwardX | forwardY | backwardY
+  · exact Or.inl (by omega)
+  · exact Or.inr (Or.inl (by omega))
+  · exact Or.inr (Or.inr (Or.inl (by omega)))
+  · exact Or.inr (Or.inr (Or.inr (by omega)))
+
 end PeriodicEightOccurrenceSplit
 
 namespace PeriodicOrthocrossing
@@ -375,6 +449,76 @@ theorem
       retainedFinalSourceScaledAllCycleRoute_point_in_metadataCenterRectangle
         formula metadataLookup cycleLiteralIndex pointMember
   · exact rectanglesSeparated
+
+/-- A successful direct occurrence strictly avoids every flattened cycle
+whose source center lies outside the endpoint rectangle of the represented
+direct source segment. -/
+theorem
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_allCycleRoute_of_center_outside
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex =
+        some choice)
+    {metadata :
+      CycleClauseMetadata
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {cycleIndex : Nat}
+    (metadataLookup :
+      (allCycleClauseMetadata
+        ((finalCoordinatedSource formula).scale
+          retainedAngularFanSourceClearanceFactor)
+        ((finalCoordinatedPlacement formula).scale
+          retainedAngularFanSourceClearanceFactor))[cycleIndex]? =
+        some metadata)
+    (cycleLiteralIndex : Nat)
+    (centerOutside :
+      ¬InClosedGridRectangle
+        choice.sourceSegment.coordinateLower
+        choice.sourceSegment.coordinateUpper
+        ((finalCoordinatedPlacement formula).position
+          metadata.atom)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedFinalCoordinatedDirectOccurrenceRoute
+        formula choice
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        literal clauseIndex literalIndex)
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (allCycleRoutes
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          cycleIndex cycleLiteralIndex)) := by
+  apply
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_allCycleRoute_of_rectanglesSeparated
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      clauseMember literalMember choiceLookup
+      metadataLookup cycleLiteralIndex
+  simpa [retainedAngularFanSourceClearanceFactor_eq] using
+    choice.scaledSourceRectangle_separated_pointCycleRectangle
+      centerOutside
 
 /-- A successful direct occurrence avoids a flattened cycle route at the
 same canonical source center. -/
@@ -592,6 +736,117 @@ theorem
       sourceClausesNonempty choice
       clauseMember literalMember choiceLookup
       cycleClauseMember cycleLiteralMember centersEqual
+
+/-- The public coordinated route selected by a successful direct choice
+strictly avoids every cycle whose metadata center is outside its represented
+source-segment rectangle. -/
+theorem
+    retainedFinalCoordinatedDirectSourceRoute_strictlyAvoids_allCycleRoute_of_center_outside
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex =
+        some choice)
+    {cycleClause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {cycleIndex : Nat}
+    (cycleClauseMember :
+      (cycleClause, cycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {cycleLiteral :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {cycleLiteralIndex : Nat}
+    (_cycleLiteralMember :
+      (cycleLiteral, cycleLiteralIndex) ∈
+        cycleClause.literals.zipIdx)
+    (centerOutside :
+      ∀ metadata,
+        (allCycleClauseMetadata
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor))[cycleIndex]? =
+            some metadata →
+        ¬InClosedGridRectangle
+          choice.sourceSegment.coordinateLower
+          choice.sourceSegment.coordinateUpper
+          ((finalCoordinatedPlacement formula).position
+            metadata.atom)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex literalIndex)
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (allCycleRoutes
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          cycleIndex cycleLiteralIndex)) := by
+  rcases allCycleClauseMetadata_lookup_valid
+      ((finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor)
+      ((finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor)
+      cycleClauseMember with
+    ⟨metadata, metadataLookup, _metadataClauseEqual,
+      _localClauseMember⟩
+  have scaledClauseMember :
+      (clause.scale retainedAngularFanSourceClearanceFactor,
+          clauseIndex) ∈
+        ((finalCoordinatedSource formula).scale
+          retainedAngularFanSourceClearanceFactor).clauses.zipIdx := by
+    rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(clause, clauseIndex), clauseMember, rfl⟩
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp scaledClauseMember
+  have literalLookup :
+      (clause.scale
+        retainedAngularFanSourceClearanceFactor).literals[
+          literalIndex]? =
+        some literal := by
+    simpa using
+      (List.mem_zipIdx_iff_getElem?).mp literalMember
+  rw [
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_some
+      formula clauseIndex literalIndex choice
+      (clause.scale retainedAngularFanSourceClearanceFactor)
+      literal choiceLookup clauseLookup literalLookup]
+  exact
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_allCycleRoute_of_center_outside
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      clauseMember literalMember choiceLookup
+      metadataLookup cycleLiteralIndex
+      (centerOutside metadata metadataLookup)
 
 end PeriodicOrthocrossing
 end LeanTrominoes
