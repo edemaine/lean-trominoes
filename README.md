@@ -2140,7 +2140,10 @@ The representation choices for this target are:
   resulting routes with the actual appended implication-cycle lookups of the
   public coordinated family.  Positive scaling also preserves full route
   simplicity, so every cycle-suffix route is simple and every distinct pair
-  in that complete suffix is continuously separated.
+  in that complete suffix is continuously separated.  The same local/global
+  split proves that every explicit Figure 7 ring-copy vertex avoids every
+  cycle-route interior, and exposes the result at the final factor-8
+  placement and public coordinated route indices.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean)
   discharges all three suffix-involving premises of the endpoint-join
   separator.  Consequently, any two successful coordinated direct
@@ -2719,9 +2722,10 @@ The representation choices for this target are:
   vertices; bridge lemmas recover the membership-style endpoint obligation
   used by the input-dependent periodic routing layer.
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingPlanarity.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingPlanarity.lean)
-  extracts route simplicity and pairwise continuous separation from those
-  finite-index certificates using ordinary clause/literal membership data,
-  which is the form needed by global assembly proofs.
+  extracts route simplicity, pairwise continuous separation, and
+  vertex/route-interior avoidance from those finite-index certificates using
+  ordinary vertex, clause, literal, and segment membership data, which is the
+  form needed by global assembly proofs.
 - [`LeanTrominoes/EmbeddedCNFIncidenceDrawingIndexedSegmentSeparation.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingIndexedSegmentSeparation.lean)
   repackages finite planarity for flat `zipIdx` incidence and segment
   occurrences: differing incidence or within-route indices imply disjoint
@@ -4420,7 +4424,10 @@ The representation choices for this target are:
   separated factor-36 macrocells; combining this geometry with the same-ring
   certificate proves complete pairwise continuous separation across the
   flattened cycle suffix whenever occurring source variables have injective
-  positions.
+  positions.  The same argument bounds every ring variable in its inner
+  square and proves that each explicit ring-copy vertex avoids every
+  flattened cycle-route interior, using local Figure 7 planarity for its own
+  ring and macrocell separation for all other rings.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean)
   gives the copied source-clause prefix its matching lossless index bridge.
   Every transformed clause and literal recovers the original positioned

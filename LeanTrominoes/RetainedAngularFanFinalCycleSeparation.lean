@@ -319,6 +319,157 @@ theorem
     retainedFinalSourceScaledAllCycleRoute_isSimple
       formula clauseMember literalMember
 
+/-- The final factor-eight placement of a Figure 7 ring-copy vertex avoids
+every segment of every factor-eight implication route. -/
+theorem retainedFinalSourceScaledAllCycleRingVertex_avoidsRouteInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {vertexAtom : WrappedPeriodicPlanarSATVariable Variable}
+    (vertexAtomMember :
+      vertexAtom ∈
+        sourceVariables
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor).erase)
+    (vertex : OccurrenceSplitRing.RingVertex)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {cycleIndex : Nat}
+    (clauseMember :
+      (clause, cycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {segment : GridSegment}
+    (segmentMember :
+      segment ∈ gridPolylineSegments
+        (scalePolyline retainedTerminalFanRoutingRefinement
+          (allCycleRoutes
+            ((finalCoordinatedSource formula).scale
+              retainedAngularFanSourceClearanceFactor)
+            ((finalCoordinatedPlacement formula).scale
+              retainedAngularFanSourceClearanceFactor)
+            cycleIndex literalIndex))) :
+    ¬segment.InteriorContains
+      ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        formula).position
+          (ringCopy vertexAtom vertex)) := by
+  rw [gridPolylineSegments_scalePolyline] at segmentMember
+  rcases List.mem_map.mp segmentMember with
+    ⟨sourceSegment, sourceSegmentMember, rfl⟩
+  have avoids :=
+    allCycleRingVertex_avoidsRouteInterior
+      ((finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor)
+      ((finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor)
+      (retainedFinalCoordinatedScaledPlacement_position_injective_on_sourceVariables
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      vertexAtomMember vertex
+      clauseMember literalMember sourceSegmentMember
+  simpa [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
+    retainedAngularFanSourceScaledRefinedPlacement,
+    retainedAngularFanRefinedPlacement,
+    finalCoordinatedPlacement] using
+      (mt
+        (GridSegment.interiorContains_scale_iff
+          (show
+            (0 : Int) < retainedTerminalFanRoutingRefinement by
+            simp [retainedTerminalFanRoutingRefinement])
+          sourceSegment
+          (((PeriodicEightOccurrenceSplitPositioned.placement
+            ((finalCoordinatedPlacement formula).scale
+              retainedAngularFanSourceClearanceFactor)).position
+              (ringCopy vertexAtom vertex)))).mp
+        avoids)
+
+/-- Vertex/interior avoidance for a Figure 7 ring-copy vertex in the public
+coordinated route-family interface at an appended implication-clause
+index. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_cycleRingVertex_avoidsRouteInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {vertexAtom : WrappedPeriodicPlanarSATVariable Variable}
+    (vertexAtomMember :
+      vertexAtom ∈
+        sourceVariables
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor).erase)
+    (vertex : OccurrenceSplitRing.RingVertex)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {cycleIndex : Nat}
+    (clauseMember :
+      (clause, cycleIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {segment : GridSegment}
+    (segmentMember :
+      let source :=
+        (finalCoordinatedSource formula).scale
+          retainedAngularFanSourceClearanceFactor
+      let routes :=
+        PositionedPeriodicCNF.scaleIncidenceRoutes
+          retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes formula)
+      let occurrencePorts :=
+        occurrencePortsOfAngularOrder
+          source.erase
+          (angularOccurrenceOrder source.erase routes)
+      segment ∈ gridPolylineSegments
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula
+          ((occurrenceClauses source occurrencePorts).length +
+            cycleIndex)
+          literalIndex)) :
+    ¬segment.InteriorContains
+      ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        formula).position
+          (ringCopy vertexAtom vertex)) := by
+  dsimp only at segmentMember
+  rw [
+    retainedFinalCoordinatedCycleRoute_eq_scaledAllCycleRoute
+      formula cycleIndex literalIndex] at segmentMember
+  exact
+    retainedFinalSourceScaledAllCycleRingVertex_avoidsRouteInterior
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty vertexAtomMember vertex
+      clauseMember literalMember segmentMember
+
 /-- The actual factor-eight implication routes used by the final retained
 fixed-eight construction are pairwise continuously separated. -/
 theorem retainedFinalSourceScaledAllCycleRoutes_avoidEachOther

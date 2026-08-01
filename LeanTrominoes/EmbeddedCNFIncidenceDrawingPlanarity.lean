@@ -167,6 +167,57 @@ theorem EmbeddedCNFIncidenceDrawing.embeddedSegment_isAxisAligned_of_members
   have aligned := selected segmentIndex
   simpa only [segmentEqual] using aligned
 
+/-- Extract vertex/interior avoidance for one genuine graph-vertex
+position and one segment of a genuine presentation-indexed incidence route
+from a finite drawing's indexed planarity certificate. -/
+theorem EmbeddedCNFIncidenceDrawing.embeddedVertex_avoidsRouteInterior_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (drawing : EmbeddedCNFIncidenceDrawing Variable)
+    (planar : drawing.IsPlanar)
+    {vertexPosition : Cell}
+    (vertexMember : vertexPosition ∈ drawing.vertexPositions)
+    {clause : EmbeddedClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ drawing.formula.zipIdx)
+    {literal : Variable × Bool}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {segment : GridSegment}
+    (segmentMember :
+      segment ∈
+        gridPolylineSegments
+          (drawing.routes clauseIndex literalIndex)) :
+    ¬segment.InteriorContains vertexPosition := by
+  let incidence : EmbeddedCNFIncidence Variable :=
+    ⟨clause, clauseIndex, literal, literalIndex⟩
+  have incidenceMember :
+      incidence ∈ drawing.incidences :=
+    (mem_embeddedCNFIncidences_iff
+      drawing.formula incidence).mpr
+        ⟨clauseMember, literalMember⟩
+  rcases List.mem_iff_get.mp vertexMember with
+    ⟨vertexIndex, vertexEqual⟩
+  rcases List.mem_iff_get.mp incidenceMember with
+    ⟨incidenceIndex, incidenceEqual⟩
+  rcases List.mem_iff_get.mp segmentMember with
+    ⟨segmentIndex, segmentEqual⟩
+  have incidenceAtEqual :
+      drawing.incidenceAt incidenceIndex = incidence :=
+    incidenceEqual
+  have routeEqual :
+      drawing.routeAt (drawing.incidenceAt incidenceIndex) =
+        drawing.routes clauseIndex literalIndex := by
+    rw [incidenceAtEqual]
+    rfl
+  have selected :=
+    planar.2.2.1 vertexIndex incidenceIndex
+  dsimp only at selected
+  rw [routeEqual] at selected
+  have avoids := selected segmentIndex
+  simpa only [segmentEqual, vertexEqual] using avoids
+
 /-- Extract continuous separation for two distinct genuine
 presentation-indexed incidences from a finite drawing's indexed planarity
 certificate. -/

@@ -97,6 +97,36 @@ def positionedCycleRouteUpper
     (atom : Variable) : Cell :=
   Cell.add (macroOrigin sourcePlacement atom) (18, 18)
 
+/-- Every positioned Figure 7 ring-variable vertex lies in the same inner
+macrocell square as its implication routes. -/
+theorem positionedCycleRingVertex_inClosedGridRectangle
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable)
+    (vertex : RingVertex) :
+    InClosedGridRectangle
+      (positionedCycleRouteLower sourcePlacement atom)
+      (positionedCycleRouteUpper sourcePlacement atom)
+      ((placement sourcePlacement).position
+        (PeriodicEightOccurrenceSplit.ringCopy atom vertex)) := by
+  rw [placement_copy_eq_translatedCycleVariablePosition]
+  change
+    InClosedGridRectangle
+      (positionedCycleRouteLower sourcePlacement atom)
+      (positionedCycleRouteUpper sourcePlacement atom)
+      (Cell.add (macroOrigin sourcePlacement atom)
+        (ringVariablePosition vertex))
+  have localBounded :=
+    ringVariablePosition_inClosedGridRectangle vertex
+  rcases originEq : macroOrigin sourcePlacement atom with
+    ⟨originX, originY⟩
+  rcases positionEq : ringVariablePosition vertex with
+    ⟨pointX, pointY⟩
+  simp only [positionedCycleRouteLower,
+    positionedCycleRouteUpper, InClosedGridRectangle,
+    originEq, positionEq, Cell.add] at localBounded ⊢
+  omega
+
 /-- Translation puts every point of a positioned implication route in its
 atom's inner macrocell square. -/
 theorem positionedCycleRoutes_inClosedGridRectangle
@@ -198,6 +228,113 @@ theorem positionedCycleRoutes_strictlyAvoid_of_positions_ne
           secondClauseIndex secondLiteralIndex pointMember)
       (positionedCycleRouteRectangles_separated_of_positions_ne
         sourcePlacement positionsDifferent)
+
+/-- A ring-variable vertex in one source macrocell cannot lie in the
+interior of a cycle-route segment in a distinct source macrocell. -/
+theorem positionedCycleRingVertex_avoidsRouteInterior_of_positions_ne
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {vertexAtom routeAtom : Variable}
+    (positionsDifferent :
+      sourcePlacement.position vertexAtom ≠
+        sourcePlacement.position routeAtom)
+    (vertex : RingVertex)
+    (clauseIndex literalIndex : Nat)
+    {segment : GridSegment}
+    (segmentMember :
+      segment ∈ gridPolylineSegments
+        (positionedCycleRoutes sourcePlacement routeAtom
+          clauseIndex literalIndex)) :
+    ¬segment.InteriorContains
+      ((placement sourcePlacement).position
+        (PeriodicEightOccurrenceSplit.ringCopy vertexAtom vertex)) := by
+  have endpoints :=
+    gridPolylineSegments_endpoints_mem segmentMember
+  exact
+    not_interiorContains_of_inClosedGridRectangles_of_separated
+      (positionedCycleRingVertex_inClosedGridRectangle
+        sourcePlacement vertexAtom vertex)
+      (positionedCycleRoutes_inClosedGridRectangle
+        sourcePlacement routeAtom clauseIndex literalIndex
+        endpoints.1)
+      (positionedCycleRoutes_inClosedGridRectangle
+        sourcePlacement routeAtom clauseIndex literalIndex
+        endpoints.2)
+      (positionedCycleRouteRectangles_separated_of_positions_ne
+        sourcePlacement positionsDifferent)
+
+/-- Every explicit ring-copy vertex avoids every genuine route segment in
+the flattened implication-cycle suffix.  The owning atom's local Figure 7
+certificate handles its own ring; strict macrocell separation handles every
+other ring. -/
+theorem allCycleRingVertex_avoidsRouteInterior
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (positionInjective :
+      ∀ {firstAtom secondAtom : Variable},
+        firstAtom ∈
+            PeriodicThreeSATThree.sourceVariables source.erase →
+          secondAtom ∈
+            PeriodicThreeSATThree.sourceVariables source.erase →
+          sourcePlacement.position firstAtom =
+              sourcePlacement.position secondAtom →
+            firstAtom = secondAtom)
+    {vertexAtom : Variable}
+    (vertexAtomMember :
+      vertexAtom ∈
+        PeriodicThreeSATThree.sourceVariables source.erase)
+    (vertex : RingVertex)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable Variable)}
+    {cycleIndex : Nat}
+    (clauseMember :
+      (clause, cycleIndex) ∈
+        (allCycleClauses source sourcePlacement).zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {segment : GridSegment}
+    (segmentMember :
+      segment ∈ gridPolylineSegments
+        (allCycleRoutes source sourcePlacement
+          cycleIndex literalIndex)) :
+    ¬segment.InteriorContains
+      ((placement sourcePlacement).position
+        (PeriodicEightOccurrenceSplit.ringCopy
+          vertexAtom vertex)) := by
+  rcases allCycleClauseMetadata_lookup_valid
+      source sourcePlacement clauseMember with
+    ⟨metadata, metadataLookup, clauseEqual,
+      localClauseMember⟩
+  have routeAtomMember :=
+    allCycleClauseMetadata_lookup_atom_mem
+      source sourcePlacement metadataLookup
+  by_cases atomsEqual : vertexAtom = metadata.atom
+  · have localAvoid :=
+      positionedCycleRingVertex_avoidsRouteInterior
+        sourcePlacement metadata.atom vertex
+        localClauseMember
+        (clauseEqual ▸ literalMember)
+        (by
+          simpa [allCycleRoutes, metadataLookup] using segmentMember)
+    simpa [atomsEqual] using localAvoid
+  · have positionsDifferent :
+      sourcePlacement.position vertexAtom ≠
+        sourcePlacement.position metadata.atom := by
+      intro positionsEqual
+      exact atomsEqual
+        (positionInjective vertexAtomMember routeAtomMember
+          positionsEqual)
+    apply
+      positionedCycleRingVertex_avoidsRouteInterior_of_positions_ne
+        sourcePlacement positionsDifferent vertex
+        metadata.localClauseIndex literalIndex
+    simpa [allCycleRoutes, metadataLookup] using segmentMember
 
 /-- The flattened implication-cycle family is pairwise continuously
 separated.  Same-atom pairs use the exact local Figure 7 certificate;
