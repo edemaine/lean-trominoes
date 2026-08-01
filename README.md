@@ -2184,6 +2184,13 @@ The representation choices for this target are:
   but not the erased exact-one formula.  It transfers the width-three and
   occurrence-three promises and proves that the final coordinated unit-free
   instance is satisfiable exactly when the original periodic CNF is.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightThreeDM.lean)
+  names the normalized 3DM target of the coordinated pipeline.  The target is
+  well-formed, every colored element has degree two or three, and both perfect
+  matching and the abstract trichromatic orientation are equivalent to
+  satisfiability of the original periodic CNF.  A ribbon-ready coordinated
+  incidence presentation is now the only missing input to the generic
+  geometric 3DM assembly.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
