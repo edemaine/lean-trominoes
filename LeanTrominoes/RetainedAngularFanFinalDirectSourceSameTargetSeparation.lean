@@ -130,23 +130,6 @@ theorem
       firstChoiceLookup secondChoiceLookup
       clauseIndicesDifferent originsEqual
   cases atlasCase with
-  | sameKind origin kind firstIndex secondIndex indicesDifferent =>
-      have localFinish :=
-        localFinish_eq_of_sameOriginFinish_eq
-          origin kind kind firstIndex secondIndex finishesEqual
-      have localAngular :
-          (retainedDirectSourceLocalChoice kind firstIndex)
-            |>.AngularOrderCompatible
-              (retainedDirectSourceLocalChoice kind secondIndex)
-              firstSlot secondSlot := by
-        simpa [RetainedDirectSourceRouteChoice.AngularOrderCompatible,
-          retainedDirectSourceLocalChoice] using angularOrder
-      exact
-        retainedDirectSourceSameOriginCompleteFigure7Routes_strictlyAvoid_of_local
-          origin kind kind firstIndex secondIndex firstSlot secondSlot
-          (retainedDirectSourceSameKindDistinctChoiceSameTarget_strictlyAvoid
-            kind firstIndex secondIndex firstSlot secondSlot
-            indicesDifferent localFinish localAngular)
   | crossover
       origin firstClause secondClause firstIndex secondIndex
       clausesDifferent =>

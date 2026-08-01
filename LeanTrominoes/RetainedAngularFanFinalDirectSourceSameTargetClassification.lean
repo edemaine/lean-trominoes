@@ -1,5 +1,4 @@
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceSharedTargetData
-import LeanTrominoes.RetainedAngularFanDirectSourceDistinctChoiceSameTargetSeparation
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedVertexPositions
 
 /-!
@@ -20,6 +19,25 @@ open PlanarThreeSAT
 open PeriodicOrthocrossing
 
 set_option maxHeartbeats 8000000
+
+private instance decidableForallFintype
+    {α : Type*} [Fintype α]
+    (predicate : α → Prop)
+    [∀ value, Decidable (predicate value)] :
+    Decidable (∀ value, predicate value) :=
+  Fintype.decidableForallFintype
+
+/-- Every incidence route of one direct local clause has the same clause
+endpoint. -/
+theorem retainedDirectSourceLocalRouteAt_headD_eq_of_sameKind :
+    ∀ (kind : RetainedDirectClauseKind)
+      (firstIndex secondIndex :
+        Fin (retainedDirectSourcePrefixChoices kind).length),
+      (retainedDirectSourceLocalRouteAt
+          kind firstIndex).headD (0, 0) =
+        (retainedDirectSourceLocalRouteAt
+          kind secondIndex).headD (0, 0) := by
+  native_decide
 
 def RetainedDirectClauseKind.SameFamily
     (first second : RetainedDirectClauseKind) : Prop :=
@@ -407,15 +425,6 @@ incidences occupying one physical component macrocell. -/
 inductive RetainedDirectSourceSameTargetAtlasCase :
     RetainedDirectSourceRouteChoice →
       RetainedDirectSourceRouteChoice → Prop
-  | sameKind
-      (origin : Cell)
-      (kind : RetainedDirectClauseKind)
-      (firstIndex secondIndex :
-        Fin (retainedDirectSourcePrefixChoices kind).length)
-      (indicesDifferent : firstIndex.val ≠ secondIndex.val) :
-      RetainedDirectSourceSameTargetAtlasCase
-        ⟨origin, kind, firstIndex⟩
-        ⟨origin, kind, secondIndex⟩
   | crossover
       (origin : Cell)
       (firstClauseIndex secondClauseIndex : Fin 26)
@@ -533,10 +542,11 @@ theorem retainedFinalDirectSourceRouteChoices_sameTargetAtlasCase
       formula sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty secondChoice
       secondClauseMember secondLiteralMember secondChoiceLookup
-  have choicesDifferent : firstChoice ≠ secondChoice := by
-    intro choicesEqual
-    apply canonicalStartsDifferent
-    rw [← firstStart, ← secondStart, choicesEqual]
+  have sourceStartsDifferent :
+      firstChoice.sourceSegment.start ≠
+        secondChoice.sourceSegment.start := by
+    rw [firstStart, secondStart]
+    exact canonicalStartsDifferent
   rcases firstChoice with ⟨firstOrigin, firstKind, firstIndex⟩
   rcases secondChoice with ⟨secondOrigin, secondKind, secondIndex⟩
   simp only at originsEqual
@@ -547,16 +557,12 @@ theorem retainedFinalDirectSourceRouteChoices_sameTargetAtlasCase
       | crossover secondClause =>
           by_cases clausesEqual : firstClause = secondClause
           · subst secondClause
-            by_cases indicesEqual :
-                firstIndex.val = secondIndex.val
-            · have indexEqual : firstIndex = secondIndex :=
-                Fin.ext indicesEqual
-              subst secondIndex
-              exact False.elim (choicesDifferent rfl)
-            · exact
-                RetainedDirectSourceSameTargetAtlasCase.sameKind
-                  firstOrigin (.crossover firstClause)
-                  firstIndex secondIndex indicesEqual
+            exfalso
+            apply sourceStartsDifferent
+            simp only [RetainedDirectSourceRouteChoice.sourceSegment]
+            rw [
+              retainedDirectSourceLocalRouteAt_headD_eq_of_sameKind
+                (.crossover firstClause) firstIndex secondIndex]
           · exact
               RetainedDirectSourceSameTargetAtlasCase.crossover
                 firstOrigin firstClause secondClause
@@ -574,16 +580,13 @@ theorem retainedFinalDirectSourceRouteChoices_sameTargetAtlasCase
               (firstArm, firstClause) =
                 (secondArm, secondClause)
           · cases branchesEqual
-            by_cases indicesEqual :
-                firstIndex.val = secondIndex.val
-            · have indexEqual : firstIndex = secondIndex :=
-                Fin.ext indicesEqual
-              subst secondIndex
-              exact False.elim (choicesDifferent rfl)
-            · exact
-                RetainedDirectSourceSameTargetAtlasCase.sameKind
-                  firstOrigin (.duplicator firstArm firstClause)
-                  firstIndex secondIndex indicesEqual
+            exfalso
+            apply sourceStartsDifferent
+            simp only [RetainedDirectSourceRouteChoice.sourceSegment]
+            rw [
+              retainedDirectSourceLocalRouteAt_headD_eq_of_sameKind
+                (.duplicator firstArm firstClause)
+                firstIndex secondIndex]
           · exact
               RetainedDirectSourceSameTargetAtlasCase.duplicator
                 firstOrigin firstArm secondArm
@@ -598,16 +601,12 @@ theorem retainedFinalDirectSourceRouteChoices_sameTargetAtlasCase
       | duplicator =>
           simp [RetainedDirectClauseKind.SameFamily] at sameFamily
       | routedClause =>
-          by_cases indicesEqual :
-              firstIndex.val = secondIndex.val
-          · have indexEqual : firstIndex = secondIndex :=
-              Fin.ext indicesEqual
-            subst secondIndex
-            exact False.elim (choicesDifferent rfl)
-          · exact
-              RetainedDirectSourceSameTargetAtlasCase.sameKind
-                firstOrigin .routedClause
-                firstIndex secondIndex indicesEqual
+          exfalso
+          apply sourceStartsDifferent
+          simp only [RetainedDirectSourceRouteChoice.sourceSegment]
+          rw [
+            retainedDirectSourceLocalRouteAt_headD_eq_of_sameKind
+              .routedClause firstIndex secondIndex]
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
