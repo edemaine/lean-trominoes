@@ -2403,6 +2403,12 @@ The representation choices for this target are:
   refined canonical source center.  These reusable estimates reduce the two
   cross-splice/suffix obligations for a completed fallback route pair to
   separation of their original source-route rectangles.
+- [`LeanTrominoes/RetainedAngularFanSourceSplicePointSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSplicePointSeparation.lean)
+  combines pointwise lattice clearance for the retained source prefix with
+  the radius-288 bound for its replacement fan.  If the raw prefix and its
+  discarded axis-aligned final segment both avoid another integral endpoint,
+  the complete ordinary splice strictly avoids every route in that endpoint's
+  refined radius-96 neighborhood.
 - [`LeanTrominoes/RetainedAngularFanEqualityLensSingletonSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanEqualityLensSingletonSpokeSeparation.lean)
   proves both directed cross-splice/suffix obligations for the exceptional
   singleton route in either clause of an arbitrarily oriented equality
