@@ -2158,6 +2158,12 @@ The representation choices for this target are:
   use the established fallback.  The total family is packaged with canonical
   endpoints and pointwise orthogonality, ready for the global nonintersection
   proof.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedTerminalDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedTerminalDirections.lean)
+  proves that joining any boundary prefix to the nondegenerate scaled
+  Figure 7 suffix preserves that suffix's final direction.  Coordinated
+  direct, delayed-lane fallback, and ordinary retained copied-source routes
+  therefore all reach their split variable with the same selected terminal
+  direction.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean)
   feeds the source-scaled coordinated fixed-eight formula, placement, and
   canonical route family into the generic positioned Figure 9 adapter.
