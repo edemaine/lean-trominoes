@@ -2179,6 +2179,11 @@ The representation choices for this target are:
   canonical endpoints, is orthogonal, and realizes every incidence-graph
   edge.  Thus the coordinated geometry is now threaded through the full
   exact-one route pipeline.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean)
+  observes that the coordinated construction changes positions and routes
+  but not the erased exact-one formula.  It transfers the width-three and
+  occurrence-three promises and proves that the final coordinated unit-free
+  instance is satisfiable exactly when the original periodic CNF is.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
