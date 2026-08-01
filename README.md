@@ -2288,13 +2288,15 @@ The representation choices for this target are:
   boundary-splice/Figure-7-suffix separations, again before and after
   rasterization.
 - [`LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean)
-  joins the exceptional rasterized boundary pair to their unchanged Figure 7
-  suffixes.  The generic endpoint-join theorem combines head-only prefix
-  contact, both directed cross-suffix bounds, and suffix/suffix separation
-  into a completed occurrence-route certificate.  A separate public lookup
-  theorem identifies each genuine established route-family entry directly
-  with its explicit boundary-prefix/Figure-7-suffix join, keeping that
-  definitional normalization independent of the geometric certificate.
+  joins both the exceptional escaped/ordinary boundary pair and the
+  complementary non-singleton ordinary/ordinary pair to their unchanged
+  Figure 7 suffixes.  The generic endpoint-join theorem combines head-only
+  prefix contact, both directed cross-suffix bounds, and suffix/suffix
+  separation into completed occurrence-route certificates.  A separate
+  public lookup theorem identifies each genuine established route-family
+  entry directly with its explicit boundary-prefix/Figure-7-suffix join,
+  keeping that definitional normalization independent of the geometric
+  certificate.
 - [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
   applies simultaneous tail-replacement separation to two classified
   retained splices.  Positive scaling preserves strict source-prefix
