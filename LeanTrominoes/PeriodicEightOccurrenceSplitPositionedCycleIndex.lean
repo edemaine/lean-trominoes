@@ -26,6 +26,14 @@ structure CycleClauseMetadata
   atom : Variable
   localClauseIndex : Nat
 
+/-- The source atom and local Figure 7 clause index uniquely identify an
+entry in the flattened cycle metadata. -/
+def CycleClauseMetadata.key
+    {Variable : Type*}
+    (metadata : CycleClauseMetadata Variable) :
+    Variable × Nat :=
+  (metadata.atom, metadata.localClauseIndex)
+
 /-- Index every implication clause in one atom's local cycle block. -/
 def cycleClauseMetadataFor
     {Variable : Type*}
@@ -77,6 +85,32 @@ theorem cycleClauseMetadataFor_valid
   subst metadata
   exact ⟨rfl, taggedClauseMember⟩
 
+/-- Local clause indices do not repeat within one atom's cycle block. -/
+theorem cycleClauseMetadataFor_keys_nodup
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable) :
+    ((cycleClauseMetadataFor sourcePlacement atom).map
+      CycleClauseMetadata.key).Nodup := by
+  let clauses := cycleClausesFor sourcePlacement atom
+  have indicesNodup :
+      (clauses.zipIdx.map Prod.snd).Nodup :=
+    List.nodup_zipIdx_map_snd clauses
+  have keyedNodup :=
+    indicesNodup.map
+      (fun first second equal =>
+        congrArg Prod.snd equal :
+        Function.Injective fun localClauseIndex : Nat =>
+          (atom, localClauseIndex))
+  unfold cycleClauseMetadataFor
+  rw [List.map_map]
+  change
+    (clauses.zipIdx.map
+      ((fun localClauseIndex => (atom, localClauseIndex)) ∘
+        Prod.snd)).Nodup
+  rw [List.map_map] at keyedNodup
+  exact keyedNodup
+
 /-- Forgetting the indexing metadata recovers the existing positioned cycle
 list definitionally block-for-block. -/
 @[simp]
@@ -111,6 +145,88 @@ theorem allCycleClauseMetadata_valid
     cycleClauseMetadataFor_valid
       sourcePlacement atom metadataMember
   simpa [valid.1] using valid.2
+
+/-- The `(source atom, local clause)` keys of the flattened cycle metadata
+are pairwise distinct. -/
+theorem allCycleClauseMetadata_keys_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable) :
+    ((allCycleClauseMetadata source sourcePlacement).map
+      CycleClauseMetadata.key).Nodup := by
+  rw [allCycleClauseMetadata, List.map_flatMap,
+    List.nodup_flatMap]
+  constructor
+  · intro atom _atomMember
+    exact
+      cycleClauseMetadataFor_keys_nodup
+        sourcePlacement atom
+  · exact
+      (List.nodup_iff_pairwise_ne.mp
+        (List.nodup_dedup _)).imp fun
+          {firstAtom secondAtom} atomsDifferent => by
+        change List.Disjoint _ _
+        rw [List.disjoint_left]
+        intro key firstKeyMember secondKeyMember
+        rcases List.mem_map.mp firstKeyMember with
+          ⟨firstMetadata, firstMetadataMember, rfl⟩
+        rcases List.mem_map.mp secondKeyMember with
+          ⟨secondMetadata, secondMetadataMember,
+            secondKeyEqual⟩
+        have firstAtomEqual :=
+          (cycleClauseMetadataFor_valid
+            sourcePlacement firstAtom
+            firstMetadataMember).1
+        have secondAtomEqual :=
+          (cycleClauseMetadataFor_valid
+            sourcePlacement secondAtom
+            secondMetadataMember).1
+        apply atomsDifferent
+        exact
+          firstAtomEqual.symm.trans
+            ((congrArg Prod.fst secondKeyEqual).symm.trans
+              secondAtomEqual)
+
+/-- Equal atom/local-clause keys returned by two metadata lookups force the
+two flattened cycle indices to be equal. -/
+theorem allCycleClauseMetadata_lookup_key_injective
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {firstMetadata secondMetadata :
+      CycleClauseMetadata Variable}
+    {firstCycleIndex secondCycleIndex : Nat}
+    (firstLookup :
+      (allCycleClauseMetadata
+        source sourcePlacement)[firstCycleIndex]? =
+          some firstMetadata)
+    (secondLookup :
+      (allCycleClauseMetadata
+        source sourcePlacement)[secondCycleIndex]? =
+          some secondMetadata)
+    (keysEqual :
+      firstMetadata.key = secondMetadata.key) :
+    firstCycleIndex = secondCycleIndex := by
+  have firstKeyLookup :
+      ((allCycleClauseMetadata source sourcePlacement).map
+        CycleClauseMetadata.key)[firstCycleIndex]? =
+          some firstMetadata.key := by
+    rw [List.getElem?_map, firstLookup]
+    rfl
+  have secondKeyLookup :
+      ((allCycleClauseMetadata source sourcePlacement).map
+        CycleClauseMetadata.key)[secondCycleIndex]? =
+          some secondMetadata.key := by
+    rw [List.getElem?_map, secondLookup]
+    rfl
+  rcases List.getElem?_eq_some_iff.mp firstKeyLookup with
+    ⟨firstIndexLt, firstKeyAt⟩
+  rcases List.getElem?_eq_some_iff.mp secondKeyLookup with
+    ⟨secondIndexLt, secondKeyAt⟩
+  apply
+    ((allCycleClauseMetadata_keys_nodup
+      source sourcePlacement).getElem_inj_iff).mp
+  rw [firstKeyAt, secondKeyAt, keysEqual]
 
 /-- Looking up a genuine flattened cycle clause yields metadata carrying
 that exact clause. -/
@@ -188,6 +304,18 @@ theorem allCycleClauseMetadata_lookup_valid
     ⟨metadata, metadataLookup, clauseEqual,
       allCycleClauseMetadata_valid
         source sourcePlacement metadataMember⟩
+
+/-- The atom owning the cycle block at a flattened clause index, when that
+index is valid. -/
+def allCycleClauseAtom?
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (cycleIndex : Nat) :
+    Option Variable :=
+  (allCycleClauseMetadata
+    source sourcePlacement)[cycleIndex]?.map
+      CycleClauseMetadata.atom
 
 /-- Route lookup for the flattened cycle suffix, indexed relative to the
 start of that suffix. -/

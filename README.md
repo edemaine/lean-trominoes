@@ -4397,7 +4397,15 @@ The representation choices for this target are:
   carries each flattened cycle clause's source atom and local Figure 7 index
   in a parallel metadata list.  Projecting the metadata recovers the existing
   formula exactly, so global route lookup can select certified local routes
-  without arithmetic assumptions about block size.
+  without arithmetic assumptions about block size.  Its atom/local-clause
+  keys are duplicate-free, making the flattened index recoverable from this
+  semantic key.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitCyclePlanarity.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCyclePlanarity.lean)
+  lifts the positioned Figure 7 certificate through that flattened metadata:
+  every genuine cycle-suffix route is simple, and any two distinct routes in
+  the same source atom's implication ring satisfy complete continuous
+  separation.  Different-atom separation remains a global macrocell
+  obligation.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceIndex.lean)
   gives the copied source-clause prefix its matching lossless index bridge.
   Every transformed clause and literal recovers the original positioned
