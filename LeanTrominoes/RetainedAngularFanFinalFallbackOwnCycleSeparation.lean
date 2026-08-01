@@ -414,6 +414,31 @@ theorem
       literal clauseIndex literalIndex center slot slotVal spokeEqual
       cycleClauseIndex cycleLiteralIndex
 
+/-- The periodically lifted implication-cycle route owned by one genuine
+copied-source occurrence in the final coordinated construction. -/
+def retainedFinalMatchingCycleLift
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable))
+    (literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable))
+    (cycleClauseIndex cycleLiteralIndex : Nat) :
+    List Cell :=
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  scalePolyline retainedTerminalFanRoutingRefinement
+    (translatePolyline
+      ((PeriodicEightOccurrenceSplitPositioned.placement
+          placement).translation
+        (incidenceRelativeOffset
+          (clause.scale retainedAngularFanSourceClearanceFactor)
+          literal))
+      (positionedCycleRoutes placement literal.atom
+        cycleClauseIndex cycleLiteralIndex))
+
 /-- The established ordinary copied-source occurrence used by a failed
 direct choice avoids every route of its matching periodically lifted
 implication cycle. -/
@@ -445,22 +470,13 @@ theorem
     (cycleClauseIndexLt :
       cycleClauseIndex < presentedCycleVertices.length)
     (cycleLiteralIndexLt : cycleLiteralIndex < 2) :
-    let placement :=
-      (finalCoordinatedPlacement formula).scale
-        retainedAngularFanSourceClearanceFactor
     RoutesAvoidEachOther
       (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
         formula clauseIndex literalIndex)
-      (scalePolyline retainedTerminalFanRoutingRefinement
-        (translatePolyline
-          ((PeriodicEightOccurrenceSplitPositioned.placement
-              placement).translation
-            (incidenceRelativeOffset
-              (clause.scale retainedAngularFanSourceClearanceFactor)
-              literal))
-          (positionedCycleRoutes placement literal.atom
-            cycleClauseIndex cycleLiteralIndex))) := by
-  dsimp only
+      (retainedFinalMatchingCycleLift
+        formula clause literal
+        cycleClauseIndex cycleLiteralIndex) := by
+  unfold retainedFinalMatchingCycleLift
   let source :=
     (finalCoordinatedSource formula).scale
       retainedAngularFanSourceClearanceFactor
@@ -630,24 +646,15 @@ theorem
     (cycleClauseIndexLt :
       cycleClauseIndex < presentedCycleVertices.length)
     (cycleLiteralIndexLt : cycleLiteralIndex < 2) :
-    let placement :=
-      (finalCoordinatedPlacement formula).scale
-        retainedAngularFanSourceClearanceFactor
     RoutesAvoidEachOther
       (retainedFinalEscapedFallbackOccurrenceRoute
         formula
         (clause.scale retainedAngularFanSourceClearanceFactor)
         literal clauseIndex literalIndex)
-      (scalePolyline retainedTerminalFanRoutingRefinement
-        (translatePolyline
-          ((PeriodicEightOccurrenceSplitPositioned.placement
-              placement).translation
-            (incidenceRelativeOffset
-              (clause.scale retainedAngularFanSourceClearanceFactor)
-              literal))
-          (positionedCycleRoutes placement literal.atom
-            cycleClauseIndex cycleLiteralIndex))) := by
-  dsimp only
+      (retainedFinalMatchingCycleLift
+        formula clause literal
+        cycleClauseIndex cycleLiteralIndex) := by
+  unfold retainedFinalMatchingCycleLift
   let source :=
     (finalCoordinatedSource formula).scale
       retainedAngularFanSourceClearanceFactor
