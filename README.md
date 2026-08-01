@@ -2169,6 +2169,12 @@ The representation choices for this target are:
   Figure 7 family.  Copied-source routes share their final spoke and cycle
   routes agree outright, so source-first refinement preserves the clockwise
   first/second/third occurrence order at every degree-three split variable.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedVariableRouteOrder.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedVariableRouteOrder.lean)
+  compares the final coordinated family incidence-by-incidence with that
+  source-scaled fallback family.  Successful direct choices and escaped
+  singleton fallbacks end in the same spoke, while all other copied routes
+  and all cycle routes are unchanged; hence the coordinated family preserves
+  the same clockwise variable occurrence order.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean)
   feeds the source-scaled coordinated fixed-eight formula, placement, and
   canonical route family into the generic positioned Figure 9 adapter.

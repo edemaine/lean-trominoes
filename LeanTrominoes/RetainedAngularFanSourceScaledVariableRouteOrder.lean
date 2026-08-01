@@ -319,6 +319,123 @@ theorem
       scaledFits scaledCertificate
       scaledFamily.endpoints scaledLengths scaledFamily.retained
 
+/-- Pointwise source-first version of the retained copied-occurrence
+terminal-direction theorem. -/
+theorem
+    retainedAngularFanSourceScaledSplicedOccurrenceRoute_lastDirection
+    {Variable : Type*} [DecidableEq Variable]
+    {factor : Nat}
+    (factorPositive : 0 < factor)
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (family :
+      PositionedPeriodicCNF.CanonicalRetainedRayIncidenceRoutes
+        source placement)
+    (fits :
+      FitsEightSlots
+        (angularOccurrenceOrder source.erase family.routes))
+    (certificate :
+      RetainedOccurrenceTerminalCertificate
+        source.erase family.routes)
+    (lengths :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          2 ≤ (family.routes clauseIndex literalIndex).length)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    AxisDirection.polylineLastDirection
+        (retainedAngularFanSplicedOccurrenceRoute
+          (source.scale factor)
+          (placement.scale factor)
+          (PositionedPeriodicCNF.scaleIncidenceRoutes
+            factor family.routes)
+          (clause.scale factor) literal
+          clauseIndex literalIndex) =
+      AxisDirection.polylineLastDirection
+        (angularOccurrenceSuffix
+          (placement.scale factor)
+          (angularOccurrenceOrder
+            (source.scale factor).erase
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              factor family.routes))
+          (clause.scale factor) literal
+          clauseIndex literalIndex) := by
+  let scaledFamily :=
+    family.scale factorPositive
+  have scaledFits :
+      FitsEightSlots
+        (angularOccurrenceOrder
+          (source.scale factor).erase
+          (PositionedPeriodicCNF.scaleIncidenceRoutes
+            factor family.routes)) := by
+    rw [PositionedPeriodicCNF.erase_scale,
+      angularOccurrenceOrder_scaleIncidenceRoutes
+        source.erase factorPositive family.routes]
+    exact fits
+  have scaledCertificate :
+      RetainedOccurrenceTerminalCertificate
+        (source.scale factor).erase
+        (PositionedPeriodicCNF.scaleIncidenceRoutes
+          factor family.routes) := by
+    simpa only [PositionedPeriodicCNF.erase_scale] using
+      certificate.scaleIncidenceRoutes factorPositive
+  have scaledClauseMember :
+      (clause.scale factor, clauseIndex) ∈
+        (source.scale factor).clauses.zipIdx := by
+    rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(clause, clauseIndex), clauseMember, rfl⟩
+  have scaledLengths :
+      ∀ scaledClause scaledClauseIndex,
+        (scaledClause, scaledClauseIndex) ∈
+          (source.scale factor).clauses.zipIdx →
+        ∀ scaledLiteral scaledLiteralIndex,
+          (scaledLiteral, scaledLiteralIndex) ∈
+            scaledClause.literals.zipIdx →
+          2 ≤
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              factor family.routes
+              scaledClauseIndex scaledLiteralIndex).length := by
+    intro scaledClause scaledClauseIndex scaledClauseMember'
+      scaledLiteral scaledLiteralIndex scaledLiteralMember
+    rw [PositionedPeriodicCNF.scale_clauses,
+      List.zipIdx_map] at scaledClauseMember'
+    rcases List.mem_map.mp scaledClauseMember' with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual :
+        taggedClause.2 = scaledClauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst scaledClauseIndex
+    subst scaledClause
+    have sourceLiteralMember :
+        (scaledLiteral, scaledLiteralIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using scaledLiteralMember
+    simpa [PositionedPeriodicCNF.scaleIncidenceRoutes,
+      scalePolyline] using
+      lengths taggedClause.1 taggedClause.2 taggedClauseMember
+        scaledLiteral scaledLiteralIndex sourceLiteralMember
+  exact
+    retainedAngularFanSplicedOccurrenceRoute_lastDirection
+      (source.scale factor)
+      (placement.scale factor)
+      (PositionedPeriodicCNF.scaleIncidenceRoutes
+        factor family.routes)
+      scaledFits scaledCertificate
+      scaledFamily.endpoints scaledLengths scaledFamily.retained
+      scaledClauseMember literalMember
+
 end PeriodicEightOccurrenceSplit
 
 namespace PeriodicOrthocrossing
