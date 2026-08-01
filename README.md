@@ -2150,6 +2150,12 @@ The representation choices for this target are:
   split proves that every Figure 7 ring-copy or implication-clause vertex
   avoids every cycle-route interior, and exposes both results at the final
   factor-8 placement and public coordinated route indices.
+- [`LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean`](LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean)
+  recovers the source atom owning any genuine appended implication route
+  and proves that every point of its factor-eight realization lies within
+  coordinate radius 48 of that atom's fully refined original position.
+  This is the uniform neighborhood certificate used by the mixed
+  copied-source/cycle separation layer.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteSeparation.lean)
   discharges all three suffix-involving premises of the endpoint-join
   separator.  Consequently, any two successful coordinated direct
