@@ -758,5 +758,107 @@ def
     ⟨_, _, modelEqualities.1, modelEqualities.2,
       separated.1, separated.2⟩
 
+/-- Unconditional same-clause separation for two distinct genuine entries
+of the public coordinated route family.  Selector success is uniform across
+the clause; on uniform failure, the two prefix-length tests choose between
+the escaped-first, escaped-second, and ordinary/ordinary certificates. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    RoutesAvoidEachOther
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex firstLiteralIndex)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex secondLiteralIndex) ∧
+      RoutesMeetOnlyAtHeads
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex firstLiteralIndex)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex secondLiteralIndex) := by
+  cases firstChoiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+        formula clauseIndex firstLiteralIndex with
+  | some firstChoice =>
+      rcases
+          retainedFinalDirectSourceRouteChoice_exists_of_sameClause_choice_some
+            formula sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty clauseMember
+            secondLiteralMember firstChoice firstChoiceLookup with
+        ⟨secondChoice, secondChoiceLookup⟩
+      have separated :=
+        retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choices_some
+          formula sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty firstChoice secondChoice
+          clauseMember firstLiteralMember secondLiteralMember
+          firstChoiceLookup secondChoiceLookup
+          literalIndicesDifferent
+      exact separated
+  | none =>
+      by_cases firstPrefixLength :
+          (finalCoordinatedSourceRoutes
+            formula clauseIndex firstLiteralIndex).dropLast.length = 1
+      · have certificate :=
+          retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choice_none_of_prefix_length_one
+            formula sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty clauseMember
+            firstLiteralMember secondLiteralMember
+            firstChoiceLookup firstPrefixLength
+            literalIndicesDifferent
+        exact
+          ⟨certificate.avoid,
+            certificate.meetOnlyAtHeads⟩
+      · by_cases secondPrefixLength :
+            (finalCoordinatedSourceRoutes
+              formula clauseIndex secondLiteralIndex).dropLast.length = 1
+        · have secondChoiceNone :=
+            retainedFinalDirectSourceRouteChoice_eq_none_of_sameClause_choice_none
+              formula sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty clauseMember
+              firstLiteralMember secondLiteralMember
+              firstChoiceLookup
+          have certificate :=
+            retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choice_none_of_second_prefix_length_one
+              formula sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty clauseMember
+              firstLiteralMember secondLiteralMember
+              secondChoiceNone secondPrefixLength
+              literalIndicesDifferent
+          exact
+            ⟨certificate.avoid,
+              certificate.meetOnlyAtHeads⟩
+        · have certificate :=
+            retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choice_none_of_prefix_lengths_ne_one
+              formula sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty clauseMember
+              firstLiteralMember secondLiteralMember
+              firstChoiceLookup firstPrefixLength
+              secondPrefixLength literalIndicesDifferent
+          exact
+            ⟨certificate.avoid,
+              certificate.meetOnlyAtHeads⟩
+
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -2146,7 +2146,10 @@ The representation choices for this target are:
   theorem to both total lookups without unfolding the geometric predicates.
   The complementary failed-selector case with two non-singleton prefixes is
   now exposed by the same interface, using two explicit ordinary occurrence
-  joins and the completed ordinary/ordinary separation theorem.
+  joins and the completed ordinary/ordinary separation theorem.  A final
+  selector-and-prefix case split packages all successful and failed cases
+  into one unconditional avoidance-and-head-contact theorem for distinct
+  genuine entries of a single final clause.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their
