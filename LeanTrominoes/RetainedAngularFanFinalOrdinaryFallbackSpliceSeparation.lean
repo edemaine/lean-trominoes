@@ -4,6 +4,7 @@ import LeanTrominoes.RetainedAngularFanFinalFallbackOrthogonality
 import LeanTrominoes.RetainedAngularFanFinalOccurrenceSuffixSeparation
 import LeanTrominoes.RetainedFinalOuterFanSeparation
 import LeanTrominoes.RetainedFinalSourceScaledSpliceSeparation
+import LeanTrominoes.RetainedAngularFanSourceSplicePointSeparation
 import LeanTrominoes.PositionedPeriodicCNFRetainedRayRasterization
 
 /-!
@@ -29,7 +30,8 @@ set_option maxHeartbeats 2000000
 
 /-- Two non-singleton ordinary fallback splices selected from different
 literals of one final clause avoid each other except for their common
-clause head.  Both splices are orthogonal. -/
+clause head.  Both splices are orthogonal, and each complete splice strictly
+avoids the unchanged Figure 7 suffix of the other literal. -/
 theorem
     retainedFinalSameClauseOrdinarySplicedBoundaryPolylines_separated_of_choice_none_of_prefix_lengths_ne_one
     {Variable : Type*}
@@ -95,6 +97,28 @@ theorem
     let secondTerminal :=
       scaleRetainedTerminalData
         retainedAngularFanSourceClearanceFactor secondRawTerminal
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let order :=
+      angularOccurrenceOrder source.erase routes
+    let firstSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement order
+          (clause.scale retainedAngularFanSourceClearanceFactor)
+          firstLiteral clauseIndex firstLiteralIndex)
+    let secondSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement order
+          (clause.scale retainedAngularFanSourceClearanceFactor)
+          secondLiteral clauseIndex secondLiteralIndex)
     RoutesAvoidEachOther
         (retainedAngularFanSplicedBoundaryPolyline
           firstRoute firstTerminal firstSlot)
@@ -109,6 +133,14 @@ theorem
         (retainedAngularFanSplicedBoundaryPolyline
           firstRoute firstTerminal firstSlot) ∧
       OrthogonalPolyline
+        (retainedAngularFanSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot) ∧
+      RoutesStrictlyAvoidEachOther
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        secondSuffix ∧
+      RoutesStrictlyAvoidEachOther
+        firstSuffix
         (retainedAngularFanSplicedBoundaryPolyline
           secondRoute secondTerminal secondSlot) := by
   dsimp only
@@ -152,6 +184,28 @@ theorem
   let secondTerminal :=
     scaleRetainedTerminalData
       retainedAngularFanSourceClearanceFactor secondRawTerminal
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let order :=
+    angularOccurrenceOrder source.erase routes
+  let firstSuffix :=
+    scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement order
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        firstLiteral clauseIndex firstLiteralIndex)
+  let secondSuffix :=
+    scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement order
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        secondLiteral clauseIndex secondLiteralIndex)
   have firstRawOccurrenceEq :
       firstRawRoute =
         finalGaugedRouteOccurrence
@@ -397,6 +451,111 @@ theorem
         (⟨polylineLastEntrance secondRawRoute,
           secondRawRoute.getLastD (0, 0)⟩ : GridSegment)
         (finalGridSegment_mem secondRawRoute secondLength)
+  have firstAlignedAtCenter :
+      (⟨polylineLastEntrance firstRawRoute,
+          PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            clause firstLiteral⟩ :
+        GridSegment).IsAxisAligned := by
+    rw [← firstLastD]
+    exact firstAligned
+  have secondAlignedAtCenter :
+      (⟨polylineLastEntrance secondRawRoute,
+          PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            clause secondLiteral⟩ :
+        GridSegment).IsAxisAligned := by
+    rw [← secondLastD]
+    exact secondAligned
+  have notBothSingleton :
+      ¬(firstRawRoute.dropLast.length = 1 ∧
+        secondRawRoute.dropLast.length = 1) := by
+    rintro ⟨firstSingleton, _⟩
+    exact firstPrefixLengthNeOne firstSingleton
+  have headLastNe :
+      firstRawRoute.head? ≠ secondRawRoute.getLast? := by
+    rw [firstEndpoints.1, secondEndpoints.2]
+    exact fun equal =>
+      firstSourceNeSecondCenter (Option.some.inj equal)
+  have lastHeadNe :
+      firstRawRoute.getLast? ≠ secondRawRoute.head? := by
+    rw [firstEndpoints.2, secondEndpoints.1]
+    exact fun equal =>
+      secondSourceNeFirstCenter (Option.some.inj equal.symm)
+  have lastLastNe :
+      firstRawRoute.getLast? ≠ secondRawRoute.getLast? := by
+    rw [firstEndpoints.2, secondEndpoints.2]
+    exact fun equal =>
+      centersDifferent (Option.some.inj equal)
+  have finalRectanglesSeparated :=
+    retainedDeduplicatedGaugedWrappedDrawing_finalSegmentRectanglesSeparated_of_axisAligned_of_not_both_singletonPrefixes
+      formula wellFormed degree isLocal retainedClausesNonempty
+      firstRawRouteMember secondRawRouteMember
+      firstLength secondLength routeIndicesDifferent
+      firstEndpoints.2 secondEndpoints.2
+      headLastNe lastHeadNe lastLastNe
+      notBothSingleton
+      firstAlignedAtCenter secondAlignedAtCenter
+  let firstFinalSegment : GridSegment :=
+    ⟨polylineLastEntrance firstRawRoute,
+      firstRawRoute.getLastD (0, 0)⟩
+  let secondFinalSegment : GridSegment :=
+    ⟨polylineLastEntrance secondRawRoute,
+      secondRawRoute.getLastD (0, 0)⟩
+  have firstFinalAvoidsSecondTarget :
+      ¬firstFinalSegment.Contains
+        (secondRawRoute.getLastD (0, 0)) := by
+    intro contains
+    have firstBounded :
+        InClosedGridRectangle
+          firstFinalSegment.coordinateLower
+          firstFinalSegment.coordinateUpper
+          (secondRawRoute.getLastD (0, 0)) :=
+      inClosedGridRectangle_of_segment_contains
+        firstFinalSegment.start_in_coordinateRectangle
+        firstFinalSegment.finish_in_coordinateRectangle
+        contains
+    have secondBounded :
+        InClosedGridRectangle
+          secondFinalSegment.coordinateLower
+          secondFinalSegment.coordinateUpper
+          (secondRawRoute.getLastD (0, 0)) := by
+      simpa [secondFinalSegment] using
+        secondFinalSegment.finish_in_coordinateRectangle
+    exact
+      (ne_of_inClosedGridRectangles_of_separated
+        firstBounded secondBounded
+        (by
+          simpa [firstFinalSegment, secondFinalSegment] using
+            finalRectanglesSeparated))
+        rfl
+  have secondFinalAvoidsFirstTarget :
+      ¬secondFinalSegment.Contains
+        (firstRawRoute.getLastD (0, 0)) := by
+    intro contains
+    have secondBounded :
+        InClosedGridRectangle
+          secondFinalSegment.coordinateLower
+          secondFinalSegment.coordinateUpper
+          (firstRawRoute.getLastD (0, 0)) :=
+      inClosedGridRectangle_of_segment_contains
+        secondFinalSegment.start_in_coordinateRectangle
+        secondFinalSegment.finish_in_coordinateRectangle
+        contains
+    have firstBounded :
+        InClosedGridRectangle
+          firstFinalSegment.coordinateLower
+          firstFinalSegment.coordinateUpper
+          (firstRawRoute.getLastD (0, 0)) := by
+      simpa [firstFinalSegment] using
+        firstFinalSegment.finish_in_coordinateRectangle
+    exact
+      (ne_of_inClosedGridRectangles_of_separated
+        secondBounded firstBounded
+        (by
+          simpa [firstFinalSegment, secondFinalSegment] using
+            finalRectanglesSeparated.symm))
+        rfl
   have fansAvoid :
       RoutesStrictlyAvoidEachOther
         (retainedTerminalFanOuterCompleteRoute
@@ -424,28 +583,10 @@ theorem
         firstEndpoints.2 secondEndpoints.2
         firstSourceNeSecondCenter secondSourceNeFirstCenter
         centersDifferent
-        (by
-          rintro ⟨firstSingleton, secondSingleton⟩
-          exact firstPrefixLengthNeOne firstSingleton)
+        notBothSingleton
         firstAligned secondAligned
         firstRawTerminal secondRawTerminal firstSlot secondSlot
         firstClassified secondClassified
-  have firstAlignedAtCenter :
-      (⟨polylineLastEntrance firstRawRoute,
-          PositionedPeriodicCNF.canonicalLiteralPosition
-            (finalCoordinatedPlacement formula)
-            clause firstLiteral⟩ :
-        GridSegment).IsAxisAligned := by
-    rw [← firstLastD]
-    exact firstAligned
-  have secondAlignedAtCenter :
-      (⟨polylineLastEntrance secondRawRoute,
-          PositionedPeriodicCNF.canonicalLiteralPosition
-            (finalCoordinatedPlacement formula)
-            clause secondLiteral⟩ :
-        GridSegment).IsAxisAligned := by
-    rw [← secondLastD]
-    exact secondAligned
   have separated :=
     retainedFinalSourceScaledSplicedBoundaryPolylines_separated_of_axisAligned_of_prefix_lengths_ne_one
       formula wellFormed degree isLocal retainedClausesNonempty
@@ -460,6 +601,168 @@ theorem
       firstAlignedAtCenter secondAlignedAtCenter
       firstRawTerminal secondRawTerminal firstSlot secondSlot
       firstClassified secondClassified fansAvoid
+  have firstPrefixClearance :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_avoids_otherFinal
+      formula wellFormed degree isLocal retainedClausesNonempty
+      firstRawRouteMember secondRawRouteMember
+      firstLength secondLength routeIndicesDifferent
+      firstEndpoints.1 secondEndpoints.2
+      firstSourceNeSecondCenter
+  have secondPrefixClearance :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_avoids_otherFinal
+      formula wellFormed degree isLocal retainedClausesNonempty
+      secondRawRouteMember firstRawRouteMember
+      secondLength firstLength routeIndicesDifferent.symm
+      secondEndpoints.1 firstEndpoints.2
+      secondSourceNeFirstCenter
+  have firstSuffixCenterEq :
+      Cell.scale
+          (retainedTerminalFanRoutingRefinement *
+            PeriodicEightOccurrenceSplitPositioned.refinementScale)
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            placement
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            firstLiteral) =
+        Cell.scale
+          (retainedTerminalFanTotalRefinement *
+            retainedAngularFanSourceClearanceFactor)
+          (firstRawRoute.getLastD (0, 0)) := by
+    dsimp only [placement]
+    rw [
+      PositionedPeriodicCNF.CanonicalRetainedRayIncidenceRoutes.canonicalLiteralPosition_scale,
+      ← firstLastD, Cell.scale_scale]
+    norm_num [retainedTerminalFanTotalRefinement_eq,
+      retainedTerminalFanRoutingRefinement,
+      retainedAngularFanSourceClearanceFactor,
+      PeriodicEightOccurrenceSplitPositioned.refinementScale]
+  have secondSuffixCenterEq :
+      Cell.scale
+          (retainedTerminalFanRoutingRefinement *
+            PeriodicEightOccurrenceSplitPositioned.refinementScale)
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            placement
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            secondLiteral) =
+        Cell.scale
+          (retainedTerminalFanTotalRefinement *
+            retainedAngularFanSourceClearanceFactor)
+          (secondRawRoute.getLastD (0, 0)) := by
+    dsimp only [placement]
+    rw [
+      PositionedPeriodicCNF.CanonicalRetainedRayIncidenceRoutes.canonicalLiteralPosition_scale,
+      ← secondLastD, Cell.scale_scale]
+    norm_num [retainedTerminalFanTotalRefinement_eq,
+      retainedTerminalFanRoutingRefinement,
+      retainedAngularFanSourceClearanceFactor,
+      PeriodicEightOccurrenceSplitPositioned.refinementScale]
+  have firstSuffixBounded :
+      ∀ point ∈ firstSuffix,
+        InClosedGridRectangle
+          (coordinateRadiusLower 96
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement *
+                retainedAngularFanSourceClearanceFactor)
+              (firstRawRoute.getLastD (0, 0))))
+          (coordinateRadiusUpper 96
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement *
+                retainedAngularFanSourceClearanceFactor)
+              (firstRawRoute.getLastD (0, 0))))
+          point := by
+    intro point pointMember
+    change
+      point ∈
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement order
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            firstLiteral clauseIndex firstLiteralIndex)
+      at pointMember
+    have bounded :=
+      scaledAngularOccurrenceSuffix_point_in_centerRectangle
+        placement order
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        firstLiteral clauseIndex firstLiteralIndex
+        pointMember
+    rw [firstSuffixCenterEq] at bounded
+    exact bounded
+  have secondSuffixBounded :
+      ∀ point ∈ secondSuffix,
+        InClosedGridRectangle
+          (coordinateRadiusLower 96
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement *
+                retainedAngularFanSourceClearanceFactor)
+              (secondRawRoute.getLastD (0, 0))))
+          (coordinateRadiusUpper 96
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement *
+                retainedAngularFanSourceClearanceFactor)
+              (secondRawRoute.getLastD (0, 0))))
+          point := by
+    intro point pointMember
+    change
+      point ∈
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement order
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            secondLiteral clauseIndex secondLiteralIndex)
+      at pointMember
+    have bounded :=
+      scaledAngularOccurrenceSuffix_point_in_centerRectangle
+        placement order
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        secondLiteral clauseIndex secondLiteralIndex
+        pointMember
+    rw [secondSuffixCenterEq] at bounded
+    exact bounded
+  have firstSpliceAvoidsSecondSuffix :
+      RoutesStrictlyAvoidEachOther
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        secondSuffix := by
+    simpa [firstRoute, firstTerminal, firstFinalSegment] using
+      retainedAngularFanSourceScaledSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
+        retainedAngularFanSourceClearanceFactor_pos
+        (by native_decide)
+        firstRawRoute firstRawTerminal firstSlot
+        firstLength firstClassified
+        (PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          clause secondLiteral)
+        firstPrefixClearance.1 firstPrefixClearance.2
+        firstAligned
+        (by
+          rw [← secondLastD]
+          simpa [firstFinalSegment] using
+            firstFinalAvoidsSecondTarget)
+        secondSuffix
+        (by
+          simpa only [secondLastD] using secondSuffixBounded)
+  have firstSuffixAvoidsSecondSplice :
+      RoutesStrictlyAvoidEachOther
+        firstSuffix
+        (retainedAngularFanSplicedBoundaryPolyline
+          secondRoute secondTerminal secondSlot) := by
+    have secondSpliceAvoidsFirstSuffix :=
+      retainedAngularFanSourceScaledSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
+        retainedAngularFanSourceClearanceFactor_pos
+        (by native_decide)
+        secondRawRoute secondRawTerminal secondSlot
+        secondLength secondClassified
+        (PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          clause firstLiteral)
+        secondPrefixClearance.1 secondPrefixClearance.2
+        secondAligned
+        (by
+          rw [← firstLastD]
+          simpa [secondFinalSegment] using
+            secondFinalAvoidsFirstTarget)
+        firstSuffix
+        (by
+          simpa only [firstLastD] using firstSuffixBounded)
+    simpa [secondRoute, secondTerminal] using
+      secondSpliceAvoidsFirstSuffix.symm
   have firstRouteLength : 2 ≤ firstRoute.length := by
     simpa [firstRoute, scalePolyline] using firstLength
   have secondRouteLength : 2 ≤ secondRoute.length := by
@@ -503,12 +806,16 @@ theorem
   simpa [firstRawRoute, secondRawRoute,
     firstRawTerminal, secondRawTerminal,
     firstSlot, secondSlot, firstRoute, secondRoute,
-    firstTerminal, secondTerminal] using
+    firstTerminal, secondTerminal,
+    source, placement, routes, order,
+    firstSuffix, secondSuffix] using
       ⟨separated.1, separated.2,
-        firstSpliceOrthogonal, secondSpliceOrthogonal⟩
+        firstSpliceOrthogonal, secondSpliceOrthogonal,
+        firstSpliceAvoidsSecondSuffix,
+        firstSuffixAvoidsSecondSplice⟩
 
-/-- The same non-singleton ordinary fallback pair remains head-only
-separated after retained rasterization. -/
+/-- The same non-singleton ordinary fallback pair and its two directed
+cross-suffix certificates survive retained rasterization. -/
 theorem
     retainedFinalSameClauseOrdinarySplicedBoundaryRoutes_separated_of_choice_none_of_prefix_lengths_ne_one
     {Variable : Type*}
@@ -574,6 +881,28 @@ theorem
     let secondTerminal :=
       scaleRetainedTerminalData
         retainedAngularFanSourceClearanceFactor secondRawTerminal
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let order :=
+      angularOccurrenceOrder source.erase routes
+    let firstSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement order
+          (clause.scale retainedAngularFanSourceClearanceFactor)
+          firstLiteral clauseIndex firstLiteralIndex)
+    let secondSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement order
+          (clause.scale retainedAngularFanSourceClearanceFactor)
+          secondLiteral clauseIndex secondLiteralIndex)
     RoutesAvoidEachOther
         (retainedAngularFanSplicedBoundaryRoute
           firstRoute firstTerminal firstSlot)
@@ -582,6 +911,14 @@ theorem
       RoutesMeetOnlyAtHeads
         (retainedAngularFanSplicedBoundaryRoute
           firstRoute firstTerminal firstSlot)
+        (retainedAngularFanSplicedBoundaryRoute
+          secondRoute secondTerminal secondSlot) ∧
+      RoutesStrictlyAvoidEachOther
+        (retainedAngularFanSplicedBoundaryRoute
+          firstRoute firstTerminal firstSlot)
+        secondSuffix ∧
+      RoutesStrictlyAvoidEachOther
+        firstSuffix
         (retainedAngularFanSplicedBoundaryRoute
           secondRoute secondTerminal secondSlot) := by
   dsimp only
@@ -593,12 +930,15 @@ theorem
         firstChoiceNone firstPrefixLengthNeOne
         secondPrefixLengthNeOne with
     ⟨avoid, contactsAtHeads,
-      firstOrthogonal, secondOrthogonal⟩
+      firstOrthogonal, secondOrthogonal,
+      firstCrossSuffix, secondCrossSuffix⟩
   rw [retainedAngularFanSplicedBoundaryRoute,
     rasterizeRetainedPolyline_eq_of_orthogonal firstOrthogonal,
     retainedAngularFanSplicedBoundaryRoute,
     rasterizeRetainedPolyline_eq_of_orthogonal secondOrthogonal]
-  exact ⟨avoid, contactsAtHeads⟩
+  exact
+    ⟨avoid, contactsAtHeads,
+      firstCrossSuffix, secondCrossSuffix⟩
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

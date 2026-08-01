@@ -2283,6 +2283,9 @@ The representation choices for this target are:
   fans, and the head-aware splice theorem proves that the ordinary boundary
   routes avoid each other except for their common clause head.  Because both
   splices are orthogonal, the same certificate holds after retained
+  rasterization.  Pointwise prefix clearance and discarded-terminal
+  rectangle separation additionally prove both directed
+  boundary-splice/Figure-7-suffix separations, again before and after
   rasterization.
 - [`LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackOccurrenceSeparation.lean)
   joins the exceptional rasterized boundary pair to their unchanged Figure 7
