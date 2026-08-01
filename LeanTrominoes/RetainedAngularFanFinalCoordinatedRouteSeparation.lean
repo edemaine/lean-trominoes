@@ -1,5 +1,6 @@
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceSpokeIdentification
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutePairs
+import LeanTrominoes.RetainedAngularFanFinalFallbackOccurrenceSeparation
 import LeanTrominoes.RetainedAngularFanFinalOccurrenceSuffixSeparation
 
 namespace LeanTrominoes
@@ -241,6 +242,277 @@ theorem
       sourceClausesNonempty choiceFirst choiceSecond
       clauseMember firstLiteralMember secondLiteralMember
       choiceFirstLookup choiceSecondLookup literalIndicesDifferent
+
+/-- A compact reusable package saying that two routes avoid each other and
+that their only possible contact is their common head.  The geometric model
+routes are stored separately from the public routes, so constructing the
+certificate never unfolds the route predicates during lookup normalization. -/
+structure RoutesSeparatedAtHeads
+    (first second : List Cell) where
+  firstModel : List Cell
+  secondModel : List Cell
+  firstEq : first = firstModel
+  secondEq : second = secondModel
+  modelsAvoid : RoutesAvoidEachOther firstModel secondModel
+  modelsMeetOnlyAtHeads :
+    RoutesMeetOnlyAtHeads firstModel secondModel
+
+namespace RoutesSeparatedAtHeads
+
+/-- Recover avoidance of the public routes from the stored geometric
+models. -/
+theorem avoid
+    {first second : List Cell}
+    (certificate : RoutesSeparatedAtHeads first second) :
+    RoutesAvoidEachOther first second := by
+  rcases certificate with
+    ⟨firstModel, secondModel, firstEq, secondEq,
+      modelsAvoid, _modelsMeet⟩
+  cases firstEq
+  cases secondEq
+  exact modelsAvoid
+
+/-- Recover common-head-only contact of the public routes from the stored
+geometric models. -/
+theorem meetOnlyAtHeads
+    {first second : List Cell}
+    (certificate : RoutesSeparatedAtHeads first second) :
+    RoutesMeetOnlyAtHeads first second := by
+  rcases certificate with
+    ⟨firstModel, secondModel, firstEq, secondEq,
+      _modelsAvoid, modelsMeet⟩
+  cases firstEq
+  cases secondEq
+  exact modelsMeet
+
+end RoutesSeparatedAtHeads
+
+private theorem
+    coordinatedFallbackSecond_choice_none_and_prefix_length_ne_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex firstLiteralIndex = none)
+    (firstPrefixLength :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex).dropLast.length = 1)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex secondLiteralIndex = none ∧
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex secondLiteralIndex).dropLast.length ≠ 1 := by
+  have secondChoiceNone :=
+    retainedFinalDirectSourceRouteChoice_eq_none_of_sameClause_choice_none
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember
+      firstLiteralMember secondLiteralMember firstChoiceNone
+  have notBothSingleton :=
+    not_both_singletonPrefixes_of_sameClause_finalDirectSourceChoice_none
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember
+      firstLiteralMember secondLiteralMember literalIndicesDifferent
+      firstChoiceNone
+  refine ⟨secondChoiceNone, ?_⟩
+  intro secondPrefixLength
+  exact notBothSingleton
+    ⟨by
+        rw [←
+          finalCoordinatedSourceRoutes_eq_finalGaugedRouteOccurrence_zero
+            formula clauseIndex firstLiteralIndex]
+        exact firstPrefixLength,
+      by
+        rw [←
+          finalCoordinatedSourceRoutes_eq_finalGaugedRouteOccurrence_zero
+            formula clauseIndex secondLiteralIndex]
+        exact secondPrefixLength⟩
+
+private theorem
+    coordinatedFallbackRouteModels_of_choice_none_of_prefix_length_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex firstLiteralIndex = none)
+    (firstPrefixLength :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex).dropLast.length = 1)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex firstLiteralIndex =
+      retainedFinalEscapedFallbackOccurrenceRoute
+        formula
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        firstLiteral clauseIndex firstLiteralIndex ∧
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex secondLiteralIndex =
+      joinAtEndpoint
+        (retainedAngularFanSplicedBoundaryRoute
+          (scalePolyline retainedAngularFanSourceClearanceFactor
+            (finalCoordinatedSourceRoutes
+              formula clauseIndex secondLiteralIndex))
+          (scaleRetainedTerminalData
+            retainedAngularFanSourceClearanceFactor
+            (classifiedRetainedTerminalData
+              (routeTerminalVector
+                (finalCoordinatedSourceRoutes
+                  formula clauseIndex secondLiteralIndex))))
+          (retainedFinalCoordinatedOccurrenceSlot
+            formula secondLiteral clauseIndex secondLiteralIndex))
+        (scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix
+            ((finalCoordinatedPlacement formula).scale
+              retainedAngularFanSourceClearanceFactor)
+            (angularOccurrenceOrder
+              ((finalCoordinatedSource formula).scale
+                retainedAngularFanSourceClearanceFactor).erase
+              (PositionedPeriodicCNF.scaleIncidenceRoutes
+                retainedAngularFanSourceClearanceFactor
+                (finalCoordinatedSourceRoutes formula)))
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            secondLiteral clauseIndex secondLiteralIndex)) := by
+  have finalClauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx := by
+    simpa [finalCoordinatedSource] using clauseMember
+  have secondProperties :=
+    coordinatedFallbackSecond_choice_none_and_prefix_length_ne_one
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember
+      firstLiteralMember secondLiteralMember
+      firstChoiceNone firstPrefixLength literalIndicesDifferent
+  have scaledClauseMember :
+      (clause.scale retainedAngularFanSourceClearanceFactor, clauseIndex) ∈
+        ((finalCoordinatedSource formula).scale
+          retainedAngularFanSourceClearanceFactor).clauses.zipIdx := by
+    rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(clause, clauseIndex), finalClauseMember, rfl⟩
+  have scaledClauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp scaledClauseMember
+  have firstLiteralLookup :
+      (clause.scale retainedAngularFanSourceClearanceFactor).literals[
+          firstLiteralIndex]? =
+        some firstLiteral := by
+    simpa using
+      (List.mem_zipIdx_iff_getElem?).mp firstLiteralMember
+  constructor
+  · exact
+      retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_one
+        formula clauseIndex firstLiteralIndex
+        (clause.scale retainedAngularFanSourceClearanceFactor)
+        firstLiteral firstChoiceNone firstPrefixLength
+        scaledClauseLookup firstLiteralLookup
+  · exact
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_choice_none_of_prefix_length_ne_one
+          formula clauseIndex secondLiteralIndex
+          secondProperties.1 secondProperties.2).trans
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_explicitOccurrenceJoin
+          formula sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty finalClauseMember secondLiteralMember)
+
+/-- The public total route family also separates the exceptional failed
+selector branch: a singleton first prefix uses the escaped route, while
+selector uniformity and the prefix-length dichotomy leave the second route
+as the established ordinary splice. -/
+def
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_separated_of_choice_none_of_prefix_length_one
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ clause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ clause.literals.zipIdx)
+    (firstChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex firstLiteralIndex = none)
+    (firstPrefixLength :
+      (finalCoordinatedSourceRoutes
+        formula clauseIndex firstLiteralIndex).dropLast.length = 1)
+    (literalIndicesDifferent :
+      firstLiteralIndex ≠ secondLiteralIndex) :
+    RoutesSeparatedAtHeads
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex firstLiteralIndex)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex secondLiteralIndex) := by
+  have finalClauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx := by
+    simpa [finalCoordinatedSource] using clauseMember
+  have modelEqualities :=
+    coordinatedFallbackRouteModels_of_choice_none_of_prefix_length_one
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember
+      firstLiteralMember secondLiteralMember
+      firstChoiceNone firstPrefixLength literalIndicesDifferent
+  have separated :=
+    retainedFinalSameClauseEscapedFallbackExplicitOccurrenceRoutes_separated
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty finalClauseMember
+      firstLiteralMember secondLiteralMember literalIndicesDifferent
+      firstChoiceNone firstPrefixLength
+  exact
+    ⟨_, _, modelEqualities.1, modelEqualities.2,
+      separated.1, separated.2⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -368,7 +368,9 @@ theorem
     retainedAngularFanSplicedOccurrenceRoutes_of_members
       source placement routes scaledClauseMember scaledLiteralMember
 
-private theorem splicedOccurrenceRoute_eq_explicitJoin
+/-- Unfold a genuine spliced occurrence route into its boundary prefix and
+unchanged Figure 7 suffix. -/
+theorem splicedOccurrenceRoute_eq_explicitJoin
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
     (placement : PeriodicVariablePlacement Variable)
@@ -401,6 +403,124 @@ private theorem splicedOccurrenceRoute_eq_explicitJoin
   rw [retainedAngularFanSplicedOccurrenceRoute]
   rw [retainedAngularFanBoundaryIncidenceRoutes_of_members
     source routes clauseMember literalMember]
+
+/-- At a genuine final copied-source incidence, the established route is
+the explicit ordinary boundary splice joined to its Figure 7 suffix. -/
+theorem
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_explicitOccurrenceJoin
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        formula clauseIndex literalIndex =
+      joinAtEndpoint
+        (retainedAngularFanSplicedBoundaryRoute
+          (scalePolyline retainedAngularFanSourceClearanceFactor
+            (finalCoordinatedSourceRoutes
+              formula clauseIndex literalIndex))
+          (scaleRetainedTerminalData
+            retainedAngularFanSourceClearanceFactor
+            (classifiedRetainedTerminalData
+              (routeTerminalVector
+                (finalCoordinatedSourceRoutes
+                  formula clauseIndex literalIndex))))
+          (retainedFinalCoordinatedOccurrenceSlot
+            formula literal clauseIndex literalIndex))
+        (scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix
+            ((finalCoordinatedPlacement formula).scale
+              retainedAngularFanSourceClearanceFactor)
+            (angularOccurrenceOrder
+              ((finalCoordinatedSource formula).scale
+                retainedAngularFanSourceClearanceFactor).erase
+              (PositionedPeriodicCNF.scaleIncidenceRoutes
+                retainedAngularFanSourceClearanceFactor
+                (finalCoordinatedSourceRoutes formula)))
+            (clause.scale retainedAngularFanSourceClearanceFactor)
+            literal clauseIndex literalIndex)) := by
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let scaledClause :=
+    clause.scale retainedAngularFanSourceClearanceFactor
+  have scaledClauseMember :
+      (scaledClause, clauseIndex) ∈ source.clauses.zipIdx := by
+    rw [show source =
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor by rfl]
+    rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(clause, clauseIndex), clauseMember, rfl⟩
+  have scaledLiteralMember :
+      (literal, literalIndex) ∈
+        scaledClause.literals.zipIdx := by
+    simpa [scaledClause] using literalMember
+  rw [
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_eq_splicedOccurrenceRoute
+      formula clauseMember literalMember,
+    splicedOccurrenceRoute_eq_explicitJoin
+      source placement routes scaledClauseMember scaledLiteralMember]
+  have classified :=
+    finalCoordinatedSourceRoute_classified
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember
+  have classified' :
+      retainedTerminalDirectionClassify
+          (routeTerminalVector
+            (finalCoordinatedSourceRoutes
+              formula clauseIndex literalIndex)) =
+        some
+          (classifiedRetainedTerminalData
+            (routeTerminalVector
+              (finalCoordinatedSourceRoutes
+                formula clauseIndex literalIndex))) := by
+    simpa using classified
+  have terminalDataScale :
+      classifiedRetainedTerminalData
+          (routeTerminalVector
+            (routes clauseIndex literalIndex)) =
+        scaleRetainedTerminalData
+          retainedAngularFanSourceClearanceFactor
+          (classifiedRetainedTerminalData
+            (routeTerminalVector
+              (finalCoordinatedSourceRoutes
+                formula clauseIndex literalIndex))) := by
+    change
+      classifiedRetainedTerminalData
+          (routeTerminalVector
+            (scalePolyline retainedAngularFanSourceClearanceFactor
+              (finalCoordinatedSourceRoutes
+                formula clauseIndex literalIndex))) =
+        _
+    rw [routeTerminalVector_scalePolyline]
+    exact
+      classifiedRetainedTerminalData_scale_of_classified
+        retainedAngularFanSourceClearanceFactor_pos classified'
+  rw [terminalDataScale]
+  rfl
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

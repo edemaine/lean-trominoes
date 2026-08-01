@@ -2135,6 +2135,12 @@ The representation choices for this target are:
   occurrences of one final clause avoid one another and can meet only at
   their inherited common clause gate.  The result is also exposed through
   the public total incidence-route family for two successful selectors.
+  The exceptional failed-selector case with a singleton first prefix is
+  likewise exposed through a compact `RoutesSeparatedAtHeads` certificate:
+  selector uniformity makes the second selector fail, the prefix-length
+  dichotomy makes its route ordinary, and stored model equalities transfer
+  the completed escaped/ordinary separation theorem to both total lookups
+  without unfolding the geometric predicates.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteFamily.lean)
   lifts that local splice certificate to every incidence in the final
   fixed-eight formula.  Successful direct copied-source choices use their
@@ -2265,9 +2271,9 @@ The representation choices for this target are:
   suffixes.  The generic endpoint-join theorem combines head-only prefix
   contact, both directed cross-suffix bounds, and suffix/suffix separation
   into a completed occurrence-route certificate.  A separate public lookup
-  theorem identifies each genuine established route-family entry with its
-  explicit spliced occurrence route, keeping that definitional normalization
-  independent of the geometric certificate.
+  theorem identifies each genuine established route-family entry directly
+  with its explicit boundary-prefix/Figure-7-suffix join, keeping that
+  definitional normalization independent of the geometric certificate.
 - [`LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceSeparation.lean)
   applies simultaneous tail-replacement separation to two classified
   retained splices.  Positive scaling preserves strict source-prefix

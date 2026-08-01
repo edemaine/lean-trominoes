@@ -140,6 +140,17 @@ theorem fanout_length_ge_two (centerX portColumn : Int) :
 def translatePolyline (offset : Cell) (points : List Cell) : List Cell :=
   points.map (Cell.add offset)
 
+@[simp]
+theorem translatePolyline_zero (points : List Cell) :
+    translatePolyline (0, 0) points = points := by
+  induction points with
+  | nil => rfl
+  | cons point points induction =>
+      change List.map (Cell.add (0, 0)) points = points at induction
+      simp only [translatePolyline, List.map_cons]
+      rw [induction]
+      simp [Cell.add]
+
 /-- The port at the source end of one indexed edge. -/
 def sourcePort {Vertex : Type*}
     (edge : PeriodicEdge Vertex) (edgeIndex : Nat) : GraphPort Vertex :=

@@ -51,6 +51,18 @@ def finalCoordinatedSourceRoutes
   retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
     formula
 
+/-- At external shift zero, the physical occurrence notation is exactly the
+route stored by the final coordinated source family. -/
+theorem finalCoordinatedSourceRoutes_eq_finalGaugedRouteOccurrence_zero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex literalIndex : Nat) :
+    finalCoordinatedSourceRoutes formula clauseIndex literalIndex =
+      finalGaugedRouteOccurrence
+        formula clauseIndex literalIndex (0, 0) := by
+  unfold finalCoordinatedSourceRoutes finalGaugedRouteOccurrence
+  simp [PeriodicVariablePlacement.translation, Cell.scale]
+
 /-- The occurrence slot selected after source-clearance scaling.  Positive
 scaling preserves the angular order, but retaining this definition in the
 scaled source makes the eventual suffix splice definitionally identical to
