@@ -80,6 +80,34 @@ theorem translatePolyline_add
   simp [Cell.add]
   constructor <;> ring
 
+/-- Translating one nonempty polyline by two offsets gives equal routes only
+when the offsets themselves are equal. -/
+theorem translatePolyline_offsets_eq_of_nonempty
+    (first second : Cell)
+    (points : List Cell)
+    (nonempty : points ≠ [])
+    (routesEqual :
+      translatePolyline first points =
+        translatePolyline second points) :
+    first = second := by
+  cases points with
+  | nil =>
+      contradiction
+  | cons head tail =>
+      have headsEqual :=
+        congrArg List.head? routesEqual
+      rcases first with ⟨firstX, firstY⟩
+      rcases second with ⟨secondX, secondY⟩
+      rcases head with ⟨headX, headY⟩
+      simp only [translatePolyline, List.map_cons,
+        List.head?_cons, Option.some.injEq, Cell.add,
+        Prod.mk.injEq] at headsEqual
+      apply Prod.ext
+      · simp only
+        omega
+      · simp only
+        omega
+
 /-- A translated crossing macrocell origin adds the refined macro-period
 offset. -/
 @[simp]

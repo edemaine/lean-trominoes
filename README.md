@@ -2052,6 +2052,11 @@ The representation choices for this target are:
   spoke/cycle certificate.  The complete joined direct occurrence therefore
   avoids every implication route in its own Figure 7 ring, allowing only
   the intended contact at its final ring vertex.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceOwnCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceOwnCycleSeparation.lean)
+  identifies that atlas ring with the matching periodically lifted cycle in
+  the final coordinates.  Equality of the common nonempty Figure 7 spoke
+  fixes the translation offset, yielding the mixed separation theorem for
+  the actual final successful direct-occurrence route.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceSpokeSeparation.lean)
   centers the actual factor-eight Figure 7 spoke at every direct-source
   atlas endpoint.  An exhaustive finite certificate proves both directed

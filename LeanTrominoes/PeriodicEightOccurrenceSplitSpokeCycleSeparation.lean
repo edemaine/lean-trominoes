@@ -54,6 +54,34 @@ theorem translatedPositionedCycleRoutes_eq_map_add
     translationEq, Cell.add]
   constructor <;> ring
 
+/-- Scaling the periodically lifted positioned cycle separates into the
+scaled complete occurrence origin and the scaled local Figure 7 route. -/
+theorem
+    scalePolyline_translatedPositionedCycleRoutes_eq_translate
+    {Variable : Type*}
+    (factor : Int)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable)
+    (logicalOffset : Cell)
+    (cycleClauseIndex literalIndex : Nat) :
+    scalePolyline factor
+        (translatePolyline
+          ((placement sourcePlacement).translation logicalOffset)
+          (positionedCycleRoutes sourcePlacement atom
+            cycleClauseIndex literalIndex)) =
+      translatePolyline
+        (Cell.scale factor
+          (angularFanOccurrenceOrigin sourcePlacement
+            atom logicalOffset))
+        (scalePolyline factor
+          (cycleRoutes cycleClauseIndex literalIndex)) := by
+  rw [translatedPositionedCycleRoutes_eq_map_add]
+  unfold scalePolyline translatePolyline
+  simp only [List.map_map]
+  apply List.map_congr_left
+  intro point _pointMember
+  exact PeriodicOrthocrossing.cell_scale_add _ _ _
+
 /-- A positioned occurrence spoke continuously avoids any route selected
 from the correspondingly translated implication ring. -/
 theorem angularFanSpokeRouteAt_avoids_translatedPositionedCycleRoutes

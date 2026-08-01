@@ -32,6 +32,23 @@ def RetainedDirectSourceRouteChoice.innerCycleRoute
     (retainedDirectSourceInnerCycleRouteAt
       choice.kind choice.index vertex literalIndex)
 
+/-- Total presentation-indexed version of the selected inner implication
+route.  Invalid cycle or literal indices select the empty route. -/
+def RetainedDirectSourceRouteChoice.innerCycleRoutes
+    (choice : RetainedDirectSourceRouteChoice)
+    (cycleClauseIndex literalIndex : Nat) :
+    List Cell :=
+  translatePolyline
+    (retainedDirectSourceFanPositioningOffset choice.origin)
+    (translatePolyline
+      (Cell.sub
+        (retainedDirectSourceFanCenterAt
+          choice.kind choice.index)
+        (Cell.scale retainedTerminalFanRoutingRefinement
+          (12, 12)))
+      (scalePolyline retainedTerminalFanRoutingRefinement
+        (cycleRoutes cycleClauseIndex literalIndex)))
+
 /-- The complete atlas prefix retains its strict inner-cycle certificate
 after positioning at the selected component origin. -/
 theorem
@@ -169,6 +186,34 @@ theorem
       (choice.figure7Spoke_meets_innerCycle_only_at_tail
         slot vertex literalIndex)
       prefixLast spokeHead
+
+/-- At valid presentation indices, the total inner-cycle lookup inherits
+the assembled complete-route certificate. -/
+theorem
+    RetainedDirectSourceRouteChoice.completeFigure7Route_avoids_innerCycleRoutes
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    (cycleClauseIndex literalIndex : Nat)
+    (cycleClauseIndexLt :
+      cycleClauseIndex < presentedCycleVertices.length)
+    (literalIndexLt : literalIndex < 2) :
+    RoutesAvoidEachOther
+      (choice.completeFigure7Route slot)
+      (choice.innerCycleRoutes
+        cycleClauseIndex literalIndex) := by
+  let selectedLiteral : Fin 2 :=
+    ⟨literalIndex, literalIndexLt⟩
+  have base :=
+    choice.completeFigure7Route_avoids_innerCycle
+      slot
+      (presentedCycleVertices.getD
+        cycleClauseIndex .separator)
+      selectedLiteral
+  simpa [RetainedDirectSourceRouteChoice.innerCycleRoutes,
+    RetainedDirectSourceRouteChoice.innerCycleRoute,
+    retainedDirectSourceInnerCycleRouteAt,
+    cycleRoutes, cycleClauseIndexLt,
+    selectedLiteral] using base
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
