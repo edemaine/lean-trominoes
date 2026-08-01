@@ -2206,6 +2206,11 @@ The representation choices for this target are:
   9, opaque wrapping, and unit elimination.  It also proves the inherited
   Figure 9 routes are long enough for both terminal-direction splice
   certificates.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRibbonOrders.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRibbonOrders.lean)
+  pairs the final clockwise variable-route order with the canonical ternary
+  clause-route order from unit elimination.  Consequently any ribbon-ready
+  presentation built from these routes has compatible clockwise source fans
+  for the normalized 3DM construction.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean)
   observes that the coordinated construction changes positions and routes
   but not the erased exact-one formula.  It transfers the width-three and
