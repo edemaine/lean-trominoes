@@ -2158,6 +2158,14 @@ The representation choices for this target are:
   use the established fallback.  The total family is packaged with canonical
   endpoints and pointwise orthogonality, ready for the global nonintersection
   proof.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean)
+  feeds the source-scaled coordinated fixed-eight formula, placement, and
+  canonical route family into the generic positioned Figure 9 adapter.
+  Coordinate scaling preserves the fixed-eight width and atom-distinctness
+  premises, and every resulting raw exact-one route has canonical endpoints,
+  is orthogonal, and exposes the first exit required by unit elimination.
+  This is the first downstream exact-one layer to consume the coordinated
+  routes instead of the older angular-spliced fallback family.
 - [`LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterRadialSeparation.lean)
   separates every ordered pair of arbitrary-length radial lanes.  A finite
   table of integer half-planes, the uniform radius-nine staircase corridor,
