@@ -1978,6 +1978,11 @@ The representation choices for this target are:
   radial bounds.  Strict compatible direction/slot order now separates a
   translated custom direct escape from either kind of fallback radial route
   at the same translated fan center.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceFallbackCompleteSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceFallbackCompleteSeparation.lean)
+  joins each separated fallback radial to its local adapter and discharges
+  the escape premise of the direct-tail replacement reducers.  Strict
+  compatible angular order therefore automatically separates the complete
+  custom direct route from either ordinary or delayed-lane fallback routes.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
