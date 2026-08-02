@@ -2041,6 +2041,14 @@ The representation choices for this target are:
   choice also exposes its exact fully scaled local head and fan-boundary
   endpoint, together with an orthogonality certificate for its complete
   coordinated route.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceTransverseBounds.lean`](LeanTrominoes/RetainedAngularFanDirectSourceTransverseBounds.lean)
+  gives finite transverse envelopes for complete coordinated atlas routes.
+  Every direct route fits in radius 3103 around its represented terminal
+  line, while every crossover and routed-variable route fits in the much
+  tighter radius 495 envelope; that tight bound is transported through a
+  checked choice's physical component translation.  The only exceptional
+  atlas kind is the routed source clause, whose deliberately wide first
+  escape is isolated for a separate carrier-interface argument.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
