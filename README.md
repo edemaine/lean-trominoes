@@ -2011,6 +2011,10 @@ The representation choices for this target are:
   terminal direction with any classified axis-aligned segment.  The final
   fallback branch instantiates this small geometry lemma with its endpoint
   classification and failed-choice alignment certificate.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean`](LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean)
+  transports equality of canonical direct/fallback literal positions to
+  equality of their fully refined physical fan centers, matching the center
+  expected by the positioned outer-route separation certificates.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
