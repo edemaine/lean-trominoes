@@ -2163,8 +2163,14 @@ The representation choices for this target are:
   construction: interior loops are allowed as long as the route does not
   revisit its clause or variable endpoint.  Memberwise versions transfer the
   variable occurrence order, ternary clause order, or both at once; the
-  remaining concrete task is to establish those two endpoint-isolation
-  conditions for the final exact-one splices.
+  remaining concrete task is to establish those endpoint-isolation
+  conditions for the inherited final exact-one splices.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean)
+  discharges both endpoint-isolation obligations for every fresh auxiliary
+  incidence in the final unit-elimination layer.  The completed auxiliary
+  suffix is a singleton, so its spliced route is exactly the already-simple
+  normalized local route.  Only inherited source-variable incidences now
+  need separate endpoint-isolation geometry.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
