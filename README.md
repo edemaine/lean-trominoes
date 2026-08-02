@@ -1998,6 +1998,10 @@ The representation choices for this target are:
   unscaled terminal-classification theorem.  Later alignment arguments can
   use the atlas direction directly without expanding source scaling or the
   full final route selector.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceSegmentClassification.lean`](LeanTrominoes/RetainedAngularFanDirectSourceSegmentClassification.lean)
+  classifies the positioned source segment stored by any successful direct
+  choice directly from the finite atlas.  Mixed alignment arguments can now
+  avoid reconstructing the full final direct-route metadata.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
