@@ -1,4 +1,5 @@
 import LeanTrominoes.RetainedAngularFanFinalOuterSpokeSeparation
+import LeanTrominoes.RetainedAngularFanSourceEscapedSplicePointSeparation
 import LeanTrominoes.RetainedAngularFanSourceSplicePointSeparation
 
 /-!
@@ -295,10 +296,11 @@ theorem
       (by simpa [center] using secondSuffixBounded)
       (by simpa [center] using replacementAvoid)
 
-/-- The ordinary fallback boundary splice of one final incidence strictly
-avoids the Figure 7 suffix of an incidence at a different canonical variable
-center.  Retained source planarity supplies clearance from the other raw
-route endpoint, and source scaling expands it past the bounded suffix. -/
+/-- The ordinary and escaped fallback boundary splices of one final
+incidence strictly avoid the Figure 7 suffix of an incidence at a different
+canonical variable center.  Retained source planarity supplies clearance
+from the other raw route endpoint, and source scaling expands it past the
+bounded suffix. -/
 theorem
     retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix_of_distinctCenters
     {Variable : Type*}
@@ -373,9 +375,13 @@ theorem
             retainedAngularFanSourceClearanceFactor)
           secondLiteral secondClauseIndex secondLiteralIndex)
     RoutesStrictlyAvoidEachOther
-      (retainedAngularFanSplicedBoundaryPolyline
-        firstRoute firstTerminal firstSlot)
-      secondSuffix := by
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        secondSuffix ∧
+      RoutesStrictlyAvoidEachOther
+        (retainedAngularFanEscapedSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        secondSuffix := by
   dsimp only
   let certificate :=
     retainedPlanarSATCertificate formula
@@ -424,9 +430,13 @@ theorem
         secondLiteral secondClauseIndex secondLiteralIndex)
   change
     RoutesStrictlyAvoidEachOther
-      (retainedAngularFanSplicedBoundaryPolyline
-        firstRoute firstTerminal firstSlot)
-      secondSuffix
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        secondSuffix ∧
+      RoutesStrictlyAvoidEachOther
+        (retainedAngularFanEscapedSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        secondSuffix
   have copiesDifferent :
       (firstLiteral.atom, firstClauseIndex, firstLiteralIndex) ≠
         (secondLiteral.atom, secondClauseIndex, secondLiteralIndex) := by
@@ -612,6 +622,14 @@ theorem
         formula sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
         firstClauseMember firstLiteralMember
+  have escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength firstTerminal := by
+    simpa [firstTerminal, firstRawTerminal, firstRawRoute, rawRoutes] using
+      finalCoordinatedScaledSourceRoute_escapeFits
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+        firstClauseMember firstLiteralMember
   have secondSuffixBounded :
       ∀ point ∈ secondSuffix,
         InClosedGridRectangle
@@ -657,7 +675,7 @@ theorem
         PeriodicEightOccurrenceSplitPositioned.refinementScale]
     rw [suffixCenterEq] at bounded
     exact bounded
-  have separated :=
+  have ordinarySeparated :=
     retainedAngularFanSourceScaledSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
       retainedAngularFanSourceClearanceFactor_pos
       (by native_decide)
@@ -666,11 +684,23 @@ theorem
       prefixClearance.1 prefixClearance.2
       firstFinalAligned firstFinalAvoidsTarget
       secondSuffix secondSuffixBounded
-  simpa only [firstRoute, firstTerminal] using separated
+  have escapedSeparated :=
+    retainedAngularFanSourceScaledEscapedSplicedBoundaryPolyline_strictlyAvoids_pointNeighborhood
+      retainedAngularFanSourceClearanceFactor_pos
+      (by native_decide)
+      firstRawRoute firstRawTerminal firstSlot
+      firstLength firstClassified escapeFits target
+      prefixClearance.1 prefixClearance.2
+      firstFinalAligned firstFinalAvoidsTarget
+      secondSuffix secondSuffixBounded
+  exact ⟨
+    by simpa only [firstRoute, firstTerminal] using ordinarySeparated,
+    by simpa only [firstRoute, firstTerminal] using escapedSeparated⟩
 
 /-- The ordinary fallback boundary splice of one genuine final incidence
 strictly avoids the Figure 7 suffix of every incidence in a different
-clause, whether or not the two canonical variable centers coincide. -/
+clause.  At distinct canonical variable centers, its escaped boundary splice
+does too. -/
 theorem
     retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix
     {Variable : Type*}
@@ -737,10 +767,23 @@ theorem
           (secondClause.scale
             retainedAngularFanSourceClearanceFactor)
           secondLiteral secondClauseIndex secondLiteralIndex)
+    let firstCenter :=
+      PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula)
+        firstClause firstLiteral
+    let secondCenter :=
+      PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula)
+        secondClause secondLiteral
     RoutesStrictlyAvoidEachOther
-      (retainedAngularFanSplicedBoundaryPolyline
-        firstRoute firstTerminal firstSlot)
-      secondSuffix := by
+        (retainedAngularFanSplicedBoundaryPolyline
+          firstRoute firstTerminal firstSlot)
+        secondSuffix ∧
+      (firstCenter ≠ secondCenter →
+        RoutesStrictlyAvoidEachOther
+          (retainedAngularFanEscapedSplicedBoundaryPolyline
+            firstRoute firstTerminal firstSlot)
+          secondSuffix) := by
   dsimp only
   by_cases centersEqual :
       PositionedPeriodicCNF.canonicalLiteralPosition
@@ -749,20 +792,23 @@ theorem
         PositionedPeriodicCNF.canonicalLiteralPosition
           (finalCoordinatedPlacement formula)
           secondClause secondLiteral
-  · exact
+  · have ordinary :=
       retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix_of_sameCenter
         formula sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
         firstClauseMember secondClauseMember
         firstLiteralMember secondLiteralMember
         clauseIndicesDifferent centersEqual
-  · exact
+    exact ⟨ordinary,
+      fun centersDifferent => (centersDifferent centersEqual).elim⟩
+  · have separated :=
       retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix_of_distinctCenters
         formula sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
         firstClauseMember secondClauseMember
         firstLiteralMember secondLiteralMember
         firstChoiceNone clauseIndicesDifferent centersEqual
+    exact ⟨separated.1, fun _ => separated.2⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -281,19 +281,19 @@ theorem
       firstLiteralMember secondLiteralMember
       firstChoiceNone secondChoiceNone clauseIndicesDifferent
   have firstPrefixAvoidsSecondSuffixPolyline :=
-    retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix
+    (retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix
       formula sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty
       firstClauseMember secondClauseMember
       firstLiteralMember secondLiteralMember
-      firstChoiceNone clauseIndicesDifferent
+      firstChoiceNone clauseIndicesDifferent).1
   have firstSuffixAvoidsSecondPrefixPolyline :=
-    (retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix
+    ((retainedFinalCrossClauseOrdinaryBoundarySplice_strictlyAvoid_occurrenceSuffix
       formula sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty
       secondClauseMember firstClauseMember
       secondLiteralMember firstLiteralMember
-      secondChoiceNone (Ne.symm clauseIndicesDifferent)).symm
+      secondChoiceNone (Ne.symm clauseIndicesDifferent)).1).symm
   have suffixesAvoid :=
     retainedFinalCrossClauseOccurrenceSuffixes_strictlyAvoid
       formula sourceLocal sourceWidth sourceOccurrences
