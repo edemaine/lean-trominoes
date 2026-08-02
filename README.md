@@ -2108,7 +2108,9 @@ The representation choices for this target are:
   two-piece boundary assembly theorem to the final router.  Thus a route
   avoids the selected rasterized fallback boundary once it avoids the fully
   refined retained source prefix and the selected ordinary or delayed-lane
-  outer replacement.
+  outer replacement.  Both replacements share the same conservative
+  radius-288 discarded-segment bound, which closes direct/fallback outer
+  separation whenever the two unscaled segment rectangles are separated.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
