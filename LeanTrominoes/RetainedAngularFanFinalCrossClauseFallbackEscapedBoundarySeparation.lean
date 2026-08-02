@@ -2,6 +2,7 @@ import LeanTrominoes.RetainedAngularFanFinalCrossClauseFallbackOrder
 import LeanTrominoes.RetainedAngularFanFinalStrictEscape
 import LeanTrominoes.RetainedAngularFanOuterEscapedCompleteSeparation
 import LeanTrominoes.RetainedFinalEscapedSharedCenterSpliceSeparation
+import LeanTrominoes.RetainedFinalEscapedOrdinarySharedCenterSpliceSeparation
 
 /-!
 # Shared-center escaped fallback boundary separation
@@ -53,10 +54,73 @@ private theorem escapedCompleteRoutes_strictlyAvoid_of_order
       directionsLt firstLengthPositive secondLengthPositive
       slotsLt firstEscapeStrict secondEscapeStrict
 
-/-- Escaped boundary splices of failed choices in different final source
-clauses are strictly separated even when their variable centers coincide. -/
+/-- Pair-valued wrapper around mixed escaped/ordinary complete-route
+separation. -/
+private theorem escapedOrdinaryCompleteRoutes_strictlyAvoid_of_order
+    (center : Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (directionsLt :
+      firstTerminal.1.angularRank <
+        secondTerminal.1.angularRank)
+    (firstLengthPositive : 0 < firstTerminal.2)
+    (secondLengthPositive : 0 < secondTerminal.2)
+    (secondRadialPositive :
+      0 < retainedTerminalFanOuterRadialLength secondTerminal)
+    (slotsLt : firstSlot.val < secondSlot.val)
+    (firstEscapeStrict :
+      retainedTerminalFanOuterSourceEscapeLength <
+        retainedTerminalFanOuterRadialLength firstTerminal) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        center firstTerminal firstSlot)
+      (retainedTerminalFanOuterCompleteRoute
+        center secondTerminal secondSlot) := by
+  rcases firstTerminal with ⟨firstDirection, firstLength⟩
+  rcases secondTerminal with ⟨secondDirection, secondLength⟩
+  exact
+    retainedTerminalFanOuterEscapedOrdinaryCompleteRoutes_strictlyAvoid_of_direction_lt
+      center firstDirection secondDirection
+      firstLength secondLength firstSlot secondSlot
+      directionsLt firstLengthPositive secondLengthPositive
+      secondRadialPositive slotsLt firstEscapeStrict
+
+/-- Pair-valued wrapper for the reverse angular orientation of the mixed
+ordinary/escaped complete-route theorem. -/
+private theorem ordinaryEscapedCompleteRoutes_strictlyAvoid_of_order
+    (center : Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (directionsLt :
+      firstTerminal.1.angularRank <
+        secondTerminal.1.angularRank)
+    (firstLengthPositive : 0 < firstTerminal.2)
+    (secondLengthPositive : 0 < secondTerminal.2)
+    (firstRadialPositive :
+      0 < retainedTerminalFanOuterRadialLength firstTerminal)
+    (slotsLt : firstSlot.val < secondSlot.val)
+    (secondEscapeStrict :
+      retainedTerminalFanOuterSourceEscapeLength <
+        retainedTerminalFanOuterRadialLength secondTerminal) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterCompleteRoute
+        center firstTerminal firstSlot)
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        center secondTerminal secondSlot) := by
+  rcases firstTerminal with ⟨firstDirection, firstLength⟩
+  rcases secondTerminal with ⟨secondDirection, secondLength⟩
+  exact
+    retainedTerminalFanOuterOrdinaryEscapedCompleteRoutes_strictlyAvoid_of_direction_lt
+      center firstDirection secondDirection
+      firstLength secondLength firstSlot secondSlot
+      directionsLt firstLengthPositive secondLengthPositive
+      firstRadialPositive slotsLt secondEscapeStrict
+
+/-- Failed choices in different final source clauses at one variable center
+supply both mixed escaped/ordinary and escaped/escaped strict boundary
+separation. -/
 theorem
-    retainedFinalCrossClauseFallbackEscapedBoundarySplices_strictlyAvoid_of_sameCenter
+    retainedFinalCrossClauseFallbackBoundarySpliceCertificates_of_sameCenter
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (sourceLocal : formula.IsLocal)
@@ -98,6 +162,33 @@ theorem
         PositionedPeriodicCNF.canonicalLiteralPosition
           (finalCoordinatedPlacement formula)
           secondClause secondLiteral) :
+    RoutesStrictlyAvoidEachOther
+      (retainedAngularFanEscapedSplicedBoundaryPolyline
+        (scalePolyline retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes
+            formula firstClauseIndex firstLiteralIndex))
+        (scaleRetainedTerminalData
+          retainedAngularFanSourceClearanceFactor
+          (classifiedRetainedTerminalData
+            (routeTerminalVector
+              (finalCoordinatedSourceRoutes
+                formula firstClauseIndex firstLiteralIndex))))
+        (retainedFinalCoordinatedOccurrenceSlot
+          formula firstLiteral
+          firstClauseIndex firstLiteralIndex))
+      (retainedAngularFanSplicedBoundaryPolyline
+        (scalePolyline retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes
+            formula secondClauseIndex secondLiteralIndex))
+        (scaleRetainedTerminalData
+          retainedAngularFanSourceClearanceFactor
+          (classifiedRetainedTerminalData
+            (routeTerminalVector
+              (finalCoordinatedSourceRoutes
+                formula secondClauseIndex secondLiteralIndex))))
+        (retainedFinalCoordinatedOccurrenceSlot
+          formula secondLiteral
+          secondClauseIndex secondLiteralIndex)) ∧
     RoutesStrictlyAvoidEachOther
       (retainedAngularFanEscapedSplicedBoundaryPolyline
         (scalePolyline retainedAngularFanSourceClearanceFactor
@@ -358,6 +449,43 @@ theorem
       firstLiteralMember secondLiteralMember
       firstChoiceNone secondChoiceNone
       clauseIndicesDifferent centersEqual
+  have secondRadialPositive :
+      0 < retainedTerminalFanOuterRadialLength secondScaledTerminal := by
+    have escapePositive :
+        0 < retainedTerminalFanOuterSourceEscapeLength := by
+      native_decide
+    omega
+  have mixedFansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          scaledFanCenter firstScaledTerminal firstSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          scaledFanCenter secondScaledTerminal secondSlot) := by
+    rcases angularOrder with firstBefore | secondBefore
+    · exact
+        escapedOrdinaryCompleteRoutes_strictlyAvoid_of_order
+          scaledFanCenter firstScaledTerminal secondScaledTerminal
+          firstSlot secondSlot
+          (by
+            simpa [firstScaledTerminal, secondScaledTerminal,
+              firstTerminal, secondTerminal, firstRoute, secondRoute,
+              routes, firstSlot, secondSlot] using firstBefore.2)
+          firstScaledLengthPositive secondScaledLengthPositive
+          secondRadialPositive
+          (by simpa [firstSlot, secondSlot] using firstBefore.1)
+          firstEscapeStrict
+    · exact
+        (ordinaryEscapedCompleteRoutes_strictlyAvoid_of_order
+          scaledFanCenter secondScaledTerminal firstScaledTerminal
+          secondSlot firstSlot
+          (by
+            simpa [firstScaledTerminal, secondScaledTerminal,
+              firstTerminal, secondTerminal, firstRoute, secondRoute,
+              routes, firstSlot, secondSlot] using secondBefore.2)
+          secondScaledLengthPositive firstScaledLengthPositive
+          secondRadialPositive
+          (by simpa [firstSlot, secondSlot] using secondBefore.1)
+          firstEscapeStrict).symm
   have fansAvoid :
       RoutesStrictlyAvoidEachOther
         (retainedTerminalFanOuterEscapedCompleteRoute
@@ -387,26 +515,46 @@ theorem
           secondScaledLengthPositive firstScaledLengthPositive
           (by simpa [firstSlot, secondSlot] using secondBefore.1)
           secondEscapeStrict firstEscapeStrict).symm
-  simpa [firstRoute, secondRoute, firstTerminal, secondTerminal,
-    firstScaledTerminal, secondScaledTerminal, firstSlot, secondSlot,
-    routes, source, placement, commonCenter, scaledFanCenter] using
-    retainedFinalSourceScaledEscapedSplicedBoundaryPolylines_strictlyAvoid_of_axisAligned_of_fansAvoid
-      formula certificate.graphWellFormed
-      certificate.graphDegreeAtMostThree certificate.graphIsLocal
-      retainedClausesNonempty
-      retainedAngularFanSourceClearanceFactor_gt_one
-      firstRouteMember secondRouteMember
-      firstLength secondLength routeIndicesDifferent headsDifferent
-      (by simpa [firstRoute, routes, placement] using firstEndpoints.1)
-      (by simpa [secondRoute, routes, placement] using secondEndpoints.1)
-      firstLast secondLast
-      firstSourceNeCenter secondSourceNeCenter
-      firstAligned secondAligned
-      firstTerminal secondTerminal firstSlot secondSlot
-      firstClassified secondClassified
-      (Nat.le_of_lt firstEscapeStrict)
-      (Nat.le_of_lt secondEscapeStrict)
-      fansAvoid
+  constructor
+  · simpa [firstRoute, secondRoute, firstTerminal, secondTerminal,
+      firstScaledTerminal, secondScaledTerminal, firstSlot, secondSlot,
+      routes, source, placement, commonCenter, scaledFanCenter] using
+      retainedFinalSourceScaledEscapedOrdinarySplicedBoundaryPolylines_strictlyAvoid_of_axisAligned_of_fansAvoid
+        formula certificate.graphWellFormed
+        certificate.graphDegreeAtMostThree certificate.graphIsLocal
+        retainedClausesNonempty
+        retainedAngularFanSourceClearanceFactor_gt_one
+        firstRouteMember secondRouteMember
+        firstLength secondLength routeIndicesDifferent headsDifferent
+        (by simpa [firstRoute, routes, placement] using firstEndpoints.1)
+        (by simpa [secondRoute, routes, placement] using secondEndpoints.1)
+        firstLast secondLast
+        firstSourceNeCenter secondSourceNeCenter
+        firstAligned secondAligned
+        firstTerminal secondTerminal firstSlot secondSlot
+        firstClassified secondClassified
+        (Nat.le_of_lt firstEscapeStrict)
+        mixedFansAvoid
+  · simpa [firstRoute, secondRoute, firstTerminal, secondTerminal,
+      firstScaledTerminal, secondScaledTerminal, firstSlot, secondSlot,
+      routes, source, placement, commonCenter, scaledFanCenter] using
+      retainedFinalSourceScaledEscapedSplicedBoundaryPolylines_strictlyAvoid_of_axisAligned_of_fansAvoid
+        formula certificate.graphWellFormed
+        certificate.graphDegreeAtMostThree certificate.graphIsLocal
+        retainedClausesNonempty
+        retainedAngularFanSourceClearanceFactor_gt_one
+        firstRouteMember secondRouteMember
+        firstLength secondLength routeIndicesDifferent headsDifferent
+        (by simpa [firstRoute, routes, placement] using firstEndpoints.1)
+        (by simpa [secondRoute, routes, placement] using secondEndpoints.1)
+        firstLast secondLast
+        firstSourceNeCenter secondSourceNeCenter
+        firstAligned secondAligned
+        firstTerminal secondTerminal firstSlot secondSlot
+        firstClassified secondClassified
+        (Nat.le_of_lt firstEscapeStrict)
+        (Nat.le_of_lt secondEscapeStrict)
+        fansAvoid
 
 end PeriodicOrthocrossing
 end LeanTrominoes
