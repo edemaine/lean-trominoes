@@ -2231,6 +2231,11 @@ The representation choices for this target are:
   generally, component rectangles that are separated before refinement stay
   separated after factor-1152 scaling and radius-288 expansion, strictly
   separating any bounded flat source prefix from the direct replacement.
+  The resulting carrier/macrocell case split eliminates every routed-clause
+  prefix interaction except equal translated macrocells: direct carriers are
+  ruled out by obliqueness, separated carrier and macrocell boxes use the
+  coarse bound, and overlapping carriers use the specialized inward-boundary
+  escape plus the already-controlled post-escape tail.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean)
   packages the structural endpoint-join step for a mixed cross-clause pair.
   Four strict certificates between the coordinated direct prefix and suffix

@@ -169,5 +169,145 @@ theorem
         rectanglesSeparated
         (by native_decide) (by native_decide)
 
+/-- Flat-component analysis reduces routed-clause source-prefix separation to
+the equal-macrocell residue.  A direct carrier is impossible by obliqueness;
+separated component boxes use the coarse bound above, and the sole
+overlapping carrier--macrocell branch uses the specialized inward-boundary
+escape together with the supplied post-escape tail certificate. -/
+theorem
+    retainedFinalSourceScaledPrefix_strictlyAvoids_routedClauseChoiceCompleteRoute_of_flatComponentCases
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈
+          PeriodicOrthocrossing.retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {sourceRoute directRoute : List Cell}
+    {sourceIndex directIndex : Nat}
+    (sourceMember :
+      (sourceRoute, sourceIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (directMember :
+      (directRoute, directIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (directLength : 2 ≤ directRoute.length)
+    {directTarget : Cell}
+    (directLast : directRoute.getLast? = some directTarget)
+    (directOblique :
+      ¬(⟨polylineLastEntrance directRoute, directTarget⟩ :
+        GridSegment).IsAxisAligned)
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    (kindEq : choice.kind = RetainedDirectClauseKind.routedClause)
+    (choiceRouteEq :
+      PeriodicOrthocrossing.translatePolyline choice.origin
+          (retainedDirectSourceLocalRouteAt
+            choice.kind choice.index) = directRoute)
+    (tailAvoid :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline
+          (retainedTerminalFanTotalRefinement * 4)
+          sourceRoute.dropLast)
+        (PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset choice.origin)
+          (retainedDirectSourceFanCompleteTailAt
+            choice.kind choice.index slot)))
+    (equalMacrocells :
+      ∀
+        (sourceMacrocell :
+          PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+            formula (sourceRoute, sourceIndex))
+        (directMacrocell :
+          PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+            formula (directRoute, directIndex)),
+        sourceMacrocell.translatedCenter =
+            directMacrocell.translatedCenter →
+          RoutesStrictlyAvoidEachOther
+            (scalePolyline
+              (retainedTerminalFanTotalRefinement * 4)
+              sourceRoute.dropLast)
+            (choice.completeRoute slot)) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline
+        (retainedTerminalFanTotalRefinement * 4)
+        sourceRoute.dropLast)
+      (choice.completeRoute slot) := by
+  rcases
+      PeriodicOrthocrossing.exists_finalGaugedFlatCarrier_or_macrocellWitness
+        formula wellFormed degree isLocal clausesNonempty
+        (directRoute, directIndex) directMember with
+    directCarrierCase | directMacrocellCase
+  · rcases directCarrierCase with ⟨directCarrier⟩
+    exact
+      (directOblique
+        (directCarrier.finalSegmentAxisAligned
+          formula wellFormed degree isLocal
+          directLength directLast)).elim
+  · rcases directMacrocellCase with ⟨directMacrocell⟩
+    have directBounded :
+        ∀ point ∈ choice.completeRoute slot,
+          InClosedGridRectangle
+            (coordinateRadiusLower 288
+              (Cell.scale
+                (retainedTerminalFanTotalRefinement * 4)
+                (PeriodicOrthocrossing.planarSATMacrocellRouteLower
+                  directMacrocell.translatedCenter)))
+            (coordinateRadiusUpper 288
+              (Cell.scale
+                (retainedTerminalFanTotalRefinement * 4)
+                (PeriodicOrthocrossing.planarSATMacrocellRouteUpper
+                  directMacrocell.translatedCenter)))
+            point := by
+      intro point pointMember
+      exact
+        choice.completeRoute_point_in_scaledMacrocellRectangle_of_routeEq
+          formula wellFormed degree isLocal
+          directMacrocell slot choiceRouteEq pointMember
+    rcases
+        PeriodicOrthocrossing.exists_finalGaugedFlatCarrier_or_macrocellWitness
+          formula wellFormed degree isLocal clausesNonempty
+          (sourceRoute, sourceIndex) sourceMember with
+      sourceCarrierCase | sourceMacrocellCase
+    · rcases sourceCarrierCase with ⟨sourceCarrier⟩
+      by_cases rectanglesSeparated :
+          ClosedGridRectanglesSeparated
+            sourceCarrier.rectangleLower sourceCarrier.rectangleUpper
+            (PeriodicOrthocrossing.planarSATMacrocellRouteLower
+              directMacrocell.translatedCenter)
+            (PeriodicOrthocrossing.planarSATMacrocellRouteUpper
+              directMacrocell.translatedCenter)
+      · exact
+          scaledFlatPrefix_strictlyAvoids_directCompleteRoute_of_componentRectanglesSeparated
+            (fun point pointMember =>
+              sourceCarrier.routePoints_in_rectangle
+                formula wellFormed degree isLocal
+                (List.mem_of_mem_dropLast pointMember))
+            choice slot directBounded rectanglesSeparated
+      · exact
+          retainedFinalScaledCarrierPrefix_strictlyAvoids_routedClauseChoiceCompleteRoute_of_kind_eq_of_rectangles_not_separated
+            formula wellFormed degree isLocal
+            sourceCarrier directMacrocell choice slot
+            kindEq choiceRouteEq rectanglesSeparated tailAvoid
+    · rcases sourceMacrocellCase with ⟨sourceMacrocell⟩
+      by_cases centersDifferent :
+          sourceMacrocell.translatedCenter ≠
+            directMacrocell.translatedCenter
+      · exact
+          scaledFlatPrefix_strictlyAvoids_directCompleteRoute_of_componentRectanglesSeparated
+            (fun point pointMember =>
+              sourceMacrocell.routePoints_in_translatedMacrocell
+                formula wellFormed degree isLocal
+                (List.mem_of_mem_dropLast pointMember))
+            choice slot directBounded
+            (PeriodicOrthocrossing.planarSATMacrocellRouteRectangles_separated
+              centersDifferent)
+      · exact equalMacrocells sourceMacrocell directMacrocell
+          (not_ne_iff.mp centersDifferent)
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
