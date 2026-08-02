@@ -1968,6 +1968,11 @@ The representation choices for this target are:
   translation-invariant and separates a positioned direct escape from every
   complete local fan adapter at the same center, closing the local half of
   the residual direct-escape/fallback interaction.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceEscapeAngularBounds.lean`](LeanTrominoes/RetainedAngularFanDirectSourceEscapeAngularBounds.lean)
+  checks both strict-order orientations of the ordinary angular separator
+  against every point in every finite direct-atlas escape.  The resulting
+  weak/strict bounds are translation-invariant and supply the radial half of
+  the residual direct-escape/fallback interaction.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
