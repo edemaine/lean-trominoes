@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineEndpointDirections
+import LeanTrominoes.OrthogonalPolylineUnitSubdivisionSimplicity
 import LeanTrominoes.PeriodicGridDrawingUnitSubdivision
 import Mathlib.Combinatorics.SimpleGraph.Paths
 
@@ -437,6 +438,82 @@ theorem normalizeOrthogonalPolyline_sublist_unitSubdividePolyline
   rw [normalizeOrthogonalPolyline_eq_erase nonempty orthogonal]
   exact eraseOrthogonalLoops_sublist_unitSubdividePolyline
     nonempty orthogonal
+
+/-! ## Normalization of already simple routes -/
+
+/-- Bypass changes nothing when its input walk is already a path. -/
+private theorem bypass_eq_self_of_isPath
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : SimpleGraph Vertex}
+    {source target : Vertex}
+    (walk : graph.Walk source target)
+    (path : walk.IsPath) :
+    walk.bypass = walk := by
+  induction walk with
+  | nil => rfl
+  | cons adjacent tail induction =>
+      rw [SimpleGraph.Walk.cons_isPath_iff] at path
+      simp [SimpleGraph.Walk.bypass,
+        induction path.1, path.2]
+
+/-- On a geometrically simple orthogonal route, normalization performs only
+ordered unit subdivision: there are no loops for `bypass` to erase. -/
+theorem normalizeOrthogonalPolyline_eq_unitSubdividePolyline_of_simple
+    {points : List Cell}
+    (nonempty : points ≠ [])
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (simple :
+      LocalIncidenceDrawing.RouteIsSimple points) :
+    normalizeOrthogonalPolyline points =
+      unitSubdividePolyline points := by
+  rw [normalizeOrthogonalPolyline_eq_erase nonempty orthogonal]
+  let walk := orthogonalUnitWalk nonempty orthogonal
+  have path : walk.IsPath := by
+    rw [SimpleGraph.Walk.isPath_def]
+    simpa [walk, orthogonalUnitWalk] using
+      unitSubdividePolyline_nodup orthogonal simple
+  unfold eraseOrthogonalLoops
+  rw [bypass_eq_self_of_isPath walk path]
+  simp [walk, orthogonalUnitWalk]
+
+/-- Normalization preserves the first directed axis of every nondegenerate
+simple orthogonal route. -/
+theorem polylineFirstDirection_normalizeOrthogonalPolyline_of_simple
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (simple :
+      LocalIncidenceDrawing.RouteIsSimple points) :
+    polylineFirstDirection (normalizeOrthogonalPolyline points) =
+      polylineFirstDirection points := by
+  have nonempty : points ≠ [] := by
+    intro empty
+    simp [empty] at length
+  rw [normalizeOrthogonalPolyline_eq_unitSubdividePolyline_of_simple
+    nonempty orthogonal simple]
+  exact polylineFirstDirection_unitSubdividePolyline
+    length orthogonal
+
+/-- Normalization preserves the final directed axis of every nondegenerate
+simple orthogonal route. -/
+theorem polylineLastDirection_normalizeOrthogonalPolyline_of_simple
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (simple :
+      LocalIncidenceDrawing.RouteIsSimple points) :
+    polylineLastDirection (normalizeOrthogonalPolyline points) =
+      polylineLastDirection points := by
+  have nonempty : points ≠ [] := by
+    intro empty
+    simp [empty] at length
+  rw [normalizeOrthogonalPolyline_eq_unitSubdividePolyline_of_simple
+    nonempty orthogonal simple]
+  exact polylineLastDirection_unitSubdividePolyline
+    length orthogonal
 
 end AxisDirection
 end LeanTrominoes

@@ -2154,6 +2154,14 @@ The representation choices for this target are:
   halo route-point bounds.  Later stages can therefore normalize inherited
   routes without rebuilding their finite-presentation bookkeeping or halo
   estimates.
+- [`LeanTrominoes/PeriodicGridDrawingLoopErasureRouteOrders.lean`](LeanTrominoes/PeriodicGridDrawingLoopErasureRouteOrders.lean)
+  isolates the exact condition under which loop erasure also preserves the
+  cyclic route orders used by the ribbon source fans.  On a nondegenerate
+  simple orthogonal route, normalization is just ordered unit subdivision,
+  so both its first and last directions are unchanged.  Memberwise versions
+  transfer the variable occurrence order, ternary clause order, or both at
+  once; the remaining concrete task is therefore to certify simplicity of
+  the unnormalized final exact-one splices.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
