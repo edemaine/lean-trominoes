@@ -2056,6 +2056,11 @@ The representation choices for this target are:
   are supplied.  A same-center wrapper derives those facts, terminal
   positivity, and escape room automatically, leaving only the source
   corridor as an explicit geometric premise.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedAlignedOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedAlignedOccurrenceSeparation.lean)
+  discharges that last corridor premise for every axis-aligned successful
+  direct segment.  Consequently a non-routed aligned direct occurrence and
+  a same-center cross-clause fallback occurrence automatically have strictly
+  disjoint complete routes in the final coordinated drawing.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
