@@ -2143,7 +2143,17 @@ The representation choices for this target are:
   drawing.  It proves exact graph-route endpoint matching, unit-step support,
   orthogonality, and unconditional integer-grid planarity.  The remaining
   ribbon-ready obligations are the stronger translated continuous and
-  listed-point contact conditions.
+  listed-point contact conditions.  It also identifies the concrete drawing
+  definitionally with drawing-level normalization of the coordinated source,
+  so route-independent certificates and geometric bounds can be transported
+  through the generic normalization interface.
+- [`LeanTrominoes/PeriodicGridDrawingLoopErasure.lean`](LeanTrominoes/PeriodicGridDrawingLoopErasure.lean)
+  lifts verified loop erasure from one polyline to an entire periodic grid
+  drawing.  It preserves exact route endpoints, graph compatibility,
+  orthogonality, unit-step structure, and both fundamental-square and open
+  halo route-point bounds.  Later stages can therefore normalize inherited
+  routes without rebuilding their finite-presentation bookkeeping or halo
+  estimates.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,

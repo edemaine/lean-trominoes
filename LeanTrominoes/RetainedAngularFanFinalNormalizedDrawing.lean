@@ -1,4 +1,5 @@
 import LeanTrominoes.RetainedAngularFanFinalNormalizedRouteSeparation
+import LeanTrominoes.PeriodicGridDrawingLoopErasure
 
 /-!
 # The assembled normalized final periodic drawing
@@ -57,6 +58,18 @@ open PeriodicEightOccurrenceSplit
 open PeriodicEightOccurrenceSplitPositioned
 open PeriodicThreeSATThree
 
+/-- The unnormalized coordinated drawing underlying the normalized final
+drawing. -/
+def retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceDrawing
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) : PeriodicGridDrawing :=
+  PositionedPeriodicCNF.incidenceDrawing
+    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+      formula)
+    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement formula)
+    (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+      formula)
+
 /-- The final positioned fixed-eight drawing with every incidence route
 unit-subdivided and loop-erased. -/
 def retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing
@@ -68,6 +81,34 @@ def retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing
     (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement formula)
     (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
       formula)
+
+/-- The final normalized drawing is exactly drawing-level loop erasure of
+the coordinated source drawing. -/
+theorem
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing_eq_normalize
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing
+        formula =
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceDrawing
+        formula).normalizeOrthogonalRoutes := by
+  have routesEqual :
+      retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          formula =
+        PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes
+          (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+            formula) := by
+    funext clauseIndex literalIndex
+    rfl
+  rw [retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing,
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceDrawing,
+    routesEqual]
+  exact PositionedPeriodicCNF.incidenceDrawing_normalizeOrthogonalRoutes
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+        formula)
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement formula)
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula)
 
 /-- The normalized drawing routes realize every edge of the final periodic
 incidence graph with its exact translated endpoints. -/
