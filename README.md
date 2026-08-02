@@ -2221,6 +2221,9 @@ The representation choices for this target are:
   that characterization through a normalized flat macrocell witness.  Thus a
   routed-clause final choice recovers the normalized routed-clause source
   needed by the carrier-boundary theorem without an extra metadata premise.
+  In an overlapping carrier--macrocell branch, normalization and the local
+  contact certificate are consequently automatic; separation from the
+  post-escape tail now closes the complete positioned routed-clause route.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean)
   packages the structural endpoint-join step for a mixed cross-clause pair.
   Four strict certificates between the coordinated direct prefix and suffix

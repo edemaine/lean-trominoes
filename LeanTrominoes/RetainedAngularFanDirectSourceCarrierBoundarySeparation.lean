@@ -933,5 +933,73 @@ theorem
         site sourceEq contact choice slot choiceRouteEq
   · exact tailAvoid
 
+/-- In the unresolved carrier--macrocell overlap, routed-clause choice kind
+and route representation recover normalization, routed source metadata, and
+the local carrier contact automatically.  Only separation from the already
+controlled post-escape tail remains as a geometric premise. -/
+theorem
+    retainedFinalScaledCarrierPrefix_strictlyAvoids_routedClauseChoiceCompleteRoute_of_kind_eq_of_rectangles_not_separated
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {carrierTaggedRoute macrocellTaggedRoute : List Cell × Nat}
+    (carrier :
+      PeriodicOrthocrossing.FinalGaugedFlatCarrierRouteWitness
+        formula carrierTaggedRoute)
+    (macrocell :
+      PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+        formula macrocellTaggedRoute)
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    (kindEq : choice.kind = RetainedDirectClauseKind.routedClause)
+    (choiceRouteEq :
+      PeriodicOrthocrossing.translatePolyline choice.origin
+          (retainedDirectSourceLocalRouteAt
+            choice.kind choice.index) =
+        macrocellTaggedRoute.1)
+    (rectanglesNotSeparated :
+      ¬ClosedGridRectanglesSeparated
+        carrier.rectangleLower carrier.rectangleUpper
+        (PeriodicOrthocrossing.planarSATMacrocellRouteLower
+          macrocell.translatedCenter)
+        (PeriodicOrthocrossing.planarSATMacrocellRouteUpper
+          macrocell.translatedCenter))
+    (tailAvoid :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline
+          (retainedTerminalFanTotalRefinement * 4)
+          carrierTaggedRoute.1.dropLast)
+        (PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset choice.origin)
+          (retainedDirectSourceFanCompleteTailAt
+            choice.kind choice.index slot))) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline
+        (retainedTerminalFanTotalRefinement * 4)
+        carrierTaggedRoute.1.dropLast)
+      (choice.completeRoute slot) := by
+  rcases macrocell.exists_normalizedSource
+      formula wellFormed degree isLocal with
+    ⟨normalized⟩
+  rcases
+      retainedFinalDirectChoice_exists_normalizedRoutedClause_of_kind_eq
+        formula wellFormed degree isLocal
+        macrocell normalized choice kindEq choiceRouteEq with
+    ⟨site, sourceEq⟩
+  have normalizedDirect : normalized.source.component.IsDirect := by
+    rw [sourceEq]
+    trivial
+  have contact :=
+    carrier.normalizedDirectContact
+      formula wellFormed degree isLocal
+      macrocell normalized normalizedDirect rectanglesNotSeparated
+  exact
+    retainedFinalScaledCarrierPrefix_strictlyAvoids_routedClauseChoiceCompleteRoute
+      formula wellFormed degree isLocal
+      carrier macrocell normalized site sourceEq contact
+      choice slot choiceRouteEq tailAvoid
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
