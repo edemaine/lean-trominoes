@@ -2094,6 +2094,12 @@ The representation choices for this target are:
   their total route-family lookups.  The same- and distinct-center theorems,
   including routed-clause direct choices, are therefore combined at the
   public interface in both route orders with no center hypothesis.
+- [`LeanTrominoes/RetainedAngularFanFinalCrossClausePublicSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCrossClausePublicSeparation.lean)
+  hides the final route selector for two copied-source incidences in
+  different clauses.  Its four-way selector split dispatches to the completed
+  direct/direct, fallback/fallback, and two mixed separation theorems, yielding
+  one unconditional public `RoutesAvoidEachOther` certificate for later
+  whole-family planarity assembly.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
