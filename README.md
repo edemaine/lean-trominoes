@@ -2084,7 +2084,10 @@ The representation choices for this target are:
   and an arbitrary fallback prefix and suffix now imply strict separation of
   the two complete occurrence routes; the validated direct boundary equation
   discharges its join automatically, and a symmetric wrapper exposes either
-  route orientation.
+  route orientation.  For different genuine source clauses, the established
+  cross-clause spoke and suffix theorems discharge both interactions with the
+  fallback suffix automatically, reducing the complete mixed pair to exactly
+  the two interactions with its fallback boundary prefix.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
