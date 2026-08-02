@@ -464,6 +464,12 @@ The representation choices for this target are:
   lifts the connector result through that proof-backed selector.  Pointwise
   source simplicity and nondegeneracy yield final-endpoint isolation for
   every genuine inherited suffix in the complete Figure 9 family.
+  [`LeanTrominoes/PeriodicOneInThreePositionedInheritedSplicedRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedSplicedRouteIsolation.lean)
+  characterizes each inherited local Figure 9 route as its explicit
+  clause-to-boundary segment and proves that this segment misses the refined
+  source lattice.  Consequently the normalized local prefix misses the final
+  canonical literal endpoint, and joining it to any isolated inherited
+  suffix preserves final-endpoint isolation for the complete route.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
