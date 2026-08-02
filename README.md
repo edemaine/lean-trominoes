@@ -1962,6 +1962,12 @@ The representation choices for this target are:
   strict common-center angular order, both ordinary and delayed-lane
   fallback cases reduce complete outer-route separation to the selected
   direct escape versus the fallback complete route.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceEscapeSideBounds.lean`](LeanTrominoes/RetainedAngularFanDirectSourceEscapeSideBounds.lean)
+  checks that every point of every finite direct-atlas escape stays strictly
+  outside its terminal direction's radius-288 supporting side.  The bound is
+  translation-invariant and separates a positioned direct escape from every
+  complete local fan adapter at the same center, closing the local half of
+  the residual direct-escape/fallback interaction.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
