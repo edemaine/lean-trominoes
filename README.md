@@ -2189,6 +2189,18 @@ The representation choices for this target are:
   lifts this exact property to every positioned direct route choice.  The
   fallback branches remain to be treated before the final inherited route
   family can preserve its variable occurrence orders through loop erasure.
+- [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionJoin.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionJoin.lean)
+  proves that ordered unit subdivision commutes with a correctly matched
+  endpoint join.  It also turns strict continuous separation from any
+  orthogonal witness route through the target into endpoint isolation for a
+  joined route with a simple terminal suffix.
+- [`LeanTrominoes/RetainedAngularFanFallbackEndpointIsolation.lean`](LeanTrominoes/RetainedAngularFanFallbackEndpointIsolation.lean)
+  applies that bridge to both ordinary and delayed-lane retained fallbacks.
+  Their source-to-boundary prefixes strictly avoid the matching implication
+  cycle, whose selected entering edge ends at the same ring vertex as the
+  simple Figure 7 spoke.  Thus neither fallback can revisit its variable
+  endpoint after unit subdivision.  The remaining step is to transport
+  these reusable certificates through the final formula-indexed case split.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
