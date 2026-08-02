@@ -2171,6 +2171,13 @@ The representation choices for this target are:
   suffix is a singleton, so its spliced route is exactly the already-simple
   normalized local route.  Only inherited source-variable incidences now
   need separate endpoint-isolation geometry.
+- [`LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean`](LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean)
+  certifies the terminal geometry shared by all inherited coordinated
+  routes.  Each of the eight explicit Figure 7 spokes is simple, and remains
+  so after periodic translation and positive refinement scaling; consequently
+  its variable endpoint is isolated after unit subdivision.  The remaining
+  work is to exclude that endpoint from the prefixes joined ahead of the
+  terminal spoke.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
