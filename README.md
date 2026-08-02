@@ -2027,6 +2027,10 @@ The representation choices for this target are:
   combines source-route separation with direct and fallback orthogonality.
   Aligned mixed routes ending at one canonical variable center must therefore
   have different classified terminal directions.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedDirectionSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedDirectionSeparation.lean)
+  joins the aligned planarity branch with exact classified-segment separation
+  for oblique direct choices, giving unconditional direction inequality for
+  same-center direct/fallback pairs from different clauses.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean`](LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean)
   transports equality of canonical direct/fallback literal positions to
   equality of their fully refined physical fan centers, matching the center

@@ -36,5 +36,29 @@ theorem RetainedDirectSourceRouteChoice.direction_ne_of_otherSegment_aligned
       otherClassified choice.sourceSegment_terminalClassify
       otherAligned directNotAligned).symm
 
+/-- Record-valued interface to
+`RetainedDirectSourceRouteChoice.direction_ne_of_otherSegment_aligned`.
+Keeping the classified direction and length bundled prevents downstream
+applications from normalizing a large route expression through both
+projections independently. -/
+theorem RetainedDirectSourceRouteChoice.direction_ne_of_otherTerminal_aligned
+    (choice : RetainedDirectSourceRouteChoice)
+    {otherStart otherFinish : Cell}
+    {otherTerminal : RetainedTerminalData}
+    (otherClassified :
+      retainedTerminalDirectionClassify
+          (Cell.sub otherStart otherFinish) =
+        some otherTerminal)
+    (otherAligned :
+      (GridSegment.mk otherStart otherFinish).IsAxisAligned)
+    (directNotAligned : ¬choice.sourceSegment.IsAxisAligned) :
+    (retainedDirectSourceFanTerminalAt
+        choice.kind choice.index).1 ≠ otherTerminal.1 := by
+  exact
+    choice.direction_ne_of_otherSegment_aligned
+      (otherDirection := otherTerminal.1)
+      (otherLength := otherTerminal.2)
+      otherClassified otherAligned directNotAligned
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
