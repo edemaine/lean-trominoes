@@ -2066,13 +2066,17 @@ The representation choices for this target are:
   disjoint complete routes in the final coordinated drawing.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceSeparation.lean)
   derives the oblique mixed occurrence theorem from the flat-component
-  corridor and combines it with the aligned branch, yielding unconditional
-  same-center cross-clause direct/fallback separation for non-routed direct
-  choices.
+  corridor and combines it with the aligned branch for non-routed choices.
+  For a routed-clause choice it combines flat-macrocell prefix reduction,
+  the specialized inward carrier-boundary escape, and ordinary corridor
+  control of the remaining tail.  These cases yield unconditional
+  same-center cross-clause direct/fallback separation for every successful
+  direct choice.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean)
   identifies the selected fallback boundary join and direct occurrence with
-  their total route-family lookups.  The same-center non-routed mixed theorem
-  is therefore available at the public interface in both route orders.
+  their total route-family lookups.  The same-center mixed theorem, including
+  routed-clause direct choices, is therefore available at the public
+  interface in both route orders.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,

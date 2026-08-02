@@ -64,8 +64,8 @@ theorem retainedFinalFallbackOccurrenceRoute_eq_boundaryPrefix_join_suffix
   · rw [if_neg prefixLength, if_neg prefixLength]
     rfl
 
-/-- At the public total-route interface, a successful non-routed direct
-choice strictly avoids a same-center failed choice from another clause. -/
+/-- At the public total-route interface, every successful direct choice
+strictly avoids a same-center failed choice from another clause. -/
 theorem
     retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_crossClause_strictlyAvoid_of_first_choice_some_second_none_of_sameCenter
     {Variable : Type*} [DecidableEq Variable]
@@ -98,7 +98,6 @@ theorem
     (choiceLookup :
       retainedFinalDirectSourceRouteChoice?
           formula directClauseIndex directLiteralIndex = some choice)
-    (kindNe : choice.kind ≠ .routedClause)
     (fallbackChoiceNone :
       retainedFinalDirectSourceRouteChoice?
           formula fallbackClauseIndex fallbackLiteralIndex = none)
@@ -143,7 +142,7 @@ theorem
       sourceClausesNonempty choice
       directClauseMember fallbackClauseMember
       directLiteralMember fallbackLiteralMember
-      choiceLookup kindNe fallbackChoiceNone clauseIndicesDifferent
+      choiceLookup fallbackChoiceNone clauseIndicesDifferent
       centersEqual
 
 /-- Symmetric public mixed separation when the failed choice is listed
@@ -183,7 +182,6 @@ theorem
     (choiceLookup :
       retainedFinalDirectSourceRouteChoice?
           formula directClauseIndex directLiteralIndex = some choice)
-    (kindNe : choice.kind ≠ .routedClause)
     (clauseIndicesDifferent :
       fallbackClauseIndex ≠ directClauseIndex)
     (centersEqual :
@@ -203,7 +201,7 @@ theorem
     sourceClausesNonempty choice
     directClauseMember fallbackClauseMember
     directLiteralMember fallbackLiteralMember
-    choiceLookup kindNe fallbackChoiceNone
+    choiceLookup fallbackChoiceNone
     (Ne.symm clauseIndicesDifferent) centersEqual.symm).symm
 
 end PeriodicOrthocrossing
