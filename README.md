@@ -2090,7 +2090,11 @@ The representation choices for this target are:
   the two interactions with its fallback boundary prefix.  The selected
   fallback-prefix theorem then discharges the reverse suffix interaction as
   well, leaving a single geometric premise: the coordinated direct prefix
-  must avoid the selected fallback boundary.
+  must avoid the selected fallback boundary.  For every non-routed direct
+  atlas kind, that premise is now itself assembled from a source-corridor
+  certificate and separation from the selected fallback outer replacement;
+  these are the only two geometric obligations left for the complete mixed
+  occurrence pair.
 - [`LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean`](LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean)
   decomposes either ordinary or delayed-lane fallback boundary into its
   refined retained prefix and outer-fan replacement.  Strict avoidance of
