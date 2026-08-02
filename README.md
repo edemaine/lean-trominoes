@@ -1973,6 +1973,11 @@ The representation choices for this target are:
   against every point in every finite direct-atlas escape.  The resulting
   weak/strict bounds are translation-invariant and supply the radial half of
   the residual direct-escape/fallback interaction.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceEscapeRadialSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceEscapeRadialSeparation.lean)
+  combines those atlas bounds with the canonical ordinary and delayed-lane
+  radial bounds.  Strict compatible direction/slot order now separates a
+  translated custom direct escape from either kind of fallback radial route
+  at the same translated fan center.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
