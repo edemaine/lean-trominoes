@@ -2103,6 +2103,13 @@ The representation choices for this target are:
   copied-source incidence keys: indexed clause uniqueness sends equal clause
   indices to the same-clause theorem, while unequal indices use the unified
   cross-clause result.
+- [`LeanTrominoes/RetainedAngularFanFinalPublicRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalPublicRouteSeparation.lean)
+  proves pairwise continuous separation for every two distinct genuine
+  incidence keys in the complete final fixed-eight family.  It removes the
+  final coordinate scaling, recovers copied-source metadata or a relative
+  implication-cycle index at the append boundary, and dispatches the four
+  source/source, source/cycle, cycle/source, and cycle/cycle cases to their
+  public separation theorems.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
