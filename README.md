@@ -2236,7 +2236,9 @@ The representation choices for this target are:
   complete direct/fallback outer-route separation whenever their classified
   terminal directions differ.  It also combines terminal classification with
   an aligned fallback segment and an oblique direct segment to supply that
-  direction inequality and hence strict order in one step.
+  direction inequality and hence strict order in one step.  The final wrapper
+  now discharges direction inequality unconditionally and derives strict order
+  directly from different source clauses sharing a canonical variable center.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
