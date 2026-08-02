@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicOneInThreePositionedLocalRoutes
 import LeanTrominoes.PositionedPeriodicCNFDeduplicationRoutes
+import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
 
 /-!
 # Anchor-normalized local Figure 9 routes
@@ -252,6 +253,60 @@ theorem normalizedLocalRoutes_orthogonal_of_members
       (localRoutes_orthogonal_of_members
         source sourceWidth sourceDistinct
         clauseMember literalMember)
+
+/-- Anchor normalization is a common translation and therefore preserves
+continuous route simplicity. -/
+theorem normalizedLocalRoutes_isSimple_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈
+        clause.literals.zipIdx) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (normalizedLocalRoutes source sourcePlacement
+        clauseIndex literalIndex) := by
+  rcases formulaClauseMetadata_lookup
+      source clauseMember with
+    ⟨metadata, metadataLookup, clauseEqual⟩
+  subst clause
+  let anchor :=
+    (placement source sourcePlacement).translation
+      (PeriodicCNF.clauseAnchor metadata.clause.literals)
+  have translatedSimple :=
+    EmbeddedCNFIncidenceDrawing.routeIsSimple_translate
+      (localRoutes_isSimple_of_members
+        source sourceWidth sourceDistinct
+        clauseMember literalMember)
+      (Cell.scale (-1) anchor)
+  have normalizedRouteEqual :
+      PositionedPeriodicCNF.normalizeIncidenceRoute
+          (placement source sourcePlacement)
+          metadata.clause
+          (localRoutes source clauseIndex literalIndex) =
+        (localRoutes source clauseIndex literalIndex).map
+          (Cell.add (Cell.scale (-1) anchor)) := by
+    unfold PositionedPeriodicCNF.normalizeIncidenceRoute
+    apply List.map_congr_left
+    intro point pointMember
+    apply Prod.ext <;>
+      simp [Cell.sub, Cell.add, Cell.scale, anchor,
+        sub_eq_add_neg, add_comm]
+  simpa [normalizedLocalRoutes, metadataLookup,
+    normalizedRouteEqual] using translatedSimple
 
 /-- Anchor normalization preserves the first exit of every genuine local
 Figure 9 route. -/

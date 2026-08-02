@@ -401,14 +401,15 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOneInThreePositionedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreePositionedLocalRoutes.lean)
   uses that index to select the exact certified Figure 9 route at every
   global output incidence.  Every selected local route is proved orthogonal
-  for width-three, atom-distinct sources; source-variable incidences still
-  require a prefix inherited from the preceding drawing.
+  and continuously simple for width-three, atom-distinct sources;
+  source-variable incidences still require a suffix inherited from the
+  preceding drawing.
   [`LeanTrominoes/PeriodicOneInThreePositionedNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreePositionedNormalizedLocalRoutes.lean)
   translates those selected routes into the canonical periodic
   clause-anchor gauge.  Every genuine route has its exact generated-clause
   start, its exact local boundary or auxiliary endpoint, and an
-  orthogonality certificate, exposing the endpoint used by the forthcoming
-  inherited-route splice.
+  orthogonality and simplicity certificate, exposing the endpoint used by
+  the inherited-route splice.
   [`LeanTrominoes/PeriodicOneInThreeAuxiliaryIncidences.lean`](LeanTrominoes/PeriodicOneInThreeAuxiliaryIncidences.lean)
   proves that every Figure 9 auxiliary literal carries exactly its source
   clause/index scope and the source anchor offset.
@@ -418,6 +419,11 @@ The representation choices for this target are:
   periodic literal endpoint.  It completes any inherited-variable suffix
   family with singleton auxiliary suffixes and packages the resulting
   canonical orthogonal splice; only source-variable ports remain to supply.
+  [`LeanTrominoes/PeriodicOneInThreePositionedAuxiliaryRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreePositionedAuxiliaryRouteIsolation.lean)
+  observes that a fresh Figure 9 auxiliary's singleton suffix leaves its
+  normalized local route unchanged.  Local simplicity and orthogonality then
+  isolate both route endpoints after unit subdivision, providing the
+  loop-erasure certificates for every auxiliary incidence.
   [`LeanTrominoes/PeriodicOneInThreeInheritedIncidences.lean`](LeanTrominoes/PeriodicOneInThreeInheritedIncidences.lean)
   classifies every inherited source literal in a generated Figure 9 clause
   by its precise source-clause presentation index, proving that its atom and
