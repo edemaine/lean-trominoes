@@ -2138,6 +2138,12 @@ The representation choices for this target are:
   applies that generic transport theorem to the final construction, proving
   complete zero-shift continuous separation for every pair of distinct
   genuine normalized incidences.
+- [`LeanTrominoes/RetainedAngularFanFinalNormalizedDrawing.lean`](LeanTrominoes/RetainedAngularFanFinalNormalizedDrawing.lean)
+  assembles the normalized routes into the positioned periodic incidence
+  drawing.  It proves exact graph-route endpoint matching, unit-step support,
+  orthogonality, and unconditional integer-grid planarity.  The remaining
+  ribbon-ready obligations are the stronger translated continuous and
+  listed-point contact conditions.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,

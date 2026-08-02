@@ -149,6 +149,53 @@ theorem
       AxisDirection.normalizeOrthogonalPolyline_isSimple
         nonempty valid.2.2
 
+/-- Every genuine route in the normalized final family consists entirely
+of genuine unit lattice steps. -/
+theorem
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_unitSteps
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      formula clauseIndex literalIndex).IsChain
+        AxisDirection.IsUnitAxisStep := by
+  let route :=
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+      formula clauseIndex literalIndex
+  have valid :=
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_valid
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember
+  have nonempty : route ≠ [] := by
+    intro routeEmpty
+    have := valid.1
+    simp [route, routeEmpty] at this
+  simpa only [
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes,
+    route] using
+      AxisDirection.normalizeOrthogonalPolyline_unitSteps
+        nonempty valid.2.2
+
 /-- The normalized final route family, packaged with canonical endpoints and
 pointwise orthogonality. -/
 def
