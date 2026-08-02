@@ -2072,6 +2072,12 @@ The representation choices for this target are:
   the closed outside, and exhaustively certifies that every routed-clause
   escape point lies strictly inside.  The generic linear half-plane theorem
   then gives strict continuous separation of the two positioned routes.
+  For a normalized final contact, route equality recovers the checked
+  choice's routed-clause kind and exact physical origin, so the boundary
+  witness discharges those positioning obligations automatically.  Finally,
+  an endpoint-join bridge combines this exceptional-escape certificate with
+  the already-controlled post-escape tail to clear the selected complete
+  direct route.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly

@@ -18,6 +18,16 @@ namespace PeriodicEightOccurrenceSplit
 open PlanarThreeSAT
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+set_option maxRecDepth 8192
+set_option maxHeartbeats 8000000
+
+private instance decidableForallFintype
+    {α : Type*} [Fintype α]
+    (predicate : α → Prop)
+    [∀ value, Decidable (predicate value)] :
+    Decidable (∀ value, predicate value) :=
+  Fintype.decidableForallFintype
+
 /-- Unit normal pointing from a carrier boundary into its macrocell. -/
 def carrierBoundaryInwardNormal : CornerPort → Cell
   | .west => (1, 0)
@@ -63,6 +73,347 @@ theorem retainedDirectRoutedClauseFanEscapeAt_strictly_inside_carrierBoundary
           Cell.linearValue (carrierBoundaryInwardNormal port) point := by
   cases port <;>
     native_decide
+
+/-- A routed-clause terminal vector cannot occur in any other direct atlas
+kind.  This finite uniqueness fact lets route equality recover the kind of
+a checked final choice. -/
+theorem
+    retainedDirectSourceLocalRouteAt_kind_eq_routedClause_of_terminalVector_eq :
+    ∀ (kind : RetainedDirectClauseKind)
+      (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+      (routedIndex :
+        Fin
+          (retainedDirectSourcePrefixChoices
+            RetainedDirectClauseKind.routedClause).length),
+      PeriodicThreeSATThree.routeTerminalVector
+          (retainedDirectSourceLocalRouteAt kind index) =
+        PeriodicThreeSATThree.routeTerminalVector
+          (retainedDirectSourceLocalRouteAt
+            RetainedDirectClauseKind.routedClause routedIndex) →
+        kind = RetainedDirectClauseKind.routedClause := by
+  native_decide
+
+/-- All three routed-clause local incidences start at their common clause
+point. -/
+theorem retainedDirectRoutedClauseLocalRouteAt_head? :
+    ∀ (index :
+      Fin
+        (retainedDirectSourcePrefixChoices
+          RetainedDirectClauseKind.routedClause).length),
+      (retainedDirectSourceLocalRouteAt
+        RetainedDirectClauseKind.routedClause index).head? =
+        some (10, 10) := by
+  native_decide
+
+/-- Inverting a successful routed-clause lookup exposes the exact routed
+atlas shape and its unscaled physical macrocell origin. -/
+theorem retainedDirectSourceRouteChoice?_routedClause_eq_some_shape
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (site : PeriodicOrthocrossing.ClauseRouteSite)
+    (literalIndex : Nat)
+    (choice : RetainedDirectSourceRouteChoice)
+    (lookup :
+      retainedDirectSourceRouteChoice?
+          formula (.routedClause site) literalIndex =
+        some choice) :
+    ∃ index :
+        Fin
+          (retainedDirectSourcePrefixChoices
+            RetainedDirectClauseKind.routedClause).length,
+      choice = {
+        origin := PeriodicOrthocrossing.routedClauseOrigin formula site
+        kind := RetainedDirectClauseKind.routedClause
+        index := index
+      } := by
+  simp only [retainedDirectSourceRouteChoice?] at lookup
+  split at lookup
+  next literalIndexLt =>
+    simp only [Option.some.injEq] at lookup
+    subst choice
+    exact ⟨_, rfl⟩
+  next =>
+    contradiction
+
+/-- Equality with a translated routed-clause local incidence recovers both
+the routed-clause atlas kind and the physical macrocell origin of a checked
+choice. -/
+theorem
+    RetainedDirectSourceRouteChoice.kind_origin_eq_routedClause_of_route_eq
+    (choice : RetainedDirectSourceRouteChoice)
+    (origin : Cell)
+    (routedIndex :
+      Fin
+        (retainedDirectSourcePrefixChoices
+          RetainedDirectClauseKind.routedClause).length)
+    (routeEq :
+      PeriodicOrthocrossing.translatePolyline choice.origin
+          (retainedDirectSourceLocalRouteAt
+            choice.kind choice.index) =
+        PeriodicOrthocrossing.translatePolyline origin
+          (retainedDirectSourceLocalRouteAt
+            RetainedDirectClauseKind.routedClause routedIndex)) :
+    choice.kind = RetainedDirectClauseKind.routedClause ∧
+      choice.origin = origin := by
+  rcases choice with ⟨choiceOrigin, kind, index⟩
+  have vectorEq :=
+    congrArg PeriodicThreeSATThree.routeTerminalVector routeEq
+  rw [routeTerminalVector_translatePolyline,
+    routeTerminalVector_translatePolyline] at vectorEq
+  have kindEq :=
+    retainedDirectSourceLocalRouteAt_kind_eq_routedClause_of_terminalVector_eq
+      kind index routedIndex vectorEq
+  subst kind
+  refine ⟨rfl, ?_⟩
+  have headEq := congrArg List.head? routeEq
+  rw [PeriodicOrthocrossing.translatePolyline,
+    PeriodicOrthocrossing.translatePolyline,
+    List.head?_map, List.head?_map,
+    retainedDirectRoutedClauseLocalRouteAt_head? index,
+    retainedDirectRoutedClauseLocalRouteAt_head? routedIndex]
+      at headEq
+  simp only [Option.map_some, Option.some.injEq] at headEq
+  rcases choiceOrigin with ⟨choiceX, choiceY⟩
+  rcases origin with ⟨originX, originY⟩
+  simp [Cell.add] at headEq
+  change (choiceX, choiceY) = (originX, originY)
+  apply Prod.ext <;> omega
+
+/-- If the normalized source of a final flat route is a routed clause, any
+checked choice representing that same route has routed-clause kind and the
+normalized routed-clause macrocell origin. -/
+theorem retainedFinalDirectChoice_kind_origin_eq_of_normalized_routedClause
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {taggedRoute : List Cell × Nat}
+    {macrocell :
+      PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+        formula taggedRoute}
+    (normalized :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedMacrocellSource
+        formula macrocell)
+    (site : PeriodicOrthocrossing.ClauseRouteSite)
+    (sourceEq :
+      normalized.source =
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+          site)
+    (choice : RetainedDirectSourceRouteChoice)
+    (choiceRouteEq :
+      PeriodicOrthocrossing.translatePolyline choice.origin
+          (retainedDirectSourceLocalRouteAt
+            choice.kind choice.index) =
+        taggedRoute.1) :
+    choice.kind = RetainedDirectClauseKind.routedClause ∧
+      choice.origin =
+        PeriodicOrthocrossing.routedClauseOrigin formula site := by
+  rcases normalized.exists_routeSelection
+      formula wellFormed degree isLocal with
+    ⟨selection⟩
+  let selectedClause := selection.clause
+  let selectedLiteral := selection.literal
+  let selectedLiteralIndex := selection.literalIndex
+  let metadata :
+      PeriodicOrthocrossing.DrawingPlanarSATClauseMetadata Variable :=
+    ⟨selectedClause, normalized.source⟩
+  have drawingMember :
+      (selectedClause, normalized.source.localClauseIndex) ∈
+        (normalized.source.incidenceDrawing formula).formula.zipIdx := by
+    simpa [selectedClause] using selection.clauseMember
+  have clauseFormulaMember :
+      (selectedClause, normalized.source.localClauseIndex) ∈
+        (normalized.source.clauseFormula formula).zipIdx := by
+    rw [sourceEq] at drawingMember ⊢
+    simpa [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing,
+      PeriodicOrthocrossing.DrawingPlanarSATClauseSource.localClauseIndex,
+      PeriodicOrthocrossing.DrawingPlanarSATClauseSource.clauseFormula]
+      using drawingMember
+  have valid : metadata.RetainedValid formula := by
+    apply
+      (metadata.retainedValid_iff_sourceMember_and_localClauseMember
+        formula).mpr
+    exact ⟨normalized.sourceMember, clauseFormulaMember⟩
+  have routedValid :
+      (⟨selectedClause,
+          PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+            site⟩ :
+        PeriodicOrthocrossing.DrawingPlanarSATClauseMetadata Variable)
+          |>.RetainedValid formula := by
+    simpa [metadata, sourceEq] using valid
+  have selectedLiteralMember :
+      (selectedLiteral, selectedLiteralIndex) ∈
+        selectedClause.literals.zipIdx := by
+    simpa [selectedLiteral, selectedLiteralIndex, selectedClause] using
+      selection.literalMember
+  rcases exists_retainedDirectSourceRouteChoice_routedClause
+      formula selectedClause site routedValid
+      selectedLiteralMember with
+    ⟨rawChoice, rawLookup, _rawMatches⟩
+  have rawRepresents :=
+    retainedDirectSourceRouteChoice?_represents_of_eq_some
+      formula
+      (PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+        site)
+      selectedLiteralIndex rawChoice rawLookup
+  unfold RetainedDirectSourceRouteChoice.Represents at rawRepresents
+  have selectionRouteEq :
+      taggedRoute.1 =
+        (normalized.source.incidenceDrawing formula).routes
+          normalized.source.localClauseIndex selectedLiteralIndex := by
+    simpa [selectedLiteralIndex] using selection.routeEq
+  rw [sourceEq] at selectionRouteEq
+  have rawRouteEq :
+      PeriodicOrthocrossing.translatePolyline rawChoice.origin
+          (retainedDirectSourceLocalRouteAt
+            rawChoice.kind rawChoice.index) =
+        taggedRoute.1 := by
+    exact rawRepresents.trans selectionRouteEq.symm
+  rcases retainedDirectSourceRouteChoice?_routedClause_eq_some_shape
+      formula site selectedLiteralIndex rawChoice rawLookup with
+    ⟨routedIndex, rawChoiceEq⟩
+  subst rawChoice
+  exact
+    choice.kind_origin_eq_routedClause_of_route_eq
+      (PeriodicOrthocrossing.routedClauseOrigin formula site)
+      routedIndex
+      (choiceRouteEq.trans rawRouteEq.symm)
+
+/-- A normalized carrier contact with a routed-clause source retains a
+boundary whose origin is definitionally that routed clause's physical
+macrocell origin.  This strengthens the generic boundary existence theorem
+with the one equality needed by the positioned direct escape. -/
+theorem retainedFinalRoutedClauseContact_exists_carrierBoundary_at_origin
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {carrierTaggedRoute macrocellTaggedRoute : List Cell × Nat}
+    (carrier :
+      PeriodicOrthocrossing.FinalGaugedFlatCarrierRouteWitness
+        formula carrierTaggedRoute)
+    (macrocell :
+      PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+        formula macrocellTaggedRoute)
+    (normalized :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedMacrocellSource
+        formula macrocell)
+    (site : PeriodicOrthocrossing.ClauseRouteSite)
+    (sourceEq :
+      normalized.source =
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+          site)
+    (contact :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedCarrierContact
+        formula carrier macrocell normalized) :
+    ∃ boundary :
+        PeriodicOrthocrossing.FinalGaugedFlatNormalizedCarrierBoundary
+          carrierTaggedRoute.1 macrocellTaggedRoute.1,
+      boundary.origin =
+        PeriodicOrthocrossing.routedClauseOrigin formula site := by
+  rcases carrier.exists_normalizedRouteSelection
+      formula wellFormed degree isLocal with
+    ⟨carrierClauseIndex, ⟨carrierSelection⟩⟩
+  rcases normalized.exists_routeSelection
+      formula wellFormed degree isLocal with
+    ⟨macrocellSelection⟩
+  have normalizedLinkMember :=
+    carrier.normalizedLink_mem_raw
+      formula wellFormed degree isLocal
+  rcases contact with crossoverContact | terminalContact
+  · rcases crossoverContact with
+      ⟨crossing, localClauseIndex, crossingSourceEq, _incident⟩
+    rw [sourceEq] at crossingSourceEq
+    contradiction
+  · rcases terminalContact with
+      routedClauseContact | routedVariableContact
+    · rcases routedClauseContact with
+        ⟨contactSite, occurrence, contactSourceEq,
+          occurrenceMember, incident⟩
+      have siteEq : site = contactSite := by
+        rw [sourceEq] at contactSourceEq
+        injection contactSourceEq
+      subst contactSite
+      rcases incident with firstEqual | secondEqual
+      · have interface :=
+          PeriodicOrthocrossing.retainedDrawingCompleteCarrierLinkRaw_first_sourceTerminalInterface
+            wellFormed degree isLocal normalizedLinkMember
+            site occurrenceMember firstEqual
+        have carrierBounded :=
+          PeriodicOrthocrossing.retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideFirst_of_raw
+            wellFormed degree isLocal normalizedLinkMember
+        rw [interface.1, interface.2] at carrierBounded
+        have carrierBounded' :
+            ((PeriodicOrthocrossing.DrawingPlanarSATClauseSource.carrier
+              carrier.normalizedLink carrierClauseIndex).incidenceDrawing
+                formula).RoutePointsSatisfy
+              ((occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+                |>.OutsideCarrierBoundaryAt
+                  (PeriodicOrthocrossing.routedClauseOrigin
+                    formula site)) := by
+          simpa [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing]
+            using carrierBounded
+        have macrocellBounded :
+            (normalized.source.incidenceDrawing formula).RoutePointsSatisfy
+              ((occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+                |>.InsideCarrierBoundaryAt
+                  (PeriodicOrthocrossing.routedClauseOrigin
+                    formula site)) := by
+          rw [sourceEq]
+          exact
+            PeriodicOrthocrossing.drawingPlanarSATRoutedClauseIncidenceDrawing_routePoints_insideCarrierBoundary
+              formula site
+              (occurrence.sourceTerminal formula).duplicatorArm
+        let boundary :=
+          PeriodicOrthocrossing.FinalGaugedFlatNormalizedCarrierBoundary.of_routeSelections
+            carrierSelection macrocellSelection
+            (occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+            (PeriodicOrthocrossing.routedClauseOrigin formula site)
+            carrierBounded' macrocellBounded
+        exact ⟨boundary, rfl⟩
+      · have interface :=
+          PeriodicOrthocrossing.retainedDrawingCompleteCarrierLinkRaw_second_sourceTerminalInterface
+            wellFormed degree isLocal normalizedLinkMember
+            site occurrenceMember secondEqual
+        have carrierBounded :=
+          PeriodicOrthocrossing.retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideSecond_of_raw
+            wellFormed degree isLocal normalizedLinkMember
+        rw [interface.1, interface.2] at carrierBounded
+        have carrierBounded' :
+            ((PeriodicOrthocrossing.DrawingPlanarSATClauseSource.carrier
+              carrier.normalizedLink carrierClauseIndex).incidenceDrawing
+                formula).RoutePointsSatisfy
+              ((occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+                |>.OutsideCarrierBoundaryAt
+                  (PeriodicOrthocrossing.routedClauseOrigin
+                    formula site)) := by
+          simpa [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing]
+            using carrierBounded
+        have macrocellBounded :
+            (normalized.source.incidenceDrawing formula).RoutePointsSatisfy
+              ((occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+                |>.InsideCarrierBoundaryAt
+                  (PeriodicOrthocrossing.routedClauseOrigin
+                    formula site)) := by
+          rw [sourceEq]
+          exact
+            PeriodicOrthocrossing.drawingPlanarSATRoutedClauseIncidenceDrawing_routePoints_insideCarrierBoundary
+              formula site
+              (occurrence.sourceTerminal formula).duplicatorArm
+        let boundary :=
+          PeriodicOrthocrossing.FinalGaugedFlatNormalizedCarrierBoundary.of_routeSelections
+            carrierSelection macrocellSelection
+            (occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+            (PeriodicOrthocrossing.routedClauseOrigin formula site)
+            carrierBounded' macrocellBounded
+        exact ⟨boundary, rfl⟩
+    · rcases routedVariableContact with
+        ⟨variableSite, armIndex, arm, link, localClauseIndex,
+          occurrence, variableSourceEq, _occurrenceMember, _incident⟩
+      rw [sourceEq] at variableSourceEq
+      contradiction
 
 /-- Scaling an outside carrier point by the construction's combined factor
 places it on the closed outside of the refined linear threshold. -/
@@ -166,6 +517,198 @@ theorem
     exact
       retainedDirectRoutedClausePositionedFanEscapeAt_strictly_inside_carrierBoundary
         origin port index slot pointMember
+
+/-- The normalized routed-clause contact and checked-choice representation
+discharge the origin and atlas-kind premises of the generic half-plane
+separator. -/
+theorem
+    retainedFinalScaledCarrierPrefix_strictlyAvoids_routedClauseChoiceEscape
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {carrierTaggedRoute macrocellTaggedRoute : List Cell × Nat}
+    (carrier :
+      PeriodicOrthocrossing.FinalGaugedFlatCarrierRouteWitness
+        formula carrierTaggedRoute)
+    (macrocell :
+      PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+        formula macrocellTaggedRoute)
+    (normalized :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedMacrocellSource
+        formula macrocell)
+    (site : PeriodicOrthocrossing.ClauseRouteSite)
+    (sourceEq :
+      normalized.source =
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+          site)
+    (contact :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedCarrierContact
+        formula carrier macrocell normalized)
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    (choiceRouteEq :
+      PeriodicOrthocrossing.translatePolyline choice.origin
+          (retainedDirectSourceLocalRouteAt
+            choice.kind choice.index) =
+        macrocellTaggedRoute.1) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline
+        (retainedTerminalFanTotalRefinement * 4)
+        carrierTaggedRoute.1.dropLast)
+      (PeriodicOrthocrossing.translatePolyline
+        (retainedDirectSourceFanPositioningOffset choice.origin)
+        (retainedDirectSourceFanEscapeAt
+          choice.kind choice.index slot).route) := by
+  have choiceData :=
+    retainedFinalDirectChoice_kind_origin_eq_of_normalized_routedClause
+      formula wellFormed degree isLocal normalized site sourceEq
+      choice choiceRouteEq
+  rcases
+      retainedFinalRoutedClauseContact_exists_carrierBoundary_at_origin
+        formula wellFormed degree isLocal
+        carrier macrocell normalized site sourceEq contact with
+    ⟨boundary, boundaryOriginEq⟩
+  rcases choice with ⟨choiceOrigin, kind, index⟩
+  rcases choiceData with ⟨kindEq, originEq⟩
+  change kind = RetainedDirectClauseKind.routedClause at kindEq
+  change choiceOrigin =
+    PeriodicOrthocrossing.routedClauseOrigin formula site at originEq
+  subst kind
+  subst choiceOrigin
+  apply
+    retainedScaledOutsidePrefix_strictlyAvoids_positionedRoutedClauseEscape
+      carrierTaggedRoute.1
+      (PeriodicOrthocrossing.routedClauseOrigin formula site)
+      boundary.port index slot
+  intro point pointMember
+  rw [← boundaryOriginEq]
+  exact boundary.carrierOutside point
+    (List.mem_of_mem_dropLast pointMember)
+
+/-- Strict avoidance of a positioned direct escape and its fixed complete
+tail assembles across their certified common checkpoint into strict
+avoidance of the whole selected direct route. -/
+theorem retainedSourcePrefix_strictlyAvoids_directCompleteRoute_of_pieces
+    (sourcePrefix : List Cell)
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    (escapeAvoid :
+      RoutesStrictlyAvoidEachOther
+        sourcePrefix
+        (PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset choice.origin)
+          (retainedDirectSourceFanEscapeAt
+            choice.kind choice.index slot).route))
+    (tailAvoid :
+      RoutesStrictlyAvoidEachOther
+        sourcePrefix
+        (PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset choice.origin)
+          (retainedDirectSourceFanCompleteTailAt
+            choice.kind choice.index slot))) :
+    RoutesStrictlyAvoidEachOther
+      sourcePrefix
+      (choice.completeRoute slot) := by
+  let offset :=
+    retainedDirectSourceFanPositioningOffset choice.origin
+  let boundary :=
+    Cell.add offset
+      (retainedTerminalFanOuterSourceEscapePoint
+        (retainedDirectSourceFanCenterAt
+          choice.kind choice.index)
+        (retainedDirectSourceFanTerminalAt
+          choice.kind choice.index)
+        slot)
+  have escapeLast :
+      (PeriodicOrthocrossing.translatePolyline offset
+        (retainedDirectSourceFanEscapeAt
+          choice.kind choice.index slot).route).getLast? =
+        some boundary := by
+    have localLast :=
+      (retainedDirectSourceFanEscapeAt
+        choice.kind choice.index slot).last_eq
+    simpa [PeriodicOrthocrossing.translatePolyline,
+      List.getLast?_map, offset, boundary] using
+      congrArg (Option.map (Cell.add offset)) localLast
+  have tailHead :
+      (PeriodicOrthocrossing.translatePolyline offset
+        (retainedDirectSourceFanCompleteTailAt
+          choice.kind choice.index slot)).head? =
+        some boundary := by
+    have localHead :=
+      retainedTerminalFanOuterCoordinatedEscapedCompleteTail_head?
+        (retainedDirectSourceFanCenterAt
+          choice.kind choice.index)
+        (retainedDirectSourceFanTerminalAt
+          choice.kind choice.index)
+        slot
+    simp [retainedDirectSourceFanCompleteTailAt,
+      PeriodicOrthocrossing.translatePolyline,
+      offset, boundary, localHead]
+  unfold RetainedDirectSourceRouteChoice.completeRoute
+    retainedDirectSourcePositionedFanCompleteRouteAt
+  rw [retainedDirectSourceFanCompleteRouteAt,
+    retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_eq_escape_join_tail,
+    translatePolyline_joinAtEndpoint]
+  exact escapeAvoid.join_right tailAvoid escapeLast tailHead
+
+/-- At a normalized routed-clause/carrier contact, the half-plane escape
+certificate and any certificate for the already-controlled post-escape tail
+assemble into strict avoidance of the selected complete direct route. -/
+theorem
+    retainedFinalScaledCarrierPrefix_strictlyAvoids_routedClauseChoiceCompleteRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {carrierTaggedRoute macrocellTaggedRoute : List Cell × Nat}
+    (carrier :
+      PeriodicOrthocrossing.FinalGaugedFlatCarrierRouteWitness
+        formula carrierTaggedRoute)
+    (macrocell :
+      PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+        formula macrocellTaggedRoute)
+    (normalized :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedMacrocellSource
+        formula macrocell)
+    (site : PeriodicOrthocrossing.ClauseRouteSite)
+    (sourceEq :
+      normalized.source =
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+          site)
+    (contact :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedCarrierContact
+        formula carrier macrocell normalized)
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    (choiceRouteEq :
+      PeriodicOrthocrossing.translatePolyline choice.origin
+          (retainedDirectSourceLocalRouteAt
+            choice.kind choice.index) =
+        macrocellTaggedRoute.1)
+    (tailAvoid :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline
+          (retainedTerminalFanTotalRefinement * 4)
+          carrierTaggedRoute.1.dropLast)
+        (PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset choice.origin)
+          (retainedDirectSourceFanCompleteTailAt
+            choice.kind choice.index slot))) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline
+        (retainedTerminalFanTotalRefinement * 4)
+        carrierTaggedRoute.1.dropLast)
+      (choice.completeRoute slot) := by
+  apply retainedSourcePrefix_strictlyAvoids_directCompleteRoute_of_pieces
+  · exact
+      retainedFinalScaledCarrierPrefix_strictlyAvoids_routedClauseChoiceEscape
+        formula wellFormed degree isLocal carrier macrocell normalized
+        site sourceEq contact choice slot choiceRouteEq
+  · exact tailAvoid
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
