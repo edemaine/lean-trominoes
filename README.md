@@ -2157,12 +2157,14 @@ The representation choices for this target are:
   estimates.
 - [`LeanTrominoes/PeriodicGridDrawingLoopErasureRouteOrders.lean`](LeanTrominoes/PeriodicGridDrawingLoopErasureRouteOrders.lean)
   isolates the exact condition under which loop erasure also preserves the
-  cyclic route orders used by the ribbon source fans.  On a nondegenerate
-  simple orthogonal route, normalization is just ordered unit subdivision,
-  so both its first and last directions are unchanged.  Memberwise versions
-  transfer the variable occurrence order, ternary clause order, or both at
-  once; the remaining concrete task is therefore to certify simplicity of
-  the unnormalized final exact-one splices.
+  cyclic route orders used by the ribbon source fans.  It first handles
+  simple routes, where normalization is just ordered unit subdivision, and
+  then proves the sharper endpoint-isolation criterion needed by the actual
+  construction: interior loops are allowed as long as the route does not
+  revisit its clause or variable endpoint.  Memberwise versions transfer the
+  variable occurrence order, ternary clause order, or both at once; the
+  remaining concrete task is to establish those two endpoint-isolation
+  conditions for the final exact-one splices.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its

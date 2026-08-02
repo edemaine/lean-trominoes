@@ -439,6 +439,328 @@ theorem normalizeOrthogonalPolyline_sublist_unitSubdividePolyline
   exact eraseOrthogonalLoops_sublist_unitSubdividePolyline
     nonempty orthogonal
 
+/-! ## Endpoint-isolated normalization -/
+
+/-- The first listed point does not occur again later in the route. -/
+def HeadNotInTail (points : List Cell) : Prop :=
+  ∀ head, points.head? = some head → head ∉ points.tail
+
+/-- The final listed point does not occur earlier in the route. -/
+def LastNotInDropLast (points : List Cell) : Prop :=
+  ∀ last, points.getLast? = some last → last ∉ points.dropLast
+
+/-- A duplicate-free point list has an isolated first endpoint. -/
+theorem headNotInTail_of_nodup
+    {points : List Cell}
+    (nodup : points.Nodup) :
+    HeadNotInTail points := by
+  intro head headLookup
+  cases points with
+  | nil => simp at headLookup
+  | cons first rest =>
+      simp only [List.head?_cons, Option.some.injEq] at headLookup
+      subst first
+      exact (List.nodup_cons.mp nodup).1
+
+/-- A duplicate-free point list has an isolated final endpoint. -/
+theorem lastNotInDropLast_of_nodup
+    {points : List Cell}
+    (nodup : points.Nodup) :
+    LastNotInDropLast points := by
+  intro last lastLookup
+  have lastMember : last ∈ points.getLast? := by
+    simp [lastLookup]
+  have decomposition :=
+    List.dropLast_append_getLast? last lastMember
+  rw [← decomposition] at nodup
+  have concatenated : (points.dropLast.concat last).Nodup := by
+    simpa [List.concat_eq_append] using nodup
+  exact
+    (List.nodup_concat points.dropLast last).mp concatenated |>.1
+
+/-- A simple orthogonal route has an isolated first endpoint even after all
+of its long segments are subdivided into unit steps. -/
+theorem headNotInTail_unitSubdividePolyline_of_simple
+    {points : List Cell}
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (simple : LocalIncidenceDrawing.RouteIsSimple points) :
+    HeadNotInTail (unitSubdividePolyline points) :=
+  headNotInTail_of_nodup
+    (unitSubdividePolyline_nodup orthogonal simple)
+
+/-- A simple orthogonal route has an isolated final endpoint even after all
+of its long segments are subdivided into unit steps. -/
+theorem lastNotInDropLast_unitSubdividePolyline_of_simple
+    {points : List Cell}
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (simple : LocalIncidenceDrawing.RouteIsSimple points) :
+    LastNotInDropLast (unitSubdividePolyline points) :=
+  lastNotInDropLast_of_nodup
+    (unitSubdividePolyline_nodup orthogonal simple)
+
+/-- Bypass retains the first dart of a nontrivial walk whenever its starting
+vertex does not occur in the rest of the walk. -/
+private theorem polylineFirstDirection_bypass_support_of_start_fresh
+    {source target : Cell}
+    (walk : unitAxisGraph.Walk source target)
+    (nontrivial : ¬ walk.Nil)
+    (fresh : source ∉ walk.support.tail) :
+    polylineFirstDirection walk.bypass.support =
+      polylineFirstDirection walk.support := by
+  cases walk with
+  | nil => exact (nontrivial .nil).elim
+  | cons adjacent tail =>
+      have absent : source ∉ tail.bypass.support := by
+        intro member
+        exact fresh
+          (tail.support_bypass_subset_support member)
+      simp only [SimpleGraph.Walk.bypass, dif_neg absent]
+      simp only [SimpleGraph.Walk.support_cons]
+      rw [← tail.bypass.cons_tail_support,
+        ← tail.cons_tail_support]
+      rfl
+
+/-- Removing the first entry of a list and then its last entry cannot expose
+a point that was not already present before the original last entry. -/
+private theorem mem_dropLast_tail_imp_mem_dropLast
+    {Item : Type*} {item : Item} {items : List Item}
+    (member : item ∈ items.tail.dropLast) :
+    item ∈ items.dropLast := by
+  cases items with
+  | nil => simp at member
+  | cons first rest =>
+      cases rest with
+      | nil => simp at member
+      | cons second rest =>
+          simpa using List.mem_cons_of_mem first member
+
+/-- In a walk whose endpoint has no earlier occurrence, the only dart ending
+at that endpoint is the final dart. -/
+private theorem dart_eq_lastDart_of_end_fresh
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : SimpleGraph Vertex}
+    {source target : Vertex}
+    (walk : graph.Walk source target)
+    (nontrivial : ¬ walk.Nil)
+    (fresh : target ∉ walk.support.dropLast)
+    {dart : graph.Dart}
+    (dartMember : dart ∈ walk.darts)
+    (dartTarget : dart.snd = target) :
+    dart = walk.lastDart nontrivial := by
+  by_contra different
+  have dartsNonempty : walk.darts ≠ [] :=
+    SimpleGraph.Walk.darts_eq_nil.not.mpr nontrivial
+  have differentFromLast :
+      dart ≠ walk.darts.getLast dartsNonempty := by
+    rw [SimpleGraph.Walk.getLast_darts_eq_lastDart]
+    exact different
+  have beforeLast : dart ∈ walk.darts.dropLast :=
+    List.mem_dropLast_of_mem_of_ne_getLast
+      dartMember differentFromLast
+  have targetInTailDropLast :
+      target ∈ walk.support.tail.dropLast := by
+    have mapped :
+        dart.snd ∈
+          (walk.darts.dropLast).map (fun edge => edge.snd) :=
+      List.mem_map.mpr ⟨dart, beforeLast, rfl⟩
+    rw [List.map_dropLast,
+      SimpleGraph.Walk.map_snd_darts] at mapped
+    simpa [dartTarget] using mapped
+  exact fresh
+    (mem_dropLast_tail_imp_mem_dropLast targetInTailDropLast)
+
+/-- The final directed axis of a nontrivial unit-axis walk is the direction
+of its final dart. -/
+private theorem polylineLastDirection_support_eq_lastDart
+    {source target : Cell}
+    (walk : unitAxisGraph.Walk source target)
+    (nontrivial : ¬ walk.Nil) :
+    polylineLastDirection walk.support =
+      between
+        (walk.lastDart nontrivial).fst
+        (walk.lastDart nontrivial).snd := by
+  let leading := walk.dropLast.support.dropLast
+  have dropLastDecomposition :
+      walk.dropLast.support =
+        leading ++ [walk.penultimate] := by
+    simp [leading]
+  have supportDecomposition :
+      walk.support =
+        leading ++ [walk.penultimate, target] := by
+    calc
+      walk.support = walk.dropLast.support ++ [target] :=
+        (walk.support_dropLast_concat nontrivial).symm
+      _ = (leading ++ [walk.penultimate]) ++ [target] := by
+        rw [dropLastDecomposition]
+      _ = leading ++ [walk.penultimate, target] := by simp
+  rw [supportDecomposition]
+  exact
+    polylineLastDirection_append_pair leading
+      ((unitAxisGraph_adj_iff _ _).mp
+        (walk.lastDart nontrivial).adj)
+
+/-- Bypass retains the final dart of a nontrivial walk whenever its target
+does not occur before the end. -/
+private theorem polylineLastDirection_bypass_support_of_end_fresh
+    {source target : Cell}
+    (walk : unitAxisGraph.Walk source target)
+    (nontrivial : ¬ walk.Nil)
+    (fresh : target ∉ walk.support.dropLast) :
+    polylineLastDirection walk.bypass.support =
+      polylineLastDirection walk.support := by
+  have sourceInDropLast : source ∈ walk.support.dropLast := by
+    have firstDartMember := walk.firstDart_mem_darts nontrivial
+    have mapped :
+        (walk.firstDart nontrivial).fst ∈
+          walk.darts.map (fun dart => dart.fst) :=
+      List.mem_map.mpr
+        ⟨walk.firstDart nontrivial, firstDartMember, rfl⟩
+    rw [SimpleGraph.Walk.map_fst_darts] at mapped
+    simpa using mapped
+  have endpointsDifferent : source ≠ target := by
+    intro equal
+    have targetInDropLast : target ∈ walk.support.dropLast := by
+      simpa only [equal] using sourceInDropLast
+    exact fresh targetInDropLast
+  have bypassNontrivial : ¬ walk.bypass.Nil :=
+    SimpleGraph.Walk.not_nil_of_ne endpointsDifferent
+  have retainedLastMember :
+      walk.bypass.lastDart bypassNontrivial ∈ walk.darts :=
+    walk.darts_bypass_subset_darts
+      (walk.bypass.lastDart_mem_darts bypassNontrivial)
+  have retainedLast :
+      walk.bypass.lastDart bypassNontrivial =
+        walk.lastDart nontrivial :=
+    dart_eq_lastDart_of_end_fresh walk nontrivial fresh
+      retainedLastMember rfl
+  rw [polylineLastDirection_support_eq_lastDart
+      walk.bypass bypassNontrivial,
+    polylineLastDirection_support_eq_lastDart
+      walk nontrivial,
+    retainedLast]
+
+/-- Orthogonal loop erasure preserves the first direction when the unit-
+subdivided starting cell does not occur again later. -/
+theorem polylineFirstDirection_normalizeOrthogonalPolyline_of_headNotInTail
+    {points : List Cell}
+    (length : 2 ≤ (unitSubdividePolyline points).length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (fresh : HeadNotInTail (unitSubdividePolyline points)) :
+    polylineFirstDirection (normalizeOrthogonalPolyline points) =
+      polylineFirstDirection points := by
+  have nonempty : points ≠ [] := by
+    intro empty
+    simp [empty] at length
+  let walk := orthogonalUnitWalk nonempty orthogonal
+  have walkSupport :
+      walk.support = unitSubdividePolyline points := by
+    simp [walk, orthogonalUnitWalk]
+  have walkNontrivial : ¬ walk.Nil := by
+    rw [SimpleGraph.Walk.not_nil_iff_lt_length]
+    have supportLength : 2 ≤ walk.support.length := by
+      simpa [walkSupport] using length
+    rw [SimpleGraph.Walk.length_support] at supportLength
+    omega
+  have subdividedStartFresh :
+      (unitSubdividePolyline points).head
+          (unitSubdividePolyline_ne_nil nonempty) ∉
+        (unitSubdividePolyline points).tail := by
+    apply fresh
+      ((unitSubdividePolyline points).head
+        (unitSubdividePolyline_ne_nil nonempty))
+    exact
+      List.head?_eq_some_head
+        (unitSubdividePolyline_ne_nil nonempty)
+  have startFresh :
+      walk.support.head walk.support_ne_nil ∉
+        walk.support.tail := by
+    simpa only [walkSupport] using subdividedStartFresh
+  rw [normalizeOrthogonalPolyline_eq_erase nonempty orthogonal]
+  change polylineFirstDirection walk.bypass.support =
+    polylineFirstDirection points
+  calc
+    polylineFirstDirection walk.bypass.support =
+        polylineFirstDirection walk.support :=
+      polylineFirstDirection_bypass_support_of_start_fresh
+        walk walkNontrivial
+        (by simpa using startFresh)
+    _ = polylineFirstDirection (unitSubdividePolyline points) := by
+      rw [walkSupport]
+    _ = polylineFirstDirection points :=
+      polylineFirstDirection_unitSubdividePolyline
+        (by
+          cases points with
+          | nil => simp at nonempty
+          | cons first rest =>
+              cases rest with
+              | nil =>
+                  simp at length
+              | cons second rest => simp)
+        orthogonal
+
+/-- Orthogonal loop erasure preserves the last direction when the unit-
+subdivided ending cell does not occur earlier. -/
+theorem polylineLastDirection_normalizeOrthogonalPolyline_of_lastNotInDropLast
+    {points : List Cell}
+    (length : 2 ≤ (unitSubdividePolyline points).length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points)
+    (fresh : LastNotInDropLast (unitSubdividePolyline points)) :
+    polylineLastDirection (normalizeOrthogonalPolyline points) =
+      polylineLastDirection points := by
+  have nonempty : points ≠ [] := by
+    intro empty
+    simp [empty] at length
+  let walk := orthogonalUnitWalk nonempty orthogonal
+  have walkSupport :
+      walk.support = unitSubdividePolyline points := by
+    simp [walk, orthogonalUnitWalk]
+  have walkNontrivial : ¬ walk.Nil := by
+    rw [SimpleGraph.Walk.not_nil_iff_lt_length]
+    have supportLength : 2 ≤ walk.support.length := by
+      simpa [walkSupport] using length
+    rw [SimpleGraph.Walk.length_support] at supportLength
+    omega
+  have subdividedEndFresh :
+      (unitSubdividePolyline points).getLast
+          (unitSubdividePolyline_ne_nil nonempty) ∉
+        (unitSubdividePolyline points).dropLast := by
+    apply fresh
+      ((unitSubdividePolyline points).getLast
+        (unitSubdividePolyline_ne_nil nonempty))
+    exact
+      List.getLast?_eq_getLast_of_ne_nil
+        (unitSubdividePolyline_ne_nil nonempty)
+  have endFresh :
+      walk.support.getLast walk.support_ne_nil ∉
+        walk.support.dropLast := by
+    simpa only [walkSupport] using subdividedEndFresh
+  rw [normalizeOrthogonalPolyline_eq_erase nonempty orthogonal]
+  change polylineLastDirection walk.bypass.support =
+    polylineLastDirection points
+  calc
+    polylineLastDirection walk.bypass.support =
+        polylineLastDirection walk.support :=
+      polylineLastDirection_bypass_support_of_end_fresh
+        walk walkNontrivial
+        (by simpa using endFresh)
+    _ = polylineLastDirection (unitSubdividePolyline points) := by
+      rw [walkSupport]
+    _ = polylineLastDirection points :=
+      polylineLastDirection_unitSubdividePolyline
+        (by
+          cases points with
+          | nil => simp at nonempty
+          | cons first rest =>
+              cases rest with
+              | nil =>
+                  simp at length
+              | cons second rest => simp)
+        orthogonal
+
 /-! ## Normalization of already simple routes -/
 
 /-- Bypass changes nothing when its input walk is already a path. -/

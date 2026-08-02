@@ -16,6 +16,25 @@ the two route-order predicates used by the ribbon construction.
 namespace LeanTrominoes
 namespace PositionedPeriodicCNF
 
+/-- A nondegenerate orthogonal route remains nondegenerate after ordered
+unit subdivision. -/
+private theorem unitSubdividePolyline_length_ge_two_of_length_ge_two
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points) :
+    2 ≤ (AxisDirection.unitSubdividePolyline points).length := by
+  cases points with
+  | nil => simp at length
+  | cons first rest =>
+      cases rest with
+      | nil => simp at length
+      | cons second rest =>
+          exact
+            AxisDirection.unitSubdividePolyline_length_ge_two
+              (first := first) (second := second)
+              (rest := rest) orthogonal
+
 /-- Canonical ternary-clause route order transfers between route families
 whose initial directions agree on every genuine positioned incidence. -/
 theorem TernaryClauseRoutesInUnitEliminationOrder.of_memberwise_firstDirection_eq
@@ -69,7 +88,7 @@ theorem VariableRoutesInOccurrenceOrder.normalizeOrthogonalIncidenceRoutes
           LocalIncidenceDrawing.RouteIsSimple
             (routes clauseIndex literalIndex)) :
     source.VariableRoutesInOccurrenceOrder
-      (normalizeOrthogonalIncidenceRoutes routes) := by
+      (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) := by
   apply ordered.of_memberwise_lastDirection_eq
   intro clause clauseIndex clauseMember
     literal literalIndex literalMember
@@ -112,7 +131,7 @@ theorem
           LocalIncidenceDrawing.RouteIsSimple
             (routes clauseIndex literalIndex)) :
     source.TernaryClauseRoutesInUnitEliminationOrder
-      (normalizeOrthogonalIncidenceRoutes routes) := by
+      (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) := by
   apply ordered.of_memberwise_firstDirection_eq
   intro clause clauseIndex clauseMember
     literal literalIndex literalMember
@@ -123,6 +142,103 @@ theorem
       (orthogonal clause clauseIndex clauseMember
         literal literalIndex literalMember)
       (simple clause clauseIndex clauseMember
+        literal literalIndex literalMember)
+
+/-- Clockwise variable occurrence order survives loop erasure even when
+routes have interior loops, provided no unit-subdivided route reaches its
+target endpoint before its final point. -/
+theorem
+    VariableRoutesInOccurrenceOrder.normalizeOrthogonalIncidenceRoutes_of_lastNotInDropLast
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {routes : IncidenceRoutes}
+    (ordered : source.VariableRoutesInOccurrenceOrder routes)
+    (lengths :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          2 ≤ (routes clauseIndex literalIndex).length)
+    (orthogonal :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (routes clauseIndex literalIndex))
+    (targetFresh :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          AxisDirection.LastNotInDropLast
+            (AxisDirection.unitSubdividePolyline
+              (routes clauseIndex literalIndex))) :
+    source.VariableRoutesInOccurrenceOrder
+      (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) := by
+  apply ordered.of_memberwise_lastDirection_eq
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember
+  have routeOrthogonal :=
+    orthogonal clause clauseIndex clauseMember
+      literal literalIndex literalMember
+  exact
+    AxisDirection.polylineLastDirection_normalizeOrthogonalPolyline_of_lastNotInDropLast
+      (unitSubdividePolyline_length_ge_two_of_length_ge_two
+        (lengths clause clauseIndex clauseMember
+          literal literalIndex literalMember)
+        routeOrthogonal)
+      routeOrthogonal
+      (targetFresh clause clauseIndex clauseMember
+        literal literalIndex literalMember)
+
+/-- Canonical ternary-clause route order survives loop erasure even when
+routes have interior loops, provided no unit-subdivided route returns to its
+clause endpoint after leaving it. -/
+theorem
+    TernaryClauseRoutesInUnitEliminationOrder.normalizeOrthogonalIncidenceRoutes_of_headNotInTail
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {routes : IncidenceRoutes}
+    (ordered :
+      source.TernaryClauseRoutesInUnitEliminationOrder routes)
+    (lengths :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          2 ≤ (routes clauseIndex literalIndex).length)
+    (orthogonal :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (routes clauseIndex literalIndex))
+    (sourceFresh :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          AxisDirection.HeadNotInTail
+            (AxisDirection.unitSubdividePolyline
+              (routes clauseIndex literalIndex))) :
+    source.TernaryClauseRoutesInUnitEliminationOrder
+      (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) := by
+  apply ordered.of_memberwise_firstDirection_eq
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember
+  have routeOrthogonal :=
+    orthogonal clause clauseIndex clauseMember
+      literal literalIndex literalMember
+  exact
+    AxisDirection.polylineFirstDirection_normalizeOrthogonalPolyline_of_headNotInTail
+      (unitSubdividePolyline_length_ge_two_of_length_ge_two
+        (lengths clause clauseIndex clauseMember
+          literal literalIndex literalMember)
+        routeOrthogonal)
+      routeOrthogonal
+      (sourceFresh clause clauseIndex clauseMember
         literal literalIndex literalMember)
 
 /-- Both ribbon route-order premises survive one pointwise normalization. -/
@@ -154,12 +270,62 @@ theorem ribbonRouteOrders_normalizeOrthogonalIncidenceRoutes
           LocalIncidenceDrawing.RouteIsSimple
             (routes clauseIndex literalIndex)) :
     source.VariableRoutesInOccurrenceOrder
-        (normalizeOrthogonalIncidenceRoutes routes) ∧
+        (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) ∧
       source.TernaryClauseRoutesInUnitEliminationOrder
-        (normalizeOrthogonalIncidenceRoutes routes) := by
+        (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) := by
   exact
     ⟨orders.1.normalizeOrthogonalIncidenceRoutes lengths orthogonal simple,
       orders.2.normalizeOrthogonalIncidenceRoutes lengths orthogonal simple⟩
+
+/-- Both ribbon route-order premises survive pointwise loop erasure under
+the weaker endpoint-isolation conditions, without requiring the source
+routes themselves to be simple. -/
+theorem
+    ribbonRouteOrders_normalizeOrthogonalIncidenceRoutes_of_endpointIsolation
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {routes : IncidenceRoutes}
+    (orders :
+      source.VariableRoutesInOccurrenceOrder routes ∧
+        source.TernaryClauseRoutesInUnitEliminationOrder routes)
+    (lengths :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          2 ≤ (routes clauseIndex literalIndex).length)
+    (orthogonal :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (routes clauseIndex literalIndex))
+    (sourceFresh :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          AxisDirection.HeadNotInTail
+            (AxisDirection.unitSubdividePolyline
+              (routes clauseIndex literalIndex)))
+    (targetFresh :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          AxisDirection.LastNotInDropLast
+            (AxisDirection.unitSubdividePolyline
+              (routes clauseIndex literalIndex))) :
+    source.VariableRoutesInOccurrenceOrder
+        (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) ∧
+      source.TernaryClauseRoutesInUnitEliminationOrder
+        (PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes routes) := by
+  exact
+    ⟨orders.1.normalizeOrthogonalIncidenceRoutes_of_lastNotInDropLast
+        lengths orthogonal targetFresh,
+      orders.2.normalizeOrthogonalIncidenceRoutes_of_headNotInTail
+        lengths orthogonal sourceFresh⟩
 
 end PositionedPeriodicCNF
 end LeanTrominoes
