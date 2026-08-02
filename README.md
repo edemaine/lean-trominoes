@@ -2002,6 +2002,10 @@ The representation choices for this target are:
   classifies the positioned source segment stored by any successful direct
   choice directly from the finite atlas.  Mixed alignment arguments can now
   avoid reconstructing the full final direct-route metadata.
+- [`LeanTrominoes/RetainedAngularFanFinalFallbackSegmentClassification.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackSegmentClassification.lean)
+  transfers a genuine final source route's retained-terminal classification
+  to its explicit penultimate-to-final segment, matching the endpoint form
+  used by the mixed direct/fallback alignment argument.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
