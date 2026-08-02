@@ -2072,6 +2072,13 @@ The representation choices for this target are:
   control of the remaining tail.  These cases yield unconditional
   same-center cross-clause direct/fallback separation for every successful
   direct choice.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedDistinctCenterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedDistinctCenterSeparation.lean)
+  starts the complementary distinct-center mixed proof.  When the selected
+  direct source segment is axis-aligned, failure of the other selector makes
+  its source segment axis-aligned as well.  Distinct clause heads, distinct
+  literal centers, and retained source compatibility then separate the two
+  terminal rectangles, which combines with the established source corridor
+  to separate the complete direct and fallback occurrences.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean)
   identifies the selected fallback boundary join and direct occurrence with
   their total route-family lookups.  The same-center mixed theorem, including
