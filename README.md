@@ -2060,7 +2060,11 @@ The representation choices for this target are:
   fallback source prefix from a non-routed direct complete route.  A second
   specialization uses the radius-65/radius-845 certificates to separate the
   same fallback prefix from every direct route's shifted radial tail,
-  including routed-clause choices.
+  including routed-clause choices.  The retained drawing's distinct-endpoint
+  certificate separately clears the fixed Figure 7 local adapter; an
+  endpoint-join theorem then clears the whole post-escape complete tail.
+  Consequently the routed-clause choice's customized first escape is now the
+  only unresolved mixed fallback/direct piece.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
