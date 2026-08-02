@@ -29,6 +29,77 @@ private theorem scalePolyline_dropLast
       | cons next rest =>
           simp [scalePolyline]
 
+/-- A source-first refined prefix avoids an escaped outer fan around another
+axis-aligned discarded terminal segment.  The escaped route's radius-288
+rectangle bound replaces the ordinary radial route's smaller tube bound. -/
+theorem
+    retainedAngularFanSourceScaledPrefix_strictlyAvoids_outerEscapedCompleteRoute_of_axisAligned
+    {factor : Nat} (factorGreaterThanOne : 1 < factor)
+    (sourceRoute referenceRoute : List Cell)
+    (referenceTerminal : RetainedTerminalData)
+    (referenceSlot : RetainedTerminalSlot)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (referenceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector referenceRoute) =
+        some referenceTerminal)
+    (referenceEscapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength
+          (scaleRetainedTerminalData factor referenceTerminal))
+    (referenceAligned :
+      (⟨polylineLastEntrance referenceRoute,
+          referenceRoute.getLastD (0, 0)⟩ :
+        GridSegment).IsAxisAligned)
+    (sourceAvoids :
+      RoutesStrictlyAvoidEachOther
+        sourceRoute.dropLast
+        [polylineLastEntrance referenceRoute,
+          referenceRoute.getLastD (0, 0)]) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline retainedTerminalFanTotalRefinement
+        (scalePolyline factor sourceRoute)).dropLast
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          ((scalePolyline factor referenceRoute).getLastD (0, 0)))
+        (scaleRetainedTerminalData factor referenceTerminal)
+        referenceSlot) := by
+  let combinedFactor :=
+    retainedTerminalFanTotalRefinement * factor
+  let referenceSegment : GridSegment :=
+    ⟨polylineLastEntrance referenceRoute,
+      referenceRoute.getLastD (0, 0)⟩
+  have combinedPositive : 0 < combinedFactor := by
+    dsimp [combinedFactor]
+    exact Nat.mul_pos (by native_decide) (by omega)
+  have radiusLt : 288 < combinedFactor := by
+    dsimp [combinedFactor]
+    rw [retainedTerminalFanTotalRefinement_eq]
+    omega
+  have separated :=
+    routesStrictlyAvoidEachOther_scalePolyline_axisAlignedSegmentNeighborhood
+      (source := sourceRoute.dropLast)
+      (nearby :=
+        retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            ((scalePolyline factor referenceRoute).getLastD (0, 0)))
+          (scaleRetainedTerminalData factor referenceTerminal)
+          referenceSlot)
+      (reference := referenceSegment)
+      combinedPositive radiusLt
+      (by simpa [referenceSegment] using referenceAligned)
+      (by simpa [referenceSegment] using sourceAvoids)
+      (by
+        intro point pointMember
+        simpa [combinedFactor, referenceSegment] using
+          retainedTerminalFanOuterEscapedCompleteRoute_point_in_scaledFinalSegmentRectangle
+            referenceRoute referenceTerminal referenceSlot
+            referenceLength referenceClassified
+            referenceEscapeFits pointMember)
+  simpa [combinedFactor, scalePolyline_scalePolyline_nat,
+    scalePolyline, List.map_map, Function.comp_def,
+    Cell.scale_scale, Nat.cast_mul] using separated
+
 /-- An escaped retained source/fan splice strictly avoids every route in
 the radius-96 neighborhood of a scaled integral point, provided both its
 retained source prefix and discarded final segment avoid that point. -/

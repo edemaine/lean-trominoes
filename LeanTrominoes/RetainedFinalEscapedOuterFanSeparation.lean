@@ -19,6 +19,212 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 set_option maxHeartbeats 2000000
 
+/-- With distinct source heads and variable centers, retained planarity
+strictly separates an escaped outer fan from an ordinary outer fan. -/
+theorem
+    retainedFinalEscapedOuterCompleteRoute_strictlyAvoid_ordinary_of_distinctEndpoints_of_axisAligned
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈
+          PeriodicOrthocrossing.retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {factor : Nat} (factorPositive : 0 < factor)
+    (clearance :
+      2 * 288 <
+        retainedTerminalFanTotalRefinement * factor)
+    {firstRoute secondRoute : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondSource firstCenter secondCenter : Cell}
+    (firstMember :
+      (firstRoute, firstIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (secondRoute, secondIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headsDifferent : firstRoute.head? ≠ secondRoute.head?)
+    (firstHead : firstRoute.head? = some firstSource)
+    (secondHead : secondRoute.head? = some secondSource)
+    (firstLast : firstRoute.getLast? = some firstCenter)
+    (secondLast : secondRoute.getLast? = some secondCenter)
+    (firstSourceNeSecondCenter : firstSource ≠ secondCenter)
+    (secondSourceNeFirstCenter : secondSource ≠ firstCenter)
+    (centersDifferent : firstCenter ≠ secondCenter)
+    (firstAligned :
+      (⟨polylineLastEntrance firstRoute,
+          firstRoute.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
+    (secondAligned :
+      (⟨polylineLastEntrance secondRoute,
+          secondRoute.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (firstEscapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength
+          (scaleRetainedTerminalData factor firstTerminal)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          ((scalePolyline factor firstRoute).getLastD (0, 0)))
+        (scaleRetainedTerminalData factor firstTerminal)
+        firstSlot)
+      (retainedTerminalFanOuterCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          ((scalePolyline factor secondRoute).getLastD (0, 0)))
+        (scaleRetainedTerminalData factor secondTerminal)
+        secondSlot) := by
+  have headLastNe :
+      firstRoute.head? ≠ secondRoute.getLast? := by
+    rw [firstHead, secondLast]
+    exact fun equal =>
+      firstSourceNeSecondCenter (Option.some.inj equal)
+  have lastHeadNe :
+      firstRoute.getLast? ≠ secondRoute.head? := by
+    rw [firstLast, secondHead]
+    exact fun equal =>
+      secondSourceNeFirstCenter (Option.some.inj equal.symm)
+  have lastLastNe :
+      firstRoute.getLast? ≠ secondRoute.getLast? := by
+    rw [firstLast, secondLast]
+    exact fun equal =>
+      centersDifferent (Option.some.inj equal)
+  have rectanglesSeparated :=
+    PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawing_finalSegmentRectanglesSeparated_of_axisAligned
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent
+      headLastNe lastHeadNe lastLastNe
+      firstAligned secondAligned
+  exact
+    retainedTerminalFanOuterEscapedCompleteRoute_strictlyAvoid_ordinary_of_finalSegmentRectanglesSeparated
+      factorPositive clearance
+      firstRoute secondRoute firstTerminal secondTerminal
+      firstSlot secondSlot firstLength secondLength
+      firstClassified secondClassified
+      firstEscapeFits rectanglesSeparated
+
+/-- With distinct endpoint pairs, retained planarity also strictly separates
+two escaped outer fans. -/
+theorem
+    retainedFinalEscapedOuterCompleteRoutes_strictlyAvoid_of_distinctEndpoints_of_axisAligned
+    {Variable : Type*}
+    [variableDecidableEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈
+          PeriodicOrthocrossing.retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {factor : Nat} (factorPositive : 0 < factor)
+    (clearance :
+      2 * 288 <
+        retainedTerminalFanTotalRefinement * factor)
+    {firstRoute secondRoute : List Cell}
+    {firstIndex secondIndex : Nat}
+    {firstSource secondSource firstCenter secondCenter : Cell}
+    (firstMember :
+      (firstRoute, firstIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (secondMember :
+      (secondRoute, secondIndex) ∈
+        (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (indicesDifferent : firstIndex ≠ secondIndex)
+    (headsDifferent : firstRoute.head? ≠ secondRoute.head?)
+    (firstHead : firstRoute.head? = some firstSource)
+    (secondHead : secondRoute.head? = some secondSource)
+    (firstLast : firstRoute.getLast? = some firstCenter)
+    (secondLast : secondRoute.getLast? = some secondCenter)
+    (firstSourceNeSecondCenter : firstSource ≠ secondCenter)
+    (secondSourceNeFirstCenter : secondSource ≠ firstCenter)
+    (centersDifferent : firstCenter ≠ secondCenter)
+    (firstAligned :
+      (⟨polylineLastEntrance firstRoute,
+          firstRoute.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
+    (secondAligned :
+      (⟨polylineLastEntrance secondRoute,
+          secondRoute.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (firstEscapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength
+          (scaleRetainedTerminalData factor firstTerminal))
+    (secondEscapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength
+          (scaleRetainedTerminalData factor secondTerminal)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          ((scalePolyline factor firstRoute).getLastD (0, 0)))
+        (scaleRetainedTerminalData factor firstTerminal)
+        firstSlot)
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          ((scalePolyline factor secondRoute).getLastD (0, 0)))
+        (scaleRetainedTerminalData factor secondTerminal)
+        secondSlot) := by
+  have headLastNe :
+      firstRoute.head? ≠ secondRoute.getLast? := by
+    rw [firstHead, secondLast]
+    exact fun equal =>
+      firstSourceNeSecondCenter (Option.some.inj equal)
+  have lastHeadNe :
+      firstRoute.getLast? ≠ secondRoute.head? := by
+    rw [firstLast, secondHead]
+    exact fun equal =>
+      secondSourceNeFirstCenter (Option.some.inj equal.symm)
+  have lastLastNe :
+      firstRoute.getLast? ≠ secondRoute.getLast? := by
+    rw [firstLast, secondLast]
+    exact fun equal =>
+      centersDifferent (Option.some.inj equal)
+  have rectanglesSeparated :=
+    PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawing_finalSegmentRectanglesSeparated_of_axisAligned
+      formula wellFormed degree isLocal clausesNonempty
+      firstMember secondMember firstLength secondLength
+      indicesDifferent headsDifferent
+      headLastNe lastHeadNe lastLastNe
+      firstAligned secondAligned
+  exact
+    retainedTerminalFanOuterEscapedCompleteRoutes_strictlyAvoid_of_finalSegmentRectanglesSeparated
+      factorPositive clearance
+      firstRoute secondRoute firstTerminal secondTerminal
+      firstSlot secondSlot firstLength secondLength
+      firstClassified secondClassified
+      firstEscapeFits secondEscapeFits rectanglesSeparated
+
 /-- Shared clause heads do not obstruct escaped/ordinary outer-fan
 separation when the two retained source prefixes are not both singletons. -/
 theorem
