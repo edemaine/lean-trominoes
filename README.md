@@ -2120,6 +2120,13 @@ The representation choices for this target are:
   remains orthogonal, and is geometrically simple.  A total computable
   wrapper makes this operation available to the final incidence-route
   family without proof arguments in its definition.
+- [`LeanTrominoes/RetainedAngularFanFinalNormalizedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalNormalizedRouteFamily.lean)
+  applies the loop-erasure normalizer to every final coordinated incidence
+  route.  For every genuine incidence it proves that normalization preserves
+  both canonical endpoints and orthogonality, and that the resulting route
+  is geometrically simple (including vertex/interior and distinct-segment
+  interior avoidance).  It also packages the normalized routes in the
+  standard canonical orthogonal-family interface.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
