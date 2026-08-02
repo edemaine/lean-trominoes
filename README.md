@@ -2110,6 +2110,16 @@ The representation choices for this target are:
   implication-cycle index at the append boundary, and dispatches the four
   source/source, source/cycle, cycle/source, and cycle/cycle cases to their
   public separation theorems.
+- [`LeanTrominoes/OrthogonalPolylineLoopErasure.lean`](LeanTrominoes/OrthogonalPolylineLoopErasure.lean)
+  supplies the route-normalization layer needed before ribbon thickening.
+  Some coordinated collar routes are certified orthogonal walks but revisit
+  lattice points, so they are not simple as listed.  The normalizer first
+  inserts every unit axis step, regards the result as a walk in the unit-grid
+  graph, and applies Mathlib's verified loop bypass.  It proves that the
+  result preserves both endpoints, retains only source unit edges and points,
+  remains orthogonal, and is geometrically simple.  A total computable
+  wrapper makes this operation available to the final incidence-route
+  family without proof arguments in its definition.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
