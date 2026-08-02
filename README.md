@@ -2154,6 +2154,13 @@ The representation choices for this target are:
   halo route-point bounds.  Later stages can therefore normalize inherited
   routes without rebuilding their finite-presentation bookkeeping or halo
   estimates.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
+  applies that normalization at the final unit-free exact-one interface
+  consumed by the ribbon and 3DM reductions.  Every genuine route has its
+  canonical endpoints, is a geometrically simple unit-step path, and the
+  assembled drawing is orthogonal, endpoint-compatible, and integer-grid
+  planar.  It is also identified with drawing-level normalization of the
+  preceding coordinated exact-one drawing for later certificate transport.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,

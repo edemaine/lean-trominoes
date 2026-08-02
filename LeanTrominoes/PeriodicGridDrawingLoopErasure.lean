@@ -1,7 +1,7 @@
 import LeanTrominoes.OrthogonalPolylineLoopErasure
 import LeanTrominoes.OrthogonalPolylineUnitSubdivisionContacts
 import LeanTrominoes.PeriodicGridDrawingPointBounds
-import LeanTrominoes.PositionedPeriodicCNFIncidenceDrawing
+import LeanTrominoes.PositionedPeriodicCNFCanonicalOrthogonalRoutes
 
 /-!
 # Loop erasure for periodic grid drawings
@@ -78,6 +78,34 @@ theorem normalizeOrthogonalRoutes_routewise
   rcases List.mem_map.mp routeMember with
     ⟨sourceRoute, sourceMember, rfl⟩
   exact preserved sourceRoute sourceMember
+
+/-- Exact route endpoints, together with agreement between the route and
+edge counts, imply that every stored route is nonempty. -/
+theorem edgeRoutes_nonempty_of_routesMatch
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    {drawing : PeriodicGridDrawing}
+    (routesMatch : drawing.RoutesMatch graph)
+    (routeLength : drawing.edgeRoutes.length = graph.edges.length) :
+    ∀ route ∈ drawing.edgeRoutes, route ≠ [] := by
+  intro route routeMember routeEmpty
+  rcases List.mem_iff_getElem.mp routeMember with
+    ⟨routeIndex, routeIndexLt, routeAt⟩
+  have edgeIndexLt : routeIndex < graph.edges.length := by
+    rwa [← routeLength]
+  have taggedEdgeMember :
+      (graph.edges[routeIndex], routeIndex) ∈ graph.edges.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨edgeIndexLt, rfl⟩
+  have endpoints :=
+    routesMatch (graph.edges[routeIndex], routeIndex)
+      taggedEdgeMember
+  have routeLookup : drawing.edgeRoute routeIndex = route := by
+    unfold edgeRoute
+    rw [List.getD_eq_getElem _ _ routeIndexLt, routeAt]
+  rw [routeLookup, routeEmpty] at endpoints
+  simp at endpoints
 
 /-- Normalization preserves exact graph endpoints for an orthogonal drawing
 whose advertised routes are nonempty. -/
@@ -303,6 +331,154 @@ theorem incidenceDrawing_normalizeOrthogonalRoutes
   apply List.flatMap_congr
   intro taggedClause _
   simp only [List.map_map, Function.comp_def]
+
+/-- An incidence drawing with exact endpoints and orthogonal routes retains
+exact endpoints after normalization.  Its route count is supplied by the
+incidence-drawing construction itself. -/
+theorem routesMatch_incidenceDrawing_normalizeOrthogonalRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (routesMatch :
+      (incidenceDrawing source placement routes).RoutesMatch
+        source.erase.incidenceGraph)
+    (orthogonal :
+      (incidenceDrawing source placement routes).IsOrthogonal) :
+    (incidenceDrawing source placement routes).normalizeOrthogonalRoutes.RoutesMatch
+      source.erase.incidenceGraph := by
+  have routeLength := incidenceEdgeRoutes_length source routes
+  exact PeriodicGridDrawing.routesMatch_normalizeOrthogonalRoutes
+    source.erase.incidenceGraph
+    (incidenceDrawing source placement routes)
+    routesMatch routeLength orthogonal
+      (PeriodicGridDrawing.edgeRoutes_nonempty_of_routesMatch
+        routesMatch routeLength)
+
+/-- An orthogonal incidence drawing with exact endpoints remains orthogonal
+after normalization. -/
+theorem isOrthogonal_incidenceDrawing_normalizeOrthogonalRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (routesMatch :
+      (incidenceDrawing source placement routes).RoutesMatch
+        source.erase.incidenceGraph)
+    (orthogonal :
+      (incidenceDrawing source placement routes).IsOrthogonal) :
+    (incidenceDrawing source placement routes).normalizeOrthogonalRoutes.IsOrthogonal := by
+  have routeLength := incidenceEdgeRoutes_length source routes
+  exact PeriodicGridDrawing.isOrthogonal_normalizeOrthogonalRoutes
+    (incidenceDrawing source placement routes) orthogonal
+      (PeriodicGridDrawing.edgeRoutes_nonempty_of_routesMatch
+        routesMatch routeLength)
+
+namespace CanonicalOrthogonalIncidenceRoutes
+
+/-- A genuine canonical route is nonempty because its head is an advertised
+clause endpoint. -/
+theorem route_ne_nil
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (family : CanonicalOrthogonalIncidenceRoutes source placement)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    family.routes clauseIndex literalIndex ≠ [] := by
+  intro routeEmpty
+  have endpoints :=
+    family.endpoints clause clauseIndex clauseMember
+      literal literalIndex literalMember
+  simp [routeEmpty] at endpoints
+
+/-- Canonical endpoint and orthogonality certificates survive pointwise loop
+erasure. -/
+def normalize
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (family : CanonicalOrthogonalIncidenceRoutes source placement) :
+    CanonicalOrthogonalIncidenceRoutes source placement where
+  routes := normalizeOrthogonalIncidenceRoutes family.routes
+  endpoints := by
+    intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    have nonempty :=
+      family.route_ne_nil clauseMember literalMember
+    have orthogonal :=
+      family.orthogonal clause clauseIndex clauseMember
+        literal literalIndex literalMember
+    have endpoints :=
+      family.endpoints clause clauseIndex clauseMember
+        literal literalIndex literalMember
+    constructor
+    · simpa only [normalizeOrthogonalIncidenceRoutes,
+        AxisDirection.normalizeOrthogonalPolyline_head?
+          nonempty orthogonal] using endpoints.1
+    · simpa only [normalizeOrthogonalIncidenceRoutes,
+        AxisDirection.normalizeOrthogonalPolyline_getLast?
+          nonempty orthogonal] using endpoints.2
+  orthogonal := by
+    intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    exact
+      AxisDirection.normalizeOrthogonalPolyline_orthogonal
+        (family.route_ne_nil clauseMember literalMember)
+        (family.orthogonal clause clauseIndex clauseMember
+          literal literalIndex literalMember)
+
+/-- Every genuine route in a normalized canonical family consists of unit
+axis steps. -/
+theorem normalize_unitSteps
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (family : CanonicalOrthogonalIncidenceRoutes source placement)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ((family.normalize).routes clauseIndex literalIndex).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  exact AxisDirection.normalizeOrthogonalPolyline_unitSteps
+    (family.route_ne_nil clauseMember literalMember)
+    (family.orthogonal clause clauseIndex clauseMember
+      literal literalIndex literalMember)
+
+/-- Every genuine route in a normalized canonical family is geometrically
+simple. -/
+theorem normalize_routeIsSimple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (family : CanonicalOrthogonalIncidenceRoutes source placement)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    LocalIncidenceDrawing.RouteIsSimple
+      ((family.normalize).routes clauseIndex literalIndex) := by
+  exact AxisDirection.normalizeOrthogonalPolyline_isSimple
+    (family.route_ne_nil clauseMember literalMember)
+    (family.orthogonal clause clauseIndex clauseMember
+      literal literalIndex literalMember)
+
+end CanonicalOrthogonalIncidenceRoutes
 
 end PositionedPeriodicCNF
 end LeanTrominoes
