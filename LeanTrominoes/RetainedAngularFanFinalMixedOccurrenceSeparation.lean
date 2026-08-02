@@ -126,11 +126,12 @@ theorem
       choiceLookup fallbackChoiceNone clauseIndicesDifferent
       directFinalOblique
 
-/-- A routed-clause direct occurrence strictly avoids a same-center
-cross-clause fallback occurrence.  Flat-component reduction handles its wide
-escape, while the ordinary corridor handles its post-escape tail. -/
+/-- A routed-clause direct occurrence strictly avoids a cross-clause fallback
+occurrence once its complete atlas route avoids the selected fallback outer
+replacement.  Flat-component reduction handles its wide escape, while the
+ordinary corridor handles its post-escape tail. -/
 theorem
-    retainedFinalCoordinatedRoutedClauseDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence
+    retainedFinalCoordinatedRoutedClauseDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_outer
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (sourceLocal : formula.IsLocal)
@@ -168,13 +169,15 @@ theorem
           formula fallbackClauseIndex fallbackLiteralIndex = none)
     (clauseIndicesDifferent :
       directClauseIndex ≠ fallbackClauseIndex)
-    (centersEqual :
-      PositionedPeriodicCNF.canonicalLiteralPosition
-          (finalCoordinatedPlacement formula)
-          directClause directLiteral =
-        PositionedPeriodicCNF.canonicalLiteralPosition
-          (finalCoordinatedPlacement formula)
-          fallbackClause fallbackLiteral) :
+    (outerAvoid :
+      let directSlot :=
+        retainedFinalCoordinatedOccurrenceSlot
+          formula directLiteral directClauseIndex directLiteralIndex
+      RoutesStrictlyAvoidEachOther
+        (choice.completeRoute directSlot)
+        (retainedFinalCoordinatedFallbackOuterReplacement
+          formula fallbackLiteral
+          fallbackClauseIndex fallbackLiteralIndex)) :
     let source :=
       (finalCoordinatedSource formula).scale
         retainedAngularFanSourceClearanceFactor
@@ -416,14 +419,119 @@ theorem
     simpa only [retainedAngularFanSourceClearanceFactor,
       Nat.cast_ofNat] using rawPrefixAvoid.symm
   exact
-    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_sourcePrefix_sameCenter
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_sourcePrefix_outer
       formula sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty choice
       directClauseMember fallbackClauseMember
       directLiteralMember fallbackLiteralMember
       choiceLookup fallbackChoiceNone clauseIndicesDifferent
-      centersEqual
       (by simpa [fallbackRoute, routes] using sourcePrefixAvoid)
+      outerAvoid
+
+/-- A routed-clause direct occurrence strictly avoids a same-center
+cross-clause fallback occurrence. -/
+theorem
+    retainedFinalCoordinatedRoutedClauseDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (kindEq : choice.kind = RetainedDirectClauseKind.routedClause)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (clauseIndicesDifferent :
+      directClauseIndex ≠ fallbackClauseIndex)
+    (centersEqual :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral =
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          fallbackClause fallbackLiteral) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let fallbackSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement
+          (angularOccurrenceOrder source.erase routes)
+          (fallbackClause.scale retainedAngularFanSourceClearanceFactor)
+          fallbackLiteral fallbackClauseIndex fallbackLiteralIndex)
+    RoutesStrictlyAvoidEachOther
+      (retainedFinalCoordinatedDirectOccurrenceRoute
+        formula choice
+        (directClause.scale retainedAngularFanSourceClearanceFactor)
+        directLiteral directClauseIndex directLiteralIndex)
+      (joinAtEndpoint
+        (retainedFinalCoordinatedFallbackBoundaryPrefix
+          formula fallbackLiteral
+          fallbackClauseIndex fallbackLiteralIndex)
+        fallbackSuffix) := by
+  apply
+    retainedFinalCoordinatedRoutedClauseDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_outer
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember
+      choiceLookup kindEq fallbackChoiceNone clauseIndicesDifferent
+  exact
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackOuterReplacement_of_order
+      formula fallbackLiteral fallbackClauseIndex fallbackLiteralIndex choice
+      (retainedFinalCoordinatedOccurrenceSlot
+        formula directLiteral directClauseIndex directLiteralIndex)
+      (retainedFinalDirectFallback_strictAngularOrderCompatible_of_sameCenter
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember
+        choiceLookup fallbackChoiceNone
+        clauseIndicesDifferent centersEqual)
+      (retainedFinalDirectFallback_positionedFanCenters_eq_of_sameCenter
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember
+        choiceLookup centersEqual)
+      (finalCoordinatedSourceRoute_terminal_length_positive
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty fallbackClauseMember fallbackLiteralMember)
+      (finalCoordinatedScaledSourceRoute_escapeStrict
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty fallbackClauseMember fallbackLiteralMember)
 
 /-- Every successful direct occurrence strictly avoids a same-center
 cross-clause fallback occurrence in the final coordinated drawing. -/

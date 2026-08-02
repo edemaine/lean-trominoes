@@ -2071,10 +2071,12 @@ The representation choices for this target are:
   the specialized inward carrier-boundary escape, and ordinary corridor
   control of the remaining tail.  These cases yield unconditional
   same-center cross-clause direct/fallback separation for every successful
-  direct choice.
+  direct choice.  Its routed-clause argument is factored through an abstract
+  selected-outer-route certificate, so the same wide-prefix reduction also
+  applies away from a shared variable center.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedDistinctCenterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedDistinctCenterSeparation.lean)
-  completes the complementary distinct-center mixed proof for non-routed
-  direct choices.  When the selected
+  completes the complementary distinct-center mixed proof for every direct
+  choice.  When the selected
   direct source segment is axis-aligned, failure of the other selector makes
   its source segment axis-aligned as well.  Distinct clause heads, distinct
   literal centers, and retained source compatibility then separate the two
@@ -2084,13 +2086,14 @@ The representation choices for this target are:
   contact geometry, and the finite equality-lens certificate separate the
   terminal rectangles; the certificate's equal-endpoint alternative
   contradicts the distinct canonical literal centers.  The aligned and
-  oblique branches are combined into one unconditional complete-occurrence
-  theorem.
+  oblique branches are combined, while routed-clause choices reuse their
+  specialized wide-prefix reduction with rectangle-separated outer fans.
+  The result is one unconditional complete-occurrence theorem.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean)
   identifies the selected fallback boundary join and direct occurrence with
-  their total route-family lookups.  The same-center mixed theorem, including
-  routed-clause direct choices, is therefore available at the public
-  interface in both route orders.
+  their total route-family lookups.  The same- and distinct-center theorems,
+  including routed-clause direct choices, are therefore combined at the
+  public interface in both route orders with no center hypothesis.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
