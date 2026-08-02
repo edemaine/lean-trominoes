@@ -2078,6 +2078,13 @@ The representation choices for this target are:
   an endpoint-join bridge combines this exceptional-escape certificate with
   the already-controlled post-escape tail to clear the selected complete
   direct route.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean)
+  packages the structural endpoint-join step for a mixed cross-clause pair.
+  Four strict certificates between the coordinated direct prefix and suffix
+  and an arbitrary fallback prefix and suffix now imply strict separation of
+  the two complete occurrence routes; the validated direct boundary equation
+  discharges its join automatically, and a symmetric wrapper exposes either
+  route orientation.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
