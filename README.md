@@ -1952,6 +1952,11 @@ The representation choices for this target are:
   corollary also transfers strict separation of the canonical rasterized
   escaped route to any coordinated escape, leaving only that replacement
   escape's interaction with the other complete route to check.
+- [`LeanTrominoes/RetainedAngularFanDirectFallbackOuterReduction.lean`](LeanTrominoes/RetainedAngularFanDirectFallbackOuterReduction.lean)
+  specializes escape replacement to the finite direct-source atlas.  Under
+  strict common-center angular order, both ordinary and delayed-lane
+  fallback cases reduce complete outer-route separation to the selected
+  direct escape versus the fallback complete route.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
