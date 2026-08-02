@@ -26,6 +26,56 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 set_option maxHeartbeats 4000000
 
+/-- After the final common refinement, a direct source route's radius-288
+rectangle is separated from the radius-96 neighborhood of every lattice
+point outside its original endpoint rectangle. -/
+theorem
+    retainedDirectSource_scaledSourceRectangle_separated_pointSpokeRectangle
+    (choice : RetainedDirectSourceRouteChoice)
+    {point : Cell}
+    (outside :
+      ¬InClosedGridRectangle
+        choice.sourceSegment.coordinateLower
+        choice.sourceSegment.coordinateUpper
+        point) :
+    ClosedGridRectanglesSeparated
+      (coordinateRadiusLower 288
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          choice.sourceSegment.coordinateLower))
+      (coordinateRadiusUpper 288
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          choice.sourceSegment.coordinateUpper))
+      (coordinateRadiusLower 96
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          point))
+      (coordinateRadiusUpper 96
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          point)) := by
+  have separated :=
+    ClosedGridRectanglesSeparated.scale_both_coordinateRadius
+      (GridSegment.coordinateRectangle_separated_point_of_not_in
+        (segment := choice.sourceSegment) outside)
+      (factor := retainedTerminalFanTotalRefinement * 4)
+      (radius := 288)
+      (by native_decide)
+      (by native_decide)
+  norm_num [retainedTerminalFanTotalRefinement,
+    PeriodicEightOccurrenceSplitPositioned.refinementScale,
+    retainedTerminalFanRoutingRefinement] at separated ⊢
+  simp only [ClosedGridRectanglesSeparated,
+    coordinateRadiusLower, coordinateRadiusUpper,
+    Cell.scale] at separated ⊢
+  rcases separated with
+      forwardX | backwardX | forwardY | backwardY
+  · exact Or.inl (by omega)
+  · exact Or.inr (Or.inl (by omega))
+  · exact Or.inr (Or.inr (Or.inl (by omega)))
+  · exact Or.inr (Or.inr (Or.inr (by omega)))
+
 /-- A successful direct occurrence's coordinated prefix strictly avoids
 the Figure 7 suffix of an incidence in another clause at the same canonical
 variable center. -/
@@ -246,6 +296,127 @@ theorem
       (choice.completeRoute firstSlot) secondSuffix
   rw [← spokeEq]
   exact localSeparated
+
+/-- A successful direct occurrence's coordinated prefix strictly avoids
+another occurrence's Figure 7 suffix whenever that occurrence's canonical
+center lies outside the direct source segment's endpoint rectangle. -/
+theorem
+    retainedFinalCoordinatedDirectOccurrencePrefix_strictlyAvoids_occurrenceSuffix_of_centerOutside
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (choice : RetainedDirectSourceRouteChoice)
+    {secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {secondClauseIndex : Nat}
+    {secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {secondLiteralIndex : Nat}
+    (firstSlot : RetainedTerminalSlot)
+    (centerOutside :
+      ¬InClosedGridRectangle
+        choice.sourceSegment.coordinateLower
+        choice.sourceSegment.coordinateUpper
+        (PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          secondClause secondLiteral)) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let secondSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement
+          (angularOccurrenceOrder source.erase routes)
+          (secondClause.scale retainedAngularFanSourceClearanceFactor)
+          secondLiteral secondClauseIndex secondLiteralIndex)
+    RoutesStrictlyAvoidEachOther
+      (choice.completeRoute firstSlot)
+      secondSuffix := by
+  dsimp only
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let order := angularOccurrenceOrder source.erase routes
+  let secondScaledClause :=
+    secondClause.scale retainedAngularFanSourceClearanceFactor
+  let secondCenter :=
+    PositionedPeriodicCNF.canonicalLiteralPosition
+      (finalCoordinatedPlacement formula)
+      secondClause secondLiteral
+  let secondSuffix :=
+    scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement order
+        secondScaledClause secondLiteral
+        secondClauseIndex secondLiteralIndex)
+  apply
+    routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles
+      (firstLower :=
+        coordinateRadiusLower 288
+          (Cell.scale
+            (retainedTerminalFanTotalRefinement * 4)
+            choice.sourceSegment.coordinateLower))
+      (firstUpper :=
+        coordinateRadiusUpper 288
+          (Cell.scale
+            (retainedTerminalFanTotalRefinement * 4)
+            choice.sourceSegment.coordinateUpper))
+      (secondLower :=
+        coordinateRadiusLower 96
+          (Cell.scale
+            (retainedTerminalFanTotalRefinement * 4)
+            secondCenter))
+      (secondUpper :=
+        coordinateRadiusUpper 96
+          (Cell.scale
+            (retainedTerminalFanTotalRefinement * 4)
+            secondCenter))
+  · intro point pointMember
+    exact choice.completeRoute_point_in_sourceSegmentRectangle
+      firstSlot pointMember
+  · intro point pointMember
+    change point ∈ secondSuffix at pointMember
+    have bounded :=
+      scaledAngularOccurrenceSuffix_point_in_centerRectangle
+        placement order secondScaledClause secondLiteral
+        secondClauseIndex secondLiteralIndex
+        pointMember
+    have suffixCenterEq :
+        Cell.scale
+            (retainedTerminalFanRoutingRefinement *
+              PeriodicEightOccurrenceSplitPositioned.refinementScale)
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              placement secondScaledClause secondLiteral) =
+          Cell.scale
+            (retainedTerminalFanTotalRefinement * 4)
+            secondCenter := by
+      dsimp only [placement, secondScaledClause, secondCenter]
+      rw [
+        PositionedPeriodicCNF.CanonicalRetainedRayIncidenceRoutes.canonicalLiteralPosition_scale,
+        Cell.scale_scale]
+      norm_num [retainedTerminalFanTotalRefinement_eq,
+        retainedTerminalFanRoutingRefinement,
+        retainedAngularFanSourceClearanceFactor,
+        PeriodicEightOccurrenceSplitPositioned.refinementScale]
+    rw [suffixCenterEq] at bounded
+    exact bounded
+  · exact
+      retainedDirectSource_scaledSourceRectangle_separated_pointSpokeRectangle
+        choice
+        (by simpa [secondCenter] using centerOutside)
 
 end PeriodicOrthocrossing
 end LeanTrominoes
