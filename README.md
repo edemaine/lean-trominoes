@@ -2103,6 +2103,12 @@ The representation choices for this target are:
   ordinary splice.  Existing shared-center and distinct-center geometry is
   combined with orthogonal rasterization to prove that this selected prefix
   avoids every other final clause's Figure 7 occurrence suffix.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedBoundaryAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedBoundaryAssembly.lean)
+  mirrors that fallback selection for the outer replacement and lifts the
+  two-piece boundary assembly theorem to the final router.  Thus a route
+  avoids the selected rasterized fallback boundary once it avoids the fully
+  refined retained source prefix and the selected ordinary or delayed-lane
+  outer replacement.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly

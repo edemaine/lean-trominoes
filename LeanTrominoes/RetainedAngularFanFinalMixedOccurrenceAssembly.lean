@@ -1,6 +1,5 @@
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceOtherSpokeSeparation
-import LeanTrominoes.RetainedAngularFanMixedBoundaryAssembly
-import LeanTrominoes.RetainedAngularFanFinalMixedFallbackSuffixSeparation
+import LeanTrominoes.RetainedAngularFanFinalMixedBoundaryAssembly
 
 /-!
 # Mixed direct/fallback occurrence-route assembly
