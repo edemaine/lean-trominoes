@@ -2127,7 +2127,9 @@ The representation choices for this target are:
   genuine fallback route of the same atom.  Their coordinated slots and
   classified terminal-direction ranks increase in the same orientation,
   supplying the exact order premise for the remaining overlapping local-fan
-  certificate.
+  certificate.  A final wrapper derives the required atom equality and
+  occurrence distinction directly from a shared canonical variable center
+  and different source-clause indices.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly

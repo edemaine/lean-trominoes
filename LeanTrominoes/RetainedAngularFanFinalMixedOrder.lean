@@ -1,4 +1,4 @@
-import LeanTrominoes.RetainedAngularFanFinalDirectSourceCrossClauseOrder
+import LeanTrominoes.RetainedAngularFanFinalDirectSourceSharedTargetData
 
 /-!
 # Angular order of final direct/fallback pairs
@@ -279,6 +279,81 @@ theorem retainedFinalDirectFallback_angularOrderCompatible
         by
           simpa [fallbackTerminal, scaleRetainedTerminalData] using
             directionsLe⟩
+
+/-- Equality of the canonical final variable centers supplies the atom
+equality required by the mixed angular-order theorem. -/
+theorem
+    retainedFinalDirectFallback_angularOrderCompatible_of_sameCenter
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex =
+        some choice)
+    (clauseIndicesDifferent :
+      directClauseIndex ≠ fallbackClauseIndex)
+    (centersEqual :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral =
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          fallbackClause fallbackLiteral) :
+    let fallbackDirection :=
+      (classifiedRetainedTerminalData
+        (routeTerminalVector
+          (finalCoordinatedSourceRoutes
+            formula fallbackClauseIndex fallbackLiteralIndex))).1
+    let directSlot :=
+      retainedFinalCoordinatedOccurrenceSlot
+        formula directLiteral directClauseIndex directLiteralIndex
+    let fallbackSlot :=
+      retainedFinalCoordinatedOccurrenceSlot
+        formula fallbackLiteral fallbackClauseIndex fallbackLiteralIndex
+    RetainedDirectSourceRouteChoice.FallbackAngularOrderCompatible
+      choice fallbackDirection directSlot fallbackSlot := by
+  have atomsEqual :
+      directLiteral.atom = fallbackLiteral.atom :=
+    retainedFinalCanonicalLiteralPositions_eq_imp_atoms_eq
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember centersEqual
+  apply
+    retainedFinalDirectFallback_angularOrderCompatible
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember
+      choiceLookup atomsEqual
+  intro occurrencesEqual
+  apply clauseIndicesDifferent
+  exact congrArg Prod.fst occurrencesEqual
 
 end PeriodicOrthocrossing
 end LeanTrominoes
