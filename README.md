@@ -2178,6 +2178,17 @@ The representation choices for this target are:
   its variable endpoint is isolated after unit subdivision.  The remaining
   work is to exclude that endpoint from the prefixes joined ahead of the
   terminal spoke.
+- [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionTranslation.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionTranslation.lean)
+  proves that translating an integral orthogonal polyline commutes with its
+  ordered unit subdivision.  Injectivity of translation then transports a
+  local final-endpoint-isolation certificate to every positioned copy.
+- [`LeanTrominoes/RetainedAngularFanDirectOccurrenceEndpointIsolation.lean`](LeanTrominoes/RetainedAngularFanDirectOccurrenceEndpointIsolation.lean)
+  checks the complete finite atlas of coordinated direct-source routes and
+  all eight Figure 7 terminal spokes.  Although some collar walks revisit
+  interior points, none revisits its final variable endpoint; translation
+  lifts this exact property to every positioned direct route choice.  The
+  fallback branches remain to be treated before the final inherited route
+  family can preserve its variable occurrence orders through loop erasure.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its

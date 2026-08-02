@@ -478,6 +478,46 @@ theorem lastNotInDropLast_of_nodup
   exact
     (List.nodup_concat points.dropLast last).mp concatenated |>.1
 
+/-- A list has an isolated final endpoint when its computed final point is
+absent from the preceding list. -/
+theorem lastNotInDropLast_of_getLastD_not_mem
+    {points : List Cell}
+    (fresh : points.getLastD (0, 0) ∉ points.dropLast) :
+    LastNotInDropLast points := by
+  intro last lastLookup
+  have lastEqual : points.getLastD (0, 0) = last := by
+    simp [List.getLastD_eq_getLast?, lastLookup]
+  rw [lastEqual] at fresh
+  exact fresh
+
+/-- An injective point map preserves isolation of the final endpoint. -/
+theorem LastNotInDropLast.map_of_injective
+    {points : List Cell}
+    {transform : Cell → Cell}
+    (fresh : LastNotInDropLast points)
+    (injective : Function.Injective transform) :
+    LastNotInDropLast (points.map transform) := by
+  intro mappedLast mappedLastLookup mappedMember
+  have pointsNonempty : points ≠ [] := by
+    intro pointsEmpty
+    simp [pointsEmpty] at mappedLastLookup
+  let originalLast := points.getLast pointsNonempty
+  have originalLastLookup :
+      points.getLast? = some originalLast :=
+    List.getLast?_eq_some_getLast pointsNonempty
+  have mappedLastEqual :
+      transform originalLast = mappedLast := by
+    simpa [List.getLast?_map, originalLastLookup]
+      using mappedLastLookup
+  rw [← List.map_dropLast] at mappedMember
+  rcases List.mem_map.mp mappedMember with
+    ⟨original, originalMember, originalMapped⟩
+  apply fresh originalLast originalLastLookup
+  have originalEqual : original = originalLast := by
+    apply injective
+    exact originalMapped.trans mappedLastEqual.symm
+  simpa [originalEqual] using originalMember
+
 /-- A simple orthogonal route has an isolated first endpoint even after all
 of its long segments are subdivided into unit steps. -/
 theorem headNotInTail_unitSubdividePolyline_of_simple
