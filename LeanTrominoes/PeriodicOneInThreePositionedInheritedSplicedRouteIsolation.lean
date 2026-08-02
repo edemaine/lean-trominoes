@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOneInThreePositionedInheritedRouteFamilyIsolation
+import LeanTrominoes.PeriodicOneInThreePositionedAuxiliaryRouteIsolation
 import LeanTrominoes.PositionedPeriodicCNFLocalRouteSplicingEndpointDirections
 
 /-!
@@ -595,6 +596,81 @@ theorem splicedRoutes_lastNotInDropLast_of_inherited
   simpa [splicedRoutes,
     PositionedPeriodicCNF.spliceLocalIncidenceRoutes,
     completeRoutesEqual, inherited, suffix] using joined
+
+/-- Every genuine complete Figure 9 route, whether inherited or auxiliary,
+has an isolated final endpoint after unit subdivision. -/
+theorem splicedRoutes_lastNotInDropLast
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (sourceEndpoints :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          (sourceRoutes sourceClauseIndex sourceLiteralIndex).head? =
+              some
+                (PositionedPeriodicCNF.canonicalClausePosition
+                  sourcePlacement sourceClause) ∧
+            (sourceRoutes sourceClauseIndex sourceLiteralIndex).getLast? =
+              some
+                (PositionedPeriodicCNF.canonicalLiteralPosition
+                  sourcePlacement sourceClause sourceLiteral))
+    (sourceOrthogonal :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (sourceRoutes sourceClauseIndex sourceLiteralIndex))
+    (sourceLength :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          2 ≤ (sourceRoutes sourceClauseIndex sourceLiteralIndex).length)
+    (sourceSimple :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          LocalIncidenceDrawing.RouteIsSimple
+            (sourceRoutes sourceClauseIndex sourceLiteralIndex))
+    {clause : PositionedPeriodicClause (OneInThreeVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ (formula source).clauses.zipIdx)
+    {literal : PeriodicLiteral (OneInThreeVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    AxisDirection.LastNotInDropLast
+      (AxisDirection.unitSubdividePolyline
+        (splicedRoutes source sourcePlacement
+          (inheritedRouteSuffixes source sourcePlacement
+            sourceWidth sourceDistinct sourceRoutes
+            sourceEndpoints sourceOrthogonal)
+          clauseIndex literalIndex)) := by
+  rcases atomEqual : literal.atom with sourceAtom | auxiliary
+  · exact splicedRoutes_lastNotInDropLast_of_inherited
+      source sourcePlacement sourceWidth sourceDistinct
+      sourceRoutes sourceEndpoints sourceOrthogonal
+      sourceLength sourceSimple clauseMember literalMember
+      sourceAtom atomEqual
+  · exact
+      (splicedRoutes_endpointIsolation_of_auxiliary
+        source sourcePlacement sourceWidth sourceDistinct
+        (inheritedRouteSuffixes source sourcePlacement
+          sourceWidth sourceDistinct sourceRoutes
+          sourceEndpoints sourceOrthogonal)
+        clauseMember literalMember auxiliary atomEqual).2
 
 end PeriodicOneInThreePositioned
 end LeanTrominoes

@@ -469,7 +469,9 @@ The representation choices for this target are:
   clause-to-boundary segment and proves that this segment misses the refined
   source lattice.  Consequently the normalized local prefix misses the final
   canonical literal endpoint, and joining it to any isolated inherited
-  suffix preserves final-endpoint isolation for the complete route.
+  suffix preserves final-endpoint isolation for the complete route.  A final
+  inherited/auxiliary classification proves this property for every genuine
+  Figure 9 incidence.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -2691,8 +2693,9 @@ The representation choices for this target are:
   loops while preserving the coordinated clockwise route order.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeInheritedRouteIsolation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeInheritedRouteIsolation.lean)
   instantiates the generic connector theorem with the normalized retained
-  fixed-eight source family.  Every genuine inherited Figure 9 suffix now
-  has an isolated variable endpoint after unit subdivision.
+  fixed-eight source family.  Every genuine inherited Figure 9 suffix and
+  every complete raw Figure 9 route now has an isolated variable endpoint
+  after unit subdivision.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean)
   transports the coordinated raw Figure 9 formula, placement, and routes
   through the exact-one variable wrapper.  The wrapper changes no geometry
