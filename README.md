@@ -2213,7 +2213,10 @@ The representation choices for this target are:
   witness discharges those positioning obligations automatically.  Finally,
   an endpoint-join bridge combines this exceptional-escape certificate with
   the already-controlled post-escape tail to clear the selected complete
-  direct route.
+  direct route.  A finite atlas check also proves that every routed-clause
+  source segment is oblique, and translation preserves this fact for every
+  positioned routed-clause choice; the exceptional escape therefore belongs
+  entirely to the oblique mixed branch.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean)
   packages the structural endpoint-join step for a mixed cross-clause pair.
   Four strict certificates between the coordinated direct prefix and suffix

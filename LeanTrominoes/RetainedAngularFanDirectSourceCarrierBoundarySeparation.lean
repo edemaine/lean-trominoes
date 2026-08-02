@@ -93,6 +93,43 @@ theorem
         kind = RetainedDirectClauseKind.routedClause := by
   native_decide
 
+/-- Every routed-clause atlas incidence is genuinely oblique.  Thus the
+exceptional wide escape never overlaps the aligned direct-source branch. -/
+theorem retainedDirectRoutedClauseLocalSegment_not_axisAligned :
+    ∀ (index :
+        Fin
+          (retainedDirectSourcePrefixChoices
+            RetainedDirectClauseKind.routedClause).length),
+      ¬(⟨(retainedDirectSourceLocalRouteAt
+              RetainedDirectClauseKind.routedClause index).headD (0, 0),
+            (retainedDirectSourceLocalRouteAt
+              RetainedDirectClauseKind.routedClause index).getLastD
+                (0, 0)⟩ : GridSegment).IsAxisAligned := by
+  native_decide
+
+/-- A positioned choice of routed-clause kind retains that obliqueness. -/
+theorem RetainedDirectSourceRouteChoice.sourceSegment_not_axisAligned_of_kind_eq_routedClause
+    (choice : RetainedDirectSourceRouteChoice)
+    (kindEq : choice.kind = RetainedDirectClauseKind.routedClause) :
+    ¬choice.sourceSegment.IsAxisAligned := by
+  rcases choice with ⟨origin, kind, index⟩
+  change kind = RetainedDirectClauseKind.routedClause at kindEq
+  subst kind
+  let localSegment : GridSegment :=
+    ⟨(retainedDirectSourceLocalRouteAt
+        RetainedDirectClauseKind.routedClause index).headD (0, 0),
+      (retainedDirectSourceLocalRouteAt
+        RetainedDirectClauseKind.routedClause index).getLastD (0, 0)⟩
+  have localOblique :=
+    retainedDirectRoutedClauseLocalSegment_not_axisAligned index
+  intro positionedAligned
+  apply localOblique
+  exact
+    (GridSegment.isAxisAligned_translate localSegment origin).mp
+      (by
+        simpa [RetainedDirectSourceRouteChoice.sourceSegment,
+          localSegment, GridSegment.translate] using positionedAligned)
+
 /-- All three routed-clause local incidences start at their common clause
 point. -/
 theorem retainedDirectRoutedClauseLocalRouteAt_head? :
