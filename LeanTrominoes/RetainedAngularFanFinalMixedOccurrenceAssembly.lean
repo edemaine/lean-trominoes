@@ -1,5 +1,6 @@
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceOtherSpokeSeparation
 import LeanTrominoes.RetainedAngularFanMixedBoundaryAssembly
+import LeanTrominoes.RetainedAngularFanFinalMixedFallbackSuffixSeparation
 
 /-!
 # Mixed direct/fallback occurrence-route assembly
@@ -328,6 +329,154 @@ theorem
       fallbackPrefixLast fallbackSuffixHead
       directPrefixAvoidFallbackPrefix directPrefixAvoidFallbackSuffix
       directSuffixAvoidFallbackPrefix suffixesAvoid
+
+/-- A complete mixed cross-clause occurrence pair reduces to one geometric
+premise: the coordinated direct prefix must avoid the boundary prefix
+selected by the failed fallback lookup.  All joins and every Figure 7
+suffix interaction are discharged here. -/
+theorem
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_prefix
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula firstClauseIndex firstLiteralIndex =
+        some choice)
+    (secondChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula secondClauseIndex secondLiteralIndex = none)
+    (clauseIndicesDifferent :
+      firstClauseIndex ≠ secondClauseIndex)
+    (directPrefixAvoidFallbackPrefix :
+      let firstSlot :=
+        retainedFinalCoordinatedOccurrenceSlot
+          formula firstLiteral firstClauseIndex firstLiteralIndex
+      RoutesStrictlyAvoidEachOther
+        (choice.completeRoute firstSlot)
+        (retainedFinalCoordinatedFallbackBoundaryPrefix
+          formula secondLiteral
+          secondClauseIndex secondLiteralIndex)) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let secondSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement
+          (angularOccurrenceOrder source.erase routes)
+          (secondClause.scale retainedAngularFanSourceClearanceFactor)
+          secondLiteral secondClauseIndex secondLiteralIndex)
+    RoutesStrictlyAvoidEachOther
+      (retainedFinalCoordinatedDirectOccurrenceRoute
+        formula choice
+        (firstClause.scale retainedAngularFanSourceClearanceFactor)
+        firstLiteral firstClauseIndex firstLiteralIndex)
+      (joinAtEndpoint
+        (retainedFinalCoordinatedFallbackBoundaryPrefix
+          formula secondLiteral
+          secondClauseIndex secondLiteralIndex)
+        secondSuffix) := by
+  dsimp only
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let routes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes formula)
+  let order := angularOccurrenceOrder source.erase routes
+  let fallbackPrefix :=
+    retainedFinalCoordinatedFallbackBoundaryPrefix
+      formula secondLiteral secondClauseIndex secondLiteralIndex
+  let secondSuffix :=
+    scalePolyline retainedTerminalFanRoutingRefinement
+      (angularOccurrenceSuffix placement order
+        (secondClause.scale retainedAngularFanSourceClearanceFactor)
+        secondLiteral secondClauseIndex secondLiteralIndex)
+  let fallbackBoundary :=
+    Cell.scale retainedTerminalFanRoutingRefinement
+      (angularFanBoundaryPositionAt
+        placement secondLiteral.atom
+        (incidenceRelativeOffset
+          (secondClause.scale retainedAngularFanSourceClearanceFactor)
+          secondLiteral)
+        (angularOccurrenceIndex order
+          secondLiteral secondClauseIndex secondLiteralIndex))
+  have fallbackJoin :
+      fallbackPrefix.getLast? = secondSuffix.head? := by
+    simpa [source, placement, routes, order,
+      fallbackPrefix, secondSuffix] using
+      retainedFinalCoordinatedFallbackBoundaryPrefix_boundary
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
+  have secondSuffixHead :
+      secondSuffix.head? = some fallbackBoundary := by
+    simp [secondSuffix, fallbackBoundary, scalePolyline]
+  have fallbackPrefixLast :
+      fallbackPrefix.getLast? = some fallbackBoundary :=
+    fallbackJoin.trans secondSuffixHead
+  have directSuffixAvoidFallbackPrefix :
+      let firstSuffix :=
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix placement order
+            (firstClause.scale retainedAngularFanSourceClearanceFactor)
+            firstLiteral firstClauseIndex firstLiteralIndex)
+      RoutesStrictlyAvoidEachOther firstSuffix fallbackPrefix := by
+    have avoid :=
+      retainedFinalCoordinatedFallbackBoundaryPrefix_strictlyAvoids_crossClauseOccurrenceSuffix
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+        secondClauseMember firstClauseMember
+        secondLiteralMember firstLiteralMember
+        secondChoiceNone (Ne.symm clauseIndicesDifferent)
+    simpa [source, placement, routes, order,
+      fallbackPrefix] using avoid.symm
+  simpa [source, placement, routes, order,
+    fallbackPrefix, secondSuffix] using
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseJoin_of_prefix_pieces
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      choiceLookup clauseIndicesDifferent
+      fallbackPrefix fallbackBoundary
+      fallbackPrefixLast secondSuffixHead
+      directPrefixAvoidFallbackPrefix
+      directSuffixAvoidFallbackPrefix
 
 /-- Symmetric orientation of the mixed occurrence-route assembly theorem. -/
 theorem

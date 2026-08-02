@@ -2087,13 +2087,22 @@ The representation choices for this target are:
   route orientation.  For different genuine source clauses, the established
   cross-clause spoke and suffix theorems discharge both interactions with the
   fallback suffix automatically, reducing the complete mixed pair to exactly
-  the two interactions with its fallback boundary prefix.
+  the two interactions with its fallback boundary prefix.  The selected
+  fallback-prefix theorem then discharges the reverse suffix interaction as
+  well, leaving a single geometric premise: the coordinated direct prefix
+  must avoid the selected fallback boundary.
 - [`LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean`](LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean)
   decomposes either ordinary or delayed-lane fallback boundary into its
   refined retained prefix and outer-fan replacement.  Strict avoidance of
   those two pieces composes across their certified gate, and orthogonality
   removes the final rasterization wrapper, so the result applies directly to
   the actual fallback boundary route.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedFallbackSuffixSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedFallbackSuffixSeparation.lean)
+  names the boundary prefix selected by a failed final direct-source lookup:
+  singleton raw prefixes use the delayed-lane escape and all others use the
+  ordinary splice.  Existing shared-center and distinct-center geometry is
+  combined with orthogonal rasterization to prove that this selected prefix
+  avoids every other final clause's Figure 7 occurrence suffix.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
