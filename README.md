@@ -2024,6 +2024,12 @@ The representation choices for this target are:
   performs the final router's singleton-prefix case split.  Strict angular
   order at an equal physical center now separates a direct route from the
   actually selected ordinary or delayed-lane fallback outer replacement.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedOrderedOccurrenceAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOrderedOccurrenceAssembly.lean)
+  threads selected outer-route avoidance through the source corridor,
+  fallback-boundary splice, and both Figure 7 suffix interactions.  A
+  non-routed direct occurrence and cross-clause fallback occurrence are now
+  completely separated once strict order and their common physical center
+  are supplied.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
