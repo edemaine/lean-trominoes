@@ -2127,6 +2127,17 @@ The representation choices for this target are:
   is geometrically simple (including vertex/interior and distinct-segment
   interior avoidance).  It also packages the normalized routes in the
   standard canonical orthogonal-family interface.
+- [`LeanTrominoes/OrthogonalPolylineLoopErasureSeparation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureSeparation.lean)
+  proves that complete continuous separation survives normalization.  Each
+  retained dart is traced to a unit-subdivision edge and then to an original
+  parent segment; an intersection after loop erasure would therefore give
+  an intersection before it.  Unit edges make point/interior contacts
+  impossible, while endpoint-only contacts transfer through the preserved
+  outer endpoints.
+- [`LeanTrominoes/RetainedAngularFanFinalNormalizedRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalNormalizedRouteSeparation.lean)
+  applies that generic transport theorem to the final construction, proving
+  complete zero-shift continuous separation for every pair of distinct
+  genuine normalized incidences.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
