@@ -19,6 +19,7 @@ reducer.
 namespace LeanTrominoes
 namespace PeriodicOrthocrossing
 
+open PeriodicEightOccurrenceSplit
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 /-- The retained prefix of one final route is strictly separated from the
@@ -79,6 +80,94 @@ theorem
     List.dropLast_append_getLast?
       secondFinal secondLast
   simpa [joinAtEndpoint, decomposition] using joined
+
+/-- An overlapping flat carrier prefix and oblique macrocell route have the
+exact mixed source-corridor certificate.  The normalized contact determines
+a carrier boundary with the prefix outside and the macrocell route inside;
+ordinary route planarity then excludes every boundary checkpoint. -/
+theorem
+    sourcePrefixCorridorSeparated_of_flatCarrierMacrocell_rectangles_not_separated
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {sourceRoute referenceRoute : List Cell}
+    {sourceIndex referenceIndex : Nat}
+    {sourcePoint referenceTarget : Cell}
+    (sourceMember :
+      (sourceRoute, sourceIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (referenceMember :
+      (referenceRoute, referenceIndex) ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing
+          formula).edgeRoutes.zipIdx)
+    (sourceLength : 2 ≤ sourceRoute.length)
+    (referenceLength : 2 ≤ referenceRoute.length)
+    (indicesDifferent : sourceIndex ≠ referenceIndex)
+    (headsDifferent : sourceRoute.head? ≠ referenceRoute.head?)
+    (sourceHead : sourceRoute.head? = some sourcePoint)
+    (referenceLast :
+      referenceRoute.getLast? = some referenceTarget)
+    (sourceNeTarget : sourcePoint ≠ referenceTarget)
+    (referenceTerminal : RetainedTerminalData)
+    (referenceClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector referenceRoute) =
+        some referenceTerminal)
+    (sourceCarrier :
+      FinalGaugedFlatCarrierRouteWitness
+        formula (sourceRoute, sourceIndex))
+    (referenceMacrocell :
+      FinalGaugedFlatRouteMacrocellWitness
+        formula (referenceRoute, referenceIndex))
+    (referenceOblique :
+      ¬(⟨polylineLastEntrance referenceRoute,
+          referenceTarget⟩ : GridSegment).IsAxisAligned)
+    (rectanglesNotSeparated :
+      ¬ClosedGridRectanglesSeparated
+        sourceCarrier.rectangleLower sourceCarrier.rectangleUpper
+        (planarSATMacrocellRouteLower
+          referenceMacrocell.translatedCenter)
+        (planarSATMacrocellRouteUpper
+          referenceMacrocell.translatedCenter)) :
+    SourcePrefixCorridorSeparated
+      sourceRoute referenceRoute referenceTerminal.1 := by
+  rcases
+      referenceMacrocell.exists_normalizedSource
+        formula wellFormed degree isLocal with
+    ⟨normalized⟩
+  have contact :=
+    sourceCarrier.normalizedContact_of_finalSegment_not_axisAligned
+      formula wellFormed degree isLocal
+      referenceMacrocell normalized
+      referenceLength referenceLast referenceOblique
+      rectanglesNotSeparated
+  rcases
+      sourceCarrier.exists_normalizedCarrierBoundary
+        formula wellFormed degree isLocal
+        referenceMacrocell normalized contact with
+    ⟨boundary⟩
+  have strictlyAvoid :=
+    retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherRoute
+      formula wellFormed degree isLocal clausesNonempty
+      sourceMember referenceMember sourceLength referenceLength
+      indicesDifferent headsDifferent sourceHead referenceLast
+      sourceNeTarget
+  apply
+    sourcePrefixCorridorSeparated_of_outside_insideCarrierBoundary
+      boundary.port boundary.origin
+      sourceRoute referenceRoute referenceTerminal
+      referenceLength referenceClassified
+  · intro point pointMember
+    exact boundary.carrierOutside point
+      (List.mem_of_mem_dropLast pointMember)
+  · exact boundary.macrocellInside
+  · exact strictlyAvoid
 
 end PeriodicOrthocrossing
 
@@ -184,38 +273,13 @@ theorem
       simp [List.getLastD_eq_getLast?, fanLast]
     rw [scalePolyline_getLastD, fanLastD] at separated
     exact separated
-  · rcases
-        fanMacrocell.exists_normalizedSource
-          formula wellFormed degree isLocal with
-      ⟨normalized⟩
-    have contact :=
-      sourceCarrier.normalizedContact_of_finalSegment_not_axisAligned
-        formula wellFormed degree isLocal
-        fanMacrocell normalized
-        fanLength fanLast fanAligned rectanglesNotSeparated
-    rcases
-        sourceCarrier.exists_normalizedCarrierBoundary
-          formula wellFormed degree isLocal
-          fanMacrocell normalized contact with
-      ⟨boundary⟩
-    have strictlyAvoid :=
-      PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawing_routePrefix_strictlyAvoids_otherRoute
+  · have corridor :=
+      PeriodicOrthocrossing.sourcePrefixCorridorSeparated_of_flatCarrierMacrocell_rectangles_not_separated
         formula wellFormed degree isLocal clausesNonempty
         sourceMember fanMember sourceLength fanLength
         indicesDifferent headsDifferent sourceHead fanLast
-        sourceNeCenter
-    have corridor :
-        SourcePrefixCorridorSeparated
-          sourceRoute fanRoute fanTerminal.1 := by
-      apply
-        sourcePrefixCorridorSeparated_of_outside_insideCarrierBoundary
-          boundary.port boundary.origin
-          sourceRoute fanRoute fanTerminal fanLength fanClassified
-      · intro point pointMember
-        exact boundary.carrierOutside point
-          (List.mem_of_mem_dropLast pointMember)
-      · exact boundary.macrocellInside
-      · exact strictlyAvoid
+        sourceNeCenter fanTerminal fanClassified
+        sourceCarrier fanMacrocell fanAligned rectanglesNotSeparated
     exact
       retainedFinalSourceScaledPrefix_strictlyAvoids_otherOuterCompleteRoute_of_corridorSeparated
         formula wellFormed degree isLocal clausesNonempty

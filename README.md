@@ -2849,11 +2849,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedFinalFlatNormalizedCorridorSeparation.lean`](LeanTrominoes/RetainedFinalFlatNormalizedCorridorSeparation.lean)
   combines the final drawing's strict prefix/full-route separation with the
   normalized boundary and checkpoint bridge.  It discharges the last
-  overlapping carrier-prefix versus oblique noncarrier-fan case and closes
-  the component-case reducer, proving unconditional directed separation of
-  a final scaled source prefix from every other complete outer fan.  Applying
-  that result in both directions closes the complete pairwise splice theorem
-  once separation of the two selected outer fans is supplied.
+  overlapping carrier-prefix versus oblique noncarrier-fan case, exporting
+  the resulting source-corridor certificate for reuse, and closes the older
+  outer-route component reducer.  The resulting unconditional directed
+  separation, applied in both directions, closes the complete pairwise
+  splice theorem once separation of the selected outer fans is supplied.
 - [`LeanTrominoes/RetainedAngularFanOuterSourceSeparation.lean`](LeanTrominoes/RetainedAngularFanOuterSourceSeparation.lean)
   bounds every complete outer fan in the radius-288 expansion of its
   combined-scaled discarded source-terminal rectangle.  Two source terminal
