@@ -2019,6 +2019,10 @@ The representation choices for this target are:
   extracts a choice-independent consequence of inherited source planarity:
   original final source routes belonging to different clauses avoid each
   other.  This is the reusable geometric input for aligned mixed terminals.
+- [`LeanTrominoes/RetainedTerminalDataEndpointSeparation.lean`](LeanTrominoes/RetainedTerminalDataEndpointSeparation.lean)
+  packages the shared-endpoint direction-separation theorem in whole
+  terminal-data records, avoiding expensive normalization of direction and
+  length projections during final-route composition.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean`](LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean)
   transports equality of canonical direct/fallback literal positions to
   equality of their fully refined physical fan centers, matching the center
