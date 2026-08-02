@@ -2061,6 +2061,11 @@ The representation choices for this target are:
   direct segment.  Consequently a non-routed aligned direct occurrence and
   a same-center cross-clause fallback occurrence automatically have strictly
   disjoint complete routes in the final coordinated drawing.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceSeparation.lean)
+  derives the oblique mixed occurrence theorem from the flat-component
+  corridor and combines it with the aligned branch, yielding unconditional
+  same-center cross-clause direct/fallback separation for non-routed direct
+  choices.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
