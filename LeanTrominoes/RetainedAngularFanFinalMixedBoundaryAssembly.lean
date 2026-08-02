@@ -421,5 +421,80 @@ theorem
       prefixAvoid.symm
   · exact outerAvoid
 
+/-- For a non-routed direct atlas kind, a source corridor and separated
+discarded terminal rectangles imply separation from the complete selected
+fallback boundary. -/
+theorem
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_corridor_finalSegmentRectanglesSeparated
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    (directClauseIndex directLiteralIndex : Nat)
+    (directSlot : RetainedTerminalSlot)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex =
+        some choice)
+    (kindNe : choice.kind ≠ .routedClause)
+    {fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackClauseIndex : Nat}
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackLiteralIndex : Nat}
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (corridor :
+      SourcePrefixCorridorSeparated
+        (finalCoordinatedSourceRoutes
+          formula fallbackClauseIndex fallbackLiteralIndex)
+        (finalCoordinatedSourceRoutes
+          formula directClauseIndex directLiteralIndex)
+        (retainedDirectSourceFanTerminalAt
+          choice.kind choice.index).1)
+    (rectanglesSeparated :
+      let fallbackRoute :=
+        finalCoordinatedSourceRoutes
+          formula fallbackClauseIndex fallbackLiteralIndex
+      ClosedGridRectanglesSeparated
+        choice.sourceSegment.coordinateLower
+        choice.sourceSegment.coordinateUpper
+        (⟨polylineLastEntrance fallbackRoute,
+            fallbackRoute.getLastD (0, 0)⟩ :
+          GridSegment).coordinateLower
+        (⟨polylineLastEntrance fallbackRoute,
+            fallbackRoute.getLastD (0, 0)⟩ :
+          GridSegment).coordinateUpper) :
+    RoutesStrictlyAvoidEachOther
+      (choice.completeRoute directSlot)
+      (retainedFinalCoordinatedFallbackBoundaryPrefix
+        formula fallbackLiteral
+        fallbackClauseIndex fallbackLiteralIndex) := by
+  apply
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_corridor_outer
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice directClauseIndex directLiteralIndex
+      directSlot choiceLookup kindNe
+      fallbackClauseMember fallbackLiteralMember fallbackChoiceNone
+      corridor
+  exact
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackOuterReplacement_of_finalSegmentRectanglesSeparated
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice directSlot
+      fallbackClauseMember fallbackLiteralMember rectanglesSeparated
+
 end PeriodicOrthocrossing
 end LeanTrominoes

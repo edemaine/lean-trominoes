@@ -2094,7 +2094,9 @@ The representation choices for this target are:
   atlas kind, that premise is now itself assembled from a source-corridor
   certificate and separation from the selected fallback outer replacement;
   these are the only two geometric obligations left for the complete mixed
-  occurrence pair.
+  occurrence pair.  When the discarded terminal rectangles are separated,
+  the shared radius bound discharges the outer obligation too, so the
+  complete mixed pair follows from the corridor certificate alone.
 - [`LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean`](LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean)
   decomposes either ordinary or delayed-lane fallback boundary into its
   refined retained prefix and outer-fan replacement.  Strict avoidance of
@@ -2117,7 +2119,9 @@ The representation choices for this target are:
   separation whenever the two unscaled segment rectangles are separated.
   For non-routed direct atlas kinds, this outer certificate combines with
   the existing source-corridor theorem to close separation from the entire
-  selected fallback boundary.
+  selected fallback boundary.  In particular, a corridor certificate and
+  separated discarded-terminal rectangles now discharge that boundary
+  interaction with no additional geometric premise.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
