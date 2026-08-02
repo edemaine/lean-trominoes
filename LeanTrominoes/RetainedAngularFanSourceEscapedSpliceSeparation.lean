@@ -21,6 +21,301 @@ namespace PeriodicEightOccurrenceSplit
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+/-- Classified source routes remain strictly separated after replacing their
+tails by arbitrary routes that start at the corresponding classified gates,
+provided all four prefix/replacement pairings are strictly separated. -/
+private theorem
+    retainedAngularFanReplacedBoundaryPolylines_strictlyAvoid
+    (firstRoute secondRoute : List Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstReplacement secondReplacement : List Cell)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (sourcePrefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstRoute.dropLast secondRoute.dropLast)
+    (firstPrefixAvoidSecondReplacement :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          firstRoute).dropLast
+        secondReplacement)
+    (firstReplacementAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement
+        (scalePolyline retainedTerminalFanTotalRefinement
+          secondRoute).dropLast)
+    (replacementsAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstReplacement secondReplacement)
+    (firstReplacementHead :
+      firstReplacement.head? =
+        some
+          (retainedAngularFanOuterDemand
+            (Cell.scale retainedTerminalFanTotalRefinement
+              (firstRoute.getLastD (0, 0)))
+            firstTerminal firstSlot).gate)
+    (secondReplacementHead :
+      secondReplacement.head? =
+        some
+          (retainedAngularFanOuterDemand
+            (Cell.scale retainedTerminalFanTotalRefinement
+              (secondRoute.getLastD (0, 0)))
+            secondTerminal secondSlot).gate) :
+    RoutesStrictlyAvoidEachOther
+      (replacePolylineTail
+        (scalePolyline retainedTerminalFanTotalRefinement firstRoute)
+        firstReplacement)
+      (replacePolylineTail
+        (scalePolyline retainedTerminalFanTotalRefinement secondRoute)
+        secondReplacement) := by
+  let firstScaled :=
+    scalePolyline retainedTerminalFanTotalRefinement firstRoute
+  let secondScaled :=
+    scalePolyline retainedTerminalFanTotalRefinement secondRoute
+  let firstCenter :=
+    Cell.scale retainedTerminalFanTotalRefinement
+      (firstRoute.getLastD (0, 0))
+  let secondCenter :=
+    Cell.scale retainedTerminalFanTotalRefinement
+      (secondRoute.getLastD (0, 0))
+  have firstReverseTailExists :
+      ∃ entrance, firstScaled.reverse.tail.head? =
+        some entrance := by
+    apply exists_reverse_tail_head?_of_two_le_length
+    simpa [firstScaled, scalePolyline] using firstLength
+  have secondReverseTailExists :
+      ∃ entrance, secondScaled.reverse.tail.head? =
+        some entrance := by
+    apply exists_reverse_tail_head?_of_two_le_length
+    simpa [secondScaled, scalePolyline] using secondLength
+  have firstLastEntrance :
+      polylineLastEntrance firstScaled =
+        (retainedAngularFanOuterDemand
+          firstCenter firstTerminal firstSlot).gate := by
+    exact polylineLastEntrance_scalePolyline_eq_outerDemand_gate
+      firstLength firstClassified firstSlot
+  have secondLastEntrance :
+      polylineLastEntrance secondScaled =
+        (retainedAngularFanOuterDemand
+          secondCenter secondTerminal secondSlot).gate := by
+    exact polylineLastEntrance_scalePolyline_eq_outerDemand_gate
+      secondLength secondClassified secondSlot
+  have firstReverseTailHead :
+      firstScaled.reverse.tail.head? =
+        some
+          (retainedAngularFanOuterDemand
+            firstCenter firstTerminal firstSlot).gate := by
+    rw [polylineLastEntrance_spec firstReverseTailExists,
+      firstLastEntrance]
+  have secondReverseTailHead :
+      secondScaled.reverse.tail.head? =
+        some
+          (retainedAngularFanOuterDemand
+            secondCenter secondTerminal secondSlot).gate := by
+    rw [polylineLastEntrance_spec secondReverseTailExists,
+      secondLastEntrance]
+  have firstEntrance :
+      firstScaled.dropLast.getLast? =
+        some
+          (retainedAngularFanOuterDemand
+            firstCenter firstTerminal firstSlot).gate :=
+    dropLast_getLast?_of_reverse_tail_head?
+      firstReverseTailHead
+  have secondEntrance :
+      secondScaled.dropLast.getLast? =
+        some
+          (retainedAngularFanOuterDemand
+            secondCenter secondTerminal secondSlot).gate :=
+    dropLast_getLast?_of_reverse_tail_head?
+      secondReverseTailHead
+  have scaledPrefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstScaled.dropLast secondScaled.dropLast := by
+    have scaled :=
+      sourcePrefixesAvoid.scalePolyline
+        (factor :=
+          (retainedTerminalFanTotalRefinement : Int))
+        (by
+          norm_num [retainedTerminalFanTotalRefinement,
+            PeriodicEightOccurrenceSplitPositioned.refinementScale,
+            retainedTerminalFanRoutingRefinement])
+    simpa [firstScaled, secondScaled, scalePolyline] using scaled
+  exact
+    RoutesStrictlyAvoidEachOther.replace_tails_of_prefixes
+      scaledPrefixesAvoid
+      (by
+        simpa [firstScaled] using
+          firstPrefixAvoidSecondReplacement)
+      (by
+        simpa [secondScaled] using
+          firstReplacementAvoidSecondPrefix)
+      replacementsAvoid
+      firstEntrance
+      (by simpa [firstCenter] using firstReplacementHead)
+      secondEntrance
+      (by simpa [secondCenter] using secondReplacementHead)
+
+/-- Replacing the first classified source tail by an escaped fan and the
+second by an ordinary fan preserves strict separation once the three new
+directed component pairings are certified. -/
+theorem
+    retainedAngularFanEscapedOrdinarySplicedBoundaryPolylines_strictlyAvoid
+    (firstRoute secondRoute : List Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (sourcePrefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstRoute.dropLast secondRoute.dropLast)
+    (firstPrefixAvoidSecondFan :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          firstRoute).dropLast
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (secondRoute.getLastD (0, 0)))
+          secondTerminal secondSlot))
+    (firstEscapedFanAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (firstRoute.getLastD (0, 0)))
+          firstTerminal firstSlot)
+        (scalePolyline retainedTerminalFanTotalRefinement
+          secondRoute).dropLast)
+    (fansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (firstRoute.getLastD (0, 0)))
+          firstTerminal firstSlot)
+        (retainedTerminalFanOuterCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (secondRoute.getLastD (0, 0)))
+          secondTerminal secondSlot)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedAngularFanEscapedSplicedBoundaryPolyline
+        firstRoute firstTerminal firstSlot)
+      (retainedAngularFanSplicedBoundaryPolyline
+        secondRoute secondTerminal secondSlot) := by
+  simpa [retainedAngularFanEscapedSplicedBoundaryPolyline,
+    retainedAngularFanSplicedBoundaryPolyline] using
+    retainedAngularFanReplacedBoundaryPolylines_strictlyAvoid
+      firstRoute secondRoute firstTerminal secondTerminal
+      firstSlot secondSlot
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (firstRoute.getLastD (0, 0)))
+        firstTerminal firstSlot)
+      (retainedTerminalFanOuterCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (secondRoute.getLastD (0, 0)))
+        secondTerminal secondSlot)
+      firstLength secondLength firstClassified secondClassified
+      sourcePrefixesAvoid firstPrefixAvoidSecondFan
+      firstEscapedFanAvoidSecondPrefix fansAvoid
+      (retainedTerminalFanOuterEscapedCompleteRoute_head?
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (firstRoute.getLastD (0, 0)))
+        firstTerminal firstSlot)
+      (retainedTerminalFanOuterCompleteRoute_head?
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (secondRoute.getLastD (0, 0)))
+        secondTerminal secondSlot)
+
+/-- Replacing both classified source tails by escaped fans preserves strict
+separation under the analogous four component certificates. -/
+theorem
+    retainedAngularFanEscapedSplicedBoundaryPolylines_strictlyAvoid
+    (firstRoute secondRoute : List Cell)
+    (firstTerminal secondTerminal : RetainedTerminalData)
+    (firstSlot secondSlot : RetainedTerminalSlot)
+    (firstLength : 2 ≤ firstRoute.length)
+    (secondLength : 2 ≤ secondRoute.length)
+    (firstClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector firstRoute) =
+        some firstTerminal)
+    (secondClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector secondRoute) =
+        some secondTerminal)
+    (sourcePrefixesAvoid :
+      RoutesStrictlyAvoidEachOther
+        firstRoute.dropLast secondRoute.dropLast)
+    (firstPrefixAvoidSecondFan :
+      RoutesStrictlyAvoidEachOther
+        (scalePolyline retainedTerminalFanTotalRefinement
+          firstRoute).dropLast
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (secondRoute.getLastD (0, 0)))
+          secondTerminal secondSlot))
+    (firstFanAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (firstRoute.getLastD (0, 0)))
+          firstTerminal firstSlot)
+        (scalePolyline retainedTerminalFanTotalRefinement
+          secondRoute).dropLast)
+    (fansAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (firstRoute.getLastD (0, 0)))
+          firstTerminal firstSlot)
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          (Cell.scale retainedTerminalFanTotalRefinement
+            (secondRoute.getLastD (0, 0)))
+          secondTerminal secondSlot)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedAngularFanEscapedSplicedBoundaryPolyline
+        firstRoute firstTerminal firstSlot)
+      (retainedAngularFanEscapedSplicedBoundaryPolyline
+        secondRoute secondTerminal secondSlot) := by
+  simpa [retainedAngularFanEscapedSplicedBoundaryPolyline] using
+    retainedAngularFanReplacedBoundaryPolylines_strictlyAvoid
+      firstRoute secondRoute firstTerminal secondTerminal
+      firstSlot secondSlot
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (firstRoute.getLastD (0, 0)))
+        firstTerminal firstSlot)
+      (retainedTerminalFanOuterEscapedCompleteRoute
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (secondRoute.getLastD (0, 0)))
+        secondTerminal secondSlot)
+      firstLength secondLength firstClassified secondClassified
+      sourcePrefixesAvoid firstPrefixAvoidSecondFan
+      firstFanAvoidSecondPrefix fansAvoid
+      (retainedTerminalFanOuterEscapedCompleteRoute_head?
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (firstRoute.getLastD (0, 0)))
+        firstTerminal firstSlot)
+      (retainedTerminalFanOuterEscapedCompleteRoute_head?
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (secondRoute.getLastD (0, 0)))
+        secondTerminal secondSlot)
+
 /-- A singleton refined source prefix is the escaped fan's own head, so
 escaped/ordinary fan separation supplies the directed prefix/ordinary-fan
 cross case by restriction. -/
