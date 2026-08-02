@@ -1,5 +1,8 @@
 import LeanTrominoes.RetainedAngularFanFinalMixedOccurrenceAssembly
 import LeanTrominoes.RetainedAngularFanFinalMixedOuterSelection
+import LeanTrominoes.RetainedAngularFanFinalMixedStrictOrder
+import LeanTrominoes.RetainedAngularFanFinalMixedCenter
+import LeanTrominoes.RetainedAngularFanFinalStrictEscape
 
 /-!
 # Ordered mixed occurrence-route assembly
@@ -152,6 +155,120 @@ theorem
       (retainedFinalCoordinatedOccurrenceSlot
         formula firstLiteral firstClauseIndex firstLiteralIndex)
       angularOrder centersEqual fallbackLengthPositive fallbackEscapeStrict
+
+/-- For a same-center cross-clause mixed pair, the source corridor is the
+only remaining premise: final occurrence order, physical center equality,
+terminal positivity, and escape room are all automatic. -/
+theorem
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_corridor
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula firstClauseIndex firstLiteralIndex =
+        some choice)
+    (kindNe : choice.kind ≠ .routedClause)
+    (secondChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula secondClauseIndex secondLiteralIndex = none)
+    (clauseIndicesDifferent :
+      firstClauseIndex ≠ secondClauseIndex)
+    (centersEqual :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          firstClause firstLiteral =
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          secondClause secondLiteral)
+    (corridor :
+      SourcePrefixCorridorSeparated
+        (finalCoordinatedSourceRoutes
+          formula secondClauseIndex secondLiteralIndex)
+        (finalCoordinatedSourceRoutes
+          formula firstClauseIndex firstLiteralIndex)
+        (retainedDirectSourceFanTerminalAt
+          choice.kind choice.index).1) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let secondSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement
+          (angularOccurrenceOrder source.erase routes)
+          (secondClause.scale retainedAngularFanSourceClearanceFactor)
+          secondLiteral secondClauseIndex secondLiteralIndex)
+    RoutesStrictlyAvoidEachOther
+      (retainedFinalCoordinatedDirectOccurrenceRoute
+        formula choice
+        (firstClause.scale retainedAngularFanSourceClearanceFactor)
+        firstLiteral firstClauseIndex firstLiteralIndex)
+      (joinAtEndpoint
+        (retainedFinalCoordinatedFallbackBoundaryPrefix
+          formula secondLiteral
+          secondClauseIndex secondLiteralIndex)
+        secondSuffix) := by
+  apply
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_corridor_order
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      choiceLookup kindNe secondChoiceNone clauseIndicesDifferent corridor
+  · exact
+      retainedFinalDirectFallback_strictAngularOrderCompatible_of_sameCenter
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        firstClauseMember secondClauseMember
+        firstLiteralMember secondLiteralMember
+        choiceLookup secondChoiceNone
+        clauseIndicesDifferent centersEqual
+  · exact
+      retainedFinalDirectFallback_positionedFanCenters_eq_of_sameCenter
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        firstClauseMember secondClauseMember
+        firstLiteralMember secondLiteralMember
+        choiceLookup centersEqual
+  · exact
+      finalCoordinatedSourceRoute_terminal_length_positive
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
+  · exact
+      finalCoordinatedScaledSourceRoute_escapeStrict
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
 
 end PeriodicOrthocrossing
 end LeanTrominoes

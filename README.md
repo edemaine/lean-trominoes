@@ -2049,7 +2049,9 @@ The representation choices for this target are:
   fallback-boundary splice, and both Figure 7 suffix interactions.  A
   non-routed direct occurrence and cross-clause fallback occurrence are now
   completely separated once strict order and their common physical center
-  are supplied.
+  are supplied.  A same-center wrapper derives those facts, terminal
+  positivity, and escape room automatically, leaving only the source
+  corridor as an explicit geometric premise.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
