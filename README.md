@@ -1983,6 +1983,11 @@ The representation choices for this target are:
   the escape premise of the direct-tail replacement reducers.  Strict
   compatible angular order therefore automatically separates the complete
   custom direct route from either ordinary or delayed-lane fallback routes.
+- [`LeanTrominoes/RetainedAngularFanOuterRouteTranslation.lean`](LeanTrominoes/RetainedAngularFanOuterRouteTranslation.lean)
+  proves that source gates, lane shifts, local adapters, and ordinary and
+  delayed-lane radial and complete outer routes all commute with translation
+  of their variable center.  Local direct/fallback certificates can therefore
+  be transported without unfolding the final positioned route definitions.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
