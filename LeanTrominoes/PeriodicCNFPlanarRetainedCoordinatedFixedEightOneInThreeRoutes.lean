@@ -1,6 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedFixedEightOneInThreePositioned
 import LeanTrominoes.PeriodicOneInThreePositionedInheritedRouteFamily
-import LeanTrominoes.RetainedAngularFanFinalCoordinatedRouteFamily
+import LeanTrominoes.RetainedAngularFanFinalNormalizedVariableRouteOrder
 
 /-!
 # Figure 9 routes over the coordinated retained fixed-eight source
@@ -103,7 +103,8 @@ theorem
   simp [
     retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeRawFormula]
 
-/-- Figure 9 suffixes inherited from the coordinated fixed-eight routes. -/
+/-- Figure 9 suffixes inherited from the normalized coordinated fixed-eight
+routes. -/
 noncomputable def
     retainedCoordinatedFixedEightPeriodicPlanarOneInThreeInheritedRouteSuffixes
     {Variable : Type*} [DecidableEq Variable]
@@ -132,18 +133,18 @@ noncomputable def
     (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_allAtomsNodup
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
-    (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
       source)
     (fun _sourceClause _sourceClauseIndex sourceClauseMember
         _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
       let valid :=
-        retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_valid
+        retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty sourceClauseMember sourceLiteralMember
       ⟨valid.1, valid.2.1⟩)
     (fun _sourceClause _sourceClauseIndex sourceClauseMember
         _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
-      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_valid
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
         sourceClauseMember sourceLiteralMember).2.2)

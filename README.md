@@ -2216,8 +2216,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFinalNormalizedVariableRouteOrder.lean`](LeanTrominoes/RetainedAngularFanFinalNormalizedVariableRouteOrder.lean)
   uses that isolation together with route nondegeneracy and orthogonality to
   carry clockwise variable occurrence order through verified fixed-eight
-  loop erasure.  Transport through Figure 9 and unit elimination remains for
-  the final exact-one normalization.
+  loop erasure.  It also proves that every normalized route still contains an
+  edge, supplying the nondegeneracy required by the downstream Figure 9
+  terminal-direction transport.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
@@ -2657,12 +2658,12 @@ The representation choices for this target are:
   local hypothesis needed to preserve route order through Figure 9.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes.lean)
   feeds the source-scaled coordinated fixed-eight formula, placement, and
-  canonical route family into the generic positioned Figure 9 adapter.
-  Coordinate scaling preserves the fixed-eight width and atom-distinctness
-  premises, and every resulting raw exact-one route has canonical endpoints,
-  is orthogonal, and exposes the first exit required by unit elimination.
-  This is the first downstream exact-one layer to consume the coordinated
-  routes instead of the older angular-spliced fallback family.
+  normalized canonical route family into the generic positioned Figure 9
+  adapter.  Coordinate scaling preserves the fixed-eight width and
+  atom-distinctness premises, and every resulting raw exact-one route has
+  canonical endpoints, is orthogonal, and exposes the first exit required by
+  unit elimination.  Normalizing before Figure 9 removes inherited collar
+  loops while preserving the coordinated clockwise route order.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean)
   transports the coordinated raw Figure 9 formula, placement, and routes
   through the exact-one variable wrapper.  The wrapper changes no geometry
@@ -2677,10 +2678,10 @@ The representation choices for this target are:
   edge.  Thus the coordinated geometry is now threaded through the full
   exact-one route pipeline.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean)
-  transports the coordinated clockwise variable-route order through Figure
-  9, opaque wrapping, and unit elimination.  It also proves the inherited
-  Figure 9 routes are long enough for both terminal-direction splice
-  certificates.
+  transports the normalized coordinated clockwise variable-route order
+  through Figure 9, opaque wrapping, and unit elimination.  It also proves
+  the inherited Figure 9 routes are long enough for both terminal-direction
+  splice certificates.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRibbonOrders.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRibbonOrders.lean)
   pairs the final clockwise variable-route order with the canonical ternary
   clause-route order from unit elimination.  Consequently any ribbon-ready

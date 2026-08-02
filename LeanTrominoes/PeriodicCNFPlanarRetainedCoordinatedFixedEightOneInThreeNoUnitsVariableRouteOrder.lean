@@ -1,4 +1,4 @@
-import LeanTrominoes.RetainedAngularFanFinalCoordinatedRouteLength
+import LeanTrominoes.RetainedAngularFanFinalNormalizedVariableRouteOrder
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRoutes
 import LeanTrominoes.PeriodicOneInThreeWrappedVariableRouteOrderTransport
 
@@ -30,7 +30,7 @@ theorem
     PeriodicOneInThreePositioned.PreservesOriginalRouteTerminalDirections
       (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
         source)
-      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
         source)
       (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes
         source sourceLocal sourceWidth sourceOccurrences
@@ -48,24 +48,24 @@ theorem
         (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_allAtomsNodup
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty)
-        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
           source)
         (fun _sourceClause _sourceClauseIndex sourceClauseMember
             _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
           let valid :=
-            retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_valid
+            retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
               source sourceLocal sourceWidth sourceOccurrences
               sourceClausesNonempty sourceClauseMember sourceLiteralMember
           ⟨valid.1, valid.2.1⟩)
         (fun _sourceClause _sourceClauseIndex sourceClauseMember
             _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
-          (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_valid
+          (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
             source sourceLocal sourceWidth sourceOccurrences
             sourceClausesNonempty
             sourceClauseMember sourceLiteralMember).2.2)
         (fun _sourceClause _sourceClauseIndex sourceClauseMember
             _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
-          retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_length_ge_two
+          retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
             source sourceLocal sourceWidth sourceOccurrences
             sourceClausesNonempty
             sourceClauseMember sourceLiteralMember)
@@ -103,12 +103,12 @@ theorem
         source)
       (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_widthAtMostThree
         source sourceWidth)
-      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
         source)
       (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty)
-      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_variableRoutesInOccurrenceOrder
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_variableRoutesInOccurrenceOrder
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty)
       (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes_preservesOriginalRouteTerminalDirections
