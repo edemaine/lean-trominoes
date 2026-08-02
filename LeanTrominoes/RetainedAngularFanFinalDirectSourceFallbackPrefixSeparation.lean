@@ -54,6 +54,89 @@ theorem
   simp [Cell.add, Cell.scale]
   constructor <;> ring
 
+/-- Positioning a direct choice transports the shifted radial tail's finite
+radius-65 bound to the represented physical source segment. -/
+theorem
+    RetainedDirectSourceRouteChoice.shiftedTail_point_in_sourceSegmentRectangle
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset choice.origin)
+          (retainedTerminalFanOuterEscapedShiftedTail
+            (retainedDirectSourceFanCenterAt
+              choice.kind choice.index)
+            (retainedDirectSourceFanTerminalAt
+              choice.kind choice.index)
+            slot)) :
+    InClosedGridRectangle
+      (coordinateRadiusLower 65
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          choice.sourceSegment.coordinateLower))
+      (coordinateRadiusUpper 65
+        (Cell.scale
+          (retainedTerminalFanTotalRefinement * 4)
+          choice.sourceSegment.coordinateUpper))
+      point := by
+  unfold PeriodicOrthocrossing.translatePolyline at pointMember
+  rcases List.mem_map.mp pointMember with
+    ⟨localPoint, localPointMember, rfl⟩
+  let localSegment : GridSegment :=
+    ⟨(retainedDirectSourceLocalRouteAt
+        choice.kind choice.index).headD (0, 0),
+      (retainedDirectSourceLocalRouteAt
+        choice.kind choice.index).getLastD (0, 0)⟩
+  let positioningOffset :=
+    retainedDirectSourceFanPositioningOffset choice.origin
+  have localBound :=
+    retainedDirectSourceFanShiftedTailAt_point_in_scaledLocalSegmentRectangle
+      choice.kind choice.index slot localPoint localPointMember
+  have lowerEq :
+      Cell.add positioningOffset
+          (coordinateRadiusLower 65
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement * 4)
+              localSegment.coordinateLower)) =
+        coordinateRadiusLower 65
+          (Cell.scale
+            (retainedTerminalFanTotalRefinement * 4)
+            choice.sourceSegment.coordinateLower) := by
+    rcases choice.origin with ⟨originX, originY⟩
+    rcases localSegment.start with ⟨startX, startY⟩
+    rcases localSegment.finish with ⟨finishX, finishY⟩
+    simp [localSegment, positioningOffset,
+      RetainedDirectSourceRouteChoice.sourceSegment,
+      retainedDirectSourceFanPositioningOffset,
+      GridSegment.coordinateLower, coordinateRadiusLower,
+      Cell.add, Cell.scale, min_add_add_left]
+    constructor <;> ring
+  have upperEq :
+      Cell.add positioningOffset
+          (coordinateRadiusUpper 65
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement * 4)
+              localSegment.coordinateUpper)) =
+        coordinateRadiusUpper 65
+          (Cell.scale
+            (retainedTerminalFanTotalRefinement * 4)
+            choice.sourceSegment.coordinateUpper) := by
+    rcases choice.origin with ⟨originX, originY⟩
+    rcases localSegment.start with ⟨startX, startY⟩
+    rcases localSegment.finish with ⟨finishX, finishY⟩
+    simp [localSegment, positioningOffset,
+      RetainedDirectSourceRouteChoice.sourceSegment,
+      retainedDirectSourceFanPositioningOffset,
+      GridSegment.coordinateUpper, coordinateRadiusUpper,
+      Cell.add, Cell.scale, max_add_add_left]
+    constructor <;> ring
+  rw [← lowerEq, ← upperEq]
+  simpa [localSegment, positioningOffset] using
+    PeriodicOrthocrossing.InClosedGridRectangle.add
+      localBound positioningOffset
+
 /-- A successful final choice's represented source segment is exactly the
 discarded final segment of the corresponding two-point retained route. -/
 theorem retainedFinalDirectSourceRouteChoice_finalSegment_eq_sourceSegment
@@ -141,6 +224,78 @@ theorem
     have bounded :=
       choice.completeRoute_transverse_band_of_kind_ne_routedClause
         slot kindNe pointMember
+    rw [choice.positionedFanCenter_eq_scale_sourceSegment_finish]
+      at bounded
+    exact bounded
+
+/-- Unlike the full routed-clause direct route, every shifted radial tail
+fits the ordinary rectangle-and-transverse corridor.  Thus the same source
+corridor certificate separates it for all direct atlas kinds. -/
+theorem
+    retainedSourceScaledPrefix_strictlyAvoids_directShiftedTail_of_corridorSeparated
+    (sourceRoute referenceRoute : List Cell)
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot)
+    (referenceSegmentEq :
+      (⟨polylineLastEntrance referenceRoute,
+          referenceRoute.getLastD (0, 0)⟩ : GridSegment) =
+        choice.sourceSegment)
+    (sourceSeparated :
+      SourcePrefixCorridorSeparated
+        sourceRoute referenceRoute
+        (retainedDirectSourceFanTerminalAt
+          choice.kind choice.index).1) :
+    RoutesStrictlyAvoidEachOther
+      (scalePolyline
+        (retainedTerminalFanTotalRefinement * 4)
+        sourceRoute.dropLast)
+      (PeriodicOrthocrossing.translatePolyline
+        (retainedDirectSourceFanPositioningOffset choice.origin)
+        (retainedTerminalFanOuterEscapedShiftedTail
+          (retainedDirectSourceFanCenterAt
+            choice.kind choice.index)
+          (retainedDirectSourceFanTerminalAt
+            choice.kind choice.index)
+          slot)) := by
+  have referenceCenterEq :
+      referenceRoute.getLastD (0, 0) =
+        choice.sourceSegment.finish :=
+    congrArg GridSegment.finish referenceSegmentEq
+  unfold SourcePrefixCorridorSeparated at sourceSeparated
+  rw [referenceSegmentEq, referenceCenterEq] at sourceSeparated
+  apply
+    routesStrictlyAvoidEachOther_scalePolyline_rectangleOrLinearNeighborhood
+      (factor := retainedTerminalFanTotalRefinement * 4)
+      (rectangleRadius := 65)
+      (linearRadius := 845)
+      (source := sourceRoute.dropLast)
+      (nearby :=
+        PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset choice.origin)
+          (retainedTerminalFanOuterEscapedShiftedTail
+            (retainedDirectSourceFanCenterAt
+              choice.kind choice.index)
+            (retainedDirectSourceFanTerminalAt
+              choice.kind choice.index)
+            slot))
+      (referenceLower := choice.sourceSegment.coordinateLower)
+      (referenceUpper := choice.sourceSegment.coordinateUpper)
+      (referenceCenter := choice.sourceSegment.finish)
+      (normal :=
+        retainedTerminalFanOuterTransverseNormal
+          (retainedDirectSourceFanTerminalAt
+            choice.kind choice.index).1)
+  · native_decide
+  · native_decide
+  · native_decide
+  · exact sourceSeparated.1
+  · exact sourceSeparated.2
+  · intro point pointMember
+    exact choice.shiftedTail_point_in_sourceSegmentRectangle
+      slot pointMember
+  · intro point pointMember
+    have bounded := choice.shiftedTail_transverse_band
+      slot pointMember
     rw [choice.positionedFanCenter_eq_scale_sourceSegment_finish]
       at bounded
     exact bounded

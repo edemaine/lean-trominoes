@@ -2046,15 +2046,21 @@ The representation choices for this target are:
   Every direct route fits in radius 3103 around its represented terminal
   line, while every crossover and routed-variable route fits in the much
   tighter radius 495 envelope; that tight bound is transported through a
-  checked choice's physical component translation.  The only exceptional
-  atlas kind is the routed source clause, whose deliberately wide first
-  escape is isolated for a separate carrier-interface argument.
+  checked choice's physical component translation.  After every customized
+  escape, the shifted radial tail for all atlas kinds returns to the ordinary
+  radius-845 transverse corridor and a radius-65 rectangle around its source
+  segment.  Thus the only exceptional piece is the routed source clause's
+  deliberately wide first escape, isolated for a separate carrier-interface
+  argument.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceFallbackPrefixSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceFallbackPrefixSeparation.lean)
   combines the tight transverse envelope with the radius-288 source-segment
   rectangle.  It identifies a successful final choice's represented segment
   with the actual retained route's discarded final edge, then applies the
   generic rectangle-or-line corridor theorem to separate any factor-1152
-  fallback source prefix from a non-routed direct complete route.
+  fallback source prefix from a non-routed direct complete route.  A second
+  specialization uses the radius-65/radius-845 certificates to separate the
+  same fallback prefix from every direct route's shifted radial tail,
+  including routed-clause choices.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
