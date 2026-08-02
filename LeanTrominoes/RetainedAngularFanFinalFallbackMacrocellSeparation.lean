@@ -18,10 +18,11 @@ open PeriodicEightOccurrenceSplit
 
 set_option maxHeartbeats 400000
 
-/-- A macrocell route whose final direct-source choice fails has translated
-center different from every macrocell route with an oblique final segment. -/
+/-- A macrocell route whose final direct-source choice fails cannot share a
+translated center with a macrocell route already known to come from a direct
+component. -/
 theorem
-    FinalGaugedFlatRouteMacrocellWitness.translatedCenter_ne_of_choice_none_of_second_finalSegment_not_axisAligned
+    FinalGaugedFlatRouteMacrocellWitness.translatedCenter_ne_of_choice_none_of_second_component_isDirect
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (wellFormed : formula.incidenceGraph.IsWellFormed)
@@ -38,19 +39,10 @@ theorem
       retainedFinalDirectSourceRouteChoice?
           formula failed.coordinates.taggedClause.2
             failed.coordinates.taggedLiteral.2 = none)
-    (referenceLength : 2 ≤ referenceTaggedRoute.1.length)
-    {referenceTarget : Cell}
-    (referenceLast :
-      referenceTaggedRoute.1.getLast? = some referenceTarget)
-    (referenceOblique :
-      ¬(⟨polylineLastEntrance referenceTaggedRoute.1,
-          referenceTarget⟩ : GridSegment).IsAxisAligned) :
+    (referenceDirect :
+      reference.routeWitness.metadata.source.component.IsDirect) :
     failed.translatedCenter ≠ reference.translatedCenter := by
   intro centersEqual
-  have referenceDirect :=
-    reference.component_isDirect_of_finalSegment_not_axisAligned
-      formula wellFormed degree isLocal
-      referenceLength referenceLast referenceOblique
   have failedDirect :=
     failed.first_component_isDirect_of_translatedCenters_eq
       formula wellFormed degree isLocal
@@ -88,6 +80,43 @@ theorem
     ⟨choice, choiceSome⟩
   rw [choiceNone] at choiceSome
   cases choiceSome
+
+/-- A macrocell route whose final direct-source choice fails has translated
+center different from every macrocell route with an oblique final segment. -/
+theorem
+    FinalGaugedFlatRouteMacrocellWitness.translatedCenter_ne_of_choice_none_of_second_finalSegment_not_axisAligned
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {failedTaggedRoute referenceTaggedRoute : List Cell × Nat}
+    (failed :
+      FinalGaugedFlatRouteMacrocellWitness
+        formula failedTaggedRoute)
+    (reference :
+      FinalGaugedFlatRouteMacrocellWitness
+        formula referenceTaggedRoute)
+    (choiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula failed.coordinates.taggedClause.2
+            failed.coordinates.taggedLiteral.2 = none)
+    (referenceLength : 2 ≤ referenceTaggedRoute.1.length)
+    {referenceTarget : Cell}
+    (referenceLast :
+      referenceTaggedRoute.1.getLast? = some referenceTarget)
+    (referenceOblique :
+      ¬(⟨polylineLastEntrance referenceTaggedRoute.1,
+          referenceTarget⟩ : GridSegment).IsAxisAligned) :
+    failed.translatedCenter ≠ reference.translatedCenter := by
+  have referenceDirect :=
+    reference.component_isDirect_of_finalSegment_not_axisAligned
+      formula wellFormed degree isLocal
+      referenceLength referenceLast referenceOblique
+  exact
+    failed.translatedCenter_ne_of_choice_none_of_second_component_isDirect
+      formula wellFormed degree isLocal
+      reference choiceNone referenceDirect
 
 end PeriodicOrthocrossing
 end LeanTrominoes

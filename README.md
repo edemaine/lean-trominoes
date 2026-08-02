@@ -2083,10 +2083,12 @@ The representation choices for this target are:
   while separated component boxes close automatically, leaving only an
   overlapping carrier--macrocell pair and an equal-macrocell pair.
 - [`LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean)
-  excludes the equal-macrocell residue for failed choices.  An oblique
-  reference makes both equal-center components direct, contradicting the
-  failed selector because every genuine direct-component route produces a
-  successful checked choice.
+  excludes the equal-macrocell residue for failed choices.  At its general
+  interface, any second route already known to come from a direct component
+  makes both equal-center components direct, contradicting the failed
+  selector because every genuine direct-component route produces a
+  successful checked choice.  The earlier oblique-reference theorem is now
+  a corollary that obtains directness from the terminal geometry.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedObliqueCorridorSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedObliqueCorridorSeparation.lean)
   closes the source-prefix corridor for a failed fallback route against an
   oblique selected direct route.  It combines flat component reduction,
