@@ -2015,6 +2015,10 @@ The representation choices for this target are:
   records the complementary aligned direct-source branch: because every
   successful choice represents an exact two-point route, alignment of its
   stored segment recovers orthogonality of the original final source route.
+- [`LeanTrominoes/RetainedAngularFanFinalCrossClauseSourceRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalCrossClauseSourceRouteSeparation.lean)
+  extracts a choice-independent consequence of inherited source planarity:
+  original final source routes belonging to different clauses avoid each
+  other.  This is the reusable geometric input for aligned mixed terminals.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean`](LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean)
   transports equality of canonical direct/fallback literal positions to
   equality of their fully refined physical fan centers, matching the center
