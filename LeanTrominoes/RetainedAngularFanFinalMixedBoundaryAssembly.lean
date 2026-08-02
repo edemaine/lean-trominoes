@@ -345,5 +345,81 @@ theorem
       rw [if_neg (by simpa [rawRoute] using singletonPrefix)] at replacementAvoid
       simpa [route, terminal, rawTerminal, slot] using replacementAvoid
 
+/-- For every non-routed direct atlas kind, a source-corridor certificate
+and separation from the selected outer replacement close the complete
+direct-prefix versus fallback-boundary interaction. -/
+theorem
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_corridor_outer
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    (directClauseIndex directLiteralIndex : Nat)
+    (directSlot : RetainedTerminalSlot)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex =
+        some choice)
+    (kindNe : choice.kind ≠ .routedClause)
+    {fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackClauseIndex : Nat}
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackLiteralIndex : Nat}
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (corridor :
+      SourcePrefixCorridorSeparated
+        (finalCoordinatedSourceRoutes
+          formula fallbackClauseIndex fallbackLiteralIndex)
+        (finalCoordinatedSourceRoutes
+          formula directClauseIndex directLiteralIndex)
+        (retainedDirectSourceFanTerminalAt
+          choice.kind choice.index).1)
+    (outerAvoid :
+      RoutesStrictlyAvoidEachOther
+        (choice.completeRoute directSlot)
+        (retainedFinalCoordinatedFallbackOuterReplacement
+          formula fallbackLiteral
+          fallbackClauseIndex fallbackLiteralIndex)) :
+    RoutesStrictlyAvoidEachOther
+      (choice.completeRoute directSlot)
+      (retainedFinalCoordinatedFallbackBoundaryPrefix
+        formula fallbackLiteral
+        fallbackClauseIndex fallbackLiteralIndex) := by
+  apply
+    strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_pieces
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty fallbackClauseMember
+      fallbackLiteralMember fallbackChoiceNone
+      (choice.completeRoute directSlot)
+  · have prefixAvoid :=
+      retainedFinalSourceScaledPrefix_strictlyAvoids_directCompleteRoute_of_corridorSeparated
+        formula
+        (finalCoordinatedSourceRoutes
+          formula fallbackClauseIndex fallbackLiteralIndex)
+        directClauseIndex directLiteralIndex choice directSlot
+        choiceLookup kindNe corridor
+    rw [scalePolyline_dropLast_eq,
+      scalePolyline_dropLast_eq,
+      scalePolyline_scalePolyline_nat]
+    simpa only [retainedAngularFanSourceClearanceFactor,
+      Nat.cast_ofNat] using
+      prefixAvoid.symm
+  · exact outerAvoid
+
 end PeriodicOrthocrossing
 end LeanTrominoes

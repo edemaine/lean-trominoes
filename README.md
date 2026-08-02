@@ -2111,6 +2111,9 @@ The representation choices for this target are:
   outer replacement.  Both replacements share the same conservative
   radius-288 discarded-segment bound, which closes direct/fallback outer
   separation whenever the two unscaled segment rectangles are separated.
+  For non-routed direct atlas kinds, this outer certificate combines with
+  the existing source-corridor theorem to close separation from the entire
+  selected fallback boundary.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
