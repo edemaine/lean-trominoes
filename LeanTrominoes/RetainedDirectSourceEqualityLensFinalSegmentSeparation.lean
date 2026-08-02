@@ -563,5 +563,167 @@ theorem
       origin direction span spanLarge carrierClauseIndex kind index
       directOblique
 
+/-- The first-end terminal dichotomy in the intrinsic coordinates of a
+geometrically certified equality link. -/
+theorem EqualityLink.lensDrawing_first_finalSegmentRectanglesSeparated_or_finish_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell}
+    {link : EqualityLink Variable}
+    (geometry : EqualityLink.LensGeometry position link)
+    (carrierClauseIndex carrierLiteralIndex : Fin 2)
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (directOblique :
+      ¬(⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).IsAxisAligned) :
+    let carrierRoute :=
+      (EqualityLink.lensDrawing position link).routes
+        carrierClauseIndex carrierLiteralIndex
+    let carrierFinal : GridSegment :=
+      ⟨polylineLastEntrance carrierRoute,
+        carrierRoute.getLastD (0, 0)⟩
+    let directFinal :=
+      (⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).translate
+          (EqualityLink.firstCarrierMacroOrigin position link)
+    ClosedGridRectanglesSeparated
+        carrierFinal.coordinateLower carrierFinal.coordinateUpper
+        directFinal.coordinateLower directFinal.coordinateUpper ∨
+      carrierFinal.finish = directFinal.finish := by
+  simpa [EqualityLink.lensDrawing,
+    placedEqualityLensDrawing,
+    EmbeddedCNFIncidenceDrawing.renameToImage,
+    EmbeddedCNFIncidenceDrawing.rename,
+    EqualityLink.firstCarrierMacroOrigin,
+    EqualityLink.carrierDirection,
+    EqualityLink.carrierSpan] using
+      axisEqualityLensDrawing_first_finalSegmentRectanglesSeparated_or_finish_eq
+        (position link.first)
+        (AxisDirection.between
+          (position link.first) (position link.second))
+        (AxisDirection.axisSpan
+          (position link.first) (position link.second))
+        geometry.spanLarge carrierClauseIndex carrierLiteralIndex
+        kind index directOblique
+
+/-- The analogous intrinsic dichotomy at the second endpoint of a certified
+equality link. -/
+theorem EqualityLink.lensDrawing_second_finalSegmentRectanglesSeparated_or_finish_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell}
+    {link : EqualityLink Variable}
+    (geometry : EqualityLink.LensGeometry position link)
+    (carrierClauseIndex carrierLiteralIndex : Fin 2)
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (directOblique :
+      ¬(⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).IsAxisAligned) :
+    let carrierRoute :=
+      (EqualityLink.lensDrawing position link).routes
+        carrierClauseIndex carrierLiteralIndex
+    let carrierFinal : GridSegment :=
+      ⟨polylineLastEntrance carrierRoute,
+        carrierRoute.getLastD (0, 0)⟩
+    let directFinal :=
+      (⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).translate
+          (EqualityLink.secondCarrierMacroOrigin position link)
+    ClosedGridRectanglesSeparated
+        carrierFinal.coordinateLower carrierFinal.coordinateUpper
+        directFinal.coordinateLower directFinal.coordinateUpper ∨
+      carrierFinal.finish = directFinal.finish := by
+  simpa [EqualityLink.lensDrawing,
+    placedEqualityLensDrawing,
+    EmbeddedCNFIncidenceDrawing.renameToImage,
+    EmbeddedCNFIncidenceDrawing.rename,
+    EqualityLink.secondCarrierMacroOrigin,
+    EqualityLink.carrierDirection,
+    EqualityLink.carrierSpan] using
+      axisEqualityLensDrawing_second_finalSegmentRectanglesSeparated_or_finish_eq
+        (position link.first)
+        (AxisDirection.between
+          (position link.first) (position link.second))
+        (AxisDirection.axisSpan
+          (position link.first) (position link.second))
+        geometry.spanLarge carrierClauseIndex carrierLiteralIndex
+        kind index directOblique
+
+/-- Natural-index interface for the intrinsic first-end dichotomy. -/
+theorem EqualityLink.lensDrawing_first_finalSegmentRectanglesSeparated_or_finish_eq_nat
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell}
+    {link : EqualityLink Variable}
+    (geometry : EqualityLink.LensGeometry position link)
+    (carrierClauseIndex carrierLiteralIndex : Nat)
+    (carrierClauseIndexLt : carrierClauseIndex < 2)
+    (carrierLiteralIndexLt : carrierLiteralIndex < 2)
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (directOblique :
+      ¬(⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).IsAxisAligned) :
+    let carrierRoute :=
+      (EqualityLink.lensDrawing position link).routes
+        carrierClauseIndex carrierLiteralIndex
+    let carrierFinal : GridSegment :=
+      ⟨polylineLastEntrance carrierRoute,
+        carrierRoute.getLastD (0, 0)⟩
+    let directFinal :=
+      (⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).translate
+          (EqualityLink.firstCarrierMacroOrigin position link)
+    ClosedGridRectanglesSeparated
+        carrierFinal.coordinateLower carrierFinal.coordinateUpper
+        directFinal.coordinateLower directFinal.coordinateUpper ∨
+      carrierFinal.finish = directFinal.finish := by
+  exact
+    EqualityLink.lensDrawing_first_finalSegmentRectanglesSeparated_or_finish_eq
+      geometry ⟨carrierClauseIndex, carrierClauseIndexLt⟩
+      ⟨carrierLiteralIndex, carrierLiteralIndexLt⟩
+      kind index directOblique
+
+/-- Natural-index interface for the intrinsic second-end dichotomy. -/
+theorem EqualityLink.lensDrawing_second_finalSegmentRectanglesSeparated_or_finish_eq_nat
+    {Variable : Type*} [DecidableEq Variable]
+    {position : Variable → Cell}
+    {link : EqualityLink Variable}
+    (geometry : EqualityLink.LensGeometry position link)
+    (carrierClauseIndex carrierLiteralIndex : Nat)
+    (carrierClauseIndexLt : carrierClauseIndex < 2)
+    (carrierLiteralIndexLt : carrierLiteralIndex < 2)
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (directOblique :
+      ¬(⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).IsAxisAligned) :
+    let carrierRoute :=
+      (EqualityLink.lensDrawing position link).routes
+        carrierClauseIndex carrierLiteralIndex
+    let carrierFinal : GridSegment :=
+      ⟨polylineLastEntrance carrierRoute,
+        carrierRoute.getLastD (0, 0)⟩
+    let directFinal :=
+      (⟨(retainedDirectSourceLocalRouteAt kind index).headD (0, 0),
+          (retainedDirectSourceLocalRouteAt kind index).getLastD (0, 0)⟩ :
+        GridSegment).translate
+          (EqualityLink.secondCarrierMacroOrigin position link)
+    ClosedGridRectanglesSeparated
+        carrierFinal.coordinateLower carrierFinal.coordinateUpper
+        directFinal.coordinateLower directFinal.coordinateUpper ∨
+      carrierFinal.finish = directFinal.finish := by
+  exact
+    EqualityLink.lensDrawing_second_finalSegmentRectanglesSeparated_or_finish_eq
+      geometry ⟨carrierClauseIndex, carrierClauseIndexLt⟩
+      ⟨carrierLiteralIndex, carrierLiteralIndexLt⟩
+      kind index directOblique
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

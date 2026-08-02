@@ -2105,6 +2105,14 @@ The representation choices for this target are:
   with translation invariance and symbolic equality-lens bounds, shows that
   a direct terminal rectangle and either endpoint of a retained equality
   lens are strictly separated unless both routes finish at that endpoint.
+  Intrinsic-link and natural-index wrappers expose the certificate directly
+  to normalized carrier route selections.
+- [`LeanTrominoes/RetainedFinalFlatNormalizedTerminalContactSeparation.lean`](LeanTrominoes/RetainedFinalFlatNormalizedTerminalContactSeparation.lean)
+  applies that finite lens certificate at every normalized carrier contact.
+  It recovers exact direct-atlas and intrinsic carrier-lens selections,
+  identifies their common physical origin for crossover, routed-clause, and
+  routed-variable contacts, and proves that the two selected final rectangles
+  are strictly separated unless their final endpoints coincide.
 - [`LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean)
   excludes the equal-macrocell residue for failed choices.  At its general
   interface, any second route already known to come from a direct component
