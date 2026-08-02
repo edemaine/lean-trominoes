@@ -2065,6 +2065,13 @@ The representation choices for this target are:
   endpoint-join theorem then clears the whole post-escape complete tail.
   Consequently the routed-clause choice's customized first escape is now the
   only unresolved mixed fallback/direct piece.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceCarrierBoundarySeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCarrierBoundarySeparation.lean)
+  treats that customized routed-clause escape at the carrier interface.  It
+  orients each compass carrier boundary by an inward unit normal, proves
+  that combined factor-1152 scaling leaves every carrier-prefix point on
+  the closed outside, and exhaustively certifies that every routed-clause
+  escape point lies strictly inside.  The generic linear half-plane theorem
+  then gives strict continuous separation of the two positioned routes.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
