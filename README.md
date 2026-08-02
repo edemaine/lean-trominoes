@@ -2230,9 +2230,13 @@ The representation choices for this target are:
   atlas kind, that premise is now itself assembled from a source-corridor
   certificate and separation from the selected fallback outer replacement;
   these are the only two geometric obligations left for the complete mixed
-  occurrence pair.  When the discarded terminal rectangles are separated,
-  the shared radius bound discharges the outer obligation too, so the
-  complete mixed pair follows from the corridor certificate alone.
+  occurrence pair.  An atlas-kind-independent variant accepts direct
+  separation from the fully refined fallback source prefix and outer
+  replacement separately, so the routed-clause carrier argument can enter
+  the same occurrence assembly without duplicating its endpoint joins or
+  suffix proofs.  When the discarded terminal rectangles are separated, the
+  shared radius bound discharges the outer obligation too, so the complete
+  mixed pair follows from the corridor certificate alone.
 - [`LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean`](LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean)
   decomposes either ordinary or delayed-lane fallback boundary into its
   refined retained prefix and outer-fan replacement.  Strict avoidance of
@@ -2253,10 +2257,11 @@ The representation choices for this target are:
   outer replacement.  Both replacements share the same conservative
   radius-288 discarded-segment bound, which closes direct/fallback outer
   separation whenever the two unscaled segment rectangles are separated.
-  For non-routed direct atlas kinds, this outer certificate combines with
-  the existing source-corridor theorem to close separation from the entire
-  selected fallback boundary.  In particular, a corridor certificate and
-  separated discarded-terminal rectangles now discharge that boundary
+  The two-piece interface itself is independent of the direct atlas kind;
+  for non-routed choices its source-prefix premise follows from the existing
+  corridor theorem, while routed-clause choices may supply the specialized
+  carrier-boundary certificate.  In particular, a corridor certificate and
+  separated discarded-terminal rectangles discharge the non-routed boundary
   interaction with no additional geometric premise.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedOrder.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOrder.lean)
   transports the final occurrence sort to a successful direct choice and a

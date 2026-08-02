@@ -345,6 +345,62 @@ theorem
       rw [if_neg (by simpa [rawRoute] using singletonPrefix)] at replacementAvoid
       simpa [route, terminal, rawTerminal, slot] using replacementAvoid
 
+/-- Direct avoidance of the fully refined fallback source prefix and of the
+router-selected outer replacement closes the complete direct-prefix versus
+fallback-boundary interaction.  This interface is independent of the direct
+atlas kind; specialized geometry can establish the two premises separately. -/
+theorem
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_prefix_outer
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    (directSlot : RetainedTerminalSlot)
+    {fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackClauseIndex : Nat}
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackLiteralIndex : Nat}
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (prefixAvoid :
+      RoutesStrictlyAvoidEachOther
+        (choice.completeRoute directSlot)
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline retainedAngularFanSourceClearanceFactor
+            (finalCoordinatedSourceRoutes
+              formula fallbackClauseIndex fallbackLiteralIndex))).dropLast)
+    (outerAvoid :
+      RoutesStrictlyAvoidEachOther
+        (choice.completeRoute directSlot)
+        (retainedFinalCoordinatedFallbackOuterReplacement
+          formula fallbackLiteral
+          fallbackClauseIndex fallbackLiteralIndex)) :
+    RoutesStrictlyAvoidEachOther
+      (choice.completeRoute directSlot)
+      (retainedFinalCoordinatedFallbackBoundaryPrefix
+        formula fallbackLiteral
+        fallbackClauseIndex fallbackLiteralIndex) := by
+  exact
+    strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_pieces
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty fallbackClauseMember
+      fallbackLiteralMember fallbackChoiceNone
+      (choice.completeRoute directSlot) prefixAvoid outerAvoid
+
 /-- For every non-routed direct atlas kind, a source-corridor certificate
 and separation from the selected outer replacement close the complete
 direct-prefix versus fallback-boundary interaction. -/
@@ -401,11 +457,10 @@ theorem
         formula fallbackLiteral
         fallbackClauseIndex fallbackLiteralIndex) := by
   apply
-    strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_pieces
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_prefix_outer
       formula sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty fallbackClauseMember
-      fallbackLiteralMember fallbackChoiceNone
-      (choice.completeRoute directSlot)
+      sourceClausesNonempty choice directSlot
+      fallbackClauseMember fallbackLiteralMember fallbackChoiceNone
   · have prefixAvoid :=
       retainedFinalSourceScaledPrefix_strictlyAvoids_directCompleteRoute_of_corridorSeparated
         formula

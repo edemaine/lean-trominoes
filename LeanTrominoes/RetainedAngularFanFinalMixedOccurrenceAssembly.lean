@@ -477,6 +477,109 @@ theorem
       directPrefixAvoidFallbackPrefix
       directSuffixAvoidFallbackPrefix
 
+/-- A complete mixed cross-clause occurrence pair follows from direct
+separation against the fully refined fallback source prefix and its selected
+outer replacement.  This atlas-kind-independent interface discharges the
+fallback boundary join and every Figure 7 suffix interaction. -/
+theorem
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_sourcePrefix_outer
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula firstClauseIndex firstLiteralIndex =
+        some choice)
+    (secondChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula secondClauseIndex secondLiteralIndex = none)
+    (clauseIndicesDifferent :
+      firstClauseIndex ≠ secondClauseIndex)
+    (sourcePrefixAvoid :
+      let firstSlot :=
+        retainedFinalCoordinatedOccurrenceSlot
+          formula firstLiteral firstClauseIndex firstLiteralIndex
+      RoutesStrictlyAvoidEachOther
+        (choice.completeRoute firstSlot)
+        (scalePolyline retainedTerminalFanTotalRefinement
+          (scalePolyline retainedAngularFanSourceClearanceFactor
+            (finalCoordinatedSourceRoutes
+              formula secondClauseIndex secondLiteralIndex))).dropLast)
+    (outerAvoid :
+      let firstSlot :=
+        retainedFinalCoordinatedOccurrenceSlot
+          formula firstLiteral firstClauseIndex firstLiteralIndex
+      RoutesStrictlyAvoidEachOther
+        (choice.completeRoute firstSlot)
+        (retainedFinalCoordinatedFallbackOuterReplacement
+          formula secondLiteral
+          secondClauseIndex secondLiteralIndex)) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let secondSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement
+          (angularOccurrenceOrder source.erase routes)
+          (secondClause.scale retainedAngularFanSourceClearanceFactor)
+          secondLiteral secondClauseIndex secondLiteralIndex)
+    RoutesStrictlyAvoidEachOther
+      (retainedFinalCoordinatedDirectOccurrenceRoute
+        formula choice
+        (firstClause.scale retainedAngularFanSourceClearanceFactor)
+        firstLiteral firstClauseIndex firstLiteralIndex)
+      (joinAtEndpoint
+        (retainedFinalCoordinatedFallbackBoundaryPrefix
+          formula secondLiteral
+          secondClauseIndex secondLiteralIndex)
+        secondSuffix) := by
+  apply
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_prefix
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      choiceLookup secondChoiceNone clauseIndicesDifferent
+  exact
+    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_prefix_outer
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      (retainedFinalCoordinatedOccurrenceSlot
+        formula firstLiteral firstClauseIndex firstLiteralIndex)
+      secondClauseMember secondLiteralMember secondChoiceNone
+      sourcePrefixAvoid outerAvoid
+
 /-- For a non-routed direct atlas kind, the complete mixed cross-clause
 occurrence pair follows from the source-corridor certificate and separation
 from the selected fallback outer replacement.  All boundary and Figure 7
@@ -564,20 +667,27 @@ theorem
           secondClauseIndex secondLiteralIndex)
         secondSuffix) := by
   apply
-    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_prefix
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_sourcePrefix_outer
       formula sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty choice
       firstClauseMember secondClauseMember
       firstLiteralMember secondLiteralMember
       choiceLookup secondChoiceNone clauseIndicesDifferent
-  exact
-    RetainedDirectSourceRouteChoice.completeRoute_strictlyAvoids_retainedFinalCoordinatedFallbackBoundaryPrefix_of_corridor_outer
-      formula sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty choice firstClauseIndex firstLiteralIndex
-      (retainedFinalCoordinatedOccurrenceSlot
-        formula firstLiteral firstClauseIndex firstLiteralIndex)
-      choiceLookup kindNe secondClauseMember secondLiteralMember
-      secondChoiceNone corridor outerAvoid
+  · have prefixAvoid :=
+      retainedFinalSourceScaledPrefix_strictlyAvoids_directCompleteRoute_of_corridorSeparated
+        formula
+        (finalCoordinatedSourceRoutes
+          formula secondClauseIndex secondLiteralIndex)
+        firstClauseIndex firstLiteralIndex choice
+        (retainedFinalCoordinatedOccurrenceSlot
+          formula firstLiteral firstClauseIndex firstLiteralIndex)
+        choiceLookup kindNe corridor
+    rw [scalePolyline_dropLast_eq,
+      scalePolyline_dropLast_eq,
+      scalePolyline_scalePolyline_nat]
+    simpa only [retainedAngularFanSourceClearanceFactor,
+      Nat.cast_ofNat] using prefixAvoid.symm
+  · exact outerAvoid
 
 /-- In the rectangle-separated branch, a non-routed direct mixed occurrence
 pair is completely discharged by its source-corridor certificate. -/
