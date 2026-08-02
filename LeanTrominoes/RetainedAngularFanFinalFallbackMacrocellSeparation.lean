@@ -15,8 +15,87 @@ namespace LeanTrominoes
 namespace PeriodicOrthocrossing
 
 open PeriodicEightOccurrenceSplit
+open PlanarThreeSAT
 
 set_option maxHeartbeats 400000
+
+/-- A successful final selector certifies that the representative physical
+route witness consulted by that selector comes from one of the three direct
+component families. -/
+theorem
+    FinalGaugedRouteOccurrenceWitness.componentIsDirect_of_finalChoiceSome
+    {Variable : Type*} [variableDecEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {clauseIndex literalIndex : Nat}
+    {shift : Cell}
+    (witness :
+      FinalGaugedRouteOccurrenceWitness
+        formula clauseIndex literalIndex shift)
+    (choice : RetainedDirectSourceRouteChoice)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex = some choice) :
+    witness.metadata.source.component.IsDirect := by
+  rcases
+      retainedFinalDirectSourceRouteChoice_exists_raw
+        formula clauseIndex literalIndex choice choiceLookup with
+    ⟨metadata, rawChoice, metadataLookup, rawLookup, choiceEq⟩
+  have witnessMetadataLookup :
+      retainedFinalDirectSourceMetadata? formula clauseIndex =
+        some witness.metadata := by
+    unfold retainedFinalDirectSourceMetadata?
+    rw [witness.finalClauseLookup]
+    have representativeLookup := witness.representativeMetadataLookup
+    have wrappedDecidableEqEq :
+        (@instDecidableEqWrappedPeriodicVariable
+            (PeriodicPlanarSATVariable Variable)
+            (@instDecidableEqPeriodicPlanarSATVariable
+              Variable variableDecEq)) =
+          (@drawingOrderedWrappedPeriodicPlanarSATVariableInstDecidableEq
+            Variable variableDecEq) := by
+      funext first second
+      exact Subsingleton.elim _ _
+    rw [wrappedDecidableEqEq] at representativeLookup
+    exact representativeLookup
+  have metadataEq : metadata = witness.metadata :=
+    Option.some.inj (metadataLookup.symm.trans witnessMetadataLookup)
+  clear choiceEq metadataLookup witnessMetadataLookup
+  subst metadata
+  cases sourceEq : witness.metadata.source with
+  | crossover crossing localClauseIndex =>
+      simp [DrawingPlanarSATClauseSource.component,
+        DrawingPlanarSATComponent.IsDirect]
+  | carrier link localClauseIndex =>
+      rw [sourceEq] at rawLookup
+      simp [retainedDirectSourceRouteChoice?] at rawLookup
+  | bend routeBend localClauseIndex =>
+      rw [sourceEq] at rawLookup
+      simp [retainedDirectSourceRouteChoice?] at rawLookup
+  | routedClause site =>
+      simp [DrawingPlanarSATClauseSource.component,
+        DrawingPlanarSATComponent.IsDirect]
+  | routedVariable site armIndex arm link localClauseIndex =>
+      simp [DrawingPlanarSATClauseSource.component,
+        DrawingPlanarSATComponent.IsDirect]
+
+/-- The macrocell packaging of a route preserves the direct-component
+certificate recovered from a successful final choice. -/
+theorem
+    FinalGaugedFlatRouteMacrocellWitness.componentIsDirect_of_finalChoiceSome
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {taggedRoute : List Cell × Nat}
+    (witness :
+      FinalGaugedFlatRouteMacrocellWitness formula taggedRoute)
+    (choice : RetainedDirectSourceRouteChoice)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula witness.coordinates.taggedClause.2
+            witness.coordinates.taggedLiteral.2 = some choice) :
+    witness.routeWitness.metadata.source.component.IsDirect := by
+  exact
+    witness.routeWitness.componentIsDirect_of_finalChoiceSome
+      formula choice choiceLookup
 
 /-- A macrocell route whose final direct-source choice fails cannot share a
 translated center with a macrocell route already known to come from a direct
@@ -80,6 +159,38 @@ theorem
     ⟨choice, choiceSome⟩
   rw [choiceNone] at choiceSome
   cases choiceSome
+
+/-- A failed final direct-source choice cannot occupy the translated
+macrocell center of any successfully selected direct-source route. -/
+theorem
+    FinalGaugedFlatRouteMacrocellWitness.translatedCenter_ne_of_choice_none_of_second_choice_some
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {failedTaggedRoute referenceTaggedRoute : List Cell × Nat}
+    (failed :
+      FinalGaugedFlatRouteMacrocellWitness
+        formula failedTaggedRoute)
+    (reference :
+      FinalGaugedFlatRouteMacrocellWitness
+        formula referenceTaggedRoute)
+    (choiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula failed.coordinates.taggedClause.2
+            failed.coordinates.taggedLiteral.2 = none)
+    (choice : RetainedDirectSourceRouteChoice)
+    (choiceSome :
+      retainedFinalDirectSourceRouteChoice?
+          formula reference.coordinates.taggedClause.2
+            reference.coordinates.taggedLiteral.2 = some choice) :
+    failed.translatedCenter ≠ reference.translatedCenter := by
+  exact
+    failed.translatedCenter_ne_of_choice_none_of_second_component_isDirect
+      formula wellFormed degree isLocal reference choiceNone
+      (reference.componentIsDirect_of_finalChoiceSome
+        formula choice choiceSome)
 
 /-- A macrocell route whose final direct-source choice fails has translated
 center different from every macrocell route with an oblique final segment. -/

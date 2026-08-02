@@ -2087,8 +2087,12 @@ The representation choices for this target are:
   interface, any second route already known to come from a direct component
   makes both equal-center components direct, contradicting the failed
   selector because every genuine direct-component route produces a
-  successful checked choice.  The earlier oblique-reference theorem is now
-  a corollary that obtains directness from the terminal geometry.
+  successful checked choice.  Conversely, a successful final selector now
+  certifies that its recovered occurrence witness belongs to a direct
+  component, so a failed fallback macrocell and a successfully selected
+  direct macrocell are proved to have unequal translated centers without any
+  extra geometric premise.  The earlier oblique-reference theorem is a
+  corollary that obtains directness from the terminal geometry.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedObliqueCorridorSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedObliqueCorridorSeparation.lean)
   closes the source-prefix corridor for a failed fallback route against an
   oblique selected direct route.  It combines flat component reduction,
