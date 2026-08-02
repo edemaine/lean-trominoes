@@ -2199,8 +2199,21 @@ The representation choices for this target are:
   Their source-to-boundary prefixes strictly avoid the matching implication
   cycle, whose selected entering edge ends at the same ring vertex as the
   simple Figure 7 spoke.  Thus neither fallback can revisit its variable
-  endpoint after unit subdivision.  The remaining step is to transport
-  these reusable certificates through the final formula-indexed case split.
+  endpoint after unit subdivision.
+- [`LeanTrominoes/RetainedAngularFanFinalFallbackEndpointIsolation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackEndpointIsolation.lean)
+  instantiates those reusable ordinary and delayed-lane certificates with
+  the retained source geometry, terminal classification, and exact Figure 7
+  spoke used by the final positioned construction.
+- [`LeanTrominoes/RetainedAngularFanFinalOccurrenceEndpointIsolation.lean`](LeanTrominoes/RetainedAngularFanFinalOccurrenceEndpointIsolation.lean)
+  resolves the final copied-source route selector.  Direct atlas choices,
+  ordinary fallbacks, and singleton-prefix escaped fallbacks all isolate the
+  same variable endpoint after unit subdivision.
+- [`LeanTrominoes/RetainedAngularFanFinalRouteEndpointIsolation.lean`](LeanTrominoes/RetainedAngularFanFinalRouteEndpointIsolation.lean)
+  combines copied-source incidences with the appended implication-cycle
+  clauses at the public fixed-eight interface.  Existing cycle simplicity
+  handles the appended suffix, so every genuine final coordinated route now
+  has an isolated variable endpoint.  Transport through Figure 9 and unit
+  elimination remains before final loop erasure can inherit the route orders.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
