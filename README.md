@@ -2088,6 +2088,12 @@ The representation choices for this target are:
   cross-clause spoke and suffix theorems discharge both interactions with the
   fallback suffix automatically, reducing the complete mixed pair to exactly
   the two interactions with its fallback boundary prefix.
+- [`LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean`](LeanTrominoes/RetainedAngularFanMixedBoundaryAssembly.lean)
+  decomposes either ordinary or delayed-lane fallback boundary into its
+  refined retained prefix and outer-fan replacement.  Strict avoidance of
+  those two pieces composes across their certified gate, and orthogonality
+  removes the final rasterization wrapper, so the result applies directly to
+  the actual fallback boundary route.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
