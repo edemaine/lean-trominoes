@@ -2061,6 +2061,11 @@ The representation choices for this target are:
   direct segment.  Consequently a non-routed aligned direct occurrence and
   a same-center cross-clause fallback occurrence automatically have strictly
   disjoint complete routes in the final coordinated drawing.
+- [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
+  reduces an oblique final source-corridor obligation by the physical
+  carrier/macrocell decomposition.  Carrier reference routes are impossible,
+  while separated component boxes close automatically, leaving only an
+  overlapping carrier--macrocell pair and an equal-macrocell pair.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
