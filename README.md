@@ -2071,6 +2071,11 @@ The representation choices for this target are:
   reference makes both equal-center components direct, contradicting the
   failed selector because every genuine direct-component route produces a
   successful checked choice.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedObliqueCorridorSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedObliqueCorridorSeparation.lean)
+  closes the source-prefix corridor for a failed fallback route against an
+  oblique selected direct route.  It combines flat component reduction,
+  normalized carrier boundaries, and recovered incidence indices to
+  discharge both residual configurations.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
