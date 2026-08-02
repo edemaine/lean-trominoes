@@ -2055,7 +2055,10 @@ The representation choices for this target are:
   completely separated once strict order and their common physical center
   are supplied.  A same-center wrapper derives those facts, terminal
   positivity, and escape room automatically, leaving only the source
-  corridor as an explicit geometric premise.
+  corridor as an explicit geometric premise.  An atlas-kind-independent
+  same-center wrapper instead accepts strict separation from the fully
+  refined fallback source prefix; it derives outer-route avoidance from the
+  same order data and reuses the complete boundary-and-suffix assembly.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedAlignedOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedAlignedOccurrenceSeparation.lean)
   discharges that last corridor premise for every axis-aligned successful
   direct segment.  Consequently a non-routed aligned direct occurrence and
