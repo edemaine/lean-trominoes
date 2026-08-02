@@ -2020,6 +2020,10 @@ The representation choices for this target are:
   terminal data used by the final router.  Equal physical centers now give
   the exact ordinary and delayed-lane outer-route avoidance certificates
   needed in the overlapping mixed branch.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedOuterSelection.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOuterSelection.lean)
+  performs the final router's singleton-prefix case split.  Strict angular
+  order at an equal physical center now separates a direct route from the
+  actually selected ordinary or delayed-lane fallback outer replacement.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
