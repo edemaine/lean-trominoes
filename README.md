@@ -1988,6 +1988,11 @@ The representation choices for this target are:
   delayed-lane radial and complete outer routes all commute with translation
   of their variable center.  Local direct/fallback certificates can therefore
   be transported without unfolding the final positioned route definitions.
+- [`LeanTrominoes/RetainedAngularFanDirectSourcePositionedFallbackSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourcePositionedFallbackSeparation.lean)
+  transports the automatic strict-order separation theorem through a checked
+  direct choice's physical component offset.  Its complete positioned route
+  now avoids either ordinary or delayed-lane fallback complete routes at the
+  same positioned fan center.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
