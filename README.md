@@ -2122,6 +2122,12 @@ The representation choices for this target are:
   selected fallback boundary.  In particular, a corridor certificate and
   separated discarded-terminal rectangles now discharge that boundary
   interaction with no additional geometric premise.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedOrder.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOrder.lean)
+  transports the final occurrence sort to a successful direct choice and a
+  genuine fallback route of the same atom.  Their coordinated slots and
+  classified terminal-direction ranks increase in the same orientation,
+  supplying the exact order premise for the remaining overlapping local-fan
+  certificate.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
