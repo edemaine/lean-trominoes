@@ -1948,7 +1948,10 @@ The representation choices for this target are:
   lane shift, remaining radial raster, and local fan adapter.  A generic
   assembly theorem reduces complete-route separation to the escape pair, two
   directed escape--tail pairs, and the tail pair, while preserving the fact
-  that the common clause head is the only permitted contact.
+  that the common clause head is the only permitted contact.  A replacement
+  corollary also transfers strict separation of the canonical rasterized
+  escaped route to any coordinated escape, leaving only that replacement
+  escape's interaction with the other complete route to check.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary

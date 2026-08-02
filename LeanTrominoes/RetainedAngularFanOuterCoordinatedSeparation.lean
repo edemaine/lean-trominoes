@@ -133,6 +133,60 @@ theorem
       (retainedTerminalFanOuterCoordinatedEscapedCompleteTail_head?
         center terminal slot)
 
+/-- Replace the canonical rasterized 64-block escape by any certified
+coordinated escape.  Separation of the canonical complete route supplies
+separation of the unchanged complete tail, so only the replacement escape
+must be checked against the other route. -/
+theorem
+    retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_strictlyAvoid_of_rasterized_escape_replacement
+    (center : Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (escape :
+      RetainedTerminalFanOuterSourceEscapeCertificate
+        center terminal slot)
+    (other : List Cell)
+    (rasterizedAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterEscapedCompleteRoute
+          center terminal slot)
+        other)
+    (replacementEscapeAvoid :
+      RoutesStrictlyAvoidEachOther escape.route other) :
+    RoutesStrictlyAvoidEachOther
+      (retainedTerminalFanOuterCoordinatedEscapedCompleteRoute
+        center terminal slot escape)
+      other := by
+  have rasterizedJoinedAvoid :
+      RoutesStrictlyAvoidEachOther
+        (joinAtEndpoint
+          (retainedTerminalFanOuterRasterizedSourceEscapeCertificate
+            center terminal slot).route
+          (retainedTerminalFanOuterCoordinatedEscapedCompleteTail
+            center terminal slot))
+        other := by
+    rw [←
+      retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_eq_escape_join_tail]
+    rw [←
+      retainedTerminalFanOuterEscapedCompleteRoute_eq_coordinatedRasterized]
+    exact rasterizedAvoid
+  have tailAvoid :
+      RoutesStrictlyAvoidEachOther
+        (retainedTerminalFanOuterCoordinatedEscapedCompleteTail
+          center terminal slot)
+        other :=
+    (rasterizedJoinedAvoid.of_join_left
+      (retainedTerminalFanOuterRasterizedSourceEscapeCertificate
+        center terminal slot).last_eq
+      (retainedTerminalFanOuterCoordinatedEscapedCompleteTail_head?
+        center terminal slot)).2
+  rw [
+    retainedTerminalFanOuterCoordinatedEscapedCompleteRoute_eq_escape_join_tail]
+  exact replacementEscapeAvoid.join_left tailAvoid
+    escape.last_eq
+    (retainedTerminalFanOuterCoordinatedEscapedCompleteTail_head?
+      center terminal slot)
+
 /-- Four pairwise piece certificates assemble two coordinated complete
 routes while preserving their common-head-only contact discipline. -/
 theorem
