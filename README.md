@@ -2212,8 +2212,12 @@ The representation choices for this target are:
   combines copied-source incidences with the appended implication-cycle
   clauses at the public fixed-eight interface.  Existing cycle simplicity
   handles the appended suffix, so every genuine final coordinated route now
-  has an isolated variable endpoint.  Transport through Figure 9 and unit
-  elimination remains before final loop erasure can inherit the route orders.
+  has an isolated variable endpoint.
+- [`LeanTrominoes/RetainedAngularFanFinalNormalizedVariableRouteOrder.lean`](LeanTrominoes/RetainedAngularFanFinalNormalizedVariableRouteOrder.lean)
+  uses that isolation together with route nondegeneracy and orthogonality to
+  carry clockwise variable occurrence order through verified fixed-eight
+  loop erasure.  Transport through Figure 9 and unit elimination remains for
+  the final exact-one normalization.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes.lean)
   applies that normalization at the final unit-free exact-one interface
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
