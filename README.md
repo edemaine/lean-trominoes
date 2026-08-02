@@ -2031,6 +2031,10 @@ The representation choices for this target are:
   joins the aligned planarity branch with exact classified-segment separation
   for oblique direct choices, giving unconditional direction inequality for
   same-center direct/fallback pairs from different clauses.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedAlignedCorridorSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedAlignedCorridorSeparation.lean)
+  lifts inherited strict prefix separation through orthogonal source-route
+  rectangles, automatically producing the mixed source corridor whenever
+  the selected direct segment is axis-aligned.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean`](LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean)
   transports equality of canonical direct/fallback literal positions to
   equality of their fully refined physical fan centers, matching the center
