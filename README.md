@@ -2066,6 +2066,10 @@ The representation choices for this target are:
   corridor and combines it with the aligned branch, yielding unconditional
   same-center cross-clause direct/fallback separation for non-routed direct
   choices.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean)
+  identifies the selected fallback boundary join and direct occurrence with
+  their total route-family lookups.  The same-center non-routed mixed theorem
+  is therefore available at the public interface in both route orders.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
