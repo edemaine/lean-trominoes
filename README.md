@@ -469,8 +469,12 @@ The representation choices for this target are:
   clause-to-boundary segment and proves that this segment misses the refined
   source lattice.  Consequently the normalized local prefix misses the final
   canonical literal endpoint, and joining it to any isolated inherited
-  suffix preserves final-endpoint isolation for the complete route.  A final
-  inherited/auxiliary classification proves this property for every genuine
+  suffix preserves final-endpoint isolation for the complete route.  In the
+  other direction, unit subdivision of every scaled source route stays on the
+  translated scale grid, while the three Figure 9 clause ports and their
+  connector paths avoid that grid.  Joining the two pieces therefore also
+  preserves first-endpoint isolation.  A final inherited/auxiliary
+  classification proves both endpoint-isolation properties for every genuine
   Figure 9 incidence.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
@@ -2694,8 +2698,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeInheritedRouteIsolation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeInheritedRouteIsolation.lean)
   instantiates the generic connector theorem with the normalized retained
   fixed-eight source family.  Every genuine inherited Figure 9 suffix and
-  every complete raw Figure 9 route now has an isolated variable endpoint
-  after unit subdivision.
+  every complete raw Figure 9 route now has isolated clause and variable
+  endpoints after unit subdivision.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean)
   transports the coordinated raw Figure 9 formula, placement, and routes
   through the exact-one variable wrapper.  The wrapper changes no geometry

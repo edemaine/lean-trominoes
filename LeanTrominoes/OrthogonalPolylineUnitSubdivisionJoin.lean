@@ -109,6 +109,54 @@ theorem unitSubdividePolyline_joinAtEndpoint
                       (secondPoint :: third :: rest)) by
                 simp only [unitSubdividePolyline]]
 
+/-- Joining a suffix to a prefix with an isolated first point preserves
+first-point isolation when that point is absent from the suffix tail. -/
+theorem HeadNotInTail.joinAtEndpoint
+    {first second : List Cell} {head : Cell}
+    (fresh : HeadNotInTail first)
+    (firstHead : first.head? = some head)
+    (headNotInSecondTail : head ∉ second.tail) :
+    HeadNotInTail (LeanTrominoes.joinAtEndpoint first second) := by
+  intro joinedHead joinedHeadLookup joinedHeadMember
+  have joinedHeadEqual : joinedHead = head := by
+    have lookup := joinAtEndpoint_head? (second := second) firstHead
+    rw [joinedHeadLookup] at lookup
+    exact Option.some.inj lookup
+  subst joinedHead
+  cases first with
+  | nil => simp at firstHead
+  | cons firstPoint firstTail =>
+      have firstPointEqual : firstPoint = head := by
+        simpa using firstHead
+      subst firstPoint
+      simp only [LeanTrominoes.joinAtEndpoint,
+        List.cons_append, List.tail_cons,
+        List.mem_append] at joinedHeadMember
+      rcases joinedHeadMember with firstMember | secondMember
+      · exact fresh head (by simp) firstMember
+      · exact headNotInSecondTail secondMember
+
+/-- Endpoint isolation of a subdivided prefix extends across a correctly
+matched subdivided suffix when the prefix's first endpoint is absent from
+the suffix. -/
+theorem HeadNotInTail.unitSubdividePolyline_joinAtEndpoint
+    {first second : List Cell} {head middle : Cell}
+    (fresh : HeadNotInTail (unitSubdividePolyline first))
+    (firstNonempty : first ≠ [])
+    (firstHead : first.head? = some head)
+    (firstLast : first.getLast? = some middle)
+    (secondHead : second.head? = some middle)
+    (headNotInSecond : head ∉ unitSubdividePolyline second) :
+    HeadNotInTail
+      (unitSubdividePolyline
+        (LeanTrominoes.joinAtEndpoint first second)) := by
+  rw [AxisDirection.unitSubdividePolyline_joinAtEndpoint
+    firstNonempty firstLast secondHead]
+  apply fresh.joinAtEndpoint
+  · rw [unitSubdividePolyline_head? firstNonempty, firstHead]
+  · intro member
+    exact headNotInSecond (List.mem_of_mem_tail member)
+
 /-- Joining a prefix to a nondegenerate suffix preserves isolation of the
 suffix's final endpoint when that endpoint is absent from the prefix. -/
 theorem LastNotInDropLast.joinAtEndpoint

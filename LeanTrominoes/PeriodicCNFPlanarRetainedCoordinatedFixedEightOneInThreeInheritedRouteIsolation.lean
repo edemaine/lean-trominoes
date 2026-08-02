@@ -166,5 +166,82 @@ theorem
             sourceClauseMember sourceLiteralMember)
         clauseMember literalMember
 
+/-- Every genuine raw Figure 9 route in the retained coordinated
+construction has both endpoints isolated after unit subdivision. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes_endpointIsolation
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (PeriodicPlanarOneInThreeThreeRawVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeRawFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (PeriodicPlanarOneInThreeThreeRawVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    AxisDirection.HeadNotInTail
+        (AxisDirection.unitSubdividePolyline
+          (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty clauseIndex literalIndex)) ∧
+      AxisDirection.LastNotInDropLast
+        (AxisDirection.unitSubdividePolyline
+          (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty clauseIndex literalIndex)) := by
+  simpa only [
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes,
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeInheritedRouteSuffixes]
+    using
+      PeriodicOneInThreePositioned.splicedRoutes_endpointIsolation
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          source)
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_widthAtMostThree
+          source sourceWidth)
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_allAtomsNodup
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty)
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          source)
+        (fun _sourceClause _sourceClauseIndex sourceClauseMember
+            _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+          let valid :=
+            retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
+              source sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty sourceClauseMember sourceLiteralMember
+          ⟨valid.1, valid.2.1⟩)
+        (fun _sourceClause _sourceClauseIndex sourceClauseMember
+            _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+          (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty
+            sourceClauseMember sourceLiteralMember).2.2)
+        (fun _sourceClause _sourceClauseIndex sourceClauseMember
+            _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+          retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty
+            sourceClauseMember sourceLiteralMember)
+        (fun _sourceClause _sourceClauseIndex sourceClauseMember
+            _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+          retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_isSimple
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty
+            sourceClauseMember sourceLiteralMember)
+        clauseMember literalMember
+
 end PeriodicOrthocrossing
 end LeanTrominoes
