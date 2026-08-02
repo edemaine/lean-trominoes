@@ -2049,6 +2049,12 @@ The representation choices for this target are:
   checked choice's physical component translation.  The only exceptional
   atlas kind is the routed source clause, whose deliberately wide first
   escape is isolated for a separate carrier-interface argument.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceFallbackPrefixSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceFallbackPrefixSeparation.lean)
+  combines the tight transverse envelope with the radius-288 source-segment
+  rectangle.  It identifies a successful final choice's represented segment
+  with the actual retained route's discarded final edge, then applies the
+  generic rectangle-or-line corridor theorem to separate any factor-1152
+  fallback source prefix from a non-routed direct complete route.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly
