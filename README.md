@@ -2011,6 +2011,10 @@ The representation choices for this target are:
   terminal direction with any classified axis-aligned segment.  The final
   fallback branch instantiates this small geometry lemma with its endpoint
   classification and failed-choice alignment certificate.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceAlignedOrthogonality.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceAlignedOrthogonality.lean)
+  records the complementary aligned direct-source branch: because every
+  successful choice represents an exact two-point route, alignment of its
+  stored segment recovers orthogonality of the original final source route.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean`](LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean)
   transports equality of canonical direct/fallback literal positions to
   equality of their fully refined physical fan centers, matching the center
