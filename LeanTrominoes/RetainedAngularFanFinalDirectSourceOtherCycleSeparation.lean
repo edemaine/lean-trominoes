@@ -829,6 +829,176 @@ theorem compatibleVariableLocalPosition_of_centerKinds
                 simpa [liftedIncidenceVertexPosition] using
                   pointEq)
 
+/-- Cancel the translation on the first of two equal translated drawing
+centers.  This is the two-shift form needed when a literal occurrence moves
+an already decomposed retained variable to another periodic copy. -/
+theorem point_eq_add_periodTranslation_sub_of_two_adds_eq
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (first second firstShift secondShift : Cell)
+    (equal :
+      Cell.add first ((drawing graph).periodTranslation firstShift) =
+        Cell.add second ((drawing graph).periodTranslation secondShift)) :
+    first =
+      Cell.add second
+        ((drawing graph).periodTranslation
+          (Cell.sub secondShift firstShift)) := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  rcases firstShift with ⟨firstShiftX, firstShiftY⟩
+  rcases secondShift with ⟨secondShiftX, secondShiftY⟩
+  simp only [PeriodicGridDrawing.periodTranslation,
+    Cell.add, Cell.sub, Cell.scale, Prod.mk.injEq] at equal ⊢
+  constructor
+  · linear_combination equal.1
+  · linear_combination equal.2
+
+/-- A periodic copy of a valid retained variable has a local coordinate
+compatible with any successful direct component occupying the same copied
+macrocell. -/
+theorem compatibleVariableLocalPosition_of_centerKinds_periodTranslate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {kind : RetainedDirectClauseKind}
+    {sourceCenter targetCenter localPosition targetShift : Cell}
+    (sourceKind :
+      RetainedFinalDirectSourceCenterKind
+        formula kind sourceCenter)
+    (targetKind :
+      RetainedFinalVariableCenterKind
+        formula targetCenter localPosition)
+    (centersEqual :
+      sourceCenter =
+        Cell.add targetCenter
+          ((drawing formula.incidenceGraph).periodTranslation
+            targetShift)) :
+    kind.CompatibleVariableLocalPosition localPosition := by
+  cases sourceKind with
+  | crossover
+      clauseIndex crossing sourceShift crossingMember =>
+      cases targetKind with
+      | carrier node nodeMember =>
+          exact Or.inl
+            (retainedCarrierNode_localPosition_isCarrierPort
+              wellFormed degree isLocal nodeMember)
+      | atom site siteMember =>
+          exfalso
+          have pointEq :
+              crossing.point =
+                liftedIncidenceVertexPosition formula
+                  (.variable site.1)
+                  (Cell.add site.2
+                    (Cell.sub targetShift sourceShift)) := by
+            rw [liftedIncidenceVertexPosition_periodTranslate]
+            exact
+              point_eq_add_periodTranslation_sub_of_two_adds_eq
+                formula.incidenceGraph crossing.point
+                (liftedIncidenceVertexPosition formula
+                  (.variable site.1) site.2)
+                sourceShift targetShift centersEqual
+          exact
+            (orientedCrossing_point_ne_liftedVertexPosition
+              wellFormed degree crossingMember
+              (drawingVariableRouteSite_vertex_mem
+                formula siteMember)
+              (Cell.add site.2
+                (Cell.sub targetShift sourceShift)))
+              (by
+                simpa [liftedIncidenceVertexPosition] using pointEq)
+      | crossoverInternal
+          targetCrossing internal targetCrossingMember =>
+          exact Or.inr ⟨internal, rfl⟩
+  | duplicator
+      arm clauseIndex site sourceShift siteMember =>
+      cases targetKind with
+      | carrier node nodeMember =>
+          exact Or.inl
+            (retainedCarrierNode_localPosition_isCarrierPort
+              wellFormed degree isLocal nodeMember)
+      | atom targetSite targetSiteMember =>
+          exact Or.inr rfl
+      | crossoverInternal
+          crossing internal crossingMember =>
+          exfalso
+          have pointEq :
+              crossing.point =
+                liftedIncidenceVertexPosition formula
+                  (.variable site.1)
+                  (Cell.add site.2
+                    (Cell.sub sourceShift targetShift)) := by
+            rw [liftedIncidenceVertexPosition_periodTranslate]
+            exact
+              point_eq_add_periodTranslation_sub_of_two_adds_eq
+                formula.incidenceGraph crossing.point
+                (liftedIncidenceVertexPosition formula
+                  (.variable site.1) site.2)
+                targetShift sourceShift centersEqual.symm
+          exact
+            (orientedCrossing_point_ne_liftedVertexPosition
+              wellFormed degree crossingMember
+              (drawingVariableRouteSite_vertex_mem
+                formula siteMember)
+              (Cell.add site.2
+                (Cell.sub sourceShift targetShift)))
+              (by
+                simpa [liftedIncidenceVertexPosition] using pointEq)
+  | routedClause site sourceShift siteMember =>
+      cases targetKind with
+      | carrier node nodeMember =>
+          exact
+            retainedCarrierNode_localPosition_isCarrierPort
+              wellFormed degree isLocal nodeMember
+      | atom targetSite targetSiteMember =>
+          exfalso
+          have positionEq :
+              liftedIncidenceVertexPosition formula
+                  (.clause site.1)
+                  (Cell.add site.2 sourceShift) =
+                liftedIncidenceVertexPosition formula
+                  (.variable targetSite.1)
+                  (Cell.add targetSite.2 targetShift) := by
+            rw [liftedIncidenceVertexPosition_periodTranslate,
+              liftedIncidenceVertexPosition_periodTranslate]
+            exact centersEqual
+          have vertexData :=
+            liftedDrawingVertexPosition_eq
+              formula.incidenceGraph
+              (drawingClauseRouteSite_vertex_mem
+                formula siteMember)
+              (drawingVariableRouteSite_vertex_mem
+                formula targetSiteMember)
+              (by
+                simpa [liftedIncidenceVertexPosition] using positionEq)
+          cases vertexData.1
+      | crossoverInternal
+          crossing internal crossingMember =>
+          exfalso
+          have pointEq :
+              crossing.point =
+                liftedIncidenceVertexPosition formula
+                  (.clause site.1)
+                  (Cell.add site.2
+                    (Cell.sub sourceShift targetShift)) := by
+            rw [liftedIncidenceVertexPosition_periodTranslate]
+            exact
+              point_eq_add_periodTranslation_sub_of_two_adds_eq
+                formula.incidenceGraph crossing.point
+                (liftedIncidenceVertexPosition formula
+                  (.clause site.1) site.2)
+                targetShift sourceShift centersEqual.symm
+          exact
+            (orientedCrossing_point_ne_liftedVertexPosition
+              wellFormed degree crossingMember
+              (drawingClauseRouteSite_vertex_mem
+                formula siteMember)
+              (Cell.add site.2
+                (Cell.sub sourceShift targetShift)))
+              (by
+                simpa [liftedIncidenceVertexPosition] using pointEq)
+
 /-- No geometrically valid final source variable other than the represented
 endpoint can lie inside a successful direct choice's source-segment
 rectangle. -/
