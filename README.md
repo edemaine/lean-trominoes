@@ -2015,6 +2015,11 @@ The representation choices for this target are:
   transports equality of canonical direct/fallback literal positions to
   equality of their fully refined physical fan centers, matching the center
   expected by the positioned outer-route separation certificates.
+- [`LeanTrominoes/RetainedAngularFanDirectSourcePositionedScaledFallbackSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourcePositionedScaledFallbackSeparation.lean)
+  specializes positioned strict-order separation to the scaled fallback
+  terminal data used by the final router.  Equal physical centers now give
+  the exact ordinary and delayed-lane outer-route avoidance certificates
+  needed in the overlapping mixed branch.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
