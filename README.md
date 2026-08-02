@@ -2146,9 +2146,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFinalMixedStrictOrder.lean`](LeanTrominoes/RetainedAngularFanFinalMixedStrictOrder.lean)
   upgrades that compatible weak order to the strict angular order required by
   complete direct/fallback outer-route separation whenever their classified
-  terminal directions differ.  Thus the overlapping branch now needs only a
-  geometric proof that its oblique direct terminal cannot equal the aligned
-  carrier terminal.
+  terminal directions differ.  It also combines terminal classification with
+  an aligned fallback segment and an oblique direct segment to supply that
+  direction inequality and hence strict order in one step.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanDirectSourceCycleSeparation.lean)
   exhaustively checks the missing inner-neighborhood interaction for all 33
   direct clause shapes: every coordinated outer prefix is strictly

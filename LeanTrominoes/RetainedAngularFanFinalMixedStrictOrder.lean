@@ -1,5 +1,6 @@
 import LeanTrominoes.RetainedAngularFanDirectFallbackOuterReduction
 import LeanTrominoes.RetainedAngularFanFinalMixedOrder
+import LeanTrominoes.RetainedTerminalDirectionAlignment
 
 /-!
 # Strict angular order of final direct/fallback pairs
@@ -48,6 +49,44 @@ theorem
         Nat.lt_of_le_of_ne ranksLe fun ranksEqual =>
           directionsDifferent
             (RetainedTerminalDirection.angularRank_injective ranksEqual.symm)⟩
+
+/-- Compatible direct/fallback order is strict when their successfully
+classified terminal segments have different axis-alignment status. -/
+theorem
+    directFallbackStrictAngularOrderCompatible_of_compatible_of_alignment_ne
+    (choice : RetainedDirectSourceRouteChoice)
+    (fallbackDirection : RetainedTerminalDirection)
+    (directSlot fallbackSlot : RetainedTerminalSlot)
+    {directStart directFinish fallbackStart fallbackFinish : Cell}
+    {directLength fallbackLength : Nat}
+    (compatible :
+      RetainedDirectSourceRouteChoice.FallbackAngularOrderCompatible
+        choice fallbackDirection directSlot fallbackSlot)
+    (directClassified :
+      retainedTerminalDirectionClassify
+          (Cell.sub directStart directFinish) =
+        some
+          ((retainedDirectSourceFanTerminalAt
+            choice.kind choice.index).1, directLength))
+    (fallbackClassified :
+      retainedTerminalDirectionClassify
+          (Cell.sub fallbackStart fallbackFinish) =
+        some (fallbackDirection, fallbackLength))
+    (fallbackAligned :
+      (GridSegment.mk fallbackStart fallbackFinish).IsAxisAligned)
+    (directNotAligned :
+      ¬(GridSegment.mk directStart directFinish).IsAxisAligned) :
+    DirectFallbackStrictAngularOrderCompatible
+      (retainedDirectSourceFanTerminalAt
+        choice.kind choice.index).1
+      fallbackDirection directSlot fallbackSlot := by
+  apply
+    directFallbackStrictAngularOrderCompatible_of_compatible_of_ne
+      choice fallbackDirection directSlot fallbackSlot compatible
+  exact
+    (retainedTerminalDirections_ne_of_segment_alignment_ne
+      fallbackClassified directClassified
+      fallbackAligned directNotAligned).symm
 
 end PeriodicOrthocrossing
 end LeanTrominoes
