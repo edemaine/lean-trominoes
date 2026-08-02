@@ -2023,6 +2023,10 @@ The representation choices for this target are:
   packages the shared-endpoint direction-separation theorem in whole
   terminal-data records, avoiding expensive normalization of direction and
   length projections during final-route composition.
+- [`LeanTrominoes/RetainedAngularFanFinalMixedAlignedDirectionSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedAlignedDirectionSeparation.lean)
+  combines source-route separation with direct and fallback orthogonality.
+  Aligned mixed routes ending at one canonical variable center must therefore
+  have different classified terminal directions.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean`](LeanTrominoes/RetainedAngularFanFinalMixedCenter.lean)
   transports equality of canonical direct/fallback literal positions to
   equality of their fully refined physical fan centers, matching the center
