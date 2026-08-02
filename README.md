@@ -2066,6 +2066,11 @@ The representation choices for this target are:
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
   while separated component boxes close automatically, leaving only an
   overlapping carrier--macrocell pair and an equal-macrocell pair.
+- [`LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean)
+  excludes the equal-macrocell residue for failed choices.  An oblique
+  reference makes both equal-center components direct, contradicting the
+  failed selector because every genuine direct-component route produces a
+  successful checked choice.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
