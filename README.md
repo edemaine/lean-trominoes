@@ -2078,7 +2078,11 @@ The representation choices for this target are:
   its source segment axis-aligned as well.  Distinct clause heads, distinct
   literal centers, and retained source compatibility then separate the two
   terminal rectangles, which combines with the established source corridor
-  to separate the complete direct and fallback occurrences.
+  to separate the complete direct and fallback occurrences.  For an oblique
+  direct segment, it now reduces terminal-rectangle separation through the
+  flat physical components: separated boxes and equal macrocells close
+  automatically, leaving exactly the overlapping fallback-carrier versus
+  direct-macrocell interface.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean)
   identifies the selected fallback boundary join and direct occurrence with
   their total route-family lookups.  The same-center mixed theorem, including
@@ -2089,6 +2093,12 @@ The representation choices for this target are:
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
   while separated component boxes close automatically, leaving only an
   overlapping carrier--macrocell pair and an equal-macrocell pair.
+- [`LeanTrominoes/RetainedFinalFlatFinalSegmentComponentCases.lean`](LeanTrominoes/RetainedFinalFlatFinalSegmentComponentCases.lean)
+  supplies the parallel component reduction for the routes' final segments.
+  Endpoint containment turns separated carrier or macrocell boxes directly
+  into separated segment rectangles without assuming axis alignment; an
+  oblique reference again rules out its carrier branch, isolating the same
+  overlap and equal-center residues.
 - [`LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean)
   excludes the equal-macrocell residue for failed choices.  At its general
   interface, any second route already known to come from a direct component

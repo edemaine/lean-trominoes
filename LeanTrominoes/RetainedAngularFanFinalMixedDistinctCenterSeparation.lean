@@ -1,6 +1,8 @@
 import LeanTrominoes.RetainedAngularFanFinalMixedAlignedCorridorSeparation
 import LeanTrominoes.RetainedAngularFanFinalMixedOccurrenceAssembly
 import LeanTrominoes.RetainedAngularFanFinalFallbackSegmentClassification
+import LeanTrominoes.RetainedAngularFanFinalMixedObliqueCorridorSeparation
+import LeanTrominoes.RetainedFinalFlatFinalSegmentComponentCases
 
 /-!
 # Distinct-center final mixed occurrence separation
@@ -268,6 +270,198 @@ theorem
     simpa only [routes] using separated
   rw [representedSegment] at separated'
   exact separated'
+
+/-- For an oblique successful direct choice, flat-component analysis proves
+final-segment rectangle separation except at an overlapping failed carrier
+and direct macrocell.  Failed/selected macrocell equality is contradictory. -/
+theorem
+    retainedFinalDirectFallback_finalSegmentRectanglesSeparated_of_directSegment_not_axisAligned_of_carrierOverlap
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (directOblique : ¬choice.sourceSegment.IsAxisAligned)
+    (carrierOverlap :
+      ∀
+        {fallbackRoute directRoute : List Cell}
+        {fallbackRouteIndex directRouteIndex : Nat}
+        (fallbackCarrier :
+          FinalGaugedFlatCarrierRouteWitness
+            formula (fallbackRoute, fallbackRouteIndex))
+        (directMacrocell :
+          FinalGaugedFlatRouteMacrocellWitness
+            formula (directRoute, directRouteIndex)),
+        fallbackRoute =
+            finalCoordinatedSourceRoutes
+              formula fallbackClauseIndex fallbackLiteralIndex →
+          directRoute =
+            finalCoordinatedSourceRoutes
+              formula directClauseIndex directLiteralIndex →
+          ¬ClosedGridRectanglesSeparated
+              fallbackCarrier.rectangleLower fallbackCarrier.rectangleUpper
+              (planarSATMacrocellRouteLower
+                directMacrocell.translatedCenter)
+              (planarSATMacrocellRouteUpper
+                directMacrocell.translatedCenter) →
+            ClosedGridRectanglesSeparated
+              choice.sourceSegment.coordinateLower
+              choice.sourceSegment.coordinateUpper
+              (⟨polylineLastEntrance fallbackRoute,
+                  fallbackRoute.getLastD (0, 0)⟩ :
+                GridSegment).coordinateLower
+              (⟨polylineLastEntrance fallbackRoute,
+                  fallbackRoute.getLastD (0, 0)⟩ :
+                GridSegment).coordinateUpper) :
+    let fallbackRoute :=
+      finalCoordinatedSourceRoutes
+        formula fallbackClauseIndex fallbackLiteralIndex
+    ClosedGridRectanglesSeparated
+      choice.sourceSegment.coordinateLower
+      choice.sourceSegment.coordinateUpper
+      (⟨polylineLastEntrance fallbackRoute,
+          fallbackRoute.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance fallbackRoute,
+          fallbackRoute.getLastD (0, 0)⟩ : GridSegment).coordinateUpper := by
+  dsimp only
+  let certificate :=
+    retainedPlanarSATCertificate formula
+      sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  let retainedClausesNonempty :=
+    retainedDrawingPlanarSATFormula_clausesNonempty_of_source
+      formula sourceClausesNonempty
+  let source := finalCoordinatedSource formula
+  let placement := finalCoordinatedPlacement formula
+  let routes := finalCoordinatedSourceRoutes formula
+  let directRoute :=
+    routes directClauseIndex directLiteralIndex
+  let fallbackRoute :=
+    routes fallbackClauseIndex fallbackLiteralIndex
+  rcases
+      PositionedPeriodicCNF.exists_taggedIncidenceRoute_of_positioned_members
+        source placement routes
+        directClauseMember directLiteralMember with
+    ⟨directRouteIndex, directIncidenceMember, directRouteMember⟩
+  rcases
+      PositionedPeriodicCNF.exists_taggedIncidenceRoute_of_positioned_members
+        source placement routes
+        fallbackClauseMember fallbackLiteralMember with
+    ⟨fallbackRouteIndex, fallbackIncidenceMember, fallbackRouteMember⟩
+  have directLength : 2 ≤ directRoute.length := by
+    simpa [directRoute, routes, source] using
+      finalCoordinatedSourceRoutes_length_ge_two
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty directClauseMember directLiteralMember
+  have fallbackLength : 2 ≤ fallbackRoute.length := by
+    simpa [fallbackRoute, routes, source] using
+      finalCoordinatedSourceRoutes_length_ge_two
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty fallbackClauseMember fallbackLiteralMember
+  have directEndpoints :=
+    finalCoordinatedSourceRoutes_endpoints
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty directClauseMember directLiteralMember
+  have directLast :
+      directRoute.getLast? =
+        some
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            placement directClause directLiteral) := by
+    exact directEndpoints.2
+  have representedSegment :=
+    retainedFinalDirectSourceRouteChoice_finalSegment_eq_sourceSegment
+      formula directClauseIndex directLiteralIndex choice choiceLookup
+  have directFinalOblique :
+      ¬(⟨polylineLastEntrance directRoute,
+          PositionedPeriodicCNF.canonicalLiteralPosition
+            placement directClause directLiteral⟩ :
+        GridSegment).IsAxisAligned := by
+    have directLastD :
+        directRoute.getLastD (0, 0) =
+          PositionedPeriodicCNF.canonicalLiteralPosition
+            placement directClause directLiteral := by
+      rw [List.getLastD_eq_getLast?, directLast]
+      rfl
+    have representedSegment' :
+        (⟨polylineLastEntrance directRoute,
+            directRoute.getLastD (0, 0)⟩ : GridSegment) =
+          choice.sourceSegment := by
+      simpa only [directRoute, routes] using representedSegment
+    rw [← directLastD]
+    rw [representedSegment']
+    exact directOblique
+  have separated :=
+    finalSegmentRectanglesSeparated_of_flatComponentCases_of_referenceFinalSegment_not_axisAligned
+      formula certificate.graphWellFormed
+      certificate.graphDegreeAtMostThree certificate.graphIsLocal
+      retainedClausesNonempty
+      fallbackRouteMember directRouteMember
+      fallbackLength directLength directLast directFinalOblique
+      (fun fallbackCarrier directMacrocell rectanglesNotSeparated => by
+        have directFirst :=
+          carrierOverlap fallbackCarrier directMacrocell
+            (by rfl) (by rfl) rectanglesNotSeparated
+        have representedSegment' :
+            (⟨polylineLastEntrance directRoute,
+                directRoute.getLastD (0, 0)⟩ : GridSegment) =
+              choice.sourceSegment := by
+          simpa only [directRoute, routes] using representedSegment
+        rw [representedSegment']
+        exact directFirst.symm)
+      (fun fallbackMacrocell directMacrocell centersEqual => by
+        have fallbackTaggedIncidenceMember :
+            ((⟨fallbackClauseIndex, fallbackClause.literals,
+                fallbackLiteralIndex, fallbackLiteral⟩ :
+              CNFIncidence
+                (WrappedPeriodicPlanarSATVariable Variable)),
+              fallbackRouteIndex) ∈
+                (finalGaugedIncidences formula).zipIdx := by
+          simpa [finalGaugedIncidences, source,
+            finalCoordinatedSource] using fallbackIncidenceMember
+        exfalso
+        exact
+          FinalGaugedFlatRouteMacrocellWitness.translatedCenter_ne_of_incidence_choice_none_of_second_finalSegment_not_axisAligned
+            formula certificate.graphWellFormed
+            certificate.graphDegreeAtMostThree certificate.graphIsLocal
+            fallbackMacrocell directMacrocell
+            fallbackTaggedIncidenceMember fallbackChoiceNone
+            directLength directLast directFinalOblique centersEqual)
+  have separated' := separated.symm
+  have representedSegment' :
+      (⟨polylineLastEntrance directRoute,
+          directRoute.getLastD (0, 0)⟩ : GridSegment) =
+        choice.sourceSegment := by
+    simpa only [directRoute, routes] using representedSegment
+  rw [representedSegment'] at separated'
+  simpa only [fallbackRoute, routes] using separated'
 
 /-- An aligned successful direct occurrence strictly avoids a distinct-center
 failed fallback occurrence from another clause. -/

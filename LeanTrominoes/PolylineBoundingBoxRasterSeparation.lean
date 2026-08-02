@@ -20,6 +20,46 @@ namespace PeriodicEightOccurrenceSplit
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+/-- If both endpoints of two segments lie in separated closed rectangles,
+then the segments' own endpoint-coordinate rectangles are separated.  No
+axis-alignment hypothesis is needed. -/
+theorem GridSegment.coordinateRectanglesSeparated_of_inClosedGridRectangles
+    {firstLower firstUpper secondLower secondUpper : Cell}
+    {first second : GridSegment}
+    (firstStart :
+      InClosedGridRectangle firstLower firstUpper first.start)
+    (firstFinish :
+      InClosedGridRectangle firstLower firstUpper first.finish)
+    (secondStart :
+      InClosedGridRectangle secondLower secondUpper second.start)
+    (secondFinish :
+      InClosedGridRectangle secondLower secondUpper second.finish)
+    (separated :
+      ClosedGridRectanglesSeparated
+        firstLower firstUpper secondLower secondUpper) :
+    ClosedGridRectanglesSeparated
+      first.coordinateLower first.coordinateUpper
+      second.coordinateLower second.coordinateUpper := by
+  rcases firstLower with ⟨firstLowerX, firstLowerY⟩
+  rcases firstUpper with ⟨firstUpperX, firstUpperY⟩
+  rcases secondLower with ⟨secondLowerX, secondLowerY⟩
+  rcases secondUpper with ⟨secondUpperX, secondUpperY⟩
+  rcases first with
+    ⟨⟨firstStartX, firstStartY⟩,
+      ⟨firstFinishX, firstFinishY⟩⟩
+  rcases second with
+    ⟨⟨secondStartX, secondStartY⟩,
+      ⟨secondFinishX, secondFinishY⟩⟩
+  simp only [InClosedGridRectangle]
+    at firstStart firstFinish secondStart secondFinish
+  simp only [ClosedGridRectanglesSeparated] at separated ⊢
+  simp only [GridSegment.coordinateLower,
+    GridSegment.coordinateUpper]
+  rcases separated with separated | separated |
+      separated | separated <;>
+    simp_all [min_def, max_def] <;>
+    omega
+
 /-- Pointwise containment of two polylines in separated closed rectangles
 implies all point/segment and segment/segment rectangle certificates used by
 retained-ray rasterization.  No orthogonality hypothesis is needed. -/
