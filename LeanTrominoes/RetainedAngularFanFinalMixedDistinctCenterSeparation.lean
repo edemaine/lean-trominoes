@@ -3,6 +3,7 @@ import LeanTrominoes.RetainedAngularFanFinalMixedOccurrenceAssembly
 import LeanTrominoes.RetainedAngularFanFinalFallbackSegmentClassification
 import LeanTrominoes.RetainedAngularFanFinalMixedObliqueCorridorSeparation
 import LeanTrominoes.RetainedFinalFlatFinalSegmentComponentCases
+import LeanTrominoes.RetainedFinalFlatNormalizedTerminalContactSeparation
 
 /-!
 # Distinct-center final mixed occurrence separation
@@ -463,6 +464,177 @@ theorem
   rw [representedSegment'] at separated'
   simpa only [fallbackRoute, routes] using separated'
 
+/-- At distinct literal centers, the normalized equality-lens contact
+dichotomy closes the remaining carrier-overlap case for an oblique direct
+source segment. -/
+theorem
+    retainedFinalDirectFallback_finalSegmentRectanglesSeparated_of_distinctCenters_of_directSegment_not_axisAligned
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (centersDifferent :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral ≠
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          fallbackClause fallbackLiteral)
+    (directOblique : ¬choice.sourceSegment.IsAxisAligned) :
+    let fallbackRoute :=
+      finalCoordinatedSourceRoutes
+        formula fallbackClauseIndex fallbackLiteralIndex
+    ClosedGridRectanglesSeparated
+      choice.sourceSegment.coordinateLower
+      choice.sourceSegment.coordinateUpper
+      (⟨polylineLastEntrance fallbackRoute,
+          fallbackRoute.getLastD (0, 0)⟩ : GridSegment).coordinateLower
+      (⟨polylineLastEntrance fallbackRoute,
+          fallbackRoute.getLastD (0, 0)⟩ : GridSegment).coordinateUpper := by
+  let certificate :=
+    retainedPlanarSATCertificate formula
+      sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  have directLength :
+      2 ≤
+        (finalCoordinatedSourceRoutes
+          formula directClauseIndex directLiteralIndex).length :=
+    finalCoordinatedSourceRoutes_length_ge_two
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty directClauseMember directLiteralMember
+  have fallbackLength :
+      2 ≤
+        (finalCoordinatedSourceRoutes
+          formula fallbackClauseIndex fallbackLiteralIndex).length :=
+    finalCoordinatedSourceRoutes_length_ge_two
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty fallbackClauseMember fallbackLiteralMember
+  have directEndpoints :=
+    finalCoordinatedSourceRoutes_endpoints
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty directClauseMember directLiteralMember
+  have fallbackEndpoints :=
+    finalCoordinatedSourceRoutes_endpoints
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty fallbackClauseMember fallbackLiteralMember
+  have representedSegment :=
+    retainedFinalDirectSourceRouteChoice_finalSegment_eq_sourceSegment
+      formula directClauseIndex directLiteralIndex choice choiceLookup
+  apply
+    retainedFinalDirectFallback_finalSegmentRectanglesSeparated_of_directSegment_not_axisAligned_of_carrierOverlap
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember
+      choiceLookup fallbackChoiceNone directOblique
+  intro fallbackRoute directRoute fallbackRouteIndex directRouteIndex
+    fallbackCarrier directMacrocell fallbackRouteEq directRouteEq
+    rectanglesNotSeparated
+  have directLast :
+      directRoute.getLast? =
+        some
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            directClause directLiteral) := by
+    rw [directRouteEq]
+    exact directEndpoints.2
+  have fallbackLast :
+      fallbackRoute.getLast? =
+        some
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            fallbackClause fallbackLiteral) := by
+    rw [fallbackRouteEq]
+    exact fallbackEndpoints.2
+  have representedSegment' :
+      (⟨polylineLastEntrance directRoute,
+          directRoute.getLastD (0, 0)⟩ : GridSegment) =
+        choice.sourceSegment := by
+    rw [directRouteEq]
+    exact representedSegment
+  have directFinalOblique :
+      ¬(⟨polylineLastEntrance directRoute,
+          directRoute.getLastD (0, 0)⟩ :
+        GridSegment).IsAxisAligned := by
+    rw [representedSegment']
+    exact directOblique
+  rcases directMacrocell.exists_normalizedSource
+      formula certificate.graphWellFormed
+      certificate.graphDegreeAtMostThree certificate.graphIsLocal with
+    ⟨normalized⟩
+  have directComponent :=
+    directMacrocell.component_isDirect_of_finalSegment_not_axisAligned
+      formula certificate.graphWellFormed
+      certificate.graphDegreeAtMostThree certificate.graphIsLocal
+      (by simpa [directRouteEq] using directLength)
+      directLast
+      (by
+        rw [List.getLastD_eq_getLast?, directLast] at directFinalOblique
+        exact directFinalOblique)
+  have normalizedDirect :=
+    normalized.componentIsDirect directComponent
+  have contact :=
+    fallbackCarrier.normalizedDirectContact
+      formula certificate.graphWellFormed
+      certificate.graphDegreeAtMostThree certificate.graphIsLocal
+      directMacrocell normalized normalizedDirect rectanglesNotSeparated
+  have dichotomy :=
+    fallbackCarrier.finalSegmentRectanglesSeparated_or_finish_eq_of_normalizedDirectContact
+      formula certificate.graphWellFormed
+      certificate.graphDegreeAtMostThree certificate.graphIsLocal
+      directMacrocell normalized normalizedDirect contact directFinalOblique
+  rcases dichotomy with separated | finishesEqual
+  · have separated' := separated.symm
+    rw [representedSegment'] at separated'
+    exact separated'
+  · exfalso
+    apply centersDifferent
+    have directLastD :
+        directRoute.getLastD (0, 0) =
+          PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            directClause directLiteral := by
+      rw [List.getLastD_eq_getLast?, directLast]
+      rfl
+    have fallbackLastD :
+        fallbackRoute.getLastD (0, 0) =
+          PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            fallbackClause fallbackLiteral := by
+      rw [List.getLastD_eq_getLast?, fallbackLast]
+      rfl
+    rw [← directLastD, ← fallbackLastD]
+    exact finishesEqual.symm
+
 /-- An aligned successful direct occurrence strictly avoids a distinct-center
 failed fallback occurrence from another clause. -/
 theorem
@@ -558,6 +730,206 @@ theorem
         directClauseMember fallbackClauseMember
         directLiteralMember fallbackLiteralMember
         choiceLookup fallbackChoiceNone clauseIndicesDifferent
+        centersDifferent directAligned
+
+/-- An oblique successful direct occurrence strictly avoids a distinct-center
+failed fallback occurrence from another clause. -/
+theorem
+    retainedFinalCoordinatedObliqueDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_distinctCenter
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (kindNe : choice.kind ≠ .routedClause)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (clauseIndicesDifferent :
+      directClauseIndex ≠ fallbackClauseIndex)
+    (centersDifferent :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral ≠
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          fallbackClause fallbackLiteral)
+    (directOblique : ¬choice.sourceSegment.IsAxisAligned) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let fallbackSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement
+          (angularOccurrenceOrder source.erase routes)
+          (fallbackClause.scale retainedAngularFanSourceClearanceFactor)
+          fallbackLiteral fallbackClauseIndex fallbackLiteralIndex)
+    RoutesStrictlyAvoidEachOther
+      (retainedFinalCoordinatedDirectOccurrenceRoute
+        formula choice
+        (directClause.scale retainedAngularFanSourceClearanceFactor)
+        directLiteral directClauseIndex directLiteralIndex)
+      (joinAtEndpoint
+        (retainedFinalCoordinatedFallbackBoundaryPrefix
+          formula fallbackLiteral
+          fallbackClauseIndex fallbackLiteralIndex)
+        fallbackSuffix) := by
+  have representedSegment :=
+    retainedFinalDirectSourceRouteChoice_finalSegment_eq_sourceSegment
+      formula directClauseIndex directLiteralIndex choice choiceLookup
+  have directFinalOblique :
+      ¬(⟨polylineLastEntrance
+            (finalCoordinatedSourceRoutes
+              formula directClauseIndex directLiteralIndex),
+          (finalCoordinatedSourceRoutes
+            formula directClauseIndex directLiteralIndex).getLastD
+              (0, 0)⟩ : GridSegment).IsAxisAligned := by
+    rw [representedSegment]
+    exact directOblique
+  apply
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_corridor_finalSegmentRectanglesSeparated
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice
+      directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember
+      choiceLookup kindNe fallbackChoiceNone clauseIndicesDifferent
+  · exact
+      retainedFinalDirectFallback_sourcePrefixCorridorSeparated_of_directSegment_not_axisAligned
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember
+        choiceLookup fallbackChoiceNone clauseIndicesDifferent
+        directFinalOblique
+  · exact
+      retainedFinalDirectFallback_finalSegmentRectanglesSeparated_of_distinctCenters_of_directSegment_not_axisAligned
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember
+        choiceLookup fallbackChoiceNone centersDifferent directOblique
+
+/-- Every non-routed successful direct occurrence strictly avoids a
+distinct-center failed fallback occurrence from another clause. -/
+theorem
+    retainedFinalCoordinatedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_distinctCenter
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (kindNe : choice.kind ≠ .routedClause)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (clauseIndicesDifferent :
+      directClauseIndex ≠ fallbackClauseIndex)
+    (centersDifferent :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral ≠
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          fallbackClause fallbackLiteral) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let placement :=
+      (finalCoordinatedPlacement formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let fallbackSuffix :=
+      scalePolyline retainedTerminalFanRoutingRefinement
+        (angularOccurrenceSuffix placement
+          (angularOccurrenceOrder source.erase routes)
+          (fallbackClause.scale retainedAngularFanSourceClearanceFactor)
+          fallbackLiteral fallbackClauseIndex fallbackLiteralIndex)
+    RoutesStrictlyAvoidEachOther
+      (retainedFinalCoordinatedDirectOccurrenceRoute
+        formula choice
+        (directClause.scale retainedAngularFanSourceClearanceFactor)
+        directLiteral directClauseIndex directLiteralIndex)
+      (joinAtEndpoint
+        (retainedFinalCoordinatedFallbackBoundaryPrefix
+          formula fallbackLiteral
+          fallbackClauseIndex fallbackLiteralIndex)
+        fallbackSuffix) := by
+  by_cases directAligned : choice.sourceSegment.IsAxisAligned
+  · exact
+      retainedFinalCoordinatedAlignedDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_distinctCenter
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember
+        choiceLookup kindNe fallbackChoiceNone clauseIndicesDifferent
+        centersDifferent directAligned
+  · exact
+      retainedFinalCoordinatedObliqueDirectOccurrenceRoute_strictlyAvoids_crossClauseFallbackOccurrence_of_distinctCenter
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice
+        directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember
+        choiceLookup kindNe fallbackChoiceNone clauseIndicesDifferent
         centersDifferent directAligned
 
 end PeriodicOrthocrossing

@@ -2073,16 +2073,19 @@ The representation choices for this target are:
   same-center cross-clause direct/fallback separation for every successful
   direct choice.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedDistinctCenterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedDistinctCenterSeparation.lean)
-  starts the complementary distinct-center mixed proof.  When the selected
+  completes the complementary distinct-center mixed proof for non-routed
+  direct choices.  When the selected
   direct source segment is axis-aligned, failure of the other selector makes
   its source segment axis-aligned as well.  Distinct clause heads, distinct
   literal centers, and retained source compatibility then separate the two
   terminal rectangles, which combines with the established source corridor
   to separate the complete direct and fallback occurrences.  For an oblique
-  direct segment, it now reduces terminal-rectangle separation through the
-  flat physical components: separated boxes and equal macrocells close
-  automatically, leaving exactly the overlapping fallback-carrier versus
-  direct-macrocell interface.
+  direct segment, flat physical-component reduction, normalized carrier
+  contact geometry, and the finite equality-lens certificate separate the
+  terminal rectangles; the certificate's equal-endpoint alternative
+  contradicts the distinct canonical literal centers.  The aligned and
+  oblique branches are combined into one unconditional complete-occurrence
+  theorem.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalMixedPublicSeparation.lean)
   identifies the selected fallback boundary join and direct occurrence with
   their total route-family lookups.  The same-center mixed theorem, including
