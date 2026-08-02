@@ -2216,7 +2216,11 @@ The representation choices for this target are:
   direct route.  A finite atlas check also proves that every routed-clause
   source segment is oblique, and translation preserves this fact for every
   positioned routed-clause choice; the exceptional escape therefore belongs
-  entirely to the oblique mixed branch.
+  entirely to the oblique mixed branch.  Raw selector success now also
+  characterizes routed-clause metadata exactly, and route equality transports
+  that characterization through a normalized flat macrocell witness.  Thus a
+  routed-clause final choice recovers the normalized routed-clause source
+  needed by the carrier-boundary theorem without an extra metadata premise.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean)
   packages the structural endpoint-join step for a mixed cross-clause pair.
   Four strict certificates between the coordinated direct prefix and suffix

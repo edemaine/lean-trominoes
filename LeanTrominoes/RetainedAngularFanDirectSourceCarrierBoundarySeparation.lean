@@ -130,6 +130,78 @@ theorem RetainedDirectSourceRouteChoice.sourceSegment_not_axisAligned_of_kind_eq
         simpa [RetainedDirectSourceRouteChoice.sourceSegment,
           localSegment, GridSegment.translate] using positionedAligned)
 
+/-- A successful raw selector has routed-clause atlas kind exactly when its
+metadata source is a routed clause. -/
+theorem retainedDirectSourceRouteChoice?_kind_eq_routedClause_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (source :
+      PeriodicOrthocrossing.DrawingPlanarSATClauseSource Variable)
+    (literalIndex : Nat)
+    (choice : RetainedDirectSourceRouteChoice)
+    (lookup :
+      retainedDirectSourceRouteChoice? formula source literalIndex =
+        some choice) :
+    choice.kind = RetainedDirectClauseKind.routedClause ↔
+      ∃ site, source =
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+          site := by
+  cases source with
+  | crossover crossing localClauseIndex =>
+      simp [retainedDirectSourceRouteChoice?] at lookup
+      rcases lookup with ⟨localClauseIndexLt, literalIndexLt, rfl⟩
+      simp
+  | carrier link localClauseIndex =>
+      simp [retainedDirectSourceRouteChoice?] at lookup
+  | bend bend localClauseIndex =>
+      simp [retainedDirectSourceRouteChoice?] at lookup
+  | routedClause site =>
+      simp [retainedDirectSourceRouteChoice?] at lookup
+      rcases lookup with ⟨literalIndexLt, rfl⟩
+      simp
+  | routedVariable site armIndex arm link localClauseIndex =>
+      simp [retainedDirectSourceRouteChoice?] at lookup
+      rcases lookup with ⟨localClauseIndexLt, literalIndexLt, rfl⟩
+      simp
+
+/-- For a retained component, the selected incidence drawing exposes exactly
+the source's unpositioned clause family. -/
+theorem retainedComponentMember_incidenceDrawing_formula_eq_clauseFormula
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (source :
+      PeriodicOrthocrossing.DrawingPlanarSATClauseSource Variable)
+    (sourceMember : source.RetainedComponentMember formula) :
+    (source.incidenceDrawing formula).formula =
+      source.clauseFormula formula := by
+  cases source with
+  | crossover crossing localClauseIndex =>
+      simp [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing,
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.clauseFormula]
+  | carrier link localClauseIndex =>
+      simpa [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing,
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.clauseFormula] using
+        PeriodicOrthocrossing.retainedDrawingPlanarSATCarrierLensIncidenceDrawing_formula
+          wellFormed degree isLocal sourceMember
+  | bend bend localClauseIndex =>
+      simp [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing,
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.clauseFormula,
+        PeriodicOrthocrossing.drawingPlanarSATBendCornerIncidenceDrawing_formula]
+  | routedClause site =>
+      simp [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing,
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.clauseFormula]
+  | routedVariable site armIndex arm link localClauseIndex =>
+      have linkMember :=
+        List.fst_mem_of_mem_zipIdx sourceMember.2.1
+      have armEq := sourceMember.2.2
+      simpa [PeriodicOrthocrossing.DrawingPlanarSATClauseSource.incidenceDrawing,
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.clauseFormula] using
+        PeriodicOrthocrossing.drawingPlanarSATRoutedVariableIncidenceDrawing_formula
+          formula site arm link linkMember armEq
+
 /-- All three routed-clause local incidences start at their common clause
 point. -/
 theorem retainedDirectRoutedClauseLocalRouteAt_head? :
@@ -316,6 +388,120 @@ theorem retainedFinalDirectChoice_kind_origin_eq_of_normalized_routedClause
       (PeriodicOrthocrossing.routedClauseOrigin formula site)
       routedIndex
       (choiceRouteEq.trans rawRouteEq.symm)
+
+/-- Conversely, a routed-clause atlas choice representing a normalized flat
+macrocell route forces that normalized source itself to be a routed clause.
+This recognizes the exceptional carrier-boundary case from the selected
+route, without exposing its representative metadata. -/
+theorem retainedFinalDirectChoice_exists_normalizedRoutedClause_of_kind_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {taggedRoute : List Cell × Nat}
+    (macrocell :
+      PeriodicOrthocrossing.FinalGaugedFlatRouteMacrocellWitness
+        formula taggedRoute)
+    (normalized :
+      PeriodicOrthocrossing.FinalGaugedFlatNormalizedMacrocellSource
+        formula macrocell)
+    (choice : RetainedDirectSourceRouteChoice)
+    (kindEq : choice.kind = RetainedDirectClauseKind.routedClause)
+    (choiceRouteEq :
+      PeriodicOrthocrossing.translatePolyline choice.origin
+          (retainedDirectSourceLocalRouteAt
+            choice.kind choice.index) =
+        taggedRoute.1) :
+    ∃ site : PeriodicOrthocrossing.ClauseRouteSite,
+      normalized.source =
+        PeriodicOrthocrossing.DrawingPlanarSATClauseSource.routedClause
+          site := by
+  have localLength :=
+    retainedDirectSourceLocalRouteAt_length choice.kind choice.index
+  have routeLength : 2 ≤ taggedRoute.1.length := by
+    rw [← choiceRouteEq]
+    simp [PeriodicOrthocrossing.translatePolyline, localLength]
+  have routeLast :
+      taggedRoute.1.getLast? = some choice.sourceSegment.finish := by
+    rcases List.length_eq_two.mp localLength with
+      ⟨localHead, localLast, localRouteEq⟩
+    rw [← choiceRouteEq]
+    simp [localRouteEq, PeriodicOrthocrossing.translatePolyline,
+      RetainedDirectSourceRouteChoice.sourceSegment]
+  have finalSegmentEq :
+      (⟨polylineLastEntrance taggedRoute.1,
+          choice.sourceSegment.finish⟩ : GridSegment) =
+        choice.sourceSegment := by
+    rcases List.length_eq_two.mp localLength with
+      ⟨localHead, localLast, localRouteEq⟩
+    rw [← choiceRouteEq]
+    simp [localRouteEq, PeriodicOrthocrossing.translatePolyline,
+      polylineLastEntrance, polylineFirstExit,
+      RetainedDirectSourceRouteChoice.sourceSegment]
+  have choiceOblique :=
+    choice.sourceSegment_not_axisAligned_of_kind_eq_routedClause kindEq
+  have finalOblique :
+      ¬(⟨polylineLastEntrance taggedRoute.1,
+          choice.sourceSegment.finish⟩ : GridSegment).IsAxisAligned := by
+    rw [finalSegmentEq]
+    exact choiceOblique
+  have componentDirect :=
+    macrocell.component_isDirect_of_finalSegment_not_axisAligned
+      formula wellFormed degree isLocal
+      routeLength routeLast finalOblique
+  have normalizedDirect :=
+    normalized.componentIsDirect componentDirect
+  rcases normalized.exists_routeSelection
+      formula wellFormed degree isLocal with
+    ⟨selection⟩
+  let metadata :
+      PeriodicOrthocrossing.DrawingPlanarSATClauseMetadata Variable :=
+    ⟨selection.clause, normalized.source⟩
+  have clauseFormulaMember :
+      (selection.clause, normalized.source.localClauseIndex) ∈
+        (normalized.source.clauseFormula formula).zipIdx := by
+    rw [←
+      retainedComponentMember_incidenceDrawing_formula_eq_clauseFormula
+        formula wellFormed degree isLocal
+        normalized.source normalized.sourceMember]
+    exact selection.clauseMember
+  have valid : metadata.RetainedValid formula := by
+    apply
+      (metadata.retainedValid_iff_sourceMember_and_localClauseMember
+        formula).mpr
+    exact ⟨normalized.sourceMember, clauseFormulaMember⟩
+  rcases
+      LeanTrominoes.PeriodicEightOccurrenceSplit.DrawingPlanarSATClauseMetadata.exists_retainedDirectSourceRouteChoice
+        metadata valid selection.literalMember
+        (normalized.directCases normalizedDirect) with
+    ⟨rawChoice, rawLookup, _rawMatches⟩
+  have rawRepresents :=
+    retainedDirectSourceRouteChoice?_represents_of_eq_some
+      formula normalized.source selection.literalIndex
+      rawChoice rawLookup
+  unfold RetainedDirectSourceRouteChoice.Represents at rawRepresents
+  have rawRouteEq :
+      PeriodicOrthocrossing.translatePolyline rawChoice.origin
+          (retainedDirectSourceLocalRouteAt
+            rawChoice.kind rawChoice.index) =
+        taggedRoute.1 :=
+    rawRepresents.trans selection.routeEq.symm
+  rcases choice with ⟨choiceOrigin, choiceKind, choiceIndex⟩
+  change choiceKind = RetainedDirectClauseKind.routedClause at kindEq
+  subst choiceKind
+  have vectorEq :=
+    congrArg PeriodicThreeSATThree.routeTerminalVector
+      (rawRouteEq.trans choiceRouteEq.symm)
+  rw [routeTerminalVector_translatePolyline,
+    routeTerminalVector_translatePolyline] at vectorEq
+  have rawKindEq :=
+    retainedDirectSourceLocalRouteAt_kind_eq_routedClause_of_terminalVector_eq
+      rawChoice.kind rawChoice.index choiceIndex vectorEq
+  exact
+    (retainedDirectSourceRouteChoice?_kind_eq_routedClause_iff
+      formula normalized.source selection.literalIndex
+      rawChoice rawLookup).mp rawKindEq
 
 /-- A normalized carrier contact with a routed-clause source retains a
 boundary whose origin is definitionally that routed clause's physical
