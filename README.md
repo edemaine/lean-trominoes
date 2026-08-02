@@ -1993,6 +1993,11 @@ The representation choices for this target are:
   direct choice's physical component offset.  Its complete positioned route
   now avoids either ordinary or delayed-lane fallback complete routes at the
   same positioned fan center.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceTerminalClassification.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceTerminalClassification.lean)
+  specializes successful final direct-choice representation to an exact
+  unscaled terminal-classification theorem.  Later alignment arguments can
+  use the atlas direction directly without expanding source scaling or the
+  full final route selector.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
