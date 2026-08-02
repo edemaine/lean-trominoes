@@ -2099,7 +2099,10 @@ The representation choices for this target are:
   different clauses.  Its four-way selector split dispatches to the completed
   direct/direct, fallback/fallback, and two mixed separation theorems, yielding
   one unconditional public `RoutesAvoidEachOther` certificate for later
-  whole-family planarity assembly.
+  whole-family planarity assembly.  A second wrapper handles any two distinct
+  copied-source incidence keys: indexed clause uniqueness sends equal clause
+  indices to the same-clause theorem, while unequal indices use the unified
+  cross-clause result.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,
