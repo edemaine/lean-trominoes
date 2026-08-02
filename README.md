@@ -2224,6 +2224,13 @@ The representation choices for this target are:
   In an overlapping carrier--macrocell branch, normalization and the local
   contact certificate are consequently automatic; separation from the
   post-escape tail now closes the complete positioned routed-clause route.
+- [`LeanTrominoes/RetainedAngularFanFinalRoutedClausePrefixSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRoutedClausePrefixSeparation.lean)
+  supplies the complementary coarse geometry for that exceptional route.
+  Route representation lifts the finite radius-288 direct-replacement bound
+  from its source segment to the whole normalized flat macrocell.  More
+  generally, component rectangles that are separated before refinement stay
+  separated after factor-1152 scaling and radius-288 expansion, strictly
+  separating any bounded flat source prefix from the direct replacement.
 - [`LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean`](LeanTrominoes/RetainedAngularFanFinalMixedOccurrenceAssembly.lean)
   packages the structural endpoint-join step for a mixed cross-clause pair.
   Four strict certificates between the coordinated direct prefix and suffix
