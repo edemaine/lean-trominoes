@@ -2099,6 +2099,12 @@ The representation choices for this target are:
   into separated segment rectangles without assuming axis alignment; an
   oblique reference again rules out its carrier branch, isolating the same
   overlap and equal-center residues.
+- [`LeanTrominoes/RetainedDirectSourceEqualityLensFinalSegmentSeparation.lean`](LeanTrominoes/RetainedDirectSourceEqualityLensFinalSegmentSeparation.lean)
+  proves the terminal geometry needed at that remaining carrier overlap.
+  An exact finite certificate for the oblique direct-route atlas, together
+  with translation invariance and symbolic equality-lens bounds, shows that
+  a direct terminal rectangle and either endpoint of a retained equality
+  lens are strictly separated unless both routes finish at that endpoint.
 - [`LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackMacrocellSeparation.lean)
   excludes the equal-macrocell residue for failed choices.  At its general
   interface, any second route already known to come from a direct component
