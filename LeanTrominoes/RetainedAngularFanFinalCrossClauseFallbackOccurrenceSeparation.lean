@@ -323,7 +323,7 @@ theorem
       firstRoute, secondRoute, firstTerminal, secondTerminal,
       firstRawRoute, secondRawRoute,
       firstRawTerminal, secondRawTerminal,
-      firstSlot, secondSlot] using prefixesAvoidPolyline
+      firstSlot, secondSlot] using prefixesAvoidPolyline.1
   have firstPrefixAvoidsSecondSuffix :
       RoutesStrictlyAvoidEachOther firstPrefix secondSuffix := by
     rw [firstPrefixEq]

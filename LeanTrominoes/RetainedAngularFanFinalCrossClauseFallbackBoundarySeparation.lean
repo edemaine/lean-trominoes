@@ -68,8 +68,10 @@ theorem retainedFinalAngularTerminalSlot_eq_coordinatedOccurrenceSlot
   simpa [indexedOccurrence, atomEqual,
     retainedPlanarSATFormula, finalCoordinatedSource]
 
-/-- Ordinary boundary splices of two failed choices in different final
-source clauses are contact-free. -/
+/-- Boundary splices of two failed choices in different final source clauses
+are contact-free.  Ordinary separation is unconditional.  If the variable
+centers are distinct, the same positioned certificate also separates an
+escaped first splice from an ordinary or escaped second splice. -/
 theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
@@ -105,8 +107,8 @@ theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
           formula secondClauseIndex secondLiteralIndex = none)
     (clauseIndicesDifferent :
       firstClauseIndex ≠ secondClauseIndex) :
-    RoutesStrictlyAvoidEachOther
-      (retainedAngularFanSplicedBoundaryPolyline
+    let firstOrdinary :=
+      retainedAngularFanSplicedBoundaryPolyline
         (scalePolyline retainedAngularFanSourceClearanceFactor
           (finalCoordinatedSourceRoutes
             formula firstClauseIndex firstLiteralIndex))
@@ -118,8 +120,9 @@ theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
                 formula firstClauseIndex firstLiteralIndex))))
         (retainedFinalCoordinatedOccurrenceSlot
           formula firstLiteral
-          firstClauseIndex firstLiteralIndex))
-      (retainedAngularFanSplicedBoundaryPolyline
+          firstClauseIndex firstLiteralIndex)
+    let secondOrdinary :=
+      retainedAngularFanSplicedBoundaryPolyline
         (scalePolyline retainedAngularFanSourceClearanceFactor
           (finalCoordinatedSourceRoutes
             formula secondClauseIndex secondLiteralIndex))
@@ -131,7 +134,49 @@ theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
                 formula secondClauseIndex secondLiteralIndex))))
         (retainedFinalCoordinatedOccurrenceSlot
           formula secondLiteral
-          secondClauseIndex secondLiteralIndex)) := by
+          secondClauseIndex secondLiteralIndex)
+    let firstEscaped :=
+      retainedAngularFanEscapedSplicedBoundaryPolyline
+        (scalePolyline retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes
+            formula firstClauseIndex firstLiteralIndex))
+        (scaleRetainedTerminalData
+          retainedAngularFanSourceClearanceFactor
+          (classifiedRetainedTerminalData
+            (routeTerminalVector
+              (finalCoordinatedSourceRoutes
+                formula firstClauseIndex firstLiteralIndex))))
+        (retainedFinalCoordinatedOccurrenceSlot
+          formula firstLiteral
+          firstClauseIndex firstLiteralIndex)
+    let secondEscaped :=
+      retainedAngularFanEscapedSplicedBoundaryPolyline
+        (scalePolyline retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes
+            formula secondClauseIndex secondLiteralIndex))
+        (scaleRetainedTerminalData
+          retainedAngularFanSourceClearanceFactor
+          (classifiedRetainedTerminalData
+            (routeTerminalVector
+              (finalCoordinatedSourceRoutes
+                formula secondClauseIndex secondLiteralIndex))))
+        (retainedFinalCoordinatedOccurrenceSlot
+          formula secondLiteral
+          secondClauseIndex secondLiteralIndex)
+    let firstCenter :=
+      PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula)
+        firstClause firstLiteral
+    let secondCenter :=
+      PositionedPeriodicCNF.canonicalLiteralPosition
+        (finalCoordinatedPlacement formula)
+        secondClause secondLiteral
+    RoutesStrictlyAvoidEachOther firstOrdinary secondOrdinary ∧
+      (firstCenter ≠ secondCenter →
+        RoutesStrictlyAvoidEachOther firstEscaped secondOrdinary) ∧
+      (firstCenter ≠ secondCenter →
+        RoutesStrictlyAvoidEachOther firstEscaped secondEscaped) := by
+  dsimp only
   let certificate :=
     retainedPlanarSATCertificate formula
       sourceLocal sourceWidth sourceOccurrences
@@ -245,9 +290,40 @@ theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
         atomsEqual copiesDifferent sourcesDifferent centersEqual
     dsimp only at separated
     rw [firstSlotEq, secondSharedSlotEq] at separated
-    simpa only [firstCopy, secondCopy,
-      finalCoordinatedSourceRoutes,
-      occurrenceTerminalVector] using separated
+    have ordinary :
+        RoutesStrictlyAvoidEachOther
+          (retainedAngularFanSplicedBoundaryPolyline
+            (scalePolyline retainedAngularFanSourceClearanceFactor
+              (finalCoordinatedSourceRoutes
+                formula firstClauseIndex firstLiteralIndex))
+            (scaleRetainedTerminalData
+              retainedAngularFanSourceClearanceFactor
+              (classifiedRetainedTerminalData
+                (routeTerminalVector
+                  (finalCoordinatedSourceRoutes
+                    formula firstClauseIndex firstLiteralIndex))))
+            (retainedFinalCoordinatedOccurrenceSlot
+              formula firstLiteral
+              firstClauseIndex firstLiteralIndex))
+          (retainedAngularFanSplicedBoundaryPolyline
+            (scalePolyline retainedAngularFanSourceClearanceFactor
+              (finalCoordinatedSourceRoutes
+                formula secondClauseIndex secondLiteralIndex))
+            (scaleRetainedTerminalData
+              retainedAngularFanSourceClearanceFactor
+              (classifiedRetainedTerminalData
+                (routeTerminalVector
+                  (finalCoordinatedSourceRoutes
+                    formula secondClauseIndex secondLiteralIndex))))
+            (retainedFinalCoordinatedOccurrenceSlot
+              formula secondLiteral
+              secondClauseIndex secondLiteralIndex)) := by
+      simpa only [firstCopy, secondCopy,
+        finalCoordinatedSourceRoutes,
+        occurrenceTerminalVector] using separated
+    exact ⟨ordinary,
+      fun centersDifferent => (centersDifferent centersEqual).elim,
+      fun centersDifferent => (centersDifferent centersEqual).elim⟩
   · have firstAligned :=
       finalCoordinatedFallbackSourceRoute_finalSegment_isAxisAligned
         formula sourceLocal sourceWidth sourceOccurrences
@@ -269,9 +345,28 @@ theorem retainedFinalCrossClauseFallbackOrdinaryBoundarySplices_strictlyAvoid
         firstLiteralMember secondLiteralMember
         copiesDifferent sourcesDifferent centersEqual
         firstAligned secondAligned
-    simpa [firstCopy, secondCopy, firstSlotEq, secondSlotEq,
-      finalCoordinatedSource, finalCoordinatedSourceRoutes,
-      occurrenceTerminalVector] using separated
+    have firstEscapeFits :=
+      finalCoordinatedScaledSourceRoute_escapeFits
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty firstClauseMember firstLiteralMember
+    have secondEscapeFits :=
+      finalCoordinatedScaledSourceRoute_escapeFits
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty secondClauseMember secondLiteralMember
+    constructor
+    · simpa [firstCopy, secondCopy, firstSlotEq, secondSlotEq,
+        finalCoordinatedSource, finalCoordinatedSourceRoutes,
+        occurrenceTerminalVector] using separated.1
+    constructor
+    · intro _
+      simpa [firstCopy, secondCopy, firstSlotEq, secondSlotEq,
+        finalCoordinatedSource, finalCoordinatedSourceRoutes,
+        occurrenceTerminalVector] using separated.2.1 firstEscapeFits
+    · intro _
+      simpa [firstCopy, secondCopy, firstSlotEq, secondSlotEq,
+        finalCoordinatedSource, finalCoordinatedSourceRoutes,
+        occurrenceTerminalVector] using
+          separated.2.2 firstEscapeFits secondEscapeFits
 
 end PeriodicOrthocrossing
 end LeanTrominoes

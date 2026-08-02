@@ -1,4 +1,5 @@
 import LeanTrominoes.PositionedPeriodicCNFTaggedRouteLookup
+import LeanTrominoes.RetainedFinalEscapedSourceScaledSpliceSeparation
 import LeanTrominoes.RetainedFinalOuterFanSeparation
 import LeanTrominoes.RetainedFinalSharedCenterFanSeparation
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATRasterizedDrawing
@@ -306,8 +307,11 @@ theorem
 
 /-- Two distinct positioned source incidences with different source and
 variable endpoints produce strictly separated source-scaled boundary
-splices whenever both discarded terminal segments are axis-aligned.  Flat
-route indices, endpoint equations, cross-endpoint inequalities, and terminal
+splices whenever both discarded terminal segments are axis-aligned.  In
+addition to ordinary/ordinary separation, the certificate supplies
+escaped/ordinary and escaped/escaped separation whenever the corresponding
+outer radial routes have room for the fixed delayed-lane escape.  Flat route
+indices, endpoint equations, cross-endpoint inequalities, and terminal
 classification are all derived from the positioned drawing certificates. -/
 theorem
     retainedFinalPositionedOccurrenceSplices_strictlyAvoid_of_distinctCenters_of_axisAligned
@@ -419,23 +423,54 @@ theorem
           (PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
             formula)
           secondClauseMember secondLiteralMember)
-    RoutesStrictlyAvoidEachOther
-      (retainedAngularFanSplicedBoundaryPolyline
+    let firstTerminal :=
+      classifiedRetainedTerminalData
+        (occurrenceTerminalVector routes firstCopy)
+    let secondTerminal :=
+      classifiedRetainedTerminalData
+        (occurrenceTerminalVector routes secondCopy)
+    let firstSlot :=
+      retainedFinalAngularTerminalSlot
+        formula fits firstLiteral.atom firstCopy firstCopyMember
+    let secondSlot :=
+      retainedFinalAngularTerminalSlot
+        formula fits secondLiteral.atom secondCopy secondCopyMember
+    let firstOrdinary :=
+      retainedAngularFanSplicedBoundaryPolyline
         (scalePolyline factor
           (routes firstClauseIndex firstLiteralIndex))
-        (scaleRetainedTerminalData factor
-          (classifiedRetainedTerminalData
-            (occurrenceTerminalVector routes firstCopy)))
-        (retainedFinalAngularTerminalSlot
-          formula fits firstLiteral.atom firstCopy firstCopyMember))
-      (retainedAngularFanSplicedBoundaryPolyline
+        (scaleRetainedTerminalData factor firstTerminal)
+        firstSlot
+    let secondOrdinary :=
+      retainedAngularFanSplicedBoundaryPolyline
         (scalePolyline factor
           (routes secondClauseIndex secondLiteralIndex))
-        (scaleRetainedTerminalData factor
-          (classifiedRetainedTerminalData
-            (occurrenceTerminalVector routes secondCopy)))
-        (retainedFinalAngularTerminalSlot
-          formula fits secondLiteral.atom secondCopy secondCopyMember)) := by
+        (scaleRetainedTerminalData factor secondTerminal)
+        secondSlot
+    let firstEscaped :=
+      retainedAngularFanEscapedSplicedBoundaryPolyline
+        (scalePolyline factor
+          (routes firstClauseIndex firstLiteralIndex))
+        (scaleRetainedTerminalData factor firstTerminal)
+        firstSlot
+    let secondEscaped :=
+      retainedAngularFanEscapedSplicedBoundaryPolyline
+        (scalePolyline factor
+          (routes secondClauseIndex secondLiteralIndex))
+        (scaleRetainedTerminalData factor secondTerminal)
+        secondSlot
+    RoutesStrictlyAvoidEachOther firstOrdinary secondOrdinary ∧
+      (retainedTerminalFanOuterSourceEscapeLength ≤
+          retainedTerminalFanOuterRadialLength
+            (scaleRetainedTerminalData factor firstTerminal) →
+        RoutesStrictlyAvoidEachOther firstEscaped secondOrdinary) ∧
+      (retainedTerminalFanOuterSourceEscapeLength ≤
+          retainedTerminalFanOuterRadialLength
+            (scaleRetainedTerminalData factor firstTerminal) →
+        retainedTerminalFanOuterSourceEscapeLength ≤
+          retainedTerminalFanOuterRadialLength
+            (scaleRetainedTerminalData factor secondTerminal) →
+        RoutesStrictlyAvoidEachOther firstEscaped secondEscaped) := by
   let source :=
     PeriodicOrthocrossing.retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
       formula
@@ -615,19 +650,51 @@ theorem
             simpa [source,
               PeriodicOrthocrossing.retainedPlanarSATFormula] using
               secondCopyMember))
-  simpa only [source, placement, routes, firstCopy, secondCopy,
-    firstTerminal, secondTerminal, firstSlot, secondSlot] using
-    retainedFinalSourceScaledSplicedBoundaryPolylines_strictlyAvoid_of_distinctEndpoints_of_axisAligned
-      formula wellFormed degree isLocal clausesNonempty
-      factorGreaterThanOne clearance
-      firstRouteMember secondRouteMember
-      firstLength secondLength routeIndicesDifferent headsDifferent
-      firstEndpoints.1 secondEndpoints.1
-      firstEndpoints.2 secondEndpoints.2
-      firstSourceNeSecondCenter secondSourceNeFirstCenter
-      centersDifferent firstAligned secondAligned
-      firstTerminal secondTerminal firstSlot secondSlot
-      firstClassified secondClassified
+  constructor
+  · simpa only [source, placement, routes, firstCopy, secondCopy,
+      firstTerminal, secondTerminal, firstSlot, secondSlot] using
+      retainedFinalSourceScaledSplicedBoundaryPolylines_strictlyAvoid_of_distinctEndpoints_of_axisAligned
+        formula wellFormed degree isLocal clausesNonempty
+        factorGreaterThanOne clearance
+        firstRouteMember secondRouteMember
+        firstLength secondLength routeIndicesDifferent headsDifferent
+        firstEndpoints.1 secondEndpoints.1
+        firstEndpoints.2 secondEndpoints.2
+        firstSourceNeSecondCenter secondSourceNeFirstCenter
+        centersDifferent firstAligned secondAligned
+        firstTerminal secondTerminal firstSlot secondSlot
+        firstClassified secondClassified
+  constructor
+  · intro firstEscapeFits
+    simpa only [source, placement, routes, firstCopy, secondCopy,
+      firstTerminal, secondTerminal, firstSlot, secondSlot] using
+      retainedFinalSourceScaledEscapedOrdinarySplicedBoundaryPolylines_strictlyAvoid_of_distinctEndpoints_of_axisAligned
+        formula wellFormed degree isLocal clausesNonempty
+        factorGreaterThanOne
+        (by omega)
+        firstRouteMember secondRouteMember
+        firstLength secondLength routeIndicesDifferent headsDifferent
+        firstEndpoints.1 secondEndpoints.1
+        firstEndpoints.2 secondEndpoints.2
+        firstSourceNeSecondCenter secondSourceNeFirstCenter
+        centersDifferent firstAligned secondAligned
+        firstTerminal secondTerminal firstSlot secondSlot
+        firstClassified secondClassified firstEscapeFits
+  · intro firstEscapeFits secondEscapeFits
+    simpa only [source, placement, routes, firstCopy, secondCopy,
+      firstTerminal, secondTerminal, firstSlot, secondSlot] using
+      retainedFinalSourceScaledEscapedSplicedBoundaryPolylines_strictlyAvoid_of_distinctEndpoints_of_axisAligned
+        formula wellFormed degree isLocal clausesNonempty
+        factorGreaterThanOne
+        (by omega)
+        firstRouteMember secondRouteMember
+        firstLength secondLength routeIndicesDifferent headsDifferent
+        firstEndpoints.1 secondEndpoints.1
+        firstEndpoints.2 secondEndpoints.2
+        firstSourceNeSecondCenter secondSourceNeFirstCenter
+        centersDifferent firstAligned secondAligned
+        firstTerminal secondTerminal firstSlot secondSlot
+        firstClassified secondClassified firstEscapeFits secondEscapeFits
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
