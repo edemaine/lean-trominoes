@@ -445,12 +445,25 @@ The representation choices for this target are:
   replacing that clause-side prefix preserves the source route's final
   direction.  Its generic Manhattan connector is the remaining piece to
   replace by a noncrossing clause-boundary fan.
+  [`LeanTrominoes/PositionedPeriodicCNFOrthogonalDetourTranslation.lean`](LeanTrominoes/PositionedPeriodicCNFOrthogonalDetourTranslation.lean)
+  proves that a common translation of the two advertised detour endpoints
+  translates the entire five-point route.  Unit-subdivision translation then
+  reduces positioned connector questions to finite local-coordinate checks.
+  [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteIsolation.lean)
+  performs that finite check for all three Figure 9 boundary ports.  The
+  connector contains no scale-twelve source-lattice point except its
+  source-clause target, so attaching it to a nondegenerate simple source
+  route preserves isolation of the final variable endpoint.
   [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean)
   packages those per-incidence splices into the total inherited-suffix
   interface.  Any source route family with pointwise canonical endpoints and
   orthogonality now induces all inherited Figure 9 suffixes, with a
   proof-backed selector carrying the corresponding source-occurrence
   provenance certificate.
+  [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamilyIsolation.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamilyIsolation.lean)
+  lifts the connector result through that proof-backed selector.  Pointwise
+  source simplicity and nondegeneracy yield final-endpoint isolation for
+  every genuine inherited suffix in the complete Figure 9 family.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -2670,6 +2683,10 @@ The representation choices for this target are:
   canonical endpoints, is orthogonal, and exposes the first exit required by
   unit elimination.  Normalizing before Figure 9 removes inherited collar
   loops while preserving the coordinated clockwise route order.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeInheritedRouteIsolation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeInheritedRouteIsolation.lean)
+  instantiates the generic connector theorem with the normalized retained
+  fixed-eight source family.  Every genuine inherited Figure 9 suffix now
+  has an isolated variable endpoint after unit subdivision.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeWrappedRoutes.lean)
   transports the coordinated raw Figure 9 formula, placement, and routes
   through the exact-one variable wrapper.  The wrapper changes no geometry
