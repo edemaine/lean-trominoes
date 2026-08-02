@@ -456,13 +456,14 @@ The representation choices for this target are:
   memberships at every flattened output index.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedLocalRoutes.lean)
   selects the corresponding certified unit-elimination route at every
-  global output incidence and proves all such local routes orthogonal under
-  the same width-three and atom-distinct hypotheses.
+  global output incidence and proves all such local routes orthogonal and
+  continuously simple under the same width-three and atom-distinct
+  hypotheses.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean)
-  supplies the analogous canonical-gauge endpoints and orthogonality
-  theorem for unit elimination.  Its inherited-variable endpoints are the
-  precise splice boundary, while its new auxiliary endpoints are already
-  final.
+  supplies the analogous canonical-gauge endpoints, orthogonality, and
+  continuous-simplicity theorems for unit elimination.  Its
+  inherited-variable endpoints are the precise splice boundary, while its
+  new auxiliary endpoints are already final.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean)
   identifies the exact source scope and source-anchor offset of every fresh
   unit-elimination auxiliary literal.
