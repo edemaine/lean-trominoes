@@ -2006,6 +2006,11 @@ The representation choices for this target are:
   transfers a genuine final source route's retained-terminal classification
   to its explicit penultimate-to-final segment, matching the endpoint form
   used by the mixed direct/fallback alignment argument.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceMixedDirectionInequality.lean`](LeanTrominoes/RetainedAngularFanDirectSourceMixedDirectionInequality.lean)
+  proves that an oblique selected direct segment cannot share a retained
+  terminal direction with any classified axis-aligned segment.  The final
+  fallback branch instantiates this small geometry lemma with its endpoint
+  classification and failed-choice alignment certificate.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedTailCardinalBounds.lean)
   bounds every point of a cardinal escaped complete tail in the inward
   half-plane 64 blocks beyond its source gate.  Its separation corollary
