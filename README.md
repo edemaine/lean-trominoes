@@ -2394,10 +2394,10 @@ The representation choices for this target are:
   geometric side condition from aligned successful/failed relative route
   separation.  Shift negation supplies the reverse failed/successful order.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeCopiedSourceReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeCopiedSourceReduction.lean)
-  reduces the last copied-source periodic separation premise to exactly two
-  nonzero-shift geometric obligations: non-axis-aligned direct/fallback and
-  fallback/fallback route separation.  All zero-shift, direct/direct, and
-  aligned mixed selector cases are discharged by existing public theorems.
+  reduces the last copied-source periodic separation premise to its selector
+  cases.  All zero-shift, direct/direct, and mixed-selector cases are now
+  discharged by public theorems, leaving only failed/failed route separation
+  at a nonzero shift.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterData.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterData.lean)
   proves that failed-choice routes meeting at one physical target across a
   nonzero period shift still have different stored occurrence slots and
@@ -2534,6 +2534,12 @@ The representation choices for this target are:
   oblique selected direct boundary avoids the whole translated fallback
   boundary and that the direct replacement avoids the fallback Figure 7
   suffix whenever their physical target centers differ.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedObliqueOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedObliqueOccurrenceSeparation.lean)
+  assembles all four boundary/suffix interactions for oblique selected direct
+  and translated fallback occurrences.  Distinct centers use the global
+  terminal rectangles, while coincident centers use strict angular slot
+  order; splitting between them closes the complete oblique mixed-selector
+  route family at every nonzero shift.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating

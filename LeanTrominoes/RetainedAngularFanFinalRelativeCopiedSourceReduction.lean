@@ -1,5 +1,6 @@
 import LeanTrominoes.RetainedAngularFanFinalRelativeRouteSeparation
 import LeanTrominoes.RetainedAngularFanFinalRelativeMixedCompleteSeparation
+import LeanTrominoes.RetainedAngularFanFinalRelativeMixedObliqueOccurrenceSeparation
 
 /-!
 # Reduction of copied-source relative separation to the two residual cases
@@ -96,6 +97,34 @@ def RetainedFinalFallbackRoutesRelativeStrictlyAvoidEachOther
                 formula).translation relativeTranslate)
               (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
                 formula secondClauseIndex secondLiteralIndex))
+
+/-- The oblique successful/failed residual follows from the complete
+occurrence theorem, including its internal split on physical target-center
+equality. -/
+theorem retainedFinalObliqueMixedRoutesRelativeStrictlyAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ []) :
+    RetainedFinalObliqueMixedRoutesRelativeStrictlyAvoidEachOther formula := by
+  intro choice directClause fallbackClause
+    directClauseIndex fallbackClauseIndex
+    directClauseMember fallbackClauseMember
+    directLiteral fallbackLiteral
+    directLiteralIndex fallbackLiteralIndex
+    directLiteralMember fallbackLiteralMember
+    choiceLookup fallbackChoiceNone directOblique
+    relativeTranslate relativeTranslateNonzero
+  exact
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_strictlyAvoids_translated_of_first_choice_some_second_none_of_not_axisAligned_of_nonzero
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember choiceLookup
+      fallbackChoiceNone directOblique relativeTranslate
+      relativeTranslateNonzero
 
 /-- Reversing the relative shift turns the forward residual mixed theorem
 into the failed/successful selector orientation. -/
