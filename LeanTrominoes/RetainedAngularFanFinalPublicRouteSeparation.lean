@@ -25,7 +25,7 @@ set_option maxHeartbeats 2000000
 
 /-- Remove the final factor-eight coordinate scaling from one genuine public
 incidence while preserving its presentation indices and literal value. -/
-private theorem finalCoordinatedIncidence_unscale
+theorem finalCoordinatedIncidence_unscale
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     {clause :
@@ -83,7 +83,7 @@ private theorem finalCoordinatedIncidence_unscale
 
 /-- A copied-prefix incidence of the unscaled split formula comes from a
 genuine incidence of the raw coordinated source at the same indices. -/
-private theorem rawCoordinatedSourceIncidence_of_occurrence
+theorem rawCoordinatedSourceIncidence_of_occurrence
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     {clause :

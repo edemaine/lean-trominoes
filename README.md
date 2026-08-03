@@ -2812,6 +2812,14 @@ The representation choices for this target are:
   lift, while unequal centers use the translated source-vertex and radius-48
   cycle bounds.  The resulting combined theorem covers every copied-source
   route, whether direct or fallback, against every translated cycle route.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeRouteSeparation.lean)
+  dispatches the complete final fixed-eight route family into copied-source,
+  mixed source/cycle, and cycle/cycle pairs.  The mixed and cycle branches
+  are fully discharged for arbitrary relative period shifts; copied-source
+  versus copied-source separation is exposed as the sole remaining geometric
+  premise.  From that premise the module transports separation through
+  pointwise loop erasure, lifts it to all periodic drawing occurrences, and
+  packages the normalized drawing as ribbon-ready.
 - [`LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean`](LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean)
   recovers the source atom owning any genuine appended implication route
   and proves that every point of its factor-eight realization lies within
