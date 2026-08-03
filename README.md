@@ -2249,6 +2249,11 @@ The representation choices for this target are:
   invariant equivalent form fixes the first route at shift zero and asks
   only about the second route's relative periodic shift, matching the local
   macrocell geometry used by the remaining construction.
+- [`LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparation.lean`](LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparation.lean)
+  transports that relative-shift predicate through the lossless flat route
+  enumeration.  The remaining geometry can therefore quantify over genuine
+  metadata-rich clause/literal incidences while retaining exactly the route
+  indices used to distinguish periodic occurrences.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean)
   discharges both endpoint-isolation obligations for every fresh auxiliary
   incidence in the final unit-elimination layer.  The completed auxiliary

@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRoutes
 import LeanTrominoes.PeriodicGridDrawingLiftedRouteSeparation
+import LeanTrominoes.PositionedPeriodicCNFRelativeRouteSeparation
 import LeanTrominoes.RetainedAngularFanFinalNormalizedDrawing
 
 /-!
@@ -529,6 +530,49 @@ theorem
     (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_hasUnitSteps
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
+
+/-- The remaining pairwise geometry may be proved directly on genuine final
+clause/literal incidences; the generic lookup bridge restores their anonymous
+flat drawing indices. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_isRibbonReady_of_relativeIncidenceRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (separated :
+      PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+          source)
+        (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement
+          source)
+        (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceRoutes
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty)) :
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).IsRibbonReady := by
+  apply
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_isRibbonReady_of_relativeLiftedRoutesAvoidEachOther
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  rw [
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing]
+  exact
+    PositionedPeriodicCNF.incidenceDrawing_relativeLiftedRoutesAvoidEachOther
+      (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+        source)
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement
+        source)
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement_period_pos
+        source)
+      separated
 
 end PeriodicOrthocrossing
 end LeanTrominoes
