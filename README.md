@@ -5048,7 +5048,9 @@ The representation choices for this target are:
   at their variable-side tails, and strictly separated cross pairs compose
   to complete endpoint-only route separation.  Ordinary route avoidance can
   be upgraded to either head-only or tail-only contact by ruling out the
-  other three endpoint pairings.
+  other three endpoint pairings.  Symmetrically to the existing `dropLast`
+  results, deleting the heads of two simple separated routes preserves
+  avoidance and makes every surviving contact tail-only.
 - [`LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean`](LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean)
   filters the local implication incidences at each ring vertex in syntactic
   order.  Every real port has exactly two cycle incidences, the separator

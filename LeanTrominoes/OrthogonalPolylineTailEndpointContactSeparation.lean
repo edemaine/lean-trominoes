@@ -1,5 +1,6 @@
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingMapPoints
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingTranslation
+import LeanTrominoes.OrthogonalPolylineRouteReversalContacts
 import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
 
 /-!
@@ -58,6 +59,81 @@ theorem RoutesMeetOnlyAtTails.symm
     contacts firstPoint firstMember
       secondPoint secondMember equal.symm
   exact ⟨tails.2, tails.1⟩
+
+/-- Deleting the obsolete head from two duplicate-free separated routes
+preserves ordinary route avoidance. -/
+theorem routesAvoidEachOther_tail_of_avoid_of_nodup
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (firstNodup : first.Nodup)
+    (secondNodup : second.Nodup) :
+    RoutesAvoidEachOther first.tail second.tail := by
+  have reversedAvoid := routesAvoidEachOther_reverse avoid
+  have dropped :=
+    routesAvoidEachOther_dropLast_of_avoid_of_nodup
+      reversedAvoid
+      (List.nodup_reverse.mpr firstNodup)
+      (List.nodup_reverse.mpr secondNodup)
+  have restored := routesAvoidEachOther_reverse dropped
+  simpa using restored
+
+/-- After deleting duplicate-free source heads, every surviving listed
+contact lies at the original final endpoint of both routes. -/
+theorem routesMeetOnlyAtTails_tail_of_avoid_of_nodup
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (firstNodup : first.Nodup)
+    (secondNodup : second.Nodup) :
+    RoutesMeetOnlyAtTails first.tail second.tail := by
+  intro firstPoint firstMember secondPoint secondMember pointsEqual
+  have firstOriginalMember : firstPoint ∈ first :=
+    List.mem_of_mem_tail firstMember
+  have secondOriginalMember : secondPoint ∈ second :=
+    List.mem_of_mem_tail secondMember
+  rcases List.mem_iff_get.mp firstOriginalMember with
+    ⟨firstIndex, firstIndexed⟩
+  rcases List.mem_iff_get.mp secondOriginalMember with
+    ⟨secondIndex, secondIndexed⟩
+  have indexedEqual :
+      first.get firstIndex = second.get secondIndex :=
+    firstIndexed.trans
+      (pointsEqual.trans secondIndexed.symm)
+  have endpoints :=
+    avoid.2.2.2 firstIndex secondIndex indexedEqual
+  rw [firstIndexed, secondIndexed] at endpoints
+  have firstNotHead : first.head? ≠ some firstPoint := by
+    intro firstHead
+    rcases first with _ | ⟨head, tail⟩
+    · simp at firstMember
+    · simp only [List.tail_cons, List.head?_cons] at firstMember firstHead
+      have headEqual : head = firstPoint := Option.some.inj firstHead
+      exact (List.nodup_cons.mp firstNodup).1 (headEqual ▸ firstMember)
+  have secondNotHead : second.head? ≠ some secondPoint := by
+    intro secondHead
+    rcases second with _ | ⟨head, tail⟩
+    · simp at secondMember
+    · simp only [List.tail_cons, List.head?_cons] at secondMember secondHead
+      have headEqual : head = secondPoint := Option.some.inj secondHead
+      exact (List.nodup_cons.mp secondNodup).1 (headEqual ▸ secondMember)
+  have firstLast : first.getLast? = some firstPoint :=
+    endpoints.1.resolve_left firstNotHead
+  have secondLast : second.getLast? = some secondPoint :=
+    endpoints.2.resolve_left secondNotHead
+  have firstTailHead : ∃ point, first.tail.head? = some point := by
+    have nonempty : first.tail ≠ [] := List.ne_nil_of_mem firstMember
+    rcases tailEq : first.tail with _ | ⟨point, rest⟩
+    · exact (nonempty tailEq).elim
+    · exact ⟨point, rfl⟩
+  have secondTailHead : ∃ point, second.tail.head? = some point := by
+    have nonempty : second.tail ≠ [] := List.ne_nil_of_mem secondMember
+    rcases tailEq : second.tail with _ | ⟨point, rest⟩
+    · exact (nonempty tailEq).elim
+    · exact ⟨point, rfl⟩
+  rcases firstTailHead with ⟨firstHead, firstTailHead⟩
+  rcases secondTailHead with ⟨secondHead, secondTailHead⟩
+  exact
+    ⟨List.getLast?_tail_eq_getLast? firstTailHead firstLast,
+      List.getLast?_tail_eq_getLast? secondTailHead secondLast⟩
 
 /-- Ordinary route separation has tail-only listed contact when the other
 three endpoint pairings are unequal. -/
