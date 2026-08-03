@@ -5294,6 +5294,18 @@ The representation choices for this target are:
   recovers each twice-inherited original occurrence from the composed
   metadata, converts its index to a certified three-port fan slot, and
   packages the selected splices as a total canonical suffix family.
+- [`LeanTrominoes/PositionedPeriodicCNFNormalizedRouteSeparation.lean`](LeanTrominoes/PositionedPeriodicCNFNormalizedRouteSeparation.lean)
+  computes the exact physical relative offset represented by two distinct
+  clause-anchor gauges and one semantic lattice translation.  Ordinary and
+  contact-free route separation transport through this two-anchor identity.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteSeparation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteSeparation.lean)
+  specializes the two-anchor transport to the selected composed local route
+  family, reducing stored relative separation back to displayed physical
+  geometry in the certified Figure 9-plus-unit-elimination neighborhoods.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSplicedRouteSeparation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSplicedRouteSeparation.lean)
+  packages the six local/local, local/suffix, and suffix/suffix conditions
+  sufficient for two complete composed routes to avoid each other, with all
+  four splice-endpoint equations discharged by the canonical certificates.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean)
   instantiates the ordered suffix family over the retained source, then
   completes both generations of auxiliary routes and splices them to the
