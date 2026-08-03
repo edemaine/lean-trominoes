@@ -5643,7 +5643,9 @@ The representation choices for this target are:
   instantiates the relative splice assembly for the retained ordered fixed-eight
   route family.  Four explicit avoidance conditions imply all six splice
   conditions, global raw route separation, and hence ribbon readiness of the
-  normalized drawing.
+  normalized drawing.  It also transports the completed fixed-eight relative
+  separation certificate through clockwise clause reordering, supplying the
+  inherited source geometry used by the suffix side of that splice.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
