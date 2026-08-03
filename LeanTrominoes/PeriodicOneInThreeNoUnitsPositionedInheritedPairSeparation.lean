@@ -278,5 +278,65 @@ theorem normalizedLocalRoutes_meetOnlyAtHeads_of_inherited_same_source
       firstLocalEndpoint, secondLocalEndpoint]
     exact fun equal => lastsNe (Option.some.inj equal)
 
+/-- The proof-backed inherited selectors automatically supply all provenance
+needed by the head-only local-contact theorem. -/
+theorem normalizedLocalRoutes_meetOnlyAtHeads_of_inheritedData_same_source
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      InheritedIncidenceData source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      InheritedIncidenceData source sourcePlacement
+        secondClauseIndex secondLiteralIndex)
+    (sameSource :
+      first.sourceClauseIndex = second.sourceClauseIndex)
+    (generatedDistinct :
+      firstClauseIndex ≠ secondClauseIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex) :
+    RoutesMeetOnlyAtHeads
+      (normalizedLocalRoutes source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+      (normalizedLocalRoutes source sourcePlacement
+        secondClauseIndex secondLiteralIndex) := by
+  have firstSourceLiteralMember :
+      (first.sourceLiteral, first.sourceLiteralIndex) ∈
+        first.metadata.sourceClause.literals.zipIdx := by
+    simpa [first.metadataSourceClause] using
+      first.sourceLiteralMember
+  have secondSourceLiteralMember :
+      (second.sourceLiteral, second.sourceLiteralIndex) ∈
+        second.metadata.sourceClause.literals.zipIdx := by
+    simpa [second.metadataSourceClause] using
+      second.sourceLiteralMember
+  have metadataSameSource :
+      first.metadata.sourceClauseIndex =
+        second.metadata.sourceClauseIndex := by
+    rw [first.metadataSourceClauseIndex,
+      second.metadataSourceClauseIndex]
+    exact sameSource
+  have sourceCoordinatesDistinct :=
+    first.sourceCoordinatesDistinct_of_generatedDistinct
+      source sourcePlacement second generatedDistinct
+  have sourceIndicesDistinct :
+      first.sourceLiteralIndex ≠ second.sourceLiteralIndex :=
+    sourceCoordinatesDistinct.resolve_left (fun ne => ne sameSource)
+  apply
+    normalizedLocalRoutes_meetOnlyAtHeads_of_inherited_same_source
+      source sourcePlacement sourceWidth sourceDistinct
+      first.generatedClauseMember second.generatedClauseMember
+      first.generatedLiteralMember second.generatedLiteralMember
+      first.metadataLookup second.metadataLookup
+      metadataSameSource generatedDistinct
+      firstSourceLiteralMember secondSourceLiteralMember
+  · simpa [first.metadataClause] using first.literalAtom
+  · simpa [second.metadataClause] using second.literalAtom
+  · exact sourceIndicesDistinct
+
 end PeriodicOneInThreeNoUnitsPositioned
 end LeanTrominoes

@@ -2289,7 +2289,8 @@ The representation choices for this target are:
   proves the local-prefix contact condition for an inherited pair in one
   source block: distinct recovered source-occurrence indices give distinct
   splice ports, so the already-separated local routes can meet only at their
-  generated clause heads.
+  generated clause heads.  The selector-level wrapper obtains those distinct
+  source indices automatically from distinct generated incidence coordinates.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
   stores exact generated-to-source occurrence provenance in every selected
   inherited suffix.  Distinct generated incidence coordinates now imply
