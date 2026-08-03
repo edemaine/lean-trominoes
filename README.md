@@ -2385,6 +2385,11 @@ The representation choices for this target are:
   nonzero-shift geometric obligations: non-axis-aligned direct/fallback and
   fallback/fallback route separation.  All zero-shift, direct/direct, and
   aligned mixed selector cases are discharged by existing public theorems.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterData.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterData.lean)
+  proves that failed-choice routes meeting at one physical target across a
+  nonzero period shift still have different stored occurrence slots and
+  different orthogonal terminal directions, and combines both facts with
+  the retained terminal profile to recover their strict angular order.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
