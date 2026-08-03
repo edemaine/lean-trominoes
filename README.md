@@ -2353,6 +2353,11 @@ The representation choices for this target are:
   four piece pairs then assemble into complete public relative separation for
   every aligned successful/failed pair at distinct translated centers; shift
   negation and symmetry also supply the failed/successful orientation.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterOrder.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterOrder.lean)
+  handles the metadata of a nonzero translated center coincidence.  It proves
+  distinct stored occurrences of one atom, strict direct/fallback terminal
+  order, equality of their physical fan centers, and separation from the
+  translated selected outer replacement.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
