@@ -2277,6 +2277,14 @@ The representation choices for this target are:
   enumeration unchanged and commutes with semantic period translation, while
   injectivity of positive scaling transports all four continuous route-contact
   conditions.
+- [`LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparationOrdering.lean`](LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparationOrdering.lean)
+  gives an equivalent coordinate-indexed form of relative separation and
+  transports it through stable clause-direction sorting.  It follows each
+  original tagged literal through the permutation, combines the two
+  route-specific anchor gauges with the requested relative shift, and then
+  translates the source separation certificate back to the reordered
+  representatives.  Presentation indices, rather than literal values, keep
+  the argument valid when a clause contains duplicate literal values.
 - [`LeanTrominoes/RetainedAngularFanFinalSourceRelativeRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalSourceRelativeRouteSeparation.lean)
   packages the retained pre-split drawing's global continuous planarity,
   endpoint-only contacts, segment-endpoint/interior avoidance, and
