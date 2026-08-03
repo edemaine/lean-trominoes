@@ -19,6 +19,26 @@ semantics are all preserved up to permutation.
 -/
 
 namespace LeanTrominoes
+
+namespace AxisDirection
+
+/-- Three distinct genuine directions whose ranks are nondecreasing occur
+in clockwise order without requiring a cyclic rotation. -/
+theorem inClockwiseOrder_of_rank_le
+    {first second third : AxisDirection}
+    (firstGenuine : first.IsGenuine)
+    (secondGenuine : second.IsGenuine)
+    (thirdGenuine : third.IsGenuine)
+    (firstSecond : first ≠ second)
+    (firstThird : first ≠ third)
+    (secondThird : second ≠ third)
+    (firstLeSecond : first.clockwiseRank ≤ second.clockwiseRank)
+    (secondLeThird : second.clockwiseRank ≤ third.clockwiseRank) :
+    InClockwiseOrder first second third := by
+  native_decide +revert
+
+end AxisDirection
+
 namespace PositionedPeriodicCNF
 
 variable {Variable : Type*}
@@ -345,6 +365,147 @@ def CanonicalOrthogonalIncidenceRoutes.orderClausesByRouteDirection
     exact (orderCanonicalRoutesByClauseDirection_valid
       placement family clauseMember literalMember).2.2
 
+/-- The anchor-gauge translation does not change the first direction of a
+reindexed route selected by an explicit sorted-tag lookup. -/
+theorem orderCanonicalRoutesByClauseDirection_firstDirection_of_lookup
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    {sourceClause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (sourceClauseMember :
+      (sourceClause, clauseIndex) ∈ source.clauses.zipIdx)
+    {taggedLiteral : PeriodicLiteral Variable × Nat}
+    {literalIndex : Nat}
+    (taggedLookup :
+      (clauseLiteralOrder routes clauseIndex sourceClause)[literalIndex]? =
+        some taggedLiteral) :
+    AxisDirection.polylineFirstDirection
+        (orderCanonicalRoutesByClauseDirection
+          source placement routes clauseIndex literalIndex) =
+      AxisDirection.polylineFirstDirection
+        (routes clauseIndex taggedLiteral.2) := by
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  simp [orderCanonicalRoutesByClauseDirection,
+    orderRoutesByClauseDirection, sourceClauseLookup, taggedLookup]
+
+/-- Route-order condition expected by a fixed three-port clause router. -/
+def TernaryClauseRoutesInClockwiseOrder
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes) : Prop :=
+  ∀ clause clauseIndex,
+    (clause, clauseIndex) ∈ source.clauses.zipIdx →
+    clause.literals.length = 3 →
+    AxisDirection.InClockwiseOrder
+      (AxisDirection.polylineFirstDirection (routes clauseIndex 0))
+      (AxisDirection.polylineFirstDirection (routes clauseIndex 1))
+      (AxisDirection.polylineFirstDirection (routes clauseIndex 2))
+
+/-- Stable rank sorting gives every ternary clause clockwise route order as
+soon as the original genuine route directions are pairwise distinct within
+that clause. -/
+theorem orderCanonicalRoutesByClauseDirection_ternaryClockwise
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (genuine :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          (AxisDirection.polylineFirstDirection
+            (routes clauseIndex literalIndex)).IsGenuine)
+    (distinct :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ first firstIndex,
+          (first, firstIndex) ∈ clause.literals.zipIdx →
+          ∀ second secondIndex,
+            (second, secondIndex) ∈ clause.literals.zipIdx →
+            firstIndex ≠ secondIndex →
+            AxisDirection.polylineFirstDirection
+                (routes clauseIndex firstIndex) ≠
+              AxisDirection.polylineFirstDirection
+                (routes clauseIndex secondIndex)) :
+    TernaryClauseRoutesInClockwiseOrder
+      (orderClausesByRouteDirection source routes)
+      (orderCanonicalRoutesByClauseDirection source placement routes) := by
+  intro orderedClause clauseIndex orderedClauseMember arity
+  rcases exists_sourceClause_of_orderedClause_mem
+      routes orderedClauseMember with
+    ⟨sourceClause, sourceClauseMember, orderedClauseEq⟩
+  have sourceArity : sourceClause.literals.length = 3 := by
+    rw [← orderClauseByRouteDirection_length
+      routes clauseIndex sourceClause, ← orderedClauseEq]
+    exact arity
+  have orderLength :
+      (clauseLiteralOrder routes clauseIndex sourceClause).length = 3 := by
+    rw [show
+      (clauseLiteralOrder routes clauseIndex sourceClause).length =
+        sourceClause.literals.zipIdx.length by
+          exact (clauseLiteralOrder_perm
+            routes clauseIndex sourceClause).length_eq]
+    simpa using sourceArity
+  rcases List.length_eq_three.mp orderLength with
+    ⟨first, second, third, orderEq⟩
+  have firstMember : first ∈ sourceClause.literals.zipIdx :=
+    (clauseLiteralOrder_perm routes clauseIndex sourceClause).mem_iff.mp
+      (by simp [orderEq])
+  have secondMember : second ∈ sourceClause.literals.zipIdx :=
+    (clauseLiteralOrder_perm routes clauseIndex sourceClause).mem_iff.mp
+      (by simp [orderEq])
+  have thirdMember : third ∈ sourceClause.literals.zipIdx :=
+    (clauseLiteralOrder_perm routes clauseIndex sourceClause).mem_iff.mp
+      (by simp [orderEq])
+  have orderedIndicesNodup :
+      ((clauseLiteralOrder routes clauseIndex sourceClause).map
+        Prod.snd).Nodup := by
+    exact ((clauseLiteralOrder_perm
+      routes clauseIndex sourceClause).map Prod.snd).nodup_iff.mpr
+        (List.nodup_zipIdx_map_snd sourceClause.literals)
+  rw [orderEq] at orderedIndicesNodup
+  simp only [List.map_cons, List.map_nil,
+    List.nodup_cons, List.mem_cons, List.mem_singleton,
+    not_or, not_false_eq_true, List.nodup_singleton] at orderedIndicesNodup
+  have sorted := clauseLiteralOrder_pairwise
+    routes clauseIndex sourceClause
+  rw [orderEq] at sorted
+  simp only [List.pairwise_cons, List.mem_cons, List.mem_singleton,
+    forall_eq_or_imp, forall_eq, List.pairwise_singleton] at sorted
+  have clockwise := AxisDirection.inClockwiseOrder_of_rank_le
+    (genuine sourceClause clauseIndex sourceClauseMember
+      first.1 first.2 firstMember)
+    (genuine sourceClause clauseIndex sourceClauseMember
+      second.1 second.2 secondMember)
+    (genuine sourceClause clauseIndex sourceClauseMember
+      third.1 third.2 thirdMember)
+    (distinct sourceClause clauseIndex sourceClauseMember
+      first.1 first.2 firstMember second.1 second.2 secondMember
+      orderedIndicesNodup.1.1)
+    (distinct sourceClause clauseIndex sourceClauseMember
+      first.1 first.2 firstMember third.1 third.2 thirdMember
+      orderedIndicesNodup.1.2.1)
+    (distinct sourceClause clauseIndex sourceClauseMember
+      second.1 second.2 secondMember third.1 third.2 thirdMember
+      orderedIndicesNodup.2.1.1)
+    (by
+      simpa [clauseLiteralDirectionLE, clauseLiteralDirectionRank] using
+        sorted.1.1)
+    (by
+      simpa [clauseLiteralDirectionLE, clauseLiteralDirectionRank] using
+        sorted.2.1)
+  rw [orderCanonicalRoutesByClauseDirection_firstDirection_of_lookup
+      placement routes sourceClauseMember
+        (literalIndex := 0) (taggedLiteral := first) (by simp [orderEq]),
+    orderCanonicalRoutesByClauseDirection_firstDirection_of_lookup
+      placement routes sourceClauseMember
+        (literalIndex := 1) (taggedLiteral := second) (by simp [orderEq]),
+    orderCanonicalRoutesByClauseDirection_firstDirection_of_lookup
+      placement routes sourceClauseMember
+        (literalIndex := 2) (taggedLiteral := third) (by simp [orderEq])]
+  exact clockwise
+
 /-- Disjunction truth is insensitive to permuting a clause's literals. -/
 theorem periodicClause_holds_iff_of_perm
     (assignment : Variable → Cell → Bool)
@@ -527,23 +688,4 @@ theorem orderClausesByRouteDirection_allAtomsNodup_iff
         PeriodicLiteral.atom).nodup_iff.mpr distinct
 
 end PositionedPeriodicCNF
-
-namespace AxisDirection
-
-/-- Three distinct genuine directions whose ranks are nondecreasing occur
-in clockwise order without requiring a cyclic rotation. -/
-theorem inClockwiseOrder_of_rank_le
-    {first second third : AxisDirection}
-    (firstGenuine : first.IsGenuine)
-    (secondGenuine : second.IsGenuine)
-    (thirdGenuine : third.IsGenuine)
-    (firstSecond : first ≠ second)
-    (firstThird : first ≠ third)
-    (secondThird : second ≠ third)
-    (firstLeSecond : first.clockwiseRank ≤ second.clockwiseRank)
-    (secondLeThird : second.clockwiseRank ≤ third.clockwiseRank) :
-    InClockwiseOrder first second third := by
-  native_decide +revert
-
-end AxisDirection
 end LeanTrominoes

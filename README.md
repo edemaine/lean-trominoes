@@ -5264,6 +5264,14 @@ The representation choices for this target are:
   A finite cardinal-direction
   lemma turns nondecreasing ranks of three distinct genuine exits into the
   clockwise condition needed by the composed boundary-port router.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightClauseDirectionOrdering.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightClauseDirectionOrdering.lean)
+  instantiates clause-direction ordering for the normalized retained
+  fixed-eight source drawing.  Continuous separation forces distinct exits
+  at each shared clause endpoint, while unit steps make every exit genuine;
+  consequently every reordered ternary clause exposes its three routes in
+  clockwise order.  The reordered presentation also retains the width-three
+  bound, per-clause atom distinctness, canonical route geometry, and
+  satisfiability equivalence with the original source.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
