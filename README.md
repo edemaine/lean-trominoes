@@ -2380,6 +2380,11 @@ The representation choices for this target are:
   splits on translated target-center equality and thereby removes that
   geometric side condition from aligned successful/failed relative route
   separation.  Shift negation supplies the reverse failed/successful order.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeCopiedSourceReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeCopiedSourceReduction.lean)
+  reduces the last copied-source periodic separation premise to exactly two
+  nonzero-shift geometric obligations: non-axis-aligned direct/fallback and
+  fallback/fallback route separation.  All zero-shift, direct/direct, and
+  aligned mixed selector cases are discharged by existing public theorems.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
