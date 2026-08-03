@@ -46,6 +46,13 @@ structure InheritedIncidenceData
   sourceClauseIndex : Nat
   sourceLiteral : PeriodicLiteral Variable
   sourceLiteralIndex : Nat
+  metadata : ClauseMetadata Variable
+  metadataLookup :
+    (formulaClauseMetadata source)[clauseIndex]? = some metadata
+  metadataClause : metadata.clause = generatedClause
+  metadataSourceClause : metadata.sourceClause = sourceClause
+  metadataSourceClauseIndex :
+    metadata.sourceClauseIndex = sourceClauseIndex
   generatedClauseMember :
     (generatedClause, clauseIndex) ∈ (formula source).clauses.zipIdx
   generatedLiteralMember :
@@ -216,6 +223,11 @@ theorem inheritedIncidenceData?_of_members
       sourceClauseIndex := metadata.sourceClauseIndex
       sourceLiteral := sourceLiteral
       sourceLiteralIndex := sourceLiteralIndex
+      metadata := metadata
+      metadataLookup := metadataLookup
+      metadataClause := metadataClause
+      metadataSourceClause := rfl
+      metadataSourceClauseIndex := rfl
       generatedClauseMember := clauseMember
       generatedLiteralMember := literalMember
       sourceClauseMember := sourceClauseMember

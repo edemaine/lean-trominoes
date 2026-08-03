@@ -2294,7 +2294,9 @@ The representation choices for this target are:
   stores exact generated-to-source occurrence provenance in every selected
   inherited suffix.  Distinct generated incidence coordinates now imply
   distinct selected source incidence coordinates by injectivity of the
-  ordered occurrence pairing.
+  ordered occurrence pairing.  Each selector record also retains its exact
+  flattened unit-elimination metadata entry, including the source block and
+  generated clause equalities needed by pairwise geometry.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean)
   identifies an inherited local endpoint with its source-occurrence boundary
   port.  The three possible source-port coordinates are injective, and every
