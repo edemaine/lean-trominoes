@@ -2782,6 +2782,14 @@ The representation choices for this target are:
   split proves that every Figure 7 ring-copy or implication-clause vertex
   avoids every cycle-route interior, and exposes both results at the final
   factor-8 placement and public coordinated route indices.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeCycleSeparation.lean)
+  extends the cycle/cycle branch to arbitrary periodic copies.  It proves
+  generically that a semantic translation moves the second factor-36 Figure
+  7 macrocell with its route, while two source points in the open fundamental
+  square cannot coincide under a nonzero period shift.  Thus every nonzero
+  translated cycle pair is strictly contact-free; combined with the existing
+  distinct-incidence theorem at shift zero, this gives complete relative
+  cycle-route separation at both the scaled and public fixed-eight interfaces.
 - [`LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean`](LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean)
   recovers the source atom owning any genuine appended implication route
   and proves that every point of its factor-eight realization lies within
