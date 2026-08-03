@@ -2358,6 +2358,10 @@ The representation choices for this target are:
   distinct stored occurrences of one atom, strict direct/fallback terminal
   order, equality of their physical fan centers, and separation from the
   translated selected outer replacement.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterBoundarySeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterBoundarySeparation.lean)
+  combines that order with the center-independent translated source corridor,
+  proving that an aligned successful direct boundary strictly avoids the
+  complete translated failed-choice boundary even at a shared physical target.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
