@@ -2337,6 +2337,10 @@ The representation choices for this target are:
   the relative shift and canonical targets are both distinct.  In the aligned
   direct/failed-choice case this yields the translated source-prefix corridor
   required by the final fallback-boundary assembly.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean)
+  models the selected ordinary-or-escaped outer fan at a translated fallback
+  endpoint.  Its radius-288 terminal-segment envelope is disjoint from every
+  aligned direct envelope at a nonzero shift with distinct canonical targets.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
