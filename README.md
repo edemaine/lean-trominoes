@@ -2285,6 +2285,11 @@ The representation choices for this target are:
   local/suffix cross pairs, and suffix avoidance with tail-only contact.  The
   standard local and canonical-suffix endpoint certificates then assemble
   those facts into separation of the complete final routes.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedPairSeparation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedPairSeparation.lean)
+  proves the local-prefix contact condition for an inherited pair in one
+  source block: distinct recovered source-occurrence indices give distinct
+  splice ports, so the already-separated local routes can meet only at their
+  generated clause heads.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean)
   identifies an inherited local endpoint with its source-occurrence boundary
   port.  The three possible source-port coordinates are injective, and every
