@@ -2436,8 +2436,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCompleteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCompleteSeparation.lean)
   combines the shared-target and distinct-target branches into unconditional
   strict separation of two failed-choice occurrence routes at every nonzero
-  shift, discharging the fallback/fallback residual proposition used by the
-  copied-source reduction.
+  shift.  Composing this with the completed oblique mixed theorem discharges
+  every copied-source selector case and proves that the final normalized
+  fixed-eight periodic incidence drawing is ribbon-ready without additional
+  geometric premises.
 - [`LeanTrominoes/RetainedFinalRouteMacrocellShapeClassification.lean`](LeanTrominoes/RetainedFinalRouteMacrocellShapeClassification.lean)
   extends the final macrocell wrapper from flat routes to arbitrary period
   occurrences.  Equal physical centers transfer direct-component shape, so

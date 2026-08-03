@@ -114,5 +114,40 @@ theorem retainedFinalFallbackRoutes_relativeStrictlyAvoidEachOther
       firstLiteralMember secondLiteralMember firstChoiceNone secondChoiceNone
       relativeTranslate relativeTranslateNonzero
 
+/-- All copied-source route occurrences are relatively separated.  The
+selector reduction is now closed by the complete oblique mixed and
+failed/failed theorems. -/
+theorem retainedFinalCopiedSourceRoutes_relativeAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty : ∀ clause ∈ formula.clauses, clause ≠ []) :
+    RetainedFinalCopiedSourceRoutesRelativeAvoidEachOther formula :=
+  retainedFinalCopiedSourceRoutes_relativeAvoidEachOther_of_residual
+    formula sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty
+    (retainedFinalObliqueMixedRoutesRelativeStrictlyAvoidEachOther
+      formula sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty)
+    (retainedFinalFallbackRoutes_relativeStrictlyAvoidEachOther
+      formula sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty)
+
+/-- The final normalized fixed-eight periodic incidence drawing satisfies the
+complete ribbon-ready interface required by the tiling construction. -/
+theorem
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing_isRibbonReady
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty : ∀ clause ∈ formula.clauses, clause ≠ []) :
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing
+      formula).IsRibbonReady :=
+  retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceDrawing_isRibbonReady_of_copiedSourceRelative
+    formula sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty
+    (retainedFinalCopiedSourceRoutes_relativeAvoidEachOther
+      formula sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty)
+
 end PeriodicOrthocrossing
 end LeanTrominoes
