@@ -5304,8 +5304,9 @@ The representation choices for this target are:
   geometry in the certified Figure 9-plus-unit-elimination neighborhoods.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSplicedRouteSeparation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSplicedRouteSeparation.lean)
   packages the six local/local, local/suffix, and suffix/suffix conditions
-  sufficient for two complete composed routes to avoid each other, with all
-  four splice-endpoint equations discharged by the canonical certificates.
+  sufficient for two complete composed routes at an arbitrary semantic lattice
+  offset to avoid each other, with all four splice-endpoint equations discharged
+  by the canonical certificates.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean)
   instantiates the ordered suffix family over the retained source, then
   completes both generations of auxiliary routes and splices them to the
@@ -5317,6 +5318,10 @@ The representation choices for this target are:
   realizes every incidence edge, is orthogonal and integer-grid planar, and
   consists entirely of simple unit-step paths.  A generic relative-separation
   premise now suffices to promote it to the ribbon-ready interface.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
+  instantiates the relative splice assembly for the retained ordered fixed-eight
+  route family.  Its six explicit component conditions imply global raw route
+  separation and hence ribbon readiness of the normalized drawing.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
