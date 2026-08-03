@@ -5243,6 +5243,16 @@ The representation choices for this target are:
   canonical endpoints and orthogonality.  This intermediate family keeps the
   raw nested variable type so that a later coordinate-preserving renaming can
   identify it with the public wrapped formula.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedRenaming.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedRenaming.lean)
+  proves that unit elimination is natural under source-variable renaming,
+  including the complete renamed source clause stored in every auxiliary
+  key.  The positioned formula and induced placement preserve clause
+  positions, the physical period, and all renamed variable positions.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsComposedWrappedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsComposedWrappedRoutes.lean)
+  applies that naturality theorem to the public opaque wrapper.  It identifies
+  the public unit-free formula and placement with their raw composed versions,
+  reuses every certified route coordinate verbatim, and packages canonical
+  endpoints and orthogonality for the public final formula.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
