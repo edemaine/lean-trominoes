@@ -2307,6 +2307,12 @@ The representation choices for this target are:
   drawing period shift, and the represented source segment translates in the
   same unscaled retained-source frame.  Periodic direct-route geometry can
   therefore reuse the existing finite complete-Figure-7 models.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeDirectSourceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeDirectSourceSeparation.lean)
+  proves strict separation of two successful direct-source routes across
+  every nonzero period shift.  Different translated component origins use
+  disjoint macrocell envelopes; coincident origins are classified into the
+  finite crossover or duplicator atlas, with translated target equality
+  recovering the wrapped atom and the semantic angular-slot order.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
