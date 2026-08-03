@@ -2839,6 +2839,11 @@ The representation choices for this target are:
   planarity also clears that point from any axis-aligned discarded final
   segment.  The failed-selector theorem is the immediate specialization that
   obtains this alignment from the fallback policy.
+- [`LeanTrominoes/RetainedFinalSourceRouteOtherTranslatedTargetSeparation.lean`](LeanTrominoes/RetainedFinalSourceRouteOtherTranslatedTargetSeparation.lean)
+  converts the fundamental-square vertex interfaces into occurrence-center
+  interfaces.  It absorbs a target literal's clause-relative period offset,
+  proving that source prefixes and aligned discarded final segments avoid
+  arbitrary translated canonical literal positions.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCycleSeparation.lean)
   completes the failed-selector half of periodic source/cycle separation.  A
   reusable point-neighborhood assembly covers both ordinary and escaped
