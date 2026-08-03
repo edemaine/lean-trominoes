@@ -236,6 +236,63 @@ theorem RoutesStrictlyAvoidEachOther.singleton_right
     RoutesStrictlyAvoidEachOther first [point] :=
   strict.symm.singleton_left pointMember |>.symm
 
+/-- Common pointwise translation preserves contact-free continuous route
+separation. -/
+theorem RoutesStrictlyAvoidEachOther.translatePolyline
+    {first second : List Cell}
+    (strict : RoutesStrictlyAvoidEachOther first second)
+    (offset : Cell) :
+    RoutesStrictlyAvoidEachOther
+      (PeriodicOrthocrossing.translatePolyline offset first)
+      (PeriodicOrthocrossing.translatePolyline offset second) := by
+  unfold RoutesStrictlyAvoidEachOther at strict ⊢
+  rw [gridPolylineSegments_translatePolyline,
+    gridPolylineSegments_translatePolyline]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro firstSegment firstMember secondSegment secondMember meet
+    rcases List.mem_map.mp firstMember with
+      ⟨sourceFirst, sourceFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨sourceSecond, sourceSecondMember, rfl⟩
+    apply strict.1 sourceFirst sourceFirstMember
+      sourceSecond sourceSecondMember
+    exact
+      (GridSegment.interiorsMeet_translate_both_iff
+        sourceFirst sourceSecond offset).mp meet
+  · intro firstPoint firstMember secondSegment secondMember contains
+    unfold PeriodicOrthocrossing.translatePolyline at firstMember
+    rcases List.mem_map.mp firstMember with
+      ⟨sourcePoint, sourcePointMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨sourceSegment, sourceSegmentMember, rfl⟩
+    apply strict.2.1 sourcePoint sourcePointMember
+      sourceSegment sourceSegmentMember
+    exact
+      (PeriodicGridDrawing.interiorContains_translate_iff
+        sourceSegment offset sourcePoint).mp
+        (by simpa [Cell.add, add_comm] using contains)
+  · intro secondPoint secondMember firstSegment firstMember contains
+    unfold PeriodicOrthocrossing.translatePolyline at secondMember
+    rcases List.mem_map.mp secondMember with
+      ⟨sourcePoint, sourcePointMember, rfl⟩
+    rcases List.mem_map.mp firstMember with
+      ⟨sourceSegment, sourceSegmentMember, rfl⟩
+    apply strict.2.2.1 sourcePoint sourcePointMember
+      sourceSegment sourceSegmentMember
+    exact
+      (PeriodicGridDrawing.interiorContains_translate_iff
+        sourceSegment offset sourcePoint).mp
+        (by simpa [Cell.add, add_comm] using contains)
+  · intro firstPoint firstMember secondPoint secondMember equal
+    unfold PeriodicOrthocrossing.translatePolyline at firstMember secondMember
+    rcases List.mem_map.mp firstMember with
+      ⟨sourceFirst, sourceFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨sourceSecond, sourceSecondMember, rfl⟩
+    exact strict.2.2.2 sourceFirst sourceFirstMember
+      sourceSecond sourceSecondMember
+      (Cell.add_left_injective offset equal)
+
 /-- Positive uniform scaling preserves contact-free route separation. -/
 theorem RoutesStrictlyAvoidEachOther.scalePolyline
     {first second : List Cell}

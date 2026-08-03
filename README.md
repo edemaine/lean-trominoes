@@ -5283,6 +5283,11 @@ The representation choices for this target are:
   clause as finite composed exit-fan data.  Generic genuine-direction and
   strict clockwise-rank invariants prove that the selected fan is one of the
   fourteen certified configurations.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteSplicing.lean)
+  translates a selected fan into a generated clause's canonical gauge and
+  splices each connector directly to the scaled inherited unit-step route.
+  The splice has exact endpoints and orthogonality, while common translation
+  preserves the fan's certified pairwise strict separation.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
