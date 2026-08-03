@@ -16,6 +16,70 @@ namespace PeriodicOneInThreeNoUnitsPositioned
 open PlanarThreeSAT
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+/-- The source-tail part of two inherited suffixes in one source block
+inherits ordinary separation and tail-only contacts from the corresponding
+simple source routes. -/
+theorem inheritedSourceRoute_tails_separated_of_inheritedData_same_source
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      InheritedIncidenceData source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      InheritedIncidenceData source sourcePlacement
+        secondClauseIndex secondLiteralIndex)
+    (sameSource :
+      first.sourceClauseIndex = second.sourceClauseIndex)
+    (sourceAvoid :
+      RoutesAvoidEachOther
+        (sourceRoutes
+          first.sourceClauseIndex first.sourceLiteralIndex)
+        (sourceRoutes
+          second.sourceClauseIndex second.sourceLiteralIndex))
+    (firstNodup :
+      (sourceRoutes
+        first.sourceClauseIndex first.sourceLiteralIndex).Nodup)
+    (secondNodup :
+      (sourceRoutes
+        second.sourceClauseIndex second.sourceLiteralIndex).Nodup) :
+    RoutesAvoidEachOther
+        (inheritedSourceRoute
+          (placement source sourcePlacement) sourcePlacement
+          first.sourceClause first.generatedClause
+          (sourceRoutes
+            first.sourceClauseIndex first.sourceLiteralIndex)).tail
+        (inheritedSourceRoute
+          (placement source sourcePlacement) sourcePlacement
+          second.sourceClause second.generatedClause
+          (sourceRoutes
+            second.sourceClauseIndex second.sourceLiteralIndex)).tail ∧
+      RoutesMeetOnlyAtTails
+        (inheritedSourceRoute
+          (placement source sourcePlacement) sourcePlacement
+          first.sourceClause first.generatedClause
+          (sourceRoutes
+            first.sourceClauseIndex first.sourceLiteralIndex)).tail
+        (inheritedSourceRoute
+          (placement source sourcePlacement) sourcePlacement
+          second.sourceClause second.generatedClause
+          (sourceRoutes
+            second.sourceClauseIndex second.sourceLiteralIndex)).tail :=
+  inheritedSourceRoute_tails_separated_of_common_shift
+    (placement source sourcePlacement) sourcePlacement
+    first.sourceClause second.sourceClause
+    first.generatedClause second.generatedClause
+    (sourceRoutes
+      first.sourceClauseIndex first.sourceLiteralIndex)
+    (sourceRoutes
+      second.sourceClauseIndex second.sourceLiteralIndex)
+    (first.sourceRouteShifts_eq_of_source_index_eq
+      source sourcePlacement second sameSource)
+    sourceAvoid firstNodup secondNodup
+
 /-- Two inherited normalized local routes in one source block can meet only
 at their clause-side heads when their recovered source occurrence indices
 are distinct. -/

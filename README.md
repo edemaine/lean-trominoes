@@ -2292,6 +2292,10 @@ The representation choices for this target are:
   splice ports, so the already-separated local routes can meet only at their
   generated clause heads.  The selector-level wrapper obtains those distinct
   source indices automatically from distinct generated incidence coordinates.
+  For the source-tail component, simple separated source routes remain
+  separated after deleting their obsolete heads and applying the block's
+  common refinement transform; every remaining listed contact is confined to
+  their variable-side tails.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
   stores exact generated-to-source occurrence provenance in every selected
   inherited suffix.  Distinct generated incidence coordinates now imply

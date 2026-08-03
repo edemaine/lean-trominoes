@@ -1,6 +1,7 @@
 import LeanTrominoes.OrthogonalPolylineHeadReplacement
 import LeanTrominoes.OrthogonalPolylineEndpointDirections
 import LeanTrominoes.OrthogonalPolylineHeadReplacementEndpointDirections
+import LeanTrominoes.OrthogonalPolylineTailEndpointContactSeparation
 import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints
 import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
@@ -75,6 +76,82 @@ def inheritedSourceRoute
     (inheritedSourceRouteShift
       outputPlacement sourcePlacement sourceClause generatedClause)
     (scalePolyline gadgetScale sourceRoute)
+
+/-- Deleting the obsolete heads of two simple separated source routes and
+then applying one common inherited-route transform preserves separation;
+all surviving listed contacts are at their variable-side tails. -/
+theorem inheritedSourceRoute_tails_separated_of_common_shift
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (firstSourceClause secondSourceClause :
+      PositionedPeriodicClause Variable)
+    (firstGeneratedClause secondGeneratedClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    (firstSourceRoute secondSourceRoute : List Cell)
+    (shiftsEqual :
+      inheritedSourceRouteShift
+          outputPlacement sourcePlacement
+          firstSourceClause firstGeneratedClause =
+        inheritedSourceRouteShift
+          outputPlacement sourcePlacement
+          secondSourceClause secondGeneratedClause)
+    (sourceAvoid :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        firstSourceRoute secondSourceRoute)
+    (firstNodup : firstSourceRoute.Nodup)
+    (secondNodup : secondSourceRoute.Nodup) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement
+          firstSourceClause firstGeneratedClause
+          firstSourceRoute).tail
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement
+          secondSourceClause secondGeneratedClause
+          secondSourceRoute).tail ∧
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesMeetOnlyAtTails
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement
+          firstSourceClause firstGeneratedClause
+          firstSourceRoute).tail
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement
+          secondSourceClause secondGeneratedClause
+          secondSourceRoute).tail := by
+  open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing in
+    have tailAvoid :
+        RoutesAvoidEachOther firstSourceRoute.tail secondSourceRoute.tail :=
+      routesAvoidEachOther_tail_of_avoid_of_nodup
+        sourceAvoid firstNodup secondNodup
+  open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing in
+    have tailContacts :
+        RoutesMeetOnlyAtTails firstSourceRoute.tail secondSourceRoute.tail :=
+      routesMeetOnlyAtTails_tail_of_avoid_of_nodup
+        sourceAvoid firstNodup secondNodup
+  open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing in
+    have scaledAvoid :=
+      tailAvoid.scalePolyline (factor := gadgetScale) (by decide)
+  open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing in
+    have scaledContacts :=
+      tailContacts.scalePolyline (factor := gadgetScale) (by decide)
+  open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing in
+    have translatedAvoid :=
+      routesAvoidEachOther_translate scaledAvoid
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement
+          firstSourceClause firstGeneratedClause)
+  open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing in
+    have translatedContacts :=
+      scaledContacts.translate
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement
+          firstSourceClause firstGeneratedClause)
+  simpa [inheritedSourceRoute,
+    PeriodicOrthocrossing.translatePolyline,
+    scalePolyline, ← shiftsEqual] using
+    And.intro translatedAvoid translatedContacts
 
 theorem inheritedSourceRoute_head?
     {Variable : Type*}
