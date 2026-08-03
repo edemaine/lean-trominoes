@@ -2455,6 +2455,11 @@ The representation choices for this target are:
   Overlapping routed-clause and routed-variable direct components yield exact
   source- and target-terminal incidences, reducing the direct-source case to
   those two contacts plus one translated-crossover residue.
+- [`LeanTrominoes/RetainedFinalRouteCarrierCrossoverNormalizedContact.lean`](LeanTrominoes/RetainedFinalRouteCarrierCrossoverNormalizedContact.lean)
+  begins the translated-crossover branch by normalizing its halo crossing to
+  the fundamental square.  The correspondingly translated selected carrier
+  support contains that canonical point, which proves its occurrence is
+  neighboring and hence that the translated link is a raw retained lens.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and
