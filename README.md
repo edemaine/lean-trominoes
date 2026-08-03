@@ -5534,7 +5534,9 @@ The representation choices for this target are:
   classifies every twice-inherited final literal through unit elimination
   and Figure 9 back to its precise original source-clause occurrence.  Its
   offset is unchanged, and the normalized composed route ends at that
-  occurrence's exact index-selected `72 × 72` boundary port.
+  occurrence's exact index-selected `72 × 72` boundary port.  The richer
+  classifier also stores the global final-to-Figure-9 and Figure-9-to-source
+  occurrence-pair witnesses used by periodic separation.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineAuxiliaryEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineAuxiliaryEndpoints.lean)
   handles both fresh-variable generations in the same composed block.  Each
   Figure 9 auxiliary inherited through unit elimination and each later
@@ -5551,7 +5553,9 @@ The representation choices for this target are:
   packages the two-stage classifier behind a proof-backed total selector.
   Any original canonical orthogonal route family with genuine first exits
   thereby induces exact, orthogonal suffixes for all and only the final
-  incidences inherited through both transformations.
+  incidences inherited through both transformations.  Composing the two
+  stored occurrence pairings proves that distinct final inherited incidences
+  always select distinct original source coordinates.
 - [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean)
   records that the Figure 9 occurrence selector is injective back to source
   incidence coordinates: two distinct generated incidences cannot select the

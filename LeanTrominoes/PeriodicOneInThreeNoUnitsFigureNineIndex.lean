@@ -970,6 +970,159 @@ theorem formulaClauseMetadata_unitEliminationMetadata_lookup_valid
       taggedFigureNineClauseMember
   · simpa [unitValid.1, unitValid.2.1] using unitValid.2.2
 
+/-- A local unit-elimination metadata lookup inside the composed source block
+is the same entry at the composed clause's global index in the standard
+second-stage metadata list. -/
+theorem formulaClauseMetadataFrom_unitEliminationMetadata_lookup
+    {Variable : Type*}
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (sourceClauses : List (PositionedPeriodicClause Variable))
+    {metadataIndex : Nat}
+    {metadata : ClauseMetadata Variable}
+    (metadataLookup :
+      (formulaClauseMetadataFrom
+        sourceClauseIndex figureNineClauseStart sourceClauses)[
+          metadataIndex]? = some metadata)
+    {unitMetadata :
+      PeriodicOneInThreeNoUnitsPositioned.ClauseMetadata
+        (OneInThreeVariable Variable)}
+    (unitMetadataLookup :
+      (PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+        metadata.figureNineClauseStart
+        (PeriodicOneInThreePositioned.clauseGadget
+          metadata.sourceClauseIndex metadata.sourceClause))[
+            metadata.localClauseIndex]? = some unitMetadata) :
+    (PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+      figureNineClauseStart
+      (figureNineClausesFrom
+        sourceClauseIndex sourceClauses))[metadataIndex]? =
+      some unitMetadata := by
+  induction sourceClauses generalizing
+      sourceClauseIndex figureNineClauseStart
+      metadataIndex metadata with
+  | nil =>
+      simp [formulaClauseMetadataFrom] at metadataLookup
+  | cons sourceClause rest induction =>
+      let figureNineBlock :=
+        PeriodicOneInThreePositioned.clauseGadget
+          sourceClauseIndex sourceClause
+      have composedSplit :
+          formulaClauseMetadataFrom sourceClauseIndex
+              figureNineClauseStart (sourceClause :: rest) =
+            clauseMetadataFor sourceClauseIndex
+                figureNineClauseStart sourceClause ++
+              formulaClauseMetadataFrom (sourceClauseIndex + 1)
+                (figureNineClauseStart + figureNineBlock.length) rest := by
+        simp [formulaClauseMetadataFrom, figureNineBlock]
+      have standardSplit :
+          PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+              figureNineClauseStart
+              (figureNineClausesFrom sourceClauseIndex
+                (sourceClause :: rest)) =
+            PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+                figureNineClauseStart figureNineBlock ++
+              PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+                (figureNineClauseStart + figureNineBlock.length)
+                (figureNineClausesFrom
+                  (sourceClauseIndex + 1) rest) := by
+        simp [PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom,
+          figureNineClausesFrom, figureNineBlock,
+          List.zipIdx_append, List.flatMap_append]
+      have standardHeadClauses :
+          (PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+            figureNineClauseStart figureNineBlock).map
+              PeriodicOneInThreeNoUnitsPositioned.ClauseMetadata.clause =
+            unitEliminationClausesFrom
+              figureNineClauseStart figureNineBlock := by
+        simp [PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom,
+          PeriodicOneInThreeNoUnitsPositioned.clauseMetadataFor,
+          unitEliminationClausesFrom_eq_zipIdx,
+          List.map_flatMap, List.map_map, Function.comp_def]
+      have standardHeadLength :
+          (PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+            figureNineClauseStart figureNineBlock).length =
+            (clauseMetadataFor sourceClauseIndex
+              figureNineClauseStart sourceClause).length := by
+        calc
+          _ = ((PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+                figureNineClauseStart figureNineBlock).map
+                  PeriodicOneInThreeNoUnitsPositioned.ClauseMetadata.clause).length := by
+              simp
+          _ = (unitEliminationClausesFrom
+                figureNineClauseStart figureNineBlock).length := by
+              rw [standardHeadClauses]
+          _ = _ := by simp [clauseMetadataFor, figureNineBlock]
+      rw [composedSplit] at metadataLookup
+      rw [standardSplit]
+      by_cases inHead :
+          metadataIndex <
+            (clauseMetadataFor sourceClauseIndex
+              figureNineClauseStart sourceClause).length
+      · rw [List.getElem?_append_left inHead] at metadataLookup
+        rw [List.getElem?_append_left (by
+          simpa [standardHeadLength] using inHead)]
+        have metadataMember :
+            metadata ∈ clauseMetadataFor sourceClauseIndex
+              figureNineClauseStart sourceClause :=
+          List.mem_iff_getElem?.mpr
+            ⟨metadataIndex, metadataLookup⟩
+        have valid :=
+          clauseMetadataFor_valid sourceClauseIndex
+            figureNineClauseStart sourceClause metadataMember
+        have localIndexEqual :
+            metadata.localClauseIndex = metadataIndex := by
+          have mapped := congrArg
+            (Option.map ClauseMetadata.localClauseIndex)
+            metadataLookup
+          simp [clauseMetadataFor] at mapped
+          exact mapped.2.symm
+        simpa [valid.1, valid.2.1, valid.2.2.1,
+          localIndexEqual, figureNineBlock] using unitMetadataLookup
+      · have headLengthLe :
+            (clauseMetadataFor sourceClauseIndex
+              figureNineClauseStart sourceClause).length ≤
+              metadataIndex := Nat.le_of_not_gt inHead
+        rw [List.getElem?_append_right headLengthLe] at metadataLookup
+        rw [List.getElem?_append_right (by
+          simpa [standardHeadLength] using headLengthLe)]
+        simpa [standardHeadLength] using
+          induction
+            (sourceClauseIndex := sourceClauseIndex + 1)
+            (figureNineClauseStart :=
+              figureNineClauseStart + figureNineBlock.length)
+            metadataLookup unitMetadataLookup
+
+/-- Complete composed and standard second-stage metadata use the same
+global final-clause index. -/
+theorem formulaClauseMetadata_unitEliminationMetadata_global_lookup
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {clauseIndex : Nat}
+    {metadata : ClauseMetadata Variable}
+    (metadataLookup :
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata)
+    {unitMetadata :
+      PeriodicOneInThreeNoUnitsPositioned.ClauseMetadata
+        (OneInThreeVariable Variable)}
+    (unitMetadataLookup :
+      (PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+        metadata.figureNineClauseStart
+        (PeriodicOneInThreePositioned.clauseGadget
+          metadata.sourceClauseIndex metadata.sourceClause))[
+            metadata.localClauseIndex]? = some unitMetadata) :
+    (PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadata
+      (PeriodicOneInThreePositioned.formula source))[clauseIndex]? =
+        some unitMetadata := by
+  have lookup :=
+    formulaClauseMetadataFrom_unitEliminationMetadata_lookup
+      0 0 source.clauses metadataLookup unitMetadataLookup
+  change
+    (PeriodicOneInThreeNoUnitsPositioned.formulaClauseMetadataFrom
+      0 (PeriodicOneInThreePositioned.formula source).clauses)[
+        clauseIndex]? = some unitMetadata
+  simpa [figureNineClausesFrom_eq_zipIdx,
+    PeriodicOneInThreePositioned.formula] using lookup
+
 /-- Every complete metadata entry has the same two membership invariants. -/
 theorem formulaClauseMetadata_valid
     {Variable : Type*}

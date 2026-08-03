@@ -53,47 +53,15 @@ structure OriginalInheritedCanonicalIncidenceRouteSuffixes
             (routes clauseIndex literalIndex)
 
 /-- Original and final incidence data needed to construct one direct
-composed inherited suffix. -/
-structure InheritedIncidenceData
+composed inherited suffix, including the two occurrence-pair witnesses used
+by global separation. -/
+abbrev InheritedIncidenceData
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
     (sourcePlacement : PeriodicVariablePlacement Variable)
-    (clauseIndex literalIndex : Nat) where
-  generatedClause :
-    PositionedPeriodicClause
-      (OneInThreeNoUnitVariable
-        (OneInThreeVariable Variable))
-  generatedLiteral :
-    PeriodicLiteral
-      (OneInThreeNoUnitVariable
-        (OneInThreeVariable Variable))
-  sourceClause : PositionedPeriodicClause Variable
-  sourceClauseIndex : Nat
-  sourceLiteral : PeriodicLiteral Variable
-  sourceLiteralIndex : Nat
-  generatedClauseMember :
-    (generatedClause, clauseIndex) ∈
-      (PeriodicOneInThreeNoUnitsPositioned.formula
-        (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx
-  generatedLiteralMember :
-    (generatedLiteral, literalIndex) ∈
-      generatedClause.literals.zipIdx
-  sourceClauseMember :
-    (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx
-  sourceLiteralMember :
-    (sourceLiteral, sourceLiteralIndex) ∈
-      sourceClause.literals.zipIdx
-  literalAtom :
-    generatedLiteral.atom =
-      .inl (.inl sourceLiteral.atom)
-  literalOffset :
-    generatedLiteral.offset = sourceLiteral.offset
-  localEndpoint :
-    normalizedLocalEndpoint source sourcePlacement
-        clauseIndex literalIndex =
-      normalizedSourcePort
-        (composedPlacement source sourcePlacement)
-        sourceClause generatedClause sourceLiteralIndex
+    (clauseIndex literalIndex : Nat) :=
+  InheritedEndpointProvenance
+    source sourcePlacement clauseIndex literalIndex
 
 /-- Select original-incidence data whenever such data exists. -/
 noncomputable def inheritedIncidenceData?
@@ -144,33 +112,10 @@ theorem inheritedIncidenceData?_of_members
       inheritedIncidenceData?
         source sourcePlacement clauseIndex literalIndex =
           some data := by
-  rcases normalizedLocalEndpoint_inherited
+  rcases inheritedEndpointProvenance_of_members
       source sourcePlacement sourceWidth sourceDistinct
       clauseMember literalMember sourceAtom literalSource with
-    ⟨metadata, sourceLiteral, sourceLiteralIndex,
-      _metadataLookup, metadataClause, sourceClauseMember,
-      sourceLiteralMember, sourceLiteralAtom,
-      literalOffset, localEndpoint⟩
-  have literalAtom :
-      literal.atom = .inl (.inl sourceLiteral.atom) := by
-    rw [literalSource, sourceLiteralAtom]
-  let witness :
-      InheritedIncidenceData
-        source sourcePlacement clauseIndex literalIndex :=
-    { generatedClause := clause
-      generatedLiteral := literal
-      sourceClause := metadata.sourceClause
-      sourceClauseIndex := metadata.sourceClauseIndex
-      sourceLiteral := sourceLiteral
-      sourceLiteralIndex := sourceLiteralIndex
-      generatedClauseMember := clauseMember
-      generatedLiteralMember := literalMember
-      sourceClauseMember := sourceClauseMember
-      sourceLiteralMember := sourceLiteralMember
-      literalAtom := literalAtom
-      literalOffset := literalOffset
-      localEndpoint := by
-        simpa [metadataClause] using localEndpoint }
+    ⟨witness⟩
   have existsData :
       Nonempty
         (InheritedIncidenceData
@@ -207,6 +152,149 @@ private theorem value_eq_of_mem_zipIdx_same_index
   exact
     (List.mem_zipIdx' firstMember).2.trans
       (List.mem_zipIdx' secondMember).2.symm
+
+private theorem pair_fst_eq_of_snd_eq
+    {First Second : Type*}
+    (pairs : List (First × Second))
+    (pairsSndNodup : (pairs.map Prod.snd).Nodup)
+    {firstPair secondPair : First × Second}
+    (firstMember : firstPair ∈ pairs)
+    (secondMember : secondPair ∈ pairs)
+    (sndEqual : firstPair.2 = secondPair.2) :
+    firstPair.1 = secondPair.1 := by
+  have pairsNodup : pairs.Nodup :=
+    pairsSndNodup.of_map Prod.snd
+  have pairEqual :=
+    ((List.nodup_map_iff_inj_on pairsNodup).mp pairsSndNodup)
+      _ firstMember _ secondMember sndEqual
+  exact congrArg Prod.fst pairEqual
+
+/-- Distinct final twice-inherited incidences recover distinct original
+source coordinates.  Injectivity composes the global unit-elimination and
+Figure 9 occurrence pairings stored in the endpoint provenance. -/
+theorem InheritedEndpointProvenance.sourceCoordinatesDistinct_of_generatedDistinct
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      InheritedEndpointProvenance source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      InheritedEndpointProvenance source sourcePlacement
+        secondClauseIndex secondLiteralIndex)
+    (generatedDistinct :
+      firstClauseIndex ≠ secondClauseIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex) :
+    first.sourceClauseIndex ≠ second.sourceClauseIndex ∨
+      first.sourceLiteralIndex ≠ second.sourceLiteralIndex := by
+  by_contra sourceNotDistinct
+  simp only [not_or, not_ne_iff] at sourceNotDistinct
+  have secondSourceClauseMember :
+      (second.sourceClause, first.sourceClauseIndex) ∈
+        source.clauses.zipIdx := by
+    simpa [sourceNotDistinct.1] using second.sourceClauseMember
+  have sourceClauseEqual : first.sourceClause = second.sourceClause :=
+    value_eq_of_mem_zipIdx_same_index
+      first.sourceClauseMember secondSourceClauseMember
+  have sourceLiteralEqual : first.sourceLiteral = second.sourceLiteral := by
+    have firstSourceLiteralMember :
+        (first.sourceLiteral, first.sourceLiteralIndex) ∈
+          second.sourceClause.literals.zipIdx := by
+      simpa [sourceClauseEqual] using first.sourceLiteralMember
+    have secondSourceLiteralMember :
+        (second.sourceLiteral, first.sourceLiteralIndex) ∈
+          second.sourceClause.literals.zipIdx := by
+      simpa [sourceNotDistinct.2] using second.sourceLiteralMember
+    exact value_eq_of_mem_zipIdx_same_index
+      firstSourceLiteralMember secondSourceLiteralMember
+  let figureNinePairs :=
+    PeriodicOneInThree.formulaOriginalOccurrencePairs
+      source.erase first.sourceLiteral.atom
+  have firstFigureNinePairMember :
+      ((first.figureNineLiteral,
+          first.unitMetadata.sourceClauseIndex,
+          first.figureNineLiteralIndex),
+        (first.sourceLiteral, first.sourceClauseIndex,
+          first.sourceLiteralIndex)) ∈ figureNinePairs := by
+    simpa [figureNinePairs] using first.figureNineOriginalOccurrencePair
+  have secondFigureNinePairMember :
+      ((second.figureNineLiteral,
+          second.unitMetadata.sourceClauseIndex,
+          second.figureNineLiteralIndex),
+        (second.sourceLiteral, second.sourceClauseIndex,
+          second.sourceLiteralIndex)) ∈ figureNinePairs := by
+    simpa [figureNinePairs, sourceLiteralEqual] using
+      second.figureNineOriginalOccurrencePair
+  have figureNinePairsSndNodup :
+      (figureNinePairs.map Prod.snd).Nodup := by
+    rw [show
+      figureNinePairs.map Prod.snd =
+        PeriodicOneInThreeToThreeDM.occurrencesOf
+          source.erase first.sourceLiteral.atom by
+      simpa [figureNinePairs] using
+        PeriodicOneInThree.formulaOriginalOccurrencePairs_snd
+          source.erase sourceWidth first.sourceLiteral.atom]
+    exact PeriodicOneInThreeToThreeDM.occurrencesOf_nodup _ _
+  have sourceOccurrencesEqual :
+      (first.sourceLiteral, first.sourceClauseIndex,
+          first.sourceLiteralIndex) =
+        (second.sourceLiteral, second.sourceClauseIndex,
+          second.sourceLiteralIndex) := by
+    simp [sourceLiteralEqual, sourceNotDistinct.1,
+      sourceNotDistinct.2]
+  have figureNineOccurrencesEqual :=
+    pair_fst_eq_of_snd_eq figureNinePairs
+      figureNinePairsSndNodup
+      firstFigureNinePairMember secondFigureNinePairMember
+      sourceOccurrencesEqual
+  have figureNineLiteralEqual :
+      first.figureNineLiteral = second.figureNineLiteral :=
+    congrArg (fun occurrence => occurrence.1)
+      figureNineOccurrencesEqual
+  let unitPairs :=
+    PeriodicOneInThreeNoUnits.formulaOriginalOccurrencePairs
+      (PeriodicOneInThreePositioned.formula source).erase
+      first.figureNineLiteral.atom
+  have firstUnitPairMember :
+      ((first.generatedLiteral, firstClauseIndex, firstLiteralIndex),
+        (first.figureNineLiteral,
+          first.unitMetadata.sourceClauseIndex,
+          first.figureNineLiteralIndex)) ∈ unitPairs := by
+    simpa [unitPairs] using first.unitOriginalOccurrencePair
+  have secondUnitPairMember :
+      ((second.generatedLiteral, secondClauseIndex, secondLiteralIndex),
+        (second.figureNineLiteral,
+          second.unitMetadata.sourceClauseIndex,
+          second.figureNineLiteralIndex)) ∈ unitPairs := by
+    simpa [unitPairs, figureNineLiteralEqual] using
+      second.unitOriginalOccurrencePair
+  have unitPairsSndNodup : (unitPairs.map Prod.snd).Nodup := by
+    rw [show
+      unitPairs.map Prod.snd =
+        PeriodicOneInThreeToThreeDM.occurrencesOf
+          (PeriodicOneInThreePositioned.formula source).erase
+          first.figureNineLiteral.atom by
+      simpa [unitPairs] using
+        PeriodicOneInThreeNoUnits.formulaOriginalOccurrencePairs_snd
+          (PeriodicOneInThreePositioned.formula source).erase
+          first.figureNineLiteral.atom]
+    exact PeriodicOneInThreeToThreeDM.occurrencesOf_nodup _ _
+  have generatedOccurrencesEqual :=
+    pair_fst_eq_of_snd_eq unitPairs unitPairsSndNodup
+      firstUnitPairMember secondUnitPairMember
+      figureNineOccurrencesEqual
+  have generatedCoordinatesEqual :
+      (firstClauseIndex, firstLiteralIndex) =
+        (secondClauseIndex, secondLiteralIndex) := by
+    exact congrArg
+      (fun occurrence => (occurrence.2.1, occurrence.2.2))
+      generatedOccurrencesEqual
+  exact generatedDistinct.elim
+    (fun clauseNe => clauseNe (congrArg Prod.fst generatedCoordinatesEqual))
+    (fun literalNe => literalNe (congrArg Prod.snd generatedCoordinatesEqual))
 
 /-- Pointwise source endpoint, orthogonality, and first-exit certificates
 lift to the total direct composed suffix lookup. -/
