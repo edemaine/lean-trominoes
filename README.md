@@ -2326,6 +2326,12 @@ The representation choices for this target are:
   the translated retained source route, then joins the translated unchanged
   Figure 7 suffix.  The fully refined drawing period is identified with the
   terminal refinement of the source-scaled semantic period.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSourceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSourceSeparation.lean)
+  starts the periodic direct/fallback geometry.  A translated Figure 7
+  occurrence suffix retains its radius-96 bound around the translated
+  canonical center, so every direct source-to-boundary route whose
+  source-segment envelope excludes that center is strictly separated from
+  the suffix.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
