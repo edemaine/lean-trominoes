@@ -5050,7 +5050,10 @@ The representation choices for this target are:
   be upgraded to either head-only or tail-only contact by ruling out the
   other three endpoint pairings.  Symmetrically to the existing `dropLast`
   results, deleting the heads of two simple separated routes preserves
-  avoidance and makes every surviving contact tail-only.
+  avoidance and makes every surviving contact tail-only.  Tail-only contact
+  is also preserved by injective point maps, in particular by the common
+  positive scaling and translation used to position inherited Figure 9
+  suffixes.
 - [`LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean`](LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean)
   filters the local implication incidences at each ring vertex in syntactic
   order.  Every real port has exactly two cycle incidences, the separator

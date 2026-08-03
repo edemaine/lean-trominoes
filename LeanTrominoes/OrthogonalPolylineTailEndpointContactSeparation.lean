@@ -223,6 +223,53 @@ theorem RoutesMeetOnlyAtFirstTail.scalePolyline
       (LeanTrominoes.scalePolyline factor second) :=
   contacts.mapPoints (Cell.scale_injective factorPositive.ne')
 
+/-- An injective point map preserves contacts that occur only at the two
+route tails. -/
+theorem RoutesMeetOnlyAtTails.mapPoints
+    {transform : Cell → Cell}
+    (injective : Function.Injective transform)
+    {first second : List Cell}
+    (contacts : RoutesMeetOnlyAtTails first second) :
+    RoutesMeetOnlyAtTails
+      (first.map transform) (second.map transform) := by
+  intro mappedFirst mappedFirstMember
+    mappedSecond mappedSecondMember mappedEqual
+  rcases List.mem_map.mp mappedFirstMember with
+    ⟨firstPoint, firstMember, rfl⟩
+  rcases List.mem_map.mp mappedSecondMember with
+    ⟨secondPoint, secondMember, rfl⟩
+  have pointsEqual : firstPoint = secondPoint :=
+    injective mappedEqual
+  have tails :=
+    contacts firstPoint firstMember
+      secondPoint secondMember pointsEqual
+  exact
+    ⟨by simpa using congrArg (Option.map transform) tails.1,
+      by simpa using congrArg (Option.map transform) tails.2⟩
+
+/-- A common translation preserves contacts that occur only at the two
+route tails. -/
+theorem RoutesMeetOnlyAtTails.translate
+    {first second : List Cell}
+    (contacts : RoutesMeetOnlyAtTails first second)
+    (offset : Cell) :
+    RoutesMeetOnlyAtTails
+      (first.map (Cell.add offset))
+      (second.map (Cell.add offset)) :=
+  contacts.mapPoints (cell_add_left_injective offset)
+
+/-- Positive uniform scaling preserves contacts that occur only at the two
+route tails. -/
+theorem RoutesMeetOnlyAtTails.scalePolyline
+    {first second : List Cell}
+    {factor : Int}
+    (factorPositive : 0 < factor)
+    (contacts : RoutesMeetOnlyAtTails first second) :
+    RoutesMeetOnlyAtTails
+      (LeanTrominoes.scalePolyline factor first)
+      (LeanTrominoes.scalePolyline factor second) :=
+  contacts.mapPoints (Cell.scale_injective factorPositive.ne')
+
 /-- Join two locally head-separated prefixes to two suffixes whose only
 possible listed contact is at their final tails.  Strict cross separation
 ensures that the two splice boundaries cannot become new contacts. -/
