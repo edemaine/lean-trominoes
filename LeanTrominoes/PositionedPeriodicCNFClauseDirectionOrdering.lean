@@ -1,6 +1,8 @@
 import LeanTrominoes.OrthogonalPolylineEndpointDirectionSeparation
+import LeanTrominoes.OrthogonalPolylineSymmetries
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonFanClockwiseOrder
 import LeanTrominoes.PlanarOneInThreeLocalDistinctness
+import LeanTrominoes.PositionedPeriodicCNFCanonicalOrthogonalRoutes
 import Mathlib.Data.List.Sort
 
 /-!
@@ -78,6 +80,28 @@ def orderRoutesByClauseDirection
         match (clauseLiteralOrder routes clauseIndex clause)[literalIndex]? with
         | none => []
         | some taggedLiteral => routes clauseIndex taggedLiteral.2
+
+/-- Reindex a canonical source route and translate it between the old and
+new clause-anchor gauges.  The translation is by a whole number of drawing
+periods, so this changes only the selected representative of the periodic
+route orbit. -/
+def orderCanonicalRoutesByClauseDirection
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes) : IncidenceRoutes :=
+  fun clauseIndex literalIndex =>
+    match source.clauses[clauseIndex]? with
+    | none => []
+    | some sourceClause =>
+        let orderedClause :=
+          orderClauseByRouteDirection routes clauseIndex sourceClause
+        PeriodicOrthocrossing.translatePolyline
+          (placement.translation
+            (Cell.sub
+              (PeriodicCNF.clauseAnchor sourceClause.literals)
+              (PeriodicCNF.clauseAnchor orderedClause.literals)))
+          (orderRoutesByClauseDirection source routes
+            clauseIndex literalIndex)
 
 @[simp]
 theorem orderClauseByRouteDirection_position
@@ -222,6 +246,104 @@ theorem exists_sourceLiteral_of_orderedLiteral_mem
   have sourceClauseLookup :=
     (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
   simp [orderRoutesByClauseDirection, sourceClauseLookup, taggedLookup]
+
+/-- Anchor-gauged reordering preserves the canonical endpoints and
+orthogonality of every genuine incidence. -/
+theorem orderCanonicalRoutesByClauseDirection_valid
+    [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (family : CanonicalOrthogonalIncidenceRoutes source placement)
+    {orderedClause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (orderedClause, clauseIndex) ∈
+        (orderClausesByRouteDirection source family.routes).clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ orderedClause.literals.zipIdx) :
+    (orderCanonicalRoutesByClauseDirection
+        source placement family.routes clauseIndex literalIndex).head? =
+        some (canonicalClausePosition placement orderedClause) ∧
+      (orderCanonicalRoutesByClauseDirection
+        source placement family.routes clauseIndex literalIndex).getLast? =
+        some (canonicalLiteralPosition
+          placement orderedClause literal) ∧
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (orderCanonicalRoutesByClauseDirection
+          source placement family.routes clauseIndex literalIndex) := by
+  rcases exists_sourceLiteral_of_orderedLiteral_mem
+      family.routes clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      orderedClauseEq, literalEq, orderedRouteEq⟩
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  have sourceValid := family.endpoints
+    sourceClause clauseIndex sourceClauseMember
+    sourceLiteral sourceLiteralIndex sourceLiteralMember
+  have sourceOrthogonal := family.orthogonal
+    sourceClause clauseIndex sourceClauseMember
+    sourceLiteral sourceLiteralIndex sourceLiteralMember
+  subst orderedClause
+  subst literal
+  rw [orderCanonicalRoutesByClauseDirection, sourceClauseLookup,
+    orderedRouteEq]
+  constructor
+  · simp only [PeriodicOrthocrossing.translatePolyline,
+      List.head?_map, sourceValid.1, Option.map_some]
+    apply congrArg some
+    cases sourceAnchorEq :
+        PeriodicCNF.clauseAnchor sourceClause.literals with
+    | mk sourceAnchorX sourceAnchorY =>
+      cases orderedAnchorEq : PeriodicCNF.clauseAnchor
+        (orderClauseByRouteDirection
+          family.routes clauseIndex sourceClause).literals with
+      | mk orderedAnchorX orderedAnchorY =>
+        simp [canonicalClausePosition,
+          PeriodicVariablePlacement.translation,
+          Cell.add, Cell.sub, Cell.scale,
+          sourceAnchorEq, orderedAnchorEq]
+        constructor <;> ring
+  constructor
+  · simp only [PeriodicOrthocrossing.translatePolyline,
+      List.getLast?_map, sourceValid.2, Option.map_some]
+    apply congrArg some
+    cases sourceAnchorEq :
+        PeriodicCNF.clauseAnchor sourceClause.literals with
+    | mk sourceAnchorX sourceAnchorY =>
+      cases orderedAnchorEq : PeriodicCNF.clauseAnchor
+        (orderClauseByRouteDirection
+          family.routes clauseIndex sourceClause).literals with
+      | mk orderedAnchorX orderedAnchorY =>
+        simp [canonicalLiteralPosition,
+          PeriodicVariablePlacement.translation,
+          Cell.add, Cell.sub, Cell.scale,
+          sourceAnchorEq, orderedAnchorEq]
+        constructor <;> ring
+  · exact sourceOrthogonal.translate _
+
+/-- Package the reordered, anchor-gauged routes behind the standard
+canonical orthogonal route interface. -/
+def CanonicalOrthogonalIncidenceRoutes.orderClausesByRouteDirection
+    [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (family : CanonicalOrthogonalIncidenceRoutes source placement) :
+    CanonicalOrthogonalIncidenceRoutes
+      (orderClausesByRouteDirection source family.routes) placement where
+  routes :=
+    orderCanonicalRoutesByClauseDirection source placement family.routes
+  endpoints := by
+    intro clause clauseIndex clauseMember literal literalIndex literalMember
+    have valid := orderCanonicalRoutesByClauseDirection_valid
+      placement family clauseMember literalMember
+    exact ⟨valid.1, valid.2.1⟩
+  orthogonal := by
+    intro clause clauseIndex clauseMember literal literalIndex literalMember
+    exact (orderCanonicalRoutesByClauseDirection_valid
+      placement family clauseMember literalMember).2.2
 
 /-- Disjunction truth is insensitive to permuting a clause's literals. -/
 theorem periodicClause_holds_iff_of_perm

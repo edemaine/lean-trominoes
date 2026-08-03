@@ -5258,7 +5258,10 @@ The representation choices for this target are:
   of their source-route first directions.  Original indices remain attached,
   so the unchanged source routes can be reindexed exactly; clause positions,
   widths, atom distinctness, assignment satisfaction, and satisfiability are
-  all proved invariant under the reordering.  A finite cardinal-direction
+  all proved invariant under the reordering.  The canonical-route package
+  also applies the necessary whole-period translation between the old and new
+  first-literal anchor gauges, preserving exact endpoints and orthogonality.
+  A finite cardinal-direction
   lemma turns nondecreasing ranks of three distinct genuine exits into the
   clockwise condition needed by the composed boundary-port router.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
