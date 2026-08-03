@@ -5549,6 +5549,11 @@ The representation choices for this target are:
   Any original canonical orthogonal route family with genuine first exits
   thereby induces exact, orthogonal suffixes for all and only the final
   incidences inherited through both transformations.
+- [`LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreePositionedInheritedRouteFamily.lean)
+  records that the Figure 9 occurrence selector is injective back to source
+  incidence coordinates: two distinct generated incidences cannot select the
+  same source clause and literal indices.  This is the first provenance layer
+  needed to lift source-route separation through the composed replacement.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineRouteFamily.lean)
   completes that inherited family with singleton suffixes for both
   generations of auxiliaries and splices every suffix onto its certified
