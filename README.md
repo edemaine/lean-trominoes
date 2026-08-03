@@ -2271,6 +2271,13 @@ The representation choices for this target are:
   flattened incidence indices are reflected to distinct clause/literal
   coordinates, and the relative obligation is decomposed into distinct
   zero-shift incidences versus arbitrary incidences at nonzero lattice shifts.
+- [`LeanTrominoes/RetainedAngularFanFinalSourceRelativeRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalSourceRelativeRouteSeparation.lean)
+  packages the retained pre-split drawing's global continuous planarity,
+  endpoint-only contacts, segment-endpoint/interior avoidance, and
+  nondegenerate route lengths into complete separation for every pair of
+  periodic incidence occurrences.  This supplies the metadata-rich relative
+  source certificate needed to transport inherited route geometry through
+  scaling, clause-direction ordering, and the later exact-one splices.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
