@@ -701,6 +701,43 @@ theorem RoutesMeetOnlyAtHeads.symm
       secondPoint secondMember equal.symm
   exact ⟨heads.2, heads.1⟩
 
+/-- Ordinary route separation has head-only listed contact when the other
+three endpoint pairings are unequal. -/
+theorem RoutesAvoidEachOther.meetOnlyAtHeads_of_endpoints_ne
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second)
+    (headLastNe : first.head? ≠ second.getLast?)
+    (lastHeadNe : first.getLast? ≠ second.head?)
+    (lastLastNe : first.getLast? ≠ second.getLast?) :
+    RoutesMeetOnlyAtHeads first second := by
+  intro firstPoint firstMember secondPoint secondMember pointsEqual
+  rcases List.mem_iff_get.mp firstMember with
+    ⟨firstIndex, firstIndexed⟩
+  rcases List.mem_iff_get.mp secondMember with
+    ⟨secondIndex, secondIndexed⟩
+  have indexedEqual :
+      first.get firstIndex = second.get secondIndex :=
+    firstIndexed.trans
+      (pointsEqual.trans secondIndexed.symm)
+  have endpoints :=
+    avoid.2.2.2 firstIndex secondIndex indexedEqual
+  rw [firstIndexed, secondIndexed] at endpoints
+  rcases endpoints.1 with firstHead | firstLast <;>
+    rcases endpoints.2 with secondHead | secondLast
+  · exact ⟨firstHead, secondHead⟩
+  · exact
+      (headLastNe
+        (firstHead.trans
+          ((congrArg some pointsEqual).trans secondLast.symm))).elim
+  · exact
+      (lastHeadNe
+        (firstLast.trans
+          ((congrArg some pointsEqual).trans secondHead.symm))).elim
+  · exact
+      (lastLastNe
+        (firstLast.trans
+          ((congrArg some pointsEqual).trans secondLast.symm))).elim
+
 /-- Restricting the first route to its head preserves the head-only contact
 property. -/
 theorem RoutesMeetOnlyAtHeads.singleton_left
