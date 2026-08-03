@@ -2340,6 +2340,14 @@ The representation choices for this target are:
   carrier boundary now turn this prefix separation into the translated source
   corridor for every successful direct route at a nonzero shift, including
   the non-axis-aligned residual case.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeRoutedClausePrefixSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeRoutedClausePrefixSeparation.lean)
+  extends that arbitrary-shift prefix result through the routed-clause
+  choice's customized escape.  It recovers the raw routed-clause source and
+  its exact physical origin, applies either scaled component rectangles or
+  the transported carrier half-plane there, and joins the escape to the
+  corridor-controlled radial and local tails.  Consequently every successful
+  direct replacement strictly avoids a translated failed-choice scaled
+  prefix at every nonzero relative shift.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean)
   models the selected ordinary-or-escaped outer fan at a translated fallback
   endpoint.  Its radius-288 terminal-segment envelope is disjoint from every
@@ -2490,7 +2498,14 @@ The representation choices for this target are:
   applies the raw carrier-lens interface geometry in those frames and obtains
   an outside/inside carrier-boundary certificate for every arbitrary
   overlapping carrier/direct pair, covering both terminal contacts and the
-  normalized crossover residue.
+  normalized crossover residue.  For routed-clause direct occurrences it
+  additionally transports the carrier-side outside half-plane to the exact
+  physical routed-clause origin.
+- [`LeanTrominoes/RetainedFinalRouteCommonFrameCorridorSeparation.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameCorridorSeparation.lean)
+  packages an arbitrary final carrier boundary and strict prefix avoidance
+  into the refined terminal-corridor predicate.  Isolating this dependent
+  boundary projection keeps the larger relative component reduction both
+  reusable and tractable for Lean's elaborator.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and

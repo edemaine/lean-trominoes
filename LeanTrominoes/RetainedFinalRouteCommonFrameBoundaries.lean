@@ -259,6 +259,190 @@ theorem FinalGaugedCarrierFrameTerminalContact.exists_carrierBoundary
           (routedVariableOrigin formula site)
           interface.1 interface.2 macrocellBounded)
 
+/-- If the original direct source is a routed clause, a terminal contact
+places the entire original carrier occurrence on the outside of a boundary
+through that routed clause's physical origin. -/
+theorem
+    FinalGaugedCarrierFrameTerminalContact.exists_routedClauseCarrierOutside_at_physicalOrigin
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {carrierClauseIndex carrierLiteralIndex
+      macrocellClauseIndex macrocellLiteralIndex : Nat}
+    {carrierShift macrocellShift : Cell}
+    {carrier :
+      FinalGaugedCarrierRouteOccurrenceWitness
+        formula carrierClauseIndex carrierLiteralIndex carrierShift}
+    {macrocell :
+      FinalGaugedRouteMacrocellOccurrenceWitness
+        formula macrocellClauseIndex macrocellLiteralIndex macrocellShift}
+    (contact :
+      FinalGaugedCarrierFrameTerminalContact formula carrier macrocell)
+    (sourceSite : ClauseRouteSite)
+    (sourceEq : macrocell.metadata.source = .routedClause sourceSite) :
+    ∃ port : CornerPort,
+      ∀ point ∈ finalGaugedRouteOccurrence formula
+          carrierClauseIndex carrierLiteralIndex carrierShift,
+        port.OutsideCarrierBoundaryAt
+          (Cell.add (routedClauseOrigin formula sourceSite)
+            macrocell.physicalOffset)
+          point := by
+  let relativeShift := macrocell.relativeShiftFrom carrier
+  have rawMember :
+      carrier.link ∈
+        retainedDrawingCompleteCarrierLinksRaw formula.incidenceGraph :=
+    (mem_retainedDrawingCompleteCarrierLinks_iff
+      formula.incidenceGraph carrier.link).mp carrier.link_mem |>.1
+  have rawZero :
+      carrierLinkPeriodTranslate formula.incidenceGraph
+          carrier.link (0, 0) ∈
+        retainedDrawingCompleteCarrierLinksRaw formula.incidenceGraph := by
+    simpa using rawMember
+  rcases
+      carrier.exists_commonFrameRouteSelection
+        formula wellFormed degree isLocal (0, 0) rawZero with
+    ⟨carrierLocalClauseIndex, ⟨carrierSelection⟩⟩
+  have carrierSelection' :
+      FinalGaugedFlatNormalizedRouteSelection formula
+        (carrier.commonFrameRoute (0, 0), carrierClauseIndex)
+        (.carrier carrier.link carrierLocalClauseIndex) := by
+    simpa using carrierSelection
+  have offsetEq :=
+    carrier.commonFrameOffset_zero_eq_relative macrocell
+  have finish
+      {targetSite : ClauseRouteSite}
+      (targetSiteEq :
+        targetSite =
+          clauseRouteSitePeriodTranslate sourceSite relativeShift)
+      (port : CornerPort)
+      (commonOutside :
+        ∀ point ∈ carrier.commonFrameRoute (0, 0),
+          port.OutsideCarrierBoundaryAt
+            (routedClauseOrigin formula targetSite) point) :
+      ∃ port : CornerPort,
+        ∀ point ∈ finalGaugedRouteOccurrence formula
+            carrierClauseIndex carrierLiteralIndex carrierShift,
+          port.OutsideCarrierBoundaryAt
+            (Cell.add (routedClauseOrigin formula sourceSite)
+              macrocell.physicalOffset)
+            point := by
+    refine ⟨port, ?_⟩
+    intro point pointMember
+    have translatedMember :
+        Cell.add (carrier.commonFrameOffset (0, 0)) point ∈
+          carrier.commonFrameRoute (0, 0) := by
+      unfold FinalGaugedRouteOccurrenceWitness.commonFrameRoute
+      exact List.mem_map.mpr ⟨point, pointMember, rfl⟩
+    have outside := commonOutside
+      (Cell.add (carrier.commonFrameOffset (0, 0)) point)
+      translatedMember
+    change
+      port.OutsideCarrierBoundary
+        (Cell.sub point
+          (Cell.add (routedClauseOrigin formula sourceSite)
+            macrocell.physicalOffset))
+    change
+      port.OutsideCarrierBoundary
+        (Cell.sub
+          (Cell.add (carrier.commonFrameOffset (0, 0)) point)
+          (routedClauseOrigin formula targetSite)) at outside
+    have subEq :
+        Cell.sub point
+            (Cell.add (routedClauseOrigin formula sourceSite)
+              macrocell.physicalOffset) =
+          Cell.sub
+            (Cell.add (carrier.commonFrameOffset (0, 0)) point)
+            (routedClauseOrigin formula targetSite) := by
+      rw [offsetEq, targetSiteEq,
+        routedClauseOrigin_periodTranslate]
+      rw [show macrocell.relativeShiftFrom carrier = relativeShift by rfl]
+      rcases relativeShiftValue : relativeShift with
+        ⟨relativeX, relativeY⟩
+      rcases physicalShiftValue : macrocell.physicalShift with
+        ⟨physicalX, physicalY⟩
+      rcases sourceOriginValue : routedClauseOrigin formula sourceSite with
+        ⟨originX, originY⟩
+      rcases point with ⟨pointX, pointY⟩
+      simp [FinalGaugedRouteOccurrenceWitness.commonFrameOffset,
+        FinalGaugedRouteMacrocellOccurrenceWitness.physicalOffset,
+        physicalShiftValue,
+        carrierMacroPeriodTranslation, Cell.add, Cell.sub, Cell.scale]
+      constructor <;> ring
+    rw [subEq]
+    exact outside
+  rcases contact with routedClauseContact | routedVariableContact
+  · obtain ⟨targetSite, occurrence, data⟩ := routedClauseContact
+    have translatedSourceEq := data.1
+    have targetSiteEq :
+        targetSite =
+          clauseRouteSitePeriodTranslate sourceSite relativeShift := by
+      rw [sourceEq] at translatedSourceEq
+      simp [DrawingPlanarSATClauseSource.periodTranslate] at translatedSourceEq
+      exact translatedSourceEq.symm
+    have occurrenceMember := data.2.2.1
+    have incident := data.2.2.2
+    rcases incident with firstEqual | secondEqual
+    · have interface :=
+        retainedDrawingCompleteCarrierLinkRaw_first_sourceTerminalInterface
+          wellFormed degree isLocal rawMember
+          targetSite occurrenceMember firstEqual
+      have carrierBounded :=
+        retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideFirst_of_raw
+          wellFormed degree isLocal rawMember
+      rw [interface.1, interface.2] at carrierBounded
+      apply finish targetSiteEq
+        (occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+      intro point pointMember
+      apply carrierBounded.of_members
+        carrierSelection'.clauseMember carrierSelection'.literalMember
+      have selectedMember :
+          point ∈
+            (((.carrier carrier.link carrierLocalClauseIndex :
+              DrawingPlanarSATClauseSource Variable).incidenceDrawing
+                formula).routes
+              carrierLocalClauseIndex
+              carrierSelection'.literalIndex) := by
+        have routeEq := carrierSelection'.routeEq
+        simp [DrawingPlanarSATClauseSource.localClauseIndex] at routeEq
+        rw [← routeEq]
+        exact pointMember
+      simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+        DrawingPlanarSATClauseSource.localClauseIndex] using selectedMember
+    · have interface :=
+        retainedDrawingCompleteCarrierLinkRaw_second_sourceTerminalInterface
+          wellFormed degree isLocal rawMember
+          targetSite occurrenceMember secondEqual
+      have carrierBounded :=
+        retainedDrawingPlanarSATCarrierLensIncidenceDrawing_routePoints_outsideSecond_of_raw
+          wellFormed degree isLocal rawMember
+      rw [interface.1, interface.2] at carrierBounded
+      apply finish targetSiteEq
+        (occurrence.sourceTerminal formula).duplicatorArm.carrierPort
+      intro point pointMember
+      apply carrierBounded.of_members
+        carrierSelection'.clauseMember carrierSelection'.literalMember
+      have selectedMember :
+          point ∈
+            (((.carrier carrier.link carrierLocalClauseIndex :
+              DrawingPlanarSATClauseSource Variable).incidenceDrawing
+                formula).routes
+              carrierLocalClauseIndex
+              carrierSelection'.literalIndex) := by
+        have routeEq := carrierSelection'.routeEq
+        simp [DrawingPlanarSATClauseSource.localClauseIndex] at routeEq
+        rw [← routeEq]
+        exact pointMember
+      simpa [DrawingPlanarSATClauseSource.incidenceDrawing,
+        DrawingPlanarSATClauseSource.localClauseIndex] using selectedMember
+  · obtain
+      ⟨targetSite, armIndex, arm, link, localClauseIndex,
+        occurrence, data⟩ := routedVariableContact
+    have translatedSourceEq := data.1
+    rw [sourceEq] at translatedSourceEq
+    simp [DrawingPlanarSATClauseSource.periodTranslate] at translatedSourceEq
+
 /-- An arbitrary crossover residue exposes a carrier boundary after common
 canonical normalization, then transports it back to the original routes. -/
 theorem
@@ -357,7 +541,7 @@ theorem
             (crossingMacroOrigin normalizedCrossing)) := by
       rw [presentation.sourceEq]
       unfold FinalGaugedRouteOccurrenceWitness.commonFrameSource
-      simp [macrocellReindex, sourceEq,
+      simp [sourceEq,
         DrawingPlanarSATClauseSource.periodTranslate,
         CrossingRecord.periodTranslate_neg_shift_eq_periodNormalize]
       exact
@@ -380,7 +564,7 @@ theorem
             (crossingMacroOrigin normalizedCrossing)) := by
       rw [presentation.sourceEq]
       unfold FinalGaugedRouteOccurrenceWitness.commonFrameSource
-      simp [macrocellReindex, sourceEq,
+      simp [sourceEq,
         DrawingPlanarSATClauseSource.periodTranslate,
         CrossingRecord.periodTranslate_neg_shift_eq_periodNormalize]
       exact
@@ -432,6 +616,52 @@ theorem
       crossing localClauseIndex sourceEq notSeparated
   · exact terminal.exists_carrierBoundary
       formula wellFormed degree isLocal
+
+/-- An overlapping carrier occurrence lies outside the routed-clause
+boundary through the direct occurrence's original physical origin. -/
+theorem
+    FinalGaugedCarrierRouteOccurrenceWitness.exists_routedClauseCarrierOutside_at_physicalOrigin
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    {carrierClauseIndex carrierLiteralIndex
+      macrocellClauseIndex macrocellLiteralIndex : Nat}
+    {carrierShift macrocellShift : Cell}
+    (carrier :
+      FinalGaugedCarrierRouteOccurrenceWitness
+        formula carrierClauseIndex carrierLiteralIndex carrierShift)
+    (macrocell :
+      FinalGaugedRouteMacrocellOccurrenceWitness
+        formula macrocellClauseIndex macrocellLiteralIndex macrocellShift)
+    (site : ClauseRouteSite)
+    (sourceEq : macrocell.metadata.source = .routedClause site)
+    (notSeparated :
+      ¬ClosedGridRectanglesSeparated
+        carrier.rectangleLower carrier.rectangleUpper
+        (planarSATMacrocellRouteLower macrocell.translatedCenter)
+        (planarSATMacrocellRouteUpper macrocell.translatedCenter)) :
+    ∃ port : CornerPort,
+      ∀ point ∈ finalGaugedRouteOccurrence formula
+          carrierClauseIndex carrierLiteralIndex carrierShift,
+        port.OutsideCarrierBoundaryAt
+          (Cell.add (routedClauseOrigin formula site)
+            macrocell.physicalOffset)
+          point := by
+  have direct : macrocell.metadata.source.component.IsDirect := by
+    rw [sourceEq]
+    trivial
+  rcases
+      carrier.crossover_or_carrierFrameTerminalContact
+        formula wellFormed degree isLocal macrocell direct notSeparated with
+    crossover | terminal
+  · obtain ⟨crossing, localClauseIndex, crossingSourceEq⟩ := crossover
+    rw [sourceEq] at crossingSourceEq
+    contradiction
+  · exact
+      terminal.exists_routedClauseCarrierOutside_at_physicalOrigin
+        formula wellFormed degree isLocal site sourceEq
 
 end PeriodicOrthocrossing
 end LeanTrominoes

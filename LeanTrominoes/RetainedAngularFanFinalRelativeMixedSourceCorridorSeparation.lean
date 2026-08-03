@@ -1,7 +1,7 @@
 import LeanTrominoes.RetainedAngularFanFinalRelativeMixedSourceSeparation
 import LeanTrominoes.RetainedAngularFanFinalMixedAlignedCorridorSeparation
 import LeanTrominoes.RetainedAngularFanFinalRelativeMixedComponentCorridorReduction
-import LeanTrominoes.RetainedFinalRouteCommonFrameBoundaries
+import LeanTrominoes.RetainedFinalRouteCommonFrameCorridorSeparation
 import LeanTrominoes.OrthogonalPolylineSymmetries
 
 /-!
@@ -883,20 +883,12 @@ theorem
     SourcePrefixCorridorSeparated
       translatedFallbackRoute directRoute directTerminal.1
   rw [← fallbackOccurrenceEq, ← directOccurrenceEq]
-  apply
-    sourcePrefixCorridorSeparated_of_outside_insideCarrierBoundary
-      boundary.port boundary.origin
-      (finalGaugedRouteOccurrence
-        formula fallbackClauseIndex fallbackLiteralIndex relativeTranslate)
-      (finalGaugedRouteOccurrence
-        formula directClauseIndex directLiteralIndex (0, 0))
-      directTerminal
+  exact
+    boundary.sourcePrefixCorridorSeparated directTerminal
       (by simpa [directOccurrenceEq] using directLength)
       (by simpa [directOccurrenceEq] using directClassified)
-  · intro point pointMember
-    exact boundary.carrierOutside point pointMember
-  · exact boundary.macrocellInside
-  · simpa [fallbackOccurrenceEq, directOccurrenceEq] using prefixStrict
+      (by
+        simpa [fallbackOccurrenceEq, directOccurrenceEq] using prefixStrict)
 
 end PeriodicOrthocrossing
 end LeanTrominoes
