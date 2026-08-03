@@ -5278,6 +5278,11 @@ The representation choices for this target are:
   The fourteen possible unary, binary, and ternary direction subsets have
   machine-checked endpoints, orthogonality, outer-frame containment, and
   pairwise strict continuous separation.
+- [`LeanTrominoes/PositionedPeriodicCNFClauseExitFanOrdering.lean`](LeanTrominoes/PositionedPeriodicCNFClauseExitFanOrdering.lean)
+  packages the first directions of any nonempty width-three positioned
+  clause as finite composed exit-fan data.  Generic genuine-direction and
+  strict clockwise-rank invariants prove that the selected fan is one of the
+  fourteen certified configurations.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal

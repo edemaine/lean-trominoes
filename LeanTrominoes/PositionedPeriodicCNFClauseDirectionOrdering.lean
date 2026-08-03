@@ -37,6 +37,15 @@ theorem inClockwiseOrder_of_rank_le
     InClockwiseOrder first second third := by
   native_decide +revert
 
+/-- Distinct genuine cardinal directions have distinct clockwise ranks. -/
+theorem clockwiseRank_ne_of_ne
+    {first second : AxisDirection}
+    (firstGenuine : first.IsGenuine)
+    (secondGenuine : second.IsGenuine)
+    (different : first ≠ second) :
+    first.clockwiseRank ≠ second.clockwiseRank := by
+  native_decide +revert
+
 end AxisDirection
 
 namespace PositionedPeriodicCNF
@@ -390,6 +399,157 @@ theorem orderCanonicalRoutesByClauseDirection_firstDirection_of_lookup
   simp [orderCanonicalRoutesByClauseDirection,
     orderRoutesByClauseDirection, sourceClauseLookup, taggedLookup]
 
+/-- Every genuine incidence route has a genuine first direction. -/
+def ClauseRouteDirectionsGenuine
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes) : Prop :=
+  ∀ clause clauseIndex,
+    (clause, clauseIndex) ∈ source.clauses.zipIdx →
+    ∀ literal literalIndex,
+      (literal, literalIndex) ∈ clause.literals.zipIdx →
+      (AxisDirection.polylineFirstDirection
+        (routes clauseIndex literalIndex)).IsGenuine
+
+/-- Within each clause, first-direction ranks strictly increase with the
+displayed literal indices. -/
+def ClauseRouteDirectionRanksStrictlyIncrease
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes) : Prop :=
+  ∀ clause clauseIndex,
+    (clause, clauseIndex) ∈ source.clauses.zipIdx →
+    ∀ first second : Fin clause.literals.length,
+      first < second →
+      (AxisDirection.polylineFirstDirection
+        (routes clauseIndex first.val)).clockwiseRank <
+      (AxisDirection.polylineFirstDirection
+        (routes clauseIndex second.val)).clockwiseRank
+
+/-- Anchor-gauged clause ordering preserves genuine first directions. -/
+theorem orderCanonicalRoutesByClauseDirection_directionsGenuine
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (genuine : ClauseRouteDirectionsGenuine source routes) :
+    ClauseRouteDirectionsGenuine
+      (orderClausesByRouteDirection source routes)
+      (orderCanonicalRoutesByClauseDirection source placement routes) := by
+  intro orderedClause clauseIndex orderedClauseMember
+    literal literalIndex literalMember
+  rcases exists_sourceLiteral_of_orderedLiteral_mem
+      routes orderedClauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      orderedClauseEq, literalEq, orderedRouteEq⟩
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  have directionEq :
+      AxisDirection.polylineFirstDirection
+          (orderCanonicalRoutesByClauseDirection
+            source placement routes clauseIndex literalIndex) =
+        AxisDirection.polylineFirstDirection
+          (routes clauseIndex sourceLiteralIndex) := by
+    simp [orderCanonicalRoutesByClauseDirection,
+      sourceClauseLookup, orderedRouteEq]
+  rw [directionEq]
+  exact genuine sourceClause clauseIndex sourceClauseMember
+    sourceLiteral sourceLiteralIndex sourceLiteralMember
+
+/-- Stable sorting and pairwise distinct source exits make the reordered
+first-direction ranks strictly increasing at every clause arity. -/
+theorem orderCanonicalRoutesByClauseDirection_ranksStrictlyIncrease
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (genuine : ClauseRouteDirectionsGenuine source routes)
+    (distinct :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ first firstIndex,
+          (first, firstIndex) ∈ clause.literals.zipIdx →
+          ∀ second secondIndex,
+            (second, secondIndex) ∈ clause.literals.zipIdx →
+            firstIndex ≠ secondIndex →
+            AxisDirection.polylineFirstDirection
+                (routes clauseIndex firstIndex) ≠
+              AxisDirection.polylineFirstDirection
+                (routes clauseIndex secondIndex)) :
+    ClauseRouteDirectionRanksStrictlyIncrease
+      (orderClausesByRouteDirection source routes)
+      (orderCanonicalRoutesByClauseDirection source placement routes) := by
+  intro orderedClause clauseIndex orderedClauseMember first second firstLt
+  rcases exists_sourceClause_of_orderedClause_mem
+      routes orderedClauseMember with
+    ⟨sourceClause, sourceClauseMember, orderedClauseEq⟩
+  let order := clauseLiteralOrder routes clauseIndex sourceClause
+  have orderLength : order.length = orderedClause.literals.length := by
+    rw [orderedClauseEq]
+    simp [order, orderClauseByRouteDirection]
+  let firstOrder : Fin order.length :=
+    ⟨first.val, by simpa [orderLength] using first.isLt⟩
+  let secondOrder : Fin order.length :=
+    ⟨second.val, by simpa [orderLength] using second.isLt⟩
+  let firstTag := order.get firstOrder
+  let secondTag := order.get secondOrder
+  have firstMember : firstTag ∈ sourceClause.literals.zipIdx :=
+    (clauseLiteralOrder_perm routes clauseIndex sourceClause).mem_iff.mp
+      (by exact List.get_mem order firstOrder)
+  have secondMember : secondTag ∈ sourceClause.literals.zipIdx :=
+    (clauseLiteralOrder_perm routes clauseIndex sourceClause).mem_iff.mp
+      (by exact List.get_mem order secondOrder)
+  have firstDirectionGenuine :=
+    genuine sourceClause clauseIndex sourceClauseMember
+      firstTag.1 firstTag.2 firstMember
+  have secondDirectionGenuine :=
+    genuine sourceClause clauseIndex sourceClauseMember
+      secondTag.1 secondTag.2 secondMember
+  have indexNe : firstTag.2 ≠ secondTag.2 := by
+    intro indicesEqual
+    have tagsEqual :=
+      PeriodicOrthocrossing.tagged_eq_of_mem_zipIdx_of_snd_eq
+        firstMember secondMember indicesEqual
+    have orderNodup : order.Nodup :=
+      (clauseLiteralOrder_perm routes clauseIndex sourceClause).nodup_iff.mpr
+        ((List.nodup_zipIdx_map_snd sourceClause.literals).of_map Prod.snd)
+    have finEqual : firstOrder = secondOrder :=
+      orderNodup.injective_get tagsEqual
+    have valueEqual : firstOrder.val = secondOrder.val :=
+      congrArg (fun index => index.val) finEqual
+    exact (Nat.ne_of_lt firstLt) valueEqual
+  have directionsNe :=
+    distinct sourceClause clauseIndex sourceClauseMember
+      firstTag.1 firstTag.2 firstMember
+      secondTag.1 secondTag.2 secondMember indexNe
+  have ranksNe := AxisDirection.clockwiseRank_ne_of_ne
+    firstDirectionGenuine secondDirectionGenuine directionsNe
+  have sorted := clauseLiteralOrder_pairwise
+    routes clauseIndex sourceClause
+  have orderFirstLtSecond : firstOrder < secondOrder := by
+    exact firstLt
+  have ranksLe :
+      (AxisDirection.polylineFirstDirection
+        (routes clauseIndex firstTag.2)).clockwiseRank ≤
+      (AxisDirection.polylineFirstDirection
+        (routes clauseIndex secondTag.2)).clockwiseRank := by
+    simpa [order, firstTag, secondTag,
+      clauseLiteralDirectionLE, clauseLiteralDirectionRank] using
+        sorted.rel_get_of_lt orderFirstLtSecond
+  have ranksLt := lt_of_le_of_ne ranksLe ranksNe
+  have firstLookup :
+      (clauseLiteralOrder routes clauseIndex sourceClause)[first.val]? =
+        some firstTag := by
+    simpa [order, firstTag, firstOrder] using
+      List.getElem?_eq_getElem order firstOrder
+  have secondLookup :
+      (clauseLiteralOrder routes clauseIndex sourceClause)[second.val]? =
+        some secondTag := by
+    simpa [order, secondTag, secondOrder] using
+      List.getElem?_eq_getElem order secondOrder
+  rw [orderCanonicalRoutesByClauseDirection_firstDirection_of_lookup
+      placement routes sourceClauseMember firstLookup,
+    orderCanonicalRoutesByClauseDirection_firstDirection_of_lookup
+      placement routes sourceClauseMember secondLookup]
+  exact ranksLt
+
 /-- Route-order condition expected by a fixed three-port clause router. -/
 def TernaryClauseRoutesInClockwiseOrder
     (source : PositionedPeriodicCNF Variable)
@@ -647,6 +807,27 @@ theorem orderClausesByRouteDirection_widthAtMost_iff
           ⟨sourceClause, List.fst_mem_of_mem_zipIdx sourceMember, rfl⟩)
     rw [sourceClauseEq]
     simpa [PeriodicClause.WidthAtMost] using bound
+
+/-- A width bound can be read directly from indexed membership in the
+reordered positioned formula, without unfolding its erasure. -/
+theorem orderClausesByRouteDirection_clause_length_le
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes)
+    (width : Nat)
+    (sourceWidth : source.erase.WidthAtMost width)
+    {orderedClause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (orderedClause, clauseIndex) ∈
+        (orderClausesByRouteDirection source routes).clauses.zipIdx) :
+    orderedClause.literals.length ≤ width := by
+  rcases exists_sourceClause_of_orderedClause_mem
+      routes clauseMember with
+    ⟨sourceClause, sourceClauseMember, rfl⟩
+  rw [orderClauseByRouteDirection_length]
+  exact sourceWidth sourceClause.literals
+    (List.mem_map.mpr
+      ⟨sourceClause, List.fst_mem_of_mem_zipIdx sourceClauseMember, rfl⟩)
 
 /-- Per-clause atom distinctness is unchanged by literal reordering. -/
 theorem orderClausesByRouteDirection_allAtomsNodup_iff

@@ -1,5 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes
-import LeanTrominoes.PositionedPeriodicCNFClauseDirectionOrdering
+import LeanTrominoes.PositionedPeriodicCNFClauseExitFanOrdering
 import LeanTrominoes.RetainedAngularFanFinalNormalizedRouteSeparation
 
 /-!
@@ -121,6 +121,134 @@ theorem
       retainedDrawingEightOccurrenceSplitFormula_satisfiable_iff
         source sourceLocal sourceWidth sourceOccurrences
 
+/-- Every normalized retained source route has a genuine first direction. -/
+theorem
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_directionsGenuine
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PositionedPeriodicCNF.ClauseRouteDirectionsGenuine
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+        source)
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source) := by
+  intro clause clauseIndex clauseMember literal literalIndex literalMember
+  exact AxisDirection.polylineFirstDirection_isGenuine
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember)
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_unitSteps
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember)
+
+/-- Distinct incidences at one retained source clause leave it in distinct
+first directions. -/
+theorem
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_directionsPairwiseDistinct
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause clauseIndex,
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx →
+      ∀ first firstIndex,
+        (first, firstIndex) ∈ clause.literals.zipIdx →
+        ∀ second secondIndex,
+          (second, secondIndex) ∈ clause.literals.zipIdx →
+          firstIndex ≠ secondIndex →
+          AxisDirection.polylineFirstDirection
+              (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+                source clauseIndex firstIndex) ≠
+            AxisDirection.polylineFirstDirection
+              (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+                source clauseIndex secondIndex) := by
+  intro clause clauseIndex clauseMember
+    first firstIndex firstMember
+    second secondIndex secondMember indexNe
+  have firstValid :=
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember firstMember
+  have secondValid :=
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember secondMember
+  apply polylineFirstDirections_ne_of_routesAvoidEachOther
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember firstMember)
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember secondMember)
+    firstValid.2.2 secondValid.2.2
+  · rw [firstValid.1, secondValid.1]
+  · exact
+      retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_avoidEachOther
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+        clauseMember clauseMember firstMember secondMember
+        (Or.inr indexNe)
+
+/-- Every reordered retained source route still has a genuine first
+direction. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_directionsGenuine
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PositionedPeriodicCNF.ClauseRouteDirectionsGenuine
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+        source)
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source) :=
+  PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection_directionsGenuine
+    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      source)
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_directionsGenuine
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+
+/-- In every reordered clause, source-route first-direction ranks strictly
+increase with literal index. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_ranksStrictlyIncrease
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PositionedPeriodicCNF.ClauseRouteDirectionRanksStrictlyIncrease
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+        source)
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source) :=
+  PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection_ranksStrictlyIncrease
+    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      source)
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_directionsGenuine
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_directionsPairwiseDistinct
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+
 /-- Every ternary clause in the reordered retained drawing has its three
 normalized routes in clockwise order. -/
 theorem
@@ -139,41 +267,59 @@ theorem
         source) := by
   apply
     PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection_ternaryClockwise
-  · intro clause clauseIndex clauseMember
-      literal literalIndex literalMember
-    exact AxisDirection.polylineFirstDirection_isGenuine
-      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
+  · exact
+      retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_directionsGenuine
         source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty clauseMember literalMember)
-      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_unitSteps
+        sourceClausesNonempty
+  · exact
+      retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_directionsPairwiseDistinct
         source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty clauseMember literalMember)
-  · intro clause clauseIndex clauseMember
-      first firstIndex firstMember
-      second secondIndex secondMember indexNe
-    have firstValid :=
-      retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty clauseMember firstMember
-    have secondValid :=
-      retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty clauseMember secondMember
-    apply polylineFirstDirections_ne_of_routesAvoidEachOther
-      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty clauseMember firstMember)
-      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty clauseMember secondMember)
-      firstValid.2.2 secondValid.2.2
-    · rw [firstValid.1, secondValid.1]
-    · exact
-        retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_avoidEachOther
-          source sourceLocal sourceWidth sourceOccurrences
-          sourceClausesNonempty
-          clauseMember clauseMember firstMember secondMember
-          (Or.inr indexNe)
+        sourceClausesNonempty
+
+/-- Every nonempty reordered retained clause selects a valid finite
+port-to-exit connector fan. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplit_clauseExitFanData_valid
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    (clauseNonempty : clause.literals ≠ []) :
+    (PositionedPeriodicCNF.clauseExitFanData
+      clause clauseIndex
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source)).IsValid := by
+  apply PositionedPeriodicCNF.clauseExitFanData_valid
+    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_directionsGenuine
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_ranksStrictlyIncrease
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+    clauseMember
+  · exact List.length_pos_iff.mpr clauseNonempty
+  · exact
+      PositionedPeriodicCNF.orderClausesByRouteDirection_clause_length_le
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          source)
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          source)
+        3
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_widthAtMostThree
+          source sourceWidth)
+        clauseMember
 
 end PeriodicOrthocrossing
 end LeanTrominoes
