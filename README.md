@@ -2836,8 +2836,9 @@ The representation choices for this target are:
   extends retained source-route/vertex separation to arbitrary periodic copies.
   Relative route separation moves a witnessing target incidence so its final
   point is the requested translated variable position; periodic vertex
-  planarity also clears that point from the fallback route's discarded final
-  segment.
+  planarity also clears that point from any axis-aligned discarded final
+  segment.  The failed-selector theorem is the immediate specialization that
+  obtains this alignment from the fallback policy.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCycleSeparation.lean)
   completes the failed-selector half of periodic source/cycle separation.  A
   reusable point-neighborhood assembly covers both ordinary and escaped

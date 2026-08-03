@@ -439,10 +439,10 @@ theorem verticesAvoidRouteInteriors_of_route_segment_mem_relativeVertex
   rw [indexedSegmentEqual] at untranslatedAvoids
   exact untranslatedAvoids
 
-/-- A fallback route's discarded final segment is axis-aligned and avoids
-every different periodically translated occurring source-variable point. -/
+/-- Any axis-aligned discarded final segment avoids every different
+periodically translated occurring source-variable point. -/
 theorem
-    finalCoordinatedFallbackSourceRoute_finalSegment_avoids_translatedSourceVariablePosition
+    finalCoordinatedSourceRoute_finalSegment_avoids_translatedSourceVariablePosition_of_axisAligned
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (sourceLocal : formula.IsLocal)
@@ -463,9 +463,11 @@ theorem
     {literalIndex : Nat}
     (literalMember :
       (literal, literalIndex) ∈ clause.literals.zipIdx)
-    (choiceNone :
-      retainedFinalDirectSourceRouteChoice?
-          formula clauseIndex literalIndex = none)
+    (finalAligned :
+      let route :=
+        finalCoordinatedSourceRoutes formula clauseIndex literalIndex
+      (⟨polylineLastEntrance route,
+          route.getLastD (0, 0)⟩ : GridSegment).IsAxisAligned)
     (targetAtom : WrappedPeriodicPlanarSATVariable Variable)
     (targetAtomMember :
       targetAtom ∈
@@ -586,14 +588,70 @@ theorem
     dsimp only [finalSegment]
     rw [finalPointEq]
     simpa only [placement] using centersDifferent
-  refine
-    ⟨finalCoordinatedFallbackSourceRoute_finalSegment_isAxisAligned
-        formula sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty clauseMember literalMember choiceNone,
-      ?_⟩
+  refine ⟨?_, ?_⟩
+  · simpa [route, finalSegment] using finalAligned
   exact
     gridSegment_not_contains_of_avoidsInterior_and_endpoints
       avoidsInterior startDifferent finishDifferent
+
+/-- A fallback route's discarded final segment is axis-aligned and avoids
+every different periodically translated occurring source-variable point. -/
+theorem
+    finalCoordinatedFallbackSourceRoute_finalSegment_avoids_translatedSourceVariablePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (choiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex = none)
+    (targetAtom : WrappedPeriodicPlanarSATVariable Variable)
+    (targetAtomMember :
+      targetAtom ∈
+        sourceVariables (finalCoordinatedSource formula).erase)
+    (relativeTranslate : Cell)
+    (centersDifferent :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula) clause literal ≠
+        Cell.add
+          ((finalCoordinatedPlacement formula).position targetAtom)
+          ((finalCoordinatedPlacement formula).translation
+            relativeTranslate)) :
+    let route :=
+      finalCoordinatedSourceRoutes formula clauseIndex literalIndex
+    let finalSegment : GridSegment :=
+      ⟨polylineLastEntrance route, route.getLastD (0, 0)⟩
+    finalSegment.IsAxisAligned ∧
+      ¬finalSegment.Contains
+        (Cell.add
+          ((finalCoordinatedPlacement formula).position targetAtom)
+          ((finalCoordinatedPlacement formula).translation
+            relativeTranslate)) := by
+  apply
+    finalCoordinatedSourceRoute_finalSegment_avoids_translatedSourceVariablePosition_of_axisAligned
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember
+      _ targetAtom targetAtomMember relativeTranslate centersDifferent
+  exact
+    finalCoordinatedFallbackSourceRoute_finalSegment_isAxisAligned
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember choiceNone
 
 end PeriodicOrthocrossing
 end LeanTrominoes
