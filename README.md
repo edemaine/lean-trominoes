@@ -2293,6 +2293,13 @@ The representation choices for this target are:
   refinement.  This supplies the metadata-rich relative source certificate
   needed to transport inherited route geometry through clause-direction
   ordering and the later exact-one splices.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeSourcePrefixSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeSourcePrefixSeparation.lean)
+  specializes that periodic certificate to the source-prefix pieces retained
+  by the final angular-fan replacement.  Nonzero period shifts force the two
+  clause heads apart; deleting both final variable points then upgrades
+  endpoint-only source separation to strict contact-free prefix separation,
+  even when the two translated incidences share their variable endpoint.
+  The result is also transported through the complete source-first scaling.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
