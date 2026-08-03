@@ -2430,6 +2430,11 @@ The representation choices for this target are:
   occurrences.  Equal physical centers transfer direct-component shape, so
   a failed selector and a successful selector can never occupy the same
   translated noncarrier macrocell.
+- [`LeanTrominoes/RetainedFinalRouteCarrierBounds.lean`](LeanTrominoes/RetainedFinalRouteCarrierBounds.lean)
+  supplies the complementary arbitrary-shift carrier-lens wrapper and its
+  narrow translated bounding rectangle.  Carrier/macrocell occurrence pairs
+  therefore yield the source-prefix raster certificate whenever those two
+  explicit enclosing rectangles are separated.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
