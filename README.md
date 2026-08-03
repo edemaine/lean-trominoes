@@ -2313,6 +2313,13 @@ The representation choices for this target are:
   disjoint macrocell envelopes; coincident origins are classified into the
   finite crossover or duplicator atlas, with translated target equality
   recovering the wrapped atom and the semantic angular-slot order.
+- [`LeanTrominoes/RetainedAngularFanSourceSpliceTranslation.lean`](LeanTrominoes/RetainedAngularFanSourceSpliceTranslation.lean)
+  proves exact translation covariance for the ordinary and delayed-lane
+  fallback source splices.  Tail replacement and whole retained-ray
+  rasterization commute with translation, while the source offset is scaled
+  through the terminal refinement before positioning the translated outer
+  fan.  This exposes translated fallback routes by the same geometric pieces
+  used in the within-cell separation proof.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
