@@ -2238,6 +2238,14 @@ The representation choices for this target are:
   variable occurrence order, ternary clause order, or both at once; the
   remaining concrete task is to establish those endpoint-isolation
   conditions for the inherited final exact-one splices.
+- [`LeanTrominoes/PeriodicGridDrawingLiftedRouteSeparation.lean`](LeanTrominoes/PeriodicGridDrawingLiftedRouteSeparation.lean)
+  bridges pairwise complete-route geometry back to the global periodic
+  drawing interface.  If every two distinct lifted route occurrences avoid
+  each other and each stored route is simple, then all globally indexed
+  segment interiors are disjoint and all listed-point contacts occur only at
+  outer endpoints.  Unit-step support therefore promotes the drawing to the
+  exact ribbon-ready predicate; same-route, same-translate comparisons are
+  discharged from simplicity rather than left implicit.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean)
   discharges both endpoint-isolation obligations for every fresh auxiliary
   incidence in the final unit-elimination layer.  The completed auxiliary
@@ -2303,8 +2311,11 @@ The representation choices for this target are:
   consumed by the ribbon and 3DM reductions.  Every genuine route has its
   canonical endpoints, is a geometrically simple unit-step path, and the
   assembled drawing is orthogonal, endpoint-compatible, and integer-grid
-  planar.  It is also identified with drawing-level normalization of the
-  preceding coordinated exact-one drawing for later certificate transport.
+  planar.  Simplicity is also lifted from genuine incidences to every stored
+  route, and complete separation of distinct lifted routes is now the single
+  premise that packages the drawing as ribbon-ready.  The drawing is
+  identified with drawing-level normalization of the preceding coordinated
+  exact-one drawing for later certificate transport.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)
   reduces an oblique final source-corridor obligation by the physical
   carrier/macrocell decomposition.  Carrier reference routes are impossible,

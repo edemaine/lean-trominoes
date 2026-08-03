@@ -48,6 +48,40 @@ theorem incidenceDrawing_hasUnitSteps_of_pointwise
     ⟨clause, literal, clauseMember, literalMember, _⟩
   exact unitSteps _ _ clauseMember _ _ literalMember
 
+/-- Pointwise simplicity certificates for genuine incidences lift to every
+stored route of the assembled periodic incidence drawing. -/
+theorem incidenceDrawing_routesSimple_of_pointwise
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (routeSimple :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          LocalIncidenceDrawing.RouteIsSimple
+            (routes clauseIndex literalIndex)) :
+    ∀ route ∈ (incidenceDrawing source placement routes).edgeRoutes,
+      LocalIncidenceDrawing.RouteIsSimple route := by
+  intro route routeMember
+  change route ∈ incidenceEdgeRoutes source routes at routeMember
+  rw [incidenceEdgeRoutes_eq_metadata_map] at routeMember
+  rcases List.mem_map.mp routeMember with
+    ⟨incidence, incidenceMember, routeEqual⟩
+  subst route
+  rcases List.mem_iff_getElem.mp incidenceMember with
+    ⟨incidenceIndex, incidenceIndexLt, incidenceAt⟩
+  have taggedMember :
+      (incidence, incidenceIndex) ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨incidenceIndexLt, incidenceAt⟩
+  rcases incidenceMetadata_of_tagged source taggedMember with
+    ⟨clause, literal, clauseMember, literalMember, _⟩
+  exact routeSimple _ _ clauseMember _ _ literalMember
+
 end PositionedPeriodicCNF
 
 namespace PeriodicOrthocrossing

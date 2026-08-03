@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRoutes
+import LeanTrominoes.PeriodicGridDrawingLiftedRouteSeparation
 import LeanTrominoes.RetainedAngularFanFinalNormalizedDrawing
 
 /-!
@@ -428,6 +429,31 @@ theorem
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty clauseMember literalMember
 
+/-- Every stored route of the final normalized exact-one drawing is a
+geometrically simple path. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_routesSimple
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ route ∈
+        (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty).edgeRoutes,
+      LocalIncidenceDrawing.RouteIsSimple route := by
+  rw [
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing]
+  apply PositionedPeriodicCNF.incidenceDrawing_routesSimple_of_pointwise
+  intro clause clauseIndex clauseMember literal literalIndex literalMember
+  exact
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceRoutes_isSimple
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember
+
 /-- Unit steps give unconditional integer-grid planarity of the final
 normalized exact-one drawing. -/
 theorem
@@ -443,6 +469,35 @@ theorem
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty).IsPlanar :=
   PeriodicGridDrawing.isPlanar_of_hasUnitSteps
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_hasUnitSteps
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+
+/-- Once complete separation is established pairwise for distinct lifted
+route occurrences, the normalized final exact-one drawing is ribbon-ready.
+The bridge discharges both global indexed-occurrence predicates and handles
+self-comparisons using route simplicity. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_isRibbonReady_of_liftedRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (separated :
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).LiftedRoutesAvoidEachOther) :
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).IsRibbonReady :=
+  PeriodicGridDrawing.isRibbonReady_of_liftedRoutesAvoidEachOther
+    separated
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_routesSimple
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
     (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_hasUnitSteps
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
