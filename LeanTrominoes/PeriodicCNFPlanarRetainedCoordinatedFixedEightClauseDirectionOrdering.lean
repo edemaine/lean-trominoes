@@ -55,6 +55,200 @@ def
     (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
       source)
 
+/-- Every genuine reordered retained route has the canonical endpoints of
+the reordered clause presentation and remains orthogonal. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_valid
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+      source clauseIndex literalIndex).head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+              source)
+            clause) ∧
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source clauseIndex literalIndex).getLast? =
+          some
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+                source)
+              clause literal) ∧
+      OrthogonalPolyline
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+          source clauseIndex literalIndex) := by
+  simpa only [
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula,
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes]
+    using
+      PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection_valid_of
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          source)
+        (fun _sourceClause _sourceClauseIndex sourceClauseMember
+            _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+          let valid :=
+            retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
+              source sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty sourceClauseMember sourceLiteralMember
+          ⟨valid.1, valid.2.1⟩)
+        (fun _sourceClause _sourceClauseIndex sourceClauseMember
+            _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+          (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_valid
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty sourceClauseMember sourceLiteralMember).2.2)
+        clauseMember literalMember
+
+/-- Every reordered retained source route still consists of unit lattice
+steps. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_unitSteps
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+      source clauseIndex literalIndex).IsChain
+        AxisDirection.IsUnitAxisStep := by
+  exact
+    PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection_unitSteps
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      (fun sourceClause sourceClauseIndex sourceClauseMember
+          sourceLiteral sourceLiteralIndex sourceLiteralMember =>
+        retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_unitSteps
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty sourceClauseMember sourceLiteralMember)
+      clauseMember literalMember
+
+/-- Every reordered retained source route contains at least one edge. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_length_ge_two
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    2 ≤
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source clauseIndex literalIndex).length := by
+  exact
+    PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection_length_ge
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      2
+      (fun sourceClause sourceClauseIndex sourceClauseMember
+          sourceLiteral sourceLiteralIndex sourceLiteralMember =>
+        retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_length_ge_two
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty sourceClauseMember sourceLiteralMember)
+      clauseMember literalMember
+
+/-- Every genuine reordered route exposes a first exit vertex after its
+canonical clause endpoint. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_exits
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ exit,
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source clauseIndex literalIndex).tail.head? = some exit := by
+  have routeLength :=
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_length_ge_two
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember
+  cases routeEq :
+      retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source clauseIndex literalIndex with
+  | nil => simp [routeEq] at routeLength
+  | cons first rest =>
+      cases rest with
+      | nil => simp [routeEq] at routeLength
+      | cons exit suffix =>
+          exact ⟨exit, rfl⟩
+
 /-- Reordering preserves the source's width-three bound. -/
 theorem
     retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree

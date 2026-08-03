@@ -122,6 +122,7 @@ theorem orderedInheritedRouteSuffixesRoutes_valid
     (sourceFanValid :
       ∀ sourceClause sourceClauseIndex,
         (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        sourceClause.literals ≠ [] →
         (PositionedPeriodicCNF.clauseExitFanData
           sourceClause sourceClauseIndex sourceRoutes).IsValid)
     (sourceEndpoints :
@@ -246,7 +247,8 @@ theorem orderedInheritedRouteSuffixesRoutes_valid
       (sourceRoutes
         data.sourceClauseIndex data.sourceLiteralIndex)
       (sourceFanValid
-        data.sourceClause data.sourceClauseIndex data.sourceClauseMember)
+        data.sourceClause data.sourceClauseIndex data.sourceClauseMember
+        (List.length_pos_iff.mp sourceClausePositive))
       slotActive directionEq endpoints.1 endpoints.2
       (sourceOrthogonal
         data.sourceClause data.sourceClauseIndex data.sourceClauseMember
@@ -274,6 +276,7 @@ noncomputable def orderedInheritedRouteSuffixes
     (sourceFanValid :
       ∀ sourceClause sourceClauseIndex,
         (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        sourceClause.literals ≠ [] →
         (PositionedPeriodicCNF.clauseExitFanData
           sourceClause sourceClauseIndex sourceRoutes).IsValid)
     (sourceEndpoints :

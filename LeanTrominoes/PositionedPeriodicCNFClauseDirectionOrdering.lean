@@ -1,5 +1,6 @@
 import LeanTrominoes.OrthogonalPolylineEndpointDirectionSeparation
 import LeanTrominoes.OrthogonalPolylineSymmetries
+import LeanTrominoes.PeriodicGridDrawingUnitSubdivision
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonFanClockwiseOrder
 import LeanTrominoes.PlanarOneInThreeLocalDistinctness
 import LeanTrominoes.PositionedPeriodicCNFCanonicalOrthogonalRoutes
@@ -278,6 +279,103 @@ theorem exists_sourceLiteral_of_orderedLiteral_mem
 
 /-- Anchor-gauged reordering preserves the canonical endpoints and
 orthogonality of every genuine incidence. -/
+theorem orderCanonicalRoutesByClauseDirection_valid_of
+    [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (sourceEndpoints :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          (routes sourceClauseIndex sourceLiteralIndex).head? =
+              some (canonicalClausePosition placement sourceClause) ∧
+            (routes sourceClauseIndex sourceLiteralIndex).getLast? =
+              some
+                (canonicalLiteralPosition
+                  placement sourceClause sourceLiteral))
+    (sourceOrthogonal :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (routes sourceClauseIndex sourceLiteralIndex))
+    {orderedClause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (orderedClause, clauseIndex) ∈
+        (orderClausesByRouteDirection source routes).clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ orderedClause.literals.zipIdx) :
+    (orderCanonicalRoutesByClauseDirection
+        source placement routes clauseIndex literalIndex).head? =
+        some (canonicalClausePosition placement orderedClause) ∧
+      (orderCanonicalRoutesByClauseDirection
+        source placement routes clauseIndex literalIndex).getLast? =
+        some (canonicalLiteralPosition
+          placement orderedClause literal) ∧
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (orderCanonicalRoutesByClauseDirection
+          source placement routes clauseIndex literalIndex) := by
+  rcases exists_sourceLiteral_of_orderedLiteral_mem
+      routes clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      orderedClauseEq, literalEq, orderedRouteEq⟩
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  have sourceValid := sourceEndpoints
+    sourceClause clauseIndex sourceClauseMember
+    sourceLiteral sourceLiteralIndex sourceLiteralMember
+  have sourceRouteOrthogonal := sourceOrthogonal
+    sourceClause clauseIndex sourceClauseMember
+    sourceLiteral sourceLiteralIndex sourceLiteralMember
+  subst orderedClause
+  subst literal
+  rw [orderCanonicalRoutesByClauseDirection, sourceClauseLookup,
+    orderedRouteEq]
+  constructor
+  · simp only [PeriodicOrthocrossing.translatePolyline,
+      List.head?_map, sourceValid.1, Option.map_some]
+    apply congrArg some
+    cases sourceAnchorEq :
+        PeriodicCNF.clauseAnchor sourceClause.literals with
+    | mk sourceAnchorX sourceAnchorY =>
+      cases orderedAnchorEq : PeriodicCNF.clauseAnchor
+        (orderClauseByRouteDirection
+          routes clauseIndex sourceClause).literals with
+      | mk orderedAnchorX orderedAnchorY =>
+        simp [canonicalClausePosition,
+          PeriodicVariablePlacement.translation,
+          Cell.add, Cell.sub, Cell.scale,
+          sourceAnchorEq, orderedAnchorEq]
+        constructor <;> ring
+  constructor
+  · simp only [PeriodicOrthocrossing.translatePolyline,
+      List.getLast?_map, sourceValid.2, Option.map_some]
+    apply congrArg some
+    cases sourceAnchorEq :
+        PeriodicCNF.clauseAnchor sourceClause.literals with
+    | mk sourceAnchorX sourceAnchorY =>
+      cases orderedAnchorEq : PeriodicCNF.clauseAnchor
+        (orderClauseByRouteDirection
+          routes clauseIndex sourceClause).literals with
+      | mk orderedAnchorX orderedAnchorY =>
+        simp [canonicalLiteralPosition,
+          PeriodicVariablePlacement.translation,
+          Cell.add, Cell.sub, Cell.scale,
+          sourceAnchorEq, orderedAnchorEq]
+        constructor <;> ring
+  · exact sourceRouteOrthogonal.translate _
+
+/-- Structure-packaged form of
+`orderCanonicalRoutesByClauseDirection_valid_of`. -/
 theorem orderCanonicalRoutesByClauseDirection_valid
     [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
@@ -302,56 +400,9 @@ theorem orderCanonicalRoutesByClauseDirection_valid
       PeriodicOrthocrossing.OrthogonalPolyline
         (orderCanonicalRoutesByClauseDirection
           source placement family.routes clauseIndex literalIndex) := by
-  rcases exists_sourceLiteral_of_orderedLiteral_mem
-      family.routes clauseMember literalMember with
-    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
-      sourceClauseMember, sourceLiteralMember,
-      orderedClauseEq, literalEq, orderedRouteEq⟩
-  have sourceClauseLookup :=
-    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
-  have sourceValid := family.endpoints
-    sourceClause clauseIndex sourceClauseMember
-    sourceLiteral sourceLiteralIndex sourceLiteralMember
-  have sourceOrthogonal := family.orthogonal
-    sourceClause clauseIndex sourceClauseMember
-    sourceLiteral sourceLiteralIndex sourceLiteralMember
-  subst orderedClause
-  subst literal
-  rw [orderCanonicalRoutesByClauseDirection, sourceClauseLookup,
-    orderedRouteEq]
-  constructor
-  · simp only [PeriodicOrthocrossing.translatePolyline,
-      List.head?_map, sourceValid.1, Option.map_some]
-    apply congrArg some
-    cases sourceAnchorEq :
-        PeriodicCNF.clauseAnchor sourceClause.literals with
-    | mk sourceAnchorX sourceAnchorY =>
-      cases orderedAnchorEq : PeriodicCNF.clauseAnchor
-        (orderClauseByRouteDirection
-          family.routes clauseIndex sourceClause).literals with
-      | mk orderedAnchorX orderedAnchorY =>
-        simp [canonicalClausePosition,
-          PeriodicVariablePlacement.translation,
-          Cell.add, Cell.sub, Cell.scale,
-          sourceAnchorEq, orderedAnchorEq]
-        constructor <;> ring
-  constructor
-  · simp only [PeriodicOrthocrossing.translatePolyline,
-      List.getLast?_map, sourceValid.2, Option.map_some]
-    apply congrArg some
-    cases sourceAnchorEq :
-        PeriodicCNF.clauseAnchor sourceClause.literals with
-    | mk sourceAnchorX sourceAnchorY =>
-      cases orderedAnchorEq : PeriodicCNF.clauseAnchor
-        (orderClauseByRouteDirection
-          family.routes clauseIndex sourceClause).literals with
-      | mk orderedAnchorX orderedAnchorY =>
-        simp [canonicalLiteralPosition,
-          PeriodicVariablePlacement.translation,
-          Cell.add, Cell.sub, Cell.scale,
-          sourceAnchorEq, orderedAnchorEq]
-        constructor <;> ring
-  · exact sourceOrthogonal.translate _
+  exact orderCanonicalRoutesByClauseDirection_valid_of
+    placement family.routes family.endpoints family.orthogonal
+    clauseMember literalMember
 
 /-- Package the reordered, anchor-gauged routes behind the standard
 canonical orthogonal route interface. -/
@@ -373,6 +424,126 @@ def CanonicalOrthogonalIncidenceRoutes.orderClausesByRouteDirection
     intro clause clauseIndex clauseMember literal literalIndex literalMember
     exact (orderCanonicalRoutesByClauseDirection_valid
       placement family clauseMember literalMember).2.2
+
+/-- Anchor-gauged reordering preserves unit lattice steps on every genuine
+incidence route. -/
+theorem orderCanonicalRoutesByClauseDirection_unitSteps
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (sourceUnitSteps :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          (routes sourceClauseIndex sourceLiteralIndex).IsChain
+            AxisDirection.IsUnitAxisStep)
+    {orderedClause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (orderedClause, clauseIndex) ∈
+        (orderClausesByRouteDirection source routes).clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ orderedClause.literals.zipIdx) :
+    (orderCanonicalRoutesByClauseDirection
+        source placement routes clauseIndex literalIndex).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  rcases exists_sourceLiteral_of_orderedLiteral_mem
+      routes clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      orderedClauseEq, literalEq, orderedRouteEq⟩
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  rw [orderCanonicalRoutesByClauseDirection, sourceClauseLookup,
+    orderedRouteEq]
+  unfold PeriodicOrthocrossing.translatePolyline
+  apply List.isChain_map_of_isChain
+      (Cell.add
+        (placement.translation
+          (Cell.sub
+            (PeriodicCNF.clauseAnchor sourceClause.literals)
+            (PeriodicCNF.clauseAnchor
+              (orderClauseByRouteDirection
+                routes clauseIndex sourceClause).literals))))
+  · intro first second
+      (unit : AxisDirection.IsUnitAxisStep first second)
+    exact AxisDirection.IsUnitAxisStep.translate unit _
+  · exact sourceUnitSteps
+      sourceClause clauseIndex sourceClauseMember
+      sourceLiteral sourceLiteralIndex sourceLiteralMember
+
+/-- Anchor-gauged reordering preserves the number of vertices on every
+genuine incidence route. -/
+theorem orderCanonicalRoutesByClauseDirection_length_eq
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    {orderedClause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (orderedClause, clauseIndex) ∈
+        (orderClausesByRouteDirection source routes).clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ orderedClause.literals.zipIdx) :
+    ∃ sourceClause sourceLiteral sourceLiteralIndex,
+      (sourceClause, clauseIndex) ∈ source.clauses.zipIdx ∧
+      (sourceLiteral, sourceLiteralIndex) ∈
+        sourceClause.literals.zipIdx ∧
+      (orderCanonicalRoutesByClauseDirection
+          source placement routes clauseIndex literalIndex).length =
+        (routes clauseIndex sourceLiteralIndex).length := by
+  rcases exists_sourceLiteral_of_orderedLiteral_mem
+      routes clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      orderedClauseEq, literalEq, orderedRouteEq⟩
+  refine ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+    sourceClauseMember, sourceLiteralMember, ?_⟩
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  simp [orderCanonicalRoutesByClauseDirection, sourceClauseLookup,
+    orderedRouteEq, PeriodicOrthocrossing.translatePolyline]
+
+/-- Any lower bound on genuine source-route lengths survives clause
+reordering and the accompanying whole-period gauge translation. -/
+theorem orderCanonicalRoutesByClauseDirection_length_ge
+    {source : PositionedPeriodicCNF Variable}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (minimum : Nat)
+    (sourceLength :
+      ∀ sourceClause sourceClauseIndex,
+        (sourceClause, sourceClauseIndex) ∈ source.clauses.zipIdx →
+        ∀ sourceLiteral sourceLiteralIndex,
+          (sourceLiteral, sourceLiteralIndex) ∈
+              sourceClause.literals.zipIdx →
+          minimum ≤ (routes sourceClauseIndex sourceLiteralIndex).length)
+    {orderedClause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (orderedClause, clauseIndex) ∈
+        (orderClausesByRouteDirection source routes).clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ orderedClause.literals.zipIdx) :
+    minimum ≤
+      (orderCanonicalRoutesByClauseDirection
+        source placement routes clauseIndex literalIndex).length := by
+  rcases orderCanonicalRoutesByClauseDirection_length_eq
+      placement routes clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember, lengthEq⟩
+  rw [lengthEq]
+  exact sourceLength
+    sourceClause clauseIndex sourceClauseMember
+    sourceLiteral sourceLiteralIndex sourceLiteralMember
 
 /-- The anchor-gauge translation does not change the first direction of a
 reindexed route selected by an explicit sorted-tag lookup. -/

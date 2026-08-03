@@ -5261,6 +5261,8 @@ The representation choices for this target are:
   all proved invariant under the reordering.  The canonical-route package
   also applies the necessary whole-period translation between the old and new
   first-literal anchor gauges, preserving exact endpoints and orthogonality.
+  Pointwise transport lemmas also preserve unit steps and route-length lower
+  bounds through that gauge change.
   A finite cardinal-direction
   lemma turns nondecreasing ranks of three distinct genuine exits into the
   clockwise condition needed by the composed boundary-port router.
@@ -5292,6 +5294,11 @@ The representation choices for this target are:
   recovers each twice-inherited original occurrence from the composed
   metadata, converts its index to a certified three-port fan slot, and
   packages the selected splices as a total canonical suffix family.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean)
+  instantiates the ordered suffix family over the retained source, then
+  completes both generations of auxiliary routes and splices them to the
+  certified local Figure 9 and unit-elimination drawings.  Every genuine
+  twice-replaced route has exact canonical endpoints and is orthogonal.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
