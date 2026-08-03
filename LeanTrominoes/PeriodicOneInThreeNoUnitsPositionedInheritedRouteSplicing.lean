@@ -33,6 +33,34 @@ def inheritedSourceRouteShift
       (PositionedPeriodicCNF.canonicalClausePosition
         sourcePlacement sourceClause))
 
+/-- Source incidences from the same unit-elimination block use one common
+translation after refinement.  Generated clauses in that block may differ,
+but their common logical anchor gives the same normalized source origin. -/
+theorem inheritedSourceRouteShift_eq_of_sourceClause_eq_of_anchor_eq
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (firstSourceClause secondSourceClause :
+      PositionedPeriodicClause Variable)
+    (firstGeneratedClause secondGeneratedClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    (sourceClausesEqual : firstSourceClause = secondSourceClause)
+    (anchorsEqual :
+      PeriodicCNF.clauseAnchor firstGeneratedClause.literals =
+        PeriodicCNF.clauseAnchor secondGeneratedClause.literals) :
+    inheritedSourceRouteShift
+        outputPlacement sourcePlacement
+        firstSourceClause firstGeneratedClause =
+      inheritedSourceRouteShift
+        outputPlacement sourcePlacement
+        secondSourceClause secondGeneratedClause := by
+  subst secondSourceClause
+  unfold inheritedSourceRouteShift
+  rw [normalizedSourceClausePosition_eq_of_anchor_eq
+    outputPlacement firstSourceClause
+    firstGeneratedClause secondGeneratedClause anchorsEqual]
+
 def inheritedSourceRoute
     {Variable : Type*}
     (outputPlacement :

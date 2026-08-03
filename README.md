@@ -544,7 +544,8 @@ The representation choices for this target are:
   the `6 × 6` unit-elimination refinement, removes its obsolete clause
   endpoint, and connects the boundary port directly to its transformed first
   exit.  Exact canonical endpoints, orthogonality, and the source route's
-  final direction are preserved.
+  final direction are preserved.  Generated clauses in a common source block
+  are also shown to induce one common inherited-route translation.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteIsolation.lean)
   applies the positive-scaling and translation transport to the inherited
   source route before its clause-side head is replaced.  Both isolated
@@ -2297,7 +2298,10 @@ The representation choices for this target are:
   distinct selected source incidence coordinates by injectivity of the
   ordered occurrence pairing.  Each selector record also retains its exact
   flattened unit-elimination metadata entry, including the source block and
-  generated clause equalities needed by pairwise geometry.
+  generated clause equalities needed by pairwise geometry.  Equal source
+  block indices recover equal positioned source clauses and equal generated
+  anchors, hence equal scale-and-translation maps for their inherited source
+  routes.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean)
   identifies an inherited local endpoint with its source-occurrence boundary
   port.  The three possible source-port coordinates are injective, and every

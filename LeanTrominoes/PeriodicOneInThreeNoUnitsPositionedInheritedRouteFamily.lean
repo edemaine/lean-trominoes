@@ -75,6 +75,129 @@ structure InheritedIncidenceData
     PeriodicOneInThreeNoUnits.formulaOriginalOccurrencePairs
           source.erase sourceLiteral.atom
 
+/-- Equal source presentation indices in two selectors identify the same
+positioned source clause. -/
+theorem InheritedIncidenceData.sourceClause_eq_of_index_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      InheritedIncidenceData source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      InheritedIncidenceData source sourcePlacement
+        secondClauseIndex secondLiteralIndex)
+    (sameSource :
+      first.sourceClauseIndex = second.sourceClauseIndex) :
+    first.sourceClause = second.sourceClause := by
+  have taggedEqual :
+      (first.sourceClause, first.sourceClauseIndex) =
+        (second.sourceClause, second.sourceClauseIndex) :=
+    PeriodicOrthocrossing.tagged_eq_of_mem_zipIdx_of_snd_eq
+      first.sourceClauseMember second.sourceClauseMember sameSource
+  exact congrArg Prod.fst taggedEqual
+
+/-- Every generated clause selected from one source-clause block has the
+same periodic anchor. -/
+theorem InheritedIncidenceData.generatedClauseAnchors_eq_of_source_index_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      InheritedIncidenceData source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      InheritedIncidenceData source sourcePlacement
+        secondClauseIndex secondLiteralIndex)
+    (sameSource :
+      first.sourceClauseIndex = second.sourceClauseIndex) :
+    PeriodicCNF.clauseAnchor first.generatedClause.literals =
+      PeriodicCNF.clauseAnchor second.generatedClause.literals := by
+  rcases formulaClauseMetadata_lookup_valid
+      source first.generatedClauseMember with
+    ⟨firstMetadata, firstLookup, _firstClauseEqual,
+      _firstSourceMember, firstLocalMember⟩
+  have firstMetadataEqual : firstMetadata = first.metadata := by
+    apply Option.some.inj
+    exact firstLookup.symm.trans first.metadataLookup
+  subst firstMetadata
+  rcases formulaClauseMetadata_lookup_valid
+      source second.generatedClauseMember with
+    ⟨secondMetadata, secondLookup, _secondClauseEqual,
+      _secondSourceMember, secondLocalMember⟩
+  have secondMetadataEqual : secondMetadata = second.metadata := by
+    apply Option.some.inj
+    exact secondLookup.symm.trans second.metadataLookup
+  subst secondMetadata
+  have sourceClausesEqual :=
+    first.sourceClause_eq_of_index_eq
+      source sourcePlacement second sameSource
+  have firstGeneratedMember :
+      first.generatedClause.literals ∈
+        PeriodicOneInThreeNoUnits.clauseClauses
+          first.sourceClauseIndex first.sourceClause.literals := by
+    rw [← first.metadataClause, ← first.metadataSourceClause,
+      ← first.metadataSourceClauseIndex, ← clauseGadget_literals]
+    exact List.mem_map.mpr
+      ⟨first.metadata.clause,
+        List.fst_mem_of_mem_zipIdx firstLocalMember, rfl⟩
+  have secondGeneratedMember :
+      second.generatedClause.literals ∈
+        PeriodicOneInThreeNoUnits.clauseClauses
+          second.sourceClauseIndex second.sourceClause.literals := by
+    rw [← second.metadataClause, ← second.metadataSourceClause,
+      ← second.metadataSourceClauseIndex, ← clauseGadget_literals]
+    exact List.mem_map.mpr
+      ⟨second.metadata.clause,
+        List.fst_mem_of_mem_zipIdx secondLocalMember, rfl⟩
+  have firstAnchor :=
+    PeriodicOneInThreeNoUnits.clauseAnchor_eq_of_mem_clauseClauses
+      first.sourceClauseIndex first.sourceClause.literals
+      first.generatedClause.literals firstGeneratedMember
+  have secondAnchor :=
+    PeriodicOneInThreeNoUnits.clauseAnchor_eq_of_mem_clauseClauses
+      second.sourceClauseIndex second.sourceClause.literals
+      second.generatedClause.literals secondGeneratedMember
+  rw [sourceClausesEqual] at firstAnchor
+  simpa [PeriodicCNF.clauseAnchor,
+    PeriodicOneInThree.anchor] using
+    firstAnchor.trans secondAnchor.symm
+
+/-- The inherited source routes selected from one source-clause block use
+the same scale-and-translation map. -/
+theorem InheritedIncidenceData.sourceRouteShifts_eq_of_source_index_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      InheritedIncidenceData source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      InheritedIncidenceData source sourcePlacement
+        secondClauseIndex secondLiteralIndex)
+    (sameSource :
+      first.sourceClauseIndex = second.sourceClauseIndex) :
+    inheritedSourceRouteShift
+        (placement source sourcePlacement) sourcePlacement
+        first.sourceClause first.generatedClause =
+      inheritedSourceRouteShift
+        (placement source sourcePlacement) sourcePlacement
+        second.sourceClause second.generatedClause :=
+  inheritedSourceRouteShift_eq_of_sourceClause_eq_of_anchor_eq
+    (placement source sourcePlacement) sourcePlacement
+    first.sourceClause second.sourceClause
+    first.generatedClause second.generatedClause
+    (first.sourceClause_eq_of_index_eq
+      source sourcePlacement second sameSource)
+    (first.generatedClauseAnchors_eq_of_source_index_eq
+      source sourcePlacement second sameSource)
+
 /-- Distinct generated incidences select distinct source incidence
 coordinates.  The explicit occurrence pairing is injective in its source
 projection because tagged source occurrences are pairwise distinct. -/
