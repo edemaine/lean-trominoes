@@ -5516,6 +5516,9 @@ The representation choices for this target are:
   certified composed drawing.  The resulting source-block/local-clause keys
   are proved globally unique, and each stored block start is proved to turn
   every local Figure 9 clause index into its exact first-stage global index.
+  Exact lookup bridges recover both the standard Figure 9 metadata entry and
+  the standard local unit-elimination metadata entry represented by each
+  composed entry, preserving both layers' source indices.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRoutes.lean)
   uses that index to select one route from the appropriate certified
   `72 × 72` composed neighborhood for every final incidence.  Every genuine
