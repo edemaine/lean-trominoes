@@ -5306,7 +5306,9 @@ The representation choices for this target are:
   packages the six local/local, local/suffix, and suffix/suffix conditions
   sufficient for two complete composed routes at an arbitrary semantic lattice
   offset to avoid each other, with all four splice-endpoint equations discharged
-  by the canonical certificates.
+  by the canonical certificates.  A second interface reduces the two allowed-
+  contact conditions to five inequalities among the semantic clause, splice,
+  and literal endpoints, leaving only four continuous-avoidance obligations.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean)
   instantiates the ordered suffix family over the retained source, then
   completes both generations of auxiliary routes and splices them to the

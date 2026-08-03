@@ -197,6 +197,230 @@ def RelativeSplicedRoutePairComponentsSeparated
     RoutesAvoidEachOther firstSuffix secondSuffix ∧
     RoutesMeetOnlyAtTails firstSuffix secondSuffix
 
+/-- The four continuous-separation facts needed before restricting the
+allowed endpoint contacts of the local/local and suffix/suffix pairs. -/
+def RelativeSplicedRoutePairAvoidances
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (original :
+      OriginalInheritedCanonicalIncidenceRouteSuffixes
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source))
+        (composedPlacement source sourcePlacement)
+        (normalizedLocalEndpoint source sourcePlacement))
+    (firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat)
+    (relativeTranslate : Cell) : Prop :=
+  let suffixes :=
+    completeRouteSuffixes
+      source sourcePlacement sourceWidth sourceDistinct original
+  let offset :=
+    (composedPlacement source sourcePlacement).translation
+      relativeTranslate
+  let firstLocal :=
+    normalizedLocalRoutes source sourcePlacement
+      firstClauseIndex firstLiteralIndex
+  let secondLocal :=
+    (normalizedLocalRoutes source sourcePlacement
+      secondClauseIndex secondLiteralIndex).map (Cell.add offset)
+  let firstSuffix :=
+    suffixes.routes firstClauseIndex firstLiteralIndex
+  let secondSuffix :=
+    (suffixes.routes
+      secondClauseIndex secondLiteralIndex).map (Cell.add offset)
+  RoutesAvoidEachOther firstLocal secondLocal ∧
+    RoutesStrictlyAvoidEachOther firstLocal secondSuffix ∧
+    RoutesStrictlyAvoidEachOther firstSuffix secondLocal ∧
+    RoutesAvoidEachOther firstSuffix secondSuffix
+
+/-- The five distinct semantic endpoint pairs whose inequality turns
+ordinary separation into the precise head-only and tail-only contact
+conditions needed by splicing.  The translated second route is expressed in
+the first route's canonical anchor gauge. -/
+def RelativeSplicedRouteEndpointPairsSeparated
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (firstClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable)))
+    (firstClauseIndex firstLiteralIndex : Nat)
+    (firstLiteral :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable)))
+    (secondClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable)))
+    (secondClauseIndex secondLiteralIndex : Nat)
+    (secondLiteral :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable)))
+    (relativeTranslate : Cell) : Prop :=
+  let placement := composedPlacement source sourcePlacement
+  let offset := placement.translation relativeTranslate
+  let firstClausePoint :=
+    PositionedPeriodicCNF.canonicalClausePosition placement firstClause
+  let secondClausePoint :=
+    Cell.add offset
+      (PositionedPeriodicCNF.canonicalClausePosition placement secondClause)
+  let firstSplicePoint :=
+    normalizedLocalEndpoint source sourcePlacement
+      firstClauseIndex firstLiteralIndex
+  let secondSplicePoint :=
+    Cell.add offset
+      (normalizedLocalEndpoint source sourcePlacement
+        secondClauseIndex secondLiteralIndex)
+  let firstLiteralPoint :=
+    PositionedPeriodicCNF.canonicalLiteralPosition
+      placement firstClause firstLiteral
+  let secondLiteralPoint :=
+    Cell.add offset
+      (PositionedPeriodicCNF.canonicalLiteralPosition
+        placement secondClause secondLiteral)
+  firstClausePoint ≠ secondSplicePoint ∧
+    firstSplicePoint ≠ secondClausePoint ∧
+    firstSplicePoint ≠ secondSplicePoint ∧
+    firstSplicePoint ≠ secondLiteralPoint ∧
+    firstLiteralPoint ≠ secondSplicePoint
+
+/-- Four route-avoidance facts and five semantic endpoint inequalities imply
+all six component conditions.  In particular, this theorem hides the list
+endpoint bookkeeping and both translated-route endpoint calculations. -/
+theorem relativeSplicedRoutePairComponentsSeparated_of_avoidances_of_endpointPairs
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (original :
+      OriginalInheritedCanonicalIncidenceRouteSuffixes
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source))
+        (composedPlacement source sourcePlacement)
+        (normalizedLocalEndpoint source sourcePlacement))
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (relativeTranslate : Cell)
+    (avoidances :
+      RelativeSplicedRoutePairAvoidances
+        source sourcePlacement sourceWidth sourceDistinct original
+        firstClauseIndex firstLiteralIndex
+        secondClauseIndex secondLiteralIndex relativeTranslate)
+    (endpointPairs :
+      RelativeSplicedRouteEndpointPairsSeparated
+        source sourcePlacement
+        firstClause firstClauseIndex firstLiteralIndex firstLiteral
+        secondClause secondClauseIndex secondLiteralIndex secondLiteral
+        relativeTranslate) :
+    RelativeSplicedRoutePairComponentsSeparated
+      source sourcePlacement sourceWidth sourceDistinct original
+      firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex relativeTranslate := by
+  let suffixes :=
+    completeRouteSuffixes
+      source sourcePlacement sourceWidth sourceDistinct original
+  let offset :=
+    (composedPlacement source sourcePlacement).translation
+      relativeTranslate
+  let firstLocal :=
+    normalizedLocalRoutes source sourcePlacement
+      firstClauseIndex firstLiteralIndex
+  let secondLocal :=
+    (normalizedLocalRoutes source sourcePlacement
+      secondClauseIndex secondLiteralIndex).map (Cell.add offset)
+  let firstSuffix :=
+    suffixes.routes firstClauseIndex firstLiteralIndex
+  let secondSuffix :=
+    (suffixes.routes
+      secondClauseIndex secondLiteralIndex).map (Cell.add offset)
+  have firstLocalEndpoints :=
+    normalizedLocalRoutes_endpoints_of_members
+      source sourcePlacement sourceWidth sourceDistinct
+      firstClauseMember firstLiteralMember
+  have secondLocalEndpoints :=
+    normalizedLocalRoutes_endpoints_of_members
+      source sourcePlacement sourceWidth sourceDistinct
+      secondClauseMember secondLiteralMember
+  have firstSuffixEndpoints :=
+    suffixes.endpoints
+      firstClause firstClauseIndex firstClauseMember
+      firstLiteral firstLiteralIndex firstLiteralMember
+  have secondSuffixEndpoints :=
+    suffixes.endpoints
+      secondClause secondClauseIndex secondClauseMember
+      secondLiteral secondLiteralIndex secondLiteralMember
+  change
+    RoutesAvoidEachOther firstLocal secondLocal ∧
+      RoutesMeetOnlyAtHeads firstLocal secondLocal ∧
+      RoutesStrictlyAvoidEachOther firstLocal secondSuffix ∧
+      RoutesStrictlyAvoidEachOther firstSuffix secondLocal ∧
+      RoutesAvoidEachOther firstSuffix secondSuffix ∧
+      RoutesMeetOnlyAtTails firstSuffix secondSuffix
+  change
+    RoutesAvoidEachOther firstLocal secondLocal ∧
+      RoutesStrictlyAvoidEachOther firstLocal secondSuffix ∧
+      RoutesStrictlyAvoidEachOther firstSuffix secondLocal ∧
+      RoutesAvoidEachOther firstSuffix secondSuffix at avoidances
+  rcases avoidances with
+    ⟨localsAvoid, firstLocalSecondSuffix,
+      firstSuffixSecondLocal, suffixesAvoid⟩
+  rcases endpointPairs with
+    ⟨firstClauseSecondSplice, firstSpliceSecondClause,
+      splicePointsDistinct, firstSpliceSecondLiteral,
+      firstLiteralSecondSplice⟩
+  refine
+    ⟨localsAvoid, ?_, firstLocalSecondSuffix,
+      firstSuffixSecondLocal, suffixesAvoid, ?_⟩
+  · apply localsAvoid.meetOnlyAtHeads_of_endpoints_ne
+    · simp only [firstLocal, secondLocal,
+        firstLocalEndpoints.1, secondLocalEndpoints.2,
+        List.getLast?_map, Option.map_some]
+      exact fun equal => firstClauseSecondSplice (Option.some.inj equal)
+    · simp only [firstLocal, secondLocal,
+        firstLocalEndpoints.2, secondLocalEndpoints.1,
+        List.head?_map, Option.map_some]
+      exact fun equal => firstSpliceSecondClause (Option.some.inj equal)
+    · simp only [firstLocal, secondLocal,
+        firstLocalEndpoints.2, secondLocalEndpoints.2,
+        List.getLast?_map, Option.map_some]
+      exact fun equal => splicePointsDistinct (Option.some.inj equal)
+  · apply suffixesAvoid.meetOnlyAtTails_of_endpoints_ne
+    · simp only [firstSuffix, secondSuffix,
+        firstSuffixEndpoints.1, secondSuffixEndpoints.1,
+        List.head?_map, Option.map_some]
+      exact fun equal => splicePointsDistinct (Option.some.inj equal)
+    · simp only [firstSuffix, secondSuffix,
+        firstSuffixEndpoints.1, secondSuffixEndpoints.2,
+        List.getLast?_map, Option.map_some]
+      exact fun equal => firstSpliceSecondLiteral (Option.some.inj equal)
+    · simp only [firstSuffix, secondSuffix,
+        firstSuffixEndpoints.2, secondSuffixEndpoints.1,
+        List.head?_map, Option.map_some]
+      exact fun equal => firstLiteralSecondSplice (Option.some.inj equal)
+
 /-- Relative component separation implies separation of the first complete
 route from the translated second complete route. -/
 theorem splicedRoutes_relative_avoidEachOther_of_components
