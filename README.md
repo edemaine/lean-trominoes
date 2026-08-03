@@ -476,6 +476,14 @@ The representation choices for this target are:
   preserves first-endpoint isolation.  A final inherited/auxiliary
   classification proves both endpoint-isolation properties for every genuine
   Figure 9 incidence.
+  [`LeanTrominoes/EmbeddedCNFIncidenceDrawingTwoPointRoutes.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingTwoPointRoutes.lean),
+  [`LeanTrominoes/PlanarOneInThreeFigureNineTwoPointRoutes.lean`](LeanTrominoes/PlanarOneInThreeFigureNineTwoPointRoutes.lean), and
+  [`LeanTrominoes/PeriodicOneInThreePositionedTwoPointRoutes.lean`](LeanTrominoes/PeriodicOneInThreePositionedTwoPointRoutes.lean)
+  isolate the only degenerate source-route case needed by the next reduction.
+  Finite checks show that every two-point auxiliary Figure 9 route is
+  vertical; inherited original-variable routes either have at least three
+  points or inherit the same vertical exception.  Scaling, anchor
+  normalization, and complete route splicing preserve this dichotomy.
   [`LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean`](LeanTrominoes/PeriodicCNFPlanarOneInThreeNoUnitsPositioned.lean)
   places the final unit-elimination gadgets in constant-size refinements of
   those exact-one clause cells.  Erasing positions is exactly the verified
@@ -539,6 +547,15 @@ The representation choices for this target are:
   first exits can therefore be lifted through unit elimination, with the
   selector carrying source-occurrence provenance; the concrete wrapped
   Figure 9 family supplies the first-exit certificate.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSuffixIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSuffixIsolation.lean),
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamilyIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamilyIsolation.lean), and
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSplicedRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSplicedRouteIsolation.lean)
+  lift final-endpoint isolation through head replacement, the proof-backed
+  inherited selector, and the complete local-plus-suffix splice.  The local
+  unit-elimination prefix misses the transformed source endpoint because the
+  former lies strictly between scale-six grid lines while the latter lies on
+  their lattice.  The resulting theorem covers both inherited and auxiliary
+  incidences.
   [`LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean`](LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean)
   proves that completing either transformation's inherited suffix family and
   prepending its normalized local clause route preserves the inherited
@@ -2732,6 +2749,16 @@ The representation choices for this target are:
   canonical endpoints, is orthogonal, and realizes every incidence-graph
   edge.  Thus the coordinated geometry is now threaded through the full
   exact-one route pipeline.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeTwoPointRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeTwoPointRoutes.lean)
+  specializes the Figure 9 two-point invariant to the raw coordinated family
+  and transports it through opaque variable wrapping.  Thus any wrapped
+  route whose first exit is already its final endpoint is necessarily a
+  vertical segment.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRouteIsolation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRouteIsolation.lean)
+  combines wrapped endpoint isolation with that vertical exception and the
+  scale-six local-prefix separation theorem.  Every route in the concrete
+  final unit-free exact-one family now has an isolated variable endpoint
+  after unit subdivision, including the one-segment edge case.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean)
   transports the normalized coordinated clockwise variable-route order
   through Figure 9, opaque wrapping, and unit elimination.  It also proves
