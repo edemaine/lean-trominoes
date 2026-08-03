@@ -2253,7 +2253,13 @@ The representation choices for this target are:
   transports that relative-shift predicate through the lossless flat route
   enumeration.  The remaining geometry can therefore quantify over genuine
   metadata-rich clause/literal incidences while retaining exactly the route
-  indices used to distinguish periodic occurrences.
+  indices used to distinguish periodic occurrences.  It also transports
+  relative separation through pointwise orthogonal loop erasure.
+- [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
+  proves the translation covariance needed by that transport.  Walk
+  `dropUntil` and `bypass` commute with injective graph maps, hence translating
+  an orthogonal lattice route before normalization exactly translates the
+  resulting simple unit path.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean)
   discharges both endpoint-isolation obligations for every fresh auxiliary
   incidence in the final unit-elimination layer.  The completed auxiliary
@@ -2320,8 +2326,10 @@ The representation choices for this target are:
   canonical endpoints, is a geometrically simple unit-step path, and the
   assembled drawing is orthogonal, endpoint-compatible, and integer-grid
   planar.  Simplicity is also lifted from genuine incidences to every stored
-  route, and complete separation of distinct lifted routes is now the single
-  premise that packages the drawing as ribbon-ready.  The drawing is
+  route, and relative separation of the genuine raw incidence routes is now
+  the single premise that packages the normalized drawing as ribbon-ready;
+  translation-equivariant loop erasure transports that premise automatically.
+  The drawing is
   identified with drawing-level normalization of the preceding coordinated
   exact-one drawing for later certificate transport.
 - [`LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean`](LeanTrominoes/RetainedFinalFlatCorridorComponentCases.lean)

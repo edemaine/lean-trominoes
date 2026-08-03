@@ -574,5 +574,67 @@ theorem
         source)
       separated
 
+/-- It is enough to establish relative separation before final loop erasure.
+Canonical endpoints make every genuine raw route nonempty, and the raw
+construction already supplies the orthogonality needed by the generic
+normalization transport theorem. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_isRibbonReady_of_rawRelativeIncidenceRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (separated :
+      PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+          source)
+        (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsPlacement
+          source)
+        (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty)) :
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).IsRibbonReady := by
+  apply
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_isRibbonReady_of_relativeIncidenceRoutesAvoidEachOther
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  apply separated.normalizeOrthogonalIncidenceRoutes
+  · intro incidence incidenceMember
+    rcases PositionedPeriodicCNF.incidenceMetadata_of_tagged
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+          source)
+        incidenceMember with
+      ⟨clause, literal, clauseMember, literalMember,
+        _incidenceEqual⟩
+    have valid :=
+      retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_valid
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+    intro routeEmpty
+    have headNonempty := valid.1
+    have routeEmpty' :
+        retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty incidence.1.clauseIndex
+            incidence.1.literalIndex = [] := by
+      simpa using routeEmpty
+    simp [routeEmpty'] at headNonempty
+  · intro incidence incidenceMember
+    rcases PositionedPeriodicCNF.incidenceMetadata_of_tagged
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+          source)
+        incidenceMember with
+      ⟨clause, literal, clauseMember, literalMember,
+        _incidenceEqual⟩
+    exact
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_valid
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember).2.2
+
 end PeriodicOrthocrossing
 end LeanTrominoes
