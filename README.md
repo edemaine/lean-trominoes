@@ -2332,6 +2332,11 @@ The representation choices for this target are:
   canonical center, so every direct source-to-boundary route whose
   source-segment envelope excludes that center is strictly separated from
   the suffix.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSourceCorridorSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSourceCorridorSeparation.lean)
+  upgrades periodic retained-source planarity to strict separation whenever
+  the relative shift and canonical targets are both distinct.  In the aligned
+  direct/failed-choice case this yields the translated source-prefix corridor
+  required by the final fallback-boundary assembly.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
