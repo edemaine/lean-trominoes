@@ -2320,6 +2320,12 @@ The representation choices for this target are:
   through the terminal refinement before positioning the translated outer
   fan.  This exposes translated fallback routes by the same geometric pieces
   used in the within-cell separation proof.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSourceModels.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSourceModels.lean)
+  gives the public failed-selector route an exact periodic model: the same
+  singleton-prefix policy rebuilds its ordinary or delayed-lane boundary from
+  the translated retained source route, then joins the translated unchanged
+  Figure 7 suffix.  The fully refined drawing period is identified with the
+  terminal refinement of the source-scaled semantic period.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
