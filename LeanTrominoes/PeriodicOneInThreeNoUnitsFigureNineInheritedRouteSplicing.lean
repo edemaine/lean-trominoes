@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineHeadReplacement
+import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
 import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineInheritedEndpoints
 import LeanTrominoes.PositionedPeriodicCNFOrthogonalIncidenceRoutes
@@ -41,6 +42,69 @@ def inheritedSourceRouteShift
     (Cell.scale composedGadgetScale
       (PositionedPeriodicCNF.canonicalClausePosition
         sourcePlacement sourceClause))
+
+/-- For the actual twice-refined placement, the inherited-route shift is a
+whole output-period translation: it is exactly the difference between the
+original source-clause anchor and the final generated-clause anchor. -/
+theorem inheritedSourceRouteShift_composedPlacement
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))) :
+    inheritedSourceRouteShift
+        (composedPlacement source sourcePlacement)
+        sourcePlacement sourceClause generatedClause =
+      (composedPlacement source sourcePlacement).translation
+        (Cell.sub
+          (PeriodicCNF.clauseAnchor sourceClause.literals)
+          (PeriodicCNF.clauseAnchor generatedClause.literals)) := by
+  apply Prod.ext <;>
+    simp [inheritedSourceRouteShift,
+      normalizedSourceClausePosition,
+      PositionedPeriodicCNF.canonicalClausePosition,
+      composedPlacement,
+      PeriodicOneInThreeNoUnitsPositioned.placement,
+      PeriodicOneInThreePositioned.placement,
+      PeriodicVariablePlacement.translation,
+      composedGadgetScale, PlanarOneInThree.gadgetScale,
+      PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+      Cell.sub, Cell.scale] <;>
+    ring
+
+/-- Whole-period gauge used to express an inherited source route in one
+generated clause's canonical representative. -/
+def inheritedSourceRouteGauge
+    {Variable : Type*}
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))) : Cell :=
+  Cell.sub
+    (PeriodicCNF.clauseAnchor sourceClause.literals)
+    (PeriodicCNF.clauseAnchor generatedClause.literals)
+
+/-- Source-level relative translation corresponding to a comparison of two
+generated-clause gauges at the requested output translation. -/
+def inheritedSourceRelativeTranslate
+    {Variable : Type*}
+    (firstSourceClause secondSourceClause :
+      PositionedPeriodicClause Variable)
+    (firstGeneratedClause secondGeneratedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (relativeTranslate : Cell) : Cell :=
+  Cell.sub
+    (Cell.add relativeTranslate
+      (inheritedSourceRouteGauge
+        secondSourceClause secondGeneratedClause))
+    (inheritedSourceRouteGauge
+      firstSourceClause firstGeneratedClause)
 
 /-- An original source incidence route, refined by the combined factor and
 expressed in a final generated clause's canonical anchor gauge. -/
@@ -249,6 +313,160 @@ theorem inheritedSourceRoute_tail_head?
           outputPlacement sourcePlacement sourceClause generatedClause))
       (List.tail_head?_map
         (Cell.scale composedGadgetScale) sourceTailHead)
+
+/-- Relative separation of two source routes survives their common
+factor-`72` refinement and their two possibly different output gauges.  The
+single displayed equality is the affine bookkeeping needed to identify the
+translated second transformed route with the transformed source comparison.
+-/
+theorem inheritedSourceRoutes_relative_avoidEachOther_of_source
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (firstSourceClause secondSourceClause :
+      PositionedPeriodicClause Variable)
+    (firstGeneratedClause secondGeneratedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (firstSourceRoute secondSourceRoute : List Cell)
+    (sourceOffset outputOffset : Cell)
+    (sourceAvoids :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        firstSourceRoute
+        (secondSourceRoute.map (Cell.add sourceOffset)))
+    (offsetsAgree :
+      Cell.add
+          (inheritedSourceRouteShift
+            outputPlacement sourcePlacement firstSourceClause
+            firstGeneratedClause)
+          (Cell.scale composedGadgetScale sourceOffset) =
+        Cell.add outputOffset
+          (inheritedSourceRouteShift
+            outputPlacement sourcePlacement secondSourceClause
+            secondGeneratedClause)) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (inheritedSourceRoute
+        outputPlacement sourcePlacement firstSourceClause
+        firstGeneratedClause firstSourceRoute)
+      ((inheritedSourceRoute
+          outputPlacement sourcePlacement secondSourceClause
+          secondGeneratedClause secondSourceRoute).map
+        (Cell.add outputOffset)) := by
+  have factorPositive : 0 < composedGadgetScale := by
+    simp [composedGadgetScale, PlanarOneInThree.gadgetScale,
+      PeriodicOneInThreeNoUnitsPositioned.gadgetScale]
+  have scaled := sourceAvoids.scalePolyline factorPositive
+  have translated :=
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesAvoidEachOther_translate
+      scaled
+      (inheritedSourceRouteShift
+        outputPlacement sourcePlacement firstSourceClause
+        firstGeneratedClause)
+  have secondRouteEq :
+      PeriodicOrthocrossing.translatePolyline
+          (inheritedSourceRouteShift
+            outputPlacement sourcePlacement firstSourceClause
+            firstGeneratedClause)
+          (scalePolyline composedGadgetScale
+            (secondSourceRoute.map (Cell.add sourceOffset))) =
+        (inheritedSourceRoute
+            outputPlacement sourcePlacement secondSourceClause
+            secondGeneratedClause secondSourceRoute).map
+          (Cell.add outputOffset) := by
+    simp only [inheritedSourceRoute,
+      PeriodicOrthocrossing.translatePolyline, scalePolyline,
+      List.map_map]
+    apply List.map_congr_left
+    intro point _pointMember
+    apply Prod.ext <;>
+      simp [Cell.add, Cell.scale, composedGadgetScale,
+        PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale]
+        at offsetsAgree ⊢ <;>
+      omega
+  change
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (PeriodicOrthocrossing.translatePolyline
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement firstSourceClause
+          firstGeneratedClause)
+        (scalePolyline composedGadgetScale firstSourceRoute))
+      (PeriodicOrthocrossing.translatePolyline
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement firstSourceClause
+          firstGeneratedClause)
+        (scalePolyline composedGadgetScale
+          (secondSourceRoute.map (Cell.add sourceOffset)))) at translated
+  rw [secondRouteEq] at translated
+  simpa [inheritedSourceRoute] using translated
+
+/-- The concrete twice-refined placement automatically satisfies the affine
+side condition of `inheritedSourceRoutes_relative_avoidEachOther_of_source`.
+Thus transformed inherited cores are relatively separated whenever their
+source routes are separated at the anchor-adjusted source translation. -/
+theorem inheritedSourceRoutes_relative_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (firstSourceClause secondSourceClause :
+      PositionedPeriodicClause Variable)
+    (firstGeneratedClause secondGeneratedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (firstSourceRoute secondSourceRoute : List Cell)
+    (relativeTranslate : Cell)
+    (sourceAvoids :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        firstSourceRoute
+        (secondSourceRoute.map
+          (Cell.add
+            (sourcePlacement.translation
+              (inheritedSourceRelativeTranslate
+                firstSourceClause secondSourceClause
+                firstGeneratedClause secondGeneratedClause
+                relativeTranslate))))) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (inheritedSourceRoute
+        (composedPlacement source sourcePlacement)
+        sourcePlacement firstSourceClause firstGeneratedClause
+        firstSourceRoute)
+      ((inheritedSourceRoute
+          (composedPlacement source sourcePlacement)
+          sourcePlacement secondSourceClause secondGeneratedClause
+          secondSourceRoute).map
+        (Cell.add
+          ((composedPlacement source sourcePlacement).translation
+            relativeTranslate))) := by
+  apply inheritedSourceRoutes_relative_avoidEachOther_of_source
+    (sourceOffset :=
+      sourcePlacement.translation
+        (inheritedSourceRelativeTranslate
+          firstSourceClause secondSourceClause
+          firstGeneratedClause secondGeneratedClause
+          relativeTranslate))
+    (outputOffset :=
+      (composedPlacement source sourcePlacement).translation
+        relativeTranslate)
+    <;> try assumption
+  rw [inheritedSourceRouteShift_composedPlacement,
+    inheritedSourceRouteShift_composedPlacement]
+  apply Prod.ext <;>
+    simp [inheritedSourceRelativeTranslate,
+      inheritedSourceRouteGauge,
+      composedPlacement,
+      PeriodicOneInThreeNoUnitsPositioned.placement,
+      PeriodicOneInThreePositioned.placement,
+      PeriodicVariablePlacement.translation,
+      composedGadgetScale,
+      PlanarOneInThree.gadgetScale,
+      PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+      Cell.add, Cell.sub, Cell.scale] <;>
+    ring
 
 /-- Attach a composed boundary port directly to the transformed first exit
 of an original source route. -/

@@ -5609,6 +5609,12 @@ The representation choices for this target are:
   splices each connector directly to the scaled inherited unit-step route.
   The splice has exact endpoints and orthogonality, while common translation
   preserves the fan's certified pairwise strict separation.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean)
+  now also transports relative continuous separation through the combined
+  factor-72 refinement and the two generated-clause anchor gauges, reducing
+  transformed inherited-core separation to the original source certificate
+  at an explicit anchor-adjusted lattice offset; the affine identity is
+  discharged for the concrete composed placement.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily.lean)
   recovers each twice-inherited original occurrence from the composed
   metadata, converts its index to a certified three-port fan slot, and
