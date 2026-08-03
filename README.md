@@ -506,12 +506,16 @@ The representation choices for this target are:
   global output incidence and proves all such local routes orthogonal and
   continuously simple under the same width-three and atom-distinct
   hypotheses.  Distinct finite gadget vertices also prove that every genuine
-  local route contains at least one edge.
+  local route contains at least one edge.  Any two distinct incidences in one
+  source-clause block inherit complete continuous separation from the same
+  certified finite drawing.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean)
   supplies the analogous canonical-gauge endpoints, orthogonality, and
   continuous-simplicity theorems for unit elimination.  Its
   inherited-variable endpoints are the precise splice boundary, while its
-  new auxiliary endpoints are already final.
+  new auxiliary endpoints are already final.  Every generated clause retains
+  its source block's periodic anchor, so the same-block pairwise separation
+  theorem survives canonical-gauge normalization.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean)
   identifies the exact source scope and source-anchor offset of every fresh
   unit-elimination auxiliary literal.

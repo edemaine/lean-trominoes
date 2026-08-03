@@ -357,5 +357,181 @@ theorem localRoutes_isSimple_of_members
   simpa [localRoutes, metadataLookup, drawing] using
     selectedSimple
 
+/-- Two distinct selected incidences in the same source-clause replacement
+block inherit complete continuous separation from their common certified
+finite unit-elimination drawing. -/
+theorem localRoutes_avoidEachOther_of_members_of_same_source
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {firstClause secondClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (OneInThreeNoUnitVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    {firstMetadata secondMetadata : ClauseMetadata Variable}
+    (firstLookup :
+      (formulaClauseMetadata source)[firstClauseIndex]? =
+        some firstMetadata)
+    (secondLookup :
+      (formulaClauseMetadata source)[secondClauseIndex]? =
+        some secondMetadata)
+    (sameSource :
+      firstMetadata.sourceClauseIndex =
+        secondMetadata.sourceClauseIndex)
+    (localIncidencesDistinct :
+      firstMetadata.localClauseIndex ≠
+          secondMetadata.localClauseIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (localRoutes source firstClauseIndex firstLiteralIndex)
+      (localRoutes source secondClauseIndex secondLiteralIndex) := by
+  rcases formulaClauseMetadata_lookup_valid
+      source firstClauseMember with
+    ⟨actualFirst, actualFirstLookup, firstClauseEqual,
+      firstSourceMember, firstLocalMember⟩
+  have actualFirstEqual : actualFirst = firstMetadata := by
+    apply Option.some.inj
+    exact actualFirstLookup.symm.trans firstLookup
+  subst actualFirst
+  rcases formulaClauseMetadata_lookup_valid
+      source secondClauseMember with
+    ⟨actualSecond, actualSecondLookup, secondClauseEqual,
+      secondSourceMember, secondLocalMember⟩
+  have actualSecondEqual : actualSecond = secondMetadata := by
+    apply Option.some.inj
+    exact actualSecondLookup.symm.trans secondLookup
+  subst actualSecond
+  have taggedSourcesEqual :
+      (firstMetadata.sourceClause,
+          firstMetadata.sourceClauseIndex) =
+        (secondMetadata.sourceClause,
+          secondMetadata.sourceClauseIndex) :=
+    PeriodicOrthocrossing.tagged_eq_of_mem_zipIdx_of_snd_eq
+      firstSourceMember secondSourceMember sameSource
+  have sourceClausesEqual :
+      firstMetadata.sourceClause =
+        secondMetadata.sourceClause :=
+    congrArg Prod.fst taggedSourcesEqual
+  have firstSourceClauseMember :
+      firstMetadata.sourceClause ∈ source.clauses :=
+    List.fst_mem_of_mem_zipIdx firstSourceMember
+  have firstWidth :
+      firstMetadata.sourceClause.literals.length ≤ 3 := by
+    apply sourceWidth firstMetadata.sourceClause.literals
+    exact List.mem_map.mpr
+      ⟨firstMetadata.sourceClause,
+        firstSourceClauseMember, rfl⟩
+  have firstDistinct :
+      firstMetadata.sourceClause.AtomsNodup :=
+    sourceDistinct firstMetadata.sourceClause
+      firstSourceClauseMember
+  let firstDrawing :=
+    PlanarOneInThreeNoUnits.instantiatedDrawing
+      firstMetadata.sourceClauseIndex
+      firstMetadata.sourceClause
+  let secondDrawing :=
+    PlanarOneInThreeNoUnits.instantiatedDrawing
+      secondMetadata.sourceClauseIndex
+      secondMetadata.sourceClause
+  have drawingsEqual : firstDrawing = secondDrawing := by
+    simp [firstDrawing, secondDrawing,
+      sameSource, sourceClausesEqual]
+  have firstDrawingFormula :
+      firstDrawing.formula =
+        (clauseGadget firstMetadata.sourceClauseIndex
+          firstMetadata.sourceClause).map
+            PlanarOneInThreeNoUnits.embedPositionedClause :=
+    PlanarOneInThreeNoUnits.instantiatedDrawing_formula
+      firstMetadata.sourceClauseIndex
+      firstMetadata.sourceClause firstWidth
+  have secondWidth :
+      secondMetadata.sourceClause.literals.length ≤ 3 := by
+    simpa [← sourceClausesEqual] using firstWidth
+  have secondDrawingFormula :
+      secondDrawing.formula =
+        (clauseGadget secondMetadata.sourceClauseIndex
+          secondMetadata.sourceClause).map
+            PlanarOneInThreeNoUnits.embedPositionedClause :=
+    PlanarOneInThreeNoUnits.instantiatedDrawing_formula
+      secondMetadata.sourceClauseIndex
+      secondMetadata.sourceClause secondWidth
+  have firstEmbeddedClauseMember :
+      (PlanarOneInThreeNoUnits.embedPositionedClause
+          firstMetadata.clause,
+        firstMetadata.localClauseIndex) ∈
+        firstDrawing.formula.zipIdx := by
+    rw [firstDrawingFormula, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(firstMetadata.clause,
+          firstMetadata.localClauseIndex),
+        firstLocalMember, rfl⟩
+  have secondEmbeddedClauseMember :
+      (PlanarOneInThreeNoUnits.embedPositionedClause
+          secondMetadata.clause,
+        secondMetadata.localClauseIndex) ∈
+        secondDrawing.formula.zipIdx := by
+    rw [secondDrawingFormula, List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(secondMetadata.clause,
+          secondMetadata.localClauseIndex),
+        secondLocalMember, rfl⟩
+  have firstMetadataLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstMetadata.clause.literals.zipIdx := by
+    simpa [firstClauseEqual] using firstLiteralMember
+  have secondMetadataLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondMetadata.clause.literals.zipIdx := by
+    simpa [secondClauseEqual] using secondLiteralMember
+  have firstEmbeddedLiteralMember :
+      ((firstLiteral.atom, firstLiteral.value),
+          firstLiteralIndex) ∈
+        (PlanarOneInThreeNoUnits.embedPositionedClause
+          firstMetadata.clause).literals.zipIdx := by
+    unfold PlanarOneInThreeNoUnits.embedPositionedClause
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(firstLiteral, firstLiteralIndex),
+        firstMetadataLiteralMember, rfl⟩
+  have secondEmbeddedLiteralMember :
+      ((secondLiteral.atom, secondLiteral.value),
+          secondLiteralIndex) ∈
+        (PlanarOneInThreeNoUnits.embedPositionedClause
+          secondMetadata.clause).literals.zipIdx := by
+    unfold PlanarOneInThreeNoUnits.embedPositionedClause
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(secondLiteral, secondLiteralIndex),
+        secondMetadataLiteralMember, rfl⟩
+  have firstDrawingValid : firstDrawing.IsValid :=
+    PlanarOneInThreeNoUnits.instantiatedDrawing_isValid
+      firstMetadata.sourceClauseIndex
+      firstMetadata.sourceClause firstWidth firstDistinct
+  rw [← drawingsEqual] at secondEmbeddedClauseMember
+  have selectedSeparated :=
+    firstDrawing.embeddedRoutes_avoidEachOther_of_members
+      firstDrawingValid.2.2
+      firstEmbeddedClauseMember secondEmbeddedClauseMember
+      firstEmbeddedLiteralMember secondEmbeddedLiteralMember
+      localIncidencesDistinct
+  simpa [localRoutes, firstLookup, secondLookup,
+    firstDrawing, secondDrawing, ← drawingsEqual] using
+      selectedSeparated
+
 end PeriodicOneInThreeNoUnitsPositioned
 end LeanTrominoes

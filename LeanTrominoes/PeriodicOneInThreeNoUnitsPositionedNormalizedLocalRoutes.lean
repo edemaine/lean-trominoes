@@ -305,5 +305,160 @@ theorem normalizedLocalRoutes_isSimple_of_members
   simpa [normalizedLocalRoutes, metadataLookup,
     normalizedRouteEqual] using translatedSimple
 
+/-- Distinct incidences in one source-clause block remain completely
+separated after their common periodic-anchor normalization. -/
+theorem normalizedLocalRoutes_avoidEachOther_of_members_of_same_source
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {firstClause secondClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (OneInThreeNoUnitVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    {firstMetadata secondMetadata : ClauseMetadata Variable}
+    (firstLookup :
+      (formulaClauseMetadata source)[firstClauseIndex]? =
+        some firstMetadata)
+    (secondLookup :
+      (formulaClauseMetadata source)[secondClauseIndex]? =
+        some secondMetadata)
+    (sameSource :
+      firstMetadata.sourceClauseIndex =
+        secondMetadata.sourceClauseIndex)
+    (localIncidencesDistinct :
+      firstMetadata.localClauseIndex ≠
+          secondMetadata.localClauseIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (normalizedLocalRoutes source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+      (normalizedLocalRoutes source sourcePlacement
+        secondClauseIndex secondLiteralIndex) := by
+  rcases formulaClauseMetadata_lookup_valid
+      source firstClauseMember with
+    ⟨actualFirst, actualFirstLookup, firstClauseEqual,
+      firstSourceMember, firstLocalMember⟩
+  have actualFirstEqual : actualFirst = firstMetadata := by
+    apply Option.some.inj
+    exact actualFirstLookup.symm.trans firstLookup
+  subst actualFirst
+  rcases formulaClauseMetadata_lookup_valid
+      source secondClauseMember with
+    ⟨actualSecond, actualSecondLookup, secondClauseEqual,
+      secondSourceMember, secondLocalMember⟩
+  have actualSecondEqual : actualSecond = secondMetadata := by
+    apply Option.some.inj
+    exact actualSecondLookup.symm.trans secondLookup
+  subst actualSecond
+  have taggedSourcesEqual :
+      (firstMetadata.sourceClause,
+          firstMetadata.sourceClauseIndex) =
+        (secondMetadata.sourceClause,
+          secondMetadata.sourceClauseIndex) :=
+    PeriodicOrthocrossing.tagged_eq_of_mem_zipIdx_of_snd_eq
+      firstSourceMember secondSourceMember sameSource
+  have sourceClausesEqual :
+      firstMetadata.sourceClause =
+        secondMetadata.sourceClause :=
+    congrArg Prod.fst taggedSourcesEqual
+  have firstGeneratedMember :
+      firstMetadata.clause.literals ∈
+        PeriodicOneInThreeNoUnits.clauseClauses
+          firstMetadata.sourceClauseIndex
+          firstMetadata.sourceClause.literals := by
+    rw [← clauseGadget_literals]
+    exact List.mem_map.mpr
+      ⟨firstMetadata.clause,
+        List.fst_mem_of_mem_zipIdx firstLocalMember, rfl⟩
+  have secondGeneratedMember :
+      secondMetadata.clause.literals ∈
+        PeriodicOneInThreeNoUnits.clauseClauses
+          secondMetadata.sourceClauseIndex
+          secondMetadata.sourceClause.literals := by
+    rw [← clauseGadget_literals]
+    exact List.mem_map.mpr
+      ⟨secondMetadata.clause,
+        List.fst_mem_of_mem_zipIdx secondLocalMember, rfl⟩
+  have firstAnchor :=
+    PeriodicOneInThreeNoUnits.clauseAnchor_eq_of_mem_clauseClauses
+      firstMetadata.sourceClauseIndex
+      firstMetadata.sourceClause.literals
+      firstMetadata.clause.literals firstGeneratedMember
+  have secondAnchor :=
+    PeriodicOneInThreeNoUnits.clauseAnchor_eq_of_mem_clauseClauses
+      secondMetadata.sourceClauseIndex
+      secondMetadata.sourceClause.literals
+      secondMetadata.clause.literals secondGeneratedMember
+  have anchorsEqual :
+      PeriodicCNF.clauseAnchor firstMetadata.clause.literals =
+        PeriodicCNF.clauseAnchor secondMetadata.clause.literals := by
+    rw [sourceClausesEqual] at firstAnchor
+    simpa [PeriodicCNF.clauseAnchor,
+      PeriodicOneInThree.anchor] using
+      firstAnchor.trans secondAnchor.symm
+  have rawSeparated :=
+    localRoutes_avoidEachOther_of_members_of_same_source
+      source sourceWidth sourceDistinct
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      firstLookup secondLookup sameSource
+      localIncidencesDistinct
+  let anchor :=
+    (placement source sourcePlacement).translation
+      (PeriodicCNF.clauseAnchor
+        firstMetadata.clause.literals)
+  have translatedSeparated :=
+    EmbeddedCNFIncidenceDrawing.routesAvoidEachOther_translate
+      rawSeparated (Cell.scale (-1) anchor)
+  have firstNormalizedEqual :
+      PositionedPeriodicCNF.normalizeIncidenceRoute
+          (placement source sourcePlacement)
+          firstMetadata.clause
+          (localRoutes source firstClauseIndex
+            firstLiteralIndex) =
+        (localRoutes source firstClauseIndex
+          firstLiteralIndex).map
+            (Cell.add (Cell.scale (-1) anchor)) := by
+    unfold PositionedPeriodicCNF.normalizeIncidenceRoute
+    apply List.map_congr_left
+    intro point pointMember
+    apply Prod.ext <;>
+      simp [anchor, Cell.sub, Cell.add, Cell.scale,
+        sub_eq_add_neg, add_comm]
+  have secondNormalizedEqual :
+      PositionedPeriodicCNF.normalizeIncidenceRoute
+          (placement source sourcePlacement)
+          secondMetadata.clause
+          (localRoutes source secondClauseIndex
+            secondLiteralIndex) =
+        (localRoutes source secondClauseIndex
+          secondLiteralIndex).map
+            (Cell.add (Cell.scale (-1) anchor)) := by
+    unfold PositionedPeriodicCNF.normalizeIncidenceRoute
+    apply List.map_congr_left
+    intro point pointMember
+    apply Prod.ext <;>
+      simp [anchor, anchorsEqual, Cell.sub, Cell.add,
+        Cell.scale, sub_eq_add_neg, add_comm]
+  simpa [normalizedLocalRoutes, firstLookup, secondLookup,
+    firstNormalizedEqual, secondNormalizedEqual] using
+      translatedSeparated
+
 end PeriodicOneInThreeNoUnitsPositioned
 end LeanTrominoes

@@ -69,6 +69,35 @@ def clauseClauses {Variable : Type*} (clauseIndex : Nat)
   | first :: second :: rest =>
       [(first :: second :: rest).map liftLiteral]
 
+/-- Every clause in one unit-elimination block retains the source clause's
+periodic anchor. -/
+theorem clauseAnchor_eq_of_mem_clauseClauses
+    {Variable : Type*} (clauseIndex : Nat)
+    (source : PeriodicClause Variable)
+    (generated :
+      PeriodicClause (OneInThreeNoUnitVariable Variable))
+    (generatedMember :
+      generated ∈ clauseClauses clauseIndex source) :
+    PeriodicOneInThree.anchor generated =
+      PeriodicOneInThree.anchor source := by
+  cases source with
+  | nil =>
+      simp [clauseClauses,
+        auxiliary, PeriodicOneInThree.anchor] at generatedMember ⊢
+      rcases generatedMember with rfl | rfl | rfl <;> rfl
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp [clauseClauses,
+            auxiliary, PeriodicOneInThree.anchor,
+            liftLiteral] at generatedMember ⊢
+          rcases generatedMember with rfl | rfl <;> rfl
+      | cons second tail =>
+          simp [clauseClauses, PeriodicOneInThree.anchor,
+            liftLiteral] at generatedMember ⊢
+          subst generated
+          rfl
+
 /-- Eliminate every unit clause in a finite periodic presentation. -/
 def formula {Variable : Type*} (source : PeriodicCNF Variable) :
     PeriodicCNF (OneInThreeNoUnitVariable Variable) where
