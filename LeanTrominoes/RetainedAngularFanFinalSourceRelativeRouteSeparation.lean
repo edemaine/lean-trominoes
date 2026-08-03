@@ -1,7 +1,7 @@
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedRibbonReady
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedPeriodicContinuousPlanarity
 import LeanTrominoes.PeriodicOrthocrossingRetainedPlanarSATGaugedTerminalDirections
-import LeanTrominoes.PositionedPeriodicCNFRelativeRouteSeparation
+import LeanTrominoes.PositionedPeriodicCNFRelativeRouteSeparationScaling
 
 /-!
 # Relative separation of the retained pre-split source routes
@@ -141,6 +141,30 @@ theorem
         source placement routes periodPositive]
   rw [translationEqual] at avoids
   exact avoids
+
+/-- Positive source-clearance scaling preserves complete separation of every
+pair of retained pre-split periodic route occurrences. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_scaled_relativeAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (clausesNonempty :
+      ∀ clause ∈ retainedDrawingPlanarSATFormula formula,
+        clause.literals ≠ [])
+    {factor : Nat} (factorPositive : 0 < factor) :
+    PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther
+      ((retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula).scale factor)
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula).scale
+        factor)
+      (PositionedPeriodicCNF.scaleIncidenceRoutes factor
+        (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+          formula)) :=
+  (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_relativeAvoidEachOther
+    formula wellFormed degree isLocal clausesNonempty).scale factorPositive
 
 end PeriodicOrthocrossing
 end LeanTrominoes

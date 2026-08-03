@@ -2271,13 +2271,20 @@ The representation choices for this target are:
   flattened incidence indices are reflected to distinct clause/literal
   coordinates, and the relative obligation is decomposed into distinct
   zero-shift incidences versus arbitrary incidences at nonzero lattice shifts.
+- [`LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparationScaling.lean`](LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparationScaling.lean)
+  proves that the metadata-rich relative certificate survives every positive
+  integral coordinate refinement.  Scaling leaves the logical incidence
+  enumeration unchanged and commutes with semantic period translation, while
+  injectivity of positive scaling transports all four continuous route-contact
+  conditions.
 - [`LeanTrominoes/RetainedAngularFanFinalSourceRelativeRouteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalSourceRelativeRouteSeparation.lean)
   packages the retained pre-split drawing's global continuous planarity,
   endpoint-only contacts, segment-endpoint/interior avoidance, and
   nondegenerate route lengths into complete separation for every pair of
-  periodic incidence occurrences.  This supplies the metadata-rich relative
-  source certificate needed to transport inherited route geometry through
-  scaling, clause-direction ordering, and the later exact-one splices.
+  periodic incidence occurrences, including after any positive source
+  refinement.  This supplies the metadata-rich relative source certificate
+  needed to transport inherited route geometry through clause-direction
+  ordering and the later exact-one splices.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
