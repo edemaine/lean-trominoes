@@ -34,6 +34,31 @@ instance (first second : List Cell) :
   unfold RoutesMeetOnlyAtFirstTail
   infer_instance
 
+/-- Every listed contact occurs at the tail of both routes. -/
+def RoutesMeetOnlyAtTails
+    (first second : List Cell) : Prop :=
+  ∀ firstPoint ∈ first,
+    ∀ secondPoint ∈ second,
+      firstPoint = secondPoint →
+        first.getLast? = some firstPoint ∧
+          second.getLast? = some secondPoint
+
+instance (first second : List Cell) :
+    Decidable (RoutesMeetOnlyAtTails first second) := by
+  unfold RoutesMeetOnlyAtTails
+  infer_instance
+
+/-- Tail-only listed contact is symmetric. -/
+theorem RoutesMeetOnlyAtTails.symm
+    {first second : List Cell}
+    (contacts : RoutesMeetOnlyAtTails first second) :
+    RoutesMeetOnlyAtTails second first := by
+  intro secondPoint secondMember firstPoint firstMember equal
+  have tails :=
+    contacts firstPoint firstMember
+      secondPoint secondMember equal.symm
+  exact ⟨tails.2, tails.1⟩
+
 /-- An injective point map preserves first-tail-only listed contacts. -/
 theorem RoutesMeetOnlyAtFirstTail.mapPoints
     {transform : Cell → Cell}
@@ -84,6 +109,105 @@ theorem RoutesMeetOnlyAtFirstTail.scalePolyline
       (LeanTrominoes.scalePolyline factor first)
       (LeanTrominoes.scalePolyline factor second) :=
   contacts.mapPoints (Cell.scale_injective factorPositive.ne')
+
+/-- Join two locally head-separated prefixes to two suffixes whose only
+possible listed contact is at their final tails.  Strict cross separation
+ensures that the two splice boundaries cannot become new contacts. -/
+theorem RoutesAvoidEachOther.join_tails_of_prefix_heads_and_suffix_tails
+    {first second firstSuffix secondSuffix : List Cell}
+    {firstMiddle secondMiddle : Cell}
+    (prefixesAvoid : RoutesAvoidEachOther first second)
+    (prefixContactsAtHeads : RoutesMeetOnlyAtHeads first second)
+    (firstPrefixAvoidSecondSuffix :
+      RoutesStrictlyAvoidEachOther first secondSuffix)
+    (firstSuffixAvoidSecondPrefix :
+      RoutesStrictlyAvoidEachOther firstSuffix second)
+    (suffixesAvoid :
+      RoutesAvoidEachOther firstSuffix secondSuffix)
+    (suffixContactsAtTails :
+      RoutesMeetOnlyAtTails firstSuffix secondSuffix)
+    (firstEntrance : first.getLast? = some firstMiddle)
+    (firstSuffixHead : firstSuffix.head? = some firstMiddle)
+    (secondEntrance : second.getLast? = some secondMiddle)
+    (secondSuffixHead : secondSuffix.head? = some secondMiddle) :
+    RoutesAvoidEachOther
+      (joinAtEndpoint first firstSuffix)
+      (joinAtEndpoint second secondSuffix) := by
+  have firstSegments :=
+    gridPolylineSegments_joinAtEndpoint
+      firstEntrance firstSuffixHead
+  have secondSegments :=
+    gridPolylineSegments_joinAtEndpoint
+      secondEntrance secondSuffixHead
+  apply routesAvoidEachOther_of_mem
+  · intro firstSegment firstMember secondSegment secondMember
+    rw [firstSegments, List.mem_append] at firstMember
+    rw [secondSegments, List.mem_append] at secondMember
+    rcases firstMember with firstPrefixMember | firstSuffixMember <;>
+      rcases secondMember with secondPrefixMember | secondSuffixMember
+    · exact prefixesAvoid.segmentsAvoid_of_mem
+        _ firstPrefixMember _ secondPrefixMember
+    · exact firstPrefixAvoidSecondSuffix.1
+        _ firstPrefixMember _ secondSuffixMember
+    · exact firstSuffixAvoidSecondPrefix.1
+        _ firstSuffixMember _ secondPrefixMember
+    · exact suffixesAvoid.segmentsAvoid_of_mem
+        _ firstSuffixMember _ secondSuffixMember
+  · intro firstPoint firstMember secondSegment secondMember
+    rcases mem_joinAtEndpoint firstMember with
+        firstPrefixMember | firstSuffixMember <;>
+      rw [secondSegments, List.mem_append] at secondMember <;>
+      rcases secondMember with secondPrefixMember | secondSuffixMember
+    · exact prefixesAvoid.firstPointsAvoid_of_mem
+        _ firstPrefixMember _ secondPrefixMember
+    · exact firstPrefixAvoidSecondSuffix.2.1
+        _ firstPrefixMember _ secondSuffixMember
+    · exact firstSuffixAvoidSecondPrefix.2.1
+        _ firstSuffixMember _ secondPrefixMember
+    · exact suffixesAvoid.firstPointsAvoid_of_mem
+        _ firstSuffixMember _ secondSuffixMember
+  · intro secondPoint secondMember firstSegment firstMember
+    rcases mem_joinAtEndpoint secondMember with
+        secondPrefixMember | secondSuffixMember <;>
+      rw [firstSegments, List.mem_append] at firstMember <;>
+      rcases firstMember with firstPrefixMember | firstSuffixMember
+    · exact prefixesAvoid.secondPointsAvoid_of_mem
+        _ secondPrefixMember _ firstPrefixMember
+    · exact firstSuffixAvoidSecondPrefix.2.2.1
+        _ secondPrefixMember _ firstSuffixMember
+    · exact firstPrefixAvoidSecondSuffix.2.2.1
+        _ secondSuffixMember _ firstPrefixMember
+    · exact suffixesAvoid.secondPointsAvoid_of_mem
+        _ secondSuffixMember _ firstSuffixMember
+  · intro firstPoint firstMember secondPoint secondMember equal
+    rcases mem_joinAtEndpoint firstMember with
+        firstPrefixMember | firstSuffixMember
+    · rcases mem_joinAtEndpoint secondMember with
+          secondPrefixMember | secondSuffixMember
+      · have heads :=
+          prefixContactsAtHeads
+            _ firstPrefixMember _ secondPrefixMember equal
+        exact
+          ⟨Or.inl (joinAtEndpoint_head? heads.1),
+            Or.inl (joinAtEndpoint_head? heads.2)⟩
+      · exact
+          (firstPrefixAvoidSecondSuffix.2.2.2
+            _ firstPrefixMember _ secondSuffixMember equal).elim
+    · rcases mem_joinAtEndpoint secondMember with
+          secondPrefixMember | secondSuffixMember
+      · exact
+          (firstSuffixAvoidSecondPrefix.2.2.2
+            _ firstSuffixMember _ secondPrefixMember equal).elim
+      · have tails :=
+          suffixContactsAtTails
+            _ firstSuffixMember _ secondSuffixMember equal
+        exact
+          ⟨Or.inr
+              (joinAtEndpoint_getLast?
+                firstEntrance firstSuffixHead tails.1),
+            Or.inr
+              (joinAtEndpoint_getLast?
+                secondEntrance secondSuffixHead tails.2)⟩
 
 /-- Joining a contact-free prefix to an ordinarily separated final piece
 preserves ordinary separation when every legal contact of the final piece

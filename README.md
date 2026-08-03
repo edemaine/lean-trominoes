@@ -5015,7 +5015,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/OrthogonalPolylineTailEndpointContactSeparation.lean`](LeanTrominoes/OrthogonalPolylineTailEndpointContactSeparation.lean)
   packages that asymmetric contact condition and proves the corresponding
   composition rule: a strictly separated prefix can be joined to such a
-  tail-contacting final piece without losing ordinary route separation.
+  tail-contacting final piece without losing ordinary route separation.  It
+  also handles the two-sided splice used by unit elimination: local prefixes
+  may meet only at their clause-side heads, inherited suffixes may meet only
+  at their variable-side tails, and strictly separated cross pairs compose
+  to complete endpoint-only route separation.
 - [`LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean`](LeanTrominoes/OccurrenceSplitRingOccurrenceOrder.lean)
   filters the local implication incidences at each ring vertex in syntactic
   order.  Every real port has exactly two cycle incidences, the separator
