@@ -2466,6 +2466,10 @@ The representation choices for this target are:
   frame, proves exact route equivariance under the compensating physical
   translation, and transports its local clause and literal indices for the
   common carrier-boundary argument.
+- [`LeanTrominoes/RetainedFinalRouteCommonFrameSourceSelections.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameSourceSelections.lean)
+  turns those translated indices into genuine routes of concrete finite
+  drawings: through a retained presentation for noncarriers and through raw
+  retained-link membership for carriers.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and
