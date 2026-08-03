@@ -47,10 +47,26 @@ theorem drawingPlanarSATRoutedVariableIncidenceDrawing_formula_periodTranslate
           (variableRouteSitePeriodTranslate site shift)
           (planarSATNodeLinkPeriodTranslate
             formula.incidenceGraph link shift).first.duplicatorArm := by
-    rw [routedVariableEqualityPositions_periodTranslate]
-    simp [planarSATNodeLinkPeriodTranslate, positions]
+    change
+      EqualityPositions.periodTranslate link.positions
+          (carrierMacroPeriodTranslation formula.incidenceGraph shift) =
+        routedVariableEqualityPositions formula
+          (variableRouteSitePeriodTranslate site shift)
+          (link.first.periodTranslate
+            formula.incidenceGraph shift).duplicatorArm
+    rw [PlanarSATNode.duplicatorArm_periodTranslate,
+      routedVariableEqualityPositions_periodTranslate, positions]
+  have translatedArm :
+      (planarSATNodeLinkPeriodTranslate
+          formula.incidenceGraph link shift).first.duplicatorArm =
+        link.first.duplicatorArm := by
+    change
+      (link.first.periodTranslate
+        formula.incidenceGraph shift).duplicatorArm = _
+    exact PlanarSATNode.duplicatorArm_periodTranslate link.first shift
   unfold drawingPlanarSATRoutedVariableFormulaAt
   rw [translatedPositions]
+  rw [translatedArm]
   simp [drawingPlanarSATRoutedVariableIncidenceDrawing,
     duplicatorArmStraightIncidenceDrawing,
     straightIncidenceDrawing, duplicatorArmFormula,
@@ -109,8 +125,7 @@ theorem FinalGaugedCarrierFrameTerminalContact.exists_commonFrameMacrocellSource
             rw [translatedSourceEq]
             simp [DrawingPlanarSATClauseSource.incidenceDrawing,
               DrawingPlanarSATClauseSource.clauseFormula]
-          componentEq := rfl
-          localClauseIndexEq := rfl
+          sourceEq := rfl
         }⟩
     | routedVariable site armIndex arm link localClauseIndex =>
         simp [sourceEq,
@@ -136,6 +151,7 @@ theorem FinalGaugedCarrierFrameTerminalContact.exists_commonFrameMacrocellSource
     | routedVariable
         sourceSite sourceArmIndex sourceArm sourceLink
           sourceLocalClauseIndex =>
+        rw [sourceEq] at originalSourceMember
         change
           sourceSite ∈ drawingVariableRouteSites formula ∧
             (sourceLink, sourceArmIndex) ∈
@@ -153,8 +169,7 @@ theorem FinalGaugedCarrierFrameTerminalContact.exists_commonFrameMacrocellSource
               sourceEq, DrawingPlanarSATClauseSource.periodTranslate,
               DrawingPlanarSATClauseSource.incidenceDrawing,
               DrawingPlanarSATClauseSource.clauseFormula] using formulaEq
-          componentEq := rfl
-          localClauseIndexEq := rfl
+          sourceEq := rfl
         }⟩
 
 /-- In the normalized crossover frame, the normalized crossover itself is
@@ -188,17 +203,11 @@ theorem
       simp [normalizedSource,
         DrawingPlanarSATClauseSource.incidenceDrawing,
         DrawingPlanarSATClauseSource.clauseFormula]
-    componentEq := by
+    sourceEq := by
       simp [normalizedSource,
         FinalGaugedRouteOccurrenceWitness.commonFrameSource,
         sourceEq, DrawingPlanarSATClauseSource.periodTranslate,
-        DrawingPlanarSATClauseSource.component,
         CrossingRecord.periodTranslate_neg_shift_eq_periodNormalize]
-    localClauseIndexEq := by
-      simp [normalizedSource,
-        FinalGaugedRouteOccurrenceWitness.commonFrameSource,
-        sourceEq, DrawingPlanarSATClauseSource.periodTranslate,
-        DrawingPlanarSATClauseSource.localClauseIndex]
   }⟩
 
 end PeriodicOrthocrossing

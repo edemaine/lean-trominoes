@@ -35,12 +35,8 @@ structure FinalGaugedCommonFrameMacrocellSource
   incidenceFormulaEq :
     (source.incidenceDrawing formula).formula =
       source.clauseFormula formula
-  componentEq :
-    source.component =
-      (macrocell.commonFrameSource reindexShift).component
-  localClauseIndexEq :
-    source.localClauseIndex =
-      (macrocell.commonFrameSource reindexShift).localClauseIndex
+  sourceEq :
+    source = macrocell.commonFrameSource reindexShift
 
 /-- A retained presentation of a translated noncarrier source selects the
 exact common-frame final route. -/
@@ -63,30 +59,15 @@ theorem FinalGaugedCommonFrameMacrocellSource.exists_routeSelection
   rcases
       macrocell.exists_commonFrameClauseLiteral reindexShift with
     ⟨selection⟩
-  have targetFormulaEq :
-      presentation.source.clauseFormula formula =
-        (macrocell.commonFrameSource reindexShift
-          |>.clauseFormula formula) :=
-    presentation.source.clauseFormula_eq_of_component_eq
-      formula (macrocell.commonFrameSource reindexShift)
-      presentation.componentEq
   have targetClauseMember :
       (selection.clause, presentation.source.localClauseIndex) ∈
         (presentation.source.clauseFormula formula).zipIdx := by
-    rw [targetFormulaEq, presentation.localClauseIndexEq]
-    exact selection.clauseMember
+    simpa only [presentation.sourceEq] using selection.clauseMember
   have targetDrawingClauseMember :
       (selection.clause, presentation.source.localClauseIndex) ∈
         (presentation.source.incidenceDrawing formula).formula.zipIdx := by
     rw [presentation.incidenceFormulaEq]
     exact targetClauseMember
-  have drawingEq :
-      presentation.source.incidenceDrawing formula =
-        (macrocell.commonFrameSource reindexShift
-          |>.incidenceDrawing formula) :=
-    presentation.source.incidenceDrawing_eq_of_component_eq
-      formula (macrocell.commonFrameSource reindexShift)
-      presentation.componentEq
   exact ⟨{
     clause := selection.clause
     literal := selection.literal
@@ -95,9 +76,7 @@ theorem FinalGaugedCommonFrameMacrocellSource.exists_routeSelection
     literalMember := selection.literalMember
     routeEq := by
       have routeEq := selection.routeEq
-      rw [← drawingEq,
-        ← presentation.localClauseIndexEq] at routeEq
-      simpa only using routeEq
+      simpa only [← presentation.sourceEq] using routeEq
   }⟩
 
 /-- A raw retained translate of an arbitrary selected carrier link selects

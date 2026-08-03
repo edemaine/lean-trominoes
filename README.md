@@ -2477,6 +2477,18 @@ The representation choices for this target are:
   directly that translated active routed-variable arms still realize their
   abstract two-clause formulas, without requiring the translated presentation
   to lie in the retained enumeration window.
+- [`LeanTrominoes/RetainedFinalRouteCommonFrameOffsets.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameOffsets.lean)
+  proves that the independently reindexed carrier and direct routes receive
+  the same compensating physical translation in both the terminal and
+  normalized-crossover cases.
+- [`LeanTrominoes/RetainedFinalRouteCommonFrameBoundaryTranslation.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameBoundaryTranslation.lean)
+  transports a carrier-boundary certificate from such a common finite frame
+  back to the two original final route occurrences.
+- [`LeanTrominoes/RetainedFinalRouteCommonFrameBoundaries.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameBoundaries.lean)
+  applies the raw carrier-lens interface geometry in those frames and obtains
+  an outside/inside carrier-boundary certificate for every arbitrary
+  overlapping carrier/direct pair, covering both terminal contacts and the
+  normalized crossover residue.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and
