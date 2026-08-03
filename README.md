@@ -2275,8 +2275,10 @@ The representation choices for this target are:
   discharges both endpoint-isolation obligations for every fresh auxiliary
   incidence in the final unit-elimination layer.  The completed auxiliary
   suffix is a singleton, so its spliced route is exactly the already-simple
-  normalized local route.  Only inherited source-variable incidences now
-  need separate endpoint-isolation geometry.
+  normalized local route.  Consequently, two distinct auxiliaries in one
+  source-clause block inherit the normalized local drawing's complete
+  pairwise separation.  Only inherited source-variable incidences now need
+  separate endpoint-isolation and splice geometry.
 - [`LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean`](LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean)
   certifies the terminal geometry shared by all inherited coordinated
   routes.  Each of the eight explicit Figure 7 spokes is simple, and remains
