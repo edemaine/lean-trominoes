@@ -90,6 +90,80 @@ theorem sourceLocalClausePosition_ne_sourceLocalPosition
     simp [sourceLocalClausePosition,
       PlanarOneInThreeNoUnits.sourceLocalPosition] at sourceLiteralIndexLt ⊢
 
+/-- Generated clauses with the same logical anchor use the same normalized
+source-clause origin. -/
+theorem normalizedSourceClausePosition_eq_of_anchor_eq
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourceClause : PositionedPeriodicClause Variable)
+    (firstClause secondClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    (anchorsEqual :
+      PeriodicCNF.clauseAnchor firstClause.literals =
+        PeriodicCNF.clauseAnchor secondClause.literals) :
+    normalizedSourceClausePosition
+        outputPlacement sourceClause firstClause =
+      normalizedSourceClausePosition
+        outputPlacement sourceClause secondClause := by
+  simp [normalizedSourceClausePosition, anchorsEqual]
+
+/-- Within one source block and one common anchor gauge, normalized source
+ports are injectively indexed by the source literal occurrence. -/
+theorem normalizedSourcePort_injective_of_anchor_eq
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourceClause : PositionedPeriodicClause Variable)
+    (firstClause secondClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    {firstIndex secondIndex : Nat}
+    (firstLt : firstIndex < 3)
+    (secondLt : secondIndex < 3)
+    (anchorsEqual :
+      PeriodicCNF.clauseAnchor firstClause.literals =
+        PeriodicCNF.clauseAnchor secondClause.literals)
+    (portsEqual :
+      normalizedSourcePort outputPlacement sourceClause
+          firstClause firstIndex =
+        normalizedSourcePort outputPlacement sourceClause
+          secondClause secondIndex) :
+    firstIndex = secondIndex := by
+  apply sourceLocalPosition_injective_below_three firstLt secondLt
+  have originsEqual :=
+    normalizedSourceClausePosition_eq_of_anchor_eq
+      outputPlacement sourceClause firstClause secondClause anchorsEqual
+  unfold normalizedSourcePort at portsEqual
+  rw [originsEqual] at portsEqual
+  exact Cell.add_left_injective _ portsEqual
+
+/-- The local generated-clause vertex and a genuine normalized source port
+remain distinct after adding their common normalized source origin. -/
+theorem normalizedSourceClauseLocalPosition_ne_port
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement (OneInThreeNoUnitVariable Variable))
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable))
+    (sourceLiteralIndex : Nat)
+    (arityPositive : 0 < sourceClause.literals.length)
+    (arityAtMostThree : sourceClause.literals.length ≤ 3)
+    (sourceLiteralIndexLt :
+      sourceLiteralIndex < sourceClause.literals.length) :
+    Cell.add
+        (normalizedSourceClausePosition
+          outputPlacement sourceClause generatedClause)
+        (sourceLocalClausePosition sourceClause.literals.length) ≠
+      normalizedSourcePort outputPlacement sourceClause
+        generatedClause sourceLiteralIndex := by
+  unfold normalizedSourcePort
+  exact fun equal =>
+    sourceLocalClausePosition_ne_sourceLocalPosition
+      sourceClause.literals.length sourceLiteralIndex
+      arityPositive arityAtMostThree sourceLiteralIndexLt
+      (Cell.add_left_injective _ equal)
+
 /-- Every inherited unit-elimination incidence recovers a genuine source
 literal occurrence and ends at its index-selected normalized boundary port. -/
 theorem normalizedLocalEndpoint_inherited
