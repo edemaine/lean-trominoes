@@ -5235,6 +5235,14 @@ The representation choices for this target are:
   generations of auxiliaries and splices every suffix onto its certified
   normalized local route.  Every final incidence thereby has exact canonical
   clause and literal endpoints and an orthogonal complete route.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsComposedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsComposedRoutes.lean)
+  instantiates the composed Figure 9 and unit-elimination route family over
+  the normalized retained fixed-eight source.  The four finite templates
+  replace the crossing-prone pair of sequential Manhattan adapters by one
+  certified local route selection, while direct source suffixes retain exact
+  canonical endpoints and orthogonality.  This intermediate family keeps the
+  raw nested variable type so that a later coordinate-preserving renaming can
+  identify it with the public wrapped formula.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
