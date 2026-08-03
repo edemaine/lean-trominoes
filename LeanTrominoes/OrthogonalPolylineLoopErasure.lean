@@ -490,6 +490,30 @@ theorem lastNotInDropLast_of_getLastD_not_mem
   rw [lastEqual] at fresh
   exact fresh
 
+/-- An injective point map preserves isolation of the first endpoint. -/
+theorem HeadNotInTail.map_of_injective
+    {points : List Cell}
+    {transform : Cell → Cell}
+    (fresh : HeadNotInTail points)
+    (injective : Function.Injective transform) :
+    HeadNotInTail (points.map transform) := by
+  intro mappedHead mappedHeadLookup mappedMember
+  cases points with
+  | nil => simp at mappedHeadLookup
+  | cons originalHead originalTail =>
+      have mappedHeadEqual :
+          transform originalHead = mappedHead := by
+        simpa using mappedHeadLookup
+      simp only [List.map_cons, List.tail_cons,
+        List.mem_map] at mappedMember
+      rcases mappedMember with
+        ⟨original, originalMember, originalMapped⟩
+      apply fresh originalHead rfl
+      have originalEqual : original = originalHead := by
+        apply injective
+        exact originalMapped.trans mappedHeadEqual.symm
+      simpa [originalEqual] using originalMember
+
 /-- An injective point map preserves isolation of the final endpoint. -/
 theorem LastNotInDropLast.map_of_injective
     {points : List Cell}

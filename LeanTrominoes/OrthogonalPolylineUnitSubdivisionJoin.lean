@@ -198,6 +198,70 @@ theorem LastNotInDropLast.joinAtEndpoint
             rw [List.dropLast_cons_of_ne_nil secondRestNe]
             exact List.mem_cons_of_mem secondFirst secondMember
 
+/-- Final-endpoint isolation of a joined route restricts to its
+nondegenerate suffix. -/
+theorem LastNotInDropLast.of_joinAtEndpoint_right
+    {first second : List Cell} {middle : Cell}
+    (fresh :
+      LastNotInDropLast
+        (LeanTrominoes.joinAtEndpoint first second))
+    (firstLast : first.getLast? = some middle)
+    (secondHead : second.head? = some middle)
+    (secondLength : 2 ≤ second.length) :
+    LastNotInDropLast second := by
+  intro last secondLast secondMember
+  have joinedLast :
+      (LeanTrominoes.joinAtEndpoint first second).getLast? =
+        some last :=
+    joinAtEndpoint_getLast? firstLast secondHead secondLast
+  apply fresh last joinedLast
+  cases second with
+  | nil => simp at secondLength
+  | cons secondFirst secondRest =>
+      cases secondRest with
+      | nil => simp at secondLength
+      | cons secondNext secondTail =>
+          simp only [LeanTrominoes.joinAtEndpoint, List.tail_cons]
+          rw [List.dropLast_append_of_ne_nil (by simp)]
+          rw [List.dropLast_cons_of_ne_nil (by simp)] at secondMember
+          simp only [List.mem_cons] at secondMember
+          rcases secondMember with lastEqual | secondTailMember
+          · have secondFirstEqual : secondFirst = middle := by
+              simpa using secondHead
+            rw [lastEqual, secondFirstEqual]
+            exact
+              List.mem_append.mpr
+                (Or.inl (List.mem_of_mem_getLast? firstLast))
+          · exact List.mem_append.mpr (Or.inr secondTailMember)
+
+/-- The isolated final endpoint of a joined route is absent from its prefix
+when the suffix contains an edge. -/
+theorem LastNotInDropLast.not_mem_left_of_joinAtEndpoint
+    {first second : List Cell} {middle last : Cell}
+    (fresh :
+      LastNotInDropLast
+        (LeanTrominoes.joinAtEndpoint first second))
+    (firstLast : first.getLast? = some middle)
+    (secondHead : second.head? = some middle)
+    (secondLast : second.getLast? = some last)
+    (secondLength : 2 ≤ second.length) :
+    last ∉ first := by
+  intro firstMember
+  have joinedLast :
+      (LeanTrominoes.joinAtEndpoint first second).getLast? =
+        some last :=
+    joinAtEndpoint_getLast? firstLast secondHead secondLast
+  apply fresh last joinedLast
+  cases second with
+  | nil => simp at secondLength
+  | cons secondFirst secondRest =>
+      cases secondRest with
+      | nil => simp at secondLength
+      | cons secondNext secondTail =>
+          simp only [LeanTrominoes.joinAtEndpoint, List.tail_cons]
+          rw [List.dropLast_append_of_ne_nil (by simp)]
+          exact List.mem_append.mpr (Or.inl firstMember)
+
 /-- Any route containing a source edge still contains an edge after ordered
 unit subdivision. -/
 theorem unitSubdividePolyline_length_ge_two_of_length_ge_two

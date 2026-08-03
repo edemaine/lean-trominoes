@@ -66,6 +66,19 @@ theorem unitSubdividePolyline_map_add
       rw [tailInduction second]
       simp [LeanTrominoes.joinAtEndpoint, List.map_append]
 
+/-- Translation preserves isolation of the first point after unit
+subdivision. -/
+theorem HeadNotInTail.unitSubdividePolyline_map_add
+    {points : List Cell}
+    (fresh : HeadNotInTail (unitSubdividePolyline points))
+    (offset : Cell) :
+    HeadNotInTail
+      (unitSubdividePolyline (points.map (Cell.add offset))) := by
+  rw [LeanTrominoes.AxisDirection.unitSubdividePolyline_map_add
+    offset points]
+  exact fresh.map_of_injective
+    (Cell.add_left_injective offset)
+
 /-- Translation preserves isolation of the final point after unit
 subdivision. -/
 theorem LastNotInDropLast.unitSubdividePolyline_map_add

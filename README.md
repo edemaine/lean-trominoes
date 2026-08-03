@@ -2211,8 +2211,8 @@ The representation choices for this target are:
   terminal spoke.
 - [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionTranslation.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionTranslation.lean)
   proves that translating an integral orthogonal polyline commutes with its
-  ordered unit subdivision.  Injectivity of translation then transports a
-  local final-endpoint-isolation certificate to every positioned copy.
+  ordered unit subdivision.  Injectivity of translation then transports
+  both endpoint-isolation certificates to every positioned copy.
 - [`LeanTrominoes/RetainedAngularFanDirectOccurrenceEndpointIsolation.lean`](LeanTrominoes/RetainedAngularFanDirectOccurrenceEndpointIsolation.lean)
   checks the complete finite atlas of coordinated direct-source routes and
   all eight Figure 7 terminal spokes.  Although some collar walks revisit
@@ -2222,9 +2222,15 @@ The representation choices for this target are:
   family can preserve its variable occurrence orders through loop erasure.
 - [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionJoin.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionJoin.lean)
   proves that ordered unit subdivision commutes with a correctly matched
-  endpoint join.  It also turns strict continuous separation from any
-  orthogonal witness route through the target into endpoint isolation for a
-  joined route with a simple terminal suffix.
+  endpoint join, transports isolation forward through a join, and restricts
+  final-endpoint isolation back to the joined suffix.  It also turns strict
+  continuous separation from any orthogonal witness route through the target
+  into endpoint isolation for a joined route with a simple terminal suffix.
+- [`LeanTrominoes/OrthogonalPolylineUnitSubdivisionScaling.lean`](LeanTrominoes/OrthogonalPolylineUnitSubdivisionScaling.lean)
+  proves that positive integral refinement cannot create a new visit to a
+  scaled source-lattice point.  This reflection principle transports both
+  first- and final-endpoint isolation through scaling, even when the source
+  route has internal loops elsewhere.
 - [`LeanTrominoes/RetainedAngularFanFallbackEndpointIsolation.lean`](LeanTrominoes/RetainedAngularFanFallbackEndpointIsolation.lean)
   applies that bridge to both ordinary and delayed-lane retained fallbacks.
   Their source-to-boundary prefixes strictly avoid the matching implication
