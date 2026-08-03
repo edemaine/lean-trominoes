@@ -2791,11 +2791,14 @@ The representation choices for this target are:
   distinct-incidence theorem at shift zero, this gives complete relative
   cycle-route separation at both the scaled and public fixed-eight interfaces.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeDirectCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeDirectCycleSeparation.lean)
-  begins the mixed direct-source/cycle periodic branch.  Equality of a genuine
-  source occurrence center with a translated cycle center identifies both the
-  underlying atom and the exact semantic period offset.  The translated
+  completes the mixed successful-direct-source/cycle periodic branch.  Equality
+  of a genuine source occurrence center with a translated cycle center
+  identifies both the underlying atom and the exact semantic period offset.  The translated
   flattened Figure 7 route is therefore the occurrence's already-certified
-  matching cycle lift, so every successful direct route avoids it.
+  matching cycle lift.  For unequal centers, periodic macrocell decomposition
+  and a transported radius-48 cycle bound put the routes in strictly separated
+  rectangles.  Thus every successful direct route avoids every genuine cycle
+  route in every relative period cell, at both internal and public interfaces.
 - [`LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean`](LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean)
   recovers the source atom owning any genuine appended implication route
   and proves that every point of its factor-eight realization lies within
