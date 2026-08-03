@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicGridDrawingRibbonSeparation
+import LeanTrominoes.PeriodicGridDrawingUnitSubdivision
 import LeanTrominoes.PeriodicGridDrawingVertexCoverage
 
 /-!
@@ -59,6 +60,21 @@ private theorem routePointOccurrenceKey_ne_of_routeOccurrence_ne'
   apply different
   simp only [RoutePointOccurrenceKey, Prod.mk.injEq] at equal ⊢
   exact ⟨equal.1, equal.2.2⟩
+
+/-- Unit lattice segments have no lattice point in their relative interior,
+so a unit-step drawing automatically satisfies the endpoint-aware segment
+separation predicate. -/
+theorem segmentEndpointsAvoidInteriors_of_hasUnitSteps
+    {drawing : PeriodicGridDrawing}
+    (unitSteps : drawing.HasUnitSteps) :
+    drawing.SegmentEndpointsAvoidInteriors := by
+  intro first firstMember second secondMember
+    firstTranslate secondTranslate point different interior
+  have firstUnit :=
+    unitStep_of_mem_indexedSegments unitSteps firstMember
+  have translatedUnit :=
+    firstUnit.translate (drawing.periodTranslation firstTranslate)
+  exact (translatedUnit.not_interiorContains interior).elim
 
 /-- A listed point of one nondegenerate route avoids the interior of every
 segment of a distinct lifted route occurrence. -/

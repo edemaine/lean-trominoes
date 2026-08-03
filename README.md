@@ -880,6 +880,8 @@ The representation choices for this target are:
   possibly diagonal routes.  The stronger segment-endpoint/interior
   certificate handles both directed listed-point cases, while continuous
   planarity and endpoint-only contacts supply segment and point contacts.
+  For a unit-step drawing the stronger segment-endpoint certificate is now
+  automatic, because a unit lattice segment has no lattice point inside it.
   [`LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean`](LeanTrominoes/OrthogonalPolylineRouteReversalContacts.lean)
   proves that this finite separation certificate is preserved when both
   routes are traversed in reverse, as required by variable-to-clause routing.
@@ -2257,7 +2259,9 @@ The representation choices for this target are:
   discharged from simplicity rather than left implicit.  A translation-
   invariant equivalent form fixes the first route at shift zero and asks
   only about the second route's relative periodic shift, matching the local
-  macrocell geometry used by the remaining construction.
+  macrocell geometry used by the remaining construction.  Conversely, a
+  ribbon-ready unit-step drawing with nondegenerate routes supplies that
+  relative complete-route predicate directly.
 - [`LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparation.lean`](LeanTrominoes/PositionedPeriodicCNFRelativeRouteSeparation.lean)
   transports that relative-shift predicate through the lossless flat route
   enumeration.  The remaining geometry can therefore quantify over genuine

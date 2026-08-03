@@ -52,6 +52,44 @@ def RelativeLiftedRoutesAvoidEachOther
               (Cell.add
                 (drawing.periodTranslation relativeTranslate)))
 
+/-- Ribbon readiness is also sufficient for relative complete route
+separation when every stored route is nondegenerate and made of unit lattice
+steps.  Unit steps supply both directed point/interior conditions, while the
+ribbon fields supply continuous segment separation and endpoint-only listed
+contacts. -/
+theorem relativeLiftedRoutesAvoidEachOther_of_isRibbonReady_of_hasUnitSteps
+    {drawing : PeriodicGridDrawing}
+    (ribbonReady : drawing.IsRibbonReady)
+    (unitSteps : drawing.HasUnitSteps)
+    (lengths :
+      ∀ route ∈ drawing.edgeRoutes,
+        2 ≤ route.length) :
+    drawing.RelativeLiftedRoutesAvoidEachOther := by
+  intro first firstMember second secondMember
+    relativeTranslate occurrencesDifferent
+  have avoids :=
+    routeOccurrences_avoidEachOther_of_segmentEndpointsAvoid
+      ribbonReady.1
+      (segmentEndpointsAvoidInteriors_of_hasUnitSteps unitSteps)
+      ribbonReady.2
+      firstMember secondMember
+      (lengths first.1 (List.fst_mem_of_mem_zipIdx firstMember))
+      (lengths second.1 (List.fst_mem_of_mem_zipIdx secondMember))
+      (0, 0) relativeTranslate occurrencesDifferent
+  have zeroTranslate :
+      first.1.map
+          (Cell.add (drawing.periodTranslation (0, 0))) =
+        first.1 := by
+    induction first.1 with
+    | nil => rfl
+    | cons point points induction =>
+        simp only [List.map_cons]
+        rw [induction]
+        congr 1
+        apply Prod.ext <;>
+          simp [periodTranslation, Cell.add, Cell.scale]
+  rwa [zeroTranslate] at avoids
+
 /-- Complete lifted separation is equivalent to checking only one relative
 periodic translate for each pair of stored routes. -/
 theorem liftedRoutesAvoidEachOther_iff_relative
