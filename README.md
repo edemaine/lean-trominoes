@@ -2290,6 +2290,11 @@ The representation choices for this target are:
   source block: distinct recovered source-occurrence indices give distinct
   splice ports, so the already-separated local routes can meet only at their
   generated clause heads.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
+  stores exact generated-to-source occurrence provenance in every selected
+  inherited suffix.  Distinct generated incidence coordinates now imply
+  distinct selected source incidence coordinates by injectivity of the
+  ordered occurrence pairing.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean)
   identifies an inherited local endpoint with its source-occurrence boundary
   port.  The three possible source-port coordinates are injective, and every
