@@ -2400,6 +2400,11 @@ The representation choices for this target are:
   terminal-direction and occurrence-slot order separates the two selected
   outer replacements across all four ordinary/delayed-lane policy pairs,
   after transporting the second fan center through the period translation.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterBoundarySeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterBoundarySeparation.lean)
+  assembles the four prefix/outer interactions into strict separation of the
+  two complete selected fallback boundaries at a shared translated target.
+  Reverse-shift transport supplies the asymmetric unshifted-prefix versus
+  translated-outer case and records covariance of both selected pieces.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
