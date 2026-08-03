@@ -2362,6 +2362,11 @@ The representation choices for this target are:
   combines that order with the center-independent translated source corridor,
   proving that an aligned successful direct boundary strictly avoids the
   complete translated failed-choice boundary even at a shared physical target.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterSpokeSeparation.lean)
+  identifies both suffixes at a shared physical target with positioned copies
+  of the same finite Figure 7 spoke family.  Strict angular order makes their
+  slots different, which proves both direct-prefix/fallback-suffix and
+  direct-suffix/fallback-suffix separation.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
