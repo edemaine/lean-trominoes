@@ -500,7 +500,9 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedIndex.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedIndex.lean)
   supplies the analogous lossless index for the variable-size
   unit-elimination blocks, retaining both source and local generated-clause
-  memberships at every flattened output index.
+  memberships at every flattened output index.  The pair consisting of the
+  source-clause index and local generated-clause index is proved globally
+  duplicate-free, hence injective back to the flattened output index.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedLocalRoutes.lean)
   selects the corresponding certified unit-elimination route at every
   global output incidence and proves all such local routes orthogonal and
@@ -508,14 +510,16 @@ The representation choices for this target are:
   hypotheses.  Distinct finite gadget vertices also prove that every genuine
   local route contains at least one edge.  Any two distinct incidences in one
   source-clause block inherit complete continuous separation from the same
-  certified finite drawing.
+  certified finite drawing, with distinctness accepted directly in either
+  local-block or global generated-formula coordinates.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean)
   supplies the analogous canonical-gauge endpoints, orthogonality, and
   continuous-simplicity theorems for unit elimination.  Its
   inherited-variable endpoints are the precise splice boundary, while its
   new auxiliary endpoints are already final.  Every generated clause retains
   its source block's periodic anchor, so the same-block pairwise separation
-  theorem survives canonical-gauge normalization.
+  theorem survives canonical-gauge normalization, again with a
+  global-incidence-coordinate interface.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsAuxiliaryIncidences.lean)
   identifies the exact source scope and source-anchor offset of every fresh
   unit-elimination auxiliary literal.

@@ -533,5 +533,55 @@ theorem localRoutes_avoidEachOther_of_members_of_same_source
     firstDrawing, secondDrawing, ← drawingsEqual] using
       selectedSeparated
 
+/-- The same-block separation theorem with distinctness stated in the
+global generated-formula clause/literal coordinates used by callers. -/
+theorem localRoutes_avoidEachOther_of_members_of_same_source_of_global_distinct
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {firstClause secondClause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (formula source).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (OneInThreeNoUnitVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    {firstMetadata secondMetadata : ClauseMetadata Variable}
+    (firstLookup :
+      (formulaClauseMetadata source)[firstClauseIndex]? =
+        some firstMetadata)
+    (secondLookup :
+      (formulaClauseMetadata source)[secondClauseIndex]? =
+        some secondMetadata)
+    (sameSource :
+      firstMetadata.sourceClauseIndex =
+        secondMetadata.sourceClauseIndex)
+    (globalIncidencesDistinct :
+      firstClauseIndex ≠ secondClauseIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex) :
+    EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (localRoutes source firstClauseIndex firstLiteralIndex)
+      (localRoutes source secondClauseIndex secondLiteralIndex) := by
+  apply localRoutes_avoidEachOther_of_members_of_same_source
+    source sourceWidth sourceDistinct
+    firstClauseMember secondClauseMember
+    firstLiteralMember secondLiteralMember
+    firstLookup secondLookup sameSource
+  exact localIncidencesDistinct_of_global
+    source firstLookup secondLookup sameSource
+      globalIncidencesDistinct
+
 end PeriodicOneInThreeNoUnitsPositioned
 end LeanTrominoes
