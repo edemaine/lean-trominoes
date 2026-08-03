@@ -2290,7 +2290,9 @@ The representation choices for this target are:
   port.  The three possible source-port coordinates are injective, and every
   genuine port is distinct from the generated clause's local vertex.  These
   facts persist in the canonical gauge shared by all generated clauses in a
-  source block, so normalized port equality recovers the source index.
+  source block, so normalized port equality recovers the source index.  When
+  source-occurrence provenance is already known, a direct theorem identifies
+  the normalized local endpoint with that exact indexed port.
 - [`LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean`](LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean)
   certifies the terminal geometry shared by all inherited coordinated
   routes.  Each of the eight explicit Figure 7 spokes is simple, and remains

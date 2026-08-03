@@ -164,6 +164,65 @@ theorem normalizedSourceClauseLocalPosition_ne_port
       arityPositive arityAtMostThree sourceLiteralIndexLt
       (Cell.add_left_injective _ equal)
 
+/-- Given explicit source-occurrence provenance, the normalized local
+endpoint is exactly that occurrence's boundary port. -/
+theorem normalizedLocalEndpoint_eq_normalizedSourcePort
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {clauseIndex : Nat}
+    {metadata : ClauseMetadata Variable}
+    (metadataLookup :
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata)
+    {literal : PeriodicLiteral (OneInThreeNoUnitVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ metadata.clause.literals.zipIdx)
+    {sourceLiteral : PeriodicLiteral Variable}
+    {sourceLiteralIndex : Nat}
+    (sourceLiteralMember :
+      (sourceLiteral, sourceLiteralIndex) ∈
+        metadata.sourceClause.literals.zipIdx)
+    (literalAtom : literal.atom = .inl sourceLiteral.atom) :
+    normalizedLocalEndpoint source sourcePlacement
+        clauseIndex literalIndex =
+      normalizedSourcePort
+        (placement source sourcePlacement)
+        metadata.sourceClause metadata.clause sourceLiteralIndex := by
+  have metadataIndexLt :
+      clauseIndex < (formulaClauseMetadata source).length :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).1
+  have metadataAt :
+      (formulaClauseMetadata source)[clauseIndex] = metadata :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).2
+  have metadataMember : metadata ∈ formulaClauseMetadata source := by
+    rw [← metadataAt]
+    exact List.getElem_mem metadataIndexLt
+  have sourceMember : metadata.sourceClause ∈ source.clauses :=
+    List.fst_mem_of_mem_zipIdx
+      (formulaClauseMetadata_valid source metadataMember).1
+  have metadataWidth :
+      metadata.sourceClause.literals.length ≤ 3 := by
+    apply sourceWidth metadata.sourceClause.literals
+    exact List.mem_map.mpr
+      ⟨metadata.sourceClause, sourceMember, rfl⟩
+  have metadataDistinct :
+      metadata.sourceClause.AtomsNodup :=
+    sourceDistinct metadata.sourceClause sourceMember
+  simp only [normalizedLocalEndpoint, metadataLookup]
+  rw [(List.mem_zipIdx_iff_getElem?).mp literalMember]
+  simp only
+  rw [literalAtom,
+    PlanarOneInThreeNoUnits.instantiatedDrawing_sourcePosition
+      metadata.sourceClauseIndex metadata.sourceClause
+      metadataWidth metadataDistinct sourceLiteralMember]
+  apply Prod.ext <;>
+    simp [normalizedSourcePort, normalizedSourceClausePosition,
+      Cell.add, Cell.sub] <;>
+    ring
+
 /-- Every inherited unit-elimination incidence recovers a genuine source
 literal occurrence and ends at its index-selected normalized boundary port. -/
 theorem normalizedLocalEndpoint_inherited
