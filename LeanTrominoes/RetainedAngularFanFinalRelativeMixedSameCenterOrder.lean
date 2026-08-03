@@ -408,6 +408,115 @@ theorem
         fallbackChoiceNone directAligned relativeTranslate
         relativeTranslateNonzero centersEqual
 
+/-- An oblique direct terminal and the axis-aligned fallback terminal have
+different directions, so compatible same-center occurrence order is strict. -/
+theorem
+    retainedFinalDirectFallback_strictAngularOrderCompatible_of_center_eq_translated_of_directSegment_not_axisAligned
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (directNotAligned : ¬choice.sourceSegment.IsAxisAligned)
+    (relativeTranslate : Cell)
+    (relativeTranslateNonzero : relativeTranslate ≠ (0, 0))
+    (centersEqual :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral =
+        Cell.add
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            fallbackClause fallbackLiteral)
+          ((finalCoordinatedPlacement formula).translation
+            relativeTranslate)) :
+    DirectFallbackStrictAngularOrderCompatible
+      (retainedDirectSourceFanTerminalAt
+        choice.kind choice.index).1
+      (classifiedRetainedTerminalData
+        (routeTerminalVector
+          (finalCoordinatedSourceRoutes
+            formula fallbackClauseIndex fallbackLiteralIndex))).1
+      (retainedFinalCoordinatedOccurrenceSlot
+        formula directLiteral directClauseIndex directLiteralIndex)
+      (retainedFinalCoordinatedOccurrenceSlot
+        formula fallbackLiteral fallbackClauseIndex fallbackLiteralIndex) := by
+  apply directFallbackStrictAngularOrderCompatible_of_compatible_of_ne
+  · exact
+      retainedFinalDirectFallback_angularOrderCompatible_of_center_eq_translated
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty choice directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember choiceLookup
+        relativeTranslate relativeTranslateNonzero centersEqual
+  · let fallbackRoute :=
+      finalCoordinatedSourceRoutes
+        formula fallbackClauseIndex fallbackLiteralIndex
+    let fallbackTerminal : RetainedTerminalData :=
+      classifiedRetainedTerminalData
+        (routeTerminalVector fallbackRoute)
+    have fallbackClassified :
+        retainedTerminalDirectionClassify
+            (Cell.sub
+              (polylineLastEntrance fallbackRoute)
+              (fallbackRoute.getLastD (0, 0))) =
+          some fallbackTerminal := by
+      simpa only [fallbackRoute, fallbackTerminal] using
+        finalCoordinatedSourceRoute_finalSegment_classified
+          formula sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty
+          fallbackClauseMember fallbackLiteralMember
+    have fallbackAligned :
+        (GridSegment.mk
+          (polylineLastEntrance fallbackRoute)
+          (fallbackRoute.getLastD (0, 0))).IsAxisAligned := by
+      simpa only [fallbackRoute] using
+        finalCoordinatedFallbackSourceRoute_finalSegment_isAxisAligned
+          formula sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty
+          fallbackClauseMember fallbackLiteralMember fallbackChoiceNone
+    rw [show
+      finalCoordinatedSourceRoutes
+          formula fallbackClauseIndex fallbackLiteralIndex =
+        fallbackRoute from rfl]
+    rw [show
+      classifiedRetainedTerminalData
+          (routeTerminalVector fallbackRoute) =
+        fallbackTerminal from rfl]
+    exact
+      choice.direction_ne_of_otherTerminal_aligned
+        (otherStart := polylineLastEntrance fallbackRoute)
+        (otherFinish := fallbackRoute.getLastD (0, 0))
+        (otherTerminal := fallbackTerminal)
+        fallbackClassified fallbackAligned directNotAligned
+
 /-- Equality of translated canonical centers becomes equality of the direct
 positioned fan center and the translated fallback's fully refined center. -/
 theorem retainedFinalDirectTranslatedFallback_positionedFanCenters_eq_of_sameCenter

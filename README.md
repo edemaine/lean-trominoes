@@ -2365,13 +2365,16 @@ The representation choices for this target are:
   negation and symmetry also supply the failed/successful orientation.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterOrder.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterOrder.lean)
   handles the metadata of a nonzero translated center coincidence.  It proves
-  distinct stored occurrences of one atom, strict direct/fallback terminal
-  order, equality of their physical fan centers, and separation from the
-  translated selected outer replacement.
+  distinct stored occurrences of one atom and strict direct/fallback terminal
+  order for both aligned and oblique direct choices.  The oblique branch uses
+  the fallback's classified axis-aligned final segment to rule out equal
+  terminal directions.  Equality of the physical fan centers then separates
+  either direct route from the translated selected outer replacement.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterBoundarySeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterBoundarySeparation.lean)
-  combines that order with the center-independent translated source corridor,
-  proving that an aligned successful direct boundary strictly avoids the
-  complete translated failed-choice boundary even at a shared physical target.
+  combines that order with the all-choice translated scaled-prefix theorem.
+  Every successful direct boundary, aligned or oblique, therefore strictly
+  avoids the complete translated failed-choice boundary even at a shared
+  physical target.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterSpokeSeparation.lean)
   identifies both suffixes at a shared physical target with positioned copies
   of the same finite Figure 7 spoke family.  Strict angular order makes their
