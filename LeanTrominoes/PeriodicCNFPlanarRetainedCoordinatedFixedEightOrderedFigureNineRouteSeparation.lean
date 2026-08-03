@@ -23,6 +23,73 @@ local instance orderedComposedVariableDecidableEqForSeparation
         (PeriodicPlanarOneInThreeThreeRawVariable Variable)) :=
   PlanarOneInThreeNoUnitsFigureNine.nestedVariableDecidableEq
 
+/-- Four pointwise avoidance conditions—ordinary local/local and
+suffix/suffix separation plus strict separation of the two cross pairs—imply
+complete raw relative route separation for the retained ordered family. -/
+theorem
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRaw_relativeIncidenceRoutesAvoidEachOther_of_avoidances
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (avoidances :
+      ∀ first ∈
+          (PeriodicCNF.incidencesWithMetadata
+            (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+              source).erase).zipIdx,
+        ∀ second ∈
+            (PeriodicCNF.incidencesWithMetadata
+              (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+                source).erase).zipIdx,
+          ∀ relativeTranslate,
+            (first.2, (0, 0)) ≠
+                (second.2, relativeTranslate) →
+              PlanarOneInThreeNoUnitsFigureNine.RelativeSplicedRoutePairAvoidances
+                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+                  source)
+                (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+                  source)
+                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+                  source sourceWidth)
+                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+                  source sourceLocal sourceWidth sourceOccurrences
+                  sourceClausesNonempty)
+                (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
+                  source sourceLocal sourceWidth sourceOccurrences
+                  sourceClausesNonempty)
+                first.1.clauseIndex first.1.literalIndex
+                second.1.clauseIndex second.1.literalIndex
+                relativeTranslate) :
+    PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+        source)
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+        source)
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) := by
+  simpa [
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes]
+    using
+      PlanarOneInThreeNoUnitsFigureNine.splicedRoutes_relativeIncidenceRoutesAvoidEachOther_of_avoidances
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source)
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+          source sourceWidth)
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty)
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty)
+        avoidances
+
 /-- The six generic component conditions, instantiated at every distinct
 relative pair of incidences of the retained ordered composed formula, imply
 complete raw relative route separation. -/

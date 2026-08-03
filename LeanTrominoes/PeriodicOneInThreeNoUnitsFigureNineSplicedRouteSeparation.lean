@@ -421,6 +421,210 @@ theorem relativeSplicedRoutePairComponentsSeparated_of_avoidances_of_endpointPai
         List.head?_map, Option.map_some]
       exact fun equal => firstLiteralSecondSplice (Option.some.inj equal)
 
+/-- The two strict cross-piece separations already imply all five semantic
+endpoint inequalities.  Consequently the four avoidance facts alone imply
+the complete six-field splice condition. -/
+theorem relativeSplicedRoutePairComponentsSeparated_of_avoidances
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (original :
+      OriginalInheritedCanonicalIncidenceRouteSuffixes
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source))
+        (composedPlacement source sourcePlacement)
+        (normalizedLocalEndpoint source sourcePlacement))
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈
+        firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (relativeTranslate : Cell)
+    (avoidances :
+      RelativeSplicedRoutePairAvoidances
+        source sourcePlacement sourceWidth sourceDistinct original
+        firstClauseIndex firstLiteralIndex
+        secondClauseIndex secondLiteralIndex relativeTranslate) :
+    RelativeSplicedRoutePairComponentsSeparated
+      source sourcePlacement sourceWidth sourceDistinct original
+      firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex relativeTranslate := by
+  let suffixes :=
+    completeRouteSuffixes
+      source sourcePlacement sourceWidth sourceDistinct original
+  let placement := composedPlacement source sourcePlacement
+  let offset := placement.translation relativeTranslate
+  let firstLocal :=
+    normalizedLocalRoutes source sourcePlacement
+      firstClauseIndex firstLiteralIndex
+  let secondLocal :=
+    (normalizedLocalRoutes source sourcePlacement
+      secondClauseIndex secondLiteralIndex).map (Cell.add offset)
+  let firstSuffix :=
+    suffixes.routes firstClauseIndex firstLiteralIndex
+  let secondSuffix :=
+    (suffixes.routes
+      secondClauseIndex secondLiteralIndex).map (Cell.add offset)
+  have firstLocalEndpoints :=
+    normalizedLocalRoutes_endpoints_of_members
+      source sourcePlacement sourceWidth sourceDistinct
+      firstClauseMember firstLiteralMember
+  have secondLocalEndpoints :=
+    normalizedLocalRoutes_endpoints_of_members
+      source sourcePlacement sourceWidth sourceDistinct
+      secondClauseMember secondLiteralMember
+  have firstSuffixEndpoints :=
+    suffixes.endpoints
+      firstClause firstClauseIndex firstClauseMember
+      firstLiteral firstLiteralIndex firstLiteralMember
+  have secondSuffixEndpoints :=
+    suffixes.endpoints
+      secondClause secondClauseIndex secondClauseMember
+      secondLiteral secondLiteralIndex secondLiteralMember
+  have secondLocalHead :
+      secondLocal.head? =
+        some
+          (Cell.add offset
+            (PositionedPeriodicCNF.canonicalClausePosition
+              placement secondClause)) := by
+    simp [secondLocal, secondLocalEndpoints.1, placement]
+  have secondLocalLast :
+      secondLocal.getLast? =
+        some
+          (Cell.add offset
+            (normalizedLocalEndpoint source sourcePlacement
+              secondClauseIndex secondLiteralIndex)) := by
+    simp [secondLocal, secondLocalEndpoints.2]
+  have secondSuffixHead :
+      secondSuffix.head? =
+        some
+          (Cell.add offset
+            (normalizedLocalEndpoint source sourcePlacement
+              secondClauseIndex secondLiteralIndex)) := by
+    simp [secondSuffix, secondSuffixEndpoints.1]
+  have secondSuffixLast :
+      secondSuffix.getLast? =
+        some
+          (Cell.add offset
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              placement secondClause secondLiteral)) := by
+    simp [secondSuffix, secondSuffixEndpoints.2, placement]
+  change
+    RoutesAvoidEachOther firstLocal secondLocal ∧
+      RoutesStrictlyAvoidEachOther firstLocal secondSuffix ∧
+      RoutesStrictlyAvoidEachOther firstSuffix secondLocal ∧
+      RoutesAvoidEachOther firstSuffix secondSuffix at avoidances
+  have firstLocalSecondSuffix := avoidances.2.1
+  have firstSuffixSecondLocal := avoidances.2.2.1
+  have firstLocalHeadMember :
+      PositionedPeriodicCNF.canonicalClausePosition
+          placement firstClause ∈ firstLocal :=
+    List.mem_of_mem_head? (by
+      simpa [firstLocal, placement] using firstLocalEndpoints.1)
+  have firstLocalLastMember :
+      normalizedLocalEndpoint source sourcePlacement
+          firstClauseIndex firstLiteralIndex ∈ firstLocal :=
+    mem_of_getLast?_eq_some (by
+      simpa [firstLocal] using firstLocalEndpoints.2)
+  have firstSuffixHeadMember :
+      normalizedLocalEndpoint source sourcePlacement
+          firstClauseIndex firstLiteralIndex ∈ firstSuffix :=
+    List.mem_of_mem_head? (by
+      simpa [firstSuffix] using firstSuffixEndpoints.1)
+  have firstSuffixLastMember :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          placement firstClause firstLiteral ∈ firstSuffix :=
+    mem_of_getLast?_eq_some (by
+      simpa [firstSuffix, placement] using firstSuffixEndpoints.2)
+  have secondLocalHeadMember :
+      Cell.add offset
+          (PositionedPeriodicCNF.canonicalClausePosition
+            placement secondClause) ∈ secondLocal :=
+    List.mem_of_mem_head? secondLocalHead
+  have secondLocalLastMember :
+      Cell.add offset
+          (normalizedLocalEndpoint source sourcePlacement
+            secondClauseIndex secondLiteralIndex) ∈ secondLocal :=
+    mem_of_getLast?_eq_some secondLocalLast
+  have secondSuffixHeadMember :
+      Cell.add offset
+          (normalizedLocalEndpoint source sourcePlacement
+            secondClauseIndex secondLiteralIndex) ∈ secondSuffix :=
+    List.mem_of_mem_head? secondSuffixHead
+  have secondSuffixLastMember :
+      Cell.add offset
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            placement secondClause secondLiteral) ∈ secondSuffix :=
+    mem_of_getLast?_eq_some secondSuffixLast
+  have endpointPairs :
+      RelativeSplicedRouteEndpointPairsSeparated
+        source sourcePlacement
+        firstClause firstClauseIndex firstLiteralIndex firstLiteral
+        secondClause secondClauseIndex secondLiteralIndex secondLiteral
+        relativeTranslate := by
+    change
+      PositionedPeriodicCNF.canonicalClausePosition
+            placement firstClause ≠
+          Cell.add offset
+            (normalizedLocalEndpoint source sourcePlacement
+              secondClauseIndex secondLiteralIndex) ∧
+        normalizedLocalEndpoint source sourcePlacement
+              firstClauseIndex firstLiteralIndex ≠
+          Cell.add offset
+            (PositionedPeriodicCNF.canonicalClausePosition
+              placement secondClause) ∧
+        normalizedLocalEndpoint source sourcePlacement
+              firstClauseIndex firstLiteralIndex ≠
+          Cell.add offset
+            (normalizedLocalEndpoint source sourcePlacement
+              secondClauseIndex secondLiteralIndex) ∧
+        normalizedLocalEndpoint source sourcePlacement
+              firstClauseIndex firstLiteralIndex ≠
+          Cell.add offset
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              placement secondClause secondLiteral) ∧
+        PositionedPeriodicCNF.canonicalLiteralPosition
+              placement firstClause firstLiteral ≠
+          Cell.add offset
+            (normalizedLocalEndpoint source sourcePlacement
+              secondClauseIndex secondLiteralIndex)
+    exact
+      ⟨firstLocalSecondSuffix.2.2.2 _ firstLocalHeadMember
+          _ secondSuffixHeadMember,
+        firstSuffixSecondLocal.2.2.2 _ firstSuffixHeadMember
+          _ secondLocalHeadMember,
+        firstLocalSecondSuffix.2.2.2 _ firstLocalLastMember
+          _ secondSuffixHeadMember,
+        firstLocalSecondSuffix.2.2.2 _ firstLocalLastMember
+          _ secondSuffixLastMember,
+        firstSuffixSecondLocal.2.2.2 _ firstSuffixLastMember
+          _ secondLocalLastMember⟩
+  exact
+    relativeSplicedRoutePairComponentsSeparated_of_avoidances_of_endpointPairs
+      source sourcePlacement sourceWidth sourceDistinct original
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember relativeTranslate
+      avoidances endpointPairs
+
 /-- Relative component separation implies separation of the first complete
 route from the translated second complete route. -/
 theorem splicedRoutes_relative_avoidEachOther_of_components
@@ -600,6 +804,69 @@ theorem splicedRoutes_relativeIncidenceRoutesAvoidEachOther_of_components
       firstClauseMember secondClauseMember
       firstLiteralMember secondLiteralMember relativeTranslate
       (components first firstMember second secondMember
+        relativeTranslate occurrencesDifferent)
+
+/-- Pointwise four-field avoidance certificates assemble directly into the
+complete incidence-indexed separation predicate.  The strict cross fields
+automatically discharge both allowed-contact fields. -/
+theorem splicedRoutes_relativeIncidenceRoutesAvoidEachOther_of_avoidances
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (original :
+      OriginalInheritedCanonicalIncidenceRouteSuffixes
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source))
+        (composedPlacement source sourcePlacement)
+        (normalizedLocalEndpoint source sourcePlacement))
+    (avoidances :
+      ∀ first ∈
+          (PeriodicCNF.incidencesWithMetadata
+            (PeriodicOneInThreeNoUnitsPositioned.formula
+              (PeriodicOneInThreePositioned.formula source)).erase).zipIdx,
+        ∀ second ∈
+            (PeriodicCNF.incidencesWithMetadata
+              (PeriodicOneInThreeNoUnitsPositioned.formula
+                (PeriodicOneInThreePositioned.formula source)).erase).zipIdx,
+          ∀ relativeTranslate,
+            (first.2, (0, 0)) ≠
+                (second.2, relativeTranslate) →
+              RelativeSplicedRoutePairAvoidances
+                source sourcePlacement sourceWidth sourceDistinct original
+                first.1.clauseIndex first.1.literalIndex
+                second.1.clauseIndex second.1.literalIndex
+                relativeTranslate) :
+    PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther
+      (PeriodicOneInThreeNoUnitsPositioned.formula
+        (PeriodicOneInThreePositioned.formula source))
+      (composedPlacement source sourcePlacement)
+      (splicedRoutes
+        source sourcePlacement sourceWidth sourceDistinct original) := by
+  apply
+    splicedRoutes_relativeIncidenceRoutesAvoidEachOther_of_components
+      source sourcePlacement sourceWidth sourceDistinct original
+  intro first firstMember second secondMember
+    relativeTranslate occurrencesDifferent
+  rcases PositionedPeriodicCNF.incidenceMetadata_of_tagged
+      (PeriodicOneInThreeNoUnitsPositioned.formula
+        (PeriodicOneInThreePositioned.formula source))
+      firstMember with
+    ⟨firstClause, firstLiteral,
+      firstClauseMember, firstLiteralMember, _⟩
+  rcases PositionedPeriodicCNF.incidenceMetadata_of_tagged
+      (PeriodicOneInThreeNoUnitsPositioned.formula
+        (PeriodicOneInThreePositioned.formula source))
+      secondMember with
+    ⟨secondClause, secondLiteral,
+      secondClauseMember, secondLiteralMember, _⟩
+  exact
+    relativeSplicedRoutePairComponentsSeparated_of_avoidances
+      source sourcePlacement sourceWidth sourceDistinct original
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember relativeTranslate
+      (avoidances first firstMember second secondMember
         relativeTranslate occurrencesDifferent)
 
 end PlanarOneInThreeNoUnitsFigureNine

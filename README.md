@@ -5306,9 +5306,9 @@ The representation choices for this target are:
   packages the six local/local, local/suffix, and suffix/suffix conditions
   sufficient for two complete composed routes at an arbitrary semantic lattice
   offset to avoid each other, with all four splice-endpoint equations discharged
-  by the canonical certificates.  A second interface reduces the two allowed-
-  contact conditions to five inequalities among the semantic clause, splice,
-  and literal endpoints, leaving only four continuous-avoidance obligations.
+  by the canonical certificates.  The two strict cross-piece conditions force
+  the five semantic endpoint inequalities automatically, leaving only four
+  continuous-avoidance obligations.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean)
   instantiates the ordered suffix family over the retained source, then
   completes both generations of auxiliary routes and splices them to the
@@ -5322,8 +5322,9 @@ The representation choices for this target are:
   premise now suffices to promote it to the ribbon-ready interface.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
   instantiates the relative splice assembly for the retained ordered fixed-eight
-  route family.  Its six explicit component conditions imply global raw route
-  separation and hence ribbon readiness of the normalized drawing.
+  route family.  Four explicit avoidance conditions imply all six splice
+  conditions, global raw route separation, and hence ribbon readiness of the
+  normalized drawing.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
