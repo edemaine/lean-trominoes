@@ -2420,6 +2420,11 @@ The representation choices for this target are:
   suffixes.  Point-neighborhood separation is applied in both relative
   orientations, one certificate is transported back to the original frame,
   and endpoint joins assemble the complete translated fallback occurrences.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCompleteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCompleteSeparation.lean)
+  combines the shared-target and distinct-target branches into unconditional
+  strict separation of two failed-choice occurrence routes at every nonzero
+  shift, discharging the fallback/fallback residual proposition used by the
+  copied-source reduction.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
