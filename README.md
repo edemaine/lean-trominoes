@@ -2350,7 +2350,8 @@ The representation choices for this target are:
   the complete fallback-versus-radius-96 theorem there.  Translating forward
   separates that suffix from the whole translated fallback occurrence.  The
   four piece pairs then assemble into complete public relative separation for
-  every aligned successful/failed pair at distinct translated centers.
+  every aligned successful/failed pair at distinct translated centers; shift
+  negation and symmetry also supply the failed/successful orientation.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating

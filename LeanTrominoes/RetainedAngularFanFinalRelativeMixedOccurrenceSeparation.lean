@@ -547,5 +547,109 @@ theorem
       fallbackChoiceNone directAligned relativeTranslate
       relativeTranslateNonzero centersDifferent
 
+/-- Reverse public selector orientation, obtained at the negative relative
+shift and translated back to the original coordinate frame. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_strictlyAvoids_translated_of_first_choice_none_second_some_of_axisAligned
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {fallbackClause directClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackClauseIndex directClauseIndex : Nat}
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {fallbackLiteral directLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {fallbackLiteralIndex directLiteralIndex : Nat}
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (directAligned : choice.sourceSegment.IsAxisAligned)
+    (relativeTranslate : Cell)
+    (relativeTranslateNonzero : relativeTranslate ≠ (0, 0))
+    (centersDifferent :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          fallbackClause fallbackLiteral ≠
+        Cell.add
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            directClause directLiteral)
+          ((finalCoordinatedPlacement formula).translation
+            relativeTranslate)) :
+    RoutesStrictlyAvoidEachOther
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula fallbackClauseIndex fallbackLiteralIndex)
+      (translatePolyline
+        ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+          formula).translation relativeTranslate)
+        (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula directClauseIndex directLiteralIndex)) := by
+  let reverseTranslate := Cell.neg relativeTranslate
+  let physicalPlacement :=
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement formula
+  let backwardsPhysical :=
+    physicalPlacement.translation reverseTranslate
+  let forwardsPhysical :=
+    physicalPlacement.translation relativeTranslate
+  have reverseTranslateNonzero : reverseTranslate ≠ (0, 0) := by
+    intro reverseZero
+    apply relativeTranslateNonzero
+    rcases relativeTranslate with ⟨translateX, translateY⟩
+    simp [reverseTranslate, Cell.neg, Cell.sub] at reverseZero ⊢
+    omega
+  have reverseCentersDifferent :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral ≠
+        Cell.add
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            fallbackClause fallbackLiteral)
+          ((finalCoordinatedPlacement formula).translation
+            reverseTranslate) := by
+    simpa [reverseTranslate] using
+      reverseCanonicalCentersDifferent
+        (finalCoordinatedPlacement formula)
+        fallbackClause directClause fallbackLiteral directLiteral
+        relativeTranslate centersDifferent
+  have backwards :=
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_strictlyAvoids_translated_of_first_choice_some_second_none_of_axisAligned
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember choiceLookup
+      fallbackChoiceNone directAligned reverseTranslate
+      reverseTranslateNonzero reverseCentersDifferent
+  have shifted :=
+    backwards.symm.translatePolyline forwardsPhysical
+  have shiftCancel :
+      Cell.add backwardsPhysical forwardsPhysical = (0, 0) := by
+    rcases relativeTranslate with ⟨translateX, translateY⟩
+    simp [backwardsPhysical, forwardsPhysical, physicalPlacement,
+      reverseTranslate, PeriodicVariablePlacement.translation,
+      Cell.neg, Cell.sub, Cell.add, Cell.scale]
+  rw [translatePolyline_add, shiftCancel, translatePolyline_zero] at shifted
+  simpa [backwardsPhysical, forwardsPhysical, physicalPlacement] using shifted
+
 end PeriodicOrthocrossing
 end LeanTrominoes
