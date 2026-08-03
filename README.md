@@ -5614,7 +5614,9 @@ The representation choices for this target are:
   factor-72 refinement and the two generated-clause anchor gauges, reducing
   transformed inherited-core separation to the original source certificate
   at an explicit anchor-adjusted lattice offset; the affine identity is
-  discharged for the concrete composed placement.
+  discharged for the concrete composed placement.  Deleting the obsolete
+  source heads preserves this separation and leaves only variable-tail
+  contacts, exactly the suffix-side interface needed by route splicing.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily.lean)
   recovers each twice-inherited original occurrence from the composed
   metadata, converts its index to a certified three-port fan slot, and

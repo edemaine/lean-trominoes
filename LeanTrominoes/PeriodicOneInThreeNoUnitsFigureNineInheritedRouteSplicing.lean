@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineHeadReplacement
+import LeanTrominoes.OrthogonalPolylineTailEndpointContactSeparation
 import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
 import LeanTrominoes.PeriodicGridDrawingScaling
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineInheritedEndpoints
@@ -467,6 +468,105 @@ theorem inheritedSourceRoutes_relative_avoidEachOther
       PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
       Cell.add, Cell.sub, Cell.scale] <;>
     ring
+
+/-- Refinement and gauge translation preserve the absence of repeated route
+points. -/
+theorem inheritedSourceRoute_nodup
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourceRoute : List Cell)
+    (sourceNodup : sourceRoute.Nodup) :
+    (inheritedSourceRoute
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute).Nodup := by
+  unfold inheritedSourceRoute
+    PeriodicOrthocrossing.translatePolyline scalePolyline
+  apply List.Nodup.map (Cell.add_left_injective _)
+  apply List.Nodup.map
+    (Cell.scale_injective (factor := composedGadgetScale) (by decide))
+  exact sourceNodup
+
+/-- After deleting the obsolete source-clause heads, the relatively
+transformed inherited cores remain separated and every surviving contact is
+at their variable-side tails. -/
+theorem inheritedSourceRoute_tails_relative_separated
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (firstSourceClause secondSourceClause :
+      PositionedPeriodicClause Variable)
+    (firstGeneratedClause secondGeneratedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (firstSourceRoute secondSourceRoute : List Cell)
+    (relativeTranslate : Cell)
+    (sourceAvoids :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        firstSourceRoute
+        (secondSourceRoute.map
+          (Cell.add
+            (sourcePlacement.translation
+              (inheritedSourceRelativeTranslate
+                firstSourceClause secondSourceClause
+                firstGeneratedClause secondGeneratedClause
+                relativeTranslate)))))
+    (firstSourceNodup : firstSourceRoute.Nodup)
+    (secondSourceNodup : secondSourceRoute.Nodup) :
+    let outputPlacement := composedPlacement source sourcePlacement
+    let firstTransformed :=
+      inheritedSourceRoute outputPlacement sourcePlacement
+        firstSourceClause firstGeneratedClause firstSourceRoute
+    let secondTransformed :=
+      (inheritedSourceRoute outputPlacement sourcePlacement
+        secondSourceClause secondGeneratedClause secondSourceRoute).map
+          (Cell.add (outputPlacement.translation relativeTranslate))
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        firstTransformed.tail secondTransformed.tail ∧
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesMeetOnlyAtTails
+        firstTransformed.tail secondTransformed.tail := by
+  let outputPlacement := composedPlacement source sourcePlacement
+  let firstTransformed :=
+    inheritedSourceRoute outputPlacement sourcePlacement
+      firstSourceClause firstGeneratedClause firstSourceRoute
+  let secondTransformedBase :=
+    inheritedSourceRoute outputPlacement sourcePlacement
+      secondSourceClause secondGeneratedClause secondSourceRoute
+  let secondTransformed :=
+    secondTransformedBase.map
+      (Cell.add (outputPlacement.translation relativeTranslate))
+  have transformedAvoids :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        firstTransformed secondTransformed := by
+    simpa [outputPlacement, firstTransformed,
+      secondTransformedBase, secondTransformed] using
+      inheritedSourceRoutes_relative_avoidEachOther
+        source sourcePlacement firstSourceClause secondSourceClause
+        firstGeneratedClause secondGeneratedClause
+        firstSourceRoute secondSourceRoute relativeTranslate sourceAvoids
+  have firstTransformedNodup : firstTransformed.Nodup := by
+    exact inheritedSourceRoute_nodup
+      outputPlacement sourcePlacement firstSourceClause
+      firstGeneratedClause firstSourceRoute firstSourceNodup
+  have secondTransformedNodup : secondTransformed.Nodup := by
+    apply List.Nodup.map (Cell.add_left_injective _)
+    exact inheritedSourceRoute_nodup
+      outputPlacement sourcePlacement secondSourceClause
+      secondGeneratedClause secondSourceRoute secondSourceNodup
+  exact
+    ⟨PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesAvoidEachOther_tail_of_avoid_of_nodup
+        transformedAvoids firstTransformedNodup secondTransformedNodup,
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routesMeetOnlyAtTails_tail_of_avoid_of_nodup
+        transformedAvoids firstTransformedNodup secondTransformedNodup⟩
 
 /-- Attach a composed boundary port directly to the transformed first exit
 of an original source route. -/
