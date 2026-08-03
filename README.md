@@ -520,6 +520,11 @@ The representation choices for this target are:
   endpoint, and connects the boundary port directly to its transformed first
   exit.  Exact canonical endpoints, orthogonality, and the source route's
   final direction are preserved.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteIsolation.lean)
+  applies the positive-scaling and translation transport to the inherited
+  source route before its clause-side head is replaced.  Both isolated
+  endpoints of an arbitrary orthogonal source route survive the `6 × 6`
+  refinement and anchor-gauge change, even if it has internal loops.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
   packages those per-incidence splices into a total proof-backed inherited
   suffix family.  Any canonical orthogonal source route family with certified
@@ -2710,8 +2715,8 @@ The representation choices for this target are:
   transports the coordinated raw Figure 9 formula, placement, and routes
   through the exact-one variable wrapper.  The wrapper changes no geometry
   or presentation indices, so generic renaming preserves canonical
-  endpoints, orthogonality, atom distinctness, width three, and the
-  first-exit certificate verbatim.
+  endpoints, orthogonality, both endpoint-isolation conditions, atom
+  distinctness, width three, and the first-exit certificate verbatim.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRoutes.lean)
   applies positioned unit elimination to the wrapped coordinated Figure 9
   routes.  The final unit-free exact-one formula has only binary or ternary

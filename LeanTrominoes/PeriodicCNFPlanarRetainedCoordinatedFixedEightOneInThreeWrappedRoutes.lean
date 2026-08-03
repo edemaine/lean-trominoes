@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeRoutes
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeInheritedRouteIsolation
 import LeanTrominoes.PositionedPeriodicCNFCanonicalRouteRenaming
 
 /-!
@@ -222,6 +222,71 @@ theorem
     retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeFormula,
     retainedCoordinatedFixedEightPeriodicPlanarOneInThreePlacement] using
       ⟨endpoints.1, endpoints.2, orthogonal⟩
+
+/-- Opaque wrapping preserves both endpoint-isolation certificates of every
+coordinated Figure 9 route. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeIncidenceRoutes_endpointIsolation
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (WrappedPeriodicVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    AxisDirection.HeadNotInTail
+        (AxisDirection.unitSubdividePolyline
+          (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeIncidenceRoutes
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty clauseIndex literalIndex)) ∧
+      AxisDirection.LastNotInDropLast
+        (AxisDirection.unitSubdividePolyline
+          (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeIncidenceRoutes
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty clauseIndex literalIndex)) := by
+  let rawFormula :=
+    retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeRawFormula
+      source
+  let routes :=
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  have transferred :=
+    PositionedPeriodicCNF.incidenceIndexProperty_rename
+      rawFormula WrappedPeriodicVariable.mk
+      (fun sourceClauseIndex sourceLiteralIndex =>
+        AxisDirection.HeadNotInTail
+            (AxisDirection.unitSubdividePolyline
+              (routes sourceClauseIndex sourceLiteralIndex)) ∧
+          AxisDirection.LastNotInDropLast
+            (AxisDirection.unitSubdividePolyline
+              (routes sourceClauseIndex sourceLiteralIndex)))
+      (fun _sourceClause _sourceClauseIndex sourceClauseMember
+          _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
+        retainedCoordinatedFixedEightPeriodicPlanarOneInThreeRawIncidenceRoutes_endpointIsolation
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty sourceClauseMember sourceLiteralMember)
+      clauseMember literalMember
+  simpa [
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeIncidenceRoutes,
+    retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeFormula,
+    rawFormula, routes] using transferred
 
 /-- Opaque wrapping also preserves every coordinated Figure 9 route's first
 exit. -/

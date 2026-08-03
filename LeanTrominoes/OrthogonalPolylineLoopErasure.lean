@@ -542,6 +542,26 @@ theorem LastNotInDropLast.map_of_injective
     exact originalMapped.trans mappedLastEqual.symm
   simpa [originalEqual] using originalMember
 
+/-- Removing a route's first listed point preserves isolation of its final
+endpoint. -/
+theorem LastNotInDropLast.tail
+    {points : List Cell}
+    (fresh : LastNotInDropLast points) :
+    LastNotInDropLast points.tail := by
+  intro last tailLast tailMember
+  cases points with
+  | nil => simp at tailLast
+  | cons first rest =>
+      cases rest with
+      | nil => simp at tailLast
+      | cons second tail =>
+          have fullLast :
+              (first :: second :: tail).getLast? = some last := by
+            simpa using tailLast
+          apply fresh last fullLast
+          rw [List.dropLast_cons_of_ne_nil (by simp)]
+          exact List.mem_cons_of_mem first tailMember
+
 /-- A simple orthogonal route has an isolated first endpoint even after all
 of its long segments are subdivided into unit steps. -/
 theorem headNotInTail_unitSubdividePolyline_of_simple
