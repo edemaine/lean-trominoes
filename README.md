@@ -2415,6 +2415,11 @@ The representation choices for this target are:
   disjoint discarded terminal rectangles; conservative outer-fan bounds and
   the already symmetric prefix interactions then assemble strict separation
   of the two selected fallback boundaries.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackDistinctCenterOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackDistinctCenterOccurrenceSeparation.lean)
+  extends the distinct-center boundary result through the unchanged Figure 7
+  suffixes.  Point-neighborhood separation is applied in both relative
+  orientations, one certificate is transported back to the original frame,
+  and endpoint joins assemble the complete translated fallback occurrences.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
