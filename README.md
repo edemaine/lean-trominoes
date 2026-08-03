@@ -2245,7 +2245,10 @@ The representation choices for this target are:
   segment interiors are disjoint and all listed-point contacts occur only at
   outer endpoints.  Unit-step support therefore promotes the drawing to the
   exact ribbon-ready predicate; same-route, same-translate comparisons are
-  discharged from simplicity rather than left implicit.
+  discharged from simplicity rather than left implicit.  A translation-
+  invariant equivalent form fixes the first route at shift zero and asks
+  only about the second route's relative periodic shift, matching the local
+  macrocell geometry used by the remaining construction.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedAuxiliaryRouteIsolation.lean)
   discharges both endpoint-isolation obligations for every fresh auxiliary
   incidence in the final unit-elimination layer.  The completed auxiliary

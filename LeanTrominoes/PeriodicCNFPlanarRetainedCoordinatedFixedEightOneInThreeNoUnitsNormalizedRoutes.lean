@@ -502,5 +502,33 @@ theorem
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
 
+/-- It suffices to separate every pair after fixing the first normalized
+route in the fundamental representative and translating only the second by
+one relative lattice offset. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_isRibbonReady_of_relativeLiftedRoutesAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (separated :
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).RelativeLiftedRoutesAvoidEachOther) :
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).IsRibbonReady :=
+  PeriodicGridDrawing.isRibbonReady_of_relativeLiftedRoutesAvoidEachOther
+    separated
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_routesSimple
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+    (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceDrawing_hasUnitSteps
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty)
+
 end PeriodicOrthocrossing
 end LeanTrominoes

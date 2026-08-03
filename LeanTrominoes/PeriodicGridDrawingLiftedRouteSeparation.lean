@@ -34,6 +34,93 @@ def LiftedRoutesAvoidEachOther (drawing : PeriodicGridDrawing) : Prop :=
               (Cell.add
                 (drawing.periodTranslation secondTranslate)))
 
+/-- Translation-invariant form of `LiftedRoutesAvoidEachOther`: hold the
+first route in the fundamental representative and translate only the second
+route by the relative lattice shift.  This is the convenient interface for
+geometric constructions whose local separation theorem is stated relative
+to one source block. -/
+def RelativeLiftedRoutesAvoidEachOther
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ first ∈ drawing.edgeRoutes.zipIdx,
+    ∀ second ∈ drawing.edgeRoutes.zipIdx,
+      ∀ relativeTranslate,
+        (first.2, (0, 0)) ≠
+            (second.2, relativeTranslate) →
+          RoutesAvoidEachOther
+            first.1
+            (second.1.map
+              (Cell.add
+                (drawing.periodTranslation relativeTranslate)))
+
+/-- Complete lifted separation is equivalent to checking only one relative
+periodic translate for each pair of stored routes. -/
+theorem liftedRoutesAvoidEachOther_iff_relative
+    (drawing : PeriodicGridDrawing) :
+    drawing.LiftedRoutesAvoidEachOther ↔
+      drawing.RelativeLiftedRoutesAvoidEachOther := by
+  constructor
+  · intro separated first firstMember second secondMember
+      relativeTranslate occurrencesDifferent
+    have avoids :=
+      separated first firstMember second secondMember
+        (0, 0) relativeTranslate occurrencesDifferent
+    have zeroTranslate :
+        first.1.map
+            (Cell.add (drawing.periodTranslation (0, 0))) =
+          first.1 := by
+      induction first.1 with
+      | nil => rfl
+      | cons point points induction =>
+          simp only [List.map_cons]
+          rw [induction]
+          congr 1
+          apply Prod.ext <;>
+            simp [periodTranslation, Cell.add, Cell.scale]
+    rwa [zeroTranslate] at avoids
+  · intro separated first firstMember second secondMember
+      firstTranslate secondTranslate occurrencesDifferent
+    let relativeTranslate :=
+      Cell.sub secondTranslate firstTranslate
+    have relativeOccurrencesDifferent :
+        (first.2, (0, 0)) ≠
+          (second.2, relativeTranslate) := by
+      intro equal
+      apply occurrencesDifferent
+      have indicesEqual : first.2 = second.2 :=
+        congrArg (fun occurrence : Nat × Cell => occurrence.1) equal
+      have relativeZero : (0, 0) = relativeTranslate :=
+        congrArg (fun occurrence : Nat × Cell => occurrence.2) equal
+      apply Prod.ext indicesEqual
+      rcases firstTranslate with ⟨firstX, firstY⟩
+      rcases secondTranslate with ⟨secondX, secondY⟩
+      simp only [relativeTranslate, Cell.sub, Prod.mk.injEq] at relativeZero
+      simp only [Prod.mk.injEq]
+      constructor <;> omega
+    have relativeAvoids :=
+      separated first firstMember second secondMember
+        relativeTranslate relativeOccurrencesDifferent
+    have translatedAvoids :=
+      routesAvoidEachOther_translate relativeAvoids
+        (drawing.periodTranslation firstTranslate)
+    have secondTranslation :
+        (second.1.map
+            (Cell.add
+              (drawing.periodTranslation relativeTranslate))).map
+            (Cell.add
+              (drawing.periodTranslation firstTranslate)) =
+          second.1.map
+            (Cell.add
+              (drawing.periodTranslation secondTranslate)) := by
+      simp only [List.map_map]
+      apply List.map_congr_left
+      intro point pointMember
+      rcases point with ⟨pointX, pointY⟩
+      apply Prod.ext <;>
+        simp [periodTranslation, relativeTranslate,
+          Cell.add, Cell.sub, Cell.scale] <;>
+        ring
+    rwa [secondTranslation] at translatedAvoids
+
 private theorem tagged_eq_of_mem_zipIdx_of_snd_eq
     {Item : Type*} {items : List Item}
     {first second : Item × Nat}
@@ -360,6 +447,20 @@ theorem isRibbonReady_of_liftedRoutesAvoidEachOther
       separated simple unitSteps,
     routePointsMeetOnlyAtEndpoints_of_liftedRoutesAvoidEachOther
       separated simple⟩
+
+/-- Relative-shift separation is the minimal pairwise hypothesis needed for
+ribbon readiness; the absolute shifts are restored by common translation. -/
+theorem isRibbonReady_of_relativeLiftedRoutesAvoidEachOther
+    {drawing : PeriodicGridDrawing}
+    (separated : drawing.RelativeLiftedRoutesAvoidEachOther)
+    (simple :
+      ∀ route ∈ drawing.edgeRoutes,
+        LocalIncidenceDrawing.RouteIsSimple route)
+    (unitSteps : drawing.HasUnitSteps) :
+    drawing.IsRibbonReady :=
+  isRibbonReady_of_liftedRoutesAvoidEachOther
+    ((liftedRoutesAvoidEachOther_iff_relative drawing).mpr separated)
+    simple unitSteps
 
 end PeriodicGridDrawing
 end LeanTrominoes
