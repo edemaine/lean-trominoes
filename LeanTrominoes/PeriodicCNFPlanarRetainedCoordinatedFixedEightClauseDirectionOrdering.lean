@@ -121,6 +121,56 @@ theorem
             sourceClausesNonempty sourceClauseMember sourceLiteralMember).2.2)
         clauseMember literalMember
 
+/-- Reindexing by clockwise clause direction and changing the whole-period
+anchor gauge preserve the absence of repeated route points. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_nodup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+      source clauseIndex literalIndex).Nodup := by
+  rcases PositionedPeriodicCNF.exists_sourceLiteral_of_orderedLiteral_mem
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      clauseEq, literalEq, orderedRouteEq⟩
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  subst clause
+  subst literal
+  rw [retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes,
+    PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection,
+    sourceClauseLookup, orderedRouteEq]
+  unfold translatePolyline
+  apply List.Nodup.map (Cell.add_left_injective _)
+  exact
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_isSimple
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty sourceClauseMember sourceLiteralMember).1
+
 /-- Every reordered retained source route still consists of unit lattice
 steps. -/
 theorem

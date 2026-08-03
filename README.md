@@ -5603,7 +5603,8 @@ The representation choices for this target are:
   at each shared clause endpoint, while unit steps make every exit genuine;
   consequently every reordered ternary clause exposes its three routes in
   clockwise order.  The reordered presentation also retains the width-three
-  bound, per-clause atom distinctness, canonical route geometry, and
+  bound, per-clause atom distinctness, canonical route geometry, route
+  point injectivity, and
   satisfiability equivalence with the original source.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean)
   gives the finite noncrossing fan from the three fixed composed Figure 9
@@ -5665,7 +5666,12 @@ The representation choices for this target are:
   conditions, global raw route separation, and hence ribbon readiness of the
   normalized drawing.  It also transports the completed fixed-eight relative
   separation certificate through clockwise clause reordering, supplying the
-  inherited source geometry used by the suffix side of that splice.
+  inherited source geometry used by the suffix side of that splice.  The
+  composed occurrence provenance now discharges the adjusted source-occurrence
+  inequality for every distinct final relative occurrence; together with
+  reordered-route point injectivity, the factor-72 transport theorem proves
+  that both transformed inherited route tails avoid each other and can meet
+  only at their variable-side endpoints.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
