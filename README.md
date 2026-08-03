@@ -2504,6 +2504,13 @@ The representation choices for this target are:
   normalized crossover residue.  For routed-clause direct occurrences it
   additionally transports the carrier-side outside half-plane to the exact
   physical routed-clause origin.
+- [`LeanTrominoes/RetainedFinalRouteCommonFrameTerminalSeparation.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameTerminalSeparation.lean)
+  reindexes a successful oblique direct choice and an arbitrary selected
+  carrier occurrence into the same physical frame.  The finite equality-lens
+  endpoint calculation then proves that every overlapping terminal or
+  normalized-crossover contact has strictly separated final-segment
+  rectangles unless the two final endpoints coincide, and the dichotomy is
+  transported back to the original occurrences.
 - [`LeanTrominoes/RetainedFinalRouteCommonFrameCorridorSeparation.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameCorridorSeparation.lean)
   packages an arbitrary final carrier boundary and strict prefix avoidance
   into the refined terminal-corridor predicate.  Isolating this dependent
