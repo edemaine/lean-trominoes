@@ -2279,6 +2279,12 @@ The representation choices for this target are:
   source-clause block inherit the normalized local drawing's complete
   pairwise separation.  Only inherited source-variable incidences now need
   separate endpoint-isolation and splice geometry.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedSplicedRouteSeparation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedSplicedRouteSeparation.lean)
+  packages the remaining pairwise splice geometry into six component facts:
+  local-route avoidance with head-only contact, strict avoidance for both
+  local/suffix cross pairs, and suffix avoidance with tail-only contact.  The
+  standard local and canonical-suffix endpoint certificates then assemble
+  those facts into separation of the complete final routes.
 - [`LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean`](LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean)
   certifies the terminal geometry shared by all inherited coordinated
   routes.  Each of the eight explicit Figure 7 spokes is simple, and remains
