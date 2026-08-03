@@ -525,6 +525,14 @@ The representation choices for this target are:
   source route before its clause-side head is replaced.  Both isolated
   endpoints of an arbitrary orthogonal source route survive the `6 × 6`
   refinement and anchor-gauge change, even if it has internal loops.
+  [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedConnectorIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedConnectorIsolation.lean)
+  develops the complementary head-replacement geometry.  A connector's
+  target remains isolated whenever it is outside the first detour segment;
+  in particular this holds for the vertical first exits of eliminated
+  Figure 9 unit clauses.  A scaled source endpoint outside the source
+  route's first segment cannot occur on the connector, and an
+  endpoint-isolated route ending at its first exit is proved to consist of
+  exactly that one segment.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamily.lean)
   packages those per-incidence splices into a total proof-backed inherited
   suffix family.  Any canonical orthogonal source route family with certified
