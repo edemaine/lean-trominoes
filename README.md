@@ -2450,6 +2450,11 @@ The representation choices for this target are:
   declared clause or variable vertex.  A carrier endpoint at that lift is
   converted back into an exact routed occurrence without first assuming the
   translated site belongs to the finite retained enumeration.
+- [`LeanTrominoes/RetainedFinalRouteCarrierFrameTerminalContacts.lean`](LeanTrominoes/RetainedFinalRouteCarrierFrameTerminalContacts.lean)
+  applies that arbitrary-lift proximity in the selected carrier frame.
+  Overlapping routed-clause and routed-variable direct components yield exact
+  source- and target-terminal incidences, reducing the direct-source case to
+  those two contacts plus one translated-crossover residue.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and
