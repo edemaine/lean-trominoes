@@ -2300,6 +2300,13 @@ The representation choices for this target are:
   endpoint-only source separation to strict contact-free prefix separation,
   even when the two translated incidences share their variable endpoint.
   The result is also transported through the complete source-first scaling.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeDirectSourceModels.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeDirectSourceModels.lean)
+  identifies semantic translation of every successful public direct-source
+  route with translation of its checked finite-atlas choice's component
+  origin.  The atlas positioning offset is proved equal to the fully refined
+  drawing period shift, and the represented source segment translates in the
+  same unscaled retained-source frame.  Periodic direct-route geometry can
+  therefore reuse the existing finite complete-Figure-7 models.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
