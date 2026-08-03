@@ -2459,7 +2459,13 @@ The representation choices for this target are:
   begins the translated-crossover branch by normalizing its halo crossing to
   the fundamental square.  The correspondingly translated selected carrier
   support contains that canonical point, which proves its occurrence is
-  neighboring and hence that the translated link is a raw retained lens.
+  neighboring and hence that the translated link is a raw retained lens;
+  preserved overlap then gives exact incidence with the canonical crossover.
+- [`LeanTrominoes/RetainedFinalRouteCommonFrameSelections.lean`](LeanTrominoes/RetainedFinalRouteCommonFrameSelections.lean)
+  reindexes any recovered final route into an arbitrary finite component
+  frame, proves exact route equivariance under the compensating physical
+  translation, and transports its local clause and literal indices for the
+  common carrier-boundary argument.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and
