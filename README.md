@@ -5288,6 +5288,10 @@ The representation choices for this target are:
   splices each connector directly to the scaled inherited unit-step route.
   The splice has exact endpoints and orthogonality, while common translation
   preserves the fan's certified pairwise strict separation.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily.lean)
+  recovers each twice-inherited original occurrence from the composed
+  metadata, converts its index to a certified three-port fan slot, and
+  packages the selected splices as a total canonical suffix family.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
