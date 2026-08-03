@@ -2345,6 +2345,12 @@ The representation choices for this target are:
   assembles the translated retained prefix and selected outer fan.  Thus a
   successful aligned direct source-to-boundary route strictly avoids the
   complete translated failed-choice boundary under the same hypotheses.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedOccurrenceSeparation.lean)
+  moves a direct Figure 7 suffix backward into the fallback cell and applies
+  the complete fallback-versus-radius-96 theorem there.  Translating forward
+  separates that suffix from the whole translated fallback occurrence.  The
+  four piece pairs then assemble into complete public relative separation for
+  every aligned successful/failed pair at distinct translated centers.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
