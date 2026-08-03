@@ -2435,6 +2435,11 @@ The representation choices for this target are:
   narrow translated bounding rectangle.  Carrier/macrocell occurrence pairs
   therefore yield the source-prefix raster certificate whenever those two
   explicit enclosing rectangles are separated.
+- [`LeanTrominoes/RetainedFinalRouteCarrierMacrocellOverlapNormalization.lean`](LeanTrominoes/RetainedFinalRouteCarrierMacrocellOverlapNormalization.lean)
+  moves arbitrary carrier and macrocell occurrences into their common
+  physical frame.  The four translated rectangle corners reduce exactly to
+  a relative carrier link and the original macrocell center, preserving and
+  reflecting the remaining overlap test.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and
