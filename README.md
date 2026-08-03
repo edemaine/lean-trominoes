@@ -2395,6 +2395,11 @@ The representation choices for this target are:
   failed-choice boundaries: the fully refined translated source prefix of
   either fallback strictly avoids the other fallback's policy-selected
   ordinary or delayed-lane outer replacement at every nonzero shift.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterOuterSeparation.lean)
+  handles the complementary shared-target interaction.  Strict agreement of
+  terminal-direction and occurrence-slot order separates the two selected
+  outer replacements across all four ordinary/delayed-lane policy pairs,
+  after transporting the second fan center through the period translation.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
