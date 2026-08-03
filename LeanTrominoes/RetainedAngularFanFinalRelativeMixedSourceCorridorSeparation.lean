@@ -1,5 +1,7 @@
 import LeanTrominoes.RetainedAngularFanFinalRelativeMixedSourceSeparation
 import LeanTrominoes.RetainedAngularFanFinalMixedAlignedCorridorSeparation
+import LeanTrominoes.RetainedAngularFanFinalRelativeMixedComponentCorridorReduction
+import LeanTrominoes.RetainedFinalRouteCommonFrameBoundaries
 import LeanTrominoes.OrthogonalPolylineSymmetries
 
 /-!
@@ -754,6 +756,147 @@ theorem
       translatedFallbackRoute directRoute directTerminal
       translatedFallbackRetained directRetained
       translatedFallbackLength directLength directClassified rectangles
+
+/-- At every nonzero relative shift, the translated failed-choice source
+prefix has the exact refined terminal corridor against an arbitrary successful
+direct route.  The only non-rectangular component case is an overlapping
+carrier lens, where the common-frame carrier boundary supplies the corridor
+checkpoint separation. -/
+theorem
+    retainedFinalTranslatedFallbackDirect_sourcePrefixCorridorSeparated_of_nonzero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex fallbackClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (fallbackClauseMember :
+      (fallbackClause, fallbackClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex fallbackLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (fallbackLiteralMember :
+      (fallbackLiteral, fallbackLiteralIndex) ∈
+        fallbackClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (fallbackChoiceNone :
+      retainedFinalDirectSourceRouteChoice?
+          formula fallbackClauseIndex fallbackLiteralIndex = none)
+    (relativeTranslate : Cell)
+    (relativeTranslateNonzero : relativeTranslate ≠ (0, 0)) :
+    SourcePrefixCorridorSeparated
+      (translatePolyline
+        ((finalCoordinatedPlacement formula).translation relativeTranslate)
+        (finalCoordinatedSourceRoutes
+          formula fallbackClauseIndex fallbackLiteralIndex))
+      (finalCoordinatedSourceRoutes
+        formula directClauseIndex directLiteralIndex)
+      (retainedDirectSourceFanTerminalAt
+        choice.kind choice.index).1 := by
+  let certificate :=
+    retainedPlanarSATCertificate formula
+      sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  apply
+    retainedFinalTranslatedFallbackDirect_sourcePrefixCorridorSeparated_of_componentCases
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice directClauseMember fallbackClauseMember
+      directLiteralMember fallbackLiteralMember choiceLookup
+      fallbackChoiceNone relativeTranslate
+  intro fallbackCarrier directMacrocell rectanglesNotSeparated
+  let directRoute :=
+    finalCoordinatedSourceRoutes
+      formula directClauseIndex directLiteralIndex
+  let fallbackRoute :=
+    finalCoordinatedSourceRoutes
+      formula fallbackClauseIndex fallbackLiteralIndex
+  let translatedFallbackRoute :=
+    translatePolyline
+      ((finalCoordinatedPlacement formula).translation relativeTranslate)
+      fallbackRoute
+  let directTerminal : RetainedTerminalData :=
+    ((retainedDirectSourceFanTerminalAt
+      choice.kind choice.index).1,
+      (retainedDirectSourceLocalTerminalAt
+        choice.kind choice.index).2)
+  have directOccurrenceEq :
+      finalGaugedRouteOccurrence
+          formula directClauseIndex directLiteralIndex (0, 0) =
+        directRoute := by
+    exact
+      (finalCoordinatedSourceRoutes_eq_finalGaugedRouteOccurrence_zero
+        formula directClauseIndex directLiteralIndex).symm
+  have fallbackOccurrenceEq :
+      finalGaugedRouteOccurrence
+          formula fallbackClauseIndex fallbackLiteralIndex
+            relativeTranslate =
+        translatedFallbackRoute := by
+    rfl
+  have directLength : 2 ≤ directRoute.length := by
+    simpa [directRoute] using
+      finalCoordinatedSourceRoutes_length_ge_two
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty directClauseMember directLiteralMember
+  have directClassified :
+      retainedTerminalDirectionClassify
+          (routeTerminalVector directRoute) =
+        some directTerminal := by
+    simpa [directRoute, directTerminal] using
+      retainedFinalDirectSourceRouteChoice_terminalClassify
+        formula directClauseIndex directLiteralIndex choice choiceLookup
+  have directComponent :
+      directMacrocell.metadata.source.component.IsDirect :=
+    directMacrocell.toFinalGaugedRouteOccurrenceWitness
+      |>.componentIsDirect_of_finalChoiceSome
+        formula choice choiceLookup
+  rcases
+      fallbackCarrier.exists_carrierBoundary_of_direct_of_notSeparated
+        formula certificate.graphWellFormed
+        certificate.graphDegreeAtMostThree certificate.graphIsLocal
+        directMacrocell directComponent rectanglesNotSeparated with
+    ⟨boundary⟩
+  have prefixStrict :
+      RoutesStrictlyAvoidEachOther
+        translatedFallbackRoute.dropLast directRoute := by
+    simpa [directRoute, fallbackRoute, translatedFallbackRoute] using
+      finalCoordinatedTranslatedSecondSourceRoutePrefix_strictlyAvoids_firstSourceRoute_of_nonzero
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty directClauseMember fallbackClauseMember
+        directLiteralMember fallbackLiteralMember
+        relativeTranslate relativeTranslateNonzero
+  change
+    SourcePrefixCorridorSeparated
+      translatedFallbackRoute directRoute directTerminal.1
+  rw [← fallbackOccurrenceEq, ← directOccurrenceEq]
+  apply
+    sourcePrefixCorridorSeparated_of_outside_insideCarrierBoundary
+      boundary.port boundary.origin
+      (finalGaugedRouteOccurrence
+        formula fallbackClauseIndex fallbackLiteralIndex relativeTranslate)
+      (finalGaugedRouteOccurrence
+        formula directClauseIndex directLiteralIndex (0, 0))
+      directTerminal
+      (by simpa [directOccurrenceEq] using directLength)
+      (by simpa [directOccurrenceEq] using directClassified)
+  · intro point pointMember
+    exact boundary.carrierOutside point pointMember
+  · exact boundary.macrocellInside
+  · simpa [fallbackOccurrenceEq, directOccurrenceEq] using prefixStrict
 
 end PeriodicOrthocrossing
 end LeanTrominoes

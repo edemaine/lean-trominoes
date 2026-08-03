@@ -2336,8 +2336,10 @@ The representation choices for this target are:
   upgrades periodic retained-source planarity to strict separation.  Distinct
   targets separate the complete routes; at a shared target, deleting the
   translated fallback endpoint still separates its prefix from the complete
-  aligned direct route.  Both cases yield the translated source corridor used
-  by final fallback-boundary assembly.
+  direct route.  Physical component reduction and the arbitrary common-frame
+  carrier boundary now turn this prefix separation into the translated source
+  corridor for every successful direct route at a nonzero shift, including
+  the non-axis-aligned residual case.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean)
   models the selected ordinary-or-escaped outer fan at a translated fallback
   endpoint.  Its radius-288 terminal-segment envelope is disjoint from every
