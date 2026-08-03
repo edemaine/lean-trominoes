@@ -2440,6 +2440,11 @@ The representation choices for this target are:
   physical frame.  The four translated rectangle corners reduce exactly to
   a relative carrier link and the original macrocell center, preserving and
   reflecting the remaining overlap test.
+- [`LeanTrominoes/RetainedFinalRouteCarrierFrameOverlapNormalization.lean`](LeanTrominoes/RetainedFinalRouteCarrierFrameOverlapNormalization.lean)
+  gives the complementary common-frame normalization that keeps the
+  carrier's original selected retained link fixed and translates the
+  macrocell by the opposite relative shift; overlap then places the relative
+  macrocell center on that selected carrier's supporting segment.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedComponentCorridorReduction.lean)
   performs the arbitrary-shift selector/component split for a successful
   direct route against a translated failed route.  Macrocell pairs and
