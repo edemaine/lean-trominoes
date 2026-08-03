@@ -5299,6 +5299,12 @@ The representation choices for this target are:
   completes both generations of auxiliary routes and splices them to the
   certified local Figure 9 and unit-elimination drawings.  Every genuine
   twice-replaced route has exact canonical endpoints and is orthogonal.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean)
+  applies final loop erasure to the ordered composed family and packages both
+  raw and normalized canonical route certificates.  The normalized drawing
+  realizes every incidence edge, is orthogonal and integer-grid planar, and
+  consists entirely of simple unit-step paths.  A generic relative-separation
+  premise now suffices to promote it to the ribbon-ready interface.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
