@@ -2390,6 +2390,11 @@ The representation choices for this target are:
   nonzero period shift still have different stored occurrence slots and
   different orthogonal terminal directions, and combines both facts with
   the retained terminal profile to recover their strict angular order.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackPrefixOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackPrefixOuterSeparation.lean)
+  proves the center-independent cross interaction needed for two translated
+  failed-choice boundaries: the fully refined translated source prefix of
+  either fallback strictly avoids the other fallback's policy-selected
+  ordinary or delayed-lane outer replacement at every nonzero shift.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
