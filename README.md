@@ -2790,6 +2790,12 @@ The representation choices for this target are:
   translated cycle pair is strictly contact-free; combined with the existing
   distinct-incidence theorem at shift zero, this gives complete relative
   cycle-route separation at both the scaled and public fixed-eight interfaces.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeDirectCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeDirectCycleSeparation.lean)
+  begins the mixed direct-source/cycle periodic branch.  Equality of a genuine
+  source occurrence center with a translated cycle center identifies both the
+  underlying atom and the exact semantic period offset.  The translated
+  flattened Figure 7 route is therefore the occurrence's already-certified
+  matching cycle lift, so every successful direct route avoids it.
 - [`LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean`](LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean)
   recovers the source atom owning any genuine appended implication route
   and proves that every point of its factor-eight realization lies within
