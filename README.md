@@ -2410,6 +2410,11 @@ The representation choices for this target are:
   Figure 7 spoke family at the common center.  Distinct slots separate both
   boundary/spoke orientations and the spoke pair, and endpoint joins then
   separate the two complete fallback occurrence routes.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackDistinctCenterBoundarySeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackDistinctCenterBoundarySeparation.lean)
+  handles the other target-center branch.  Relative route separation gives
+  disjoint discarded terminal rectangles; conservative outer-fan bounds and
+  the already symmetric prefix interactions then assemble strict separation
+  of the two selected fallback boundaries.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
