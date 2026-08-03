@@ -2341,6 +2341,10 @@ The representation choices for this target are:
   models the selected ordinary-or-escaped outer fan at a translated fallback
   endpoint.  Its radius-288 terminal-segment envelope is disjoint from every
   aligned direct envelope at a nonzero shift with distinct canonical targets.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackBoundarySeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackBoundarySeparation.lean)
+  assembles the translated retained prefix and selected outer fan.  Thus a
+  successful aligned direct source-to-boundary route strictly avoids the
+  complete translated failed-choice boundary under the same hypotheses.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
