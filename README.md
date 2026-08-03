@@ -2405,6 +2405,11 @@ The representation choices for this target are:
   two complete selected fallback boundaries at a shared translated target.
   Reverse-shift transport supplies the asymmetric unshifted-prefix versus
   translated-outer case and records covariance of both selected pieces.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackSameCenterOccurrenceSeparation.lean)
+  identifies both occurrence suffixes with translated copies of the finite
+  Figure 7 spoke family at the common center.  Distinct slots separate both
+  boundary/spoke orientations and the spoke pair, and endpoint joins then
+  separate the two complete fallback occurrence routes.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
