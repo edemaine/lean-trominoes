@@ -40,6 +40,7 @@ def FinalGaugedCarrierFrameTerminalContact
       macrocell.metadata.source.periodTranslate formula
           (macrocell.relativeShiftFrom carrier) =
         .routedClause site ∧
+      occurrence ∈ drawingCNFRouteOccurrences formula ∧
       occurrence ∈ clauseRouteOccurrencesAt formula site ∧
       CarrierLinkIncidentToSourceTerminal
         formula carrier.link occurrence) ∨
@@ -48,6 +49,7 @@ def FinalGaugedCarrierFrameTerminalContact
           (macrocell.relativeShiftFrom carrier) =
         .routedVariable
           site armIndex arm link localClauseIndex ∧
+      occurrence ∈ drawingCNFRouteOccurrences formula ∧
       occurrence ∈ variableRouteOccurrencesAt formula site ∧
       CarrierLinkIncidentToTargetTerminal
         formula carrier.link occurrence)
@@ -140,7 +142,7 @@ theorem
               (liftedIncidenceVertexPosition
                 formula (.clause targetSite.1) targetSite.2)) := by
         simpa only [← relativeCenterEq] using overlap
-      rcases
+      obtain ⟨occurrence, occurrenceData⟩ :=
           retainedDrawingCompleteCarrierLink_exists_sourceOccurrence_of_liftedClauseMacrocell_overlap
             wellFormed degree isLocal carrier.link_mem
             targetSite.1
@@ -148,11 +150,13 @@ theorem
               simpa only [targetSite,
                 clauseRouteSitePeriodTranslate] using
                 drawingClauseRouteSite_vertex_mem formula siteMember)
-            targetSite.2 targetOverlap with
-        ⟨occurrence, occurrenceMember, incident⟩
+            targetSite.2 targetOverlap
+      have occurrenceGlobal := occurrenceData.1
+      have occurrenceMember := occurrenceData.2.1
+      have incident := occurrenceData.2.2
       exact Or.inr (Or.inl
         ⟨targetSite, occurrence, translatedSourceEq,
-          occurrenceMember, incident⟩)
+          occurrenceGlobal, occurrenceMember, incident⟩)
   | routedVariable
       site armIndex arm link localClauseIndex =>
       have siteMember : site ∈ drawingVariableRouteSites formula := by
@@ -201,7 +205,7 @@ theorem
               (liftedIncidenceVertexPosition
                 formula (.variable targetSite.1) targetSite.2)) := by
         simpa only [← relativeCenterEq] using overlap
-      rcases
+      obtain ⟨occurrence, occurrenceData⟩ :=
           retainedDrawingCompleteCarrierLink_exists_targetOccurrence_of_liftedVariableMacrocell_overlap
             wellFormed degree isLocal carrier.link_mem
             targetSite.1
@@ -209,12 +213,14 @@ theorem
               simpa only [targetSite,
                 variableRouteSitePeriodTranslate] using
                 drawingVariableRouteSite_vertex_mem formula siteMember)
-            targetSite.2 targetOverlap with
-        ⟨occurrence, occurrenceMember, incident⟩
+            targetSite.2 targetOverlap
+      have occurrenceGlobal := occurrenceData.1
+      have occurrenceMember := occurrenceData.2.1
+      have incident := occurrenceData.2.2
       exact Or.inr (Or.inr
         ⟨targetSite, armIndex, arm, targetLink,
           localClauseIndex, occurrence, translatedSourceEq,
-          occurrenceMember, incident⟩)
+          occurrenceGlobal, occurrenceMember, incident⟩)
 
 end PeriodicOrthocrossing
 end LeanTrominoes

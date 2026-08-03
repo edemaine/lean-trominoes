@@ -2448,8 +2448,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierLiftedVertexOccurrenceProximity.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierLiftedVertexOccurrenceProximity.lean)
   strengthens retained-carrier terminal proximity to arbitrary lifts of a
   declared clause or variable vertex.  A carrier endpoint at that lift is
-  converted back into an exact routed occurrence without first assuming the
-  translated site belongs to the finite retained enumeration.
+  converted back into an exact globally represented routed occurrence
+  without first assuming the translated site belongs to the finite retained
+  enumeration.
 - [`LeanTrominoes/RetainedFinalRouteCarrierFrameTerminalContacts.lean`](LeanTrominoes/RetainedFinalRouteCarrierFrameTerminalContacts.lean)
   applies that arbitrary-lift proximity in the selected carrier frame.
   Overlapping routed-clause and routed-variable direct components yield exact

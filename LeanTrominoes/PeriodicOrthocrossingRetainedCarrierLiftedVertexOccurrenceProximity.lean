@@ -54,7 +54,8 @@ theorem
           (liftedIncidenceVertexPosition
             formula (.variable atom) translate))) :
     ∃ occurrence,
-      occurrence ∈
+      occurrence ∈ drawingCNFRouteOccurrences formula ∧
+        occurrence ∈
           variableRouteOccurrencesAt formula (atom, translate) ∧
         CarrierLinkIncidentToTargetTerminal
           formula link occurrence := by
@@ -143,6 +144,7 @@ theorem
       · exact siteData.2
     refine
       ⟨routeEndpoint.occurrence,
+        occurrenceMem,
         routeEndpoint.occurrence
           |>.mem_variableRouteOccurrencesAt_of_mem_drawing
             formula occurrenceMem (atom, translate)
@@ -183,7 +185,8 @@ theorem
           (liftedIncidenceVertexPosition
             formula (.clause clauseIndex) translate))) :
     ∃ occurrence,
-      occurrence ∈
+      occurrence ∈ drawingCNFRouteOccurrences formula ∧
+        occurrence ∈
           clauseRouteOccurrencesAt formula (clauseIndex, translate) ∧
         CarrierLinkIncidentToSourceTerminal
           formula link occurrence := by
@@ -246,6 +249,7 @@ theorem
       · exact siteData.2
     refine
       ⟨routeEndpoint.occurrence,
+        occurrenceMem,
         routeEndpoint.occurrence
           |>.mem_clauseRouteOccurrencesAt_of_mem_drawing
             formula occurrenceMem (clauseIndex, translate)
