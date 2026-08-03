@@ -2425,6 +2425,11 @@ The representation choices for this target are:
   strict separation of two failed-choice occurrence routes at every nonzero
   shift, discharging the fallback/fallback residual proposition used by the
   copied-source reduction.
+- [`LeanTrominoes/RetainedFinalRouteMacrocellShapeClassification.lean`](LeanTrominoes/RetainedFinalRouteMacrocellShapeClassification.lean)
+  extends the final macrocell wrapper from flat routes to arbitrary period
+  occurrences.  Equal physical centers transfer direct-component shape, so
+  a failed selector and a successful selector can never occupy the same
+  translated noncarrier macrocell.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating

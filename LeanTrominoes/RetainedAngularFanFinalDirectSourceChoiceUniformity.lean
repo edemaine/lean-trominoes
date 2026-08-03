@@ -33,9 +33,10 @@ theorem
     {Variable : Type*} [variableDecEq : DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     {clauseIndex literalIndex : Nat}
+    {shift : Cell}
     (witness :
       FinalGaugedRouteOccurrenceWitness
-        formula clauseIndex literalIndex (0, 0))
+        formula clauseIndex literalIndex shift)
     (directCases :
       (∃ crossing localClauseIndex,
           witness.metadata.source =
@@ -88,25 +89,46 @@ theorem
     have routeEq := witness.routeEq
     unfold finalGaugedRouteOccurrence
       metadataPhysicalRouteOccurrence at routeEq
-    have zeroTranslation :
-        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-          formula).translation (0, 0) = (0, 0) := by
-      simp [PeriodicVariablePlacement.translation, Cell.scale]
-    rw [zeroTranslation] at routeEq
-    have translatePolyline_zero (points : List Cell) :
-        translatePolyline (0, 0) points = points := by
-      induction points with
-      | nil => rfl
-      | cons point points induction =>
-          change
-            List.map (Cell.add (0, 0)) points = points at induction
-          simp only [translatePolyline, List.map_cons]
-          rw [induction]
-          simp [Cell.add]
-    rw [translatePolyline_zero] at routeEq
-    rw [localRouteEq] at routeEq
+    let placement :=
+      retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+    let backwards := placement.translation (Cell.neg shift)
+    have shifted :=
+      congrArg (translatePolyline backwards) routeEq
+    have leftCancel :
+        Cell.add (placement.translation shift) backwards = (0, 0) := by
+      rcases shift with ⟨shiftX, shiftY⟩
+      simp [placement, backwards,
+        PeriodicVariablePlacement.translation,
+        Cell.neg, Cell.sub, Cell.add, Cell.scale]
+    have rightReduce :
+        Cell.add
+            (placement.translation
+              (Cell.sub shift
+                (PeriodicCNF.clauseAnchor
+                  (metadataGaugedPositionedClause
+                    formula witness.metadata).literals)))
+            backwards =
+          placement.translation
+            (Cell.sub (0, 0)
+              (PeriodicCNF.clauseAnchor
+                (metadataGaugedPositionedClause
+                  formula witness.metadata).literals)) := by
+      rcases shift with ⟨shiftX, shiftY⟩
+      rcases anchorEq :
+          PeriodicCNF.clauseAnchor
+            (metadataGaugedPositionedClause
+              formula witness.metadata).literals with
+        ⟨anchorX, anchorY⟩
+      simp [placement, backwards,
+        PeriodicVariablePlacement.translation,
+        Cell.neg, Cell.sub, Cell.add, Cell.scale]
+      constructor <;> ring
+    rw [translatePolyline_add, leftCancel, translatePolyline_zero,
+      translatePolyline_add, rightReduce] at shifted
+    rw [localRouteEq] at shifted
     simpa [translation,
-      retainedFinalDirectSourceMetadataTranslation] using routeEq
+      retainedFinalDirectSourceMetadataTranslation,
+      placement] using shifted
   have represents :
       choice.RepresentsFinalRoute
         formula clauseIndex literalIndex := by
