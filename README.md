@@ -5253,6 +5253,14 @@ The representation choices for this target are:
   the public unit-free formula and placement with their raw composed versions,
   reuses every certified route coordinate verbatim, and packages canonical
   endpoints and orthogonality for the public final formula.
+- [`LeanTrominoes/PositionedPeriodicCNFClauseDirectionOrdering.lean`](LeanTrominoes/PositionedPeriodicCNFClauseDirectionOrdering.lean)
+  stably sorts each positioned clause's tagged literals by the clockwise rank
+  of their source-route first directions.  Original indices remain attached,
+  so the unchanged source routes can be reindexed exactly; clause positions,
+  widths, atom distinctness, assignment satisfaction, and satisfiability are
+  all proved invariant under the reordering.  A finite cardinal-direction
+  lemma turns nondecreasing ranks of three distinct genuine exits into the
+  clockwise condition needed by the composed boundary-port router.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
