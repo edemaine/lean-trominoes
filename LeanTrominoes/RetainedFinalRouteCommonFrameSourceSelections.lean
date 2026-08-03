@@ -7,12 +7,9 @@ import LeanTrominoes.RetainedFinalFlatNormalizedRouteSelections
 The generic common-frame calculation remembers membership in the translated
 source's local clause family.  Carrier-boundary bounds instead consume a
 genuine route of a concrete finite incidence drawing.  This file supplies
-that last bridge.
-
-For a noncarrier, a retained source presentation with the same translated
-component may differ only in enumeration bookkeeping.  For a carrier, raw
-retained-link membership identifies the translated equality-lens formula
-directly.
+that last bridge once the concrete drawing is known to realize the source
+formula.  For a carrier, raw retained-link membership identifies the
+translated equality-lens formula directly.
 -/
 
 namespace LeanTrominoes
@@ -22,8 +19,9 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 1200000
 
-/-- A retained finite source presentation of a macrocell route in an
-arbitrary common frame. -/
+/-- A concrete finite source presentation of a macrocell route in an
+arbitrary common frame, with its source formula realized by the selected
+incidence drawing. -/
 structure FinalGaugedCommonFrameMacrocellSource
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
@@ -34,7 +32,9 @@ structure FinalGaugedCommonFrameMacrocellSource
         formula clauseIndex literalIndex shift)
     (reindexShift : Cell) where
   source : DrawingPlanarSATClauseSource Variable
-  sourceMember : source.RetainedComponentMember formula
+  incidenceFormulaEq :
+    (source.incidenceDrawing formula).formula =
+      source.clauseFormula formula
   componentEq :
     source.component =
       (macrocell.commonFrameSource reindexShift).component
@@ -47,9 +47,6 @@ exact common-frame final route. -/
 theorem FinalGaugedCommonFrameMacrocellSource.exists_routeSelection
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
-    (wellFormed : formula.incidenceGraph.IsWellFormed)
-    (degree : formula.incidenceGraph.DegreeAtMost 3)
-    (isLocal : formula.incidenceGraph.IsLocal)
     {clauseIndex literalIndex : Nat}
     {shift reindexShift : Cell}
     {macrocell :
@@ -78,21 +75,11 @@ theorem FinalGaugedCommonFrameMacrocellSource.exists_routeSelection
         (presentation.source.clauseFormula formula).zipIdx := by
     rw [targetFormulaEq, presentation.localClauseIndexEq]
     exact selection.clauseMember
-  let targetMetadata :
-      DrawingPlanarSATClauseMetadata Variable :=
-    ⟨selection.clause, presentation.source⟩
-  have targetValid : targetMetadata.RetainedValid formula := by
-    apply
-      (targetMetadata
-        |>.retainedValid_iff_sourceMember_and_localClauseMember
-          formula).mpr
-    exact ⟨presentation.sourceMember, targetClauseMember⟩
   have targetDrawingClauseMember :
       (selection.clause, presentation.source.localClauseIndex) ∈
         (presentation.source.incidenceDrawing formula).formula.zipIdx := by
-    simpa only [targetMetadata] using
-      targetMetadata.retainedLocalClauseMember
-        wellFormed degree isLocal targetValid
+    rw [presentation.incidenceFormulaEq]
+    exact targetClauseMember
   have drawingEq :
       presentation.source.incidenceDrawing formula =
         (macrocell.commonFrameSource reindexShift
