@@ -2367,6 +2367,19 @@ The representation choices for this target are:
   of the same finite Figure 7 spoke family.  Strict angular order makes their
   slots different, which proves both direct-prefix/fallback-suffix and
   direct-suffix/fallback-suffix separation.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterFallbackSpokeSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterFallbackSpokeSeparation.lean)
+  proves the slot-parametric complementary interaction: a selected ordinary
+  or singleton-escaped fallback boundary avoids every other spoke at its own
+  center.  Translating this local certificate proves direct-suffix versus
+  translated-fallback-boundary separation.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterOccurrenceSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSameCenterOccurrenceSeparation.lean)
+  combines the four boundary/suffix cross interactions into strict separation
+  of the complete direct and translated fallback occurrence routes at a
+  shared physical target.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedCompleteSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedCompleteSeparation.lean)
+  splits on translated target-center equality and thereby removes that
+  geometric side condition from aligned successful/failed relative route
+  separation.  Shift negation supplies the reverse failed/successful order.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating

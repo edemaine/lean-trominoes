@@ -47,6 +47,72 @@ theorem retainedDirectSourceRouteChoice_figure7Spoke_eq_spokeRouteAt
     constructor <;> ring
   · rfl
 
+/-- A translated fallback canonical center is the positioned direct fan
+center when the two retained occurrences share that physical target. -/
+theorem
+    retainedFinalDirectPositionedFanCenter_eq_add_translatedFallbackCanonicalFanCenter_of_sameCenter
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    (choice : RetainedDirectSourceRouteChoice)
+    {directClause fallbackClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {directClauseIndex : Nat}
+    (directClauseMember :
+      (directClause, directClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {directLiteral fallbackLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {directLiteralIndex : Nat}
+    (directLiteralMember :
+      (directLiteral, directLiteralIndex) ∈
+        directClause.literals.zipIdx)
+    (choiceLookup :
+      retainedFinalDirectSourceRouteChoice?
+          formula directClauseIndex directLiteralIndex = some choice)
+    (relativeTranslate : Cell)
+    (centersEqual :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+          (finalCoordinatedPlacement formula)
+          directClause directLiteral =
+        Cell.add
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (finalCoordinatedPlacement formula)
+            fallbackClause fallbackLiteral)
+          ((finalCoordinatedPlacement formula).translation
+            relativeTranslate)) :
+    retainedDirectSourcePositionedFanCenterAt
+        choice.origin choice.kind choice.index =
+      Cell.add
+        ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+          formula).translation relativeTranslate)
+        (Cell.scale retainedTerminalFanTotalRefinement
+          (Cell.scale retainedAngularFanSourceClearanceFactor
+            (PositionedPeriodicCNF.canonicalLiteralPosition
+              (finalCoordinatedPlacement formula)
+              fallbackClause fallbackLiteral))) := by
+  have directFinish :=
+    retainedFinalDirectSourceRouteChoice_sourceSegment_finish
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty choice directClauseMember
+      directLiteralMember choiceLookup
+  rw [choice.positionedFanCenter_eq_scale_sourceSegment_finish,
+    directFinish, centersEqual,
+    retainedFinalPhysicalTranslation_eq_refinedSourceTranslation]
+  rcases (finalCoordinatedPlacement formula).translation
+      relativeTranslate with ⟨translateX, translateY⟩
+  rcases PositionedPeriodicCNF.canonicalLiteralPosition
+      (finalCoordinatedPlacement formula)
+      fallbackClause fallbackLiteral with ⟨centerX, centerY⟩
+  simp [retainedAngularFanSourceClearanceFactor,
+    Cell.add, Cell.scale]
+  constructor <;> ring
+
 /-- The two existing normal forms for a centered refined Figure 7 spoke
 coincide. -/
 theorem retainedTerminalFanFigure7SpokeAt_eq_spokeRouteAt
