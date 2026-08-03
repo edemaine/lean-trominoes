@@ -1,5 +1,8 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightThreeDM
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsNormalizedRoutes
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRouteIsolation
+import LeanTrominoes.PeriodicGridDrawingLoopErasureRouteOrders
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanRouteOrder
 
 /-!
@@ -79,6 +82,62 @@ theorem
       retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_ternaryClauseRoutesInUnitEliminationOrder
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
+
+/-- Final loop erasure preserves both cyclic route orders needed by the
+ribbon source fans. -/
+theorem
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceRoutes_ribbonRouteOrders
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PositionedPeriodicCNF.VariableRoutesInOccurrenceOrder
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+          source)
+        (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceRoutes
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty) ∧
+      PositionedPeriodicCNF.TernaryClauseRoutesInUnitEliminationOrder
+        (retainedCoordinatedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFormula
+          source)
+        (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceRoutes
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty) := by
+  rw [
+    retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsNormalizedIncidenceRoutes_eq_normalize]
+  apply
+    PositionedPeriodicCNF.ribbonRouteOrders_normalizeOrthogonalIncidenceRoutes_of_endpointIsolation
+  · exact
+      retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_ribbonRouteOrders
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+  · intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    exact
+      retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_length_ge_two
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+  · intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    exact
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_valid
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember).2.2
+  · intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    exact
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_endpointIsolation
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember).1
+  · intro clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    exact
+      (retainedCoordinatedFixedEightPeriodicPlanarOneInThreeNoUnitsIncidenceRoutes_endpointIsolation
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember).2
 
 /-- The coordinated variable-route order, transferred to an explicitly
 chosen decidable equality on the generated endpoint variables. -/

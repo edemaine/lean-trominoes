@@ -476,6 +476,14 @@ The representation choices for this target are:
   preserves first-endpoint isolation.  A final inherited/auxiliary
   classification proves both endpoint-isolation properties for every genuine
   Figure 9 incidence.
+  [`LeanTrominoes/EmbeddedCNFIncidenceDrawingMiddleRouteDirections.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingMiddleRouteDirections.lean),
+  [`LeanTrominoes/PlanarOneInThreeFigureNineMiddleRouteDirections.lean`](LeanTrominoes/PlanarOneInThreeFigureNineMiddleRouteDirections.lean), and
+  [`LeanTrominoes/PeriodicOneInThreePositionedMiddleRouteDirections.lean`](LeanTrominoes/PeriodicOneInThreePositionedMiddleRouteDirections.lean)
+  isolate the clause-side directional fact needed by unit elimination.
+  Native finite checks cover every Figure 9 source arity and truth pattern:
+  a literal-index-one route always exits weakly left of its clause point.
+  Translation, renaming, anchor normalization, and route splicing preserve
+  this property.
   [`LeanTrominoes/EmbeddedCNFIncidenceDrawingTwoPointRoutes.lean`](LeanTrominoes/EmbeddedCNFIncidenceDrawingTwoPointRoutes.lean),
   [`LeanTrominoes/PlanarOneInThreeFigureNineTwoPointRoutes.lean`](LeanTrominoes/PlanarOneInThreeFigureNineTwoPointRoutes.lean), and
   [`LeanTrominoes/PeriodicOneInThreePositionedTwoPointRoutes.lean`](LeanTrominoes/PeriodicOneInThreePositionedTwoPointRoutes.lean)
@@ -497,7 +505,8 @@ The representation choices for this target are:
   selects the corresponding certified unit-elimination route at every
   global output incidence and proves all such local routes orthogonal and
   continuously simple under the same width-three and atom-distinct
-  hypotheses.
+  hypotheses.  Distinct finite gadget vertices also prove that every genuine
+  local route contains at least one edge.
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedNormalizedLocalRoutes.lean)
   supplies the analogous canonical-gauge endpoints, orthogonality, and
   continuous-simplicity theorems for unit elimination.  Its
@@ -550,12 +559,15 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSuffixIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSuffixIsolation.lean),
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamilyIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedRouteFamilyIsolation.lean), and
   [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSplicedRouteIsolation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedSplicedRouteIsolation.lean)
-  lift final-endpoint isolation through head replacement, the proof-backed
+  lift endpoint isolation through head replacement, the proof-backed
   inherited selector, and the complete local-plus-suffix splice.  The local
   unit-elimination prefix misses the transformed source endpoint because the
   former lies strictly between scale-six grid lines while the latter lies on
-  their lattice.  The resulting theorem covers both inherited and auxiliary
-  incidences.
+  their lattice.  Conversely, the generated clause endpoint misses every
+  inherited suffix: all literal indices are handled arithmetically, with the
+  middle route using the weak-left first-exit invariant.  The resulting
+  two-sided theorem covers both inherited and auxiliary incidences and also
+  records that every complete route contains an edge.
   [`LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean`](LeanTrominoes/PeriodicOneInThreePositionedRouteTerminalDirections.lean)
   proves that completing either transformation's inherited suffix family and
   prepending its normalized local clause route preserves the inherited
@@ -2754,11 +2766,15 @@ The representation choices for this target are:
   and transports it through opaque variable wrapping.  Thus any wrapped
   route whose first exit is already its final endpoint is necessarily a
   vertical segment.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeMiddleRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeMiddleRouteDirections.lean)
+  specializes the Figure 9 weak-left middle-route invariant to the raw
+  coordinated family and transports it through opaque variable wrapping.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRouteIsolation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRouteIsolation.lean)
   combines wrapped endpoint isolation with that vertical exception and the
   scale-six local-prefix separation theorem.  Every route in the concrete
-  final unit-free exact-one family now has an isolated variable endpoint
-  after unit subdivision, including the one-segment edge case.
+  final unit-free exact-one family now has both endpoints isolated after unit
+  subdivision, including the one-segment source edge case, and contains at
+  least one local unit-elimination edge.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsVariableRouteOrder.lean)
   transports the normalized coordinated clockwise variable-route order
   through Figure 9, opaque wrapping, and unit elimination.  It also proves
@@ -2766,9 +2782,10 @@ The representation choices for this target are:
   splice certificates.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRibbonOrders.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeNoUnitsRibbonOrders.lean)
   pairs the final clockwise variable-route order with the canonical ternary
-  clause-route order from unit elimination.  Consequently any ribbon-ready
-  presentation built from these routes has compatible clockwise source fans
-  for the normalized 3DM construction.
+  clause-route order from unit elimination.  The two endpoint-isolation
+  certificates then transport both cyclic orders through final loop erasure.
+  Consequently a ribbon-ready presentation built from the normalized routes
+  has compatible clockwise source fans for the normalized 3DM construction.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOneInThreeSemantics.lean)
   observes that the coordinated construction changes positions and routes
   but not the erased exact-one formula.  It transfers the width-three and
