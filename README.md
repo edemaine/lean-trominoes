@@ -2333,10 +2333,11 @@ The representation choices for this target are:
   source-segment envelope excludes that center is strictly separated from
   the suffix.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedSourceCorridorSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedSourceCorridorSeparation.lean)
-  upgrades periodic retained-source planarity to strict separation whenever
-  the relative shift and canonical targets are both distinct.  In the aligned
-  direct/failed-choice case this yields the translated source-prefix corridor
-  required by the final fallback-boundary assembly.
+  upgrades periodic retained-source planarity to strict separation.  Distinct
+  targets separate the complete routes; at a shared target, deleting the
+  translated fallback endpoint still separates its prefix from the complete
+  aligned direct route.  Both cases yield the translated source corridor used
+  by final fallback-boundary assembly.
 - [`LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeTranslatedFallbackOuterSeparation.lean)
   models the selected ordinary-or-escaped outer fan at a translated fallback
   endpoint.  Its radius-288 terminal-segment envelope is disjoint from every

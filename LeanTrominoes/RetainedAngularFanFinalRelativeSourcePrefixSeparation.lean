@@ -117,6 +117,75 @@ theorem finalCoordinatedCanonicalClausePositions_ne_translated_of_nonzero
           wrappedDrawingPeriodicPlanarSATPlacement] using secondBounds)
       relativeTranslate relativeTranslateNonzero
 
+/-- Complete retained source routes satisfy ordinary endpoint-only
+separation at every nonzero relative shift. -/
+theorem finalCoordinatedSourceRoutes_avoid_translated_of_nonzero
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ secondClause.literals.zipIdx)
+    (relativeTranslate : Cell)
+    (relativeTranslateNonzero : relativeTranslate ≠ (0, 0)) :
+    RoutesAvoidEachOther
+      (finalCoordinatedSourceRoutes
+        formula firstClauseIndex firstLiteralIndex)
+      (translatePolyline
+        ((finalCoordinatedPlacement formula).translation relativeTranslate)
+        (finalCoordinatedSourceRoutes
+          formula secondClauseIndex secondLiteralIndex)) := by
+  let sourceCertificate :=
+    retainedPlanarSATCertificate formula
+      sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  let retainedClausesNonempty :=
+    retainedDrawingPlanarSATFormula_clausesNonempty_of_source
+      formula sourceClausesNonempty
+  have sourceRelative :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_relativeAvoidEachOther
+      formula sourceCertificate.graphWellFormed
+      sourceCertificate.graphDegreeAtMostThree
+      sourceCertificate.graphIsLocal retainedClausesNonempty
+  have sourceCoordinate :=
+    @PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther.coordinate
+      (WrappedPeriodicPlanarSATVariable Variable)
+      (@drawingOrderedWrappedPeriodicPlanarSATVariableInstDecidableEq
+        Variable inferInstance)
+      _ _ _ sourceRelative
+  have occurrencesDifferent :
+      ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
+        ((secondClauseIndex, secondLiteralIndex), relativeTranslate) := by
+    intro occurrencesEqual
+    apply relativeTranslateNonzero
+    exact (congrArg Prod.snd occurrencesEqual).symm
+  simpa [finalCoordinatedSource, finalCoordinatedPlacement,
+    finalCoordinatedSourceRoutes, translatePolyline] using
+    sourceCoordinate
+      firstClause firstClauseIndex firstClauseMember
+      firstLiteral firstLiteralIndex firstLiteralMember
+      secondClause secondClauseIndex secondClauseMember
+      secondLiteral secondLiteralIndex secondLiteralMember
+      relativeTranslate occurrencesDifferent
+
 /-- At a nonzero relative period shift, the final-point-deleted retained raw
 source routes are strictly contact-free.  Possible coincidence of their
 variable endpoints is harmless because both endpoints have been deleted. -/
