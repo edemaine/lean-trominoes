@@ -13,6 +13,11 @@ literal occurrence through the flattened positioned formula.
 namespace LeanTrominoes
 namespace PeriodicOneInThreeNoUnitsPositioned
 
+/-- Local generated-clause endpoint of a source-variable route, selected by
+the arity of the source clause. -/
+def sourceLocalClausePosition (sourceArity : Nat) : Cell :=
+  if sourceArity = 1 then (3, 2) else (3, 3)
+
 /-- The displayed source-clause vertex expressed in a generated
 unit-elimination clause's canonical anchor gauge after refinement. -/
 def normalizedSourceClausePosition
@@ -43,6 +48,47 @@ def normalizedSourcePort
     (normalizedSourceClausePosition
       outputPlacement sourceClause generatedClause)
     (PlanarOneInThreeNoUnits.sourceLocalPosition sourceLiteralIndex)
+
+/-- The three unit-elimination source ports have distinct local
+coordinates. -/
+theorem sourceLocalPosition_injective_below_three
+    {firstIndex secondIndex : Nat}
+    (firstLt : firstIndex < 3)
+    (secondLt : secondIndex < 3)
+    (positionsEqual :
+      PlanarOneInThreeNoUnits.sourceLocalPosition firstIndex =
+        PlanarOneInThreeNoUnits.sourceLocalPosition secondIndex) :
+    firstIndex = secondIndex := by
+  have firstCases :
+      firstIndex = 0 ∨ firstIndex = 1 ∨ firstIndex = 2 := by
+    omega
+  have secondCases :
+      secondIndex = 0 ∨ secondIndex = 1 ∨ secondIndex = 2 := by
+    omega
+  rcases firstCases with rfl | rfl | rfl <;>
+    rcases secondCases with rfl | rfl | rfl <;>
+    simp [PlanarOneInThreeNoUnits.sourceLocalPosition] at positionsEqual ⊢
+
+/-- A generated clause's local vertex is different from every genuine
+source port in the same unit-elimination block. -/
+theorem sourceLocalClausePosition_ne_sourceLocalPosition
+    (sourceArity sourceLiteralIndex : Nat)
+    (arityPositive : 0 < sourceArity)
+    (arityAtMostThree : sourceArity ≤ 3)
+    (sourceLiteralIndexLt : sourceLiteralIndex < sourceArity) :
+    sourceLocalClausePosition sourceArity ≠
+      PlanarOneInThreeNoUnits.sourceLocalPosition sourceLiteralIndex := by
+  have arityCases :
+      sourceArity = 1 ∨ sourceArity = 2 ∨ sourceArity = 3 := by
+    omega
+  have indexCases :
+      sourceLiteralIndex = 0 ∨ sourceLiteralIndex = 1 ∨
+        sourceLiteralIndex = 2 := by
+    omega
+  rcases arityCases with rfl | rfl | rfl <;>
+    rcases indexCases with rfl | rfl | rfl <;>
+    simp [sourceLocalClausePosition,
+      PlanarOneInThreeNoUnits.sourceLocalPosition] at sourceLiteralIndexLt ⊢
 
 /-- Every inherited unit-elimination incidence recovers a genuine source
 literal occurrence and ends at its index-selected normalized boundary port. -/

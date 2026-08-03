@@ -2285,6 +2285,10 @@ The representation choices for this target are:
   local/suffix cross pairs, and suffix avoidance with tail-only contact.  The
   standard local and canonical-suffix endpoint certificates then assemble
   those facts into separation of the complete final routes.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedInheritedEndpoints.lean)
+  identifies an inherited local endpoint with its source-occurrence boundary
+  port.  The three possible source-port coordinates are injective, and every
+  genuine port is distinct from the generated clause's local vertex.
 - [`LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean`](LeanTrominoes/RetainedAngularFanOccurrenceSuffixSimplicity.lean)
   certifies the terminal geometry shared by all inherited coordinated
   routes.  Each of the eight explicit Figure 7 spokes is simple, and remains

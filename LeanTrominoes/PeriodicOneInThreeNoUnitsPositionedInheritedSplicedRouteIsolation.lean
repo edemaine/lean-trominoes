@@ -14,11 +14,6 @@ endpoint-isolation theorem.
 namespace LeanTrominoes
 namespace PeriodicOneInThreeNoUnitsPositioned
 
-/-- Local generated-clause endpoint of a source-variable route, selected by
-the arity of the source clause. -/
-def sourceLocalClausePosition (sourceArity : Nat) : Cell :=
-  if sourceArity = 1 then (3, 2) else (3, 3)
-
 /-- Every inherited local unit-elimination route is the single displayed
 segment from its generated clause to its source boundary port. -/
 theorem localRoutes_eq_inherited_segment
