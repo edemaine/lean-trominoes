@@ -2528,6 +2528,12 @@ The representation choices for this target are:
   The surrounding carrier-box and macrocell-box cases complete strict
   endpoint-rectangle separation for an oblique direct/translated-fallback
   pair.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedObliqueBoundarySeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedObliqueBoundarySeparation.lean)
+  scales that terminal separation to the two complete outer replacements and
+  combines it with translated source-prefix isolation.  It proves that an
+  oblique selected direct boundary avoids the whole translated fallback
+  boundary and that the direct replacement avoids the fallback Figure 7
+  suffix whenever their physical target centers differ.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
