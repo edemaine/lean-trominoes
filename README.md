@@ -2521,6 +2521,13 @@ The representation choices for this target are:
   direct route against a translated failed route.  Macrocell pairs and
   separated carrier/macrocell boxes produce the exact terminal corridor,
   leaving only an overlapping carrier lens as a local callback.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeMixedObliqueTerminalSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeMixedObliqueTerminalSeparation.lean)
+  closes that overlapping carrier callback for final-segment geometry.  A
+  common-frame terminal or crossover contact gives separation or equal final
+  endpoints; distinct physical canonical literal centers exclude equality.
+  The surrounding carrier-box and macrocell-box cases complete strict
+  endpoint-rectangle separation for an oblique direct/translated-fallback
+  pair.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating
