@@ -5272,6 +5272,12 @@ The representation choices for this target are:
   clockwise order.  The reordered presentation also retains the width-three
   bound, per-clause atom distinctness, canonical route geometry, and
   satisfiability equivalence with the original source.
+- [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean)
+  gives the finite noncrossing fan from the three fixed composed Figure 9
+  source ports to the radius-72 first exits of an ordered source clause.
+  The fourteen possible unary, binary, and ternary direction subsets have
+  machine-checked endpoints, orthogonality, outer-frame containment, and
+  pairwise strict continuous separation.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
