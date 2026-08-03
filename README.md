@@ -2262,7 +2262,10 @@ The representation choices for this target are:
   enumeration.  The remaining geometry can therefore quantify over genuine
   metadata-rich clause/literal incidences while retaining exactly the route
   indices used to distinguish periodic occurrences.  It also transports
-  relative separation through pointwise orthogonal loop erasure.
+  relative separation through pointwise orthogonal loop erasure.  Distinct
+  flattened incidence indices are reflected to distinct clause/literal
+  coordinates, and the relative obligation is decomposed into distinct
+  zero-shift incidences versus arbitrary incidences at nonzero lattice shifts.
 - [`LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureTranslation.lean)
   proves the translation covariance needed by that transport.  Walk
   `dropUntil` and `bypass` commute with injective graph maps, hence translating

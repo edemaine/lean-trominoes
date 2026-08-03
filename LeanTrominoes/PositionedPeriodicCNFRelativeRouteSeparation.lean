@@ -18,6 +18,50 @@ namespace PositionedPeriodicCNF
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
+/-- Distinct flattened indices of genuine metadata-rich incidences imply
+distinct clause/literal presentation coordinates. -/
+theorem incidenceCoordinatesDistinct_of_flatIndicesDistinct
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    {first second : CNFIncidence Variable × Nat}
+    (firstMember :
+      first ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx)
+    (secondMember :
+      second ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx)
+    (flatIndicesDistinct : first.2 ≠ second.2) :
+    first.1.clauseIndex ≠ second.1.clauseIndex ∨
+      first.1.literalIndex ≠ second.1.literalIndex := by
+  by_contra coordinatesNotDistinct
+  simp only [not_or, not_not] at coordinatesNotDistinct
+  have incidencesEqual : first.1 = second.1 :=
+    PeriodicCNF.incidence_eq_of_indices_eq
+      source.erase
+      (List.fst_mem_of_mem_zipIdx firstMember)
+      (List.fst_mem_of_mem_zipIdx secondMember)
+      coordinatesNotDistinct.1 coordinatesNotDistinct.2
+  have firstLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp firstMember
+  have secondLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp secondMember
+  rcases List.getElem?_eq_some_iff.mp firstLookup with
+    ⟨firstIndexLt, firstAt⟩
+  rcases List.getElem?_eq_some_iff.mp secondLookup with
+    ⟨secondIndexLt, secondAt⟩
+  have incidenceValuesEqual :
+      (PeriodicCNF.incidencesWithMetadata
+        source.erase)[first.2]'firstIndexLt =
+      (PeriodicCNF.incidencesWithMetadata
+        source.erase)[second.2]'secondIndexLt := by
+    rw [firstAt, secondAt, incidencesEqual]
+  apply flatIndicesDistinct
+  exact
+    ((PeriodicCNF.incidencesWithMetadata_nodup
+      source.erase).getElem_inj_iff
+        (hi := firstIndexLt) (hj := secondIndexLt)).mp
+      incidenceValuesEqual
+
 /-- Every pair of genuine positioned incidences avoids each other after one
 relative semantic-lattice translation.  The flat incidence indices make the
 exception exactly the same as in the drawing-level lifted predicate. -/
@@ -39,6 +83,61 @@ def RelativeIncidenceRoutesAvoidEachOther
                 second.1.literalIndex).map
               (Cell.add
                 (placement.translation relativeTranslate)))
+
+/-- To prove relative incidence separation, it is enough to handle distinct
+stored incidences at zero shift and arbitrary incidences at every nonzero
+relative lattice shift. -/
+theorem relativeIncidenceRoutesAvoidEachOther_of_zero_of_nonzero
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (zeroShift :
+      ∀ first ∈
+          (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx,
+        ∀ second ∈
+            (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx,
+          first.2 ≠ second.2 →
+            RoutesAvoidEachOther
+              (routes first.1.clauseIndex first.1.literalIndex)
+              (routes second.1.clauseIndex second.1.literalIndex))
+    (nonzeroShift :
+      ∀ first ∈
+          (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx,
+        ∀ second ∈
+            (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx,
+          ∀ relativeTranslate,
+            relativeTranslate ≠ (0, 0) →
+              RoutesAvoidEachOther
+                (routes first.1.clauseIndex first.1.literalIndex)
+                ((routes second.1.clauseIndex
+                    second.1.literalIndex).map
+                  (Cell.add
+                    (placement.translation relativeTranslate)))) :
+    RelativeIncidenceRoutesAvoidEachOther
+      source placement routes := by
+  intro first firstMember second secondMember
+    relativeTranslate occurrencesDifferent
+  by_cases translateZero : relativeTranslate = (0, 0)
+  · subst relativeTranslate
+    have zeroSeparated :=
+      zeroShift first firstMember second secondMember (by
+        intro flatIndicesEqual
+        apply occurrencesDifferent
+        exact Prod.ext flatIndicesEqual rfl)
+    have zeroTranslation :
+        placement.translation (0, 0) = (0, 0) := by
+      simp [PeriodicVariablePlacement.translation,
+        Cell.scale]
+    rw [zeroTranslation]
+    change
+      RoutesAvoidEachOther
+        (routes first.1.clauseIndex first.1.literalIndex)
+        (PeriodicOrthocrossing.translatePolyline (0, 0)
+          (routes second.1.clauseIndex second.1.literalIndex))
+    simpa using zeroSeparated
+  · exact nonzeroShift first firstMember second secondMember
+      relativeTranslate translateZero
 
 /-- Relative incidence separation survives pointwise orthogonal loop
 erasure.  Translation equivariance identifies normalization of the lifted
