@@ -2799,6 +2799,19 @@ The representation choices for this target are:
   and a transported radius-48 cycle bound put the routes in strictly separated
   rectangles.  Thus every successful direct route avoids every genuine cycle
   route in every relative period cell, at both internal and public interfaces.
+- [`LeanTrominoes/RetainedFinalSourceRouteOtherTranslatedVertexSeparation.lean`](LeanTrominoes/RetainedFinalSourceRouteOtherTranslatedVertexSeparation.lean)
+  extends retained source-route/vertex separation to arbitrary periodic copies.
+  Relative route separation moves a witnessing target incidence so its final
+  point is the requested translated variable position; periodic vertex
+  planarity also clears that point from the fallback route's discarded final
+  segment.
+- [`LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCycleSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalRelativeFallbackCycleSeparation.lean)
+  completes the failed-selector half of periodic source/cycle separation.  A
+  reusable point-neighborhood assembly covers both ordinary and escaped
+  fallback prefixes.  Equal translated centers reuse the matching Figure 7
+  lift, while unequal centers use the translated source-vertex and radius-48
+  cycle bounds.  The resulting combined theorem covers every copied-source
+  route, whether direct or fallback, against every translated cycle route.
 - [`LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean`](LeanTrominoes/RetainedAngularFanFinalCycleBounds.lean)
   recovers the source atom owning any genuine appended implication route
   and proves that every point of its factor-eight realization lies within
