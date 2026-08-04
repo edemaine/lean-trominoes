@@ -5740,6 +5740,11 @@ The representation choices for this target are:
   the clause vertex that is strictly separated from each inherited suffix;
   hence no raw route can revisit its clause endpoint, and orthogonal loop
   erasure preserves its first direction.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonOrders.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonOrders.lean)
+  combines the normalized variable and ternary-clause route orders, transports
+  the variable certificate to the endpoint's opaque decidable equality, and
+  discharges the clockwise-compatibility condition for every ribbon-ready
+  presentation carrying the final Figure 9 route family.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
   instantiates the relative splice assembly for the retained ordered fixed-eight
   route family.  Four explicit avoidance conditions imply all six splice
