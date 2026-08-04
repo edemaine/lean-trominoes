@@ -46,6 +46,58 @@ theorem generatedClausePosition_inMacrocellOrbit
     generatedClausePosition_eq_macrocellPosition
       sourcePosition generatedIndex
 
+/-- The outer presentation index of a clause in one Figure Nine block is
+the local index used to select its geometric clause offset. -/
+theorem clauseGadget_position_eq_generatedClausePosition
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (sourceClause : PositionedPeriodicClause Variable)
+    {clause : PositionedPeriodicClause (OneInThreeVariable Variable)}
+    {generatedIndex : Nat}
+    (clauseMember :
+      (clause, generatedIndex) ∈
+        (clauseGadget sourceClauseIndex sourceClause).zipIdx) :
+    clause.position =
+      PlanarOneInThree.generatedClausePosition
+        sourceClause.position generatedIndex := by
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp clauseMember
+  unfold clauseGadget at clauseLookup
+  rw [List.getElem?_map, List.getElem?_zipIdx] at clauseLookup
+  simp only [Option.map_eq_some_iff] at clauseLookup
+  rcases clauseLookup with ⟨taggedClause, taggedLookup, clauseEqual⟩
+  rcases taggedLookup with
+    ⟨generatedClause, generatedClauseLookup, taggedEqual⟩
+  subst taggedClause
+  simpa using
+    congrArg PositionedPeriodicClause.position clauseEqual.symm
+
+/-- A Figure Nine block has at most the six local clause positions reserved
+by its geometry. -/
+theorem clauseGadget_length_le_six
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (sourceClause : PositionedPeriodicClause Variable) :
+    (clauseGadget sourceClauseIndex sourceClause).length ≤ 6 := by
+  rcases sourceClause with ⟨sourcePosition, literals⟩
+  cases literals with
+  | nil =>
+      simp [clauseGadget, PeriodicOneInThree.clauseClauses,
+        PeriodicOneInThree.disjunctionGadget]
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          simp [clauseGadget, PeriodicOneInThree.clauseClauses,
+            PeriodicOneInThree.disjunctionGadget]
+      | cons second tail =>
+          cases tail with
+          | nil =>
+              simp [clauseGadget, PeriodicOneInThree.clauseClauses,
+                PeriodicOneInThree.disjunctionGadget]
+          | cons third tail =>
+              simp [clauseGadget, PeriodicOneInThree.clauseClauses,
+                PeriodicOneInThree.disjunctionGadget]
+
 /-- An inherited Figure Nine variable occupies the origin of the refined
 macrocell over its source variable. -/
 theorem placement_inherited_inMacrocellOrbit
@@ -136,6 +188,31 @@ theorem generatedClausePosition_inMacrocellOrbit
   refine ⟨(0, 0), ?_⟩
   simpa [Cell.add, Cell.scale] using
     generatedClausePosition_eq_macrocellPosition source generatedIndex
+
+/-- The presentation index inside one unit-elimination block is exactly the
+index selecting the generated clause's local offset. -/
+theorem clauseGadget_position_eq_generatedClausePosition
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (sourceClause : PositionedPeriodicClause Variable)
+    {clause :
+      PositionedPeriodicClause (OneInThreeNoUnitVariable Variable)}
+    {generatedIndex : Nat}
+    (clauseMember :
+      (clause, generatedIndex) ∈
+        (clauseGadget sourceClauseIndex sourceClause).zipIdx) :
+    clause.position = generatedClausePosition sourceClause generatedIndex := by
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp clauseMember
+  unfold clauseGadget at clauseLookup
+  rw [List.getElem?_map, List.getElem?_zipIdx] at clauseLookup
+  simp only [Option.map_eq_some_iff] at clauseLookup
+  rcases clauseLookup with ⟨taggedClause, taggedLookup, clauseEqual⟩
+  rcases taggedLookup with
+    ⟨generatedClause, generatedClauseLookup, taggedEqual⟩
+  subst taggedClause
+  simpa using
+    congrArg PositionedPeriodicClause.position clauseEqual.symm
 
 /-- Unit elimination retains every old variable at the origin of its new
 macrocell. -/

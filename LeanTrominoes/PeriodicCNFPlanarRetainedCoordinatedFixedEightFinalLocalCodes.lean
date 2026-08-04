@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicCNFPlanarOneInThreePlacements
+import LeanTrominoes.PeriodicCNFPlanarOneInThreeMacrocellOrbits
 import LeanTrominoes.PeriodicMacrocellGeometry
 
 /-!
@@ -38,6 +38,47 @@ def FinalUnitClauseLocal.position : FinalUnitClauseLocal → Cell
   | .unitFirst => (3, 2)
   | .unitSecond => (3, 4)
   | .ordinary => (3, 3)
+
+/-- Select the unit-elimination local clause role from the source arity and
+the clause's local presentation index. -/
+def finalUnitClauseLocal
+    {Variable : Type*} (literals : PeriodicClause Variable)
+    (generatedIndex : Nat) : FinalUnitClauseLocal :=
+  match literals with
+  | [] =>
+      match generatedIndex with
+      | 0 => .emptyFirst
+      | 1 => .emptySecond
+      | _ => .emptyThird
+  | [_] =>
+      match generatedIndex with
+      | 0 => .unitFirst
+      | _ => .unitSecond
+  | _ :: _ :: _ => .ordinary
+
+/-- The finite role table agrees with the local coordinate used by the
+positioned unit-elimination construction. -/
+theorem finalUnitClauseLocal_position
+    {Variable : Type*} (literals : PeriodicClause Variable)
+    (generatedIndex : Nat) :
+    (finalUnitClauseLocal literals generatedIndex).position =
+      PeriodicOneInThreeNoUnitsPositioned.generatedClauseLocalPosition
+        literals generatedIndex := by
+  cases literals with
+  | nil =>
+      cases generatedIndex with
+      | zero => rfl
+      | succ generatedIndex =>
+          cases generatedIndex with
+          | zero => rfl
+          | succ generatedIndex => rfl
+  | cons first rest =>
+      cases rest with
+      | nil =>
+          cases generatedIndex with
+          | zero => rfl
+          | succ generatedIndex => rfl
+      | cons second tail => rfl
 
 /-- A finite address for every kind of vertex that can occur after both
 clause-replacement layers. -/
