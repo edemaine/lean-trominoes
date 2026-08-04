@@ -639,6 +639,163 @@ theorem strictlyAvoids_translatedScaledDoubledSubdividedTail
     shift 72 (by norm_num) sourceOrthogonal sourceSimple
     nearbyOrthogonal nearbyBounded
 
+/-- In one source gauge, any active connector strictly avoids the transformed
+tail selected by a different active source slot. -/
+theorem translatedConnector_strictlyAvoids_otherInheritedSourceRouteTail
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (firstSlot secondSlot : Fin 3)
+    (first second : Cell)
+    (rest : List Cell)
+    (fanValid : data.IsValid)
+    (firstActive : data.SlotActive firstSlot)
+    (secondActive : data.SlotActive secondSlot)
+    (slotsDifferent : firstSlot ≠ secondSlot)
+    (firstUnit : AxisDirection.IsUnitAxisStep first second)
+    (scaledHead :
+      Cell.scale 2 first =
+        PositionedPeriodicCNF.canonicalClausePosition
+          sourcePlacement sourceClause)
+    (directionEq :
+      data.direction secondSlot = AxisDirection.between first second)
+    (sourceOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (first :: second :: rest))
+    (sourceSimple :
+      LocalIncidenceDrawing.RouteIsSimple
+        (first :: second :: rest)) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      (data.translatedRoute
+        (normalizedSourceClausePosition
+          outputPlacement sourceClause generatedClause)
+        firstSlot)
+      ((inheritedSourceRoute
+        outputPlacement sourcePlacement sourceClause generatedClause
+        (AxisDirection.unitSubdividePolyline
+          (scalePolyline 2 (first :: second :: rest)))).tail) := by
+  let origin :=
+    normalizedSourceClausePosition
+      outputPlacement sourceClause generatedClause
+  let shift :=
+    inheritedSourceRouteShift
+      outputPlacement sourcePlacement sourceClause generatedClause
+  let connector := data.translatedRoute origin firstSlot
+  let radial :=
+    PeriodicOrthocrossing.translatePolyline origin
+      [ComposedClauseExitFanData.sourceExit (data.direction secondSlot),
+        ComposedClauseExitFanData.outerSourceExit
+          (data.direction secondSlot)]
+  let farTail :=
+    PeriodicOrthocrossing.translatePolyline shift
+      (scalePolyline composedGadgetScale
+        (AxisDirection.unitSubdividePolyline
+          (scalePolyline 2 (second :: rest))))
+  have tailEq :=
+    inheritedSourceRoute_tail_eq_radial_join_farTail
+      outputPlacement sourcePlacement sourceClause generatedClause
+      data secondSlot first second rest firstUnit scaledHead directionEq
+  have connectorRadial :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+        connector radial := by
+    have finiteStrict :=
+      ComposedClauseExitFanData.route_strictlyAvoids_otherRadialExtension
+        data fanValid firstSlot secondSlot
+        firstActive secondActive slotsDifferent
+    simpa [connector, radial,
+      ComposedClauseExitFanData.translatedRoute] using
+      finiteStrict.translatePolyline origin
+  have connectorOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline connector :=
+    data.translatedRoute_orthogonal origin fanValid firstSlot firstActive
+  have originEq :
+      origin = Cell.add shift (Cell.scale 144 first) := by
+    apply Prod.ext
+    · have coordinateEqual := congrArg Prod.fst scaledHead
+      simp [origin, shift, inheritedSourceRouteShift,
+        composedGadgetScale, PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+        Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+      nlinarith
+    · have coordinateEqual := congrArg Prod.snd scaledHead
+      simp [origin, shift, inheritedSourceRouteShift,
+        composedGadgetScale, PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+        Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+      nlinarith
+  have connectorBounded :
+      ∀ point ∈ connector,
+        WithinCoordinateRadius 73
+          (Cell.add shift (Cell.scale 144 first)) point := by
+    intro point pointMember
+    rw [← originEq]
+    exact data.translatedRoute_points_within_sourceNeighborhood
+      origin fanValid firstSlot firstActive pointMember
+  have connectorFar :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+        connector farTail := by
+    exact
+      strictlyAvoids_translatedScaledDoubledSubdividedTail_of_radius
+        shift 73 (by norm_num) sourceOrthogonal sourceSimple
+        connectorOrthogonal connectorBounded
+  have radialLast :
+      radial.getLast? =
+        some
+          (Cell.add origin
+            (ComposedClauseExitFanData.outerSourceExit
+              (data.direction secondSlot))) := by
+    simp [radial, PeriodicOrthocrossing.translatePolyline]
+  have farHead :
+      farTail.head? =
+        some
+          (Cell.add origin
+            (ComposedClauseExitFanData.outerSourceExit
+              (data.direction secondSlot))) := by
+    rcases firstUnit with ⟨direction, genuine, secondEq⟩
+    have betweenEq :
+        AxisDirection.between first second = direction := by
+      rw [secondEq]
+      exact AxisDirection.between_add_step first genuine
+    have dataDirectionEq : data.direction secondSlot = direction :=
+      directionEq.trans betweenEq
+    have pointEq :
+        Cell.add shift
+            (Cell.scale composedGadgetScale (Cell.scale 2 second)) =
+          Cell.add origin
+            (ComposedClauseExitFanData.outerSourceExit
+              (data.direction secondSlot)) := by
+      rw [dataDirectionEq, secondEq]
+      unfold shift origin inheritedSourceRouteShift
+      rw [← scaledHead]
+      apply Prod.ext <;>
+        simp [ComposedClauseExitFanData.outerSourceExit,
+          composedGadgetScale, PlanarOneInThree.gadgetScale,
+          PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+          Cell.add, Cell.sub, Cell.scale] <;>
+        ring
+    have subdividedHead :
+        (AxisDirection.unitSubdividePolyline
+          (scalePolyline 2 (second :: rest))).head? =
+            some (Cell.scale 2 second) := by
+      simpa [scalePolyline] using
+        AxisDirection.unitSubdividePolyline_head?
+          (show scalePolyline 2 (second :: rest) ≠ [] by simp)
+    simp only [farTail, PeriodicOrthocrossing.translatePolyline,
+      List.head?_map, scalePolyline_head?, subdividedHead,
+      Option.map_some]
+    exact congrArg some pointEq
+  rw [tailEq]
+  exact connectorRadial.join_right connectorFar radialLast farHead
+
 /-- The transformed subdivision of the doubled source tail begins exactly
 at the translated outer endpoint of the radially extended connector. -/
 theorem translatedScaledDoubledSubdividedTail_head?
