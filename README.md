@@ -5699,6 +5699,12 @@ The representation choices for this target are:
   realizes every incidence edge, is orthogonal and integer-grid planar, and
   consists entirely of simple unit-step paths.  A generic relative-separation
   premise now suffices to promote it to the ribbon-ready interface.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedClauseRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedClauseRouteOrder.lean)
+  proves that final loop erasure preserves the canonical exit order at every
+  ternary clause.  A non-inherited second literal supplies a local route through
+  the clause vertex that is strictly separated from each inherited suffix;
+  hence no raw route can revisit its clause endpoint, and orthogonal loop
+  erasure preserves its first direction.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
   instantiates the relative splice assembly for the retained ordered fixed-eight
   route family.  Four explicit avoidance conditions imply all six splice
