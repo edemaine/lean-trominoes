@@ -42,8 +42,7 @@ theorem
   apply PeriodicOneInThreeNoUnitsPositioned.placement_period_pos
   apply PeriodicOneInThreePositioned.placement_period_pos
   exact
-    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement_period_pos
-      source
+    retainedFigureNineClearancePlacement_period_pos source
 
 /-- The normalized route family installed at the final unit-free exact-one
 interface. -/

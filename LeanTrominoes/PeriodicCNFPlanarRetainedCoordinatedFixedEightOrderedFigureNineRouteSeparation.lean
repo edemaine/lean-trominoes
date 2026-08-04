@@ -128,28 +128,24 @@ theorem
       secondClauseIndex secondLiteralIndex : Nat}
     (first :
       PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-          source)
-        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
         firstClauseIndex firstLiteralIndex)
     (second :
       PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-          source)
-        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
         secondClauseIndex secondLiteralIndex)
     (relativeTranslate : Cell)
     (generatedOccurrencesDifferent :
       ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
         ((secondClauseIndex, secondLiteralIndex), relativeTranslate)) :
     let sourceFormula :=
-      retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-        source
+      retainedFigureNineClearancePositionedFormula source
     let sourcePlacement :=
-      retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source
+      retainedFigureNineClearancePlacement source
     let sourceRoutes :=
-      retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
-        source
+      retainedFigureNineClearanceIncidenceRoutes source
     let outputPlacement :=
       PlanarOneInThreeNoUnitsFigureNine.composedPlacement
         sourceFormula sourcePlacement
@@ -169,21 +165,19 @@ theorem
       PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesMeetOnlyAtTails
         firstTransformed.tail secondTransformed.tail := by
   let sourceFormula :=
-    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-      source
+    retainedFigureNineClearancePositionedFormula source
   let sourcePlacement :=
-    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source
+    retainedFigureNineClearancePlacement source
   let sourceRoutes :=
-    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
-      source
+    retainedFigureNineClearanceIncidenceRoutes source
   have sourceOccurrencesDifferent :=
     inheritedSourceOccurrencesDifferent
       sourceFormula sourcePlacement
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+      (retainedFigureNineClearancePositionedFormula_widthAtMostThree
         source sourceWidth)
       first second relativeTranslate generatedOccurrencesDifferent
   have sourceAvoids :=
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_relativeAvoidEachOther
+    (retainedFigureNineClearanceIncidenceRoutes_relativeAvoidEachOther
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty).coordinate
       first.sourceClause first.sourceClauseIndex first.sourceClauseMember
@@ -202,14 +196,14 @@ theorem
       (sourceRoutes first.sourceClauseIndex first.sourceLiteralIndex)
       (sourceRoutes second.sourceClauseIndex second.sourceLiteralIndex)
       relativeTranslate sourceAvoids
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_nodup
+      (retainedFigureNineClearanceIncidenceRoutes_isSimple
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty first.sourceClauseMember
-        first.sourceLiteralMember)
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_nodup
+        first.sourceLiteralMember).1
+      (retainedFigureNineClearanceIncidenceRoutes_isSimple
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty second.sourceClauseMember
-        second.sourceLiteralMember)
+        second.sourceLiteralMember).1
 
 /-- Four pointwise avoidance conditions—ordinary local/local and
 suffix/suffix separation plus strict separation of the two cross pairs—imply
@@ -236,13 +230,11 @@ theorem
             (first.2, (0, 0)) ≠
                 (second.2, relativeTranslate) →
               PlanarOneInThreeNoUnitsFigureNine.RelativeSplicedRoutePairAvoidances
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-                  source)
-                (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
-                  source)
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+                (retainedFigureNineClearancePositionedFormula source)
+                (retainedFigureNineClearancePlacement source)
+                (retainedFigureNineClearancePositionedFormula_widthAtMostThree
                   source sourceWidth)
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+                (retainedFigureNineClearancePositionedFormula_allAtomsNodup
                   source sourceLocal sourceWidth sourceOccurrences
                   sourceClausesNonempty)
                 (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
@@ -265,12 +257,11 @@ theorem
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes]
     using
       PlanarOneInThreeNoUnitsFigureNine.splicedRoutes_relativeIncidenceRoutesAvoidEachOther_of_avoidances
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-          source)
-        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        (retainedFigureNineClearancePositionedFormula_widthAtMostThree
           source sourceWidth)
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+        (retainedFigureNineClearancePositionedFormula_allAtomsNodup
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty)
         (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
@@ -303,13 +294,11 @@ theorem
             (first.2, (0, 0)) ≠
                 (second.2, relativeTranslate) →
               PlanarOneInThreeNoUnitsFigureNine.RelativeSplicedRoutePairComponentsSeparated
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-                  source)
-                (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
-                  source)
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+                (retainedFigureNineClearancePositionedFormula source)
+                (retainedFigureNineClearancePlacement source)
+                (retainedFigureNineClearancePositionedFormula_widthAtMostThree
                   source sourceWidth)
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+                (retainedFigureNineClearancePositionedFormula_allAtomsNodup
                   source sourceLocal sourceWidth sourceOccurrences
                   sourceClausesNonempty)
                 (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
@@ -332,12 +321,11 @@ theorem
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes]
     using
       PlanarOneInThreeNoUnitsFigureNine.splicedRoutes_relativeIncidenceRoutesAvoidEachOther_of_components
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-          source)
-        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        (retainedFigureNineClearancePositionedFormula_widthAtMostThree
           source sourceWidth)
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+        (retainedFigureNineClearancePositionedFormula_allAtomsNodup
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty)
         (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
@@ -369,13 +357,11 @@ theorem
             (first.2, (0, 0)) ≠
                 (second.2, relativeTranslate) →
               PlanarOneInThreeNoUnitsFigureNine.RelativeSplicedRoutePairComponentsSeparated
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-                  source)
-                (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
-                  source)
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+                (retainedFigureNineClearancePositionedFormula source)
+                (retainedFigureNineClearancePlacement source)
+                (retainedFigureNineClearancePositionedFormula_widthAtMostThree
                   source sourceWidth)
-                (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+                (retainedFigureNineClearancePositionedFormula_allAtomsNodup
                   source sourceLocal sourceWidth sourceOccurrences
                   sourceClausesNonempty)
                 (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes

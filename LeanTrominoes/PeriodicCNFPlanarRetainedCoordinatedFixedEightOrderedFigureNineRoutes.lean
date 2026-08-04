@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightClauseDirectionOrdering
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearance
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineRouteFamily
 
@@ -31,8 +31,7 @@ def
         (PeriodicPlanarOneInThreeThreeRawVariable Variable)) :=
   PeriodicOneInThreeNoUnitsPositioned.formula
     (PeriodicOneInThreePositioned.formula
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-        source))
+      (retainedFigureNineClearancePositionedFormula source))
 
 /-- The two-stage Figure 9 placement over the ordered retained source. -/
 def
@@ -43,9 +42,8 @@ def
       (OneInThreeNoUnitVariable
         (PeriodicPlanarOneInThreeThreeRawVariable Variable)) :=
   PlanarOneInThreeNoUnitsFigureNine.composedPlacement
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-      source)
-    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
+    (retainedFigureNineClearancePositionedFormula source)
+    (retainedFigureNineClearancePlacement source)
 
 /-- Direct original-source suffixes selected from the valid ordered connector
 fan of each retained source clause. -/
@@ -59,41 +57,39 @@ noncomputable def
     (sourceClausesNonempty :
       ∀ clause ∈ source.clauses, clause ≠ []) :=
   PlanarOneInThreeNoUnitsFigureNine.orderedInheritedRouteSuffixes
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-      source)
-    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+    (retainedFigureNineClearancePositionedFormula source)
+    (retainedFigureNineClearancePlacement source)
+    (retainedFigureNineClearancePositionedFormula_widthAtMostThree
       source sourceWidth)
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+    (retainedFigureNineClearancePositionedFormula_allAtomsNodup
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
-      source)
+    (retainedFigureNineClearanceIncidenceRoutes source)
     (fun _sourceClause _sourceClauseIndex sourceClauseMember
         sourceClauseNonempty =>
-      retainedDrawingSourceScaledClockwiseEightOccurrenceSplit_clauseExitFanData_valid
+      retainedFigureNineClearance_clauseExitFanData_valid
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty sourceClauseMember sourceClauseNonempty)
     (fun _sourceClause _sourceClauseIndex sourceClauseMember
         _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
       let valid :=
-        retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_valid
+        retainedFigureNineClearanceIncidenceRoutes_valid
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty sourceClauseMember sourceLiteralMember
       ⟨valid.1, valid.2.1⟩)
     (fun _sourceClause _sourceClauseIndex sourceClauseMember
         _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_valid
+      (retainedFigureNineClearanceIncidenceRoutes_valid
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty sourceClauseMember sourceLiteralMember).2.2)
     (fun _sourceClause _sourceClauseIndex sourceClauseMember
         _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
-      retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_exits
+      retainedFigureNineClearanceIncidenceRoutes_exits
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty sourceClauseMember sourceLiteralMember)
     (fun _sourceClause _sourceClauseIndex sourceClauseMember
         _sourceLiteral _sourceLiteralIndex sourceLiteralMember =>
-      retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_unitSteps
+      retainedFigureNineClearanceIncidenceRoutes_unitSteps
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty sourceClauseMember sourceLiteralMember)
 
@@ -110,12 +106,11 @@ noncomputable def
       ∀ clause ∈ source.clauses, clause ≠ []) :
     PositionedPeriodicCNF.IncidenceRoutes :=
   PlanarOneInThreeNoUnitsFigureNine.splicedRoutes
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-      source)
-    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+    (retainedFigureNineClearancePositionedFormula source)
+    (retainedFigureNineClearancePlacement source)
+    (retainedFigureNineClearancePositionedFormula_widthAtMostThree
       source sourceWidth)
-    (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+    (retainedFigureNineClearancePositionedFormula_allAtomsNodup
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
     (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
@@ -175,12 +170,11 @@ theorem
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes]
     using
       PlanarOneInThreeNoUnitsFigureNine.splicedRoutes_valid_of_members
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-          source)
-        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        (retainedFigureNineClearancePositionedFormula_widthAtMostThree
           source sourceWidth)
-        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup
+        (retainedFigureNineClearancePositionedFormula_allAtomsNodup
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty)
         (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes

@@ -5660,10 +5660,11 @@ The representation choices for this target are:
   the five semantic endpoint inequalities automatically, leaving only four
   continuous-avoidance obligations.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean)
-  instantiates the ordered suffix family over the retained source, then
-  completes both generations of auxiliary routes and splices them to the
-  certified local Figure 9 and unit-elimination drawings.  Every genuine
-  twice-replaced route has exact canonical endpoints and is orthogonal.
+  instantiates the ordered suffix family over the factor-two clearance
+  presentation of the retained source, then completes both generations of
+  auxiliary routes and splices them to the certified local Figure 9 and
+  unit-elimination drawings.  Every genuine twice-replaced route has exact
+  canonical endpoints and is orthogonal.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean)
   applies final loop erasure to the ordered composed family and packages both
   raw and normalized canonical route certificates.  The normalized drawing
@@ -5674,14 +5675,13 @@ The representation choices for this target are:
   instantiates the relative splice assembly for the retained ordered fixed-eight
   route family.  Four explicit avoidance conditions imply all six splice
   conditions, global raw route separation, and hence ribbon readiness of the
-  normalized drawing.  It also transports the completed fixed-eight relative
-  separation certificate through clockwise clause reordering, supplying the
-  inherited source geometry used by the suffix side of that splice.  The
-  composed occurrence provenance now discharges the adjusted source-occurrence
-  inequality for every distinct final relative occurrence; together with
-  reordered-route point injectivity, the factor-72 transport theorem proves
-  that both transformed inherited route tails avoid each other and can meet
-  only at their variable-side endpoints.
+  normalized drawing.  It consumes the relative separation and route
+  simplicity certificates of the factor-two clearance source, supplying the
+  inherited geometry used by the suffix side of that splice.  The composed
+  occurrence provenance discharges the adjusted source-occurrence inequality
+  for every distinct final relative occurrence; the factor-72 transport
+  theorem then proves that both transformed inherited route tails avoid each
+  other and can meet only at their variable-side endpoints.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
