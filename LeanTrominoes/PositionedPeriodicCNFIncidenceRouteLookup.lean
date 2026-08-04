@@ -336,6 +336,70 @@ theorem PlanarIncidencePresentation.vertexPosition_injective_on
     _ = second :=
       List.idxOf_get secondIndexLt
 
+/-- Listed incidence vertices remain injective even when one representative
+is shifted by an arbitrary integral period translation.  Compatibility puts
+both prototype positions in the open fundamental square, so distinct
+vertices cannot acquire equal representatives after such a shift. -/
+theorem PlanarIncidencePresentation.incidenceVertexPositionAt_eq_translated_imp_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PlanarIncidencePresentation source placement)
+    {first second : CNFVertex Variable}
+    (firstMember :
+      first ∈ source.erase.incidenceGraph.vertices)
+    (secondMember :
+      second ∈ source.erase.incidenceGraph.vertices)
+    (relativeTranslate : Cell)
+    (equal :
+      incidenceVertexPositionAt source placement first =
+        Cell.add (placement.translation relativeTranslate)
+          (incidenceVertexPositionAt source placement second)) :
+    first = second := by
+  let drawing :=
+    incidenceDrawing source placement presentation.routes
+  have firstLookup :
+      drawing.vertexPosition source.erase.incidenceGraph first =
+        incidenceVertexPositionAt source placement first := by
+    exact incidenceDrawing_vertexPosition_of_mem
+      source placement presentation.routes firstMember
+  have secondLookup :
+      drawing.vertexPosition source.erase.incidenceGraph second =
+        incidenceVertexPositionAt source placement second := by
+    exact incidenceDrawing_vertexPosition_of_mem
+      source placement presentation.routes secondMember
+  by_contra verticesDifferent
+  have positionsDifferent :
+      drawing.vertexPosition source.erase.incidenceGraph first ≠
+        drawing.vertexPosition source.erase.incidenceGraph second := by
+    intro positionsEqual
+    exact verticesDifferent
+      (PlanarIncidencePresentation.vertexPosition_injective_on
+        presentation firstMember secondMember positionsEqual)
+  have firstBounds :=
+    presentation.compatible.2.2.2.2.1
+      (drawing.vertexPosition source.erase.incidenceGraph first)
+      (PlanarIncidencePresentation.vertexPosition_mem
+        presentation firstMember)
+  have secondBounds :=
+    presentation.compatible.2.2.2.2.1
+      (drawing.vertexPosition source.erase.incidenceGraph second)
+      (PlanarIncidencePresentation.vertexPosition_mem
+        presentation secondMember)
+  apply
+    PositionedPeriodicCNF.fundamentalPosition_ne_translated
+      drawing firstBounds secondBounds positionsDifferent
+  rw [firstLookup, secondLookup]
+  have periodEqual : drawing.gridSize = placement.period := by
+    exact incidenceDrawing_gridSize
+      source placement presentation.routes presentation.periodPositive
+  rw [show drawing.periodTranslation relativeTranslate =
+      placement.translation relativeTranslate by
+    simp [drawing, PeriodicGridDrawing.periodTranslation,
+      PeriodicVariablePlacement.translation, periodEqual]]
+  simpa [Cell.add, add_comm] using equal
+
 /-- A genuine positioned clause index retrieves its canonical clause
 position. -/
 @[simp]
