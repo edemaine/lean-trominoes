@@ -114,7 +114,7 @@ remain injective modulo period translations.  This descends through the
 clockwise ordering and factor-eight refinement to the generic positioned
 fixed-eight split, whose source macrocells are separated by the retained
 planar incidence presentation. -/
-private theorem
+theorem
     retainedOrderedFixedEightCanonicalClausePosition_eq_translated_imp_clauseIndex_eq
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
@@ -288,7 +288,7 @@ private theorem
 /-- Equality of source-gauge centers is exactly equality of the two
 canonical source-clause representatives at the inherited, anchor-adjusted
 source translation. -/
-private theorem localRouteSourceGaugeCenter_eq_translated_iff
+theorem localRouteSourceGaugeCenter_eq_translated_iff
     {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (firstSourceClause secondSourceClause :
