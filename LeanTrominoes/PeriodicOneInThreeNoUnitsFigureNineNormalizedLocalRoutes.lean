@@ -73,6 +73,76 @@ def normalizedLocalRoutes
           metadata.clause
           (localRoutes source clauseIndex literalIndex)
 
+/-- Every genuine normalized local route is exactly its finite-template
+route translated to the source-clause position in the generated clause's
+anchor gauge. -/
+theorem normalizedLocalRoutes_eq_translated_templateRoute_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ (metadata : ClauseMetadata Variable)
+      (templateIndex : Fin
+        (templateDrawing metadata.sourceClause).incidences.length),
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata ∧
+        metadata.clause = clause ∧
+        normalizedLocalRoutes source sourcePlacement
+            clauseIndex literalIndex =
+          PeriodicOrthocrossing.translatePolyline
+            (Cell.sub
+              (Cell.scale composedGadgetScale
+                metadata.sourceClause.position)
+              ((composedPlacement source sourcePlacement).translation
+                (PeriodicCNF.clauseAnchor metadata.clause.literals)))
+            ((templateDrawing metadata.sourceClause).routeAt
+              ((templateDrawing metadata.sourceClause).incidenceAt
+                templateIndex)) := by
+  rcases localRoutes_eq_translated_templateRoute_of_members
+      source sourceWidth clauseMember literalMember with
+    ⟨metadata, templateIndex, metadataLookup, clauseEqual,
+      localRouteEqual⟩
+  refine ⟨metadata, templateIndex, metadataLookup, clauseEqual, ?_⟩
+  let anchor :=
+    (composedPlacement source sourcePlacement).translation
+      (PeriodicCNF.clauseAnchor metadata.clause.literals)
+  let macroOrigin :=
+    Cell.scale composedGadgetScale metadata.sourceClause.position
+  let templateRoute :=
+    (templateDrawing metadata.sourceClause).routeAt
+      ((templateDrawing metadata.sourceClause).incidenceAt templateIndex)
+  have composedTranslations :
+      (PeriodicOrthocrossing.translatePolyline
+          macroOrigin templateRoute).map
+          (fun point => Cell.sub point anchor) =
+        PeriodicOrthocrossing.translatePolyline
+          (Cell.sub macroOrigin anchor) templateRoute := by
+    unfold PeriodicOrthocrossing.translatePolyline
+    rw [List.map_map]
+    apply List.map_congr_left
+    intro point pointMember
+    apply Prod.ext <;>
+      simp [Cell.add, Cell.sub, sub_eq_add_neg, add_comm, add_assoc]
+  simpa [normalizedLocalRoutes, metadataLookup,
+    PositionedPeriodicCNF.normalizeIncidenceRoute,
+    clauseEqual, localRouteEqual, anchor, macroOrigin, templateRoute]
+    using composedTranslations
+
 /-- Every genuine normalized composed route has the exact canonical
 final-clause endpoint and selected normalized local endpoint. -/
 theorem normalizedLocalRoutes_endpoints_of_members

@@ -66,6 +66,113 @@ theorem localRoutes_of_clause_member
   refine ⟨metadata, clauseEqual, ?_⟩
   simp [localRoutes, metadataLookup]
 
+/-- Every genuine selected local route is a common translation of one
+presentation-indexed route in the finite template chosen for its source
+clause. -/
+theorem localRoutes_eq_translated_templateRoute_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ (metadata : ClauseMetadata Variable)
+      (templateIndex : Fin
+        (templateDrawing metadata.sourceClause).incidences.length),
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata ∧
+        metadata.clause = clause ∧
+        localRoutes source clauseIndex literalIndex =
+          PeriodicOrthocrossing.translatePolyline
+            (Cell.scale composedGadgetScale
+              metadata.sourceClause.position)
+            ((templateDrawing metadata.sourceClause).routeAt
+              ((templateDrawing metadata.sourceClause).incidenceAt
+                templateIndex)) := by
+  letI := nestedVariableDecidableEq (Variable := Variable)
+  rcases formulaClauseMetadata_lookup_valid_embedded
+      source clauseMember with
+    ⟨metadata, metadataLookup, clauseEqual,
+      sourceClauseMember, localClauseMember⟩
+  have metadataLiteralMember :
+      (literal, literalIndex) ∈ metadata.clause.literals.zipIdx := by
+    simpa [clauseEqual] using literalMember
+  have metadataSourceMember :
+      metadata.sourceClause ∈ source.clauses :=
+    List.fst_mem_of_mem_zipIdx sourceClauseMember
+  have metadataWidth :
+      metadata.sourceClause.literals.length ≤ 3 := by
+    apply sourceWidth metadata.sourceClause.literals
+    exact List.mem_map.mpr
+      ⟨metadata.sourceClause, metadataSourceMember, rfl⟩
+  let drawing :=
+    instantiatedDrawing
+      metadata.sourceClauseIndex
+      metadata.figureNineClauseStart
+      metadata.sourceClause
+  have drawingFormula :
+      drawing.formula =
+        composedClauseGadget
+          metadata.sourceClauseIndex
+          metadata.figureNineClauseStart
+          metadata.sourceClause :=
+    instantiatedDrawing_formula
+      metadata.sourceClauseIndex
+      metadata.figureNineClauseStart
+      metadata.sourceClause metadataWidth
+  have embeddedClauseMember :
+      (PlanarOneInThreeNoUnits.embedPositionedClause metadata.clause,
+          metadata.localClauseIndex) ∈ drawing.formula.zipIdx := by
+    rw [drawingFormula]
+    exact localClauseMember
+  have embeddedLiteralMember :
+      ((literal.atom, literal.value), literalIndex) ∈
+        (PlanarOneInThreeNoUnits.embedPositionedClause
+          metadata.clause).literals.zipIdx := by
+    unfold PlanarOneInThreeNoUnits.embedPositionedClause
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(literal, literalIndex), metadataLiteralMember, rfl⟩
+  let incidence :
+      EmbeddedCNFIncidence
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)) :=
+    ⟨PlanarOneInThreeNoUnits.embedPositionedClause metadata.clause,
+      metadata.localClauseIndex,
+      (literal.atom, literal.value), literalIndex⟩
+  have incidenceMember : incidence ∈ drawing.incidences :=
+    (mem_embeddedCNFIncidences_iff drawing.formula incidence).mpr
+      ⟨embeddedClauseMember, embeddedLiteralMember⟩
+  rcases List.mem_iff_get.mp incidenceMember with
+    ⟨incidenceIndex, incidenceEqual⟩
+  rcases instantiatedDrawing_routeAt_incidenceAt_eq
+      metadata.sourceClauseIndex
+      metadata.figureNineClauseStart
+      metadata.sourceClause incidenceIndex with
+    ⟨templateIndex, _templateIndexValue, selectedRoute⟩
+  refine ⟨metadata, templateIndex, metadataLookup, clauseEqual, ?_⟩
+  calc
+    localRoutes source clauseIndex literalIndex =
+        drawing.routes metadata.localClauseIndex literalIndex := by
+      simp [localRoutes, metadataLookup, drawing]
+    _ = drawing.routeAt (drawing.incidenceAt incidenceIndex) := by
+      unfold EmbeddedCNFIncidenceDrawing.routeAt
+        EmbeddedCNFIncidenceDrawing.incidenceAt
+      rw [incidenceEqual]
+    _ = _ := selectedRoute
+
 /-- Every genuine selected route meets its displayed final clause and the
 exact variable endpoint advertised by its composed finite drawing. -/
 theorem localRoutes_endpoints_of_members

@@ -104,6 +104,125 @@ theorem instantiatedDrawing_eq
     · rfl
     · rcases rest with _ | ⟨third, tail⟩ <;> rfl
 
+private theorem routeAt_incidenceAt_eq_of_drawing_eq
+    {Variable : Type*}
+    {first second : EmbeddedCNFIncidenceDrawing Variable}
+    (equal : first = second)
+    (index : Fin first.incidences.length) :
+    first.routeAt (first.incidenceAt index) =
+      second.routeAt
+        (second.incidenceAt
+          (Fin.cast
+            (congrArg
+              (fun drawing : EmbeddedCNFIncidenceDrawing Variable =>
+                drawing.incidences.length)
+              equal)
+            index)) := by
+  subst second
+  rfl
+
+/-- Every presentation-indexed route in the selected instantiated drawing
+is the corresponding finite-template route translated into the source
+macrocell.  Logical renaming changes only incidence labels. -/
+theorem instantiatedDrawing_routeAt_incidenceAt_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (index : Fin
+      (instantiatedDrawing
+        sourceClauseIndex figureNineClauseStart source).incidences.length) :
+    ∃ templateIndex : Fin (templateDrawing source).incidences.length,
+      templateIndex.val = index.val ∧
+        (instantiatedDrawing
+            sourceClauseIndex figureNineClauseStart source).routeAt
+              ((instantiatedDrawing
+                sourceClauseIndex figureNineClauseStart source).incidenceAt
+                  index) =
+          PeriodicOrthocrossing.translatePolyline
+            (Cell.scale composedGadgetScale source.position)
+            ((templateDrawing source).routeAt
+              ((templateDrawing source).incidenceAt templateIndex)) := by
+  let template := templateDrawing source
+  let variableMap :=
+    instantiatedVariableMap
+      sourceClauseIndex figureNineClauseStart source
+  let renamed :=
+    EmbeddedCNFIncidenceDrawing.renameToImage template variableMap
+  let offset := Cell.scale composedGadgetScale source.position
+  let target := renamed.translate offset
+  have drawingEqual :
+      instantiatedDrawing
+          sourceClauseIndex figureNineClauseStart source = target := by
+    simpa [target, renamed, template, variableMap, offset] using
+      instantiatedDrawing_eq
+        sourceClauseIndex figureNineClauseStart source
+  let targetIndex : Fin target.incidences.length :=
+    Fin.cast
+      (congrArg
+        (fun drawing :
+          EmbeddedCNFIncidenceDrawing
+            (OneInThreeNoUnitVariable
+              (OneInThreeVariable Variable)) =>
+          drawing.incidences.length)
+        drawingEqual)
+      index
+  let renamedIndex : Fin renamed.incidences.length :=
+    ⟨targetIndex.val, targetIndex.isLt.trans_eq
+      (EmbeddedCNFIncidenceDrawing.translate_incidences_length
+        renamed offset)⟩
+  let templateIndex : Fin template.incidences.length :=
+    ⟨renamedIndex.val, renamedIndex.isLt.trans_eq
+      (EmbeddedCNFIncidenceDrawing.rename_incidences_length
+        template variableMap
+        (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+          template variableMap))⟩
+  refine ⟨templateIndex, ?_, ?_⟩
+  · simp [templateIndex, renamedIndex, targetIndex]
+  have selectedRouteEqual :
+      (instantiatedDrawing
+          sourceClauseIndex figureNineClauseStart source).routeAt
+            ((instantiatedDrawing
+              sourceClauseIndex figureNineClauseStart source).incidenceAt
+                index) =
+        target.routeAt (target.incidenceAt targetIndex) := by
+    simpa [targetIndex] using
+      routeAt_incidenceAt_eq_of_drawing_eq drawingEqual index
+  have translatedIncidence :=
+    EmbeddedCNFIncidenceDrawing.incidenceAt_translate
+      renamed offset targetIndex
+  have renamedIncidence :=
+    EmbeddedCNFIncidenceDrawing.incidenceAt_rename
+      template variableMap
+      (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+        template variableMap)
+      renamedIndex
+  rw [selectedRouteEqual]
+  change
+    (renamed.translate offset).routeAt
+        ((renamed.translate offset).incidenceAt targetIndex) = _
+  rw [translatedIncidence,
+    EmbeddedCNFIncidenceDrawing.routeAt_translate_incidence]
+  have renamedIndexEqual :
+      (⟨targetIndex.val, by
+        exact targetIndex.isLt.trans_eq
+          (EmbeddedCNFIncidenceDrawing.translate_incidences_length
+            renamed offset)⟩ : Fin renamed.incidences.length) =
+        renamedIndex := by
+    apply Fin.ext
+    rfl
+  rw [renamedIndexEqual]
+  change
+    List.map (Cell.add offset)
+        ((template.rename variableMap
+          (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+            template variableMap)).routeAt
+          ((template.rename variableMap
+            (EmbeddedCNFIncidenceDrawing.imageVariablePosition
+              template variableMap)).incidenceAt renamedIndex)) = _
+  rw [renamedIncidence,
+    EmbeddedCNFIncidenceDrawing.routeAt_rename_incidence]
+  rfl
+
 /-- Width three and source-atom distinctness make the selected actual
 variable map injective on every role occurring in the selected template. -/
 theorem instantiatedVariableMap_injectiveOn
