@@ -830,5 +830,94 @@ theorem instantiatedDrawing_sourcePosition
             PlanarOneInThree.figureNineVariablePosition,
             sourceLocalPosition, Cell.scale, Cell.add] using rolePosition
 
+/-- Every genuine original source literal is represented by a variable
+vertex of the selected composed finite drawing. -/
+theorem instantiatedDrawing_sourceAtom_mem_variableVertices
+    {Variable : Type*} [DecidableEq Variable]
+    (sourceClauseIndex figureNineClauseStart : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (distinct : source.AtomsNodup)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ source.literals.zipIdx) :
+    (.inl (.inl literal.atom) :
+        OneInThreeNoUnitVariable (OneInThreeVariable Variable)) ∈
+      (instantiatedDrawing
+        sourceClauseIndex figureNineClauseStart source).variableVertices := by
+  rw [instantiatedDrawing_variableVertices
+    sourceClauseIndex figureNineClauseStart source width distinct]
+  apply List.mem_map.mpr
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, rest⟩
+  · simp at literalMember
+  · rcases rest with _ | ⟨second, rest⟩
+    · simp at literalMember
+      rcases literalMember with ⟨rfl, rfl⟩
+      refine
+        ⟨.inherited PlanarOneInThree.FigureNineVariable.sourceFirst,
+          ?_, ?_⟩
+      · simp [templateDrawing, oneDrawingFor, oneFormulaFor,
+          forcedFalseUnitReplacement, clause,
+          EmbeddedCNFIncidenceDrawing.variableVertices]
+      · simp [instantiatedVariableMap, oneVariableMap,
+          variableMap, oneInheritedMap]
+    · rcases rest with _ | ⟨third, tail⟩
+      · have firstNeSecond : first.atom ≠ second.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup] using distinct
+        simp at literalMember
+        rcases literalMember with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · refine
+            ⟨.inherited PlanarOneInThree.FigureNineVariable.sourceFirst,
+              ?_, ?_⟩
+          · simp [templateDrawing, twoDrawingFor, twoFormulaFor,
+              forcedFalseUnitReplacement, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+          · simp [instantiatedVariableMap, twoVariableMap,
+              variableMap, twoInheritedMap]
+        · refine
+            ⟨.inherited PlanarOneInThree.FigureNineVariable.sourceSecond,
+              ?_, ?_⟩
+          · simp [templateDrawing, twoDrawingFor, twoFormulaFor,
+              forcedFalseUnitReplacement, clause,
+              EmbeddedCNFIncidenceDrawing.variableVertices]
+          · simp [instantiatedVariableMap, twoVariableMap,
+              variableMap, twoInheritedMap]
+      · have tailEmpty : tail = [] := by
+          apply List.length_eq_zero_iff.mp
+          simp at width
+          omega
+        subst tail
+        have pairwise :
+            (first.atom ≠ second.atom ∧
+              first.atom ≠ third.atom) ∧
+            second.atom ≠ third.atom := by
+          simpa [PositionedPeriodicClause.AtomsNodup] using distinct
+        simp at literalMember
+        rcases literalMember with
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · refine
+            ⟨.inherited PlanarOneInThree.FigureNineVariable.sourceFirst,
+              ?_, ?_⟩
+          · simp [templateDrawing, fullDrawingFor, fullFormulaFor,
+              clause, EmbeddedCNFIncidenceDrawing.variableVertices]
+          · simp [instantiatedVariableMap, threeVariableMap,
+              variableMap, threeInheritedMap]
+        · refine
+            ⟨.inherited PlanarOneInThree.FigureNineVariable.sourceSecond,
+              ?_, ?_⟩
+          · simp [templateDrawing, fullDrawingFor, fullFormulaFor,
+              clause, EmbeddedCNFIncidenceDrawing.variableVertices]
+          · simp [instantiatedVariableMap, threeVariableMap,
+              variableMap, threeInheritedMap]
+        · refine
+            ⟨.inherited PlanarOneInThree.FigureNineVariable.sourceThird,
+              ?_, ?_⟩
+          · simp [templateDrawing, fullDrawingFor, fullFormulaFor,
+              clause, EmbeddedCNFIncidenceDrawing.variableVertices]
+          · simp [instantiatedVariableMap, threeVariableMap,
+              variableMap, threeInheritedMap]
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes
