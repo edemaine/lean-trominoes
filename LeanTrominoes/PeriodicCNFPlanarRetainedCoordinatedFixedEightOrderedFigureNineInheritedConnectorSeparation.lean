@@ -467,6 +467,161 @@ theorem
         clearanceSource, clearancePlacement, outputPlacement,
         clearanceWidth] using endpointsDifferent)
 
+/-- The reverse cross pair follows from the preceding theorem at the negated
+relative translation. -/
+theorem
+    retainedOrderedFixedEightFigureNine_inheritedSuffix_strictlyAvoids_translatedInheritedLocal_of_sourceGaugesEqual
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        secondClauseIndex secondLiteralIndex)
+    (relativeTranslate : Cell)
+    (sourceGaugesEqual :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          first.sourceClause first.generatedClause =
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            second.sourceClause second.generatedClause))
+    (generatedOccurrencesDifferent :
+      ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
+        ((secondClauseIndex, secondLiteralIndex), relativeTranslate)) :
+    let outputPlacement :=
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+    let clearanceWidth :=
+      retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth
+    RoutesStrictlyAvoidEachOther
+      (PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+        outputPlacement
+        (retainedFigureNineClearancePlacement source)
+        first.sourceClause first.generatedClause
+        (PositionedPeriodicCNF.clauseExitFanData
+          first.sourceClause first.sourceClauseIndex
+          (retainedFigureNineClearanceIncidenceRoutes source))
+        (first.sourceSlot clearanceWidth)
+        (retainedFigureNineClearanceIncidenceRoutes
+          source first.sourceClauseIndex first.sourceLiteralIndex))
+      (translatePolyline (outputPlacement.translation relativeTranslate)
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source)
+          secondClauseIndex secondLiteralIndex)) := by
+  let clearanceSource :=
+    retainedFigureNineClearancePositionedFormula source
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      clearanceSource clearancePlacement
+  let clearanceWidth :=
+    retainedFigureNineClearancePositionedFormula_widthAtMostThree
+      source sourceWidth
+  let reverseTranslate := Cell.neg relativeTranslate
+  let offset := outputPlacement.translation relativeTranslate
+  let reverseOffset := outputPlacement.translation reverseTranslate
+  let firstSuffix :=
+    PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+      outputPlacement clearancePlacement
+      first.sourceClause first.generatedClause
+      (PositionedPeriodicCNF.clauseExitFanData
+        first.sourceClause first.sourceClauseIndex
+        (retainedFigureNineClearanceIncidenceRoutes source))
+      (first.sourceSlot clearanceWidth)
+      (retainedFigureNineClearanceIncidenceRoutes
+        source first.sourceClauseIndex first.sourceLiteralIndex)
+  let secondLocal :=
+    PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+      clearanceSource clearancePlacement
+      secondClauseIndex secondLiteralIndex
+  have reverseSourceGaugesEqual :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          outputPlacement second.sourceClause second.generatedClause =
+        Cell.add reverseOffset
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            outputPlacement first.sourceClause first.generatedClause) := by
+    apply Prod.ext
+    · have coordinateEqual := congrArg Prod.fst sourceGaugesEqual
+      simp [outputPlacement, clearanceSource, clearancePlacement,
+        reverseOffset, reverseTranslate,
+        PeriodicVariablePlacement.translation,
+        Cell.neg, Cell.add, Cell.sub, Cell.scale]
+        at coordinateEqual ⊢
+      nlinarith
+    · have coordinateEqual := congrArg Prod.snd sourceGaugesEqual
+      simp [outputPlacement, clearanceSource, clearancePlacement,
+        reverseOffset, reverseTranslate,
+        PeriodicVariablePlacement.translation,
+        Cell.neg, Cell.add, Cell.sub, Cell.scale]
+        at coordinateEqual ⊢
+      nlinarith
+  have reverseOccurrencesDifferent :
+      ((secondClauseIndex, secondLiteralIndex), (0, 0)) ≠
+        ((firstClauseIndex, firstLiteralIndex), reverseTranslate) := by
+    intro reverseEqual
+    have clauseEqual : secondClauseIndex = firstClauseIndex :=
+      congrArg (fun occurrence : (Nat × Nat) × Cell => occurrence.1.1)
+        reverseEqual
+    have literalEqual : secondLiteralIndex = firstLiteralIndex :=
+      congrArg (fun occurrence : (Nat × Nat) × Cell => occurrence.1.2)
+        reverseEqual
+    have reverseTranslateZero : (0, 0) = reverseTranslate :=
+      congrArg (fun occurrence : (Nat × Nat) × Cell => occurrence.2)
+        reverseEqual
+    have relativeTranslateZero : relativeTranslate = (0, 0) := by
+      rcases relativeTranslate with ⟨translateX, translateY⟩
+      simp [reverseTranslate, Cell.neg, Cell.sub]
+        at reverseTranslateZero ⊢
+      exact ⟨reverseTranslateZero.1,
+        reverseTranslateZero.2⟩
+    apply generatedOccurrencesDifferent
+    simp [clauseEqual, literalEqual, relativeTranslateZero]
+  have backwards :=
+    retainedOrderedFixedEightFigureNine_inheritedLocal_strictlyAvoids_translatedInheritedSuffix_of_sourceGaugesEqual
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty second first reverseTranslate
+      (by simpa [outputPlacement, reverseOffset,
+        clearanceSource, clearancePlacement] using
+        reverseSourceGaugesEqual)
+      reverseOccurrencesDifferent
+  have shifted := backwards.symm.translatePolyline offset
+  have shiftCancel : Cell.add reverseOffset offset = (0, 0) := by
+    rcases relativeTranslate with ⟨translateX, translateY⟩
+    simp [reverseOffset, offset, reverseTranslate,
+      PeriodicVariablePlacement.translation,
+      Cell.neg, Cell.add, Cell.sub, Cell.scale]
+  rw [translatePolyline_add, shiftCancel,
+    translatePolyline_zero] at shifted
+  simpa [firstSuffix, secondLocal, outputPlacement,
+    clearanceSource, clearancePlacement, clearanceWidth,
+    offset, reverseOffset, reverseTranslate] using shifted
+
 /-- The radially extended exit connectors of a distinct inherited pair are
 strictly separated when their normalized source gauges agree. -/
 theorem
