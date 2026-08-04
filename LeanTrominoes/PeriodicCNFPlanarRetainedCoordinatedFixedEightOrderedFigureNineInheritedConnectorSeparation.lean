@@ -1203,6 +1203,90 @@ theorem
         (secondData.translatedRoute secondBaseOrigin secondSlot))
   simpa only [translatedSecondConnector] using connectorsStrict
 
+/-- Unequal normalized source gauges force distinct recovered source-route
+occurrences after the inherited anchor change. -/
+private theorem
+    inheritedSourceOccurrencesDifferent_of_sourceGaugesNe
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        secondClauseIndex secondLiteralIndex)
+    (relativeTranslate : Cell)
+    (sourceGaugesNe :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          first.sourceClause first.generatedClause ≠
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            second.sourceClause second.generatedClause)) :
+    ((first.sourceClauseIndex, first.sourceLiteralIndex), (0, 0)) ≠
+      ((second.sourceClauseIndex, second.sourceLiteralIndex),
+        PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRelativeTranslate
+          first.sourceClause second.sourceClause
+          first.generatedClause second.generatedClause
+          relativeTranslate) := by
+  let clearanceSource :=
+    retainedFigureNineClearancePositionedFormula source
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let sourceRelativeTranslate :=
+    PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRelativeTranslate
+      first.sourceClause second.sourceClause
+      first.generatedClause second.generatedClause
+      relativeTranslate
+  intro sourceOccurrencesEqual
+  have sourceClauseIndexEqual :
+      first.sourceClauseIndex = second.sourceClauseIndex :=
+    congrArg (fun occurrence : (Nat × Nat) × Cell => occurrence.1.1)
+      sourceOccurrencesEqual
+  have sourceRelativeTranslateZero :
+      (0, 0) = sourceRelativeTranslate :=
+    congrArg (fun occurrence : (Nat × Nat) × Cell => occurrence.2)
+      sourceOccurrencesEqual
+  have sourceClausesEqual : first.sourceClause = second.sourceClause := by
+    apply value_eq_of_mem_zipIdx_same_index first.sourceClauseMember
+    simpa [sourceClauseIndexEqual] using second.sourceClauseMember
+  have canonicalPositionsEqual :
+      PositionedPeriodicCNF.canonicalClausePosition
+          clearancePlacement first.sourceClause =
+        Cell.add
+          (clearancePlacement.translation sourceRelativeTranslate)
+          (PositionedPeriodicCNF.canonicalClausePosition
+            clearancePlacement second.sourceClause) := by
+    rw [← sourceRelativeTranslateZero]
+    simp [sourceClausesEqual,
+      PeriodicVariablePlacement.translation, Cell.add, Cell.scale]
+  have sourceCentersEqual :=
+    (localRouteSourceGaugeCenter_eq_translated_iff
+      clearancePlacement first.sourceClause second.sourceClause
+      first.generatedClause second.generatedClause relativeTranslate).mpr
+        (by simpa [sourceRelativeTranslate] using canonicalPositionsEqual)
+  apply sourceGaugesNe
+  rw [PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition_eq_scale_sourceGaugeCenter,
+    PlanarOneInThreeNoUnitsFigureNine.translated_normalizedSourceClausePosition_eq_scale_sourceGaugeCenter]
+  exact congrArg
+    (Cell.scale PlanarOneInThreeNoUnitsFigureNine.composedGadgetScale)
+    sourceCentersEqual
+
 /-- In one retained normalized source gauge, the first inherited connector
 strictly avoids the translated transformed source tail selected by a
 different inherited slot. -/

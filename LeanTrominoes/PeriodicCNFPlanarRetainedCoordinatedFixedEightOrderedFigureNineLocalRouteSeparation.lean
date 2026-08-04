@@ -109,6 +109,89 @@ private theorem
       Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
     nlinarith
 
+/-- A canonical clause-to-literal equality after factor-eight refinement and
+clockwise ordering descends to an equality between the unscaled clause
+representative and a periodic translate of the literal's split variable.
+The adjusted translate absorbs both clause-anchor changes and the literal
+offset. -/
+private theorem
+    orderedFactorEightCanonicalClausePosition_eq_translatedLiteralPosition_imp_exists_unscaled
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (firstBaseClause secondBaseClause :
+      PositionedPeriodicClause Variable)
+    (firstClauseIndex secondClauseIndex : Nat)
+    (firstOrderedClause secondOrderedClause :
+      PositionedPeriodicClause Variable)
+    (secondBaseLiteral : PeriodicLiteral Variable)
+    (secondOrderedLiteral : PeriodicLiteral Variable)
+    (firstOrderedEqual :
+      firstOrderedClause =
+        PositionedPeriodicCNF.orderClauseByRouteDirection routes
+          firstClauseIndex
+          (firstBaseClause.scale retainedTerminalFanRoutingRefinement))
+    (secondOrderedEqual :
+      secondOrderedClause =
+        PositionedPeriodicCNF.orderClauseByRouteDirection routes
+          secondClauseIndex
+          (secondBaseClause.scale retainedTerminalFanRoutingRefinement))
+    (secondLiteralEqual : secondOrderedLiteral = secondBaseLiteral)
+    (relativeTranslate : Cell)
+    (positionsEqual :
+      PositionedPeriodicCNF.canonicalClausePosition
+          (placement.scale retainedTerminalFanRoutingRefinement)
+          firstOrderedClause =
+        Cell.add
+          ((placement.scale
+            retainedTerminalFanRoutingRefinement).translation
+              relativeTranslate)
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (placement.scale retainedTerminalFanRoutingRefinement)
+            secondOrderedClause secondOrderedLiteral)) :
+    ∃ adjustedTranslate,
+      PositionedPeriodicCNF.canonicalClausePosition
+          placement firstBaseClause =
+        Cell.add (placement.translation adjustedTranslate)
+          (placement.position secondBaseLiteral.atom) := by
+  let firstBaseAnchor :=
+    PeriodicCNF.clauseAnchor firstBaseClause.literals
+  let firstOrderedAnchor :=
+    PeriodicCNF.clauseAnchor firstOrderedClause.literals
+  let secondOrderedAnchor :=
+    PeriodicCNF.clauseAnchor secondOrderedClause.literals
+  let adjustedTranslate :=
+    Cell.add relativeTranslate
+      (Cell.sub
+        (Cell.add
+          (Cell.sub secondBaseLiteral.offset secondOrderedAnchor)
+          firstOrderedAnchor)
+        firstBaseAnchor)
+  refine ⟨adjustedTranslate, ?_⟩
+  apply Prod.ext
+  · have coordinateEqual := congrArg Prod.fst positionsEqual
+    simp [firstOrderedEqual, secondOrderedEqual,
+      secondLiteralEqual, firstBaseAnchor, firstOrderedAnchor,
+      secondOrderedAnchor, adjustedTranslate,
+      PositionedPeriodicCNF.orderClauseByRouteDirection,
+      PositionedPeriodicCNF.canonicalClausePosition,
+      PositionedPeriodicCNF.canonicalLiteralPosition,
+      PeriodicVariablePlacement.translation,
+      retainedTerminalFanRoutingRefinement,
+      Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+    nlinarith
+  · have coordinateEqual := congrArg Prod.snd positionsEqual
+    simp [firstOrderedEqual, secondOrderedEqual,
+      secondLiteralEqual, firstBaseAnchor, firstOrderedAnchor,
+      secondOrderedAnchor, adjustedTranslate,
+      PositionedPeriodicCNF.orderClauseByRouteDirection,
+      PositionedPeriodicCNF.canonicalClausePosition,
+      PositionedPeriodicCNF.canonicalLiteralPosition,
+      PeriodicVariablePlacement.translation,
+      retainedTerminalFanRoutingRefinement,
+      Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+    nlinarith
+
 /-- Every source-gauge center in the clockwise retained fixed-eight source
 is still a multiple of the factor-eight terminal-fan refinement.  Clockwise
 literal ordering changes the clause anchor but not its displayed position,
@@ -391,6 +474,200 @@ theorem
     PeriodicEightOccurrenceSplitPositioned.canonicalClausePosition_eq_translated_imp_clauseIndex_eq
       baseSource basePlacement occurrencePorts presentation'
       firstBaseMember secondBaseMember adjustedTranslate
+      (by simpa [splitFormula, splitPlacement]
+        using basePositionsEqual)
+
+/-- A genuine clockwise fixed-eight clause vertex cannot coincide with a
+periodic translate of any genuine literal endpoint.  Clockwise ordering and
+factor-eight refinement descend to the positioned split, where the endpoint
+belongs to a source variable macrocell and clause-versus-variable separation
+applies. -/
+theorem
+    retainedOrderedFixedEightCanonicalClausePosition_ne_translatedLiteralPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstMember :
+      (firstClause, firstClauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    (secondMember :
+      (secondClause, secondClauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {secondLiteral :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {secondLiteralIndex : Nat}
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈
+        secondClause.literals.zipIdx)
+    (relativeTranslate : Cell) :
+    PositionedPeriodicCNF.canonicalClausePosition
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+          source)
+        firstClause ≠
+      Cell.add
+        ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+          source).translation relativeTranslate)
+        (PositionedPeriodicCNF.canonicalLiteralPosition
+          (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+            source)
+          secondClause secondLiteral) := by
+  let baseSource :=
+    (finalCoordinatedSource source).scale
+      retainedAngularFanSourceClearanceFactor
+  let basePlacement :=
+    (finalCoordinatedPlacement source).scale
+      retainedAngularFanSourceClearanceFactor
+  let baseRoutes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes source)
+  let occurrencePorts :=
+    occurrencePortsOfAngularOrder baseSource.erase
+      (PeriodicThreeSATThree.angularOccurrenceOrder
+        baseSource.erase baseRoutes)
+  let splitFormula :=
+    PeriodicEightOccurrenceSplitPositioned.formula
+      baseSource basePlacement occurrencePorts
+  let splitPlacement :=
+    PeriodicEightOccurrenceSplitPositioned.placement basePlacement
+  have firstOrderedMember := firstMember
+  have secondOrderedMember := secondMember
+  rw [retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula]
+    at firstOrderedMember secondOrderedMember
+  rcases PositionedPeriodicCNF.exists_sourceClause_of_orderedClause_mem
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      firstOrderedMember with
+    ⟨firstScaledClause, firstScaledMember, firstOrderedEqual⟩
+  rcases PositionedPeriodicCNF.exists_sourceLiteral_of_orderedLiteral_mem
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      secondOrderedMember secondLiteralMember with
+    ⟨secondScaledClause, secondBaseLiteral, secondBaseLiteralIndex,
+      secondScaledMember, secondScaledLiteralMember,
+      secondOrderedEqual, secondLiteralEqual, _secondRouteEqual⟩
+  have firstScaledMember' := firstScaledMember
+  have secondScaledMember' := secondScaledMember
+  change
+    (firstScaledClause, firstClauseIndex) ∈
+      (splitFormula.scale
+        retainedTerminalFanRoutingRefinement).clauses.zipIdx
+    at firstScaledMember'
+  change
+    (secondScaledClause, secondClauseIndex) ∈
+      (splitFormula.scale
+        retainedTerminalFanRoutingRefinement).clauses.zipIdx
+    at secondScaledMember'
+  rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    at firstScaledMember' secondScaledMember'
+  rcases List.mem_map.mp firstScaledMember' with
+    ⟨firstTaggedClause, firstBaseMember, firstTaggedEqual⟩
+  rcases List.mem_map.mp secondScaledMember' with
+    ⟨secondTaggedClause, secondBaseMember, secondTaggedEqual⟩
+  rcases firstTaggedClause with
+    ⟨firstBaseClause, firstBaseClauseIndex⟩
+  rcases secondTaggedClause with
+    ⟨secondBaseClause, secondBaseClauseIndex⟩
+  have firstBaseIndexEqual :
+      firstBaseClauseIndex = firstClauseIndex :=
+    congrArg Prod.snd firstTaggedEqual
+  have secondBaseIndexEqual :
+      secondBaseClauseIndex = secondClauseIndex :=
+    congrArg Prod.snd secondTaggedEqual
+  have firstScaledEqual :
+      firstBaseClause.scale retainedTerminalFanRoutingRefinement =
+        firstScaledClause :=
+    congrArg Prod.fst firstTaggedEqual
+  have secondScaledEqual :
+      secondBaseClause.scale retainedTerminalFanRoutingRefinement =
+        secondScaledClause :=
+    congrArg Prod.fst secondTaggedEqual
+  subst firstBaseClauseIndex
+  subst secondBaseClauseIndex
+  subst firstScaledClause
+  subst secondScaledClause
+  have secondBaseLiteralMember :
+      (secondBaseLiteral, secondBaseLiteralIndex) ∈
+        secondBaseClause.literals.zipIdx := by
+    simpa using secondScaledLiteralMember
+  intro positionsEqual
+  have positionsEqual' :
+      PositionedPeriodicCNF.canonicalClausePosition
+          (splitPlacement.scale retainedTerminalFanRoutingRefinement)
+          firstClause =
+        Cell.add
+          ((splitPlacement.scale
+            retainedTerminalFanRoutingRefinement).translation
+              relativeTranslate)
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            (splitPlacement.scale retainedTerminalFanRoutingRefinement)
+            secondClause secondLiteral) := by
+    simpa [splitPlacement, basePlacement,
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
+      retainedAngularFanSourceScaledRefinedPlacement,
+      retainedAngularFanRefinedPlacement,
+      finalCoordinatedPlacement] using positionsEqual
+  rcases
+      orderedFactorEightCanonicalClausePosition_eq_translatedLiteralPosition_imp_exists_unscaled
+        splitPlacement
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          source)
+        firstBaseClause secondBaseClause
+        firstClauseIndex secondClauseIndex
+        firstClause secondClause
+        secondBaseLiteral secondLiteral
+        firstOrderedEqual secondOrderedEqual secondLiteralEqual
+        relativeTranslate positionsEqual' with
+    ⟨adjustedTranslate, basePositionsEqual⟩
+  have graphWellFormed :=
+    PeriodicCNF.incidenceGraph_isWellFormed source
+  have graphDegree :=
+    PeriodicCNF.incidenceGraph_degreeAtMost
+      sourceWidth sourceOccurrences
+  have graphLocal :=
+    PeriodicCNF.incidenceGraph_isLocal sourceLocal
+  have retainedClausesNonempty :=
+    retainedDrawingPlanarSATFormula_clausesNonempty_of_source
+      source sourceClausesNonempty
+  let presentation :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATPlanarIncidencePresentation
+      retainedAngularFanSourceClearanceFactor_pos
+      source graphWellFormed graphDegree graphLocal
+      retainedClausesNonempty
+  have presentation' :
+      PositionedPeriodicCNF.PlanarIncidencePresentation
+        baseSource basePlacement := by
+    have wrappedDecidableEqEqual :
+        (@drawingOrderedWrappedPeriodicPlanarSATVariableInstDecidableEq
+            Variable _ ) =
+          (@instDecidableEqWrappedPeriodicVariable
+            (PeriodicPlanarSATVariable Variable) _) :=
+      Subsingleton.elim _ _
+    rw [wrappedDecidableEqEqual]
+    simpa [baseSource, basePlacement,
+      finalCoordinatedSource, finalCoordinatedPlacement] using
+      presentation
+  have atomMember :=
+    PeriodicEightOccurrenceSplitPositioned.literal_atom_fst_mem_sourceVariables
+      baseSource basePlacement occurrencePorts
+      secondBaseMember secondBaseLiteralMember
+  exact
+    (PeriodicEightOccurrenceSplitPositioned.canonicalClausePosition_ne_translated_occurrenceVariablePosition
+      baseSource basePlacement occurrencePorts presentation'
+      firstBaseMember secondBaseLiteral.atom atomMember adjustedTranslate)
       (by simpa [splitFormula, splitPlacement]
         using basePositionsEqual)
 

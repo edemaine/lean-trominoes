@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicEightOccurrenceSplitCycleMacrocellSeparation
 import LeanTrominoes.PeriodicEightOccurrenceSplitPositionedOccurrenceIndex
 import LeanTrominoes.PeriodicEightOccurrenceSplitPositionedCycleIndex
+import LeanTrominoes.PeriodicEightOccurrenceSplitOccurrences
 import LeanTrominoes.RetainedAngularFanCompleteRouteCertificates
 import LeanTrominoes.PositionedPeriodicCNFIncidenceRouteLookup
 
@@ -806,6 +807,51 @@ theorem canonicalClausePosition_ne_translated_occurrenceVariablePosition
       (cycleClauseOffset_ne_occurrenceVariableOffset
         sourcePlacement localMember occurrence atomsEqual)
         macrocellEqual.2
+
+/-- Every literal in the positioned fixed-eight split names a copy of an
+original variable occurring in the source presentation. -/
+theorem literal_atom_fst_mem_sourceVariables
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (occurrencePorts :
+      PeriodicEightOccurrenceSplit.OccurrencePorts)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (formula source sourcePlacement
+          occurrencePorts).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral (ThreeOccurrenceVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    literal.atom.1 ∈ sourceVariables source.erase := by
+  have erasedClauseMember :
+      clause.literals ∈
+        (formula source sourcePlacement occurrencePorts).erase.clauses := by
+    change clause.literals ∈
+      (formula source sourcePlacement occurrencePorts).clauses.map
+        PositionedPeriodicClause.literals
+    exact List.mem_map.mpr
+      ⟨clause, List.fst_mem_of_mem_zipIdx clauseMember, rfl⟩
+  have occurrenceMember :
+      literal.atom ∈
+        (formula source sourcePlacement
+          occurrencePorts).erase.variableOccurrences := by
+    exact List.mem_flatMap.mpr
+      ⟨clause.literals, erasedClauseMember,
+        List.mem_map.mpr
+          ⟨literal,
+            List.fst_mem_of_mem_zipIdx literalMember,
+            rfl⟩⟩
+  apply
+    PeriodicEightOccurrenceSplit.formula_variableOccurrences_fst_mem_sourceVariables
+      source.erase occurrencePorts
+  simpa using occurrenceMember
 
 end PeriodicEightOccurrenceSplitPositioned
 end LeanTrominoes

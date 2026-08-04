@@ -52,6 +52,24 @@ theorem occurrenceClauses_variableOccurrences
     List.map_flatMap, List.flatMap_map, List.map_map,
     Function.comp_def]
 
+/-- The original-variable projection of every selected fixed copy occurs in
+the source presentation. -/
+theorem selectedCopies_fst_mem_sourceVariables
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (occurrencePorts : OccurrencePorts)
+    {occurrence : ThreeOccurrenceVariable Variable}
+    (occurrenceMember :
+      occurrence ∈ selectedCopies source occurrencePorts) :
+    occurrence.1 ∈ PeriodicThreeSATThree.sourceVariables source := by
+  rw [selectedCopies] at occurrenceMember
+  rcases List.mem_map.mp occurrenceMember with
+    ⟨taggedLiteral, taggedLiteralMember, occurrenceEqual⟩
+  have atomMember :=
+    PeriodicThreeSATThree.sourceVariables_mem
+      source taggedLiteralMember
+  simpa [← occurrenceEqual, copy] using atomMember
+
 /-- The numeric compass encoding is injective. -/
 theorem portIndex_injective : Function.Injective portIndex := by
   intro first second
@@ -194,6 +212,56 @@ theorem cyclesFor_count_le
             (fun equal => same equal.symm)
         rw [headCount]
         exact induction
+
+/-- Every variable occurring anywhere in the fixed-eight split projects to
+an original variable that occurs in the source presentation. -/
+theorem formula_variableOccurrences_fst_mem_sourceVariables
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (occurrencePorts : OccurrencePorts)
+    {occurrence : ThreeOccurrenceVariable Variable}
+    (occurrenceMember :
+      occurrence ∈
+        PeriodicCNF.variableOccurrences
+          (formula source occurrencePorts)) :
+    occurrence.1 ∈ PeriodicThreeSATThree.sourceVariables source := by
+  change occurrence ∈
+    PeriodicCNF.variableOccurrences
+      (PeriodicCNF.mk
+        (occurrenceClauses source occurrencePorts ++
+          allCycleClauses source)) at occurrenceMember
+  rw [PeriodicThreeSATThree.variableOccurrences_append]
+    at occurrenceMember
+  rcases List.mem_append.mp occurrenceMember with
+    occurrenceMember | occurrenceMember
+  · rw [occurrenceClauses_variableOccurrences]
+      at occurrenceMember
+    exact selectedCopies_fst_mem_sourceVariables
+      source occurrencePorts occurrenceMember
+  · have occurrenceCountPositive :
+        0 <
+          (PeriodicCNF.variableOccurrences
+            (PeriodicCNF.mk
+              (allCycleClauses source))).count occurrence :=
+      List.count_pos_iff.mpr occurrenceMember
+    have occurrenceCountBound :=
+      cyclesFor_count_le
+        (PeriodicThreeSATThree.sourceVariables source) occurrence
+    have cyclesCountPositive :
+        0 <
+          (PeriodicCNF.variableOccurrences
+            (PeriodicCNF.mk
+              (cyclesFor
+                (PeriodicThreeSATThree.sourceVariables source)))).count
+            occurrence := by
+      simpa [allCycleClauses, cyclesFor] using
+        occurrenceCountPositive
+    have sourceCountPositive :
+        0 <
+          (PeriodicThreeSATThree.sourceVariables source).count
+            occurrence.1 := by
+      omega
+    exact List.count_pos_iff.mp sourceCountPositive
 
 /-- Every fixed compass copy occurs at most twice among all implication
 rings. -/
