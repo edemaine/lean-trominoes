@@ -291,6 +291,112 @@ theorem variableGauge_canonicalPositionGauge_position
       Cell.sub, Cell.scale] <;>
     omega
 
+/-- Equality of two canonically gauged variable representatives lifts to an
+equality of their original representatives after a whole-period
+translation. -/
+theorem exists_translation_of_variableGauge_canonicalPositionGauge_position_eq
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable)
+    {first second : Variable}
+    (positionsEqual :
+      (placement.variableGauge
+          placement.canonicalPositionGauge).position first =
+        (placement.variableGauge
+          placement.canonicalPositionGauge).position second) :
+    ∃ relativeTranslate,
+      placement.position first =
+        Cell.add
+          (placement.translation relativeTranslate)
+          (placement.position second) := by
+  rw [variableGauge_canonicalPositionGauge_position,
+    variableGauge_canonicalPositionGauge_position] at positionsEqual
+  let relativeTranslate : Cell :=
+    ((placement.position first).1 / placement.period -
+        (placement.position second).1 / placement.period,
+      (placement.position first).2 / placement.period -
+        (placement.position second).2 / placement.period)
+  refine ⟨relativeTranslate, ?_⟩
+  apply Prod.ext
+  · have residuesEqual := congrArg Prod.fst positionsEqual
+    change
+      (placement.position first).1 % placement.period =
+        (placement.position second).1 % placement.period
+      at residuesEqual
+    change
+      (placement.position first).1 =
+        (placement.period : Int) * relativeTranslate.1 +
+          (placement.position second).1
+    calc
+      (placement.position first).1 =
+          (placement.position first).1 % placement.period +
+            (placement.period : Int) *
+              ((placement.position first).1 / placement.period) :=
+        (Int.emod_add_mul_ediv _ _).symm
+      _ = (placement.position second).1 % placement.period +
+            (placement.period : Int) *
+              ((placement.position first).1 / placement.period) := by
+        rw [residuesEqual]
+      _ = (placement.period : Int) * relativeTranslate.1 +
+            ((placement.position second).1 % placement.period +
+              (placement.period : Int) *
+                ((placement.position second).1 / placement.period)) := by
+        simp only [relativeTranslate]
+        ring
+      _ = (placement.period : Int) * relativeTranslate.1 +
+            (placement.position second).1 := by
+        rw [Int.emod_add_mul_ediv]
+  · have residuesEqual := congrArg Prod.snd positionsEqual
+    change
+      (placement.position first).2 % placement.period =
+        (placement.position second).2 % placement.period
+      at residuesEqual
+    change
+      (placement.position first).2 =
+        (placement.period : Int) * relativeTranslate.2 +
+          (placement.position second).2
+    calc
+      (placement.position first).2 =
+          (placement.position first).2 % placement.period +
+            (placement.period : Int) *
+              ((placement.position first).2 / placement.period) :=
+        (Int.emod_add_mul_ediv _ _).symm
+      _ = (placement.position second).2 % placement.period +
+            (placement.period : Int) *
+              ((placement.position first).2 / placement.period) := by
+        rw [residuesEqual]
+      _ = (placement.period : Int) * relativeTranslate.2 +
+            ((placement.position second).2 % placement.period +
+              (placement.period : Int) *
+                ((placement.position second).2 / placement.period)) := by
+        simp only [relativeTranslate]
+        ring
+      _ = (placement.period : Int) * relativeTranslate.2 +
+            (placement.position second).2 := by
+        rw [Int.emod_add_mul_ediv]
+
+/-- Orbit-injectivity of an ungauged placement implies ordinary injectivity
+of its canonical fundamental-cell representatives. -/
+theorem variableGauge_canonicalPositionGauge_position_injective_of_orbit
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable)
+    (orbitInjective :
+      ∀ first second relativeTranslate,
+        placement.position first =
+            Cell.add
+              (placement.translation relativeTranslate)
+              (placement.position second) →
+          first = second) :
+    Function.Injective
+      (placement.variableGauge
+        placement.canonicalPositionGauge).position := by
+  intro first second positionsEqual
+  rcases
+      exists_translation_of_variableGauge_canonicalPositionGauge_position_eq
+        placement positionsEqual with
+    ⟨relativeTranslate, originalPositionsEqual⟩
+  exact orbitInjective first second relativeTranslate
+    originalPositionsEqual
+
 /-- Canonically gauged variable positions lie in the half-open fundamental
 square whenever the period is positive. -/
 theorem variableGauge_canonicalPositionGauge_position_halfOpen
