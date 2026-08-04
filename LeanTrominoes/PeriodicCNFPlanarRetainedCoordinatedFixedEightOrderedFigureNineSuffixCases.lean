@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes
+import LeanTrominoes.PositionedPeriodicCNFLocalRouteSplicingEndpointDirections
 
 /-!
 # Pointwise cases for retained ordered Figure 9 suffixes
@@ -191,6 +192,75 @@ theorem
       | inl sourceAtom => exact (notInherited sourceAtom atomEq).elim
       | inr figureNineAuxiliary => simp
   | inr unitAuxiliary => simp
+
+/-- A non-inherited incidence's complete retained route is exactly its
+normalized local route, because its completed suffix is the singleton splice
+point. -/
+theorem
+    retainedOrderedFixedEightComposedRawIncidenceRoutes_eq_normalizedLocalRoutes_of_not_inherited
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (notInherited :
+      ∀ sourceAtom :
+        ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable),
+        literal.atom ≠ .inl (.inl sourceAtom)) :
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseIndex literalIndex =
+      PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        clauseIndex literalIndex := by
+  let suffixes :=
+    PlanarOneInThreeNoUnitsFigureNine.completeRouteSuffixes
+      (retainedFigureNineClearancePositionedFormula source)
+      (retainedFigureNineClearancePlacement source)
+      (retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth)
+      (retainedFigureNineClearancePositionedFormula_allAtomsNodup
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+  have suffixSingleton :=
+    retainedOrderedFixedEightCompleteRouteSuffixes_eq_singleton_of_not_inherited
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember notInherited
+  change
+    PositionedPeriodicCNF.spliceLocalIncidenceRoutes
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source))
+        suffixes clauseIndex literalIndex = _
+  exact
+    PositionedPeriodicCNF.spliceLocalIncidenceRoutes_eq_local_of_suffix_singleton
+      (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source))
+      suffixes clauseIndex literalIndex suffixSingleton
 
 end PeriodicOrthocrossing
 end LeanTrominoes
