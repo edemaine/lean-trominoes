@@ -32,6 +32,15 @@ def translatedRoute
     (slot : Fin 3) : List Cell :=
   PeriodicOrthocrossing.translatePolyline origin (data.route slot)
 
+/-- Translate the connector together with its factor-two radial clearance
+extension into an arbitrary clause gauge. -/
+def translatedExtendedRoute
+    (origin : Cell)
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3) : List Cell :=
+  PeriodicOrthocrossing.translatePolyline origin
+    (data.extendedRoute slot)
+
 /-- The translated connector begins at its translated composed source
 port. -/
 @[simp]

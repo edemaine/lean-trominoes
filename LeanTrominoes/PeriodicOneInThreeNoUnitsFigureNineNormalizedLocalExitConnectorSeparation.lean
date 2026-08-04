@@ -115,5 +115,112 @@ theorem normalizedLocalRoutes_strictlyAvoids_translatedExitConnector_of_members
   simpa [normalizedRouteEqual',
     ComposedClauseExitFanData.translatedRoute] using translatedStrict
 
+/-- The same finite transport separates a genuine normalized local route
+from the connector plus its factor-two radial source-edge extension. -/
+theorem
+    normalizedLocalRoutes_strictlyAvoids_translatedExtendedExitConnector_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (metadata : ClauseMetadata Variable)
+    (metadataLookup :
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata)
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (valid : data.IsValid)
+    (active : data.SlotActive slot)
+    (endpointsDifferent :
+      (normalizedLocalRoutes source sourcePlacement
+          clauseIndex literalIndex).getLast? ≠
+        (data.translatedExtendedRoute
+          (normalizedSourceClausePosition
+            (composedPlacement source sourcePlacement)
+            metadata.sourceClause metadata.clause)
+          slot).head?) :
+    RoutesStrictlyAvoidEachOther
+      (normalizedLocalRoutes source sourcePlacement
+        clauseIndex literalIndex)
+      (data.translatedExtendedRoute
+        (normalizedSourceClausePosition
+          (composedPlacement source sourcePlacement)
+          metadata.sourceClause metadata.clause)
+        slot) := by
+  rcases normalizedLocalRoutes_eq_translated_templateRoute_of_members
+      source sourcePlacement sourceWidth clauseMember literalMember with
+    ⟨actualMetadata, templateIndex, actualLookup, clauseEqual,
+      normalizedRouteEqual⟩
+  have metadataEqual : actualMetadata = metadata := by
+    apply Option.some.inj
+    exact actualLookup.symm.trans metadataLookup
+  subst actualMetadata
+  have metadataWidth : metadata.sourceClause.literals.length ≤ 3 := by
+    rcases formulaClauseMetadata_lookup_valid_embedded
+        source clauseMember with
+      ⟨witnessMetadata, witnessLookup, _witnessClauseEqual,
+        sourceClauseMember, _localClauseMember⟩
+    have witnessEqual : witnessMetadata = metadata := by
+      apply Option.some.inj
+      exact witnessLookup.symm.trans metadataLookup
+    subst witnessMetadata
+    have sourceClauseMember : metadata.sourceClause ∈ source.clauses :=
+      List.fst_mem_of_mem_zipIdx sourceClauseMember
+    apply sourceWidth metadata.sourceClause.literals
+    exact List.mem_map.mpr
+      ⟨metadata.sourceClause, sourceClauseMember, rfl⟩
+  let origin :=
+    normalizedSourceClausePosition
+      (composedPlacement source sourcePlacement)
+      metadata.sourceClause metadata.clause
+  let templateRoute :=
+    (templateDrawing metadata.sourceClause).routeAt
+      ((templateDrawing metadata.sourceClause).incidenceAt templateIndex)
+  have normalizedRouteEqual' :
+      normalizedLocalRoutes source sourcePlacement
+          clauseIndex literalIndex =
+        PeriodicOrthocrossing.translatePolyline origin templateRoute := by
+    simpa [origin, templateRoute, normalizedSourceClausePosition]
+      using normalizedRouteEqual
+  have extendedHead :
+      (data.extendedRoute slot).head? =
+        (data.route slot).head? := by
+    have routeHead := data.route_head? valid slot active
+    rw [routeHead]
+    simp [ComposedClauseExitFanData.extendedRoute,
+      routeHead, joinAtEndpoint]
+  have rawEndpointsDifferent :
+      templateRoute.getLast? ≠ (data.route slot).head? := by
+    intro rawEndpointsEqual
+    apply endpointsDifferent
+    rw [normalizedRouteEqual']
+    simp [origin, templateRoute,
+      ComposedClauseExitFanData.translatedExtendedRoute,
+      PeriodicOrthocrossing.translatePolyline,
+      extendedHead, rawEndpointsEqual]
+  have finiteStrict :=
+    ComposedClauseExitFanData.templateDrawing_routeAt_strictlyAvoids_extendedRoute
+      metadata.sourceClause metadataWidth data templateIndex slot
+      valid active rawEndpointsDifferent
+  have translatedStrict := finiteStrict.translatePolyline origin
+  simpa [normalizedRouteEqual',
+    ComposedClauseExitFanData.translatedExtendedRoute] using
+      translatedStrict
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes

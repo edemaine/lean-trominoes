@@ -65,6 +65,11 @@ instance (data : ComposedClauseExitFanData) :
 def sourceExit (direction : AxisDirection) : Cell :=
   Cell.scale composedGadgetScale direction.step
 
+/-- The same radial source exit after the retained construction's extra
+factor-two clearance refinement. -/
+def outerSourceExit (direction : AxisDirection) : Cell :=
+  Cell.scale (2 * composedGadgetScale) direction.step
+
 /-- The safe frame outside the open composed-gadget rectangle. -/
 def InOuterFrame (point : Cell) : Prop :=
   point.2 ≤ 0 ∨ point.1 ≤ 0 ∨ point.1 ≥ composedGadgetScale
@@ -94,6 +99,14 @@ def route
   | 2, .north =>
       [(72, 30), (73, 30), (73, 73), (0, 73), (0, 72)]
   | _, _ => []
+
+/-- Extend one finite port-to-exit connector along the first half of the
+factor-two-refined source edge. -/
+def extendedRoute
+    (data : ComposedClauseExitFanData) (slot : Fin 3) : List Cell :=
+  joinAtEndpoint (data.route slot)
+    [sourceExit (data.direction slot),
+      outerSourceExit (data.direction slot)]
 
 /-- Every active route begins at its index-selected composed source port. -/
 @[simp]
@@ -270,6 +283,120 @@ theorem templateDrawing_routeAt_strictlyAvoids_route
           omega
         subst tail
         exact fullDrawingFor_routeAt_strictlyAvoids_route
+          first.value second.value third.value data localIndex slot
+          valid active endpointsDifferent
+
+/-! ## Isolation from the radially extended connector -/
+
+/-- Ternary-source templates remain separated when each connector is
+continued radially to the factor-two-refined source lattice. -/
+theorem fullDrawingFor_routeAt_strictlyAvoids_extendedRoute :
+    ∀ (first second third : Bool)
+      (data : ComposedClauseExitFanData)
+      (localIndex : Fin
+        (fullDrawingFor first second third).incidences.length)
+      (slot : Fin 3),
+      data.IsValid → data.SlotActive slot →
+      ((fullDrawingFor first second third).routeAt
+          ((fullDrawingFor first second third).incidenceAt
+            localIndex)).getLast? ≠
+        (data.route slot).head? →
+      RoutesStrictlyAvoidEachOther
+        ((fullDrawingFor first second third).routeAt
+          ((fullDrawingFor first second third).incidenceAt
+            localIndex))
+        (data.extendedRoute slot) := by
+  native_decide
+
+/-- Binary-source version of the extended-connector finite check. -/
+theorem twoDrawingFor_routeAt_strictlyAvoids_extendedRoute :
+    ∀ (first second : Bool)
+      (data : ComposedClauseExitFanData)
+      (localIndex : Fin
+        (twoDrawingFor first second).incidences.length)
+      (slot : Fin 3),
+      data.IsValid → data.SlotActive slot →
+      ((twoDrawingFor first second).routeAt
+          ((twoDrawingFor first second).incidenceAt
+            localIndex)).getLast? ≠
+        (data.route slot).head? →
+      RoutesStrictlyAvoidEachOther
+        ((twoDrawingFor first second).routeAt
+          ((twoDrawingFor first second).incidenceAt
+            localIndex))
+        (data.extendedRoute slot) := by
+  native_decide
+
+/-- Unit-source version of the extended-connector finite check. -/
+theorem oneDrawingFor_routeAt_strictlyAvoids_extendedRoute :
+    ∀ (first : Bool)
+      (data : ComposedClauseExitFanData)
+      (localIndex : Fin
+        (oneDrawingFor first).incidences.length)
+      (slot : Fin 3),
+      data.IsValid → data.SlotActive slot →
+      ((oneDrawingFor first).routeAt
+          ((oneDrawingFor first).incidenceAt
+            localIndex)).getLast? ≠
+        (data.route slot).head? →
+      RoutesStrictlyAvoidEachOther
+        ((oneDrawingFor first).routeAt
+          ((oneDrawingFor first).incidenceAt
+            localIndex))
+        (data.extendedRoute slot) := by
+  native_decide
+
+/-- Empty-source version of the extended-connector finite check. -/
+theorem zeroDrawing_routeAt_strictlyAvoids_extendedRoute :
+    ∀ (data : ComposedClauseExitFanData)
+      (localIndex : Fin zeroDrawing.incidences.length)
+      (slot : Fin 3),
+      data.IsValid → data.SlotActive slot →
+      (zeroDrawing.routeAt
+          (zeroDrawing.incidenceAt localIndex)).getLast? ≠
+        (data.route slot).head? →
+      RoutesStrictlyAvoidEachOther
+        (zeroDrawing.routeAt
+          (zeroDrawing.incidenceAt localIndex))
+        (data.extendedRoute slot) := by
+  native_decide
+
+/-- Uniform selector form of the four radially extended connector checks. -/
+theorem templateDrawing_routeAt_strictlyAvoids_extendedRoute
+    {Variable : Type*}
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.length ≤ 3)
+    (data : ComposedClauseExitFanData)
+    (localIndex : Fin (templateDrawing source).incidences.length)
+    (slot : Fin 3)
+    (valid : data.IsValid)
+    (active : data.SlotActive slot)
+    (endpointsDifferent :
+      ((templateDrawing source).routeAt
+          ((templateDrawing source).incidenceAt localIndex)).getLast? ≠
+        (data.route slot).head?) :
+    RoutesStrictlyAvoidEachOther
+      ((templateDrawing source).routeAt
+        ((templateDrawing source).incidenceAt localIndex))
+      (data.extendedRoute slot) := by
+  rcases source with ⟨sourcePosition, literals⟩
+  rcases literals with _ | ⟨first, tail⟩
+  · exact zeroDrawing_routeAt_strictlyAvoids_extendedRoute
+      data localIndex slot valid active endpointsDifferent
+  · rcases tail with _ | ⟨second, tail⟩
+    · exact oneDrawingFor_routeAt_strictlyAvoids_extendedRoute
+        first.value data localIndex slot valid active
+        endpointsDifferent
+    · rcases tail with _ | ⟨third, tail⟩
+      · exact twoDrawingFor_routeAt_strictlyAvoids_extendedRoute
+          first.value second.value data localIndex slot
+          valid active endpointsDifferent
+      · have tailEmpty : tail = [] := by
+          apply List.length_eq_zero_iff.mp
+          simp at width
+          omega
+        subst tail
+        exact fullDrawingFor_routeAt_strictlyAvoids_extendedRoute
           first.value second.value third.value data localIndex slot
           valid active endpointsDifferent
 
