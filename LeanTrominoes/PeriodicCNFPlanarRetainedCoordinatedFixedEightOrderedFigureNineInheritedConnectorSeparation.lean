@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalRouteSeparation
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalInheritedSeparation
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineOrderedInheritedRouteFamily
 
 /-!
@@ -31,6 +32,25 @@ private theorem value_eq_of_mem_zipIdx_same_index
     first = second :=
   (List.mem_zipIdx' firstMember).2.trans
     (List.mem_zipIdx' secondMember).2.symm
+
+private theorem composedSourceLocalPosition_injective_below_three
+    {firstIndex secondIndex : Nat}
+    (firstLt : firstIndex < 3)
+    (secondLt : secondIndex < 3)
+    (positionsEqual :
+      PlanarOneInThreeNoUnitsFigureNine.sourceLocalPosition firstIndex =
+        PlanarOneInThreeNoUnitsFigureNine.sourceLocalPosition secondIndex) :
+    firstIndex = secondIndex := by
+  have firstCases :
+      firstIndex = 0 ∨ firstIndex = 1 ∨ firstIndex = 2 := by
+    omega
+  have secondCases :
+      secondIndex = 0 ∨ secondIndex = 1 ∨ secondIndex = 2 := by
+    omega
+  rcases firstCases with rfl | rfl | rfl <;>
+    rcases secondCases with rfl | rfl | rfl <;>
+    simp [PlanarOneInThreeNoUnitsFigureNine.sourceLocalPosition]
+      at positionsEqual ⊢
 
 /-- Under an equal normalized source gauge, a distinct relative pair of
 twice-inherited incidences must already have distinct final coordinates. -/
@@ -122,6 +142,76 @@ theorem
   simp [generatedCoordinatesNotDistinct.1,
     generatedCoordinatesNotDistinct.2, relativeTranslateZero]
 
+/-- Distinct inherited final incidences in one normalized source gauge
+recover different source-literal slots. -/
+theorem
+    retainedOrderedFixedEightFigureNine_inheritedSourceLiteralIndicesDifferent_of_sourceGaugesEqual
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        secondClauseIndex secondLiteralIndex)
+    (relativeTranslate : Cell)
+    (sourceGaugesEqual :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          first.sourceClause first.generatedClause =
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            second.sourceClause second.generatedClause))
+    (generatedOccurrencesDifferent :
+      ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
+        ((secondClauseIndex, secondLiteralIndex), relativeTranslate)) :
+    first.sourceLiteralIndex ≠ second.sourceLiteralIndex := by
+  have metadataSourceClauseIndicesEqual :=
+    retainedOrderedFixedEightFigureNine_sourceClauseIndex_eq_of_normalizedSourceGaugesEqual
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first.generatedClauseMember
+      first.metadata first.metadataLookup first.metadataClause
+      second relativeTranslate (by
+        simpa [first.metadataSourceClause] using sourceGaugesEqual)
+  have sourceClauseIndicesEqual :
+      first.sourceClauseIndex = second.sourceClauseIndex :=
+    first.metadataSourceClauseIndex.symm.trans
+      metadataSourceClauseIndicesEqual
+  have generatedCoordinatesDistinct :=
+    retainedOrderedFixedEightFigureNine_inheritedGeneratedCoordinatesDistinct_of_sourceGaugesEqual
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first second relativeTranslate
+      sourceGaugesEqual generatedOccurrencesDifferent
+  have sourceCoordinatesDistinct :=
+    first.sourceCoordinatesDistinct_of_generatedDistinct
+      (retainedFigureNineClearancePositionedFormula source)
+      (retainedFigureNineClearancePlacement source)
+      (retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth)
+      second generatedCoordinatesDistinct
+  exact sourceCoordinatesDistinct.resolve_left
+    (fun different => different sourceClauseIndicesEqual)
+
 /-- A retained inherited extended connector begins at the recovered composed
 source port in its final clause gauge. -/
 theorem retainedOrderedFixedEightFigureNine_inheritedExtendedConnector_head?
@@ -197,6 +287,185 @@ theorem retainedOrderedFixedEightFigureNine_inheritedExtendedConnector_head?
     slot,
     PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData.sourceSlot_val]
   rfl
+
+/-- For a distinct inherited pair in one normalized source gauge, the first
+local route strictly avoids the translated second inherited suffix. -/
+theorem
+    retainedOrderedFixedEightFigureNine_inheritedLocal_strictlyAvoids_translatedInheritedSuffix_of_sourceGaugesEqual
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        secondClauseIndex secondLiteralIndex)
+    (relativeTranslate : Cell)
+    (sourceGaugesEqual :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          first.sourceClause first.generatedClause =
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            second.sourceClause second.generatedClause))
+    (generatedOccurrencesDifferent :
+      ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
+        ((secondClauseIndex, secondLiteralIndex), relativeTranslate)) :
+    let outputPlacement :=
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+    let clearanceWidth :=
+      retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth
+    RoutesStrictlyAvoidEachOther
+      (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+      (translatePolyline (outputPlacement.translation relativeTranslate)
+        (PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+          outputPlacement
+          (retainedFigureNineClearancePlacement source)
+          second.sourceClause second.generatedClause
+          (PositionedPeriodicCNF.clauseExitFanData
+            second.sourceClause second.sourceClauseIndex
+            (retainedFigureNineClearanceIncidenceRoutes source))
+          (second.sourceSlot clearanceWidth)
+          (retainedFigureNineClearanceIncidenceRoutes
+            source second.sourceClauseIndex
+            second.sourceLiteralIndex))) := by
+  let clearanceSource :=
+    retainedFigureNineClearancePositionedFormula source
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      clearanceSource clearancePlacement
+  let clearanceWidth :=
+    retainedFigureNineClearancePositionedFormula_widthAtMostThree
+      source sourceWidth
+  let firstLocalRoute :=
+    PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+      clearanceSource clearancePlacement
+      firstClauseIndex firstLiteralIndex
+  let secondConnector :=
+    (PositionedPeriodicCNF.clauseExitFanData
+      second.sourceClause second.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+    ).translatedExtendedRoute
+      (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+        outputPlacement second.sourceClause second.generatedClause)
+      (second.sourceSlot clearanceWidth)
+  let offset := outputPlacement.translation relativeTranslate
+  have sourceLiteralIndicesDifferent :=
+    retainedOrderedFixedEightFigureNine_inheritedSourceLiteralIndicesDifferent_of_sourceGaugesEqual
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first second relativeTranslate
+      sourceGaugesEqual generatedOccurrencesDifferent
+  have firstIndexLtThree : first.sourceLiteralIndex < 3 := by
+    have sourceIndexLt := first.sourceLiteralIndex_lt
+    have sourceWidthAtMost := first.sourceClause_width clearanceWidth
+    omega
+  have secondIndexLtThree : second.sourceLiteralIndex < 3 := by
+    have sourceIndexLt := second.sourceLiteralIndex_lt
+    have sourceWidthAtMost := second.sourceClause_width clearanceWidth
+    omega
+  have sourceGaugesEqual' :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          outputPlacement first.sourceClause first.generatedClause =
+        Cell.add offset
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            outputPlacement second.sourceClause second.generatedClause) := by
+    simpa [outputPlacement, offset, clearanceSource,
+      clearancePlacement] using sourceGaugesEqual
+  have sourcePortsDifferent :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort
+          outputPlacement first.sourceClause first.generatedClause
+          first.sourceLiteralIndex ≠
+        Cell.add offset
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort
+            outputPlacement second.sourceClause second.generatedClause
+            second.sourceLiteralIndex) := by
+    intro portsEqual
+    apply sourceLiteralIndicesDifferent
+    apply composedSourceLocalPosition_injective_below_three
+      firstIndexLtThree secondIndexLtThree
+    apply Prod.ext
+    · have coordinateEqual := congrArg Prod.fst portsEqual
+      have gaugeCoordinateEqual := congrArg Prod.fst sourceGaugesEqual'
+      simp [PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort,
+        Cell.add] at coordinateEqual gaugeCoordinateEqual ⊢
+      nlinarith
+    · have coordinateEqual := congrArg Prod.snd portsEqual
+      have gaugeCoordinateEqual := congrArg Prod.snd sourceGaugesEqual'
+      simp [PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort,
+        Cell.add] at coordinateEqual gaugeCoordinateEqual ⊢
+      nlinarith
+  have firstLocalEndpoints :=
+    PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes_endpoints_of_members
+      clearanceSource clearancePlacement clearanceWidth
+      (retainedFigureNineClearancePositionedFormula_allAtomsNodup
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      first.generatedClauseMember first.generatedLiteralMember
+  have firstLocalLast :
+      firstLocalRoute.getLast? =
+        some
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort
+            outputPlacement first.sourceClause first.generatedClause
+            first.sourceLiteralIndex) := by
+    rw [firstLocalEndpoints.2]
+    exact congrArg some first.localEndpoint
+  have secondConnectorHead :=
+    retainedOrderedFixedEightFigureNine_inheritedExtendedConnector_head?
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty second
+  have translatedSecondConnectorHead :
+      (translatePolyline offset secondConnector).head? =
+        some
+          (Cell.add offset
+            (PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort
+              outputPlacement second.sourceClause second.generatedClause
+              second.sourceLiteralIndex)) := by
+    simpa [secondConnector, translatePolyline] using
+      congrArg (Option.map (Cell.add offset)) secondConnectorHead
+  have endpointsDifferent :
+      firstLocalRoute.getLast? ≠
+        (translatePolyline offset secondConnector).head? := by
+    rw [firstLocalLast, translatedSecondConnectorHead]
+    exact fun equal => sourcePortsDifferent (Option.some.inj equal)
+  dsimp only
+  exact
+    retainedOrderedFixedEightFigureNineNormalizedLocalRoute_strictlyAvoids_translatedInheritedSuffix_of_sourceGauge
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first.generatedClauseMember
+      first.generatedLiteralMember first.metadata first.metadataLookup
+      first.metadataClause second relativeTranslate
+      (by simpa [first.metadataSourceClause] using sourceGaugesEqual)
+      (by simpa [firstLocalRoute, secondConnector, offset,
+        clearanceSource, clearancePlacement, outputPlacement,
+        clearanceWidth] using endpointsDifferent)
 
 /-- The radially extended exit connectors of a distinct inherited pair are
 strictly separated when their normalized source gauges agree. -/
