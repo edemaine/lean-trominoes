@@ -32,6 +32,88 @@ def PolylineRefines (refined source : List Cell) : Prop :=
         parent.Contains child.start ∧
           parent.Contains child.finish
 
+/-- Positive uniform scaling transports a polyline-refinement
+certificate. -/
+theorem PolylineRefines.scalePolyline
+    {refined source : List Cell}
+    {factor : Int} (factorPositive : 0 < factor)
+    (refines : PolylineRefines refined source) :
+    PolylineRefines
+      (LeanTrominoes.scalePolyline factor refined)
+      (LeanTrominoes.scalePolyline factor source) := by
+  constructor
+  · intro scaledPoint scaledPointMember
+    rcases List.mem_map.mp scaledPointMember with
+      ⟨point, pointMember, rfl⟩
+    rcases refines.1 point pointMember with
+      sourcePoint | ⟨segment, segmentMember, interior⟩
+    · exact Or.inl (List.mem_map.mpr
+        ⟨point, sourcePoint, rfl⟩)
+    · refine Or.inr ⟨segment.scale factor, ?_, ?_⟩
+      · rw [gridPolylineSegments_scalePolyline]
+        exact List.mem_map.mpr
+          ⟨segment, segmentMember, rfl⟩
+      · exact
+          (GridSegment.interiorContains_scale_iff
+            factorPositive segment point).mpr interior
+  · intro scaledChild scaledChildMember
+    rw [gridPolylineSegments_scalePolyline] at scaledChildMember
+    rcases List.mem_map.mp scaledChildMember with
+      ⟨child, childMember, rfl⟩
+    rcases refines.2 child childMember with
+      ⟨parent, parentMember, startContained, finishContained⟩
+    refine ⟨parent.scale factor, ?_, ?_, ?_⟩
+    · rw [gridPolylineSegments_scalePolyline]
+      exact List.mem_map.mpr
+        ⟨parent, parentMember, rfl⟩
+    · exact
+        (GridSegment.contains_scale_iff
+          factorPositive parent child.start).mpr startContained
+    · exact
+        (GridSegment.contains_scale_iff
+          factorPositive parent child.finish).mpr finishContained
+
+/-- Common pointwise translation transports a polyline-refinement
+certificate. -/
+theorem PolylineRefines.translatePolyline
+    {refined source : List Cell}
+    (refines : PolylineRefines refined source)
+    (offset : Cell) :
+    PolylineRefines
+      (PeriodicOrthocrossing.translatePolyline offset refined)
+      (PeriodicOrthocrossing.translatePolyline offset source) := by
+  constructor
+  · intro translatedPoint translatedPointMember
+    rcases List.mem_map.mp translatedPointMember with
+      ⟨point, pointMember, rfl⟩
+    rcases refines.1 point pointMember with
+      sourcePoint | ⟨segment, segmentMember, interior⟩
+    · exact Or.inl (List.mem_map.mpr
+        ⟨point, sourcePoint, rfl⟩)
+    · refine Or.inr ⟨segment.translate offset, ?_, ?_⟩
+      · rw [gridPolylineSegments_translatePolyline]
+        exact List.mem_map.mpr
+          ⟨segment, segmentMember, rfl⟩
+      · simpa [Cell.add, add_comm] using
+          (PeriodicGridDrawing.interiorContains_translate_iff
+            segment offset point).mpr interior
+  · intro translatedChild translatedChildMember
+    rw [gridPolylineSegments_translatePolyline] at translatedChildMember
+    rcases List.mem_map.mp translatedChildMember with
+      ⟨child, childMember, rfl⟩
+    rcases refines.2 child childMember with
+      ⟨parent, parentMember, startContained, finishContained⟩
+    refine ⟨parent.translate offset, ?_, ?_, ?_⟩
+    · rw [gridPolylineSegments_translatePolyline]
+      exact List.mem_map.mpr
+        ⟨parent, parentMember, rfl⟩
+    · simpa [GridSegment.translate, Cell.add, add_comm] using
+        (PeriodicGridDrawing.contains_translate_iff
+          parent offset child.start).mpr startContained
+    · simpa [GridSegment.translate, Cell.add, add_comm] using
+        (PeriodicGridDrawing.contains_translate_iff
+          parent offset child.finish).mpr finishContained
+
 /-- Closed betweenness is transitive through a nested interval. -/
 private theorem GridSegment.Between.of_nested
     {outerFirst outerLast innerFirst innerLast point : Int}
