@@ -5614,6 +5614,12 @@ The representation choices for this target are:
   A finite cardinal-direction
   lemma turns nondecreasing ranks of three distinct genuine exits into the
   clockwise condition needed by the composed boundary-port router.
+- [`LeanTrominoes/PositionedPeriodicCNFClauseDirectionVariableRouteOrder.lean`](LeanTrominoes/PositionedPeriodicCNFClauseDirectionVariableRouteOrder.lean)
+  proves that the same per-clause sort preserves variable occurrence order.
+  It matches slots by their unchanged clause-index sequence, uses per-clause
+  atom distinctness to recover the unique source literal, and proves that
+  route reindexing and the whole-period gauge translation preserve its final
+  direction.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightClauseDirectionOrdering.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightClauseDirectionOrdering.lean)
   instantiates clause-direction ordering for the normalized retained
   fixed-eight source drawing.  Continuous separation forces distinct exits
@@ -5634,6 +5640,11 @@ The representation choices for this target are:
   the later exact-one reductions.  Thus the later factor-72 inheritance sees a source
   lattice spacing of `144`, safely larger than the connector fan's radius-73
   reach.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearanceVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearanceVariableRouteOrder.lean)
+  specializes variable-order preservation to the retained clockwise source.
+  Positive factor-two scaling preserves all terminal directions, while
+  endpoint freshness of the scaled simple routes proves that the clearance
+  loop erasure preserves them as well.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean)
   gives the finite noncrossing fan from the three fixed composed Figure 9
   source ports to the radius-72 first exits of an ordered source clause.
