@@ -30,6 +30,11 @@ def PositionInHalfOpenMacrocell (factor : Nat) (position : Cell) : Prop :=
   0 ≤ position.1 ∧ position.1 < factor ∧
     0 ≤ position.2 ∧ position.2 < factor
 
+instance (factor : Nat) (position : Cell) :
+    Decidable (PositionInHalfOpenMacrocell factor position) := by
+  unfold PositionInHalfOpenMacrocell
+  infer_instance
+
 /-- A local coordinate lies less than one full refined cell from its
 macrocell origin in either direction.  Route bends may lie on or just outside
 the nominal local cell even when all graph vertices lie strictly inside it. -/
