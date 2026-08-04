@@ -412,6 +412,211 @@ theorem
     outputPlacement, clearancePlacement, clearanceWidth, offset,
     translatePolyline_joinAtEndpoint] using assembled
 
+/-- The equal-source-gauge inherited branch supplies all four geometric
+avoidances required by the generic relative splice assembler. -/
+theorem
+    retainedOrderedFixedEightFigureNine_relativeSplicedRoutePairAvoidances_of_inherited_sourceGaugesEqual
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        secondClauseIndex secondLiteralIndex)
+    (firstLookup :
+      PlanarOneInThreeNoUnitsFigureNine.inheritedIncidenceData?
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source)
+          firstClauseIndex firstLiteralIndex = some first)
+    (secondLookup :
+      PlanarOneInThreeNoUnitsFigureNine.inheritedIncidenceData?
+          (retainedFigureNineClearancePositionedFormula source)
+          (retainedFigureNineClearancePlacement source)
+          secondClauseIndex secondLiteralIndex = some second)
+    (relativeTranslate : Cell)
+    (sourceGaugesEqual :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          first.sourceClause first.generatedClause =
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            second.sourceClause second.generatedClause))
+    (generatedOccurrencesDifferent :
+      ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
+        ((secondClauseIndex, secondLiteralIndex), relativeTranslate)) :
+    PlanarOneInThreeNoUnitsFigureNine.RelativeSplicedRoutePairAvoidances
+      (retainedFigureNineClearancePositionedFormula source)
+      (retainedFigureNineClearancePlacement source)
+      (retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth)
+      (retainedFigureNineClearancePositionedFormula_allAtomsNodup
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex relativeTranslate := by
+  let clearanceSource :=
+    retainedFigureNineClearancePositionedFormula source
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let clearanceWidth :=
+    retainedFigureNineClearancePositionedFormula_widthAtMostThree
+      source sourceWidth
+  let clearanceDistinct :=
+    retainedFigureNineClearancePositionedFormula_allAtomsNodup
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  let original :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsOriginalInheritedRouteSuffixes
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  let suffixes :=
+    PlanarOneInThreeNoUnitsFigureNine.completeRouteSuffixes
+      clearanceSource clearancePlacement clearanceWidth
+      clearanceDistinct original
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      clearanceSource clearancePlacement
+  let offset := outputPlacement.translation relativeTranslate
+  have firstSuffixEq :
+      suffixes.routes firstClauseIndex firstLiteralIndex =
+        PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+          outputPlacement clearancePlacement
+          first.sourceClause first.generatedClause
+          (PositionedPeriodicCNF.clauseExitFanData
+            first.sourceClause first.sourceClauseIndex
+            (retainedFigureNineClearanceIncidenceRoutes source))
+          (first.sourceSlot clearanceWidth)
+          (retainedFigureNineClearanceIncidenceRoutes
+            source first.sourceClauseIndex first.sourceLiteralIndex) := by
+    have completedShape :=
+      PlanarOneInThreeNoUnitsFigureNine.completeRouteSuffixes_routes_of_members
+        clearanceSource clearancePlacement clearanceWidth
+        clearanceDistinct original first.generatedClauseMember
+        first.generatedLiteralMember
+    rw [first.literalAtom] at completedShape
+    rw [completedShape]
+    change
+      PlanarOneInThreeNoUnitsFigureNine.orderedInheritedRouteSuffixesRoutes
+          clearanceSource clearancePlacement clearanceWidth
+          (retainedFigureNineClearanceIncidenceRoutes source)
+          firstClauseIndex firstLiteralIndex = _
+    exact
+      PlanarOneInThreeNoUnitsFigureNine.orderedInheritedRouteSuffixesRoutes_eq_fanInheritedRouteSuffix_of_lookup
+        clearanceSource clearancePlacement clearanceWidth
+        (retainedFigureNineClearanceIncidenceRoutes source)
+        firstClauseIndex firstLiteralIndex first firstLookup
+  have secondSuffixEq :
+      suffixes.routes secondClauseIndex secondLiteralIndex =
+        PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+          outputPlacement clearancePlacement
+          second.sourceClause second.generatedClause
+          (PositionedPeriodicCNF.clauseExitFanData
+            second.sourceClause second.sourceClauseIndex
+            (retainedFigureNineClearanceIncidenceRoutes source))
+          (second.sourceSlot clearanceWidth)
+          (retainedFigureNineClearanceIncidenceRoutes
+            source second.sourceClauseIndex second.sourceLiteralIndex) := by
+    have completedShape :=
+      PlanarOneInThreeNoUnitsFigureNine.completeRouteSuffixes_routes_of_members
+        clearanceSource clearancePlacement clearanceWidth
+        clearanceDistinct original second.generatedClauseMember
+        second.generatedLiteralMember
+    rw [second.literalAtom] at completedShape
+    rw [completedShape]
+    change
+      PlanarOneInThreeNoUnitsFigureNine.orderedInheritedRouteSuffixesRoutes
+          clearanceSource clearancePlacement clearanceWidth
+          (retainedFigureNineClearanceIncidenceRoutes source)
+          secondClauseIndex secondLiteralIndex = _
+    exact
+      PlanarOneInThreeNoUnitsFigureNine.orderedInheritedRouteSuffixesRoutes_eq_fanInheritedRouteSuffix_of_lookup
+        clearanceSource clearancePlacement clearanceWidth
+        (retainedFigureNineClearanceIncidenceRoutes source)
+        secondClauseIndex secondLiteralIndex second secondLookup
+  have localsAvoid :=
+    retainedOrderedFixedEightFigureNineNormalizedLocalRoutes_relative_avoidEachOther
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first.generatedClauseMember
+      second.generatedClauseMember first.generatedLiteralMember
+      second.generatedLiteralMember relativeTranslate
+      generatedOccurrencesDifferent
+  have firstLocalSecondSuffix :=
+    retainedOrderedFixedEightFigureNine_inheritedLocal_strictlyAvoids_translatedInheritedSuffix_of_sourceGaugesEqual
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first second relativeTranslate
+      sourceGaugesEqual generatedOccurrencesDifferent
+  have firstSuffixSecondLocal :=
+    retainedOrderedFixedEightFigureNine_inheritedSuffix_strictlyAvoids_translatedInheritedLocal_of_sourceGaugesEqual
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first second relativeTranslate
+      sourceGaugesEqual generatedOccurrencesDifferent
+  have suffixesAvoid :=
+    retainedOrderedFixedEightFigureNine_inheritedSuffixes_relativeAvoidEachOther_of_sourceGaugesEqual
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first second relativeTranslate
+      sourceGaugesEqual generatedOccurrencesDifferent
+  change
+    RoutesAvoidEachOther
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+          clearanceSource clearancePlacement
+          firstClauseIndex firstLiteralIndex)
+        (translatePolyline offset
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+            clearanceSource clearancePlacement
+            secondClauseIndex secondLiteralIndex)) ∧
+      RoutesStrictlyAvoidEachOther
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+          clearanceSource clearancePlacement
+          firstClauseIndex firstLiteralIndex)
+        (translatePolyline offset
+          (suffixes.routes secondClauseIndex secondLiteralIndex)) ∧
+      RoutesStrictlyAvoidEachOther
+        (suffixes.routes firstClauseIndex firstLiteralIndex)
+        (translatePolyline offset
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedLocalRoutes
+            clearanceSource clearancePlacement
+            secondClauseIndex secondLiteralIndex)) ∧
+      RoutesAvoidEachOther
+        (suffixes.routes firstClauseIndex firstLiteralIndex)
+        (translatePolyline offset
+          (suffixes.routes secondClauseIndex secondLiteralIndex))
+  rw [firstSuffixEq, secondSuffixEq]
+  exact
+    ⟨by simpa [translatePolyline, clearanceSource,
+        clearancePlacement, outputPlacement, offset] using localsAvoid,
+      by simpa [clearanceSource, clearancePlacement,
+        clearanceWidth, outputPlacement, offset] using
+          firstLocalSecondSuffix,
+      by simpa [clearanceSource, clearancePlacement,
+        clearanceWidth, outputPlacement, offset] using
+          firstSuffixSecondLocal,
+      by simpa [clearanceSource, clearancePlacement,
+        clearanceWidth, outputPlacement, offset] using suffixesAvoid⟩
+
 /-- Four pointwise avoidance conditions—ordinary local/local and
 suffix/suffix separation plus strict separation of the two cross pairs—imply
 complete raw relative route separation for the retained ordered family. -/
