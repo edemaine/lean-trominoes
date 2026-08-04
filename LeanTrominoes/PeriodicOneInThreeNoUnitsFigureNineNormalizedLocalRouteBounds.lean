@@ -199,5 +199,86 @@ theorem normalizedLocalRoutes_points_within_sourceGaugeNeighborhood_of_members
   simpa [normalizedSourceClausePosition_eq_scale_sourceGaugeCenter]
     using bounded point pointMember
 
+/-- Every genuine normalized local route lies in the coarser radius-72
+square centered directly at its factor-72 source-clause gauge.  The extra
+room absorbs the fixed `(36, 32)` offset of the tighter local template
+bound. -/
+theorem normalizedLocalRoutes_points_within_sourceGaugeRadius72_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    ∃ metadata : ClauseMetadata Variable,
+      (formulaClauseMetadata source)[clauseIndex]? = some metadata ∧
+        metadata.clause = clause ∧
+        (metadata.sourceClause, metadata.sourceClauseIndex) ∈
+          source.clauses.zipIdx ∧
+        ∀ point ∈
+            normalizedLocalRoutes source sourcePlacement
+              clauseIndex literalIndex,
+          WithinCoordinateRadius 72
+            (Cell.scale composedGadgetScale
+              (localRouteSourceGaugeCenter
+                sourcePlacement metadata.sourceClause clause)) point := by
+  rcases normalizedLocalRoutes_points_within_sourceGaugeNeighborhood_of_members
+      source sourcePlacement sourceWidth clauseMember literalMember with
+    ⟨metadata, metadataLookup, metadataClause,
+      sourceClauseMember, bounded⟩
+  refine
+    ⟨metadata, metadataLookup, metadataClause,
+      sourceClauseMember, ?_⟩
+  intro point pointMember
+  let center :=
+    Cell.scale composedGadgetScale
+      (localRouteSourceGaugeCenter
+        sourcePlacement metadata.sourceClause clause)
+  have tight := bounded point pointMember
+  change
+    WithinCoordinateRadius 36
+      (Cell.add center localRouteNeighborhoodOffset) point at tight
+  rcases tight with ⟨horizontal, vertical⟩
+  constructor
+  · have decomposition :
+        point.1 - center.1 =
+          (point.1 -
+              (Cell.add center localRouteNeighborhoodOffset).1) + 36 := by
+      simp [localRouteNeighborhoodOffset, Cell.add]
+      ring
+    rw [decomposition]
+    exact
+      (Int.natAbs_add_le _ _).trans
+        (by
+          simpa using Nat.add_le_add horizontal
+            (show (36 : Int).natAbs ≤ 36 by norm_num))
+  · have decomposition :
+        point.2 - center.2 =
+          (point.2 -
+              (Cell.add center localRouteNeighborhoodOffset).2) + 32 := by
+      simp [localRouteNeighborhoodOffset, Cell.add]
+      ring
+    rw [decomposition]
+    exact
+      (Int.natAbs_add_le _ _).trans
+        (by
+          have sumBound := Nat.add_le_add vertical
+            (show (32 : Int).natAbs ≤ 32 by norm_num)
+          omega)
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes
