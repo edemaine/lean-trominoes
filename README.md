@@ -5693,6 +5693,12 @@ The representation choices for this target are:
   specializes that finite-template invariant to the retained fixed-eight
   construction, proving that its complete raw ternary clause routes already
   have the exit order required by the normalized 3DM ribbon source.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineTerminalDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineTerminalDirections.lean)
+  proves that positive scaling, canonical-gauge translation, the ordered fan
+  head replacement, and the final local splice preserve variable-side
+  terminal direction.  Every twice-inherited final incidence recovers its
+  exact factor-two clearance-source occurrence, and its complete raw route
+  has that occurrence's final direction.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean)
   applies final loop erasure to the ordered composed family and packages both
   raw and normalized canonical route certificates.  The normalized drawing
