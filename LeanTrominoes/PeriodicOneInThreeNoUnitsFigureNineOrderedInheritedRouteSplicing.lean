@@ -420,13 +420,15 @@ theorem fanInheritedRouteSuffix_eq_extended_join_farTail
     _ = joinAtEndpoint (data.translatedExtendedRoute origin slot)
           farTail := by rw [extendedEq]
 
-/-- A radius-72 local route strictly avoids the actual subdivided far tail
-of a simple source route.  The coarse source tail is first separated at
-factor 144, then the result is transported through factor-two unit
+/-- A route in any radius strictly below `144` avoids the actual subdivided
+far tail of a simple source route.  The coarse source tail is first separated
+at factor `144`, then the result is transported through factor-two unit
 subdivision, factor-72 scaling, and translation. -/
-theorem strictlyAvoids_translatedScaledDoubledSubdividedTail
+theorem strictlyAvoids_translatedScaledDoubledSubdividedTail_of_radius
     {first second : Cell} {rest nearby : List Cell}
     (shift : Cell)
+    (radius : Nat)
+    (radiusLt : radius < 144)
     (sourceOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline
         (first :: second :: rest))
@@ -437,7 +439,7 @@ theorem strictlyAvoids_translatedScaledDoubledSubdividedTail
       PeriodicOrthocrossing.OrthogonalPolyline nearby)
     (nearbyBounded :
       ∀ point ∈ nearby,
-        WithinCoordinateRadius 72
+        WithinCoordinateRadius radius
           (Cell.add shift (Cell.scale 144 first)) point) :
     PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
       nearby
@@ -452,8 +454,8 @@ theorem strictlyAvoids_translatedScaledDoubledSubdividedTail
     routesStrictlyAvoidEachOther_translateScalePolyline_pointNeighborhood
       (source := second :: rest) (nearby := nearby)
       (center := first) (offset := shift)
-      (factor := 144) (radius := 72)
-      (by norm_num) (by norm_num)
+      (factor := 144) (radius := radius)
+      (by norm_num) radiusLt
       (by simpa using tailAvoids.1)
       (by simpa using tailAvoids.2)
       nearbyBounded
@@ -498,6 +500,32 @@ theorem strictlyAvoids_translatedScaledDoubledSubdividedTail
   exact
     coarseSourceAvoidsNearby.symm.refine_right
       nearbyOrthogonal coarseOrthogonal farRefines
+
+/-- The radius-72 specialization used by normalized composed local routes. -/
+theorem strictlyAvoids_translatedScaledDoubledSubdividedTail
+    {first second : Cell} {rest nearby : List Cell}
+    (shift : Cell)
+    (sourceOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (first :: second :: rest))
+    (sourceSimple :
+      LocalIncidenceDrawing.RouteIsSimple
+        (first :: second :: rest))
+    (nearbyOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline nearby)
+    (nearbyBounded :
+      ∀ point ∈ nearby,
+        WithinCoordinateRadius 72
+          (Cell.add shift (Cell.scale 144 first)) point) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      nearby
+      (PeriodicOrthocrossing.translatePolyline shift
+        (scalePolyline composedGadgetScale
+          (AxisDirection.unitSubdividePolyline
+            (scalePolyline 2 (second :: rest))))) :=
+  strictlyAvoids_translatedScaledDoubledSubdividedTail_of_radius
+    shift 72 (by norm_num) sourceOrthogonal sourceSimple
+    nearbyOrthogonal nearbyBounded
 
 /-- The transformed subdivision of the doubled source tail begins exactly
 at the translated outer endpoint of the radially extended connector. -/
