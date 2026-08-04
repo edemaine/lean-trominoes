@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes
+import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteBounds
 import LeanTrominoes.PositionedPeriodicCNFNormalizedRouteSeparation
 
 /-!
@@ -116,6 +117,166 @@ theorem normalizedLocalRoutes_relative_strictlyAvoidEachOther
       (localRoutes source firstClauseIndex firstLiteralIndex)
       (localRoutes source secondClauseIndex secondLiteralIndex)
       relativeTranslate physicalAvoid
+
+/-- If two relatively positioned local routes come from the same original
+source clause and their source-gauge centers agree, the relative clause
+anchors cancel exactly.  Thus the comparison reduces to two distinct
+incidences in one certified finite Figure 9 drawing. -/
+theorem normalizedLocalRoutes_relative_avoidEachOther_of_sameSourceGaugeCenter
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourcePeriodPositive : 0 < sourcePlacement.period)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    {firstClause secondClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {firstClauseIndex secondClauseIndex : Nat}
+    (firstClauseMember :
+      (firstClause, firstClauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    (secondClauseMember :
+      (secondClause, secondClauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {firstLiteral secondLiteral :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {firstLiteralIndex secondLiteralIndex : Nat}
+    (firstLiteralMember :
+      (firstLiteral, firstLiteralIndex) ∈ firstClause.literals.zipIdx)
+    (secondLiteralMember :
+      (secondLiteral, secondLiteralIndex) ∈ secondClause.literals.zipIdx)
+    {firstMetadata secondMetadata : ClauseMetadata Variable}
+    (firstLookup :
+      (formulaClauseMetadata source)[firstClauseIndex]? =
+        some firstMetadata)
+    (secondLookup :
+      (formulaClauseMetadata source)[secondClauseIndex]? =
+        some secondMetadata)
+    (sameSource :
+      firstMetadata.sourceClauseIndex =
+        secondMetadata.sourceClauseIndex)
+    (relativeTranslate : Cell)
+    (centersEqual :
+      localRouteSourceGaugeCenter sourcePlacement
+          firstMetadata.sourceClause firstClause =
+        Cell.add (sourcePlacement.translation relativeTranslate)
+          (localRouteSourceGaugeCenter sourcePlacement
+            secondMetadata.sourceClause secondClause))
+    (generatedOccurrencesDifferent :
+      ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
+        ((secondClauseIndex, secondLiteralIndex), relativeTranslate)) :
+    RoutesAvoidEachOther
+      (normalizedLocalRoutes source sourcePlacement
+        firstClauseIndex firstLiteralIndex)
+      ((normalizedLocalRoutes source sourcePlacement
+          secondClauseIndex secondLiteralIndex).map
+        (Cell.add
+          ((composedPlacement source sourcePlacement).translation
+            relativeTranslate))) := by
+  have firstMetadataMember :
+      firstMetadata ∈ formulaClauseMetadata source := by
+    rcases List.getElem?_eq_some_iff.mp firstLookup with
+      ⟨firstIndexLt, firstAt⟩
+    rw [← firstAt]
+    exact List.getElem_mem firstIndexLt
+  have secondMetadataMember :
+      secondMetadata ∈ formulaClauseMetadata source := by
+    rcases List.getElem?_eq_some_iff.mp secondLookup with
+      ⟨secondIndexLt, secondAt⟩
+    rw [← secondAt]
+    exact List.getElem_mem secondIndexLt
+  have sourceClauseEqual :
+      firstMetadata.sourceClause = secondMetadata.sourceClause :=
+    (formulaClauseMetadata_sourceBlock_eq source
+      firstMetadataMember secondMetadataMember sameSource).1
+  have incidencesDistinct :
+      firstClauseIndex ≠ secondClauseIndex ∨
+        firstLiteralIndex ≠ secondLiteralIndex := by
+    by_contra incidencesNotDistinct
+    simp only [not_or, not_ne_iff] at incidencesNotDistinct
+    have clauseEqual : firstClause = secondClause := by
+      have secondMemberAtFirst :
+          (secondClause, firstClauseIndex) ∈
+            (PeriodicOneInThreeNoUnitsPositioned.formula
+              (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx := by
+        simpa [incidencesNotDistinct.1] using secondClauseMember
+      exact
+        (List.mem_zipIdx' firstClauseMember).2.trans
+          (List.mem_zipIdx' secondMemberAtFirst).2.symm
+    have relativeTranslateZero : relativeTranslate = (0, 0) := by
+      rw [sourceClauseEqual, clauseEqual] at centersEqual
+      rcases relativeTranslate with ⟨translateX, translateY⟩
+      have periodPositiveInt : (0 : Int) < sourcePlacement.period := by
+        exact_mod_cast sourcePeriodPositive
+      apply Prod.ext
+      · have coordinateEq := congrArg Prod.fst centersEqual
+        simp only [PeriodicVariablePlacement.translation, Cell.add,
+          Cell.scale] at coordinateEq
+        have productZero :
+            (sourcePlacement.period : Int) * translateX = 0 := by
+          nlinarith
+        exact
+          (mul_eq_zero.mp productZero).resolve_left
+            (ne_of_gt periodPositiveInt)
+      · have coordinateEq := congrArg Prod.snd centersEqual
+        simp only [PeriodicVariablePlacement.translation, Cell.add,
+          Cell.scale] at coordinateEq
+        have productZero :
+            (sourcePlacement.period : Int) * translateY = 0 := by
+          nlinarith
+        exact
+          (mul_eq_zero.mp productZero).resolve_left
+            (ne_of_gt periodPositiveInt)
+    apply generatedOccurrencesDifferent
+    apply Prod.ext
+    · exact Prod.ext incidencesNotDistinct.1 incidencesNotDistinct.2
+    · exact relativeTranslateZero.symm
+  have localAvoid :=
+    localRoutes_avoidEachOther_of_members_of_same_source
+      source sourceWidth sourceDistinct
+      firstClauseMember secondClauseMember
+      firstLiteralMember secondLiteralMember
+      firstLookup secondLookup sameSource incidencesDistinct
+  have physicalOffsetZero :
+      PositionedPeriodicCNF.relativePhysicalRouteOffset
+          (composedPlacement source sourcePlacement)
+          firstClause secondClause relativeTranslate =
+        (0, 0) := by
+    rw [sourceClauseEqual] at centersEqual
+    apply Prod.ext <;>
+      norm_num [PositionedPeriodicCNF.relativePhysicalRouteOffset,
+        PositionedPeriodicCNF.clauseAnchorTranslation,
+        composedPlacement,
+        PeriodicOneInThreeNoUnitsPositioned.placement,
+        PeriodicOneInThreePositioned.placement,
+        PeriodicVariablePlacement.translation,
+        localRouteSourceGaugeCenter,
+        composedGadgetScale, PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+        Cell.add, Cell.sub, Cell.scale]
+        at centersEqual ⊢ <;>
+      nlinarith
+  apply normalizedLocalRoutes_relative_avoidEachOther
+    source sourcePlacement firstClauseMember secondClauseMember
+      firstLiteralIndex secondLiteralIndex relativeTranslate
+  rw [physicalOffsetZero]
+  have mapZero :
+      (localRoutes source secondClauseIndex secondLiteralIndex).map
+          (Cell.add (0, 0)) =
+        localRoutes source secondClauseIndex secondLiteralIndex := by
+    calc
+      _ = (localRoutes source secondClauseIndex secondLiteralIndex).map id := by
+        apply List.map_congr_left
+        intro point pointMember
+        rcases point with ⟨pointX, pointY⟩
+        simp [Cell.add]
+      _ = _ := List.map_id _
+  rw [mapZero]
+  exact localAvoid
 
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes
