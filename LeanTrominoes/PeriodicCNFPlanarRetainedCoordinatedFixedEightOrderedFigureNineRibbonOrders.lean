@@ -95,6 +95,9 @@ Figure 9 routes has coordinated clockwise variable and clause source fans. -/
 theorem
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnits_sourceRibbonFansClockwiseCompatible
     {Variable : Type*} [DecidableEq Variable]
+    [finalDecEq :
+      DecidableEq
+        (RetainedOrderedFixedEightOneInThreeVariable Variable)]
     (source : PeriodicCNF Variable)
     (sourceLocal : source.IsLocal)
     (sourceWidth : source.WidthAtMost 3)
@@ -124,7 +127,17 @@ theorem
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
     unfold RetainedOrderedFixedEightOccurrencesAtMostThree at finalOccurrences
-    exact finalOccurrences
+    exact
+      PeriodicCNF.occurrencesAtMost_congr_beq
+        retainedOrderedFixedEightOneInThreeVariableBEq
+        (@instBEqOfDecidableEq
+          (RetainedOrderedFixedEightOneInThreeVariable Variable)
+          finalDecEq)
+        retainedOrderedFixedEightOneInThreeVariableLawfulBEq
+        (by infer_instance) 3
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source).erase
+        finalOccurrences
   · exact
       retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula_arityTwoOrThree
         source
@@ -134,7 +147,7 @@ theorem
     rw [routesEq]
     exact
       retainedOrderedFixedEightComposedRawNormalizedIncidenceRoutes_variableRoutesInOccurrenceOrderFor
-        retainedOrderedFixedEightOneInThreeVariableDecidableEq
+        finalDecEq
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty
   · rw [routesEq]

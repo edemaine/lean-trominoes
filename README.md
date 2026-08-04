@@ -5745,6 +5745,12 @@ The representation choices for this target are:
   the variable certificate to the endpoint's opaque decidable equality, and
   discharges the clockwise-compatibility condition for every ribbon-ready
   presentation carrying the final Figure 9 route family.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonPresentation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonPresentation.lean)
+  packages the completed route geometry at the precise source interface used
+  by ribbon thickening.  Continuous planarity, orthogonality, exact endpoints,
+  and endpoint-only contacts are discharged; finite drawing compatibility and
+  the rebased-route halo bound are the two remaining explicit premises, after
+  which the concrete presentation also inherits clockwise-compatible fans.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
   instantiates the relative splice assembly for the retained ordered fixed-eight
   route family.  Four explicit avoidance conditions imply all six splice
