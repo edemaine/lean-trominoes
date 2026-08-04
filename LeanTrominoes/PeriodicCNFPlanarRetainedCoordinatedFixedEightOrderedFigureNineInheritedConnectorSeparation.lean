@@ -122,6 +122,82 @@ theorem
   simp [generatedCoordinatesNotDistinct.1,
     generatedCoordinatesNotDistinct.2, relativeTranslateZero]
 
+/-- A retained inherited extended connector begins at the recovered composed
+source port in its final clause gauge. -/
+theorem retainedOrderedFixedEightFigureNine_inheritedExtendedConnector_head?
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clauseIndex literalIndex : Nat}
+    (data :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        clauseIndex literalIndex) :
+    let clearanceWidth :=
+      retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth
+    let outputPlacement :=
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+    ((PositionedPeriodicCNF.clauseExitFanData
+        data.sourceClause data.sourceClauseIndex
+        (retainedFigureNineClearanceIncidenceRoutes source)
+      ).translatedExtendedRoute
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          outputPlacement data.sourceClause data.generatedClause)
+        (data.sourceSlot clearanceWidth)).head? =
+      some
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort
+          outputPlacement data.sourceClause data.generatedClause
+          data.sourceLiteralIndex) := by
+  let clearanceWidth :=
+    retainedFigureNineClearancePositionedFormula_widthAtMostThree
+      source sourceWidth
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      (retainedFigureNineClearancePositionedFormula source)
+      (retainedFigureNineClearancePlacement source)
+  let fanData :=
+    PositionedPeriodicCNF.clauseExitFanData
+      data.sourceClause data.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+  let slot := data.sourceSlot clearanceWidth
+  have sourceClauseNonempty : data.sourceClause.literals ≠ [] :=
+    List.ne_nil_of_mem
+      (List.fst_mem_of_mem_zipIdx data.sourceLiteralMember)
+  have fanValid : fanData.IsValid :=
+    retainedFigureNineClearance_clauseExitFanData_valid
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty data.sourceClauseMember sourceClauseNonempty
+  have fanCount : fanData.count = data.sourceClause.literals.length :=
+    PositionedPeriodicCNF.clauseExitFanData_count_eq
+      data.sourceClause data.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+      (List.length_pos_iff.mpr sourceClauseNonempty)
+      (data.sourceClause_width clearanceWidth)
+  have slotActive : fanData.SlotActive slot := by
+    unfold PlanarOneInThreeNoUnitsFigureNine.ComposedClauseExitFanData.SlotActive
+    rw [fanCount]
+    exact data.sourceLiteralIndex_lt
+  dsimp only
+  change
+    (fanData.translatedExtendedRoute
+      (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+        outputPlacement data.sourceClause data.generatedClause)
+      slot).head? = _
+  rw [PlanarOneInThreeNoUnitsFigureNine.ComposedClauseExitFanData.translatedExtendedRoute_head?
+    _ fanData fanValid slot slotActive]
+  simp [PlanarOneInThreeNoUnitsFigureNine.normalizedSourcePort,
+    slot,
+    PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData.sourceSlot_val]
+  rfl
+
 /-- The radially extended exit connectors of a distinct inherited pair are
 strictly separated when their normalized source gauges agree. -/
 theorem
