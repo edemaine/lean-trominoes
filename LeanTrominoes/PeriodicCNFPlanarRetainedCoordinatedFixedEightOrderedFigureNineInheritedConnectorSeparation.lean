@@ -1230,5 +1230,118 @@ theorem
     clearancePlacement, clearanceWidth, offset,
     reverseOffset, reverseTranslate] using shifted
 
+/-- The finite inherited connector and the unchanged transformed source tail
+advertise the same splice endpoint. -/
+theorem retainedOrderedFixedEightFigureNine_inheritedConnector_last?_eq_sourceTail_head?
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clauseIndex literalIndex : Nat}
+    (data :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        clauseIndex literalIndex) :
+    let clearanceWidth :=
+      retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth
+    let outputPlacement :=
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+    ((PositionedPeriodicCNF.clauseExitFanData
+        data.sourceClause data.sourceClauseIndex
+        (retainedFigureNineClearanceIncidenceRoutes source)
+      ).translatedRoute
+        (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          outputPlacement data.sourceClause data.generatedClause)
+        (data.sourceSlot clearanceWidth)).getLast? =
+      ((PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRoute
+        outputPlacement
+        (retainedFigureNineClearancePlacement source)
+        data.sourceClause data.generatedClause
+        (retainedFigureNineClearanceIncidenceRoutes
+          source data.sourceClauseIndex data.sourceLiteralIndex)).tail).head? := by
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let clearanceWidth :=
+    retainedFigureNineClearancePositionedFormula_widthAtMostThree
+      source sourceWidth
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      (retainedFigureNineClearancePositionedFormula source)
+      clearancePlacement
+  let clearanceRoute :=
+    retainedFigureNineClearanceIncidenceRoutes
+      source data.sourceClauseIndex data.sourceLiteralIndex
+  let fanData :=
+    PositionedPeriodicCNF.clauseExitFanData
+      data.sourceClause data.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+  let slot := data.sourceSlot clearanceWidth
+  have sourceClauseNonempty : data.sourceClause.literals ≠ [] :=
+    List.ne_nil_of_mem
+      (List.fst_mem_of_mem_zipIdx data.sourceLiteralMember)
+  have fanValid : fanData.IsValid :=
+    retainedFigureNineClearance_clauseExitFanData_valid
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty data.sourceClauseMember sourceClauseNonempty
+  have fanCount : fanData.count = data.sourceClause.literals.length :=
+    PositionedPeriodicCNF.clauseExitFanData_count_eq
+      data.sourceClause data.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+      (List.length_pos_iff.mpr sourceClauseNonempty)
+      (data.sourceClause_width clearanceWidth)
+  have slotActive : fanData.SlotActive slot := by
+    unfold PlanarOneInThreeNoUnitsFigureNine.ComposedClauseExitFanData.SlotActive
+    rw [fanCount]
+    exact data.sourceLiteralIndex_lt
+  have directionEq :
+      fanData.direction slot =
+        AxisDirection.polylineFirstDirection clearanceRoute := by
+    simp [fanData, clearanceRoute,
+      PositionedPeriodicCNF.clauseExitFanData, slot,
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData.sourceSlot_val]
+  have sourceHead :
+      clearanceRoute.head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            clearancePlacement data.sourceClause) := by
+    simpa [clearanceRoute, clearancePlacement] using
+      (retainedFigureNineClearanceIncidenceRoutes_valid
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty data.sourceClauseMember
+        data.sourceLiteralMember).1
+  have sourceTailNonempty :
+      ∃ sourceExit, clearanceRoute.tail.head? = some sourceExit := by
+    simpa [clearanceRoute] using
+      retainedFigureNineClearanceIncidenceRoutes_exits
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty data.sourceClauseMember
+        data.sourceLiteralMember
+  have sourceUnitSteps :
+      clearanceRoute.IsChain AxisDirection.IsUnitAxisStep := by
+    simpa [clearanceRoute] using
+      retainedFigureNineClearanceIncidenceRoutes_unitSteps
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty data.sourceClauseMember
+        data.sourceLiteralMember
+  have connectorLast :=
+    fanData.translatedRoute_getLast?
+      (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+        outputPlacement data.sourceClause data.generatedClause)
+      fanValid slot slotActive
+  have sourceTailHead :=
+    PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRoute_tail_head?_of_unitSteps
+      outputPlacement clearancePlacement data.sourceClause
+      data.generatedClause clearanceRoute sourceHead
+      sourceTailNonempty sourceUnitSteps
+  rw [directionEq] at connectorLast
+  exact connectorLast.trans sourceTailHead.symm
+
 end PeriodicOrthocrossing
 end LeanTrominoes
