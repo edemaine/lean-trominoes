@@ -160,5 +160,138 @@ theorem
   exact
     extendedAvoid.join_right farTailAvoid extendedLast farHead
 
+/-- Strict separation from a translated fan-spliced inherited suffix also
+holds for the translated transformed source tail contained in that suffix. -/
+theorem
+    strictlyAvoids_translatedInheritedSourceRouteTail_of_fanInheritedRouteSuffix
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (sourceRoute localRoute : List Cell)
+    (offset : Cell)
+    (fanValid : data.IsValid)
+    (slotActive : data.SlotActive slot)
+    (directionEq :
+      data.direction slot =
+        AxisDirection.polylineFirstDirection sourceRoute)
+    (sourceHead :
+      sourceRoute.head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            sourcePlacement sourceClause))
+    (sourceTailNonempty :
+      ∃ sourceExit, sourceRoute.tail.head? = some sourceExit)
+    (sourceUnitSteps :
+      sourceRoute.IsChain AxisDirection.IsUnitAxisStep)
+    (strictSuffix :
+      RoutesStrictlyAvoidEachOther localRoute
+        (PeriodicOrthocrossing.translatePolyline offset
+          (fanInheritedRouteSuffix
+            outputPlacement sourcePlacement sourceClause generatedClause
+            data slot sourceRoute))) :
+    RoutesStrictlyAvoidEachOther localRoute
+      (PeriodicOrthocrossing.translatePolyline offset
+        ((inheritedSourceRoute
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceRoute).tail)) := by
+  let origin :=
+    normalizedSourceClausePosition
+      outputPlacement sourceClause generatedClause
+  let transformed :=
+    inheritedSourceRoute
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute
+  let splicePoint :=
+    Cell.add offset
+      (Cell.add origin
+        (ComposedClauseExitFanData.sourceExit
+          (data.direction slot)))
+  have connectorLastBase :=
+    data.translatedRoute_getLast?
+      origin fanValid slot slotActive
+  have transformedTailHeadBase :=
+    inheritedSourceRoute_tail_head?_of_unitSteps
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute sourceHead sourceTailNonempty sourceUnitSteps
+  have connectorLast :
+      (PeriodicOrthocrossing.translatePolyline offset
+        (data.translatedRoute origin slot)).getLast? =
+          some splicePoint := by
+    simpa [PeriodicOrthocrossing.translatePolyline, splicePoint] using
+      congrArg (Option.map (Cell.add offset)) connectorLastBase
+  have transformedTailHead :
+      (PeriodicOrthocrossing.translatePolyline offset transformed.tail).head? =
+        some splicePoint := by
+    simpa [PeriodicOrthocrossing.translatePolyline, splicePoint,
+      transformed, origin, directionEq] using
+      congrArg (Option.map (Cell.add offset)) transformedTailHeadBase
+  unfold fanInheritedRouteSuffix replacePolylineHead at strictSuffix
+  rw [translatePolyline_joinAtEndpoint] at strictSuffix
+  exact (strictSuffix.of_join_right connectorLast transformedTailHead).2
+
+/-- Version of
+`strictlyAvoids_translatedInheritedSourceRouteTail_of_fanInheritedRouteSuffix`
+where the fan suffix has already been rewritten to an equal presentation of
+the source route. -/
+theorem
+    strictlyAvoids_translatedInheritedSourceRouteTail_of_fanInheritedRouteSuffix_of_sourceRoute_eq
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (sourceRoute fanSourceRoute localRoute : List Cell)
+    (offset : Cell)
+    (sourceRouteEq : sourceRoute = fanSourceRoute)
+    (fanValid : data.IsValid)
+    (slotActive : data.SlotActive slot)
+    (directionEq :
+      data.direction slot =
+        AxisDirection.polylineFirstDirection sourceRoute)
+    (sourceHead :
+      sourceRoute.head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            sourcePlacement sourceClause))
+    (sourceTailNonempty :
+      ∃ sourceExit, sourceRoute.tail.head? = some sourceExit)
+    (sourceUnitSteps :
+      sourceRoute.IsChain AxisDirection.IsUnitAxisStep)
+    (strictSuffix :
+      RoutesStrictlyAvoidEachOther localRoute
+        (PeriodicOrthocrossing.translatePolyline offset
+          (fanInheritedRouteSuffix
+            outputPlacement sourcePlacement sourceClause generatedClause
+            data slot fanSourceRoute))) :
+    RoutesStrictlyAvoidEachOther localRoute
+      (PeriodicOrthocrossing.translatePolyline offset
+        ((inheritedSourceRoute
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceRoute).tail)) := by
+  subst fanSourceRoute
+  exact
+    strictlyAvoids_translatedInheritedSourceRouteTail_of_fanInheritedRouteSuffix
+      outputPlacement sourcePlacement sourceClause generatedClause data slot
+      sourceRoute localRoute offset fanValid slotActive directionEq sourceHead
+      sourceTailNonempty sourceUnitSteps strictSuffix
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes
