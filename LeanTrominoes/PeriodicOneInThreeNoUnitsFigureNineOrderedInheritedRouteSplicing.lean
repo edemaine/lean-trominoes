@@ -281,6 +281,118 @@ def fanInheritedRouteSuffix
     (data.translatedRoute origin slot)
     transformed
 
+/-- The transformed tail of a doubled and subdivided source route consists
+of the finite radial half-edge followed by the refined far source tail. -/
+theorem inheritedSourceRoute_tail_eq_radial_join_farTail
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (first second : Cell)
+    (rest : List Cell)
+    (firstUnit : AxisDirection.IsUnitAxisStep first second)
+    (scaledHead :
+      Cell.scale 2 first =
+        PositionedPeriodicCNF.canonicalClausePosition
+          sourcePlacement sourceClause)
+    (directionEq :
+      data.direction slot = AxisDirection.between first second) :
+    (inheritedSourceRoute
+      outputPlacement sourcePlacement sourceClause generatedClause
+      (AxisDirection.unitSubdividePolyline
+        (scalePolyline 2 (first :: second :: rest)))).tail =
+      joinAtEndpoint
+        (PeriodicOrthocrossing.translatePolyline
+          (normalizedSourceClausePosition
+            outputPlacement sourceClause generatedClause)
+          [ComposedClauseExitFanData.sourceExit (data.direction slot),
+            ComposedClauseExitFanData.outerSourceExit
+              (data.direction slot)])
+        (PeriodicOrthocrossing.translatePolyline
+          (inheritedSourceRouteShift
+            outputPlacement sourcePlacement sourceClause generatedClause)
+          (scalePolyline composedGadgetScale
+            (AxisDirection.unitSubdividePolyline
+              (scalePolyline 2 (second :: rest))))) := by
+  let origin :=
+    normalizedSourceClausePosition
+      outputPlacement sourceClause generatedClause
+  let shift :=
+    inheritedSourceRouteShift
+      outputPlacement sourcePlacement sourceClause generatedClause
+  let radial :=
+    PeriodicOrthocrossing.translatePolyline shift
+      (scalePolyline composedGadgetScale
+        [Cell.add (Cell.scale 2 first)
+            (AxisDirection.between first second).step,
+          Cell.scale 2 second])
+  let farTail :=
+    PeriodicOrthocrossing.translatePolyline shift
+      (scalePolyline composedGadgetScale
+        (AxisDirection.unitSubdividePolyline
+          (scalePolyline 2 (second :: rest))))
+  have originEq :
+      origin =
+        Cell.add shift
+          (Cell.scale composedGadgetScale (Cell.scale 2 first)) := by
+    rw [scaledHead]
+    apply Prod.ext <;>
+      simp [origin, shift, inheritedSourceRouteShift,
+        Cell.add, Cell.sub, Cell.scale]
+  rcases firstUnit with ⟨direction, genuine, secondEq⟩
+  have betweenEq :
+      AxisDirection.between first second = direction := by
+    rw [secondEq]
+    exact AxisDirection.between_add_step first genuine
+  have dataDirectionEq : data.direction slot = direction :=
+    directionEq.trans betweenEq
+  have firstUnitAgain :
+      AxisDirection.IsUnitAxisStep first second :=
+    ⟨direction, genuine, secondEq⟩
+  have radialEq :
+      radial =
+        PeriodicOrthocrossing.translatePolyline origin
+          [ComposedClauseExitFanData.sourceExit (data.direction slot),
+            ComposedClauseExitFanData.outerSourceExit
+              (data.direction slot)] := by
+    rw [dataDirectionEq]
+    simp only [radial]
+    rw [betweenEq, secondEq]
+    simp [originEq,
+      ComposedClauseExitFanData.sourceExit,
+      ComposedClauseExitFanData.outerSourceExit,
+      PeriodicOrthocrossing.translatePolyline, scalePolyline,
+      composedGadgetScale, Cell.add, Cell.scale]
+    constructor <;> ring_nf <;> simp
+  have scalePolyline_tail
+      (factor : Int) (route : List Cell) :
+      (scalePolyline factor route).tail =
+        scalePolyline factor route.tail := by
+    simp [scalePolyline]
+  have transformedTailEq :
+      (inheritedSourceRoute
+        outputPlacement sourcePlacement sourceClause generatedClause
+        (AxisDirection.unitSubdividePolyline
+          (scalePolyline 2 (first :: second :: rest)))).tail =
+        joinAtEndpoint radial farTail := by
+    rw [inheritedSourceRoute]
+    unfold PeriodicOrthocrossing.translatePolyline
+    rw [← List.map_tail, scalePolyline_tail]
+    rw [AxisDirection.unitSubdividePolyline_scale_two_tail firstUnitAgain]
+    simp [radial, farTail, shift,
+      PeriodicOrthocrossing.translatePolyline,
+      scalePolyline, joinAtEndpoint]
+  rw [transformedTailEq, radialEq]
+
 /-- When the source route is the ordered subdivision of a doubled unit-step
 route, the Figure 9 splice is exactly the radially extended connector joined
 to the subdivision of the remaining doubled source route. -/
