@@ -5678,12 +5678,21 @@ The representation choices for this target are:
   by the canonical certificates.  The two strict cross-piece conditions force
   the five semantic endpoint inequalities automatically, leaving only four
   continuous-avoidance obligations.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseRouteOrder.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseRouteOrder.lean)
+  machine-checks the canonical south-west-east first-edge order on every
+  ternary clause of the four finite composed templates.  The invariant is
+  transported through logical renaming, geometric translation, clause-anchor
+  normalization, metadata selection, and arbitrary inherited-suffix splicing.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRoutes.lean)
   instantiates the ordered suffix family over the factor-two clearance
   presentation of the retained source, then completes both generations of
   auxiliary routes and splices them to the certified local Figure 9 and
   unit-elimination drawings.  Every genuine twice-replaced route has exact
   canonical endpoints and is orthogonal.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineClauseRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineClauseRouteOrder.lean)
+  specializes that finite-template invariant to the retained fixed-eight
+  construction, proving that its complete raw ternary clause routes already
+  have the exit order required by the normalized 3DM ribbon source.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean)
   applies final loop erasure to the ordered composed family and packages both
   raw and normalized canonical route certificates.  The normalized drawing
