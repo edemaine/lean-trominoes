@@ -45,6 +45,48 @@ def translatedExtendedRoute
   PeriodicOrthocrossing.translatePolyline origin
     (data.extendedRoute slot)
 
+/-- The translated extended connector begins at its translated composed
+source port. -/
+@[simp]
+theorem translatedExtendedRoute_head?
+    (origin : Cell)
+    (data : ComposedClauseExitFanData)
+    (valid : data.IsValid)
+    (slot : Fin 3)
+    (active : data.SlotActive slot) :
+    (data.translatedExtendedRoute origin slot).head? =
+      some (Cell.add origin (sourceLocalPosition slot.val)) := by
+  simp [translatedExtendedRoute,
+    PeriodicOrthocrossing.translatePolyline,
+    extendedRoute_head? data valid slot active]
+
+/-- The translated extended connector ends at its translated factor-two
+outer source exit. -/
+@[simp]
+theorem translatedExtendedRoute_getLast?
+    (origin : Cell)
+    (data : ComposedClauseExitFanData)
+    (valid : data.IsValid)
+    (slot : Fin 3)
+    (active : data.SlotActive slot) :
+    (data.translatedExtendedRoute origin slot).getLast? =
+      some
+        (Cell.add origin
+          (outerSourceExit (data.direction slot))) := by
+  simp [translatedExtendedRoute,
+    PeriodicOrthocrossing.translatePolyline,
+    extendedRoute_getLast? data valid slot active]
+
+/-- Translation preserves rectilinearity of an active extended connector. -/
+theorem translatedExtendedRoute_orthogonal
+    (origin : Cell)
+    (data : ComposedClauseExitFanData)
+    (valid : data.IsValid)
+    (slot : Fin 3)
+    (active : data.SlotActive slot) :
+    OrthogonalPolyline (data.translatedExtendedRoute origin slot) := by
+  exact (extendedRoute_orthogonal data valid slot active).translate origin
+
 /-- The translated connector begins at its translated composed source
 port. -/
 @[simp]

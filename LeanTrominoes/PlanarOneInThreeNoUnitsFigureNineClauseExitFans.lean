@@ -108,6 +108,36 @@ def extendedRoute
     [sourceExit (data.direction slot),
       outerSourceExit (data.direction slot)]
 
+/-- Every active extended connector retains the composed source port as its
+first endpoint. -/
+@[simp]
+theorem extendedRoute_head? :
+    ∀ (data : ComposedClauseExitFanData),
+      data.IsValid →
+      ∀ slot, data.SlotActive slot →
+        (data.extendedRoute slot).head? =
+          some (sourceLocalPosition slot.val) := by
+  native_decide
+
+/-- Every active extended connector ends at the factor-two-refined outer
+source exit. -/
+@[simp]
+theorem extendedRoute_getLast? :
+    ∀ (data : ComposedClauseExitFanData),
+      data.IsValid →
+      ∀ slot, data.SlotActive slot →
+        (data.extendedRoute slot).getLast? =
+          some (outerSourceExit (data.direction slot)) := by
+  native_decide
+
+/-- Every active radially extended connector remains rectilinear. -/
+theorem extendedRoute_orthogonal :
+    ∀ (data : ComposedClauseExitFanData),
+      data.IsValid →
+      ∀ slot, data.SlotActive slot →
+        OrthogonalPolyline (data.extendedRoute slot) := by
+  native_decide
+
 /-- Every active route begins at its index-selected composed source port. -/
 @[simp]
 theorem route_head? :
