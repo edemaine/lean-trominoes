@@ -5715,6 +5715,12 @@ The representation choices for this target are:
   promise.  Named opaque equality and occurrence interfaces keep these facts
   usable without repeatedly normalizing the deeply nested reduction-variable
   type.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineThreeDM.lean)
+  applies the normalized periodic 3DM encoding to that exact ordered formula
+  and placement.  The result is well formed, every colored element has degree
+  two or three, and both perfect-matching existence and the abstract required
+  incidence orientation are equivalent to satisfiability of the original
+  local periodic CNF.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal
