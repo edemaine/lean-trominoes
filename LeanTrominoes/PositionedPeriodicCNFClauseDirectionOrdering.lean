@@ -446,6 +446,57 @@ def CanonicalOrthogonalIncidenceRoutes.orderClausesByRouteDirection
     exact (orderCanonicalRoutesByClauseDirection_valid
       placement family clauseMember literalMember).2.2
 
+/-- Pointwise canonical endpoint and orthogonality certificates can be
+transported through clause-direction ordering without first packaging the
+source routes behind a structure projection.  Keeping `routes` explicit in
+the conclusion avoids expensive unfolding for deeply composed reductions. -/
+theorem incidenceDrawing_orderCanonicalRoutesByClauseDirection_geometry
+    [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (endpoints :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          (routes clauseIndex literalIndex).head? =
+              some (canonicalClausePosition placement clause) ∧
+            (routes clauseIndex literalIndex).getLast? =
+              some (canonicalLiteralPosition placement clause literal))
+    (orthogonal :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (routes clauseIndex literalIndex))
+    (periodPositive : 0 < placement.period) :
+    (incidenceDrawing
+        (orderClausesByRouteDirection source routes)
+        placement
+        (orderCanonicalRoutesByClauseDirection
+          source placement routes)).RoutesMatch
+          (orderClausesByRouteDirection source routes).erase.incidenceGraph ∧
+      (incidenceDrawing
+        (orderClausesByRouteDirection source routes)
+        placement
+        (orderCanonicalRoutesByClauseDirection
+          source placement routes)).IsOrthogonal := by
+  let family : CanonicalOrthogonalIncidenceRoutes source placement := {
+    routes := routes
+    endpoints := endpoints
+    orthogonal := orthogonal
+  }
+  let ordered := family.orderClausesByRouteDirection
+  constructor
+  · simpa only [family, ordered,
+      CanonicalOrthogonalIncidenceRoutes.orderClausesByRouteDirection]
+      using ordered.routesMatch periodPositive
+  · simpa only [family, ordered,
+      CanonicalOrthogonalIncidenceRoutes.orderClausesByRouteDirection]
+      using ordered.isOrthogonal
+
 /-- Anchor-gauged reordering preserves unit lattice steps on every genuine
 incidence route. -/
 theorem orderCanonicalRoutesByClauseDirection_unitSteps

@@ -73,31 +73,6 @@ noncomputable def
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty)
 
-/-- The final reordered routes retain their canonical endpoints and
-orthogonality. -/
-noncomputable def
-    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalClockwiseCanonicalRoutes
-    {Variable : Type*} [DecidableEq Variable]
-    (source : PeriodicCNF Variable)
-    (sourceLocal : source.IsLocal)
-    (sourceWidth : source.WidthAtMost 3)
-    (sourceOccurrences : source.OccurrencesAtMost 3)
-    (sourceClausesNonempty :
-      ∀ clause ∈ source.clauses, clause ≠ []) :
-    PositionedPeriodicCNF.CanonicalOrthogonalIncidenceRoutes
-      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty)
-      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
-        source) := by
-  simpa only [
-    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula,
-    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalClockwiseIncidenceRoutes]
-    using
-      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedCanonicalRoutes
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty).orderClausesByRouteDirection
-
 /-- Relative separation also holds for the normalized routes before the
 final clause sort. -/
 theorem
@@ -185,14 +160,19 @@ theorem
     (source : PeriodicCNF Variable) :
     (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
       source).AllAtomsNodup := by
-  simpa only [
-    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula]
-    using
-      PeriodicOneInThreeNoUnitsPositioned.formula_allAtomsNodup
-        (PeriodicOneInThreePositioned.formula
-          (retainedFigureNineClearancePositionedFormula source))
-        (PeriodicOneInThreePositioned.formula_allAtomsNodup
-          (retainedFigureNineClearancePositionedFormula source))
+  intro clause clauseMember
+  have distinct :=
+    PeriodicOneInThreeNoUnitsPositioned.formula_allAtomsNodup
+      (PeriodicOneInThreePositioned.formula
+        (retainedFigureNineClearancePositionedFormula source))
+      (PeriodicOneInThreePositioned.formula_allAtomsNodup
+        (retainedFigureNineClearancePositionedFormula source))
+  have clauseDistinct := distinct clause (by
+    simpa only [
+      retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula]
+      using clauseMember)
+  unfold PositionedPeriodicClause.AtomsNodup at clauseDistinct ⊢
+  exact clauseDistinct
 
 /-- The final clause sort preserves clockwise variable fan order. -/
 theorem
