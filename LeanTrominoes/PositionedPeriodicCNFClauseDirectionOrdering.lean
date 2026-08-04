@@ -189,6 +189,26 @@ theorem orderClauseByRouteDirection_length
   (orderClauseByRouteDirection_literals_perm
     routes clauseIndex clause).length_eq
 
+/-- Reordering every clause by route direction preserves clause
+nonemptiness. -/
+theorem orderClausesByRouteDirection_clausesNonempty
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause.literals ≠ []) :
+    ∀ clause ∈
+        (orderClausesByRouteDirection source routes).clauses,
+      clause.literals ≠ [] := by
+  intro clause clauseMember
+  rw [orderClausesByRouteDirection] at clauseMember
+  rcases List.mem_map.mp clauseMember with
+    ⟨taggedClause, taggedClauseMember, rfl⟩
+  apply List.ne_nil_of_length_pos
+  rw [orderClauseByRouteDirection_length]
+  exact List.length_pos_iff.mpr
+    (sourceClausesNonempty taggedClause.1
+      (List.fst_mem_of_mem_zipIdx taggedClauseMember))
+
 /-- Clause membership is transported forward through the ordering map. -/
 theorem orderClauseByRouteDirection_mem
     {source : PositionedPeriodicCNF Variable}

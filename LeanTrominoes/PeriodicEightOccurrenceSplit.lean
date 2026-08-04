@@ -244,6 +244,61 @@ theorem formula_widthAtMostThree
     exact cycleClausesFor_widthAtMostThree
       atom clause cycleMember
 
+private theorem cycleFrom_clausesNonempty
+    {Variable : Type*}
+    (first current : ThreeOccurrenceVariable Variable) :
+    ∀ (rest : List (ThreeOccurrenceVariable Variable))
+      (clause : PeriodicClause (ThreeOccurrenceVariable Variable)),
+      clause ∈ PeriodicThreeSATThree.cycleFrom first current rest →
+        clause ≠ [] := by
+  intro rest
+  induction rest generalizing current with
+  | nil =>
+      intro clause clauseMember
+      simp only [PeriodicThreeSATThree.cycleFrom,
+        List.mem_singleton] at clauseMember
+      rw [clauseMember]
+      simp [PeriodicThreeSATThree.implicationClause]
+  | cons next rest ih =>
+      intro clause clauseMember
+      simp only [PeriodicThreeSATThree.cycleFrom,
+        List.mem_cons] at clauseMember
+      rcases clauseMember with rfl | clauseMember
+      · simp [PeriodicThreeSATThree.implicationClause]
+      · exact ih next clause clauseMember
+
+/-- Fixed-eight occurrence splitting preserves clause nonemptiness. -/
+theorem formula_clausesNonempty
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (occurrencePorts : OccurrencePorts)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause ∈ (formula source occurrencePorts).clauses,
+      clause ≠ [] := by
+  intro clause clauseMember
+  simp only [formula, List.mem_append] at clauseMember
+  rcases clauseMember with sourceMember | cycleMember
+  · simp only [occurrenceClauses, List.mem_map] at sourceMember
+    rcases sourceMember with
+      ⟨taggedClause, taggedClauseMember, rfl⟩
+    apply List.ne_nil_of_length_pos
+    rw [occurrenceClause_length]
+    exact List.length_pos_iff.mpr
+      (sourceClausesNonempty taggedClause.1
+        (List.fst_mem_of_mem_zipIdx taggedClauseMember))
+  · simp only [allCycleClauses, List.mem_flatMap] at cycleMember
+    rcases cycleMember with
+      ⟨atom, _atomMember, cycleMember⟩
+    unfold cycleClausesFor at cycleMember
+    cases copiesEq : copies atom with
+    | nil =>
+        simp [PeriodicThreeSATThree.cycleClauses, copiesEq] at cycleMember
+    | cons first rest =>
+        exact cycleFrom_clausesNonempty first first rest clause
+          (by simpa [PeriodicThreeSATThree.cycleClauses, copiesEq] using
+            cycleMember)
+
 /-- Read a source value from the first fixed compass copy. -/
 def restrictAssignment {Variable : Type*}
     (assignment :

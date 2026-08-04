@@ -452,6 +452,34 @@ theorem
     retainedDrawingAngularOccurrenceOrder,
     retainedPlanarSATFormula]
 
+/-- Source-first refinement and fixed-eight splitting preserve the absence
+of empty clauses in the retained planar-SAT source. -/
+theorem
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_clausesNonempty
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause ∈
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          source).clauses,
+      clause.literals ≠ [] := by
+  unfold
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+    retainedAngularFanSourceScaledRefinedFormula
+  apply retainedAngularFanRefinedFormula_clausesNonempty
+  intro scaledClause scaledClauseMember
+  rw [PositionedPeriodicCNF.scale_clauses] at scaledClauseMember
+  rcases List.mem_map.mp scaledClauseMember with
+    ⟨unscaledClause, unscaledClauseMember, rfl⟩
+  simpa using
+    PeriodicEightOccurrenceSplitPositioned.positionedClausesNonempty_of_erase
+      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        source)
+      (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_clausesNonempty_of_source
+        source sourceClausesNonempty)
+      unscaledClause unscaledClauseMember
+
 /-- The source-scaled retained fixed-eight placement has positive period. -/
 theorem
     retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement_period_pos

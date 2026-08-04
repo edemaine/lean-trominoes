@@ -78,6 +78,25 @@ theorem retainedFigureNineClearancePositionedFormula_widthAtMostThree
     retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
       source sourceWidth
 
+/-- The extra Figure Nine clearance scale preserves the absence of empty
+ordered retained source clauses. -/
+theorem retainedFigureNineClearancePositionedFormula_clausesNonempty
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause ∈
+        (retainedFigureNineClearancePositionedFormula source).clauses,
+      clause.literals ≠ [] := by
+  intro clause clauseMember
+  rw [retainedFigureNineClearancePositionedFormula,
+    PositionedPeriodicCNF.scale_clauses] at clauseMember
+  rcases List.mem_map.mp clauseMember with
+    ⟨unscaledClause, unscaledClauseMember, rfl⟩
+  simpa using
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_clausesNonempty
+      source sourceClausesNonempty unscaledClause unscaledClauseMember
+
 /-- The extra coordinate refinement leaves per-clause atom distinctness
 unchanged. -/
 theorem retainedFigureNineClearancePositionedFormula_allAtomsNodup

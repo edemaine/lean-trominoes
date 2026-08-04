@@ -139,6 +139,31 @@ theorem retainedAngularFanRefinedFormula_erase
           (angularOccurrenceOrder source.erase routes)) := by
   simp [retainedAngularFanRefinedFormula]
 
+/-- Retained fan refinement preserves clause nonemptiness. -/
+theorem retainedAngularFanRefinedFormula_clausesNonempty
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause.literals ≠ []) :
+    ∀ clause ∈
+        (retainedAngularFanRefinedFormula
+          source placement routes).clauses,
+      clause.literals ≠ [] := by
+  intro clause clauseMember
+  rw [retainedAngularFanRefinedFormula,
+    PositionedPeriodicCNF.scale_clauses] at clauseMember
+  rcases List.mem_map.mp clauseMember with
+    ⟨unscaledClause, unscaledClauseMember, rfl⟩
+  simpa using
+    PeriodicEightOccurrenceSplitPositioned.formula_clausesNonempty
+      source placement
+      (occurrencePortsOfAngularOrder
+        source.erase
+        (angularOccurrenceOrder source.erase routes))
+      sourceClausesNonempty unscaledClause unscaledClauseMember
+
 /-- Positive source period gives a positive refined split period. -/
 theorem retainedAngularFanRefinedPlacement_period_pos
     {Variable : Type*}

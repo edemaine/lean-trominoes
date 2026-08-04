@@ -368,6 +368,27 @@ theorem
         (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_widthAtMostThree
           source sourceWidth)
 
+/-- Clockwise literal ordering preserves the absence of empty retained
+source clauses. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_clausesNonempty
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ clause ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses,
+      clause.literals ≠ [] := by
+  exact
+    PositionedPeriodicCNF.orderClausesByRouteDirection_clausesNonempty
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+        source)
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_clausesNonempty
+        source sourceClausesNonempty)
+
 /-- Reordering preserves collision-free atoms within every clause. -/
 theorem
     retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_allAtomsNodup

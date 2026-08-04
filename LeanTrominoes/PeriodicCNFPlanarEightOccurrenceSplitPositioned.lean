@@ -144,6 +144,55 @@ theorem erase_formula {Variable : Type*} [DecidableEq Variable]
   simp [formula, PositionedPeriodicCNF.erase,
     PeriodicEightOccurrenceSplit.formula]
 
+/-- Clause nonemptiness of an erased positioned presentation lifts back to
+the positioned clauses. -/
+theorem positionedClausesNonempty_of_erase
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (erasedClausesNonempty :
+      ∀ clause ∈ source.erase.clauses, clause ≠ []) :
+    ∀ clause ∈ source.clauses, clause.literals ≠ [] := by
+  intro clause clauseMember
+  apply erasedClausesNonempty clause.literals
+  change clause.literals ∈
+    source.clauses.map PositionedPeriodicClause.literals
+  exact List.mem_map.mpr ⟨clause, clauseMember, rfl⟩
+
+/-- Positioned fixed-eight occurrence splitting preserves clause
+nonemptiness. -/
+theorem formula_clausesNonempty
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (occurrencePorts : PeriodicEightOccurrenceSplit.OccurrencePorts)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause.literals ≠ []) :
+    ∀ clause ∈
+        (formula source sourcePlacement occurrencePorts).clauses,
+      clause.literals ≠ [] := by
+  intro clause clauseMember
+  have erasedSourceClausesNonempty :
+      ∀ erasedClause ∈ source.erase.clauses,
+        erasedClause ≠ [] := by
+    intro erasedClause erasedClauseMember
+    change erasedClause ∈
+      (source.clauses.map PositionedPeriodicClause.literals) at erasedClauseMember
+    rcases List.mem_map.mp erasedClauseMember with
+      ⟨sourceClause, sourceClauseMember, rfl⟩
+    exact sourceClausesNonempty sourceClause sourceClauseMember
+  have erasedClauseMember :
+      clause.literals ∈
+        (formula source sourcePlacement occurrencePorts).erase.clauses := by
+    change clause.literals ∈
+      (formula source sourcePlacement occurrencePorts).clauses.map
+        PositionedPeriodicClause.literals
+    exact List.mem_map.mpr ⟨clause, clauseMember, rfl⟩
+  rw [erase_formula] at erasedClauseMember
+  exact
+    PeriodicEightOccurrenceSplit.formula_clausesNonempty
+      occurrencePorts erasedSourceClausesNonempty
+      clause.literals erasedClauseMember
+
 theorem placement_period_pos {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (sourcePeriodPositive : 0 < sourcePlacement.period) :
