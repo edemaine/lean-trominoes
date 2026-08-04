@@ -681,5 +681,146 @@ theorem
         generatedOccurrencesDifferent
   · exact strictlyAvoid.toRoutesAvoidEachOther
 
+/-- Equality of a local route's normalized source gauge with a translated
+inherited source gauge forces the two recovered retained source clauses to
+have the same index.  This is the metadata-facing form of the clockwise
+fixed-eight clause-position injectivity theorem. -/
+theorem
+    retainedOrderedFixedEightFigureNine_sourceClauseIndex_eq_of_normalizedSourceGaugesEqual
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {localClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {localClauseIndex : Nat}
+    (localClauseMember :
+      (localClause, localClauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula
+            (retainedFigureNineClearancePositionedFormula source))).clauses.zipIdx)
+    (localMetadata :
+      PlanarOneInThreeNoUnitsFigureNine.ClauseMetadata
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable)))
+    (localMetadataLookup :
+      (PlanarOneInThreeNoUnitsFigureNine.formulaClauseMetadata
+        (retainedFigureNineClearancePositionedFormula source))[
+          localClauseIndex]? = some localMetadata)
+    (localMetadataClause : localMetadata.clause = localClause)
+    {inheritedClauseIndex inheritedLiteralIndex : Nat}
+    (data :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedEndpointProvenance
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        inheritedClauseIndex inheritedLiteralIndex)
+    (relativeTranslate : Cell)
+    (sourceGaugesEqual :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          localMetadata.sourceClause localClause =
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            data.sourceClause data.generatedClause)) :
+    localMetadata.sourceClauseIndex = data.sourceClauseIndex := by
+  let clearanceSource :=
+    retainedFigureNineClearancePositionedFormula source
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      clearanceSource clearancePlacement
+  let clockwisePlacement :=
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source
+  rcases
+      PlanarOneInThreeNoUnitsFigureNine.formulaClauseMetadata_lookup_valid_embedded
+        clearanceSource localClauseMember with
+    ⟨actualMetadata, actualLookup, _actualClause,
+      localClearanceSourceMember, _localClauseMember⟩
+  have actualMetadataEqual : actualMetadata = localMetadata := by
+    apply Option.some.inj
+    exact actualLookup.symm.trans localMetadataLookup
+  subst actualMetadata
+  rcases exists_clockwiseClause_of_clearanceClause_mem
+      localClearanceSourceMember with
+    ⟨localSourceClause, localSourceMember, localSourceEq⟩
+  rcases exists_clockwiseClause_of_clearanceClause_mem
+      data.sourceClauseMember with
+    ⟨inheritedSourceClause, inheritedSourceMember,
+      inheritedSourceEq⟩
+  have clearanceCentersEqual :
+      PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+          clearancePlacement localMetadata.sourceClause localClause =
+        Cell.add (clearancePlacement.translation relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+            clearancePlacement data.sourceClause data.generatedClause) := by
+    rw [
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition_eq_scale_sourceGaugeCenter
+        clearanceSource clearancePlacement
+        localMetadata.sourceClause localClause,
+      PlanarOneInThreeNoUnitsFigureNine.translated_normalizedSourceClausePosition_eq_scale_sourceGaugeCenter
+        clearanceSource clearancePlacement
+        data.sourceClause data.generatedClause relativeTranslate
+    ] at sourceGaugesEqual
+    exact Cell.scale_injective (by
+      norm_num [PlanarOneInThreeNoUnitsFigureNine.composedGadgetScale,
+        PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale] :
+      PlanarOneInThreeNoUnitsFigureNine.composedGadgetScale ≠ 0)
+      sourceGaugesEqual
+  have clockwiseCentersEqual :
+      PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+          clockwisePlacement localSourceClause localClause =
+        Cell.add (clockwisePlacement.translation relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+            clockwisePlacement inheritedSourceClause
+            data.generatedClause) := by
+    rw [localSourceEq, inheritedSourceEq] at clearanceCentersEqual
+    apply Prod.ext
+    · have coordinateEqual := congrArg Prod.fst clearanceCentersEqual
+      simp [clockwisePlacement, clearancePlacement,
+        retainedFigureNineClearancePlacement,
+        PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter,
+        PeriodicVariablePlacement.translation,
+        retainedFigureNineSourceClearanceFactor,
+        Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+      nlinarith
+    · have coordinateEqual := congrArg Prod.snd clearanceCentersEqual
+      simp [clockwisePlacement, clearancePlacement,
+        retainedFigureNineClearancePlacement,
+        PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter,
+        PeriodicVariablePlacement.translation,
+        retainedFigureNineSourceClearanceFactor,
+        Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+      nlinarith
+  have canonicalPositionsEqual :=
+    (localRouteSourceGaugeCenter_eq_translated_iff
+      clockwisePlacement localSourceClause inheritedSourceClause
+      localClause data.generatedClause relativeTranslate).mp
+        clockwiseCentersEqual
+  exact
+    retainedOrderedFixedEightCanonicalClausePosition_eq_translated_imp_clauseIndex_eq
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      localSourceMember inheritedSourceMember
+      (PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRelativeTranslate
+        localSourceClause inheritedSourceClause
+        localClause data.generatedClause relativeTranslate)
+      canonicalPositionsEqual
+
 end PeriodicOrthocrossing
 end LeanTrominoes
