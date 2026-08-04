@@ -208,6 +208,207 @@ theorem
         sourceClausesNonempty second.sourceClauseMember
         second.sourceLiteralMember).1
 
+/-- Unequal retained source gauges let the two inherited Figure 9 suffixes
+be assembled from strictly separated finite connectors, strictly separated
+connector–tail cross pairs, and source tails that can meet only at their
+variable-side endpoints. -/
+theorem
+    retainedOrderedFixedEightFigureNine_inheritedSuffixes_relativeAvoidEachOther_of_sourceGaugesNe
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        secondClauseIndex secondLiteralIndex)
+    (relativeTranslate : Cell)
+    (sourceGaugesNe :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          first.sourceClause first.generatedClause ≠
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            second.sourceClause second.generatedClause))
+    (generatedOccurrencesDifferent :
+      ((firstClauseIndex, firstLiteralIndex), (0, 0)) ≠
+        ((secondClauseIndex, secondLiteralIndex), relativeTranslate)) :
+    let clearanceWidth :=
+      retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth
+    let outputPlacement :=
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+    RoutesAvoidEachOther
+      (PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+        outputPlacement
+        (retainedFigureNineClearancePlacement source)
+        first.sourceClause first.generatedClause
+        (PositionedPeriodicCNF.clauseExitFanData
+          first.sourceClause first.sourceClauseIndex
+          (retainedFigureNineClearanceIncidenceRoutes source))
+        (first.sourceSlot clearanceWidth)
+        (retainedFigureNineClearanceIncidenceRoutes
+          source first.sourceClauseIndex first.sourceLiteralIndex))
+      (translatePolyline (outputPlacement.translation relativeTranslate)
+        (PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix
+          outputPlacement
+          (retainedFigureNineClearancePlacement source)
+          second.sourceClause second.generatedClause
+          (PositionedPeriodicCNF.clauseExitFanData
+            second.sourceClause second.sourceClauseIndex
+            (retainedFigureNineClearanceIncidenceRoutes source))
+          (second.sourceSlot clearanceWidth)
+          (retainedFigureNineClearanceIncidenceRoutes
+            source second.sourceClauseIndex
+            second.sourceLiteralIndex))) := by
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let clearanceWidth :=
+    retainedFigureNineClearancePositionedFormula_widthAtMostThree
+      source sourceWidth
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      (retainedFigureNineClearancePositionedFormula source)
+      clearancePlacement
+  let offset := outputPlacement.translation relativeTranslate
+  let firstConnector :=
+    (PositionedPeriodicCNF.clauseExitFanData
+      first.sourceClause first.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+    ).translatedRoute
+      (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+        outputPlacement first.sourceClause first.generatedClause)
+      (first.sourceSlot clearanceWidth)
+  let secondConnectorBase :=
+    (PositionedPeriodicCNF.clauseExitFanData
+      second.sourceClause second.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+    ).translatedRoute
+      (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+        outputPlacement second.sourceClause second.generatedClause)
+      (second.sourceSlot clearanceWidth)
+  let secondConnector := translatePolyline offset secondConnectorBase
+  let firstTail :=
+    (PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRoute
+      outputPlacement clearancePlacement
+      first.sourceClause first.generatedClause
+      (retainedFigureNineClearanceIncidenceRoutes
+        source first.sourceClauseIndex first.sourceLiteralIndex)).tail
+  let secondTailBase :=
+    (PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRoute
+      outputPlacement clearancePlacement
+      second.sourceClause second.generatedClause
+      (retainedFigureNineClearanceIncidenceRoutes
+        source second.sourceClauseIndex second.sourceLiteralIndex)).tail
+  let secondTail := translatePolyline offset secondTailBase
+  have connectorsStrict :
+      RoutesStrictlyAvoidEachOther firstConnector secondConnector := by
+    simpa [firstConnector, secondConnector, secondConnectorBase,
+      outputPlacement, clearancePlacement, clearanceWidth, offset] using
+      retainedOrderedFixedEightFigureNine_inheritedConnectors_strictlyAvoidEachOther_of_sourceGaugesNe
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty first second relativeTranslate sourceGaugesNe
+  have connectorContactsAtHeads :
+      RoutesMeetOnlyAtHeads firstConnector secondConnector := by
+    intro firstPoint firstMember secondPoint secondMember pointsEqual
+    exact (connectorsStrict.2.2.2
+      firstPoint firstMember secondPoint secondMember pointsEqual).elim
+  have firstConnectorAvoidsSecondTail :
+      RoutesStrictlyAvoidEachOther firstConnector secondTail := by
+    simpa [firstConnector, secondTail, secondTailBase,
+      outputPlacement, clearancePlacement, clearanceWidth, offset] using
+      retainedOrderedFixedEightFigureNine_inheritedConnector_strictlyAvoids_translatedInheritedSourceTail_of_sourceGaugesNe
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty first second relativeTranslate sourceGaugesNe
+  have firstTailAvoidsSecondConnector :
+      RoutesStrictlyAvoidEachOther firstTail secondConnector := by
+    simpa [firstTail, secondConnector, secondConnectorBase,
+      outputPlacement, clearancePlacement, clearanceWidth, offset] using
+      retainedOrderedFixedEightFigureNine_inheritedSourceTail_strictlyAvoids_translatedInheritedConnector_of_sourceGaugesNe
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty first second relativeTranslate sourceGaugesNe
+  have tailsSeparated :=
+    retainedOrderedFixedEightInheritedSourceRouteTails_relativeSeparated
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first second relativeTranslate
+      generatedOccurrencesDifferent
+  have tailsAvoid : RoutesAvoidEachOther firstTail secondTail := by
+    simpa [firstTail, secondTail, secondTailBase,
+      outputPlacement, clearancePlacement, offset,
+      translatePolyline] using tailsSeparated.1
+  have tailContactsAtTails :
+      RoutesMeetOnlyAtTails firstTail secondTail := by
+    simpa [firstTail, secondTail, secondTailBase,
+      outputPlacement, clearancePlacement, offset,
+      translatePolyline] using tailsSeparated.2
+  rcases
+      retainedOrderedFixedEightFigureNine_inheritedConnector_spliceEndpoint
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty first with
+    ⟨firstSplicePoint, firstConnectorLast, firstTailHead⟩
+  rcases
+      retainedOrderedFixedEightFigureNine_inheritedConnector_spliceEndpoint
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty second with
+    ⟨secondSplicePoint, secondConnectorBaseLast, secondTailBaseHead⟩
+  have firstConnectorLast' :
+      firstConnector.getLast? = some firstSplicePoint := by
+    simpa [firstConnector, outputPlacement,
+      clearancePlacement, clearanceWidth] using firstConnectorLast
+  have firstTailHead' :
+      firstTail.head? = some firstSplicePoint := by
+    simpa [firstTail, outputPlacement,
+      clearancePlacement] using firstTailHead
+  have secondConnectorLast :
+      secondConnector.getLast? =
+        some (Cell.add offset secondSplicePoint) := by
+    simpa [secondConnector, secondConnectorBase,
+      translatePolyline] using
+        congrArg (Option.map (Cell.add offset)) secondConnectorBaseLast
+  have secondTailHead :
+      secondTail.head? =
+        some (Cell.add offset secondSplicePoint) := by
+    simpa [secondTail, secondTailBase,
+      translatePolyline] using
+        congrArg (Option.map (Cell.add offset)) secondTailBaseHead
+  have assembled :=
+    connectorsStrict.toRoutesAvoidEachOther
+      |>.join_tails_of_prefix_heads_and_suffix_tails
+        connectorContactsAtHeads
+        firstConnectorAvoidsSecondTail
+        firstTailAvoidsSecondConnector
+        tailsAvoid tailContactsAtTails
+        firstConnectorLast' firstTailHead'
+        secondConnectorLast secondTailHead
+  simpa [PlanarOneInThreeNoUnitsFigureNine.fanInheritedRouteSuffix,
+    replacePolylineHead,
+    firstConnector, secondConnector, secondConnectorBase,
+    firstTail, secondTail, secondTailBase,
+    outputPlacement, clearancePlacement, clearanceWidth, offset,
+    translatePolyline_joinAtEndpoint] using assembled
+
 /-- Equal retained source gauges let the two inherited Figure 9 suffixes be
 assembled from strictly separated finite connectors, strictly separated
 connector–tail cross pairs, and source tails that can meet only at their
