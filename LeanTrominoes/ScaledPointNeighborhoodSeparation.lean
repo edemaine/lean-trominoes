@@ -92,6 +92,65 @@ theorem LocalIncidenceDrawing.RouteIsSimple.tail_avoids_head
       · exact headFresh (atStart.symm ▸ endpoints.1)
       · exact headFresh (atFinish.symm ▸ endpoints.2)
 
+/-- If two ordinarily separated routes have different heads and the first
+head is not the second tail, then the whole second route avoids the first
+head, both at its listed points and along every segment.  This packages the
+endpoint bookkeeping needed to apply a scaled point-neighborhood theorem at
+one route's clause-side endpoint. -/
+theorem
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther.second_avoids_first_head_of_endpoints_ne
+    {first second : List Cell}
+    {firstHead secondHead secondLast : Cell}
+    (avoid :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+        first second)
+    (firstHeadLookup : first.head? = some firstHead)
+    (secondHeadLookup : second.head? = some secondHead)
+    (secondLastLookup : second.getLast? = some secondLast)
+    (headsDifferent : firstHead ≠ secondHead)
+    (firstHeadDifferentSecondLast : firstHead ≠ secondLast) :
+    (∀ point ∈ second, point ≠ firstHead) ∧
+      ∀ segment ∈ gridPolylineSegments second,
+        ¬segment.Contains firstHead := by
+  have firstHeadMember : firstHead ∈ first :=
+    List.mem_of_mem_head? firstHeadLookup
+  have pointsAvoid : ∀ point ∈ second, point ≠ firstHead := by
+    intro point pointMember pointEqual
+    subst point
+    rcases List.mem_iff_get.mp firstHeadMember with
+      ⟨firstIndex, firstIndexed⟩
+    rcases List.mem_iff_get.mp pointMember with
+      ⟨secondIndex, secondIndexed⟩
+    have indexedEqual :
+        first.get firstIndex = second.get secondIndex := by
+      rw [firstIndexed, secondIndexed]
+    have endpoints :=
+      avoid.2.2.2 firstIndex secondIndex indexedEqual
+    rw [firstIndexed, secondIndexed] at endpoints
+    rcases endpoints.2 with secondHead | secondLast
+    · exact headsDifferent
+        (Option.some.inj (secondHead.symm.trans secondHeadLookup))
+    · exact firstHeadDifferentSecondLast
+        (Option.some.inj (secondLast.symm.trans secondLastLookup))
+  refine ⟨pointsAvoid, ?_⟩
+  intro segment segmentMember contains
+  rcases
+      GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+        contains with
+    interior | endpoint
+  · rcases List.mem_iff_get.mp firstHeadMember with
+      ⟨firstIndex, firstIndexed⟩
+    rcases List.mem_iff_get.mp segmentMember with
+      ⟨secondSegmentIndex, secondSegmentIndexed⟩
+    have interiorAvoid := avoid.2.1 firstIndex secondSegmentIndex
+    rw [firstIndexed, secondSegmentIndexed] at interiorAvoid
+    exact interiorAvoid interior
+  · have segmentEndpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    rcases endpoint with atStart | atFinish
+    · exact pointsAvoid segment.start segmentEndpoints.1 atStart.symm
+    · exact pointsAvoid segment.finish segmentEndpoints.2 atFinish.symm
+
 /-- A segment's first endpoint lies in its endpoint rectangle. -/
 theorem GridSegment.start_in_coordinateRectangle
     (segment : GridSegment) :
