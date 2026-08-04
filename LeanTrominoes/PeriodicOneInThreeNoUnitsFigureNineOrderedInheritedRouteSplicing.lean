@@ -499,6 +499,146 @@ theorem strictlyAvoids_translatedScaledDoubledSubdividedTail
     coarseSourceAvoidsNearby.symm.refine_right
       nearbyOrthogonal coarseOrthogonal farRefines
 
+/-- The transformed subdivision of the doubled source tail begins exactly
+at the translated outer endpoint of the radially extended connector. -/
+theorem translatedScaledDoubledSubdividedTail_head?
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (first second : Cell)
+    (rest : List Cell)
+    (firstUnit : AxisDirection.IsUnitAxisStep first second)
+    (scaledHead :
+      Cell.scale 2 first =
+        PositionedPeriodicCNF.canonicalClausePosition
+          sourcePlacement sourceClause)
+    (directionEq :
+      data.direction slot = AxisDirection.between first second) :
+    (PeriodicOrthocrossing.translatePolyline
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement sourceClause generatedClause)
+        (scalePolyline composedGadgetScale
+          (AxisDirection.unitSubdividePolyline
+            (scalePolyline 2 (second :: rest))))).head? =
+      some
+        (Cell.add
+          (normalizedSourceClausePosition
+            outputPlacement sourceClause generatedClause)
+          (ComposedClauseExitFanData.outerSourceExit
+            (data.direction slot))) := by
+  rcases firstUnit with ⟨direction, genuine, secondEq⟩
+  have betweenEq :
+      AxisDirection.between first second = direction := by
+    rw [secondEq]
+    exact AxisDirection.between_add_step first genuine
+  have dataDirectionEq : data.direction slot = direction :=
+    directionEq.trans betweenEq
+  have pointEq :
+      Cell.add
+          (inheritedSourceRouteShift
+            outputPlacement sourcePlacement sourceClause generatedClause)
+          (Cell.scale composedGadgetScale (Cell.scale 2 second)) =
+        Cell.add
+          (normalizedSourceClausePosition
+            outputPlacement sourceClause generatedClause)
+          (ComposedClauseExitFanData.outerSourceExit
+            (data.direction slot)) := by
+    rw [dataDirectionEq, secondEq]
+    unfold inheritedSourceRouteShift
+    rw [← scaledHead]
+    apply Prod.ext <;>
+      simp [ComposedClauseExitFanData.outerSourceExit,
+        composedGadgetScale, PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+        Cell.add, Cell.sub, Cell.scale] <;>
+      ring
+  have doubledTailNonempty :
+      scalePolyline 2 (second :: rest) ≠ [] := by simp
+  have subdividedHead :
+      (AxisDirection.unitSubdividePolyline
+        (scalePolyline 2 (second :: rest))).head? =
+          some (Cell.scale 2 second) := by
+    simpa [scalePolyline] using
+      AxisDirection.unitSubdividePolyline_head? doubledTailNonempty
+  simp only [PeriodicOrthocrossing.translatePolyline,
+    List.head?_map, scalePolyline_head?, subdividedHead,
+    Option.map_some]
+  exact congrArg some pointEq
+
+/-- Strict separation from an extended finite connector and from the far
+refined source tail yields strict separation from their actual Figure 9
+inherited suffix. -/
+theorem strictlyAvoids_fanInheritedRouteSuffix_of_extended_of_farTail
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (first second : Cell)
+    (rest localRoute : List Cell)
+    (fanValid : data.IsValid)
+    (slotActive : data.SlotActive slot)
+    (firstUnit : AxisDirection.IsUnitAxisStep first second)
+    (scaledHead :
+      Cell.scale 2 first =
+        PositionedPeriodicCNF.canonicalClausePosition
+          sourcePlacement sourceClause)
+    (directionEq :
+      data.direction slot = AxisDirection.between first second)
+    (extendedAvoid :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+        localRoute
+        (data.translatedExtendedRoute
+          (normalizedSourceClausePosition
+            outputPlacement sourceClause generatedClause)
+          slot))
+    (farTailAvoid :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+        localRoute
+        (PeriodicOrthocrossing.translatePolyline
+          (inheritedSourceRouteShift
+            outputPlacement sourcePlacement sourceClause generatedClause)
+          (scalePolyline composedGadgetScale
+            (AxisDirection.unitSubdividePolyline
+              (scalePolyline 2 (second :: rest)))))) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      localRoute
+      (fanInheritedRouteSuffix
+        outputPlacement sourcePlacement sourceClause generatedClause
+        data slot
+        (AxisDirection.unitSubdividePolyline
+          (scalePolyline 2 (first :: second :: rest)))) := by
+  rw [fanInheritedRouteSuffix_eq_extended_join_farTail
+    outputPlacement sourcePlacement sourceClause generatedClause
+    data slot first second rest firstUnit scaledHead directionEq]
+  exact
+    extendedAvoid.join_right farTailAvoid
+      (data.translatedExtendedRoute_getLast?
+        (normalizedSourceClausePosition
+          outputPlacement sourceClause generatedClause)
+        fanValid slot slotActive)
+      (translatedScaledDoubledSubdividedTail_head?
+        outputPlacement sourcePlacement sourceClause generatedClause
+        data slot first second rest firstUnit scaledHead directionEq)
+
 /-- Strict separation from both pieces of an ordered inherited suffix
 composes across the certified connector-to-source-route splice.  This lemma
 isolates the reusable bookkeeping at the join: downstream geometry only has
