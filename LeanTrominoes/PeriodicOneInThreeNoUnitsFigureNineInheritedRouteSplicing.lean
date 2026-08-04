@@ -128,6 +128,51 @@ def inheritedSourceRoute
       outputPlacement sourcePlacement sourceClause generatedClause)
     (scalePolyline composedGadgetScale sourceRoute)
 
+/-- Equal normalized source-clause gauges identify the corresponding
+inherited source routes up to the same ambient translation. -/
+theorem inheritedSourceRoute_eq_translate_of_normalizedSourceClausePosition_eq
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (firstGeneratedClause secondGeneratedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourceRoute : List Cell)
+    (offset : Cell)
+    (gaugesEqual :
+      normalizedSourceClausePosition
+          outputPlacement sourceClause firstGeneratedClause =
+        Cell.add offset
+          (normalizedSourceClausePosition
+            outputPlacement sourceClause secondGeneratedClause)) :
+    inheritedSourceRoute
+        outputPlacement sourcePlacement sourceClause firstGeneratedClause
+        sourceRoute =
+      PeriodicOrthocrossing.translatePolyline offset
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement sourceClause secondGeneratedClause
+          sourceRoute) := by
+  unfold inheritedSourceRoute PeriodicOrthocrossing.translatePolyline
+  rw [List.map_map]
+  apply List.map_congr_left
+  intro point _pointMember
+  apply Prod.ext
+  · have coordinateEqual := congrArg Prod.fst gaugesEqual
+    simp [normalizedSourceClausePosition, inheritedSourceRouteShift,
+      PositionedPeriodicCNF.canonicalClausePosition,
+      Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+    linarith
+  · have coordinateEqual := congrArg Prod.snd gaugesEqual
+    simp [normalizedSourceClausePosition, inheritedSourceRouteShift,
+      PositionedPeriodicCNF.canonicalClausePosition,
+      Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
+    linarith
+
 /-- The transformed source route begins at the displayed original
 source-clause vertex in the final clause's gauge. -/
 theorem inheritedSourceRoute_head?
