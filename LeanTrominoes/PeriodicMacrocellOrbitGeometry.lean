@@ -21,6 +21,32 @@ def InMacrocellOrbit
         (Cell.scale (factor * period) shift)
         (macrocellPosition factor base offset)
 
+/-- Successive macrocell refinements compose by scaling the first local
+offset and then adding the second. -/
+theorem InMacrocellOrbit.compose
+    {firstFactor secondFactor period : Nat}
+    {base firstOffset middle secondOffset position : Cell}
+    (firstOrbit :
+      InMacrocellOrbit firstFactor period
+        base firstOffset middle)
+    (secondOrbit :
+      InMacrocellOrbit secondFactor (firstFactor * period)
+        middle secondOffset position) :
+    InMacrocellOrbit (secondFactor * firstFactor) period base
+      (Cell.add (Cell.scale secondFactor firstOffset) secondOffset)
+      position := by
+  rcases firstOrbit with ⟨firstShift, firstEqual⟩
+  rcases secondOrbit with ⟨secondShift, secondEqual⟩
+  refine ⟨Cell.add secondShift firstShift, ?_⟩
+  rw [secondEqual, firstEqual]
+  rcases firstShift with ⟨firstShiftX, firstShiftY⟩
+  rcases secondShift with ⟨secondShiftX, secondShiftY⟩
+  rcases base with ⟨baseX, baseY⟩
+  rcases firstOffset with ⟨firstOffsetX, firstOffsetY⟩
+  rcases secondOffset with ⟨secondOffsetX, secondOffsetY⟩
+  simp only [macrocellPosition, Cell.add, Cell.scale, Prod.mk.injEq]
+  constructor <;> norm_num [Nat.cast_mul] <;> ring
+
 /-- Equality of two refined orbits, up to another whole refined period,
 recovers equal local codes and equality of the bases up to a base period. -/
 theorem inMacrocellOrbit_eq_periodTranslate
