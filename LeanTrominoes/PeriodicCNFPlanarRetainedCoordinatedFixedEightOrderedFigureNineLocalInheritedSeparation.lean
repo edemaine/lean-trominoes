@@ -41,7 +41,7 @@ private theorem value_eq_of_mem_zipIdx_same_index
 supplied successful lookup.  Keeping this uniqueness step in the generic
 Figure 9 context avoids making later retained-instance proofs unfold the
 entire composed formula merely to compare metadata witnesses. -/
-private theorem normalizedLocalRoutes_points_within_sourceGaugeRadius72_at_metadata
+theorem normalizedLocalRoutes_points_within_sourceGaugeRadius72_at_metadata
     {Variable : Type*} [DecidableEq Variable]
     (source : PositionedPeriodicCNF Variable)
     (sourcePlacement : PeriodicVariablePlacement Variable)
