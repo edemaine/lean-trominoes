@@ -151,6 +151,24 @@ theorem translatedRoute_points_within_sourceNeighborhood
       data valid slot active sourcePoint sourcePointMember
   simpa [Cell.add] using sourceBounded.translate origin
 
+/-- A translated extended connector stays in the radius-`144` neighborhood
+of its source-clause origin. -/
+theorem translatedExtendedRoute_points_within_sourceNeighborhood
+    (origin : Cell)
+    (data : ComposedClauseExitFanData)
+    (valid : data.IsValid)
+    (slot : Fin 3)
+    (active : data.SlotActive slot)
+    {point : Cell}
+    (pointMember : point ∈ data.translatedExtendedRoute origin slot) :
+    WithinCoordinateRadius 144 origin point := by
+  rcases List.mem_map.mp pointMember with
+    ⟨sourcePoint, sourcePointMember, rfl⟩
+  have sourceBounded :=
+    extendedRoute_points_within_sourceNeighborhood
+      data valid slot active sourcePoint sourcePointMember
+  simpa [Cell.add] using sourceBounded.translate origin
+
 /-- Distinct active connectors remain strictly separated after their common
 translation into a clause gauge. -/
 theorem translatedRoutes_strictlyAvoidEachOther
@@ -532,6 +550,80 @@ theorem fanInheritedRouteSuffix_eq_extended_join_farTail
     _ = joinAtEndpoint (data.translatedExtendedRoute origin slot)
           farTail := by rw [extendedEq]
 
+/-- A route in any radius strictly below `144` avoids an actual subdivided
+far tail whenever the corresponding coarse source tail avoids the
+neighborhood's source-scale center. -/
+theorem strictlyAvoids_translatedScaledDoubledSubdividedTail_of_avoidedCenter
+    {source nearby : List Cell}
+    {center : Cell}
+    (shift : Cell)
+    (radius : Nat)
+    (radiusLt : radius < 144)
+    (sourceOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline source)
+    (sourcePointsAvoid :
+      ∀ point ∈ source, point ≠ center)
+    (sourceSegmentsAvoid :
+      ∀ segment ∈ gridPolylineSegments source,
+        segment.IsAxisAligned → ¬segment.Contains center)
+    (nearbyOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline nearby)
+    (nearbyBounded :
+      ∀ point ∈ nearby,
+        WithinCoordinateRadius radius
+          (Cell.add shift (Cell.scale 144 center)) point) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      nearby
+      (PeriodicOrthocrossing.translatePolyline shift
+        (scalePolyline composedGadgetScale
+          (AxisDirection.unitSubdividePolyline
+            (scalePolyline 2 source)))) := by
+  have coarseSourceAvoidsNearby :=
+    routesStrictlyAvoidEachOther_translateScalePolyline_pointNeighborhood
+      (source := source) (nearby := nearby)
+      (center := center) (offset := shift)
+      (factor := 144) (radius := radius)
+      (by norm_num) radiusLt sourcePointsAvoid sourceSegmentsAvoid
+      nearbyBounded
+  have doubledSourceOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (scalePolyline 2 source) :=
+    sourceOrthogonal.scalePolyline (by norm_num)
+  have baseRefines :=
+    AxisDirection.unitSubdividePolyline_refines
+      doubledSourceOrthogonal
+  have scaledRefines :=
+    PolylineRefines.scalePolyline
+      (factor := composedGadgetScale)
+      (by
+        norm_num [composedGadgetScale, PlanarOneInThree.gadgetScale,
+          PeriodicOneInThreeNoUnitsPositioned.gadgetScale])
+      baseRefines
+  have translatedRefines :=
+    PolylineRefines.translatePolyline scaledRefines shift
+  have farRefines :
+      PolylineRefines
+        (PeriodicOrthocrossing.translatePolyline shift
+          (scalePolyline composedGadgetScale
+            (AxisDirection.unitSubdividePolyline
+              (scalePolyline 2 source))))
+        (PeriodicOrthocrossing.translatePolyline shift
+          (scalePolyline 144 source)) := by
+    simpa [scalePolyline, Cell.scale_scale,
+      List.map_map, Function.comp_def,
+      composedGadgetScale, PlanarOneInThree.gadgetScale,
+      PeriodicOneInThreeNoUnitsPositioned.gadgetScale] using
+      translatedRefines
+  have coarseOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline
+        (PeriodicOrthocrossing.translatePolyline shift
+          (scalePolyline 144 source)) :=
+    (sourceOrthogonal.scalePolyline (factor := 144) (by norm_num)).translate
+      shift
+  exact
+    coarseSourceAvoidsNearby.symm.refine_right
+      nearbyOrthogonal coarseOrthogonal farRefines
+
 /-- A route in any radius strictly below `144` avoids the actual subdivided
 far tail of a simple source route.  The coarse source tail is first separated
 at factor `144`, then the result is transported through factor-two unit
@@ -562,56 +654,17 @@ theorem strictlyAvoids_translatedScaledDoubledSubdividedTail_of_radius
   have tailAvoids :=
     sourceSimple.tail_avoids_head
       (head := first) (by rfl)
-  have coarseSourceAvoidsNearby :=
-    routesStrictlyAvoidEachOther_translateScalePolyline_pointNeighborhood
-      (source := second :: rest) (nearby := nearby)
-      (center := first) (offset := shift)
-      (factor := 144) (radius := radius)
-      (by norm_num) radiusLt
-      (by simpa using tailAvoids.1)
-      (by simpa using tailAvoids.2)
-      nearbyBounded
   have tailOrthogonal :
       PeriodicOrthocrossing.OrthogonalPolyline (second :: rest) :=
     (List.isChain_cons_cons.mp sourceOrthogonal).2
-  have doubledTailOrthogonal :
-      PeriodicOrthocrossing.OrthogonalPolyline
-        (scalePolyline 2 (second :: rest)) :=
-    tailOrthogonal.scalePolyline (by norm_num)
-  have baseRefines :=
-    AxisDirection.unitSubdividePolyline_refines
-      doubledTailOrthogonal
-  have scaledRefines :=
-    PolylineRefines.scalePolyline
-      (factor := composedGadgetScale)
-      (by
-        norm_num [composedGadgetScale, PlanarOneInThree.gadgetScale,
-          PeriodicOneInThreeNoUnitsPositioned.gadgetScale])
-      baseRefines
-  have translatedRefines :=
-    PolylineRefines.translatePolyline scaledRefines shift
-  have farRefines :
-      PolylineRefines
-        (PeriodicOrthocrossing.translatePolyline shift
-          (scalePolyline composedGadgetScale
-            (AxisDirection.unitSubdividePolyline
-              (scalePolyline 2 (second :: rest)))))
-        (PeriodicOrthocrossing.translatePolyline shift
-          (scalePolyline 144 (second :: rest))) := by
-    simpa [scalePolyline, Cell.scale_scale,
-      List.map_map, Function.comp_def,
-      composedGadgetScale, PlanarOneInThree.gadgetScale,
-      PeriodicOneInThreeNoUnitsPositioned.gadgetScale] using
-      translatedRefines
-  have coarseOrthogonal :
-      PeriodicOrthocrossing.OrthogonalPolyline
-        (PeriodicOrthocrossing.translatePolyline shift
-          (scalePolyline 144 (second :: rest))) :=
-    (tailOrthogonal.scalePolyline (factor := 144) (by norm_num)).translate
-      shift
   exact
-    coarseSourceAvoidsNearby.symm.refine_right
-      nearbyOrthogonal coarseOrthogonal farRefines
+    strictlyAvoids_translatedScaledDoubledSubdividedTail_of_avoidedCenter
+      shift radius radiusLt tailOrthogonal
+      (by simpa using tailAvoids.1)
+      (by
+        intro segment segmentMember aligned
+        exact tailAvoids.2 segment segmentMember aligned)
+      nearbyOrthogonal nearbyBounded
 
 /-- The radius-72 specialization used by normalized composed local routes. -/
 theorem strictlyAvoids_translatedScaledDoubledSubdividedTail

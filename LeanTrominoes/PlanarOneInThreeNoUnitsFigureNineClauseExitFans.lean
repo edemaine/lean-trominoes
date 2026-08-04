@@ -186,6 +186,16 @@ theorem route_points_within_sourceNeighborhood :
           WithinCoordinateRadius 73 (0, 0) point := by
   native_decide
 
+/-- Adding the factor-two radial extension enlarges the connector's
+coordinate neighborhood from radius `73` to exactly radius `144`. -/
+theorem extendedRoute_points_within_sourceNeighborhood :
+    ∀ (data : ComposedClauseExitFanData),
+      data.IsValid →
+      ∀ slot, data.SlotActive slot →
+        ∀ point ∈ data.extendedRoute slot,
+          WithinCoordinateRadius 144 (0, 0) point := by
+  native_decide
+
 /-- Distinct active connectors have no continuous or listed-point contact. -/
 theorem routes_strictlyAvoidEachOther :
     ∀ (data : ComposedClauseExitFanData),
