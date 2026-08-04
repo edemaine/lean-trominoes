@@ -171,6 +171,57 @@ theorem
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty sourceClauseMember sourceLiteralMember).1
 
+/-- Clockwise reindexing and anchor-gauge translation preserve the complete
+geometric simplicity certificate of every source route. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_isSimple
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        source clauseIndex literalIndex) := by
+  rcases PositionedPeriodicCNF.exists_sourceLiteral_of_orderedLiteral_mem
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      clauseEq, literalEq, orderedRouteEq⟩
+  have sourceClauseLookup :=
+    (List.mk_mem_zipIdx_iff_getElem?).mp sourceClauseMember
+  subst clause
+  subst literal
+  rw [retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes,
+    PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection,
+    sourceClauseLookup, orderedRouteEq]
+  exact
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.routeIsSimple_translate
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_isSimple
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty sourceClauseMember sourceLiteralMember)
+      _
+
 /-- Every reordered retained source route still consists of unit lattice
 steps. -/
 theorem

@@ -1,7 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearance
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineSplicedRouteSeparation
-import LeanTrominoes.PositionedPeriodicCNFRelativeRouteSeparationOrdering
-import LeanTrominoes.RetainedAngularFanFinalRelativeFallbackCompleteSeparation
 
 /-!
 # Relative separation interface for ordered retained Figure 9 routes
@@ -24,34 +23,6 @@ local instance orderedComposedVariableDecidableEqForSeparation
       (OneInThreeNoUnitVariable
         (PeriodicPlanarOneInThreeThreeRawVariable Variable)) :=
   PlanarOneInThreeNoUnitsFigureNine.nestedVariableDecidableEq
-
-/-- Reordering the retained fixed-eight clauses by their clockwise exit
-directions preserves the complete relative separation certificate already
-proved for the normalized source routes.  This is the suffix/suffix source
-geometry consumed by the ordered two-stage splice. -/
-theorem
-    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_relativeAvoidEachOther
-    {Variable : Type*} [DecidableEq Variable]
-    (source : PeriodicCNF Variable)
-    (sourceLocal : source.IsLocal)
-    (sourceWidth : source.WidthAtMost 3)
-    (sourceOccurrences : source.OccurrencesAtMost 3)
-    (sourceClausesNonempty :
-      ∀ clause ∈ source.clauses, clause ≠ []) :
-    PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
-        source)
-      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source)
-      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
-        source) := by
-  apply
-    PositionedPeriodicCNF.RelativeIncidenceRoutesAvoidEachOther.orderCanonicalRoutesByClauseDirection
-  exact
-    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_relativeAvoidEachOther_of_copiedSource
-      source sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty
-      (retainedFinalCopiedSourceRoutes_relativeAvoidEachOther
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty)
 
 /-- A distinct final relative occurrence remains distinct after recovering
 its original source coordinates and changing to the inherited source-route

@@ -1,4 +1,6 @@
 import LeanTrominoes.PeriodicGridDrawingScaling
+import LeanTrominoes.OrthogonalPolylineScaling
+import LeanTrominoes.PositionedPeriodicCNFCanonicalOrthogonalRoutes
 
 /-!
 # Positive integral scaling of positioned periodic CNF drawings
@@ -239,6 +241,72 @@ theorem incidenceDrawing_scale
       (incidenceEdgeRoutes source routes).map
         (scalePolyline factor))
   rw [oldGridSize, Nat.pred_eq_sub_one]
+
+namespace CanonicalOrthogonalIncidenceRoutes
+
+/-- Positive uniform coordinate scaling preserves a canonical orthogonal
+incidence-route family. -/
+def scale
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {factor : Nat} (factorPositive : 0 < factor)
+    (family :
+      CanonicalOrthogonalIncidenceRoutes source placement) :
+    CanonicalOrthogonalIncidenceRoutes
+      (source.scale factor) (placement.scale factor) where
+  routes := scaleIncidenceRoutes factor family.routes
+  endpoints := by
+    intro scaledClause clauseIndex scaledClauseMember
+      literal literalIndex literalMember
+    rw [scale_clauses, List.zipIdx_map] at scaledClauseMember
+    rcases List.mem_map.mp scaledClauseMember with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual : taggedClause.2 = clauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst clauseIndex
+    subst scaledClause
+    have sourceLiteralMember :
+        (literal, literalIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using literalMember
+    have sourceEndpoints :=
+      family.endpoints
+        taggedClause.1 taggedClause.2 taggedClauseMember
+        literal literalIndex sourceLiteralMember
+    constructor
+    · simpa [scaleIncidenceRoutes, scalePolyline,
+        sourceEndpoints.1]
+    · simpa [scaleIncidenceRoutes, scalePolyline,
+        sourceEndpoints.2, canonicalLiteralPosition,
+        Cell.scale_add]
+  orthogonal := by
+    intro scaledClause clauseIndex scaledClauseMember
+      literal literalIndex literalMember
+    rw [scale_clauses, List.zipIdx_map] at scaledClauseMember
+    rcases List.mem_map.mp scaledClauseMember with
+      ⟨taggedClause, taggedClauseMember, taggedClauseEqual⟩
+    have clauseIndexEqual : taggedClause.2 = clauseIndex :=
+      congrArg Prod.snd taggedClauseEqual
+    have scaledClauseEqual :
+        taggedClause.1.scale factor = scaledClause :=
+      congrArg Prod.fst taggedClauseEqual
+    subst clauseIndex
+    subst scaledClause
+    have sourceLiteralMember :
+        (literal, literalIndex) ∈
+          taggedClause.1.literals.zipIdx := by
+      simpa using literalMember
+    exact
+      (family.orthogonal
+        taggedClause.1 taggedClause.2 taggedClauseMember
+        literal literalIndex sourceLiteralMember).scalePolyline
+          (by exact_mod_cast factorPositive)
+
+end CanonicalOrthogonalIncidenceRoutes
 
 /-- Positive scaling transports a continuously planar positioned incidence
 presentation to the uniformly refined coordinates. -/

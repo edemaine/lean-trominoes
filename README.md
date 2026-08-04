@@ -5606,6 +5606,16 @@ The representation choices for this target are:
   bound, per-clause atom distinctness, canonical route geometry, route
   point injectivity, and
   satisfiability equivalence with the original source.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearance.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearance.lean)
+  inserts the extra factor-two whole-source refinement required before the
+  fixed-size Figure 9 connector fan.  It scales the completed clockwise
+  source drawing and then normalizes each route back to unit steps, proving
+  canonical endpoints, orthogonality, simplicity, a nontrivial first edge,
+  exact preservation of first directions and strict clockwise ranks, valid
+  finite exit-fan selection, unchanged satisfiability, and complete relative
+  route separation.  Thus the later factor-72 inheritance sees a source
+  lattice spacing of `144`, safely larger than the connector fan's radius-73
+  reach.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean)
   gives the finite noncrossing fan from the three fixed composed Figure 9
   source ports to the radius-72 first exits of an ordered source clause.
