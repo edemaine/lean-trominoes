@@ -5745,6 +5745,11 @@ The representation choices for this target are:
   the variable certificate to the endpoint's opaque decidable equality, and
   discharges the clockwise-compatibility condition for every ribbon-ready
   presentation carrying the final Figure 9 route family.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonCompatibility.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonCompatibility.lean)
+  isolates the finite compatibility boundary.  Graph well-formedness, both
+  presentation lengths, and exact periodic route endpoints are automatic;
+  compatibility is therefore equivalent to duplicate-free final vertex
+  positions lying strictly inside the fundamental square.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonPresentation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonPresentation.lean)
   packages the completed route geometry at the precise source interface used
   by ribbon thickening.  Continuous planarity, orthogonality, exact endpoints,
