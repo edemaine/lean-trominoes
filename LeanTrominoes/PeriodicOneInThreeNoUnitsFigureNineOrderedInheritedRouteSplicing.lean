@@ -18,6 +18,7 @@ used when the complete route family is assembled.
 namespace LeanTrominoes
 namespace PlanarOneInThreeNoUnitsFigureNine
 
+open PeriodicEightOccurrenceSplit
 open PeriodicOrthocrossing
 
 namespace ComposedClauseExitFanData
@@ -75,6 +76,24 @@ theorem translatedRoute_orthogonal
       (GridSegment.isAxisAligned_translate
         (GridSegment.mk first second) origin).2 aligned
   · exact route_orthogonal data valid slot active
+
+/-- Every translated connector stays in the radius-73 neighborhood of its
+translated source-clause origin. -/
+theorem translatedRoute_points_within_sourceNeighborhood
+    (origin : Cell)
+    (data : ComposedClauseExitFanData)
+    (valid : data.IsValid)
+    (slot : Fin 3)
+    (active : data.SlotActive slot)
+    {point : Cell}
+    (pointMember : point ∈ data.translatedRoute origin slot) :
+    WithinCoordinateRadius 73 origin point := by
+  rcases List.mem_map.mp pointMember with
+    ⟨sourcePoint, sourcePointMember, rfl⟩
+  have sourceBounded :=
+    route_points_within_sourceNeighborhood
+      data valid slot active sourcePoint sourcePointMember
+  simpa [Cell.add] using sourceBounded.translate origin
 
 /-- Distinct active connectors remain strictly separated after their common
 translation into a clause gauge. -/

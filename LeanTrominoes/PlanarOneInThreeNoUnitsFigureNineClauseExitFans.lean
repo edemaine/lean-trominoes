@@ -1,6 +1,7 @@
 import LeanTrominoes.OrthogonalPolylineStrictSeparation
 import LeanTrominoes.PlanarOneInThreeNoUnitsFigureNineSelector
 import LeanTrominoes.PositionedPeriodicCNFClauseDirectionOrdering
+import LeanTrominoes.RetainedRayRasterizationCorridor
 
 /-!
 # Noncrossing fans from composed Figure 9 ports to source exits
@@ -21,6 +22,7 @@ namespace LeanTrominoes
 namespace PlanarOneInThreeNoUnitsFigureNine
 
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+open PeriodicEightOccurrenceSplit
 open PeriodicOrthocrossing
 
 /-- A finite family of one, two, or three source exits. -/
@@ -128,6 +130,17 @@ theorem route_points_inOuterFrame :
       data.IsValid →
       ∀ slot, data.SlotActive slot →
         ∀ point ∈ data.route slot, InOuterFrame point := by
+  native_decide
+
+/-- Every active connector stays in the closed radius-`73` square around
+the source-clause origin.  This includes the one-cell outer clearance used
+by the west, north, and south detours. -/
+theorem route_points_within_sourceNeighborhood :
+    ∀ (data : ComposedClauseExitFanData),
+      data.IsValid →
+      ∀ slot, data.SlotActive slot →
+        ∀ point ∈ data.route slot,
+          WithinCoordinateRadius 73 (0, 0) point := by
   native_decide
 
 /-- Distinct active connectors have no continuous or listed-point contact. -/

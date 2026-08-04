@@ -5525,6 +5525,11 @@ The representation choices for this target are:
   selected route has its exact displayed endpoints, is orthogonal, and is
   continuously simple; distinct incidences in the same original source block
   satisfy the complete pairwise continuous-separation predicate.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteBounds.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteBounds.lean)
+  certifies that every genuine finite-template route stays in the common
+  radius-73 source neighborhood, transports that bound through logical
+  renaming and factor-72 placement, and exposes the resulting physical bound
+  through the flattened composed metadata index.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean)
   transports those selected routes into each final clause's canonical
   periodic anchor gauge.  The normalized family has exact periodic clause
@@ -5620,8 +5625,8 @@ The representation choices for this target are:
   gives the finite noncrossing fan from the three fixed composed Figure 9
   source ports to the radius-72 first exits of an ordered source clause.
   The fourteen possible unary, binary, and ternary direction subsets have
-  machine-checked endpoints, orthogonality, outer-frame containment, and
-  pairwise strict continuous separation.
+  machine-checked endpoints, orthogonality, outer-frame and radius-73
+  containment, and pairwise strict continuous separation.
 - [`LeanTrominoes/PositionedPeriodicCNFClauseExitFanOrdering.lean`](LeanTrominoes/PositionedPeriodicCNFClauseExitFanOrdering.lean)
   packages the first directions of any nonempty width-three positioned
   clause as finite composed exit-fan data.  Generic genuine-direction and
@@ -5631,7 +5636,8 @@ The representation choices for this target are:
   translates a selected fan into a generated clause's canonical gauge and
   splices each connector directly to the scaled inherited unit-step route.
   The splice has exact endpoints and orthogonality, while common translation
-  preserves the fan's certified pairwise strict separation.
+  preserves both the fan's certified pairwise strict separation and its
+  radius-73 source-neighborhood bound.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing.lean)
   now also transports relative continuous separation through the combined
   factor-72 refinement and the two generated-clause anchor gauges, reducing
