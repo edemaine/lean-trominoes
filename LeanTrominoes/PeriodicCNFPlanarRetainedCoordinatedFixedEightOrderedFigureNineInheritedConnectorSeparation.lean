@@ -1397,7 +1397,7 @@ theorem
 
 /-- The finite inherited connector and the unchanged transformed source tail
 advertise the same splice endpoint. -/
-theorem retainedOrderedFixedEightFigureNine_inheritedConnector_last?_eq_sourceTail_head?
+theorem retainedOrderedFixedEightFigureNine_inheritedConnector_spliceEndpoint
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
     (sourceLocal : source.IsLocal)
@@ -1418,19 +1418,21 @@ theorem retainedOrderedFixedEightFigureNine_inheritedConnector_last?_eq_sourceTa
       PlanarOneInThreeNoUnitsFigureNine.composedPlacement
         (retainedFigureNineClearancePositionedFormula source)
         (retainedFigureNineClearancePlacement source)
-    ((PositionedPeriodicCNF.clauseExitFanData
-        data.sourceClause data.sourceClauseIndex
-        (retainedFigureNineClearanceIncidenceRoutes source)
-      ).translatedRoute
-        (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
-          outputPlacement data.sourceClause data.generatedClause)
-        (data.sourceSlot clearanceWidth)).getLast? =
-      ((PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRoute
-        outputPlacement
-        (retainedFigureNineClearancePlacement source)
-        data.sourceClause data.generatedClause
-        (retainedFigureNineClearanceIncidenceRoutes
-          source data.sourceClauseIndex data.sourceLiteralIndex)).tail).head? := by
+    ∃ splicePoint,
+      ((PositionedPeriodicCNF.clauseExitFanData
+          data.sourceClause data.sourceClauseIndex
+          (retainedFigureNineClearanceIncidenceRoutes source)
+        ).translatedRoute
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            outputPlacement data.sourceClause data.generatedClause)
+          (data.sourceSlot clearanceWidth)).getLast? = some splicePoint ∧
+        ((PlanarOneInThreeNoUnitsFigureNine.inheritedSourceRoute
+          outputPlacement
+          (retainedFigureNineClearancePlacement source)
+          data.sourceClause data.generatedClause
+          (retainedFigureNineClearanceIncidenceRoutes
+            source data.sourceClauseIndex data.sourceLiteralIndex)).tail).head? =
+          some splicePoint := by
   let clearancePlacement :=
     retainedFigureNineClearancePlacement source
   let clearanceWidth :=
@@ -1506,7 +1508,7 @@ theorem retainedOrderedFixedEightFigureNine_inheritedConnector_last?_eq_sourceTa
       data.generatedClause clearanceRoute sourceHead
       sourceTailNonempty sourceUnitSteps
   rw [directionEq] at connectorLast
-  exact connectorLast.trans sourceTailHead.symm
+  exact ⟨_, connectorLast, sourceTailHead⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes
