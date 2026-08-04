@@ -147,6 +147,72 @@ def completeRouteSuffixes
         source sourcePlacement sourceWidth sourceDistinct
         clauseMember literalMember auxiliary literalAuxiliary)
 
+/-- Pointwise shape of the completed suffix lookup.  Twice-inherited source
+literals retain the supplied original suffix; either generation of local
+auxiliary receives only the singleton splice point. -/
+theorem completeRouteSuffixes_routes_of_members
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceDistinct : source.AllAtomsNodup)
+    (original :
+      OriginalInheritedCanonicalIncidenceRouteSuffixes
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source))
+        (composedPlacement source sourcePlacement)
+        (normalizedLocalEndpoint source sourcePlacement))
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    (completeRouteSuffixes
+        source sourcePlacement sourceWidth sourceDistinct original).routes
+        clauseIndex literalIndex =
+      match literal.atom with
+      | .inl (.inl _) => original.routes clauseIndex literalIndex
+      | _ =>
+          [normalizedLocalEndpoint
+            source sourcePlacement clauseIndex literalIndex] := by
+  have clauseLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp clauseMember
+  have literalLookup :=
+    (List.mem_zipIdx_iff_getElem?).mp literalMember
+  rcases atomEquation : literal.atom with
+    outerInherited | outerAuxiliary
+  · rcases figureEquation : outerInherited with
+      sourceAtom | figureAuxiliary
+    · simp [completeRouteSuffixes,
+        PositionedPeriodicCNF.completeSumIncidenceRouteSuffixes,
+        PositionedPeriodicCNF.completeSumIncidenceRouteSuffixesRoutes,
+        firstStageInheritedRouteSuffixes,
+        firstStageInheritedRouteSuffixesRoutes,
+        clauseLookup, literalLookup, atomEquation,
+        figureEquation]
+    · simp [completeRouteSuffixes,
+        PositionedPeriodicCNF.completeSumIncidenceRouteSuffixes,
+        PositionedPeriodicCNF.completeSumIncidenceRouteSuffixesRoutes,
+        firstStageInheritedRouteSuffixes,
+        firstStageInheritedRouteSuffixesRoutes,
+        clauseLookup, literalLookup, atomEquation,
+        figureEquation]
+  · simp [completeRouteSuffixes,
+      PositionedPeriodicCNF.completeSumIncidenceRouteSuffixes,
+      PositionedPeriodicCNF.completeSumIncidenceRouteSuffixesRoutes,
+      clauseLookup, literalLookup, atomEquation]
+
 /-- Fully spliced routes for the two-stage composed clause replacement. -/
 def splicedRoutes
     {Variable : Type*} [DecidableEq Variable]
