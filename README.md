@@ -5532,7 +5532,14 @@ The representation choices for this target are:
   resulting physical bound through the flattened composed metadata index.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteBounds.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteBounds.lean)
   translates the same radius-36 offset bound into each generated clause's
-  canonical anchor gauge used by ordered inherited-route splicing.
+  canonical anchor gauge, factors its center through the combined factor-72
+  source gauge, and transports relative output translations through that
+  factorization.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalRouteSeparation.lean)
+  recovers the unscaled clockwise source clauses for any relative pair of
+  generated incidences and closes the distinct-center local/local case:
+  the extra source factor two makes their radius-36 neighborhoods distinct
+  factor-144 lattice neighborhoods, hence contact-free.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean)
   transports those selected routes into each final clause's canonical
   periodic anchor gauge.  The normalized family has exact periodic clause

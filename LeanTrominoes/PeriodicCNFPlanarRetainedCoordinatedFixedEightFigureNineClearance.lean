@@ -97,7 +97,7 @@ theorem retainedFigureNineClearancePositionedFormula_allAtomsNodup
 
 /-- Membership in the scaled clearance presentation recovers the precise
 unscaled clockwise clause at the same list index. -/
-private theorem exists_clockwiseClause_of_clearanceClause_mem
+theorem exists_clockwiseClause_of_clearanceClause_mem
     {Variable : Type*} [DecidableEq Variable]
     {source : PeriodicCNF Variable}
     {clause :
