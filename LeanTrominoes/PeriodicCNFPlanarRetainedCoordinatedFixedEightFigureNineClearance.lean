@@ -277,6 +277,49 @@ private theorem retainedFigureNineClearanceScaledRoute_data
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty sourceClauseMember sourceLiteralMember)
 
+/-- On every genuine incidence, the clearance route is exactly the ordered
+unit subdivision of the factor-two scaled clockwise source route.  This
+exposes the route shape used when the Figure 9 connector is spliced to its
+first two refined source steps. -/
+theorem retainedFigureNineClearanceIncidenceRoutes_eq_unitSubdividePolyline
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedFigureNineClearancePositionedFormula source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    retainedFigureNineClearanceIncidenceRoutes
+        source clauseIndex literalIndex =
+      AxisDirection.unitSubdividePolyline
+        (scalePolyline retainedFigureNineSourceClearanceFactor
+          (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+            source clauseIndex literalIndex)) := by
+  have scaledData :=
+    retainedFigureNineClearanceScaledRoute_data
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember
+  simpa [retainedFigureNineClearanceIncidenceRoutes,
+    PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes,
+    PositionedPeriodicCNF.scaleIncidenceRoutes] using
+      AxisDirection.normalizeOrthogonalPolyline_eq_unitSubdividePolyline_of_simple
+        scaledData.1 scaledData.2.1 scaledData.2.2.1
+
 /-- Every genuine normalized clearance route is a geometrically simple
 path. -/
 theorem retainedFigureNineClearanceIncidenceRoutes_isSimple
