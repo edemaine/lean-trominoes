@@ -209,6 +209,20 @@ theorem extendedRoutes_strictlyAvoidEachOther :
         (data.extendedRoute first) (data.extendedRoute second) := by
   native_decide
 
+/-- A connector strictly avoids the radial extension belonging to every
+other active slot. -/
+theorem route_strictlyAvoids_otherRadialExtension :
+    ∀ (data : ComposedClauseExitFanData),
+      data.IsValid →
+      ∀ first second,
+        data.SlotActive first → data.SlotActive second →
+      first ≠ second →
+      RoutesStrictlyAvoidEachOther
+        (data.route first)
+        [sourceExit (data.direction second),
+          outerSourceExit (data.direction second)] := by
+  native_decide
+
 /-! ## Isolation from the finite composed local drawings -/
 
 /-- In every ternary-source template, a local route and an active exit-fan
