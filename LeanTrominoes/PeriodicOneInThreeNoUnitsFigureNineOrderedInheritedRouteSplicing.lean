@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicOneInThreeNoUnitsFigureNineInheritedRouteSplicing
 import LeanTrominoes.PositionedPeriodicCNFClauseExitFanOrdering
+import LeanTrominoes.OrthogonalPolylineStrictSeparation
 
 /-!
 # Splicing ordered composed exit fans to inherited routes
@@ -224,6 +225,88 @@ def fanInheritedRouteSuffix
   replacePolylineHead
     (data.translatedRoute origin slot)
     transformed
+
+/-- Strict separation from both pieces of an ordered inherited suffix
+composes across the certified connector-to-source-route splice.  This lemma
+isolates the reusable bookkeeping at the join: downstream geometry only has
+to separate a route from the finite connector and from the unchanged tail of
+the transformed source route. -/
+theorem strictlyAvoids_fanInheritedRouteSuffix_of_connector_of_tail
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (sourceRoute localRoute : List Cell)
+    (fanValid : data.IsValid)
+    (slotActive : data.SlotActive slot)
+    (directionEq :
+      data.direction slot =
+        AxisDirection.polylineFirstDirection sourceRoute)
+    (sourceHead :
+      sourceRoute.head? =
+        some
+          (PositionedPeriodicCNF.canonicalClausePosition
+            sourcePlacement sourceClause))
+    (sourceTailNonempty :
+      ∃ sourceExit, sourceRoute.tail.head? = some sourceExit)
+    (sourceUnitSteps :
+      sourceRoute.IsChain AxisDirection.IsUnitAxisStep)
+    (connectorAvoid :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+        localRoute
+        (data.translatedRoute
+          (normalizedSourceClausePosition
+            outputPlacement sourceClause generatedClause)
+          slot))
+    (tailAvoid :
+      PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+        localRoute
+        (inheritedSourceRoute
+          outputPlacement sourcePlacement sourceClause generatedClause
+          sourceRoute).tail) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      localRoute
+      (fanInheritedRouteSuffix
+        outputPlacement sourcePlacement sourceClause generatedClause
+        data slot sourceRoute) := by
+  let origin :=
+    normalizedSourceClausePosition
+      outputPlacement sourceClause generatedClause
+  let transformed :=
+    inheritedSourceRoute
+      outputPlacement sourcePlacement sourceClause generatedClause
+      sourceRoute
+  have connectorLast :
+      (data.translatedRoute origin slot).getLast? =
+        some
+          (Cell.add origin
+            (ComposedClauseExitFanData.sourceExit
+              (data.direction slot))) :=
+    data.translatedRoute_getLast? origin fanValid slot slotActive
+  have transformedTailHead :
+      transformed.tail.head? =
+        some
+          (Cell.add origin
+            (ComposedClauseExitFanData.sourceExit
+              (data.direction slot))) := by
+    rw [directionEq]
+    exact
+      inheritedSourceRoute_tail_head?_of_unitSteps
+        outputPlacement sourcePlacement sourceClause generatedClause
+        sourceRoute sourceHead sourceTailNonempty sourceUnitSteps
+  unfold fanInheritedRouteSuffix replacePolylineHead
+  exact
+    connectorAvoid.join_right tailAvoid
+      connectorLast transformedTailHead
 
 /-- A valid selected fan connector splices to a matching unit-step source
 route with exact canonical endpoints and preserved orthogonality. -/
