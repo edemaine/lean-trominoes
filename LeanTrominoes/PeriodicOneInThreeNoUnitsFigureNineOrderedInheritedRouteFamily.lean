@@ -100,6 +100,34 @@ noncomputable def orderedInheritedRouteSuffixesRoutes
           (sourceRoutes
             data.sourceClauseIndex data.sourceLiteralIndex)
 
+/-- A successful inherited-incidence lookup exposes the selected ordered
+fan suffix without unfolding the total lookup at each use site. -/
+theorem orderedInheritedRouteSuffixesRoutes_eq_fanInheritedRouteSuffix_of_lookup
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceWidth : source.erase.WidthAtMost 3)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (clauseIndex literalIndex : Nat)
+    (data :
+      InheritedIncidenceData
+        source sourcePlacement clauseIndex literalIndex)
+    (dataLookup :
+      inheritedIncidenceData?
+          source sourcePlacement clauseIndex literalIndex = some data) :
+    orderedInheritedRouteSuffixesRoutes
+        source sourcePlacement sourceWidth sourceRoutes
+        clauseIndex literalIndex =
+      fanInheritedRouteSuffix
+        (composedPlacement source sourcePlacement)
+        sourcePlacement data.sourceClause data.generatedClause
+        (PositionedPeriodicCNF.clauseExitFanData
+          data.sourceClause data.sourceClauseIndex sourceRoutes)
+        (data.sourceSlot sourceWidth)
+        (sourceRoutes
+          data.sourceClauseIndex data.sourceLiteralIndex) := by
+  simp [orderedInheritedRouteSuffixesRoutes, dataLookup]
+
 private theorem value_eq_of_mem_zipIdx_same_index
     {α : Type*} {values : List α}
     {first second : α} {index : Nat}
