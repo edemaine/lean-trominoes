@@ -29,6 +29,28 @@ def localRouteSourceGaugeCenter
     (sourcePlacement.translation
       (PeriodicCNF.clauseAnchor generatedClause.literals))
 
+/-- Scaling the source clause and placement scales its anchor-normalized
+source-gauge center, even though the generated clause itself is unchanged. -/
+@[simp]
+theorem localRouteSourceGaugeCenter_scale
+    {Variable : Type*}
+    (factor : Nat)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable))) :
+    localRouteSourceGaugeCenter
+        (sourcePlacement.scale factor)
+        (sourceClause.scale factor) generatedClause =
+      Cell.scale factor
+        (localRouteSourceGaugeCenter
+          sourcePlacement sourceClause generatedClause) := by
+  apply Prod.ext <;>
+    simp [localRouteSourceGaugeCenter, Cell.sub, Cell.scale] <;>
+    ring
+
 /-- Anchor normalization commutes with the combined refinement: the local
 route's source center is factor 72 times its unrefined source-gauge center. -/
 theorem normalizedSourceClausePosition_eq_scale_sourceGaugeCenter

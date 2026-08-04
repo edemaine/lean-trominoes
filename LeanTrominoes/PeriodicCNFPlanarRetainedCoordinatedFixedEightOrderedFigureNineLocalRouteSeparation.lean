@@ -109,6 +109,115 @@ private theorem
       Cell.add, Cell.sub, Cell.scale] at coordinateEqual ⊢
     nlinarith
 
+/-- Every source-gauge center in the clockwise retained fixed-eight source
+is still a multiple of the factor-eight terminal-fan refinement.  Clockwise
+literal ordering changes the clause anchor but not its displayed position,
+so the claim holds for the anchor gauge of any generated clause. -/
+theorem
+    retainedOrderedFixedEight_localRouteSourceGaugeCenter_eq_scale_refinement
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    {sourceClause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {sourceClauseIndex : Nat}
+    (sourceClauseMember :
+      (sourceClause, sourceClauseIndex) ∈
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+          source).clauses.zipIdx)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))) :
+    ∃ baseCenter,
+      PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+          (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+            source)
+          sourceClause generatedClause =
+        Cell.scale retainedTerminalFanRoutingRefinement baseCenter := by
+  let baseSource :=
+    (finalCoordinatedSource source).scale
+      retainedAngularFanSourceClearanceFactor
+  let basePlacement :=
+    (finalCoordinatedPlacement source).scale
+      retainedAngularFanSourceClearanceFactor
+  let baseRoutes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+      retainedAngularFanSourceClearanceFactor
+      (finalCoordinatedSourceRoutes source)
+  let occurrencePorts :=
+    occurrencePortsOfAngularOrder baseSource.erase
+      (PeriodicThreeSATThree.angularOccurrenceOrder
+        baseSource.erase baseRoutes)
+  let splitFormula :=
+    PeriodicEightOccurrenceSplitPositioned.formula
+      baseSource basePlacement occurrencePorts
+  let splitPlacement :=
+    PeriodicEightOccurrenceSplitPositioned.placement basePlacement
+  have orderedMember := sourceClauseMember
+  rw [retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula]
+    at orderedMember
+  rcases PositionedPeriodicCNF.exists_sourceClause_of_orderedClause_mem
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      orderedMember with
+    ⟨scaledClause, scaledClauseMember, orderedClauseEq⟩
+  have scaledClauseMember' := scaledClauseMember
+  change
+    (scaledClause, sourceClauseIndex) ∈
+      (splitFormula.scale
+        retainedTerminalFanRoutingRefinement).clauses.zipIdx
+    at scaledClauseMember'
+  rw [PositionedPeriodicCNF.scale_clauses, List.zipIdx_map]
+    at scaledClauseMember'
+  rcases List.mem_map.mp scaledClauseMember' with
+    ⟨taggedBaseClause, _baseClauseMember, taggedClauseEq⟩
+  rcases taggedBaseClause with ⟨baseClause, baseClauseIndex⟩
+  have scaledClauseEq :
+      baseClause.scale retainedTerminalFanRoutingRefinement =
+        scaledClause :=
+    congrArg Prod.fst taggedClauseEq
+  refine
+    ⟨PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+        splitPlacement baseClause generatedClause, ?_⟩
+  apply Prod.ext <;>
+    simp [PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter,
+      orderedClauseEq, ← scaledClauseEq,
+      PositionedPeriodicCNF.orderClauseByRouteDirection_position,
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
+      retainedAngularFanSourceScaledRefinedPlacement,
+      retainedAngularFanRefinedPlacement,
+      splitPlacement, basePlacement,
+      finalCoordinatedPlacement,
+      PeriodicVariablePlacement.translation,
+      Cell.sub, Cell.scale] <;>
+    ring
+
+/-- Every period translation of the retained fixed-eight source is likewise
+a multiple of the factor-eight terminal-fan refinement. -/
+theorem retainedOrderedFixedEight_translation_eq_scale_refinement
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (relativeTranslate : Cell) :
+    ∃ baseOffset,
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+          source).translation relativeTranslate =
+        Cell.scale retainedTerminalFanRoutingRefinement baseOffset := by
+  let basePlacement :=
+    (finalCoordinatedPlacement source).scale
+      retainedAngularFanSourceClearanceFactor
+  let splitPlacement :=
+    PeriodicEightOccurrenceSplitPositioned.placement basePlacement
+  refine ⟨splitPlacement.translation relativeTranslate, ?_⟩
+  apply Prod.ext <;>
+    simp [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
+      retainedAngularFanSourceScaledRefinedPlacement,
+      retainedAngularFanRefinedPlacement,
+      splitPlacement, basePlacement, finalCoordinatedPlacement,
+      PeriodicVariablePlacement.translation, Cell.scale] <;>
+    ring
+
 /-- Canonical clause positions in the final clockwise fixed-eight source
 remain injective modulo period translations.  This descends through the
 clockwise ordering and factor-eight refinement to the generic positioned

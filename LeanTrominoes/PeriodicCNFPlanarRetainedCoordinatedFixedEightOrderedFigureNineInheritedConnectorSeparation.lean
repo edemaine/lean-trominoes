@@ -963,6 +963,246 @@ theorem
   rw [translatedSecondConnector]
   exact translatedStrict
 
+/-- Unequal retained source gauges put the two finite inherited connectors
+in disjoint radius-`73` neighborhoods.  Although Figure 9 itself only adds
+factor `144`, every gauge of the retained fixed-eight source was already
+refined by factor eight, so distinct connector origins are separated on a
+factor-`1152` lattice. -/
+theorem
+    retainedOrderedFixedEightFigureNine_inheritedConnectors_strictlyAvoidEachOther_of_sourceGaugesNe
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {firstClauseIndex firstLiteralIndex
+      secondClauseIndex secondLiteralIndex : Nat}
+    (first :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        firstClauseIndex firstLiteralIndex)
+    (second :
+      PlanarOneInThreeNoUnitsFigureNine.InheritedIncidenceData
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+        secondClauseIndex secondLiteralIndex)
+    (relativeTranslate : Cell)
+    (sourceGaugesNe :
+      PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+          (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source))
+          first.sourceClause first.generatedClause ≠
+        Cell.add
+          ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            (retainedFigureNineClearancePositionedFormula source)
+            (retainedFigureNineClearancePlacement source)).translation
+              relativeTranslate)
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+              (retainedFigureNineClearancePositionedFormula source)
+              (retainedFigureNineClearancePlacement source))
+            second.sourceClause second.generatedClause)) :
+    let clearanceWidth :=
+      retainedFigureNineClearancePositionedFormula_widthAtMostThree
+        source sourceWidth
+    let outputPlacement :=
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+        (retainedFigureNineClearancePositionedFormula source)
+        (retainedFigureNineClearancePlacement source)
+    RoutesStrictlyAvoidEachOther
+      ((PositionedPeriodicCNF.clauseExitFanData
+          first.sourceClause first.sourceClauseIndex
+          (retainedFigureNineClearanceIncidenceRoutes source)
+        ).translatedRoute
+          (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+            outputPlacement first.sourceClause first.generatedClause)
+          (first.sourceSlot clearanceWidth))
+      (translatePolyline (outputPlacement.translation relativeTranslate)
+        ((PositionedPeriodicCNF.clauseExitFanData
+            second.sourceClause second.sourceClauseIndex
+            (retainedFigureNineClearanceIncidenceRoutes source)
+          ).translatedRoute
+            (PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+              outputPlacement second.sourceClause second.generatedClause)
+            (second.sourceSlot clearanceWidth))) := by
+  let clearancePlacement :=
+    retainedFigureNineClearancePlacement source
+  let clockwisePlacement :=
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement source
+  let clearanceWidth :=
+    retainedFigureNineClearancePositionedFormula_widthAtMostThree
+      source sourceWidth
+  let outputPlacement :=
+    PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+      (retainedFigureNineClearancePositionedFormula source)
+      clearancePlacement
+  let offset := outputPlacement.translation relativeTranslate
+  let firstData :=
+    PositionedPeriodicCNF.clauseExitFanData
+      first.sourceClause first.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+  let secondData :=
+    PositionedPeriodicCNF.clauseExitFanData
+      second.sourceClause second.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+  let firstSlot := first.sourceSlot clearanceWidth
+  let secondSlot := second.sourceSlot clearanceWidth
+  let firstOrigin :=
+    PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+      outputPlacement first.sourceClause first.generatedClause
+  let secondBaseOrigin :=
+    PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition
+      outputPlacement second.sourceClause second.generatedClause
+  let secondOrigin := Cell.add offset secondBaseOrigin
+  have firstClauseNonempty : first.sourceClause.literals ≠ [] :=
+    List.ne_nil_of_mem
+      (List.fst_mem_of_mem_zipIdx first.sourceLiteralMember)
+  have secondClauseNonempty : second.sourceClause.literals ≠ [] :=
+    List.ne_nil_of_mem
+      (List.fst_mem_of_mem_zipIdx second.sourceLiteralMember)
+  have firstValid : firstData.IsValid :=
+    retainedFigureNineClearance_clauseExitFanData_valid
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty first.sourceClauseMember firstClauseNonempty
+  have secondValid : secondData.IsValid :=
+    retainedFigureNineClearance_clauseExitFanData_valid
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty second.sourceClauseMember secondClauseNonempty
+  have firstCount :
+      firstData.count = first.sourceClause.literals.length :=
+    PositionedPeriodicCNF.clauseExitFanData_count_eq
+      first.sourceClause first.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+      (List.length_pos_iff.mpr firstClauseNonempty)
+      (first.sourceClause_width clearanceWidth)
+  have secondCount :
+      secondData.count = second.sourceClause.literals.length :=
+    PositionedPeriodicCNF.clauseExitFanData_count_eq
+      second.sourceClause second.sourceClauseIndex
+      (retainedFigureNineClearanceIncidenceRoutes source)
+      (List.length_pos_iff.mpr secondClauseNonempty)
+      (second.sourceClause_width clearanceWidth)
+  have firstActive : firstData.SlotActive firstSlot := by
+    unfold PlanarOneInThreeNoUnitsFigureNine.ComposedClauseExitFanData.SlotActive
+    rw [firstCount]
+    exact first.sourceLiteralIndex_lt
+  have secondActive : secondData.SlotActive secondSlot := by
+    unfold PlanarOneInThreeNoUnitsFigureNine.ComposedClauseExitFanData.SlotActive
+    rw [secondCount]
+    exact second.sourceLiteralIndex_lt
+  rcases exists_clockwiseClause_of_clearanceClause_mem
+      first.sourceClauseMember with
+    ⟨firstClockwiseClause, firstClockwiseMember, firstSourceEq⟩
+  rcases exists_clockwiseClause_of_clearanceClause_mem
+      second.sourceClauseMember with
+    ⟨secondClockwiseClause, secondClockwiseMember, secondSourceEq⟩
+  rcases
+      retainedOrderedFixedEight_localRouteSourceGaugeCenter_eq_scale_refinement
+        source firstClockwiseMember first.generatedClause with
+    ⟨firstBaseCenter, firstCenterEq⟩
+  rcases
+      retainedOrderedFixedEight_localRouteSourceGaugeCenter_eq_scale_refinement
+        source secondClockwiseMember second.generatedClause with
+    ⟨secondBaseCenter, secondCenterEq⟩
+  rcases
+      retainedOrderedFixedEight_translation_eq_scale_refinement
+        source relativeTranslate with
+    ⟨baseOffset, offsetCenterEq⟩
+  let connectorScale : Nat := 1152
+  have firstOriginEq :
+      firstOrigin = Cell.scale connectorScale firstBaseCenter := by
+    dsimp only [firstOrigin]
+    rw [PlanarOneInThreeNoUnitsFigureNine.normalizedSourceClausePosition_eq_scale_sourceGaugeCenter,
+      firstSourceEq]
+    change
+      Cell.scale PlanarOneInThreeNoUnitsFigureNine.composedGadgetScale
+          (PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+            (clockwisePlacement.scale
+              retainedFigureNineSourceClearanceFactor)
+            (firstClockwiseClause.scale
+              retainedFigureNineSourceClearanceFactor)
+            first.generatedClause) = _
+    rw [PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter_scale,
+      firstCenterEq]
+    apply Prod.ext <;>
+      simp [PlanarOneInThreeNoUnitsFigureNine.composedGadgetScale,
+        PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+        retainedFigureNineSourceClearanceFactor,
+        PeriodicEightOccurrenceSplit.retainedTerminalFanRoutingRefinement,
+        connectorScale,
+        Cell.scale] <;>
+      ring
+  have secondOriginEq :
+      secondOrigin =
+        Cell.scale connectorScale
+          (Cell.add baseOffset secondBaseCenter) := by
+    dsimp only [secondOrigin, secondBaseOrigin]
+    rw [PlanarOneInThreeNoUnitsFigureNine.translated_normalizedSourceClausePosition_eq_scale_sourceGaugeCenter,
+      secondSourceEq]
+    change
+      Cell.scale PlanarOneInThreeNoUnitsFigureNine.composedGadgetScale
+          (Cell.add
+            ((clockwisePlacement.scale
+              retainedFigureNineSourceClearanceFactor).translation
+                relativeTranslate)
+            (PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter
+              (clockwisePlacement.scale
+                retainedFigureNineSourceClearanceFactor)
+              (secondClockwiseClause.scale
+                retainedFigureNineSourceClearanceFactor)
+              second.generatedClause)) = _
+    rw [PeriodicVariablePlacement.translation_scale,
+      PlanarOneInThreeNoUnitsFigureNine.localRouteSourceGaugeCenter_scale,
+      offsetCenterEq, secondCenterEq]
+    apply Prod.ext <;>
+      simp [PlanarOneInThreeNoUnitsFigureNine.composedGadgetScale,
+        PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+        retainedFigureNineSourceClearanceFactor,
+        PeriodicEightOccurrenceSplit.retainedTerminalFanRoutingRefinement,
+        connectorScale,
+        Cell.add, Cell.scale] <;>
+      ring
+  have baseCentersDifferent :
+      firstBaseCenter ≠ Cell.add baseOffset secondBaseCenter := by
+    intro baseCentersEqual
+    apply sourceGaugesNe
+    change firstOrigin = secondOrigin
+    rw [firstOriginEq, secondOriginEq, baseCentersEqual]
+  have connectorsStrict :=
+    routesStrictlyAvoidEachOther_of_distinct_scaledCoordinateNeighborhoods
+      (firstCenter := firstBaseCenter)
+      (secondCenter := Cell.add baseOffset secondBaseCenter)
+      (factor := connectorScale) (radius := 73)
+      baseCentersDifferent (by norm_num [connectorScale])
+      (by norm_num [connectorScale])
+      (fun point pointMember => by
+        simpa only [firstOriginEq] using
+          firstData.translatedRoute_points_within_sourceNeighborhood
+            firstOrigin firstValid firstSlot firstActive pointMember)
+      (fun point pointMember => by
+        simpa only [secondOriginEq] using
+          secondData.translatedRoute_points_within_sourceNeighborhood
+            secondOrigin secondValid secondSlot secondActive pointMember)
+  have translatedSecondConnector :
+      translatePolyline offset
+          (secondData.translatedRoute secondBaseOrigin secondSlot) =
+        secondData.translatedRoute secondOrigin secondSlot := by
+    simp [PlanarOneInThreeNoUnitsFigureNine.ComposedClauseExitFanData.translatedRoute,
+      translatePolyline_add, secondOrigin, Cell.add, add_comm]
+  dsimp only [clearanceWidth, outputPlacement, clearancePlacement]
+  change
+    RoutesStrictlyAvoidEachOther
+      (firstData.translatedRoute firstOrigin firstSlot)
+      (translatePolyline offset
+        (secondData.translatedRoute secondBaseOrigin secondSlot))
+  simpa only [translatedSecondConnector] using connectorsStrict
+
 /-- In one retained normalized source gauge, the first inherited connector
 strictly avoids the translated transformed source tail selected by a
 different inherited slot. -/
