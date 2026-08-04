@@ -5608,7 +5608,9 @@ The representation choices for this target are:
   also applies the necessary whole-period translation between the old and new
   first-literal anchor gauges, preserving exact endpoints and orthogonality.
   Pointwise transport lemmas also preserve unit steps and route-length lower
-  bounds through that gauge change.
+  bounds through that gauge change.  The complete finite variable-occurrence
+  list is preserved up to permutation, so every occurrence bound is invariant
+  as well.
   A finite cardinal-direction
   lemma turns nondecreasing ranks of three distinct genuine exits into the
   clockwise condition needed by the composed boundary-port router.
@@ -5628,7 +5630,8 @@ The representation choices for this target are:
   canonical endpoints, orthogonality, simplicity, a nontrivial first edge,
   exact preservation of first directions and strict clockwise ranks, valid
   finite exit-fan selection, unchanged satisfiability, and complete relative
-  route separation.  Thus the later factor-72 inheritance sees a source
+  route separation.  It also retains the occurrence-three promise needed by
+  the later exact-one reductions.  Thus the later factor-72 inheritance sees a source
   lattice spacing of `144`, safely larger than the connector fan's radius-73
   reach.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsFigureNineClauseExitFans.lean)
@@ -5698,6 +5701,20 @@ The representation choices for this target are:
   for every distinct final relative occurrence; the factor-72 transport
   theorem then proves that both transformed inherited route tails avoid each
   other and can meet only at their variable-side endpoints.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineCompleteRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineCompleteRouteSeparation.lean)
+  discharges the four remaining local/local, local/inherited, inherited/local,
+  and inherited/inherited avoidance obligations for every relative pair of
+  final incidences.  Consequently the raw route family is globally separated,
+  and the normalized drawing is route-matching, orthogonal, planar, and
+  ribbon-ready without any residual geometric hypothesis.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineSemantics.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineSemantics.lean)
+  reconnects that completed ordered drawing to the two verified logical
+  exact-one transformations.  The erased endpoint is satisfiable exactly when
+  the original local periodic CNF is satisfiable, has width at most three,
+  has only binary or ternary clauses, and preserves the occurrence-three
+  promise.  Named opaque equality and occurrence interfaces keep these facts
+  usable without repeatedly normalizing the deeply nested reduction-variable
+  type.
 - [`LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean`](LeanTrominoes/PlanarOneInThreeNoUnitsInstantiation.lean)
   renames and translates all four unit-elimination templates to actual
   positioned periodic source clauses.  Forgetting only logical literal

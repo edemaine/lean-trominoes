@@ -1,6 +1,7 @@
 import LeanTrominoes.OrthogonalPolylineEndpointDirectionSeparation
 import LeanTrominoes.OrthogonalPolylineSymmetries
 import LeanTrominoes.PeriodicGridDrawingUnitSubdivision
+import LeanTrominoes.PeriodicOccurrences
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonFanClockwiseOrder
 import LeanTrominoes.PlanarOneInThreeLocalDistinctness
 import LeanTrominoes.PositionedPeriodicCNFCanonicalOrthogonalRoutes
@@ -947,6 +948,40 @@ theorem orderClausesByRouteDirection_satisfiable_iff
   · exact ⟨assignment,
       (orderClausesByRouteDirection_satisfies_iff
         source routes assignment).mpr satisfies⟩
+
+/-- Reordering clause literals preserves the complete finite list of
+variable occurrences up to permutation. -/
+theorem orderClausesByRouteDirection_variableOccurrences_perm
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes) :
+    (orderClausesByRouteDirection source routes).erase.variableOccurrences.Perm
+      source.erase.variableOccurrences := by
+  unfold PeriodicCNF.variableOccurrences PositionedPeriodicCNF.erase
+    orderClausesByRouteDirection
+  rw [List.map_map, List.flatMap_map, List.flatMap_map]
+  rw [← List.zipIdx_map_fst 0 source.clauses, List.flatMap_map]
+  simpa [Function.comp_def] using
+    (List.Perm.refl source.clauses.zipIdx).flatMap fun taggedClause _ =>
+      (orderClauseByRouteDirection_literals_perm
+        routes taggedClause.2 taggedClause.1).map PeriodicLiteral.atom
+
+/-- Every finite-presentation occurrence bound is invariant under clockwise
+clause-literal ordering. -/
+theorem orderClausesByRouteDirection_occurrencesAtMost_iff
+    [BEq Variable] [LawfulBEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (routes : IncidenceRoutes) (bound : Nat) :
+    (orderClausesByRouteDirection source routes).erase.OccurrencesAtMost bound ↔
+      source.erase.OccurrencesAtMost bound := by
+  have occurrencesPerm :=
+    orderClausesByRouteDirection_variableOccurrences_perm source routes
+  constructor
+  · intro orderedOccurrences atom
+    rw [← occurrencesPerm.count atom]
+    exact orderedOccurrences atom
+  · intro sourceOccurrences atom
+    rw [occurrencesPerm.count atom]
+    exact sourceOccurrences atom
 
 /-- Reordering preserves every uniform clause-width bound. -/
 theorem orderClausesByRouteDirection_widthAtMost_iff

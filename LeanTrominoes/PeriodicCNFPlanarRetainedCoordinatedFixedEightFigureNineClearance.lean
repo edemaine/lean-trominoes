@@ -78,6 +78,37 @@ theorem retainedFigureNineClearancePositionedFormula_widthAtMostThree
     retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_widthAtMostThree
       source sourceWidth
 
+/-- Clockwise ordering and the final coordinate refinement preserve the
+occurrence-three promise of the retained fixed-eight source. -/
+theorem retainedFigureNineClearancePositionedFormula_occurrencesAtMostThree
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    (retainedFigureNineClearancePositionedFormula
+      source).erase.OccurrencesAtMost 3 := by
+  have refinedOccurrences :
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+        source).erase.OccurrencesAtMost 3 := by
+    rw [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_erase]
+    exact
+      retainedDrawingEightOccurrenceSplitFormula_occurrencesAtMostThree
+        sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty
+  have orderedOccurrences :
+      (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula
+        source).erase.OccurrencesAtMost 3 :=
+    (PositionedPeriodicCNF.orderClausesByRouteDirection_occurrencesAtMost_iff
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+        source)
+      (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+        source)
+      3).mpr refinedOccurrences
+  simpa [retainedFigureNineClearancePositionedFormula] using
+    orderedOccurrences
+
 /-- The extra Figure Nine clearance scale preserves the absence of empty
 ordered retained source clauses. -/
 theorem retainedFigureNineClearancePositionedFormula_clausesNonempty
