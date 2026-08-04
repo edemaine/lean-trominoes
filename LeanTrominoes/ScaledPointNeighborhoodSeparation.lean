@@ -280,6 +280,148 @@ theorem ClosedGridRectanglesSeparated.scale_left_point_radius
     rw [mul_add] at scaled
     omega
 
+/-- Scaling two separated integral rectangles leaves room to expand both by
+the same coordinate radius when twice that radius is smaller than the scale.
+This local variant keeps the point-neighborhood infrastructure independent
+of the retained-ray rasterization modules. -/
+theorem ClosedGridRectanglesSeparated.scale_both_coordinateRadius'
+    {firstLower firstUpper secondLower secondUpper : Cell}
+    {factor radius : Nat}
+    (separated :
+      ClosedGridRectanglesSeparated
+        firstLower firstUpper secondLower secondUpper)
+    (factorPositive : 0 < factor)
+    (twiceRadiusLt : 2 * radius < factor) :
+    ClosedGridRectanglesSeparated
+      (coordinateRadiusLower radius
+        (Cell.scale factor firstLower))
+      (coordinateRadiusUpper radius
+        (Cell.scale factor firstUpper))
+      (coordinateRadiusLower radius
+        (Cell.scale factor secondLower))
+      (coordinateRadiusUpper radius
+        (Cell.scale factor secondUpper)) := by
+  rcases firstLower with ⟨firstLowerX, firstLowerY⟩
+  rcases firstUpper with ⟨firstUpperX, firstUpperY⟩
+  rcases secondLower with ⟨secondLowerX, secondLowerY⟩
+  rcases secondUpper with ⟨secondUpperX, secondUpperY⟩
+  have factorNonnegativeInt :
+      (0 : Int) ≤ factor := by
+    exact_mod_cast factorPositive.le
+  have twiceRadiusLtInt :
+      2 * (radius : Int) < factor := by
+    exact_mod_cast twiceRadiusLt
+  simp only [ClosedGridRectanglesSeparated,
+    coordinateRadiusLower, coordinateRadiusUpper,
+    Cell.scale] at separated ⊢
+  rcases separated with
+      forwardX | backwardX | forwardY | backwardY
+  · left
+    have gap : firstUpperX + 1 ≤ secondLowerX := by
+      omega
+    have scaled :=
+      mul_le_mul_of_nonneg_left gap factorNonnegativeInt
+    rw [mul_add] at scaled
+    omega
+  · right
+    left
+    have gap : secondUpperX + 1 ≤ firstLowerX := by
+      omega
+    have scaled :=
+      mul_le_mul_of_nonneg_left gap factorNonnegativeInt
+    rw [mul_add] at scaled
+    omega
+  · right
+    right
+    left
+    have gap : firstUpperY + 1 ≤ secondLowerY := by
+      omega
+    have scaled :=
+      mul_le_mul_of_nonneg_left gap factorNonnegativeInt
+    rw [mul_add] at scaled
+    omega
+  · right
+    right
+    right
+    have gap : secondUpperY + 1 ≤ firstLowerY := by
+      omega
+    have scaled :=
+      mul_le_mul_of_nonneg_left gap factorNonnegativeInt
+    rw [mul_add] at scaled
+    omega
+
+/-- Routes in equal-radius neighborhoods of two distinct integral centers
+are contact-free after a common scale with more than twice the radius of
+clearance. -/
+theorem
+    routesStrictlyAvoidEachOther_of_distinct_scaledCoordinateNeighborhoods
+    {first second : List Cell}
+    {firstCenter secondCenter : Cell}
+    {factor radius : Nat}
+    (centersDifferent : firstCenter ≠ secondCenter)
+    (factorPositive : 0 < factor)
+    (clearance : 2 * radius < factor)
+    (firstBounded :
+      ∀ point ∈ first,
+        WithinCoordinateRadius radius
+          (Cell.scale factor firstCenter) point)
+    (secondBounded :
+      ∀ point ∈ second,
+        WithinCoordinateRadius radius
+          (Cell.scale factor secondCenter) point) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      first second := by
+  apply routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles
+  · intro point pointMember
+    exact inClosedGridRectangle_coordinateRadius
+      (firstBounded point pointMember)
+  · intro point pointMember
+    exact inClosedGridRectangle_coordinateRadius
+      (secondBounded point pointMember)
+  · exact
+      (closedGridSingletons_separated_of_ne centersDifferent)
+        |>.scale_both_coordinateRadius'
+          factorPositive clearance
+
+/-- A common integral offset of both scaled neighborhood centers does not
+affect the strict-separation guarantee. -/
+theorem
+    routesStrictlyAvoidEachOther_of_distinct_offsetScaledCoordinateNeighborhoods
+    {first second : List Cell}
+    {firstCenter secondCenter offset : Cell}
+    {factor radius : Nat}
+    (centersDifferent : firstCenter ≠ secondCenter)
+    (factorPositive : 0 < factor)
+    (clearance : 2 * radius < factor)
+    (firstBounded :
+      ∀ point ∈ first,
+        WithinCoordinateRadius radius
+          (Cell.add (Cell.scale factor firstCenter) offset) point)
+    (secondBounded :
+      ∀ point ∈ second,
+        WithinCoordinateRadius radius
+          (Cell.add (Cell.scale factor secondCenter) offset) point) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      first second := by
+  apply routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles
+  · intro point pointMember
+    exact inClosedGridRectangle_coordinateRadius
+      (firstBounded point pointMember)
+  · intro point pointMember
+    exact inClosedGridRectangle_coordinateRadius
+      (secondBounded point pointMember)
+  · have separated :=
+      (closedGridSingletons_separated_of_ne centersDifferent)
+        |>.scale_both_coordinateRadius'
+          factorPositive clearance
+    rcases firstCenter with ⟨firstX, firstY⟩
+    rcases secondCenter with ⟨secondX, secondY⟩
+    rcases offset with ⟨offsetX, offsetY⟩
+    simp only [ClosedGridRectanglesSeparated,
+      coordinateRadiusLower, coordinateRadiusUpper,
+      Cell.scale, Cell.add] at separated ⊢
+    omega
+
 /-- A finite route that avoids one integral source point remains strictly
 separated, after scaling, from every route in a smaller coordinate-radius
 neighborhood of the scaled point. -/

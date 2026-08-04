@@ -5526,10 +5526,13 @@ The representation choices for this target are:
   continuously simple; distinct incidences in the same original source block
   satisfy the complete pairwise continuous-separation predicate.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteBounds.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteBounds.lean)
-  certifies that every genuine finite-template route stays in the common
-  radius-73 source neighborhood, transports that bound through logical
-  renaming and factor-72 placement, and exposes the resulting physical bound
-  through the flattened composed metadata index.
+  certifies that every genuine finite-template route stays in the tight
+  radius-36 neighborhood centered at offset `(36, 32)`, transports that
+  bound through logical renaming and factor-72 placement, and exposes the
+  resulting physical bound through the flattened composed metadata index.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteBounds.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRouteBounds.lean)
+  translates the same radius-36 offset bound into each generated clause's
+  canonical anchor gauge used by ordered inherited-route splicing.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineNormalizedLocalRoutes.lean)
   transports those selected routes into each final clause's canonical
   periodic anchor gauge.  The normalized family has exact periodic clause

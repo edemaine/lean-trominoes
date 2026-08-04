@@ -6,9 +6,9 @@ import LeanTrominoes.PlanarOneInThreeNoUnitsFigureNineClauseExitFans
 # Coordinate bounds for composed Figure 9 local routes
 
 Every genuine route in each finite Figure 9-plus-unit-elimination template
-lies in the same radius-73 square as the ordered clause-exit connectors.
-Logical renaming leaves the route coordinates unchanged, and translation
-places this square at the factor-72 refinement of the original source-clause
+lies in the radius-36 square centered at `(36, 32)`.  Logical renaming leaves
+the route coordinates unchanged, and translation places this square at a
+fixed offset from the factor-72 refinement of the original source-clause
 position.  The resulting physical bound is the local-neighborhood input to
 the factor-144 lattice-clearance argument.
 -/
@@ -19,44 +19,48 @@ namespace PlanarOneInThreeNoUnitsFigureNine
 open PlanarThreeSAT
 open PeriodicEightOccurrenceSplit
 
-/-- Every genuine empty-source template route lies in the common
-radius-73 source neighborhood. -/
+/-- Common center of the tight coordinate square containing every finite
+composed Figure 9 route. -/
+def localRouteNeighborhoodOffset : Cell := (36, 32)
+
+/-- Every genuine empty-source template route lies in the tight radius-36
+source neighborhood. -/
 theorem zeroDrawing_routePoints_within_sourceNeighborhood :
     zeroDrawing.RoutePointsSatisfy
-      (WithinCoordinateRadius 73 (0, 0)) := by
+      (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
   native_decide
 
-/-- Every genuine unit-source template route lies in the common radius-73
+/-- Every genuine unit-source template route lies in the tight radius-36
 source neighborhood, independently of its polarity. -/
 theorem oneDrawingFor_routePoints_within_sourceNeighborhood
     (first : Bool) :
     (oneDrawingFor first).RoutePointsSatisfy
-      (WithinCoordinateRadius 73 (0, 0)) := by
+      (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
   cases first <;> native_decide
 
-/-- Every genuine binary-source template route lies in the common radius-73
+/-- Every genuine binary-source template route lies in the tight radius-36
 source neighborhood, independently of its polarities. -/
 theorem twoDrawingFor_routePoints_within_sourceNeighborhood
     (first second : Bool) :
     (twoDrawingFor first second).RoutePointsSatisfy
-      (WithinCoordinateRadius 73 (0, 0)) := by
+      (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
   cases first <;> cases second <;> native_decide
 
-/-- Every genuine ternary-source template route lies in the common
-radius-73 source neighborhood, independently of its polarities. -/
+/-- Every genuine ternary-source template route lies in the tight radius-36
+source neighborhood, independently of its polarities. -/
 theorem fullDrawingFor_routePoints_within_sourceNeighborhood
     (first second third : Bool) :
     (fullDrawingFor first second third).RoutePointsSatisfy
-      (WithinCoordinateRadius 73 (0, 0)) := by
+      (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
   cases first <;> cases second <;> cases third <;> native_decide
 
 /-- Every genuine route of the finite template selected at any source arity
-lies in the common radius-73 source neighborhood. -/
+lies in the tight radius-36 source neighborhood. -/
 theorem templateDrawing_routePoints_within_sourceNeighborhood
     {Variable : Type*}
     (source : PositionedPeriodicClause Variable) :
     (templateDrawing source).RoutePointsSatisfy
-      (WithinCoordinateRadius 73 (0, 0)) := by
+      (WithinCoordinateRadius 36 localRouteNeighborhoodOffset) := by
   rcases source with ⟨sourcePosition, literals⟩
   rcases literals with _ | ⟨first, rest⟩
   · exact zeroDrawing_routePoints_within_sourceNeighborhood
@@ -70,15 +74,18 @@ theorem templateDrawing_routePoints_within_sourceNeighborhood
           first.value second.value third.value
 
 /-- Renaming and positioning a selected finite template translates its
-radius-73 route-point certificate to the refined source-clause center. -/
+radius-36 route-point certificate to a fixed offset from the refined
+source-clause center. -/
 theorem instantiatedDrawing_routePoints_within_sourceNeighborhood
     {Variable : Type*} [DecidableEq Variable]
     (sourceClauseIndex figureNineClauseStart : Nat)
     (source : PositionedPeriodicClause Variable) :
     (instantiatedDrawing
       sourceClauseIndex figureNineClauseStart source).RoutePointsSatisfy
-        (WithinCoordinateRadius 73
-          (Cell.scale composedGadgetScale source.position)) := by
+        (WithinCoordinateRadius 36
+          (Cell.add
+            (Cell.scale composedGadgetScale source.position)
+            localRouteNeighborhoodOffset)) := by
   letI := nestedVariableDecidableEq (Variable := Variable)
   rw [instantiatedDrawing_eq]
   unfold EmbeddedCNFIncidenceDrawing.renameToImage
@@ -92,7 +99,7 @@ theorem instantiatedDrawing_routePoints_within_sourceNeighborhood
           sourceClauseIndex figureNineClauseStart source))).translate
       (Cell.scale composedGadgetScale source.position) ?_
   intro point pointBounded
-  simpa [Cell.add] using
+  simpa [Cell.add, add_comm, add_left_comm, add_assoc] using
     pointBounded.translate
       (Cell.scale composedGadgetScale source.position)
 
@@ -125,9 +132,11 @@ theorem localRoutes_points_within_sourceNeighborhood_of_members
         (metadata.sourceClause, metadata.sourceClauseIndex) ∈
           source.clauses.zipIdx ∧
         ∀ point ∈ localRoutes source clauseIndex literalIndex,
-          WithinCoordinateRadius 73
-            (Cell.scale composedGadgetScale
-              metadata.sourceClause.position) point := by
+          WithinCoordinateRadius 36
+            (Cell.add
+              (Cell.scale composedGadgetScale
+                metadata.sourceClause.position)
+              localRouteNeighborhoodOffset) point := by
   letI := nestedVariableDecidableEq (Variable := Variable)
   rcases formulaClauseMetadata_lookup_valid_embedded
       source clauseMember with
