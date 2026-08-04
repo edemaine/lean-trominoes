@@ -293,5 +293,38 @@ theorem
       sourceRoute localRoute offset fanValid slotActive directionEq sourceHead
       sourceTailNonempty sourceUnitSteps strictSuffix
 
+/-- Transport strict separation from a translated fan-spliced suffix across
+an equality between two presentations of its source route. -/
+theorem strictlyAvoids_translatedFanInheritedRouteSuffix_of_sourceRoute_eq
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (data : ComposedClauseExitFanData)
+    (slot : Fin 3)
+    (sourceRoute fanSourceRoute localRoute : List Cell)
+    (offset : Cell)
+    (sourceRouteEq : sourceRoute = fanSourceRoute)
+    (strictSuffix :
+      RoutesStrictlyAvoidEachOther localRoute
+        (PeriodicOrthocrossing.translatePolyline offset
+          (fanInheritedRouteSuffix
+            outputPlacement sourcePlacement sourceClause generatedClause
+            data slot fanSourceRoute))) :
+    RoutesStrictlyAvoidEachOther localRoute
+      (PeriodicOrthocrossing.translatePolyline offset
+        (fanInheritedRouteSuffix
+          outputPlacement sourcePlacement sourceClause generatedClause
+          data slot sourceRoute)) := by
+  subst fanSourceRoute
+  exact strictSuffix
+
 end PlanarOneInThreeNoUnitsFigureNine
 end LeanTrominoes
