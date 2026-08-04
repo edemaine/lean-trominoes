@@ -16,6 +16,41 @@ transport isolation of both route endpoints through scaling and translation.
 namespace LeanTrominoes
 namespace AxisDirection
 
+/-- Subdividing a doubled unit edge lists its scaled start, its unique
+unit-distance midpoint, and its scaled finish. -/
+theorem unitSegmentPoints_scale_two_of_unitAxisStep
+    {first second : Cell}
+    (unit : IsUnitAxisStep first second) :
+    unitSegmentPoints (Cell.scale 2 first) (Cell.scale 2 second) =
+      [Cell.scale 2 first,
+        Cell.add (Cell.scale 2 first) (between first second).step,
+        Cell.scale 2 second] := by
+  rcases unit with ⟨direction, genuine, rfl⟩
+  cases direction <;>
+    simp_all [IsGenuine, unitSegmentPoints, segmentLength, between, step,
+      Cell.add, Cell.scale] <;>
+    ring_nf <;>
+    simp [List.range_succ] <;>
+    constructor <;> ring
+
+/-- After discarding the doubled route's source point, its first half-edge
+and the subdivision of the remaining source route form an exact endpoint
+join. -/
+theorem unitSubdividePolyline_scale_two_tail
+    {first second : Cell} {rest : List Cell}
+    (unit : IsUnitAxisStep first second) :
+    (unitSubdividePolyline
+        (scalePolyline 2 (first :: second :: rest))).tail =
+      LeanTrominoes.joinAtEndpoint
+        [Cell.add (Cell.scale 2 first) (between first second).step,
+          Cell.scale 2 second]
+        (unitSubdividePolyline
+          (scalePolyline 2 (second :: rest))) := by
+  simp only [scalePolyline_cons]
+  rw [unitSubdividePolyline,
+    unitSegmentPoints_scale_two_of_unitAxisStep unit]
+  simp [LeanTrominoes.joinAtEndpoint]
+
 /-- If a scaled source lattice point occurs in the unit subdivision of a
 scaled orthogonal route, then its unscaled point occurs in the original unit
 subdivision. -/
