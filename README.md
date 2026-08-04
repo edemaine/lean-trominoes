@@ -5710,6 +5710,15 @@ The representation choices for this target are:
   terminal direction.  Every twice-inherited final incidence recovers its
   exact factor-two clearance-source occurrence, and its complete raw route
   has that occurrence's final direction.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOccurrenceSlots.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOccurrenceSlots.lean)
+  composes the occurrence-pair correspondences of Figure 9 and unit
+  elimination.  A twice-inherited endpoint recovers its original incidence in
+  the same first, second, or third occurrence slot, and any final atom reaching
+  the third slot is inherited from an original source atom through both layers.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineVariableRouteOrder.lean)
+  combines same-slot provenance with terminal-direction preservation.  The
+  three raw routes of every degree-three final atom therefore inherit the
+  clockwise order already proved for their factor-two clearance-source routes.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean)
   applies final loop erasure to the ordered composed family and packages both
   raw and normalized canonical route certificates.  The normalized drawing
