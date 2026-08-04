@@ -197,6 +197,18 @@ theorem routes_strictlyAvoidEachOther :
         (data.route first) (data.route second) := by
   native_decide
 
+/-- Distinct active connectors remain contact-free after extending each one
+along the first half of its factor-two-refined source edge. -/
+theorem extendedRoutes_strictlyAvoidEachOther :
+    ∀ (data : ComposedClauseExitFanData),
+      data.IsValid →
+      ∀ first second,
+        data.SlotActive first → data.SlotActive second →
+      first ≠ second →
+      RoutesStrictlyAvoidEachOther
+        (data.extendedRoute first) (data.extendedRoute second) := by
+  native_decide
+
 /-! ## Isolation from the finite composed local drawings -/
 
 /-- In every ternary-source template, a local route and an active exit-fan
