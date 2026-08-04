@@ -5719,12 +5719,21 @@ The representation choices for this target are:
   combines same-slot provenance with terminal-direction preservation.  The
   three raw routes of every degree-three final atom therefore inherit the
   clockwise order already proved for their factor-two clearance-source routes.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedEndpointIsolation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineInheritedEndpointIsolation.lean)
+  proves variable-endpoint isolation for every twice-inherited raw route.  Its
+  transformed source tail inherits isolation from the simple clearance route,
+  while the local route and finite ordered fan stay inside radius `73`, strictly
+  below the combined source scale `144`.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedRoutes.lean)
   applies final loop erasure to the ordered composed family and packages both
   raw and normalized canonical route certificates.  The normalized drawing
   realizes every incidence edge, is orthogonal and integer-grid planar, and
   consists entirely of simple unit-step paths.  A generic relative-separation
   premise now suffices to promote it to the ribbon-ready interface.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedVariableRouteOrder.lean)
+  uses inherited endpoint isolation to preserve terminal directions through
+  final loop erasure.  Because every degree-three final atom is twice inherited,
+  its three normalized routes retain the raw clockwise occurrence order.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedClauseRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineNormalizedClauseRouteOrder.lean)
   proves that final loop erasure preserves the canonical exit order at every
   ternary clause.  A non-inherited second literal supplies a local route through
