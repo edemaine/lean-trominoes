@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineBoundingBox
+import LeanTrominoes.OrthogonalPolylineLoopErasure
 import LeanTrominoes.RetainedAngularFanOuterRadialSeparation
 
 /-!
@@ -56,6 +57,40 @@ def GridSegment.coordinateUpper
     (segment : GridSegment) : Cell :=
   (max segment.start.1 segment.finish.1,
     max segment.start.2 segment.finish.2)
+
+/-- A simple route's tail neither lists the discarded head nor contains it
+anywhere along a surviving tail segment. -/
+theorem LocalIncidenceDrawing.RouteIsSimple.tail_avoids_head
+    {route : List Cell} {head : Cell}
+    (simple : LocalIncidenceDrawing.RouteIsSimple route)
+    (headLookup : route.head? = some head) :
+    (∀ point ∈ route.tail, point ≠ head) ∧
+      ∀ segment ∈ gridPolylineSegments route.tail,
+        segment.IsAxisAligned →
+          ¬segment.Contains head := by
+  have headMember : head ∈ route :=
+    List.mem_of_mem_head? headLookup
+  have headFresh : head ∉ route.tail :=
+    AxisDirection.headNotInTail_of_nodup simple.1
+      head headLookup
+  constructor
+  · intro point pointMember pointEqual
+    subst point
+    exact headFresh pointMember
+  · intro segment segmentMember _segmentAligned contains
+    rcases
+        GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+          contains with
+      interior | endpoint
+    · exact
+        simple.2.1 head headMember segment
+          (gridPolylineSegments_tail_subset route segmentMember)
+          interior
+    · have endpoints :=
+        gridPolylineSegments_endpoints_mem segmentMember
+      rcases endpoint with atStart | atFinish
+      · exact headFresh (atStart.symm ▸ endpoints.1)
+      · exact headFresh (atFinish.symm ▸ endpoints.2)
 
 /-- A segment's first endpoint lies in its endpoint rectangle. -/
 theorem GridSegment.start_in_coordinateRectangle
