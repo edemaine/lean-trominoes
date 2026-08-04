@@ -562,4 +562,53 @@ theorem routesStrictlyAvoidEachOther_scalePolyline_pointNeighborhood
           (nearbyBounded _ nearbyPointMember))
         separated
 
+/-- The point-neighborhood clearance theorem is invariant under a common
+translation of the scaled source route and the neighborhood center. -/
+theorem
+    routesStrictlyAvoidEachOther_translateScalePolyline_pointNeighborhood
+    {source nearby : List Cell}
+    {center offset : Cell}
+    {factor radius : Nat}
+    (factorPositive : 0 < factor)
+    (radiusLt : radius < factor)
+    (sourcePointsAvoid :
+      ∀ point ∈ source, point ≠ center)
+    (sourceSegmentsAvoid :
+      ∀ segment ∈ gridPolylineSegments source,
+        segment.IsAxisAligned →
+          ¬segment.Contains center)
+    (nearbyBounded :
+      ∀ point ∈ nearby,
+        WithinCoordinateRadius radius
+          (Cell.add offset (Cell.scale factor center)) point) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesStrictlyAvoidEachOther
+      (PeriodicOrthocrossing.translatePolyline offset
+        (scalePolyline factor source))
+      nearby := by
+  let inverse : Cell := (-offset.1, -offset.2)
+  let unshiftedNearby :=
+    PeriodicOrthocrossing.translatePolyline inverse nearby
+  have unshiftedBounded :
+      ∀ point ∈ unshiftedNearby,
+        WithinCoordinateRadius radius
+          (Cell.scale factor center) point := by
+    intro point pointMember
+    rcases List.mem_map.mp pointMember with
+      ⟨original, originalMember, rfl⟩
+    have translated :=
+      (nearbyBounded original originalMember).translate inverse
+    simpa [inverse, Cell.add] using translated
+  have base :=
+    routesStrictlyAvoidEachOther_scalePolyline_pointNeighborhood
+      factorPositive radiusLt sourcePointsAvoid
+      sourceSegmentsAvoid unshiftedBounded
+  have translated := base.translatePolyline offset
+  have restoreNearby :
+      PeriodicOrthocrossing.translatePolyline offset unshiftedNearby =
+        nearby := by
+    simp [unshiftedNearby, inverse,
+      PeriodicOrthocrossing.translatePolyline,
+      List.map_map, Function.comp_def, Cell.add]
+  simpa [restoreNearby] using translated
+
 end LeanTrominoes
