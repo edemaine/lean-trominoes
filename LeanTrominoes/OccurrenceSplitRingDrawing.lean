@@ -131,6 +131,22 @@ def cycleClausePosition : RingVertex → Cell
   | .port .north => (16, 6)
   | .port .northeast => (18, 8)
 
+/-- No implication-clause vertex of the local ring occupies a ring-variable
+vertex, including the separator copy. -/
+theorem cycleClausePosition_ne_ringVariablePosition :
+    ∀ clauseVertex variableVertex : RingVertex,
+      cycleClausePosition clauseVertex ≠
+        ringVariablePosition variableVertex := by
+  intro clauseVertex variableVertex
+  cases clauseVertex <;> cases variableVertex
+  · native_decide
+  · rename_i variablePort
+    cases variablePort <;> native_decide
+  · rename_i clausePort
+    cases clausePort <;> native_decide
+  · rename_i clausePort variablePort
+    cases clausePort <;> cases variablePort <;> native_decide
+
 /-- One retained old incidence, represented locally as a unary port clause. -/
 def spokeClause (port : Port) : EmbeddedClause RingVertex where
   position := spokeClausePosition port

@@ -220,6 +220,94 @@ private def cycleClauseOffset
     (Cell.scale refinementScale
       (sourcePlacement.position metadata.atom))
 
+/-- Local displacement of one split variable from the center of its
+factor-36 source-variable macrocell. -/
+private def occurrenceVariableOffset
+    {Variable : Type*}
+    (_sourcePlacement : PeriodicVariablePlacement Variable)
+    (occurrence : ThreeOccurrenceVariable Variable) : Cell :=
+  Cell.sub
+    (ringVariablePosition
+      (PeriodicEightOccurrenceSplit.ringVertexOfIndex occurrence.2.1))
+    (12, 12)
+
+/-- Every split variable lies in the radius-six neighborhood of its source
+variable macrocell center. -/
+private theorem occurrenceVariableOffset_data
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (occurrence : ThreeOccurrenceVariable Variable) :
+    (-6 ≤ (occurrenceVariableOffset
+          sourcePlacement occurrence).1 ∧
+        (occurrenceVariableOffset
+          sourcePlacement occurrence).1 ≤ 6 ∧
+      -6 ≤ (occurrenceVariableOffset
+          sourcePlacement occurrence).2 ∧
+        (occurrenceVariableOffset
+          sourcePlacement occurrence).2 ≤ 6) ∧
+      (placement sourcePlacement).position occurrence =
+        Cell.add
+          (Cell.scale refinementScale
+            (sourcePlacement.position occurrence.1))
+          (occurrenceVariableOffset sourcePlacement occurrence) := by
+  have localBounds :=
+    ringVariablePosition_inClosedGridRectangle
+      (PeriodicEightOccurrenceSplit.ringVertexOfIndex occurrence.2.1)
+  constructor
+  · simp only [InClosedGridRectangle] at localBounds
+    simp [occurrenceVariableOffset, Cell.sub] at localBounds ⊢
+    omega
+  · apply Prod.ext <;>
+      simp [placement, occurrenceVariablePosition,
+        occurrenceVariableOffset, macroOrigin,
+        Cell.add, Cell.sub, Cell.scale] <;>
+      ring
+
+/-- An implication-clause offset never equals any ring-variable offset in
+the same source-variable macrocell. -/
+private theorem cycleClauseOffset_ne_occurrenceVariableOffset
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    {metadata : CycleClauseMetadata Variable}
+    (clauseMember :
+      (metadata.clause, metadata.localClauseIndex) ∈
+        (cycleClausesFor
+          sourcePlacement metadata.atom).zipIdx)
+    (occurrence : ThreeOccurrenceVariable Variable)
+    (atomsEqual : metadata.atom = occurrence.1) :
+    cycleClauseOffset sourcePlacement metadata ≠
+      occurrenceVariableOffset sourcePlacement occurrence := by
+  rw [cycleClausesFor_eq_cycleFormula,
+    List.zipIdx_map] at clauseMember
+  rcases List.mem_map.mp clauseMember with
+    ⟨taggedClause, taggedClauseMember,
+      taggedClauseEqual⟩
+  have clauseEqual :
+      metadata.clause =
+        positionedLocalCycleClause
+          sourcePlacement metadata.atom taggedClause.1 :=
+    (congrArg Prod.fst taggedClauseEqual).symm
+  have localClauseMember : taggedClause.1 ∈ cycleFormula :=
+    List.fst_mem_of_mem_zipIdx taggedClauseMember
+  rw [cycleFormula] at localClauseMember
+  rcases List.mem_map.mp localClauseMember with
+    ⟨clauseVertex, _clauseVertexMember, localClauseEqual⟩
+  intro offsetsEqual
+  apply cycleClausePosition_ne_ringVariablePosition
+    clauseVertex
+    (PeriodicEightOccurrenceSplit.ringVertexOfIndex occurrence.2.1)
+  have localPositionEqual :=
+    congrArg PlanarThreeSAT.EmbeddedClause.position localClauseEqual
+  change cycleClausePosition clauseVertex =
+    taggedClause.1.position at localPositionEqual
+  rw [localPositionEqual]
+  apply Prod.ext <;>
+    simp [cycleClauseOffset, occurrenceVariableOffset,
+      clauseEqual, positionedLocalCycleClause,
+      macroOrigin, atomsEqual, Cell.add, Cell.sub, Cell.scale]
+      at offsetsEqual ⊢ <;>
+    omega
+
 /-- Every genuine implication clause has a radius-six local displacement,
 and its canonical position is its macrocell center plus that displacement. -/
 private theorem cycleClauseOffset_data
@@ -611,6 +699,113 @@ theorem canonicalClausePosition_eq_translated_imp_clauseIndex_eq
           source sourcePlacement firstLookup secondLookup keysEqual
       dsimp [boundary] at firstOccurrence secondOccurrence
       omega
+
+/-- No genuine fixed-eight split clause vertex can coincide with a periodic
+translate of a genuine split-variable vertex.  At the macrocell level this
+is either source clause-versus-variable injectivity, or the finite local
+separation of an implication-clause port from every ring-variable port. -/
+theorem canonicalClausePosition_ne_translated_occurrenceVariablePosition
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (occurrencePorts :
+      PeriodicEightOccurrenceSplit.OccurrencePorts)
+    (presentation :
+      PlanarIncidencePresentation source sourcePlacement)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (formula source sourcePlacement
+          occurrencePorts).clauses.zipIdx)
+    (occurrence : ThreeOccurrenceVariable Variable)
+    (atomMember : occurrence.1 ∈ sourceVariables source.erase)
+    (relativeTranslate : Cell) :
+    PositionedPeriodicCNF.canonicalClausePosition
+        (placement sourcePlacement) clause ≠
+      Cell.add
+        ((placement sourcePlacement).translation relativeTranslate)
+        ((placement sourcePlacement).position occurrence) := by
+  let boundary :=
+    (occurrenceClauses source occurrencePorts).length
+  have targetVertexMember :=
+    variableVertex_mem_incidenceGraph source atomMember
+  have targetPosition :=
+    occurrenceVariableOffset_data sourcePlacement occurrence
+  intro positionsEqual
+  by_cases clauseOccurrence : clauseIndex < boundary
+  · have occurrenceMember :=
+      occurrenceClauseMemberGeneric_of_formula_member
+        source sourcePlacement occurrencePorts clauseMember
+        clauseOccurrence
+    rcases occurrenceClauseMetadata_lookup
+        source occurrencePorts occurrenceMember with
+      ⟨metadata, _metadataLookup, clauseEqual,
+        sourceMember, _indexEqual, occurrenceEqual⟩
+    have sourceVertexMember :=
+      clauseVertex_mem_incidenceGraph source sourceMember
+    have sourcePosition :=
+      occurrenceClauseMacrocell_data source sourcePlacement
+        occurrencePorts metadata sourceMember occurrenceEqual
+    have macrocellEqual :=
+      translatedMacrocell_eq sourcePlacement
+        (incidenceVertexPositionAt source sourcePlacement
+          (.clause metadata.clauseIndex))
+        (sourcePlacement.position occurrence.1)
+        (0, 0)
+        (occurrenceVariableOffset sourcePlacement occurrence)
+        (by norm_num) targetPosition.1
+        (PositionedPeriodicCNF.canonicalClausePosition
+          (placement sourcePlacement) metadata.clause)
+        ((placement sourcePlacement).position occurrence)
+        sourcePosition targetPosition.2 relativeTranslate
+        (by simpa [clauseEqual] using positionsEqual)
+    have verticesEqual :=
+      presentation.incidenceVertexPositionAt_eq_translated_imp_eq
+        sourceVertexMember targetVertexMember relativeTranslate
+        (by simpa [incidenceVertexPositionAt]
+          using macrocellEqual.1)
+    cases verticesEqual
+  · have cycleMember :=
+      cycleClauseMember_of_formula_member
+        source sourcePlacement occurrencePorts clauseMember
+        clauseOccurrence
+    rcases allCycleClauseMetadata_lookup_valid
+        source sourcePlacement cycleMember with
+      ⟨metadata, metadataLookup, clauseEqual,
+        localMember⟩
+    have sourceAtomMember :=
+      allCycleClauseMetadata_lookup_atom_mem
+        source sourcePlacement metadataLookup
+    have sourceVertexMember :=
+      variableVertex_mem_incidenceGraph source sourceAtomMember
+    have sourcePosition :=
+      cycleClauseOffset_data sourcePlacement localMember
+    have macrocellEqual :=
+      translatedMacrocell_eq sourcePlacement
+        (sourcePlacement.position metadata.atom)
+        (sourcePlacement.position occurrence.1)
+        (cycleClauseOffset sourcePlacement metadata)
+        (occurrenceVariableOffset sourcePlacement occurrence)
+        sourcePosition.1 targetPosition.1
+        (PositionedPeriodicCNF.canonicalClausePosition
+          (placement sourcePlacement) metadata.clause)
+        ((placement sourcePlacement).position occurrence)
+        sourcePosition.2 targetPosition.2 relativeTranslate
+        (by simpa [clauseEqual] using positionsEqual)
+    have verticesEqual :=
+      presentation.incidenceVertexPositionAt_eq_translated_imp_eq
+        sourceVertexMember targetVertexMember relativeTranslate
+        (by simpa [incidenceVertexPositionAt]
+          using macrocellEqual.1)
+    have atomsEqual : metadata.atom = occurrence.1 :=
+      CNFVertex.variable.inj verticesEqual
+    exact
+      (cycleClauseOffset_ne_occurrenceVariableOffset
+        sourcePlacement localMember occurrence atomsEqual)
+        macrocellEqual.2
 
 end PeriodicEightOccurrenceSplitPositioned
 end LeanTrominoes
