@@ -1,3 +1,4 @@
+import LeanTrominoes.OrthogonalPolylineCoordinateRadiusBounds
 import LeanTrominoes.PositionedPeriodicCNFRebasedRouteBounds
 import LeanTrominoes.PositionedPeriodicCNFRebasedRouteTransport
 import LeanTrominoes.PositionedPeriodicCNFVariableGaugeClauseMembership
@@ -190,6 +191,67 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.variableGaugeCanonicalInciden
     PeriodicVariablePlacement.translation,
     Cell.add, Cell.sub, Cell.scale,
     sub_eq_add_neg, add_comm] using translated
+
+/-- Pointwise orthogonal loop erasure preserves the raw variable-centered
+radius certificate.  Newly inserted unit-subdivision points remain on
+radius-bounded source segments, and loop erasure only discards points. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.normalizeOrthogonalIncidenceRoutes
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes)
+    (routesNonempty :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          routes clauseIndex literalIndex ≠ [])
+    (routesOrthogonal :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (routes clauseIndex literalIndex)) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      source placement
+      (normalizeOrthogonalIncidenceRoutes routes) := by
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember point pointMember
+  let shift :=
+    placement.translation
+      (Cell.sub
+        (PeriodicCNF.clauseAnchor clause.literals)
+        literal.offset)
+  let route := routes clauseIndex literalIndex
+  change point ∈
+    PeriodicOrthocrossing.translatePolyline shift
+      (AxisDirection.normalizeOrthogonalPolyline route).reverse
+    at pointMember
+  unfold PeriodicOrthocrossing.translatePolyline at pointMember
+  rcases List.mem_map.mp pointMember with
+    ⟨normalizedPoint, normalizedPointMember, rfl⟩
+  have normalizedPointMember' :
+      normalizedPoint ∈
+        AxisDirection.normalizeOrthogonalPolyline route := by
+    simpa using normalizedPointMember
+  apply
+    AxisDirection.normalizeOrthogonalPolyline_points_withinCoordinateRadius
+      (routesNonempty clause clauseIndex clauseMember
+        literal literalIndex literalMember)
+      (routesOrthogonal clause clauseIndex clauseMember
+        literal literalIndex literalMember)
+      shift (placement.position literal.atom)
+  · intro sourcePoint sourcePointMember
+    apply bounds clause clauseIndex clauseMember
+      literal literalIndex literalMember
+    unfold PeriodicOrthocrossing.translatePolyline
+    exact List.mem_map.mpr
+      ⟨sourcePoint, by simpa using sourcePointMember, rfl⟩
+  · exact normalizedPointMember'
 
 /-- The variable-centered one-period radius criterion implies the exact
 rebased-route halo bound consumed by ribbon thickening. -/
