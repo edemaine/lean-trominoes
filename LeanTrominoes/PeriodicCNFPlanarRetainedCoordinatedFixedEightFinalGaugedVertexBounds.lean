@@ -24,6 +24,109 @@ local instance finalGaugedVertexBoundsDecidableEq
         (PeriodicPlanarOneInThreeThreeRawVariable Variable)) :=
   PlanarOneInThreeNoUnitsFigureNine.nestedVariableDecidableEq
 
+/-- A composed literal that is local to either exact-one replacement layer
+has its actual physical occurrence at the natural point of its finite
+`72 × 72` macrocell address.  That point lies strictly inside the final
+fundamental square. -/
+theorem retainedOrderedFixedEightComposedRawLocalLiteralPosition_inSquare
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (localLiteral :
+      ∀ sourceAtom : PeriodicPlanarThreeSATThreeVariable Variable,
+        literal.atom ≠ .inl (.inl sourceAtom)) :
+    let placement :=
+      retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+        source
+    0 < (placement.literalPosition literal).1 ∧
+      (placement.literalPosition literal).1 < placement.period ∧
+      0 < (placement.literalPosition literal).2 ∧
+      (placement.literalPosition literal).2 < placement.period := by
+  dsimp only
+  rcases composedLiteralVariable_inMacrocellOrbit
+      (retainedFigureNineClearancePositionedFormula source)
+      (retainedFigureNineClearancePlacement source)
+      (by simpa only [
+        retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula]
+        using clauseMember)
+    literalMember with
+    ⟨base, address, sourceData, _orbit, localPosition⟩
+  have localPositionEq :
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+          source).literalPosition literal =
+        Cell.macrocellPosition finalFigureNineMacrocellScale
+          base address.position := by
+    simpa only [
+      retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement]
+      using localPosition localLiteral
+  clear localPosition localLiteral
+  have baseInside :
+      0 < base.1 ∧
+        base.1 < (retainedFigureNineClearancePlacement source).period ∧
+      0 < base.2 ∧
+        base.2 < (retainedFigureNineClearancePlacement source).period := by
+    generalize atomEq : literal.atom = atom at sourceData
+    cases sourceData with
+    | inherited sourceAtom sourceAtomMember =>
+        exact retainedFigureNineClearancePlacement_position_inSquare_of_mem
+          source sourceAtom sourceAtomMember
+    | figureNineAuxiliary sourceClause sourceClauseIndex
+        sourceClauseMember kind =>
+        exact retainedFigureNineClearanceStoredClausePosition_inSquare_of_mem
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty sourceClause
+          (List.fst_mem_of_mem_zipIdx sourceClauseMember)
+    | unitEliminationAuxiliary sourceClause sourceClauseIndex
+        sourceClauseMember figureNineClause figureNineClauseIndex
+        localFigureNineClauseIndex localFigureNineClauseMember
+        figureNineClauseMember figureNineMetadataLookup kind =>
+        exact retainedFigureNineClearanceStoredClausePosition_inSquare_of_mem
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty sourceClause
+          (List.fst_mem_of_mem_zipIdx sourceClauseMember)
+  have naturalInside :=
+    Cell.macrocellPosition_halfOpen_in_refined_square
+      (factor := finalFigureNineMacrocellScale)
+      (period := (retainedFigureNineClearancePlacement source).period)
+      (by native_decide) baseInside
+      (finalFigureNineLocalAddress_position_halfOpen address)
+  rw [localPositionEq]
+  have periodEq :
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+        source).period =
+        finalFigureNineMacrocellScale *
+          (retainedFigureNineClearancePlacement source).period := by
+    simp [retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement,
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement,
+      PeriodicOneInThreeNoUnitsPositioned.placement,
+      PeriodicOneInThreePositioned.placement,
+      finalFigureNineMacrocellScale,
+      PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+      PlanarOneInThree.gadgetScale]
+    omega
+  rw [periodEq]
+  simpa only [Nat.cast_mul] using naturalInside
+
 /-- The coordinate residue of every genuine raw composed variable is the
 natural bounded point selected by its finite Figure 9 macrocell address. -/
 theorem retainedOrderedFixedEightComposedRawVariablePosition_residue_inSquare

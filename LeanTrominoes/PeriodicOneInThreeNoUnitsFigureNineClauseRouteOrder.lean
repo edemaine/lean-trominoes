@@ -509,7 +509,10 @@ theorem binaryClause_literal_not_original
     rcases finalClauseLiteralsMember with
       generatedEq | generatedEq | generatedEq <;>
       rw [generatedEq] at finalLiteralMember <;>
-      simp_all [PeriodicOneInThreeNoUnits.auxiliary]
+      simp only [List.mem_cons, List.not_mem_nil, or_false]
+        at finalLiteralMember <;>
+      rcases finalLiteralMember with rfl | rfl <;>
+      simp [PeriodicOneInThreeNoUnits.auxiliary]
   · rcases sourceRest with _ | ⟨sourceSecond, sourceTail⟩
     · simp [PeriodicOneInThreeNoUnits.clauseClauses,
         sourceLiteralsEq] at finalClauseLiteralsMember
@@ -517,7 +520,10 @@ theorem binaryClause_literal_not_original
       · rw [ternaryEq] at unitClauseArity
         simp at unitClauseArity
       · rw [binaryEq] at finalLiteralMember
-        simp_all [PeriodicOneInThreeNoUnits.auxiliary]
+        simp only [List.mem_cons, List.not_mem_nil, or_false]
+          at finalLiteralMember
+        rcases finalLiteralMember with rfl | rfl <;>
+          simp [PeriodicOneInThreeNoUnits.auxiliary]
     · have generatedLiterals :
           unitMetadata.clause.literals =
             (sourceFirst :: sourceSecond :: sourceTail).map
