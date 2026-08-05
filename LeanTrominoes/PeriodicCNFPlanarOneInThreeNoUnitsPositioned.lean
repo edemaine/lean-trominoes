@@ -93,6 +93,45 @@ theorem erase_formula {Variable : Type*}
   rw [List.zipIdx_map]
   simp [List.flatMap_map, clauseGadget_literals]
 
+/-- Every positioned clause produced by one unit-elimination gadget is
+binary or ternary whenever its source clause has width at most three. -/
+theorem clauseGadget_arityTwoOrThree {Variable : Type*}
+    (clauseIndex : Nat)
+    (source : PositionedPeriodicClause Variable)
+    (width : source.literals.WidthAtMost 3) :
+    ∀ generated ∈ clauseGadget clauseIndex source,
+      generated.literals.length = 2 ∨
+        generated.literals.length = 3 := by
+  intro generated generatedMember
+  unfold clauseGadget at generatedMember
+  rcases List.mem_map.mp generatedMember with
+    ⟨tagged, taggedMember, rfl⟩
+  exact
+    PeriodicOneInThreeNoUnits.clauseClauses_arityTwoOrThree
+      clauseIndex source.literals width tagged.1
+      (List.fst_mem_of_mem_zipIdx taggedMember)
+
+/-- The positioned unit-elimination output has only binary or ternary
+clauses, stated directly over positioned clause membership. -/
+theorem formula_arityTwoOrThree {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (width : source.erase.WidthAtMost 3) :
+    ∀ generated ∈ (formula source).clauses,
+      generated.literals.length = 2 ∨
+        generated.literals.length = 3 := by
+  intro generated generatedMember
+  change generated ∈
+    source.clauses.zipIdx.flatMap fun taggedClause =>
+      clauseGadget taggedClause.2 taggedClause.1 at generatedMember
+  rcases List.mem_flatMap.mp generatedMember with
+    ⟨taggedClause, taggedClauseMember, generatedMember⟩
+  exact clauseGadget_arityTwoOrThree
+    taggedClause.2 taggedClause.1
+    (width taggedClause.1.literals
+      (List.mem_map_of_mem
+        (List.fst_mem_of_mem_zipIdx taggedClauseMember)))
+    generated generatedMember
+
 end PeriodicOneInThreeNoUnitsPositioned
 
 namespace PeriodicOrthocrossing
