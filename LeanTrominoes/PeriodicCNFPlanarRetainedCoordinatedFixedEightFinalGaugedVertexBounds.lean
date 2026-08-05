@@ -2,6 +2,7 @@ import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineCle
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedVertexSeparation
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineSemantics
 import LeanTrominoes.PeriodicMacrocellOrbitGeometry
+import LeanTrominoes.PositionedPeriodicCNFVariableGaugeClauseMembership
 
 /-!
 # Fundamental-square bounds for final gauged Figure 9 vertices
@@ -604,6 +605,163 @@ theorem retainedOrderedFixedEightFinalClockwiseClause_exists_localAnchor
     · simpa [rawLiteralsEq]
     · rw [orderedClauseEq]
       exact orderedLiteralsEq
+
+/-- Gauging sends the selected local anchor to offset zero, so the final
+canonical clause representative is exactly its unchanged raw stored point. -/
+theorem retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_eq_rawPosition
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {gaugedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (gaugedClauseMember :
+      (gaugedClause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty).clauses.zipIdx) :
+    ∃ rawClause,
+      (rawClause, clauseIndex) ∈
+          (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+            source).clauses.zipIdx ∧
+        PositionedPeriodicCNF.canonicalClausePosition
+            (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+              source)
+            gaugedClause = rawClause.position := by
+  let rawPlacement :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+      source
+  let gauge :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+      source
+  let orderedFormula :=
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  have gaugedClauseMember' :
+      (gaugedClause, clauseIndex) ∈
+        (orderedFormula.variableGauge gauge).clauses.zipIdx := by
+    simpa only [orderedFormula, gauge,
+      retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula]
+      using gaugedClauseMember
+  rcases PositionedPeriodicCNF.exists_sourceClause_of_variableGaugeClause_mem
+      orderedFormula gauge gaugedClauseMember' with
+    ⟨orderedClause, orderedClauseMember, gaugedClauseEq⟩
+  rcases retainedOrderedFixedEightFinalClockwiseClause_exists_localAnchor
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+      (by simpa only [orderedFormula] using orderedClauseMember) with
+    ⟨rawClause, anchorLiteral, anchorLiteralIndex, rest,
+      rawClauseMember, anchorLiteralMember, orderedLiteralsEq,
+      localAnchor⟩
+  have atomMember :
+      anchorLiteral.atom ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source).erase.variableOccurrences := by
+    unfold PeriodicCNF.variableOccurrences
+    apply List.mem_flatMap.mpr
+    refine ⟨rawClause.literals, ?_, ?_⟩
+    · exact List.mem_map.mpr
+        ⟨rawClause, List.fst_mem_of_mem_zipIdx rawClauseMember, rfl⟩
+    · exact List.mem_map.mpr
+        ⟨anchorLiteral,
+          List.fst_mem_of_mem_zipIdx anchorLiteralMember, rfl⟩
+  have residueInside :=
+    retainedOrderedFixedEightComposedRawVariablePosition_residue_inSquare
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty anchorLiteral.atom atomMember
+  have gaugedPositionInside :=
+    PeriodicVariablePlacement.variableGauge_canonicalPositionGauge_position_inSquare
+      rawPlacement
+      (by
+        simpa only [rawPlacement] using
+          retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement_period_pos
+            source)
+      anchorLiteral.atom (ne_of_gt residueInside.1)
+      (ne_of_gt residueInside.2.2.1)
+  have literalPositionInside :=
+    retainedOrderedFixedEightComposedRawLocalLiteralPosition_inSquare
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty rawClauseMember anchorLiteralMember
+      localAnchor
+  have anchorOffsetZero :
+      (anchorLiteral.variableGauge gauge).offset = (0, 0) := by
+    apply
+      PeriodicVariablePlacement.canonicalPositionGauge_literalOffset_eq_zero
+        rawPlacement
+        (by
+          simpa only [rawPlacement] using
+            retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement_period_pos
+              source)
+        anchorLiteral
+    · simpa only [rawPlacement, gauge,
+        retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge]
+        using gaugedPositionInside
+    · simpa only [rawPlacement] using literalPositionInside
+  have gaugedAnchorZero :
+      PeriodicCNF.clauseAnchor gaugedClause.literals = (0, 0) := by
+    rw [gaugedClauseEq]
+    simp [PeriodicClause.variableGauge, orderedLiteralsEq,
+      PeriodicCNF.clauseAnchor, anchorOffsetZero]
+  refine ⟨rawClause, rawClauseMember, ?_⟩
+  rw [PositionedPeriodicCNF.canonicalClausePosition, gaugedAnchorZero]
+  simp [gaugedClauseEq, rawPlacement, gauge,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement,
+    PeriodicVariablePlacement.translation, Cell.sub, Cell.scale]
+
+/-- Every final gauged canonical clause vertex lies strictly inside the
+final fundamental square. -/
+theorem retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_inSquare_of_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {gaugedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (gaugedClauseMember :
+      (gaugedClause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty).clauses.zipIdx) :
+    let position :=
+      PositionedPeriodicCNF.canonicalClausePosition
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+          source)
+        gaugedClause
+    0 < position.1 ∧
+      position.1 <
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+          source).period ∧
+      0 < position.2 ∧
+      position.2 <
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+          source).period := by
+  dsimp only
+  rcases
+      retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_eq_rawPosition
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty gaugedClauseMember with
+    ⟨rawClause, rawClauseMember, positionEq⟩
+  have rawBounds :=
+    retainedOrderedFixedEightComposedRawStoredClausePosition_inSquare_of_mem
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty rawClause clauseIndex rawClauseMember
+  rw [positionEq]
+  simpa only [
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement,
+    PeriodicVariablePlacement.variableGauge_period] using rawBounds
 
 end PeriodicOrthocrossing
 end LeanTrominoes
