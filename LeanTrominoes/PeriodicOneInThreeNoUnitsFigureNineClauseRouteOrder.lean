@@ -197,6 +197,41 @@ theorem figureNineClause_thirdAtom_not_original_of_mem_clauseClauses
           rw [thirdEq] <;>
           simp [PeriodicOneInThree.auxiliary]
 
+/-- Figure 9 emits only ternary gadget equations and unary padding
+constraints; in particular it never emits a binary clause. -/
+theorem figureNineClause_length_ne_two_of_mem_clauseClauses
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (source : PeriodicClause Variable)
+    {clause : PeriodicClause (OneInThreeVariable Variable)}
+    (member :
+      clause ∈
+        PeriodicOneInThree.clauseClauses sourceClauseIndex source) :
+    clause.length ≠ 2 := by
+  have lengthMember :
+      clause.length ∈
+        (PeriodicOneInThree.clauseClauses
+          sourceClauseIndex source).map List.length :=
+    List.mem_map.mpr ⟨clause, member, rfl⟩
+  rcases source with _ | ⟨sourceFirst, sourceRest⟩
+  · simp at lengthMember
+    simp_all [PeriodicOneInThree.clauseClauses,
+      PeriodicOneInThree.disjunctionGadget,
+      PeriodicOneInThree.padding,
+      PeriodicOneInThree.forcePaddingFalse] <;> omega
+  · rcases sourceRest with _ | ⟨sourceSecond, sourceRest⟩
+    · simp_all [PeriodicOneInThree.clauseClauses,
+        PeriodicOneInThree.disjunctionGadget,
+        PeriodicOneInThree.padding,
+        PeriodicOneInThree.forcePaddingFalse] <;> omega
+    · rcases sourceRest with _ | ⟨sourceThird, sourceTail⟩
+      · simp_all [PeriodicOneInThree.clauseClauses,
+          PeriodicOneInThree.disjunctionGadget,
+          PeriodicOneInThree.padding,
+          PeriodicOneInThree.forcePaddingFalse] <;> omega
+      · simp_all [PeriodicOneInThree.clauseClauses,
+          PeriodicOneInThree.disjunctionGadget]
+
 /-- Every ternary clause in the composed formula has a second literal that
 is not inherited through both transformations.  This auxiliary incidence
 will later witness that the clause endpoint is absent from an inherited
@@ -409,6 +444,93 @@ theorem ternaryClause_thirdLiteral_not_original
           Sum.inl sourceThird.atom =
             Sum.inl (Sum.inl sourceAtom) at equal
         exact Sum.inl.inj equal
+
+/-- Every literal in a binary composed clause is local to one of the two
+exact-one replacement layers.  A doubly inherited source literal can occur
+only in a ternary output clause. -/
+theorem binaryClause_literal_not_original
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    (arity : clause.literals.length = 2)
+    {literal :
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    (literalMember : literal ∈ clause.literals) :
+    ∀ sourceAtom : Variable,
+      literal.atom ≠ .inl (.inl sourceAtom) := by
+  rcases formulaClauseMetadata_lookup_valid
+      source clauseMember with
+    ⟨metadata, metadataLookup, metadataClause,
+      _sourceClauseMember, _localClauseMember⟩
+  have metadataIndexLt :
+      clauseIndex < (formulaClauseMetadata source).length :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).1
+  have metadataMember : metadata ∈ formulaClauseMetadata source := by
+    rw [← (List.getElem?_eq_some_iff.mp metadataLookup).2]
+    exact List.getElem_mem metadataIndexLt
+  rcases formulaClauseMetadata_unitEliminationMetadata_lookup_valid
+      source metadataMember with
+    ⟨unitMetadata, _unitMetadataLookup, unitMetadataClause,
+      unitSourceClauseMember, unitGeneratedClauseMember⟩
+  have finalClauseLiteralsMember :
+      unitMetadata.clause.literals ∈
+        PeriodicOneInThreeNoUnits.clauseClauses
+          unitMetadata.sourceClauseIndex
+          unitMetadata.sourceClause.literals := by
+    rw [← PeriodicOneInThreeNoUnitsPositioned.clauseGadget_literals]
+    exact List.mem_map.mpr
+      ⟨unitMetadata.clause,
+        List.fst_mem_of_mem_zipIdx unitGeneratedClauseMember, rfl⟩
+  have finalLiteralMember : literal ∈ unitMetadata.clause.literals := by
+    simpa [unitMetadataClause, metadataClause] using literalMember
+  have unitClauseArity : unitMetadata.clause.literals.length = 2 := by
+    simpa [unitMetadataClause, metadataClause] using arity
+  have figureNineClauseLiteralsMember :
+      unitMetadata.sourceClause.literals ∈
+        PeriodicOneInThree.clauseClauses
+          metadata.sourceClauseIndex
+          metadata.sourceClause.literals := by
+    rw [← PeriodicOneInThreePositioned.clauseGadget_literals]
+    exact List.mem_map.mpr
+      ⟨unitMetadata.sourceClause,
+        List.fst_mem_of_mem_zipIdx unitSourceClauseMember, rfl⟩
+  rcases sourceLiteralsEq : unitMetadata.sourceClause.literals with
+    _ | ⟨sourceFirst, sourceRest⟩
+  · simp [PeriodicOneInThreeNoUnits.clauseClauses,
+      sourceLiteralsEq] at finalClauseLiteralsMember
+    rcases finalClauseLiteralsMember with
+      generatedEq | generatedEq | generatedEq <;>
+      rw [generatedEq] at finalLiteralMember <;>
+      simp_all [PeriodicOneInThreeNoUnits.auxiliary]
+  · rcases sourceRest with _ | ⟨sourceSecond, sourceTail⟩
+    · simp [PeriodicOneInThreeNoUnits.clauseClauses,
+        sourceLiteralsEq] at finalClauseLiteralsMember
+      rcases finalClauseLiteralsMember with ternaryEq | binaryEq
+      · rw [ternaryEq] at unitClauseArity
+        simp at unitClauseArity
+      · rw [binaryEq] at finalLiteralMember
+        simp_all [PeriodicOneInThreeNoUnits.auxiliary]
+    · have generatedLiterals :
+          unitMetadata.clause.literals =
+            (sourceFirst :: sourceSecond :: sourceTail).map
+              PeriodicOneInThreeNoUnits.liftLiteral := by
+        simpa [PeriodicOneInThreeNoUnits.clauseClauses,
+          sourceLiteralsEq] using finalClauseLiteralsMember
+      have figureNineLengthTwo :
+          unitMetadata.sourceClause.literals.length = 2 := by
+        simpa [sourceLiteralsEq, generatedLiterals] using unitClauseArity
+      exact False.elim
+        (figureNineClause_length_ne_two_of_mem_clauseClauses
+          metadata.sourceClauseIndex metadata.sourceClause.literals
+          figureNineClauseLiteralsMember figureNineLengthTwo)
 
 /-- The full-width composed template has the canonical route order for all
 eight source-polarity patterns. -/
