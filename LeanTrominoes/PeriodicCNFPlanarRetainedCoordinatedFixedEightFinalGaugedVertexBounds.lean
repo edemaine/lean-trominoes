@@ -178,5 +178,143 @@ theorem retainedOrderedFixedEightFinalGaugedVariablePosition_inSquare_of_mem
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge,
     PeriodicVariablePlacement.variableGauge_period] using gaugedInside
 
+/-- Exact clause provenance identifies the stored raw clause position with
+the natural point of its finite two-stage macrocell address. -/
+theorem FinalFigureNineClauseSource.position_eq_macrocellPosition
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {clauseIndex : Nat} {base : Cell}
+    {address : FinalFigureNineLocalAddress}
+    (sourceData :
+      FinalFigureNineClauseSource source clause clauseIndex base address) :
+    clause.position =
+      Cell.macrocellPosition finalFigureNineMacrocellScale
+        base address.position := by
+  cases sourceData with
+  | generated sourceClause sourceClauseIndex sourceClauseMember
+      figureNineClauseStart localFinalClauseIndex finalClause
+      finalClauseIndex composedMetadataLookup figureNineClause
+      figureNineClauseIndex localFigureNineClauseIndex
+      localFigureNineClauseMember figureNineMetadataLookup
+      unitClauseIndex unitClauseMember unitMetadataLookup =>
+      have figureNinePosition :=
+        PeriodicOneInThreePositioned.clauseGadget_position_eq_generatedClausePosition
+          sourceClauseIndex sourceClause localFigureNineClauseMember
+      have finalPosition :=
+        PeriodicOneInThreeNoUnitsPositioned.clauseGadget_position_eq_generatedClausePosition
+          figureNineClauseIndex figureNineClause unitClauseMember
+      let figureNineLocal :=
+        PeriodicOneInThreePositioned.generatedClauseLocalPosition
+          localFigureNineClauseIndex.val
+      let unitLocal :=
+        PeriodicOneInThreeNoUnitsPositioned.generatedClauseLocalPosition
+          figureNineClause.literals unitClauseIndex
+      have figureNineMacrocell :
+          figureNineClause.position =
+            Cell.macrocellPosition 12 sourceClause.position
+              figureNineLocal := by
+        rw [figureNinePosition]
+        exact
+          PeriodicOneInThreePositioned.generatedClausePosition_eq_macrocellPosition
+            sourceClause.position localFigureNineClauseIndex.val
+      have finalMacrocell :
+          clause.position =
+            Cell.macrocellPosition 6 figureNineClause.position
+              unitLocal := by
+        rw [finalPosition]
+        exact
+          PeriodicOneInThreeNoUnitsPositioned.generatedClausePosition_eq_macrocellPosition
+            figureNineClause unitClauseIndex
+      rw [finalMacrocell, figureNineMacrocell]
+      have composedMacrocell :
+          Cell.macrocellPosition 6
+              (Cell.macrocellPosition 12 sourceClause.position figureNineLocal)
+              unitLocal =
+            Cell.macrocellPosition 72 sourceClause.position
+              (Cell.add (Cell.scale 6 figureNineLocal) unitLocal) := by
+        apply Prod.ext <;>
+          simp [Cell.macrocellPosition, Cell.add, Cell.scale] <;>
+          ring
+      rw [composedMacrocell]
+      congr 1
+      simp [figureNineLocal, unitLocal,
+        FinalFigureNineLocalAddress.position,
+        finalFigureNineClauseLocalPosition,
+        finalUnitClauseLocal_position,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+        PeriodicOneInThreePositioned.generatedClauseLocalPosition]
+
+/-- Every genuine raw composed stored clause lies strictly inside the final
+physical fundamental square. -/
+theorem retainedOrderedFixedEightComposedRawStoredClausePosition_inSquare_of_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable)))
+    (clauseIndex : Nat)
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source).clauses.zipIdx) :
+    0 < clause.position.1 ∧
+      clause.position.1 <
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+          source).period ∧
+      0 < clause.position.2 ∧
+      clause.position.2 <
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+          source).period := by
+  rcases retainedOrderedFixedEightComposedRawClause_inMacrocellOrbit_withSource
+      source clauseMember with
+    ⟨base, address, sourceData, _orbit⟩
+  have baseInside :
+      0 < base.1 ∧
+        base.1 < (retainedFigureNineClearancePlacement source).period ∧
+      0 < base.2 ∧
+        base.2 < (retainedFigureNineClearancePlacement source).period := by
+    cases sourceData with
+    | generated sourceClause sourceClauseIndex sourceClauseMember
+        figureNineClauseStart localFinalClauseIndex finalClause
+        finalClauseIndex composedMetadataLookup figureNineClause
+        figureNineClauseIndex localFigureNineClauseIndex
+        localFigureNineClauseMember figureNineMetadataLookup
+        unitClauseIndex unitClauseMember unitMetadataLookup =>
+        exact retainedFigureNineClearanceStoredClausePosition_inSquare_of_mem
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty sourceClause
+          (List.fst_mem_of_mem_zipIdx sourceClauseMember)
+  have naturalInside :=
+    Cell.macrocellPosition_halfOpen_in_refined_square
+      (factor := finalFigureNineMacrocellScale)
+      (period := (retainedFigureNineClearancePlacement source).period)
+      (by native_decide) baseInside
+      (finalFigureNineLocalAddress_position_halfOpen address)
+  rw [FinalFigureNineClauseSource.position_eq_macrocellPosition sourceData]
+  have periodEq :
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+        source).period =
+        finalFigureNineMacrocellScale *
+          (retainedFigureNineClearancePlacement source).period := by
+    simp [retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement,
+      PlanarOneInThreeNoUnitsFigureNine.composedPlacement,
+      PeriodicOneInThreeNoUnitsPositioned.placement,
+      PeriodicOneInThreePositioned.placement,
+      finalFigureNineMacrocellScale,
+      PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+      PlanarOneInThree.gadgetScale]
+    omega
+  rw [periodEq]
+  simpa only [Nat.cast_mul] using naturalInside
+
 end PeriodicOrthocrossing
 end LeanTrominoes
