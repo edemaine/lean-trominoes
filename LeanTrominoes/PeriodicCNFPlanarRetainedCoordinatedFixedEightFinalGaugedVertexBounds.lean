@@ -763,5 +763,150 @@ theorem retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_inSquare_of_
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement,
     PeriodicVariablePlacement.variableGauge_period] using rawBounds
 
+/-- Every stored vertex in the final gauged incidence drawing lies strictly
+inside its fundamental square. -/
+theorem retainedOrderedFixedEightFinalGaugedIncidenceVertexPosition_inSquare_of_mem
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (position : Cell)
+    (positionMember :
+      position ∈
+        PositionedPeriodicCNF.incidenceVertexPositions
+          (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty)
+          (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+            source)) :
+    0 < position.1 ∧
+      position.1 <
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+          source).period ∧
+      0 < position.2 ∧
+      position.2 <
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+          source).period := by
+  simp only [PositionedPeriodicCNF.incidenceVertexPositions,
+    List.mem_append] at positionMember
+  rcases positionMember with variableMember | clauseMember
+  · rcases List.mem_map.mp variableMember with
+      ⟨vertex, vertexMember, positionEq⟩
+    unfold PeriodicCNF.incidenceVariableVertices at vertexMember
+    rcases List.mem_map.mp vertexMember with
+      ⟨atom, atomMember, vertexEq⟩
+    subst vertex
+    simp only at positionEq
+    subst position
+    exact
+      retainedOrderedFixedEightFinalGaugedVariablePosition_inSquare_of_mem
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty atom (List.mem_dedup.mp atomMember)
+  · rcases List.mem_map.mp clauseMember with
+      ⟨clause, clauseMember, rfl⟩
+    rcases List.mem_iff_getElem.mp clauseMember with
+      ⟨clauseIndex, clauseIndexLt, clauseAt⟩
+    have taggedClauseMember :
+        (clause, clauseIndex) ∈
+          (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty).clauses.zipIdx := by
+      rw [List.mem_zipIdx_iff_getElem?, List.getElem?_eq_some_iff]
+      exact ⟨clauseIndexLt, clauseAt⟩
+    exact
+      retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_inSquare_of_mem
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty taggedClauseMember
+
+/-- The final canonically gauged incidence drawing has the complete finite
+compatibility certificate: matching endpoints, distinct representatives,
+and strict fundamental-square vertex bounds. -/
+theorem retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauged_isCompatible
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceDrawing
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).IsCompatible
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).erase.incidenceGraph := by
+  let orderedFormula :=
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  let rawPlacement :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+      source
+  let gauge :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+      source
+  let routes :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalClockwiseIncidenceRoutes
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  have rawPeriodPositive : 0 < rawPlacement.period := by
+    simpa only [rawPlacement] using
+      retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement_period_pos
+        source
+  have positionsInside :
+      ∀ position ∈
+          PositionedPeriodicCNF.incidenceVertexPositions
+            (orderedFormula.variableGauge gauge)
+            (rawPlacement.variableGauge gauge),
+        (PositionedPeriodicCNF.incidenceDrawing
+          (orderedFormula.variableGauge gauge)
+          (rawPlacement.variableGauge gauge)
+          (PositionedPeriodicCNF.variableGaugeCanonicalIncidenceRoutes
+            orderedFormula rawPlacement gauge routes))
+          |>.PositionInFundamentalSquare position := by
+    intro position positionMember
+    have bounds :=
+      retainedOrderedFixedEightFinalGaugedIncidenceVertexPosition_inSquare_of_mem
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty position (by
+          simpa only [orderedFormula, rawPlacement, gauge,
+            retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula,
+            retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement]
+            using positionMember)
+    rw [PeriodicGridDrawing.PositionInFundamentalSquare,
+      PositionedPeriodicCNF.incidenceDrawing_gridSize
+        _ _ _ (by
+          simpa only [PeriodicVariablePlacement.variableGauge_period]
+            using rawPeriodPositive)]
+    simpa only [rawPlacement, gauge,
+      retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement,
+      PeriodicVariablePlacement.variableGauge_period] using bounds
+  have compatible :=
+    PositionedPeriodicCNF.incidenceDrawing_variableGaugeCanonicalIncidenceRoutes_isCompatible
+      orderedFormula rawPlacement gauge routes rawPeriodPositive
+      (by
+        simpa only [orderedFormula, rawPlacement, routes] using
+          retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalClockwise_routesMatch
+            source sourceLocal sourceWidth sourceOccurrences
+            sourceClausesNonempty)
+      (by
+        simpa only [orderedFormula, rawPlacement, gauge,
+          retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula,
+          retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement]
+          using
+            retainedOrderedFixedEightFinalGaugedIncidenceVertexPositions_nodup
+              source sourceLocal sourceWidth sourceOccurrences
+              sourceClausesNonempty)
+      positionsInside
+  simpa only [orderedFormula, rawPlacement, gauge, routes,
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceRoutes,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceDrawing]
+    using compatible
+
 end PeriodicOrthocrossing
 end LeanTrominoes
