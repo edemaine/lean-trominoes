@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearanceVertexBounds
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedVertexSeparation
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineSemantics
 import LeanTrominoes.PeriodicMacrocellOrbitGeometry
 
 /-!
@@ -489,6 +490,120 @@ theorem retainedOrderedFixedEightComposedRawStoredClausePosition_inSquare_of_mem
     omega
   rw [periodEq]
   simpa only [Nat.cast_mul] using naturalInside
+
+/-- The final route-direction sort chooses a local auxiliary occurrence as
+the first literal of every binary or ternary clause. -/
+theorem retainedOrderedFixedEightFinalClockwiseClause_exists_localAnchor
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {orderedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (orderedClauseMember :
+      (orderedClause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty).clauses.zipIdx) :
+    ∃ rawClause anchorLiteral anchorLiteralIndex rest,
+      (rawClause, clauseIndex) ∈
+          (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+            source).clauses.zipIdx ∧
+        (anchorLiteral, anchorLiteralIndex) ∈
+          rawClause.literals.zipIdx ∧
+        orderedClause.literals = anchorLiteral :: rest ∧
+        ∀ sourceAtom : PeriodicPlanarThreeSATThreeVariable Variable,
+          anchorLiteral.atom ≠ .inl (.inl sourceAtom) := by
+  let rawFormula :=
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+      source
+  let routes :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  have orderedClauseMember' :
+      (orderedClause, clauseIndex) ∈
+        (PositionedPeriodicCNF.orderClausesByRouteDirection
+          rawFormula routes).clauses.zipIdx := by
+    simpa only [rawFormula, routes,
+      retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula]
+      using orderedClauseMember
+  rcases PositionedPeriodicCNF.exists_sourceClause_of_orderedClause_mem
+      routes orderedClauseMember' with
+    ⟨rawClause, rawClauseMember, orderedClauseEq⟩
+  have rawArity :=
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula_arityTwoOrThree
+      source rawClause.literals
+      (by
+        exact List.mem_map.mpr
+          ⟨rawClause, List.fst_mem_of_mem_zipIdx rawClauseMember, rfl⟩)
+  rcases rawArity with binary | ternary
+  · have orderedLength : orderedClause.literals.length = 2 := by
+      rw [orderedClauseEq,
+        PositionedPeriodicCNF.orderClauseByRouteDirection_length]
+      exact binary
+    rcases List.length_eq_two.mp orderedLength with
+      ⟨anchorLiteral, otherLiteral, orderedLiteralsEq⟩
+    have anchorOrderedMember : anchorLiteral ∈ orderedClause.literals := by
+      simp [orderedLiteralsEq]
+    have anchorRawMember : anchorLiteral ∈ rawClause.literals :=
+      (PositionedPeriodicCNF.orderClauseByRouteDirection_literals_perm
+        routes clauseIndex rawClause).mem_iff.mp (by
+          simpa [orderedClauseEq] using anchorOrderedMember)
+    rcases List.mem_iff_getElem.mp anchorRawMember with
+      ⟨anchorLiteralIndex, anchorLiteralIndexLt, anchorLiteralAt⟩
+    have taggedAnchorMember :
+        (anchorLiteral, anchorLiteralIndex) ∈
+          rawClause.literals.zipIdx := by
+      rw [List.mem_zipIdx_iff_getElem?, List.getElem?_eq_some_iff]
+      exact ⟨anchorLiteralIndexLt, anchorLiteralAt⟩
+    have localAnchor :=
+      PlanarOneInThreeNoUnitsFigureNine.binaryClause_literal_not_original
+        (retainedFigureNineClearancePositionedFormula source)
+        (by simpa only [rawFormula,
+          retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula]
+          using rawClauseMember)
+        binary anchorRawMember
+    exact ⟨rawClause, anchorLiteral, anchorLiteralIndex,
+      [otherLiteral], rawClauseMember, taggedAnchorMember,
+      orderedLiteralsEq, localAnchor⟩
+  · rcases List.length_eq_three.mp ternary with
+      ⟨first, second, third, rawLiteralsEq⟩
+    have orderedRoutes :=
+      retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes_ternaryClauseRoutesInUnitEliminationOrder
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+    have orderedLiteralsEq :=
+      PositionedPeriodicCNF.orderClauseByRouteDirection_literals_eq_two_zero_one_of_unitEliminationOrder
+        (placement :=
+          retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+            source)
+        orderedRoutes
+        (by simpa only [rawFormula] using rawClauseMember)
+        rawLiteralsEq
+    have thirdLocal :=
+      PlanarOneInThreeNoUnitsFigureNine.ternaryClause_thirdLiteral_not_original
+        (retainedFigureNineClearancePositionedFormula source)
+        (by simpa only [rawFormula,
+          retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula]
+          using rawClauseMember)
+        ternary
+    rcases thirdLocal with
+      ⟨thirdLiteral, thirdLiteralMember, thirdLiteralLocal⟩
+    have thirdLiteralEq : thirdLiteral = third := by
+      simpa [rawLiteralsEq] using thirdLiteralMember
+    subst thirdLiteral
+    refine ⟨rawClause, third, 2, [first, second],
+      rawClauseMember, ?_, ?_, thirdLiteralLocal⟩
+    · simpa [rawLiteralsEq]
+    · rw [orderedClauseEq]
+      exact orderedLiteralsEq
 
 end PeriodicOrthocrossing
 end LeanTrominoes
