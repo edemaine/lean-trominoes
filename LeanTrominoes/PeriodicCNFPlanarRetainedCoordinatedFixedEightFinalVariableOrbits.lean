@@ -204,6 +204,15 @@ inductive FinalFigureNineVariableSource
       (figureNineClauseMember :
         (figureNineClause, figureNineClauseIndex) ∈
           (PeriodicOneInThreePositioned.formula source).clauses.zipIdx)
+      (figureNineMetadataLookup :
+        (PeriodicOneInThreePositioned.formulaClauseMetadata source)[
+            figureNineClauseIndex]? =
+          some
+            ({ sourceClause := sourceClause
+               sourceClauseIndex := sourceClauseIndex
+               clause := figureNineClause
+               localClauseIndex := localFigureNineClauseIndex.val } :
+              PeriodicOneInThreePositioned.ClauseMetadata Variable))
       (kind : OneInThreeNoUnitAux) :
       FinalFigureNineVariableSource source sourcePlacement
         (.inr ((figureNineClauseIndex, figureNineClause.literals), kind))
@@ -438,7 +447,12 @@ theorem composedLiteralVariable_inMacrocellOrbit
             localFigureNineClauseIndex
             (by simpa [localFigureNineClauseIndex] using
               taggedFigureNineClauseMember)
-            figureNineGlobalMember kind
+            figureNineGlobalMember
+            (by
+              simpa [localFigureNineClauseIndex] using
+                PlanarOneInThreeNoUnitsFigureNine.formulaClauseMetadata_figureNineMetadata_lookup
+                  source metadataMember taggedFigureNineClauseMember)
+            kind
       · simpa [literalAtom, auxiliaryScopeEqual,
           finalFigureNineMacrocellScale,
           FinalFigureNineLocalAddress.position,
