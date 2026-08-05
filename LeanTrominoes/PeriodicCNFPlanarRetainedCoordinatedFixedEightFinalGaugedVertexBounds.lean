@@ -127,6 +127,77 @@ theorem retainedOrderedFixedEightComposedRawLocalLiteralPosition_inSquare
   rw [periodEq]
   simpa only [Nat.cast_mul] using naturalInside
 
+/-- If both a literal occurrence and its canonically gauged variable
+representative lie in the same strict fundamental square, their difference
+cannot be a nonzero whole-period translation. -/
+theorem PeriodicVariablePlacement.canonicalPositionGauge_literalOffset_eq_zero
+    {Variable : Type*}
+    (placement : PeriodicVariablePlacement Variable)
+    (periodPositive : 0 < placement.period)
+    (literal : PeriodicLiteral Variable)
+    (gaugedPositionInside :
+      0 < ((placement.variableGauge
+          placement.canonicalPositionGauge).position literal.atom).1 ∧
+        ((placement.variableGauge
+            placement.canonicalPositionGauge).position literal.atom).1 <
+          placement.period ∧
+        0 < ((placement.variableGauge
+          placement.canonicalPositionGauge).position literal.atom).2 ∧
+        ((placement.variableGauge
+            placement.canonicalPositionGauge).position literal.atom).2 <
+          placement.period)
+    (literalPositionInside :
+      0 < (placement.literalPosition literal).1 ∧
+        (placement.literalPosition literal).1 < placement.period ∧
+        0 < (placement.literalPosition literal).2 ∧
+        (placement.literalPosition literal).2 < placement.period) :
+    (literal.variableGauge placement.canonicalPositionGauge).offset =
+      (0, 0) := by
+  have invariant :=
+    PeriodicVariablePlacement.variableGauge_literalPosition
+      placement placement.canonicalPositionGauge literal
+  cases gaugedPositionEq :
+      (placement.variableGauge
+        placement.canonicalPositionGauge).position literal.atom with
+  | mk variableX variableY =>
+      cases literalPositionEq : placement.literalPosition literal with
+      | mk literalX literalY =>
+          cases gaugedOffsetEq :
+              (literal.variableGauge
+                placement.canonicalPositionGauge).offset with
+          | mk offsetX offsetY =>
+              rw [literalPositionEq] at invariant
+              simp only [PeriodicVariablePlacement.literalPosition,
+                PeriodicLiteral.variableGauge_atom] at invariant
+              rw [gaugedPositionEq, gaugedOffsetEq] at invariant
+              have horizontal :
+                  variableX + (placement.period : Int) * offsetX =
+                    literalX := by
+                simpa [
+                  PeriodicVariablePlacement.translation,
+                  Cell.add, Cell.scale] using
+                    congrArg Prod.fst invariant
+              have vertical :
+                  variableY + (placement.period : Int) * offsetY =
+                    literalY := by
+                simpa [
+                  PeriodicVariablePlacement.translation,
+                  Cell.add, Cell.scale] using
+                    congrArg Prod.snd invariant
+              simp only [gaugedPositionEq] at gaugedPositionInside
+              simp only [literalPositionEq] at literalPositionInside
+              have periodIntPositive : 0 < (placement.period : Int) := by
+                exact_mod_cast periodPositive
+              have offsetXZero : offsetX = 0 := by
+                by_contra nonzero
+                have sign : offsetX ≤ -1 ∨ 1 ≤ offsetX := by omega
+                rcases sign with negative | positive <;> nlinarith
+              have offsetYZero : offsetY = 0 := by
+                by_contra nonzero
+                have sign : offsetY ≤ -1 ∨ 1 ≤ offsetY := by omega
+                rcases sign with negative | positive <;> nlinarith
+              simp [offsetXZero, offsetYZero]
+
 /-- The coordinate residue of every genuine raw composed variable is the
 natural bounded point selected by its finite Figure 9 macrocell address. -/
 theorem retainedOrderedFixedEightComposedRawVariablePosition_residue_inSquare
