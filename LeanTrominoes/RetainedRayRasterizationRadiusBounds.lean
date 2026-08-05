@@ -99,5 +99,57 @@ theorem rasterizeRetainedPolyline_points_withinCoordinateRadius
       vector indexBound
   exact checkpointBounded.trans pointNearCheckpoint
 
+/-- A retained-ray rasterization expands any common closed rectangle for the
+source polyline by at most nine cells in every coordinate.  The statement
+also covers empty and singleton polylines. -/
+theorem rasterizeRetainedPolyline_point_in_expandedRectangle
+    {lower upper : Cell} {points : List Cell}
+    (retained : RetainedRayPolyline points)
+    (sourceBounded :
+      ∀ point ∈ points,
+        InClosedGridRectangle lower upper point)
+    {point : Cell}
+    (pointMember :
+      point ∈ rasterizeRetainedPolyline points) :
+    InClosedGridRectangle
+      (coordinateRadiusLower 9 lower)
+      (coordinateRadiusUpper 9 upper)
+      point := by
+  by_cases length : 2 ≤ points.length
+  · rcases
+        rasterizeRetainedPolyline_point_in_corridor
+          retained length pointMember with
+      ⟨segment, segmentMember, corridor⟩
+    have segmentBounded :=
+      inExpandedCoordinateRectangle_of_inRetainedSegmentRasterCorridor
+        corridor
+    have endpoints :=
+      gridPolylineSegments_endpoints_mem segmentMember
+    have startBounded :=
+      sourceBounded segment.start endpoints.1
+    have finishBounded :=
+      sourceBounded segment.finish endpoints.2
+    rcases lower with ⟨lowerX, lowerY⟩
+    rcases upper with ⟨upperX, upperY⟩
+    rcases segment with
+      ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
+    rcases point with ⟨pointX, pointY⟩
+    simp only [InClosedGridRectangle,
+      coordinateRadiusLower, coordinateRadiusUpper,
+      GridSegment.coordinateLower,
+      GridSegment.coordinateUpper]
+      at startBounded finishBounded segmentBounded ⊢
+    omega
+  · rcases points with _ | ⟨first, rest⟩
+    · simp [rasterizeRetainedPolyline] at pointMember
+    · rcases rest with _ | ⟨second, rest⟩
+      · simp only [rasterizeRetainedPolyline_singleton,
+          List.mem_singleton] at pointMember
+        subst point
+        exact inClosedGridRectangle_coordinateRadius_of_center
+          (sourceBounded first (by simp))
+          (withinCoordinateRadius_refl 9 first)
+      · simp at length
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
