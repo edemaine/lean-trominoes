@@ -1,4 +1,6 @@
 import LeanTrominoes.PositionedPeriodicCNFRebasedRouteBounds
+import LeanTrominoes.PositionedPeriodicCNFRebasedRouteTransport
+import LeanTrominoes.PositionedPeriodicCNFVariableGaugeClauseMembership
 import LeanTrominoes.RetainedRayRasterizationCorridor
 
 /-!
@@ -60,6 +62,134 @@ def PlanarIncidencePresentation.RebasedRoutePointsWithinVariablePeriod
     ∀ point ∈ presentation.variableToClauseRoute tagged.1,
       WithinCoordinateRadius placement.period
         (placement.position tagged.1.literal.atom) point
+
+/-- Pointwise, membership-based form of the variable-centered radius bound.
+Unlike a planar presentation, this predicate needs only a positioned formula,
+placement, and raw route family, so it can be transported through intermediate
+presentation changes before compatibility has been packaged. -/
+def RebasedIncidenceRoutesWithinVariablePeriod
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes) : Prop :=
+  ∀ clause clauseIndex,
+    (clause, clauseIndex) ∈ source.clauses.zipIdx →
+    ∀ literal literalIndex,
+      (literal, literalIndex) ∈ clause.literals.zipIdx →
+      ∀ point ∈
+        PeriodicOrthocrossing.translatePolyline
+          (placement.translation
+            (Cell.sub
+              (PeriodicCNF.clauseAnchor clause.literals)
+              literal.offset))
+          (routes clauseIndex literalIndex).reverse,
+        WithinCoordinateRadius placement.period
+          (placement.position literal.atom) point
+
+/-- The raw membership-based radius certificate supplies the corresponding
+field of any planar presentation with that route family. -/
+theorem PlanarIncidencePresentation.rebasedRoutePointsWithinVariablePeriod_of_raw
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : PlanarIncidencePresentation source placement)
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement presentation.routes) :
+    presentation.RebasedRoutePointsWithinVariablePeriod := by
+  intro tagged taggedMember point pointMember
+  rcases incidenceMetadata_of_tagged source taggedMember with
+    ⟨clause, literal, clauseMember, literalMember, incidenceEq⟩
+  rw [incidenceEq] at pointMember ⊢
+  exact bounds clause tagged.1.clauseIndex clauseMember
+    literal tagged.1.literalIndex literalMember point pointMember
+
+/-- Stable clause reindexing and its canonical anchor translation preserve
+the raw variable-centered radius certificate. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.orderCanonicalRoutesByClauseDirection
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      (orderClausesByRouteDirection source routes)
+      placement
+      (orderCanonicalRoutesByClauseDirection
+        source placement routes) := by
+  intro orderedClause clauseIndex clauseMember
+    literal literalIndex literalMember point pointMember
+  rcases exists_sourceLiteral_of_orderCanonicalRoutes_rebasedRoute_eq
+      source placement routes clauseMember literalMember with
+    ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
+      sourceClauseMember, sourceLiteralMember,
+      literalEq, routeEq⟩
+  subst literal
+  rw [routeEq] at pointMember
+  exact bounds sourceClause clauseIndex sourceClauseMember
+    sourceLiteral sourceLiteralIndex sourceLiteralMember
+    point pointMember
+
+/-- Canonical route transport through a variable gauge preserves the raw
+variable-centered radius certificate: both route points and their variable
+center receive the same inverse physical gauge translation. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.variableGaugeCanonicalIncidenceRoutes
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (gauge : Variable → Cell)
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      (source.variableGauge gauge)
+      (placement.variableGauge gauge)
+      (variableGaugeCanonicalIncidenceRoutes
+        source placement gauge routes) := by
+  intro gaugedClause clauseIndex gaugedClauseMember
+    gaugedLiteral literalIndex gaugedLiteralMember point pointMember
+  rcases exists_sourceClause_of_variableGaugeClause_mem
+      source gauge gaugedClauseMember with
+    ⟨sourceClause, sourceClauseMember, gaugedClauseEq⟩
+  subst gaugedClause
+  change
+    (gaugedLiteral, literalIndex) ∈
+      (sourceClause.literals.map
+        (PeriodicLiteral.variableGauge gauge)).zipIdx
+    at gaugedLiteralMember
+  rw [List.zipIdx_map] at gaugedLiteralMember
+  rcases List.mem_map.mp gaugedLiteralMember with
+    ⟨taggedSourceLiteral, taggedSourceLiteralMember,
+      gaugedTaggedLiteralEq⟩
+  have literalIndexEq :
+      taggedSourceLiteral.2 = literalIndex :=
+    congrArg Prod.snd gaugedTaggedLiteralEq
+  subst literalIndex
+  have gaugedLiteralEq :
+      gaugedLiteral =
+        taggedSourceLiteral.1.variableGauge gauge :=
+    (congrArg Prod.fst gaugedTaggedLiteralEq).symm
+  subst gaugedLiteral
+  rw [variableGaugeCanonicalIncidenceRoutes_rebasedRoute_eq
+    source placement gauge routes sourceClauseMember]
+    at pointMember
+  unfold PeriodicOrthocrossing.translatePolyline at pointMember
+  rcases List.mem_map.mp pointMember with
+    ⟨sourcePoint, sourcePointMember, rfl⟩
+  have sourceBounded :=
+    bounds sourceClause clauseIndex sourceClauseMember
+      taggedSourceLiteral.1 taggedSourceLiteral.2
+      taggedSourceLiteralMember sourcePoint sourcePointMember
+  have translated := sourceBounded.translate
+    (placement.translation
+      (Cell.sub (0, 0) (gauge taggedSourceLiteral.1.atom)))
+  simpa [PeriodicVariablePlacement.variableGauge,
+    PeriodicVariablePlacement.translation,
+    Cell.add, Cell.sub, Cell.scale,
+    sub_eq_add_neg, add_comm] using translated
 
 /-- The variable-centered one-period radius criterion implies the exact
 rebased-route halo bound consumed by ribbon thickening. -/

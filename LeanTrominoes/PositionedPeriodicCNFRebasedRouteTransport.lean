@@ -44,6 +44,7 @@ theorem exists_sourceLiteral_of_orderCanonicalRoutes_rebasedRoute_eq
       (sourceClause, clauseIndex) ∈ source.clauses.zipIdx ∧
         (sourceLiteral, sourceLiteralIndex) ∈
           sourceClause.literals.zipIdx ∧
+        literal = sourceLiteral ∧
         PeriodicOrthocrossing.translatePolyline
             (placement.translation
               (Cell.sub
@@ -64,7 +65,7 @@ theorem exists_sourceLiteral_of_orderCanonicalRoutes_rebasedRoute_eq
       orderedClauseEq, literalEq, orderedRouteEq⟩
   refine
     ⟨sourceClause, sourceLiteral, sourceLiteralIndex,
-      sourceClauseMember, sourceLiteralMember, ?_⟩
+      sourceClauseMember, sourceLiteralMember, literalEq, ?_⟩
   subst orderedClause
   subst literal
   have sourceClauseLookup :=
