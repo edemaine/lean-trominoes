@@ -175,5 +175,99 @@ theorem
     (retainedGaugedWrappedDrawingIncidenceRoutes_withinPhysicalLiteralPeriod
       formula wellFormed degree isLocal).anchorNormalize
 
+/-- Literal-list deduplication reuses the zero-anchor representative route,
+so it preserves the retained variable-centered certificate exactly. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingIncidenceRoutes_withinVariablePeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal) :
+    PositionedPeriodicCNF.RebasedIncidenceRoutesWithinVariablePeriod
+      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+      (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+        formula) := by
+  let source :=
+    retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  let sourceRoutes :=
+    PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes
+      (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      placement
+      (retainedDrawingPlanarSATLocalIncidenceRoutes formula)
+  have sourceBounds :
+      PositionedPeriodicCNF.RebasedIncidenceRoutesWithinVariablePeriod
+        source placement sourceRoutes := by
+    simpa [source, placement, sourceRoutes] using
+      retainedAnchorNormalizedGaugedWrappedDrawingIncidenceRoutes_withinVariablePeriod
+        formula wellFormed degree isLocal
+  intro retainedClause clauseIndex retainedClauseMember
+    literal literalIndex literalMember point pointMember
+  have retainedClauseLookup :
+      source.deduplicateByLiterals.clauses[clauseIndex]? =
+        some retainedClause := by
+    apply (List.mem_zipIdx_iff_getElem?).mp
+    simpa [source,
+      retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+      using retainedClauseMember
+  have retainedClauseMem :
+      retainedClause ∈ source.deduplicateByLiterals.clauses :=
+    List.fst_mem_of_mem_zipIdx (by
+      simpa [source,
+        retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+        using retainedClauseMember)
+  rcases exists_representativeClause_of_mem_deduplicateByLiterals
+      source retainedClause retainedClauseMem with
+    ⟨sourceClause, sourceClauseLookup, sourceClauseLiterals⟩
+  have sourceClauseMember :
+      (sourceClause,
+        source.representativeClauseIndex retainedClause.literals) ∈
+          source.clauses.zipIdx :=
+    (List.mem_zipIdx_iff_getElem?).mpr sourceClauseLookup
+  have sourceLiteralMember :
+      (literal, literalIndex) ∈ sourceClause.literals.zipIdx := by
+    simpa [sourceClauseLiterals] using literalMember
+  have anchorZero :
+      PeriodicCNF.clauseAnchor retainedClause.literals = (0, 0) := by
+    apply clauseAnchor_eq_zero_of_mem_deduplicate_anchorNormalize
+      (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      placement retainedClause
+    simpa [source] using retainedClauseMem
+  unfold PeriodicOrthocrossing.translatePolyline at pointMember
+  rcases List.mem_map.mp pointMember with
+    ⟨storedPoint, storedPointMember, rfl⟩
+  have storedPointMember' :
+      storedPoint ∈
+        retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+          formula clauseIndex literalIndex :=
+    List.mem_reverse.mp storedPointMember
+  have sourcePointMember :
+      storedPoint ∈
+        sourceRoutes
+          (source.representativeClauseIndex retainedClause.literals)
+          literalIndex := by
+    apply mem_sourceRoute_of_mem_deduplicatedIncidenceRoute_of_anchor_zero
+      source placement sourceRoutes retainedClauseLookup anchorZero
+    simpa [source, placement, sourceRoutes,
+      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes]
+      using storedPointMember'
+  apply sourceBounds sourceClause
+    (source.representativeClauseIndex retainedClause.literals)
+    sourceClauseMember literal literalIndex sourceLiteralMember
+  unfold PeriodicOrthocrossing.translatePolyline
+  apply List.mem_map.mpr
+  refine ⟨storedPoint, List.mem_reverse.mpr sourcePointMember, ?_⟩
+  simp [sourceClauseLiterals]
+
 end PeriodicOrthocrossing
 end LeanTrominoes
