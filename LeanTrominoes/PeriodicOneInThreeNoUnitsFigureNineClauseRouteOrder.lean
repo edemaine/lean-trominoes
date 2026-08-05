@@ -142,6 +142,61 @@ theorem figureNineClause_secondAtom_not_original_of_mem_clauseClauses
           ⟨rfl, rfl, rfl⟩ | ⟨rfl, rfl, rfl⟩ | ⟨rfl, rfl, rfl⟩ <;>
           simp [PeriodicOneInThree.auxiliary]
 
+/-- Whenever a Figure 9 clause has at least three literals, its third
+literal is a fresh Figure 9 auxiliary rather than an original source
+variable. -/
+theorem figureNineClause_thirdAtom_not_original_of_mem_clauseClauses
+    {Variable : Type*}
+    (sourceClauseIndex : Nat)
+    (source : PeriodicClause Variable)
+    {first second third : PeriodicLiteral (OneInThreeVariable Variable)}
+    {rest : List (PeriodicLiteral (OneInThreeVariable Variable))}
+    (member :
+      first :: second :: third :: rest ∈
+        PeriodicOneInThree.clauseClauses sourceClauseIndex source) :
+    ∀ sourceAtom : Variable, third.atom ≠ .inl sourceAtom := by
+  rcases source with _ | ⟨sourceFirst, sourceRest⟩
+  · simp [PeriodicOneInThree.clauseClauses,
+      PeriodicOneInThree.disjunctionGadget,
+      PeriodicOneInThree.padding,
+      PeriodicOneInThree.forcePaddingFalse] at member
+    rcases member with h | h | h <;>
+      rcases h with ⟨_, tail⟩ <;>
+      rcases tail with ⟨_, tail⟩ <;>
+      rcases tail with ⟨thirdEq, _⟩ <;>
+      rw [thirdEq] <;>
+      simp [PeriodicOneInThree.auxiliary]
+  · rcases sourceRest with _ | ⟨sourceSecond, sourceRest⟩
+    · simp [PeriodicOneInThree.clauseClauses,
+        PeriodicOneInThree.disjunctionGadget,
+        PeriodicOneInThree.padding,
+        PeriodicOneInThree.forcePaddingFalse] at member
+      rcases member with h | h | h <;>
+        rcases h with ⟨_, tail⟩ <;>
+        rcases tail with ⟨_, tail⟩ <;>
+        rcases tail with ⟨thirdEq, _⟩ <;>
+        rw [thirdEq] <;>
+        simp [PeriodicOneInThree.auxiliary]
+    · rcases sourceRest with _ | ⟨sourceThird, sourceTail⟩
+      · simp [PeriodicOneInThree.clauseClauses,
+          PeriodicOneInThree.disjunctionGadget,
+          PeriodicOneInThree.padding,
+          PeriodicOneInThree.forcePaddingFalse] at member
+        rcases member with h | h | h <;>
+          rcases h with ⟨_, tail⟩ <;>
+          rcases tail with ⟨_, tail⟩ <;>
+          rcases tail with ⟨thirdEq, _⟩ <;>
+          rw [thirdEq] <;>
+          simp [PeriodicOneInThree.auxiliary]
+      · simp [PeriodicOneInThree.clauseClauses,
+          PeriodicOneInThree.disjunctionGadget] at member
+        rcases member with h | h | h <;>
+          rcases h with ⟨_, tail⟩ <;>
+          rcases tail with ⟨_, tail⟩ <;>
+          rcases tail with ⟨thirdEq, _⟩ <;>
+          rw [thirdEq] <;>
+          simp [PeriodicOneInThree.auxiliary]
+
 /-- Every ternary clause in the composed formula has a second literal that
 is not inherited through both transformations.  This auxiliary incidence
 will later witness that the clause endpoint is absent from an inherited
@@ -243,6 +298,115 @@ theorem ternaryClause_secondLiteral_not_original
         apply sourceSecondNotOriginal sourceAtom
         change
           Sum.inl sourceSecond.atom =
+            Sum.inl (Sum.inl sourceAtom) at equal
+        exact Sum.inl.inj equal
+
+/-- Every ternary clause in the composed formula has a third literal that
+is not inherited through both transformations.  The final clockwise sort
+will move precisely this clause-local auxiliary to the anchor position. -/
+theorem ternaryClause_thirdLiteral_not_original
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    {clause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable (OneInThreeVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (PeriodicOneInThreeNoUnitsPositioned.formula
+          (PeriodicOneInThreePositioned.formula source)).clauses.zipIdx)
+    (arity : clause.literals.length = 3) :
+    ∃ third,
+      (third, 2) ∈ clause.literals.zipIdx ∧
+        ∀ sourceAtom : Variable,
+          third.atom ≠ .inl (.inl sourceAtom) := by
+  rcases formulaClauseMetadata_lookup_valid
+      source clauseMember with
+    ⟨metadata, metadataLookup, metadataClause,
+      _sourceClauseMember, _localClauseMember⟩
+  have metadataIndexLt :
+      clauseIndex < (formulaClauseMetadata source).length :=
+    (List.getElem?_eq_some_iff.mp metadataLookup).1
+  have metadataMember : metadata ∈ formulaClauseMetadata source := by
+    rw [← (List.getElem?_eq_some_iff.mp metadataLookup).2]
+    exact List.getElem_mem metadataIndexLt
+  rcases formulaClauseMetadata_unitEliminationMetadata_lookup_valid
+      source metadataMember with
+    ⟨unitMetadata, _unitMetadataLookup, unitMetadataClause,
+      unitSourceClauseMember, unitGeneratedClauseMember⟩
+  have finalClauseLiteralsMember :
+      unitMetadata.clause.literals ∈
+        PeriodicOneInThreeNoUnits.clauseClauses
+          unitMetadata.sourceClauseIndex
+          unitMetadata.sourceClause.literals := by
+    rw [← PeriodicOneInThreeNoUnitsPositioned.clauseGadget_literals]
+    exact List.mem_map.mpr
+      ⟨unitMetadata.clause,
+        List.fst_mem_of_mem_zipIdx unitGeneratedClauseMember, rfl⟩
+  have unitClauseArity : unitMetadata.clause.literals.length = 3 := by
+    simpa [unitMetadataClause, metadataClause] using arity
+  rcases sourceLiteralsEq : unitMetadata.sourceClause.literals with
+    _ | ⟨sourceFirst, sourceRest⟩
+  · simp [PeriodicOneInThreeNoUnits.clauseClauses,
+      sourceLiteralsEq] at finalClauseLiteralsMember
+    rcases finalClauseLiteralsMember with firstEq | secondEq | thirdEq
+    · rw [firstEq] at unitClauseArity
+      simp at unitClauseArity
+    · rw [secondEq] at unitClauseArity
+      simp at unitClauseArity
+    · rw [thirdEq] at unitClauseArity
+      simp at unitClauseArity
+  · rcases sourceRest with _ | ⟨sourceSecond, sourceTail⟩
+    · simp [PeriodicOneInThreeNoUnits.clauseClauses,
+        sourceLiteralsEq] at finalClauseLiteralsMember
+      rcases finalClauseLiteralsMember with ternaryEq | binaryEq
+      · let third :=
+          PeriodicOneInThreeNoUnits.auxiliary
+            unitMetadata.sourceClauseIndex [sourceFirst]
+            OneInThreeNoUnitAux.second
+        refine ⟨third, ?_, ?_⟩
+        · rw [← metadataClause, ← unitMetadataClause,
+            ternaryEq]
+          simp [third]
+        · intro sourceAtom
+          simp [third, PeriodicOneInThreeNoUnits.auxiliary]
+      · rw [binaryEq] at unitClauseArity
+        simp at unitClauseArity
+    · have figureNineClauseLiteralsMember :
+          (sourceFirst :: sourceSecond :: sourceTail) ∈
+            PeriodicOneInThree.clauseClauses
+              metadata.sourceClauseIndex
+              metadata.sourceClause.literals := by
+        rw [← PeriodicOneInThreePositioned.clauseGadget_literals]
+        exact List.mem_map.mpr
+          ⟨unitMetadata.sourceClause,
+            List.fst_mem_of_mem_zipIdx unitSourceClauseMember,
+            by simp [sourceLiteralsEq]⟩
+      have generatedLiterals :
+          unitMetadata.clause.literals =
+            (sourceFirst :: sourceSecond :: sourceTail).map
+              PeriodicOneInThreeNoUnits.liftLiteral := by
+        simpa [PeriodicOneInThreeNoUnits.clauseClauses,
+          sourceLiteralsEq] using finalClauseLiteralsMember
+      have sourceTailLength : sourceTail.length = 1 := by
+        simpa [generatedLiterals] using unitClauseArity
+      rcases List.length_eq_one_iff.mp sourceTailLength with
+        ⟨sourceThird, sourceTailEq⟩
+      have sourceThirdNotOriginal :=
+        figureNineClause_thirdAtom_not_original_of_mem_clauseClauses
+          metadata.sourceClauseIndex metadata.sourceClause.literals
+          (first := sourceFirst) (second := sourceSecond)
+          (third := sourceThird) (rest := [])
+          (by simpa [sourceTailEq] using figureNineClauseLiteralsMember)
+      let third := PeriodicOneInThreeNoUnits.liftLiteral sourceThird
+      refine ⟨third, ?_, ?_⟩
+      · rw [← metadataClause, ← unitMetadataClause,
+          generatedLiterals, sourceTailEq]
+        simp [third]
+      · intro sourceAtom equal
+        apply sourceThirdNotOriginal sourceAtom
+        change
+          Sum.inl sourceThird.atom =
             Sum.inl (Sum.inl sourceAtom) at equal
         exact Sum.inl.inj equal
 
