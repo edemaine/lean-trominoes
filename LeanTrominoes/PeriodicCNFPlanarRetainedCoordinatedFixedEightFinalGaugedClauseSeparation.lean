@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalClauseOrbitSeparation
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedDrawing
+import LeanTrominoes.PositionedPeriodicCNFVariableGaugeClauseMembership
 
 /-!
 # Clause separation in the final canonical gauge
@@ -24,7 +25,7 @@ local instance finalGaugedClauseSeparationDecidableEq
 
 /-- A genuine clause of the final gauged presentation recovers the raw
 composed clause at exactly the same presentation index and stored position. -/
-private theorem exists_composedRawClause_of_finalGaugedClause_mem
+theorem exists_composedRawClause_of_finalGaugedClause_mem
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
     (sourceLocal : source.IsLocal)
@@ -47,36 +48,29 @@ private theorem exists_composedRawClause_of_finalGaugedClause_mem
           (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
             source).clauses.zipIdx ∧
         finalClause.position = rawClause.position := by
-  change
-    (finalClause, clauseIndex) ∈
-      ((retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
+  have finalMember' :
+      (finalClause, clauseIndex) ∈
+        ((retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
           source sourceLocal sourceWidth sourceOccurrences
-          sourceClausesNonempty).clauses.map fun clause =>
-        ⟨clause.position,
-          clause.literals.variableGauge
+          sourceClausesNonempty).variableGauge
             (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
-              source)⟩).zipIdx at finalMember
-  rw [List.zipIdx_map] at finalMember
-  rcases List.mem_map.mp finalMember with
-    ⟨taggedClause, taggedClauseMember, finalClauseEq⟩
-  have clauseIndexEq : taggedClause.2 = clauseIndex :=
-    congrArg Prod.snd finalClauseEq
-  have finalClauseValueEq :
-      finalClause =
-        ⟨taggedClause.1.position,
-          taggedClause.1.literals.variableGauge
-            (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
-              source)⟩ :=
-    (congrArg Prod.fst finalClauseEq).symm
-  subst clauseIndex
-  subst finalClause
+              source)).clauses.zipIdx := by
+    simpa only [
+      retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula]
+      using finalMember
+  rcases PositionedPeriodicCNF.exists_sourceClause_of_variableGaugeClause_mem
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
+        source sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty)
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge source)
+      finalMember' with
+    ⟨orderedClause, orderedClauseMember, finalClauseEq⟩
   rcases PositionedPeriodicCNF.exists_sourceClause_of_orderedClause_mem
       (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes
         source sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty)
-      taggedClauseMember with
+      orderedClauseMember with
     ⟨rawClause, rawClauseMember, orderedClauseEq⟩
   refine ⟨rawClause, rawClauseMember, ?_⟩
-  rw [orderedClauseEq]
+  rw [finalClauseEq, orderedClauseEq]
   rfl
 
 /-- Canonical final clause positions identify their unchanged presentation
@@ -131,8 +125,8 @@ theorem retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_eq_imp_claus
               source).translation relativeTranslate)
           secondRawClause.position := by
     rw [← firstStoredPosition, ← secondStoredPosition]
-    rcases firstClause.position with ⟨firstX, firstY⟩
-    rcases secondClause.position with ⟨secondX, secondY⟩
+    rcases firstPositionEq : firstClause.position with ⟨firstX, firstY⟩
+    rcases secondPositionEq : secondClause.position with ⟨secondX, secondY⟩
     rcases firstAnchorEq :
         PeriodicCNF.clauseAnchor firstClause.literals with
       ⟨firstAnchorX, firstAnchorY⟩
@@ -144,12 +138,39 @@ theorem retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_eq_imp_claus
       PeriodicVariablePlacement.variableGauge_period,
       PeriodicVariablePlacement.translation, Cell.add, Cell.sub, Cell.scale,
       relativeTranslate, firstAnchorEq, secondAnchorEq,
-      Prod.mk.injEq] at positionsEqual ⊢
-    constructor <;> nlinarith
+      firstPositionEq, secondPositionEq, Prod.mk.injEq]
+      at positionsEqual ⊢
+    constructor
+    · linear_combination positionsEqual.1
+    · linear_combination positionsEqual.2
   exact
     retainedOrderedFixedEightComposedRawClausePosition_eq_translated_imp_clauseIndex_eq
       source sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty
       firstRawMember secondRawMember relativeTranslate rawPositionsEqual
+
+private theorem canonicalClausePositions_nodup_of_index_injective
+    {Variable : Type*}
+    (formula : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (indexInjective :
+      ∀ {firstClause secondClause : PositionedPeriodicClause Variable}
+          {firstClauseIndex secondClauseIndex : Nat},
+        (firstClause, firstClauseIndex) ∈ formula.clauses.zipIdx →
+        (secondClause, secondClauseIndex) ∈ formula.clauses.zipIdx →
+        PositionedPeriodicCNF.canonicalClausePosition placement firstClause =
+          PositionedPeriodicCNF.canonicalClausePosition placement secondClause →
+        firstClauseIndex = secondClauseIndex) :
+    (formula.clauses.map
+      (PositionedPeriodicCNF.canonicalClausePosition placement)).Nodup := by
+  rw [List.nodup_iff_injective_getElem]
+  intro firstIndex secondIndex positionsEqual
+  apply Fin.ext
+  apply indexInjective
+  · apply List.mk_mem_zipIdx_iff_getElem?.mpr
+    exact List.getElem?_eq_getElem (by simpa using firstIndex.isLt)
+  · apply List.mk_mem_zipIdx_iff_getElem?.mpr
+    exact List.getElem?_eq_getElem (by simpa using secondIndex.isLt)
+  · simpa using positionsEqual
 
 /-- The canonical clause-position suffix of the final incidence drawing has
 no collisions. -/
@@ -167,30 +188,13 @@ theorem retainedOrderedFixedEightFinalGaugedCanonicalClausePositions_nodup
       (PositionedPeriodicCNF.canonicalClausePosition
         (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
           source))).Nodup := by
-  rw [List.nodup_iff_injective_getElem]
-  intro firstIndex secondIndex positionsEqual
-  have firstMember :
-      ((retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
-          source sourceLocal sourceWidth sourceOccurrences
-          sourceClausesNonempty).clauses[firstIndex.val], firstIndex.val) ∈
-        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
-          source sourceLocal sourceWidth sourceOccurrences
-          sourceClausesNonempty).clauses.zipIdx :=
-    List.mem_zipIdx'.mpr ⟨by simpa using firstIndex.isLt, rfl⟩
-  have secondMember :
-      ((retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
-          source sourceLocal sourceWidth sourceOccurrences
-          sourceClausesNonempty).clauses[secondIndex.val], secondIndex.val) ∈
-        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
-          source sourceLocal sourceWidth sourceOccurrences
-          sourceClausesNonempty).clauses.zipIdx :=
-    List.mem_zipIdx'.mpr ⟨by simpa using secondIndex.isLt, rfl⟩
-  apply Fin.ext
-  apply
+  apply canonicalClausePositions_nodup_of_index_injective
+  intro firstClause secondClause firstClauseIndex secondClauseIndex
+    firstMember secondMember positionsEqual
+  exact
     retainedOrderedFixedEightFinalGaugedCanonicalClausePosition_eq_imp_clauseIndex_eq
       source sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty
-      firstMember secondMember
-  simpa using positionsEqual
+      firstMember secondMember positionsEqual
 
 end PeriodicOrthocrossing
 end LeanTrominoes

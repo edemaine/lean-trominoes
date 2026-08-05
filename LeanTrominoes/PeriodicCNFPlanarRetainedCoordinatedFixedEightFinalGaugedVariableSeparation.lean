@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalVariableOrbitSeparation
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedDrawing
+import LeanTrominoes.PositionedPeriodicCNFVariableVertexPosition
 
 /-!
 # Variable separation in the final canonical gauge
@@ -56,7 +57,7 @@ private theorem finalClockwiseVariableOccurrence_mem_composedRaw
 
 /-- Every occurrence in the final gauged formula was already a genuine raw
 composed occurrence. -/
-private theorem finalGaugedVariableOccurrence_mem_composedRaw
+theorem finalGaugedVariableOccurrence_mem_composedRaw
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
     (sourceLocal : source.IsLocal)
@@ -150,12 +151,10 @@ theorem retainedOrderedFixedEightFinalGaugedVariablePositions_nodup
       ∀ clause ∈ source.clauses, clause ≠ []) :
     ((retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
         source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty).erase.incidenceVariableVertices.map fun vertex =>
-      match vertex with
-      | .variable atom =>
-          (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
-            source).position atom
-      | .clause _ => (0, 0)).Nodup := by
+        sourceClausesNonempty).erase.incidenceVariableVertices.map
+      (PositionedPeriodicCNF.incidenceVariableVertexPosition
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
+          source))).Nodup := by
   rw [PeriodicCNF.incidenceVariableVertices, List.map_map]
   apply
     (List.nodup_dedup
@@ -167,7 +166,8 @@ theorem retainedOrderedFixedEightFinalGaugedVariablePositions_nodup
     source sourceLocal sourceWidth sourceOccurrences sourceClausesNonempty
   · exact (List.mem_dedup.mp firstMember)
   · exact (List.mem_dedup.mp secondMember)
-  · simpa [Function.comp_def] using positionsEqual
+  · simpa [PositionedPeriodicCNF.incidenceVariableVertexPosition,
+      Function.comp_def] using positionsEqual
 
 end PeriodicOrthocrossing
 end LeanTrominoes
