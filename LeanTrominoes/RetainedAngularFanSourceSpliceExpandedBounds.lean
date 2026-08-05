@@ -132,5 +132,59 @@ theorem
   norm_num [Nat.cast_mul] at rasterBounded marginFitsInt ⊢
   omega
 
+/-- A local factor-eight Figure 7 occurrence suffix stays in the refined
+neighboring-period square whenever its canonical source center lies in the
+unrefined neighboring-period square.  The factor-288 refinement leaves much
+more room than the suffix's radius-96 bound. -/
+theorem scaledAngularOccurrenceSuffix_point_inExpanded
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (order : OccurrenceOrder source.erase)
+    (clause : PositionedPeriodicClause Variable)
+    (literal : PeriodicLiteral Variable)
+    (clauseIndex literalIndex : Nat)
+    (centerBounded :
+      let sourcePeriod : Int := sourcePlacement.period
+      let center :=
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          sourcePlacement clause literal
+      -sourcePeriod < center.1 ∧
+        center.1 < 2 * sourcePeriod ∧
+        -sourcePeriod < center.2 ∧
+        center.2 < 2 * sourcePeriod)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (angularOccurrenceSuffix sourcePlacement order
+            clause literal clauseIndex literalIndex)) :
+    let refinedPeriod : Int :=
+      (retainedTerminalFanRoutingRefinement *
+        PeriodicEightOccurrenceSplitPositioned.refinementScale) *
+          sourcePlacement.period
+    -refinedPeriod < point.1 ∧
+      point.1 < 2 * refinedPeriod ∧
+      -refinedPeriod < point.2 ∧
+      point.2 < 2 * refinedPeriod := by
+  have localBound :=
+    scaledAngularOccurrenceSuffix_point_in_centerRectangle
+      sourcePlacement order clause literal
+      clauseIndex literalIndex pointMember
+  rcases centerEq :
+      PositionedPeriodicCNF.canonicalLiteralPosition
+        sourcePlacement clause literal with
+    ⟨centerX, centerY⟩
+  rcases point with ⟨pointX, pointY⟩
+  simp only [InClosedGridRectangle,
+    coordinateRadiusLower, coordinateRadiusUpper,
+    Cell.scale, centerEq] at localBound
+  simp only [centerEq] at centerBounded
+  dsimp only
+  norm_num [retainedTerminalFanRoutingRefinement,
+    PeriodicEightOccurrenceSplitPositioned.refinementScale]
+    at localBound ⊢
+  omega
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
