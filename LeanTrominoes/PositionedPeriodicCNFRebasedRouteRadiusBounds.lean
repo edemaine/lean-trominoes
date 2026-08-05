@@ -87,6 +87,54 @@ def RebasedIncidenceRoutesWithinVariablePeriod
         WithinCoordinateRadius placement.period
           (placement.position literal.atom) point
 
+/-- The rebased variable-centered certificate can equivalently be read on
+the stored physical route: every raw point is within one period of that
+incidence's canonical clause-anchor-gauged literal endpoint. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.rawRoutePointsWithinCanonicalLiteralPeriod
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember : point ∈ routes clauseIndex literalIndex) :
+    WithinCoordinateRadius placement.period
+      (canonicalLiteralPosition placement clause literal)
+      point := by
+  let shift :=
+    placement.translation
+      (Cell.sub
+        (PeriodicCNF.clauseAnchor clause.literals)
+        literal.offset)
+  have rebasedMember :
+      Cell.add shift point ∈
+        PeriodicOrthocrossing.translatePolyline shift
+          (routes clauseIndex literalIndex).reverse := by
+    unfold PeriodicOrthocrossing.translatePolyline
+    exact List.mem_map.mpr
+      ⟨point, List.mem_reverse.mpr pointMember, rfl⟩
+  have rebasedBounded :=
+    bounds clause clauseIndex clauseMember
+      literal literalIndex literalMember
+      (Cell.add shift point) rebasedMember
+  have translated := rebasedBounded.translate
+    (Cell.scale (-1) shift)
+  simpa [shift, canonicalLiteralPosition,
+    PeriodicVariablePlacement.translation,
+    Cell.add, Cell.sub, Cell.scale,
+    sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
+    using translated
+
 /-- The raw membership-based radius certificate supplies the corresponding
 field of any planar presentation with that route family. -/
 theorem PlanarIncidencePresentation.rebasedRoutePointsWithinVariablePeriod_of_raw
