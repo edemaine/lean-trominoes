@@ -245,7 +245,13 @@ theorem composedLiteralVariable_inMacrocellOrbit
       Cell.InMacrocellOrbit finalFigureNineMacrocellScale
         sourcePlacement.period base address.position
         ((PlanarOneInThreeNoUnitsFigureNine.composedPlacement
-          source sourcePlacement).position literal.atom) := by
+          source sourcePlacement).position literal.atom) ∧
+      ((∀ sourceAtom : Variable,
+          literal.atom ≠ .inl (.inl sourceAtom)) →
+        (PlanarOneInThreeNoUnitsFigureNine.composedPlacement
+            source sourcePlacement).literalPosition literal =
+          Cell.macrocellPosition finalFigureNineMacrocellScale
+            base address.position) := by
   rcases PlanarOneInThreeNoUnitsFigureNine.formulaClauseMetadata_lookup_valid
       source clauseMember with
     ⟨metadata, metadataLookup, metadataClauseEqual,
@@ -311,7 +317,7 @@ theorem composedLiteralVariable_inMacrocellOrbit
           finalClauseLiteralsMember finalLiteralMember
           figureNineAtom literalAtom with
         ⟨figureNineLiteral, figureNineLiteralIndex,
-          figureNineLiteralMember, figureNineLiteralAtom, _literalOffset⟩
+          figureNineLiteralMember, figureNineLiteralAtom, literalOffset⟩
       have figureNineLiteralMem :
           figureNineLiteral ∈ taggedFigureNineClause.1.literals :=
         List.fst_mem_of_mem_zipIdx figureNineLiteralMember
@@ -336,7 +342,7 @@ theorem composedLiteralVariable_inMacrocellOrbit
                   List.fst_mem_of_mem_zipIdx sourceLiteralMember,
                   sourceLiteralAtom⟩
           refine ⟨sourcePlacement.position sourceAtom,
-            .inheritedVariable, ?_, ?_⟩
+            .inheritedVariable, ?_, ?_, ?_⟩
           · simpa [literalAtom] using
               FinalFigureNineVariableSource.inherited
                 (source := source) (sourcePlacement := sourcePlacement)
@@ -344,6 +350,9 @@ theorem composedLiteralVariable_inMacrocellOrbit
           · simpa [literalAtom] using
               composedInheritedVariable_inMacrocellOrbit
                 source sourcePlacement sourceAtom
+          · intro notInherited
+            exact False.elim
+              (notInherited sourceAtom (by simp))
       | inr auxiliary =>
           have auxiliaryData :=
             PeriodicOneInThree.auxiliary_scope_offset_of_mem_clauseClauses
@@ -362,7 +371,7 @@ theorem composedLiteralVariable_inMacrocellOrbit
             simp [PositionedPeriodicCNF.clausePosition,
               (List.mem_zipIdx_iff_getElem?).mp sourceClauseMember]
           refine ⟨metadata.sourceClause.position,
-            .figureNineAuxiliary kind, ?_, ?_⟩
+            .figureNineAuxiliary kind, ?_, ?_, ?_⟩
           · simpa [literalAtom, auxiliaryScopeEqual] using
               FinalFigureNineVariableSource.figureNineAuxiliary
                 (source := source) (sourcePlacement := sourcePlacement)
@@ -372,6 +381,27 @@ theorem composedLiteralVariable_inMacrocellOrbit
               composedFigureNineAuxiliary_inMacrocellOrbit
                 source sourcePlacement metadata.sourceClauseIndex
                 metadata.sourceClause.literals kind
+          · intro _notInherited
+            have figureNineOffset :
+                figureNineLiteral.offset =
+                  PeriodicOneInThree.anchor
+                    metadata.sourceClause.literals :=
+              auxiliaryData.2
+            apply Prod.ext <;>
+              simp [PlanarOneInThreeNoUnitsFigureNine.composedPlacement,
+                PeriodicVariablePlacement.literalPosition,
+                PeriodicOneInThreeNoUnitsPositioned.placement,
+                PeriodicOneInThreePositioned.placement,
+                PeriodicVariablePlacement.translation,
+                PeriodicOneInThreePositioned.auxiliaryOccurrencePosition,
+                literalAtom, auxiliaryScopeEqual, literalOffset,
+                figureNineOffset, sourceClausePosition,
+                finalFigureNineMacrocellScale,
+                FinalFigureNineLocalAddress.position,
+                Cell.macrocellPosition, Cell.add, Cell.sub, Cell.scale,
+                PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+                PlanarOneInThree.gadgetScale] <;>
+              ring
   | inr auxiliary =>
       have auxiliaryData :=
         PeriodicOneInThreeNoUnits.auxiliary_scope_offset_of_mem_clauseClauses
@@ -384,7 +414,12 @@ theorem composedLiteralVariable_inMacrocellOrbit
           auxiliaryScope =
             (metadata.figureNineClauseStart + taggedFigureNineClause.2,
               taggedFigureNineClause.1.literals) :=
-        auxiliaryData.1
+          auxiliaryData.1
+      have literalOffset :
+          literal.offset =
+            PeriodicOneInThree.anchor
+              taggedFigureNineClause.1.literals :=
+        auxiliaryData.2
       have localFigureNineClauseIndexLt : taggedFigureNineClause.2 < 6 :=
         lt_of_lt_of_le
           (List.mem_zipIdx' taggedFigureNineClauseMember).1
@@ -435,7 +470,7 @@ theorem composedLiteralVariable_inMacrocellOrbit
             taggedFigureNineClause.1.literals kind
       have orbit := firstOrbit.compose secondOrbit
       refine ⟨metadata.sourceClause.position,
-        .unitEliminationAuxiliary localFigureNineClauseIndex kind, ?_, ?_⟩
+        .unitEliminationAuxiliary localFigureNineClauseIndex kind, ?_, ?_, ?_⟩
       · simpa [literalAtom, auxiliaryScopeEqual,
           localFigureNineClauseIndex] using
           FinalFigureNineVariableSource.unitEliminationAuxiliary
@@ -461,6 +496,24 @@ theorem composedLiteralVariable_inMacrocellOrbit
           PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
           PeriodicOneInThreePositioned.generatedClauseLocalPosition] using
             orbit
+      · intro _notInherited
+        apply Prod.ext <;>
+          simp [PlanarOneInThreeNoUnitsFigureNine.composedPlacement,
+            PeriodicVariablePlacement.literalPosition,
+            PeriodicOneInThreeNoUnitsPositioned.placement,
+            PeriodicVariablePlacement.translation,
+            PeriodicOneInThreeNoUnitsPositioned.auxiliaryOccurrencePosition,
+            literalAtom, auxiliaryScopeEqual, literalOffset,
+            figureNineClausePosition, generatedPosition,
+            finalFigureNineMacrocellScale,
+            FinalFigureNineLocalAddress.position,
+            finalFigureNineClauseLocalPosition,
+            localFigureNineClauseIndex,
+            PeriodicOneInThreeNoUnitsPositioned.gadgetScale,
+            PlanarOneInThree.gadgetScale,
+            PlanarOneInThree.generatedClausePosition,
+            Cell.macrocellPosition, Cell.add, Cell.sub, Cell.scale] <;>
+          ring
 
 /-- The literal-level classification lifts to every variable occurrence in
 the erased twice-replaced formula. -/
@@ -501,9 +554,11 @@ theorem composedVariableOccurrence_inMacrocellOrbit
       (literal, literalIndex) ∈ clause.literals.zipIdx := by
     rw [List.mem_zipIdx_iff_getElem?, List.getElem?_eq_some_iff]
     exact ⟨literalIndexLt, literalAt⟩
-  simpa [literalAtomEqual] using
-    composedLiteralVariable_inMacrocellOrbit
-      source sourcePlacement taggedClauseMember taggedLiteralMember
+  rcases composedLiteralVariable_inMacrocellOrbit
+      source sourcePlacement taggedClauseMember taggedLiteralMember with
+    ⟨base, address, sourceData, orbit, _localPosition⟩
+  exact ⟨base, address, by simpa [literalAtomEqual] using sourceData,
+    by simpa [literalAtomEqual] using orbit⟩
 
 /-- Specialization to the retained fixed-eight source and composed raw
 placement used in the hardness construction. -/
