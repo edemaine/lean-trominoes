@@ -66,15 +66,41 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.scale
   change
     (literal, literalIndex) ∈ taggedClause.1.literals.zipIdx
     at literalMember
-  simp only [PeriodicVariablePlacement.translation_scale,
-    scaleIncidenceRoutes, List.reverse_map,
-    PeriodicOrthocrossing.translatePolyline, scalePolyline,
-    List.map_map, Function.comp_def, Cell.scale_add] at pointMember
+  simp only [PositionedPeriodicClause.scale_literals,
+    PeriodicVariablePlacement.translation_scale,
+    scaleIncidenceRoutes,
+    PeriodicOrthocrossing.translatePolyline, scalePolyline]
+    at pointMember
+  rw [← List.map_reverse] at pointMember
+  simp only [List.map_map, Function.comp_def, ← Cell.scale_add]
+    at pointMember
   rcases List.mem_map.mp pointMember with
     ⟨sourcePoint, sourcePointMember, rfl⟩
+  have sourceRebasedMember :
+      Cell.add
+          (placement.translation
+            (Cell.sub
+              (PeriodicCNF.clauseAnchor taggedClause.1.literals)
+              literal.offset))
+          sourcePoint ∈
+        PeriodicOrthocrossing.translatePolyline
+          (placement.translation
+            (Cell.sub
+              (PeriodicCNF.clauseAnchor taggedClause.1.literals)
+              literal.offset))
+          (routes taggedClause.2 literalIndex).reverse := by
+    unfold PeriodicOrthocrossing.translatePolyline
+    exact List.mem_map.mpr ⟨sourcePoint, sourcePointMember, rfl⟩
   have sourceBounded :=
     bounds taggedClause.1 taggedClause.2 taggedClauseMember
-      literal literalIndex literalMember sourcePoint sourcePointMember
+      literal literalIndex literalMember
+      (Cell.add
+        (placement.translation
+          (Cell.sub
+            (PeriodicCNF.clauseAnchor taggedClause.1.literals)
+            literal.offset))
+        sourcePoint)
+      sourceRebasedMember
   simpa using sourceBounded.scale factor
 
 end PositionedPeriodicCNF
