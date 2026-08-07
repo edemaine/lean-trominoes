@@ -35,13 +35,23 @@ theorem withinCoordinateRadius_of_segmentCheckpoint
     retainedSegmentCheckpoint_in_coordinateRectangle
       segment primitive length index vector indexBound
   rcases startBounded.coordinate_bounds with
-    ⟨startHorizontal, startVertical⟩
+    ⟨⟨startHorizontalLower, startHorizontalUpper⟩,
+      ⟨startVerticalLower, startVerticalUpper⟩⟩
   rcases finishBounded.coordinate_bounds with
-    ⟨finishHorizontal, finishVertical⟩
+    ⟨⟨finishHorizontalLower, finishHorizontalUpper⟩,
+      ⟨finishVerticalLower, finishVerticalUpper⟩⟩
   rcases center with ⟨centerX, centerY⟩
   rcases segment with
     ⟨⟨startX, startY⟩, ⟨finishX, finishY⟩⟩
   rcases primitive with ⟨primitiveX, primitiveY⟩
+  change centerX - (radius : Int) ≤ startX at startHorizontalLower
+  change startX ≤ centerX + (radius : Int) at startHorizontalUpper
+  change centerY - (radius : Int) ≤ startY at startVerticalLower
+  change startY ≤ centerY + (radius : Int) at startVerticalUpper
+  change centerX - (radius : Int) ≤ finishX at finishHorizontalLower
+  change finishX ≤ centerX + (radius : Int) at finishHorizontalUpper
+  change centerY - (radius : Int) ≤ finishY at finishVerticalLower
+  change finishY ≤ centerY + (radius : Int) at finishVerticalUpper
   have horizontal :
       centerX - radius ≤
           startX + (index : Int) * primitiveX ∧
@@ -64,11 +74,31 @@ theorem withinCoordinateRadius_of_segmentCheckpoint
       Cell.add, Cell.scale] at checkpointBounded
     simp only [min_def, max_def] at checkpointBounded
     omega
+  have natAbsLe
+      {delta : Int}
+      (bounded : -(radius : Int) ≤ delta ∧
+        delta ≤ (radius : Int)) :
+      delta.natAbs ≤ radius := by
+    by_cases nonnegative : 0 ≤ delta
+    · have castBound :
+          (delta.natAbs : Int) ≤ (radius : Int) := by
+        rw [Int.natAbs_of_nonneg nonnegative]
+        exact bounded.2
+      exact_mod_cast castBound
+    · have negativeNonnegative : 0 ≤ -delta := by
+        omega
+      have castBound :
+          ((-delta).natAbs : Int) ≤ (radius : Int) := by
+        rw [Int.natAbs_of_nonneg negativeNonnegative]
+        omega
+      have negativeBound : (-delta).natAbs ≤ radius := by
+        exact_mod_cast castBound
+      simpa using negativeBound
   simp only [WithinCoordinateRadius, Cell.add, Cell.scale]
   constructor
-  · rw [Int.natAbs_le]
+  · apply natAbsLe
     omega
-  · rw [Int.natAbs_le]
+  · apply natAbsLe
     omega
 
 /-- Retained-ray rasterization enlarges a common coordinate-radius bound by
@@ -146,9 +176,14 @@ theorem rasterizeRetainedPolyline_point_in_expandedRectangle
       · simp only [rasterizeRetainedPolyline_singleton,
           List.mem_singleton] at pointMember
         subst point
-        exact inClosedGridRectangle_coordinateRadius_of_center
-          (sourceBounded first (by simp))
-          (withinCoordinateRadius_refl 9 first)
+        have firstBounded := sourceBounded first (by simp)
+        rcases lower with ⟨lowerX, lowerY⟩
+        rcases upper with ⟨upperX, upperY⟩
+        rcases first with ⟨firstX, firstY⟩
+        simp only [InClosedGridRectangle,
+          coordinateRadiusLower, coordinateRadiusUpper]
+          at firstBounded ⊢
+        omega
       · simp at length
 
 end PeriodicEightOccurrenceSplit

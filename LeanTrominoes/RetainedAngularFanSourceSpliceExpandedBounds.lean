@@ -1,5 +1,8 @@
 import LeanTrominoes.RetainedAngularFanSourceSpliceBounds
 import LeanTrominoes.RetainedRayRasterizationRadiusBounds
+import LeanTrominoes.PeriodicEightOccurrenceSplitAngularBoundaryRoutes
+import LeanTrominoes.PeriodicEightOccurrenceSplitTerminalPortGeometry
+import LeanTrominoes.PeriodicThreeSATThreeAngularOrder
 
 /-!
 # Expanded-period bounds for retained angular-fan source splices
@@ -13,6 +16,9 @@ both the radius-288 fan replacement and the radius-nine rasterization error.
 
 namespace LeanTrominoes
 namespace PeriodicEightOccurrenceSplit
+
+open PeriodicEightOccurrenceSplitPositioned
+open PeriodicThreeSATThree
 
 /-- A source-first retained angular-fan boundary splice remains in the open
 neighboring-period square whenever its combined refinement exceeds the
@@ -34,7 +40,7 @@ theorem
     (retained : RetainedRayPolyline route)
     (routeBounded :
       ∀ point ∈ route,
-        let sourcePeriod : Int := period
+        let sourcePeriod : Int := period;
         -sourcePeriod < point.1 ∧
           point.1 < 2 * sourcePeriod ∧
           -sourcePeriod < point.2 ∧
@@ -47,7 +53,7 @@ theorem
           (scaleRetainedTerminalData factor terminal)
           slot) :
     let refinedPeriod : Int :=
-      (retainedTerminalFanTotalRefinement * factor) * period
+      (retainedTerminalFanTotalRefinement * factor) * period;
     -refinedPeriod < point.1 ∧
       point.1 < 2 * refinedPeriod ∧
       -refinedPeriod < point.2 ∧
@@ -129,7 +135,9 @@ theorem
     Cell.scale] at rasterBounded
   dsimp only [lower, upper] at rasterBounded
   dsimp only
+  rw [retainedTerminalFanTotalRefinement_eq] at marginFitsInt ⊢
   norm_num [Nat.cast_mul] at rasterBounded marginFitsInt ⊢
+  ring_nf at rasterBounded ⊢
   omega
 
 /-- A local factor-eight Figure 7 occurrence suffix stays in the refined
@@ -145,10 +153,10 @@ theorem scaledAngularOccurrenceSuffix_point_inExpanded
     (literal : PeriodicLiteral Variable)
     (clauseIndex literalIndex : Nat)
     (centerBounded :
-      let sourcePeriod : Int := sourcePlacement.period
+      let sourcePeriod : Int := sourcePlacement.period;
       let center :=
         PositionedPeriodicCNF.canonicalLiteralPosition
-          sourcePlacement clause literal
+          sourcePlacement clause literal;
       -sourcePeriod < center.1 ∧
         center.1 < 2 * sourcePeriod ∧
         -sourcePeriod < center.2 ∧
@@ -162,7 +170,7 @@ theorem scaledAngularOccurrenceSuffix_point_inExpanded
     let refinedPeriod : Int :=
       (retainedTerminalFanRoutingRefinement *
         PeriodicEightOccurrenceSplitPositioned.refinementScale) *
-          sourcePlacement.period
+          sourcePlacement.period;
     -refinedPeriod < point.1 ∧
       point.1 < 2 * refinedPeriod ∧
       -refinedPeriod < point.2 ∧
@@ -224,7 +232,7 @@ theorem
             placement clause literal))
     (routeBounded :
       ∀ routePoint ∈ routes clauseIndex literalIndex,
-        let sourcePeriod : Int := placement.period
+        let sourcePeriod : Int := placement.period;
         -sourcePeriod < routePoint.1 ∧
           routePoint.1 < 2 * sourcePeriod ∧
           -sourcePeriod < routePoint.2 ∧
@@ -241,7 +249,7 @@ theorem
           clauseIndex literalIndex) :
     let refinedPeriod : Int :=
       (retainedTerminalFanTotalRefinement * factor) *
-        placement.period
+        placement.period;
     -refinedPeriod < point.1 ∧
       point.1 < 2 * refinedPeriod ∧
       -refinedPeriod < point.2 ∧
@@ -269,17 +277,23 @@ theorem
               factor routes clauseIndex literalIndex)) =
         scaleRetainedTerminalData factor terminal := by
     rw [PositionedPeriodicCNF.scaleIncidenceRoutes_apply,
-      PeriodicThreeSATThree.routeTerminalVector_scalePolyline,
+      routeTerminalVector_scalePolyline,
       classifiedRetainedTerminalData_scale_of_classified
         factorPositive classified,
       classifiedRetainedTerminalData_eq_of_classified classified]
-  have scaledOrderEq :
-      angularOccurrenceOrder (source.scale factor).erase
-          (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes) =
-        angularOccurrenceOrder source.erase routes := by
-    rw [PositionedPeriodicCNF.erase_scale]
-    exact angularOccurrenceOrder_scaleIncidenceRoutes
-      source.erase factorPositive routes
+  have scaledOccurrenceIndexEq :
+      angularOccurrenceIndex
+          (angularOccurrenceOrder (source.scale factor).erase
+            (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes))
+          literal clauseIndex literalIndex =
+        angularOccurrenceIndex
+          (angularOccurrenceOrder source.erase routes)
+          literal clauseIndex literalIndex := by
+    unfold angularOccurrenceIndex
+    simp only [angularOccurrenceOrder_copies,
+      PositionedPeriodicCNF.erase_scale]
+    rw [angularOccurrenceVariables_scaleIncidenceRoutes
+      source.erase factorPositive routes]
   unfold retainedAngularFanSplicedOccurrenceRoute at pointMember
   rcases mem_joinAtEndpoint pointMember with
     boundaryMember | suffixMember
@@ -288,7 +302,8 @@ theorem
       (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes)
       scaledClauseMember scaledLiteralMember]
       at boundaryMember
-    simp only [scaledOrderEq, scaledTerminalEq] at boundaryMember
+    simp only [scaledOccurrenceIndexEq, scaledTerminalEq]
+      at boundaryMember
     exact
       retainedAngularFanSourceScaledSplicedBoundaryRoute_point_inExpanded
         factorPositive marginFits
@@ -306,12 +321,12 @@ theorem
           placement clause literal)
         centerMember
     have scaledCenterBounded :
-        let sourcePeriod : Int :=
-          (placement.scale factor).period
-        let center :=
-          PositionedPeriodicCNF.canonicalLiteralPosition
-            (placement.scale factor)
-            (clause.scale factor) literal
+      let sourcePeriod : Int :=
+          (placement.scale factor).period;
+      let center :=
+        PositionedPeriodicCNF.canonicalLiteralPosition
+          (placement.scale factor)
+            (clause.scale factor) literal;
         -sourcePeriod < center.1 ∧
           center.1 < 2 * sourcePeriod ∧
           -sourcePeriod < center.2 ∧
@@ -320,14 +335,19 @@ theorem
           PositionedPeriodicCNF.canonicalLiteralPosition
             placement clause literal with
         ⟨centerX, centerY⟩
-      simp only [PositionedPeriodicCNF.canonicalLiteralPosition_scale,
+      simp only [
+        PositionedPeriodicCNF.CanonicalRetainedRayIncidenceRoutes.canonicalLiteralPosition_scale,
         PeriodicVariablePlacement.scale_period,
         centerEq, Cell.scale]
       simp only [centerEq] at sourceCenterBounded
       have factorPositiveInt : (0 : Int) < factor := by
         exact_mod_cast factorPositive
       norm_num [Nat.cast_mul] at sourceCenterBounded ⊢
-      constructor <;> constructor <;> nlinarith
+      constructor
+      · nlinarith
+      constructor
+      · nlinarith
+      constructor <;> nlinarith
     have suffixBounded :=
       scaledAngularOccurrenceSuffix_point_inExpanded
         (placement.scale factor)
@@ -339,7 +359,7 @@ theorem
       retainedTerminalFanRoutingRefinement,
       PeriodicEightOccurrenceSplitPositioned.refinementScale,
       PeriodicVariablePlacement.scale_period,
-      Nat.mul_assoc, Nat.cast_mul] using suffixBounded
+      mul_assoc, Nat.cast_mul] using suffixBounded
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
