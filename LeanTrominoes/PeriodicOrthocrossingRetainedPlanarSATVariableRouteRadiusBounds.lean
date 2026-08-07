@@ -32,16 +32,17 @@ private theorem within_period_of_in_same_planarSATMacrocell
     WithinCoordinateRadius
       (drawingPeriodicPlanarSATPlacement formula).period
       first second := by
+  rcases center with ⟨centerX, centerY⟩
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
   rw [withinCoordinateRadius_iff_abs_le]
   have gridPositive :
       0 < drawingGridSize (PeriodicCNF.incidenceGraph formula) :=
     drawingGridSize_pos _
   unfold InPlanarSATMacrocell planarSATMacrocellRouteLower
-    planarSATMacrocellRouteUpper InClosedGridRectangle at
-      firstInside secondInside
-  simp only [drawingPeriodicPlanarSATPlacement,
-    PeriodicVariablePlacement.period, Cell.add, Cell.scale]
-  norm_num [planarMacroScale] at firstInside secondInside ⊢
+    planarSATMacrocellRouteUpper InClosedGridRectangle at firstInside secondInside
+  simp [drawingPeriodicPlanarSATPlacement, planarMacroScale,
+    Cell.add, Cell.scale] at firstInside secondInside ⊢
   constructor <;> apply abs_le.mpr <;> omega
 
 /-- Any point of a retained finite planar-SAT incidence route is within one
@@ -121,17 +122,18 @@ theorem metadata_localRoutePoint_within_variablePeriod
     unfold drawingCompleteCarrierLinkRectangleLower
       drawingCompleteCarrierLinkRectangleUpper
       InClosedGridRectangle at pointInside endpointInside
-    simp only [drawingPeriodicPlanarSATPlacement,
-      PeriodicVariablePlacement.period]
+    simp only [drawingPeriodicPlanarSATPlacement]
     by_cases horizontal : link.first.isHorizontal = true
     · rw [if_pos horizontal] at pointInside endpointInside span
       simp only [horizontal, if_true] at pointInside endpointInside
+      norm_num [planarMacroScale] at pointInside endpointInside span periodPositive ⊢
       constructor <;> apply abs_le.mpr <;> omega
     · rw [if_neg horizontal] at pointInside endpointInside span
       have horizontalFalse : link.first.isHorizontal = false :=
         Bool.eq_false_of_not_eq_true horizontal
       simp only [horizontalFalse, Bool.false_eq_true, if_false]
         at pointInside endpointInside
+      norm_num [planarMacroScale] at pointInside endpointInside span periodPositive ⊢
       constructor <;> apply abs_le.mpr <;> omega
   · rcases metadata.source.component.exists_macrocellCenter_of_not_carrier
         formula carrier with

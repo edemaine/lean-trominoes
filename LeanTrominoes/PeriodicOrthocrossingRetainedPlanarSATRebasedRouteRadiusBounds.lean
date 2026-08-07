@@ -19,25 +19,60 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
-/-- Before anchor normalization, every retained physical route point is
-within one period of its gauged physical literal occurrence. -/
-theorem
-    retainedGaugedWrappedDrawingIncidenceRoutes_withinPhysicalLiteralPeriod
+/-- Periodicization, opaque wrapping, and the canonical variable gauge leave
+the displayed physical position of a retained literal unchanged. -/
+private theorem retainedGaugedWrappedLiteralPosition_eq_finite
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
-    (wellFormed :
-      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
-    (degree :
-      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
-    (isLocal :
-      (PeriodicCNF.incidenceGraph formula).IsLocal) :
-    PositionedPeriodicCNF.IncidenceRoutesWithinPhysicalLiteralPeriod
-      (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-        formula)
-      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
-      (retainedDrawingPlanarSATLocalIncidenceRoutes formula) := by
-  intro positionedClause clauseIndex positionedClauseMember
-    gaugedLiteral literalIndex gaugedLiteralMember point pointMember
+    (literal : PlanarSATVariable Variable × Bool) :
+    (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula).literalPosition
+        (PeriodicLiteral.variableGauge
+          (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+          (wrapPeriodicPlanarSATLiteral
+            (periodicizePlanarSATLiteral formula literal))) =
+      drawingPlanarSATVariablePosition formula literal.1 := by
+  calc
+    _ = (wrappedDrawingPeriodicPlanarSATPlacement formula).literalPosition
+          (wrapPeriodicPlanarSATLiteral
+            (periodicizePlanarSATLiteral formula literal)) :=
+      PeriodicVariablePlacement.variableGauge_literalPosition
+        (wrappedDrawingPeriodicPlanarSATPlacement formula)
+        (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+        (wrapPeriodicPlanarSATLiteral
+          (periodicizePlanarSATLiteral formula literal))
+    _ = (drawingPeriodicPlanarSATPlacement formula).literalPosition
+          (periodicizePlanarSATLiteral formula literal) := rfl
+    _ = drawingPlanarSATVariablePosition formula literal.1 :=
+      periodicizePlanarSATLiteral_position formula literal
+
+/-- Membership in the gauged positioned source can be decoded back to the
+retained finite metadata and literal at the same indices. -/
+private theorem exists_retainedMetadata_of_gauged_members
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {positionedClause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (positionedClauseMember :
+      (positionedClause, clauseIndex) ∈
+        (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).clauses.zipIdx)
+    {gaugedLiteral :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (gaugedLiteralMember :
+      (gaugedLiteral, literalIndex) ∈
+        positionedClause.literals.zipIdx) :
+    ∃ metadata literal,
+      (metadata, clauseIndex) ∈
+          (retainedDrawingPlanarSATClauseMetadata formula).zipIdx ∧
+        (literal, literalIndex) ∈ metadata.clause.literals.zipIdx ∧
+        gaugedLiteral =
+          PeriodicLiteral.variableGauge
+            (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+            (wrapPeriodicPlanarSATLiteral
+              (periodicizePlanarSATLiteral formula literal)) := by
   rw [gauged_clauses_eq_metadata formula, List.zipIdx_map]
     at positionedClauseMember
   rcases List.mem_map.mp positionedClauseMember with
@@ -65,7 +100,7 @@ theorem
                 (retainedDrawingWrappedPeriodicPlanarSATVariableGauge
                   formula))).zipIdx
     at gaugedLiteralMember
-  rw [← List.map_map, ← List.map_map,
+  rw [List.map_map, List.map_map,
     List.zipIdx_map] at gaugedLiteralMember
   rcases List.mem_map.mp gaugedLiteralMember with
     ⟨taggedLiteral, taggedLiteralMember, gaugedLiteralEqual⟩
@@ -73,82 +108,97 @@ theorem
     congrArg Prod.snd gaugedLiteralEqual
   have gaugedLiteralValueEqual :
       gaugedLiteral =
-        (wrapPeriodicPlanarSATLiteral
-          (periodicizePlanarSATLiteral formula taggedLiteral.1))
-          |>.variableGauge
-            (retainedDrawingWrappedPeriodicPlanarSATVariableGauge
-              formula) :=
+        PeriodicLiteral.variableGauge
+          (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+          (wrapPeriodicPlanarSATLiteral
+            (periodicizePlanarSATLiteral formula taggedLiteral.1)) :=
     (congrArg Prod.fst gaugedLiteralEqual).symm
   subst literalIndex
-  subst gaugedLiteral
-  have metadataMember :
-      taggedMetadata.1 ∈
-        retainedDrawingPlanarSATClauseMetadata formula :=
-    List.fst_mem_of_mem_zipIdx taggedMetadataMember
-  have valid : taggedMetadata.1.RetainedValid formula :=
-    retainedDrawingPlanarSATClauseMetadata_valid formula metadataMember
+  exact ⟨taggedMetadata.1, taggedLiteral.1,
+    taggedMetadataMember, taggedLiteralMember,
+    gaugedLiteralValueEqual⟩
+
+/-- The finite local route bound, expressed at one decoded gauged literal. -/
+private theorem retainedMetadataRoutePoint_within_gaugedLiteralPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {metadata : DrawingPlanarSATClauseMetadata Variable}
+    {clauseIndex : Nat}
+    (metadataMember :
+      (metadata, clauseIndex) ∈
+        (retainedDrawingPlanarSATClauseMetadata formula).zipIdx)
+    {literal : PlanarSATVariable Variable × Bool}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ metadata.clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        retainedDrawingPlanarSATLocalIncidenceRoutes
+          formula clauseIndex literalIndex) :
+    WithinCoordinateRadius
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula).period
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+        |>.literalPosition
+          (PeriodicLiteral.variableGauge
+            (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+            (wrapPeriodicPlanarSATLiteral
+              (periodicizePlanarSATLiteral formula literal))))
+      point := by
+  have metadataLookup :
+      (retainedDrawingPlanarSATClauseMetadata formula)[clauseIndex]? =
+        some metadata :=
+    (List.mem_zipIdx_iff_getElem?).mp metadataMember
+  simp only [retainedDrawingPlanarSATLocalIncidenceRoutes,
+    metadataLookup] at pointMember
+  have metadataMem :
+      metadata ∈ retainedDrawingPlanarSATClauseMetadata formula :=
+    List.fst_mem_of_mem_zipIdx metadataMember
+  have valid : metadata.RetainedValid formula :=
+    retainedDrawingPlanarSATClauseMetadata_valid formula metadataMem
   have finiteBound :=
     metadata_localRoutePoint_within_variablePeriod
-      wellFormed degree isLocal taggedMetadata.1 valid
-      taggedLiteralMember pointMember
-  have finiteEndpoints :=
-    (taggedMetadata.1.source.incidenceDrawing formula).physicalRoutesMatch
-      (taggedMetadata.1.retainedLocalDrawingRoutesMatch
-        wellFormed degree isLocal valid)
-      taggedMetadata.1.clause taggedMetadata.1.source.localClauseIndex
-      (taggedMetadata.1.retainedLocalClauseMember
-        wellFormed degree isLocal valid)
-      taggedLiteral.1 taggedLiteral.2 taggedLiteralMember
-  rw [DrawingPlanarSATClauseSource.incidenceDrawing_variablePosition]
-    at finiteEndpoints
-  have gaugedEndpoints :=
-    retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_physicalRoutesMatch
-      formula wellFormed degree isLocal
-      ⟨taggedMetadata.1.clause.position,
-        (wrapPeriodicPlanarSATClause
-          (periodicizePlanarSATClause formula
-            taggedMetadata.1.clause)).variableGauge
-              (retainedDrawingWrappedPeriodicPlanarSATVariableGauge
-                formula)⟩
-      taggedMetadata.2
-      (by simpa [gauged_clauses_eq_metadata formula] using
-        taggedMetadataMember)
-      ((wrapPeriodicPlanarSATLiteral
-        (periodicizePlanarSATLiteral formula taggedLiteral.1))
-        |>.variableGauge
-          (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula))
-      taggedLiteral.2
-      (by
-        change
-          ((wrapPeriodicPlanarSATLiteral
-              (periodicizePlanarSATLiteral formula taggedLiteral.1))
-              |>.variableGauge
-                (retainedDrawingWrappedPeriodicPlanarSATVariableGauge
-                  formula),
-            taggedLiteral.2) ∈
-            (((taggedMetadata.1.clause.literals.map
-                (periodicizePlanarSATLiteral formula)).map
-                  wrapPeriodicPlanarSATLiteral).map
-                    (PeriodicLiteral.variableGauge
-                      (retainedDrawingWrappedPeriodicPlanarSATVariableGauge
-                        formula))).zipIdx
-        rw [← List.map_map, ← List.map_map, List.zipIdx_map]
-        exact List.mem_map.mpr
-          ⟨taggedLiteral, taggedLiteralMember, rfl⟩)
-  have centersEqual :
-      drawingPlanarSATVariablePosition formula taggedLiteral.1.1 =
-        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
-          |>.literalPosition
-            ((wrapPeriodicPlanarSATLiteral
-              (periodicizePlanarSATLiteral formula taggedLiteral.1))
-              |>.variableGauge
-                (retainedDrawingWrappedPeriodicPlanarSATVariableGauge
-                  formula)) := by
-    apply Option.some.inj
-    exact finiteEndpoints.2.symm.trans gaugedEndpoints.2
-  rw [← centersEqual]
-  simpa [retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement,
-    wrappedDrawingPeriodicPlanarSATPlacement] using finiteBound
+      wellFormed degree isLocal metadata valid
+      literalMember pointMember
+  rw [retainedGaugedWrappedLiteralPosition_eq_finite]
+  change WithinCoordinateRadius
+    (drawingPeriodicPlanarSATPlacement formula).period
+    (drawingPlanarSATVariablePosition formula literal.1) point
+  exact finiteBound
+
+/-- Before anchor normalization, every retained physical route point is
+within one period of its gauged physical literal occurrence. -/
+theorem
+    retainedGaugedWrappedDrawingIncidenceRoutes_withinPhysicalLiteralPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal) :
+    PositionedPeriodicCNF.IncidenceRoutesWithinPhysicalLiteralPeriod
+      (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+      (retainedDrawingPlanarSATLocalIncidenceRoutes formula) := by
+  intro positionedClause clauseIndex positionedClauseMember
+    gaugedLiteral literalIndex gaugedLiteralMember point pointMember
+  rcases exists_retainedMetadata_of_gauged_members
+      formula positionedClauseMember gaugedLiteralMember with
+    ⟨metadata, literal, metadataMember,
+      literalMember, gaugedLiteralEq⟩
+  subst gaugedLiteral
+  exact retainedMetadataRoutePoint_within_gaugedLiteralPeriod
+    formula wellFormed degree isLocal metadataMember
+    literalMember pointMember
 
 /-- Anchor normalization turns the retained physical endpoint certificate
 into the variable-centered rebased-route certificate. -/
@@ -210,64 +260,23 @@ theorem
     simpa [source, placement, sourceRoutes] using
       retainedAnchorNormalizedGaugedWrappedDrawingIncidenceRoutes_withinVariablePeriod
         formula wellFormed degree isLocal
-  intro retainedClause clauseIndex retainedClauseMember
-    literal literalIndex literalMember point pointMember
-  have retainedClauseLookup :
-      source.deduplicateByLiterals.clauses[clauseIndex]? =
-        some retainedClause := by
-    apply (List.mem_zipIdx_iff_getElem?).mp
-    simpa [source,
-      retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
-      using retainedClauseMember
-  have retainedClauseMem :
-      retainedClause ∈ source.deduplicateByLiterals.clauses :=
-    List.fst_mem_of_mem_zipIdx (by
-      simpa [source,
-        retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
-        using retainedClauseMember)
-  rcases exists_representativeClause_of_mem_deduplicateByLiterals
-      source retainedClause retainedClauseMem with
-    ⟨sourceClause, sourceClauseLookup, sourceClauseLiterals⟩
-  have sourceClauseMember :
-      (sourceClause,
-        source.representativeClauseIndex retainedClause.literals) ∈
-          source.clauses.zipIdx :=
-    (List.mem_zipIdx_iff_getElem?).mpr sourceClauseLookup
-  have sourceLiteralMember :
-      (literal, literalIndex) ∈ sourceClause.literals.zipIdx := by
-    simpa [sourceClauseLiterals] using literalMember
   have anchorZero :
-      PeriodicCNF.clauseAnchor retainedClause.literals = (0, 0) := by
+      ∀ clause ∈ source.deduplicateByLiterals.clauses,
+        PeriodicCNF.clauseAnchor clause.literals = (0, 0) := by
+    intro clause clauseMember
     apply clauseAnchor_eq_zero_of_mem_deduplicate_anchorNormalize
       (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
         formula)
-      placement retainedClause
-    simpa [source] using retainedClauseMem
-  unfold PeriodicOrthocrossing.translatePolyline at pointMember
-  rcases List.mem_map.mp pointMember with
-    ⟨storedPoint, storedPointMember, rfl⟩
-  have storedPointMember' :
-      storedPoint ∈
-        retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
-          formula clauseIndex literalIndex :=
-    List.mem_reverse.mp storedPointMember
-  have sourcePointMember :
-      storedPoint ∈
-        sourceRoutes
-          (source.representativeClauseIndex retainedClause.literals)
-          literalIndex := by
-    apply mem_sourceRoute_of_mem_deduplicatedIncidenceRoute_of_anchor_zero
-      source placement sourceRoutes retainedClauseLookup anchorZero
-    simpa [source, placement, sourceRoutes,
-      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes]
-      using storedPointMember'
-  apply sourceBounds sourceClause
-    (source.representativeClauseIndex retainedClause.literals)
-    sourceClauseMember literal literalIndex sourceLiteralMember
-  unfold PeriodicOrthocrossing.translatePolyline
-  apply List.mem_map.mpr
-  refine ⟨storedPoint, List.mem_reverse.mpr sourcePointMember, ?_⟩
-  simp [sourceClauseLiterals]
+      placement clause
+    simpa [source, placement,
+      retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+      using clauseMember
+  have deduplicatedBounds :=
+    sourceBounds.deduplicateByLiterals anchorZero
+  simpa [source, placement, sourceRoutes,
+    retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula,
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes]
+    using deduplicatedBounds
 
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -52,11 +52,35 @@ theorem withinCoordinateRadius_normalize_rebase
         (Cell.sub rawPoint (placement.translation anchor))) := by
   have translated := bounded.translate
     (Cell.scale (-1) (placement.translation literal.offset))
-  simpa [PeriodicVariablePlacement.literalPosition,
-    PeriodicVariablePlacement.translation,
-    PeriodicLiteral.anchorNormalize,
-    Cell.add, Cell.sub, Cell.scale,
-    sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using translated
+  have centerEq :
+      Cell.add
+          (Cell.scale (-1) (placement.translation literal.offset))
+          (placement.literalPosition literal) =
+        placement.position literal.atom := by
+    apply Prod.ext <;>
+      simp [PeriodicVariablePlacement.literalPosition,
+        PeriodicVariablePlacement.translation,
+        Cell.add, Cell.scale] <;>
+      ring
+  have pointEq :
+      Cell.add
+          (Cell.scale (-1) (placement.translation literal.offset))
+          rawPoint =
+        Cell.add
+          (placement.translation
+            (Cell.sub (0, 0)
+              (literal.anchorNormalize anchor).offset))
+          (Cell.sub rawPoint (placement.translation anchor)) := by
+    rcases anchor with ⟨anchorX, anchorY⟩
+    rcases offsetEq : literal.offset with ⟨offsetX, offsetY⟩
+    rcases rawPoint with ⟨pointX, pointY⟩
+    apply Prod.ext <;>
+      simp [PeriodicVariablePlacement.translation,
+        PeriodicLiteral.anchorNormalize,
+        Cell.add, Cell.sub, Cell.scale, offsetEq] <;>
+      ring
+  rw [centerEq, pointEq] at translated
+  exact translated
 
 /-- Physical literal-endpoint bounds become variable-prototype bounds when
 the formula and route family are normalized by each clause anchor. -/

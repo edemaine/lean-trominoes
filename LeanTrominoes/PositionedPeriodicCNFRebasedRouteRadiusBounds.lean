@@ -1,6 +1,7 @@
 import LeanTrominoes.OrthogonalPolylineCoordinateRadiusBounds
 import LeanTrominoes.PositionedPeriodicCNFRebasedRouteBounds
 import LeanTrominoes.PositionedPeriodicCNFRebasedRouteTransport
+import LeanTrominoes.PositionedPeriodicCNFDeduplicationRoutes
 import LeanTrominoes.PositionedPeriodicCNFVariableGaugeClauseMembership
 import LeanTrominoes.RetainedRayRasterizationCorridor
 
@@ -129,11 +130,28 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.rawRoutePointsWithinCanonical
       (Cell.add shift point) rebasedMember
   have translated := rebasedBounded.translate
     (Cell.scale (-1) shift)
-  simpa [shift, canonicalLiteralPosition,
-    PeriodicVariablePlacement.translation,
-    Cell.add, Cell.sub, Cell.scale,
-    sub_eq_add_neg, add_comm, add_left_comm, add_assoc]
-    using translated
+  have centerEq :
+      Cell.add (Cell.scale (-1) shift)
+          (placement.position literal.atom) =
+        canonicalLiteralPosition placement clause literal := by
+    rcases anchorEq :
+        PeriodicCNF.clauseAnchor clause.literals with
+      ⟨anchorX, anchorY⟩
+    rcases offsetEq : literal.offset with ⟨offsetX, offsetY⟩
+    apply Prod.ext <;>
+      simp [shift, canonicalLiteralPosition,
+        PeriodicVariablePlacement.translation,
+        Cell.add, Cell.sub, Cell.scale,
+        anchorEq, offsetEq] <;>
+      ring
+  have pointEq :
+      Cell.add (Cell.scale (-1) shift)
+          (Cell.add shift point) = point := by
+    rcases shift with ⟨shiftX, shiftY⟩
+    rcases point with ⟨pointX, pointY⟩
+    simp [Cell.add, Cell.scale]
+  rw [centerEq, pointEq] at translated
+  exact translated
 
 /-- The raw membership-based radius certificate supplies the corresponding
 field of any planar presentation with that route family. -/
@@ -152,6 +170,80 @@ theorem PlanarIncidencePresentation.rebasedRoutePointsWithinVariablePeriod_of_ra
   rw [incidenceEq] at pointMember ⊢
   exact bounds clause tagged.1.clauseIndex clauseMember
     literal tagged.1.literalIndex literalMember point pointMember
+
+/-- Clause-orbit deduplication preserves the rebased variable-centered
+radius certificate when every retained clause is already in the zero-anchor
+gauge.  The retained route is the representative source route at exactly the
+same literal list, so its variable-side rebase is unchanged. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.deduplicateByLiterals
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes)
+    (anchorZero :
+      ∀ clause ∈ source.deduplicateByLiterals.clauses,
+        PeriodicCNF.clauseAnchor clause.literals = (0, 0)) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      source.deduplicateByLiterals placement
+      (source.deduplicatedIncidenceRoutes placement routes) := by
+  intro retainedClause clauseIndex retainedClauseMember
+    literal literalIndex literalMember point pointMember
+  have retainedClauseLookup :
+      source.deduplicateByLiterals.clauses[clauseIndex]? =
+        some retainedClause :=
+    (List.mem_zipIdx_iff_getElem?).mp retainedClauseMember
+  have retainedClauseMem :
+      retainedClause ∈ source.deduplicateByLiterals.clauses :=
+    List.fst_mem_of_mem_zipIdx retainedClauseMember
+  have retainedLiteralsMem :
+      retainedClause.literals ∈ source.erase.clauses := by
+    have deduplicatedMember :
+        retainedClause.literals ∈
+          source.deduplicateByLiterals.erase.clauses :=
+      List.mem_map.mpr ⟨retainedClause, retainedClauseMem, rfl⟩
+    exact
+      (clause_mem_erase_deduplicateByLiterals_iff
+        source retainedClause.literals).mp deduplicatedMember
+  rcases exists_representativeClause
+      source retainedClause.literals retainedLiteralsMem with
+    ⟨sourceClause, sourceClauseLookup, sourceClauseLiterals,
+      _sourceClausePosition⟩
+  have sourceClauseMember :
+      (sourceClause,
+        source.representativeClauseIndex retainedClause.literals) ∈
+          source.clauses.zipIdx :=
+    (List.mem_zipIdx_iff_getElem?).mpr sourceClauseLookup
+  have sourceLiteralMember :
+      (literal, literalIndex) ∈ sourceClause.literals.zipIdx := by
+    simpa [sourceClauseLiterals] using literalMember
+  unfold PeriodicOrthocrossing.translatePolyline at pointMember
+  rcases List.mem_map.mp pointMember with
+    ⟨storedPoint, storedPointMember, rfl⟩
+  have storedPointMember' :
+      storedPoint ∈
+        source.deduplicatedIncidenceRoutes placement routes
+          clauseIndex literalIndex :=
+    List.mem_reverse.mp storedPointMember
+  have sourcePointMember :
+      storedPoint ∈
+        routes
+          (source.representativeClauseIndex retainedClause.literals)
+          literalIndex := by
+    simpa [deduplicatedIncidenceRoutes,
+      retainedClauseLookup, normalizeIncidenceRoute,
+      anchorZero retainedClause retainedClauseMem,
+      PeriodicVariablePlacement.translation,
+      Cell.sub, Cell.scale] using storedPointMember'
+  apply bounds sourceClause
+    (source.representativeClauseIndex retainedClause.literals)
+    sourceClauseMember literal literalIndex sourceLiteralMember
+  unfold PeriodicOrthocrossing.translatePolyline
+  apply List.mem_map.mpr
+  refine ⟨storedPoint, List.mem_reverse.mpr sourcePointMember, ?_⟩
+  simp [sourceClauseLiterals]
 
 /-- Stable clause reindexing and its canonical anchor translation preserve
 the raw variable-centered radius certificate. -/
