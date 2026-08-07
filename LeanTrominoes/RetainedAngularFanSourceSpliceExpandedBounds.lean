@@ -140,6 +140,130 @@ theorem
   ring_nf at rasterBounded ⊢
   omega
 
+/-- The delayed-lane escaped boundary splice satisfies the same open
+neighboring-period bound as the ordinary splice. -/
+theorem
+    retainedAngularFanSourceScaledEscapedSplicedBoundaryRoute_point_inExpanded
+    {factor period : Nat}
+    (factorPositive : 0 < factor)
+    (marginFits :
+      297 < retainedTerminalFanTotalRefinement * factor)
+    (route : List Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (routeLength : 2 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some terminal)
+    (retained : RetainedRayPolyline route)
+    (escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength
+          (scaleRetainedTerminalData factor terminal))
+    (routeBounded :
+      ∀ point ∈ route,
+        let sourcePeriod : Int := period;
+        -sourcePeriod < point.1 ∧
+          point.1 < 2 * sourcePeriod ∧
+          -sourcePeriod < point.2 ∧
+          point.2 < 2 * sourcePeriod)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        retainedAngularFanEscapedSplicedBoundaryRoute
+          (scalePolyline factor route)
+          (scaleRetainedTerminalData factor terminal)
+          slot) :
+    let refinedPeriod : Int :=
+      (retainedTerminalFanTotalRefinement * factor) * period;
+    -refinedPeriod < point.1 ∧
+      point.1 < 2 * refinedPeriod ∧
+      -refinedPeriod < point.2 ∧
+      point.2 < 2 * refinedPeriod := by
+  let lower : Cell :=
+    (1 - (period : Int), 1 - (period : Int))
+  let upper : Cell :=
+    (2 * (period : Int) - 1,
+      2 * (period : Int) - 1)
+  have sourceInRectangle :
+      ∀ sourcePoint ∈ route,
+        InClosedGridRectangle lower upper sourcePoint := by
+    intro sourcePoint sourcePointMember
+    have bounded :=
+      routeBounded sourcePoint sourcePointMember
+    rcases sourcePoint with ⟨sourceX, sourceY⟩
+    simpa [lower, upper, InClosedGridRectangle] using
+      (show
+        1 - (period : Int) ≤ sourceX ∧
+          sourceX ≤ 2 * (period : Int) - 1 ∧
+          1 - (period : Int) ≤ sourceY ∧
+          sourceY ≤ 2 * (period : Int) - 1 by
+        omega)
+  let scaledRoute := scalePolyline factor route
+  let scaledTerminal :=
+    scaleRetainedTerminalData factor terminal
+  let splicedPolyline :=
+    retainedAngularFanEscapedSplicedBoundaryPolyline
+      scaledRoute scaledTerminal slot
+  have scaledLength : 2 ≤ scaledRoute.length := by
+    simpa [scaledRoute, scalePolyline] using routeLength
+  have scaledClassified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector scaledRoute) =
+        some scaledTerminal := by
+    simpa [scaledRoute, scaledTerminal] using
+      routeTerminalVector_scale_classified
+        factorPositive classified
+  have scaledRetained : RetainedRayPolyline scaledRoute :=
+    retained.scale factorPositive
+  have splicedRetained :
+      RetainedRayPolyline splicedPolyline := by
+    simpa [splicedPolyline] using
+      retainedAngularFanEscapedSplicedBoundaryPolyline_retained
+        scaledRoute scaledTerminal slot scaledLength
+        scaledClassified scaledRetained
+        (by simpa [scaledTerminal] using escapeFits)
+  have splicedBounded :
+      ∀ splicedPoint ∈ splicedPolyline,
+        InClosedGridRectangle
+          (coordinateRadiusLower 288
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement * factor)
+              lower))
+          (coordinateRadiusUpper 288
+            (Cell.scale
+              (retainedTerminalFanTotalRefinement * factor)
+              upper))
+          splicedPoint := by
+    intro splicedPoint splicedPointMember
+    exact
+      retainedAngularFanSourceScaledEscapedSplicedBoundaryPolyline_point_in_routeRectangle
+        factorPositive route terminal slot routeLength classified
+        escapeFits lower upper sourceInRectangle
+        (by simpa [splicedPolyline, scaledRoute, scaledTerminal]
+          using splicedPointMember)
+  have rasterBounded :=
+    rasterizeRetainedPolyline_point_in_expandedRectangle
+      splicedRetained splicedBounded
+      (by simpa [retainedAngularFanEscapedSplicedBoundaryRoute,
+        splicedPolyline, scaledRoute, scaledTerminal]
+        using pointMember)
+  have marginFitsInt :
+      (297 : Int) <
+        retainedTerminalFanTotalRefinement * factor := by
+    exact_mod_cast marginFits
+  rcases point with ⟨pointX, pointY⟩
+  simp only [InClosedGridRectangle,
+    coordinateRadiusLower, coordinateRadiusUpper,
+    Cell.scale] at rasterBounded
+  dsimp only [lower, upper] at rasterBounded
+  dsimp only
+  rw [retainedTerminalFanTotalRefinement_eq] at marginFitsInt ⊢
+  norm_num [Nat.cast_mul] at rasterBounded marginFitsInt ⊢
+  ring_nf at rasterBounded ⊢
+  omega
+
 /-- A local factor-eight Figure 7 occurrence suffix stays in the refined
 neighboring-period square whenever its canonical source center lies in the
 unrefined neighboring-period square.  The factor-288 refinement leaves much

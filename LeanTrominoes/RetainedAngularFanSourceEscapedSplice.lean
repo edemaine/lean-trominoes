@@ -43,6 +43,79 @@ def retainedAngularFanEscapedSplicedBoundaryRoute
     (retainedAngularFanEscapedSplicedBoundaryPolyline
       route terminal slot)
 
+/-- Replacing the final retained-ray segment by the delayed-lane escaped
+outer fan preserves retained-ray geometry before rasterization. -/
+theorem retainedAngularFanEscapedSplicedBoundaryPolyline_retained
+    (route : List Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (routeLength : 2 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some terminal)
+    (retained : RetainedRayPolyline route)
+    (escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength terminal) :
+    RetainedRayPolyline
+      (retainedAngularFanEscapedSplicedBoundaryPolyline
+        route terminal slot) := by
+  let scaledRoute :=
+    scalePolyline retainedTerminalFanTotalRefinement route
+  let center :=
+    Cell.scale retainedTerminalFanTotalRefinement
+      (route.getLastD (0, 0))
+  let replacement :=
+    retainedTerminalFanOuterEscapedCompleteRoute
+      center terminal slot
+  have scaledLength : 2 ≤ scaledRoute.length := by
+    simpa [scaledRoute, scalePolyline] using routeLength
+  have reverseTailExists :
+      ∃ entrance, scaledRoute.reverse.tail.head? =
+        some entrance :=
+    exists_reverse_tail_head?_of_two_le_length
+      scaledRoute scaledLength
+  have lastEntranceEq :
+      polylineLastEntrance scaledRoute =
+        (retainedAngularFanOuterDemand
+          center terminal slot).gate := by
+    exact polylineLastEntrance_scalePolyline_eq_outerDemand_gate
+      routeLength classified slot
+  have reverseTailHead :
+      scaledRoute.reverse.tail.head? =
+        some
+          (retainedAngularFanOuterDemand
+            center terminal slot).gate := by
+    rw [polylineLastEntrance_spec reverseTailExists,
+      lastEntranceEq]
+  have dropLastLast :
+      scaledRoute.dropLast.getLast? =
+        some
+          (retainedAngularFanOuterDemand
+            center terminal slot).gate :=
+    dropLast_getLast?_of_reverse_tail_head?
+      reverseTailHead
+  have replacementHead :
+      replacement.head? =
+        some
+          (retainedAngularFanOuterDemand
+            center terminal slot).gate := by
+    exact retainedTerminalFanOuterEscapedCompleteRoute_head?
+      center terminal slot
+  have lengthPositive : 0 < terminal.2 :=
+    (retainedTerminalDirectionClassify_sound classified).1
+  have scaledRetained : RetainedRayPolyline scaledRoute :=
+    retained.scale (by native_decide)
+  have replacementRetained : RetainedRayPolyline replacement :=
+    RetainedRayPolyline.of_orthogonal
+      (retainedTerminalFanOuterEscapedCompleteRoute_orthogonal
+        center terminal slot lengthPositive escapeFits)
+  simpa [retainedAngularFanEscapedSplicedBoundaryPolyline,
+    scaledRoute, center, replacement] using
+    scaledRetained.replaceTail replacementRetained
+      dropLastLast replacementHead
+
 /-- If the retained source route is already orthogonal, the delayed-lane
 escaped tail replacement is orthogonal before rasterization as well. -/
 theorem retainedAngularFanEscapedSplicedBoundaryPolyline_orthogonal
