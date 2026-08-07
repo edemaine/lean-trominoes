@@ -21,6 +21,111 @@ open PeriodicThreeSATThree
 
 set_option maxHeartbeats 4000000
 
+/-- Every point of a genuine route in the final retained source lies in the
+open neighboring-period square before source-clearance scaling. -/
+theorem finalCoordinatedSourceRoutes_point_inExpanded
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (finalCoordinatedSource formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember :
+      point ∈ finalCoordinatedSourceRoutes
+        formula clauseIndex literalIndex) :
+    let sourcePeriod : Int :=
+      (finalCoordinatedPlacement formula).period;
+    -sourcePeriod < point.1 ∧
+      point.1 < 2 * sourcePeriod ∧
+      -sourcePeriod < point.2 ∧
+      point.2 < 2 * sourcePeriod := by
+  let sourceCertificate :=
+    retainedPlanarSATCertificate formula
+      sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  let retainedClausesNonempty :=
+    retainedDrawingPlanarSATFormula_clausesNonempty_of_source
+      formula sourceClausesNonempty
+  have bounded :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutePoint_inExpandedSquare
+      formula sourceCertificate.graphWellFormed
+      sourceCertificate.graphDegreeAtMostThree
+      sourceCertificate.graphIsLocal retainedClausesNonempty
+      (clause, clauseIndex) (by
+        simpa only [finalCoordinatedSource] using clauseMember)
+      (literal, literalIndex) literalMember pointMember
+  unfold PeriodicGridDrawing.PositionInExpandedSquare at bounded
+  simp only [
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing,
+    PositionedPeriodicCNF.incidenceDrawing,
+    PeriodicGridDrawing.gridSize] at bounded
+  have periodPositive :
+      0 <
+        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          formula).period := by
+    simpa [retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement,
+      wrappedDrawingPeriodicPlanarSATPlacement] using
+      drawingPeriodicPlanarSATPlacement_period_pos formula
+  have gridSizeEq :
+      Nat.pred
+            (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+              formula).period +
+          1 =
+        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
+          formula).period := by
+    simpa [Nat.succ_eq_add_one] using
+      Nat.succ_pred_eq_of_pos periodPositive
+  simp only [gridSizeEq] at bounded
+  simpa only [finalCoordinatedPlacement,
+    finalCoordinatedSourceRoutes] using bounded
+
+/-- The public fixed-eight placement period is the raw retained-source
+period multiplied by the source-clearance and complete fan refinements. -/
+theorem
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement_period_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        formula).period =
+      (retainedTerminalFanTotalRefinement *
+        retainedAngularFanSourceClearanceFactor) *
+          (finalCoordinatedPlacement formula).period := by
+  simp only [
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
+    retainedAngularFanSourceScaledRefinedPlacement,
+    retainedAngularFanRefinedPlacement,
+    PeriodicEightOccurrenceSplitPositioned.placement,
+    PeriodicVariablePlacement.scale_period,
+    finalCoordinatedPlacement,
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_period]
+  norm_num [
+    retainedTerminalFanTotalRefinement_eq,
+    retainedTerminalFanRoutingRefinement,
+    PeriodicEightOccurrenceSplitPositioned.refinementScale,
+    retainedAngularFanSourceClearanceFactor]
+  change
+    8 *
+        (36 *
+          (4 *
+            (wrappedDrawingPeriodicPlanarSATPlacement formula).period)) =
+      1152 *
+        (wrappedDrawingPeriodicPlanarSATPlacement formula).period
+  ring
+
 /-- Every point of a copied occurrence route built from the final retained
 source lies in the open neighboring-period square after source-first scaling
 and terminal-fan refinement. -/
@@ -65,13 +170,6 @@ theorem retainedFinalSourceScaledSplicedOccurrenceRoute_point_inExpanded
       point.1 < 2 * refinedPeriod ∧
       -refinedPeriod < point.2 ∧
       point.2 < 2 * refinedPeriod := by
-  let sourceCertificate :=
-    retainedPlanarSATCertificate formula
-      sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty
-  let retainedClausesNonempty :=
-    retainedDrawingPlanarSATFormula_clausesNonempty_of_source
-      formula sourceClausesNonempty
   let terminal :=
     classifiedRetainedTerminalData
       (routeTerminalVector
@@ -104,37 +202,11 @@ theorem retainedFinalSourceScaledSplicedOccurrenceRoute_point_inExpanded
         formula sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty clauseMember literalMember).2
   · intro routePoint routePointMember
-    have bounded :=
-      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutePoint_inExpandedSquare
-        formula sourceCertificate.graphWellFormed
-        sourceCertificate.graphDegreeAtMostThree
-        sourceCertificate.graphIsLocal retainedClausesNonempty
-        (clause, clauseIndex) (by
-          simpa only [finalCoordinatedSource] using clauseMember)
-        (literal, literalIndex) literalMember routePointMember
-    unfold PeriodicGridDrawing.PositionInExpandedSquare at bounded
-    simp only [
-      retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceDrawing,
-      PositionedPeriodicCNF.incidenceDrawing,
-      PeriodicGridDrawing.gridSize] at bounded
-    have periodPositive :
-        0 <
-          (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-            formula).period := by
-      simpa [retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement,
-        wrappedDrawingPeriodicPlanarSATPlacement] using
-        drawingPeriodicPlanarSATPlacement_period_pos formula
-    have gridSizeEq :
-        Nat.pred
-              (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-                formula).period +
-            1 =
-          (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
-            formula).period := by
-      simpa [Nat.succ_eq_add_one] using
-        Nat.succ_pred_eq_of_pos periodPositive
-    simp only [gridSizeEq] at bounded
-    simpa only [finalCoordinatedPlacement] using bounded
+    exact
+      finalCoordinatedSourceRoutes_point_inExpanded
+        formula sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clauseMember literalMember
+        routePointMember
   · exact pointMember
 
 /-- Every point of every genuine route in the final source-scaled fixed-eight
@@ -190,33 +262,9 @@ theorem
   let order := angularOccurrenceOrder scaledSource.erase scaledRoutes
   let occurrencePorts :=
     occurrencePortsOfAngularOrder scaledSource.erase order
-  have publicPeriodEq :
-      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
-          formula).period =
-        (retainedTerminalFanTotalRefinement *
-          retainedAngularFanSourceClearanceFactor) *
-            (finalCoordinatedPlacement formula).period := by
-    simp only [
-      retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement,
-      retainedAngularFanSourceScaledRefinedPlacement,
-      retainedAngularFanRefinedPlacement,
-      PeriodicEightOccurrenceSplitPositioned.placement,
-      PeriodicVariablePlacement.scale_period,
-      finalCoordinatedPlacement,
-      retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement_period]
-    norm_num [
-      retainedTerminalFanTotalRefinement_eq,
-      retainedTerminalFanRoutingRefinement,
-      PeriodicEightOccurrenceSplitPositioned.refinementScale,
-      retainedAngularFanSourceClearanceFactor]
-    change
-      8 *
-          (36 *
-            (4 *
-              (wrappedDrawingPeriodicPlanarSATPlacement formula).period)) =
-        1152 *
-          (wrappedDrawingPeriodicPlanarSATPlacement formula).period
-    ring
+  have publicPeriodEq :=
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement_period_eq
+      formula
   rw [retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula,
     retainedAngularFanSourceScaledRefinedFormula,
     retainedAngularFanRefinedFormula,
