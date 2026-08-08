@@ -5778,6 +5778,12 @@ The representation choices for this target are:
   final gauge also preserves clockwise variable and ternary-clause route
   orders and carries the binary-or-ternary and width-three promises to the
   finished formula.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonFans.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonFans.lean)
+  transports the occurrence-three promise through the final clause sort and
+  variable gauge, then assembles geometry and both cyclic route orders in one
+  enriched presentation.  Its generic bridge proves that the final variable
+  and clause endpoint fans are clockwise-compatible with the ribbon source
+  tables, closing the remaining combinatorial side condition at this endpoint.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
   instantiates the relative splice assembly for the retained ordered fixed-eight
   route family.  Four explicit avoidance conditions imply all six splice
