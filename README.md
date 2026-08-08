@@ -4252,12 +4252,23 @@ The representation choices for this target are:
   variable-site core remains in its standard ribbon macrocell, misses every
   possible ribbon exit, and strictly avoids every legal corridor tile in
   each of the eight neighboring macrocells.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreClauseFanSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreClauseFanSeparation.lean)
+  strengthens that core bound to the one-cell inset rectangle
+  `[1, 127] × [1, 127]`.  A generic separated-rectangle argument then proves
+  that a selected core strictly avoids any route bounded in an adjacent
+  closed macrocell, in particular every complete coordinated clause fan.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreCorridorSeparation.lean)
   lifts those finite facts into source coordinates.  Duplicate freedom of
   each unit source route lets the neighboring/far-macrocell argument recurse
   over the entire corridor, proving that the assembled routed prefix
   strictly avoids its corridor core and avoids the joined variable-stub plus
   corridor prefix with only the advertised variable-port contact.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreClauseStubSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreClauseStubSeparation.lean)
+  lifts the inset certificate to the occurrence's clause target, using
+  vertex separation for equal centers and macrocell bounds for far centers.
+  It closes the same-incidence splice: the assembled variable prefix avoids
+  the complete coordinated variable-stub, corridor-core, and clause-stub
+  occurrence route with only its intended variable-port contact.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean)
   begins the global separation proof for that fan system.  Source-variable
   fan data uses a canonical inactive-slot fallback, so every occurrence of
