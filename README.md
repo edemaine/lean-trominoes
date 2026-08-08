@@ -4295,6 +4295,13 @@ The representation choices for this target are:
   endpoint-fan/corridor inductions, separating an unshifted variable or
   clause fan from a shifted corridor; reversing the relative frame gives
   corridor separation from a forward-shifted clause fan.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedFanSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedFanSeparation.lean)
+  completes the nonzero-translate endpoint-fan matrix.  Macrocell bounds
+  settle distant variable and clause fans; continuous separation of the
+  underlying lifted source routes rules out the finite classifiers' facing
+  cases for adjacent macrocells.  Coincident translated clause targets are
+  traced back to one prototype clause and still select distinct local fan
+  strands because the relative period shift is nonzero.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
