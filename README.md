@@ -4318,6 +4318,12 @@ The representation choices for this target are:
   while distinct semantic colors select different physical lanes at the
   intended final tile.  Endpoint-only source contact supplies the same
   exclusions for cores belonging to another occurrence.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanCorridorContacts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceFanCorridorContacts.lean)
+  treats the complementary same-strand interfaces needed for route
+  simplicity.  Translation preserves each finite fan's simplicity, and the
+  matching first and final corridor tiles are ordinarily separated from
+  their endpoint fans with their advertised boundary as the only listed
+  contact.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean)
   assembles the five source-level pairwise results into the coordinated
   endpoint-fan system's complete separation certificate.  Besides width and
