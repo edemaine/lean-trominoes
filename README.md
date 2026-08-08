@@ -4271,6 +4271,12 @@ The representation choices for this target are:
   from unrelated corridor interiors; strict inset bounds then separate the
   corridor and clause-side fan, while the variable-side fan retains the
   precise no-segment-interior-contact guarantee needed for global planarity.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean)
+  decomposes every typed incidence route into its finite gadget core and an
+  optional coordinated occurrence suffix.  It combines core/core, both
+  core/suffix directions, and suffix/suffix separation to prove that every
+  pair of distinct colored typed routes has disjoint segment interiors and
+  no listed point in the other route's interior.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean)
   exposes that constructed route as the global assembly's common routed
   variable prefix.  Both the ordinary and fixed-red prefix branches are
