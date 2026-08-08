@@ -4289,6 +4289,12 @@ The representation choices for this target are:
   so the existing corridor theorem proves strict separation of length-three
   corridor cores at arbitrary distinct lifted route keys, and in particular
   against every nonzero period translate.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedFanCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedFanCorridorSeparation.lean)
+  transports duplicate-freeness, unit steps, and no-immediate-reversal to
+  shifted occurrence routes.  These certificates feed the existing
+  endpoint-fan/corridor inductions, separating an unshifted variable or
+  clause fan from a shifted corridor; reversing the relative frame gives
+  corridor separation from a forward-shifted clause fan.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
