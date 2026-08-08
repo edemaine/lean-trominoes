@@ -4131,9 +4131,10 @@ The representation choices for this target are:
   directions facing through their common cardinal edge.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanMacrocellSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanMacrocellSeparation.lean)
   classifies contact between a complete coordinated variable fan and one
-  legal corridor tile in an adjacent macrocell.  The only remaining pattern
-  is the actual first source tile entering on the fan's selected physical
-  lane; the connector-local gates avoid every neighboring tile outright.
+  legal corridor tile in an adjacent macrocell.  The actual first source
+  tile on the selected physical lane is ordinarily separated from the fan
+  and shares only its advertised exit; all other neighboring tiles, and the
+  connector-local gates outright, are contact-free.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans.lean)
   performs the reflected clause-side classification.  Exhaustive certificates
   cover outer/outer, local/local, and both cross interactions for two- and
@@ -4142,10 +4143,10 @@ The representation choices for this target are:
   edge.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseFanMacrocellSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseFanMacrocellSeparation.lean)
   classifies contact between a complete coordinated clause fan and one legal
-  corridor tile in an adjacent macrocell.  The only remaining pattern is the
-  actual final source tile leaving toward the clause on the fan's selected
-  physical lane; the connector-local gates avoid every neighboring tile
-  outright.
+  corridor tile in an adjacent macrocell.  The actual final source tile on
+  the selected physical lane is ordinarily separated from the fan and shares
+  only its advertised entry; all other neighboring tiles, and the
+  connector-local gates outright, are contact-free.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableClauseFans.lean)
   performs the mixed variable/clause finite classification across all
   `28 × 28` outer-template pairs and the three local/outer interactions.
