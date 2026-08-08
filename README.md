@@ -4277,6 +4277,12 @@ The representation choices for this target are:
   core/suffix directions, and suffix/suffix separation to prove that every
   pair of distinct colored typed routes has disjoint segment interiors and
   no listed point in the other route's interior.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean)
+  transports that decomposition through arbitrary physical translations,
+  including the translated splice endpoint.  At the source level it augments
+  each stable route identity by an arbitrary lattice shift and proves that a
+  nonzero relative shift always selects distinct lifted route occurrences,
+  which therefore inherit separation from source continuous planarity.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
