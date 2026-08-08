@@ -4320,6 +4320,12 @@ The representation choices for this target are:
   owner fresh from nonzero-translated corridor interiors; strict inset bounds
   also settle the exceptional two-point source route, proving strict
   core/corridor separation at every nonzero relative shift.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCoreFanSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCoreFanSeparation.lean)
+  separates every finite incidence core from translated variable and clause
+  endpoint fans.  Distinct owner centers follow from periodic vertex
+  injectivity and strict inset bounds; when a translated clause fan shares a
+  clause-core center, the checked finite fan/core table permits only the
+  advertised outer-endpoint contact.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
