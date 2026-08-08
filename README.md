@@ -4329,6 +4329,12 @@ The representation choices for this target are:
   corridor.  Duplicate freedom makes every tile after the first contact-free
   from the variable fan, so the complete fan/core join is geometrically
   simple whenever the source route has an interior lattice point.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceOccurrenceRouteSimplicity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceOccurrenceRouteSimplicity.lean)
+  peels the corridor from its variable end to propagate the final tile's
+  tail-only clause-fan contact across all earlier contact-free tiles.  Joining
+  the simple clause fan to the simple variable-fan/corridor prefix proves
+  every complete coordinated occurrence route simple under the same
+  length-at-least-three hypothesis.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean)
   assembles the five source-level pairwise results into the coordinated
   endpoint-fan system's complete separation certificate.  Besides width and
