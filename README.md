@@ -4153,6 +4153,12 @@ The representation choices for this target are:
   segment interiors and mutually avoid point-to-interior contacts; the
   selected occurrence-and-color route has the stronger certificate that its
   only listed contact with the gate is their unique splice port.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreCoordinatedFans.lean)
+  extends that selected core-to-gate certificate through the complete
+  coordinated variable fan.  The selected variable-site route is
+  contact-free from its matching physical-lane outer route, so joining the
+  local gate to that outer route preserves endpoint-only contact at exactly
+  the advertised variable port.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean)
   packages the active top/left or top/left/right clause terminals and reuses
   the 28 certified variable outer-fan templates by vertical reflection and
