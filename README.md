@@ -4172,6 +4172,12 @@ The representation choices for this target are:
   actual source macrocells.  Given the explicit clockwise-order obligation,
   it proves exact global endpoints, rectilinearity, and macrocell
   containment, and packages the result as a `RibbonEndpointFanSystem`.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean)
+  begins the global separation proof for that fan system.  Source-variable
+  fan data now uses a canonical inactive-slot fallback, so every occurrence
+  of one variable produces literally the same finite fan; translating the
+  finite certificate proves strict separation of all distinct colored stubs
+  incident to that variable.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

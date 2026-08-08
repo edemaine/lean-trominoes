@@ -32,8 +32,9 @@ def sourceVariableRibbonCountPred
 
 /-- Finite coordinated-fan data read from one actual source variable.
 
-The result depends propositionally only on `entry.1.1`; carrying `entry`
-itself supplies a harmless direction fallback for inactive slots. -/
+The result depends only on `entry.1.1`.  Active slots look up their genuine
+source-route directions; inactive slots use the fixed north fallback and are
+never inspected by a certified fan. -/
 noncomputable def sourceVariableRibbonFanData
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
@@ -55,9 +56,34 @@ noncomputable def sourceVariableRibbonFanData
       occurrenceSourceVariableDirection presentation
         ⟨(entry.1.1, occurrenceSlot), member⟩
     else
-      occurrenceSourceVariableDirection presentation entry
+      .north
 
 namespace VariableRibbonFanData
+
+/-- Occurrence-specific construction is only a convenient way to obtain
+membership evidence: any two active occurrences of the same variable produce
+literally the same finite fan data. -/
+theorem sourceVariableRibbonFanData_eq_of_same_atom
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (first second : ActiveOccurrenceEntry source.erase)
+    (sameAtom : first.1.1 = second.1.1) :
+    sourceVariableRibbonFanData presentation first =
+      sourceVariableRibbonFanData presentation second := by
+  unfold sourceVariableRibbonFanData
+  cases first with
+  | mk firstValue firstMember =>
+      cases second with
+      | mk secondValue secondMember =>
+          cases firstValue with
+          | mk firstAtom firstSlot =>
+              cases secondValue with
+              | mk secondAtom secondSlot =>
+                  simp only at sameAtom
+                  subst secondAtom
+                  rfl
 
 /-- The finite source data has exactly the source variable's active slot
 count. -/
