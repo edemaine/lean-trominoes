@@ -4108,6 +4108,11 @@ The representation choices for this target are:
   checks certify local/local and both local/outer interactions; the endpoint
   joins leave the same single possible contact pattern, namely two source
   directions facing through their common cardinal edge.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanMacrocellSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableFanMacrocellSeparation.lean)
+  classifies contact between a complete coordinated variable fan and one
+  legal corridor tile in an adjacent macrocell.  The only remaining pattern
+  is the actual first source tile entering on the fan's selected physical
+  lane; the connector-local gates avoid every neighboring tile outright.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans.lean)
   performs the reflected clause-side classification.  Exhaustive certificates
   cover outer/outer, local/local, and both cross interactions for two- and
@@ -4210,6 +4215,13 @@ The representation choices for this target are:
   bounds handle far targets, and source-route planarity discharges the
   adjacent classifier.  Width three recovers occurrence identity inside one
   shared clause fan from its terminal group and physical lane.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreSeparation.lean)
+  discharges the coordinated fan system's `variableCore` obligation.  A
+  one-edge core is handled by restricting global variable-stub separation to
+  its last point.  Longer cores recursively join the finite fan/tile
+  certificates: distinct colors separate the intended first-tile lanes,
+  while source-route endpoint separation and duplicate freedom exclude that
+  contact at every later or inter-occurrence interior center.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
