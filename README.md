@@ -4089,6 +4089,13 @@ The representation choices for this target are:
   macrocell and protected-frame bounds, and strict separation of every pair
   of active colored strands.  This makes the required cyclic-order invariant
   explicit at the remaining source-presentation boundary.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableOuterFans.lean)
+  classifies contacts between two selected variable outer-fan tables in
+  neighboring ribbon macrocells.  An exhaustive certificate covers all 28
+  templates, active slots, colors, and eight adjacent offsets: contact is
+  impossible unless the centers differ by one cardinal step and both source
+  directions point along that shared unit edge.  Compatible abstract fan
+  data are connected back to the finite table by certified template lookup.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean)
   joins each connector-dependent gate route to its selected cyclic outer
   route.  Finite interface checks show that the two pieces meet only at the

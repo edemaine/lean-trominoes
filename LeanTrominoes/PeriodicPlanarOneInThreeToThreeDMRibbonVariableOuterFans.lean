@@ -402,6 +402,70 @@ def selectedTemplate
     fun template =>
       decide (template.directions = data.activeDirections)).getD default
 
+/-- The active-direction list has exactly one entry per active slot. -/
+@[simp]
+theorem activeDirections_length
+    (data : VariableOuterFanData) :
+    data.activeDirections.length = data.count := by
+  native_decide +revert
+
+/-- Looking up an active direction by its slot recovers the direction field. -/
+theorem activeDirections_getD
+    (data : VariableOuterFanData)
+    (slot : VariableSiteSlot)
+    (active : data.SlotActive slot) :
+    data.activeDirections.getD slot.index .invalid =
+      data.direction slot := by
+  native_decide +revert
+
+/-- A compatible lookup selects one of the explicitly certified templates. -/
+theorem selectedTemplate_mem
+    (data : VariableOuterFanData)
+    (compatible : data.IsClockwiseCompatible) :
+    data.selectedTemplate ∈ standardVariableOuterFanTemplates := by
+  unfold selectedTemplate
+  generalize foundEq :
+    standardVariableOuterFanTemplates.find?
+      (fun template => decide
+        (template.directions = data.activeDirections)) = found
+  cases found with
+  | none =>
+      have none := List.find?_eq_none.mp foundEq
+      unfold IsClockwiseCompatible at compatible
+      rcases List.mem_map.mp compatible with
+        ⟨template, templateMember, directionsEqual⟩
+      have rejected := none template templateMember
+      simp only [decide_eq_true_eq] at rejected
+      exact (rejected directionsEqual).elim
+  | some template =>
+      simp only [Option.getD_some]
+      exact List.mem_of_find?_eq_some foundEq
+
+/-- A compatible lookup selects the template with the advertised active
+direction list, not merely some member of the finite table. -/
+theorem selectedTemplate_directions
+    (data : VariableOuterFanData)
+    (compatible : data.IsClockwiseCompatible) :
+    data.selectedTemplate.directions = data.activeDirections := by
+  unfold selectedTemplate
+  generalize foundEq :
+    standardVariableOuterFanTemplates.find?
+      (fun template => decide
+        (template.directions = data.activeDirections)) = found
+  cases found with
+  | none =>
+      have none := List.find?_eq_none.mp foundEq
+      unfold IsClockwiseCompatible at compatible
+      rcases List.mem_map.mp compatible with
+        ⟨template, templateMember, directionsEqual⟩
+      have rejected := none template templateMember
+      simp only [decide_eq_true_eq] at rejected
+      exact (rejected directionsEqual).elim
+  | some template =>
+      simp only [Option.getD_some]
+      simpa only [decide_eq_true_eq] using
+        (List.find?_eq_some_iff_append.mp foundEq).1
+
 /-- Coordinated route from one standardized gate to its ribbon exit. -/
 def outerRoute
     (data : VariableOuterFanData)
