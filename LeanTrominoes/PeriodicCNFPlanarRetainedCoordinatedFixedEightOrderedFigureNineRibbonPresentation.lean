@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonCompatibility
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonOrders
+import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteRadiusBounds
 
 /-!
 # Ribbon presentation boundary for the ordered retained Figure 9 endpoint
@@ -105,8 +106,42 @@ noncomputable def
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty).1
 
-/-- Add the rebased-route halo bound to the continuously planar final route
-family. -/
+/-- The normalized composed route-radius certificate places every rebased
+route point in the open one-period halo of the final incidence drawing. -/
+theorem
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation_rebasedRoutePointsInExpandedSquare
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (compatible :
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceDrawing
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).IsCompatible
+          (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+            source).erase.incidenceGraph) :
+    (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty compatible)
+      |>.RebasedRoutePointsInExpandedSquare := by
+  let presentation :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty compatible
+  apply presentation.rebasedRoutePointsInExpandedSquare_of_withinVariablePeriod
+  apply presentation.rebasedRoutePointsWithinVariablePeriod_of_raw
+  simpa [presentation,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation]
+    using
+      retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes_withinVariablePeriod
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty
+
+/-- Add the now-verified rebased-route halo bound to the continuously planar
+final route family. -/
 noncomputable def
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedHaloBoundedContinuousPlanarIncidencePresentation
     {Variable : Type*} [DecidableEq Variable]
@@ -121,12 +156,7 @@ noncomputable def
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty).IsCompatible
           (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
-            source).erase.incidenceGraph)
-    (rebasedRoutePointsInside :
-      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty compatible)
-        |>.RebasedRoutePointsInExpandedSquare) :
+            source).erase.incidenceGraph) :
     PositionedPeriodicCNF.HaloBoundedContinuousPlanarIncidencePresentation
       (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
         source)
@@ -139,11 +169,14 @@ noncomputable def
   rebasedRoutePointsInside := by
     simpa only [
       retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedContinuousPlanarIncidencePresentation]
-      using rebasedRoutePointsInside
+      using
+        retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation_rebasedRoutePointsInExpandedSquare
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty compatible
 
 /-- Promote the final normalized drawing to the complete halo-bounded,
-ribbon-ready source interface once its two remaining finite-presentation
-facts are supplied. -/
+ribbon-ready source interface once its remaining finite compatibility fact
+is supplied. -/
 noncomputable def
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedHaloBoundedRibbonReadyIncidencePresentation
     {Variable : Type*} [DecidableEq Variable]
@@ -158,12 +191,7 @@ noncomputable def
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty).IsCompatible
           (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
-            source).erase.incidenceGraph)
-    (rebasedRoutePointsInside :
-      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty compatible)
-        |>.RebasedRoutePointsInExpandedSquare) :
+            source).erase.incidenceGraph) :
     (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
       source).HaloBoundedRibbonReadyIncidencePresentation
         (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
@@ -178,7 +206,7 @@ noncomputable def
         source)
       (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedHaloBoundedContinuousPlanarIncidencePresentation
         source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty compatible rebasedRoutePointsInside)
+        sourceClausesNonempty compatible)
       ?_
   ·
     simpa only [
@@ -207,22 +235,17 @@ theorem
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty).IsCompatible
           (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
-            source).erase.incidenceGraph)
-    (rebasedRoutePointsInside :
-      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedPlanarIncidencePresentation
-        source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty compatible)
-        |>.RebasedRoutePointsInExpandedSquare) :
+            source).erase.incidenceGraph) :
     let presentation :=
       retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedHaloBoundedRibbonReadyIncidencePresentation
         source sourceLocal sourceWidth sourceOccurrences
-        sourceClausesNonempty compatible rebasedRoutePointsInside
+        sourceClausesNonempty compatible
     PeriodicPlanarOneInThreeToThreeDM.SourceRibbonFansClockwiseCompatible
       presentation.toPlanarIncidencePresentation := by
   let presentation :=
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedHaloBoundedRibbonReadyIncidencePresentation
       source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty compatible rebasedRoutePointsInside
+      sourceClausesNonempty compatible
   apply
     @retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnits_sourceRibbonFansClockwiseCompatible
       Variable (inferInstance)

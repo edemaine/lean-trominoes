@@ -5750,11 +5750,18 @@ The representation choices for this target are:
   presentation lengths, and exact periodic route endpoints are automatic;
   compatibility is therefore equivalent to duplicate-free final vertex
   positions lying strictly inside the fundamental square.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteRadiusBounds.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteRadiusBounds.lean)
+  carries the strict fixed-eight variable-centered route bound through both
+  Figure 9 transformations.  Inherited source tails scale their old bound,
+  ordered connectors add at most 73 cells, and auxiliary routes use the full
+  144-cell reserve created by factor-two clearance followed by factor-72
+  refinement.  Raw and finally normalized routes therefore lie within one
+  output period of their canonical variable endpoint.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonPresentation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRibbonPresentation.lean)
   packages the completed route geometry at the precise source interface used
   by ribbon thickening.  Continuous planarity, orthogonality, exact endpoints,
-  and endpoint-only contacts are discharged; finite drawing compatibility and
-  the rebased-route halo bound are the two remaining explicit premises, after
+  endpoint-only contacts, and the rebased-route halo bound are discharged;
+  finite drawing compatibility is the sole remaining explicit premise, after
   which the concrete presentation also inherits clockwise-compatible fans.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
   instantiates the relative splice assembly for the retained ordered fixed-eight
