@@ -451,6 +451,26 @@ structure AssemblyGeometry
   planar :
     (assembledDrawing routing).IsPlanar
 
+/-- Vertex distinctness and fundamental-square bounds complete every finite
+compatibility obligation for the assembled encoded incidence drawing.  No
+planarity premise is needed for this purely combinatorial interface. -/
+theorem assembledDrawing_isCompatible_of_positions
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (routing : ThreeStrandRouting source)
+    (positionsNodup :
+      (assembledVertexPositions routing).Nodup)
+    (positionsInside :
+      ∀ position ∈ assembledVertexPositions routing,
+        (assembledDrawing routing).PositionInFundamentalSquare position) :
+    (assembledDrawing routing).IsCompatible
+      (encodedProblem source).incidenceGraph := by
+  refine ⟨?_, assembledVertexPositions_length routing,
+    assembledEdgeRoutes_length routing, positionsNodup,
+    positionsInside, assembledDrawing_routesMatch routing⟩
+  exact PeriodicThreeDM.incidenceGraph_isWellFormed
+    (encodedProblem source) (encodedProblem_isWellFormed source)
+
 /-- A global geometry certificate completes every finite compatibility
 obligation for the assembled encoded incidence drawing. -/
 theorem assembledDrawing_isCompatible
@@ -459,12 +479,9 @@ theorem assembledDrawing_isCompatible
     (routing : ThreeStrandRouting source)
     (geometry : AssemblyGeometry routing) :
     (assembledDrawing routing).IsCompatible
-      (encodedProblem source).incidenceGraph := by
-  refine ⟨?_, assembledVertexPositions_length routing,
-    assembledEdgeRoutes_length routing, geometry.positionsNodup,
-    geometry.positionsInside, assembledDrawing_routesMatch routing⟩
-  exact PeriodicThreeDM.incidenceGraph_isWellFormed
-    (encodedProblem source) (encodedProblem_isWellFormed source)
+      (encodedProblem source).incidenceGraph :=
+  assembledDrawing_isCompatible_of_positions routing
+    geometry.positionsNodup geometry.positionsInside
 
 /-- Package a three-strand routing and its global geometry certificate as a
 certified planar presentation of the encoded periodic 3DM problem. -/

@@ -4282,6 +4282,11 @@ The representation choices for this target are:
   anchor-normalized construction.  It also transfers the result through
   numeric incidence-tag lookup, proving separation for every pair of
   distinct genuine routes stored by the assembled periodic drawing.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedVertexCoverage.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedVertexCoverage.lean)
+  proves the complementary vertex condition for that final assembly.  The
+  encoded degree-two-or-three promise rules out isolated vertices, while
+  compatibility and looplessness make every stored graph-vertex position an
+  endpoint of a lifted route segment.
 - [`LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean)
   lifts that deliberately weaker three-field separation predicate to the
   infinite periodic drawing.  Pairwise lifted separation plus stored-route
@@ -6422,6 +6427,11 @@ The representation choices for this target are:
   and a well-formed degree-two-or-three instance has ordinary maximum degree
   three, as required by the drawing construction.  The edge list is proved
   index-for-index equal to the separately retained colored incidence tags.
+- [`LeanTrominoes/PeriodicThreeDMIncidenceVertexCoverage.lean`](LeanTrominoes/PeriodicThreeDMIncidenceVertexCoverage.lean)
+  shows that this incidence graph is loopless and, under the degree-two-or-
+  three promise, has no isolated vertices.  Consequently every compatible
+  nondegenerate incidence drawing covers all of its stored vertex positions
+  by lifted route-segment endpoints.
 - [`LeanTrominoes/PeriodicThreeDMGraphOrientation.lean`](LeanTrominoes/PeriodicThreeDMGraphOrientation.lean)
   expresses orientations directly as values on those colored incidence-edge
   orbits.  It proves this tagged graph presentation equivalent to the

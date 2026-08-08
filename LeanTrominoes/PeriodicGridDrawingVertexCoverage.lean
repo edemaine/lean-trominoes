@@ -68,6 +68,29 @@ def EdgesAreLoopless {Vertex : Type*}
     (graph : PeriodicGraph Vertex) : Prop :=
   ∀ edge ∈ graph.edges, edge.source ≠ edge.target
 
+/-- Membership of every listed vertex in the flat edge-end list is exactly
+the combinatorial information needed to choose an incident tagged edge. -/
+theorem everyVertexIncident_of_mem_incidences
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (covered :
+      ∀ vertex ∈ graph.vertices, vertex ∈ graph.incidences) :
+    EveryVertexIncident graph := by
+  intro vertex vertexMember
+  have incidenceMember := covered vertex vertexMember
+  unfold PeriodicGraph.incidences at incidenceMember
+  rcases List.mem_flatMap.mp incidenceMember with
+    ⟨edge, edgeMember, endpointMember⟩
+  rcases List.mem_iff_get.mp edgeMember with
+    ⟨edgeIndex, edgeAt⟩
+  have taggedMember :
+      (edge, edgeIndex.val) ∈ graph.edges.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨edgeIndex.isLt, edgeAt⟩
+  refine ⟨(edge, edgeIndex.val), taggedMember, ?_⟩
+  simpa [PeriodicEdge.incidences, eq_comm] using endpointMember
+
 /-- Compatibility makes the stored position lookup an actual member of the
 drawing's position list. -/
 theorem IsCompatible.vertexPosition_mem
