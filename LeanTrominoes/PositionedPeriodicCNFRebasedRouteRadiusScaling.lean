@@ -36,19 +36,20 @@ end PeriodicEightOccurrenceSplit
 
 namespace PositionedPeriodicCNF
 
-/-- Scaling a positioned formula, placement, and route family preserves the
-raw variable-centered one-period certificate. -/
-theorem RebasedIncidenceRoutesWithinVariablePeriod.scale
+/-- Scaling a positioned formula, placement, and route family multiplies the
+raw variable-centered radius by the same factor. -/
+theorem RebasedIncidenceRoutesWithinVariableRadius.scale
     {Variable : Type*}
+    {radius : Nat}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {routes : IncidenceRoutes}
     (bounds :
-      RebasedIncidenceRoutesWithinVariablePeriod
-        source placement routes)
+      RebasedIncidenceRoutesWithinVariableRadius
+        radius source placement routes)
     (factor : Nat) :
-    RebasedIncidenceRoutesWithinVariablePeriod
-      (source.scale factor)
+    RebasedIncidenceRoutesWithinVariableRadius
+      (factor * radius) (source.scale factor)
       (placement.scale factor)
       (scaleIncidenceRoutes factor routes) := by
   intro scaledClause clauseIndex scaledClauseMember
@@ -102,6 +103,24 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.scale
         sourcePoint)
       sourceRebasedMember
   simpa using sourceBounded.scale factor
+
+/-- Scaling a one-period certificate yields the one-period certificate for
+the scaled placement. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.scale
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes)
+    (factor : Nat) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      (source.scale factor)
+      (placement.scale factor)
+      (scaleIncidenceRoutes factor routes) := by
+  exact
+    RebasedIncidenceRoutesWithinVariableRadius.scale bounds factor
 
 end PositionedPeriodicCNF
 end LeanTrominoes

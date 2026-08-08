@@ -21,16 +21,16 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
-/-- Two points in the same retained non-carrier macrocell are within one
-physical planar-SAT period of each other. -/
-private theorem within_period_of_in_same_planarSATMacrocell
+/-- Two points in the same retained non-carrier macrocell are separated by
+strictly less than one physical planar-SAT period in each coordinate. -/
+private theorem within_pred_period_of_in_same_planarSATMacrocell
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     {center first second : Cell}
     (firstInside : InPlanarSATMacrocell center first)
     (secondInside : InPlanarSATMacrocell center second) :
     WithinCoordinateRadius
-      (drawingPeriodicPlanarSATPlacement formula).period
+      ((drawingPeriodicPlanarSATPlacement formula).period - 1)
       first second := by
   rcases center with ⟨centerX, centerY⟩
   rcases first with ⟨firstX, firstY⟩
@@ -45,9 +45,10 @@ private theorem within_period_of_in_same_planarSATMacrocell
     Cell.add, Cell.scale] at firstInside secondInside ⊢
   constructor <;> apply abs_le.mpr <;> omega
 
-/-- Any point of a retained finite planar-SAT incidence route is within one
-physical period of that incidence's displayed variable endpoint. -/
-theorem metadata_localRoutePoint_within_variablePeriod
+/-- Any point of a retained finite planar-SAT incidence route is strictly
+within one physical period of that incidence's displayed variable endpoint.
+The integral form keeps the resulting one-cell margin explicit. -/
+theorem metadata_localRoutePoint_within_variablePredPeriod
     {Variable : Type*} [DecidableEq Variable]
     {formula : PeriodicCNF Variable}
     (wellFormed :
@@ -68,7 +69,7 @@ theorem metadata_localRoutePoint_within_variablePeriod
         (metadata.source.incidenceDrawing formula).routes
           metadata.source.localClauseIndex literalIndex) :
     WithinCoordinateRadius
-      (drawingPeriodicPlanarSATPlacement formula).period
+      ((drawingPeriodicPlanarSATPlacement formula).period - 1)
       (drawingPlanarSATVariablePosition formula literal.1) point := by
   have clauseMember :=
     metadata.retainedLocalClauseMember
@@ -123,18 +124,25 @@ theorem metadata_localRoutePoint_within_variablePeriod
       drawingCompleteCarrierLinkRectangleUpper
       InClosedGridRectangle at pointInside endpointInside
     simp only [drawingPeriodicPlanarSATPlacement]
+    have periodOne :
+        1 ≤ planarMacroScale.toNat *
+          drawingGridSize (PeriodicCNF.incidenceGraph formula) := by
+      exact Nat.one_le_iff_ne_zero.mpr
+        (Nat.mul_ne_zero (by native_decide)
+          (Nat.ne_of_gt (drawingGridSize_pos _)))
+    rw [Nat.cast_sub periodOne]
     by_cases horizontal : link.first.isHorizontal = true
     · rw [if_pos horizontal] at pointInside endpointInside span
       simp only [horizontal, if_true] at pointInside endpointInside
       norm_num [planarMacroScale] at pointInside endpointInside span periodPositive ⊢
-      constructor <;> apply abs_le.mpr <;> omega
+      constructor <;> apply abs_lt.mpr <;> omega
     · rw [if_neg horizontal] at pointInside endpointInside span
       have horizontalFalse : link.first.isHorizontal = false :=
         Bool.eq_false_of_not_eq_true horizontal
       simp only [horizontalFalse, Bool.false_eq_true, if_false]
         at pointInside endpointInside
       norm_num [planarMacroScale] at pointInside endpointInside span periodPositive ⊢
-      constructor <;> apply abs_le.mpr <;> omega
+      constructor <;> apply abs_lt.mpr <;> omega
   · rcases metadata.source.component.exists_macrocellCenter_of_not_carrier
         formula carrier with
       ⟨center, centerEq⟩
@@ -148,8 +156,38 @@ theorem metadata_localRoutePoint_within_variablePeriod
       metadata.localRoutePoints_inPlanarSATMacrocell
         wellFormed degree isLocal originalValid center centerEq
         literalMember endpointMember
-    exact within_period_of_in_same_planarSATMacrocell
+    exact within_pred_period_of_in_same_planarSATMacrocell
       formula endpointInside pointInside
+
+/-- Forgetting the strict integral margin recovers the one-period bound. -/
+theorem metadata_localRoutePoint_within_variablePeriod
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (valid : metadata.RetainedValid formula)
+    {literal : PlanarSATVariable Variable × Bool}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ metadata.clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        (metadata.source.incidenceDrawing formula).routes
+          metadata.source.localClauseIndex literalIndex) :
+    WithinCoordinateRadius
+      (drawingPeriodicPlanarSATPlacement formula).period
+      (drawingPlanarSATVariablePosition formula literal.1) point := by
+  have bounded :=
+    metadata_localRoutePoint_within_variablePredPeriod
+      wellFormed degree isLocal metadata valid literalMember pointMember
+  exact ⟨bounded.1.trans (Nat.sub_le _ _),
+    bounded.2.trans (Nat.sub_le _ _)⟩
 
 end PeriodicOrthocrossing
 end LeanTrominoes

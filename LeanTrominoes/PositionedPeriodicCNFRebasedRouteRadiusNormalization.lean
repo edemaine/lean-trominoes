@@ -16,10 +16,11 @@ open PeriodicEightOccurrenceSplit
 
 namespace PositionedPeriodicCNF
 
-/-- Raw physical route points are within one period of the displayed
+/-- Raw physical route points are within a fixed radius of the displayed
 physical occurrence of their literal endpoint. -/
-def IncidenceRoutesWithinPhysicalLiteralPeriod
+def IncidenceRoutesWithinPhysicalLiteralRadius
     {Variable : Type*}
+    (radius : Nat)
     (source : PositionedPeriodicCNF Variable)
     (placement : PeriodicVariablePlacement Variable)
     (routes : IncidenceRoutes) : Prop :=
@@ -28,8 +29,17 @@ def IncidenceRoutesWithinPhysicalLiteralPeriod
     ∀ literal literalIndex,
       (literal, literalIndex) ∈ clause.literals.zipIdx →
       ∀ point ∈ routes clauseIndex literalIndex,
-        WithinCoordinateRadius placement.period
+        WithinCoordinateRadius radius
           (placement.literalPosition literal) point
+
+/-- One-period specialization of physical literal-endpoint bounds. -/
+def IncidenceRoutesWithinPhysicalLiteralPeriod
+    {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes) : Prop :=
+  IncidenceRoutesWithinPhysicalLiteralRadius
+    placement.period source placement routes
 
 /-- A point bounded around a physical literal occurrence remains bounded
 around the variable prototype after route normalization and the reverse
@@ -84,16 +94,17 @@ theorem withinCoordinateRadius_normalize_rebase
 
 /-- Physical literal-endpoint bounds become variable-prototype bounds when
 the formula and route family are normalized by each clause anchor. -/
-theorem IncidenceRoutesWithinPhysicalLiteralPeriod.anchorNormalize
+theorem IncidenceRoutesWithinPhysicalLiteralRadius.anchorNormalize
     {Variable : Type*}
+    {radius : Nat}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {routes : IncidenceRoutes}
     (bounds :
-      IncidenceRoutesWithinPhysicalLiteralPeriod
-        source placement routes) :
-    RebasedIncidenceRoutesWithinVariablePeriod
-      (source.anchorNormalize placement)
+      IncidenceRoutesWithinPhysicalLiteralRadius
+        radius source placement routes) :
+    RebasedIncidenceRoutesWithinVariableRadius
+      radius (source.anchorNormalize placement)
       placement
       (source.anchorNormalizedIncidenceRoutes placement routes) := by
   intro normalizedClause clauseIndex normalizedClauseMember
@@ -160,6 +171,22 @@ theorem IncidenceRoutesWithinPhysicalLiteralPeriod.anchorNormalize
       (bounds taggedClause.1 taggedClause.2 taggedClauseMember
         taggedLiteral.1 taggedLiteral.2 taggedLiteralMember
         rawPoint rawPointMember)
+
+/-- One-period specialization of physical-bound anchor normalization. -/
+theorem IncidenceRoutesWithinPhysicalLiteralPeriod.anchorNormalize
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      IncidenceRoutesWithinPhysicalLiteralPeriod
+        source placement routes) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      (source.anchorNormalize placement)
+      placement
+      (source.anchorNormalizedIncidenceRoutes placement routes) := by
+  exact
+    IncidenceRoutesWithinPhysicalLiteralRadius.anchorNormalize bounds
 
 end PositionedPeriodicCNF
 end LeanTrominoes

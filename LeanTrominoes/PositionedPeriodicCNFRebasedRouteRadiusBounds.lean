@@ -65,12 +65,13 @@ def PlanarIncidencePresentation.RebasedRoutePointsWithinVariablePeriod
       WithinCoordinateRadius placement.period
         (placement.position tagged.1.literal.atom) point
 
-/-- Pointwise, membership-based form of the variable-centered radius bound.
+/-- Pointwise, membership-based form of a variable-centered radius bound.
 Unlike a planar presentation, this predicate needs only a positioned formula,
 placement, and raw route family, so it can be transported through intermediate
 presentation changes before compatibility has been packaged. -/
-def RebasedIncidenceRoutesWithinVariablePeriod
+def RebasedIncidenceRoutesWithinVariableRadius
     {Variable : Type*}
+    (radius : Nat)
     (source : PositionedPeriodicCNF Variable)
     (placement : PeriodicVariablePlacement Variable)
     (routes : IncidenceRoutes) : Prop :=
@@ -85,20 +86,51 @@ def RebasedIncidenceRoutesWithinVariablePeriod
               (PeriodicCNF.clauseAnchor clause.literals)
               literal.offset))
           (routes clauseIndex literalIndex).reverse,
-        WithinCoordinateRadius placement.period
+        WithinCoordinateRadius radius
           (placement.position literal.atom) point
 
-/-- The rebased variable-centered certificate can equivalently be read on
-the stored physical route: every raw point is within one period of that
-incidence's canonical clause-anchor-gauged literal endpoint. -/
-theorem RebasedIncidenceRoutesWithinVariablePeriod.rawRoutePointsWithinCanonicalLiteralPeriod
+/-- The principal radius certificate uses one physical placement period. -/
+def RebasedIncidenceRoutesWithinVariablePeriod
     {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes) : Prop :=
+  RebasedIncidenceRoutesWithinVariableRadius
+    placement.period source placement routes
+
+/-- Increasing the admitted coordinate radius preserves a raw rebased-route
+certificate. -/
+theorem RebasedIncidenceRoutesWithinVariableRadius.mono
+    {Variable : Type*}
+    {firstRadius secondRadius : Nat}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {routes : IncidenceRoutes}
     (bounds :
-      RebasedIncidenceRoutesWithinVariablePeriod
-        source placement routes)
+      RebasedIncidenceRoutesWithinVariableRadius
+        firstRadius source placement routes)
+    (radiusLe : firstRadius ≤ secondRadius) :
+    RebasedIncidenceRoutesWithinVariableRadius
+      secondRadius source placement routes := by
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember point pointMember
+  have bounded :=
+    bounds clause clauseIndex clauseMember
+      literal literalIndex literalMember point pointMember
+  exact ⟨bounded.1.trans radiusLe, bounded.2.trans radiusLe⟩
+
+/-- A rebased variable-centered certificate can equivalently be read on the
+stored physical route: every raw point remains within the given radius of
+that incidence's canonical clause-anchor-gauged literal endpoint. -/
+theorem RebasedIncidenceRoutesWithinVariableRadius.rawRoutePointsWithinCanonicalLiteralRadius
+    {Variable : Type*}
+    {radius : Nat}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariableRadius
+        radius source placement routes)
     {clause : PositionedPeriodicClause Variable}
     {clauseIndex : Nat}
     (clauseMember :
@@ -109,7 +141,7 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.rawRoutePointsWithinCanonical
       (literal, literalIndex) ∈ clause.literals.zipIdx)
     {point : Cell}
     (pointMember : point ∈ routes clauseIndex literalIndex) :
-    WithinCoordinateRadius placement.period
+    WithinCoordinateRadius radius
       (canonicalLiteralPosition placement clause literal)
       point := by
   let shift :=
@@ -153,6 +185,33 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.rawRoutePointsWithinCanonical
   rw [centerEq, pointEq] at translated
   exact translated
 
+/-- Period-specialized form of
+`rawRoutePointsWithinCanonicalLiteralRadius`. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.rawRoutePointsWithinCanonicalLiteralPeriod
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember : point ∈ routes clauseIndex literalIndex) :
+    WithinCoordinateRadius placement.period
+      (canonicalLiteralPosition placement clause literal)
+      point := by
+  exact
+    RebasedIncidenceRoutesWithinVariableRadius.rawRoutePointsWithinCanonicalLiteralRadius
+      bounds clauseMember literalMember pointMember
+
 /-- The raw membership-based radius certificate supplies the corresponding
 field of any planar presentation with that route family. -/
 theorem PlanarIncidencePresentation.rebasedRoutePointsWithinVariablePeriod_of_raw
@@ -175,19 +234,20 @@ theorem PlanarIncidencePresentation.rebasedRoutePointsWithinVariablePeriod_of_ra
 radius certificate when every retained clause is already in the zero-anchor
 gauge.  The retained route is the representative source route at exactly the
 same literal list, so its variable-side rebase is unchanged. -/
-theorem RebasedIncidenceRoutesWithinVariablePeriod.deduplicateByLiterals
+theorem RebasedIncidenceRoutesWithinVariableRadius.deduplicateByLiterals
     {Variable : Type*} [DecidableEq Variable]
+    {radius : Nat}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {routes : IncidenceRoutes}
     (bounds :
-      RebasedIncidenceRoutesWithinVariablePeriod
-        source placement routes)
+      RebasedIncidenceRoutesWithinVariableRadius
+        radius source placement routes)
     (anchorZero :
       ∀ clause ∈ source.deduplicateByLiterals.clauses,
         PeriodicCNF.clauseAnchor clause.literals = (0, 0)) :
-    RebasedIncidenceRoutesWithinVariablePeriod
-      source.deduplicateByLiterals placement
+    RebasedIncidenceRoutesWithinVariableRadius
+      radius source.deduplicateByLiterals placement
       (source.deduplicatedIncidenceRoutes placement routes) := by
   intro retainedClause clauseIndex retainedClauseMember
     literal literalIndex literalMember point pointMember
@@ -244,6 +304,26 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.deduplicateByLiterals
   apply List.mem_map.mpr
   refine ⟨storedPoint, List.mem_reverse.mpr sourcePointMember, ?_⟩
   simp [sourceClauseLiterals]
+
+/-- One-period specialization of radius-preserving clause-orbit
+deduplication. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.deduplicateByLiterals
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes)
+    (anchorZero :
+      ∀ clause ∈ source.deduplicateByLiterals.clauses,
+        PeriodicCNF.clauseAnchor clause.literals = (0, 0)) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      source.deduplicateByLiterals placement
+      (source.deduplicatedIncidenceRoutes placement routes) := by
+  exact
+    RebasedIncidenceRoutesWithinVariableRadius.deduplicateByLiterals
+      bounds anchorZero
 
 /-- Stable clause reindexing and its canonical anchor translation preserve
 the raw variable-centered radius certificate. -/

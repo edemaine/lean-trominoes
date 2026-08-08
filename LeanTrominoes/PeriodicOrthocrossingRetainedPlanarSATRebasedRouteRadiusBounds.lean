@@ -172,6 +172,61 @@ private theorem retainedMetadataRoutePoint_within_gaugedLiteralPeriod
     (drawingPlanarSATVariablePosition formula literal.1) point
   exact finiteBound
 
+/-- The finite local route bound with its strict one-cell integral margin
+preserved at one decoded gauged literal. -/
+private theorem retainedMetadataRoutePoint_within_gaugedLiteralPredPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal)
+    {metadata : DrawingPlanarSATClauseMetadata Variable}
+    {clauseIndex : Nat}
+    (metadataMember :
+      (metadata, clauseIndex) ∈
+        (retainedDrawingPlanarSATClauseMetadata formula).zipIdx)
+    {literal : PlanarSATVariable Variable × Bool}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ metadata.clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        retainedDrawingPlanarSATLocalIncidenceRoutes
+          formula clauseIndex literalIndex) :
+    WithinCoordinateRadius
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula).period - 1)
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+        |>.literalPosition
+          (PeriodicLiteral.variableGauge
+            (retainedDrawingWrappedPeriodicPlanarSATVariableGauge formula)
+            (wrapPeriodicPlanarSATLiteral
+              (periodicizePlanarSATLiteral formula literal))))
+      point := by
+  have metadataLookup :
+      (retainedDrawingPlanarSATClauseMetadata formula)[clauseIndex]? =
+        some metadata :=
+    (List.mem_zipIdx_iff_getElem?).mp metadataMember
+  simp only [retainedDrawingPlanarSATLocalIncidenceRoutes,
+    metadataLookup] at pointMember
+  have metadataMem :
+      metadata ∈ retainedDrawingPlanarSATClauseMetadata formula :=
+    List.fst_mem_of_mem_zipIdx metadataMember
+  have valid : metadata.RetainedValid formula :=
+    retainedDrawingPlanarSATClauseMetadata_valid formula metadataMem
+  have finiteBound :=
+    metadata_localRoutePoint_within_variablePredPeriod
+      wellFormed degree isLocal metadata valid
+      literalMember pointMember
+  rw [retainedGaugedWrappedLiteralPosition_eq_finite]
+  change WithinCoordinateRadius
+    ((drawingPeriodicPlanarSATPlacement formula).period - 1)
+    (drawingPlanarSATVariablePosition formula literal.1) point
+  exact finiteBound
+
 /-- Before anchor normalization, every retained physical route point is
 within one period of its gauged physical literal occurrence. -/
 theorem
@@ -200,6 +255,35 @@ theorem
     formula wellFormed degree isLocal metadataMember
     literalMember pointMember
 
+/-- Before anchor normalization, every retained physical route point keeps
+the strict one-cell margin below the placement period. -/
+theorem
+    retainedGaugedWrappedDrawingIncidenceRoutes_withinPhysicalLiteralPredPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal) :
+    PositionedPeriodicCNF.IncidenceRoutesWithinPhysicalLiteralRadius
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula).period - 1)
+      (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+      (retainedDrawingPlanarSATLocalIncidenceRoutes formula) := by
+  intro positionedClause clauseIndex positionedClauseMember
+    gaugedLiteral literalIndex gaugedLiteralMember point pointMember
+  rcases exists_retainedMetadata_of_gauged_members
+      formula positionedClauseMember gaugedLiteralMember with
+    ⟨metadata, literal, metadataMember,
+      literalMember, gaugedLiteralEq⟩
+  subst gaugedLiteral
+  exact retainedMetadataRoutePoint_within_gaugedLiteralPredPeriod
+    formula wellFormed degree isLocal metadataMember
+    literalMember pointMember
+
 /-- Anchor normalization turns the retained physical endpoint certificate
 into the variable-centered rebased-route certificate. -/
 theorem
@@ -223,6 +307,31 @@ theorem
         (retainedDrawingPlanarSATLocalIncidenceRoutes formula)) := by
   exact
     (retainedGaugedWrappedDrawingIncidenceRoutes_withinPhysicalLiteralPeriod
+      formula wellFormed degree isLocal).anchorNormalize
+
+/-- Anchor normalization preserves the strict one-cell source margin. -/
+theorem
+    retainedAnchorNormalizedGaugedWrappedDrawingIncidenceRoutes_withinVariablePredPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal) :
+    PositionedPeriodicCNF.RebasedIncidenceRoutesWithinVariableRadius
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula).period - 1)
+      (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+      (PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes
+        (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula)
+        (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+        (retainedDrawingPlanarSATLocalIncidenceRoutes formula)) := by
+  exact
+    (retainedGaugedWrappedDrawingIncidenceRoutes_withinPhysicalLiteralPredPeriod
       formula wellFormed degree isLocal).anchorNormalize
 
 /-- Literal-list deduplication reuses the zero-anchor representative route,
@@ -259,6 +368,60 @@ theorem
         source placement sourceRoutes := by
     simpa [source, placement, sourceRoutes] using
       retainedAnchorNormalizedGaugedWrappedDrawingIncidenceRoutes_withinVariablePeriod
+        formula wellFormed degree isLocal
+  have anchorZero :
+      ∀ clause ∈ source.deduplicateByLiterals.clauses,
+        PeriodicCNF.clauseAnchor clause.literals = (0, 0) := by
+    intro clause clauseMember
+    apply clauseAnchor_eq_zero_of_mem_deduplicate_anchorNormalize
+      (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      placement clause
+    simpa [source, placement,
+      retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula]
+      using clauseMember
+  have deduplicatedBounds :=
+    sourceBounds.deduplicateByLiterals anchorZero
+  simpa [source, placement, sourceRoutes,
+    retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula,
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes]
+    using deduplicatedBounds
+
+/-- Literal-list deduplication also preserves the strict one-cell source
+margin. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingIncidenceRoutes_withinVariablePredPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (wellFormed :
+      (PeriodicCNF.incidenceGraph formula).IsWellFormed)
+    (degree :
+      (PeriodicCNF.incidenceGraph formula).DegreeAtMost 3)
+    (isLocal :
+      (PeriodicCNF.incidenceGraph formula).IsLocal) :
+    PositionedPeriodicCNF.RebasedIncidenceRoutesWithinVariableRadius
+      ((retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula).period - 1)
+      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula)
+      (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+        formula) := by
+  let source :=
+    retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula
+  let placement :=
+    retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement formula
+  let sourceRoutes :=
+    PositionedPeriodicCNF.anchorNormalizedIncidenceRoutes
+      (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+        formula)
+      placement
+      (retainedDrawingPlanarSATLocalIncidenceRoutes formula)
+  have sourceBounds :
+      PositionedPeriodicCNF.RebasedIncidenceRoutesWithinVariableRadius
+        (placement.period - 1) source placement sourceRoutes := by
+    simpa [source, placement, sourceRoutes] using
+      retainedAnchorNormalizedGaugedWrappedDrawingIncidenceRoutes_withinVariablePredPeriod
         formula wellFormed degree isLocal
   have anchorZero :
       ∀ clause ∈ source.deduplicateByLiterals.clauses,
