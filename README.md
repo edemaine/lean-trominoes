@@ -4283,6 +4283,12 @@ The representation choices for this target are:
   each stable route identity by an arbitrary lattice shift and proves that a
   nonzero relative shift always selects distinct lifted route occurrences,
   which therefore inherit separation from source continuous planarity.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCorridorSeparation.lean)
+  proves that ribbon-corridor assembly commutes with source-lattice
+  translation.  Lifted source-route separation survives unit subdivision,
+  so the existing corridor theorem proves strict separation of length-three
+  corridor cores at arbitrary distinct lifted route keys, and in particular
+  against every nonzero period translate.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
