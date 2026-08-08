@@ -433,9 +433,10 @@ theorem retainedFinalEscapedFallbackOccurrenceRoute_point_withinCopiedLiteralRad
   simpa using bounded
 
 /-- Every physical route point of the public coordinated fixed-eight family
-lies within one public placement period of its canonical literal endpoint. -/
+lies within one less than the public placement period of its canonical
+literal endpoint. -/
 theorem
-    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPeriod
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPredPeriod
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (sourceLocal : formula.IsLocal)
@@ -465,8 +466,8 @@ theorem
         retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
           formula clauseIndex literalIndex) :
     WithinCoordinateRadius
-      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
-        formula).period
+      ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        formula).period - 1)
       (PositionedPeriodicCNF.canonicalLiteralPosition
         (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
           formula)
@@ -594,7 +595,7 @@ theorem
                     ((finalCoordinatedPlacement formula).period - 1) +
                   345 ≤
                 (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
-                  formula).period := by
+                  formula).period - 1 := by
             rw [publicPeriodEq]
             norm_num [retainedTerminalFanTotalRefinement_eq,
               retainedAngularFanSourceClearanceFactor]
@@ -614,7 +615,7 @@ theorem
               formula baseIndex literalIndex choiceLookup prefixLength]
             at pointMember
           exact
-            retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPeriod
+            retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPredPeriod
               formula sourceLocal sourceWidth sourceOccurrences
               sourceClausesNonempty publicClauseMember
               publicLiteralMember pointMember
@@ -636,7 +637,7 @@ theorem
                   ((finalCoordinatedPlacement formula).period - 1) +
                 336 ≤
               (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
-                formula).period := by
+                formula).period - 1 := by
           rw [publicPeriodEq]
           norm_num [retainedTerminalFanTotalRefinement_eq,
             retainedAngularFanSourceClearanceFactor]
@@ -663,10 +664,85 @@ theorem
       retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_of_clause_none
         formula baseIndex literalIndex scaledClauseNone] at pointMember
     exact
-      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPeriod
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPredPeriod
         formula sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty publicClauseMember
         publicLiteralMember pointMember
+
+/-- One-period corollary of the strict coordinated fixed-eight radius
+bound. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ [])
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (clause, clauseIndex) ∈
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          formula).clauses.zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+          formula clauseIndex literalIndex) :
+    WithinCoordinateRadius
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        formula).period
+      (PositionedPeriodicCNF.canonicalLiteralPosition
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+          formula)
+        clause literal)
+      point := by
+  exact
+    (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPredPeriod
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember pointMember).mono
+        (Nat.sub_le _ _)
+
+/-- The public coordinated fixed-eight route family retains the complete
+strict rebased variable-radius certificate. -/
+theorem
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_withinVariablePredPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ formula.clauses, clause ≠ []) :
+    PositionedPeriodicCNF.RebasedIncidenceRoutesWithinVariableRadius
+      ((retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        formula).period - 1)
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+        formula)
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        formula)
+      (retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        formula) := by
+  apply
+    PositionedPeriodicCNF.rebasedIncidenceRoutesWithinVariableRadius_of_rawRoutePointsWithinCanonicalLiteralRadius
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember point pointMember
+  exact
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes_rawRoutePoint_withinCanonicalLiteralPredPeriod
+      formula sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty clauseMember literalMember pointMember
 
 /-- The public coordinated fixed-eight route family retains the complete
 rebased one-period variable-radius certificate. -/

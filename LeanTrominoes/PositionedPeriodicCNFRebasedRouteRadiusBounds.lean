@@ -382,15 +382,16 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.deduplicateByLiterals
 
 /-- Stable clause reindexing and its canonical anchor translation preserve
 the raw variable-centered radius certificate. -/
-theorem RebasedIncidenceRoutesWithinVariablePeriod.orderCanonicalRoutesByClauseDirection
+theorem RebasedIncidenceRoutesWithinVariableRadius.orderCanonicalRoutesByClauseDirection
     {Variable : Type*}
+    {radius : Nat}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {routes : IncidenceRoutes}
     (bounds :
-      RebasedIncidenceRoutesWithinVariablePeriod
-        source placement routes) :
-    RebasedIncidenceRoutesWithinVariablePeriod
+      RebasedIncidenceRoutesWithinVariableRadius
+        radius source placement routes) :
+    RebasedIncidenceRoutesWithinVariableRadius radius
       (orderClausesByRouteDirection source routes)
       placement
       (orderCanonicalRoutesByClauseDirection
@@ -407,6 +408,25 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.orderCanonicalRoutesByClauseD
   exact bounds sourceClause clauseIndex sourceClauseMember
     sourceLiteral sourceLiteralIndex sourceLiteralMember
     point pointMember
+
+/-- One-period specialization of radius-preserving stable clause
+reindexing. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.orderCanonicalRoutesByClauseDirection
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      (orderClausesByRouteDirection source routes)
+      placement
+      (orderCanonicalRoutesByClauseDirection
+        source placement routes) := by
+  exact
+    RebasedIncidenceRoutesWithinVariableRadius.orderCanonicalRoutesByClauseDirection
+      bounds
 
 /-- Canonical route transport through a variable gauge preserves the raw
 variable-centered radius certificate: both route points and their variable
@@ -470,14 +490,15 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.variableGaugeCanonicalInciden
 /-- Pointwise orthogonal loop erasure preserves the raw variable-centered
 radius certificate.  Newly inserted unit-subdivision points remain on
 radius-bounded source segments, and loop erasure only discards points. -/
-theorem RebasedIncidenceRoutesWithinVariablePeriod.normalizeOrthogonalIncidenceRoutes
+theorem RebasedIncidenceRoutesWithinVariableRadius.normalizeOrthogonalIncidenceRoutes
     {Variable : Type*}
+    {radius : Nat}
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     {routes : IncidenceRoutes}
     (bounds :
-      RebasedIncidenceRoutesWithinVariablePeriod
-        source placement routes)
+      RebasedIncidenceRoutesWithinVariableRadius
+        radius source placement routes)
     (routesNonempty :
       ∀ clause clauseIndex,
         (clause, clauseIndex) ∈ source.clauses.zipIdx →
@@ -491,7 +512,7 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.normalizeOrthogonalIncidenceR
           (literal, literalIndex) ∈ clause.literals.zipIdx →
           PeriodicOrthocrossing.OrthogonalPolyline
             (routes clauseIndex literalIndex)) :
-    RebasedIncidenceRoutesWithinVariablePeriod
+    RebasedIncidenceRoutesWithinVariableRadius radius
       source placement
       (normalizeOrthogonalIncidenceRoutes routes) := by
   intro clause clauseIndex clauseMember
@@ -527,6 +548,36 @@ theorem RebasedIncidenceRoutesWithinVariablePeriod.normalizeOrthogonalIncidenceR
     exact List.mem_map.mpr
       ⟨sourcePoint, by simpa using sourcePointMember, rfl⟩
   · exact normalizedPointMember'
+
+/-- One-period specialization of radius-preserving orthogonal loop
+erasure. -/
+theorem RebasedIncidenceRoutesWithinVariablePeriod.normalizeOrthogonalIncidenceRoutes
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      RebasedIncidenceRoutesWithinVariablePeriod
+        source placement routes)
+    (routesNonempty :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          routes clauseIndex literalIndex ≠ [])
+    (routesOrthogonal :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          PeriodicOrthocrossing.OrthogonalPolyline
+            (routes clauseIndex literalIndex)) :
+    RebasedIncidenceRoutesWithinVariablePeriod
+      source placement
+      (normalizeOrthogonalIncidenceRoutes routes) := by
+  exact
+    RebasedIncidenceRoutesWithinVariableRadius.normalizeOrthogonalIncidenceRoutes
+      bounds routesNonempty routesOrthogonal
 
 /-- The variable-centered one-period radius criterion implies the exact
 rebased-route halo bound consumed by ribbon thickening. -/
