@@ -4240,6 +4240,13 @@ The representation choices for this target are:
   variable-origin translations and proves that the resulting constructed
   prefix meets the complete coordinated source-variable stub only at their
   advertised port.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean)
+  exposes that constructed route as the global assembly's common routed
+  variable prefix.  Both the ordinary and fixed-red prefix branches are
+  identified with it, and the routed typed-incidence branch is exactly this
+  prefix joined to the selected occurrence route.  Assemblies using the
+  standard constructed variable origins inherit the coordinated-stub
+  avoidance certificate directly.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean)
   begins the global separation proof for that fan system.  Source-variable
   fan data uses a canonical inactive-slot fallback, so every occurrence of
