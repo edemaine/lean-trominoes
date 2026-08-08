@@ -4266,6 +4266,11 @@ The representation choices for this target are:
   certificate immediately proves contact-free separation of every pair of
   distinct colored occurrence routes, assuming the same source route-length
   invariant.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFanCompatibilityTransport.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFanCompatibilityTransport.lean)
+  proves that positive coordinate scaling and clause-anchor normalization
+  preserve the variable and ternary-clause cyclic route orders.  It combines
+  those transports into the clockwise compatibility certificate needed by
+  the coordinated fans on the final doubled, normalized ribbon source.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
