@@ -4125,6 +4125,12 @@ The representation choices for this target are:
   three-terminal fans.  Complete clause stubs in adjacent macrocells are
   contact-free unless both source routes enter their targets from the shared
   edge.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseFanMacrocellSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseFanMacrocellSeparation.lean)
+  classifies contact between a complete coordinated clause fan and one legal
+  corridor tile in an adjacent macrocell.  The only remaining pattern is the
+  actual final source tile leaving toward the clause on the fan's selected
+  physical lane; the connector-local gates avoid every neighboring tile
+  outright.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableClauseFans.lean)
   performs the mixed variable/clause finite classification across all
   `28 × 28` outer-template pairs and the three local/outer interactions.
