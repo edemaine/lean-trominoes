@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedPresentation
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteRadiusBounds
+import LeanTrominoes.PositionedPeriodicCNFVariableGaugeRouteOrders
 
 /-!
 # Halo-bounded final gauged Figure 9 presentation
@@ -23,6 +24,142 @@ local instance finalGaugedRibbonPresentationVariableDecidableEq
       (OneInThreeNoUnitVariable
         (PeriodicPlanarOneInThreeThreeRawVariable Variable)) :=
   PlanarOneInThreeNoUnitsFigureNine.nestedVariableDecidableEq
+
+/-- The canonical variable gauge preserves the final clockwise occurrence
+order at every degree-three variable. -/
+theorem
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauged_variableRoutesInOccurrenceOrder
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PositionedPeriodicCNF.VariableRoutesInOccurrenceOrder
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) := by
+  simpa only [
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceRoutes]
+    using
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalClockwise_variableRoutesInOccurrenceOrder
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).variableGaugeCanonicalIncidenceRoutes
+          (placement :=
+            retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+              source)
+          (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+            source)
+
+/-- The canonical variable gauge likewise preserves the final clockwise
+literal order at every ternary clause. -/
+theorem
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauged_ternaryClauseRoutesInClockwiseOrder
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PositionedPeriodicCNF.TernaryClauseRoutesInClockwiseOrder
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceRoutes
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) := by
+  simpa only [
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement,
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceRoutes]
+    using
+      (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalClockwise_ternaryClauseRoutesInClockwiseOrder
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).variableGaugeCanonicalIncidenceRoutes
+          (placement :=
+            retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawPlacement
+              source)
+          (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+            source)
+
+/-- The final clause sort preserves the binary-or-ternary promise. -/
+theorem
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula_arityTwoOrThree
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PeriodicOneInThreeNoUnits.ArityTwoOrThree
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).erase := by
+  simpa only [
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula]
+    using
+      PositionedPeriodicCNF.orderClausesByRouteDirection_arityTwoOrThree
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula
+          source)
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty)
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsComposedRawFormula_arityTwoOrThree
+          source)
+
+/-- The canonical variable gauge preserves the binary-or-ternary promise. -/
+theorem
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_arityTwoOrThree
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    PeriodicOneInThreeNoUnits.ArityTwoOrThree
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).erase := by
+  simpa only [
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula,
+    PositionedPeriodicCNF.erase_variableGauge]
+    using
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormula_arityTwoOrThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).variableGauge
+          (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+            source)
+
+/-- Binary-or-ternary arity gives the final gauged width-three promise. -/
+theorem
+    retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_widthAtMostThree
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).erase.WidthAtMost 3 := by
+  intro clause clauseMember
+  rcases
+      retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_arityTwoOrThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty clause clauseMember with
+    clauseArity | clauseArity
+  · exact clauseArity.le.trans (by decide)
+  · exact clauseArity.le
 
 /-- The final stable clause sort preserves the one-period route-radius
 certificate of the completed normalized Figure 9 drawing. -/

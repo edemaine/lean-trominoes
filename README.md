@@ -5763,12 +5763,21 @@ The representation choices for this target are:
   endpoint-only contacts, and the rebased-route halo bound are discharged;
   finite drawing compatibility is the sole remaining explicit premise, after
   which the concrete presentation also inherits clockwise-compatible fans.
+- [`LeanTrominoes/PositionedPeriodicCNFVariableGaugeRouteOrders.lean`](LeanTrominoes/PositionedPeriodicCNFVariableGaugeRouteOrders.lean)
+  proves that canonical variable gauging preserves occurrence-slot lookup,
+  occurrence bounds, binary-or-ternary arity, clockwise variable-route order,
+  and clockwise ternary-clause route order.  It also supplies the generic
+  bridge from those two route-order certificates to clockwise-compatible
+  source ribbon fans.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonPresentation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonPresentation.lean)
   carries that one-period route-radius certificate through the final stable
   clause ordering and the canonical variable gauge.  At this final endpoint,
   the already verified vertex compatibility combines with continuous
   planarity and endpoint-only contacts to give an unconditional halo-bounded,
-  ribbon-ready source presentation; no finite-geometry premise remains.
+  ribbon-ready source presentation; no finite-geometry premise remains.  The
+  final gauge also preserves clockwise variable and ternary-clause route
+  orders and carries the binary-or-ternary and width-three promises to the
+  finished formula.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineRouteSeparation.lean)
   instantiates the relative splice assembly for the retained ordered fixed-eight
   route family.  Four explicit avoidance conditions imply all six splice
