@@ -176,5 +176,88 @@ theorem assembledClauseRoute_avoids_occurrenceCoordinatedRibbonClauseStub
       presentation.toPlanarIncidencePresentation compatible clauseIndex
       set coreColor entry fanColor
 
+/-- A checked clause-core route is strictly separated from every
+coordinated variable stub.  The two pieces belong to distinct declared
+source-vertex macrocells. -/
+theorem constructedClauseRoute_strictlyAvoids_occurrenceCoordinatedRibbonVariableStub
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (compatible : SourceRibbonFansClockwiseCompatible presentation)
+    (clauseIndex : Nat)
+    (indexLt : clauseIndex < source.clauses.length)
+    (set : X3CClauseSet)
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (fanColor : WireColor) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline
+        (constructedClauseOrigin source standardThreeStrandLayout
+          clauseIndex)
+        (X3CClauseOrthogonal.route set coreColor))
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation entry fanColor) := by
+  let firstCenter := positionedClausePositionAt source clauseIndex
+  let secondCenter := placement.position entry.1.1
+  have centersNe : firstCenter ≠ secondCenter := by
+    exact assemblyMacrocellOwnerPosition_ne_of_ne
+      presentation anchorsZero (.clause clauseIndex) (.atom entry.1.1)
+      (by simpa [AssemblyMacrocellOwner.IsDeclared,
+        PositionedPeriodicCNF.erase] using indexLt)
+      entry.atom_mem
+      (by intro equal; cases equal)
+  have separated :=
+    insetRoute_strictlyAvoids_route_in_distinctRibbonMacrocell
+      (firstCenter := firstCenter) (secondCenter := secondCenter)
+      (first :=
+        translatePolyline standardThreeStrandLayout.clauseOffset
+          (X3CClauseOrthogonal.route set coreColor))
+      (second :=
+        occurrenceCoordinatedRibbonVariableStub
+          presentation entry fanColor)
+      (all_clauseRoute_points_in_inset_rectangle set coreColor)
+      (fun point pointMember => by
+        simpa [secondCenter] using
+          occurrenceCoordinatedRibbonVariableStub_points_bounded
+            presentation compatible entry fanColor pointMember)
+      centersNe
+  rw [translatePolyline_add] at separated
+  simpa [constructedClauseOrigin, firstCenter, ribbonMacrocellOrigin,
+    Cell.add, add_comm] using separated
+
+/-- The assembled coordinated routing inherits strict clause-core versus
+variable-stub separation. -/
+theorem assembledClauseRoute_strictlyAvoids_occurrenceCoordinatedRibbonVariableStub
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (width : source.erase.WidthAtMost 3)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (clauseIndex : Nat)
+    (indexLt : clauseIndex < source.clauses.length)
+    (set : X3CClauseSet)
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (fanColor : WireColor) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesStrictlyAvoidEachOther
+      (assembledClauseRoute routing clauseIndex set coreColor)
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation.toPlanarIncidencePresentation entry fanColor) := by
+  dsimp only
+  simpa [assembledClauseRoute, orientedIncidenceLocalRoute,
+    coordinatedSourceRibbonThreeStrandRouting,
+    RibbonEndpointFanSystem.threeStrandRouting] using
+    constructedClauseRoute_strictlyAvoids_occurrenceCoordinatedRibbonVariableStub
+      presentation.toPlanarIncidencePresentation anchorsZero compatible
+      clauseIndex indexLt set coreColor entry fanColor
+
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
