@@ -1,0 +1,213 @@
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMGlobalRouteSimplicity
+
+/-!
+# Separation of finite assembled route pieces
+
+The checked local incidence drawings express separation using route keys and
+list membership.  The global periodic drawing uses the equivalent indexed
+continuous-separation predicate.  This file bridges the two formulations and
+applies the result to variable-site prefixes and clause-core routes.
+-/
+
+namespace LeanTrominoes
+
+namespace LocalIncidenceDrawing
+
+open Gadget
+
+/-- Two distinct routes in a valid local incidence drawing satisfy the
+indexed continuous-separation predicate used by global drawings. -/
+theorem routeAt_routesAvoidEachOther_of_isValid
+    {Triple Element : Type*}
+    (drawing : LocalIncidenceDrawing Triple Element)
+    (valid : drawing.IsValid)
+    {first second : RouteKey Triple}
+    (different : first ≠ second) :
+    PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutesAvoidEachOther
+      (drawing.routeAt first) (drawing.routeAt second) := by
+  have forward := valid.2.2.2.1 first second different
+  have backward := valid.2.2.2.1 second first different.symm
+  constructor
+  · intro firstIndex secondIndex interiorsMeet
+    exact forward.1.1
+      ((gridPolylineSegments (drawing.routeAt first)).get firstIndex)
+      (List.get_mem _ _)
+      ((gridPolylineSegments (drawing.routeAt second)).get secondIndex)
+      (List.get_mem _ _)
+      interiorsMeet
+  constructor
+  · intro firstPointIndex secondSegmentIndex interiorContains
+    exact forward.1.2
+      ((drawing.routeAt first).get firstPointIndex)
+      (List.get_mem _ _)
+      ((gridPolylineSegments (drawing.routeAt second)).get
+        secondSegmentIndex)
+      (List.get_mem _ _)
+      interiorContains
+  constructor
+  · intro secondPointIndex firstSegmentIndex interiorContains
+    exact backward.1.2
+      ((drawing.routeAt second).get secondPointIndex)
+      (List.get_mem _ _)
+      ((gridPolylineSegments (drawing.routeAt first)).get
+        firstSegmentIndex)
+      (List.get_mem _ _)
+      interiorContains
+  · intro firstPointIndex secondPointIndex pointsEqual
+    have secondMembership :
+        (drawing.routeAt first).get firstPointIndex ∈
+          drawing.routeAt second := by
+      rw [pointsEqual]
+      exact List.get_mem _ _
+    have endpoints := forward.2
+      ((drawing.routeAt first).get firstPointIndex)
+      (List.get_mem _ _) secondMembership
+    have firstEndpoint :
+        PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutePointIsEndpoint
+          (drawing.routeAt first)
+          ((drawing.routeAt first).get firstPointIndex) := by
+      rcases endpoints.1 with sourceEq | targetEq
+      · left
+        exact (valid.1 first).1.trans (congrArg some sourceEq.symm)
+      · right
+        exact (valid.1 first).2.trans (congrArg some targetEq.symm)
+    have secondEndpoint :
+        PlanarThreeSAT.EmbeddedCNFIncidenceDrawing.RoutePointIsEndpoint
+          (drawing.routeAt second)
+          ((drawing.routeAt first).get firstPointIndex) := by
+      rcases endpoints.2 with sourceEq | targetEq
+      · left
+        exact (valid.1 second).1.trans (congrArg some sourceEq.symm)
+      · right
+        exact (valid.1 second).2.trans (congrArg some targetEq.symm)
+    rw [pointsEqual] at secondEndpoint
+    exact ⟨firstEndpoint, secondEndpoint⟩
+
+end LocalIncidenceDrawing
+
+namespace PeriodicPlanarOneInThreeToThreeDM
+
+open Gadget PlanarThreeDM PeriodicOrthocrossing
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+/-- Distinct selected incidences in one finite variable site avoid each
+other continuously. -/
+theorem typedVariableSiteRoutes_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (atomMember : atom ∈ occurringVariables source)
+    (firstSlot : OccurrenceSlot)
+    (firstSlotMember : firstSlot ∈ usedSlots source atom)
+    (firstTriple : Triple Variable)
+    (firstTripleMember :
+      firstTriple ∈ occurrenceTriples source atom firstSlot)
+    (firstColor : WireColor)
+    (secondSlot : OccurrenceSlot)
+    (secondSlotMember : secondSlot ∈ usedSlots source atom)
+    (secondTriple : Triple Variable)
+    (secondTripleMember :
+      secondTriple ∈ occurrenceTriples source atom secondSlot)
+    (secondColor : WireColor)
+    (different :
+      (activeVariableSiteTriple source atom atomMember
+          firstSlot firstSlotMember firstTriple firstTripleMember,
+        firstColor) ≠
+      (activeVariableSiteTriple source atom atomMember
+          secondSlot secondSlotMember secondTriple secondTripleMember,
+        secondColor)) :
+    RoutesAvoidEachOther
+      (typedVariableSiteRoute source atom atomMember
+        firstSlot firstSlotMember firstTriple firstTripleMember firstColor)
+      (typedVariableSiteRoute source atom atomMember
+        secondSlot secondSlotMember secondTriple secondTripleMember
+        secondColor) := by
+  exact LocalIncidenceDrawing.routeAt_routesAvoidEachOther_of_isValid
+    (sourceVariableSiteDrawing source atom)
+    (sourceVariableSiteDrawing_isValid source atom atomMember)
+    different
+
+/-- Translating two distinct incidences from the same variable site
+preserves their continuous separation. -/
+theorem translatedTypedVariableSiteRoutes_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (atomMember : atom ∈ occurringVariables source)
+    (firstSlot : OccurrenceSlot)
+    (firstSlotMember : firstSlot ∈ usedSlots source atom)
+    (firstTriple : Triple Variable)
+    (firstTripleMember :
+      firstTriple ∈ occurrenceTriples source atom firstSlot)
+    (firstColor : WireColor)
+    (secondSlot : OccurrenceSlot)
+    (secondSlotMember : secondSlot ∈ usedSlots source atom)
+    (secondTriple : Triple Variable)
+    (secondTripleMember :
+      secondTriple ∈ occurrenceTriples source atom secondSlot)
+    (secondColor : WireColor)
+    (different :
+      (activeVariableSiteTriple source atom atomMember
+          firstSlot firstSlotMember firstTriple firstTripleMember,
+        firstColor) ≠
+      (activeVariableSiteTriple source atom atomMember
+          secondSlot secondSlotMember secondTriple secondTripleMember,
+        secondColor))
+    (offset : Cell) :
+    RoutesAvoidEachOther
+      (translatePolyline offset
+        (typedVariableSiteRoute source atom atomMember
+          firstSlot firstSlotMember firstTriple firstTripleMember
+          firstColor))
+      (translatePolyline offset
+        (typedVariableSiteRoute source atom atomMember
+          secondSlot secondSlotMember secondTriple secondTripleMember
+          secondColor)) := by
+  exact routesAvoidEachOther_translate
+    (typedVariableSiteRoutes_avoidEachOther source atom atomMember
+      firstSlot firstSlotMember firstTriple firstTripleMember firstColor
+      secondSlot secondSlotMember secondTriple secondTripleMember
+      secondColor different)
+    offset
+
+/-- Distinct colored incidences in the checked clause core avoid each other
+continuously. -/
+theorem orientedClauseLocalRoutes_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (firstSet secondSet : X3CClauseSet)
+    (firstColor secondColor : WireColor)
+    (different :
+      (firstSet, firstColor) ≠ (secondSet, secondColor)) :
+    RoutesAvoidEachOther
+      (orientedIncidenceLocalRoute source
+        (.clause clauseIndex firstSet) firstColor)
+      (orientedIncidenceLocalRoute source
+        (.clause clauseIndex secondSet) secondColor) := by
+  simpa [orientedIncidenceLocalRoute,
+    LocalIncidenceDrawing.routeAt, X3CClauseOrthogonal.drawing] using
+    (LocalIncidenceDrawing.routeAt_routesAvoidEachOther_of_isValid
+      X3CClauseOrthogonal.drawing
+      X3CClauseOrthogonal.drawing_isValid different)
+
+/-- Distinct colored routes assembled in one clause core retain continuous
+separation after placement at the global clause origin. -/
+theorem assembledClauseRoutes_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PeriodicCNF Variable}
+    (routing : ThreeStrandRouting source)
+    (clauseIndex : Nat)
+    (firstSet secondSet : X3CClauseSet)
+    (firstColor secondColor : WireColor)
+    (different :
+      (firstSet, firstColor) ≠ (secondSet, secondColor)) :
+    RoutesAvoidEachOther
+      (assembledClauseRoute routing clauseIndex firstSet firstColor)
+      (assembledClauseRoute routing clauseIndex secondSet secondColor) := by
+  simpa [assembledClauseRoute, translatePolyline] using
+    routesAvoidEachOther_translate
+      (orientedClauseLocalRoutes_avoidEachOther source clauseIndex
+        firstSet secondSet firstColor secondColor different)
+      (routing.clauseOrigin clauseIndex)
+
+end PeriodicPlanarOneInThreeToThreeDM
+end LeanTrominoes
