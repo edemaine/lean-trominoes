@@ -1,6 +1,8 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMGlobalRouteSimplicity
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVertexGeometry
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVertexDistinctness
 import LeanTrominoes.OrthogonalPolylineBoundingBox
+import LeanTrominoes.PeriodicOrthocrossingPlanarSATSourceRouteTranslation
 
 /-!
 # Separation of finite assembled route pieces
@@ -189,6 +191,188 @@ theorem insetRoutes_strictlyAvoidEachOther_of_centers_ne
     simp only [ClosedGridRectanglesSeparated,
       standardThreeStrandLayout, Cell.add, Cell.scale]
     rcases coordinateNe with xNe | yNe <;> omega
+
+/-- Every route in an actually instantiated source-variable site inherits
+the exhaustive strict-inset certificate. -/
+theorem sourceVariableSiteRoute_points_in_inset_rectangle
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (atomMember : atom ∈ occurringVariables source) :
+    ∀ triple color point,
+      point ∈
+          translatePolyline standardThreeStrandLayout.variableOffset
+            ((sourceVariableSiteDrawing source atom).route
+              triple color) →
+        InClosedGridRectangle (1, 1) (127, 127) point := by
+  rcases usedSlots_cases_of_atom_mem source atom atomMember with
+    one | twoOrThree
+  · unfold sourceVariableSiteDrawing sourceVariableSiteCount
+      sourceVariableSiteKind sourceVariableSitePolarity
+    rw [one]
+    intro triple color point pointMember
+    exact all_variableSiteRoute_points_in_inset_rectangle
+      ⟨0, by decide⟩ _ _ triple color point pointMember
+  · rcases twoOrThree with two | three
+    · unfold sourceVariableSiteDrawing sourceVariableSiteCount
+        sourceVariableSiteKind sourceVariableSitePolarity
+      rw [two]
+      intro triple color point pointMember
+      exact all_variableSiteRoute_points_in_inset_rectangle
+        ⟨1, by decide⟩ _ _ triple color point pointMember
+    · unfold sourceVariableSiteDrawing sourceVariableSiteCount
+        sourceVariableSiteKind sourceVariableSitePolarity
+      rw [three]
+      intro triple color point pointMember
+      exact all_variableSiteRoute_points_in_inset_rectangle
+        ⟨2, by decide⟩ _ _ triple color point pointMember
+
+/-- Distinct declared source owners have distinct lattice centers. -/
+theorem assemblyMacrocellOwnerPosition_ne_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (first second : AssemblyMacrocellOwner Variable)
+    (firstDeclared : first.IsDeclared source.erase)
+    (secondDeclared : second.IsDeclared source.erase)
+    (ownersNe : first ≠ second) :
+    assemblyMacrocellOwnerPosition source placement first ≠
+      assemblyMacrocellOwnerPosition source placement second := by
+  intro centersEqual
+  exact ownersNe
+    (assemblyMacrocellOwnerPosition_injective_on
+      presentation anchorsZero first second firstDeclared secondDeclared
+      centersEqual)
+
+/-! ## Separation across distinct source cores -/
+
+/-- Arbitrary finite routes housed at two distinct source variables are
+contact-free after standard placement. -/
+theorem constructedVariableSiteRoutes_strictlyAvoidEachOther_of_atoms_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (firstAtom secondAtom : Variable)
+    (firstAtomMember : firstAtom ∈ occurringVariables source.erase)
+    (secondAtomMember : secondAtom ∈ occurringVariables source.erase)
+    (atomsNe : firstAtom ≠ secondAtom)
+    (firstTriple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase firstAtom)
+        (sourceVariableSiteKind source.erase firstAtom))
+    (firstColor : WireColor)
+    (secondTriple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase secondAtom)
+        (sourceVariableSiteKind source.erase secondAtom))
+    (secondColor : WireColor) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout
+          firstAtom)
+        ((sourceVariableSiteDrawing source.erase firstAtom).route
+          firstTriple firstColor))
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout
+          secondAtom)
+        ((sourceVariableSiteDrawing source.erase secondAtom).route
+          secondTriple secondColor)) := by
+  have centersNe :
+      placement.position firstAtom ≠ placement.position secondAtom := by
+    exact assemblyMacrocellOwnerPosition_ne_of_ne
+      presentation anchorsZero (.atom firstAtom) (.atom secondAtom)
+      firstAtomMember secondAtomMember
+      (fun equal => atomsNe (AssemblyMacrocellOwner.atom.inj equal))
+  have separated := insetRoutes_strictlyAvoidEachOther_of_centers_ne
+    (sourceVariableSiteRoute_points_in_inset_rectangle
+      source.erase firstAtom firstAtomMember firstTriple firstColor)
+    (sourceVariableSiteRoute_points_in_inset_rectangle
+      source.erase secondAtom secondAtomMember secondTriple secondColor)
+    centersNe
+  simpa [constructedVariableOrigin, translatePolyline_add,
+    Cell.add, add_comm] using separated
+
+/-- Every finite source-variable route strictly avoids every finite clause
+route housed at a distinct source owner. -/
+theorem constructedVariableSiteRoute_strictlyAvoids_clauseRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (atom : Variable) (atomMember : atom ∈ occurringVariables source.erase)
+    (variableTriple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase atom)
+        (sourceVariableSiteKind source.erase atom))
+    (variableColor : WireColor)
+    (clauseIndex : Nat) (indexLt : clauseIndex < source.clauses.length)
+    (set : X3CClauseSet) (clauseColor : WireColor) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout atom)
+        ((sourceVariableSiteDrawing source.erase atom).route
+          variableTriple variableColor))
+      (translatePolyline
+        (constructedClauseOrigin source standardThreeStrandLayout clauseIndex)
+        (X3CClauseOrthogonal.route set clauseColor)) := by
+  have centersNe :
+      placement.position atom ≠
+        positionedClausePositionAt source clauseIndex := by
+    exact assemblyMacrocellOwnerPosition_ne_of_ne
+      presentation anchorsZero (.atom atom) (.clause clauseIndex)
+      atomMember (by
+        simpa [AssemblyMacrocellOwner.IsDeclared,
+          PositionedPeriodicCNF.erase] using indexLt)
+      (by intro equal; cases equal)
+  have separated := insetRoutes_strictlyAvoidEachOther_of_centers_ne
+    (sourceVariableSiteRoute_points_in_inset_rectangle
+      source.erase atom atomMember variableTriple variableColor)
+    (all_clauseRoute_points_in_inset_rectangle set clauseColor)
+    centersNe
+  simpa [constructedVariableOrigin, constructedClauseOrigin,
+    translatePolyline_add, Cell.add, add_comm] using separated
+
+/-- Finite clause-core routes belonging to distinct clauses are
+contact-free after standard placement. -/
+theorem constructedClauseRoutes_strictlyAvoidEachOther_of_indices_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (firstIndex secondIndex : Nat)
+    (firstIndexLt : firstIndex < source.clauses.length)
+    (secondIndexLt : secondIndex < source.clauses.length)
+    (indicesNe : firstIndex ≠ secondIndex)
+    (firstSet secondSet : X3CClauseSet)
+    (firstColor secondColor : WireColor) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline
+        (constructedClauseOrigin source standardThreeStrandLayout firstIndex)
+        (X3CClauseOrthogonal.route firstSet firstColor))
+      (translatePolyline
+        (constructedClauseOrigin source standardThreeStrandLayout secondIndex)
+        (X3CClauseOrthogonal.route secondSet secondColor)) := by
+  have centersNe :
+      positionedClausePositionAt source firstIndex ≠
+        positionedClausePositionAt source secondIndex := by
+    exact assemblyMacrocellOwnerPosition_ne_of_ne
+      presentation anchorsZero (.clause firstIndex) (.clause secondIndex)
+      (by simpa [AssemblyMacrocellOwner.IsDeclared,
+        PositionedPeriodicCNF.erase] using firstIndexLt)
+      (by simpa [AssemblyMacrocellOwner.IsDeclared,
+        PositionedPeriodicCNF.erase] using secondIndexLt)
+      (fun equal => indicesNe (AssemblyMacrocellOwner.clause.inj equal))
+  have separated := insetRoutes_strictlyAvoidEachOther_of_centers_ne
+    (all_clauseRoute_points_in_inset_rectangle firstSet firstColor)
+    (all_clauseRoute_points_in_inset_rectangle secondSet secondColor)
+    centersNe
+  simpa [constructedClauseOrigin, translatePolyline_add,
+    Cell.add, add_comm] using separated
 
 /-- Distinct selected incidences in one finite variable site avoid each
 other continuously. -/
