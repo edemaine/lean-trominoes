@@ -4176,8 +4176,10 @@ The representation choices for this target are:
   begins the global separation proof for that fan system.  Source-variable
   fan data now uses a canonical inactive-slot fallback, so every occurrence
   of one variable produces literally the same finite fan; translating the
-  finite certificate proves strict separation of all distinct colored stubs
-  incident to that variable.
+  finite certificates proves strict separation of all distinct colored stubs
+  incident to one variable or one physical clause copy.  The clause result
+  uses width three to recover occurrence identity from the terminal group and
+  injectivity of the occurrence-specific physical-lane permutation.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

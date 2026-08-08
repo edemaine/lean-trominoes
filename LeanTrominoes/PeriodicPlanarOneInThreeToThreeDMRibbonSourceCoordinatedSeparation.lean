@@ -82,5 +82,89 @@ theorem occurrenceCoordinatedRibbonVariableStubs_strictlyAvoidEachOther_of_same_
     planar, data, firstSlot, secondSlot, sameAtom, dataEqual] using
       translatedAvoid
 
+/-- Distinct colored strands incident to one physical source-clause copy
+have strictly separated translated coordinated stubs.  Equality of the
+finite clause-orbit indices makes the two occurrences use one shared fan
+table; equality of their lifted targets makes the translations identical. -/
+theorem occurrenceCoordinatedRibbonClauseStubs_strictlyAvoidEachOther_of_same_target
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    {first second : ActiveOccurrenceEntry source.erase}
+    {firstColor secondColor : WireColor}
+    (sameClauseIndex :
+      occurrenceClauseIndex source.erase first.1.1 first.1.2 =
+        occurrenceClauseIndex source.erase second.1.1 second.1.2)
+    (sameTarget :
+      occurrenceSourceClauseTarget
+          presentation.toPlanarIncidencePresentation first =
+        occurrenceSourceClauseTarget
+          presentation.toPlanarIncidencePresentation second)
+    (different :
+      RibbonStrandsDifferent first firstColor second secondColor) :
+    RoutesStrictlyAvoidEachOther
+      (occurrenceCoordinatedRibbonClauseStub
+        presentation.toPlanarIncidencePresentation first firstColor)
+      (occurrenceCoordinatedRibbonClauseStub
+        presentation.toPlanarIncidencePresentation second secondColor) := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let clauseIndex :=
+    occurrenceClauseIndex source.erase first.1.1 first.1.2
+  let data := sourceClauseRibbonFanData planar clauseIndex
+  let firstGroup := occurrenceClauseTerminalGroup source.erase first
+  let secondGroup := occurrenceClauseTerminalGroup source.erase second
+  let firstLane := routedRibbonLane source.erase first firstColor
+  let secondLane := routedRibbonLane source.erase second secondColor
+  have firstMember :
+      first ∈ activeClauseOccurrenceEntries
+        source.erase clauseIndex :=
+    first.mem_activeClauseOccurrenceEntries
+  have secondMember :
+      second ∈ activeClauseOccurrenceEntries
+        source.erase clauseIndex := by
+    rw [mem_activeClauseOccurrenceEntries_iff]
+    exact sameClauseIndex.symm
+  have firstActive : data.GroupActive firstGroup :=
+    ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
+      planar clauseIndex first firstMember
+  have secondActive : data.GroupActive secondGroup :=
+    ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
+      planar clauseIndex second secondMember
+  have localDifferent :
+      (firstGroup, firstLane) ≠ (secondGroup, secondLane) := by
+    intro equal
+    have groupEqual : firstGroup = secondGroup :=
+      congrArg Prod.fst equal
+    have occurrenceEqual : first = second :=
+      sourceClauseTerminalGroupsUnique_of_widthAtMostThree
+        planar width clauseIndex first second firstMember secondMember
+        groupEqual
+    subst second
+    have colorEqual : firstColor = secondColor :=
+      routedRibbonLane_injective source.erase first
+        (congrArg Prod.snd equal)
+    exact different (Prod.ext rfl colorEqual)
+  have localAvoid :
+      RoutesStrictlyAvoidEachOther
+        (data.coordinatedRoute firstGroup firstLane)
+        (data.coordinatedRoute secondGroup secondLane) :=
+    ClauseRibbonFanData.coordinatedRoutes_strictlyAvoidEachOther
+      data (compatible.2 first)
+      firstGroup secondGroup firstActive secondActive
+      firstLane secondLane localDifferent
+  have translatedAvoid :=
+    localAvoid.translatePolyline
+      (ribbonMacrocellOrigin
+        (occurrenceSourceClauseTarget planar first))
+  simpa [occurrenceCoordinatedRibbonClauseStub,
+    planar, clauseIndex, data, firstGroup, secondGroup,
+    firstLane, secondLane, sameClauseIndex, sameTarget] using
+      translatedAvoid
+
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
