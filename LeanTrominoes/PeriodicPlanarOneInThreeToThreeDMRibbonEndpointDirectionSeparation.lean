@@ -124,6 +124,80 @@ theorem occurrenceSourceVariableDirections_ne_of_same_variable
       (occurrenceSourceRoutes_avoidEachOther_of_ne
         presentation different)
 
+/-- Distinct active source routes cannot leave adjacent variable positions
+through the same unit edge in opposite directions.  This is the source-level
+obstruction corresponding to the sole adjacent variable-fan contact
+classified by the finite ribbon tables. -/
+theorem occurrenceSourceVariableDirections_not_facing
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second) :
+    ∀ direction, direction.IsGenuine →
+      Cell.sub (placement.position second.1.1)
+          (placement.position first.1.1) ≠ direction.step ∨
+        occurrenceSourceVariableDirection
+            presentation.toPlanarIncidencePresentation first ≠ direction ∨
+        occurrenceSourceVariableDirection
+            presentation.toPlanarIncidencePresentation second ≠
+          direction.opposite := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let firstData := occurrenceSpliceData planar first
+  let secondData := occurrenceSpliceData planar second
+  have firstAtom : firstData.tagged.1.atom = first.1.1 :=
+    (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
+      source.erase first.1.1 first.1.2 firstData.tagged
+      firstData.occurrenceLookup).2
+  have secondAtom : secondData.tagged.1.atom = second.1.1 :=
+    (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
+      source.erase second.1.1 second.1.2 secondData.tagged
+      secondData.occurrenceLookup).2
+  have firstHead :
+      (occurrenceSourceRoute planar first).head? =
+        some (placement.position first.1.1) := by
+    simpa [occurrenceSourceRoute, firstData, firstAtom] using
+      firstData.routeHead
+  have secondHead :
+      (occurrenceSourceRoute planar second).head? =
+        some (placement.position second.1.1) := by
+    simpa [occurrenceSourceRoute, secondData, secondAtom] using
+      secondData.routeHead
+  intro direction genuine
+  by_cases offsetDifferent :
+      Cell.sub (placement.position second.1.1)
+          (placement.position first.1.1) ≠ direction.step
+  · exact Or.inl offsetDifferent
+  · right
+    have offsetEqual :
+        Cell.sub (placement.position second.1.1)
+            (placement.position first.1.1) = direction.step :=
+      not_ne_iff.mp offsetDifferent
+    have adjacent :
+        placement.position second.1.1 =
+          Cell.add (placement.position first.1.1) direction.step := by
+      calc
+        placement.position second.1.1 =
+            Cell.add (placement.position first.1.1)
+              (Cell.sub (placement.position second.1.1)
+                (placement.position first.1.1)) := by
+          rcases placement.position first.1.1 with ⟨firstX, firstY⟩
+          rcases placement.position second.1.1 with ⟨secondX, secondY⟩
+          simp [Cell.add, Cell.sub]
+        _ = Cell.add (placement.position first.1.1) direction.step := by
+          rw [offsetEqual]
+    have separated :=
+      polylineFirstDirections_not_facing_of_routesAvoidEachOther
+        (occurrenceSourceRoute_length planar first)
+        (occurrenceSourceRoute_length planar second)
+        firstHead secondHead genuine adjacent
+        (occurrenceSourceRoutes_avoidEachOther_of_ne
+          presentation different)
+    simpa [occurrenceSourceVariableDirection_eq_sourceRoute]
+      using separated
+
 /-- Distinct incidences of one clause orbit enter every translated copy of
 that clause in different directions.  Their stored routes share the
 canonical clause endpoint; reversing and independently rebasing those routes

@@ -4001,7 +4001,8 @@ The representation choices for this target are:
   share their first or last point must use distinct endpoint directions.  It
   also extracts the basic discrete consequence of endpoint-only contact:
   listed points on two such routes are unequal whenever either point is
-  internal.
+  internal.  Its adjacent-start variant proves that two separated routes
+  cannot point toward each other through the unit edge joining their starts.
 - [`LeanTrominoes/OrthogonalPolylineElbow.lean`](LeanTrominoes/OrthogonalPolylineElbow.lean)
   supplies horizontal-first and vertical-first one-bend routes for those
   finite endpoint fans.  Coincident or already aligned endpoints are
@@ -4050,6 +4051,8 @@ The representation choices for this target are:
   while unequal incidences of one clause orbit enter every translated clause
   copy in different directions.  Translation invariance connects those
   directions to the stored routes at their common canonical clause vertex.
+  It also rules out the opposing-direction pattern that could make two
+  variable endpoint fans in adjacent macrocells touch.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean)
   packages the coordinated local inputs needed by that construction.
   Occurrences at one variable and in one finite clause orbit are enumerated

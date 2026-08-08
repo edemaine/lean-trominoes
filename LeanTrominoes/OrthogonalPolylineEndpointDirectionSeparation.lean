@@ -51,6 +51,7 @@ theorem interiorsMeet_of_same_start_direction
         GridSegment.IsHorizontal, GridSegment.IsVertical,
         GridSegment.OpenIntervalsOverlap]
       omega
+
   | north =>
       have firstData :=
         (AxisDirection.between_eq_north_iff
@@ -101,6 +102,91 @@ theorem interiorsMeet_of_same_start_direction
       rcases start with ⟨startX, startY⟩
       rcases firstFinish with ⟨firstX, firstY⟩
       rcases secondFinish with ⟨secondX, secondY⟩
+      simp [GridSegment.InteriorsMeet,
+        GridSegment.IsHorizontal, GridSegment.IsVertical,
+        GridSegment.OpenIntervalsOverlap]
+      omega
+
+/-- Two directed segments starting at opposite endpoints of one cardinal
+unit edge overlap when both point through that edge toward each other. -/
+theorem interiorsMeet_of_adjacent_opposite_directions
+    {firstStart firstFinish secondStart secondFinish : Cell}
+    {direction : AxisDirection}
+    (genuine : direction.IsGenuine)
+    (adjacent : secondStart = Cell.add firstStart direction.step)
+    (firstDirection :
+      AxisDirection.between firstStart firstFinish = direction)
+    (secondDirection :
+      AxisDirection.between secondStart secondFinish = direction.opposite) :
+    GridSegment.InteriorsMeet
+      (GridSegment.mk firstStart firstFinish)
+      (GridSegment.mk secondStart secondFinish) := by
+  cases direction with
+  | invalid => simp [AxisDirection.IsGenuine] at genuine
+  | east =>
+      have firstData :=
+        (AxisDirection.between_eq_east_iff
+          firstStart firstFinish).mp firstDirection
+      have secondData :=
+        (AxisDirection.between_eq_west_iff
+          secondStart secondFinish).mp (by
+            simpa [AxisDirection.opposite] using secondDirection)
+      rcases firstStart with ⟨firstStartX, firstStartY⟩
+      rcases firstFinish with ⟨firstFinishX, firstFinishY⟩
+      rcases secondStart with ⟨secondStartX, secondStartY⟩
+      rcases secondFinish with ⟨secondFinishX, secondFinishY⟩
+      simp [AxisDirection.step, Cell.add] at adjacent
+      simp [GridSegment.InteriorsMeet,
+        GridSegment.IsHorizontal, GridSegment.IsVertical,
+        GridSegment.OpenIntervalsOverlap]
+      omega
+  | north =>
+      have firstData :=
+        (AxisDirection.between_eq_north_iff
+          firstStart firstFinish).mp firstDirection
+      have secondData :=
+        (AxisDirection.between_eq_south_iff
+          secondStart secondFinish).mp (by
+            simpa [AxisDirection.opposite] using secondDirection)
+      rcases firstStart with ⟨firstStartX, firstStartY⟩
+      rcases firstFinish with ⟨firstFinishX, firstFinishY⟩
+      rcases secondStart with ⟨secondStartX, secondStartY⟩
+      rcases secondFinish with ⟨secondFinishX, secondFinishY⟩
+      simp [AxisDirection.step, Cell.add] at adjacent
+      simp [GridSegment.InteriorsMeet,
+        GridSegment.IsHorizontal, GridSegment.IsVertical,
+        GridSegment.OpenIntervalsOverlap]
+      omega
+  | west =>
+      have firstData :=
+        (AxisDirection.between_eq_west_iff
+          firstStart firstFinish).mp firstDirection
+      have secondData :=
+        (AxisDirection.between_eq_east_iff
+          secondStart secondFinish).mp (by
+            simpa [AxisDirection.opposite] using secondDirection)
+      rcases firstStart with ⟨firstStartX, firstStartY⟩
+      rcases firstFinish with ⟨firstFinishX, firstFinishY⟩
+      rcases secondStart with ⟨secondStartX, secondStartY⟩
+      rcases secondFinish with ⟨secondFinishX, secondFinishY⟩
+      simp [AxisDirection.step, Cell.add] at adjacent
+      simp [GridSegment.InteriorsMeet,
+        GridSegment.IsHorizontal, GridSegment.IsVertical,
+        GridSegment.OpenIntervalsOverlap]
+      omega
+  | south =>
+      have firstData :=
+        (AxisDirection.between_eq_south_iff
+          firstStart firstFinish).mp firstDirection
+      have secondData :=
+        (AxisDirection.between_eq_north_iff
+          secondStart secondFinish).mp (by
+            simpa [AxisDirection.opposite] using secondDirection)
+      rcases firstStart with ⟨firstStartX, firstStartY⟩
+      rcases firstFinish with ⟨firstFinishX, firstFinishY⟩
+      rcases secondStart with ⟨secondStartX, secondStartY⟩
+      rcases secondFinish with ⟨secondFinishX, secondFinishY⟩
+      simp [AxisDirection.step, Cell.add] at adjacent
       simp [GridSegment.InteriorsMeet,
         GridSegment.IsHorizontal, GridSegment.IsVertical,
         GridSegment.OpenIntervalsOverlap]
@@ -232,6 +318,52 @@ theorem polylineFirstDirections_ne_of_routesAvoidEachOther
                     AxisDirection.polylineFirstDirection] using
                     GridSegment.interiorsMeet_of_same_start_direction
                       firstAligned secondAligned sameDirection
+
+/-- Continuously separated routes whose starts are one cardinal step apart
+cannot both point through the unit edge joining those starts. -/
+theorem polylineFirstDirections_not_facing_of_routesAvoidEachOther
+    {first second : List Cell}
+    {firstStart secondStart : Cell}
+    {direction : AxisDirection}
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (firstHead : first.head? = some firstStart)
+    (secondHead : second.head? = some secondStart)
+    (genuine : direction.IsGenuine)
+    (adjacent : secondStart = Cell.add firstStart direction.step)
+    (avoids : RoutesAvoidEachOther first second) :
+    AxisDirection.polylineFirstDirection first ≠ direction ∨
+      AxisDirection.polylineFirstDirection second ≠ direction.opposite := by
+  by_contra facing
+  simp only [not_or, not_ne_iff] at facing
+  rcases firstEquation : first with _ | ⟨firstPoint, firstRest⟩
+  · simp [firstEquation] at firstLength
+  rcases firstRest with _ | ⟨firstNext, firstTail⟩
+  · simp [firstEquation] at firstLength
+  rcases secondEquation : second with _ | ⟨secondPoint, secondRest⟩
+  · simp [secondEquation] at secondLength
+  rcases secondRest with _ | ⟨secondNext, secondTail⟩
+  · simp [secondEquation] at secondLength
+  have firstPointEq : firstPoint = firstStart := by
+    rw [firstEquation] at firstHead
+    exact Option.some.inj firstHead
+  have secondPointEq : secondPoint = secondStart := by
+    rw [secondEquation] at secondHead
+    exact Option.some.inj secondHead
+  have interiorsMeet :
+      GridSegment.InteriorsMeet
+        (GridSegment.mk firstPoint firstNext)
+        (GridSegment.mk secondPoint secondNext) := by
+    apply GridSegment.interiorsMeet_of_adjacent_opposite_directions genuine
+    · simpa [firstPointEq, secondPointEq] using adjacent
+    · simpa [firstEquation] using facing.1
+    · simpa [secondEquation] using facing.2
+  have disjoint := avoids.1
+    (⟨0, by simp [firstEquation, gridPolylineSegments]⟩)
+    (⟨0, by simp [secondEquation, gridPolylineSegments]⟩)
+  exact disjoint (by
+    simpa [firstEquation, secondEquation, gridPolylineSegments] using
+      interiorsMeet)
 
 /-- Continuously separated orthogonal routes with the same final point
 must enter it in different directions. -/
