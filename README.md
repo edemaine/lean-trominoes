@@ -4314,6 +4314,12 @@ The representation choices for this target are:
   injectivity keeps any two owner macrocells distinct under a nonzero lattice
   shift, proving strict separation of arbitrary finite cores from all their
   nonzero relative period translates.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCoreCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCoreCorridorSeparation.lean)
+  covers every finite-core owner by an endpoint of an active source route.
+  Endpoint-only contact between distinct lifted source routes then keeps the
+  owner fresh from nonzero-translated corridor interiors; strict inset bounds
+  also settle the exceptional two-point source route, proving strict
+  core/corridor separation at every nonzero relative shift.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
