@@ -62,7 +62,25 @@ theorem routedVariableSiteRoute_avoids_coordinatedRoute
       slot (data.kind slot) (data.polarity slot) color
   · exact data.outerData.outerRoute_head?
       compatible slot active
-        ((data.kind slot).ribbonLaneForColor color)
+      ((data.kind slot).ribbonLaneForColor color)
+
+/-- The advertised variable port is the only listed point shared by the
+routed finite variable-site route and its complete coordinated fan. -/
+theorem routedVariableSiteRoute_coordinatedRoute_only_common
+    (data : VariableRibbonFanData)
+    (compatible : data.IsClockwiseCompatible)
+    (slot : VariableSiteSlot)
+    (active : data.SlotActive slot)
+    (color : WireColor)
+    (point : Cell)
+    (coreMember :
+      point ∈
+        translatePolyline standardThreeStrandLayout.variableOffset
+          ((variableSiteDrawing data.count data.kind data.polarity).route
+            (data.activeRoutedTriple slot active color) color))
+    (fanMember : point ∈ data.coordinatedRoute slot color) :
+    point = data.port slot active color := by
+  native_decide +revert
 
 end VariableRibbonFanData
 end PeriodicPlanarOneInThreeToThreeDM

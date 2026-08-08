@@ -4335,6 +4335,13 @@ The representation choices for this target are:
   the simple clause fan to the simple variable-fan/corridor prefix proves
   every complete coordinated occurrence route simple under the same
   length-at-least-three hypothesis.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSimplicity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSimplicity.lean)
+  closes the routed-incidence splice.  A finite table certifies that the
+  variable port is the only listed contact between a routed variable-site
+  prefix and its coordinated fan; translation and strict corridor/clause
+  separation lift that fact to the complete source route.  Together with
+  simplicity of both pieces, this proves the assembled routed typed
+  incidence simple whenever its unit source route has length at least three.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean)
   assembles the five source-level pairwise results into the coordinated
   endpoint-fan system's complete separation certificate.  Besides width and
