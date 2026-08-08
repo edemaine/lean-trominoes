@@ -4308,6 +4308,12 @@ The representation choices for this target are:
   endpoints.  Thus any complete coordinated occurrence route strictly avoids
   every nonzero relative period translate of every other complete occurrence
   route, without requiring the prototype entries or colors to differ.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCoreSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedCoreSeparation.lean)
+  expresses every finite variable-site or clause incidence core as a route in
+  the strict inset of its source-owner macrocell.  Periodic source-vertex
+  injectivity keeps any two owner macrocells distinct under a nonzero lattice
+  shift, proving strict separation of arbitrary finite cores from all their
+  nonzero relative period translates.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
