@@ -1,4 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMGlobalRouteSimplicity
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVertexGeometry
+import LeanTrominoes.OrthogonalPolylineBoundingBox
 
 /-!
 # Separation of finite assembled route pieces
@@ -89,6 +91,104 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PlanarThreeDM PeriodicOrthocrossing
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+
+set_option maxHeartbeats 2500000
+set_option maxRecDepth 10000
+
+/-! ## Strict inset bounds -/
+
+/-- Every route in every finite one-, two-, or three-occurrence variable
+site lies in the strict one-cell inset of its standard macrocell. -/
+theorem all_variableSiteRoute_points_in_inset_rectangle :
+    ∀ (countPred : Fin 3)
+      (kind : VariableSiteSlot → VariableConnectorKind)
+      (polarity : VariableSiteSlot → Bool)
+      (triple :
+        ActiveVariableSiteTriple (countPred + 1) kind)
+      (color : WireColor)
+      (point : Cell),
+      point ∈
+          translatePolyline standardThreeStrandLayout.variableOffset
+            ((variableSiteDrawing (countPred + 1) kind polarity).route
+              triple color) →
+        InClosedGridRectangle (1, 1) (127, 127) point := by
+  native_decide
+
+/-- Every route in the fixed clause core has the same strict inset bound. -/
+theorem all_clauseRoute_points_in_inset_rectangle :
+    ∀ (set : X3CClauseSet) (color : WireColor) (point : Cell),
+      point ∈
+          translatePolyline standardThreeStrandLayout.clauseOffset
+            (X3CClauseOrthogonal.route set color) →
+        InClosedGridRectangle (1, 1) (127, 127) point := by
+  native_decide
+
+/-- Routes contained in strict standard-macrocell insets become
+contact-free after placement at two distinct source lattice points. -/
+theorem insetRoutes_strictlyAvoidEachOther_of_centers_ne
+    {first second : List Cell}
+    {firstCenter secondCenter : Cell}
+    (firstBounded :
+      ∀ point ∈ first,
+        InClosedGridRectangle (1, 1) (127, 127) point)
+    (secondBounded :
+      ∀ point ∈ second,
+        InClosedGridRectangle (1, 1) (127, 127) point)
+    (centersNe : firstCenter ≠ secondCenter) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline
+        (Cell.scale standardThreeStrandLayout.factor firstCenter) first)
+      (translatePolyline
+        (Cell.scale standardThreeStrandLayout.factor secondCenter)
+        second) := by
+  apply routesStrictlyAvoidEachOther_of_inSeparatedClosedGridRectangles
+      (firstLower :=
+        Cell.add
+          (Cell.scale standardThreeStrandLayout.factor firstCenter)
+          (1, 1))
+      (firstUpper :=
+        Cell.add
+          (Cell.scale standardThreeStrandLayout.factor firstCenter)
+          (127, 127))
+      (secondLower :=
+        Cell.add
+          (Cell.scale standardThreeStrandLayout.factor secondCenter)
+          (1, 1))
+      (secondUpper :=
+        Cell.add
+          (Cell.scale standardThreeStrandLayout.factor secondCenter)
+          (127, 127))
+  · intro point pointMember
+    unfold translatePolyline at pointMember
+    rcases List.mem_map.mp pointMember with
+      ⟨localPoint, localMember, rfl⟩
+    have bounded := firstBounded localPoint localMember
+    rcases firstCenter with ⟨centerX, centerY⟩
+    rcases localPoint with ⟨pointX, pointY⟩
+    simp only [InClosedGridRectangle, standardThreeStrandLayout,
+      Cell.add, Cell.scale] at bounded ⊢
+    omega
+  · intro point pointMember
+    unfold translatePolyline at pointMember
+    rcases List.mem_map.mp pointMember with
+      ⟨localPoint, localMember, rfl⟩
+    have bounded := secondBounded localPoint localMember
+    rcases secondCenter with ⟨centerX, centerY⟩
+    rcases localPoint with ⟨pointX, pointY⟩
+    simp only [InClosedGridRectangle, standardThreeStrandLayout,
+      Cell.add, Cell.scale] at bounded ⊢
+    omega
+  · rcases firstCenter with ⟨firstX, firstY⟩
+    rcases secondCenter with ⟨secondX, secondY⟩
+    have coordinateNe : firstX ≠ secondX ∨ firstY ≠ secondY := by
+      by_cases xEq : firstX = secondX
+      · right
+        intro yEq
+        exact centersNe (Prod.ext xEq yEq)
+      · exact Or.inl xEq
+    simp only [ClosedGridRectanglesSeparated,
+      standardThreeStrandLayout, Cell.add, Cell.scale]
+    rcases coordinateNe with xNe | yNe <;> omega
 
 /-- Distinct selected incidences in one finite variable site avoid each
 other continuously. -/
