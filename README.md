@@ -4369,7 +4369,8 @@ The representation choices for this target are:
   length-at-least-three invariant discharge the complete fan-system
   certificate, so all distinct colored occurrence routes are strictly
   separated.  The same invariant now also proves every occurrence suffix
-  and every complete assembled typed incidence route geometrically simple.
+  and every complete assembled typed incidence route geometrically simple;
+  the result is lifted through total tag lookup to every stored edge route.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonRouting.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonRouting.lean)
   specializes that routing to the retained, ordered, fixed-eight final
   gauged Figure 9 presentation.  Its stored width, occurrence, arity, and

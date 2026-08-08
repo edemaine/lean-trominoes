@@ -131,6 +131,66 @@ theorem paddedNormalizedCoordinatedAssembledTypedIncidenceRoute_simple
     (paddedNormalizedOccurrenceUnitSourceRoute_length_ge_three presentation)
     triple color
 
+/-- Total incidence-tag lookup preserves route simplicity, including its
+unreachable empty fallback branch. -/
+theorem paddedNormalizedCoordinatedAssembledRouteAtTag_simple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes)
+    (tag : PeriodicThreeDM.IncidenceTag) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (assembledRouteAtTag
+        (paddedNormalizedCoordinatedRibbonThreeStrandRouting
+          presentation width occurrences arity
+          variableOrdered clauseOrdered)
+        tag) := by
+  unfold assembledRouteAtTag
+  split
+  next indexLt =>
+    exact
+      paddedNormalizedCoordinatedAssembledTypedIncidenceRoute_simple
+        presentation width occurrences arity
+        variableOrdered clauseOrdered
+        ⟨_, List.getElem_mem indexLt⟩ tag.color
+  next indexNotLt =>
+    simp [LocalIncidenceDrawing.RouteIsSimple, gridPolylineSegments]
+
+/-- Every route stored in the final padded normalized coordinated assembly
+is geometrically simple. -/
+theorem paddedNormalizedCoordinatedAssembledEdgeRoutes_simple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes) :
+    ∀ route ∈ assembledEdgeRoutes
+        (paddedNormalizedCoordinatedRibbonThreeStrandRouting
+          presentation width occurrences arity
+          variableOrdered clauseOrdered),
+      LocalIncidenceDrawing.RouteIsSimple route := by
+  intro route routeMember
+  unfold assembledEdgeRoutes at routeMember
+  rcases List.mem_map.mp routeMember with ⟨tag, tagMember, rfl⟩
+  exact paddedNormalizedCoordinatedAssembledRouteAtTag_simple
+    presentation width occurrences arity
+    variableOrdered clauseOrdered tag
+
 set_option maxHeartbeats 1000000 in
 /-- Every pair of distinct colored occurrence routes in the final
 coordinated routing is contact-free. -/
