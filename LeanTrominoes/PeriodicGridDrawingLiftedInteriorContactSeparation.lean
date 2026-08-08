@@ -56,6 +56,67 @@ def RelativeLiftedRoutesAvoidInteriorContacts
               (Cell.add
                 (drawing.periodTranslation relativeTranslate)))
 
+/-- Distinct routes stored in one fundamental drawing avoid all three kinds
+of segment-interior contact before any period translation. -/
+def StoredRoutesAvoidInteriorContacts
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ first ∈ drawing.edgeRoutes.zipIdx,
+    ∀ second ∈ drawing.edgeRoutes.zipIdx,
+      first.2 ≠ second.2 →
+        RoutesAvoidInteriorContacts first.1 second.1
+
+/-- The genuinely periodic part of relative lifted separation: every stored
+route avoids every nonzero lattice translate of every stored route. -/
+def NonzeroRelativeLiftedRoutesAvoidInteriorContacts
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ first ∈ drawing.edgeRoutes.zipIdx,
+    ∀ second ∈ drawing.edgeRoutes.zipIdx,
+      ∀ relativeTranslate,
+        relativeTranslate ≠ (0, 0) →
+          RoutesAvoidInteriorContacts
+            first.1
+            (second.1.map
+              (Cell.add
+                (drawing.periodTranslation relativeTranslate)))
+
+/-- Translating a route by the zero lattice offset leaves it unchanged. -/
+theorem map_add_periodTranslation_zero
+    (drawing : PeriodicGridDrawing) (route : List Cell) :
+    route.map
+        (Cell.add (drawing.periodTranslation (0, 0))) =
+      route := by
+  induction route with
+  | nil => rfl
+  | cons point points induction =>
+      simp only [List.map_cons]
+      rw [induction]
+      congr 1
+      apply Prod.ext <;>
+        simp [periodTranslation, Cell.add, Cell.scale]
+
+/-- Same-period separation and the nonzero relative-shift cases together
+are exactly enough for full relative lifted separation. -/
+theorem relativeLiftedRoutesAvoidInteriorContacts_of_stored_of_nonzero
+    {drawing : PeriodicGridDrawing}
+    (stored : drawing.StoredRoutesAvoidInteriorContacts)
+    (nonzero :
+      drawing.NonzeroRelativeLiftedRoutesAvoidInteriorContacts) :
+    drawing.RelativeLiftedRoutesAvoidInteriorContacts := by
+  intro first firstMember second secondMember
+    relativeTranslate occurrencesDifferent
+  by_cases relativeZero : relativeTranslate = (0, 0)
+  · subst relativeTranslate
+    have indicesDifferent : first.2 ≠ second.2 := by
+      intro indicesEqual
+      apply occurrencesDifferent
+      exact Prod.ext indicesEqual rfl
+    have avoids :=
+      stored first firstMember second secondMember indicesDifferent
+    rwa [map_add_periodTranslation_zero drawing second.1]
+  · exact
+      nonzero first firstMember second secondMember
+        relativeTranslate relativeZero
+
 /-- Absolute lifted interior-contact separation is equivalent to checking
 one relative translation for each pair of stored routes. -/
 theorem liftedRoutesAvoidInteriorContacts_iff_relative
@@ -68,19 +129,7 @@ theorem liftedRoutesAvoidInteriorContacts_iff_relative
     have avoids :=
       separated first firstMember second secondMember
         (0, 0) relativeTranslate occurrencesDifferent
-    have zeroTranslate :
-        first.1.map
-            (Cell.add (drawing.periodTranslation (0, 0))) =
-          first.1 := by
-      induction first.1 with
-      | nil => rfl
-      | cons point points induction =>
-          simp only [List.map_cons]
-          rw [induction]
-          congr 1
-          apply Prod.ext <;>
-            simp [periodTranslation, Cell.add, Cell.scale]
-    rwa [zeroTranslate] at avoids
+    rwa [map_add_periodTranslation_zero drawing first.1] at avoids
   · intro separated first firstMember second secondMember
       firstTranslate secondTranslate occurrencesDifferent
     let relativeTranslate :=

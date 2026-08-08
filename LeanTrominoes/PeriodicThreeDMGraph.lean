@@ -95,6 +95,48 @@ def incidenceGraph (problem : PeriodicThreeDM) :
 theorem incidenceColors_nodup : incidenceColors.Nodup := by
   decide
 
+/-- Incidence tags can equivalently be enumerated by triple index rather
+than by the value/index pairs of `zipIdx`. -/
+theorem incidenceTags_eq_range_flatMap (problem : PeriodicThreeDM) :
+    problem.incidenceTags =
+      (List.range problem.triples.length).flatMap tripleIncidenceTags := by
+  unfold incidenceTags
+  rw [← List.flatMap_map]
+  congr 1
+  rw [List.zipIdx_map_snd, List.range_eq_range']
+
+/-- The three colored tags of one triple index are duplicate-free. -/
+theorem tripleIncidenceTags_nodup (tripleIndex : Nat) :
+    (tripleIncidenceTags tripleIndex).Nodup := by
+  apply incidenceColors_nodup.map
+  intro first second equality
+  cases equality
+  rfl
+
+/-- Distinct triple indices contribute disjoint incidence-tag blocks. -/
+theorem tripleIncidenceTags_disjoint
+    {firstIndex secondIndex : Nat}
+    (different : firstIndex ≠ secondIndex) :
+    List.Disjoint
+      (tripleIncidenceTags firstIndex)
+      (tripleIncidenceTags secondIndex) := by
+  rw [List.disjoint_left]
+  intro tag firstMem secondMem
+  simp only [tripleIncidenceTags, List.mem_map] at firstMem secondMem
+  rcases firstMem with ⟨firstColor, _, rfl⟩
+  rcases secondMem with ⟨secondColor, _, equality⟩
+  cases equality
+  exact different rfl
+
+/-- Every original incidence edge has one unique tag-list position. -/
+theorem incidenceTags_nodup (problem : PeriodicThreeDM) :
+    problem.incidenceTags.Nodup := by
+  rw [incidenceTags_eq_range_flatMap, List.nodup_flatMap]
+  exact
+    ⟨fun index _ => tripleIncidenceTags_nodup index,
+      List.nodup_range.imp fun different =>
+        tripleIncidenceTags_disjoint different⟩
+
 @[simp]
 theorem incidenceColors_length : incidenceColors.length = 3 := by
   rfl

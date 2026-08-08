@@ -4287,12 +4287,19 @@ The representation choices for this target are:
   encoded degree-two-or-three promise rules out isolated vertices, while
   compatibility and looplessness make every stored graph-vertex position an
   endpoint of a lifted route segment.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedLiftedContactReduction.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedLiftedContactReduction.lean)
+  transports distinct stored route indices to unique incidence tags and
+  discharges the zero-relative-shift case with the preceding same-period
+  theorem.  It packages simplicity, endpoint coverage, and orthogonality to
+  show that separation from nonzero relative period translates is now the
+  sole remaining geometric input for continuous planarity of the assembly.
 - [`LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean)
   lifts that deliberately weaker three-field separation predicate to the
   infinite periodic drawing.  Pairwise lifted separation plus stored-route
   simplicity proves both global route-interior predicates; ordinary endpoint
   coverage then supplies graph-vertex/interior avoidance, so harmless shared
-  bend points do not obstruct continuous planarity.
+  bend points do not obstruct continuous planarity.  Its stored/nonzero
+  factorization isolates the genuinely periodic translated-route cases.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean)
   exposes that constructed route as the global assembly's common routed
   variable prefix.  Both the ordinary and fixed-red prefix branches are
@@ -6426,7 +6433,8 @@ The representation choices for this target are:
   colored-element graph degrees are exactly the corresponding 3DM degrees,
   and a well-formed degree-two-or-three instance has ordinary maximum degree
   three, as required by the drawing construction.  The edge list is proved
-  index-for-index equal to the separately retained colored incidence tags.
+  index-for-index equal to the separately retained duplicate-free colored
+  incidence tags.
 - [`LeanTrominoes/PeriodicThreeDMIncidenceVertexCoverage.lean`](LeanTrominoes/PeriodicThreeDMIncidenceVertexCoverage.lean)
   shows that this incidence graph is loopless and, under the degree-two-or-
   three promise, has no isolated vertices.  Consequently every compatible
