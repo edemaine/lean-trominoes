@@ -4233,6 +4233,13 @@ The representation choices for this target are:
   actual source macrocells.  Given the explicit clockwise-order obligation,
   it proves exact global endpoints, rectilinearity, and macrocell
   containment, and packages the result as a `RibbonEndpointFanSystem`.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreSplice.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreSplice.lean)
+  identifies the finite fan's selected core route with the routed typed
+  variable-site route used by the global assembly, including its dependent
+  count and connector indices.  It then composes the macrocell and global
+  variable-origin translations and proves that the resulting constructed
+  prefix meets the complete coordinated source-variable stub only at their
+  advertised port.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean)
   begins the global separation proof for that fan system.  Source-variable
   fan data uses a canonical inactive-slot fallback, so every occurrence of
