@@ -4254,6 +4254,12 @@ The representation choices for this target are:
   while distinct semantic colors select different physical lanes at the
   intended final tile.  Endpoint-only source contact supplies the same
   exclusions for cores belonging to another occurrence.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean)
+  assembles the five source-level pairwise results into the coordinated
+  endpoint-fan system's complete separation certificate.  Besides width and
+  clockwise compatibility, its sole hypothesis is the proved
+  length-at-least-three condition that supplies an interior source-route
+  point for the mixed variable/clause case.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
