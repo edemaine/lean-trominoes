@@ -4260,6 +4260,12 @@ The representation choices for this target are:
   clockwise compatibility, its sole hypothesis is the proved
   length-at-least-three condition that supplies an interior source-route
   point for the mixed variable/clause case.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceRouting.lean)
+  joins those coordinated endpoint fans to the certified corridor cores and
+  packages the result as a `ThreeStrandRouting`.  The complete fan-system
+  certificate immediately proves contact-free separation of every pair of
+  distinct colored occurrence routes, assuming the same source route-length
+  invariant.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
