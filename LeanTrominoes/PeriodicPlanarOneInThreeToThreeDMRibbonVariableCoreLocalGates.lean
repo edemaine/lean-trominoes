@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans
+import LeanTrominoes.OrthogonalPolylineStrictSeparation
 
 /-!
 # Variable-site cores versus coordinated ribbon gates
@@ -37,6 +38,197 @@ instance (first second : List Cell) :
     Decidable (RoutesAvoidInteriorContacts first second) := by
   unfold RoutesAvoidInteriorContacts
   infer_instance
+
+/-- Ordinary endpoint-permitting route separation contains the three
+interior-contact fields. -/
+theorem RoutesAvoidEachOther.toRoutesAvoidInteriorContacts
+    {first second : List Cell}
+    (avoid : RoutesAvoidEachOther first second) :
+    RoutesAvoidInteriorContacts first second :=
+  ⟨avoid.1, avoid.2.1, avoid.2.2.1⟩
+
+/-- Contact-free route separation in particular excludes every kind of
+interior contact. -/
+theorem RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts
+    {first second : List Cell}
+    (strict : RoutesStrictlyAvoidEachOther first second) :
+    RoutesAvoidInteriorContacts first second :=
+  RoutesAvoidEachOther.toRoutesAvoidInteriorContacts
+    strict.toRoutesAvoidEachOther
+
+/-- Membership hypotheses imply the indexed interior-contact predicate. -/
+theorem routesAvoidInteriorContacts_of_mem
+    {first second : List Cell}
+    (segmentsAvoid :
+      ∀ firstSegment ∈ gridPolylineSegments first,
+        ∀ secondSegment ∈ gridPolylineSegments second,
+          ¬GridSegment.InteriorsMeet firstSegment secondSegment)
+    (firstPointsAvoid :
+      ∀ firstPoint ∈ first,
+        ∀ secondSegment ∈ gridPolylineSegments second,
+          ¬secondSegment.InteriorContains firstPoint)
+    (secondPointsAvoid :
+      ∀ secondPoint ∈ second,
+        ∀ firstSegment ∈ gridPolylineSegments first,
+          ¬firstSegment.InteriorContains secondPoint) :
+    RoutesAvoidInteriorContacts first second := by
+  unfold RoutesAvoidInteriorContacts
+    SegmentInteriorsDisjoint RoutePointsAvoidInteriors
+  exact
+    ⟨fun firstIndex secondIndex =>
+        segmentsAvoid _ (List.get_mem _ firstIndex)
+          _ (List.get_mem _ secondIndex),
+      fun firstPointIndex secondSegmentIndex =>
+        firstPointsAvoid _ (List.get_mem _ firstPointIndex)
+          _ (List.get_mem _ secondSegmentIndex),
+      fun secondPointIndex firstSegmentIndex =>
+        secondPointsAvoid _ (List.get_mem _ secondPointIndex)
+          _ (List.get_mem _ firstSegmentIndex)⟩
+
+/-- Interior-contact avoidance is symmetric. -/
+theorem RoutesAvoidInteriorContacts.symm
+    {first second : List Cell}
+    (avoid : RoutesAvoidInteriorContacts first second) :
+    RoutesAvoidInteriorContacts second first := by
+  unfold RoutesAvoidInteriorContacts
+    SegmentInteriorsDisjoint RoutePointsAvoidInteriors at avoid ⊢
+  refine ⟨?_, avoid.2.2, avoid.2.1⟩
+  intro secondIndex firstIndex interiorsMeet
+  exact avoid.1 firstIndex secondIndex
+    ((GridSegment.interiorsMeet_comm _ _).mpr interiorsMeet)
+
+/-- Membership form of the segment-interior field. -/
+theorem RoutesAvoidInteriorContacts.segmentsAvoid_of_mem
+    {first second : List Cell}
+    (avoid : RoutesAvoidInteriorContacts first second)
+    (firstSegment : GridSegment)
+    (firstMember : firstSegment ∈ gridPolylineSegments first)
+    (secondSegment : GridSegment)
+    (secondMember : secondSegment ∈ gridPolylineSegments second) :
+    ¬GridSegment.InteriorsMeet firstSegment secondSegment := by
+  rcases List.mem_iff_get.mp firstMember with ⟨firstIndex, rfl⟩
+  rcases List.mem_iff_get.mp secondMember with ⟨secondIndex, rfl⟩
+  exact avoid.1 firstIndex secondIndex
+
+/-- Membership form of the first-point/second-interior field. -/
+theorem RoutesAvoidInteriorContacts.firstPointsAvoid_of_mem
+    {first second : List Cell}
+    (avoid : RoutesAvoidInteriorContacts first second)
+    (firstPoint : Cell) (firstMember : firstPoint ∈ first)
+    (secondSegment : GridSegment)
+    (secondMember : secondSegment ∈ gridPolylineSegments second) :
+    ¬secondSegment.InteriorContains firstPoint := by
+  rcases List.mem_iff_get.mp firstMember with ⟨firstIndex, rfl⟩
+  rcases List.mem_iff_get.mp secondMember with ⟨secondIndex, rfl⟩
+  exact avoid.2.1 firstIndex secondIndex
+
+/-- Membership form of the second-point/first-interior field. -/
+theorem RoutesAvoidInteriorContacts.secondPointsAvoid_of_mem
+    {first second : List Cell}
+    (avoid : RoutesAvoidInteriorContacts first second)
+    (secondPoint : Cell) (secondMember : secondPoint ∈ second)
+    (firstSegment : GridSegment)
+    (firstMember : firstSegment ∈ gridPolylineSegments first) :
+    ¬firstSegment.InteriorContains secondPoint := by
+  exact avoid.symm.firstPointsAvoid_of_mem
+    secondPoint secondMember firstSegment firstMember
+
+/-- Joining two pieces on the right preserves interior-contact avoidance
+when the first route avoids both pieces.  Listed-point coincidences need no
+extra side condition because this predicate deliberately ignores them. -/
+theorem RoutesAvoidInteriorContacts.join_right
+    {first second extra : List Cell} {boundary : Cell}
+    (secondAvoid : RoutesAvoidInteriorContacts first second)
+    (extraAvoid : RoutesAvoidInteriorContacts first extra)
+    (secondLast : second.getLast? = some boundary)
+    (extraHead : extra.head? = some boundary) :
+    RoutesAvoidInteriorContacts first (joinAtEndpoint second extra) := by
+  have joinedSegments :
+      gridPolylineSegments (joinAtEndpoint second extra) =
+        gridPolylineSegments second ++ gridPolylineSegments extra :=
+    gridPolylineSegments_joinAtEndpoint secondLast extraHead
+  apply routesAvoidInteriorContacts_of_mem
+  · intro firstSegment firstMember joinedSegment joinedMember
+    rw [joinedSegments, List.mem_append] at joinedMember
+    rcases joinedMember with secondMember | extraMember
+    · exact secondAvoid.segmentsAvoid_of_mem
+        firstSegment firstMember joinedSegment secondMember
+    · exact extraAvoid.segmentsAvoid_of_mem
+        firstSegment firstMember joinedSegment extraMember
+  · intro firstPoint firstPointMember joinedSegment joinedMember
+    rw [joinedSegments, List.mem_append] at joinedMember
+    rcases joinedMember with secondMember | extraMember
+    · exact secondAvoid.firstPointsAvoid_of_mem
+        firstPoint firstPointMember joinedSegment secondMember
+    · exact extraAvoid.firstPointsAvoid_of_mem
+        firstPoint firstPointMember joinedSegment extraMember
+  · intro joinedPoint joinedPointMember firstSegment firstMember
+    rcases mem_joinAtEndpoint joinedPointMember with
+      secondMember | extraMember
+    · exact secondAvoid.secondPointsAvoid_of_mem
+        joinedPoint secondMember firstSegment firstMember
+    · exact extraAvoid.secondPointsAvoid_of_mem
+        joinedPoint extraMember firstSegment firstMember
+
+/-- Joining two pieces on the left preserves interior-contact avoidance. -/
+theorem RoutesAvoidInteriorContacts.join_left
+    {first extra second : List Cell} {boundary : Cell}
+    (firstAvoid : RoutesAvoidInteriorContacts first second)
+    (extraAvoid : RoutesAvoidInteriorContacts extra second)
+    (firstLast : first.getLast? = some boundary)
+    (extraHead : extra.head? = some boundary) :
+    RoutesAvoidInteriorContacts (joinAtEndpoint first extra) second :=
+  (firstAvoid.symm.join_right extraAvoid.symm firstLast extraHead).symm
+
+/-- Common pointwise translation preserves interior-contact avoidance. -/
+theorem RoutesAvoidInteriorContacts.translatePolyline
+    {first second : List Cell}
+    (avoid : RoutesAvoidInteriorContacts first second)
+    (offset : Cell) :
+    RoutesAvoidInteriorContacts
+      (translatePolyline offset first)
+      (translatePolyline offset second) := by
+  apply routesAvoidInteriorContacts_of_mem
+  · rw [gridPolylineSegments_translatePolyline,
+      gridPolylineSegments_translatePolyline]
+    intro firstSegment firstMember secondSegment secondMember
+    rcases List.mem_map.mp firstMember with
+      ⟨sourceFirst, sourceFirstMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨sourceSecond, sourceSecondMember, rfl⟩
+    intro interiorsMeet
+    apply avoid.segmentsAvoid_of_mem
+      sourceFirst sourceFirstMember sourceSecond sourceSecondMember
+    exact (GridSegment.interiorsMeet_translate_both_iff
+      sourceFirst sourceSecond offset).mp interiorsMeet
+  · rw [gridPolylineSegments_translatePolyline]
+    intro firstPoint firstMember secondSegment secondMember
+    unfold PeriodicOrthocrossing.translatePolyline at firstMember
+    rcases List.mem_map.mp firstMember with
+      ⟨sourcePoint, sourcePointMember, rfl⟩
+    rcases List.mem_map.mp secondMember with
+      ⟨sourceSegment, sourceSegmentMember, rfl⟩
+    intro interiorContains
+    apply avoid.firstPointsAvoid_of_mem
+      sourcePoint sourcePointMember sourceSegment sourceSegmentMember
+    exact (PeriodicGridDrawing.interiorContains_translate_iff
+      sourceSegment offset sourcePoint).mp (by simpa
+        [PeriodicOrthocrossing.translatePolyline,
+        Cell.add, add_comm] using interiorContains)
+  · rw [gridPolylineSegments_translatePolyline]
+    intro secondPoint secondMember firstSegment firstMember
+    unfold PeriodicOrthocrossing.translatePolyline at secondMember
+    rcases List.mem_map.mp secondMember with
+      ⟨sourcePoint, sourcePointMember, rfl⟩
+    rcases List.mem_map.mp firstMember with
+      ⟨sourceSegment, sourceSegmentMember, rfl⟩
+    intro interiorContains
+    apply avoid.secondPointsAvoid_of_mem
+      sourcePoint sourcePointMember sourceSegment sourceSegmentMember
+    exact (PeriodicGridDrawing.interiorContains_translate_iff
+      sourceSegment offset sourcePoint).mp (by simpa
+        [PeriodicOrthocrossing.translatePolyline,
+        Cell.add, add_comm] using interiorContains)
 
 /-- Every route in a complete one-, two-, or three-module variable site
 avoids the continuous interiors of every active local gate, in both

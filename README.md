@@ -4114,8 +4114,11 @@ The representation choices for this target are:
   annular RGB router for each.  Lean exhaustively certifies the generated
   tables' exact standardized-gate and ribbon-exit endpoints, rectilinearity,
   macrocell and protected-frame bounds, and strict separation of every pair
-  of active colored strands.  This makes the required cyclic-order invariant
-  explicit at the remaining source-presentation boundary.
+  of active colored strands.  A common lower-detour correction leaves a
+  one-row gap below the complete variable-site core, and every outer segment
+  is classified into one of the four safe-frame arms.  This makes the required
+  cyclic-order invariant explicit at the remaining source-presentation
+  boundary.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableOuterFans.lean)
   classifies contacts between two selected variable outer-fan tables in
   neighboring ribbon macrocells.  An exhaustive certificate covers all 28
@@ -4170,11 +4173,11 @@ The representation choices for this target are:
   selected occurrence-and-color route has the stronger certificate that its
   only listed contact with the gate is their unique splice port.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreCoordinatedFans.lean)
-  extends that selected core-to-gate certificate through the complete
-  coordinated variable fan.  The selected variable-site route is
-  contact-free from its matching physical-lane outer route, so joining the
-  local gate to that outer route preserves endpoint-only contact at exactly
-  the advertised variable port.
+  extends the core-to-gate certificates through complete coordinated variable
+  fans.  Every variable-site route strictly avoids every outer fan and avoids
+  the interiors of every complete fan, including nonmatching occurrence/color
+  pairs whose listed points may coincide.  The selected matching pair retains
+  the stronger endpoint-only contact certificate at its advertised port.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean)
   packages the active top/left or top/left/right clause terminals and reuses
   the 28 certified variable outer-fan templates by vertical reflection and

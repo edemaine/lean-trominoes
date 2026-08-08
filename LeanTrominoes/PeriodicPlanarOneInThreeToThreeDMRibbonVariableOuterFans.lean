@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableLocalGates
+import LeanTrominoes.OrthogonalPolylineBoundingBox
 
 /-!
 # Coordinated variable-side outer ribbon fans
@@ -8,8 +9,9 @@ of the variable gadget.  This file supplies the remaining finite routing
 from those gates to the direction-dependent ribbon exits.
 
 The safe routing region is the rectangular annulus outside
-`[11, 109] × [51, 107]`, which contains the complete variable-site drawing
-and every local gate route except its advertised endpoint.  A family exists
+`[11, 109] × [48, 107]`, which contains the complete variable-site drawing.
+Its lower detours lie at height at most `46`, leaving a full empty row before
+the core.  A family exists
 exactly when the one, two, or three active direction bundles occur in cyclic
 clockwise order around the macrocell.  The table below enumerates the 28
 possible direction lists: four singletons, twelve ordered pairs, and twelve
@@ -52,9 +54,10 @@ def VariableOuterFanTemplate.route
   template.routes.getD
     (variableOuterFanRouteIndex slot color) []
 
-/-! The following table is proof data: the theorems below independently
-check every endpoint, segment, bound, and pairwise separation claim. -/
-def standardVariableOuterFanTemplates :
+/-! The following raw table is proof data.  The lower detour band is adjusted
+below after the common table so it remains visibly uniform across every
+cyclic direction family. -/
+def rawStandardVariableOuterFanTemplates :
     List VariableOuterFanTemplate := [
   { directions := [.north]
     routes := [
@@ -334,6 +337,26 @@ def standardVariableOuterFanTemplates :
     ] }
 ]
 
+/-- Move only the internal lower detour band below the variable-site core.
+The standardized gates at height `108` and the boundary exits are fixed. -/
+def lowerVariableOuterFanDetourPoint (point : Cell) : Cell :=
+  if 40 ≤ point.2 ∧ point.2 ≤ 50 then
+    (point.1, point.2 - 4)
+  else point
+
+/-- Apply the common lower-band correction to one raw fan template. -/
+def lowerVariableOuterFanDetours
+    (template : VariableOuterFanTemplate) : VariableOuterFanTemplate where
+  directions := template.directions
+  routes := template.routes.map fun route =>
+    route.map lowerVariableOuterFanDetourPoint
+
+/-- Corrected finite fan table.  All geometric properties of this transformed
+table are checked independently below. -/
+def standardVariableOuterFanTemplates :
+    List VariableOuterFanTemplate :=
+  rawStandardVariableOuterFanTemplates.map lowerVariableOuterFanDetours
+
 /-- Finite direction data controlling one variable-side outer fan. -/
 structure VariableOuterFanData where
   countPred : Fin 3
@@ -481,12 +504,31 @@ def ofVariableRibbonFanData
 
 /-- The outer safe frame used by all generated routes. -/
 def InOuterSafeFrame (point : Cell) : Prop :=
-  point.2 ≥ 108 ∨ point.1 ≤ 10 ∨
-    point.1 ≥ 110 ∨ point.2 ≤ 50
+  InClosedGridRectangle (0, 108) (128, 128) point ∨
+    InClosedGridRectangle (0, 0) (10, 128) point ∨
+      InClosedGridRectangle (110, 0) (128, 128) point ∨
+        InClosedGridRectangle (0, 0) (128, 46) point
 
 instance (point : Cell) :
     Decidable (InOuterSafeFrame point) := by
   unfold InOuterSafeFrame
+  infer_instance
+
+/-- Both endpoints of a safe-frame segment lie in one common arm of the
+frame, so the segment itself cannot cut across the protected center. -/
+def OuterSafeFrameSegment (segment : GridSegment) : Prop :=
+  (InClosedGridRectangle (0, 108) (128, 128) segment.start ∧
+      InClosedGridRectangle (0, 108) (128, 128) segment.finish) ∨
+    (InClosedGridRectangle (0, 0) (10, 128) segment.start ∧
+      InClosedGridRectangle (0, 0) (10, 128) segment.finish) ∨
+    (InClosedGridRectangle (110, 0) (128, 128) segment.start ∧
+      InClosedGridRectangle (110, 0) (128, 128) segment.finish) ∨
+    (InClosedGridRectangle (0, 0) (128, 46) segment.start ∧
+      InClosedGridRectangle (0, 0) (128, 46) segment.finish)
+
+instance (segment : GridSegment) :
+    Decidable (OuterSafeFrameSegment segment) := by
+  unfold OuterSafeFrameSegment
   infer_instance
 
 private instance orthogonalPolylineDecidable
@@ -556,6 +598,17 @@ theorem outerRoute_points_in_safeFrame :
       ∀ color point,
         point ∈ data.outerRoute slot color →
         InOuterSafeFrame point := by
+  native_decide
+
+/-- Every selected outer-route segment stays in one arm of the safe frame;
+in particular, no segment shortcuts through the protected center. -/
+theorem outerRoute_segments_in_safeFrame :
+    ∀ (data : VariableOuterFanData),
+      data.IsClockwiseCompatible →
+      ∀ slot, data.SlotActive slot →
+      ∀ color segment,
+        segment ∈ gridPolylineSegments (data.outerRoute slot color) →
+        OuterSafeFrameSegment segment := by
   native_decide
 
 /-- Distinct active RGB strands in one selected outer fan have no continuous
