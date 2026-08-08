@@ -4282,6 +4282,12 @@ The representation choices for this target are:
   anchor-normalized construction.  It also transfers the result through
   numeric incidence-tag lookup, proving separation for every pair of
   distinct genuine routes stored by the assembled periodic drawing.
+- [`LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean)
+  lifts that deliberately weaker three-field separation predicate to the
+  infinite periodic drawing.  Pairwise lifted separation plus stored-route
+  simplicity proves both global route-interior predicates; ordinary endpoint
+  coverage then supplies graph-vertex/interior avoidance, so harmless shared
+  bend points do not obstruct continuous planarity.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean)
   exposes that constructed route as the global assembly's common routed
   variable prefix.  Both the ordinary and fixed-red prefix branches are

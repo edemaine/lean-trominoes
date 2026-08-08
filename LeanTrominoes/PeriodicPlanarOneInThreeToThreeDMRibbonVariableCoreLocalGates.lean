@@ -133,6 +133,41 @@ theorem RoutesAvoidInteriorContacts.secondPointsAvoid_of_mem
   exact avoid.symm.firstPointsAvoid_of_mem
     secondPoint secondMember firstSegment firstMember
 
+/-- A point in the first segment's relative interior cannot lie anywhere
+on the second segment.  If it were internal to the second segment, the two
+segment interiors would meet; if it were an endpoint, it would be a listed
+point of the second route in the first segment's interior. -/
+theorem RoutesAvoidInteriorContacts.firstInterior_not_secondContains
+    {first second : List Cell}
+    (avoid : RoutesAvoidInteriorContacts first second)
+    (firstSegment : GridSegment)
+    (firstMember : firstSegment ∈ gridPolylineSegments first)
+    (secondSegment : GridSegment)
+    (secondMember : secondSegment ∈ gridPolylineSegments second)
+    (point : Cell)
+    (firstContains : firstSegment.InteriorContains point) :
+    ¬secondSegment.Contains point := by
+  intro secondContains
+  rcases
+      GridSegment.interiorContains_or_eq_start_or_eq_finish_of_contains
+        secondContains with
+    secondInterior | secondEndpoint
+  · exact
+      (avoid.segmentsAvoid_of_mem
+        firstSegment firstMember secondSegment secondMember)
+        (GridSegment.interiorsMeet_of_interiorContains
+          firstContains secondInterior)
+  · have endpoints := gridPolylineSegments_endpoints_mem secondMember
+    rcases secondEndpoint with atStart | atFinish
+    · exact
+        (avoid.secondPointsAvoid_of_mem
+          secondSegment.start endpoints.1 firstSegment firstMember)
+          (atStart ▸ firstContains)
+    · exact
+        (avoid.secondPointsAvoid_of_mem
+          secondSegment.finish endpoints.2 firstSegment firstMember)
+          (atFinish ▸ firstContains)
+
 /-- Joining two pieces on the right preserves interior-contact avoidance
 when the first route avoids both pieces.  Listed-point coincidences need no
 extra side condition because this predicate deliberately ignores them. -/
