@@ -4277,6 +4277,11 @@ The representation choices for this target are:
   core/suffix directions, and suffix/suffix separation to prove that every
   pair of distinct colored typed routes has disjoint segment interiors and
   no listed point in the other route's interior.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
+  specializes complete typed-route separation to the final doubled,
+  anchor-normalized construction.  It also transfers the result through
+  numeric incidence-tag lookup, proving separation for every pair of
+  distinct genuine routes stored by the assembled periodic drawing.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean)
   exposes that constructed route as the global assembly's common routed
   variable prefix.  Both the ordinary and fixed-red prefix branches are
