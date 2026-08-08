@@ -462,5 +462,179 @@ theorem
       copiedCenterFromSource.symm.trans suffixBounded
     exact recentered.mono (by omega)
 
+/-- The delayed-lane occurrence splice has the same variable-centered
+radius bound as the ordinary splice.  Its longer source-side escape remains
+inside the same conservative `297`-cell boundary margin. -/
+theorem
+    retainedAngularFanSourceScaledEscapedSplicedOccurrenceRoute_point_withinCopiedLiteralRadius
+    {Variable : Type*} [DecidableEq Variable]
+    {factor radius : Nat}
+    (factorPositive : 0 < factor)
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    {clause : PositionedPeriodicClause Variable}
+    {clauseIndex : Nat}
+    (_clauseMember :
+      (clause, clauseIndex) ∈ source.clauses.zipIdx)
+    {literal : PeriodicLiteral Variable}
+    {literalIndex : Nat}
+    (_literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx)
+    (terminal : RetainedTerminalData)
+    (classified :
+      retainedTerminalDirectionClassify
+          (routeTerminalVector
+            (routes clauseIndex literalIndex)) =
+        some terminal)
+    (routeLength :
+      2 ≤ (routes clauseIndex literalIndex).length)
+    (retained :
+      RetainedRayPolyline
+        (routes clauseIndex literalIndex))
+    (escapeFits :
+      retainedTerminalFanOuterSourceEscapeLength ≤
+        retainedTerminalFanOuterRadialLength
+          (scaleRetainedTerminalData factor terminal))
+    (routeBounded :
+      ∀ routePoint ∈ routes clauseIndex literalIndex,
+        WithinCoordinateRadius radius
+          (PositionedPeriodicCNF.canonicalLiteralPosition
+            placement clause literal)
+          routePoint)
+    {point : Cell}
+    (pointMember :
+      point ∈
+        let scaledSource := source.scale factor
+        let scaledPlacement := placement.scale factor
+        let scaledRoutes :=
+          PositionedPeriodicCNF.scaleIncidenceRoutes factor routes
+        let rawTerminal :=
+          scaleRetainedTerminalData factor terminal
+        let slot :=
+          boundedRetainedTerminalSlot
+            (angularOccurrenceIndex
+              (angularOccurrenceOrder scaledSource.erase scaledRoutes)
+              literal clauseIndex literalIndex)
+        joinAtEndpoint
+          (retainedAngularFanEscapedSplicedBoundaryRoute
+            (scalePolyline factor
+              (routes clauseIndex literalIndex))
+            rawTerminal slot)
+          (scalePolyline retainedTerminalFanRoutingRefinement
+            (angularOccurrenceSuffix scaledPlacement
+              (angularOccurrenceOrder scaledSource.erase scaledRoutes)
+              (clause.scale factor) literal
+              clauseIndex literalIndex))) :
+    let scaledSource := source.scale factor
+    let scaledPlacement := placement.scale factor
+    let scaledRoutes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes factor routes
+    let occurrencePorts :=
+      occurrencePortsOfAngularOrder scaledSource.erase
+        (angularOccurrenceOrder scaledSource.erase scaledRoutes)
+    let copiedClause :=
+      PeriodicEightOccurrenceSplitPositioned.occurrenceClause
+        occurrencePorts clauseIndex (clause.scale factor)
+    let copiedLiteral :=
+      PeriodicEightOccurrenceSplit.occurrenceLiteral
+        occurrencePorts clauseIndex literalIndex literal
+    WithinCoordinateRadius
+      ((retainedTerminalFanTotalRefinement * factor) * radius + 345)
+      (Cell.scale retainedTerminalFanRoutingRefinement
+        (PositionedPeriodicCNF.canonicalLiteralPosition
+          (PeriodicEightOccurrenceSplitPositioned.placement
+            scaledPlacement)
+          copiedClause copiedLiteral))
+      point := by
+  dsimp only at pointMember ⊢
+  let scaledSource := source.scale factor
+  let scaledPlacement := placement.scale factor
+  let scaledRoutes :=
+    PositionedPeriodicCNF.scaleIncidenceRoutes factor routes
+  let order :=
+    angularOccurrenceOrder scaledSource.erase scaledRoutes
+  let occurrencePorts :=
+    occurrencePortsOfAngularOrder scaledSource.erase order
+  let sourceCenter :=
+    PositionedPeriodicCNF.canonicalLiteralPosition
+      placement clause literal
+  let refinedSourceCenter :=
+    Cell.scale
+      (retainedTerminalFanTotalRefinement * factor)
+      sourceCenter
+  let copiedCenter :=
+    Cell.scale retainedTerminalFanRoutingRefinement
+      (PositionedPeriodicCNF.canonicalLiteralPosition
+        (PeriodicEightOccurrenceSplitPositioned.placement
+          scaledPlacement)
+        (PeriodicEightOccurrenceSplitPositioned.occurrenceClause
+          occurrencePorts clauseIndex (clause.scale factor))
+        (PeriodicEightOccurrenceSplit.occurrenceLiteral
+          occurrencePorts clauseIndex literalIndex literal))
+  have copiedCenterFromScaledSource :=
+    occurrenceLiteralPosition_within_scaledSourceLiteral
+      scaledPlacement occurrencePorts clauseIndex literalIndex
+      (clause.scale factor) literal
+  have copiedCenterFromSource :
+      WithinCoordinateRadius 48
+        refinedSourceCenter copiedCenter := by
+    have refined :=
+      copiedCenterFromScaledSource.scale
+        retainedTerminalFanRoutingRefinement
+    have refinedCenterEq :
+        Cell.scale retainedTerminalFanRoutingRefinement
+            (Cell.scale
+              PeriodicEightOccurrenceSplitPositioned.refinementScale
+              (PositionedPeriodicCNF.canonicalLiteralPosition
+                scaledPlacement (clause.scale factor) literal)) =
+          refinedSourceCenter := by
+      rcases centerEq : sourceCenter with ⟨centerX, centerY⟩
+      apply Prod.ext <;>
+        simp [refinedSourceCenter, sourceCenter, scaledPlacement,
+          PositionedPeriodicCNF.CanonicalRetainedRayIncidenceRoutes.canonicalLiteralPosition_scale,
+          Cell.scale_scale, retainedTerminalFanTotalRefinement_eq,
+          retainedTerminalFanRoutingRefinement,
+          PeriodicEightOccurrenceSplitPositioned.refinementScale,
+          centerEq] <;>
+        ring_nf
+    rw [refinedCenterEq] at refined
+    simpa [copiedCenter, retainedTerminalFanRoutingRefinement]
+      using refined
+  rcases mem_joinAtEndpoint pointMember with
+    boundaryMember | suffixMember
+  · have boundaryBounded :=
+      retainedAngularFanSourceScaledEscapedSplicedBoundaryRoute_point_withinCoordinateRadius
+        factorPositive (routes clauseIndex literalIndex)
+        terminal
+        (boundedRetainedTerminalSlot
+          (angularOccurrenceIndex order
+            literal clauseIndex literalIndex))
+        routeLength classified retained escapeFits sourceCenter
+        (by simpa [sourceCenter] using routeBounded)
+        (by simpa [scaledSource, scaledRoutes, order] using boundaryMember)
+    have recentered :=
+      copiedCenterFromSource.symm.trans boundaryBounded
+    exact recentered.mono (by omega)
+  · have suffixRectangle :=
+      scaledAngularOccurrenceSuffix_point_in_centerRectangle
+        scaledPlacement order (clause.scale factor) literal
+        clauseIndex literalIndex suffixMember
+    have suffixBounded :
+        WithinCoordinateRadius 96
+          refinedSourceCenter point := by
+      apply
+        withinCoordinateRadius_of_inClosedGridRectangle_coordinateRadius
+      simpa [refinedSourceCenter, sourceCenter,
+        scaledPlacement,
+        PositionedPeriodicCNF.CanonicalRetainedRayIncidenceRoutes.canonicalLiteralPosition_scale,
+        Cell.scale_scale, retainedTerminalFanTotalRefinement_eq,
+        retainedTerminalFanRoutingRefinement,
+        PeriodicEightOccurrenceSplitPositioned.refinementScale,
+        Nat.cast_mul, mul_assoc] using suffixRectangle
+    have recentered :=
+      copiedCenterFromSource.symm.trans suffixBounded
+    exact recentered.mono (by omega)
+
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
