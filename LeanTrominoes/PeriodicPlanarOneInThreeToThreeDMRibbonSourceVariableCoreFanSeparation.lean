@@ -1,0 +1,134 @@
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseCoreStubSeparation
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreSplice
+
+/-!
+# Source variable cores versus coordinated variable fans
+
+The finite variable-site theorem applies to every core route, not just the
+route selected by the occurrence being fanned out.  This file transports that
+stronger statement into source coordinates.  At one source variable it allows
+harmless listed-point coincidences while excluding every segment-interior
+contact; distinct variable macrocells are separated strictly by their inset
+bounds.
+-/
+
+namespace LeanTrominoes
+namespace PeriodicPlanarOneInThreeToThreeDM
+
+open Gadget PlanarThreeDM
+open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+open PeriodicOrthocrossing
+
+/-- Every route in one source variable site avoids the segment interiors of
+every coordinated fan belonging to that same variable. -/
+theorem sourceVariableSiteRoute_avoids_coordinatedVariableStubInteriors
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (compatible : SourceRibbonFansClockwiseCompatible presentation)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (triple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase entry.1.1)
+        (sourceVariableSiteKind source.erase entry.1.1))
+    (coreColor routeColor : WireColor) :
+    RoutesAvoidInteriorContacts
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout
+          entry.1.1)
+        ((sourceVariableSiteDrawing source.erase entry.1.1).route
+          triple coreColor))
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation entry routeColor) := by
+  let data := sourceVariableRibbonFanData presentation entry
+  let slot := occurrenceVariableSiteSlot entry.1.2
+  have active : data.SlotActive slot :=
+    VariableRibbonFanData.sourceVariableRibbonFanData_slotActive
+      presentation entry
+  let dataTriple : ActiveVariableSiteTriple data.count data.kind :=
+    ⟨triple.1, by
+      rw [VariableRibbonFanData.sourceVariableRibbonFanData_count
+        presentation entry]
+      change VariableSiteTriple.MatchesKind
+        (sourceVariableSiteCount source.erase entry.1.1)
+        (sourceVariableSiteKind source.erase entry.1.1) triple.1
+      exact triple.2⟩
+  have localAvoid :=
+    data.variableSiteRoute_avoids_coordinatedRouteInteriors
+      (compatible.1 entry) slot active dataTriple coreColor routeColor
+  have coreEq :
+      (variableSiteDrawing data.count data.kind data.polarity).route
+          dataTriple coreColor =
+        (sourceVariableSiteDrawing source.erase entry.1.1).route
+          triple coreColor := by
+    unfold sourceVariableSiteDrawing
+    apply variableSiteDrawing_route_eq_of_indices_eq
+    · exact VariableRibbonFanData.sourceVariableRibbonFanData_count
+        presentation entry
+    · rfl
+    · rfl
+    · rfl
+  have translatedAvoid :=
+    localAvoid.translatePolyline
+      (ribbonMacrocellOrigin (placement.position entry.1.1))
+  simpa [data, slot, occurrenceCoordinatedRibbonVariableStub,
+    constructedVariableOrigin, ribbonMacrocellOrigin,
+    translatePolyline_add, coreEq, Cell.add, add_comm] using
+      translatedAvoid
+
+/-- A route in any source variable core avoids the segment interiors of any
+coordinated source-variable fan.  Equal owners use the finite all-pairs
+certificate; distinct owners are strictly separated macrocells. -/
+theorem constructedVariableSiteRoute_avoids_occurrenceCoordinatedRibbonVariableStubInteriors
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (atom : Variable)
+    (atomMember : atom ∈ occurringVariables source.erase)
+    (triple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase atom)
+        (sourceVariableSiteKind source.erase atom))
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (routeColor : WireColor) :
+    RoutesAvoidInteriorContacts
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout atom)
+        ((sourceVariableSiteDrawing source.erase atom).route
+          triple coreColor))
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation.toPlanarIncidencePresentation entry routeColor) := by
+  by_cases sameAtom : atom = entry.1.1
+  · subst atom
+    exact
+      sourceVariableSiteRoute_avoids_coordinatedVariableStubInteriors
+        presentation.toPlanarIncidencePresentation compatible entry
+        triple coreColor routeColor
+  · have centersNe :
+        placement.position atom ≠ placement.position entry.1.1 := by
+      exact assemblyMacrocellOwnerPosition_ne_of_ne
+        presentation.toPlanarIncidencePresentation anchorsZero
+        (.atom atom) (.atom entry.1.1) atomMember entry.atom_mem
+        (fun equal => sameAtom (AssemblyMacrocellOwner.atom.inj equal))
+    have strict :=
+      insetRoute_strictlyAvoids_route_in_distinctRibbonMacrocell
+        (sourceVariableSiteRoute_points_in_inset_rectangle
+          source.erase atom atomMember triple coreColor)
+        (fun point member =>
+          occurrenceCoordinatedRibbonVariableStub_points_bounded
+            presentation.toPlanarIncidencePresentation compatible
+            entry routeColor member)
+        centersNe
+    exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+      simpa [constructedVariableOrigin, translatePolyline_add,
+        ribbonMacrocellOrigin, Cell.add, add_comm] using strict)
+
+end PeriodicPlanarOneInThreeToThreeDM
+end LeanTrominoes

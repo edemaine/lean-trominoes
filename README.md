@@ -4259,6 +4259,12 @@ The representation choices for this target are:
   variable-origin translations and proves that the resulting constructed
   prefix meets the complete coordinated source-variable stub only at their
   advertised port.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreFanSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreFanSeparation.lean)
+  transports the finite all-pairs core/fan theorem to source coordinates.
+  Every route in a variable-site core avoids the interiors of every
+  coordinated variable fan at the same source variable, including
+  nonmatching routes with harmless listed-point coincidences; cores and fans
+  owned by distinct variable macrocells are strictly separated.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean)
   exposes that constructed route as the global assembly's common routed
   variable prefix.  Both the ordinary and fixed-red prefix branches are
