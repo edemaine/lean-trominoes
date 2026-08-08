@@ -4302,6 +4302,12 @@ The representation choices for this target are:
   cases for adjacent macrocells.  Coincident translated clause targets are
   traced back to one prototype clause and still select distinct local fan
   strands because the relative period shift is nonzero.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedOccurrenceRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedOccurrenceRouteSeparation.lean)
+  supplies the two missing reverse-frame component orientations and composes
+  all nine variable-fan/corridor/clause-fan pairs through their certified
+  endpoints.  Thus any complete coordinated occurrence route strictly avoids
+  every nonzero relative period translate of every other complete occurrence
+  route, without requiring the prototype entries or colors to differ.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
