@@ -4147,6 +4147,12 @@ The representation choices for this target are:
   rectilinear, bounded, simple, and pairwise strictly separated.  Their sole
   remaining premise is the now-explicit clockwise compatibility of the source
   occurrence directions.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreLocalGates.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreLocalGates.lean)
+  checks the interface between the finite variable-site drawing and those
+  coordinated gates.  Every site route and every active gate have disjoint
+  segment interiors and mutually avoid point-to-interior contacts; the
+  selected occurrence-and-color route has the stronger certificate that its
+  only listed contact with the gate is their unique splice port.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans.lean)
   packages the active top/left or top/left/right clause terminals and reuses
   the 28 certified variable outer-fan templates by vertical reflection and
