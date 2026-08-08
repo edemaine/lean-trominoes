@@ -3945,6 +3945,11 @@ The representation choices for this target are:
   duplicate-free unit-step source route are pairwise contact-free.  The
   recursive proof separates each leading tile from all later tiles and then
   composes the four resulting piecewise certificates across both joins.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorSimplicity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorSimplicity.lean)
+  handles the same-colored, same-route case.  Consecutive tiles share only
+  their intended half-edge boundary, while duplicate freedom makes every
+  nonconsecutive tile pair contact-free; induction with endpoint-join
+  simplicity proves that each complete corridor core is geometrically simple.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSeparation.lean)
   retains full-route provenance while recursively comparing every tile in
   two different corridor cores.  Duplicate-freeness makes each displayed
