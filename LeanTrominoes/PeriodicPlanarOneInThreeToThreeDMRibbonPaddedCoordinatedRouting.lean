@@ -1,6 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonFanCompatibilityTransport
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouteLength
-import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceRouting
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSimplicity
 
 /-!
 # Padded normalized coordinated ribbon routing
@@ -54,6 +54,82 @@ noncomputable def paddedNormalizedCoordinatedRibbonThreeStrandRouting
     (paddedNormalizedSource_widthAtMostThree width)
     (paddedNormalizedRibbonReady_sourceRibbonFansClockwiseCompatible
       presentation width occurrences arity variableOrdered clauseOrdered)
+
+/-- Every occurrence-route suffix in the final padded normalized routing is
+geometrically simple. -/
+theorem paddedNormalizedCoordinatedRibbonThreeStrandRouting_route_simple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes)
+    (entry :
+      ActiveOccurrenceEntry
+        (normalizedPositionedSource
+          (source.scale 2) (placement.scale 2)).erase)
+    (color : WireColor) :
+    LocalIncidenceDrawing.RouteIsSimple
+      ((paddedNormalizedCoordinatedRibbonThreeStrandRouting
+        presentation width occurrences arity
+        variableOrdered clauseOrdered).route entry color) := by
+  let normalized :=
+    normalizedRibbonReadyIncidencePresentation presentation.scaleTwo
+  let compatible :=
+    paddedNormalizedRibbonReady_sourceRibbonFansClockwiseCompatible
+      presentation width occurrences arity variableOrdered clauseOrdered
+  exact
+    coordinatedSourceRibbonThreeStrandRouting_route_simple_of_length_ge_three
+      normalized
+      (paddedNormalizedSource_widthAtMostThree width)
+      compatible entry color
+      (paddedNormalizedOccurrenceUnitSourceRoute_length_ge_three
+        presentation entry)
+
+/-- Every assembled typed incidence route in the final padded normalized
+coordinated routing is geometrically simple. -/
+theorem paddedNormalizedCoordinatedAssembledTypedIncidenceRoute_simple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes)
+    (triple :
+      {triple : Triple Variable //
+        triple ∈ triples
+          (normalizedPositionedSource
+            (source.scale 2) (placement.scale 2)).erase})
+    (color : WireColor) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (assembledTypedIncidenceRoute
+        (paddedNormalizedCoordinatedRibbonThreeStrandRouting
+          presentation width occurrences arity
+          variableOrdered clauseOrdered)
+        triple color) := by
+  let normalized :=
+    normalizedRibbonReadyIncidencePresentation presentation.scaleTwo
+  let compatible :=
+    paddedNormalizedRibbonReady_sourceRibbonFansClockwiseCompatible
+      presentation width occurrences arity variableOrdered clauseOrdered
+  exact coordinatedSourceAssembledTypedIncidenceRoute_simple
+    normalized
+    (paddedNormalizedSource_widthAtMostThree width)
+    compatible
+    (paddedNormalizedOccurrenceUnitSourceRoute_length_ge_three presentation)
+    triple color
 
 set_option maxHeartbeats 1000000 in
 /-- Every pair of distinct colored occurrence routes in the final

@@ -4335,6 +4335,10 @@ The representation choices for this target are:
   the simple clause fan to the simple variable-fan/corridor prefix proves
   every complete coordinated occurrence route simple under the same
   length-at-least-three hypothesis.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalRouteSimplicity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalRouteSimplicity.lean)
+  exposes the simple-route fields of the checked variable-site and clause
+  drawings and transports them to every translated ordinary, fixed-red, and
+  clause-core route piece used by the global assembly.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSimplicity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSimplicity.lean)
   closes the routed-incidence splice.  A finite table certifies that the
   variable port is the only listed contact between a routed variable-site
@@ -4364,7 +4368,8 @@ The representation choices for this target are:
   `ThreeStrandRouting`.  Width, cyclic order, and the proved padded
   length-at-least-three invariant discharge the complete fan-system
   certificate, so all distinct colored occurrence routes are strictly
-  separated.
+  separated.  The same invariant now also proves every occurrence suffix
+  and every complete assembled typed incidence route geometrically simple.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonRouting.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonRouting.lean)
   specializes that routing to the retained, ordered, fixed-eight final
   gauged Figure 9 presentation.  Its stored width, occurrence, arity, and

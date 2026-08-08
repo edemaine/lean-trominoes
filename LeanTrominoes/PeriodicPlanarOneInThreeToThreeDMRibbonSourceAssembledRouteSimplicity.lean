@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceOccurrenceRouteSimplicity
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreClauseStubSeparation
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMGlobalRouteSimplicity
 
 /-!
 # Simplicity of assembled routed incidences
@@ -270,6 +271,93 @@ theorem assembledRoutedTypedIncidenceRoute_simple_of_length_ge_three
   · exact (routing.route_endpoints entry color).1
   · exact assembledRoutedVariablePrefix_coordinatedSourceRoute_only_common
       presentation width compatible entry color
+
+/-- Every typed incidence route in the coordinated source assembly is
+simple when all selected occurrence routes have length at least three.
+Nonselected variable incidences and clause incidences inherit simplicity
+directly from their translated finite drawings. -/
+theorem coordinatedSourceAssembledTypedIncidenceRoute_simple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (lengthGeThree :
+      ∀ entry : ActiveOccurrenceEntry source.erase,
+        3 ≤ (occurrenceUnitSourceRoute
+          presentation.toPlanarIncidencePresentation entry).length)
+    (triple :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (color : WireColor) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (assembledTypedIncidenceRoute
+        (coordinatedSourceRibbonThreeStrandRouting
+          presentation width compatible)
+        triple color) := by
+  let routing :=
+    coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+  change LocalIncidenceDrawing.RouteIsSimple
+    (assembledTypedIncidenceRoute routing triple color)
+  unfold assembledTypedIncidenceRoute
+  split
+  next atom slot variant localTriple tripleEq =>
+    let member :
+        Triple.ordinary atom slot variant localTriple ∈
+          triples source.erase :=
+      tripleEq ▸ triple.2
+    split
+    next routed =>
+      let location :=
+        ordinaryTriple_location source.erase atom slot variant
+          localTriple member
+      let entry : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      dsimp only
+      rw [assembledOrdinaryPrefix_eq_assembledRoutedVariablePrefix
+        routing entry color variant localTriple routed.symm]
+      have selected :=
+        assembledRoutedTypedIncidenceRoute_simple_of_length_ge_three
+          presentation width compatible entry color
+          (lengthGeThree entry)
+      rw [assembledRoutedTypedIncidenceRoute_eq routing entry color]
+        at selected
+      exact selected
+    next notRouted =>
+      exact assembledOrdinaryPrefix_simple routing atom slot variant
+        localTriple member color
+  next atom slot localTriple tripleEq =>
+    let member :
+        Triple.fixedRed atom slot localTriple ∈ triples source.erase :=
+      tripleEq ▸ triple.2
+    split
+    next routed =>
+      let location :=
+        fixedRedTriple_location source.erase atom slot localTriple member
+      let entry : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      dsimp only
+      rw [assembledFixedRedPrefix_eq_assembledRoutedVariablePrefix
+        routing entry color localTriple routed.symm]
+      have selected :=
+        assembledRoutedTypedIncidenceRoute_simple_of_length_ge_three
+          presentation width compatible entry color
+          (lengthGeThree entry)
+      rw [assembledRoutedTypedIncidenceRoute_eq routing entry color]
+        at selected
+      exact selected
+    next notRouted =>
+      exact assembledFixedRedPrefix_simple routing atom slot
+        localTriple member color
+  next clauseIndex set tripleEq =>
+    exact assembledClauseRoute_simple routing clauseIndex set color
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
