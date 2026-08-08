@@ -4235,6 +4235,12 @@ The representation choices for this target are:
   certificates: distinct colors separate the intended first-tile lanes,
   while source-route endpoint separation and duplicate freedom exclude that
   contact at every later or inter-occurrence interior center.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableClauseSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableClauseSeparation.lean)
+  discharges `variableClause` for any source whose active unit routes have
+  length at least three.  Periodic vertex injectivity excludes equal
+  variable/clause centers, macrocell bounds handle far centers, and the
+  route's first neighbor is an internal point, eliminating the sole adjacent
+  placement left by the mixed finite classifier.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
