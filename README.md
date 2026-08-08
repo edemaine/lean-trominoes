@@ -4099,6 +4099,12 @@ The representation choices for this target are:
   impossible unless the centers differ by one cardinal step and both source
   directions point along that shared unit edge.  Compatible abstract fan
   data are connected back to the finite table by certified template lookup.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableFans.lean)
+  extends that adjacent-macrocell classifier from outer annular routes to
+  complete connector-to-boundary variable stubs.  Three smaller exhaustive
+  checks certify local/local and both local/outer interactions; the endpoint
+  joins leave the same single possible contact pattern, namely two source
+  directions facing through their common cardinal edge.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean)
   joins each connector-dependent gate route to its selected cyclic outer
   route.  Finite interface checks show that the two pieces meet only at the
@@ -4184,11 +4190,14 @@ The representation choices for this target are:
   containment, and packages the result as a `RibbonEndpointFanSystem`.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean)
   begins the global separation proof for that fan system.  Source-variable
-  fan data now uses a canonical inactive-slot fallback, so every occurrence
-  of one variable produces literally the same finite fan; translating the
-  finite certificates proves strict separation of all distinct colored stubs
-  incident to one variable or one physical clause copy.  The clause result
-  uses width three to recover occurrence identity from the terminal group and
+  fan data uses a canonical inactive-slot fallback, so every occurrence of
+  one variable produces literally the same finite fan.  For different
+  variables, compatible drawing positions separate equal centers, macrocell
+  bounds separate far centers, and source-route planarity eliminates the one
+  facing-direction contact left by the adjacent finite classifier.  Thus all
+  distinct variable-side colored stubs are now strictly separated globally.
+  The same module proves separation inside one physical clause copy, using
+  width three to recover occurrence identity from the terminal group and
   injectivity of the occurrence-specific physical-lane permutation.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:

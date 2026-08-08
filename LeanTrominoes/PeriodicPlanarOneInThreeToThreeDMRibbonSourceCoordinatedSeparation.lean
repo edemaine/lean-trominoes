@@ -1,6 +1,9 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFanSystemSeparation
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableFans
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedStubs
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVariableSiteElements
+import LeanTrominoes.PeriodicOrthocrossingPlanarSATSourceRouteTranslation
 
 /-!
 # Separation of translated coordinated source fans
@@ -18,6 +21,50 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 open Gadget
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
+
+/-- Compatible source drawings cannot place two active source variables at
+the same lattice point unless the variables are equal. -/
+theorem activeOccurrenceVariablePosition_eq_imp_atom_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (first second : ActiveOccurrenceEntry source.erase)
+    (equal :
+      placement.position first.1.1 =
+        placement.position second.1.1) :
+    first.1.1 = second.1.1 := by
+  let planar := presentation.toPlanarIncidencePresentation
+  have firstAtomMember :
+      first.1.1 ∈ source.erase.variableOccurrences.dedup := by
+    simpa [occurringVariables,
+      PeriodicOneInThreeToThreeDM.occurringVariables] using first.atom_mem
+  have secondAtomMember :
+      second.1.1 ∈ source.erase.variableOccurrences.dedup := by
+    simpa [occurringVariables,
+      PeriodicOneInThreeToThreeDM.occurringVariables] using second.atom_mem
+  have firstVertexMember :
+      CNFVertex.variable first.1.1 ∈
+        source.erase.incidenceGraph.vertices := by
+    apply List.mem_append.mpr
+    left
+    exact List.mem_map.mpr ⟨first.1.1, firstAtomMember, rfl⟩
+  have secondVertexMember :
+      CNFVertex.variable second.1.1 ∈
+        source.erase.incidenceGraph.vertices := by
+    apply List.mem_append.mpr
+    left
+    exact List.mem_map.mpr ⟨second.1.1, secondAtomMember, rfl⟩
+  have vertexEqual :=
+    planar.vertexPosition_injective_on
+      firstVertexMember secondVertexMember (by
+        rw [PositionedPeriodicCNF.incidenceDrawing_vertexPosition_of_mem
+          source placement planar.routes firstVertexMember]
+        rw [PositionedPeriodicCNF.incidenceDrawing_vertexPosition_of_mem
+          source placement planar.routes secondVertexMember]
+        exact equal)
+  exact CNFVertex.variable.inj vertexEqual
 
 /-- Distinct colored strands incident to one source variable have strictly
 separated translated coordinated stubs. -/
@@ -81,6 +128,96 @@ theorem occurrenceCoordinatedRibbonVariableStubs_strictlyAvoidEachOther_of_same_
   simpa [occurrenceCoordinatedRibbonVariableStub,
     planar, data, firstSlot, secondSlot, sameAtom, dataEqual] using
       translatedAvoid
+
+/-- Any two distinct colored variable-side stubs in the source presentation
+are strictly separated.  Equal variable centers use the one-fan theorem,
+far centers use macrocell bounds, and adjacent centers use the finite
+`notFacing` classifier together with source-route planarity. -/
+theorem occurrenceCoordinatedRibbonVariableStubs_strictlyAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    {first second : ActiveOccurrenceEntry source.erase}
+    {firstColor secondColor : WireColor}
+    (different :
+      RibbonStrandsDifferent first firstColor second secondColor) :
+    RoutesStrictlyAvoidEachOther
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation.toPlanarIncidencePresentation first firstColor)
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation.toPlanarIncidencePresentation second secondColor) := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let firstCenter := placement.position first.1.1
+  let secondCenter := placement.position second.1.1
+  rcases ribbonMacrocellCenters_eq_or_far_or_adjacent
+      firstCenter secondCenter with
+    centersEqual | centersFar | centersAdjacent
+  · have sameAtom : first.1.1 = second.1.1 :=
+      activeOccurrenceVariablePosition_eq_imp_atom_eq
+        presentation first second centersEqual
+    exact
+      occurrenceCoordinatedRibbonVariableStubs_strictlyAvoidEachOther_of_same_atom
+        presentation compatible sameAtom different
+  · exact routesStrictlyAvoidEachOther_of_inFarRibbonMacrocells
+      (fun point member =>
+        occurrenceCoordinatedRibbonVariableStub_points_bounded
+          planar compatible first firstColor member)
+      (fun point member =>
+        occurrenceCoordinatedRibbonVariableStub_points_bounded
+          planar compatible second secondColor member)
+      centersFar
+  · let firstData := sourceVariableRibbonFanData planar first
+    let secondData := sourceVariableRibbonFanData planar second
+    let firstSlot := occurrenceVariableSiteSlot first.1.2
+    let secondSlot := occurrenceVariableSiteSlot second.1.2
+    let offset := Cell.sub secondCenter firstCenter
+    have firstActive : firstData.SlotActive firstSlot :=
+      VariableRibbonFanData.sourceVariableRibbonFanData_slotActive
+        planar first
+    have secondActive : secondData.SlotActive secondSlot :=
+      VariableRibbonFanData.sourceVariableRibbonFanData_slotActive
+        planar second
+    have occurrenceDifferent : first ≠ second := by
+      intro occurrenceEqual
+      subst second
+      unfold RibbonMacrocellCentersAdjacent
+        RibbonMacrocellOffsetAdjacent at centersAdjacent
+      simp [firstCenter, secondCenter, Cell.sub] at centersAdjacent
+    have notFacing : ∀ direction, direction.IsGenuine →
+        offset ≠ direction.step ∨
+          firstData.direction firstSlot ≠ direction ∨
+          secondData.direction secondSlot ≠ direction.opposite := by
+      intro direction genuine
+      simpa [offset, firstCenter, secondCenter, firstData, secondData,
+        firstSlot, secondSlot] using
+        occurrenceSourceVariableDirections_not_facing
+          presentation occurrenceDifferent direction genuine
+    have localAvoid :=
+      firstData.coordinatedRoutes_strictlyAvoidEachOther_of_adjacent_notFacing
+        secondData (compatible.1 first) (compatible.1 second)
+        firstSlot secondSlot firstActive secondActive
+        firstColor secondColor offset centersAdjacent notFacing
+    have translatedAvoid :=
+      localAvoid.translatePolyline (ribbonMacrocellOrigin firstCenter)
+    have originEq :
+        Cell.add
+            (Cell.scale standardThreeStrandLayout.factor offset)
+            (ribbonMacrocellOrigin firstCenter) =
+          ribbonMacrocellOrigin secondCenter := by
+      rcases firstCenter with ⟨firstX, firstY⟩
+      rcases secondCenter with ⟨secondX, secondY⟩
+      apply Prod.ext <;>
+        simp [offset, ribbonMacrocellOrigin,
+          Cell.add, Cell.sub, Cell.scale] <;>
+        ring
+    rw [translatePolyline_add, originEq] at translatedAvoid
+    simpa [occurrenceCoordinatedRibbonVariableStub,
+      planar, firstData, secondData, firstSlot, secondSlot,
+      firstCenter, secondCenter] using translatedAvoid
 
 /-- Distinct colored strands incident to one physical source-clause copy
 have strictly separated translated coordinated stubs.  Equality of the
