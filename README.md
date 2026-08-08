@@ -3964,6 +3964,12 @@ The representation choices for this target are:
   unchanged finite gadget prefixes and clause routes to bound every assembled
   route, proving the open-halo endpoint hypothesis required by the expanded
   finite checker.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouteLength.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouteLength.lean)
+  proves that the same factor-two padding inserts a genuine interior lattice
+  point into every active source route.  The proof transports this
+  length-at-least-three invariant through anchor normalization, giving the
+  source fact needed to exclude the mixed-fan classifier's sole exceptional
+  first-neighbor offset.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFiniteGeometry.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonFiniteGeometry.lean)
   transfers normalized gadget-vertex distinctness and fundamental-square
   bounds to the corrected ribbon routing.  Because the corrected construction

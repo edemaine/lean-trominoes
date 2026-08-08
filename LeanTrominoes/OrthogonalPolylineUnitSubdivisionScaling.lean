@@ -16,6 +16,51 @@ transport isolation of both route endpoints through scaling and translation.
 namespace LeanTrominoes
 namespace AxisDirection
 
+/-- Doubling both endpoints doubles the Manhattan length of their lattice
+segment. -/
+@[simp]
+theorem segmentLength_scale_two (first second : Cell) :
+    segmentLength (Cell.scale 2 first) (Cell.scale 2 second) =
+      2 * segmentLength first second := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp only [segmentLength, Cell.scale]
+  have horizontal :
+      2 * secondX - 2 * firstX = 2 * (secondX - firstX) := by
+    ring
+  have vertical :
+      2 * secondY - 2 * firstY = 2 * (secondY - firstY) := by
+    ring
+  rw [horizontal, vertical, Int.natAbs_mul, Int.natAbs_mul]
+  simp
+  omega
+
+/-- Doubling any nondegenerate orthogonal lattice route inserts an interior
+unit-subdivision point into its first segment. -/
+theorem unitSubdividePolyline_scale_two_length_ge_three
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline points) :
+    3 ≤
+      (unitSubdividePolyline
+        (scalePolyline 2 points)).length := by
+  cases points with
+  | nil => simp at length
+  | cons first rest =>
+      cases rest with
+      | nil => simp at length
+      | cons second tail =>
+          have aligned :
+              (GridSegment.mk first second).IsAxisAligned :=
+            (List.isChain_cons_cons.mp orthogonal).1
+          have positive : 0 < segmentLength first second :=
+            segmentLength_positive_of_axisAligned aligned
+          simp only [scalePolyline_cons]
+          rw [unitSubdividePolyline.eq_def]
+          simp [LeanTrominoes.joinAtEndpoint]
+          omega
+
 /-- Subdividing a doubled unit edge lists its scaled start, its unique
 unit-distance midpoint, and its scaled finish. -/
 theorem unitSegmentPoints_scale_two_of_unitAxisStep
