@@ -4247,6 +4247,17 @@ The representation choices for this target are:
   prefix joined to the selected occurrence route.  Assemblies using the
   standard constructed variable origins inherit the coordinated-stub
   avoidance certificate directly.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreMacrocellSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreMacrocellSeparation.lean)
+  exhaustively certifies the next finite interface: every selected
+  variable-site core remains in its standard ribbon macrocell, misses every
+  possible ribbon exit, and strictly avoids every legal corridor tile in
+  each of the eight neighboring macrocells.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreCorridorSeparation.lean)
+  lifts those finite facts into source coordinates.  Duplicate freedom of
+  each unit source route lets the neighboring/far-macrocell argument recurse
+  over the entire corridor, proving that the assembled routed prefix
+  strictly avoids its corridor core and avoids the joined variable-stub plus
+  corridor prefix with only the advertised variable-port contact.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedSeparation.lean)
   begins the global separation proof for that fan system.  Source-variable
   fan data uses a canonical inactive-slot fallback, so every occurrence of
