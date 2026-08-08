@@ -4002,7 +4002,9 @@ The representation choices for this target are:
   also extracts the basic discrete consequence of endpoint-only contact:
   listed points on two such routes are unequal whenever either point is
   internal.  Its adjacent-start variant proves that two separated routes
-  cannot point toward each other through the unit edge joining their starts.
+  cannot point toward each other through the unit edge joining their starts;
+  reversing both routes gives the analogous obstruction for adjacent final
+  points entered from their shared edge.
 - [`LeanTrominoes/OrthogonalPolylineElbow.lean`](LeanTrominoes/OrthogonalPolylineElbow.lean)
   supplies horizontal-first and vertical-first one-bend routes for those
   finite endpoint fans.  Coincident or already aligned endpoints are
@@ -4052,7 +4054,8 @@ The representation choices for this target are:
   copy in different directions.  Translation invariance connects those
   directions to the stored routes at their common canonical clause vertex.
   It also rules out the opposing-direction pattern that could make two
-  variable endpoint fans in adjacent macrocells touch.
+  variable endpoint fans in adjacent macrocells touch, and the corresponding
+  incoming pattern for clause fans at adjacent lifted targets.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionFamilies.lean)
   packages the coordinated local inputs needed by that construction.
   Occurrences at one variable and in one finite clause orbit are enumerated
@@ -4105,6 +4108,12 @@ The representation choices for this target are:
   checks certify local/local and both local/outer interactions; the endpoint
   joins leave the same single possible contact pattern, namely two source
   directions facing through their common cardinal edge.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans.lean)
+  performs the reflected clause-side classification.  Exhaustive certificates
+  cover outer/outer, local/local, and both cross interactions for two- and
+  three-terminal fans.  Complete clause stubs in adjacent macrocells are
+  contact-free unless both source routes enter their targets from the shared
+  edge.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoordinatedFans.lean)
   joins each connector-dependent gate route to its selected cyclic outer
   route.  Finite interface checks show that the two pieces meet only at the
@@ -4196,9 +4205,11 @@ The representation choices for this target are:
   bounds separate far centers, and source-route planarity eliminates the one
   facing-direction contact left by the adjacent finite classifier.  Thus all
   distinct variable-side colored stubs are now strictly separated globally.
-  The same module proves separation inside one physical clause copy, using
-  width three to recover occurrence identity from the terminal group and
-  injectivity of the occurrence-specific physical-lane permutation.
+  Clause-side stubs now have the same complete result: compatibility identifies
+  equal lifted clause targets (even across period translations), macrocell
+  bounds handle far targets, and source-route planarity discharges the
+  adjacent classifier.  Width three recovers occurrence identity inside one
+  shared clause fan from its terminal group and physical lane.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such

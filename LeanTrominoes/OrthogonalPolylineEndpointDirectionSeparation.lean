@@ -365,6 +365,41 @@ theorem polylineFirstDirections_not_facing_of_routesAvoidEachOther
     simpa [firstEquation, secondEquation, gridPolylineSegments] using
       interiorsMeet)
 
+/-- Continuously separated routes whose final points are one cardinal step
+apart cannot enter those points from the intervening unit edge. -/
+theorem polylineLastDirections_not_facing_of_routesAvoidEachOther
+    {first second : List Cell}
+    {firstFinish secondFinish : Cell}
+    {direction : AxisDirection}
+    (firstLength : 2 ≤ first.length)
+    (secondLength : 2 ≤ second.length)
+    (firstLast : first.getLast? = some firstFinish)
+    (secondLast : second.getLast? = some secondFinish)
+    (genuine : direction.IsGenuine)
+    (adjacent : secondFinish = Cell.add firstFinish direction.step)
+    (avoids : RoutesAvoidEachOther first second) :
+    AxisDirection.polylineLastDirection first ≠ direction.opposite ∨
+      AxisDirection.polylineLastDirection second ≠ direction := by
+  have reversed :=
+    polylineFirstDirections_not_facing_of_routesAvoidEachOther
+      (first := first.reverse) (second := second.reverse)
+      (by simpa using firstLength)
+      (by simpa using secondLength)
+      (by simpa using firstLast)
+      (by simpa using secondLast)
+      genuine adjacent (routesAvoidEachOther_reverse avoids)
+  rcases reversed with firstDifferent | secondDifferent
+  · left
+    intro equal
+    apply firstDifferent
+    exact AxisDirection.opposite_injective (by
+      simpa [AxisDirection.polylineLastDirection] using equal)
+  · right
+    intro equal
+    apply secondDifferent
+    have oppositeEqual := congrArg AxisDirection.opposite equal
+    simpa [AxisDirection.polylineLastDirection] using oppositeEqual
+
 /-- Continuously separated orthogonal routes with the same final point
 must enter it in different directions. -/
 theorem polylineLastDirections_ne_of_routesAvoidEachOther

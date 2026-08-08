@@ -198,6 +198,79 @@ theorem occurrenceSourceVariableDirections_not_facing
     simpa [occurrenceSourceVariableDirection_eq_sourceRoute]
       using separated
 
+/-- Distinct active source occurrences whose lifted clause targets are in
+adjacent macrocells cannot enter those targets from the shared unit edge.
+This is the clause-side counterpart of
+`occurrenceSourceVariableDirections_not_facing`. -/
+theorem occurrenceSourceClauseDirections_not_facing
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    {first second : ActiveOccurrenceEntry source.erase}
+    (different : first ≠ second) :
+    let planar := presentation.toPlanarIncidencePresentation
+    let firstData := occurrenceSpliceData planar first
+    let secondData := occurrenceSpliceData planar second
+    ∀ direction, direction.IsGenuine →
+      Cell.sub
+          (PositionedPeriodicCNF.variableToClauseTarget
+            placement secondData.positionedClause secondData.tagged.1)
+          (PositionedPeriodicCNF.variableToClauseTarget
+            placement firstData.positionedClause firstData.tagged.1) ≠
+          direction.step ∨
+        occurrenceSourceClauseDirection
+            presentation.toPlanarIncidencePresentation first ≠
+          direction.opposite ∨
+        occurrenceSourceClauseDirection
+            presentation.toPlanarIncidencePresentation second ≠
+          direction := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let firstData := occurrenceSpliceData planar first
+  let secondData := occurrenceSpliceData planar second
+  dsimp only
+  let firstTarget := PositionedPeriodicCNF.variableToClauseTarget
+    placement firstData.positionedClause firstData.tagged.1
+  let secondTarget := PositionedPeriodicCNF.variableToClauseTarget
+    placement secondData.positionedClause secondData.tagged.1
+  have firstLast :
+      (occurrenceSourceRoute planar first).getLast? =
+        some firstTarget := by
+    simpa [occurrenceSourceRoute,
+      firstData, firstTarget] using firstData.routeLast
+  have secondLast :
+      (occurrenceSourceRoute planar second).getLast? =
+        some secondTarget := by
+    simpa [occurrenceSourceRoute,
+      secondData, secondTarget] using secondData.routeLast
+  intro direction genuine
+  by_cases offsetDifferent :
+      Cell.sub secondTarget firstTarget ≠ direction.step
+  · simpa [firstTarget, secondTarget] using Or.inl offsetDifferent
+  · right
+    have offsetEqual :
+        Cell.sub secondTarget firstTarget = direction.step :=
+      not_ne_iff.mp offsetDifferent
+    have adjacent :
+        secondTarget = Cell.add firstTarget direction.step := by
+      calc
+        secondTarget = Cell.add firstTarget
+            (Cell.sub secondTarget firstTarget) := by
+          rcases firstTarget with ⟨firstX, firstY⟩
+          rcases secondTarget with ⟨secondX, secondY⟩
+          simp [Cell.add, Cell.sub]
+        _ = Cell.add firstTarget direction.step := by rw [offsetEqual]
+    have separated :=
+      polylineLastDirections_not_facing_of_routesAvoidEachOther
+        (occurrenceSourceRoute_length planar first)
+        (occurrenceSourceRoute_length planar second)
+        firstLast secondLast genuine adjacent
+        (occurrenceSourceRoutes_avoidEachOther_of_ne
+          presentation different)
+    simpa [occurrenceSourceClauseDirection_eq_sourceRoute]
+      using separated
+
 /-- Distinct incidences of one clause orbit enter every translated copy of
 that clause in different directions.  Their stored routes share the
 canonical clause endpoint; reversing and independently rebasing those routes

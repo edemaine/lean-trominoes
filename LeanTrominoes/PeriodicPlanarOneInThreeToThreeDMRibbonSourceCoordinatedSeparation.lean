@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointFanSystemSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentVariableFans
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonAdjacentClauseFans
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonEndpointDirectionSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoordinatedStubs
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMVariableSiteElements
@@ -302,6 +303,292 @@ theorem occurrenceCoordinatedRibbonClauseStubs_strictlyAvoidEachOther_of_same_ta
     planar, clauseIndex, data, firstGroup, secondGroup,
     firstLane, secondLane, sameClauseIndex, sameTarget] using
       translatedAvoid
+
+/-- An erased incidence and the positioned clause at its recorded index have
+the same literal list. -/
+private theorem indexedIncidence_clause_eq_positionedClause_literals_for_separation
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    {indexed : CNFIncidence Variable × Nat}
+    (indexedMember :
+      indexed ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx)
+    {positionedClause : PositionedPeriodicClause Variable}
+    (clauseMember :
+      (positionedClause, indexed.1.clauseIndex) ∈
+        source.clauses.zipIdx) :
+    indexed.1.clause = positionedClause.literals := by
+  have incidenceMember :
+      indexed.1 ∈
+        PeriodicCNF.incidencesWithMetadata source.erase :=
+    List.fst_mem_of_mem_zipIdx indexedMember
+  have indexedClauseMember :=
+    (PeriodicCNF.mem_incidencesWithMetadata_iff
+      source.erase indexed.1).mp incidenceMember |>.1
+  have positionedClauseMember :
+      (positionedClause.literals, indexed.1.clauseIndex) ∈
+        source.erase.clauses.zipIdx := by
+    change
+      (positionedClause.literals, indexed.1.clauseIndex) ∈
+        (source.clauses.map
+          PositionedPeriodicClause.literals).zipIdx
+    rw [List.zipIdx_map]
+    exact List.mem_map.mpr
+      ⟨(positionedClause, indexed.1.clauseIndex),
+        clauseMember, rfl⟩
+  exact
+    (List.mem_zipIdx' indexedClauseMember).2.trans
+      (List.mem_zipIdx' positionedClauseMember).2.symm
+
+/-- Equal lifted targets of two active occurrence routes represent the same
+source clause protovertex.  Compatibility makes prototype clause positions
+injective even after an arbitrary integral period translation. -/
+theorem occurrenceSourceClauseTarget_eq_imp_clauseIndex_eq
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (first second : ActiveOccurrenceEntry source.erase)
+    (equal :
+      occurrenceSourceClauseTarget
+          presentation.toPlanarIncidencePresentation first =
+        occurrenceSourceClauseTarget
+          presentation.toPlanarIncidencePresentation second) :
+    occurrenceClauseIndex source.erase first.1.1 first.1.2 =
+      occurrenceClauseIndex source.erase second.1.1 second.1.2 := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let firstData := occurrenceSpliceData planar first
+  let secondData := occurrenceSpliceData planar second
+  have firstEdgeMember :=
+    PeriodicCNF.tagged_incidence_edge_mem
+      source.erase firstData.indexedMember
+  have secondEdgeMember :=
+    PeriodicCNF.tagged_incidence_edge_mem
+      source.erase secondData.indexedMember
+  have firstEndpointMembers :=
+    planar.compatible.1.2 firstData.indexed.1.edge
+      (List.fst_mem_of_mem_zipIdx firstEdgeMember)
+  have secondEndpointMembers :=
+    planar.compatible.1.2 secondData.indexed.1.edge
+      (List.fst_mem_of_mem_zipIdx secondEdgeMember)
+  have firstClauseVertexMember :
+      CNFVertex.clause firstData.indexed.1.clauseIndex ∈
+        source.erase.incidenceGraph.vertices := by
+    simpa [CNFIncidence.edge, PeriodicCNF.incidenceEdge] using
+      firstEndpointMembers.1
+  have secondClauseVertexMember :
+      CNFVertex.clause secondData.indexed.1.clauseIndex ∈
+        source.erase.incidenceGraph.vertices := by
+    simpa [CNFIncidence.edge, PeriodicCNF.incidenceEdge] using
+      secondEndpointMembers.1
+  have firstIndexLt :
+      firstData.indexed.1.clauseIndex < source.clauses.length :=
+    (List.mem_zipIdx' firstData.clauseMember).1
+  have secondIndexLt :
+      secondData.indexed.1.clauseIndex < source.clauses.length :=
+    (List.mem_zipIdx' secondData.clauseMember).1
+  have firstClauseLookup :
+      source.clauses[firstData.indexed.1.clauseIndex] =
+        firstData.positionedClause := by
+    have lookup :=
+      (List.mem_zipIdx_iff_getElem?).mp firstData.clauseMember
+    rw [List.getElem?_eq_getElem firstIndexLt] at lookup
+    exact Option.some.inj lookup
+  have secondClauseLookup :
+      source.clauses[secondData.indexed.1.clauseIndex] =
+        secondData.positionedClause := by
+    have lookup :=
+      (List.mem_zipIdx_iff_getElem?).mp secondData.clauseMember
+    rw [List.getElem?_eq_getElem secondIndexLt] at lookup
+    exact Option.some.inj lookup
+  have firstVertexPosition :
+      PositionedPeriodicCNF.incidenceVertexPositionAt source placement
+          (.clause firstData.indexed.1.clauseIndex) =
+        PositionedPeriodicCNF.canonicalClausePosition
+          placement firstData.positionedClause := by
+    rw [PositionedPeriodicCNF.incidenceVertexPositionAt_clause
+      source placement firstData.indexed.1.clauseIndex firstIndexLt,
+      firstClauseLookup]
+  have secondVertexPosition :
+      PositionedPeriodicCNF.incidenceVertexPositionAt source placement
+          (.clause secondData.indexed.1.clauseIndex) =
+        PositionedPeriodicCNF.canonicalClausePosition
+          placement secondData.positionedClause := by
+    rw [PositionedPeriodicCNF.incidenceVertexPositionAt_clause
+      source placement secondData.indexed.1.clauseIndex secondIndexLt,
+      secondClauseLookup]
+  have firstClauseEq :
+      firstData.indexed.1.clause =
+        firstData.positionedClause.literals :=
+    indexedIncidence_clause_eq_positionedClause_literals_for_separation
+      firstData.indexedMember firstData.clauseMember
+  have secondClauseEq :
+      secondData.indexed.1.clause =
+        secondData.positionedClause.literals :=
+    indexedIncidence_clause_eq_positionedClause_literals_for_separation
+      secondData.indexedMember secondData.clauseMember
+  have firstLiteralEq :
+      firstData.indexed.1.literal = firstData.tagged.1 :=
+    congrArg Prod.fst firstData.metadataEq
+  have secondLiteralEq :
+      secondData.indexed.1.literal = secondData.tagged.1 :=
+    congrArg Prod.fst secondData.metadataEq
+  let firstTranslate :=
+    PositionedPeriodicCNF.variableToClauseTranslate firstData.indexed.1
+  let secondTranslate :=
+    PositionedPeriodicCNF.variableToClauseTranslate secondData.indexed.1
+  have liftedEqual :
+      PositionedPeriodicCNF.incidenceVertexPositionAt source placement
+          (.clause firstData.indexed.1.clauseIndex) =
+        Cell.add
+          (placement.translation
+            (Cell.sub secondTranslate firstTranslate))
+          (PositionedPeriodicCNF.incidenceVertexPositionAt source placement
+            (.clause secondData.indexed.1.clauseIndex)) := by
+    rw [firstVertexPosition, secondVertexPosition]
+    rcases firstData.positionedClause.position with ⟨firstX, firstY⟩
+    rcases secondData.positionedClause.position with ⟨secondX, secondY⟩
+    rcases PeriodicCNF.clauseAnchor firstData.positionedClause.literals with
+      ⟨firstAnchorX, firstAnchorY⟩
+    rcases PeriodicCNF.clauseAnchor secondData.positionedClause.literals with
+      ⟨secondAnchorX, secondAnchorY⟩
+    rcases firstData.tagged.1.offset with ⟨firstOffsetX, firstOffsetY⟩
+    rcases secondData.tagged.1.offset with ⟨secondOffsetX, secondOffsetY⟩
+    simp only [occurrenceSourceClauseTarget,
+      PositionedPeriodicCNF.variableToClauseTarget,
+      PositionedPeriodicCNF.canonicalClausePosition,
+      PositionedPeriodicCNF.variableToClauseTranslate,
+      PeriodicOneInThreeToThreeDM.reverseOffset,
+      PeriodicVariablePlacement.translation,
+      Cell.add, Cell.sub, Cell.scale, Prod.mk.injEq,
+      planar, firstData, secondData,
+      firstTranslate, secondTranslate,
+      firstClauseEq, secondClauseEq,
+      firstLiteralEq, secondLiteralEq] at equal ⊢
+    constructor
+    · linear_combination equal.1
+    · linear_combination equal.2
+  have clauseVerticesEqual :=
+    planar.incidenceVertexPositionAt_eq_translated_imp_eq
+      firstClauseVertexMember secondClauseVertexMember
+      (Cell.sub secondTranslate firstTranslate) liftedEqual
+  have indexedClauseIndicesEqual :
+      firstData.indexed.1.clauseIndex =
+        secondData.indexed.1.clauseIndex :=
+    CNFVertex.clause.inj clauseVerticesEqual
+  rw [occurrenceClauseIndex_eq_indexedClauseIndex planar first,
+    occurrenceClauseIndex_eq_indexedClauseIndex planar second]
+  exact indexedClauseIndicesEqual
+
+/-- Any two distinct colored clause-side stubs in the source presentation
+are strictly separated. -/
+theorem occurrenceCoordinatedRibbonClauseStubs_strictlyAvoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    {first second : ActiveOccurrenceEntry source.erase}
+    {firstColor secondColor : WireColor}
+    (different :
+      RibbonStrandsDifferent first firstColor second secondColor) :
+    RoutesStrictlyAvoidEachOther
+      (occurrenceCoordinatedRibbonClauseStub
+        presentation.toPlanarIncidencePresentation first firstColor)
+      (occurrenceCoordinatedRibbonClauseStub
+        presentation.toPlanarIncidencePresentation second secondColor) := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let firstCenter := occurrenceSourceClauseTarget planar first
+  let secondCenter := occurrenceSourceClauseTarget planar second
+  rcases ribbonMacrocellCenters_eq_or_far_or_adjacent
+      firstCenter secondCenter with
+    centersEqual | centersFar | centersAdjacent
+  · have sameClauseIndex :=
+      occurrenceSourceClauseTarget_eq_imp_clauseIndex_eq
+        presentation first second centersEqual
+    exact
+      occurrenceCoordinatedRibbonClauseStubs_strictlyAvoidEachOther_of_same_target
+        presentation width compatible sameClauseIndex centersEqual different
+  · exact routesStrictlyAvoidEachOther_of_inFarRibbonMacrocells
+      (fun point member =>
+        occurrenceCoordinatedRibbonClauseStub_points_bounded
+          planar compatible first firstColor member)
+      (fun point member =>
+        occurrenceCoordinatedRibbonClauseStub_points_bounded
+          planar compatible second secondColor member)
+      centersFar
+  · let firstClauseIndex :=
+      occurrenceClauseIndex source.erase first.1.1 first.1.2
+    let secondClauseIndex :=
+      occurrenceClauseIndex source.erase second.1.1 second.1.2
+    let firstData := sourceClauseRibbonFanData planar firstClauseIndex
+    let secondData := sourceClauseRibbonFanData planar secondClauseIndex
+    let firstGroup := occurrenceClauseTerminalGroup source.erase first
+    let secondGroup := occurrenceClauseTerminalGroup source.erase second
+    let firstLane := routedRibbonLane source.erase first firstColor
+    let secondLane := routedRibbonLane source.erase second secondColor
+    have firstMember :
+        first ∈ activeClauseOccurrenceEntries
+          source.erase firstClauseIndex :=
+      first.mem_activeClauseOccurrenceEntries
+    have secondMember :
+        second ∈ activeClauseOccurrenceEntries
+          source.erase secondClauseIndex :=
+      second.mem_activeClauseOccurrenceEntries
+    have firstActive : firstData.GroupActive firstGroup :=
+      ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
+        planar firstClauseIndex first firstMember
+    have secondActive : secondData.GroupActive secondGroup :=
+      ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
+        planar secondClauseIndex second secondMember
+    have occurrenceDifferent : first ≠ second := by
+      intro occurrenceEqual
+      subst second
+      unfold RibbonMacrocellCentersAdjacent
+        RibbonMacrocellOffsetAdjacent at centersAdjacent
+      simp [firstCenter, secondCenter, Cell.sub] at centersAdjacent
+    have notFacing : ∀ direction, direction.IsGenuine →
+        Cell.sub secondCenter firstCenter ≠ direction.step ∨
+          firstData.direction firstGroup ≠ direction.opposite ∨
+          secondData.direction secondGroup ≠ direction := by
+      intro direction genuine
+      rw [ClauseRibbonFanData.sourceClauseRibbonFanData_direction_at_occurrence_of_widthAtMostThree
+          planar width first,
+        ClauseRibbonFanData.sourceClauseRibbonFanData_direction_at_occurrence_of_widthAtMostThree
+          planar width second]
+      simpa [firstCenter, secondCenter, occurrenceSourceClauseTarget] using
+        occurrenceSourceClauseDirections_not_facing
+          presentation occurrenceDifferent direction genuine
+    have localAvoid :=
+      firstData.coordinatedRoutes_strictlyAvoidEachOther_of_adjacent_notFacing
+        secondData (compatible.2 first) (compatible.2 second)
+        firstGroup secondGroup firstActive secondActive
+        firstLane secondLane (Cell.sub secondCenter firstCenter)
+        centersAdjacent notFacing
+    have translatedAvoid :=
+      localAvoid.translatePolyline (ribbonMacrocellOrigin firstCenter)
+    have originEq :
+        Cell.add
+            (Cell.scale standardThreeStrandLayout.factor
+              (Cell.sub secondCenter firstCenter))
+            (ribbonMacrocellOrigin firstCenter) =
+          ribbonMacrocellOrigin secondCenter := by
+      rcases firstCenter with ⟨firstX, firstY⟩
+      rcases secondCenter with ⟨secondX, secondY⟩
+      apply Prod.ext <;>
+        simp [ribbonMacrocellOrigin,
+          Cell.add, Cell.sub, Cell.scale] <;>
+        ring
+    rw [translatePolyline_add, originEq] at translatedAvoid
+    simpa [occurrenceCoordinatedRibbonClauseStub,
+      planar, firstData, secondData,
+      firstClauseIndex, secondClauseIndex,
+      firstGroup, secondGroup, firstLane, secondLane,
+      firstCenter, secondCenter] using translatedAvoid
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
