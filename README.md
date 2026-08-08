@@ -4277,6 +4277,11 @@ The representation choices for this target are:
   length-at-least-three invariant discharge the complete fan-system
   certificate, so all distinct colored occurrence routes are strictly
   separated.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonRouting.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonRouting.lean)
+  specializes that routing to the retained, ordered, fixed-eight final
+  gauged Figure 9 presentation.  Its stored width, occurrence, arity, and
+  cyclic-order certificates produce one concrete padded normalized routing
+  whose distinct colored occurrence routes are all proved contact-free.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
