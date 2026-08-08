@@ -3829,6 +3829,11 @@ The representation choices for this target are:
   both outer endpoints and any caller-specified chain relation, with
   orthogonality as an immediate specialization, supplying the generic splice
   lemma used by fan and later gadget routing.
+- [`LeanTrominoes/OrthogonalPolylineJoinSimplicity.lean`](LeanTrominoes/OrthogonalPolylineJoinSimplicity.lean)
+  proves the corresponding geometric-simplicity rule.  Two individually
+  simple and continuously separated routes whose join boundary is their only
+  common listed point remain simple after the duplicate boundary entry is
+  removed.
 - [`LeanTrominoes/OrthogonalPolylineRibbon.lean`](LeanTrominoes/OrthogonalPolylineRibbon.lean)
   introduces directed normal offsets as the replacement for unsound uniform
   diagonal lane translation.  It gives exact endpoint and orthogonality
