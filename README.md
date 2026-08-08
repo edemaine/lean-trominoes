@@ -3950,6 +3950,11 @@ The representation choices for this target are:
   their intended half-edge boundary, while duplicate freedom makes every
   nonconsecutive tile pair contact-free; induction with endpoint-join
   simplicity proves that each complete corridor core is geometrically simple.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSimplicity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSimplicity.lean)
+  applies corridor simplicity to every active occurrence of a ribbon-ready
+  source.  Unitization supplies genuine steps, continuous planarity rules out
+  immediate reversals, and ribbon readiness supplies duplicate freedom, so
+  each selected occurrence corridor core is geometrically simple.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCorridorSeparation.lean)
   retains full-route provenance while recursively comparing every tile in
   two different corridor cores.  Duplicate-freeness makes each displayed
