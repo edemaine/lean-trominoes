@@ -185,6 +185,61 @@ theorem RebasedIncidenceRoutesWithinVariableRadius.rawRoutePointsWithinCanonical
   rw [centerEq, pointEq] at translated
   exact translated
 
+/-- Conversely, a coordinate-radius certificate on every stored physical
+route supplies the corresponding variable-centered certificate after the
+standard clause-anchor rebase. -/
+theorem rebasedIncidenceRoutesWithinVariableRadius_of_rawRoutePointsWithinCanonicalLiteralRadius
+    {Variable : Type*}
+    {radius : Nat}
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {routes : IncidenceRoutes}
+    (bounds :
+      ∀ clause clauseIndex,
+        (clause, clauseIndex) ∈ source.clauses.zipIdx →
+        ∀ literal literalIndex,
+          (literal, literalIndex) ∈ clause.literals.zipIdx →
+          ∀ point ∈ routes clauseIndex literalIndex,
+            WithinCoordinateRadius radius
+              (canonicalLiteralPosition placement clause literal)
+              point) :
+    RebasedIncidenceRoutesWithinVariableRadius
+      radius source placement routes := by
+  intro clause clauseIndex clauseMember
+    literal literalIndex literalMember point pointMember
+  let shift :=
+    placement.translation
+      (Cell.sub
+        (PeriodicCNF.clauseAnchor clause.literals)
+        literal.offset)
+  unfold PeriodicOrthocrossing.translatePolyline at pointMember
+  rcases List.mem_map.mp pointMember with
+    ⟨routePoint, routePointMember, rfl⟩
+  have routePointMember' :
+      routePoint ∈ routes clauseIndex literalIndex :=
+    List.mem_reverse.mp routePointMember
+  have rawBounded :=
+    bounds clause clauseIndex clauseMember
+      literal literalIndex literalMember
+      routePoint routePointMember'
+  have translated := rawBounded.translate shift
+  have centerEq :
+      Cell.add shift
+          (canonicalLiteralPosition placement clause literal) =
+        placement.position literal.atom := by
+    rcases anchorEq :
+        PeriodicCNF.clauseAnchor clause.literals with
+      ⟨anchorX, anchorY⟩
+    rcases offsetEq : literal.offset with ⟨offsetX, offsetY⟩
+    apply Prod.ext <;>
+      simp [shift, canonicalLiteralPosition,
+        PeriodicVariablePlacement.translation,
+        Cell.add, Cell.sub, Cell.scale,
+        anchorEq, offsetEq] <;>
+      ring
+  rw [centerEq] at translated
+  exact translated
+
 /-- Period-specialized form of
 `rawRoutePointsWithinCanonicalLiteralRadius`. -/
 theorem RebasedIncidenceRoutesWithinVariablePeriod.rawRoutePointsWithinCanonicalLiteralPeriod
