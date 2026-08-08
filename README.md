@@ -4324,6 +4324,11 @@ The representation choices for this target are:
   matching first and final corridor tiles are ordinarily separated from
   their endpoint fans with their advertised boundary as the only listed
   contact.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCorridorSimplicity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCorridorSimplicity.lean)
+  extends the first matching interface across the complete occurrence
+  corridor.  Duplicate freedom makes every tile after the first contact-free
+  from the variable fan, so the complete fan/core join is geometrically
+  simple whenever the source route has an interior lattice point.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceEndpointFanSystemSeparation.lean)
   assembles the five source-level pairwise results into the coordinated
   endpoint-fan system's complete separation certificate.  Besides width and
