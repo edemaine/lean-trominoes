@@ -4282,6 +4282,11 @@ The representation choices for this target are:
   anchor-normalized construction.  It also transfers the result through
   numeric incidence-tag lookup, proving separation for every pair of
   distinct genuine routes stored by the assembled periodic drawing.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedBounds.lean)
+  uses the coordinated fan system's macrocell-containment contract to prove
+  that every point of every final assembled route lies in the open one-cell
+  halo.  The proof covers the finite variable and clause prefixes as well as
+  the genuinely coordinated occurrence-route suffixes.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedVertexCoverage.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedVertexCoverage.lean)
   proves the complementary vertex condition for that final assembly.  The
   encoded degree-two-or-three promise rules out isolated vertices, while
@@ -4290,9 +4295,15 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedLiftedContactReduction.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedLiftedContactReduction.lean)
   transports distinct stored route indices to unique incidence tags and
   discharges the zero-relative-shift case with the preceding same-period
-  theorem.  It packages simplicity, endpoint coverage, and orthogonality to
-  show that separation from nonzero relative period translates is now the
-  sole remaining geometric input for continuous planarity of the assembly.
+  theorem.  Halo bounds reduce every possible nonzero translated contact to
+  the 24 nonzero shifts in the surrounding `5 × 5` block; checking those
+  finite cases, together with simplicity, endpoint coverage, and
+  orthogonality, now suffices for continuous planarity of the assembly.
+- [`LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean)
+  proves the reusable finite-to-infinite bridge behind that reduction.  A
+  halo-bounded route pair at any shift outside the `5 × 5` block
+  automatically has disjoint segment interiors and both directed
+  point/interior separation properties.
 - [`LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingLiftedInteriorContactSeparation.lean)
   lifts that deliberately weaker three-field separation predicate to the
   infinite periodic drawing.  Pairwise lifted separation plus stored-route

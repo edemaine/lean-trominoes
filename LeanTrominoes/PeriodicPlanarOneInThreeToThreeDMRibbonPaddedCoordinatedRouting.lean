@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonFanCompatibilityTransport
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouteLength
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonPaddedRouting
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSimplicity
 
 /-!
@@ -54,6 +55,96 @@ noncomputable def paddedNormalizedCoordinatedRibbonThreeStrandRouting
     (paddedNormalizedSource_widthAtMostThree width)
     (paddedNormalizedRibbonReady_sourceRibbonFansClockwiseCompatible
       presentation width occurrences arity variableOrdered clauseOrdered)
+
+/-- Every listed point of a final coordinated occurrence route remains in
+the assembled open one-cell halo. -/
+theorem paddedNormalizedCoordinatedRibbonRoute_pointsInsideExpandedSquare
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes)
+    (entry :
+      ActiveOccurrenceEntry
+        (normalizedPositionedSource
+          (source.scale 2) (placement.scale 2)).erase)
+    (color : WireColor) {point : Cell}
+    (pointMember :
+      point ∈
+        (paddedNormalizedCoordinatedRibbonThreeStrandRouting
+          presentation width occurrences arity
+          variableOrdered clauseOrdered).route entry color) :
+    (assembledDrawing
+      (paddedNormalizedCoordinatedRibbonThreeStrandRouting
+        presentation width occurrences arity
+        variableOrdered clauseOrdered))
+      |>.PositionInExpandedSquare point := by
+  let padded := presentation.scaleTwo
+  let normalized :=
+    normalizedRibbonReadyIncidencePresentation padded
+  let compatible :=
+    paddedNormalizedRibbonReady_sourceRibbonFansClockwiseCompatible
+      presentation width occurrences arity variableOrdered clauseOrdered
+  let fans :=
+    coordinatedSourceRibbonEndpointFanSystem
+      normalized.toPlanarIncidencePresentation
+      (paddedNormalizedSource_widthAtMostThree width) compatible
+  change point ∈ fans.occurrenceThreeStrandRoute entry color
+    at pointMember
+  change
+    (assembledDrawing
+      (ribbonThreeStrandRouting
+        normalized.toContinuousPlanarIncidencePresentation))
+      |>.PositionInExpandedSquare point
+  rcases
+      fans.occurrenceThreeStrandRoute_points_bounded
+        entry color pointMember with
+    variableBounded | corridorBounded | clauseBounded
+  · apply inRibbonMacrocell_insideExpandedSquare
+      normalized.toContinuousPlanarIncidencePresentation
+    · exact
+        occurrenceUnitSourceRoute_pointsInsideExpandedSquareWithUpperMargin
+          normalized.toPlanarIncidencePresentation
+          (padded.toPlanarIncidencePresentation
+            |>.rebasedRoutePointsInExpandedSquareWithUpperMargin_anchorNormalize
+              presentation.scaleTwo_rebasedRoutePointsInExpandedSquareWithUpperMargin)
+          entry
+          (occurrenceUnitSourceRoute_variableEndpoint_mem
+            normalized.toPlanarIncidencePresentation entry)
+    · exact variableBounded
+  · rcases corridorBounded with
+      ⟨center, centerMember, bounded⟩
+    apply inRibbonMacrocell_insideExpandedSquare
+      normalized.toContinuousPlanarIncidencePresentation
+    · exact
+        occurrenceUnitSourceRoute_pointsInsideExpandedSquareWithUpperMargin
+          normalized.toPlanarIncidencePresentation
+          (padded.toPlanarIncidencePresentation
+            |>.rebasedRoutePointsInExpandedSquareWithUpperMargin_anchorNormalize
+              presentation.scaleTwo_rebasedRoutePointsInExpandedSquareWithUpperMargin)
+          entry centerMember
+    · exact bounded
+  · let data :=
+      occurrenceSpliceData normalized.toPlanarIncidencePresentation entry
+    apply inRibbonMacrocell_insideExpandedSquare
+      normalized.toContinuousPlanarIncidencePresentation
+    · exact
+        occurrenceUnitSourceRoute_pointsInsideExpandedSquareWithUpperMargin
+          normalized.toPlanarIncidencePresentation
+          (padded.toPlanarIncidencePresentation
+            |>.rebasedRoutePointsInExpandedSquareWithUpperMargin_anchorNormalize
+              presentation.scaleTwo_rebasedRoutePointsInExpandedSquareWithUpperMargin)
+          entry
+          (occurrenceUnitSourceRoute_clauseEndpoint_mem
+            normalized.toPlanarIncidencePresentation entry)
+    · exact clauseBounded
 
 /-- Every occurrence-route suffix in the final padded normalized routing is
 geometrically simple. -/

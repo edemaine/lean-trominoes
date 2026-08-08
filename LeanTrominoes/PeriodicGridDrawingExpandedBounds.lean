@@ -113,6 +113,14 @@ theorem doubleNeighborTranslations_nodup :
     doubleNeighborTranslations.Nodup := by
   native_decide
 
+/-- The `5 × 5` relative-translation set is closed under negation. -/
+theorem sub_zero_mem_doubleNeighborTranslations_iff (translate : Cell) :
+    Cell.sub (0, 0) translate ∈ doubleNeighborTranslations ↔
+      translate ∈ doubleNeighborTranslations := by
+  rcases translate with ⟨horizontal, vertical⟩
+  simp only [mem_doubleNeighborTranslations_iff, Cell.sub]
+  omega
+
 /-- Equality of a translated halo coordinate with another halo coordinate
 bounds the relative period shift by two. -/
 theorem lane_shift_is_doubleNeighbor
@@ -320,6 +328,91 @@ theorem relativeTranslate_isDoubleNeighbor_of_contact
           (first.segment.finish.2 +
             drawing.gridSize * relative.2)
           normalized.2 := by
+      simpa [GridSegment.translate, periodTranslation,
+        Cell.add, Cell.scale, add_comm] using between
+    exact
+      ⟨lane_shift_is_doubleNeighbor periodPositive
+          startXLower startXUpper
+          pointXLower pointXUpper same',
+        between_shift_is_doubleNeighbor periodPositive
+          startYLower startYUpper finishYLower finishYUpper
+          pointYLower pointYUpper between'⟩
+
+/-- A translated halo-bounded segment meeting a translated halo-bounded
+point also has one of the `5 × 5` relative translations. -/
+theorem relativeTranslate_isDoubleNeighbor_of_expandedPointContact
+    {drawing : PeriodicGridDrawing}
+    (endpointBounds : drawing.SegmentEndpointsInExpandedSquare)
+    {point : Cell}
+    (pointBounds : drawing.PositionInExpandedSquare point)
+    {indexed : IndexedGridSegment}
+    (indexedMember : indexed ∈ drawing.indexedSegments)
+    {pointTranslate routeTranslate : Cell}
+    (contains :
+      (indexed.segment.translate
+        (drawing.periodTranslation routeTranslate)).InteriorContains
+        (Cell.add point
+          (drawing.periodTranslation pointTranslate))) :
+    Cell.sub routeTranslate pointTranslate ∈
+      doubleNeighborTranslations := by
+  let relative := Cell.sub routeTranslate pointTranslate
+  have normalized :
+      (indexed.segment.translate
+        (drawing.periodTranslation relative)).InteriorContains point := by
+    have := (interiorContains_normalize drawing indexed.segment
+      routeTranslate pointTranslate
+      (Cell.add point
+        (drawing.periodTranslation pointTranslate))).mp contains
+    simpa [relative, normalizePoint, Cell.add, Cell.sub] using this
+  have periodPositive : (0 : Int) < drawing.gridSize := by
+    exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+  have segmentBounds := endpointBounds indexed indexedMember
+  apply (mem_doubleNeighborTranslations_iff relative).mpr
+  rcases segmentBounds with ⟨startBounds, finishBounds⟩
+  rcases startBounds with
+    ⟨startXLower, startXUpper, startYLower, startYUpper⟩
+  rcases finishBounds with
+    ⟨finishXLower, finishXUpper, finishYLower, finishYUpper⟩
+  rcases pointBounds with
+    ⟨pointXLower, pointXUpper, pointYLower, pointYUpper⟩
+  rcases normalized with
+    ⟨horizontal, same, between⟩ |
+      ⟨vertical, same, between⟩
+  · have same' :
+        point.2 =
+          indexed.segment.start.2 +
+            drawing.gridSize * relative.2 := by
+      simpa [GridSegment.translate, periodTranslation,
+        Cell.add, Cell.scale, add_comm] using same
+    have between' :
+        GridSegment.StrictlyBetween
+          (indexed.segment.start.1 +
+            drawing.gridSize * relative.1)
+          (indexed.segment.finish.1 +
+            drawing.gridSize * relative.1)
+          point.1 := by
+      simpa [GridSegment.translate, periodTranslation,
+        Cell.add, Cell.scale, add_comm] using between
+    exact
+      ⟨between_shift_is_doubleNeighbor periodPositive
+          startXLower startXUpper finishXLower finishXUpper
+          pointXLower pointXUpper between',
+        lane_shift_is_doubleNeighbor periodPositive
+          startYLower startYUpper
+          pointYLower pointYUpper same'⟩
+  · have same' :
+        point.1 =
+          indexed.segment.start.1 +
+            drawing.gridSize * relative.1 := by
+      simpa [GridSegment.translate, periodTranslation,
+        Cell.add, Cell.scale, add_comm] using same
+    have between' :
+        GridSegment.StrictlyBetween
+          (indexed.segment.start.2 +
+            drawing.gridSize * relative.2)
+          (indexed.segment.finish.2 +
+            drawing.gridSize * relative.2)
+          point.2 := by
       simpa [GridSegment.translate, periodTranslation,
         Cell.add, Cell.scale, add_comm] using between
     exact

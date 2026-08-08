@@ -1,5 +1,6 @@
-import LeanTrominoes.PeriodicGridDrawingLiftedInteriorContactSeparation
+import LeanTrominoes.PeriodicGridDrawingExpandedLiftedInteriorContactSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedBounds
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonPaddedVertexCoverage
 
 /-!
@@ -87,6 +88,42 @@ theorem paddedNormalizedCoordinatedAssembledStoredRoutes_avoidInteriors
       presentation width occurrences arity variableOrdered clauseOrdered
       firstTag secondTag firstTagMember secondTagMember tagsDifferent
 
+/-- The 24 nonzero halo-neighbor shifts suffice for all nonzero translated
+route pairs in the final padded coordinated assembly. -/
+theorem paddedNormalizedCoordinatedNonzeroRelativeLiftedRoutes_avoidInteriors_of_doubleNeighbor
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes)
+    (finite :
+      let routing :=
+        paddedNormalizedCoordinatedRibbonThreeStrandRouting
+          presentation width occurrences arity
+          variableOrdered clauseOrdered
+      (assembledDrawing routing)
+        |>.DoubleNeighborNonzeroRelativeLiftedRoutesAvoidInteriorContacts) :
+    let routing :=
+      paddedNormalizedCoordinatedRibbonThreeStrandRouting
+        presentation width occurrences arity
+        variableOrdered clauseOrdered
+    (assembledDrawing routing)
+      |>.NonzeroRelativeLiftedRoutesAvoidInteriorContacts := by
+  dsimp only at finite ⊢
+  apply
+    PeriodicGridDrawing.nonzeroRelativeLiftedRoutesAvoidInteriorContacts_of_doubleNeighbor
+  · exact
+      paddedNormalizedCoordinatedAssembledRoutePointsInExpandedSquare
+        presentation width occurrences arity variableOrdered clauseOrdered
+  · exact finite
+
 /-- Once nonzero relative translates are separated, the final padded
 assembly satisfies the complete relative lifted contact predicate. -/
 theorem paddedNormalizedCoordinatedRelativeLiftedRoutes_avoidInteriors_of_nonzero
@@ -167,6 +204,41 @@ theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_nonz
       paddedNormalizedCoordinatedAssembledVertexPositions_covered
         presentation width occurrences arity variableOrdered clauseOrdered
   · exact assembledDrawing_isOrthogonal routing
+
+/-- Checking the 24 nonzero halo-neighbor shifts is enough to prove exact
+continuous planarity of the final padded coordinated assembly. -/
+theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_doubleNeighbor
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes)
+    (finite :
+      let routing :=
+        paddedNormalizedCoordinatedRibbonThreeStrandRouting
+          presentation width occurrences arity
+          variableOrdered clauseOrdered
+      (assembledDrawing routing)
+        |>.DoubleNeighborNonzeroRelativeLiftedRoutesAvoidInteriorContacts) :
+    let routing :=
+      paddedNormalizedCoordinatedRibbonThreeStrandRouting
+        presentation width occurrences arity
+        variableOrdered clauseOrdered
+    (assembledDrawing routing).IsContinuouslyPlanar := by
+  dsimp only at finite ⊢
+  apply
+    paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_nonzero
+      presentation width occurrences arity variableOrdered clauseOrdered
+  exact
+    paddedNormalizedCoordinatedNonzeroRelativeLiftedRoutes_avoidInteriors_of_doubleNeighbor
+      presentation width occurrences arity variableOrdered clauseOrdered finite
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes
