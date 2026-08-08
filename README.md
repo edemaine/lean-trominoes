@@ -4326,6 +4326,12 @@ The representation choices for this target are:
   injectivity and strict inset bounds; when a translated clause fan shares a
   clause-core center, the checked finite fan/core table permits only the
   advertised outer-endpoint contact.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRouteSeparation.lean)
+  composes finite-core/core, both finite-core/occurrence-route orientations,
+  and occurrence-route/occurrence-route separation.  Decomposing both full
+  assembled incidences at their certified splice endpoints proves that any
+  complete typed route avoids every nonzero relative period translate of any
+  other complete typed route.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
   specializes complete typed-route separation to the final doubled,
   anchor-normalized construction.  It also transfers the result through
