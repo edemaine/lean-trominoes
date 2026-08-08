@@ -4265,6 +4265,12 @@ The representation choices for this target are:
   coordinated variable fan at the same source variable, including
   nonmatching routes with harmless listed-point coincidences; cores and fans
   owned by distinct variable macrocells are strictly separated.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean)
+  extends that all-pairs result across every complete coordinated occurrence
+  route.  Source-route endpoint separation makes every variable center fresh
+  from unrelated corridor interiors; strict inset bounds then separate the
+  corridor and clause-side fan, while the variable-side fan retains the
+  precise no-segment-interior-contact guarantee needed for global planarity.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonAssembledVariablePrefix.lean)
   exposes that constructed route as the global assembly's common routed
   variable prefix.  Both the ordinary and fixed-red prefix branches are
