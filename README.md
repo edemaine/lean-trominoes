@@ -4247,6 +4247,13 @@ The representation choices for this target are:
   variable/clause centers, macrocell bounds handle far centers, and the
   route's first neighbor is an internal point, eliminating the sole adjacent
   placement left by the mixed finite classifier.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoreClauseSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceCoreClauseSeparation.lean)
+  discharges the coordinated fan system's `coreClause` obligation.  It
+  exposes every source route as a prefix followed by its final edge and
+  inducts toward that edge: duplicate freedom separates every earlier tile,
+  while distinct semantic colors select different physical lanes at the
+  intended final tile.  Endpoint-only source contact supplies the same
+  exclusions for cores belonging to another occurrence.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
