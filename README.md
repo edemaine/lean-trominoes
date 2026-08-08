@@ -4271,6 +4271,12 @@ The representation choices for this target are:
   preserve the variable and ternary-clause cyclic route orders.  It combines
   those transports into the clockwise compatibility certificate needed by
   the coordinated fans on the final doubled, normalized ribbon source.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedRouting.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedRouting.lean)
+  constructs the final doubled and anchor-normalized coordinated
+  `ThreeStrandRouting`.  Width, cyclic order, and the proved padded
+  length-at-least-three invariant discharge the complete fan-system
+  certificate, so all distinct colored occurrence routes are strictly
+  separated.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
