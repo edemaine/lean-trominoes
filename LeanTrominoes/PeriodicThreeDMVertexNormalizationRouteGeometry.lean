@@ -109,6 +109,13 @@ theorem rotationRoundPortAndRoute_secondPoint
       some (Cell.add center result.1.direction.step) := by
   cases active <;> cases oldPort <;> native_decide
 
+/-- Every selected rotation-round template contains at least four points,
+so both of its endpoint-adjacent points survive reversal and joining. -/
+theorem rotationRoundPortAndRoute_length_ge_four
+    (active : Bool) (oldPort : CanonicalVertexPort) :
+    4 ≤ (rotationRoundPortAndRoute active oldPort).2.length := by
+  cases active <;> cases oldPort <;> native_decide
+
 /-- The final local endpoint template has the geometry advertised by the
 endpoint's final normalized port. -/
 theorem ContractedEndpoint.finalNormalizationTemplate_geometry
@@ -157,6 +164,18 @@ theorem ContractedEndpoint.finalNormalizationTemplate_secondPoint
   simpa [ContractedEndpoint.finalNormalizationTemplate,
     ContractedEndpoint.finalNormalizedPort] using
     rotationRoundPortAndRoute_secondPoint
+      (secondRotationActive presentation endpoint.vertex)
+      (endpoint.secondNormalizedPort presentation)
+
+/-- Final endpoint templates are long enough to preserve their target-side
+adjacent point through both surrounding joins. -/
+theorem ContractedEndpoint.finalNormalizationTemplate_length_ge_four
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    4 ≤ (endpoint.finalNormalizationTemplate presentation).length := by
+  simpa [ContractedEndpoint.finalNormalizationTemplate] using
+    rotationRoundPortAndRoute_length_ge_four
       (secondRotationActive presentation endpoint.vertex)
       (endpoint.secondNormalizedPort presentation)
 
@@ -224,6 +243,40 @@ theorem joinAtEndpoint_getLast?_of_second_length_ge_two
           simp only [LeanTrominoes.joinAtEndpoint, List.tail_cons]
           exact List.getLast?_append_of_ne_nil first (by simp)
 
+/-- If the appended route has two points before its final point, it also
+determines the point immediately before the joined route's target. -/
+theorem List.append_tail_head?_of_left_length_ge_two
+    {α : Type*} (first second : List α)
+    (length : 2 ≤ first.length) :
+    (first ++ second).tail.head? = first.tail.head? := by
+  cases first with
+  | nil => simp at length
+  | cons first rest =>
+      cases rest with
+      | nil => simp at length
+      | cons second rest =>
+          simp
+
+theorem joinAtEndpoint_reverse_tail_head?_of_second_length_ge_three
+    {α : Type*} (first second : List α)
+    (length : 3 ≤ second.length) :
+    (LeanTrominoes.joinAtEndpoint first second).reverse.tail.head? =
+      second.reverse.tail.head? := by
+  cases second with
+  | nil => simp at length
+  | cons firstPoint rest =>
+      have restLength : 2 ≤ rest.length := by
+        simpa using length
+      have reversedRestLength : 2 ≤ rest.reverse.length := by
+        simpa using restLength
+      unfold LeanTrominoes.joinAtEndpoint
+      rw [List.reverse_append, List.reverse_cons]
+      simp only [List.tail_cons]
+      rw [List.append_tail_head?_of_left_length_ge_two _ _
+        reversedRestLength]
+      rw [List.append_tail_head?_of_left_length_ge_two _ _
+        reversedRestLength]
+
 /-- Reversing and translating a center-rooted template makes the normalized
 target position its final point. -/
 theorem normalizationTemplateAt_reverse_getLast?
@@ -261,6 +314,41 @@ theorem normalizeRouteWithTemplates_getLast?
     targetRouteLength]
   exact normalizationTemplateAt_reverse_getLast?
     targetPosition targetHead
+
+/-- With a target template of length at least four, the same splice also
+preserves the target-adjacent point. -/
+theorem normalizeRouteWithTemplates_reverse_tail_head?
+    (sourcePosition targetPosition : Cell)
+    (sourceTemplate targetTemplate oldRoute : List Cell)
+    (middleLength : 2 ≤ (trimmedMagnifiedRoute oldRoute).length)
+    (targetSecond : targetTemplate.tail.head? = some
+      (Cell.add center
+        (AxisDirection.polylineFirstDirection targetTemplate).step))
+    (targetLength : 4 ≤ targetTemplate.length) :
+    (normalizeRouteWithTemplates sourcePosition targetPosition
+        sourceTemplate targetTemplate oldRoute).reverse.tail.head? =
+      some (Cell.add (normalizeVertexPosition targetPosition)
+        (AxisDirection.polylineFirstDirection targetTemplate).step) := by
+  let targetRoute :=
+    (normalizationTemplateAt targetPosition targetTemplate).reverse
+  have targetRouteLength : 4 ≤ targetRoute.length := by
+    simpa only [targetRoute, List.length_reverse,
+      normalizationTemplateAt_length] using targetLength
+  have innerLength :
+      3 ≤ (joinAtEndpoint (trimmedMagnifiedRoute oldRoute)
+        targetRoute).length := by
+    simp only [joinAtEndpoint, List.length_append, List.length_tail]
+    omega
+  unfold normalizeRouteWithTemplates
+  rw [joinAtEndpoint_reverse_tail_head?_of_second_length_ge_three
+    _ _ innerLength]
+  rw [joinAtEndpoint_reverse_tail_head?_of_second_length_ge_three
+    _ _ (by omega : 3 ≤ targetRoute.length)]
+  simp only [targetRoute, List.reverse_reverse]
+  change
+    (normalizationTemplateAt targetPosition targetTemplate).tail.head? = _
+  rw [normalizationTemplateAt_tail_head? targetPosition targetSecond]
+  simp [normalizeVertexPosition, Cell.add_assoc]
 
 /-! ## The magnified middle has enough room for trimming -/
 
@@ -403,6 +491,40 @@ theorem PlanarPresentation.finalNormalizationRoute_getLast?
       presentation (ContractedEndpoint.target edge)).1
   · exact (ContractedEndpoint.finalNormalizationTemplate_geometry
       presentation (ContractedEndpoint.target edge)).2.1
+
+/-- The point before the final target is the target endpoint's outward unit
+step through its final canonical port. -/
+theorem PlanarPresentation.finalNormalizationRoute_reverse_tail_head?
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (edge : ContractedEdge) :
+    (presentation.finalNormalizationRoute edge).reverse.tail.head? =
+      some (Cell.add
+        (normalizeVertexPosition (presentation.normalizationTarget2 edge))
+        ((ContractedEndpoint.target edge).finalNormalizedPort
+          presentation).direction.step) := by
+  let endpoint := ContractedEndpoint.target edge
+  have geometry := endpoint.finalNormalizationTemplate_geometry presentation
+  unfold PlanarPresentation.finalNormalizationRoute
+  have targetSecond :
+      (endpoint.finalNormalizationTemplate presentation).tail.head? =
+        some (Cell.add center
+          (AxisDirection.polylineFirstDirection
+            (endpoint.finalNormalizationTemplate presentation)).step) := by
+    rw [geometry.2.2.2]
+    exact endpoint.finalNormalizationTemplate_secondPoint presentation
+  have preserved := normalizeRouteWithTemplates_reverse_tail_head?
+    (presentation.normalizationPosition2 edge.toPeriodicEdge.source)
+    (presentation.normalizationTarget2 edge)
+    ((ContractedEndpoint.source edge).finalNormalizationTemplate presentation)
+    (endpoint.finalNormalizationTemplate presentation)
+    (presentation.normalizationRoute2 edge)
+    (le_trans (by omega)
+      (presentation.finalTrimmedMiddle_length_ge_seven edge))
+    targetSecond
+    (endpoint.finalNormalizationTemplate_length_ge_four presentation)
+  rw [geometry.2.2.2] at preserved
+  exact preserved
 
 /-- The final normalized route starts at its source's final normalized
 vertex position. -/
