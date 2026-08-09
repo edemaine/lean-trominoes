@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseCoreRouteSeparation
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceOccurrenceRouteSimplicity
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMGlobalRouteSeparation
 
 /-!
@@ -17,6 +18,43 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 open Gadget PlanarThreeDM PeriodicOrthocrossing
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOneInThreePolarityNormalization
+
+/-- Forgetting global names is injective between variable triples with the
+same atom owner. -/
+private theorem variableSiteTripleOfTyped_injective_of_same_atom_owner
+    {Variable : Type*}
+    {atom : Variable} {first second : Triple Variable}
+    (firstOwner : tripleMacrocellOwner first = .atom atom)
+    (secondOwner : tripleMacrocellOwner second = .atom atom)
+    (localEq : variableSiteTripleOfTyped first =
+      variableSiteTripleOfTyped second) :
+    first = second := by
+  cases first <;> cases second <;>
+    simp_all [tripleMacrocellOwner, variableSiteTripleOfTyped]
+
+/-- A strictly separated route pair vacuously has first-tail-only contact. -/
+private theorem routesMeetOnlyAtFirstTail_of_strict
+    {first second : List Cell}
+    (strict : RoutesStrictlyAvoidEachOther first second) :
+    RoutesMeetOnlyAtFirstTail first second := by
+  intro firstPoint firstMember secondPoint secondMember equal
+  exact
+    (strict.2.2.2
+      firstPoint firstMember secondPoint secondMember equal).elim
+
+/-- The typed triple selected by an occurrence strand is housed in that
+occurrence's variable macrocell. -/
+private theorem routedOccurrenceTriple_atom_owner
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : Variable) (slot : OccurrenceSlot)
+    (color : WireColor) :
+    tripleMacrocellOwner
+        (routedOccurrenceTriple source atom slot color) =
+      .atom atom := by
+  cases kindEq : occurrenceConnectorKind source atom slot <;>
+    cases color <;>
+    simp [routedOccurrenceTriple, tripleMacrocellOwner, kindEq]
 
 /-- The finite variable-site or clause-core prefix underlying an assembled
 typed incidence, before its optional routed occurrence suffix is attached. -/
@@ -694,6 +732,196 @@ theorem assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRoute
           presentation anchorsZero occurrences arity width compatible
           clauseIndex indexLt set coreColor entry routeColor
 
+/-- A variable-owned assembled core is contact-free from every nonmatching
+complete occurrence route. -/
+theorem
+    assembledTypedIncidenceCoreRoute_strictlyAvoids_coordinatedSourceRoute_of_atom_owner
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (coreTriple :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (routeColor : WireColor)
+    (atomOwner :
+      ∃ atom, tripleMacrocellOwner coreTriple.1 = .atom atom)
+    (different :
+      (coreTriple.1, coreColor) ≠
+        (routedOccurrenceTriple source.erase
+          entry.1.1 entry.1.2 routeColor,
+          routeColor)) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesStrictlyAvoidEachOther
+      (assembledTypedIncidenceCoreRoute
+        routing coreTriple coreColor)
+      (routing.route entry routeColor) := by
+  dsimp only
+  let routing := coordinatedSourceRibbonThreeStrandRouting
+    presentation width compatible
+  rcases coreTriple with ⟨coreTriple, coreMember⟩
+  cases coreTriple with
+  | ordinary atom slot variant localTriple =>
+      let location := ordinaryTriple_location source.erase
+        atom slot variant localTriple coreMember
+      let owner : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      have localDifferent : owner.1.1 = entry.1.1 →
+          ((activeVariableSiteTriple source.erase atom location.1
+              slot location.2.1
+              (.ordinary atom slot variant localTriple) location.2.2).1,
+            coreColor) ≠
+          (variableSiteTripleOfTyped
+            (routedOccurrenceTriple source.erase
+              entry.1.1 entry.1.2 routeColor),
+            routeColor) := by
+        intro sameAtom localPairEq
+        apply different
+        rcases Prod.mk.inj localPairEq with ⟨localEq, colorEq⟩
+        apply Prod.ext
+        · apply variableSiteTripleOfTyped_injective_of_same_atom_owner
+          · rfl
+          · cases kindEq : occurrenceConnectorKind
+                source.erase entry.1.1 entry.1.2 <;>
+              cases routeColor <;>
+              simpa [routedOccurrenceTriple, tripleMacrocellOwner,
+                kindEq] using
+                congrArg AssemblyMacrocellOwner.atom sameAtom.symm
+          · simpa [activeVariableSiteTriple] using localEq
+        · exact colorEq
+      simpa [assembledTypedIncidenceCoreRoute,
+        assembledOrdinaryPrefix, typedVariableSiteRoute,
+        location, owner, routing,
+        coordinatedSourceRibbonThreeStrandRouting,
+        RibbonEndpointFanSystem.threeStrandRouting] using
+        constructedVariableSiteRoute_strictlyAvoids_coordinatedSourceRibbonRoute_of_ne
+          presentation anchorsZero width normalized compatible owner entry
+          (activeVariableSiteTriple source.erase atom location.1
+            slot location.2.1
+            (.ordinary atom slot variant localTriple) location.2.2)
+          coreColor routeColor localDifferent
+  | fixedRed atom slot localTriple =>
+      let location := fixedRedTriple_location source.erase
+        atom slot localTriple coreMember
+      let owner : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      have localDifferent : owner.1.1 = entry.1.1 →
+          ((activeVariableSiteTriple source.erase atom location.1
+              slot location.2.1
+              (.fixedRed atom slot localTriple) location.2.2).1,
+            coreColor) ≠
+          (variableSiteTripleOfTyped
+            (routedOccurrenceTriple source.erase
+              entry.1.1 entry.1.2 routeColor),
+            routeColor) := by
+        intro sameAtom localPairEq
+        apply different
+        rcases Prod.mk.inj localPairEq with ⟨localEq, colorEq⟩
+        apply Prod.ext
+        · apply variableSiteTripleOfTyped_injective_of_same_atom_owner
+          · rfl
+          · cases kindEq : occurrenceConnectorKind
+                source.erase entry.1.1 entry.1.2 <;>
+              cases routeColor <;>
+              simpa [routedOccurrenceTriple, tripleMacrocellOwner,
+                kindEq] using
+                congrArg AssemblyMacrocellOwner.atom sameAtom.symm
+          · simpa [activeVariableSiteTriple] using localEq
+        · exact colorEq
+      simpa [assembledTypedIncidenceCoreRoute,
+        assembledFixedRedPrefix, typedVariableSiteRoute,
+        location, owner, routing,
+        coordinatedSourceRibbonThreeStrandRouting,
+        RibbonEndpointFanSystem.threeStrandRouting] using
+        constructedVariableSiteRoute_strictlyAvoids_coordinatedSourceRibbonRoute_of_ne
+          presentation anchorsZero width normalized compatible owner entry
+          (activeVariableSiteTriple source.erase atom location.1
+            slot location.2.1
+            (.fixedRed atom slot localTriple) location.2.2)
+          coreColor routeColor localDifferent
+  | clause clauseIndex set =>
+      rcases atomOwner with ⟨atom, ownerEq⟩
+      simp [tripleMacrocellOwner] at ownerEq
+
+/-- For any nonmatching core/occurrence pair, all possible listed contact
+with the complete occurrence route is at that route's outer clause tail. -/
+theorem assembledTypedIncidenceCoreRoute_meets_coordinatedSourceRoute_onlyAtFirstTail
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (coreTriple :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (routeColor : WireColor)
+    (different :
+      (coreTriple.1, coreColor) ≠
+        (routedOccurrenceTriple source.erase
+          entry.1.1 entry.1.2 routeColor,
+          routeColor)) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesMeetOnlyAtFirstTail
+      (routing.route entry routeColor)
+      (assembledTypedIncidenceCoreRoute
+        routing coreTriple coreColor) := by
+  dsimp only
+  let routing := coordinatedSourceRibbonThreeStrandRouting
+    presentation width compatible
+  rcases coreTriple with ⟨coreTriple, coreMember⟩
+  cases coreTriple with
+  | ordinary atom slot variant localTriple =>
+      apply routesMeetOnlyAtFirstTail_of_strict
+      apply RoutesStrictlyAvoidEachOther.symm
+      exact
+        assembledTypedIncidenceCoreRoute_strictlyAvoids_coordinatedSourceRoute_of_atom_owner
+          presentation anchorsZero width normalized compatible
+          ⟨.ordinary atom slot variant localTriple, coreMember⟩
+          coreColor entry routeColor
+          ⟨atom, rfl⟩ different
+  | fixedRed atom slot localTriple =>
+      apply routesMeetOnlyAtFirstTail_of_strict
+      apply RoutesStrictlyAvoidEachOther.symm
+      exact
+        assembledTypedIncidenceCoreRoute_strictlyAvoids_coordinatedSourceRoute_of_atom_owner
+          presentation anchorsZero width normalized compatible
+          ⟨.fixedRed atom slot localTriple, coreMember⟩
+          coreColor entry routeColor
+          ⟨atom, rfl⟩ different
+  | clause clauseIndex set =>
+      have declared :=
+        tripleMacrocellOwner_declared source.erase
+          (.clause clauseIndex set) coreMember
+      have indexLt : clauseIndex < source.clauses.length := by
+        simpa [tripleMacrocellOwner,
+          AssemblyMacrocellOwner.IsDeclared,
+          PositionedPeriodicCNF.erase] using declared
+      simpa [assembledTypedIncidenceCoreRoute, routing] using
+        coordinatedSourceRibbonRoute_meets_assembledClauseRoute_onlyAtFirstTail
+          presentation anchorsZero occurrences arity width compatible
+          clauseIndex indexLt set coreColor entry routeColor
+
 /-- An assembled typed incidence is either its core alone or that core joined
 at the certified variable port to one routed occurrence suffix. -/
 theorem assembledTypedIncidenceRoute_eq_core_or_join
@@ -778,6 +1006,191 @@ theorem assembledTypedIncidenceRoute_eq_core_or_join
     left
     exact (assembledTypedIncidenceCoreRoute_eq_clause
       routing triple color clauseIndex set tripleEq).symm
+
+/-- Every pair of distinct colored typed incidence routes in the coordinated
+source assembly has full endpoint-aware separation.  Thus listed-point
+contacts, when they exist, occur only at advertised outer endpoints. -/
+theorem coordinatedSourceAssembledTypedIncidenceRoutes_avoidEachOther
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (lengthGeThree :
+      ∀ entry : ActiveOccurrenceEntry source.erase,
+        3 ≤ (occurrenceUnitSourceRoute
+          presentation.toPlanarIncidencePresentation entry).length)
+    (first second :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (firstColor secondColor : WireColor)
+    (different : (first.1, firstColor) ≠ (second.1, secondColor)) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesAvoidEachOther
+      (assembledTypedIncidenceRoute routing first firstColor)
+      (assembledTypedIncidenceRoute routing second secondColor) := by
+  dsimp only
+  let routing := coordinatedSourceRibbonThreeStrandRouting
+    presentation width compatible
+  have coreAvoid :=
+    assembledTypedIncidenceCoreRoutes_avoidEachOther
+      presentation anchorsZero width compatible first second
+      firstColor secondColor different
+  have firstParts :=
+    assembledTypedIncidenceRoute_eq_core_or_join
+      routing first firstColor
+  have secondParts :=
+    assembledTypedIncidenceRoute_eq_core_or_join
+      routing second secondColor
+  rcases firstParts with firstCore | firstJoined
+  · rcases secondParts with secondCore | secondJoined
+    · rw [firstCore, secondCore]
+      exact coreAvoid
+    · rcases secondJoined with
+        ⟨secondEntry, secondBoundary, secondTripleEq,
+          secondCoreLast, secondRouteHead, secondJoined⟩
+      have firstSecondRouteDifferent :
+          (first.1, firstColor) ≠
+            (routedOccurrenceTriple source.erase
+              secondEntry.1.1 secondEntry.1.2 secondColor,
+              secondColor) := by
+        simpa [secondTripleEq] using different
+      have coreRouteAvoid :=
+        assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRoute
+          presentation anchorsZero occurrences arity width normalized compatible
+          first firstColor secondEntry secondColor
+      have routeCoreContacts :=
+        assembledTypedIncidenceCoreRoute_meets_coordinatedSourceRoute_onlyAtFirstTail
+          presentation anchorsZero occurrences arity width normalized compatible
+          first firstColor secondEntry secondColor firstSecondRouteDifferent
+      have joinedAvoid := coreAvoid.join_right_of_tail_contact
+        coreRouteAvoid routeCoreContacts secondCoreLast secondRouteHead
+      rw [firstCore, secondJoined]
+      exact joinedAvoid
+  · rcases firstJoined with
+      ⟨firstEntry, firstBoundary, firstTripleEq,
+        firstCoreLast, firstRouteHead, firstJoined⟩
+    rcases secondParts with secondCore | secondJoined
+    · have secondFirstRouteDifferent :
+          (second.1, secondColor) ≠
+            (routedOccurrenceTriple source.erase
+              firstEntry.1.1 firstEntry.1.2 firstColor,
+              firstColor) := by
+        simpa [firstTripleEq] using different.symm
+      have secondCoreFirstRouteAvoid :=
+        assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRoute
+          presentation anchorsZero occurrences arity width normalized compatible
+          second secondColor firstEntry firstColor
+      have firstRouteSecondCoreContacts :=
+        assembledTypedIncidenceCoreRoute_meets_coordinatedSourceRoute_onlyAtFirstTail
+          presentation anchorsZero occurrences arity width normalized compatible
+          second secondColor firstEntry firstColor secondFirstRouteDifferent
+      have joinedAvoid := routesAvoidEachOther_comm
+        ((routesAvoidEachOther_comm coreAvoid).join_right_of_tail_contact
+          secondCoreFirstRouteAvoid firstRouteSecondCoreContacts
+          firstCoreLast firstRouteHead)
+      rw [firstJoined, secondCore]
+      exact joinedAvoid
+    · rcases secondJoined with
+        ⟨secondEntry, secondBoundary, secondTripleEq,
+          secondCoreLast, secondRouteHead, secondJoined⟩
+      have firstSecondRouteDifferent :
+          (first.1, firstColor) ≠
+            (routedOccurrenceTriple source.erase
+              secondEntry.1.1 secondEntry.1.2 secondColor,
+              secondColor) := by
+        simpa [secondTripleEq] using different
+      have secondFirstRouteDifferent :
+          (second.1, secondColor) ≠
+            (routedOccurrenceTriple source.erase
+              firstEntry.1.1 firstEntry.1.2 firstColor,
+              firstColor) := by
+        simpa [firstTripleEq] using different.symm
+      have firstAtomOwner :
+          ∃ atom, tripleMacrocellOwner first.1 = .atom atom := by
+        refine ⟨firstEntry.1.1, ?_⟩
+        rw [firstTripleEq]
+        exact routedOccurrenceTriple_atom_owner source.erase
+          firstEntry.1.1 firstEntry.1.2 firstColor
+      have secondAtomOwner :
+          ∃ atom, tripleMacrocellOwner second.1 = .atom atom := by
+        refine ⟨secondEntry.1.1, ?_⟩
+        rw [secondTripleEq]
+        exact routedOccurrenceTriple_atom_owner source.erase
+          secondEntry.1.1 secondEntry.1.2 secondColor
+      have firstCoreSecondRoute :=
+        assembledTypedIncidenceCoreRoute_strictlyAvoids_coordinatedSourceRoute_of_atom_owner
+          presentation anchorsZero width normalized compatible
+          first firstColor secondEntry secondColor firstAtomOwner
+          firstSecondRouteDifferent
+      have firstRouteSecondCore :=
+        (assembledTypedIncidenceCoreRoute_strictlyAvoids_coordinatedSourceRoute_of_atom_owner
+          presentation anchorsZero width normalized compatible
+          second secondColor firstEntry firstColor secondAtomOwner
+          secondFirstRouteDifferent).symm
+      have strandsDifferent :
+          RibbonStrandsDifferent firstEntry firstColor
+            secondEntry secondColor := by
+        intro strandsEq
+        apply different
+        rcases Prod.mk.inj strandsEq with ⟨entryEq, colorEq⟩
+        apply Prod.ext
+        · rw [firstTripleEq, secondTripleEq, entryEq, colorEq]
+        · exact colorEq
+      have routeRouteAvoid :=
+        coordinatedSourceRibbonThreeStrandRoutes_strictlyAvoidEachOther
+          presentation width compatible lengthGeThree strandsDifferent
+      have coreContactsAtHeads :
+          RoutesMeetOnlyAtHeads
+            (assembledTypedIncidenceCoreRoute routing first firstColor)
+            (assembledTypedIncidenceCoreRoute routing second secondColor) := by
+        apply coreAvoid.meetOnlyAtHeads_of_endpoints_ne
+        · intro equal
+          have firstHeadAtBoundary :
+              (assembledTypedIncidenceCoreRoute
+                routing first firstColor).head? = some secondBoundary :=
+            equal.trans secondCoreLast
+          exact
+            (firstCoreSecondRoute.2.2.2
+              secondBoundary
+              (List.mem_of_mem_head? firstHeadAtBoundary)
+              secondBoundary
+              (List.mem_of_mem_head? secondRouteHead) rfl).elim
+        · intro equal
+          have secondHeadAtBoundary :
+              (assembledTypedIncidenceCoreRoute
+                routing second secondColor).head? = some firstBoundary :=
+            equal.symm.trans firstCoreLast
+          exact
+            (firstRouteSecondCore.2.2.2
+              firstBoundary
+              (List.mem_of_mem_head? firstRouteHead)
+              firstBoundary
+              (List.mem_of_mem_head? secondHeadAtBoundary) rfl).elim
+        · intro equal
+          have firstLastAtBoundary :
+              (assembledTypedIncidenceCoreRoute
+                routing first firstColor).getLast? = some secondBoundary :=
+            equal.trans secondCoreLast
+          exact
+            (firstCoreSecondRoute.2.2.2
+              secondBoundary
+              (mem_of_getLast?_eq_some firstLastAtBoundary)
+              secondBoundary
+              (List.mem_of_mem_head? secondRouteHead) rfl).elim
+      have fullAvoid := coreAvoid.join_tails_of_prefixes
+        coreContactsAtHeads firstCoreSecondRoute firstRouteSecondCore
+        routeRouteAvoid firstCoreLast firstRouteHead
+        secondCoreLast secondRouteHead
+      rw [firstJoined, secondJoined]
+      exact fullAvoid
 
 /-- Every pair of distinct colored typed incidence routes in the coordinated
 source assembly avoids all segment-interior contacts. -/

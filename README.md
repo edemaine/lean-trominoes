@@ -115,8 +115,10 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Classify variable-core/occurrence contacts: every nonmatching
           routed triple/color is strictly separated, while the unique
           matching route retains only its intended variable-port splice.
-        - [ ] Prove endpoint-only contacts for distinct complete assembled
-          incidence routes and their periodic translates.
+        - [x] Prove endpoint-only contacts for distinct complete assembled
+          incidence routes.
+        - [ ] Lift endpoint-only contacts to stored routes and all relevant
+          periodic translates.
         - [ ] Preserve endpoint-only contacts through degree-two contraction
           and all three local endpoint-template normalization rounds.
       - [ ] Deduce global assignment collision freedom and matching ports for
@@ -4317,16 +4319,20 @@ The representation choices for this target are:
   corridor and clause-side fan.  Because those two suffixes are contact-free,
   both joins preserve either the variable-side fan's endpoint-aware contact
   law or, for a nonmatching routed triple/color, its strict separation.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseCoreRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseCoreRouteSeparation.lean)
+  proves the complementary clause-side contact classifier.  A complete
+  occurrence route can meet a finite clause core only at the occurrence
+  route's outer clause tail, and this property is preserved while the
+  variable fan, corridor, and clause fan are joined.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean)
   decomposes every typed incidence route into its finite gadget core and an
   optional coordinated occurrence suffix.  It combines core/core, both
   core/suffix directions, and suffix/suffix separation to prove that every
-  pair of distinct colored typed routes has disjoint segment interiors and
-  no listed point in the other route's interior.  Both the core/core and
-  core/complete-suffix stages now retain the stronger endpoint-aware
-  `RoutesAvoidEachOther` certificate.  Classifying the legal splice contacts
-  while joining two complete incidences remains the next endpoint-contact
-  obligation.
+  pair of distinct colored typed routes has full endpoint-aware
+  `RoutesAvoidEachOther` separation.  Variable-owned cores are strictly
+  separated from nonmatching suffixes; clause-owned contacts occur only at
+  the suffix's outer tail.  These classifications make all four assembly
+  cases preserve only advertised outer-endpoint contacts.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean)
   transports that decomposition through arbitrary physical translations,
   including the translated splice endpoint.  At the source level it augments
@@ -5756,8 +5762,8 @@ The representation choices for this target are:
   contact occurs at the spoke's terminal ring vertex.
 - [`LeanTrominoes/OrthogonalPolylineTailEndpointContactSeparation.lean`](LeanTrominoes/OrthogonalPolylineTailEndpointContactSeparation.lean)
   packages that asymmetric contact condition and proves the corresponding
-  composition rule: a strictly separated prefix can be joined to such a
-  tail-contacting final piece without losing ordinary route separation.  It
+  composition rules: a tail-contacting final piece can be joined on either
+  side of an ordinarily separated pair without losing route separation.  It
   also handles the two-sided splice used by unit elimination: local prefixes
   may meet only at their clause-side heads, inherited suffixes may meet only
   at their variable-side tails, and strictly separated cross pairs compose

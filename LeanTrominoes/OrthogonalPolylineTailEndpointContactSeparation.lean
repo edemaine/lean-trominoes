@@ -443,6 +443,82 @@ theorem RoutesAvoidEachOther.join_left_of_tail_contact
           firstLast extraHead contacts.1
       exact ⟨Or.inr joinedLast, contacts.2⟩
 
+/-- Joining a suffix onto the second route preserves ordinary separation
+when every contact with that suffix occurs at its outer tail.  If the splice
+boundary is also that tail, it remains the joined route's outer tail. -/
+theorem RoutesAvoidEachOther.join_right_of_tail_contact
+    {first second extra : List Cell}
+    {boundary : Cell}
+    (secondAvoid : RoutesAvoidEachOther first second)
+    (extraAvoid : RoutesAvoidEachOther first extra)
+    (extraContactsAtTail : RoutesMeetOnlyAtFirstTail extra first)
+    (secondLast : second.getLast? = some boundary)
+    (extraHead : extra.head? = some boundary) :
+    RoutesAvoidEachOther first (joinAtEndpoint second extra) := by
+  have joinedSegments :
+      gridPolylineSegments (joinAtEndpoint second extra) =
+        gridPolylineSegments second ++ gridPolylineSegments extra :=
+    gridPolylineSegments_joinAtEndpoint secondLast extraHead
+  apply routesAvoidEachOther_of_mem
+  · intro firstSegment firstMember joinedSegment joinedMember
+    rw [joinedSegments, List.mem_append] at joinedMember
+    rcases joinedMember with secondMember | extraMember
+    · exact secondAvoid.segmentsAvoid_of_mem
+        firstSegment firstMember joinedSegment secondMember
+    · exact extraAvoid.segmentsAvoid_of_mem
+        firstSegment firstMember joinedSegment extraMember
+  · intro firstPoint firstMember joinedSegment joinedMember
+    rw [joinedSegments, List.mem_append] at joinedMember
+    rcases joinedMember with secondMember | extraMember
+    · exact secondAvoid.firstPointsAvoid_of_mem
+        firstPoint firstMember joinedSegment secondMember
+    · exact extraAvoid.firstPointsAvoid_of_mem
+        firstPoint firstMember joinedSegment extraMember
+  · intro joinedPoint joinedMember firstSegment firstMember
+    rcases mem_joinAtEndpoint joinedMember with
+      secondMember | extraMember
+    · exact secondAvoid.secondPointsAvoid_of_mem
+        joinedPoint secondMember firstSegment firstMember
+    · exact extraAvoid.secondPointsAvoid_of_mem
+        joinedPoint extraMember firstSegment firstMember
+  · intro firstPoint firstMember joinedPoint joinedMember equal
+    rcases mem_joinAtEndpoint joinedMember with
+      secondMember | extraMember
+    · rcases List.mem_iff_get.mp firstMember with
+        ⟨firstIndex, firstEq⟩
+      rcases List.mem_iff_get.mp secondMember with
+        ⟨secondIndex, secondEq⟩
+      have endpoints :=
+        secondAvoid.2.2.2 firstIndex secondIndex
+          (firstEq.trans (equal.trans secondEq.symm))
+      rw [firstEq, secondEq] at endpoints
+      rcases endpoints.2 with secondHead | secondTail
+      · exact
+          ⟨endpoints.1,
+            Or.inl (joinAtEndpoint_head? secondHead)⟩
+      · have joinedAtBoundary : joinedPoint = boundary :=
+          Option.some.inj (secondTail.symm.trans secondLast)
+        have boundaryMember : boundary ∈ extra :=
+          List.mem_of_mem_head? extraHead
+        have contacts :=
+          extraContactsAtTail boundary boundaryMember
+            firstPoint firstMember (joinedAtBoundary.symm.trans equal.symm)
+        have joinedLast :
+            (joinAtEndpoint second extra).getLast? = some boundary :=
+          joinAtEndpoint_getLast?
+            secondLast extraHead contacts.1
+        exact
+          ⟨contacts.2,
+            Or.inr (by simpa [joinedAtBoundary] using joinedLast)⟩
+    · have contacts :=
+        extraContactsAtTail joinedPoint extraMember
+          firstPoint firstMember equal.symm
+      have joinedLast :
+          (joinAtEndpoint second extra).getLast? = some joinedPoint :=
+        joinAtEndpoint_getLast?
+          secondLast extraHead contacts.1
+      exact ⟨contacts.2, Or.inr joinedLast⟩
+
 end EmbeddedCNFIncidenceDrawing
 end PlanarThreeSAT
 end LeanTrominoes
