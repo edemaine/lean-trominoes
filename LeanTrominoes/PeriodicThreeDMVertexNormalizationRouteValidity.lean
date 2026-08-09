@@ -761,5 +761,367 @@ theorem ContinuousPlanarPresentation.normalizationRoute1_unitSteps
   · exact targetEndpoint.firstNormalizationTemplate_getLast?
       planar targetUsed
 
+/-! ## Cyclic normalization rounds -/
+
+/-- Every first-round template has enough points and takes its first step
+through the endpoint's first canonical port. -/
+theorem ContractedEndpoint.firstNormalizationTemplate_geometry
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    let template := endpoint.firstNormalizationTemplate presentation
+    template.head? = some center ∧
+      4 ≤ template.length ∧
+      template.IsChain AxisDirection.IsUnitAxisStep ∧
+      template.tail.head? = some (Cell.add center
+        (endpoint.firstNormalizedPort presentation).direction.step) := by
+  unfold ContractedEndpoint.firstNormalizationTemplate
+    ContractedEndpoint.firstNormalizedPort
+  cases omittedSideAt presentation endpoint.vertex <;>
+    cases endpoint.outwardSide presentation <;> native_decide
+
+/-- Any nondegenerate orthogonal route leaves at least seven points after
+the normalization clearance trim. -/
+theorem trimmedMagnifiedRoute_length_ge_seven_of_length_ge_two
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points) :
+    7 ≤ (trimmedMagnifiedRoute points).length := by
+  obtain ⟨first, second, rest, equation⟩ :=
+    List.exists_eq_cons_cons_of_length_ge_two length
+  rw [equation] at orthogonal ⊢
+  apply trimmedMagnifiedRoute_length_ge_seven
+    (first := first) (second := second)
+  · simp
+  · simp
+  · exact (List.isChain_cons_cons.mp orthogonal).1
+
+/-- A complete normalization splice preserves the source and target
+vertices and the first outward step named by each local template. -/
+theorem normalizeRouteWithTemplates_endpointGeometry
+    (sourcePosition targetPosition : Cell)
+    (sourceTemplate targetTemplate oldRoute : List Cell)
+    {sourceDirection targetDirection : AxisDirection}
+    (targetGenuine : targetDirection.IsGenuine)
+    (middleLength : 2 ≤ (trimmedMagnifiedRoute oldRoute).length)
+    (sourceHead : sourceTemplate.head? = some center)
+    (sourceSecond : sourceTemplate.tail.head? =
+      some (Cell.add center sourceDirection.step))
+    (targetHead : targetTemplate.head? = some center)
+    (targetSecond : targetTemplate.tail.head? =
+      some (Cell.add center targetDirection.step))
+    (targetLength : 4 ≤ targetTemplate.length) :
+    let route := normalizeRouteWithTemplates
+      sourcePosition targetPosition sourceTemplate targetTemplate oldRoute
+    route.head? = some (normalizeVertexPosition sourcePosition) ∧
+      route.tail.head? = some (Cell.add
+        (normalizeVertexPosition sourcePosition) sourceDirection.step) ∧
+      route.getLast? = some (normalizeVertexPosition targetPosition) ∧
+      route.reverse.tail.head? = some (Cell.add
+        (normalizeVertexPosition targetPosition) targetDirection.step) := by
+  dsimp only
+  constructor
+  · unfold normalizeRouteWithTemplates
+    apply joinAtEndpoint_head?
+    exact normalizationTemplateAt_head? sourcePosition sourceHead
+  constructor
+  · unfold normalizeRouteWithTemplates
+    apply joinAtEndpoint_tail_head?
+    rw [normalizationTemplateAt_tail_head? sourcePosition sourceSecond]
+    simp [normalizeVertexPosition, Cell.add_assoc]
+  constructor
+  · apply normalizeRouteWithTemplates_getLast?
+    · exact middleLength
+    · exact targetHead
+    · exact le_trans (by omega) targetLength
+  · have targetFirstDirection :
+        AxisDirection.polylineFirstDirection targetTemplate =
+          targetDirection := by
+      cases targetTemplate with
+      | nil => simp at targetHead
+      | cons first rest =>
+          cases rest with
+          | nil => simp at targetSecond
+          | cons second rest =>
+              have firstEqual : first = center := Option.some.inj targetHead
+              have secondEqual : second =
+                  Cell.add center targetDirection.step := by
+                simpa using Option.some.inj targetSecond
+              subst first
+              subst second
+              rw [AxisDirection.polylineFirstDirection]
+              exact AxisDirection.between_add_step center
+                targetGenuine
+    simpa [targetFirstDirection] using
+      normalizeRouteWithTemplates_reverse_tail_head?
+        sourcePosition targetPosition sourceTemplate targetTemplate oldRoute
+        middleLength
+        (by simpa [targetFirstDirection] using targetSecond)
+        targetLength
+
+/-- The first normalization round advertises exactly the endpoint geometry
+needed by the first cyclic round. -/
+theorem ContinuousPlanarPresentation.normalizationRoute1_endpointGeometry
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    let planar := presentation.toPlanarPresentation
+    let sourcePort :=
+      (ContractedEndpoint.source edge).firstNormalizedPort planar
+    let targetPort :=
+      (ContractedEndpoint.target edge).firstNormalizedPort planar
+    (planar.normalizationRoute1 edge).head? =
+        some (planar.normalizationPosition1 edge.toPeriodicEdge.source) ∧
+      (planar.normalizationRoute1 edge).tail.head? =
+        some (Cell.add
+          (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+          sourcePort.direction.step) ∧
+      (planar.normalizationRoute1 edge).getLast? =
+        some (planar.normalizationTarget1 edge) ∧
+      (planar.normalizationRoute1 edge).reverse.tail.head? =
+        some (Cell.add (planar.normalizationTarget1 edge)
+          targetPort.direction.step) := by
+  dsimp only
+  let planar := presentation.toPlanarPresentation
+  have oldLength :=
+    planar.contractedEdgeRoute_length_ge_two degree edgeMember
+  have oldOrthogonal :=
+    planar.contractedEdgeRoute_orthogonal_of_mem edgeMember
+  have middleLength :
+      2 ≤ (trimmedMagnifiedRoute
+        (planar.contractedEdgeRoute edge)).length :=
+    le_trans (by omega)
+      (trimmedMagnifiedRoute_length_ge_seven_of_length_ge_two
+        oldLength oldOrthogonal)
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  have sourceGeometry :=
+    sourceEndpoint.firstNormalizationTemplate_geometry planar
+  have targetGeometry :=
+    targetEndpoint.firstNormalizationTemplate_geometry planar
+  have result := normalizeRouteWithTemplates_endpointGeometry
+    (planar.normalizationPosition0 edge.toPeriodicEdge.source)
+    (planar.normalizationTarget0 edge)
+    (sourceEndpoint.firstNormalizationTemplate planar)
+    (targetEndpoint.firstNormalizationTemplate planar)
+    (planar.contractedEdgeRoute edge)
+    (targetGenuine :=
+      CanonicalVertexPort.direction_isGenuine
+        (targetEndpoint.firstNormalizedPort planar))
+    middleLength
+    sourceGeometry.1 sourceGeometry.2.2.2
+    targetGeometry.1 targetGeometry.2.2.2
+    targetGeometry.2.1
+  simpa [PlanarPresentation.normalizationRoute1,
+    PlanarPresentation.normalizationPosition1,
+    PlanarPresentation.normalizationTarget1,
+    sourceEndpoint, targetEndpoint] using result
+
+/-- The first cyclic-rotation round preserves the unit-step invariant. -/
+theorem ContinuousPlanarPresentation.normalizationRoute2_unitSteps
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    (presentation.toPlanarPresentation.normalizationRoute2 edge).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  let planar := presentation.toPlanarPresentation
+  let oldRoute := planar.normalizationRoute1 edge
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  let sourcePort := sourceEndpoint.firstNormalizedPort planar
+  let targetPort := targetEndpoint.firstNormalizedPort planar
+  have oldUnitSteps : oldRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    presentation.normalizationRoute1_unitSteps
+      wellFormed degree edgeMember
+  have oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute :=
+    oldUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have endpoints := presentation.normalizationRoute1_endpointGeometry
+    degree edgeMember
+  have sourceStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+      (Cell.add
+        (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+        sourcePort.direction.step) :=
+    ⟨sourcePort.direction,
+      CanonicalVertexPort.direction_isGenuine sourcePort, rfl⟩
+  have targetStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationTarget1 edge)
+      (Cell.add (planar.normalizationTarget1 edge)
+        targetPort.direction.step) :=
+    ⟨targetPort.direction,
+      CanonicalVertexPort.direction_isGenuine targetPort, rfl⟩
+  have sourceGeometry :=
+    sourceEndpoint.secondNormalizationTemplate_geometry planar
+  have targetGeometry :=
+    targetEndpoint.secondNormalizationTemplate_geometry planar
+  unfold PlanarPresentation.normalizationRoute2
+  apply normalizeRouteWithTemplates_unitSteps
+    (sourceNext := Cell.add
+      (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+      sourcePort.direction.step)
+    (targetBefore := Cell.add (planar.normalizationTarget1 edge)
+      targetPort.direction.step)
+    (sourceDirection := sourcePort.direction)
+    (targetDirection := targetPort.direction)
+  · exact oldOrthogonal
+  · exact endpoints.1
+  · exact endpoints.2.1
+  · exact endpoints.2.2.1
+  · exact endpoints.2.2.2
+  · exact sourceStep.isAxisAligned
+  · exact targetStep.symm.isAxisAligned
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine sourcePort)
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine targetPort)
+  · exact sourceGeometry.2.2.1
+  · exact targetGeometry.2.2.1
+  · exact sourceEndpoint.secondNormalizationTemplate_getLast? planar
+  · exact targetEndpoint.secondNormalizationTemplate_getLast? planar
+
+/-- The first cyclic round advertises the endpoint geometry consumed by the
+final cyclic round. -/
+theorem ContinuousPlanarPresentation.normalizationRoute2_endpointGeometry
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    let planar := presentation.toPlanarPresentation
+    let sourcePort :=
+      (ContractedEndpoint.source edge).secondNormalizedPort planar
+    let targetPort :=
+      (ContractedEndpoint.target edge).secondNormalizedPort planar
+    (planar.normalizationRoute2 edge).head? =
+        some (planar.normalizationPosition2 edge.toPeriodicEdge.source) ∧
+      (planar.normalizationRoute2 edge).tail.head? =
+        some (Cell.add
+          (planar.normalizationPosition2 edge.toPeriodicEdge.source)
+          sourcePort.direction.step) ∧
+      (planar.normalizationRoute2 edge).getLast? =
+        some (planar.normalizationTarget2 edge) ∧
+      (planar.normalizationRoute2 edge).reverse.tail.head? =
+        some (Cell.add (planar.normalizationTarget2 edge)
+          targetPort.direction.step) := by
+  dsimp only
+  let planar := presentation.toPlanarPresentation
+  let oldRoute := planar.normalizationRoute1 edge
+  have oldEndpoints := presentation.normalizationRoute1_endpointGeometry
+    degree edgeMember
+  have oldLength : 2 ≤ oldRoute.length :=
+    List.two_le_length_of_tail_head?_eq_some oldEndpoints.2.1
+  have oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute := by
+    have oldUnitSteps := presentation.normalizationRoute1_unitSteps
+      wellFormed degree edgeMember
+    exact oldUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have middleLength : 2 ≤ (trimmedMagnifiedRoute oldRoute).length :=
+    le_trans (by omega)
+      (trimmedMagnifiedRoute_length_ge_seven_of_length_ge_two
+        oldLength oldOrthogonal)
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  have sourceGeometry :=
+    sourceEndpoint.secondNormalizationTemplate_geometry planar
+  have targetGeometry :=
+    targetEndpoint.secondNormalizationTemplate_geometry planar
+  have result := normalizeRouteWithTemplates_endpointGeometry
+    (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+    (planar.normalizationTarget1 edge)
+    (sourceEndpoint.secondNormalizationTemplate planar)
+    (targetEndpoint.secondNormalizationTemplate planar)
+    oldRoute
+    (targetGenuine :=
+      CanonicalVertexPort.direction_isGenuine
+        (targetEndpoint.secondNormalizedPort planar))
+    middleLength
+    sourceGeometry.1
+    (sourceEndpoint.secondNormalizationTemplate_secondPoint planar)
+    targetGeometry.1
+    (targetEndpoint.secondNormalizationTemplate_secondPoint planar)
+    (le_trans (by omega)
+      (rotationRoundPortAndRoute_length_ge_four
+        (firstRotationActive planar targetEndpoint.vertex)
+        (targetEndpoint.firstNormalizedPort planar)))
+  simpa [PlanarPresentation.normalizationRoute2,
+    PlanarPresentation.normalizationPosition2,
+    PlanarPresentation.normalizationTarget2,
+    sourceEndpoint, targetEndpoint] using result
+
+/-- All three concrete replacement rounds preserve the unit-step
+invariant; in particular this discharges the rasterizer's unit-step
+hypothesis for every final normalized route. -/
+theorem ContinuousPlanarPresentation.finalNormalizationRoute_unitSteps
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    (presentation.toPlanarPresentation.finalNormalizationRoute edge).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  let planar := presentation.toPlanarPresentation
+  let oldRoute := planar.normalizationRoute2 edge
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  let sourcePort := sourceEndpoint.secondNormalizedPort planar
+  let targetPort := targetEndpoint.secondNormalizedPort planar
+  have oldUnitSteps : oldRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    presentation.normalizationRoute2_unitSteps
+      wellFormed degree edgeMember
+  have oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute :=
+    oldUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have endpoints := presentation.normalizationRoute2_endpointGeometry
+    wellFormed degree edgeMember
+  have sourceStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationPosition2 edge.toPeriodicEdge.source)
+      (Cell.add
+        (planar.normalizationPosition2 edge.toPeriodicEdge.source)
+        sourcePort.direction.step) :=
+    ⟨sourcePort.direction,
+      CanonicalVertexPort.direction_isGenuine sourcePort, rfl⟩
+  have targetStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationTarget2 edge)
+      (Cell.add (planar.normalizationTarget2 edge)
+        targetPort.direction.step) :=
+    ⟨targetPort.direction,
+      CanonicalVertexPort.direction_isGenuine targetPort, rfl⟩
+  have sourceGeometry :=
+    sourceEndpoint.finalNormalizationTemplate_geometry planar
+  have targetGeometry :=
+    targetEndpoint.finalNormalizationTemplate_geometry planar
+  unfold PlanarPresentation.finalNormalizationRoute
+  apply normalizeRouteWithTemplates_unitSteps
+    (sourceNext := Cell.add
+      (planar.normalizationPosition2 edge.toPeriodicEdge.source)
+      sourcePort.direction.step)
+    (targetBefore := Cell.add (planar.normalizationTarget2 edge)
+      targetPort.direction.step)
+    (sourceDirection := sourcePort.direction)
+    (targetDirection := targetPort.direction)
+  · exact oldOrthogonal
+  · exact endpoints.1
+  · exact endpoints.2.1
+  · exact endpoints.2.2.1
+  · exact endpoints.2.2.2
+  · exact sourceStep.isAxisAligned
+  · exact targetStep.symm.isAxisAligned
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine sourcePort)
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine targetPort)
+  · exact sourceGeometry.2.2.1
+  · exact targetGeometry.2.2.1
+  · exact sourceEndpoint.finalNormalizationTemplate_getLast? planar
+  · exact targetEndpoint.finalNormalizationTemplate_getLast? planar
+
 end PeriodicThreeDM
 end LeanTrominoes

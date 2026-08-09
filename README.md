@@ -6706,6 +6706,9 @@ The representation choices for this target are:
   that each complete two-ended splice is a unit-step route.  Instantiating
   it with the contracted drawing and its certified nonomitted endpoint sides
   proves that every first-round `normalizationRoute1` is a unit-step chain.
+  The preserved endpoint/adjacent-point interface then lifts this invariant
+  through both cyclic-rotation rounds, proving every
+  `finalNormalizationRoute` is a unit-step chain.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
