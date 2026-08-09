@@ -6597,6 +6597,11 @@ The representation choices for this target are:
   port-rotation template from Lemma 2.3.  Finite computation verifies exact
   endpoints, unit rectilinear steps, square containment, the omitted-side
   permutation, and disjointness away from the common vertex center.
+- [`LeanTrominoes/DegreeThreeVertexNormalizationPorts.lean`](LeanTrominoes/DegreeThreeVertexNormalizationPorts.lean)
+  formalizes the finite port bookkeeping behind those templates.  It inverts
+  the omitted-side permutation, tracks zero, one, or two cyclic rotations,
+  moves the red incidence to the north port, and proves that the resulting
+  RGB assignment exactly matches one of the two trichromatic cell types.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
