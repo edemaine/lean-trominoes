@@ -84,6 +84,39 @@ def RelativeIncidenceRoutesAvoidEachOther
               (Cell.add
                 (placement.translation relativeTranslate)))
 
+/-- Anonymous flat-route relative separation can be reindexed by the
+metadata-rich positioned incidences that generated those routes. -/
+theorem relativeIncidenceRoutesAvoidEachOther_of_incidenceDrawing
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : IncidenceRoutes)
+    (periodPositive : 0 < placement.period)
+    (separated :
+      (incidenceDrawing source placement routes)
+        |>.RelativeLiftedRoutesAvoidEachOther) :
+    RelativeIncidenceRoutesAvoidEachOther source placement routes := by
+  intro first firstMember second secondMember
+    relativeTranslate occurrencesDifferent
+  have firstRouteMember := taggedRoute_mem_of_taggedIncidence
+    source placement routes firstMember
+  have secondRouteMember := taggedRoute_mem_of_taggedIncidence
+    source placement routes secondMember
+  have avoids := separated
+    (routes first.1.clauseIndex first.1.literalIndex, first.2)
+      firstRouteMember
+    (routes second.1.clauseIndex second.1.literalIndex, second.2)
+      secondRouteMember
+    relativeTranslate occurrencesDifferent
+  have translationEqual :
+      (incidenceDrawing source placement routes).periodTranslation
+          relativeTranslate =
+        placement.translation relativeTranslate := by
+    simp [PeriodicGridDrawing.periodTranslation,
+      PeriodicVariablePlacement.translation,
+      incidenceDrawing_gridSize source placement routes periodPositive]
+  rwa [translationEqual] at avoids
+
 /-- To prove relative incidence separation, it is enough to handle distinct
 stored incidences at zero shift and arbitrary incidences at every nonzero
 relative lattice shift. -/
