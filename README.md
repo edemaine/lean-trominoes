@@ -6677,6 +6677,11 @@ The representation choices for this target are:
   therefore finds its contracted-edge color at its computed final normalized
   port, and both the trichromatic and monochromatic vertex cell constructors
   are proved to expose that color there.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationAssignmentLookup.lean`](LeanTrominoes/PeriodicThreeDMNormalizationAssignmentLookup.lean)
+  isolates raster collision freedom as duplicate-freeness of assigned torus
+  locations.  Under this one explicit invariant, every listed degree-three
+  vertex and every emitted route-interior assignment is recovered exactly by
+  the compiled cell lookup.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
