@@ -1127,6 +1127,111 @@ theorem ContinuousPlanarPresentation.finalNormalizationRoute_unitSteps
 
 /-! ## Preservation of nonreversal -/
 
+/-- Every first-round Figure 2 template avoids an immediate reversal. -/
+theorem firstNormalizationRoute_hasNoImmediateReversal
+    (omitted : VertexSide) (port : CanonicalVertexPort) :
+    AxisDirection.HasNoImmediateReversal
+      (route omitted port) := by
+  cases omitted <;> cases port <;>
+    simp [route, AxisDirection.HasNoImmediateReversal,
+      AxisDirection.between, AxisDirection.opposite]
+
+/-- The last directed step of a Figure 2 template points toward the old
+boundary side reached by that template. -/
+theorem firstNormalizationRoute_lastDirection
+    (omitted : VertexSide) (port : CanonicalVertexPort) :
+    AxisDirection.polylineLastDirection (route omitted port) =
+      (boundarySide omitted port).direction := by
+  cases omitted <;> cases port <;> native_decide
+
+/-- Either cyclic-rotation template finishes in the incoming old port's
+direction. -/
+theorem rotationRoundPortAndRoute_lastDirection
+    (active : Bool) (oldPort : CanonicalVertexPort) :
+    AxisDirection.polylineLastDirection
+        (rotationRoundPortAndRoute active oldPort).2 =
+      oldPort.direction := by
+  cases active <;> cases oldPort <;> native_decide
+
+/-- Every selected first-round endpoint template avoids an immediate
+reversal. -/
+theorem ContractedEndpoint.firstNormalizationTemplate_noImmediateReversal
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    AxisDirection.HasNoImmediateReversal
+      (endpoint.firstNormalizationTemplate presentation) := by
+  exact firstNormalizationRoute_hasNoImmediateReversal
+    (omittedSideAt presentation endpoint.vertex)
+    (endpoint.firstNormalizedPort presentation)
+
+/-- Every selected first cyclic-round endpoint template avoids an immediate
+reversal. -/
+theorem ContractedEndpoint.secondNormalizationTemplate_noImmediateReversal
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    AxisDirection.HasNoImmediateReversal
+      (endpoint.secondNormalizationTemplate presentation) := by
+  simpa [ContractedEndpoint.secondNormalizationTemplate] using
+    rotationRoundPortAndRoute_noImmediateReversal
+      (firstRotationActive presentation endpoint.vertex)
+      (endpoint.firstNormalizedPort presentation)
+
+/-- A first-round endpoint template finishes in the endpoint's original
+outward direction. -/
+theorem ContractedEndpoint.firstNormalizationTemplate_lastDirection
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint)
+    (used : endpoint.outwardSide presentation ≠
+      omittedSideAt presentation endpoint.vertex) :
+    AxisDirection.polylineLastDirection
+        (endpoint.firstNormalizationTemplate presentation) =
+      (endpoint.outwardSide presentation).direction := by
+  unfold ContractedEndpoint.firstNormalizationTemplate
+  rw [firstNormalizationRoute_lastDirection]
+  rw [ContractedEndpoint.firstNormalizedPort,
+    boundarySide_canonicalPortForSide _ _ used]
+
+/-- A first cyclic-round endpoint template finishes in its incoming
+first-round port direction. -/
+theorem ContractedEndpoint.secondNormalizationTemplate_lastDirection
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    AxisDirection.polylineLastDirection
+        (endpoint.secondNormalizationTemplate presentation) =
+      (endpoint.firstNormalizedPort presentation).direction := by
+  simpa [ContractedEndpoint.secondNormalizationTemplate] using
+    rotationRoundPortAndRoute_lastDirection
+      (firstRotationActive presentation endpoint.vertex)
+      (endpoint.firstNormalizedPort presentation)
+
+/-- A final cyclic-round endpoint template finishes in its incoming
+second-round port direction. -/
+theorem ContractedEndpoint.finalNormalizationTemplate_lastDirection
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    AxisDirection.polylineLastDirection
+        (endpoint.finalNormalizationTemplate presentation) =
+      (endpoint.secondNormalizedPort presentation).direction := by
+  simpa [ContractedEndpoint.finalNormalizationTemplate] using
+    rotationRoundPortAndRoute_lastDirection
+      (secondRotationActive presentation endpoint.vertex)
+      (endpoint.secondNormalizedPort presentation)
+
+/-- Translating a local normalization template preserves absence of
+immediate reversals. -/
+theorem normalizationTemplateAt_hasNoImmediateReversal
+    (position : Cell) {template : List Cell}
+    (noReversal : AxisDirection.HasNoImmediateReversal template) :
+    AxisDirection.HasNoImmediateReversal
+      (normalizationTemplateAt position template) := by
+  exact noReversal.translate
+    (Cell.scale vertexNormalizationScale position)
+
 /-- Taking an initial segment preserves absence of immediate reversals. -/
 theorem hasNoImmediateReversal_take
     {points : List Cell}

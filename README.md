@@ -6711,7 +6711,10 @@ The representation choices for this target are:
   `finalNormalizationRoute` is a unit-step chain.  For the remaining
   validity invariant, continuous planarity rules out reversals in every
   contracted route, and affine magnification, unit subdivision, and trimming
-  are proved to preserve that nonreversal property.
+  are proved to preserve that nonreversal property.  All finite Figure 2 and
+  cyclic-rotation templates are also certified nonreversing, with their final
+  directed steps identified as the exact incoming old endpoint directions;
+  these are the local facts needed to verify both splice boundaries.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
