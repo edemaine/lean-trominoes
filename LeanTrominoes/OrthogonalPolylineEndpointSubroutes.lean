@@ -106,6 +106,51 @@ theorem translate
 
 end EndpointSubroute
 
+/-- Membership-form consequence of listed-point/interior separation. -/
+theorem RoutePointsAvoidInteriors.not_interior_of_mem
+    {first second : List Cell}
+    (avoids : RoutePointsAvoidInteriors first second)
+    {point : Cell} (pointMember : point ∈ first)
+    {segment : GridSegment}
+    (segmentMember : segment ∈ gridPolylineSegments second) :
+    ¬segment.InteriorContains point := by
+  rcases List.mem_iff_get.mp pointMember with
+    ⟨pointIndex, pointAt⟩
+  rcases List.mem_iff_get.mp segmentMember with
+    ⟨segmentIndex, segmentAt⟩
+  rw [← pointAt, ← segmentAt]
+  exact avoids pointIndex segmentIndex
+
+/-- Points of one supported subroute avoid interiors of another supported
+subroute of the same geometrically simple source route. -/
+theorem routeIsSimple_endpointSubroutePointsAvoidInteriors
+    {source firstFragment secondFragment : List Cell}
+    (simple : LocalIncidenceDrawing.RouteIsSimple source)
+    (firstSubroute : EndpointSubroute firstFragment source)
+    (secondSubroute : EndpointSubroute secondFragment source) :
+    RoutePointsAvoidInteriors firstFragment secondFragment := by
+  intro pointIndex segmentIndex interior
+  let point := firstFragment.get pointIndex
+  let segment :=
+    (gridPolylineSegments secondFragment).get segmentIndex
+  have pointMember : point ∈ firstFragment :=
+    List.get_mem _ pointIndex
+  have segmentMember : segment ∈
+      gridPolylineSegments secondFragment :=
+    List.get_mem _ segmentIndex
+  change segment.InteriorContains point at interior
+  rcases secondSubroute.segmentsSupported segment segmentMember with
+    ⟨sourceSegment, sourceSegmentMember, forward | reversed⟩
+  · apply simple.2.1 point
+      (firstSubroute.pointsSubset point pointMember)
+      sourceSegment sourceSegmentMember
+    rwa [forward] at interior
+  · apply simple.2.1 point
+      (firstSubroute.pointsSubset point pointMember)
+      sourceSegment sourceSegmentMember
+    rw [reversed] at interior
+    exact (GridSegment.interiorContains_reverse _ _).mp interior
+
 /-- Complete continuous separation passes to endpoint-respecting fragments
 of both routes. -/
 theorem RoutesAvoidEachOther.endpointSubroutes
