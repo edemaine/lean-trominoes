@@ -173,6 +173,32 @@ theorem variableSiteRoute_avoids_coordinatedRouteInteriors
       compatible slot active
       ((data.kind slot).ribbonLaneForColor gateColor)
 
+/-- A core route from another occurrence module has complete endpoint-aware
+separation from the coordinated local-plus-outer fan. -/
+theorem variableSiteRoute_avoids_coordinatedRoute_of_slot_ne
+    (data : VariableRibbonFanData)
+    (compatible : data.IsClockwiseCompatible)
+    (slot : VariableSiteSlot)
+    (active : data.SlotActive slot)
+    (triple : ActiveVariableSiteTriple data.count data.kind)
+    (routeColor gateColor : WireColor)
+    (differentSlot : triple.1.slot ≠ slot) :
+    RoutesAvoidEachOther
+      (translatePolyline standardThreeStrandLayout.variableOffset
+        ((variableSiteDrawing data.count data.kind data.polarity).route
+          triple routeColor))
+      (data.coordinatedRoute slot gateColor) := by
+  apply RoutesAvoidEachOther.join_right_of_strict_suffix
+    (data.variableSiteRoute_avoids_localGateRoute_of_slot_ne
+      slot active triple routeColor gateColor differentSlot)
+    (data.variableSiteRoute_strictlyAvoids_outerRoute
+      compatible slot active triple routeColor gateColor)
+  · exact standardVariableLocalGateRoute_getLast?
+      slot (data.kind slot) (data.polarity slot) gateColor
+  · exact data.outerData.outerRoute_head?
+      compatible slot active
+      ((data.kind slot).ribbonLaneForColor gateColor)
+
 /-- The finite variable-site route selected by a colored occurrence is
 contact-free from the matching physical-lane outer route. -/
 theorem routedVariableSiteRoute_strictlyAvoids_outerRoute

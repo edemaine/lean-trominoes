@@ -82,6 +82,11 @@ instance : Fintype VariableSiteTriple :=
 
 namespace VariableSiteTriple
 
+/-- Occurrence-module slot containing a variable-site triple. -/
+def slot : VariableSiteTriple → VariableSiteSlot
+  | .ordinary slot _ _ => slot
+  | .fixedRed slot _ => slot
+
 /-- Whether a candidate triple belongs to the connector selected for its
 slot. -/
 def MatchesKind

@@ -77,6 +77,77 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStubInteriors
     translatePolyline_add, coreEq, Cell.add, add_comm] using
       translatedAvoid
 
+/-- Within one source variable, a core route and a coordinated fan from a
+different occurrence module have complete endpoint-aware separation. -/
+theorem sourceVariableSiteRoute_avoids_coordinatedVariableStub_of_slot_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (compatible : SourceRibbonFansClockwiseCompatible presentation)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (triple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase entry.1.1)
+        (sourceVariableSiteKind source.erase entry.1.1))
+    (coreColor routeColor : WireColor)
+    (differentSlot :
+      triple.1.slot ≠ occurrenceVariableSiteSlot entry.1.2) :
+    RoutesAvoidEachOther
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout
+          entry.1.1)
+        ((sourceVariableSiteDrawing source.erase entry.1.1).route
+          triple coreColor))
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation entry routeColor) := by
+  let data := sourceVariableRibbonFanData presentation entry
+  let slot := occurrenceVariableSiteSlot entry.1.2
+  have active : data.SlotActive slot :=
+    VariableRibbonFanData.sourceVariableRibbonFanData_slotActive
+      presentation entry
+  let dataTriple : ActiveVariableSiteTriple data.count data.kind :=
+    ⟨triple.1, by
+      rw [VariableRibbonFanData.sourceVariableRibbonFanData_count
+        presentation entry]
+      change VariableSiteTriple.MatchesKind
+        (sourceVariableSiteCount source.erase entry.1.1)
+        (sourceVariableSiteKind source.erase entry.1.1) triple.1
+      exact triple.2⟩
+  have localAvoid :=
+    data.variableSiteRoute_avoids_coordinatedRoute_of_slot_ne
+      (compatible.1 entry) slot active dataTriple coreColor routeColor
+      (by simpa [dataTriple, slot] using differentSlot)
+  have coreEq :
+      (variableSiteDrawing data.count data.kind data.polarity).route
+          dataTriple coreColor =
+        (sourceVariableSiteDrawing source.erase entry.1.1).route
+          triple coreColor := by
+    unfold sourceVariableSiteDrawing
+    apply variableSiteDrawing_route_eq_of_indices_eq
+    · exact VariableRibbonFanData.sourceVariableRibbonFanData_count
+        presentation entry
+    · rfl
+    · rfl
+    · rfl
+  have translatedAvoid :
+      RoutesAvoidEachOther
+        (translatePolyline
+          (ribbonMacrocellOrigin (placement.position entry.1.1))
+          (translatePolyline standardThreeStrandLayout.variableOffset
+            ((variableSiteDrawing data.count data.kind data.polarity).route
+              dataTriple coreColor)))
+        (translatePolyline
+          (ribbonMacrocellOrigin (placement.position entry.1.1))
+          (data.coordinatedRoute slot routeColor)) := by
+    simpa [PeriodicOrthocrossing.translatePolyline] using
+      routesAvoidEachOther_translate localAvoid
+        (ribbonMacrocellOrigin (placement.position entry.1.1))
+  simpa [data, slot, occurrenceCoordinatedRibbonVariableStub,
+    constructedVariableOrigin, ribbonMacrocellOrigin,
+    translatePolyline_add, coreEq, Cell.add, add_comm] using
+      translatedAvoid
+
 /-- A route in any source variable core avoids the segment interiors of any
 coordinated source-variable fan.  Equal owners use the finite all-pairs
 certificate; distinct owners are strictly separated macrocells. -/

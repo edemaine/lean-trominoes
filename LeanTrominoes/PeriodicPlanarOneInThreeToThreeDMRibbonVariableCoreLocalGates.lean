@@ -284,6 +284,27 @@ theorem variableSiteRoute_avoids_standardVariableLocalGateRoute :
             slot (kind slot) (polarity slot) gateColor) := by
   native_decide
 
+/-- A finite variable-site route and a gate belonging to a different
+occurrence module have complete endpoint-aware separation.  Thus all
+non-endpoint listed contacts admitted by the preceding all-pairs theorem
+are local to one occurrence module. -/
+theorem variableSiteRoute_avoids_standardVariableLocalGateRoute_of_slot_ne :
+    ∀ (countPred : Fin 3)
+      (kind : VariableSiteSlot → VariableConnectorKind)
+      (polarity : VariableSiteSlot → Bool)
+      (slot : VariableSiteSlot),
+      ∀ (_active : slot.index < countPred + 1)
+        (triple : ActiveVariableSiteTriple (countPred + 1) kind)
+        (routeColor gateColor : WireColor),
+        triple.1.slot ≠ slot →
+          RoutesAvoidEachOther
+            (translatePolyline standardThreeStrandLayout.variableOffset
+              ((variableSiteDrawing (countPred + 1) kind polarity).route
+                triple routeColor))
+            (standardVariableLocalGateRoute
+              slot (kind slot) (polarity slot) gateColor) := by
+  native_decide
+
 /-- The finite variable-site route selected for an active gate has
 endpoint-permitting continuous separation from that gate. -/
 theorem routedVariableSiteRoute_avoids_standardVariableLocalGateRoute :
@@ -326,6 +347,25 @@ theorem variableSiteRoute_avoids_localGateRoute
   exact variableSiteRoute_avoids_standardVariableLocalGateRoute
     data.countPred data.kind data.polarity slot active
     triple routeColor gateColor
+
+/-- Data-packaged endpoint-aware separation for a core route and a gate in
+a different occurrence module. -/
+theorem variableSiteRoute_avoids_localGateRoute_of_slot_ne
+    (data : VariableRibbonFanData)
+    (slot : VariableSiteSlot)
+    (active : data.SlotActive slot)
+    (triple : ActiveVariableSiteTriple data.count data.kind)
+    (routeColor gateColor : WireColor)
+    (differentSlot : triple.1.slot ≠ slot) :
+    RoutesAvoidEachOther
+      (translatePolyline standardThreeStrandLayout.variableOffset
+        ((variableSiteDrawing data.count data.kind data.polarity).route
+          triple routeColor))
+      (standardVariableLocalGateRoute
+        slot (data.kind slot) (data.polarity slot) gateColor) := by
+  exact variableSiteRoute_avoids_standardVariableLocalGateRoute_of_slot_ne
+    data.countPred data.kind data.polarity slot active
+    triple routeColor gateColor differentSlot
 
 /-- Data-packaged form of the advertised core-to-gate splice interface. -/
 theorem routedVariableSiteRoute_avoids_localGateRoute

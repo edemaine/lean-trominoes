@@ -4263,8 +4263,14 @@ The representation choices for this target are:
   transports the finite all-pairs core/fan theorem to source coordinates.
   Every route in a variable-site core avoids the interiors of every
   coordinated variable fan at the same source variable, including
-  nonmatching routes with harmless listed-point coincidences; cores and fans
-  owned by distinct variable macrocells are strictly separated.
+  nonmatching routes with listed-point coincidences permitted by the
+  continuous-planarity interface; cores and fans owned by distinct variable
+  macrocells are strictly separated.  A sharper exhaustive certificate now
+  proves full endpoint-aware `RoutesAvoidEachOther` whenever the core and fan
+  belong to different occurrence slots, and transports that fact through the
+  complete coordinated fan.  Consequently the listed contacts that still
+  need a clearance repair before assignment rasterization are confined to a
+  single occurrence module, rather than the whole variable macrocell.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean)
   extends that all-pairs result across every complete coordinated occurrence
   route.  Source-route endpoint separation makes every variable center fresh
