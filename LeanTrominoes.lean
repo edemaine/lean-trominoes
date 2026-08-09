@@ -3,6 +3,7 @@ import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
 import LeanTrominoes.DegreeThreeVertexNormalizationTemplates
 import LeanTrominoes.DegreeThreeVertexNormalizationPorts
+import LeanTrominoes.DegreeThreeVertexNormalizationFans
 import LeanTrominoes.EncodingBounds
 import LeanTrominoes.EncodingLengthComputability
 import LeanTrominoes.FiniteSearch

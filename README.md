@@ -6602,6 +6602,11 @@ The representation choices for this target are:
   the omitted-side permutation, tracks zero, one, or two cyclic rotations,
   moves the red incidence to the north port, and proves that the resulting
   RGB assignment exactly matches one of the two trichromatic cell types.
+- [`LeanTrominoes/DegreeThreeVertexNormalizationFans.lean`](LeanTrominoes/DegreeThreeVertexNormalizationFans.lean)
+  packages the three colored endpoint directions at a degree-three vertex.
+  It selects the unique unused cardinal side and proves that the Figure 2
+  permutation transports all three old edge colors, including both the
+  monochromatic and distinct-RGB cases, to the canonical ports.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
