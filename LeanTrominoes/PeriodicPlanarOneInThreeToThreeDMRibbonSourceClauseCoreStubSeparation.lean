@@ -19,7 +19,7 @@ open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 
 /-- The finite clause-side fan can contact the checked core only at the
 fan's final advertised core port. -/
-private theorem coordinatedClauseRoute_meets_clauseCore_onlyAtFirstTail :
+theorem coordinatedClauseRoute_meets_clauseCore_onlyAtFirstTail :
     ∀ (data : ClauseRibbonFanData),
       data.IsClockwiseCompatible →
       ∀ group, data.GroupActive group →

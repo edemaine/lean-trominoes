@@ -35,6 +35,16 @@ instance (first second : List Cell) :
   unfold RoutesMeetOnlyAtFirstTail
   infer_instance
 
+/-- Strictly separated routes vacuously have first-tail-only contact. -/
+theorem RoutesMeetOnlyAtFirstTail.of_strict
+    {first second : List Cell}
+    (strict : RoutesStrictlyAvoidEachOther first second) :
+    RoutesMeetOnlyAtFirstTail first second := by
+  intro firstPoint firstMember secondPoint secondMember equal
+  exact
+    (strict.2.2.2
+      firstPoint firstMember secondPoint secondMember equal).elim
+
 /-- Every listed contact occurs at the tail of both routes. -/
 def RoutesMeetOnlyAtTails
     (first second : List Cell) : Prop :=
@@ -269,6 +279,30 @@ theorem RoutesMeetOnlyAtTails.scalePolyline
       (LeanTrominoes.scalePolyline factor first)
       (LeanTrominoes.scalePolyline factor second) :=
   contacts.mapPoints (Cell.scale_injective factorPositive.ne')
+
+/-- Prepending a strictly separated route preserves the fact that all
+listed contact of the resulting route occurs at its outer tail. -/
+theorem RoutesMeetOnlyAtFirstTail.join_left_of_strict_prefix
+    {first extra second : List Cell}
+    {boundary : Cell}
+    (firstAvoid : RoutesStrictlyAvoidEachOther first second)
+    (extraContacts : RoutesMeetOnlyAtFirstTail extra second)
+    (firstLast : first.getLast? = some boundary)
+    (extraHead : extra.head? = some boundary) :
+    RoutesMeetOnlyAtFirstTail
+      (joinAtEndpoint first extra) second := by
+  intro joinedPoint joinedMember secondPoint secondMember equal
+  rcases mem_joinAtEndpoint joinedMember with firstMember | extraMember
+  · exact
+      (firstAvoid.2.2.2
+        joinedPoint firstMember secondPoint secondMember equal).elim
+  · have contacts :=
+      extraContacts
+        joinedPoint extraMember secondPoint secondMember equal
+    exact
+      ⟨joinAtEndpoint_getLast?
+          firstLast extraHead contacts.1,
+        contacts.2⟩
 
 /-- Join two locally head-separated prefixes to two suffixes whose only
 possible listed contact is at their final tails.  Strict cross separation

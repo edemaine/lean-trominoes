@@ -181,6 +181,98 @@ theorem constructedClauseRoute_avoids_translatedOccurrenceCoordinatedRibbonClaus
       ribbonMacrocellOrigin, Cell.add, add_comm] using
       separated.toRoutesAvoidEachOther
 
+/-- Every listed contact of a translated coordinated clause stub with a
+checked clause core occurs at the stub's outer tail. -/
+theorem translatedOccurrenceCoordinatedRibbonClauseStub_meets_constructedClauseRoute_onlyAtFirstTail
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (compatible : SourceRibbonFansClockwiseCompatible presentation)
+    (clauseIndex : Nat) (set : X3CClauseSet)
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (translate : Cell) (fanColor : WireColor) :
+    RoutesMeetOnlyAtFirstTail
+      (translatePolyline
+        (ribbonMacrocellOrigin (placement.translation translate))
+        (occurrenceCoordinatedRibbonClauseStub
+          presentation entry fanColor))
+      (translatePolyline
+        (constructedClauseOrigin source standardThreeStrandLayout
+          clauseIndex)
+        (X3CClauseOrthogonal.route set coreColor)) := by
+  let firstCenter := positionedClausePositionAt source clauseIndex
+  let baseCenter := occurrenceSourceClauseTarget presentation entry
+  let secondCenter := Cell.add (placement.translation translate) baseCenter
+  by_cases centersEq : firstCenter = secondCenter
+  · let entryClauseIndex :=
+      occurrenceClauseIndex source.erase entry.1.1 entry.1.2
+    let data := sourceClauseRibbonFanData presentation entryClauseIndex
+    let group := occurrenceClauseTerminalGroup source.erase entry
+    let lane := routedRibbonLane source.erase entry fanColor
+    have active : data.GroupActive group :=
+      ClauseRibbonFanData.sourceClauseRibbonFanData_groupActive
+        presentation entryClauseIndex entry
+        entry.mem_activeClauseOccurrenceEntries
+    have localContacts :=
+      coordinatedClauseRoute_meets_clauseCore_onlyAtFirstTail
+        data (compatible.2 entry) group active lane set coreColor
+    have translatedContacts := localContacts.translate
+      (ribbonMacrocellOrigin secondCenter)
+    have coreTranslation :
+        translatePolyline (ribbonMacrocellOrigin secondCenter)
+            (translatePolyline standardThreeStrandLayout.clauseOffset
+              (X3CClauseOrthogonal.route set coreColor)) =
+          translatePolyline
+            (constructedClauseOrigin source standardThreeStrandLayout
+              clauseIndex)
+            (X3CClauseOrthogonal.route set coreColor) := by
+      rw [translatePolyline_add]
+      congr 1
+      simp [constructedClauseOrigin, firstCenter, centersEq,
+        ribbonMacrocellOrigin, Cell.add, add_comm]
+    have fanTranslation :
+        translatePolyline (ribbonMacrocellOrigin secondCenter)
+            (data.coordinatedRoute group lane) =
+          translatePolyline
+            (ribbonMacrocellOrigin (placement.translation translate))
+            (occurrenceCoordinatedRibbonClauseStub
+              presentation entry fanColor) := by
+      change translatePolyline (ribbonMacrocellOrigin secondCenter)
+          (data.coordinatedRoute group lane) =
+        translatePolyline (ribbonMacrocellOrigin
+          (placement.translation translate))
+          (translatePolyline (ribbonMacrocellOrigin baseCenter)
+            (data.coordinatedRoute group lane))
+      rw [translatePolyline_add]
+      congr 1
+      rw [show secondCenter =
+          Cell.add baseCenter (placement.translation translate) by
+        simp [secondCenter, Cell.add, add_comm]]
+      exact ribbonMacrocellOrigin_add
+        baseCenter (placement.translation translate)
+    change RoutesMeetOnlyAtFirstTail
+      (translatePolyline (ribbonMacrocellOrigin secondCenter)
+        (data.coordinatedRoute group lane))
+      (translatePolyline (ribbonMacrocellOrigin secondCenter)
+        (translatePolyline standardThreeStrandLayout.clauseOffset
+          (X3CClauseOrthogonal.route set coreColor))) at translatedContacts
+    rw [fanTranslation, coreTranslation] at translatedContacts
+    exact translatedContacts
+  · have separated :=
+      insetRoute_strictlyAvoids_translatedOccurrenceCoordinatedRibbonClauseStub_of_centers_ne
+        presentation compatible firstCenter
+        (translatePolyline standardThreeStrandLayout.clauseOffset
+          (X3CClauseOrthogonal.route set coreColor))
+        (all_clauseRoute_points_in_inset_rectangle set coreColor)
+        entry translate centersEq fanColor
+    rw [translatePolyline_add] at separated
+    apply RoutesMeetOnlyAtFirstTail.of_strict
+    exact (by
+      simpa [constructedClauseOrigin, firstCenter,
+        ribbonMacrocellOrigin, Cell.add, add_comm] using separated.symm)
+
 /-- Every assembled finite incidence core is strictly separated from every
 nonzero-translated coordinated variable fan. -/
 theorem assembledTypedIncidenceCoreRoute_strictlyAvoids_translatedOccurrenceCoordinatedRibbonVariableStub
@@ -329,6 +421,152 @@ theorem assembledTypedIncidenceCoreRoute_avoids_translatedOccurrenceCoordinatedR
         coordinatedSourceRibbonThreeStrandRouting,
         RibbonEndpointFanSystem.threeStrandRouting] using
         constructedClauseRoute_avoids_translatedOccurrenceCoordinatedRibbonClauseStub
+          planar compatible clauseIndex set coreColor entry translate fanColor
+
+/-- A variable-owned finite core is strictly separated from every translated
+coordinated clause fan. -/
+theorem assembledTypedIncidenceCoreRoute_strictlyAvoids_translatedOccurrenceCoordinatedRibbonClauseStub_of_atom_owner
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (coreTriple :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (translate : Cell) (fanColor : WireColor)
+    (atomOwner :
+      ∃ atom, tripleMacrocellOwner coreTriple.1 = .atom atom) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesStrictlyAvoidEachOther
+      (assembledTypedIncidenceCoreRoute routing coreTriple coreColor)
+      (translatePolyline
+        (ribbonMacrocellOrigin (placement.translation translate))
+        (occurrenceCoordinatedRibbonClauseStub
+          presentation.toPlanarIncidencePresentation entry fanColor)) := by
+  dsimp only
+  let planar := presentation.toPlanarIncidencePresentation
+  let routing := coordinatedSourceRibbonThreeStrandRouting
+    presentation width compatible
+  rcases coreTriple with ⟨coreTriple, coreMember⟩
+  cases coreTriple with
+  | ordinary atom slot variant localTriple =>
+      let location := ordinaryTriple_location source.erase
+        atom slot variant localTriple coreMember
+      let owner : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      let localRoute :=
+        translatePolyline standardThreeStrandLayout.variableOffset
+          ((sourceVariableSiteDrawing source.erase atom).route
+            (activeVariableSiteTriple source.erase atom location.1
+              slot location.2.1
+              (.ordinary atom slot variant localTriple) location.2.2)
+            coreColor)
+      have centersNe :=
+        occurrenceSourceVariablePosition_ne_translatedClauseTarget
+          presentation owner entry translate
+      have separated :=
+        insetRoute_strictlyAvoids_translatedOccurrenceCoordinatedRibbonClauseStub_of_centers_ne
+          planar compatible (placement.position atom) localRoute
+          (sourceVariableSiteRoute_points_in_inset_rectangle
+            source.erase atom location.1 _ coreColor)
+          entry translate (by simpa [owner] using centersNe) fanColor
+      simpa [assembledTypedIncidenceCoreRoute, assembledOrdinaryPrefix,
+        typedVariableSiteRoute, localRoute, location, routing,
+        coordinatedSourceRibbonThreeStrandRouting,
+        RibbonEndpointFanSystem.threeStrandRouting,
+        constructedVariableOrigin, ribbonMacrocellOrigin,
+        translatePolyline_add, Cell.add, add_comm] using separated
+  | fixedRed atom slot localTriple =>
+      let location := fixedRedTriple_location source.erase
+        atom slot localTriple coreMember
+      let owner : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      let localRoute :=
+        translatePolyline standardThreeStrandLayout.variableOffset
+          ((sourceVariableSiteDrawing source.erase atom).route
+            (activeVariableSiteTriple source.erase atom location.1
+              slot location.2.1
+              (.fixedRed atom slot localTriple) location.2.2)
+            coreColor)
+      have centersNe :=
+        occurrenceSourceVariablePosition_ne_translatedClauseTarget
+          presentation owner entry translate
+      have separated :=
+        insetRoute_strictlyAvoids_translatedOccurrenceCoordinatedRibbonClauseStub_of_centers_ne
+          planar compatible (placement.position atom) localRoute
+          (sourceVariableSiteRoute_points_in_inset_rectangle
+            source.erase atom location.1 _ coreColor)
+          entry translate (by simpa [owner] using centersNe) fanColor
+      simpa [assembledTypedIncidenceCoreRoute, assembledFixedRedPrefix,
+        typedVariableSiteRoute, localRoute, location, routing,
+        coordinatedSourceRibbonThreeStrandRouting,
+        RibbonEndpointFanSystem.threeStrandRouting,
+        constructedVariableOrigin, ribbonMacrocellOrigin,
+        translatePolyline_add, Cell.add, add_comm] using separated
+  | clause clauseIndex set =>
+      rcases atomOwner with ⟨atom, ownerEq⟩
+      simp [tripleMacrocellOwner] at ownerEq
+
+/-- For every core and translated clause fan, all possible listed contact is
+at the fan's outer tail. -/
+theorem translatedOccurrenceCoordinatedRibbonClauseStub_meets_assembledTypedIncidenceCoreRoute_onlyAtFirstTail
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (coreTriple :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (translate : Cell) (fanColor : WireColor) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesMeetOnlyAtFirstTail
+      (translatePolyline
+        (ribbonMacrocellOrigin (placement.translation translate))
+        (occurrenceCoordinatedRibbonClauseStub
+          presentation.toPlanarIncidencePresentation entry fanColor))
+      (assembledTypedIncidenceCoreRoute routing coreTriple coreColor) := by
+  dsimp only
+  let planar := presentation.toPlanarIncidencePresentation
+  let routing := coordinatedSourceRibbonThreeStrandRouting
+    presentation width compatible
+  rcases coreTriple with ⟨coreTriple, coreMember⟩
+  cases coreTriple with
+  | ordinary atom slot variant localTriple =>
+      apply RoutesMeetOnlyAtFirstTail.of_strict
+      exact
+        (assembledTypedIncidenceCoreRoute_strictlyAvoids_translatedOccurrenceCoordinatedRibbonClauseStub_of_atom_owner
+          presentation width compatible
+          ⟨.ordinary atom slot variant localTriple, coreMember⟩
+          coreColor entry translate fanColor ⟨atom, rfl⟩).symm
+  | fixedRed atom slot localTriple =>
+      apply RoutesMeetOnlyAtFirstTail.of_strict
+      exact
+        (assembledTypedIncidenceCoreRoute_strictlyAvoids_translatedOccurrenceCoordinatedRibbonClauseStub_of_atom_owner
+          presentation width compatible
+          ⟨.fixedRed atom slot localTriple, coreMember⟩
+          coreColor entry translate fanColor ⟨atom, rfl⟩).symm
+  | clause clauseIndex set =>
+      simpa [assembledTypedIncidenceCoreRoute, routing,
+        assembledClauseRoute, orientedIncidenceLocalRoute,
+        coordinatedSourceRibbonThreeStrandRouting,
+        RibbonEndpointFanSystem.threeStrandRouting] using
+        translatedOccurrenceCoordinatedRibbonClauseStub_meets_constructedClauseRoute_onlyAtFirstTail
           planar compatible clauseIndex set coreColor entry translate fanColor
 
 end PeriodicPlanarOneInThreeToThreeDM

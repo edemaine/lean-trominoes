@@ -117,7 +117,7 @@ build; an imported proof counts when its statement matches the paper.
           matching route retains only its intended variable-port splice.
         - [x] Prove endpoint-only contacts for distinct complete assembled
           incidence routes.
-        - [ ] Lift endpoint-only contacts to stored routes and all relevant
+        - [x] Lift endpoint-only contacts to stored routes and all relevant
           periodic translates.
         - [ ] Preserve endpoint-only contacts through degree-two contraction
           and all three local endpoint-template normalization rounds.
@@ -4380,19 +4380,23 @@ The representation choices for this target are:
   separates every finite incidence core from translated variable and clause
   endpoint fans.  Distinct owner centers follow from periodic vertex
   injectivity and strict inset bounds; when a translated clause fan shares a
-  clause-core center, the checked finite fan/core table permits only the
-  advertised outer-endpoint contact.
+  clause-core center, the checked finite fan/core table classifies its only
+  possible contact as the first point of the translated fan's outer tail.
+  Variable-owned cores remain strictly separated from every translated
+  clause fan.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRouteSeparation.lean)
   composes finite-core/core, both finite-core/occurrence-route orientations,
   and occurrence-route/occurrence-route separation.  Decomposing both full
-  assembled incidences at their certified splice endpoints proves that any
-  complete typed route avoids every nonzero relative period translate of any
-  other complete typed route.
+  assembled incidences at their certified splice endpoints, with exact
+  first-tail classifiers for the exceptional clause contact, proves full
+  endpoint-aware separation between any complete typed route and every
+  nonzero relative period translate of any other complete typed route.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedAssembledRouteSeparation.lean)
-  specializes complete typed-route separation to the final doubled,
-  anchor-normalized construction.  It also transfers the result through
-  numeric incidence-tag lookup, proving separation for every pair of
-  distinct genuine routes stored by the assembled periodic drawing.
+  specializes full endpoint-aware typed-route separation to the final
+  doubled, anchor-normalized construction.  It also transfers the result
+  through numeric incidence-tag lookup, proving the same separation for
+  every pair of distinct genuine routes stored by the assembled periodic
+  drawing.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedBounds.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedBounds.lean)
   uses the coordinated fan system's macrocell-containment contract to prove
   that every point of every final assembled route lies in the open one-cell
@@ -4411,11 +4415,13 @@ The representation choices for this target are:
   finite cases, together with simplicity, endpoint coverage, and
   orthogonality, now suffices for continuous planarity of the assembly.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedTranslatedPlanarity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedTranslatedPlanarity.lean)
-  specializes complete translated typed-route separation to the doubled,
-  anchor-normalized source and transports it through numeric incidence tags
-  to every stored route.  This discharges all nonzero relative lifted
-  contacts and proves continuous planarity of the final padded coordinated
-  assembly without any remaining finite-neighbor hypothesis.
+  specializes endpoint-aware translated typed-route separation to the
+  doubled, anchor-normalized source and transports it through numeric
+  incidence tags to every stored route.  Combining the nonzero translations
+  with same-period separation proves both relative and absolute separation
+  of all distinct lifted occurrences, and hence endpoint-only listed-point
+  contacts for the final padded drawing.  It also proves continuous planarity
+  without any remaining finite-neighbor hypothesis.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedContinuousPresentation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedContinuousPresentation.lean)
   combines that continuous-planarity theorem with the already proved
   normalized vertex distinctness and fundamental-square bounds.  The final
