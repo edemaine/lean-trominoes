@@ -98,6 +98,11 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove that affine magnification, ordered unit subdivision, and a
         common translation preserve endpoint-only route contacts, with all
         contracted-drawing side conditions derived from the existing API.
+      - [x] Isolate the normalized fixed-green/true contact obstruction: the
+        local green gate passes through the shared endpoint of exactly two
+        green core incidences while preserving continuous-interior planarity.
+      - [ ] Replace that exceptional module-local gate by a certified
+        site-wide annular route through the complete variable fan.
       - [ ] Prove contracted-drawing endpoint contacts and preserve them
         through the local endpoint-template splices.
       - [ ] Deduce global assignment collision freedom and matching ports for
