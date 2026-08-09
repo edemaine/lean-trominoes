@@ -6718,7 +6718,10 @@ The representation choices for this target are:
   facts feed a generic two-ended splice theorem proving that neither join can
   introduce an immediate reversal.  The theorem has been instantiated for
   the Figure 2 replacement, so every first-round `normalizationRoute1` is now
-  nonreversing as well as unit-step.
+  nonreversing as well as unit-step.  The invariant is then lifted through
+  both cyclic replacements: every `finalNormalizationRoute` is now formally
+  certified as a nonreversing unit-step route, discharging both validity
+  hypotheses of the normalized-route rasterizer.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose

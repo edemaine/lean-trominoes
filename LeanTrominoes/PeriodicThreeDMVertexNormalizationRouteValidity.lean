@@ -2117,5 +2117,158 @@ theorem ContinuousPlanarPresentation.normalizationRoute1_hasNoImmediateReversal
   · exact targetEndpoint.firstNormalizationTemplate_lastDirection
       planar targetUsed
 
+/-- The first cyclic-rotation replacement preserves nonreversal. -/
+theorem ContinuousPlanarPresentation.normalizationRoute2_hasNoImmediateReversal
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    AxisDirection.HasNoImmediateReversal
+      (presentation.toPlanarPresentation.normalizationRoute2 edge) := by
+  let planar := presentation.toPlanarPresentation
+  let oldRoute := planar.normalizationRoute1 edge
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  let sourcePort := sourceEndpoint.firstNormalizedPort planar
+  let targetPort := targetEndpoint.firstNormalizedPort planar
+  have oldUnitSteps : oldRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    presentation.normalizationRoute1_unitSteps
+      wellFormed degree edgeMember
+  have oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute :=
+    oldUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have oldNoReversal : AxisDirection.HasNoImmediateReversal oldRoute :=
+    presentation.normalizationRoute1_hasNoImmediateReversal
+      wellFormed degree edgeMember
+  have endpoints := presentation.normalizationRoute1_endpointGeometry
+    degree edgeMember
+  have sourceStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+      (Cell.add
+        (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+        sourcePort.direction.step) :=
+    ⟨sourcePort.direction,
+      CanonicalVertexPort.direction_isGenuine sourcePort, rfl⟩
+  have targetStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationTarget1 edge)
+      (Cell.add (planar.normalizationTarget1 edge)
+        targetPort.direction.step) :=
+    ⟨targetPort.direction,
+      CanonicalVertexPort.direction_isGenuine targetPort, rfl⟩
+  have sourceGeometry :=
+    sourceEndpoint.secondNormalizationTemplate_geometry planar
+  have targetGeometry :=
+    targetEndpoint.secondNormalizationTemplate_geometry planar
+  unfold PlanarPresentation.normalizationRoute2
+  apply normalizeRouteWithTemplates_hasNoImmediateReversal
+    (sourceNext := Cell.add
+      (planar.normalizationPosition1 edge.toPeriodicEdge.source)
+      sourcePort.direction.step)
+    (targetBefore := Cell.add (planar.normalizationTarget1 edge)
+      targetPort.direction.step)
+    (sourceDirection := sourcePort.direction)
+    (targetDirection := targetPort.direction)
+  · exact oldOrthogonal
+  · exact oldNoReversal
+  · exact endpoints.1
+  · exact endpoints.2.1
+  · exact endpoints.2.2.1
+  · exact endpoints.2.2.2
+  · exact sourceStep.isAxisAligned
+  · exact targetStep.symm.isAxisAligned
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine sourcePort)
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine targetPort)
+  · exact sourceGeometry.2.1
+  · exact targetGeometry.2.1
+  · exact sourceGeometry.2.2.1
+  · exact targetGeometry.2.2.1
+  · exact sourceEndpoint.secondNormalizationTemplate_noImmediateReversal planar
+  · exact targetEndpoint.secondNormalizationTemplate_noImmediateReversal planar
+  · exact sourceEndpoint.secondNormalizationTemplate_getLast? planar
+  · exact targetEndpoint.secondNormalizationTemplate_getLast? planar
+  · exact sourceEndpoint.secondNormalizationTemplate_lastDirection planar
+  · exact targetEndpoint.secondNormalizationTemplate_lastDirection planar
+
+/-- All three replacement rounds preserve nonreversal; this discharges the
+remaining route-validity hypothesis of the normalized-route rasterizer. -/
+theorem ContinuousPlanarPresentation.finalNormalizationRoute_hasNoImmediateReversal
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    AxisDirection.HasNoImmediateReversal
+      (presentation.toPlanarPresentation.finalNormalizationRoute edge) := by
+  let planar := presentation.toPlanarPresentation
+  let oldRoute := planar.normalizationRoute2 edge
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  let sourcePort := sourceEndpoint.secondNormalizedPort planar
+  let targetPort := targetEndpoint.secondNormalizedPort planar
+  have oldUnitSteps : oldRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    presentation.normalizationRoute2_unitSteps
+      wellFormed degree edgeMember
+  have oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute :=
+    oldUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have oldNoReversal : AxisDirection.HasNoImmediateReversal oldRoute :=
+    presentation.normalizationRoute2_hasNoImmediateReversal
+      wellFormed degree edgeMember
+  have endpoints := presentation.normalizationRoute2_endpointGeometry
+    wellFormed degree edgeMember
+  have sourceStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationPosition2 edge.toPeriodicEdge.source)
+      (Cell.add
+        (planar.normalizationPosition2 edge.toPeriodicEdge.source)
+        sourcePort.direction.step) :=
+    ⟨sourcePort.direction,
+      CanonicalVertexPort.direction_isGenuine sourcePort, rfl⟩
+  have targetStep : AxisDirection.IsUnitAxisStep
+      (planar.normalizationTarget2 edge)
+      (Cell.add (planar.normalizationTarget2 edge)
+        targetPort.direction.step) :=
+    ⟨targetPort.direction,
+      CanonicalVertexPort.direction_isGenuine targetPort, rfl⟩
+  have sourceGeometry :=
+    sourceEndpoint.finalNormalizationTemplate_geometry planar
+  have targetGeometry :=
+    targetEndpoint.finalNormalizationTemplate_geometry planar
+  unfold PlanarPresentation.finalNormalizationRoute
+  apply normalizeRouteWithTemplates_hasNoImmediateReversal
+    (sourceNext := Cell.add
+      (planar.normalizationPosition2 edge.toPeriodicEdge.source)
+      sourcePort.direction.step)
+    (targetBefore := Cell.add (planar.normalizationTarget2 edge)
+      targetPort.direction.step)
+    (sourceDirection := sourcePort.direction)
+    (targetDirection := targetPort.direction)
+  · exact oldOrthogonal
+  · exact oldNoReversal
+  · exact endpoints.1
+  · exact endpoints.2.1
+  · exact endpoints.2.2.1
+  · exact endpoints.2.2.2
+  · exact sourceStep.isAxisAligned
+  · exact targetStep.symm.isAxisAligned
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine sourcePort)
+  · exact AxisDirection.between_add_step _
+      (CanonicalVertexPort.direction_isGenuine targetPort)
+  · exact sourceGeometry.2.1
+  · exact targetGeometry.2.1
+  · exact sourceGeometry.2.2.1
+  · exact targetGeometry.2.2.1
+  · exact sourceEndpoint.finalNormalizationTemplate_noImmediateReversal planar
+  · exact targetEndpoint.finalNormalizationTemplate_noImmediateReversal planar
+  · exact sourceEndpoint.finalNormalizationTemplate_getLast? planar
+  · exact targetEndpoint.finalNormalizationTemplate_getLast? planar
+  · exact sourceEndpoint.finalNormalizationTemplate_lastDirection planar
+  · exact targetEndpoint.finalNormalizationTemplate_lastDirection planar
+
 end PeriodicThreeDM
 end LeanTrominoes
