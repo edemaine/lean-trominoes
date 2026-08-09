@@ -95,7 +95,12 @@ build; an imported proof counts when its statement matches the paper.
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
         normalized vertex lattice and that adjacent cells are nonvertices.
-      - [ ] Prove global assignment collision freedom and matching ports for
+      - [x] Prove that affine magnification, ordered unit subdivision, and a
+        common translation preserve endpoint-only route contacts, with all
+        contracted-drawing side conditions derived from the existing API.
+      - [ ] Prove contracted-drawing endpoint contacts and preserve them
+        through the local endpoint-template splices.
+      - [ ] Deduce global assignment collision freedom and matching ports for
         the compiled drawing, then package the computable reduction.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
@@ -6668,6 +6673,21 @@ The representation choices for this target are:
   arbitrary endpoint directions to west/north/east, then applies up to two
   clockwise port rotations to put red north, magnifying by twelve and
   splicing verified local templates onto every contracted route each round.
+- [`LeanTrominoes/PeriodicGridDrawingAffineUnitRefinement.lean`](LeanTrominoes/PeriodicGridDrawingAffineUnitRefinement.lean)
+  packages the common affine stage used by vertex normalization.  For a
+  ribbon-ready orthogonal drawing with nondegenerate simple routes, complete
+  lifted-route separation is derived, preserved by positive scaling and
+  ordered unit subdivision, and transported through a common coordinate
+  translation.  Consequently endpoint-only route contacts survive the whole
+  magnify/subdivide/translate operation.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationMagnifiedContacts.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationMagnifiedContacts.lean)
+  identifies that generic affine stage at scale twelve with the executable
+  `normalizeVertexPosition` and `magnifiedUnitRoute` data.  For the contracted
+  3DM drawing, compatibility, looplessness, continuous planarity, route
+  nondegeneracy, orthogonality, and route simplicity are all discharged from
+  existing certificates; endpoint-contact preservation therefore has only
+  the contracted drawing's endpoint-contact certificate as a geometric
+  premise.  The later local endpoint-template splices remain to be handled.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB

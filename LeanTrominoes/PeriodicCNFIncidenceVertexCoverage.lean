@@ -111,6 +111,84 @@ theorem route_length_ge_two_of_compatible_of_loopless
     exact routeLookup
   simpa only [selectedRouteEq] using routeLength
 
+/-- Global continuous-planarity and endpoint-contact certificates make every
+stored route of a compatible loopless orthogonal drawing simple.  Compatibility
+supplies the advertised route endpoints, while the open-fundamental-square
+condition ensures that those endpoints remain distinct in the periodic lift. -/
+theorem routesSimple_of_globalCertificates_of_compatible_of_loopless
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing)
+    (compatible : drawing.IsCompatible graph)
+    (loopless : EdgesAreLoopless graph)
+    (continuous : drawing.IsContinuouslyPlanar)
+    (endpointContacts : drawing.RoutePointsMeetOnlyAtEndpoints)
+    (orthogonal : drawing.IsOrthogonal) :
+    ∀ route ∈ drawing.edgeRoutes,
+      LocalIncidenceDrawing.RouteIsSimple route := by
+  intro route routeMember
+  rcases List.mem_iff_get.mp routeMember with
+    ⟨routeIndex, routeLookup⟩
+  have edgeIndexLt :
+      routeIndex.val < graph.edges.length := by
+    rw [← compatible.2.2.1]
+    exact routeIndex.isLt
+  let edgeIndex : Fin graph.edges.length :=
+    ⟨routeIndex.val, edgeIndexLt⟩
+  let edge := graph.edges.get edgeIndex
+  have edgeMember : edge ∈ graph.edges :=
+    List.get_mem graph.edges edgeIndex
+  have taggedEdgeMember :
+      (edge, routeIndex.val) ∈ graph.edges.zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?,
+      List.getElem?_eq_some_iff]
+    exact ⟨edgeIndexLt, rfl⟩
+  have selectedRouteEq :
+      drawing.edgeRoute routeIndex.val = route := by
+    unfold PeriodicGridDrawing.edgeRoute
+    rw [List.getD_eq_getElem _ _ routeIndex.isLt]
+    exact routeLookup
+  have endpoints :=
+    compatible.2.2.2.2.2
+      (edge, routeIndex.val) taggedEdgeMember
+  rw [selectedRouteEq] at endpoints
+  have endpointMembers := compatible.1.2 edge edgeMember
+  have sourcePositionMember :=
+    compatible.vertexPosition_mem endpointMembers.1
+  have targetPositionMember :=
+    compatible.vertexPosition_mem endpointMembers.2
+  have sourceBounds :=
+    compatible.2.2.2.2.1
+      (drawing.vertexPosition graph edge.source)
+      sourcePositionMember
+  have targetBounds :=
+    compatible.2.2.2.2.1
+      (drawing.vertexPosition graph edge.target)
+      targetPositionMember
+  have prototypePositionsDifferent :
+      drawing.vertexPosition graph edge.source ≠
+        drawing.vertexPosition graph edge.target := by
+    intro equal
+    exact
+      loopless edge edgeMember
+        (compatible.vertexPosition_injective_on
+          endpointMembers.1 endpointMembers.2 equal)
+  have liftedEndpointsDifferent :
+      drawing.vertexPosition graph edge.source ≠
+        Cell.add
+          (drawing.vertexPosition graph edge.target)
+          (drawing.periodTranslation edge.offset) :=
+    PositionedPeriodicCNF.fundamentalPosition_ne_translated
+      drawing sourceBounds targetBounds prototypePositionsDifferent
+  exact
+    PeriodicGridDrawing.routeIsSimple_of_globalCertificates
+      continuous endpointContacts routeMember
+      (route_length_ge_two_of_compatible_of_loopless
+        graph drawing compatible loopless routeMember)
+      ((PeriodicGridDrawing.isOrthogonal_iff_routes drawing).1
+        orthogonal route routeMember)
+      endpoints.1 endpoints.2 liftedEndpointsDifferent
+
 end PeriodicGridDrawing
 
 namespace PeriodicCNF
