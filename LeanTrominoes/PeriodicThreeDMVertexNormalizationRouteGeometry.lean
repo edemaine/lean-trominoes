@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicThreeDMNormalizationRasterizationCorrectness
+import LeanTrominoes.OrthogonalPolylineHeadReplacement
 
 /-!
 # Endpoint geometry of normalized 3DM routes
@@ -40,20 +41,6 @@ theorem polylineFirstDirection_joinAtEndpoint
           simp [LeanTrominoes.joinAtEndpoint, polylineFirstDirection]
 
 end AxisDirection
-
-/-- Joining after a route containing an edge preserves its second point as
-well as its head. -/
-theorem joinAtEndpoint_tail_head?
-    {first second : List Cell} {next : Cell}
-    (secondPoint : first.tail.head? = some next) :
-    (LeanTrominoes.joinAtEndpoint first second).tail.head? = some next := by
-  cases first with
-  | nil => simp at secondPoint
-  | cons first rest =>
-      cases rest with
-      | nil => simp at secondPoint
-      | cons next rest =>
-          simpa [LeanTrominoes.joinAtEndpoint] using secondPoint
 
 namespace DegreeThreeVertexNormalization
 
