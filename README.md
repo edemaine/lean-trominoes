@@ -6646,6 +6646,11 @@ The representation choices for this target are:
   contracted fans.  It proves the selected final cell has the normalized RGB
   colors at each triple and the constant element color at every retained
   monochromatic vertex.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationRasterization.lean)
+  compiles the final unit-route geometry into a finite square-torus
+  `PeriodicOrthogonalDrawing`: centers become normalized vertex cells,
+  internal route points become colored wires or bends, and every unused cell
+  is blank.  Its row-major array has exactly the advertised positive period.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
