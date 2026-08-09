@@ -6685,10 +6685,11 @@ The representation choices for this target are:
   vertex and every emitted route-interior assignment is recovered exactly by
   the compiled cell lookup.
 - [`LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean)
-  proves that every final route begins with two nonreversing unit steps from
-  its normalized source vertex.  Its first routing assignment is therefore
-  emitted, exposes the edge color toward the vertex under collision freedom,
-  and matches the automatically recovered color of the vertex port.
+  proves that every final route begins and ends with two nonreversing unit
+  steps at its normalized endpoint occurrences.  Its first and last routing
+  assignments are therefore emitted, expose the edge color toward their
+  vertices under collision freedom, and match the automatically recovered
+  colors of both vertex ports after finite-torus projection.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
