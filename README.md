@@ -7160,6 +7160,12 @@ The representation choices for this target are:
   Combining those provenance results with subdivision-point separation proves
   that the final variable prefix, clause suffix, and their concatenation are
   all duplicate-free.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteCompatibility.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteCompatibility.lean)
+  classifies every final vertex as either a retained scaled source vertex or
+  one of the two bounded subdivision points.  It proves strict
+  fundamental-square bounds for the complete vertex list and packages those
+  bounds, vertex injectivity, and exact route endpoints into the final finite
+  compatibility certificate.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
