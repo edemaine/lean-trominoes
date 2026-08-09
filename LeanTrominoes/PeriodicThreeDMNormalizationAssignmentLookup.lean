@@ -20,6 +20,29 @@ open Gadget
 
 namespace PeriodicThreeDM
 
+/-- A successful key lookup comes from a pair in the original association
+list.  Unlike the converse lookup lemma below, this direction needs no
+duplicate-freedom hypothesis. -/
+theorem List.mem_of_lookup_eq_some
+    {α β : Type*} [BEq α] [LawfulBEq α]
+    {entries : List (α × β)} {key : α} {value : β}
+    (lookup : entries.lookup key = some value) :
+    (key, value) ∈ entries := by
+  induction entries with
+  | nil => simp at lookup
+  | cons entry entries inductionHypothesis =>
+      obtain ⟨entryKey, entryValue⟩ := entry
+      by_cases equal : key = entryKey
+      · subst entryKey
+        simp only [List.lookup_cons, beq_self_eq_true,
+          Option.some.injEq] at lookup
+        subst entryValue
+        simp
+      · have beqFalse : (key == entryKey) = false :=
+          beq_eq_false_iff_ne.mpr equal
+        simp only [List.lookup_cons, beqFalse] at lookup
+        exact List.mem_cons_of_mem _ (inductionHypothesis lookup)
+
 /-- A key-value list with no repeated keys returns the value of every pair
 that occurs in the list. -/
 theorem List.lookup_eq_some_of_mem_of_nodup_keys

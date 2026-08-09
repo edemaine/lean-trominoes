@@ -93,6 +93,10 @@ build; an imported proof counts when its statement matches the paper.
       assembly, retaining degree two or three and exact orientation semantics.
     - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
+      - [x] Prove that every compiled vertex cell comes from the coarse
+        normalized vertex lattice and that adjacent cells are nonvertices.
+      - [ ] Prove global assignment collision freedom and matching ports for
+        the compiled drawing, then package the computable reduction.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -6725,6 +6729,15 @@ The representation choices for this target are:
   incident, specializing the result so endpoint-only contacts in the final
   normalized drawing are the sole remaining input to assignment collision
   freedom.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationVertexSeparation.lean`](LeanTrominoes/PeriodicThreeDMNormalizationVertexSeparation.lean)
+  proves the compiled drawing's unconditional `VerticesSeparated`
+  certificate.  A successful vertex-valued lookup must come from the
+  vertex-assignment prefix because every route assignment is a wire, bend,
+  or blank.  Three affine normalization rounds place all such vertex centers
+  in residue class `(471, 471)` modulo `12³`, so no whole-period translate of
+  one center can be a cardinal neighbor of another.  The result includes
+  finite-torus wraparound and does not assume the still-pending global route
+  collision certificate.
 - [`LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean)
   proves that every final route begins and ends with two nonreversing unit
   steps at its normalized endpoint occurrences.  Its first and last routing
