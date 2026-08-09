@@ -7112,13 +7112,21 @@ The representation choices for this target are:
   with the two new vertex positions abstracted for the planar route layer.
   Erasure is proved equal to the logical normalization, so satisfiability,
   locality, arity, polarity, and occurrence bounds transfer immediately.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationPositionedIndex.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationPositionedIndex.lean)
+  gives the variable-size positioned replacement a parallel lossless clause
+  index.  Every generated clause retains its source clause and is classified
+  as either the normalized main clause or the binary clause of one exact
+  incompatible source occurrence.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteSubdivision.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteSubdivision.lean)
-  begins the geometric realization of that three-edge path.  It
+  realizes that three-edge path geometrically.  It
   anchor-normalizes and refines each source route by a factor of three, proving
   that two interior unit-subdivision points are available.  The fresh
   complement variable and binary clause occupy those points, while a
   fresh-only variable gauge makes the fresh literal offset zero and preserves
-  both physical placement and exact-one satisfiability.
+  both physical placement and exact-one satisfiability.  The indexed output
+  route family keeps a compatible route whole and splits every incompatible
+  route into the clause-side prefix, reversed middle edge, and translated
+  original-variable suffix.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence

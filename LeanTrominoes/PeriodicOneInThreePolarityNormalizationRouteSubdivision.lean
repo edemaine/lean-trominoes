@@ -1,6 +1,6 @@
 import LeanTrominoes.OrthogonalPolylineUnitSubdivisionScaling
 import LeanTrominoes.PeriodicOneInThreeAnchorNormalization
-import LeanTrominoes.PeriodicOneInThreePolarityNormalizationPositioned
+import LeanTrominoes.PeriodicOneInThreePolarityNormalizationPositionedIndex
 import LeanTrominoes.PositionedPeriodicCNFAnchorNormalizationDrawing
 import LeanTrominoes.PositionedPeriodicCNFScaling
 import LeanTrominoes.PositionedPeriodicCNFVariableGaugeOneInThree
@@ -87,24 +87,268 @@ def freshGauge {Variable : Type*} :
   | Sum.inr fresh => Cell.sub (0, 0) fresh.2.offset
 
 /-- Positioned normalized formula after moving every fresh variable to its
+selected route point, before applying the fresh-variable gauge. -/
+def rawFormula {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes) :
+    PositionedPeriodicCNF (PolarityNormalizedVariable Variable) :=
+  PeriodicOneInThreePolarityNormalizationPositioned.formula
+    (rawPositions placement routes)
+    (refinedSource source placement)
+
+/-- Placement parallel to `rawFormula`, before gauging fresh variables. -/
+def rawPlacement {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes) :
+    PeriodicVariablePlacement (PolarityNormalizedVariable Variable) :=
+  PeriodicOneInThreePolarityNormalizationPositioned.placement
+    (refinedPlacement sourcePlacement)
+    (rawPositions sourcePlacement routes)
+
+/-- Positioned normalized formula after moving every fresh variable to its
 selected route point. -/
 def formula {Variable : Type*}
     (source : PositionedPeriodicCNF Variable)
     (placement : PeriodicVariablePlacement Variable)
     (routes : PositionedPeriodicCNF.IncidenceRoutes) :
     PositionedPeriodicCNF (PolarityNormalizedVariable Variable) :=
-  (PeriodicOneInThreePolarityNormalizationPositioned.formula
-      (rawPositions placement routes)
-      (refinedSource source placement)).variableGauge freshGauge
+  (rawFormula source placement routes).variableGauge freshGauge
 
 /-- Placement parallel to `formula`. -/
 def placement {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (routes : PositionedPeriodicCNF.IncidenceRoutes) :
     PeriodicVariablePlacement (PolarityNormalizedVariable Variable) :=
-  (PeriodicOneInThreePolarityNormalizationPositioned.placement
-      (refinedPlacement sourcePlacement)
-      (rawPositions sourcePlacement routes)).variableGauge freshGauge
+  (rawPlacement sourcePlacement routes).variableGauge freshGauge
+
+/-- Translate a displayed source occurrence back to the canonical cell of
+its binary complement clause.  Both literals of the raw binary clause have
+the same source offset, so this is precisely the clause-anchor correction. -/
+def complementCanonicalShift {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceLiteral : PeriodicLiteral Variable) : Cell :=
+  Cell.sub (0, 0)
+    ((refinedPlacement sourcePlacement).translation sourceLiteral.offset)
+
+/-- Clause-origin metadata parallel to `rawFormula`. -/
+def clauseMetadata {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes) :=
+  PeriodicOneInThreePolarityNormalizationPositioned.formulaClauseMetadata
+    (rawPositions sourcePlacement sourceRoutes)
+    (refinedSource source sourcePlacement)
+
+/-- Forgetting route-splitting metadata recovers the complete ungauged
+positioned formula. -/
+@[simp]
+theorem clauseMetadata_clauses {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes) :
+    (clauseMetadata source sourcePlacement sourceRoutes).map
+        PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata.clause =
+      (rawFormula source sourcePlacement sourceRoutes).clauses := by
+  simp [clauseMetadata, rawFormula]
+
+/-- Select the canonical raw route for one metadata-classified output
+incidence.  Compatible main incidences keep the whole refined source route.
+An incompatible incidence is split into its first edge, reversed middle
+edge, and remaining suffix.  The two complement-clause routes receive the
+common source-offset translation required by that clause's canonical
+anchor. -/
+def rawRouteForMetadata {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (literalIndex : Nat) : List Cell :=
+  match metadata.origin with
+  | .normalized =>
+      match metadata.sourceClause.literals[literalIndex]? with
+      | none => []
+      | some sourceLiteral =>
+          if sourceLiteral.value =
+              PeriodicOneInThreePolarityNormalization.normalizedPolarity
+                literalIndex then
+            refinedRoute sourceRoutes metadata.sourceClauseIndex literalIndex
+          else
+            (refinedRoute sourceRoutes metadata.sourceClauseIndex
+              literalIndex).take 2
+  | .complement sourceLiteralIndex sourceLiteral =>
+      if literalIndex = 0 then
+        PeriodicOrthocrossing.translatePolyline
+          (complementCanonicalShift sourcePlacement sourceLiteral)
+          ((refinedRoute sourceRoutes metadata.sourceClauseIndex
+            sourceLiteralIndex).drop 2)
+      else if literalIndex = 1 then
+        PeriodicOrthocrossing.translatePolyline
+          (complementCanonicalShift sourcePlacement sourceLiteral)
+          [routePoint sourceRoutes
+              ((metadata.sourceClauseIndex, sourceLiteralIndex),
+                sourceLiteral) 2,
+            routePoint sourceRoutes
+              ((metadata.sourceClauseIndex, sourceLiteralIndex),
+                sourceLiteral) 1]
+      else
+        []
+
+/-- Raw incidence routes parallel to the ungauged positioned normalization.
+The flattened clause lookup is total outside the finite formula. -/
+def rawIncidenceRoutes {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes) :
+    PositionedPeriodicCNF.IncidenceRoutes :=
+  fun clauseIndex literalIndex =>
+    match (clauseMetadata source sourcePlacement sourceRoutes)[clauseIndex]? with
+    | none => []
+    | some metadata =>
+        rawRouteForMetadata sourcePlacement sourceRoutes metadata literalIndex
+
+/-- Final route family after transporting every split raw route through the
+fresh-variable gauge. -/
+def incidenceRoutes {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes) :
+    PositionedPeriodicCNF.IncidenceRoutes :=
+  PositionedPeriodicCNF.variableGaugeCanonicalIncidenceRoutes
+    (rawFormula source sourcePlacement sourceRoutes)
+    (rawPlacement sourcePlacement sourceRoutes)
+    freshGauge
+    (rawIncidenceRoutes source sourcePlacement sourceRoutes)
+
+/-- A successful output-clause metadata lookup exposes the selected raw
+route definitionally. -/
+theorem rawIncidenceRoutes_of_metadata_lookup {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (clauseIndex literalIndex : Nat)
+    (metadataLookup :
+      (clauseMetadata source sourcePlacement sourceRoutes)[clauseIndex]? =
+        some metadata) :
+    rawIncidenceRoutes source sourcePlacement sourceRoutes
+        clauseIndex literalIndex =
+      rawRouteForMetadata sourcePlacement sourceRoutes metadata
+        literalIndex := by
+  simp [rawIncidenceRoutes, metadataLookup]
+
+/-- A compatible main incidence retains its entire refined source route. -/
+theorem rawRouteForMetadata_normalized_compatible {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (sourceLiteral : PeriodicLiteral Variable)
+    (literalIndex : Nat)
+    (originEq : metadata.origin = .normalized)
+    (literalLookup :
+      metadata.sourceClause.literals[literalIndex]? = some sourceLiteral)
+    (compatible :
+      sourceLiteral.value =
+        PeriodicOneInThreePolarityNormalization.normalizedPolarity
+          literalIndex) :
+    rawRouteForMetadata sourcePlacement sourceRoutes metadata literalIndex =
+      refinedRoute sourceRoutes metadata.sourceClauseIndex literalIndex := by
+  simp [rawRouteForMetadata, originEq, literalLookup, compatible]
+
+/-- An incompatible main incidence keeps exactly the clause-side first
+edge of its refined source route. -/
+theorem rawRouteForMetadata_normalized_incompatible {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (sourceLiteral : PeriodicLiteral Variable)
+    (literalIndex : Nat)
+    (originEq : metadata.origin = .normalized)
+    (literalLookup :
+      metadata.sourceClause.literals[literalIndex]? = some sourceLiteral)
+    (incompatible :
+      sourceLiteral.value ≠
+        PeriodicOneInThreePolarityNormalization.normalizedPolarity
+          literalIndex) :
+    rawRouteForMetadata sourcePlacement sourceRoutes metadata literalIndex =
+      (refinedRoute sourceRoutes metadata.sourceClauseIndex
+        literalIndex).take 2 := by
+  simp [rawRouteForMetadata, originEq, literalLookup, incompatible]
+
+/-- The first binary-clause incidence is the translated suffix leading to
+the original variable. -/
+theorem rawRouteForMetadata_complement_original {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (sourceLiteral : PeriodicLiteral Variable)
+    (sourceLiteralIndex : Nat)
+    (originEq :
+      metadata.origin = .complement sourceLiteralIndex sourceLiteral) :
+    rawRouteForMetadata sourcePlacement sourceRoutes metadata 0 =
+      PeriodicOrthocrossing.translatePolyline
+        (complementCanonicalShift sourcePlacement sourceLiteral)
+        ((refinedRoute sourceRoutes metadata.sourceClauseIndex
+          sourceLiteralIndex).drop 2) := by
+  simp [rawRouteForMetadata, originEq]
+
+/-- The second binary-clause incidence is the translated reverse middle
+edge leading to the fresh complement variable. -/
+theorem rawRouteForMetadata_complement_fresh {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    (metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable)
+    (sourceLiteral : PeriodicLiteral Variable)
+    (sourceLiteralIndex : Nat)
+    (originEq :
+      metadata.origin = .complement sourceLiteralIndex sourceLiteral) :
+    rawRouteForMetadata sourcePlacement sourceRoutes metadata 1 =
+      PeriodicOrthocrossing.translatePolyline
+        (complementCanonicalShift sourcePlacement sourceLiteral)
+        [routePoint sourceRoutes
+            ((metadata.sourceClauseIndex, sourceLiteralIndex), sourceLiteral) 2,
+          routePoint sourceRoutes
+            ((metadata.sourceClauseIndex, sourceLiteralIndex), sourceLiteral) 1] := by
+  simp [rawRouteForMetadata, originEq]
+
+/-- At a genuine raw output clause, final routes are exactly the split raw
+routes translated by the canonical fresh-variable gauge shift. -/
+theorem incidenceRoutes_of_raw_clause_mem {Variable : Type*}
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
+    {rawClause :
+      PositionedPeriodicClause (PolarityNormalizedVariable Variable)}
+    {clauseIndex literalIndex : Nat}
+    (clauseMember :
+      (rawClause, clauseIndex) ∈
+        (rawFormula source sourcePlacement sourceRoutes).clauses.zipIdx) :
+    incidenceRoutes source sourcePlacement sourceRoutes
+        clauseIndex literalIndex =
+      PeriodicOrthocrossing.translatePolyline
+        ((rawPlacement sourcePlacement sourceRoutes).translation
+          (PositionedPeriodicCNF.variableGaugeCanonicalRouteShift
+            freshGauge rawClause))
+        (rawIncidenceRoutes source sourcePlacement sourceRoutes
+          clauseIndex literalIndex) := by
+  exact
+    PositionedPeriodicCNF.variableGaugeCanonicalIncidenceRoutes_of_clause_mem
+      (rawFormula source sourcePlacement sourceRoutes)
+      (rawPlacement sourcePlacement sourceRoutes)
+      freshGauge
+      (rawIncidenceRoutes source sourcePlacement sourceRoutes)
+      clauseMember
 
 /-- Threefold scaling multiplies the Manhattan length of an axis segment by
 three. -/
@@ -176,7 +420,7 @@ theorem placement_original_position {Variable : Type*}
     (atom : Variable) :
     (placement sourcePlacement routes).position (Sum.inl atom) =
       (refinedPlacement sourcePlacement).position atom := by
-  simp [placement, freshGauge,
+  simp [placement, rawPlacement, freshGauge,
     PeriodicVariablePlacement.variableGauge,
     PeriodicOneInThreePolarityNormalizationPositioned.placement,
     PeriodicVariablePlacement.translation, Cell.scale, Cell.sub]
@@ -192,7 +436,7 @@ theorem placement_fresh_position {Variable : Type*}
       routePoint routes fresh 1 := by
   generalize pointEq : routePoint routes fresh 1 = point
   rcases point with ⟨pointX, pointY⟩
-  simp [placement, rawPositions, freshGauge,
+  simp [placement, rawPlacement, rawPositions, freshGauge,
     PeriodicOneInThreePolarityNormalizationPositioned.placement,
     PeriodicVariablePlacement.variableGauge,
     PeriodicVariablePlacement.translation,
@@ -222,7 +466,8 @@ theorem erase_formula {Variable : Type*}
       (PeriodicOneInThreePolarityNormalization.formula
         (refinedSource source sourcePlacement).erase).variableGauge
           freshGauge := by
-  simp [formula, PositionedPeriodicCNF.erase_variableGauge]
+  simp [formula, rawFormula,
+    PositionedPeriodicCNF.erase_variableGauge]
 
 /-- Route-subdivision polarity normalization preserves exact-one
 satisfiability all the way back to the unrefined positioned source. -/
