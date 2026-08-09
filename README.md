@@ -6691,7 +6691,10 @@ The representation choices for this target are:
   and a duplicate-free occurrence-indexed enumeration gives every vertex or
   route-interior point a stable key.  Thus `FinalAssignmentsCollisionFree`
   reduces to the single geometric certificate that distinct keyed
-  occurrences have distinct torus locations.
+  occurrences have distinct torus locations.  Compatible fundamental-square
+  placement proves the vertex/vertex cases, while endpoint-only route
+  contacts prove the route-interior/route-interior cases; only mixed
+  vertex/route-interior avoidance remains.
 - [`LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean)
   proves that every final route begins and ends with two nonreversing unit
   steps at its normalized endpoint occurrences.  Its first and last routing

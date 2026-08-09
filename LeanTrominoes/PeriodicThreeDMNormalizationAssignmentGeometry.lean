@@ -166,6 +166,78 @@ def indexedInteriorRoutePoints (drawing : PeriodicGridDrawing) :
         routeLength := taggedRoute.1.length
         point := taggedPoint.1 }
 
+/-- Removing a final point preserves the tagged indices of every remaining
+point. -/
+private theorem zipIdx_dropLast_sublist :
+    ∀ (points : List Cell) (start : Nat),
+      List.Sublist (points.dropLast.zipIdx start) (points.zipIdx start)
+  | [], _ => by simp
+  | [_], _ => by simp
+  | first :: second :: rest, start => by
+      simp only [List.dropLast_cons_cons, List.zipIdx_cons]
+      exact
+        List.Sublist.cons_cons (first, start)
+          (zipIdx_dropLast_sublist (second :: rest) (start + 1))
+
+/-- Every directly enumerated internal occurrence also belongs to the
+standard all-route-point enumeration. -/
+theorem indexedInteriorRoutePoint_mem_indexedRoutePoints
+    {drawing : PeriodicGridDrawing} {indexed : IndexedRoutePoint}
+    (member : indexed ∈ drawing.indexedInteriorRoutePoints) :
+    indexed ∈ drawing.indexedRoutePoints := by
+  unfold indexedInteriorRoutePoints at member
+  rcases List.mem_flatMap.mp member with
+    ⟨taggedRoute, taggedRouteMember, indexedMember⟩
+  rcases taggedRoute with ⟨route, routeIndex⟩
+  rcases List.mem_map.mp indexedMember with
+    ⟨taggedPoint, taggedPointMember, indexedEqual⟩
+  subst indexed
+  unfold indexedRoutePoints
+  apply List.mem_flatMap.mpr
+  refine ⟨(route, routeIndex), taggedRouteMember, ?_⟩
+  apply List.mem_map.mpr
+  refine ⟨taggedPoint, ?_, rfl⟩
+  cases route with
+  | nil => simp at taggedPointMember
+  | cons first rest =>
+      simp only [List.tail_cons] at taggedPointMember
+      simp only [List.zipIdx_cons, List.mem_cons]
+      right
+      exact
+        (zipIdx_dropLast_sublist rest 1).mem taggedPointMember
+
+/-- A directly enumerated route-interior occurrence is syntactically neither
+the first nor the last point of its route. -/
+theorem indexedInteriorRoutePoint_not_endpoint
+    {drawing : PeriodicGridDrawing} {indexed : IndexedRoutePoint}
+    (member : indexed ∈ drawing.indexedInteriorRoutePoints) :
+    ¬ indexed.IsEndpoint := by
+  unfold indexedInteriorRoutePoints at member
+  rcases List.mem_flatMap.mp member with
+    ⟨taggedRoute, taggedRouteMember, indexedMember⟩
+  rcases taggedRoute with ⟨route, routeIndex⟩
+  rcases List.mem_map.mp indexedMember with
+    ⟨taggedPoint, taggedPointMember, indexedEqual⟩
+  subst indexed
+  have shiftedMember := taggedPointMember
+  rw [List.zipIdx_eq_map_add] at shiftedMember
+  rcases List.mem_map.mp shiftedMember with
+    ⟨localPoint, localPointMember, localEqual⟩
+  rcases taggedPoint with ⟨point, pointIndex⟩
+  rcases localPoint with ⟨localPoint, localIndex⟩
+  simp only [Prod.mk.injEq] at localEqual
+  rcases localEqual with ⟨pointEqual, indexEqual⟩
+  subst point
+  subst pointIndex
+  have localIndexLt := List.snd_lt_of_mem_zipIdx localPointMember
+  simp only [List.length_dropLast, List.length_tail] at localIndexLt
+  unfold IndexedRoutePoint.IsEndpoint
+  have pointIndexNonzero : 1 + localIndex ≠ 0 := by omega
+  have pointIndexBeforeLast : 1 + localIndex + 1 < route.length := by
+    omega
+  exact fun endpoint => endpoint.elim pointIndexNonzero
+    (Nat.ne_of_lt pointIndexBeforeLast)
+
 /-- Every assignment-receiving geometric occurrence, with vertices before
 route interiors just as in the rasterizer. -/
 def indexedAssignmentPoints (drawing : PeriodicGridDrawing) :
@@ -292,6 +364,71 @@ theorem indexedAssignmentPointKeys_nodup
       exact vertexEqual.trans (equal.trans routeEqual.symm)
     cases impossible
 
+/-- Rasterization is injective on the open fundamental square of a periodic
+drawing. -/
+theorem rasterLocation_injective_on_fundamentalSquare
+    {drawing : PeriodicGridDrawing} {first second : Cell}
+    (firstBounds : drawing.PositionInFundamentalSquare first)
+    (secondBounds : drawing.PositionInFundamentalSquare second)
+    (equal : rasterLocation drawing.gridSize first =
+      rasterLocation drawing.gridSize second) :
+    first = second := by
+  rcases
+      (rasterLocation_eq_iff_exists_periodTranslation
+        drawing.gridSize first second).mp equal with
+    ⟨translate, translatedEqual⟩
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  rcases translate with ⟨translateX, translateY⟩
+  simp only [PositionInFundamentalSquare] at firstBounds secondBounds
+  simp only [Cell.add, Cell.scale, Prod.mk.injEq] at translatedEqual
+  have periodPositive : (0 : Int) < drawing.gridSize := by
+    exact_mod_cast Nat.zero_lt_succ drawing.gridSizePred
+  have translation_eq_zero
+      (firstCoordinate secondCoordinate translationCoordinate : Int)
+      (firstLower : 0 < firstCoordinate)
+      (firstUpper : firstCoordinate < drawing.gridSize)
+      (secondLower : 0 < secondCoordinate)
+      (secondUpper : secondCoordinate < drawing.gridSize)
+      (coordinateEqual : firstCoordinate =
+        secondCoordinate + drawing.gridSize * translationCoordinate) :
+      translationCoordinate = 0 := by
+    by_cases nonnegative : 0 ≤ translationCoordinate
+    · by_cases zero : translationCoordinate = 0
+      · exact zero
+      · have productNonnegative :
+            0 ≤ (drawing.gridSize : Int) *
+              (translationCoordinate - 1) :=
+          mul_nonneg (le_of_lt periodPositive) (by omega)
+        nlinarith
+    · have productNonnegative :
+          0 ≤ (drawing.gridSize : Int) *
+            (-translationCoordinate - 1) :=
+        mul_nonneg (le_of_lt periodPositive) (by omega)
+      nlinarith
+  have horizontalTranslationZero :=
+    translation_eq_zero firstX secondX translateX
+      firstBounds.1 firstBounds.2.1
+      secondBounds.1 secondBounds.2.1 translatedEqual.1
+  have verticalTranslationZero :=
+    translation_eq_zero firstY secondY translateY
+      firstBounds.2.2.1 firstBounds.2.2.2
+      secondBounds.2.2.1 secondBounds.2.2.2 translatedEqual.2
+  subst translateX
+  subst translateY
+  simp only [mul_zero, add_zero] at translatedEqual
+  exact Prod.ext translatedEqual.1 translatedEqual.2
+
+/-- The mixed separation obligation left after compatible vertex placement
+and endpoint-only route contacts: no stored vertex and route-interior
+occurrence have the same torus location. -/
+def VertexAssignmentsAvoidRouteInteriors
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ vertex ∈ drawing.vertexPositions.zipIdx,
+    ∀ routePoint ∈ drawing.indexedInteriorRoutePoints,
+      rasterLocation drawing.gridSize vertex.1 ≠
+        rasterLocation drawing.gridSize routePoint.point
+
 /-- Exact geometric condition needed for assignment rasterization: distinct
 syntactic assignment occurrences have distinct torus locations. -/
 def AssignmentPointOccurrencesSeparated
@@ -301,6 +438,89 @@ def AssignmentPointOccurrencesSeparated
       first.1 ≠ second.1 →
         rasterLocation drawing.gridSize first.2 ≠
           rasterLocation drawing.gridSize second.2
+
+/-- Compatible fundamental-square vertices, endpoint-only route-point
+contacts, and the mixed vertex/interior condition together prove complete
+assignment-occurrence separation. -/
+theorem assignmentPointOccurrencesSeparated_of_endpointContacts
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex} {drawing : PeriodicGridDrawing}
+    (compatible : drawing.IsCompatible graph)
+    (endpointContacts : drawing.RoutePointsMeetOnlyAtEndpoints)
+    (mixed : drawing.VertexAssignmentsAvoidRouteInteriors) :
+    drawing.AssignmentPointOccurrencesSeparated := by
+  intro first firstMember second secondMember keysDifferent locationsEqual
+  simp only [indexedAssignmentPoints, List.mem_append] at firstMember secondMember
+  rcases firstMember with firstVertexMember | firstRouteMember
+  · rcases List.mem_map.mp firstVertexMember with
+      ⟨firstVertex, firstVertexSourceMember, firstEqual⟩
+    subst first
+    rcases secondMember with secondVertexMember | secondRouteMember
+    · rcases List.mem_map.mp secondVertexMember with
+        ⟨secondVertex, secondVertexSourceMember, secondEqual⟩
+      subst second
+      have positionsEqual :=
+        rasterLocation_injective_on_fundamentalSquare
+          (compatible.2.2.2.2.1 firstVertex.1
+            (List.fst_mem_of_mem_zipIdx firstVertexSourceMember))
+          (compatible.2.2.2.2.1 secondVertex.1
+            (List.fst_mem_of_mem_zipIdx secondVertexSourceMember))
+          locationsEqual
+      have verticesEqual :=
+        PeriodicThreeDM.tagged_eq_of_mem_zipIdx_of_fst_eq_of_nodup
+          compatible.2.2.2.1 firstVertexSourceMember
+          secondVertexSourceMember
+          positionsEqual
+      apply keysDifferent
+      simpa using congrArg Prod.snd verticesEqual
+    · rcases List.mem_map.mp secondRouteMember with
+        ⟨secondRoute, secondRouteSourceMember, secondEqual⟩
+      subst second
+      exact mixed firstVertex firstVertexSourceMember secondRoute
+        secondRouteSourceMember locationsEqual
+  · rcases List.mem_map.mp firstRouteMember with
+      ⟨firstRoute, firstRouteSourceMember, firstEqual⟩
+    subst first
+    rcases secondMember with secondVertexMember | secondRouteMember
+    · rcases List.mem_map.mp secondVertexMember with
+        ⟨secondVertex, secondVertexSourceMember, secondEqual⟩
+      subst second
+      exact mixed secondVertex secondVertexSourceMember firstRoute
+        firstRouteSourceMember locationsEqual.symm
+    · rcases List.mem_map.mp secondRouteMember with
+        ⟨secondRoute, secondRouteSourceMember, secondEqual⟩
+      subst second
+      have routePointKeysDifferent :
+          (firstRoute.routeIndex, firstRoute.pointIndex) ≠
+            (secondRoute.routeIndex, secondRoute.pointIndex) := by
+        simpa using keysDifferent
+      rcases
+          (rasterLocation_eq_iff_exists_periodTranslation
+            drawing.gridSize firstRoute.point secondRoute.point).mp
+            locationsEqual with
+        ⟨translate, pointEqual⟩
+      have fullKeysDifferent :
+          RoutePointOccurrenceKey firstRoute (0, 0) ≠
+            RoutePointOccurrenceKey secondRoute translate := by
+        intro equal
+        apply routePointKeysDifferent
+        simp only [RoutePointOccurrenceKey] at equal
+        exact Prod.ext
+          (congrArg (fun key => key.1) equal)
+          (congrArg (fun key => key.2.1) equal)
+      have endpoints :=
+        endpointContacts firstRoute
+          (indexedInteriorRoutePoint_mem_indexedRoutePoints
+            firstRouteSourceMember)
+          secondRoute
+          (indexedInteriorRoutePoint_mem_indexedRoutePoints
+            secondRouteSourceMember)
+          (0, 0) translate fullKeysDifferent
+          (by
+            simpa [periodTranslation, Cell.scale, Cell.add] using
+              pointEqual)
+      exact (indexedInteriorRoutePoint_not_endpoint firstRouteSourceMember
+        endpoints.1).elim
 
 /-- Occurrence separation makes the raster locations of all assignment
 points duplicate-free. -/
