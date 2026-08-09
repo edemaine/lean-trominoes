@@ -181,17 +181,17 @@ def rawRouteForMetadata {Variable : Type*}
       if literalIndex = 0 then
         PeriodicOrthocrossing.translatePolyline
           (complementCanonicalShift sourcePlacement sourceLiteral)
-          ((refinedRoute sourceRoutes metadata.sourceClauseIndex
-            sourceLiteralIndex).drop 2)
-      else if literalIndex = 1 then
-        PeriodicOrthocrossing.translatePolyline
-          (complementCanonicalShift sourcePlacement sourceLiteral)
           [routePoint sourceRoutes
               ((metadata.sourceClauseIndex, sourceLiteralIndex),
                 sourceLiteral) 2,
             routePoint sourceRoutes
               ((metadata.sourceClauseIndex, sourceLiteralIndex),
                 sourceLiteral) 1]
+      else if literalIndex = 1 then
+        PeriodicOrthocrossing.translatePolyline
+          (complementCanonicalShift sourcePlacement sourceLiteral)
+          ((refinedRoute sourceRoutes metadata.sourceClauseIndex
+            sourceLiteralIndex).drop 2)
       else
         []
 
@@ -282,9 +282,9 @@ theorem rawRouteForMetadata_normalized_incompatible {Variable : Type*}
         literalIndex).take 2 := by
   simp [rawRouteForMetadata, originEq, literalLookup, incompatible]
 
-/-- The first binary-clause incidence is the translated suffix leading to
-the original variable. -/
-theorem rawRouteForMetadata_complement_original {Variable : Type*}
+/-- The first binary-clause incidence is the translated reverse middle edge
+leading to the fresh complement variable. -/
+theorem rawRouteForMetadata_complement_fresh {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
     (metadata :
@@ -297,13 +297,15 @@ theorem rawRouteForMetadata_complement_original {Variable : Type*}
     rawRouteForMetadata sourcePlacement sourceRoutes metadata 0 =
       PeriodicOrthocrossing.translatePolyline
         (complementCanonicalShift sourcePlacement sourceLiteral)
-        ((refinedRoute sourceRoutes metadata.sourceClauseIndex
-          sourceLiteralIndex).drop 2) := by
+        [routePoint sourceRoutes
+            ((metadata.sourceClauseIndex, sourceLiteralIndex), sourceLiteral) 2,
+          routePoint sourceRoutes
+            ((metadata.sourceClauseIndex, sourceLiteralIndex), sourceLiteral) 1] := by
   simp [rawRouteForMetadata, originEq]
 
-/-- The second binary-clause incidence is the translated reverse middle
-edge leading to the fresh complement variable. -/
-theorem rawRouteForMetadata_complement_fresh {Variable : Type*}
+/-- The second binary-clause incidence is the translated suffix leading to
+the original variable. -/
+theorem rawRouteForMetadata_complement_original {Variable : Type*}
     (sourcePlacement : PeriodicVariablePlacement Variable)
     (sourceRoutes : PositionedPeriodicCNF.IncidenceRoutes)
     (metadata :
@@ -316,10 +318,8 @@ theorem rawRouteForMetadata_complement_fresh {Variable : Type*}
     rawRouteForMetadata sourcePlacement sourceRoutes metadata 1 =
       PeriodicOrthocrossing.translatePolyline
         (complementCanonicalShift sourcePlacement sourceLiteral)
-        [routePoint sourceRoutes
-            ((metadata.sourceClauseIndex, sourceLiteralIndex), sourceLiteral) 2,
-          routePoint sourceRoutes
-            ((metadata.sourceClauseIndex, sourceLiteralIndex), sourceLiteral) 1] := by
+        ((refinedRoute sourceRoutes metadata.sourceClauseIndex
+          sourceLiteralIndex).drop 2) := by
   simp [rawRouteForMetadata, originEq]
 
 /-- At a genuine raw output clause, final routes are exactly the split raw

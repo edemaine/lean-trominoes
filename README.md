@@ -7092,7 +7092,7 @@ The representation choices for this target are:
   geometry.  It normalizes clause positions to the fixed-red/fixed-blue/
   fixed-green polarity pattern `false`, `false`, `true`.  An incompatible
   occurrence is replaced by a fresh complement variable and the binary
-  exact-one clause `[original = false, fresh = false]`; the file proves both
+  exact-one clause `[fresh = false, original = false]`; the file proves both
   directions of satisfiability preservation, locality, binary-or-ternary
   arity, and the polarity certificate for every generated clause.  The
   remaining work is to splice this preprocessing into the positioned planar

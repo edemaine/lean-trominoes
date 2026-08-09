@@ -86,8 +86,8 @@ theorem clauseClausesFrom_count_original {Variable : Type*}
           (Sum.inr ((clauseIndex, literalStart), literal) ::
             (normalizeClauseFrom clauseIndex (literalStart + 1) rest).map
                 PeriodicLiteral.atom ++
-              Sum.inl literal.atom ::
-                Sum.inr ((clauseIndex, literalStart), literal) ::
+              Sum.inr ((clauseIndex, literalStart), literal) ::
+                Sum.inl literal.atom ::
                   (complementClausesFrom clauseIndex
                     (literalStart + 1) rest).flatMap
                     (fun clause => clause.map PeriodicLiteral.atom)).count

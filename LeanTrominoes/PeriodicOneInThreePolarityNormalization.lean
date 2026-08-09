@@ -12,7 +12,7 @@ and `true`.
 This file gives the logical preprocessing needed to impose that convention.
 An occurrence that already has the requested polarity is merely embedded.
 An occurrence with the opposite polarity is replaced by a fresh variable,
-and the binary exact-one clause `[original = false, fresh = false]` forces
+and the binary exact-one clause `[fresh = false, original = false]` forces
 the fresh variable to be the complement of the original.  Consequently the
 replacement literal has exactly the same truth value as the source literal.
 -/
@@ -69,12 +69,13 @@ def complementFalseLiteral {Variable : Type*}
   ⟨Sum.inr ((clauseIndex, literalIndex), source), source.offset, false⟩
 
 /-- The binary exact-one clause forcing a fresh variable to complement its
-source variable. -/
+source variable.  The fresh literal comes first so that the later
+fresh-variable gauge makes this clause's anchor zero. -/
 def complementClause {Variable : Type*} (clauseIndex literalIndex : Nat)
     (source : PeriodicLiteral Variable) :
     PeriodicClause (PolarityNormalizedVariable Variable) :=
-  [originalFalseLiteral source,
-    complementFalseLiteral clauseIndex literalIndex source]
+  [complementFalseLiteral clauseIndex literalIndex source,
+    originalFalseLiteral source]
 
 /-- Normalize a suffix of literal occurrences, retaining its absolute
 starting index. -/
@@ -368,7 +369,7 @@ theorem exactlyOne_negative_pair_forces_complement
     (holds :
       PeriodicOneInThree.ExactlyOne
         [first == false, second == false]) :
-    second = !first := by
+    first = !second := by
   cases first <;> cases second <;>
     simp_all [PeriodicOneInThree.ExactlyOne]
 

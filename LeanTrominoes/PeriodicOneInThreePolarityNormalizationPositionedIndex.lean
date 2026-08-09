@@ -147,6 +147,32 @@ theorem complementClauseMetadataFrom_source_eq {Variable : Type*}
           exact ⟨rfl, rfl⟩
         · exact induction (literalStart + 1) metadataMember
 
+/-- Filtered complement metadata can never masquerade as the normalized
+main-clause origin. -/
+theorem complementClauseMetadataFrom_origin_ne_normalized
+    {Variable : Type*}
+    (positions : Positions Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (sourceClauseIndex literalStart : Nat)
+    (source : PeriodicClause Variable)
+    {metadata : ClauseMetadata Variable}
+    (metadataMember :
+      metadata ∈ complementClauseMetadataFrom positions sourceClause
+        sourceClauseIndex literalStart source) :
+    metadata.origin ≠ .normalized := by
+  induction source generalizing literalStart metadata with
+  | nil =>
+      simp [complementClauseMetadataFrom] at metadataMember
+  | cons literal rest induction =>
+      simp only [complementClauseMetadataFrom] at metadataMember
+      split at metadataMember
+      · exact induction (literalStart + 1) metadataMember
+      · simp only [List.mem_cons] at metadataMember
+        rcases metadataMember with metadataEq | metadataMember
+        · subst metadata
+          simp
+        · exact induction (literalStart + 1) metadataMember
+
 /-- A complement origin in the filtered metadata is exactly a genuine
 incompatible occurrence of the indexed literal suffix. -/
 theorem complementClauseMetadataFrom_complement_valid {Variable : Type*}
@@ -195,6 +221,43 @@ theorem complementClauseMetadataFrom_complement_valid {Variable : Type*}
                     sourceLiteralIndex = literalStart) ∨
                   (sourceLiteral, sourceLiteralIndex) ∈
                     rest.zipIdx (literalStart + 1)), valid.2⟩
+
+/-- A classified complement origin carries exactly its positioned binary
+clause, not merely the source-occurrence tag. -/
+theorem complementClauseMetadataFrom_complement_clause_eq
+    {Variable : Type*}
+    (positions : Positions Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (sourceClauseIndex literalStart : Nat)
+    (source : PeriodicClause Variable)
+    {metadata : ClauseMetadata Variable}
+    {sourceLiteralIndex : Nat}
+    {sourceLiteral : PeriodicLiteral Variable}
+    (metadataMember :
+      metadata ∈ complementClauseMetadataFrom positions sourceClause
+        sourceClauseIndex literalStart source)
+    (originEq :
+      metadata.origin = .complement sourceLiteralIndex sourceLiteral) :
+    metadata.clause =
+      positionedComplementClause positions sourceClauseIndex
+        sourceLiteralIndex sourceLiteral := by
+  induction source generalizing literalStart metadata with
+  | nil =>
+      simp [complementClauseMetadataFrom] at metadataMember
+  | cons literal rest induction =>
+      by_cases compatible :
+          literal.value = normalizedPolarity literalStart
+      · rw [complementClauseMetadataFrom, if_pos compatible]
+          at metadataMember
+        exact induction (literalStart + 1) metadataMember originEq
+      · rw [complementClauseMetadataFrom, if_neg compatible]
+          at metadataMember
+        simp only [List.mem_cons] at metadataMember
+        rcases metadataMember with metadataEq | metadataMember
+        · subst metadata
+          cases originEq
+          rfl
+        · exact induction (literalStart + 1) metadataMember originEq
 
 /-- Every global metadata entry retains a genuine source clause. -/
 theorem formulaClauseMetadata_source_mem {Variable : Type*}
@@ -251,6 +314,59 @@ theorem formulaClauseMetadata_complement_valid {Variable : Type*}
       taggedSource.1.literals metadataMember
     simpa [sourceEq.1, sourceEq.2] using
       And.intro sourceMember valid
+
+/-- A globally indexed complement origin carries its exact positioned
+binary clause. -/
+theorem formulaClauseMetadata_complement_clause_eq {Variable : Type*}
+    (positions : Positions Variable)
+    (source : PositionedPeriodicCNF Variable)
+    {metadata : ClauseMetadata Variable}
+    {sourceLiteralIndex : Nat}
+    {sourceLiteral : PeriodicLiteral Variable}
+    (metadataMember : metadata ∈ formulaClauseMetadata positions source)
+    (originEq :
+      metadata.origin = .complement sourceLiteralIndex sourceLiteral) :
+    metadata.clause =
+      positionedComplementClause positions metadata.sourceClauseIndex
+        sourceLiteralIndex sourceLiteral := by
+  simp only [formulaClauseMetadata, List.mem_flatMap] at metadataMember
+  rcases metadataMember with
+    ⟨taggedSource, _taggedSourceMember, metadataMember⟩
+  unfold clauseMetadataFor at metadataMember
+  simp only [List.mem_cons] at metadataMember
+  rcases metadataMember with metadataEq | metadataMember
+  · subst metadata
+    contradiction
+  · have clauseEq := complementClauseMetadataFrom_complement_clause_eq
+      positions taggedSource.1 taggedSource.2 0
+      taggedSource.1.literals metadataMember originEq
+    have sourceEq := complementClauseMetadataFrom_source_eq
+      positions taggedSource.1 taggedSource.2 0
+      taggedSource.1.literals metadataMember
+    simpa [sourceEq.2] using clauseEq
+
+/-- A globally indexed normalized origin is exactly the main clause of its
+retained source block. -/
+theorem formulaClauseMetadata_normalized_clause_eq {Variable : Type*}
+    (positions : Positions Variable)
+    (source : PositionedPeriodicCNF Variable)
+    {metadata : ClauseMetadata Variable}
+    (metadataMember : metadata ∈ formulaClauseMetadata positions source)
+    (originEq : metadata.origin = .normalized) :
+    metadata.clause =
+      normalizedClause metadata.sourceClauseIndex metadata.sourceClause := by
+  simp only [formulaClauseMetadata, List.mem_flatMap] at metadataMember
+  rcases metadataMember with
+    ⟨taggedSource, _taggedSourceMember, metadataMember⟩
+  unfold clauseMetadataFor at metadataMember
+  simp only [List.mem_cons] at metadataMember
+  rcases metadataMember with metadataEq | metadataMember
+  · subst metadata
+    rfl
+  · exact
+      (complementClauseMetadataFrom_origin_ne_normalized
+        positions taggedSource.1 taggedSource.2 0
+        taggedSource.1.literals metadataMember originEq).elim
 
 /-- Looking up a genuine flattened output clause yields metadata carrying
 that exact clause. -/
