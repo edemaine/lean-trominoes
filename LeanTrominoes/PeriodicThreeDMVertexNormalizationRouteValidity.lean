@@ -315,5 +315,236 @@ theorem trimmedMagnifiedRoute_getLast?_of_append_pair
     unitSegmentPoints_getElem?_three_before_last
       normalizedAligned normalizedLong
 
+/-! ## Template boundaries -/
+
+/-- Every side midpoint is three cardinal steps from the template center. -/
+theorem boundaryPoint_eq_center_add_three_steps (side : VertexSide) :
+    boundaryPoint side =
+      Cell.add center (Cell.scale 3 side.direction.step) := by
+  cases side <;> rfl
+
+/-- A selected cyclic-rotation route ends at the boundary corresponding to
+its incoming old port. -/
+theorem rotationRoundPortAndRoute_getLast?
+    (active : Bool) (oldPort : CanonicalVertexPort) :
+    (rotationRoundPortAndRoute active oldPort).2.getLast? =
+      some (Cell.add center
+        (Cell.scale 3 oldPort.direction.step)) := by
+  cases active <;> cases oldPort <;> native_decide
+
+/-- The first normalization template ends three steps along its endpoint's
+actual old side. -/
+theorem ContractedEndpoint.firstNormalizationTemplate_getLast?
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint)
+    (used : endpoint.outwardSide presentation ≠
+      omittedSideAt presentation endpoint.vertex) :
+    (endpoint.firstNormalizationTemplate presentation).getLast? =
+      some (Cell.add center (Cell.scale 3
+        (endpoint.outwardSide presentation).direction.step)) := by
+  unfold ContractedEndpoint.firstNormalizationTemplate
+  rw [(route_endpoints
+    (omittedSideAt presentation endpoint.vertex)
+    (endpoint.firstNormalizedPort presentation)).2]
+  rw [boundaryPoint_eq_center_add_three_steps]
+  rw [ContractedEndpoint.firstNormalizedPort,
+    boundarySide_canonicalPortForSide _ _ used]
+
+/-- The first normalization template is a unit-step chain. -/
+theorem ContractedEndpoint.firstNormalizationTemplate_unitSteps
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    (endpoint.firstNormalizationTemplate presentation).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  exact route_unitSteps
+    (omittedSideAt presentation endpoint.vertex)
+    (endpoint.firstNormalizedPort presentation)
+
+/-- The first cyclic round ends three steps along the incoming first-round
+port. -/
+theorem ContractedEndpoint.secondNormalizationTemplate_getLast?
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    (endpoint.secondNormalizationTemplate presentation).getLast? =
+      some (Cell.add center (Cell.scale 3
+        (endpoint.firstNormalizedPort presentation).direction.step)) := by
+  simpa [ContractedEndpoint.secondNormalizationTemplate] using
+    rotationRoundPortAndRoute_getLast?
+      (firstRotationActive presentation endpoint.vertex)
+      (endpoint.firstNormalizedPort presentation)
+
+/-- The final cyclic round ends three steps along the incoming second-round
+port. -/
+theorem ContractedEndpoint.finalNormalizationTemplate_getLast?
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (endpoint : ContractedEndpoint) :
+    (endpoint.finalNormalizationTemplate presentation).getLast? =
+      some (Cell.add center (Cell.scale 3
+        (endpoint.secondNormalizedPort presentation).direction.step)) := by
+  simpa [ContractedEndpoint.finalNormalizationTemplate] using
+    rotationRoundPortAndRoute_getLast?
+      (secondRotationActive presentation endpoint.vertex)
+      (endpoint.secondNormalizedPort presentation)
+
+/-- Translating a center-rooted template transports its three-step boundary
+to the corresponding normalized old endpoint. -/
+theorem normalizationTemplateAt_getLast?_of_three_steps
+    (position : Cell) {template : List Cell}
+    {direction : AxisDirection}
+    (last : template.getLast? =
+      some (Cell.add center (Cell.scale 3 direction.step))) :
+    (normalizationTemplateAt position template).getLast? =
+      some (Cell.add (normalizeVertexPosition position)
+        (Cell.scale 3 direction.step)) := by
+  simp [normalizationTemplateAt,
+    PeriodicOrthocrossing.translatePolyline, last,
+    normalizeVertexPosition, Cell.add_assoc]
+
+/-! ## Generic normalization-round validity -/
+
+/-- Endpoint lookups are enough to apply the explicit source trimming
+formula without exposing the route's tail in the caller. -/
+theorem trimmedMagnifiedRoute_head?_of_endpoints
+    (points : List Cell) {first second : Cell}
+    (head : points.head? = some first)
+    (next : points.tail.head? = some second)
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    (trimmedMagnifiedRoute points).head? =
+      some (Cell.add (normalizeVertexPosition first)
+        (Cell.scale 3 (AxisDirection.between first second).step)) := by
+  cases points with
+  | nil => simp at head
+  | cons actualFirst rest =>
+      cases rest with
+      | nil => simp at next
+      | cons actualSecond rest =>
+          have firstEqual : actualFirst = first := Option.some.inj head
+          have secondEqual : actualSecond = second := by
+            simpa using Option.some.inj next
+          subst actualFirst
+          subst actualSecond
+          exact trimmedMagnifiedRoute_head?_of_cons_cons
+            first second rest aligned
+
+/-- Final and reverse-tail lookups similarly feed the explicit target
+trimming formula. -/
+theorem trimmedMagnifiedRoute_getLast?_of_endpoints
+    (points : List Cell) {before last : Cell}
+    (lastLookup : points.getLast? = some last)
+    (beforeLookup : points.reverse.tail.head? = some before)
+    (aligned : (GridSegment.mk before last).IsAxisAligned) :
+    (trimmedMagnifiedRoute points).getLast? =
+      some (Cell.add (normalizeVertexPosition last)
+        (Cell.scale 3 (AxisDirection.between last before).step)) := by
+  have reverseLength : 2 ≤ points.reverse.length :=
+    List.two_le_length_of_tail_head?_eq_some beforeLookup
+  have length : 2 ≤ points.length := by simpa using reverseLength
+  obtain ⟨leading, actualBefore, actualLast, equation⟩ :=
+    AxisDirection.exists_eq_append_pair_of_length_ge_two length
+  have lastEqual : actualLast = last := by
+    rw [equation] at lastLookup
+    apply Option.some.inj
+    simpa using lastLookup
+  have beforeEqual : actualBefore = before := by
+    rw [equation] at beforeLookup
+    apply Option.some.inj
+    simpa using beforeLookup
+  subst actualLast
+  subst actualBefore
+  rw [equation]
+  exact trimmedMagnifiedRoute_getLast?_of_append_pair
+    leading before last aligned
+
+/-- Reversing a unit-step chain yields another unit-step chain. -/
+theorem unitSteps_reverse {points : List Cell}
+    (unitSteps : points.IsChain AxisDirection.IsUnitAxisStep) :
+    points.reverse.IsChain AxisDirection.IsUnitAxisStep := by
+  rw [List.isChain_reverse]
+  exact unitSteps.imp fun _ _ step => step.symm
+
+/-- A normalization round is a unit-step route once the incoming route and
+the two template boundaries advertise matching endpoint directions. -/
+theorem normalizeRouteWithTemplates_unitSteps
+    (sourcePosition targetPosition : Cell)
+    (sourceTemplate targetTemplate oldRoute : List Cell)
+    {sourceNext targetBefore : Cell}
+    {sourceDirection targetDirection : AxisDirection}
+    (oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute)
+    (oldHead : oldRoute.head? = some sourcePosition)
+    (oldSourceNext : oldRoute.tail.head? = some sourceNext)
+    (oldTarget : oldRoute.getLast? = some targetPosition)
+    (oldTargetBefore : oldRoute.reverse.tail.head? = some targetBefore)
+    (sourceAligned :
+      (GridSegment.mk sourcePosition sourceNext).IsAxisAligned)
+    (targetAligned :
+      (GridSegment.mk targetBefore targetPosition).IsAxisAligned)
+    (sourceDirectionEq :
+      AxisDirection.between sourcePosition sourceNext = sourceDirection)
+    (targetDirectionEq :
+      AxisDirection.between targetPosition targetBefore = targetDirection)
+    (sourceUnitSteps :
+      sourceTemplate.IsChain AxisDirection.IsUnitAxisStep)
+    (targetUnitSteps :
+      targetTemplate.IsChain AxisDirection.IsUnitAxisStep)
+    (sourceLast : sourceTemplate.getLast? =
+      some (Cell.add center (Cell.scale 3 sourceDirection.step)))
+    (targetLast : targetTemplate.getLast? =
+      some (Cell.add center (Cell.scale 3 targetDirection.step))) :
+    (normalizeRouteWithTemplates sourcePosition targetPosition
+      sourceTemplate targetTemplate oldRoute).IsChain
+        AxisDirection.IsUnitAxisStep := by
+  let sourceRoute := normalizationTemplateAt sourcePosition sourceTemplate
+  let middleRoute := trimmedMagnifiedRoute oldRoute
+  let targetRoute :=
+    (normalizationTemplateAt targetPosition targetTemplate).reverse
+  have sourceRouteUnitSteps :
+      sourceRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    normalizationTemplateAt_unitSteps sourcePosition sourceUnitSteps
+  have middleRouteUnitSteps :
+      middleRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    trimmedMagnifiedRoute_unitSteps oldOrthogonal
+  have targetRouteUnitSteps :
+      targetRoute.IsChain AxisDirection.IsUnitAxisStep := by
+    apply unitSteps_reverse
+    exact normalizationTemplateAt_unitSteps targetPosition targetUnitSteps
+  have sourceRouteLast : sourceRoute.getLast? =
+      some (Cell.add (normalizeVertexPosition sourcePosition)
+        (Cell.scale 3 sourceDirection.step)) :=
+    normalizationTemplateAt_getLast?_of_three_steps
+      sourcePosition sourceLast
+  have middleRouteHead : middleRoute.head? =
+      some (Cell.add (normalizeVertexPosition sourcePosition)
+        (Cell.scale 3 sourceDirection.step)) := by
+    rw [← sourceDirectionEq]
+    exact trimmedMagnifiedRoute_head?_of_endpoints
+      oldRoute oldHead oldSourceNext sourceAligned
+  have middleRouteLast : middleRoute.getLast? =
+      some (Cell.add (normalizeVertexPosition targetPosition)
+        (Cell.scale 3 targetDirection.step)) := by
+    rw [← targetDirectionEq]
+    exact trimmedMagnifiedRoute_getLast?_of_endpoints
+      oldRoute oldTarget oldTargetBefore targetAligned
+  have targetRouteHead : targetRoute.head? =
+      some (Cell.add (normalizeVertexPosition targetPosition)
+        (Cell.scale 3 targetDirection.step)) := by
+    simp only [targetRoute, List.head?_reverse]
+    exact normalizationTemplateAt_getLast?_of_three_steps
+      targetPosition targetLast
+  have innerRouteHead :
+      (joinAtEndpoint middleRoute targetRoute).head? =
+        some (Cell.add (normalizeVertexPosition sourcePosition)
+          (Cell.scale 3 sourceDirection.step)) :=
+    joinAtEndpoint_head? middleRouteHead
+  unfold normalizeRouteWithTemplates
+  exact List.IsChain.joinAtEndpoint sourceRouteUnitSteps
+    (List.IsChain.joinAtEndpoint middleRouteUnitSteps targetRouteUnitSteps
+      middleRouteLast targetRouteHead)
+    sourceRouteLast innerRouteHead
+
 end PeriodicThreeDM
 end LeanTrominoes

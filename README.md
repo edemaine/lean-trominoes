@@ -6701,6 +6701,9 @@ The representation choices for this target are:
   produce a unit-step middle in every normalization round.  It also computes
   both splice boundaries exactly: trimming lands three unit steps along the
   old first segment and three reverse unit steps along the old last segment.
+  The finite direction-normalization and cyclic-rotation templates are
+  certified to end at those same boundaries, yielding a reusable theorem
+  that each complete two-ended splice is a unit-step route.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
