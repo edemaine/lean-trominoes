@@ -648,5 +648,26 @@ theorem ContinuousPlanarPresentation.finalAssignmentsCollisionFree_of_occurrence
   simpa only [presentation.toPlanarPresentation.finalNormalizedGridDrawing_gridSize]
     using PeriodicGridDrawing.assignmentPointRasterLocations_nodup separated
 
+/-- For a restricted 3DM instance, endpoint-only contacts in the final
+normalized drawing are the sole remaining geometric input needed for raster
+assignment collision freedom. -/
+theorem ContinuousPlanarPresentation.finalAssignmentsCollisionFree_of_endpointContacts
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (degree : problem.DegreeTwoOrThree)
+    (endpointContacts :
+      presentation.toPlanarPresentation.finalNormalizedGridDrawing
+        |>.RoutePointsMeetOnlyAtEndpoints) :
+    presentation.toPlanarPresentation.FinalAssignmentsCollisionFree := by
+  apply presentation.finalAssignmentsCollisionFree_of_occurrencesSeparated
+  exact
+    PeriodicGridDrawing.assignmentPointOccurrencesSeparated_of_incident_endpointContacts
+      problem.contractedGraph
+      presentation.toPlanarPresentation.finalNormalizedGridDrawing
+      presentation.toPlanarPresentation.finalNormalizedGridDrawing_isCompatible
+      (contractedGraph_everyVertexIncident problem
+        presentation.problemWellFormed degree)
+      endpointContacts
+
 end PeriodicThreeDM
 end LeanTrominoes

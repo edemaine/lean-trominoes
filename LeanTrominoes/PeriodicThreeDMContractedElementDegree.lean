@@ -180,5 +180,40 @@ theorem contractedEndpointsAt_element_length
   exact contractedGraph_element_degree_eq_three
     problem color atom atomLt degree
 
+/-- Every retained contracted vertex is incident to a contracted edge.  The
+triple and retained-element degree calculations above both give the stronger
+fact that each such vertex has exactly three endpoint occurrences. -/
+theorem contractedGraph_everyVertexIncident
+    (problem : PeriodicThreeDM)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree) :
+    PeriodicGridDrawing.EveryVertexIncident problem.contractedGraph := by
+  apply PeriodicGridDrawing.everyVertexIncident_of_mem_incidences
+  intro vertex vertexMember
+  simp only [contractedGraph, List.mem_append] at vertexMember
+  rcases vertexMember with tripleMember | elementMember
+  · simp only [tripleVertices, List.mem_map] at tripleMember
+    rcases tripleMember with ⟨tripleIndex, indexMember, rfl⟩
+    have indexLt : tripleIndex < problem.triples.length := by
+      simpa using indexMember
+    apply List.count_pos_iff.mp
+    rw [contractedGraph_triple_degree_eq_three
+      problem wellFormed degree tripleIndex indexLt]
+    omega
+  · simp only [contractedElementVertices, List.mem_flatMap]
+      at elementMember
+    rcases elementMember with
+      ⟨color, colorMember, elementMember⟩
+    simp only [contractedElementVerticesForColor, List.mem_map]
+      at elementMember
+    rcases elementMember with ⟨atom, atomMember, rfl⟩
+    have filtered := List.mem_filter.mp atomMember
+    have atomLt : atom < problem.elementCount color := by
+      simpa using filtered.1
+    apply List.count_pos_iff.mp
+    rw [contractedGraph_element_degree_eq_three
+      problem color atom atomLt (of_decide_eq_true filtered.2)]
+    omega
+
 end PeriodicThreeDM
 end LeanTrominoes

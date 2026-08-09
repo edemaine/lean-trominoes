@@ -6698,6 +6698,10 @@ The representation choices for this target are:
   endpoint, so the same endpoint-contact certificate also excludes all mixed
   vertex/route-interior collisions.  Thus, for an incident compatible graph,
   endpoint-only route contacts alone imply complete assignment separation.
+  A degree calculation proves every retained contracted 3DM vertex is
+  incident, specializing the result so endpoint-only contacts in the final
+  normalized drawing are the sole remaining input to assignment collision
+  freedom.
 - [`LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean)
   proves that every final route begins and ends with two nonreversing unit
   steps at its normalized endpoint occurrences.  Its first and last routing
