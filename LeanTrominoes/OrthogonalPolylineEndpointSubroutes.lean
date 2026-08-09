@@ -1,5 +1,6 @@
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingMapPoints
 import LeanTrominoes.OrthogonalPolylineTailReplacementSeparation
+import LeanTrominoes.PeriodicThreeDMContractionContinuousPlanarity
 
 /-!
 # Endpoint-respecting polyline subroutes
@@ -17,8 +18,9 @@ namespace PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 source endpoint retained by the fragment remains a fragment endpoint. -/
 structure EndpointSubroute (fragment source : List Cell) : Prop where
   pointsSubset : ∀ point ∈ fragment, point ∈ source
-  segmentsSubset : ∀ segment ∈ gridPolylineSegments fragment,
-    segment ∈ gridPolylineSegments source
+  segmentsSupported : ∀ segment ∈ gridPolylineSegments fragment,
+    ∃ sourceSegment ∈ gridPolylineSegments source,
+      segment = sourceSegment ∨ segment = sourceSegment.reverse
   endpointOfSourceEndpoint : ∀ point ∈ fragment,
     RoutePointIsEndpoint source point →
       RoutePointIsEndpoint fragment point
@@ -27,7 +29,8 @@ namespace EndpointSubroute
 
 /-- Every route is an endpoint-respecting subroute of itself. -/
 theorem refl (route : List Cell) : EndpointSubroute route route := by
-  exact ⟨fun _ member => member, fun _ member => member,
+  exact ⟨fun _ member => member,
+    fun segment member => ⟨segment, member, Or.inl rfl⟩,
     fun _ _ endpoint => endpoint⟩
 
 /-- Injective point maps preserve endpoint-respecting subroutes. -/
@@ -48,8 +51,18 @@ theorem map
         at mappedMember ⊢
     rcases List.mem_map.mp mappedMember with
       ⟨segment, segmentMember, rfl⟩
-    exact List.mem_map.mpr
-      ⟨segment, subroute.segmentsSubset segment segmentMember, rfl⟩
+    rcases subroute.segmentsSupported segment segmentMember with
+      ⟨sourceSegment, sourceSegmentMember, forward | reversed⟩
+    · refine ⟨sourceSegment.mapPoints transform,
+        List.mem_map.mpr ⟨sourceSegment, sourceSegmentMember, rfl⟩,
+        Or.inl ?_⟩
+      exact congrArg (GridSegment.mapPoints transform) forward
+    · refine ⟨sourceSegment.mapPoints transform,
+        List.mem_map.mpr ⟨sourceSegment, sourceSegmentMember, rfl⟩,
+        Or.inr ?_⟩
+      rw [reversed]
+      cases sourceSegment
+      rfl
   · intro mappedPoint mappedMember mappedEndpoint
     rcases List.mem_map.mp mappedMember with
       ⟨point, pointMember, rfl⟩
@@ -103,21 +116,59 @@ theorem RoutesAvoidEachOther.endpointSubroutes
     RoutesAvoidEachOther firstFragment secondFragment := by
   apply routesAvoidEachOther_of_mem
   · intro firstSegment firstMember secondSegment secondMember
-    exact avoids.segmentsAvoid_of_mem
-      firstSegment
-      (firstSubroute.segmentsSubset firstSegment firstMember)
-      secondSegment
-      (secondSubroute.segmentsSubset secondSegment secondMember)
+    rcases firstSubroute.segmentsSupported firstSegment firstMember with
+      ⟨firstSourceSegment, firstSourceMember, firstEq⟩
+    rcases secondSubroute.segmentsSupported secondSegment secondMember with
+      ⟨secondSourceSegment, secondSourceMember, secondEq⟩
+    have sourceAvoid := avoids.segmentsAvoid_of_mem
+      firstSourceSegment firstSourceMember
+      secondSourceSegment secondSourceMember
+    rcases firstEq with firstForward | firstReverse
+    · subst firstSegment
+      rcases secondEq with secondForward | secondReverse
+      · subst secondSegment
+        exact sourceAvoid
+      · subst secondSegment
+        intro meet
+        exact sourceAvoid
+          ((GridSegment.interiorsMeet_reverse_right_iff _ _).mp meet)
+    · subst firstSegment
+      rcases secondEq with secondForward | secondReverse
+      · subst secondSegment
+        intro meet
+        exact sourceAvoid
+          ((GridSegment.interiorsMeet_reverse_left_iff _ _).mp meet)
+      · subst secondSegment
+        intro meet
+        apply sourceAvoid
+        exact (GridSegment.interiorsMeet_reverse_left_iff _ _).mp
+          ((GridSegment.interiorsMeet_reverse_right_iff _ _).mp meet)
   · intro firstPoint firstMember secondSegment secondMember
-    exact avoids.firstPointsAvoid_of_mem
-      firstPoint (firstSubroute.pointsSubset firstPoint firstMember)
-      secondSegment
-      (secondSubroute.segmentsSubset secondSegment secondMember)
+    rcases secondSubroute.segmentsSupported secondSegment secondMember with
+      ⟨sourceSegment, sourceMember, forward | reversed⟩
+    · rw [forward]
+      exact avoids.firstPointsAvoid_of_mem
+        firstPoint (firstSubroute.pointsSubset firstPoint firstMember)
+        sourceSegment sourceMember
+    · intro interior
+      apply avoids.firstPointsAvoid_of_mem
+        firstPoint (firstSubroute.pointsSubset firstPoint firstMember)
+        sourceSegment sourceMember
+      rw [reversed] at interior
+      exact (GridSegment.interiorContains_reverse _ _).mp interior
   · intro secondPoint secondMember firstSegment firstMember
-    exact avoids.secondPointsAvoid_of_mem
-      secondPoint (secondSubroute.pointsSubset secondPoint secondMember)
-      firstSegment
-      (firstSubroute.segmentsSubset firstSegment firstMember)
+    rcases firstSubroute.segmentsSupported firstSegment firstMember with
+      ⟨sourceSegment, sourceMember, forward | reversed⟩
+    · rw [forward]
+      exact avoids.secondPointsAvoid_of_mem
+        secondPoint (secondSubroute.pointsSubset secondPoint secondMember)
+        sourceSegment sourceMember
+    · intro interior
+      apply avoids.secondPointsAvoid_of_mem
+        secondPoint (secondSubroute.pointsSubset secondPoint secondMember)
+        sourceSegment sourceMember
+      rw [reversed] at interior
+      exact (GridSegment.interiorContains_reverse _ _).mp interior
   · intro firstPoint firstMember secondPoint secondMember pointsEqual
     rcases List.mem_iff_get.mp
         (firstSubroute.pointsSubset firstPoint firstMember) with
