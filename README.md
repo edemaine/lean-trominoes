@@ -4354,6 +4354,12 @@ The representation choices for this target are:
   the 24 nonzero shifts in the surrounding `5 × 5` block; checking those
   finite cases, together with simplicity, endpoint coverage, and
   orthogonality, now suffices for continuous planarity of the assembly.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedTranslatedPlanarity.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedTranslatedPlanarity.lean)
+  specializes complete translated typed-route separation to the doubled,
+  anchor-normalized source and transports it through numeric incidence tags
+  to every stored route.  This discharges all nonzero relative lifted
+  contacts and proves continuous planarity of the final padded coordinated
+  assembly without any remaining finite-neighbor hypothesis.
 - [`LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean)
   proves the reusable finite-to-infinite bridge behind that reduction.  A
   halo-bounded route pair at any shift outside the `5 × 5` block
