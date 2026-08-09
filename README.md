@@ -6636,6 +6636,11 @@ The representation choices for this target are:
   interface used by the finite normalization templates.  Triple fans have
   pairwise-distinct RGB colors, while retained element fans induce the
   constant coloring of their element color.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationRoutes.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationRoutes.lean)
+  defines the executable three-round geometric replacement.  It first maps
+  arbitrary endpoint directions to west/north/east, then applies up to two
+  clockwise port rotations to put red north, magnifying by twelve and
+  splicing verified local templates onto every contracted route each round.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
