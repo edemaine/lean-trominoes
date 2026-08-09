@@ -123,13 +123,19 @@ def PlanarPresentation.finalCellTypeAt
     (location : Cell) : OrthogonalCellType :=
   (presentation.finalCellAssignments.lookup location).getD .blank
 
+/-- Generic rectangular row-major enumeration. -/
+def rowMajorList {α : Type*} (height width : Nat)
+    (entry : Nat → Nat → α) : List α :=
+  (List.range height).flatMap fun vertical =>
+    (List.range width).map fun horizontal => entry horizontal vertical
+
 /-- Row-major full torus array consumed by `PeriodicOrthogonalDrawing`. -/
 def PlanarPresentation.finalCellTypes
     {problem : PeriodicThreeDM}
     (presentation : problem.PlanarPresentation) :
     List OrthogonalCellType :=
-  (List.range presentation.finalNormalizationPeriod).flatMap fun vertical =>
-    (List.range presentation.finalNormalizationPeriod).map fun horizontal =>
+  rowMajorList presentation.finalNormalizationPeriod
+    presentation.finalNormalizationPeriod fun horizontal vertical =>
       presentation.finalCellTypeAt (horizontal, vertical)
 
 /-- Executable normalized drawing compiled from a contracted planar 3DM
@@ -141,6 +147,14 @@ def PlanarPresentation.normalizedOrthogonalDrawing
   horizontalPeriodPred := presentation.finalNormalizationPeriod - 1
   verticalPeriodPred := presentation.finalNormalizationPeriod - 1
   cellTypes := presentation.finalCellTypes
+
+@[simp]
+theorem PlanarPresentation.normalizedOrthogonalDrawing_cellTypes
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.normalizedOrthogonalDrawing.cellTypes =
+      presentation.finalCellTypes := by
+  simp only [PlanarPresentation.normalizedOrthogonalDrawing]
 
 /-- Both actual periods of the compiled drawing are the advertised final
 normalization period. -/
@@ -162,6 +176,7 @@ theorem PlanarPresentation.finalCellTypes_length
     presentation.finalCellTypes.length =
       presentation.finalNormalizationPeriod ^ 2 := by
   unfold PlanarPresentation.finalCellTypes
+  unfold rowMajorList
   rw [List.length_flatMap]
   simp [pow_two]
 

@@ -6651,6 +6651,11 @@ The representation choices for this target are:
   `PeriodicOrthogonalDrawing`: centers become normalized vertex cells,
   internal route points become colored wires or bends, and every unused cell
   is blank.  Its row-major array has exactly the advertised positive period.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationRasterizationCorrectness.lean`](LeanTrominoes/PeriodicThreeDMNormalizationRasterizationCorrectness.lean)
+  proves the local rasterizer semantics and the row-major lookup theorem.
+  It reduces drawing well-formedness and degree-three vertex separation to
+  explicit neighboring-cell obligations on the finite assignment lookup,
+  isolating those remaining obligations from array-index bookkeeping.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
