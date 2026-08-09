@@ -7,10 +7,11 @@ import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseCenterFr
 Every route in a source variable core avoids every complete coordinated
 occurrence-route suffix.  A source-route freshness argument handles all
 interior corridor macrocells; the two-point corridor case is instead bounded
-from its clause-facing macrocell.  Variable-fan contacts retain the weaker
-`RoutesAvoidInteriorContacts` conclusion needed by the global continuous
-planarity proof, while corridor and clause-stub contacts are excluded
-strictly.
+from its clause-facing macrocell.  Variable-fan contacts satisfy the full
+endpoint-aware law, while the corridor and clause-stub suffixes are excluded
+strictly; both joins therefore preserve endpoint-only contacts.  The weaker
+interior-contact projection remains available to the continuous-planarity
+proof.
 -/
 
 namespace LeanTrominoes
@@ -334,6 +335,95 @@ theorem constructedVariableSiteRoute_avoids_occurrenceThreeStrandRouteInteriors
     coordinatedSourceRibbonEndpointFanSystem, coreRoute, variableStub,
     corridor, clauseStub, planar] using fullAvoid
 
+/-- Every route in an active source variable core has complete
+endpoint-aware separation from every complete coordinated occurrence route.
+The local fan may meet the core at a legal endpoint; the corridor and clause
+suffixes are strictly separated, so both joins preserve that contact law. -/
+theorem constructedVariableSiteRoute_avoids_occurrenceThreeStrandRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (owner entry : ActiveOccurrenceEntry source.erase)
+    (triple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase owner.1.1)
+        (sourceVariableSiteKind source.erase owner.1.1))
+    (coreColor routeColor : WireColor) :
+    RoutesAvoidEachOther
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout
+          owner.1.1)
+        ((sourceVariableSiteDrawing source.erase owner.1.1).route
+          triple coreColor))
+      (RibbonEndpointFanSystem.occurrenceThreeStrandRoute
+        (coordinatedSourceRibbonEndpointFanSystem
+          presentation.toPlanarIncidencePresentation width compatible)
+        entry routeColor) := by
+  let planar := presentation.toPlanarIncidencePresentation
+  let coreRoute :=
+    translatePolyline
+      (constructedVariableOrigin placement standardThreeStrandLayout
+        owner.1.1)
+      ((sourceVariableSiteDrawing source.erase owner.1.1).route
+        triple coreColor)
+  let variableStub :=
+    occurrenceCoordinatedRibbonVariableStub planar entry routeColor
+  let corridor :=
+    occurrenceRibbonCorridorCore planar entry routeColor
+  let clauseStub :=
+    occurrenceCoordinatedRibbonClauseStub planar entry routeColor
+  have variableAvoid : RoutesAvoidEachOther coreRoute variableStub := by
+    simpa [coreRoute, variableStub, planar] using
+      constructedVariableSiteRoute_avoids_occurrenceCoordinatedRibbonVariableStub
+        presentation anchorsZero width normalized compatible
+        owner.1.1 owner.atom_mem triple coreColor entry routeColor
+  have corridorAvoid :
+      RoutesStrictlyAvoidEachOther coreRoute corridor := by
+    simpa [coreRoute, corridor, planar] using
+      constructedVariableSiteRoute_strictlyAvoids_occurrenceRibbonCorridorCore
+        presentation owner entry triple coreColor routeColor
+  have clauseAvoid :
+      RoutesStrictlyAvoidEachOther coreRoute clauseStub := by
+    simpa [coreRoute, clauseStub, planar] using
+      constructedVariableSiteRoute_strictlyAvoids_occurrenceCoordinatedRibbonClauseStub
+        presentation compatible owner entry triple coreColor routeColor
+  have variableEndpoints :=
+    occurrenceCoordinatedRibbonVariableStub_endpoints
+      planar compatible entry routeColor
+  have corridorEndpoints :=
+    occurrenceRibbonCorridorCore_endpoints planar entry routeColor
+  have clauseEndpoints :=
+    occurrenceCoordinatedRibbonClauseStub_endpoints
+      planar width compatible entry routeColor
+  have prefixAvoid :
+      RoutesAvoidEachOther coreRoute
+        (joinAtEndpoint variableStub corridor) :=
+    variableAvoid.join_right_of_strict_suffix corridorAvoid
+      variableEndpoints.2 corridorEndpoints.1
+  have prefixLast :
+      (joinAtEndpoint variableStub corridor).getLast? =
+        some (ribbonCorridorRouteEnd
+          (routedRibbonLane source.erase entry routeColor)
+          (occurrenceUnitSourceRoute planar entry)) :=
+    joinAtEndpoint_getLast?
+      variableEndpoints.2 corridorEndpoints.1 corridorEndpoints.2
+  have fullAvoid :
+      RoutesAvoidEachOther coreRoute
+        (joinAtEndpoint
+          (joinAtEndpoint variableStub corridor) clauseStub) :=
+    prefixAvoid.join_right_of_strict_suffix clauseAvoid
+      prefixLast clauseEndpoints.1
+  simpa [RibbonEndpointFanSystem.occurrenceThreeStrandRoute,
+    coordinatedSourceRibbonEndpointFanSystem, coreRoute, variableStub,
+    corridor, clauseStub, planar] using fullAvoid
+
 /-- The same all-pairs variable-core certificate for the route selected by
 the actual coordinated source routing. -/
 theorem constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRouteInteriors
@@ -366,6 +456,41 @@ theorem constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRouteInterior
   rw [coordinatedSourceRibbonThreeStrandRouting_route]
   exact
     constructedVariableSiteRoute_avoids_occurrenceThreeStrandRouteInteriors
+      presentation anchorsZero width normalized compatible owner entry triple
+      coreColor routeColor
+
+/-- Data-selected form of the endpoint-aware all-pairs variable-core versus
+complete occurrence-route certificate. -/
+theorem constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (owner entry : ActiveOccurrenceEntry source.erase)
+    (triple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase owner.1.1)
+        (sourceVariableSiteKind source.erase owner.1.1))
+    (coreColor routeColor : WireColor) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesAvoidEachOther
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout
+          owner.1.1)
+        ((sourceVariableSiteDrawing source.erase owner.1.1).route
+          triple coreColor))
+      (routing.route entry routeColor) := by
+  dsimp only
+  rw [coordinatedSourceRibbonThreeStrandRouting_route]
+  exact
+    constructedVariableSiteRoute_avoids_occurrenceThreeStrandRoute
       presentation anchorsZero width normalized compatible owner entry triple
       coreColor routeColor
 

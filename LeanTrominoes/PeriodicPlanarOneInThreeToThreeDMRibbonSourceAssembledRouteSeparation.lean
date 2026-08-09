@@ -614,6 +614,86 @@ theorem assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
             presentation anchorsZero occurrences arity width compatible
             clauseIndex indexLt set coreColor entry routeColor)
 
+/-- Every assembled finite core has complete endpoint-aware separation from
+every coordinated source occurrence route. -/
+theorem assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRoute
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (coreTriple :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (routeColor : WireColor) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesAvoidEachOther
+      (assembledTypedIncidenceCoreRoute
+        routing coreTriple coreColor)
+      (routing.route entry routeColor) := by
+  dsimp only
+  let routing := coordinatedSourceRibbonThreeStrandRouting
+    presentation width compatible
+  rcases coreTriple with ⟨coreTriple, coreMember⟩
+  cases coreTriple with
+  | ordinary atom slot variant localTriple =>
+      let location := ordinaryTriple_location source.erase
+        atom slot variant localTriple coreMember
+      let owner : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      simpa [assembledTypedIncidenceCoreRoute,
+        assembledOrdinaryPrefix, typedVariableSiteRoute,
+        location, owner, routing,
+        coordinatedSourceRibbonThreeStrandRouting,
+        RibbonEndpointFanSystem.threeStrandRouting] using
+        constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRoute
+          presentation anchorsZero width normalized compatible owner entry
+          (activeVariableSiteTriple source.erase atom location.1
+            slot location.2.1
+            (.ordinary atom slot variant localTriple) location.2.2)
+          coreColor routeColor
+  | fixedRed atom slot localTriple =>
+      let location := fixedRedTriple_location source.erase
+        atom slot localTriple coreMember
+      let owner : ActiveOccurrenceEntry source.erase :=
+        ⟨(atom, slot),
+          (mem_occurrenceEntries_iff source.erase atom slot).mpr
+            ⟨location.1, location.2.1⟩⟩
+      simpa [assembledTypedIncidenceCoreRoute,
+        assembledFixedRedPrefix, typedVariableSiteRoute,
+        location, owner, routing,
+        coordinatedSourceRibbonThreeStrandRouting,
+        RibbonEndpointFanSystem.threeStrandRouting] using
+        constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRoute
+          presentation anchorsZero width normalized compatible owner entry
+          (activeVariableSiteTriple source.erase atom location.1
+            slot location.2.1
+            (.fixedRed atom slot localTriple) location.2.2)
+          coreColor routeColor
+  | clause clauseIndex set =>
+      have declared :=
+        tripleMacrocellOwner_declared source.erase
+          (.clause clauseIndex set) coreMember
+      have indexLt : clauseIndex < source.clauses.length := by
+        simpa [tripleMacrocellOwner,
+          AssemblyMacrocellOwner.IsDeclared,
+          PositionedPeriodicCNF.erase] using declared
+      simpa [assembledTypedIncidenceCoreRoute, routing] using
+        assembledClauseRoute_avoids_coordinatedSourceRibbonRoute
+          presentation anchorsZero occurrences arity width compatible
+          clauseIndex indexLt set coreColor entry routeColor
+
 /-- An assembled typed incidence is either its core alone or that core joined
 at the certified variable port to one routed occurrence suffix. -/
 theorem assembledTypedIncidenceRoute_eq_core_or_join

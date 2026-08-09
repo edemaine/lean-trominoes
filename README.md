@@ -109,6 +109,13 @@ build; an imported proof counts when its statement matches the paper.
         anchor normalization, padded assembly, and continuous planarity.
       - [ ] Prove contracted-drawing endpoint contacts and preserve them
         through the local endpoint-template splices.
+        - [x] Lift the normalized endpoint-aware variable-core/gate tables
+          through source coordinates, coordinated fans, complete occurrence
+          routes, and the typed finite-core interface.
+        - [ ] Prove endpoint-only contacts for distinct complete assembled
+          incidence routes and their periodic translates.
+        - [ ] Preserve endpoint-only contacts through degree-two contraction
+          and all three local endpoint-template normalization rounds.
       - [ ] Deduce global assignment collision freedom and matching ports for
         the compiled drawing, then package the computable reduction.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
@@ -4292,38 +4299,29 @@ The representation choices for this target are:
   advertised port.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreFanSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreFanSeparation.lean)
   transports the finite all-pairs core/fan theorem to source coordinates.
-  Every route in a variable-site core avoids the interiors of every
-  coordinated variable fan at the same source variable, including
-  nonmatching routes with listed-point coincidences permitted by the
-  continuous-planarity interface; cores and fans owned by distinct variable
-  macrocells are strictly separated.  A sharper exhaustive certificate now
-  proves full endpoint-aware `RoutesAvoidEachOther` whenever the core and fan
-  belong to different occurrence slots, and transports that fact through the
-  complete coordinated fan.  Consequently the listed contacts that still
-  need a clearance repair before assignment rasterization are confined to a
-  single occurrence module, rather than the whole variable macrocell.  A
-  shorter fixed-blue/false local-gate table now removes that module's
-  contacts as well.  The executable
-  `VariableLocalGateTableEndpointClear` certificate gives full
-  endpoint-aware core/fan separation throughout every one-, two-, and
-  three-module variable site for the false fixed-red and fixed-blue
-  patterns.  Thus the unresolved local clearance cases require either a
-  fixed-green connector or the true orientation.
+  The executable `VariableLocalGateTableEndpointClear` certificate now gives
+  full endpoint-aware `RoutesAvoidEachOther` for every core route and every
+  coordinated fan in all three polarity-normalized tables, including the
+  repaired fixed-green/true case.  This stronger result is preserved by the
+  source-coordinate translation; cores and fans owned by distinct variable
+  macrocells remain strictly separated.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean)
   extends that all-pairs result across every complete coordinated occurrence
   route.  Source-route endpoint separation makes every variable center fresh
   from unrelated corridor interiors; strict inset bounds then separate the
-  corridor and clause-side fan, while the variable-side fan retains the
-  precise no-segment-interior-contact guarantee needed for global planarity.
+  corridor and clause-side fan.  Because those two suffixes are contact-free,
+  both joins preserve the variable-side fan's full endpoint-aware contact
+  law.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean)
   decomposes every typed incidence route into its finite gadget core and an
   optional coordinated occurrence suffix.  It combines core/core, both
   core/suffix directions, and suffix/suffix separation to prove that every
   pair of distinct colored typed routes has disjoint segment interiors and
-  no listed point in the other route's interior.  The core/core stage now
-  retains the stronger endpoint-aware `RoutesAvoidEachOther` certificate,
-  including its proof that every listed-point contact is an endpoint of both
-  finite cores; the former interior-only result is derived from it.
+  no listed point in the other route's interior.  Both the core/core and
+  core/complete-suffix stages now retain the stronger endpoint-aware
+  `RoutesAvoidEachOther` certificate.  Classifying the legal splice contacts
+  while joining two complete incidences remains the next endpoint-contact
+  obligation.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean)
   transports that decomposition through arbitrary physical translations,
   including the translated splice endpoint.  At the source level it augments

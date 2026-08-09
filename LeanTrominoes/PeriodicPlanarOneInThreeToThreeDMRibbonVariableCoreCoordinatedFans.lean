@@ -203,7 +203,7 @@ theorem variableSiteRoute_avoids_coordinatedRoute_of_slot_ne
       compatible slot active
       ((data.kind slot).ribbonLaneForColor gateColor)
 
-/-- In either endpoint-clear connector table, every finite core route has
+/-- In every endpoint-clear connector table, every finite core route has
 complete endpoint-aware separation from the entire coordinated
 local-plus-outer fan. -/
 theorem variableSiteRoute_avoids_coordinatedRoute_of_endpointClear
