@@ -89,8 +89,10 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Normalize exact-one literal polarities while preserving
       satisfiability, occurrence and arity bounds, and the complete
       halo-bounded ribbon-ready planar presentation.
-    - [ ] Connect the normalized presentation to the planar 3DM ribbon
-      assembly and the I- and L-tromino gadget reductions.
+    - [x] Connect the normalized presentation to the padded planar 3DM ribbon
+      assembly, retaining degree two or three and exact orientation semantics.
+    - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
+      interface and compose the I- and L-tromino gadget reductions.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -7190,6 +7192,12 @@ The representation choices for this target are:
   packages continuous planarity, halo bounds, and endpoint-only contacts as
   the complete `HaloBoundedRibbonReadyIncidencePresentation` consumed by the
   planar 3DM ribbon construction.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRibbonThreeDM.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRibbonThreeDM.lean)
+  feeds that presentation and the transported variable/clause route orders
+  into the padded three-strand assembly.  The resulting periodic 3DM target
+  is well formed, has colored degree two or three, has a concrete continuously
+  planar presentation, and admits a graph orientation exactly when the
+  original exact-one source is satisfiable.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
