@@ -163,5 +163,78 @@ theorem ContractedVertexFan.finalVertexCellType_portColor_element
   cases port <;>
     simp_all [CanonicalVertexPort.side]
 
+/-- Every enumerated contracted endpoint is based at a listed contracted
+vertex. -/
+theorem ContractedEndpoint.vertex_mem_of_mem
+    {problem : PeriodicThreeDM} {endpoint : ContractedEndpoint}
+    (member : endpoint ∈ problem.contractedEndpoints) :
+    endpoint.vertex ∈ problem.contractedGraph.vertices := by
+  have edgeMember := endpoint.edge_mem_of_mem member
+  have graphEdgeMember :
+      endpoint.edge.toPeriodicEdge ∈ problem.contractedGraph.edges := by
+    exact List.mem_map.mpr ⟨endpoint.edge, edgeMember, rfl⟩
+  have endpoints :=
+    (contractedGraph_isWellFormed problem).2 _ graphEdgeMember
+  cases endpoint with
+  | source edge => exact endpoints.1
+  | target edge => exact endpoints.2
+
+/-- The final normalized vertex cell exposes the owning edge color at every
+enumerated endpoint's computed port.  This packages the triple and retained
+element fan cases behind the executable endpoint enumeration. -/
+theorem PlanarPresentation.finalVertexCellType_portColor_endpoint
+    {problem : PeriodicThreeDM}
+    {presentation : problem.ContinuousPlanarPresentation}
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {endpoint : ContractedEndpoint}
+    (member : endpoint ∈ problem.contractedEndpoints) :
+    (presentation.toPlanarPresentation.finalVertexCellType
+        endpoint.vertex).portColor
+        (endpoint.finalNormalizedPort
+          presentation.toPlanarPresentation).side =
+      some endpoint.color := by
+  have vertexMember := endpoint.vertex_mem_of_mem member
+  cases vertexEquation : endpoint.vertex with
+  | triple tripleIndex =>
+      have indexLt : tripleIndex < problem.triples.length := by
+        rw [vertexEquation] at vertexMember
+        simpa [contractedGraph, tripleVertices,
+          contractedElementVertices,
+          contractedElementVerticesForColor] using vertexMember
+      obtain ⟨fan⟩ := exists_contractVertexFan_at_triple
+        presentation wellFormed degree tripleIndex indexLt
+      have endpointAt : endpoint ∈
+          problem.contractedEndpointsAt (.triple tripleIndex) :=
+        (contractedEndpointsAt_mem_iff problem _ endpoint).2
+          ⟨member, vertexEquation⟩
+      have fanMember : endpoint ∈ [fan.first, fan.second, fan.third] := by
+        rw [← fan.endpoints_eq]
+        exact endpointAt
+      simpa [vertexEquation] using
+        fan.finalVertexCellType_portColor_triple wellFormed degree
+          tripleIndex indexLt endpoint fanMember
+  | element color atom =>
+      have atomData :
+          atom < problem.elementCount color ∧
+            problem.degree color atom = 3 := by
+        rw [vertexEquation] at vertexMember
+        simp [contractedGraph, tripleVertices,
+          contractedElementVertices,
+          contractedElementVerticesForColor,
+          incidenceColors] at vertexMember
+        cases color <;> simp_all
+      obtain ⟨fan⟩ := exists_contractVertexFan_at_element
+        presentation degree color atom atomData.1 atomData.2
+      have endpointAt : endpoint ∈
+          problem.contractedEndpointsAt (.element color atom) :=
+        (contractedEndpointsAt_mem_iff problem _ endpoint).2
+          ⟨member, vertexEquation⟩
+      have fanMember : endpoint ∈ [fan.first, fan.second, fan.third] := by
+        rw [← fan.endpoints_eq]
+        exact endpointAt
+      simpa [vertexEquation] using
+        fan.finalVertexCellType_portColor_element color atom endpoint fanMember
+
 end PeriodicThreeDM
 end LeanTrominoes

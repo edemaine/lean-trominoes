@@ -6676,7 +6676,9 @@ The representation choices for this target are:
   selected zero/one/two-step port permutation.  Every certified fan endpoint
   therefore finds its contracted-edge color at its computed final normalized
   port, and both the trichromatic and monochromatic vertex cell constructors
-  are proved to expose that color there.
+  are proved to expose that color there.  A final enumeration theorem
+  reconstructs the appropriate fan automatically for every listed contracted
+  endpoint, so later route proofs need no hand-supplied local fan data.
 - [`LeanTrominoes/PeriodicThreeDMNormalizationAssignmentLookup.lean`](LeanTrominoes/PeriodicThreeDMNormalizationAssignmentLookup.lean)
   isolates raster collision freedom as duplicate-freeness of assigned torus
   locations.  Under this one explicit invariant, every listed degree-three
