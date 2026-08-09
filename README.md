@@ -6671,6 +6671,12 @@ The representation choices for this target are:
   offset is proved to become an integer multiple of the final torus period,
   so the translated occurrence and base target vertex have the same raster
   key.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationEndpointColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationEndpointColors.lean)
+  proves that the two executable Boolean rotation rounds implement the
+  selected zero/one/two-step port permutation.  Every certified fan endpoint
+  therefore finds its contracted-edge color at its computed final normalized
+  port, and both the trichromatic and monochromatic vertex cell constructors
+  are proved to expose that color there.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
