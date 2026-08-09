@@ -90,6 +90,16 @@ theorem trimmedMagnifiedRoute_orthogonal
   exact (trimmedMagnifiedRoute_unitSteps orthogonal).imp
     fun _ _ step => step.isAxisAligned
 
+/-- Dropping within a subdivided segment lands at the corresponding unit
+step from its initial endpoint. -/
+theorem unitSegmentPoints_drop_head?
+    {first second : Cell} {count : Nat}
+    (within : count < AxisDirection.segmentLength first second + 1) :
+    ((AxisDirection.unitSegmentPoints first second).drop count).head? =
+      some (Cell.add first
+        (Cell.scale count (AxisDirection.between first second).step)) := by
+  simp [AxisDirection.unitSegmentPoints, List.head?_eq_getElem?, within]
+
 /-- Dropping three entries from a sufficiently long subdivided segment
 lands exactly three unit steps from its initial endpoint. -/
 theorem unitSegmentPoints_drop_three_head?
@@ -97,8 +107,55 @@ theorem unitSegmentPoints_drop_three_head?
     (long : 3 < AxisDirection.segmentLength first second + 1) :
     ((AxisDirection.unitSegmentPoints first second).drop 3).head? =
       some (Cell.add first
-        (Cell.scale 3 (AxisDirection.between first second).step)) := by
-  simp [AxisDirection.unitSegmentPoints, List.head?_eq_getElem?, long]
+        (Cell.scale 3 (AxisDirection.between first second).step)) :=
+  unitSegmentPoints_drop_head? long
+
+/-- After dropping three points strictly inside a long subdivided segment,
+the next displayed edge still has the segment's original direction. -/
+theorem unitSegmentPoints_drop_three_firstDirection
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned)
+    (long : 4 < AxisDirection.segmentLength first second + 1) :
+    AxisDirection.polylineFirstDirection
+        ((AxisDirection.unitSegmentPoints first second).drop 3) =
+      AxisDirection.between first second := by
+  let direction := AxisDirection.between first second
+  let third := Cell.add first (Cell.scale 3 direction.step)
+  let fourth := Cell.add first (Cell.scale 4 direction.step)
+  have thirdLookup :
+      ((AxisDirection.unitSegmentPoints first second).drop 3).head? =
+        some third := by
+    exact unitSegmentPoints_drop_three_head? (by omega)
+  have fourthLookup :
+      ((AxisDirection.unitSegmentPoints first second).drop 3).tail.head? =
+        some fourth := by
+    simp [AxisDirection.unitSegmentPoints, List.head?_eq_getElem?, long,
+      fourth, direction]
+  cases equation :
+      (AxisDirection.unitSegmentPoints first second).drop 3 with
+  | nil => simp [equation] at thirdLookup
+  | cons actualThird rest =>
+      cases rest with
+      | nil => simp [equation] at fourthLookup
+      | cons actualFourth rest =>
+          have thirdEqual : actualThird = third :=
+            Option.some.inj (by simpa [equation] using thirdLookup)
+          have fourthEqual : actualFourth = fourth := by
+            apply Option.some.inj
+            simpa [equation] using fourthLookup
+          subst actualThird
+          subst actualFourth
+          change AxisDirection.between third fourth = direction
+          have fourthEquation : fourth = Cell.add third direction.step := by
+            rcases first with ⟨firstX, firstY⟩
+            cases directionEquation : AxisDirection.between
+                (firstX, firstY) second <;>
+              simp [third, fourth, Cell.add, Cell.scale,
+                AxisDirection.step, direction, directionEquation] <;>
+              omega
+          rw [fourthEquation]
+          apply AxisDirection.between_add_step
+          exact AxisDirection.between_isGenuine_of_axisAligned aligned
 
 /-- Taking a positive number of entries preserves a list's optional head. -/
 theorem List.head?_take_of_pos
@@ -106,6 +163,32 @@ theorem List.head?_take_of_pos
     (positive : 0 < count) :
     (items.take count).head? = items.head? := by
   cases items <;> cases count <;> simp_all
+
+/-- Taking at least two entries preserves a list's optional second point. -/
+theorem List.tail_head?_take_of_two_le
+    {α : Type*} (items : List α) {count : Nat}
+    (two : 2 ≤ count) :
+    (items.take count).tail.head? = items.tail.head? := by
+  cases items with
+  | nil => simp
+  | cons first rest =>
+      cases rest with
+      | nil => simp
+      | cons second rest =>
+          cases count with
+          | zero => omega
+          | succ count =>
+              cases count with
+              | zero => omega
+              | succ count => simp
+
+/-- Exposing the tail after an initial drop is one additional drop. -/
+theorem List.tail_drop (items : List α) (count : Nat) :
+    (items.drop count).tail = items.drop (count + 1) := by
+  induction count generalizing items with
+  | zero => simp
+  | succ count induction =>
+      cases items <;> simp [induction, Nat.add_assoc]
 
 /-- Dropping strictly within a left summand makes the right summand
 irrelevant to the resulting head. -/
@@ -169,6 +252,94 @@ theorem trimmedMagnifiedRoute_head?_of_cons_cons
   rw [unitSegmentPoints_drop_three_head? normalizedLong]
   simp
 
+/-- The second point of the trimmed magnified route is the following unit
+step along the original route's first directed segment. -/
+theorem trimmedMagnifiedRoute_tail_head?_of_cons_cons
+    (first second : Cell) (rest : List Cell)
+    (aligned : (GridSegment.mk first second).IsAxisAligned) :
+    (trimmedMagnifiedRoute (first :: second :: rest)).tail.head? =
+      some (Cell.add (normalizeVertexPosition first)
+        (Cell.scale 4 (AxisDirection.between first second).step)) := by
+  have magnifiedLength :=
+    magnifiedUnitRoute_cons_cons_length_ge_thirteen
+      first second rest aligned
+  have takeTwo :
+      2 ≤ (magnifiedUnitRoute (first :: second :: rest)).length - 6 := by
+    omega
+  unfold trimmedMagnifiedRoute
+  rw [List.tail_head?_take_of_two_le _ takeTwo]
+  unfold magnifiedUnitRoute
+  simp only [List.map_cons]
+  rw [AxisDirection.unitSubdividePolyline]
+  unfold LeanTrominoes.joinAtEndpoint
+  rw [List.tail_drop]
+  have normalizedLong :
+      4 < AxisDirection.segmentLength
+          (normalizeVertexPosition first)
+          (normalizeVertexPosition second) + 1 := by
+    rw [segmentLength_normalizeVertexPosition]
+    have positive := AxisDirection.segmentLength_positive_of_axisAligned aligned
+    omega
+  rw [List.head?_drop_append_of_lt_length _ _ (by
+    simpa using normalizedLong)]
+  rw [unitSegmentPoints_drop_head? normalizedLong]
+  simp
+
+/-- Trimming preserves the first directed edge of every nondegenerate
+orthogonal route. -/
+theorem trimmedMagnifiedRoute_firstDirection
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points) :
+    AxisDirection.polylineFirstDirection (trimmedMagnifiedRoute points) =
+      AxisDirection.polylineFirstDirection points := by
+  obtain ⟨first, second, rest, equation⟩ :=
+    List.exists_eq_cons_cons_of_length_ge_two length
+  rw [equation] at orthogonal ⊢
+  have aligned := (List.isChain_cons_cons.mp orthogonal).1
+  have head := trimmedMagnifiedRoute_head?_of_cons_cons
+    first second rest aligned
+  have next := trimmedMagnifiedRoute_tail_head?_of_cons_cons
+    first second rest aligned
+  cases routeEquation :
+      trimmedMagnifiedRoute (first :: second :: rest) with
+  | nil => simp [routeEquation] at head
+  | cons actualFirst routeRest =>
+      cases routeRest with
+      | nil => simp [routeEquation] at next
+      | cons actualSecond routeRest =>
+          have firstEqual : actualFirst =
+              Cell.add (normalizeVertexPosition first)
+                (Cell.scale 3 (AxisDirection.between first second).step) :=
+            Option.some.inj (by simpa [routeEquation] using head)
+          have secondEqual : actualSecond =
+              Cell.add (normalizeVertexPosition first)
+                (Cell.scale 4 (AxisDirection.between first second).step) := by
+            apply Option.some.inj
+            simpa [routeEquation] using next
+          subst actualFirst
+          subst actualSecond
+          change AxisDirection.between
+              (Cell.add (normalizeVertexPosition first)
+                (Cell.scale 3 (AxisDirection.between first second).step))
+              (Cell.add (normalizeVertexPosition first)
+                (Cell.scale 4 (AxisDirection.between first second).step)) =
+            AxisDirection.between first second
+          have fourthEquation :
+              Cell.add (normalizeVertexPosition first)
+                  (Cell.scale 4 (AxisDirection.between first second).step) =
+                Cell.add
+                  (Cell.add (normalizeVertexPosition first)
+                    (Cell.scale 3
+                      (AxisDirection.between first second).step))
+                  (AxisDirection.between first second).step := by
+            rcases normalizeVertexPosition first with ⟨firstX, firstY⟩
+            cases directionEquation : AxisDirection.between first second <;>
+              simp [Cell.add, Cell.scale, AxisDirection.step] <;> omega
+          rw [fourthEquation]
+          exact AxisDirection.between_add_step _
+            (AxisDirection.between_isGenuine_of_axisAligned aligned)
+
 /-- Trimming three points at each end leaves the original point three
 steps before the last as its new final point. -/
 theorem List.getLast?_drop_three_take_length_sub_six
@@ -183,6 +354,37 @@ theorem List.getLast?_drop_three_take_length_sub_six
   rw [if_pos (by omega)]
   rw [show 3 + (items.length - 6 - 1) = items.length - 4 by omega]
 
+/-- The optional point exposed after reversing and dropping the endpoint is
+the original list's penultimate point. -/
+theorem List.reverse_tail_head?_eq_getElem?_length_sub_two
+    {α : Type*} (items : List α)
+    (length : 2 ≤ items.length) :
+    items.reverse.tail.head? = items[items.length - 2]? := by
+  obtain ⟨leading, before, last, equation⟩ :=
+    AxisDirection.exists_eq_append_pair_of_length_ge_two length
+  rw [equation]
+  simp
+
+/-- The point preceding the final point of the symmetric endpoint trim was
+four entries before the original endpoint. -/
+theorem List.reverse_tail_head?_drop_three_take_length_sub_six
+    {α : Type*} (items : List α)
+    (long : 8 ≤ items.length) :
+    (((items.drop 3).take (items.length - 6)).reverse.tail.head?) =
+      items[items.length - 5]? := by
+  let trimmed := (items.drop 3).take (items.length - 6)
+  have trimmedLength : trimmed.length = items.length - 6 := by
+    simp only [trimmed, List.length_take, List.length_drop]
+    rw [Nat.min_eq_left (by omega)]
+  have trimmedTwo : 2 ≤ trimmed.length := by omega
+  rw [List.reverse_tail_head?_eq_getElem?_length_sub_two
+    trimmed trimmedTwo]
+  simp only [trimmed, trimmedLength, List.getElem?_take,
+    List.getElem?_drop]
+  rw [if_pos (by omega)]
+  congr 2
+  omega
+
 /-- On a long axis-aligned segment, the point three entries before the
 last endpoint is three reverse unit steps from that endpoint. -/
 theorem unitSegmentPoints_getElem?_three_before_last
@@ -193,6 +395,34 @@ theorem unitSegmentPoints_getElem?_three_before_last
         AxisDirection.segmentLength first second - 3]? =
       some (Cell.add second
         (Cell.scale 3 (AxisDirection.between second first).step)) := by
+  rw [List.getElem?_eq_getElem (by
+    simp [AxisDirection.unitSegmentPoints])]
+  simp only [AxisDirection.unitSegmentPoints, List.getElem_map,
+    List.getElem_range]
+  have endpoint :=
+    AxisDirection.add_length_step_eq_second_of_axisAligned aligned
+  have genuine := AxisDirection.between_isGenuine_of_axisAligned aligned
+  have reverse := AxisDirection.between_reverse_eq_opposite genuine
+  rw [reverse]
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  cases direction : AxisDirection.between
+      (firstX, firstY) (secondX, secondY) <;>
+    simp_all only [AxisDirection.IsGenuine, AxisDirection.opposite,
+      AxisDirection.step, Cell.add, Cell.scale, Prod.mk.injEq,
+      Option.some.injEq] <;>
+    omega
+
+/-- On a long axis-aligned segment, the point four entries before the last
+endpoint is four reverse unit steps from that endpoint. -/
+theorem unitSegmentPoints_getElem?_four_before_last
+    {first second : Cell}
+    (aligned : (GridSegment.mk first second).IsAxisAligned)
+    (long : 4 ≤ AxisDirection.segmentLength first second) :
+    (AxisDirection.unitSegmentPoints first second)[
+        AxisDirection.segmentLength first second - 4]? =
+      some (Cell.add second
+        (Cell.scale 4 (AxisDirection.between second first).step)) := by
   rw [List.getElem?_eq_getElem (by
     simp [AxisDirection.unitSegmentPoints])]
   simp only [AxisDirection.unitSegmentPoints, List.getElem_map,
@@ -315,6 +545,94 @@ theorem trimmedMagnifiedRoute_getLast?_of_append_pair
     Nat.sub_add_comm (by omega : 1 ≤ finalSegment.length),
     normalizedIndex, between_normalizeVertexPosition] using
     unitSegmentPoints_getElem?_three_before_last
+      normalizedAligned normalizedLong
+
+/-- The point immediately preceding the end of a trimmed magnified route is
+exactly four reverse unit steps along its original final segment. -/
+theorem trimmedMagnifiedRoute_reverse_tail_head?_of_append_pair
+    (leading : List Cell) (before last : Cell)
+    (aligned : (GridSegment.mk before last).IsAxisAligned) :
+    (trimmedMagnifiedRoute
+      (leading ++ [before, last])).reverse.tail.head? =
+      some (Cell.add (normalizeVertexPosition last)
+        (Cell.scale 4 (AxisDirection.between last before).step)) := by
+  let initialRoute := AxisDirection.unitSubdividePolyline
+    ((leading ++ [before]).map normalizeVertexPosition)
+  let finalSegment := AxisDirection.unitSegmentPoints
+    (normalizeVertexPosition before) (normalizeVertexPosition last)
+  have magnifiedEquation :
+      magnifiedUnitRoute (leading ++ [before, last]) =
+        joinAtEndpoint initialRoute finalSegment := by
+    unfold magnifiedUnitRoute
+    simp only [List.map_append, List.map_cons, List.map_nil]
+    rw [unitSubdividePolyline_append_pair]
+    simp [initialRoute, finalSegment]
+  have oldPositive :=
+    AxisDirection.segmentLength_positive_of_axisAligned aligned
+  have normalizedVeryLong :
+      12 ≤ AxisDirection.segmentLength
+        (normalizeVertexPosition before) (normalizeVertexPosition last) := by
+    rw [segmentLength_normalizeVertexPosition]
+    omega
+  have normalizedLong :
+      4 ≤ AxisDirection.segmentLength
+        (normalizeVertexPosition before) (normalizeVertexPosition last) :=
+    le_trans (by omega) normalizedVeryLong
+  have segmentLength : 13 ≤ finalSegment.length := by
+    simp only [finalSegment, AxisDirection.unitSegmentPoints_length,
+      segmentLength_normalizeVertexPosition]
+    omega
+  have initialRouteNonempty : initialRoute ≠ [] := by
+    apply AxisDirection.unitSubdividePolyline_ne_nil
+    simp
+  have initialRoutePositive : 0 < initialRoute.length :=
+    List.length_pos_of_ne_nil initialRouteNonempty
+  have magnifiedLong :
+      13 ≤ (magnifiedUnitRoute (leading ++ [before, last])).length := by
+    rw [magnifiedEquation]
+    simp only [joinAtEndpoint, List.length_append, List.length_tail]
+    omega
+  unfold trimmedMagnifiedRoute
+  rw [List.reverse_tail_head?_drop_three_take_length_sub_six _
+    (le_trans (by omega) magnifiedLong)]
+  rw [magnifiedEquation]
+  unfold joinAtEndpoint
+  rw [List.getElem?_append_right (by
+    simp only [List.length_append, List.length_tail]
+    omega)]
+  simp only [List.length_append, List.length_tail]
+  rw [show
+    initialRoute.length + (finalSegment.length - 1) - 5 -
+        initialRoute.length =
+      finalSegment.length - 1 - 5 by omega]
+  rw [List.getElem?_tail]
+  have normalizedAligned :
+      (GridSegment.mk
+        (normalizeVertexPosition before)
+        (normalizeVertexPosition last)).IsAxisAligned := by
+    have scaledAligned :
+        (GridSegment.scale vertexNormalizationScale
+          (GridSegment.mk before last)).IsAxisAligned :=
+      (GridSegment.isAxisAligned_scale_iff
+        (by norm_num [vertexNormalizationScale])
+        (GridSegment.mk before last)).2 aligned
+    have translatedAligned :=
+      (GridSegment.isAxisAligned_translate
+        (GridSegment.scale vertexNormalizationScale
+          (GridSegment.mk before last)) center).2 scaledAligned
+    simpa [GridSegment.scale, GridSegment.translate,
+      normalizeVertexPosition, Cell.add_comm] using translatedAligned
+  have normalizedIndex :
+      AxisDirection.segmentLength
+          (normalizeVertexPosition before) (normalizeVertexPosition last) - 5 + 1 =
+        AxisDirection.segmentLength
+          (normalizeVertexPosition before) (normalizeVertexPosition last) - 4 := by
+    omega
+  simpa only [finalSegment, AxisDirection.unitSegmentPoints_length,
+    Nat.add_sub_cancel,
+    Nat.sub_add_comm (by omega : 1 ≤ finalSegment.length),
+    normalizedIndex, between_normalizeVertexPosition] using
+    unitSegmentPoints_getElem?_four_before_last
       normalizedAligned normalizedLong
 
 /-! ## Template boundaries -/
@@ -460,6 +778,115 @@ theorem trimmedMagnifiedRoute_getLast?_of_endpoints
   rw [equation]
   exact trimmedMagnifiedRoute_getLast?_of_append_pair
     leading before last aligned
+
+/-- Endpoint lookups also expose the penultimate point left by target-side
+trimming. -/
+theorem trimmedMagnifiedRoute_reverse_tail_head?_of_endpoints
+    (points : List Cell) {before last : Cell}
+    (lastLookup : points.getLast? = some last)
+    (beforeLookup : points.reverse.tail.head? = some before)
+    (aligned : (GridSegment.mk before last).IsAxisAligned) :
+    (trimmedMagnifiedRoute points).reverse.tail.head? =
+      some (Cell.add (normalizeVertexPosition last)
+        (Cell.scale 4 (AxisDirection.between last before).step)) := by
+  have reverseLength : 2 ≤ points.reverse.length :=
+    List.two_le_length_of_tail_head?_eq_some beforeLookup
+  have length : 2 ≤ points.length := by simpa using reverseLength
+  obtain ⟨leading, actualBefore, actualLast, equation⟩ :=
+    AxisDirection.exists_eq_append_pair_of_length_ge_two length
+  have lastEqual : actualLast = last := by
+    rw [equation] at lastLookup
+    apply Option.some.inj
+    simpa using lastLookup
+  have beforeEqual : actualBefore = before := by
+    rw [equation] at beforeLookup
+    apply Option.some.inj
+    simpa using beforeLookup
+  subst actualLast
+  subst actualBefore
+  rw [equation]
+  exact trimmedMagnifiedRoute_reverse_tail_head?_of_append_pair
+    leading before last aligned
+
+/-- Exact final and penultimate lookups identify the final direction of an
+orthogonal route. -/
+theorem polylineLastDirection_eq_between_of_endpoints
+    (points : List Cell) {before last : Cell}
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points)
+    (lastLookup : points.getLast? = some last)
+    (beforeLookup : points.reverse.tail.head? = some before) :
+    AxisDirection.polylineLastDirection points =
+      AxisDirection.between before last := by
+  have reverseLength : 2 ≤ points.reverse.length :=
+    List.two_le_length_of_tail_head?_eq_some beforeLookup
+  have length : 2 ≤ points.length := by simpa using reverseLength
+  obtain ⟨leading, actualBefore, actualLast, equation⟩ :=
+    AxisDirection.exists_eq_append_pair_of_length_ge_two length
+  have lastEqual : actualLast = last := by
+    rw [equation] at lastLookup
+    apply Option.some.inj
+    simpa using lastLookup
+  have beforeEqual : actualBefore = before := by
+    rw [equation] at beforeLookup
+    apply Option.some.inj
+    simpa using beforeLookup
+  subst actualLast
+  subst actualBefore
+  rw [equation] at orthogonal ⊢
+  exact AxisDirection.polylineLastDirection_append_pair_of_axisAligned
+    leading (List.isChain_append_cons_cons.mp orthogonal).2.1
+
+/-- Trimming preserves the last directed edge of every nondegenerate
+orthogonal route. -/
+theorem trimmedMagnifiedRoute_lastDirection
+    {points : List Cell}
+    (length : 2 ≤ points.length)
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points) :
+    AxisDirection.polylineLastDirection (trimmedMagnifiedRoute points) =
+      AxisDirection.polylineLastDirection points := by
+  obtain ⟨leading, before, last, equation⟩ :=
+    AxisDirection.exists_eq_append_pair_of_length_ge_two length
+  rw [equation] at orthogonal ⊢
+  have aligned := (List.isChain_append_cons_cons.mp orthogonal).2.1
+  let reverseDirection := AxisDirection.between last before
+  let finalPoint := Cell.add (normalizeVertexPosition last)
+    (Cell.scale 3 reverseDirection.step)
+  let precedingPoint := Cell.add (normalizeVertexPosition last)
+    (Cell.scale 4 reverseDirection.step)
+  have finalLookup :
+      (trimmedMagnifiedRoute
+        (leading ++ [before, last])).getLast? = some finalPoint := by
+    simpa [finalPoint, reverseDirection] using
+      trimmedMagnifiedRoute_getLast?_of_append_pair
+        leading before last aligned
+  have precedingLookup :
+      (trimmedMagnifiedRoute
+        (leading ++ [before, last])).reverse.tail.head? =
+          some precedingPoint := by
+    simpa [precedingPoint, reverseDirection] using
+      trimmedMagnifiedRoute_reverse_tail_head?_of_append_pair
+        leading before last aligned
+  have trimmedOrthogonal : PeriodicOrthocrossing.OrthogonalPolyline
+      (trimmedMagnifiedRoute (leading ++ [before, last])) :=
+    trimmedMagnifiedRoute_orthogonal orthogonal
+  rw [polylineLastDirection_eq_between_of_endpoints _
+    trimmedOrthogonal finalLookup precedingLookup]
+  rw [AxisDirection.polylineLastDirection_append_pair_of_axisAligned
+    leading aligned]
+  let forwardDirection := AxisDirection.between before last
+  have genuine : forwardDirection.IsGenuine :=
+    AxisDirection.between_isGenuine_of_axisAligned aligned
+  have reverseEquation : reverseDirection = forwardDirection.opposite := by
+    exact AxisDirection.between_reverse_eq_opposite genuine
+  have finalPointEquation :
+      finalPoint = Cell.add precedingPoint forwardDirection.step := by
+    rcases normalizeVertexPosition last with ⟨lastX, lastY⟩
+    cases directionEquation : forwardDirection <;>
+      simp_all [finalPoint, precedingPoint, reverseDirection,
+        forwardDirection, Cell.add, Cell.scale, AxisDirection.step,
+        AxisDirection.opposite] <;> omega
+  rw [finalPointEquation]
+  exact AxisDirection.between_add_step precedingPoint genuine
 
 /-- Reversing a unit-step chain yields another unit-step chain. -/
 theorem unitSteps_reverse {points : List Cell}
