@@ -6612,6 +6612,10 @@ The representation choices for this target are:
   edges, carrying their vertex, color, route, and outward direction.  It
   proves contraction creates no prototype loops and that every actual end
   has a genuine cardinal direction in the certified orthogonal drawing.
+- [`LeanTrominoes/PeriodicThreeDMContractedEndpointDegree.lean`](LeanTrominoes/PeriodicThreeDMContractedEndpointDegree.lean)
+  identifies endpoint-fan length with graph-theoretic degree and uses the
+  incidence-tag permutation preserved by contraction to prove that every
+  indexed trichromatic triple still has exactly three endpoint occurrences.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
