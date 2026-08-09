@@ -18,6 +18,26 @@ namespace LeanTrominoes
 
 namespace PeriodicGridDrawing
 
+/-- Positive uniform scaling preserves the open one-period halo. -/
+theorem positionInExpandedSquare_scale
+    {factor : Nat} (positive : 0 < factor)
+    {drawing : PeriodicGridDrawing} {point : Cell}
+    (inside : drawing.PositionInExpandedSquare point) :
+    (drawing.scale factor).PositionInExpandedSquare
+      (Cell.scale factor point) := by
+  simp only [PositionInExpandedSquare] at inside ⊢
+  rw [gridSize_scale positive]
+  rcases point with ⟨pointX, pointY⟩
+  simp only [Cell.scale, Nat.cast_mul]
+  have factorPositive : (0 : Int) < factor := by exact_mod_cast positive
+  constructor
+  · nlinarith [inside.1]
+  constructor
+  · nlinarith [inside.2.1]
+  constructor
+  · nlinarith [inside.2.2.1]
+  · nlinarith [inside.2.2.2]
+
 /-- Doubling a point in the open source halo gives one unit of upper margin
 in the doubled halo. -/
 theorem positionInExpandedSquareWithUpperMargin_scale_two
@@ -56,6 +76,39 @@ theorem ContinuousPlanarIncidencePresentation.variableToClauseRoute_scale
     PeriodicOrthocrossing.translatePolyline,
     scalePolyline, List.map_reverse, List.map_map,
     Function.comp_def, Cell.scale_add]
+
+/-- Any positive uniform scale preserves ordinary rebased-route halo
+bounds. -/
+theorem HaloBoundedContinuousPlanarIncidencePresentation.rebasedRoutePointsInExpandedSquare_scale
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    {factor : Nat} (factorPositive : 0 < factor)
+    (presentation :
+      source.HaloBoundedContinuousPlanarIncidencePresentation placement) :
+    ((presentation.toContinuousPlanarIncidencePresentation.scale
+        factorPositive).toPlanarIncidencePresentation)
+      |>.RebasedRoutePointsInExpandedSquare := by
+  intro tagged taggedMember point pointMember
+  have taggedMember' :
+      tagged ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx := by
+    simpa using taggedMember
+  rw [ContinuousPlanarIncidencePresentation.variableToClauseRoute_scale]
+    at pointMember
+  rcases List.mem_map.mp pointMember with
+    ⟨originalPoint, originalMember, rfl⟩
+  change
+    (incidenceDrawing
+      (source.scale factor) (placement.scale factor)
+      (scaleIncidenceRoutes factor presentation.routes))
+      |>.PositionInExpandedSquare
+        (Cell.scale factor originalPoint)
+  rw [incidenceDrawing_scale
+    factor source placement presentation.routes presentation.periodPositive]
+  exact PeriodicGridDrawing.positionInExpandedSquare_scale factorPositive
+    (presentation.rebasedRoutePointsInside
+      tagged taggedMember' originalPoint originalMember)
 
 /-- Doubling an ordinary rebased-route halo certificate produces the upper
 margin needed by closed ribbon macrocells. -/
