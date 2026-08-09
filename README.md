@@ -6693,8 +6693,11 @@ The representation choices for this target are:
   reduces to the single geometric certificate that distinct keyed
   occurrences have distinct torus locations.  Compatible fundamental-square
   placement proves the vertex/vertex cases, while endpoint-only route
-  contacts prove the route-interior/route-interior cases; only mixed
-  vertex/route-interior avoidance remains.
+  contacts prove the route-interior/route-interior cases.  Exact compatible
+  route endpoints and graph incidence cover every stored vertex by a route
+  endpoint, so the same endpoint-contact certificate also excludes all mixed
+  vertex/route-interior collisions.  Thus, for an incident compatible graph,
+  endpoint-only route contacts alone imply complete assignment separation.
 - [`LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean)
   proves that every final route begins and ends with two nonreversing unit
   steps at its normalized endpoint occurrences.  Its first and last routing

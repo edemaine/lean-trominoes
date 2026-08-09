@@ -27,6 +27,17 @@ def VertexPositionsCoveredBySegmentEndpoints
             (indexed.segment.translate
               (drawing.periodTranslation translate)).finish
 
+/-- Every stored graph-vertex position is a translated outer endpoint of a
+listed route-point occurrence. -/
+def VertexPositionsCoveredByRouteEndpoints
+    (drawing : PeriodicGridDrawing) : Prop :=
+  ∀ vertexPosition ∈ drawing.vertexPositions,
+    ∃ indexed ∈ drawing.indexedRoutePoints,
+      ∃ translate : Cell,
+        indexed.IsEndpoint ∧
+          vertexPosition = Cell.add indexed.point
+            (drawing.periodTranslation translate)
+
 /-- The relative interior of each lifted segment avoids both endpoints of
 every distinct lifted segment occurrence.  Unlike `RoutesAvoidInteriors`,
 this predicate still records endpoint separation when the second segment
@@ -178,6 +189,141 @@ private theorem edgeRoute_mem_zipIdx
   refine ⟨routeIndexLt, ?_⟩
   unfold edgeRoute
   rw [List.getD_eq_getElem _ _ routeIndexLt]
+
+/-- Incidence and exact compatible route endpoints cover every stored graph
+vertex by an outer listed route point. -/
+theorem vertexPositionsCoveredByRouteEndpoints_of_compatible
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex)
+    (drawing : PeriodicGridDrawing)
+    (compatible : drawing.IsCompatible graph)
+    (incident : EveryVertexIncident graph) :
+    drawing.VertexPositionsCoveredByRouteEndpoints := by
+  intro vertexPosition vertexPositionMember
+  rcases List.mem_iff_get.mp vertexPositionMember with
+    ⟨positionIndex, positionAt⟩
+  have graphIndexLt :
+      positionIndex.val < graph.vertices.length := by
+    rw [← compatible.2.1]
+    exact positionIndex.isLt
+  let graphIndex : Fin graph.vertices.length :=
+    ⟨positionIndex.val, graphIndexLt⟩
+  let vertex := graph.vertices.get graphIndex
+  have vertexMember : vertex ∈ graph.vertices :=
+    List.get_mem graph.vertices graphIndex
+  have vertexIndexEq :
+      graph.vertices.idxOf vertex = graphIndex.val :=
+    compatible.1.1.idxOf_getElem graphIndex.val graphIndexLt
+  have vertexPositionEq :
+      drawing.vertexPosition graph vertex = vertexPosition := by
+    unfold PeriodicGridDrawing.vertexPosition
+    rw [vertexIndexEq,
+      List.getD_eq_getElem _ _ positionIndex.isLt]
+    exact positionAt
+  rcases incident vertex vertexMember with
+    ⟨taggedEdge, taggedEdgeMember, source | target⟩
+  · have routeMember :=
+      edgeRoute_mem_zipIdx compatible taggedEdgeMember
+    have endpoints :=
+      compatible.2.2.2.2.2 taggedEdge taggedEdgeMember
+    have routeNonempty : drawing.edgeRoute taggedEdge.2 ≠ [] := by
+      intro empty
+      rw [empty] at endpoints
+      simp at endpoints
+    have routeLengthPositive :
+        0 < (drawing.edgeRoute taggedEdge.2).length :=
+      List.length_pos_iff.mpr routeNonempty
+    let pointIndex : Fin (drawing.edgeRoute taggedEdge.2).length :=
+      ⟨0, routeLengthPositive⟩
+    let indexed : IndexedRoutePoint :=
+      { routeIndex := taggedEdge.2
+        pointIndex := pointIndex
+        routeLength := (drawing.edgeRoute taggedEdge.2).length
+        point := (drawing.edgeRoute taggedEdge.2).get pointIndex }
+    have indexedMember : indexed ∈ drawing.indexedRoutePoints :=
+      indexedRoutePoint_mem_of_route_mem routeMember pointIndex
+    have pointEq :
+        (drawing.edgeRoute taggedEdge.2).get pointIndex =
+          drawing.vertexPosition graph taggedEdge.1.source := by
+      have headEq :
+          (drawing.edgeRoute taggedEdge.2).head routeNonempty =
+            drawing.vertexPosition graph taggedEdge.1.source := by
+        rw [List.head?_eq_some_head routeNonempty] at endpoints
+        exact Option.some.inj endpoints.1
+      change (drawing.edgeRoute taggedEdge.2)[0] =
+        drawing.vertexPosition graph taggedEdge.1.source
+      rw [← List.head_eq_getElem_zero routeNonempty]
+      exact headEq
+    refine ⟨indexed, indexedMember, (0, 0), ?_, ?_⟩
+    · left
+      rfl
+    · calc
+        vertexPosition = drawing.vertexPosition graph vertex :=
+          vertexPositionEq.symm
+        _ = drawing.vertexPosition graph taggedEdge.1.source := by
+          rw [source]
+        _ = indexed.point := by
+          exact pointEq.symm
+        _ = Cell.add indexed.point
+            (drawing.periodTranslation (0, 0)) := by
+          simp [periodTranslation, Cell.scale, Cell.add]
+  · have routeMember :=
+      edgeRoute_mem_zipIdx compatible taggedEdgeMember
+    have endpoints :=
+      compatible.2.2.2.2.2 taggedEdge taggedEdgeMember
+    have routeNonempty : drawing.edgeRoute taggedEdge.2 ≠ [] := by
+      intro empty
+      rw [empty] at endpoints
+      simp at endpoints
+    have lastIndexLt :
+        (drawing.edgeRoute taggedEdge.2).length - 1 <
+          (drawing.edgeRoute taggedEdge.2).length := by
+      have routeLengthPositive :
+          0 < (drawing.edgeRoute taggedEdge.2).length :=
+        List.length_pos_iff.mpr routeNonempty
+      omega
+    let pointIndex : Fin (drawing.edgeRoute taggedEdge.2).length :=
+      ⟨(drawing.edgeRoute taggedEdge.2).length - 1, lastIndexLt⟩
+    let indexed : IndexedRoutePoint :=
+      { routeIndex := taggedEdge.2
+        pointIndex := pointIndex
+        routeLength := (drawing.edgeRoute taggedEdge.2).length
+        point := (drawing.edgeRoute taggedEdge.2).get pointIndex }
+    have indexedMember : indexed ∈ drawing.indexedRoutePoints :=
+      indexedRoutePoint_mem_of_route_mem routeMember pointIndex
+    have pointEq :
+        (drawing.edgeRoute taggedEdge.2).get pointIndex =
+          Cell.add
+            (drawing.vertexPosition graph taggedEdge.1.target)
+            (drawing.periodTranslation taggedEdge.1.offset) := by
+      have lastEq :
+          (drawing.edgeRoute taggedEdge.2).getLast routeNonempty =
+            Cell.add
+              (drawing.vertexPosition graph taggedEdge.1.target)
+              (drawing.periodTranslation taggedEdge.1.offset) := by
+        rw [List.getLast?_eq_getLast_of_ne_nil routeNonempty]
+          at endpoints
+        exact Option.some.inj endpoints.2
+      rw [show pointIndex =
+          ⟨(drawing.edgeRoute taggedEdge.2).length - 1,
+            lastIndexLt⟩ from rfl,
+        List.get_length_sub_one lastIndexLt]
+      exact lastEq
+    rcases offsetEq : taggedEdge.1.offset with ⟨offsetX, offsetY⟩
+    let reverseOffset : Cell := (-offsetX, -offsetY)
+    refine ⟨indexed, indexedMember, reverseOffset, ?_, ?_⟩
+    · right
+      dsimp [indexed, pointIndex]
+      omega
+    · rw [← vertexPositionEq, ← target]
+      change drawing.vertexPosition graph taggedEdge.1.target =
+        Cell.add
+          ((drawing.edgeRoute taggedEdge.2).get pointIndex)
+          (drawing.periodTranslation reverseOffset)
+      rw [pointEq]
+      apply Prod.ext <;>
+        simp [reverseOffset, periodTranslation, Cell.scale, Cell.add,
+          offsetEq]
 
 /-- Incidence and nondegeneracy convert exact compatible route endpoints
 into endpoint coverage of every stored graph vertex. -/

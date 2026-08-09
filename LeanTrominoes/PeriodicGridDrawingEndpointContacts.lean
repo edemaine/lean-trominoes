@@ -52,6 +52,36 @@ def indexedRoutePoints (drawing : PeriodicGridDrawing) :
         routeLength := taggedRoute.1.length
         point := taggedPoint.1 }
 
+/-- Within the standard route-point enumeration, the route and point
+indices uniquely determine the complete indexed occurrence. -/
+theorem indexedRoutePoint_eq_of_mem_of_indices_eq
+    {drawing : PeriodicGridDrawing} {first second : IndexedRoutePoint}
+    (firstMember : first ∈ drawing.indexedRoutePoints)
+    (secondMember : second ∈ drawing.indexedRoutePoints)
+    (routeIndexEq : first.routeIndex = second.routeIndex)
+    (pointIndexEq : first.pointIndex = second.pointIndex) :
+    first = second := by
+  unfold indexedRoutePoints at firstMember secondMember
+  rcases List.mem_flatMap.mp firstMember with
+    ⟨firstTaggedRoute, firstRouteMember, firstPointMember⟩
+  rcases List.mem_flatMap.mp secondMember with
+    ⟨secondTaggedRoute, secondRouteMember, secondPointMember⟩
+  rcases List.mem_map.mp firstPointMember with
+    ⟨firstTaggedPoint, firstTaggedPointMember, firstEqual⟩
+  rcases List.mem_map.mp secondPointMember with
+    ⟨secondTaggedPoint, secondTaggedPointMember, secondEqual⟩
+  subst first
+  subst second
+  have taggedRoutesEqual : firstTaggedRoute = secondTaggedRoute :=
+    PeriodicOrthocrossing.tagged_eq_of_mem_zipIdx_of_snd_eq
+      firstRouteMember secondRouteMember routeIndexEq
+  subst secondTaggedRoute
+  have taggedPointsEqual : firstTaggedPoint = secondTaggedPoint :=
+    PeriodicOrthocrossing.tagged_eq_of_mem_zipIdx_of_snd_eq
+      firstTaggedPointMember secondTaggedPointMember pointIndexEq
+  subst secondTaggedPoint
+  rfl
+
 /-- Identity of one listed route point in the infinite periodic lift. -/
 def RoutePointOccurrenceKey
     (indexed : IndexedRoutePoint) (translate : Cell) :

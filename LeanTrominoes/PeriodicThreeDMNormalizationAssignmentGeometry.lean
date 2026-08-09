@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicThreeDMNormalizationAssignmentLookup
 import LeanTrominoes.PeriodicThreeDMVertexNormalizationDrawing
 import LeanTrominoes.PeriodicGridDrawingEndpointContacts
+import LeanTrominoes.PeriodicGridDrawingVertexCoverage
 
 /-!
 # Geometric meaning of normalized 3DM assignments
@@ -429,6 +430,50 @@ def VertexAssignmentsAvoidRouteInteriors
       rasterLocation drawing.gridSize vertex.1 ≠
         rasterLocation drawing.gridSize routePoint.point
 
+/-- Endpoint coverage and endpoint-only route contacts exclude every mixed
+vertex/route-interior raster collision. -/
+theorem vertexAssignmentsAvoidRouteInteriors_of_endpointCoverage
+    (drawing : PeriodicGridDrawing)
+    (covered : drawing.VertexPositionsCoveredByRouteEndpoints)
+    (endpointContacts : drawing.RoutePointsMeetOnlyAtEndpoints) :
+    drawing.VertexAssignmentsAvoidRouteInteriors := by
+  intro vertex vertexMember routePoint routePointMember locationsEqual
+  have routePointAllMember :=
+    indexedInteriorRoutePoint_mem_indexedRoutePoints routePointMember
+  rcases covered vertex.1
+      (List.fst_mem_of_mem_zipIdx vertexMember) with
+    ⟨covering, coveringMember, coverTranslate,
+      coveringEndpoint, coveredEq⟩
+  rcases
+      (rasterLocation_eq_iff_exists_periodTranslation
+        drawing.gridSize vertex.1 routePoint.point).mp locationsEqual with
+    ⟨routeTranslate, translatedEq⟩
+  have translatedEq' :
+      vertex.1 = Cell.add routePoint.point
+        (drawing.periodTranslation routeTranslate) := by
+    simpa [periodTranslation] using translatedEq
+  have keysDifferent :
+      RoutePointOccurrenceKey covering coverTranslate ≠
+        RoutePointOccurrenceKey routePoint routeTranslate := by
+    intro keysEqual
+    have routeIndexEq :
+        covering.routeIndex = routePoint.routeIndex :=
+      congrArg (fun key => key.1) keysEqual
+    have pointIndexEq :
+        covering.pointIndex = routePoint.pointIndex :=
+      congrArg (fun key => key.2.1) keysEqual
+    have indexedEq : covering = routePoint :=
+      indexedRoutePoint_eq_of_mem_of_indices_eq
+        coveringMember routePointAllMember routeIndexEq pointIndexEq
+    apply indexedInteriorRoutePoint_not_endpoint routePointMember
+    rw [← indexedEq]
+    exact coveringEndpoint
+  have endpoints :=
+    endpointContacts covering coveringMember routePoint routePointAllMember
+      coverTranslate routeTranslate keysDifferent
+      (coveredEq.symm.trans translatedEq')
+  exact indexedInteriorRoutePoint_not_endpoint routePointMember endpoints.2
+
 /-- Exact geometric condition needed for assignment rasterization: distinct
 syntactic assignment occurrences have distinct torus locations. -/
 def AssignmentPointOccurrencesSeparated
@@ -521,6 +566,23 @@ theorem assignmentPointOccurrencesSeparated_of_endpointContacts
               pointEqual)
       exact (indexedInteriorRoutePoint_not_endpoint firstRouteSourceMember
         endpoints.1).elim
+
+/-- Compatibility, incidence, and endpoint-only route contacts are enough
+for complete assignment-occurrence separation; mixed vertex/interior
+separation need not be supplied independently. -/
+theorem assignmentPointOccurrencesSeparated_of_incident_endpointContacts
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) (drawing : PeriodicGridDrawing)
+    (compatible : drawing.IsCompatible graph)
+    (incident : EveryVertexIncident graph)
+    (endpointContacts : drawing.RoutePointsMeetOnlyAtEndpoints) :
+    drawing.AssignmentPointOccurrencesSeparated := by
+  apply assignmentPointOccurrencesSeparated_of_endpointContacts
+    compatible endpointContacts
+  exact vertexAssignmentsAvoidRouteInteriors_of_endpointCoverage drawing
+    (vertexPositionsCoveredByRouteEndpoints_of_compatible
+      graph drawing compatible incident)
+    endpointContacts
 
 /-- Occurrence separation makes the raster locations of all assignment
 points duplicate-free. -/
