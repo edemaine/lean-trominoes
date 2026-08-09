@@ -6663,6 +6663,9 @@ The representation choices for this target are:
   route.  In particular, each source route leaves its normalized vertex by
   one unit step through the endpoint's computed west, north, or east port,
   and that step projects to the matching neighbor in the finite drawing.
+  It also proves the twelvefold magnification leaves at least seven middle
+  points after trimming, so the reversed target template survives the splice
+  and the final route reaches the normalized periodic target occurrence.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
