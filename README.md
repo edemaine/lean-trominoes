@@ -7149,6 +7149,11 @@ The representation choices for this target are:
   derives a two-cell boundary margin from strict source-vertex bounds and
   threefold scaling, then proves that both inserted unit-subdivision vertices
   remain strictly inside the refined fundamental square.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertexSeparation.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertexSeparation.lean)
+  locates each inserted vertex in the relative interior of the first scaled
+  source segment.  Source planarity then proves that no inserted vertex is an
+  old source vertex, that the two vertices of one split incidence differ, and
+  that vertices reserved for distinct source occurrences differ.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
