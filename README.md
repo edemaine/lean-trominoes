@@ -7105,6 +7105,13 @@ The representation choices for this target are:
   occurrence count, while each occurrence-indexed fresh complement variable
   appears at most twice: once in its normalized source clause and once in its
   binary complement clause.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationPositioned.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationPositioned.lean)
+  lifts the construction to positioned formulas.  It exposes the incompatible
+  incidence replacement as the three-edge path from the source clause through
+  its fresh variable and binary complement clause to the original variable,
+  with the two new vertex positions abstracted for the planar route layer.
+  Erasure is proved equal to the logical normalization, so satisfiability,
+  locality, arity, polarity, and occurrence bounds transfer immediately.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
