@@ -25,6 +25,19 @@ open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
 
+/-- The two connector patterns whose current local-gate tables have complete
+endpoint-aware separation from the whole variable-site core.  The fixed-red
+and fixed-blue tables are clear in the false orientation; fixed-green still
+requires the remaining annular clearance repair. -/
+def VariableLocalGateTableEndpointClear
+    (kind : VariableConnectorKind) (polarity : Bool) : Prop :=
+  polarity = false ∧ kind ≠ .fixedGreen
+
+instance (kind : VariableConnectorKind) (polarity : Bool) :
+    Decidable (VariableLocalGateTableEndpointClear kind polarity) := by
+  unfold VariableLocalGateTableEndpointClear
+  infer_instance
+
 /-- The three continuous-separation fields used by periodic continuous
 planarity, without imposing any condition on listed point-to-point
 contacts. -/
@@ -305,6 +318,29 @@ theorem variableSiteRoute_avoids_standardVariableLocalGateRoute_of_slot_ne :
               slot (kind slot) (polarity slot) gateColor) := by
   native_decide
 
+/-- In either endpoint-clear local table, every core route has full
+endpoint-aware separation from every gate in the selected occurrence
+module.  The certificate ranges over complete one-, two-, and three-module
+sites, so it includes the closing variable-cycle route. -/
+theorem
+    variableSiteRoute_avoids_standardVariableLocalGateRoute_of_endpointClear :
+    ∀ (countPred : Fin 3)
+      (kind : VariableSiteSlot → VariableConnectorKind)
+      (polarity : VariableSiteSlot → Bool)
+      (slot : VariableSiteSlot),
+      ∀ (_active : slot.index < countPred + 1)
+        (triple : ActiveVariableSiteTriple (countPred + 1) kind)
+        (routeColor gateColor : WireColor),
+        VariableLocalGateTableEndpointClear
+            (kind slot) (polarity slot) →
+          RoutesAvoidEachOther
+            (translatePolyline standardThreeStrandLayout.variableOffset
+              ((variableSiteDrawing (countPred + 1) kind polarity).route
+                triple routeColor))
+            (standardVariableLocalGateRoute
+              slot (kind slot) (polarity slot) gateColor) := by
+  native_decide
+
 /-- The finite variable-site route selected for an active gate has
 endpoint-permitting continuous separation from that gate. -/
 theorem routedVariableSiteRoute_avoids_standardVariableLocalGateRoute :
@@ -366,6 +402,28 @@ theorem variableSiteRoute_avoids_localGateRoute_of_slot_ne
   exact variableSiteRoute_avoids_standardVariableLocalGateRoute_of_slot_ne
     data.countPred data.kind data.polarity slot active
     triple routeColor gateColor differentSlot
+
+/-- Data-packaged endpoint-aware separation for either local connector table
+whose complete finite certificate is clear. -/
+theorem variableSiteRoute_avoids_localGateRoute_of_endpointClear
+    (data : VariableRibbonFanData)
+    (slot : VariableSiteSlot)
+    (active : data.SlotActive slot)
+    (triple : ActiveVariableSiteTriple data.count data.kind)
+    (routeColor gateColor : WireColor)
+    (clear :
+      VariableLocalGateTableEndpointClear
+        (data.kind slot) (data.polarity slot)) :
+    RoutesAvoidEachOther
+      (translatePolyline standardThreeStrandLayout.variableOffset
+        ((variableSiteDrawing data.count data.kind data.polarity).route
+          triple routeColor))
+      (standardVariableLocalGateRoute
+        slot (data.kind slot) (data.polarity slot) gateColor) := by
+  exact
+    variableSiteRoute_avoids_standardVariableLocalGateRoute_of_endpointClear
+      data.countPred data.kind data.polarity slot active
+      triple routeColor gateColor clear
 
 /-- Data-packaged form of the advertised core-to-gate splice interface. -/
 theorem routedVariableSiteRoute_avoids_localGateRoute

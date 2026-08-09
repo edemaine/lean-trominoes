@@ -4270,7 +4270,14 @@ The representation choices for this target are:
   belong to different occurrence slots, and transports that fact through the
   complete coordinated fan.  Consequently the listed contacts that still
   need a clearance repair before assignment rasterization are confined to a
-  single occurrence module, rather than the whole variable macrocell.
+  single occurrence module, rather than the whole variable macrocell.  A
+  shorter fixed-blue/false local-gate table now removes that module's
+  contacts as well.  The executable
+  `VariableLocalGateTableEndpointClear` certificate gives full
+  endpoint-aware core/fan separation throughout every one-, two-, and
+  three-module variable site for the false fixed-red and fixed-blue
+  patterns.  Thus the unresolved local clearance cases require either a
+  fixed-green connector or the true orientation.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean)
   extends that all-pairs result across every complete coordinated occurrence
   route.  Source-route endpoint separation makes every variable center fresh

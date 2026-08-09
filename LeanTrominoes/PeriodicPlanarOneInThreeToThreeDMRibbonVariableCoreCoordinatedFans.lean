@@ -199,6 +199,35 @@ theorem variableSiteRoute_avoids_coordinatedRoute_of_slot_ne
       compatible slot active
       ((data.kind slot).ribbonLaneForColor gateColor)
 
+/-- In either endpoint-clear connector table, every finite core route has
+complete endpoint-aware separation from the entire coordinated
+local-plus-outer fan. -/
+theorem variableSiteRoute_avoids_coordinatedRoute_of_endpointClear
+    (data : VariableRibbonFanData)
+    (compatible : data.IsClockwiseCompatible)
+    (slot : VariableSiteSlot)
+    (active : data.SlotActive slot)
+    (triple : ActiveVariableSiteTriple data.count data.kind)
+    (routeColor gateColor : WireColor)
+    (clear :
+      VariableLocalGateTableEndpointClear
+        (data.kind slot) (data.polarity slot)) :
+    RoutesAvoidEachOther
+      (translatePolyline standardThreeStrandLayout.variableOffset
+        ((variableSiteDrawing data.count data.kind data.polarity).route
+          triple routeColor))
+      (data.coordinatedRoute slot gateColor) := by
+  apply RoutesAvoidEachOther.join_right_of_strict_suffix
+    (data.variableSiteRoute_avoids_localGateRoute_of_endpointClear
+      slot active triple routeColor gateColor clear)
+    (data.variableSiteRoute_strictlyAvoids_outerRoute
+      compatible slot active triple routeColor gateColor)
+  · exact standardVariableLocalGateRoute_getLast?
+      slot (data.kind slot) (data.polarity slot) gateColor
+  · exact data.outerData.outerRoute_head?
+      compatible slot active
+      ((data.kind slot).ribbonLaneForColor gateColor)
+
 /-- The finite variable-site route selected by a colored occurrence is
 contact-free from the matching physical-lane outer route. -/
 theorem routedVariableSiteRoute_strictlyAvoids_outerRoute
