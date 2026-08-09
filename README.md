@@ -7140,6 +7140,11 @@ The representation choices for this target are:
   proves that all those prefixes, reverse middle edges, suffixes, and gauge
   translations consist of genuine unit lattice steps.  Consequently the final
   normalized incidence drawing satisfies the integer-grid planarity predicate.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertices.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertices.lean)
+  identifies the two inserted vertices after gauging: each fresh variable is
+  subdivision point one and its complement clause is subdivision point two.
+  It also proves that normalized main clauses and binary complement clauses
+  both have zero canonical anchor.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
