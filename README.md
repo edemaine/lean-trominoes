@@ -6698,7 +6698,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteValidity.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteValidity.lean)
   begins discharging those route-validity hypotheses: affine magnification,
   ordered unit subdivision, and endpoint trimming preserve orthogonality and
-  produce a unit-step middle in every normalization round.
+  produce a unit-step middle in every normalization round.  It also computes
+  both splice boundaries exactly: trimming lands three unit steps along the
+  old first segment and three reverse unit steps along the old last segment.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
