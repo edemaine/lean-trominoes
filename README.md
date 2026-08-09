@@ -6626,6 +6626,11 @@ The representation choices for this target are:
   axis-aligned segment leaving the base vertex occurrence.  Target rays are
   reversed and period-translated back from their stored endpoint, while
   retaining the indexed segment occurrence needed for planarity arguments.
+- [`LeanTrominoes/PeriodicThreeDMContractedEndpointDirectionSeparation.lean`](LeanTrominoes/PeriodicThreeDMContractedEndpointDirectionSeparation.lean)
+  proves that the endpoint enumeration is duplicate-free and that distinct
+  endpoints at one contracted vertex leave in distinct cardinal directions.
+  Equal directions would force their realized segment interiors to overlap,
+  contradicting continuous planarity of the contracted drawing.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
