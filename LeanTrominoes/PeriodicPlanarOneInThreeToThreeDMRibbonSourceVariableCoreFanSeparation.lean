@@ -165,6 +165,84 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStub
     translatePolyline_add, coreEq, Cell.add, add_comm] using
       translatedAvoid
 
+/-- Within one source variable, a core route is contact-free from a
+coordinated fan unless it is that fan's selected colored route. -/
+theorem sourceVariableSiteRoute_strictlyAvoids_coordinatedVariableStub_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation : source.PlanarIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible presentation)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (triple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase entry.1.1)
+        (sourceVariableSiteKind source.erase entry.1.1))
+    (coreColor routeColor : WireColor)
+    (different :
+      (triple.1, coreColor) ≠
+        (variableSiteTripleOfTyped
+          (routedOccurrenceTriple source.erase
+            entry.1.1 entry.1.2 routeColor),
+          routeColor)) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout
+          entry.1.1)
+        ((sourceVariableSiteDrawing source.erase entry.1.1).route
+          triple coreColor))
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation entry routeColor) := by
+  let data := sourceVariableRibbonFanData presentation entry
+  let slot := occurrenceVariableSiteSlot entry.1.2
+  have active : data.SlotActive slot :=
+    VariableRibbonFanData.sourceVariableRibbonFanData_slotActive
+      presentation entry
+  rcases exists_occurrenceAt_of_mem_usedSlots source.erase
+      entry.1.1 entry.1.2 entry.slot_mem with ⟨tagged, lookup⟩
+  have clear : VariableLocalGateTableEndpointClear
+      (data.kind slot) (data.polarity slot) := by
+    simpa [data, slot] using
+      occurrenceConnectorPolarity_pattern source.erase width normalized
+        entry.1.1 entry.1.2 tagged lookup
+  let dataTriple : ActiveVariableSiteTriple data.count data.kind :=
+    ⟨triple.1, by
+      rw [VariableRibbonFanData.sourceVariableRibbonFanData_count
+        presentation entry]
+      change VariableSiteTriple.MatchesKind
+        (sourceVariableSiteCount source.erase entry.1.1)
+        (sourceVariableSiteKind source.erase entry.1.1) triple.1
+      exact triple.2⟩
+  have localDifferent :
+      (dataTriple.1, coreColor) ≠
+        (data.routedTriple slot routeColor, routeColor) := by
+    simpa [dataTriple, data, slot] using different
+  have localAvoid :=
+    data.variableSiteRoute_strictlyAvoids_coordinatedRoute_of_ne
+      (compatible.1 entry) slot active dataTriple coreColor routeColor clear
+      localDifferent
+  have coreEq :
+      (variableSiteDrawing data.count data.kind data.polarity).route
+          dataTriple coreColor =
+        (sourceVariableSiteDrawing source.erase entry.1.1).route
+          triple coreColor := by
+    unfold sourceVariableSiteDrawing
+    apply variableSiteDrawing_route_eq_of_indices_eq
+    · exact VariableRibbonFanData.sourceVariableRibbonFanData_count
+        presentation entry
+    · rfl
+    · rfl
+    · rfl
+  have translatedAvoid :=
+    localAvoid.translatePolyline
+      (ribbonMacrocellOrigin (placement.position entry.1.1))
+  simpa [data, slot, occurrenceCoordinatedRibbonVariableStub,
+    constructedVariableOrigin, ribbonMacrocellOrigin,
+    translatePolyline_add, coreEq, Cell.add, add_comm] using
+      translatedAvoid
+
 /-- Within one source variable, a core route and a coordinated fan from a
 different occurrence module have complete endpoint-aware separation. -/
 theorem sourceVariableSiteRoute_avoids_coordinatedVariableStub_of_slot_ne
@@ -356,6 +434,68 @@ theorem constructedVariableSiteRoute_avoids_occurrenceCoordinatedRibbonVariableS
     exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
       simpa [constructedVariableOrigin, translatePolyline_add,
         ribbonMacrocellOrigin, Cell.add, add_comm] using strict)
+
+/-- A source variable-core route is contact-free from a coordinated fan
+whenever, for a common variable owner, it is not that fan's selected
+colored route.  Distinct owners remain strictly separated unconditionally. -/
+theorem
+    constructedVariableSiteRoute_strictlyAvoids_occurrenceCoordinatedRibbonVariableStub_of_ne
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (atom : Variable)
+    (atomMember : atom ∈ occurringVariables source.erase)
+    (triple :
+      ActiveVariableSiteTriple
+        (sourceVariableSiteCount source.erase atom)
+        (sourceVariableSiteKind source.erase atom))
+    (coreColor : WireColor)
+    (entry : ActiveOccurrenceEntry source.erase)
+    (routeColor : WireColor)
+    (different : atom = entry.1.1 →
+      (triple.1, coreColor) ≠
+        (variableSiteTripleOfTyped
+          (routedOccurrenceTriple source.erase
+            entry.1.1 entry.1.2 routeColor),
+          routeColor)) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline
+        (constructedVariableOrigin placement standardThreeStrandLayout atom)
+        ((sourceVariableSiteDrawing source.erase atom).route
+          triple coreColor))
+      (occurrenceCoordinatedRibbonVariableStub
+        presentation.toPlanarIncidencePresentation entry routeColor) := by
+  by_cases sameAtom : atom = entry.1.1
+  · subst atom
+    exact
+      sourceVariableSiteRoute_strictlyAvoids_coordinatedVariableStub_of_ne
+        presentation.toPlanarIncidencePresentation width normalized
+        compatible entry triple coreColor routeColor
+        (different rfl)
+  · have centersNe :
+        placement.position atom ≠ placement.position entry.1.1 := by
+      exact assemblyMacrocellOwnerPosition_ne_of_ne
+        presentation.toPlanarIncidencePresentation anchorsZero
+        (.atom atom) (.atom entry.1.1) atomMember entry.atom_mem
+        (fun equal => sameAtom (AssemblyMacrocellOwner.atom.inj equal))
+    have strict :=
+      insetRoute_strictlyAvoids_route_in_distinctRibbonMacrocell
+        (sourceVariableSiteRoute_points_in_inset_rectangle
+          source.erase atom atomMember triple coreColor)
+        (fun point member =>
+          occurrenceCoordinatedRibbonVariableStub_points_bounded
+            presentation.toPlanarIncidencePresentation compatible
+            entry routeColor member)
+        centersNe
+    simpa [constructedVariableOrigin, translatePolyline_add,
+      ribbonMacrocellOrigin, Cell.add, add_comm] using strict
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

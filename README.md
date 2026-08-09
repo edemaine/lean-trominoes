@@ -112,6 +112,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Lift the normalized endpoint-aware variable-core/gate tables
           through source coordinates, coordinated fans, complete occurrence
           routes, and the typed finite-core interface.
+        - [x] Classify variable-core/occurrence contacts: every nonmatching
+          routed triple/color is strictly separated, while the unique
+          matching route retains only its intended variable-port splice.
         - [ ] Prove endpoint-only contacts for distinct complete assembled
           incidence routes and their periodic translates.
         - [ ] Preserve endpoint-only contacts through degree-two contraction
@@ -4302,16 +4305,18 @@ The representation choices for this target are:
   The executable `VariableLocalGateTableEndpointClear` certificate now gives
   full endpoint-aware `RoutesAvoidEachOther` for every core route and every
   coordinated fan in all three polarity-normalized tables, including the
-  repaired fixed-green/true case.  This stronger result is preserved by the
-  source-coordinate translation; cores and fans owned by distinct variable
-  macrocells remain strictly separated.
+  repaired fixed-green/true case.  Exhaustive finite classification further
+  proves strict separation unless the core triple/color is exactly the fan's
+  selected routed pair.  Both results survive source-coordinate translation;
+  cores and fans owned by distinct variable macrocells remain strictly
+  separated.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreRouteSeparation.lean)
   extends that all-pairs result across every complete coordinated occurrence
   route.  Source-route endpoint separation makes every variable center fresh
   from unrelated corridor interiors; strict inset bounds then separate the
   corridor and clause-side fan.  Because those two suffixes are contact-free,
-  both joins preserve the variable-side fan's full endpoint-aware contact
-  law.
+  both joins preserve either the variable-side fan's endpoint-aware contact
+  law or, for a nonmatching routed triple/color, its strict separation.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonSourceAssembledRouteSeparation.lean)
   decomposes every typed incidence route into its finite gadget core and an
   optional coordinated occurrence suffix.  It combines core/core, both

@@ -232,6 +232,37 @@ theorem variableSiteRoute_avoids_coordinatedRoute_of_endpointClear
       compatible slot active
       ((data.kind slot).ribbonLaneForColor gateColor)
 
+/-- A finite core route is contact-free from a complete coordinated fan
+unless it is the fan's own selected colored route. -/
+theorem variableSiteRoute_strictlyAvoids_coordinatedRoute_of_ne
+    (data : VariableRibbonFanData)
+    (compatible : data.IsClockwiseCompatible)
+    (slot : VariableSiteSlot)
+    (active : data.SlotActive slot)
+    (triple : ActiveVariableSiteTriple data.count data.kind)
+    (routeColor gateColor : WireColor)
+    (clear :
+      VariableLocalGateTableEndpointClear
+        (data.kind slot) (data.polarity slot))
+    (different :
+      (triple.1, routeColor) ≠
+        (data.routedTriple slot gateColor, gateColor)) :
+    RoutesStrictlyAvoidEachOther
+      (translatePolyline standardThreeStrandLayout.variableOffset
+        ((variableSiteDrawing data.count data.kind data.polarity).route
+          triple routeColor))
+      (data.coordinatedRoute slot gateColor) := by
+  apply RoutesStrictlyAvoidEachOther.join_right
+    (data.variableSiteRoute_strictlyAvoids_localGateRoute_of_ne
+      slot active triple routeColor gateColor clear different)
+    (data.variableSiteRoute_strictlyAvoids_outerRoute
+      compatible slot active triple routeColor gateColor)
+  · exact standardVariableLocalGateRoute_getLast?
+      slot (data.kind slot) (data.polarity slot) gateColor
+  · exact data.outerData.outerRoute_head?
+      compatible slot active
+      ((data.kind slot).ribbonLaneForColor gateColor)
+
 /-- The finite variable-site route selected by a colored occurrence is
 contact-free from the matching physical-lane outer route. -/
 theorem routedVariableSiteRoute_strictlyAvoids_outerRoute
