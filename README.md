@@ -6690,6 +6690,11 @@ The representation choices for this target are:
   assignments are therefore emitted, expose the edge color toward their
   vertices under collision freedom, and match the automatically recovered
   colors of both vertex ports after finite-torus projection.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationRouteRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationRouteRasterization.lean)
+  proves the uniform route-interior counterpart: every displayed route triple
+  emits its middle assignment, and every four-point window in a unit-step,
+  nonreversing final route compiles to two routing cells whose common ports
+  expose the same edge color under collision freedom.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
