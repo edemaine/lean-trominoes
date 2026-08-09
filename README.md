@@ -6695,6 +6695,10 @@ The representation choices for this target are:
   emits its middle assignment, and every four-point window in a unit-step,
   nonreversing final route compiles to two routing cells whose common ports
   expose the same edge color under collision freedom.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteValidity.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteValidity.lean)
+  begins discharging those route-validity hypotheses: affine magnification,
+  ordered unit subdivision, and endpoint trimming preserve orthogonality and
+  produce a unit-step middle in every normalization round.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
