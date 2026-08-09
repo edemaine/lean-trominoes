@@ -6658,6 +6658,11 @@ The representation choices for this target are:
   isolating those remaining obligations from array-index bookkeeping.  It
   also proves that reflected geometric unit steps commute with finite-torus
   projection, including wraparound in both periods.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteGeometry.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteGeometry.lean)
+  verifies the first two points and first direction of every final normalized
+  route.  In particular, each source route leaves its normalized vertex by
+  one unit step through the endpoint's computed west, north, or east port,
+  and that step projects to the matching neighbor in the finite drawing.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
