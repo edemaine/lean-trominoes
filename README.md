@@ -6708,7 +6708,10 @@ The representation choices for this target are:
   proves that every first-round `normalizationRoute1` is a unit-step chain.
   The preserved endpoint/adjacent-point interface then lifts this invariant
   through both cyclic-rotation rounds, proving every
-  `finalNormalizationRoute` is a unit-step chain.
+  `finalNormalizationRoute` is a unit-step chain.  For the remaining
+  validity invariant, continuous planarity rules out reversals in every
+  contracted route, and affine magnification, unit subdivision, and trimming
+  are proved to preserve that nonreversal property.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose

@@ -1,5 +1,7 @@
 import LeanTrominoes.OrthogonalPolylineScaling
 import LeanTrominoes.OrthogonalPolylineUnitSubdivisionJoin
+import LeanTrominoes.PeriodicGridDrawingNoImmediateReversal
+import LeanTrominoes.PeriodicThreeDMContractionContinuousPlanarity
 import LeanTrominoes.PeriodicThreeDMNormalizationRouteRasterization
 
 /-!
@@ -1122,6 +1124,109 @@ theorem ContinuousPlanarPresentation.finalNormalizationRoute_unitSteps
   · exact targetGeometry.2.2.1
   · exact sourceEndpoint.finalNormalizationTemplate_getLast? planar
   · exact targetEndpoint.finalNormalizationTemplate_getLast? planar
+
+/-! ## Preservation of nonreversal -/
+
+/-- Taking an initial segment preserves absence of immediate reversals. -/
+theorem hasNoImmediateReversal_take
+    {points : List Cell}
+    (noReversal : AxisDirection.HasNoImmediateReversal points)
+    (count : Nat) :
+    AxisDirection.HasNoImmediateReversal (points.take count) := by
+  induction count generalizing points with
+  | zero => simp [AxisDirection.HasNoImmediateReversal]
+  | succ count induction =>
+      cases points with
+      | nil => simp [AxisDirection.HasNoImmediateReversal]
+      | cons first rest =>
+          cases count with
+          | zero => simp [AxisDirection.HasNoImmediateReversal]
+          | succ count =>
+              cases rest with
+              | nil => simp [AxisDirection.HasNoImmediateReversal]
+              | cons second rest =>
+                  cases count with
+                  | zero => simp [AxisDirection.HasNoImmediateReversal]
+                  | succ count =>
+                      cases rest with
+                      | nil => simp [AxisDirection.HasNoImmediateReversal]
+                      | cons third rest =>
+                          exact ⟨noReversal.1,
+                            induction noReversal.2⟩
+
+/-- The positive affine normalization map preserves every local turn
+direction and hence absence of immediate reversals. -/
+theorem map_normalizeVertexPosition_hasNoImmediateReversal
+    {points : List Cell}
+    (noReversal : AxisDirection.HasNoImmediateReversal points) :
+    AxisDirection.HasNoImmediateReversal
+      (points.map normalizeVertexPosition) := by
+  induction points using List.twoStepInduction with
+  | nil | singleton => simp [AxisDirection.HasNoImmediateReversal]
+  | cons_cons first second rest _ induction =>
+      cases rest with
+      | nil => simp [AxisDirection.HasNoImmediateReversal]
+      | cons third rest =>
+          constructor
+          · simpa using noReversal.1
+          · exact induction second noReversal.2
+
+/-- Affine magnification followed by ordered unit subdivision preserves
+absence of immediate reversals on an orthogonal route. -/
+theorem magnifiedUnitRoute_hasNoImmediateReversal
+    {points : List Cell}
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points)
+    (noReversal : AxisDirection.HasNoImmediateReversal points) :
+    AxisDirection.HasNoImmediateReversal
+      (magnifiedUnitRoute points) := by
+  unfold magnifiedUnitRoute
+  apply AxisDirection.unitSubdividePolyline_hasNoImmediateReversal
+  · rw [map_normalizeVertexPosition_eq_translate_scalePolyline]
+    have scaled : PeriodicOrthocrossing.OrthogonalPolyline
+        (scalePolyline vertexNormalizationScale points) := by
+      simpa [vertexNormalizationScale] using
+        PeriodicOrthocrossing.OrthogonalPolyline.scalePolyline
+          orthogonal (factor := 12) (by norm_num)
+    exact scaled.translate center
+  · exact map_normalizeVertexPosition_hasNoImmediateReversal noReversal
+
+/-- The endpoint clearance trim preserves absence of immediate reversals. -/
+theorem trimmedMagnifiedRoute_hasNoImmediateReversal
+    {points : List Cell}
+    (orthogonal : PeriodicOrthocrossing.OrthogonalPolyline points)
+    (noReversal : AxisDirection.HasNoImmediateReversal points) :
+    AxisDirection.HasNoImmediateReversal
+      (trimmedMagnifiedRoute points) := by
+  unfold trimmedMagnifiedRoute
+  exact hasNoImmediateReversal_take
+    (hasNoImmediateReversal_drop
+      (magnifiedUnitRoute_hasNoImmediateReversal orthogonal noReversal) 3) _
+
+/-- Continuous planarity excludes immediate reversals from every emitted
+contracted edge route. -/
+theorem ContinuousPlanarPresentation.contractedEdgeRoute_hasNoImmediateReversal
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    AxisDirection.HasNoImmediateReversal
+      (presentation.contractedEdgeRoute edge) := by
+  have routeMember :=
+    presentation.toPlanarPresentation.contractedEdgeRoute_mem_zipIdx
+      edgeMember
+  have indexLt := List.snd_lt_of_mem_zipIdx routeMember
+  have stored :=
+    (presentation.contractedDrawing_isContinuouslyPlanar degree)
+      |>.routeHasNoImmediateReversal
+        presentation.toPlanarPresentation.contractedDrawing_isOrthogonal
+        indexLt
+  have lookup :
+      presentation.contractedDrawing.edgeRoutes[
+        problem.contractedEdges.idxOf edge] =
+        presentation.contractedEdgeRoute edge := by
+    exact (List.mem_zipIdx' routeMember).2.symm
+  simpa [lookup] using stored
 
 end PeriodicThreeDM
 end LeanTrominoes
