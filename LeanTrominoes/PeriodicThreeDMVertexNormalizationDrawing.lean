@@ -128,6 +128,152 @@ theorem PlanarPresentation.finalNormalizedGridDrawing_edgeRoute
     (fun tagged => presentation.finalNormalizationRoute tagged.1)
     [] member
 
+/-- The positive affine position normalization is injective. -/
+theorem normalizeVertexPosition_injective :
+    Function.Injective normalizeVertexPosition := by
+  intro first second equal
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  have horizontalEqual := congrArg Prod.fst equal
+  have verticalEqual := congrArg Prod.snd equal
+  simp only [normalizeVertexPosition, vertexNormalizationScale,
+    DegreeThreeVertexNormalization.center, Cell.scale, Cell.add] at horizontalEqual verticalEqual
+  apply Prod.ext
+  · omega
+  · omega
+
+/-- Applying the affine normalization three times remains injective on the
+listed contracted vertices. -/
+theorem PlanarPresentation.finalNormalizationPosition_injective_on
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {first second : PeriodicThreeDMVertex}
+    (firstMember : first ∈ problem.contractedGraph.vertices)
+    (secondMember : second ∈ problem.contractedGraph.vertices)
+    (equal : presentation.finalNormalizationPosition first =
+      presentation.finalNormalizationPosition second) :
+    first = second := by
+  have oldEqual : presentation.normalizationPosition0 first =
+      presentation.normalizationPosition0 second :=
+    normalizeVertexPosition_injective
+      (normalizeVertexPosition_injective
+        (normalizeVertexPosition_injective equal))
+  unfold PlanarPresentation.normalizationPosition0 at oldEqual
+  rw [presentation.contractedDrawing_vertexPosition firstMember,
+    presentation.contractedDrawing_vertexPosition secondMember] at oldEqual
+  exact presentation.vertexPosition_injective_on
+    (contractedGraph_vertex_mem_incidenceGraph problem firstMember)
+    (contractedGraph_vertex_mem_incidenceGraph problem secondMember)
+    oldEqual
+
+/-- Final normalized vertex positions remain duplicate-free. -/
+theorem PlanarPresentation.finalNormalizedVertexPositions_nodup
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.finalNormalizedVertexPositions.Nodup := by
+  rw [presentation.finalNormalizedVertexPositions_eq_map]
+  apply List.Nodup.map_on
+  · intro first firstMember second secondMember equal
+    exact presentation.finalNormalizationPosition_injective_on
+      firstMember secondMember equal
+  · exact contractedGraph_vertices_nodup problem
+
+/-- Three affine rounds send every contracted vertex from the old open
+fundamental square into the enlarged open fundamental square. -/
+theorem PlanarPresentation.finalNormalizedPositions_in_fundamental_square
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    ∀ position ∈ presentation.finalNormalizedVertexPositions,
+      presentation.finalNormalizedGridDrawing.PositionInFundamentalSquare
+        position := by
+  intro position positionMember
+  rw [presentation.finalNormalizedVertexPositions_eq_map] at positionMember
+  rcases List.mem_map.mp positionMember with
+    ⟨vertex, vertexMember, rfl⟩
+  have oldPositionMember : presentation.normalizationPosition0 vertex ∈
+      presentation.contractedVertexPositions := by
+    unfold PlanarPresentation.normalizationPosition0
+    rw [presentation.contractedDrawing_vertexPosition vertexMember]
+    rw [presentation.contractedVertexPositions_eq_map]
+    exact List.mem_map.mpr ⟨vertex, vertexMember, rfl⟩
+  have oldBounds :=
+    presentation.contractedPositions_in_fundamental_square
+      _ oldPositionMember
+  rcases presentation.normalizationPosition0 vertex with ⟨horizontal, vertical⟩
+  simp only [PeriodicGridDrawing.PositionInFundamentalSquare] at oldBounds ⊢
+  simp only [PlanarPresentation.finalNormalizationPosition,
+    PlanarPresentation.normalizationPosition2,
+    PlanarPresentation.normalizationPosition1,
+    normalizeVertexPosition, vertexNormalizationScale,
+    DegreeThreeVertexNormalization.center, Cell.scale, Cell.add]
+  rw [presentation.finalNormalizedGridDrawing_gridSize]
+  simp only [PlanarPresentation.finalNormalizationPeriod,
+    vertexNormalizationScaleNat]
+  have oldGridPositive : 0 < presentation.contractedDrawing.gridSize :=
+    Nat.zero_lt_succ presentation.contractedDrawing.gridSizePred
+  norm_num at oldBounds ⊢
+  constructor <;> omega
+
+/-- Final normalized routes still match the source, target, and offset of
+every contracted graph edge. -/
+theorem PlanarPresentation.finalNormalizedGridDrawing_routesMatch
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.finalNormalizedGridDrawing.RoutesMatch
+      problem.contractedGraph := by
+  intro taggedGraphEdge graphEdgeMember
+  rcases contractedGraph_edge_zipIdx problem graphEdgeMember with
+    ⟨edge, edgeZipMember, edgeEquation⟩
+  rw [← edgeEquation]
+  have edgeMember : edge ∈ problem.contractedEdges :=
+    List.fst_mem_of_mem_zipIdx edgeZipMember
+  have graphEdgeListMember : edge.toPeriodicEdge ∈
+      problem.contractedGraph.edges := by
+    rw [edgeEquation]
+    exact List.fst_mem_of_mem_zipIdx graphEdgeMember
+  have endpointMembers :=
+    (contractedGraph_isWellFormed problem).2
+      edge.toPeriodicEdge graphEdgeListMember
+  rw [presentation.finalNormalizedGridDrawing_edgeRoute edgeZipMember]
+  rw [presentation.finalNormalizedGridDrawing_vertexPosition
+      endpointMembers.1,
+    presentation.finalNormalizedGridDrawing_vertexPosition
+      endpointMembers.2]
+  constructor
+  · exact presentation.finalNormalizationRoute_head? edge
+  · rw [presentation.finalNormalizationRoute_getLast? edge]
+    rw [presentation.finalTargetOccurrence_eq edge]
+    rw [presentation.finalScaledPeriodTranslation_eq]
+    rw [presentation.finalNormalizedGridDrawing_periodTranslation]
+
+/-- The packaged drawing has the expected vertex and edge list lengths. -/
+theorem PlanarPresentation.finalNormalizedGridDrawing_lengths
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.finalNormalizedGridDrawing.vertexPositions.length =
+        problem.contractedGraph.vertices.length ∧
+      presentation.finalNormalizedGridDrawing.edgeRoutes.length =
+        problem.contractedGraph.edges.length := by
+  constructor
+  · simp [PlanarPresentation.finalNormalizedGridDrawing,
+      PlanarPresentation.finalNormalizedVertexPositions]
+  · simp [PlanarPresentation.finalNormalizedGridDrawing, contractedGraph]
+
+/-- The final normalized geometric data form a compatible finite periodic
+drawing of the contracted graph. -/
+theorem PlanarPresentation.finalNormalizedGridDrawing_isCompatible
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) :
+    presentation.finalNormalizedGridDrawing.IsCompatible
+      problem.contractedGraph := by
+  refine ⟨contractedGraph_isWellFormed problem,
+    presentation.finalNormalizedGridDrawing_lengths.1,
+    presentation.finalNormalizedGridDrawing_lengths.2,
+    ?_, ?_, ?_⟩
+  · exact presentation.finalNormalizedVertexPositions_nodup
+  · exact presentation.finalNormalizedPositions_in_fundamental_square
+  · exact presentation.finalNormalizedGridDrawing_routesMatch
+
 /-- Every route stored by the packaged final drawing consists of unit axis
 steps. -/
 theorem ContinuousPlanarPresentation.finalNormalizedGridDrawing_hasUnitSteps

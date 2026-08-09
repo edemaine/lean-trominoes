@@ -6727,9 +6727,11 @@ The representation choices for this target are:
   certificate.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationDrawing.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationDrawing.lean)
   packages the final normalized positions and routes as a standard
-  `PeriodicGridDrawing`, with exact vertex/edge lookup lemmas and the proved
-  unit-step invariant.  This occurrence-indexed drawing is the interface for
-  the remaining global separation and assignment-collision proof.
+  `PeriodicGridDrawing`.  It proves exact vertex/edge lookup, injective
+  fundamental-square vertex placement, source/translated-target route
+  compatibility, and the drawing-wide unit-step invariant.  This certified
+  occurrence-indexed drawing is the interface for the remaining global
+  separation and assignment-collision proof.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
