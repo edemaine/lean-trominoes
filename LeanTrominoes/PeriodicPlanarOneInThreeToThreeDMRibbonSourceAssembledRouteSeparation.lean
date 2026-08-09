@@ -91,9 +91,9 @@ theorem assembledTypedIncidenceCoreRoute_eq_clause
   cases tripleEq
   rfl
 
-/-- Distinct colored typed incidences have continuously separated finite
-cores, including pairs housed in the same finite gadget. -/
-theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
+/-- Distinct colored typed incidences have fully endpoint-aware separated
+finite cores, including pairs housed in the same finite gadget. -/
+theorem assembledTypedIncidenceCoreRoutes_avoidEachOther
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
@@ -109,7 +109,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
     (different : (first.1, firstColor) ≠ (second.1, secondColor)) :
     let routing := coordinatedSourceRibbonThreeStrandRouting
       presentation width compatible
-    RoutesAvoidInteriorContacts
+    RoutesAvoidEachOther
       (assembledTypedIncidenceCoreRoute routing first firstColor)
       (assembledTypedIncidenceCoreRoute routing second secondColor) := by
   dsimp only
@@ -154,7 +154,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                         variableSiteTripleOfTyped,
                         occurrenceVariableSiteSlot]
                   · exact colorEq
-                exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts (by
+                exact (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledOrdinaryPrefix, typedVariableSiteRoute,
                     firstLocation, secondLocation, routing,
@@ -170,7 +170,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                       secondLocation.2.2 secondColor keysDifferent
                       (constructedVariableOrigin placement
                         standardThreeStrandLayout firstAtom))
-              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledOrdinaryPrefix, typedVariableSiteRoute,
                     firstLocation, secondLocation, routing,
@@ -213,7 +213,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                   have underlyingEq := congrArg Subtype.val activeEq
                   simp [activeVariableSiteTriple,
                     variableSiteTripleOfTyped] at underlyingEq
-                exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts (by
+                exact (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledOrdinaryPrefix, assembledFixedRedPrefix,
                     typedVariableSiteRoute, firstLocation, secondLocation,
@@ -229,7 +229,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                       secondLocation.2.2 secondColor keysDifferent
                       (constructedVariableOrigin placement
                         standardThreeStrandLayout firstAtom))
-              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledOrdinaryPrefix, assembledFixedRedPrefix,
                     typedVariableSiteRoute, firstLocation, secondLocation,
@@ -259,7 +259,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                 simpa [tripleMacrocellOwner,
                   AssemblyMacrocellOwner.IsDeclared,
                   PositionedPeriodicCNF.erase] using secondDeclared
-              exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                 simpa [assembledTypedIncidenceCoreRoute,
                   assembledOrdinaryPrefix, typedVariableSiteRoute,
                   assembledClauseRoute, orientedIncidenceLocalRoute,
@@ -299,7 +299,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                   have underlyingEq := congrArg Subtype.val activeEq
                   simp [activeVariableSiteTriple,
                     variableSiteTripleOfTyped] at underlyingEq
-                exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts (by
+                exact (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledOrdinaryPrefix, assembledFixedRedPrefix,
                     typedVariableSiteRoute, firstLocation, secondLocation,
@@ -315,7 +315,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                       secondLocation.2.2 secondColor keysDifferent
                       (constructedVariableOrigin placement
                         standardThreeStrandLayout firstAtom))
-              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledOrdinaryPrefix, assembledFixedRedPrefix,
                     typedVariableSiteRoute, firstLocation, secondLocation,
@@ -366,7 +366,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                         variableSiteTripleOfTyped,
                         occurrenceVariableSiteSlot]
                   · exact colorEq
-                exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts (by
+                exact (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledFixedRedPrefix, typedVariableSiteRoute,
                     firstLocation, secondLocation, routing,
@@ -382,7 +382,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                       secondLocation.2.2 secondColor keysDifferent
                       (constructedVariableOrigin placement
                         standardThreeStrandLayout firstAtom))
-              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledFixedRedPrefix, typedVariableSiteRoute,
                     firstLocation, secondLocation, routing,
@@ -412,7 +412,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                 simpa [tripleMacrocellOwner,
                   AssemblyMacrocellOwner.IsDeclared,
                   PositionedPeriodicCNF.erase] using secondDeclared
-              exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                 simpa [assembledTypedIncidenceCoreRoute,
                   assembledFixedRedPrefix, typedVariableSiteRoute,
                   assembledClauseRoute, orientedIncidenceLocalRoute,
@@ -439,7 +439,8 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
           | ordinary secondAtom secondSlot secondVariant secondLocal =>
               let secondLocation := ordinaryTriple_location source.erase
                 secondAtom secondSlot secondVariant secondLocal secondMember
-              exact (RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              exact routesAvoidEachOther_comm
+                (RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                 simpa [assembledTypedIncidenceCoreRoute,
                   assembledOrdinaryPrefix, typedVariableSiteRoute,
                   assembledClauseRoute, orientedIncidenceLocalRoute,
@@ -453,11 +454,12 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                       secondLocation.1 secondSlot secondLocation.2.1
                       (.ordinary secondAtom secondSlot secondVariant secondLocal)
                       secondLocation.2.2)
-                    secondColor firstIndex firstIndexLt firstSet firstColor)).symm
+                    secondColor firstIndex firstIndexLt firstSet firstColor))
           | fixedRed secondAtom secondSlot secondLocal =>
               let secondLocation := fixedRedTriple_location source.erase
                 secondAtom secondSlot secondLocal secondMember
-              exact (RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              exact routesAvoidEachOther_comm
+                (RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                 simpa [assembledTypedIncidenceCoreRoute,
                   assembledFixedRedPrefix, typedVariableSiteRoute,
                   assembledClauseRoute, orientedIncidenceLocalRoute,
@@ -471,7 +473,7 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                       secondLocation.1 secondSlot secondLocation.2.1
                       (.fixedRed secondAtom secondSlot secondLocal)
                       secondLocation.2.2)
-                    secondColor firstIndex firstIndexLt firstSet firstColor)).symm
+                    secondColor firstIndex firstIndexLt firstSet firstColor))
           | clause secondIndex secondSet =>
               have secondDeclared :=
                 tripleMacrocellOwner_declared source.erase
@@ -490,11 +492,11 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                   cases setEq
                   cases colorEq
                   rfl
-                exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts (by
+                exact (by
                   simpa [assembledTypedIncidenceCoreRoute, routing] using
                     assembledClauseRoutes_avoidEachOther routing firstIndex
                       firstSet secondSet firstColor secondColor keysDifferent)
-              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
+              · exact RoutesStrictlyAvoidEachOther.toRoutesAvoidEachOther (by
                   simpa [assembledTypedIncidenceCoreRoute,
                     assembledClauseRoute, orientedIncidenceLocalRoute, routing,
                     coordinatedSourceRibbonThreeStrandRouting,
@@ -503,6 +505,32 @@ theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
                       presentation.toPlanarIncidencePresentation anchorsZero
                       firstIndex secondIndex firstIndexLt secondIndexLt indicesEq
                       firstSet secondSet firstColor secondColor)
+
+/-- The endpoint-aware finite-core theorem in particular supplies the three
+interior-contact fields used by continuous planarity. -/
+theorem assembledTypedIncidenceCoreRoutes_avoidInteriors
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {placement : PeriodicVariablePlacement Variable}
+    (presentation :
+      source.HaloBoundedRibbonReadyIncidencePresentation placement)
+    (anchorsZero : HasZeroClauseAnchors source)
+    (width : source.erase.WidthAtMost 3)
+    (compatible : SourceRibbonFansClockwiseCompatible
+      presentation.toPlanarIncidencePresentation)
+    (first second :
+      {triple : Triple Variable // triple ∈ triples source.erase})
+    (firstColor secondColor : WireColor)
+    (different : (first.1, firstColor) ≠ (second.1, secondColor)) :
+    let routing := coordinatedSourceRibbonThreeStrandRouting
+      presentation width compatible
+    RoutesAvoidInteriorContacts
+      (assembledTypedIncidenceCoreRoute routing first firstColor)
+      (assembledTypedIncidenceCoreRoute routing second secondColor) := by
+  exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts
+    (assembledTypedIncidenceCoreRoutes_avoidEachOther
+      presentation anchorsZero width compatible first second
+      firstColor secondColor different)
 
 /-- Every assembled finite core avoids every complete coordinated source
 occurrence route. -/

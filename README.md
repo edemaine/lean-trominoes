@@ -4276,7 +4276,10 @@ The representation choices for this target are:
   optional coordinated occurrence suffix.  It combines core/core, both
   core/suffix directions, and suffix/suffix separation to prove that every
   pair of distinct colored typed routes has disjoint segment interiors and
-  no listed point in the other route's interior.
+  no listed point in the other route's interior.  The core/core stage now
+  retains the stronger endpoint-aware `RoutesAvoidEachOther` certificate,
+  including its proof that every listed-point contact is an endpoint of both
+  finite cores; the former interior-only result is derived from it.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMTranslatedAssembledRoutes.lean)
   transports that decomposition through arbitrary physical translations,
   including the translated splice endpoint.  At the source level it augments
