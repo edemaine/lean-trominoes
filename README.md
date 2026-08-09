@@ -4497,6 +4497,11 @@ The representation choices for this target are:
   gauged Figure 9 presentation.  Its stored width, occurrence, arity, and
   cyclic-order certificates produce one concrete padded normalized routing
   whose distinct colored occurrence routes are all proved contact-free.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonThreeDM.lean)
+  packages that exact concrete routing as a continuously planar periodic 3DM
+  presentation.  Every colored element has degree two or three, and both
+  perfect matching and abstract trichromatic orientation are proved
+  equivalent to satisfiability of the original local periodic CNF.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
