@@ -546,5 +546,220 @@ theorem normalizeRouteWithTemplates_unitSteps
       middleRouteLast targetRouteHead)
     sourceRouteLast innerRouteHead
 
+/-! ## Concrete first normalization round -/
+
+/-- Every endpoint belonging to a certified contracted fan uses one of its
+three occupied sides, hence not the selected fourth side. -/
+theorem ContractedVertexFan.endpoint_outwardSide_ne_omittedSideAt
+    {problem : PeriodicThreeDM}
+    {presentation : problem.ContinuousPlanarPresentation}
+    {vertex : PeriodicThreeDMVertex}
+    (fan : ContractedVertexFan presentation vertex)
+    {endpoint : ContractedEndpoint}
+    (member : endpoint ∈ [fan.first, fan.second, fan.third]) :
+    endpoint.outwardSide presentation.toPlanarPresentation ≠
+      omittedSideAt presentation.toPlanarPresentation vertex := by
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at member
+  rcases member with first | second | third
+  · subst endpoint
+    rw [fan.omittedSideAt_eq]
+    exact fan.coloredFan.omitted_not_first.symm
+  · subst endpoint
+    rw [fan.omittedSideAt_eq]
+    exact fan.coloredFan.omitted_not_second.symm
+  · subst endpoint
+    rw [fan.omittedSideAt_eq]
+    exact fan.coloredFan.omitted_not_third.symm
+
+/-- Every enumerated endpoint uses a nonomitted side in the executable
+normalization data. -/
+theorem ContractedEndpoint.outwardSide_ne_omittedSideAt
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {endpoint : ContractedEndpoint}
+    (member : endpoint ∈ problem.contractedEndpoints) :
+    endpoint.outwardSide presentation.toPlanarPresentation ≠
+      omittedSideAt presentation.toPlanarPresentation endpoint.vertex := by
+  have vertexMember := endpoint.vertex_mem_of_mem member
+  cases vertexEquation : endpoint.vertex with
+  | triple tripleIndex =>
+      have indexLt : tripleIndex < problem.triples.length := by
+        rw [vertexEquation] at vertexMember
+        simpa [contractedGraph, tripleVertices,
+          contractedElementVertices,
+          contractedElementVerticesForColor] using vertexMember
+      obtain ⟨fan⟩ := exists_contractVertexFan_at_triple
+        presentation wellFormed degree tripleIndex indexLt
+      have endpointAt : endpoint ∈
+          problem.contractedEndpointsAt (.triple tripleIndex) :=
+        (contractedEndpointsAt_mem_iff problem _ endpoint).2
+          ⟨member, vertexEquation⟩
+      have fanMember : endpoint ∈ [fan.first, fan.second, fan.third] := by
+        rw [← fan.endpoints_eq]
+        exact endpointAt
+      simpa [vertexEquation] using
+        fan.endpoint_outwardSide_ne_omittedSideAt fanMember
+  | element color atom =>
+      have atomData :
+          atom < problem.elementCount color ∧
+            problem.degree color atom = 3 := by
+        rw [vertexEquation] at vertexMember
+        simp [contractedGraph, tripleVertices,
+          contractedElementVertices,
+          contractedElementVerticesForColor,
+          incidenceColors] at vertexMember
+        cases color <;> simp_all
+      obtain ⟨fan⟩ := exists_contractVertexFan_at_element
+        presentation degree color atom atomData.1 atomData.2
+      have endpointAt : endpoint ∈
+          problem.contractedEndpointsAt (.element color atom) :=
+        (contractedEndpointsAt_mem_iff problem _ endpoint).2
+          ⟨member, vertexEquation⟩
+      have fanMember : endpoint ∈ [fan.first, fan.second, fan.third] := by
+        rw [← fan.endpoints_eq]
+        exact endpointAt
+      simpa [vertexEquation] using
+        fan.endpoint_outwardSide_ne_omittedSideAt fanMember
+
+/-- Contracted routes already use the stage-zero normalization endpoint
+coordinates. -/
+theorem PlanarPresentation.contractedEdgeRoute_normalizationEndpoints
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {edge : ContractedEdge}
+    (member : edge ∈ problem.contractedEdges) :
+    (presentation.contractedEdgeRoute edge).head? =
+        some (presentation.normalizationPosition0
+          edge.toPeriodicEdge.source) ∧
+      (presentation.contractedEdgeRoute edge).getLast? =
+        some (presentation.normalizationTarget0 edge) := by
+  have endpoints := presentation.contractedEdgeRoute_endpoints_of_mem member
+  have graphEdgeMember : edge.toPeriodicEdge ∈
+      problem.contractedGraph.edges :=
+    List.mem_map.mpr ⟨edge, member, rfl⟩
+  have endpointMembers :=
+    (contractedGraph_isWellFormed problem).2 _ graphEdgeMember
+  constructor
+  · rw [endpoints.1]
+    unfold PlanarPresentation.normalizationPosition0
+    rw [presentation.contractedDrawing_vertexPosition endpointMembers.1]
+  · rw [endpoints.2]
+    unfold PlanarPresentation.normalizationTarget0
+      PlanarPresentation.normalizationPosition0
+    rw [presentation.contractedDrawing_vertexPosition endpointMembers.2]
+    simp
+
+/-- The first concrete normalization round converts every emitted
+contracted edge into a unit-step route. -/
+theorem ContinuousPlanarPresentation.normalizationRoute1_unitSteps
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    (presentation.toPlanarPresentation.normalizationRoute1 edge).IsChain
+      AxisDirection.IsUnitAxisStep := by
+  let planar := presentation.toPlanarPresentation
+  let oldRoute := planar.contractedEdgeRoute edge
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  have sourceMember : sourceEndpoint ∈ problem.contractedEndpoints := by
+    simp [sourceEndpoint, contractedEndpoints, edgeMember]
+  have targetMember : targetEndpoint ∈ problem.contractedEndpoints := by
+    simp [targetEndpoint, contractedEndpoints, edgeMember]
+  have routeLength : 2 ≤ oldRoute.length :=
+    planar.contractedEdgeRoute_length_ge_two degree edgeMember
+  have oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute :=
+    planar.contractedEdgeRoute_orthogonal_of_mem edgeMember
+  obtain ⟨first, second, rest, sourceEquation⟩ :=
+    List.exists_eq_cons_cons_of_length_ge_two routeLength
+  obtain ⟨leading, before, last, targetEquation⟩ :=
+    AxisDirection.exists_eq_append_pair_of_length_ge_two routeLength
+  have endpoints :=
+    planar.contractedEdgeRoute_normalizationEndpoints edgeMember
+  have firstEqual : first =
+      planar.normalizationPosition0 edge.toPeriodicEdge.source := by
+    have oldHead := endpoints.1
+    change oldRoute.head? = _ at oldHead
+    rw [sourceEquation] at oldHead
+    exact Option.some.inj oldHead
+  have lastEqual : last = planar.normalizationTarget0 edge := by
+    have oldLast := endpoints.2
+    change oldRoute.getLast? = _ at oldLast
+    rw [targetEquation] at oldLast
+    apply Option.some.inj
+    simpa using oldLast
+  subst first
+  subst last
+  have sourceAligned :
+      (GridSegment.mk
+        (planar.normalizationPosition0 edge.toPeriodicEdge.source)
+        second).IsAxisAligned := by
+    change PeriodicOrthocrossing.OrthogonalPolyline oldRoute at oldOrthogonal
+    rw [sourceEquation] at oldOrthogonal
+    exact (List.isChain_cons_cons.mp oldOrthogonal).1
+  have targetAligned :
+      (GridSegment.mk before (planar.normalizationTarget0 edge)).IsAxisAligned := by
+    change PeriodicOrthocrossing.OrthogonalPolyline oldRoute at oldOrthogonal
+    rw [targetEquation] at oldOrthogonal
+    exact (List.isChain_append_cons_cons.mp oldOrthogonal).2.1
+  have sourceDirection :
+      AxisDirection.between
+          (planar.normalizationPosition0 edge.toPeriodicEdge.source) second =
+        (sourceEndpoint.outwardSide planar).direction := by
+    rw [sourceEndpoint.outwardSide_direction planar degree sourceMember]
+    change AxisDirection.between
+        (planar.normalizationPosition0 edge.toPeriodicEdge.source) second =
+      AxisDirection.polylineFirstDirection oldRoute
+    rw [sourceEquation]
+    rfl
+  have targetDirection :
+      AxisDirection.between (planar.normalizationTarget0 edge) before =
+        (targetEndpoint.outwardSide planar).direction := by
+    rw [targetEndpoint.outwardSide_direction planar degree targetMember]
+    change AxisDirection.between (planar.normalizationTarget0 edge) before =
+      (AxisDirection.polylineLastDirection oldRoute).opposite
+    rw [targetEquation]
+    rw [AxisDirection.polylineLastDirection_append_pair_of_axisAligned
+      leading targetAligned]
+    exact AxisDirection.between_reverse_eq_opposite
+      (AxisDirection.between_isGenuine_of_axisAligned targetAligned)
+  have sourceUsed := sourceEndpoint.outwardSide_ne_omittedSideAt
+    presentation wellFormed degree sourceMember
+  have targetUsed := targetEndpoint.outwardSide_ne_omittedSideAt
+    presentation wellFormed degree targetMember
+  unfold PlanarPresentation.normalizationRoute1
+  apply normalizeRouteWithTemplates_unitSteps
+    (sourceNext := second) (targetBefore := before)
+    (sourceDirection := (sourceEndpoint.outwardSide planar).direction)
+    (targetDirection := (targetEndpoint.outwardSide planar).direction)
+  · exact oldOrthogonal
+  · change oldRoute.head? = _
+    rw [sourceEquation]
+    simp [planar]
+  · change oldRoute.tail.head? = _
+    rw [sourceEquation]
+    simp
+  · change oldRoute.getLast? = _
+    rw [targetEquation]
+    simp [planar]
+  · change oldRoute.reverse.tail.head? = _
+    rw [targetEquation]
+    simp
+  · exact sourceAligned
+  · exact targetAligned
+  · exact sourceDirection
+  · exact targetDirection
+  · exact sourceEndpoint.firstNormalizationTemplate_unitSteps planar
+  · exact targetEndpoint.firstNormalizationTemplate_unitSteps planar
+  · exact sourceEndpoint.firstNormalizationTemplate_getLast?
+      planar sourceUsed
+  · exact targetEndpoint.firstNormalizationTemplate_getLast?
+      planar targetUsed
+
 end PeriodicThreeDM
 end LeanTrominoes
