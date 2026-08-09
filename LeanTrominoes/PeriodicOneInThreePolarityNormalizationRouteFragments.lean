@@ -25,6 +25,40 @@ def RawRouteFragment.select
   | .middle => [route.getD 2 (0, 0), route.getD 1 (0, 0)]
   | .suffix => route.drop 2
 
+/-- Every listed point of a selected raw fragment is a listed point of its
+complete refined source route. -/
+theorem RawRouteFragment.select_subset
+    (fragment : RawRouteFragment)
+    (route : List Cell)
+    (length : 4 ≤ route.length) :
+    ∀ {point}, point ∈ fragment.select route → point ∈ route := by
+  intro point pointMember
+  cases route with
+  | nil => simp at length
+  | cons first rest =>
+      cases rest with
+      | nil => simp at length
+      | cons second rest =>
+          cases rest with
+          | nil => simp at length
+          | cons third rest =>
+              cases rest with
+              | nil => simp at length
+              | cons fourth rest =>
+                  cases fragment with
+                  | whole => exact pointMember
+                  | «prefix» =>
+                      simp [RawRouteFragment.select] at pointMember
+                      rcases pointMember with rfl | rfl <;> simp
+                  | middle =>
+                      simp [RawRouteFragment.select] at pointMember
+                      rcases pointMember with rfl | rfl <;> simp
+                  | suffix =>
+                      simp only [RawRouteFragment.select,
+                        List.drop] at pointMember ⊢
+                      exact List.mem_cons_of_mem first
+                        (List.mem_cons_of_mem second pointMember)
+
 /-- Every raw route shape is supported on its complete refined source route,
 and retained source endpoints remain endpoints of the selected fragment. -/
 theorem RawRouteFragment.endpointSubroute

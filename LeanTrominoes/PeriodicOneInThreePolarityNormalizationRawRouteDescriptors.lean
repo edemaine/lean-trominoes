@@ -97,6 +97,52 @@ theorem RawRouteShape.classify
       exact Or.inr (Or.inr (Or.inr
         ⟨rfl, origin, index, incompatible⟩))
 
+/-- Route-shape classification retaining the canonical lattice shift as an
+ordinary equality, so clients need not eliminate dependently through
+descriptor projections. -/
+theorem RawRouteShape.classifyWithShift
+    {Variable : Type*}
+    {metadata :
+      PeriodicOneInThreePolarityNormalizationPositioned.ClauseMetadata
+        Variable}
+    {sourceLiteral : PeriodicLiteral Variable}
+    {sourceLiteralIndex outputLiteralIndex : Nat}
+    {fragment : RawRouteFragment} {latticeShift : Cell}
+    (shape : RawRouteShape metadata sourceLiteral sourceLiteralIndex
+      outputLiteralIndex fragment latticeShift) :
+    (fragment = .whole ∧ latticeShift = (0, 0) ∧
+        metadata.origin = .normalized ∧
+        sourceLiteralIndex = outputLiteralIndex ∧
+        sourceLiteral.value = normalizedPolarity sourceLiteralIndex) ∨
+      (fragment = .prefix ∧ latticeShift = (0, 0) ∧
+        metadata.origin = .normalized ∧
+        sourceLiteralIndex = outputLiteralIndex ∧
+        sourceLiteral.value ≠ normalizedPolarity sourceLiteralIndex) ∨
+      (fragment = .middle ∧
+        latticeShift = complementLatticeShift sourceLiteral ∧
+        metadata.origin =
+          .complement sourceLiteralIndex sourceLiteral ∧
+        outputLiteralIndex = 0 ∧
+        sourceLiteral.value ≠ normalizedPolarity sourceLiteralIndex) ∨
+      (fragment = .suffix ∧
+        latticeShift = complementLatticeShift sourceLiteral ∧
+        metadata.origin =
+          .complement sourceLiteralIndex sourceLiteral ∧
+        outputLiteralIndex = 1 ∧
+        sourceLiteral.value ≠ normalizedPolarity sourceLiteralIndex) := by
+  cases shape with
+  | whole origin index compatible =>
+      exact Or.inl ⟨rfl, rfl, origin, index, compatible⟩
+  | «prefix» origin index incompatible =>
+      exact Or.inr (Or.inl
+        ⟨rfl, rfl, origin, index, incompatible⟩)
+  | middle origin index incompatible =>
+      exact Or.inr (Or.inr (Or.inl
+        ⟨rfl, rfl, origin, index, incompatible⟩))
+  | suffix origin index incompatible =>
+      exact Or.inr (Or.inr (Or.inr
+        ⟨rfl, rfl, origin, index, incompatible⟩))
+
 /-- Complete route-level provenance for one genuine raw incidence. -/
 structure RawRouteDescriptor
     {Variable : Type*} [DecidableEq Variable]
