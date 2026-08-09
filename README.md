@@ -6631,6 +6631,11 @@ The representation choices for this target are:
   endpoints at one contracted vertex leave in distinct cardinal directions.
   Equal directions would force their realized segment interiors to overlap,
   contradicting continuous planarity of the contracted drawing.
+- [`LeanTrominoes/PeriodicThreeDMContractedVertexFans.lean`](LeanTrominoes/PeriodicThreeDMContractedVertexFans.lean)
+  packages each exact three-entry endpoint list into the colored-fan
+  interface used by the finite normalization templates.  Triple fans have
+  pairwise-distinct RGB colors, while retained element fans induce the
+  constant coloring of their element color.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
