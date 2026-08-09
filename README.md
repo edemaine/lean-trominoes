@@ -7136,6 +7136,10 @@ The representation choices for this target are:
   complement-clause incidence has its exact canonical endpoints, every route
   is orthogonal, and both properties are transported through the fresh-variable
   gauge to the final normalized incidence drawing.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRoutePlanarity.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRoutePlanarity.lean)
+  proves that all those prefixes, reverse middle edges, suffixes, and gauge
+  translations consist of genuine unit lattice steps.  Consequently the final
+  normalized incidence drawing satisfies the integer-grid planarity predicate.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
