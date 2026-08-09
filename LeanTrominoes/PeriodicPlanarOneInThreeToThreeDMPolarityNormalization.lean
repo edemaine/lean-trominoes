@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicOneInThreePolarityNormalization
+import LeanTrominoes.PeriodicOneInThreePolarityNormalizationPresentationProperties
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRoutedTriples
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreLocalGates
 
@@ -197,6 +197,49 @@ theorem normalizedFormula_occurrenceConnectorPolarity_pattern
     · omega
     · omega
   · exact formula_polarityNormalized source
+  · exact lookup
+
+/-- The geometrically routed polarity normalization has the same connector
+classification at every active occurrence. -/
+theorem routedNormalizedFormula_occurrenceConnectorPolarity_pattern
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (atom : PolarityNormalizedVariable Variable)
+    (slot : OccurrenceSlot)
+    (tagged : TaggedOccurrence (PolarityNormalizedVariable Variable))
+    (lookup : occurrenceAt
+      (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
+        source sourcePlacement routes).erase
+      atom slot = some tagged) :
+    VariableLocalGateTableEndpointClear
+        (occurrenceConnectorKind
+          (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
+            source sourcePlacement routes).erase
+          atom slot)
+        (occurrencePolarity
+          (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
+            source sourcePlacement routes).erase
+          atom slot) ∨
+      (occurrenceConnectorKind
+          (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
+            source sourcePlacement routes).erase
+          atom slot = .fixedGreen ∧
+        occurrencePolarity
+          (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
+            source sourcePlacement routes).erase
+          atom slot = true) := by
+  apply occurrenceConnectorPolarity_pattern
+    (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
+      source sourcePlacement routes).erase
+  · exact
+      PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula_widthAtMostThree
+        source sourcePlacement routes arity
+  · exact
+      PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula_polarityNormalized
+        source sourcePlacement routes
   · exact lookup
 
 end PeriodicPlanarOneInThreeToThreeDM
