@@ -18,6 +18,7 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PlanarThreeDM PeriodicOrthocrossing
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+open PeriodicOneInThreePolarityNormalization
 
 /-- The center of any active source variable is never an interior point of
 any active occurrence's unit source route. -/
@@ -255,6 +256,7 @@ theorem constructedVariableSiteRoute_avoids_occurrenceThreeStrandRouteInteriors
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (anchorsZero : HasZeroClauseAnchors source)
     (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
     (compatible : SourceRibbonFansClockwiseCompatible
       presentation.toPlanarIncidencePresentation)
     (owner entry : ActiveOccurrenceEntry source.erase)
@@ -290,8 +292,8 @@ theorem constructedVariableSiteRoute_avoids_occurrenceThreeStrandRouteInteriors
       RoutesAvoidInteriorContacts coreRoute variableStub := by
     simpa [coreRoute, variableStub, planar] using
       constructedVariableSiteRoute_avoids_occurrenceCoordinatedRibbonVariableStubInteriors
-        presentation anchorsZero compatible owner.1.1 owner.atom_mem triple
-        coreColor entry routeColor
+        presentation anchorsZero width normalized compatible
+        owner.1.1 owner.atom_mem triple coreColor entry routeColor
   have corridorAvoid :
       RoutesAvoidInteriorContacts coreRoute corridor :=
     RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts (by
@@ -342,6 +344,7 @@ theorem constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRouteInterior
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (anchorsZero : HasZeroClauseAnchors source)
     (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
     (compatible : SourceRibbonFansClockwiseCompatible
       presentation.toPlanarIncidencePresentation)
     (owner entry : ActiveOccurrenceEntry source.erase)
@@ -363,7 +366,7 @@ theorem constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRouteInterior
   rw [coordinatedSourceRibbonThreeStrandRouting_route]
   exact
     constructedVariableSiteRoute_avoids_occurrenceThreeStrandRouteInteriors
-      presentation anchorsZero width compatible owner entry triple
+      presentation anchorsZero width normalized compatible owner entry triple
       coreColor routeColor
 
 end PeriodicPlanarOneInThreeToThreeDM

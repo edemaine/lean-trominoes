@@ -477,7 +477,7 @@ def occurrenceGreenElements {Variable : Type*} [DecidableEq Variable]
         .fixedRedInternal atom slot .topRightLink,
         .fixedRedInternal atom slot .bottomRightLink]
   | .fixedGreen =>
-      [.ordinaryInternal atom slot .auxiliaryShared]
+      [.ordinaryInternal atom slot .cycleShared]
   | .fixedBlue =>
       [.ordinaryInternal atom slot .cycleShared]
 
@@ -491,7 +491,7 @@ def occurrenceBlueElements {Variable : Type*} [DecidableEq Variable]
         .fixedRedInternal atom slot .bottomLeftLink,
         .fixedRedInternal atom slot .rightRung]
   | .fixedGreen =>
-      [.ordinaryInternal atom slot .cycleShared]
+      [.ordinaryInternal atom slot .auxiliaryShared]
   | .fixedBlue =>
       [.ordinaryInternal atom slot .auxiliaryShared]
 

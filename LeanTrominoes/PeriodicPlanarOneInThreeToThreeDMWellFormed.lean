@@ -175,7 +175,7 @@ theorem ordinaryGreenInternal_mem {Variable : Type*}
         | .fixedBlue => .fixedBlue) :
     GreenElement.ordinaryInternal atom slot
         (match variant with
-        | .fixedGreen => .auxiliaryShared
+        | .fixedGreen => .cycleShared
         | .fixedBlue => .cycleShared) ∈
       greenElements source := by
   apply List.mem_append_left
@@ -198,7 +198,7 @@ theorem ordinaryBlueInternal_mem {Variable : Type*}
         | .fixedBlue => .fixedBlue) :
     BlueElement.ordinaryInternal atom slot
         (match variant with
-        | .fixedGreen => .cycleShared
+        | .fixedGreen => .auxiliaryShared
         | .fixedBlue => .auxiliaryShared) ∈
       blueElements source := by
   apply List.mem_append_left

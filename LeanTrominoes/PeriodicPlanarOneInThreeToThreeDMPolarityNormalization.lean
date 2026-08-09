@@ -7,12 +7,8 @@ import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreLocalGat
 
 This file connects the formula-level polarity certificate to the occurrence
 tables used by the planar 3DM construction.  Every active occurrence of a
-width-three normalized formula is in one of two geometric classes:
-
-* a fixed-red or fixed-blue connector in the false orientation, already
-  covered by the endpoint-clear finite local-gate checker; or
-* a fixed-green connector in the true orientation, the single remaining
-  site-wide annular routing case.
+width-three normalized formula selects one of the three endpoint-clear local
+tables: fixed-red/false, fixed-blue/false, or fixed-green/true.
 -/
 
 namespace LeanTrominoes
@@ -20,6 +16,19 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 
 open PlanarThreeDM
 open PeriodicOneInThreePolarityNormalization
+
+/-- Shifting each clause to zero anchor preserves its literal-value pattern. -/
+theorem FormulaPolarityNormalized.anchorNormalize
+    {Variable : Type*} {source : PeriodicCNF Variable}
+    (normalized : FormulaPolarityNormalized source) :
+    FormulaPolarityNormalized source.anchorNormalize := by
+  unfold FormulaPolarityNormalized at normalized ⊢
+  intro normalizedClause normalizedMember
+  rcases List.mem_map.mp normalizedMember with
+    ⟨sourceClause, sourceMember, rfl⟩
+  unfold ClausePolarityNormalized at normalized ⊢
+  simpa [PeriodicClause.anchorNormalize, List.map_map,
+    Function.comp_def] using normalized sourceClause sourceMember
 
 /-- A tagged occurrence inherits the requested polarity at its literal
 index from the formula-level certificate. -/
@@ -61,15 +70,13 @@ theorem taggedOccurrence_literalIndex_lt_three
     width taggedClause.1 (List.fst_mem_of_mem_zipIdx clauseMember)
   simpa using literalLt.trans_le clauseWidth
 
-/-- The three normalized literal positions are exactly the two already-clear
-local connector tables and the remaining fixed-green/true table. -/
+/-- Each of the three normalized literal positions selects an endpoint-clear
+local connector table. -/
 theorem connectorKind_normalizedPolarity_pattern
     (literalIndex : Nat) (indexLt : literalIndex < 3) :
     VariableLocalGateTableEndpointClear
         (connectorKindOfLiteralIndex literalIndex)
-        (normalizedPolarity literalIndex) ∨
-      (connectorKindOfLiteralIndex literalIndex = .fixedGreen ∧
-        normalizedPolarity literalIndex = true) := by
+        (normalizedPolarity literalIndex) := by
   interval_cases literalIndex <;>
     decide
 
@@ -97,9 +104,8 @@ theorem occurrencePolarity_eq_normalizedPolarity
       rw [occurrenceLiteralIndex_of_occurrenceAt
         source atom slot tagged lookup]
 
-/-- Every active occurrence in a width-three normalized source has either an
-already endpoint-clear local table or precisely the fixed-green/true pattern
-reserved for the site-wide annular route. -/
+/-- Every active occurrence in a width-three normalized source has an
+endpoint-clear local table. -/
 theorem occurrenceConnectorPolarity_pattern
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
@@ -110,9 +116,7 @@ theorem occurrenceConnectorPolarity_pattern
     (lookup : occurrenceAt source atom slot = some tagged) :
     VariableLocalGateTableEndpointClear
         (occurrenceConnectorKind source atom slot)
-        (occurrencePolarity source atom slot) ∨
-      (occurrenceConnectorKind source atom slot = .fixedGreen ∧
-        occurrencePolarity source atom slot = true) := by
+        (occurrencePolarity source atom slot) := by
   have taggedMember :=
     (PeriodicOneInThreeToThreeDM.occurrenceAt_mem_and_atom
       source atom slot tagged lookup).1
@@ -127,8 +131,8 @@ theorem occurrenceConnectorPolarity_pattern
     source normalized atom slot tagged lookup] at pattern
   exact pattern
 
-/-- Any active normalized occurrence that is not fixed-green immediately
-discharges the hypothesis of the checked endpoint-clear local-gate theorem. -/
+/-- Any active normalized occurrence, in particular one that is not
+fixed-green, discharges the endpoint-clear local-gate hypothesis. -/
 theorem occurrence_localGateTableEndpointClear_of_kind_ne_fixedGreen
     {Variable : Type*} [DecidableEq Variable]
     (source : PeriodicCNF Variable)
@@ -137,14 +141,12 @@ theorem occurrence_localGateTableEndpointClear_of_kind_ne_fixedGreen
     (atom : Variable) (slot : OccurrenceSlot)
     (tagged : TaggedOccurrence Variable)
     (lookup : occurrenceAt source atom slot = some tagged)
-    (kindNe : occurrenceConnectorKind source atom slot ≠ .fixedGreen) :
+    (_kindNe : occurrenceConnectorKind source atom slot ≠ .fixedGreen) :
     VariableLocalGateTableEndpointClear
       (occurrenceConnectorKind source atom slot)
       (occurrencePolarity source atom slot) := by
-  rcases occurrenceConnectorPolarity_pattern source width normalized
-      atom slot tagged lookup with clear | green
-  · exact clear
-  · exact (kindNe green.1).elim
+  exact occurrenceConnectorPolarity_pattern source width normalized
+    atom slot tagged lookup
 
 /-- Conversely, a fixed-green active occurrence in a normalized source is
 always in the true orientation. -/
@@ -159,9 +161,9 @@ theorem occurrencePolarity_eq_true_of_connectorKind_eq_fixedGreen
     (kindEq : occurrenceConnectorKind source atom slot = .fixedGreen) :
     occurrencePolarity source atom slot = true := by
   rcases occurrenceConnectorPolarity_pattern source width normalized
-      atom slot tagged lookup with clear | green
+      atom slot tagged lookup with clear | clear
   · exact (clear.2 kindEq).elim
-  · exact green.2
+  · exact clear.1
 
 /-- The output of logical polarity normalization satisfies the connector
 classification whenever the input already has binary-or-ternary clauses. -/
@@ -181,13 +183,7 @@ theorem normalizedFormula_occurrenceConnectorPolarity_pattern
           atom slot)
         (occurrencePolarity
           (PeriodicOneInThreePolarityNormalization.formula source)
-          atom slot) ∨
-      (occurrenceConnectorKind
-          (PeriodicOneInThreePolarityNormalization.formula source)
-          atom slot = .fixedGreen ∧
-        occurrencePolarity
-          (PeriodicOneInThreePolarityNormalization.formula source)
-          atom slot = true) := by
+          atom slot) := by
   apply occurrenceConnectorPolarity_pattern
     (PeriodicOneInThreePolarityNormalization.formula source)
   · intro clause clauseMember
@@ -222,15 +218,7 @@ theorem routedNormalizedFormula_occurrenceConnectorPolarity_pattern
         (occurrencePolarity
           (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
             source sourcePlacement routes).erase
-          atom slot) ∨
-      (occurrenceConnectorKind
-          (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
-            source sourcePlacement routes).erase
-          atom slot = .fixedGreen ∧
-        occurrencePolarity
-          (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
-            source sourcePlacement routes).erase
-          atom slot = true) := by
+          atom slot) := by
   apply occurrenceConnectorPolarity_pattern
     (PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
       source sourcePlacement routes).erase

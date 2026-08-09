@@ -96,9 +96,9 @@ def routedOccurrenceTriple
   | .fixedGreen, .red =>
       .ordinary atom slot .fixedGreen .auxiliary
   | .fixedGreen, .green =>
-      .ordinary atom slot .fixedGreen .first
-  | .fixedGreen, .blue =>
       .ordinary atom slot .fixedGreen .auxiliary
+  | .fixedGreen, .blue =>
+      .ordinary atom slot .fixedGreen .first
   | .fixedBlue, .red =>
       .ordinary atom slot .fixedBlue .auxiliary
   | .fixedBlue, .green =>

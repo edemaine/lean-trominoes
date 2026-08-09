@@ -14,6 +14,7 @@ namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PeriodicOrthocrossing
+open PeriodicOneInThreePolarityNormalization
 
 /-- Complete typed routes in the final padded normalized assembly avoid every
 nonzero relative period translate. -/
@@ -221,6 +222,7 @@ theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -234,7 +236,8 @@ theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar
   dsimp only
   apply
     paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_nonzero
-      presentation width occurrences arity variableOrdered clauseOrdered
+      presentation width polarityNormalized occurrences arity
+      variableOrdered clauseOrdered
   exact
     paddedNormalizedCoordinatedNonzeroRelativeLiftedRoutes_avoidInteriors
       presentation width occurrences arity variableOrdered clauseOrdered

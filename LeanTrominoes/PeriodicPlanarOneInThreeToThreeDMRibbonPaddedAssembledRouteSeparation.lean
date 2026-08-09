@@ -5,8 +5,9 @@ import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonPaddedCoordinatedRou
 # Stored-route separation in the final padded assembly
 
 The general source-assembly theorem specializes to the doubled,
-anchor-normalized source without additional assumptions.  This file records
-the resulting separation first for typed incidences and then for the genuine
+anchor-normalized source once the source formula has the polarity convention
+used by the three endpoint-clear variable tables.  This file records the
+resulting separation first for typed incidences and then for the genuine
 numeric incidence tags used by the assembled periodic drawing.
 -/
 
@@ -14,6 +15,7 @@ namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget
+open PeriodicOneInThreePolarityNormalization
 
 /-- Distinct colored typed incidences in the final padded normalized assembly
 avoid every kind of segment-interior contact. -/
@@ -24,6 +26,7 @@ theorem paddedNormalizedCoordinatedAssembledTypedIncidenceRoutes_avoidInteriors
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -71,11 +74,20 @@ theorem paddedNormalizedCoordinatedAssembledTypedIncidenceRoutes_avoidInteriors
     simpa [normalizedSource] using
       normalizedSource_arityTwoOrThree
         (source.scale 2) (placement.scale 2) (by simpa using arity)
+  have normalizedPolarity :
+      FormulaPolarityNormalized
+        (normalizedPositionedSource
+          (source.scale 2) (placement.scale 2)).erase := by
+    rw [normalizedPositionedSource,
+      PositionedPeriodicCNF.erase_anchorNormalize,
+      PositionedPeriodicCNF.erase_scale]
+    exact FormulaPolarityNormalized.anchorNormalize polarityNormalized
   simpa [paddedNormalizedCoordinatedRibbonThreeStrandRouting,
     normalized, compatible] using
     coordinatedSourceAssembledTypedIncidenceRoutes_avoidInteriors
       normalized anchorsZero normalizedOccurrences normalizedArity
-      (paddedNormalizedSource_widthAtMostThree width) compatible
+      (paddedNormalizedSource_widthAtMostThree width) normalizedPolarity
+      compatible
       (paddedNormalizedOccurrenceUnitSourceRoute_length_ge_three presentation)
       first second firstColor secondColor different
 
@@ -88,6 +100,7 @@ theorem paddedNormalizedCoordinatedAssembledRouteAtTags_avoidInteriors
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -150,7 +163,8 @@ theorem paddedNormalizedCoordinatedAssembledRouteAtTags_avoidInteriors
     simp_all
   have separated :=
     paddedNormalizedCoordinatedAssembledTypedIncidenceRoutes_avoidInteriors
-      presentation width occurrences arity variableOrdered clauseOrdered
+      presentation width polarityNormalized occurrences arity
+      variableOrdered clauseOrdered
       firstTriple secondTriple first.color second.color keysDifferent
   simpa [assembledRouteAtTag, firstIndexLt, secondIndexLt,
     firstTriple, secondTriple, routing, normalizedSource] using separated

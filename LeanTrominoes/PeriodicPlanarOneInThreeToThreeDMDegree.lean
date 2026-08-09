@@ -148,7 +148,7 @@ theorem problem_degreeTwoOrThree
           have degreeEq :
               ((problem source).greenIncidences
                 (.ordinaryInternal atom slot
-                  .auxiliaryShared)).length = 2 := by
+                  .cycleShared)).length = 2 := by
             simpa [ordinaryGreenPrivate] using
               (ordinaryPrivate_degrees source atom atomMember
                 slot slotMember .fixedGreen kindEq).1
@@ -206,7 +206,7 @@ theorem problem_degreeTwoOrThree
           have degreeEq :
               ((problem source).blueIncidences
                 (.ordinaryInternal atom slot
-                  .cycleShared)).length = 2 := by
+                  .auxiliaryShared)).length = 2 := by
             simpa [ordinaryBluePrivate] using
               (ordinaryPrivate_degrees source atom atomMember
                 slot slotMember .fixedGreen kindEq).2

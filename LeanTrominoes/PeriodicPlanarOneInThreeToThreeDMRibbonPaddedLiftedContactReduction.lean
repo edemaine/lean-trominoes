@@ -16,6 +16,8 @@ nonzero relative lattice translates.
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
+open PeriodicOneInThreePolarityNormalization
+
 /-- Distinct numeric routes stored by the final padded normalized assembly
 avoid all three forms of segment-interior contact. -/
 theorem paddedNormalizedCoordinatedAssembledStoredRoutes_avoidInteriors
@@ -25,6 +27,7 @@ theorem paddedNormalizedCoordinatedAssembledStoredRoutes_avoidInteriors
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -85,7 +88,8 @@ theorem paddedNormalizedCoordinatedAssembledStoredRoutes_avoidInteriors
   rw [firstRouteEq, secondRouteEq]
   exact
     paddedNormalizedCoordinatedAssembledRouteAtTags_avoidInteriors
-      presentation width occurrences arity variableOrdered clauseOrdered
+      presentation width polarityNormalized occurrences arity
+      variableOrdered clauseOrdered
       firstTag secondTag firstTagMember secondTagMember tagsDifferent
 
 /-- The 24 nonzero halo-neighbor shifts suffice for all nonzero translated
@@ -133,6 +137,7 @@ theorem paddedNormalizedCoordinatedRelativeLiftedRoutes_avoidInteriors_of_nonzer
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -156,7 +161,8 @@ theorem paddedNormalizedCoordinatedRelativeLiftedRoutes_avoidInteriors_of_nonzer
     PeriodicGridDrawing.relativeLiftedRoutesAvoidInteriorContacts_of_stored_of_nonzero
   · exact
       paddedNormalizedCoordinatedAssembledStoredRoutes_avoidInteriors
-        presentation width occurrences arity variableOrdered clauseOrdered
+        presentation width polarityNormalized occurrences arity
+        variableOrdered clauseOrdered
   · exact nonzero
 
 /-- Nonzero translated-route separation is the sole remaining geometric
@@ -168,6 +174,7 @@ theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_nonz
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -195,8 +202,8 @@ theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_nonz
     PeriodicGridDrawing.isContinuouslyPlanar_of_relativeLiftedRoutesAvoidInteriorContacts
   · exact
       paddedNormalizedCoordinatedRelativeLiftedRoutes_avoidInteriors_of_nonzero
-        presentation width occurrences arity variableOrdered clauseOrdered
-        nonzero
+        presentation width polarityNormalized occurrences arity
+        variableOrdered clauseOrdered nonzero
   · simpa [assembledDrawing] using
       paddedNormalizedCoordinatedAssembledEdgeRoutes_simple
         presentation width occurrences arity variableOrdered clauseOrdered
@@ -214,6 +221,7 @@ theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_doub
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -235,7 +243,8 @@ theorem paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_doub
   dsimp only at finite ⊢
   apply
     paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar_of_nonzero
-      presentation width occurrences arity variableOrdered clauseOrdered
+      presentation width polarityNormalized occurrences arity
+      variableOrdered clauseOrdered
   exact
     paddedNormalizedCoordinatedNonzeroRelativeLiftedRoutes_avoidInteriors_of_doubleNeighbor
       presentation width occurrences arity variableOrdered clauseOrdered finite

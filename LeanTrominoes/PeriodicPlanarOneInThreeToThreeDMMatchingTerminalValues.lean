@@ -306,6 +306,26 @@ theorem occurrenceBlock_terminalIncidentValues_ofMatching
                 kindEq (Cell.add cell tagged.1.offset)
           have behavior :=
             variableOccurrence_port_behavior _ holds
+          have secondTruth :
+              matching
+                  (.ordinary entry.1 entry.2 .fixedGreen .second)
+                  (Cell.add cell tagged.1.offset) =
+                !PeriodicOneInThree.literalTruth
+                  (assignmentOfMatching source matching) cell tagged.1 := by
+            calc
+              _ = !matching
+                  (.ordinary entry.1 entry.2 .fixedGreen .first)
+                  (Cell.add cell tagged.1.offset) := by
+                    rw [behavior.1]
+                    simp
+              _ = !matching
+                  (.ordinary entry.1 entry.2 .fixedGreen .auxiliary)
+                  (Cell.add cell tagged.1.offset) :=
+                congrArg (fun value => !value) behavior.2
+              _ = _ := by
+                apply congrArg (fun value => !value)
+                simpa [occurrenceBoundary, kindEq, polarityEq] using
+                  connectorTruth
           simp_all [occurrenceTriples, allOrdinaryTriples,
             terminalReferenceMatches, terminalReferenceOffset,
             tripleReferences, ordinaryTripleReferences,

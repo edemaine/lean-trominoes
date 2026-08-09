@@ -16,6 +16,7 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 
 open Gadget PlanarThreeDM PeriodicOrthocrossing
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
+open PeriodicOneInThreePolarityNormalization
 
 /-- The finite variable-site or clause-core prefix underlying an assembled
 typed incidence, before its optional routed occurrence suffix is attached. -/
@@ -544,6 +545,7 @@ theorem assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
     (compatible : SourceRibbonFansClockwiseCompatible
       presentation.toPlanarIncidencePresentation)
     (coreTriple :
@@ -575,7 +577,7 @@ theorem assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
         coordinatedSourceRibbonThreeStrandRouting,
         RibbonEndpointFanSystem.threeStrandRouting] using
         constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRouteInteriors
-          presentation anchorsZero width compatible owner entry
+          presentation anchorsZero width normalized compatible owner entry
           (activeVariableSiteTriple source.erase atom location.1
             slot location.2.1
             (.ordinary atom slot variant localTriple) location.2.2)
@@ -593,7 +595,7 @@ theorem assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
         coordinatedSourceRibbonThreeStrandRouting,
         RibbonEndpointFanSystem.threeStrandRouting] using
         constructedVariableSiteRoute_avoids_coordinatedSourceRibbonRouteInteriors
-          presentation anchorsZero width compatible owner entry
+          presentation anchorsZero width normalized compatible owner entry
           (activeVariableSiteTriple source.erase atom location.1
             slot location.2.1
             (.fixedRed atom slot localTriple) location.2.2)
@@ -709,6 +711,7 @@ theorem coordinatedSourceAssembledTypedIncidenceRoutes_avoidInteriors
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
     (compatible : SourceRibbonFansClockwiseCompatible
       presentation.toPlanarIncidencePresentation)
     (lengthGeThree :
@@ -746,7 +749,7 @@ theorem coordinatedSourceAssembledTypedIncidenceRoutes_avoidInteriors
           secondCoreLast, secondRouteHead, secondJoined⟩
       have coreRouteAvoid :=
         assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
-          presentation anchorsZero occurrences arity width compatible
+          presentation anchorsZero occurrences arity width normalized compatible
           first firstColor secondEntry secondColor
       have joinedAvoid := coreAvoid.join_right coreRouteAvoid
         secondCoreLast secondRouteHead
@@ -758,7 +761,7 @@ theorem coordinatedSourceAssembledTypedIncidenceRoutes_avoidInteriors
     rcases secondParts with secondCore | secondJoined
     · have routeCoreAvoid :=
         (assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
-          presentation anchorsZero occurrences arity width compatible
+          presentation anchorsZero occurrences arity width normalized compatible
           second secondColor firstEntry firstColor).symm
       have joinedAvoid := coreAvoid.join_left routeCoreAvoid
         firstCoreLast firstRouteHead
@@ -769,11 +772,11 @@ theorem coordinatedSourceAssembledTypedIncidenceRoutes_avoidInteriors
           secondCoreLast, secondRouteHead, secondJoined⟩
       have firstCoreSecondRoute :=
         assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
-          presentation anchorsZero occurrences arity width compatible
+          presentation anchorsZero occurrences arity width normalized compatible
           first firstColor secondEntry secondColor
       have firstRouteSecondCore :=
         (assembledTypedIncidenceCoreRoute_avoids_coordinatedSourceRouteInteriors
-          presentation anchorsZero occurrences arity width compatible
+          presentation anchorsZero occurrences arity width normalized compatible
           second secondColor firstEntry firstColor).symm
       have strandsDifferent :
           RibbonStrandsDifferent firstEntry firstColor

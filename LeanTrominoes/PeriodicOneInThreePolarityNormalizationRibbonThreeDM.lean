@@ -143,6 +143,8 @@ noncomputable def paddedPeriodicThreeDMContinuousPlanarPresentation
       normalizedPresentation
       (formula_widthAtMostThree
         source sourcePlacement presentation.routes arity)
+      (formula_polarityNormalized
+        source sourcePlacement presentation.routes)
       (formula_occurrencesAtMostThree_canonicalBEq
         source sourcePlacement presentation.routes occurrences)
       (formula_arityTwoOrThree

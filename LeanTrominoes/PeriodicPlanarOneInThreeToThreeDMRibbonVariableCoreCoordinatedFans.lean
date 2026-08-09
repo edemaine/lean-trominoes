@@ -155,7 +155,9 @@ theorem variableSiteRoute_avoids_coordinatedRouteInteriors
     (slot : VariableSiteSlot)
     (active : data.SlotActive slot)
     (triple : ActiveVariableSiteTriple data.count data.kind)
-    (routeColor gateColor : WireColor) :
+    (routeColor gateColor : WireColor)
+    (clear : VariableLocalGateTableEndpointClear
+      (data.kind slot) (data.polarity slot)) :
     RoutesAvoidInteriorContacts
       (translatePolyline standardThreeStrandLayout.variableOffset
         ((variableSiteDrawing data.count data.kind data.polarity).route
@@ -163,7 +165,7 @@ theorem variableSiteRoute_avoids_coordinatedRouteInteriors
       (data.coordinatedRoute slot gateColor) := by
   apply RoutesAvoidInteriorContacts.join_right
     (data.variableSiteRoute_avoids_localGateRoute
-      slot active triple routeColor gateColor)
+      slot active triple routeColor gateColor clear)
     (RoutesStrictlyAvoidEachOther.toRoutesAvoidInteriorContacts
       (data.variableSiteRoute_strictlyAvoids_outerRoute
         compatible slot active triple routeColor gateColor))
@@ -182,6 +184,8 @@ theorem variableSiteRoute_avoids_coordinatedRoute_of_slot_ne
     (active : data.SlotActive slot)
     (triple : ActiveVariableSiteTriple data.count data.kind)
     (routeColor gateColor : WireColor)
+    (clear : VariableLocalGateTableEndpointClear
+      (data.kind slot) (data.polarity slot))
     (differentSlot : triple.1.slot ≠ slot) :
     RoutesAvoidEachOther
       (translatePolyline standardThreeStrandLayout.variableOffset
@@ -190,7 +194,7 @@ theorem variableSiteRoute_avoids_coordinatedRoute_of_slot_ne
       (data.coordinatedRoute slot gateColor) := by
   apply RoutesAvoidEachOther.join_right_of_strict_suffix
     (data.variableSiteRoute_avoids_localGateRoute_of_slot_ne
-      slot active triple routeColor gateColor differentSlot)
+      slot active triple routeColor gateColor clear differentSlot)
     (data.variableSiteRoute_strictlyAvoids_outerRoute
       compatible slot active triple routeColor gateColor)
   · exact standardVariableLocalGateRoute_getLast?

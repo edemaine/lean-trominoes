@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceClauseCoreStubSeparation
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonSourceVariableCoreSplice
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMPolarityNormalization
 
 /-!
 # Source variable cores versus coordinated variable fans
@@ -18,6 +19,7 @@ namespace PeriodicPlanarOneInThreeToThreeDM
 open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
+open PeriodicOneInThreePolarityNormalization
 
 /-- Every route in one source variable site avoids the segment interiors of
 every coordinated fan belonging to that same variable. -/
@@ -26,6 +28,8 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStubInteriors
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
     (compatible : SourceRibbonFansClockwiseCompatible presentation)
     (entry : ActiveOccurrenceEntry source.erase)
     (triple :
@@ -46,6 +50,13 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStubInteriors
   have active : data.SlotActive slot :=
     VariableRibbonFanData.sourceVariableRibbonFanData_slotActive
       presentation entry
+  rcases exists_occurrenceAt_of_mem_usedSlots source.erase
+      entry.1.1 entry.1.2 entry.slot_mem with ⟨tagged, lookup⟩
+  have clear : VariableLocalGateTableEndpointClear
+      (data.kind slot) (data.polarity slot) := by
+    simpa [data, slot] using
+      occurrenceConnectorPolarity_pattern source.erase width normalized
+        entry.1.1 entry.1.2 tagged lookup
   let dataTriple : ActiveVariableSiteTriple data.count data.kind :=
     ⟨triple.1, by
       rw [VariableRibbonFanData.sourceVariableRibbonFanData_count
@@ -56,7 +67,7 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStubInteriors
       exact triple.2⟩
   have localAvoid :=
     data.variableSiteRoute_avoids_coordinatedRouteInteriors
-      (compatible.1 entry) slot active dataTriple coreColor routeColor
+      (compatible.1 entry) slot active dataTriple coreColor routeColor clear
   have coreEq :
       (variableSiteDrawing data.count data.kind data.polarity).route
           dataTriple coreColor =
@@ -84,6 +95,8 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStub_of_slot_ne
     {source : PositionedPeriodicCNF Variable}
     {placement : PeriodicVariablePlacement Variable}
     (presentation : source.PlanarIncidencePresentation placement)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
     (compatible : SourceRibbonFansClockwiseCompatible presentation)
     (entry : ActiveOccurrenceEntry source.erase)
     (triple :
@@ -106,6 +119,13 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStub_of_slot_ne
   have active : data.SlotActive slot :=
     VariableRibbonFanData.sourceVariableRibbonFanData_slotActive
       presentation entry
+  rcases exists_occurrenceAt_of_mem_usedSlots source.erase
+      entry.1.1 entry.1.2 entry.slot_mem with ⟨tagged, lookup⟩
+  have clear : VariableLocalGateTableEndpointClear
+      (data.kind slot) (data.polarity slot) := by
+    simpa [data, slot] using
+      occurrenceConnectorPolarity_pattern source.erase width normalized
+        entry.1.1 entry.1.2 tagged lookup
   let dataTriple : ActiveVariableSiteTriple data.count data.kind :=
     ⟨triple.1, by
       rw [VariableRibbonFanData.sourceVariableRibbonFanData_count
@@ -116,7 +136,7 @@ theorem sourceVariableSiteRoute_avoids_coordinatedVariableStub_of_slot_ne
       exact triple.2⟩
   have localAvoid :=
     data.variableSiteRoute_avoids_coordinatedRoute_of_slot_ne
-      (compatible.1 entry) slot active dataTriple coreColor routeColor
+      (compatible.1 entry) slot active dataTriple coreColor routeColor clear
       (by simpa [dataTriple, slot] using differentSlot)
   have coreEq :
       (variableSiteDrawing data.count data.kind data.polarity).route
@@ -158,6 +178,8 @@ theorem constructedVariableSiteRoute_avoids_occurrenceCoordinatedRibbonVariableS
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (anchorsZero : HasZeroClauseAnchors source)
+    (width : source.erase.WidthAtMost 3)
+    (normalized : FormulaPolarityNormalized source.erase)
     (compatible : SourceRibbonFansClockwiseCompatible
       presentation.toPlanarIncidencePresentation)
     (atom : Variable)
@@ -180,7 +202,8 @@ theorem constructedVariableSiteRoute_avoids_occurrenceCoordinatedRibbonVariableS
   · subst atom
     exact
       sourceVariableSiteRoute_avoids_coordinatedVariableStubInteriors
-        presentation.toPlanarIncidencePresentation compatible entry
+        presentation.toPlanarIncidencePresentation width normalized
+        compatible entry
         triple coreColor routeColor
   · have centersNe :
         placement.position atom ≠ placement.position entry.1.1 := by

@@ -77,10 +77,10 @@ def routedTriple
   | .fixedRed, .green
   | .fixedRed, .blue =>
       .fixedRed slot .auxiliary
-  | .fixedGreen, .green =>
+  | .fixedGreen, .blue =>
       .ordinary slot .fixedGreen .first
   | .fixedGreen, .red
-  | .fixedGreen, .blue =>
+  | .fixedGreen, .green =>
       .ordinary slot .fixedGreen .auxiliary
   | .fixedBlue, .blue =>
       .ordinary slot .fixedBlue .first

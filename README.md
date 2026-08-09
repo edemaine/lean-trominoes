@@ -98,11 +98,15 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove that affine magnification, ordered unit subdivision, and a
         common translation preserve endpoint-only route contacts, with all
         contracted-drawing side conditions derived from the existing API.
-      - [x] Isolate the normalized fixed-green/true contact obstruction: the
-        local green gate passes through the shared endpoint of exactly two
-        green core incidences while preserving continuous-interior planarity.
-      - [ ] Replace that exceptional module-local gate by a certified
-        site-wide annular route through the complete variable fan.
+      - [x] Rotate the ordinary fixed-green occurrence tree without changing
+        its boundary truth table, aligning its connector leaves with the
+        physical ribbon-lane order.
+      - [x] Give fixed-green/true a lane-aligned embedding and certify full
+        endpoint-aware separation between every core route and local gate.
+      - [x] Prove that polarity normalization selects exactly the three
+        endpoint-clear tables (fixed-red/false, fixed-blue/false, and
+        fixed-green/true), and preserve that prerequisite through scaling,
+        anchor normalization, padded assembly, and continuous planarity.
       - [ ] Prove contracted-drawing endpoint contacts and preserve them
         through the local endpoint-template splices.
       - [ ] Deduce global assignment collision freedom and matching ports for
@@ -4189,10 +4193,16 @@ The representation choices for this target are:
   occurrence directions.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreLocalGates.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreLocalGates.lean)
   checks the interface between the finite variable-site drawing and those
-  coordinated gates.  Every site route and every active gate have disjoint
-  segment interiors and mutually avoid point-to-interior contacts; the
-  selected occurrence-and-color route has the stronger certificate that its
-  only listed contact with the gate is their unique splice port.
+  coordinated gates for the three polarity-normalized connector tables.
+  Every site route and every active gate have disjoint segment interiors and
+  mutually avoid point-to-interior contacts; the selected occurrence-and-color
+  route has the stronger certificate that its only listed contact with the
+  gate is their unique splice port.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFixedGreenContactAudit.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMFixedGreenContactAudit.lean)
+  records the repaired fixed-green/true interface explicitly.  Exhaustive
+  finite certificates show endpoint-aware separation for every core/gate
+  pair and identify the three intended splice contacts, one on each physical
+  color lane.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreCoordinatedFans.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreCoordinatedFans.lean)
   extends the core-to-gate certificates through complete coordinated variable
   fans.  Every variable-site route strictly avoids every outer fan and avoids
@@ -4535,15 +4545,18 @@ The representation choices for this target are:
   cyclic-order certificates produce one concrete padded normalized routing
   whose distinct colored occurrence routes are all proved contact-free.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonThreeDM.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonThreeDM.lean)
-  packages that exact concrete routing as a continuously planar periodic 3DM
-  presentation.  Every colored element has degree two or three, and both
-  perfect matching and abstract trichromatic orientation are proved
-  equivalent to satisfiability of the original local periodic CNF.
+  packages that exact concrete routing as a periodic 3DM presentation.  Its
+  continuous-planarity certificate now states the required polarity
+  convention explicitly; the separate routed polarity-normalization pipeline
+  above supplies it.  Every colored element has degree two or three, and both
+  perfect matching and abstract trichromatic orientation are proved equivalent
+  to satisfiability of the original local periodic CNF.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonContraction.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonContraction.lean)
   suppresses every degree-two colored element in that concrete endpoint.
-  The resulting executable colored graph has a compatible, orthogonal, and
-  continuously planar drawing, and its suppressed orientation predicate is
-  still equivalent to satisfiability of the original periodic CNF.
+  Under the same explicit polarity convention, the resulting executable
+  colored graph has a compatible, orthogonal, and continuously planar drawing;
+  independently, its suppressed orientation predicate remains equivalent to
+  satisfiability of the original periodic CNF.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
@@ -7239,9 +7252,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
-  is proved to be either fixed-red/fixed-blue with the already checked
-  endpoint-clear false table, or exactly fixed-green/true.  Thus the latter is
-  now the sole explicitly isolated variable-core/local-gate clearance case.
+  is proved to select exactly one of the three endpoint-clear tables:
+  fixed-red/false, fixed-blue/false, or fixed-green/true.  Anchor normalization
+  preserves the certificate, so the padded assembly and its continuous
+  planarity proof consume the same convention explicitly.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports

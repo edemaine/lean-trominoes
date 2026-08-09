@@ -1,19 +1,13 @@
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonVariableCoreLocalGates
 
 /-!
-# The fixed-green local-contact obstruction
+# Fixed-green normalized contact repair
 
-Polarity normalization leaves one variable connector outside the two
-endpoint-clear local tables: a fixed-green connector in the true
-orientation.  This file records the exact finite obstruction.  Its green
-gate route passes through the common endpoint `(36, 68)` of the second and
-auxiliary green core incidences.  Thus the continuous-interior certificate
-still holds, but endpoint-only route contact does not.
-
-The obstruction is deliberately isolated before replacing this one
-module-local route by the required site-wide annular route.  In particular,
-the audit prevents a later global collision proof from silently treating
-continuous planarity as endpoint-only contact.
+Polarity normalization uses a fixed-green connector in the true orientation.
+The lane-aligned occurrence-tree rotation places its blue, red, and green
+leaves directly at the three physical ribbon lanes.  This file records the
+finite endpoint-aware certificate that replaced the former local-contact
+obstruction.
 -/
 
 namespace LeanTrominoes
@@ -23,12 +17,12 @@ open Gadget PlanarThreeDM
 open PlanarThreeSAT.EmbeddedCNFIncidenceDrawing
 open PeriodicOrthocrossing
 
-/-- The one-module connector-kind data for the exceptional normalized
-fixed-green occurrence. -/
+/-- The one-module connector-kind data for the normalized fixed-green
+occurrence. -/
 def fixedGreenTrueKind (_ : VariableSiteSlot) : VariableConnectorKind :=
   .fixedGreen
 
-/-- The exceptional normalized polarity data. -/
+/-- The normalized fixed-green polarity data. -/
 def fixedGreenTruePolarity (_ : VariableSiteSlot) : Bool :=
   true
 
@@ -54,53 +48,56 @@ def fixedGreenTrueGateRoute (color : WireColor) : List Cell :=
   standardVariableLocalGateRoute
     .first .fixedGreen true color
 
-/-- The only endpoint-aware failures between a fixed-green/true module's
-core and its local gates are the two green incidences ending at the shared
-green element. -/
-theorem fixedGreenTrue_core_gate_endpointContact_classification :
+/-- Every core incidence in the normalized fixed-green module has complete
+endpoint-aware separation from every local gate. -/
+theorem fixedGreenTrue_core_gate_endpointSeparated :
     ∀ (triple : VariableOccurrenceTriple)
       (routeColor gateColor : WireColor),
       RoutesAvoidEachOther
           (fixedGreenTrueCoreRoute triple routeColor)
-          (fixedGreenTrueGateRoute gateColor) ↔
-        ¬(routeColor = .green ∧ gateColor = .green ∧
-          (triple = .second ∨ triple = .auxiliary)) := by
+          (fixedGreenTrueGateRoute gateColor) := by
   native_decide
 
-/-- Even the exceptional two pairs retain the three conditions needed for
-continuous planarity: segment interiors are disjoint and neither route has
-a listed point in the other route's segment interior. -/
+/-- The endpoint-aware certificate contains the three continuous-planarity
+conditions. -/
 theorem fixedGreenTrue_core_gate_avoidInteriorContacts :
     ∀ (triple : VariableOccurrenceTriple)
       (routeColor gateColor : WireColor),
       RoutesAvoidInteriorContacts
         (fixedGreenTrueCoreRoute triple routeColor)
         (fixedGreenTrueGateRoute gateColor) := by
+  intro triple routeColor gateColor
+  exact RoutesAvoidEachOther.toRoutesAvoidInteriorContacts
+    (fixedGreenTrue_core_gate_endpointSeparated
+      triple routeColor gateColor)
+
+/-- The routed blue incidence meets its gate only at the advertised splice
+port. -/
+theorem fixedGreenTrue_blue_commonPoints :
+    (fixedGreenTrueCoreRoute .first .blue).filter
+        (fun point => point ∈ fixedGreenTrueGateRoute .blue) =
+      [(20, 76)] := by
   native_decide
 
-/-- The second green core route and the green gate have exactly one common
-listed point. -/
-theorem fixedGreenTrue_second_green_commonPoints :
-    (fixedGreenTrueCoreRoute .second .green).filter
-        (fun point => point ∈ fixedGreenTrueGateRoute .green) =
-      [(36, 68)] := by
+/-- The routed red incidence meets its gate only at its splice port. -/
+theorem fixedGreenTrue_red_commonPoints :
+    (fixedGreenTrueCoreRoute .auxiliary .red).filter
+        (fun point => point ∈ fixedGreenTrueGateRoute .red) =
+      [(24, 76)] := by
   native_decide
 
-/-- The auxiliary green core route has the same unique contact. -/
-theorem fixedGreenTrue_auxiliary_green_commonPoints :
+/-- The routed green incidence meets its gate only at its splice port. -/
+theorem fixedGreenTrue_green_commonPoints :
     (fixedGreenTrueCoreRoute .auxiliary .green).filter
         (fun point => point ∈ fixedGreenTrueGateRoute .green) =
-      [(36, 68)] := by
+      [(28, 76)] := by
   native_decide
 
-/-- The common point is not an endpoint of the complete green gate route,
-which is why ordinary endpoint-permitting separation rejects the contact. -/
-theorem fixedGreenTrue_contact_not_gate_endpoint :
-    (fixedGreenTrueGateRoute .green).head? = some (24, 72) ∧
-      (fixedGreenTrueGateRoute .green).getLast? = some (28, 108) ∧
-      (36, 68) ≠ (24, 72) ∧
-      (36, 68) ≠ (28, 108) := by
-  native_decide
+/-- The repaired normalized fixed-green table is one of the endpoint-clear
+tables admitted by the global routing interface. -/
+theorem fixedGreenTrue_localGateTableEndpointClear :
+    VariableLocalGateTableEndpointClear .fixedGreen true := by
+  decide
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

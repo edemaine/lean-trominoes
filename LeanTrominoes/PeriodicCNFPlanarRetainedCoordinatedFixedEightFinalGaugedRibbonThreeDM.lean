@@ -41,8 +41,25 @@ noncomputable def retainedOrderedFixedEightFinalGaugedPaddedPeriodicThreeDMProbl
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty).erase
 
+/-- The logical convention required by the endpoint-clear variable tables in
+the direct retained Figure 9 endpoint.  The polarity-normalized hardness
+pipeline proves this convention before invoking the padded assembly. -/
+def retainedOrderedFixedEightFinalGaugedSourcePolarityNormalized
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) : Prop :=
+  PeriodicOneInThreePolarityNormalization.FormulaPolarityNormalized
+    (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).erase
+
 /-- The final retained Figure 9 3DM problem has a concrete continuously
-planar presentation, with no geometric premise left to discharge. -/
+planar presentation whenever its source obeys the endpoint-clear polarity
+convention. -/
 noncomputable def
     retainedOrderedFixedEightFinalGaugedPaddedContinuousPlanarPresentation
     {Variable : Type*} [DecidableEq Variable]
@@ -51,7 +68,11 @@ noncomputable def
     (sourceWidth : source.WidthAtMost 3)
     (sourceOccurrences : source.OccurrencesAtMost 3)
     (sourceClausesNonempty :
-      ∀ clause ∈ source.clauses, clause ≠ []) :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (polarityNormalized :
+      retainedOrderedFixedEightFinalGaugedSourcePolarityNormalized
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) :
     (retainedOrderedFixedEightFinalGaugedPaddedPeriodicThreeDMProblem
       source sourceLocal sourceWidth sourceOccurrences
       sourceClausesNonempty).ContinuousPlanarPresentation := by
@@ -65,6 +86,7 @@ noncomputable def
       (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_widthAtMostThree
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty)
+      polarityNormalized
       (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_occurrencesAtMostThree
         source sourceLocal sourceWidth sourceOccurrences
         sourceClausesNonempty).occurrencesAtMostThree

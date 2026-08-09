@@ -93,14 +93,14 @@ theorem ordinary_holds_of_satisfies
   cases variant with
   | fixedGreen =>
       constructor
-      · simpa [ordinaryBluePrivate, ordinaryBluePrivateNeighbors,
-          VariableOccurrenceElement.neighbors,
-          TypedProblem.incidenceValue, Cell.sub,
-          List.map_map, Function.comp_def] using blueCover
       · simpa [ordinaryGreenPrivate, ordinaryGreenPrivateNeighbors,
           VariableOccurrenceElement.neighbors,
           TypedProblem.incidenceValue, Cell.sub,
           List.map_map, Function.comp_def] using greenCover
+      · simpa [ordinaryBluePrivate, ordinaryBluePrivateNeighbors,
+          VariableOccurrenceElement.neighbors,
+          TypedProblem.incidenceValue, Cell.sub,
+          List.map_map, Function.comp_def] using blueCover
   | fixedBlue =>
       constructor
       · simpa [ordinaryGreenPrivate, ordinaryGreenPrivateNeighbors,

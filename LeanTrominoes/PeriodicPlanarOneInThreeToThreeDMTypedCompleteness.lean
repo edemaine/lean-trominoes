@@ -41,7 +41,7 @@ theorem matchingOfAssignment_covers_ordinary_green
       simpa [ordinaryGreenPrivate, ordinaryGreenPrivateNeighbors,
         VariableOccurrenceElement.neighbors,
         TypedProblem.incidenceValue, Cell.sub,
-        List.map_map, Function.comp_def] using holds.2
+        List.map_map, Function.comp_def] using holds.1
   | fixedBlue =>
       simpa [ordinaryGreenPrivate, ordinaryGreenPrivateNeighbors,
         VariableOccurrenceElement.neighbors,
@@ -77,7 +77,7 @@ theorem matchingOfAssignment_covers_ordinary_blue
       simpa [ordinaryBluePrivate, ordinaryBluePrivateNeighbors,
         VariableOccurrenceElement.neighbors,
         TypedProblem.incidenceValue, Cell.sub,
-        List.map_map, Function.comp_def] using holds.1
+        List.map_map, Function.comp_def] using holds.2
   | fixedBlue =>
       simpa [ordinaryBluePrivate, ordinaryBluePrivateNeighbors,
         VariableOccurrenceElement.neighbors,

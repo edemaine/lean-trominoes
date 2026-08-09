@@ -17,22 +17,22 @@ open PlanarThreeDM
 
 def ordinaryGreenPrivate :
     VariableOccurrenceVariant → OrdinaryInternal
-  | .fixedGreen => .auxiliaryShared
+  | .fixedGreen => .cycleShared
   | .fixedBlue => .cycleShared
 
 def ordinaryBluePrivate :
     VariableOccurrenceVariant → OrdinaryInternal
-  | .fixedGreen => .cycleShared
+  | .fixedGreen => .auxiliaryShared
   | .fixedBlue => .auxiliaryShared
 
 def ordinaryGreenPrivateNeighbors :
     VariableOccurrenceVariant → List VariableOccurrenceTriple
-  | .fixedGreen => [.second, .auxiliary]
+  | .fixedGreen => [.first, .second]
   | .fixedBlue => [.first, .second]
 
 def ordinaryBluePrivateNeighbors :
     VariableOccurrenceVariant → List VariableOccurrenceTriple
-  | .fixedGreen => [.first, .second]
+  | .fixedGreen => [.second, .auxiliary]
   | .fixedBlue => [.second, .auxiliary]
 
 /-- One occurrence block contributes the expected ordinary private-green

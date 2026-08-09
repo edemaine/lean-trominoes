@@ -52,9 +52,10 @@ structure VariableOccurrenceReferences where
 
 namespace VariableOccurrenceVariant
 
-/-- Color of the connector element incident to the first cycle triple. -/
+/-- The connector element incident to the first cycle triple is blue in the
+shared rotated occurrence tree. -/
 def fixedColor : VariableOccurrenceVariant → Gadget.WireColor
-  | .fixedGreen => .green
+  | .fixedGreen => .blue
   | .fixedBlue => .blue
 
 end VariableOccurrenceVariant
@@ -66,11 +67,11 @@ def references :
     VariableOccurrenceVariant →
       VariableOccurrenceTriple → VariableOccurrenceReferences
   | .fixedGreen, .first =>
-      ⟨.leftContinuation, .connectorGreen, .cycleShared⟩
+      ⟨.leftContinuation, .cycleShared, .connectorBlue⟩
   | .fixedGreen, .second =>
-      ⟨.rightContinuation, .auxiliaryShared, .cycleShared⟩
+      ⟨.rightContinuation, .cycleShared, .auxiliaryShared⟩
   | .fixedGreen, .auxiliary =>
-      ⟨.connectorRed, .auxiliaryShared, .connectorBlue⟩
+      ⟨.connectorRed, .connectorGreen, .auxiliaryShared⟩
   | .fixedBlue, .first =>
       ⟨.leftContinuation, .cycleShared, .connectorBlue⟩
   | .fixedBlue, .second =>
@@ -94,8 +95,8 @@ def color :
       VariableOccurrenceElement → Gadget.WireColor
   | _, .leftContinuation => .red
   | _, .rightContinuation => .red
-  | .fixedGreen, .cycleShared => .blue
-  | .fixedGreen, .auxiliaryShared => .green
+  | .fixedGreen, .cycleShared => .green
+  | .fixedGreen, .auxiliaryShared => .blue
   | .fixedBlue, .cycleShared => .green
   | .fixedBlue, .auxiliaryShared => .blue
   | _, .connectorRed => .red
@@ -112,9 +113,9 @@ def neighbors :
   | _, .cycleShared => [.first, .second]
   | _, .auxiliaryShared => [.second, .auxiliary]
   | _, .connectorRed => [.auxiliary]
-  | .fixedGreen, .connectorGreen => [.first]
+  | .fixedGreen, .connectorGreen => [.auxiliary]
   | .fixedBlue, .connectorGreen => [.auxiliary]
-  | .fixedGreen, .connectorBlue => [.auxiliary]
+  | .fixedGreen, .connectorBlue => [.first]
   | .fixedBlue, .connectorBlue => [.first]
 
 /-- Integer coordinates for the local incidence layout. -/

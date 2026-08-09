@@ -14,6 +14,8 @@ the final padded coordinated construction as a continuously planar periodic
 namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
+open PeriodicOneInThreePolarityNormalization
+
 /-- Complete continuously planar geometry for the final padded normalized
 coordinated assembly. -/
 noncomputable def paddedNormalizedCoordinatedContinuousAssemblyGeometry
@@ -23,6 +25,7 @@ noncomputable def paddedNormalizedCoordinatedContinuousAssemblyGeometry
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -42,7 +45,8 @@ noncomputable def paddedNormalizedCoordinatedContinuousAssemblyGeometry
       positionsInside := ?_
       continuouslyPlanar :=
         paddedNormalizedCoordinatedAssembledDrawing_isContinuouslyPlanar
-          presentation width occurrences arity variableOrdered clauseOrdered }
+          presentation width polarityNormalized occurrences arity
+          variableOrdered clauseOrdered }
   · change
       (assembledVertexPositions
         (paddedNormalizedRibbonThreeStrandRouting presentation)).Nodup
@@ -67,6 +71,7 @@ noncomputable def paddedNormalizedCoordinatedContinuousPlanarPresentation
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -80,7 +85,8 @@ noncomputable def paddedNormalizedCoordinatedContinuousPlanarPresentation
   dsimp only
   exact
     (paddedNormalizedCoordinatedContinuousAssemblyGeometry
-      presentation width occurrences arity variableOrdered clauseOrdered)
+      presentation width polarityNormalized occurrences arity
+      variableOrdered clauseOrdered)
       |>.toContinuousPlanarPresentation
 
 /-- Existence form of the final continuously planar presentation. -/
@@ -91,6 +97,7 @@ theorem paddedNormalizedCoordinatedHasContinuousPlanarPresentation
     (presentation :
       source.HaloBoundedRibbonReadyIncidencePresentation placement)
     (width : source.erase.WidthAtMost 3)
+    (polarityNormalized : FormulaPolarityNormalized source.erase)
     (occurrences : source.erase.OccurrencesAtMost 3)
     (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
     (variableOrdered :
@@ -103,7 +110,8 @@ theorem paddedNormalizedCoordinatedHasContinuousPlanarPresentation
     (encodedProblem normalizedSource).HasContinuousPlanarPresentation := by
   dsimp only
   exact ⟨paddedNormalizedCoordinatedContinuousPlanarPresentation
-    presentation width occurrences arity variableOrdered clauseOrdered⟩
+    presentation width polarityNormalized occurrences arity
+    variableOrdered clauseOrdered⟩
 
 end PeriodicPlanarOneInThreeToThreeDM
 end LeanTrominoes

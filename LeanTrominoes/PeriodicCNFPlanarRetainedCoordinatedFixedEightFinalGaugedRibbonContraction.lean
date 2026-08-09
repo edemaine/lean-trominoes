@@ -37,11 +37,15 @@ noncomputable def retainedOrderedFixedEightFinalGaugedContractedDrawing
     (sourceWidth : source.WidthAtMost 3)
     (sourceOccurrences : source.OccurrencesAtMost 3)
     (sourceClausesNonempty :
-      ∀ clause ∈ source.clauses, clause ≠ []) :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (polarityNormalized :
+      retainedOrderedFixedEightFinalGaugedSourcePolarityNormalized
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) :
     PeriodicGridDrawing :=
   (retainedOrderedFixedEightFinalGaugedPaddedContinuousPlanarPresentation
     source sourceLocal sourceWidth sourceOccurrences
-    sourceClausesNonempty).contractedDrawing
+    sourceClausesNonempty polarityNormalized).contractedDrawing
 
 /-- The concrete contracted drawing is compatible with the executable
 contracted graph. -/
@@ -52,17 +56,21 @@ theorem retainedOrderedFixedEightFinalGaugedContractedDrawing_isCompatible
     (sourceWidth : source.WidthAtMost 3)
     (sourceOccurrences : source.OccurrencesAtMost 3)
     (sourceClausesNonempty :
-      ∀ clause ∈ source.clauses, clause ≠ []) :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (polarityNormalized :
+      retainedOrderedFixedEightFinalGaugedSourcePolarityNormalized
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) :
     (retainedOrderedFixedEightFinalGaugedContractedDrawing
       source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty).IsCompatible
+      sourceClausesNonempty polarityNormalized).IsCompatible
         (retainedOrderedFixedEightFinalGaugedContractedGraph
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty) := by
   exact
     (retainedOrderedFixedEightFinalGaugedPaddedContinuousPlanarPresentation
       source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty).toPlanarPresentation
+      sourceClausesNonempty polarityNormalized).toPlanarPresentation
       |>.contractedDrawing_isCompatible
 
 /-- Degree-two contraction preserves rectilinearity of every concrete
@@ -74,14 +82,18 @@ theorem retainedOrderedFixedEightFinalGaugedContractedDrawing_isOrthogonal
     (sourceWidth : source.WidthAtMost 3)
     (sourceOccurrences : source.OccurrencesAtMost 3)
     (sourceClausesNonempty :
-      ∀ clause ∈ source.clauses, clause ≠ []) :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (polarityNormalized :
+      retainedOrderedFixedEightFinalGaugedSourcePolarityNormalized
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) :
     (retainedOrderedFixedEightFinalGaugedContractedDrawing
       source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty).IsOrthogonal := by
+      sourceClausesNonempty polarityNormalized).IsOrthogonal := by
   exact
     (retainedOrderedFixedEightFinalGaugedPaddedContinuousPlanarPresentation
       source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty).toPlanarPresentation
+      sourceClausesNonempty polarityNormalized).toPlanarPresentation
       |>.contractedDrawing_isOrthogonal
 
 /-- Degree-two contraction also preserves exact continuous separation of all
@@ -94,14 +106,19 @@ theorem
     (sourceWidth : source.WidthAtMost 3)
     (sourceOccurrences : source.OccurrencesAtMost 3)
     (sourceClausesNonempty :
-      ∀ clause ∈ source.clauses, clause ≠ []) :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    (polarityNormalized :
+      retainedOrderedFixedEightFinalGaugedSourcePolarityNormalized
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty) :
     (retainedOrderedFixedEightFinalGaugedContractedDrawing
       source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty).IsContinuouslyPlanar := by
+      sourceClausesNonempty polarityNormalized).IsContinuouslyPlanar := by
   exact
     (retainedOrderedFixedEightFinalGaugedPaddedContinuousPlanarPresentation
       source sourceLocal sourceWidth sourceOccurrences
-      sourceClausesNonempty).contractedDrawing_isContinuouslyPlanar
+      sourceClausesNonempty polarityNormalized)
+      |>.contractedDrawing_isContinuouslyPlanar
         (retainedOrderedFixedEightFinalGaugedPaddedPeriodicThreeDMProblem_degreeTwoOrThree
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty)

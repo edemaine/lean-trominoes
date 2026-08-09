@@ -44,7 +44,7 @@ def outerConnectorRoute
     (variant : VariableOccurrenceVariant) : List Cell :=
   match variant with
   | .fixedGreen =>
-      [(0, 0), (0, -4), (8, -4), (8, 6), (4, 6)]
+      [(0, 0), (0, -4), (8, -4), (8, 4), (6, 4)]
   | .fixedBlue =>
       [(0, 0), (0, -4), (8, -4), (8, 4), (6, 4)]
 
@@ -154,7 +154,7 @@ def boundaryTriplePosition : VariableOccurrenceTriple → Cell
 color is the lower leaf of the first triple; the other two connector colors
 are the upper and lower leaves of the auxiliary triple. -/
 def boundaryElementPosition
-    (variant : VariableOccurrenceVariant) :
+    (_variant : VariableOccurrenceVariant) :
     VariableOccurrenceElement → Cell
   | .leftContinuation => (4, 0)
   | .rightContinuation => (12, 0)
@@ -162,9 +162,9 @@ def boundaryElementPosition
   | .auxiliaryShared => (16, 4)
   | .connectorRed => (20, 0)
   | .connectorGreen =>
-      if variant = .fixedGreen then (4, 8) else (20, 8)
+      (20, 8)
   | .connectorBlue =>
-      if variant = .fixedBlue then (4, 8) else (20, 8)
+      (4, 8)
 
 /-- Every incidence of the path-shaped embedding is a direct segment. -/
 def boundaryRoute (variant : VariableOccurrenceVariant)
@@ -188,16 +188,70 @@ theorem boundaryDrawing_isValid
     (boundaryDrawing variant).IsValid := by
   cases variant <;> native_decide
 
+/-! The fixed-green connector uses the same logical occurrence tree as the
+fixed-blue module, but its three semantic colors occupy a different cyclic
+order in the surrounding ribbon.  The following positive-orientation
+embedding exposes those connector leaves directly in fixed-green lane order
+while retaining the standard two continuation ports. -/
+
+/-- Triple positions in the lane-aligned positive fixed-green embedding. -/
+def positiveFixedGreenTriplePosition : VariableOccurrenceTriple → Cell
+  | .first => (2, 4)
+  | .second => (8, 4)
+  | .auxiliary => (6, 10)
+
+/-- Element positions in the lane-aligned positive fixed-green embedding. -/
+def positiveFixedGreenElementPosition : VariableOccurrenceElement → Cell
+  | .leftContinuation => (4, 0)
+  | .rightContinuation => (12, 0)
+  | .cycleShared => (5, 4)
+  | .auxiliaryShared => (8, 8)
+  | .connectorRed => (4, 12)
+  | .connectorGreen => (8, 12)
+  | .connectorBlue => (0, 12)
+
+/-- Pairwise separated orthogonal incidences of the lane-aligned positive
+fixed-green embedding. -/
+def positiveFixedGreenRoute
+    (triple : VariableOccurrenceTriple)
+    (color : WireColor) : List Cell :=
+  match triple, color with
+  | .first, .red => [(2, 4), (2, 0), (4, 0)]
+  | .first, .green => [(2, 4), (5, 4)]
+  | .first, .blue => [(2, 4), (0, 4), (0, 12)]
+  | .second, .red => [(8, 4), (12, 4), (12, 0)]
+  | .second, .green => [(8, 4), (5, 4)]
+  | .second, .blue => [(8, 4), (8, 8)]
+  | .auxiliary, .red => [(6, 10), (4, 10), (4, 12)]
+  | .auxiliary, .green => [(6, 10), (8, 10), (8, 12)]
+  | .auxiliary, .blue => [(6, 10), (6, 8), (8, 8)]
+
+/-- Positive fixed-green drawing with its connector leaves ordered as blue,
+red, green along the outer boundary. -/
+def positiveFixedGreenBoundaryDrawing :
+    LocalIncidenceDrawing
+      VariableOccurrenceTriple VariableOccurrenceElement where
+  triplePosition := positiveFixedGreenTriplePosition
+  elementPosition := positiveFixedGreenElementPosition
+  reference := reference .fixedGreen
+  route := positiveFixedGreenRoute
+
+/-- The lane-aligned fixed-green embedding is a valid local drawing. -/
+theorem positiveFixedGreenBoundaryDrawing_isValid :
+    positiveFixedGreenBoundaryDrawing.IsValid := by
+  native_decide
+
 /-- Reflect a negative occurrence so the continuation for the current slot
 is always the left boundary port. -/
 def orientedBoundaryDrawing
     (variant : VariableOccurrenceVariant) (polarity : Bool) :
     LocalIncidenceDrawing
       VariableOccurrenceTriple VariableOccurrenceElement :=
-  if polarity then
-    boundaryDrawing variant
-  else
-    (boundaryDrawing variant).mapPoints (reflectAcrossVertical 8)
+  match variant, polarity with
+  | .fixedGreen, true => positiveFixedGreenBoundaryDrawing
+  | variant, true => boundaryDrawing variant
+  | variant, false =>
+      (boundaryDrawing variant).mapPoints (reflectAcrossVertical 8)
 
 @[simp]
 theorem orientedBoundaryDrawing_reference
@@ -205,7 +259,7 @@ theorem orientedBoundaryDrawing_reference
     (triple : VariableOccurrenceTriple) (color : WireColor) :
     (orientedBoundaryDrawing variant polarity).reference triple color =
       reference variant triple color := by
-  cases polarity <;> rfl
+  cases variant <;> cases polarity <;> rfl
 
 @[simp]
 theorem orientedBoundaryDrawing_slotContinuationPosition
