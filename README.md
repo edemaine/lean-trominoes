@@ -7145,6 +7145,10 @@ The representation choices for this target are:
   subdivision point one and its complement clause is subdivision point two.
   It also proves that normalized main clauses and binary complement clauses
   both have zero canonical anchor.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertexBounds.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertexBounds.lean)
+  derives a two-cell boundary margin from strict source-vertex bounds and
+  threefold scaling, then proves that both inserted unit-subdivision vertices
+  remain strictly inside the refined fundamental square.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
