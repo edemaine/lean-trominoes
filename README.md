@@ -6684,6 +6684,11 @@ The representation choices for this target are:
   locations.  Under this one explicit invariant, every listed degree-three
   vertex and every emitted route-interior assignment is recovered exactly by
   the compiled cell lookup.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean`](LeanTrominoes/PeriodicThreeDMNormalizationEndpointRasterization.lean)
+  proves that every final route begins with two nonreversing unit steps from
+  its normalized source vertex.  Its first routing assignment is therefore
+  emitted, exposes the edge color toward the vertex under collision freedom,
+  and matches the automatically recovered color of the vertex port.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
