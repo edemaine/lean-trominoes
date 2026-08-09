@@ -7099,6 +7099,12 @@ The representation choices for this target are:
   presentation (subdividing the affected incidence routes) and to finish the
   site-wide fixed-green/true strand, whose route cannot be chosen independently
   in each occurrence slot.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
+  transports that formula-level certificate through the actual occurrence
+  lookup table used by the typed planar 3DM assembly.  Every active occurrence
+  is proved to be either fixed-red/fixed-blue with the already checked
+  endpoint-clear false table, or exactly fixed-green/true.  Thus the latter is
+  now the sole explicitly isolated variable-core/local-gate clearance case.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports

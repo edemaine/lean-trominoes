@@ -503,6 +503,18 @@ def FormulaPolarityNormalized {Variable : Type*}
     (source : PeriodicCNF Variable) : Prop :=
   ∀ clause ∈ source.clauses, ClausePolarityNormalized clause
 
+/-- Pointwise form of a clause's polarity-normalization certificate. -/
+theorem literal_value_eq_normalizedPolarity_of_clause
+    {Variable : Type*} {clause : PeriodicClause Variable}
+    (normalized : ClausePolarityNormalized clause)
+    {literal : PeriodicLiteral Variable} {literalIndex : Nat}
+    (literalMember : (literal, literalIndex) ∈ clause.zipIdx) :
+    literal.value = normalizedPolarity literalIndex := by
+  have indexData := List.mem_zipIdx' literalMember
+  have atIndex := congrArg (fun values => values[literalIndex]?) normalized
+  simpa [List.getElem?_map, List.getElem?_range, indexData.1,
+    indexData.2] using atIndex
+
 @[simp]
 theorem normalizeLiteral_offset {Variable : Type*}
     (clauseIndex literalIndex : Nat)
