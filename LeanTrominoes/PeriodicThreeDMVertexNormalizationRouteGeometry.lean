@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicThreeDMNormalizationRasterizationCorrectness
 import LeanTrominoes.OrthogonalPolylineHeadReplacement
+import LeanTrominoes.PeriodicGridDrawingScaling
 
 /-!
 # Endpoint geometry of normalized 3DM routes
@@ -20,6 +21,13 @@ theorem Cell.add_assoc (first second third : Cell) :
   rcases first with ⟨firstX, firstY⟩
   rcases second with ⟨secondX, secondY⟩
   rcases third with ⟨thirdX, thirdY⟩
+  simp only [Cell.add, Prod.mk.injEq]
+  omega
+
+theorem Cell.add_comm (first second : Cell) :
+    Cell.add first second = Cell.add second first := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
   simp only [Cell.add, Prod.mk.injEq]
   omega
 
@@ -525,6 +533,91 @@ theorem PlanarPresentation.finalNormalizationRoute_reverse_tail_head?
     (endpoint.finalNormalizationTemplate_length_ge_four presentation)
   rw [geometry.2.2.2] at preserved
   exact preserved
+
+/-! ## Periodic target occurrences -/
+
+/-- One normalization round is affine with linear part equal to the
+twelvefold magnification. -/
+theorem normalizeVertexPosition_add (position translation : Cell) :
+    normalizeVertexPosition (Cell.add position translation) =
+      Cell.add (normalizeVertexPosition position)
+        (Cell.scale vertexNormalizationScale translation) := by
+  rcases position with ⟨positionX, positionY⟩
+  rcases translation with ⟨translationX, translationY⟩
+  simp only [normalizeVertexPosition, vertexNormalizationScale, center,
+    Cell.add, Cell.scale, Prod.mk.injEq]
+  constructor <;> ring
+
+/-- After three rounds, a stored target occurrence differs from the base
+target vertex by the original drawing translation magnified three times. -/
+theorem PlanarPresentation.finalTargetOccurrence_eq
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (edge : ContractedEdge) :
+    normalizeVertexPosition (presentation.normalizationTarget2 edge) =
+      Cell.add
+        (presentation.finalNormalizationPosition
+          edge.toPeriodicEdge.target)
+        (Cell.scale (vertexNormalizationScale ^ 3)
+          (presentation.contractedDrawing.periodTranslation
+            edge.toPeriodicEdge.offset)) := by
+  simp only [PlanarPresentation.normalizationTarget2,
+    PlanarPresentation.normalizationTarget1,
+    PlanarPresentation.normalizationTarget0,
+    PlanarPresentation.finalNormalizationPosition,
+    PlanarPresentation.normalizationPosition2,
+    PlanarPresentation.normalizationPosition1,
+    normalizeVertexPosition_add, Cell.scale_scale]
+  simp [vertexNormalizationScale, pow_succ]
+
+/-- The thrice-magnified old period translation is exactly an integer
+multiple of the final raster period in both coordinates. -/
+theorem PlanarPresentation.finalScaledPeriodTranslation_eq
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) (translation : Cell) :
+    Cell.scale (vertexNormalizationScale ^ 3)
+        (presentation.contractedDrawing.periodTranslation translation) =
+      Cell.scale (presentation.finalNormalizationPeriod : Int) translation := by
+  rcases translation with ⟨horizontal, vertical⟩
+  simp only [vertexNormalizationScale,
+    PeriodicGridDrawing.periodTranslation,
+    PlanarPresentation.finalNormalizationPeriod,
+    vertexNormalizationScaleNat, Cell.scale, Prod.mk.injEq]
+  norm_num
+  constructor <;> ring
+
+/-- Adding any integer number of complete periods does not change a
+rasterized location. -/
+theorem rasterLocation_add_period
+    (period : Nat) (point translation : Cell) :
+    rasterLocation period
+        (Cell.add point (Cell.scale (period : Int) translation)) =
+      rasterLocation period point := by
+  rcases point with ⟨pointX, pointY⟩
+  rcases translation with ⟨translationX, translationY⟩
+  apply Prod.ext
+  · simp [rasterLocation, Cell.add, Cell.scale, Int.add_emod]
+  · simp only [rasterLocation, Cell.add, Cell.scale]
+    have equation :
+        -(pointY + (period : Int) * translationY) =
+          -pointY + (period : Int) * (-translationY) := by ring
+    rw [equation]
+    simp [Int.add_emod]
+
+/-- Thus the normalized stored target occurrence and its base vertex use
+the same finite-torus assignment key. -/
+theorem PlanarPresentation.rasterLocation_finalTargetOccurrence
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (edge : ContractedEdge) :
+    rasterLocation presentation.finalNormalizationPeriod
+        (normalizeVertexPosition (presentation.normalizationTarget2 edge)) =
+      rasterLocation presentation.finalNormalizationPeriod
+        (presentation.finalNormalizationPosition
+          edge.toPeriodicEdge.target) := by
+  rw [presentation.finalTargetOccurrence_eq]
+  rw [presentation.finalScaledPeriodTranslation_eq]
+  exact rasterLocation_add_period _ _ _
 
 /-- The final normalized route starts at its source's final normalized
 vertex position. -/

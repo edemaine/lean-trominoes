@@ -6667,7 +6667,10 @@ The representation choices for this target are:
   points after trimming, so the reversed target template survives the splice
   and the final route reaches the normalized periodic target occurrence.
   The target-adjacent point is likewise identified as the outward unit step
-  through that endpoint's final canonical port.
+  through that endpoint's final canonical port.  Finally, the stored target
+  offset is proved to become an integer multiple of the final torus period,
+  so the translated occurrence and base target vertex have the same raster
+  key.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
