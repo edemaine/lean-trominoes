@@ -6655,7 +6655,9 @@ The representation choices for this target are:
   proves the local rasterizer semantics and the row-major lookup theorem.
   It reduces drawing well-formedness and degree-three vertex separation to
   explicit neighboring-cell obligations on the finite assignment lookup,
-  isolating those remaining obligations from array-index bookkeeping.
+  isolating those remaining obligations from array-index bookkeeping.  It
+  also proves that reflected geometric unit steps commute with finite-torus
+  projection, including wraparound in both periods.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose

@@ -270,5 +270,96 @@ theorem PlanarPresentation.normalizedOrthogonalDrawing_verticesSeparated_of_look
   rw [presentation.normalizedOrthogonalDrawing_get] at isVertex ⊢
   exact separated position side isVertex
 
+/-! ## Geometric points and finite torus positions -/
+
+/-- Reflect geometric coordinates into drawing-row coordinates without yet
+choosing a periodic representative. -/
+def reflectedLocation (point : Cell) : Cell :=
+  (point.1, -point.2)
+
+/-- A genuine geometric unit step becomes the correspondingly named lattice
+neighbor after vertical reflection. -/
+theorem reflectedLocation_add_step
+    (point : Cell) {direction : AxisDirection}
+    (genuine : direction.IsGenuine) :
+    reflectedLocation (Cell.add point direction.step) =
+      PeriodicOrthogonalDrawing.latticeNeighbor
+        (reflectedLocation point) (Side.ofAxisDirection direction) := by
+  rcases point with ⟨horizontal, vertical⟩
+  cases direction <;>
+    simp_all [AxisDirection.IsGenuine, AxisDirection.step,
+      Cell.add, reflectedLocation, Side.ofAxisDirection,
+      PeriodicOrthogonalDrawing.latticeNeighbor] <;> omega
+
+/-- Project a geometric point directly to the final normalized drawing's
+finite torus. -/
+def PlanarPresentation.normalizedPositionAt
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) (point : Cell) :
+    presentation.normalizedOrthogonalDrawing.Position :=
+  presentation.normalizedOrthogonalDrawing.positionAt
+    (reflectedLocation point)
+
+/-- Geometric unit steps commute with finite-torus projection. -/
+theorem PlanarPresentation.normalizedPositionAt_add_step
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (point : Cell) {direction : AxisDirection}
+    (genuine : direction.IsGenuine) :
+    presentation.normalizedPositionAt
+        (Cell.add point direction.step) =
+      presentation.normalizedOrthogonalDrawing.neighbor
+        (presentation.normalizedPositionAt point)
+        (Side.ofAxisDirection direction) := by
+  unfold PlanarPresentation.normalizedPositionAt
+  rw [reflectedLocation_add_step point genuine]
+  exact PeriodicOrthogonalDrawing.positionAt_latticeNeighbor _ _ _
+
+/-- The finite position's stored integer representatives are precisely
+`rasterLocation`. -/
+theorem PlanarPresentation.normalizedPositionAt_values
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) (point : Cell) :
+    (((presentation.normalizedPositionAt point).1.val : Int),
+      ((presentation.normalizedPositionAt point).2.val : Int)) =
+        rasterLocation presentation.finalNormalizationPeriod point := by
+  apply Prod.ext
+  · change
+      ((PeriodicOrthogonalDrawing.residue point.1
+          presentation.normalizedOrthogonalDrawing.horizontalPeriodPred).val :
+          Int) =
+        point.1 % presentation.finalNormalizationPeriod
+    rw [PeriodicOrthogonalDrawing.residue_val_int]
+    have periodEquality :
+        (presentation.normalizedOrthogonalDrawing.horizontalPeriodPred : Int) +
+            1 =
+          (presentation.finalNormalizationPeriod : Int) := by
+      exact_mod_cast presentation.normalizedOrthogonalDrawing_periods.1
+    rw [periodEquality]
+  · change
+      ((PeriodicOrthogonalDrawing.residue (-point.2)
+          presentation.normalizedOrthogonalDrawing.verticalPeriodPred).val :
+          Int) =
+        (-point.2) % presentation.finalNormalizationPeriod
+    rw [PeriodicOrthogonalDrawing.residue_val_int]
+    have periodEquality :
+        (presentation.normalizedOrthogonalDrawing.verticalPeriodPred : Int) +
+            1 =
+          (presentation.finalNormalizationPeriod : Int) := by
+      exact_mod_cast presentation.normalizedOrthogonalDrawing_periods.2
+    rw [periodEquality]
+
+/-- Reading the compiled drawing at a projected geometric point uses exactly
+the rasterized assignment key. -/
+theorem PlanarPresentation.normalizedOrthogonalDrawing_get_normalizedPositionAt
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation) (point : Cell) :
+    presentation.normalizedOrthogonalDrawing.get
+        (presentation.normalizedPositionAt point) =
+      presentation.finalCellTypeAt
+        (rasterLocation presentation.finalNormalizationPeriod point) := by
+  rw [presentation.normalizedOrthogonalDrawing_get]
+  rw [presentation.normalizedPositionAt_values]
+
 end PeriodicThreeDM
 end LeanTrominoes
