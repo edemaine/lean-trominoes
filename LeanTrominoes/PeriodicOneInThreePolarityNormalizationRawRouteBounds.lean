@@ -362,6 +362,238 @@ theorem rebasedPoint_mem_refinedVariableToClauseRoute
   apply descriptor.fragment.select_subset _ descriptor.sourceRoute_length_ge_four
   simpa using fragmentPointMember
 
+/-- The two near-clause fragment kinds use only refined points zero, one,
+and two, all of which remain inside the final normalized fundamental
+square. -/
+theorem nearClauseFragment_pointInsideFinalExpandedSquare
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {sourcePlacement : PeriodicVariablePlacement Variable}
+    {presentation :
+      PositionedPeriodicCNF.ContinuousPlanarIncidencePresentation
+        source sourcePlacement}
+    {taggedIncidence :
+      CNFIncidence (PolarityNormalizedVariable Variable) × Nat}
+    (descriptor : RawRouteDescriptor presentation taggedIncidence)
+    (nearClause :
+      descriptor.fragment = .prefix ∨ descriptor.fragment = .middle)
+    {point : Cell}
+    (pointMember :
+      point ∈ descriptor.fragment.select
+        (refinedRoute presentation.routes
+          descriptor.metadata.sourceClauseIndex
+          descriptor.sourceLiteralIndex)) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      (formula source sourcePlacement presentation.routes)
+      (placement sourcePlacement presentation.routes)
+      (incidenceRoutes source sourcePlacement presentation.routes))
+        |>.PositionInExpandedSquare point := by
+  let route := refinedRoute presentation.routes
+    descriptor.metadata.sourceClauseIndex descriptor.sourceLiteralIndex
+  have routeLength : 4 ≤ route.length := descriptor.sourceRoute_length_ge_four
+  have pointCases := descriptor.fragment.select_mem_getD_zero_one_two
+    route routeLength nearClause pointMember
+  have routeEndpoints :=
+    (refinedRouteFamily presentation).endpoints
+      descriptor.metadata.sourceClause
+      descriptor.metadata.sourceClauseIndex descriptor.sourceClauseMember
+      descriptor.sourceLiteral descriptor.sourceLiteralIndex
+      descriptor.sourceLiteralMember
+  rw [refinedRouteFamily_routes] at routeEndpoints
+  have sourceAnchor := refinedSource_clauseAnchor_eq_zero
+    source sourcePlacement descriptor.sourceClauseMember
+  have routeHead :
+      route.head? = some descriptor.metadata.sourceClause.position := by
+    simpa [route, PositionedPeriodicCNF.canonicalClausePosition,
+      PeriodicVariablePlacement.translation, Cell.scale, Cell.sub,
+      sourceAnchor] using routeEndpoints.1
+  have routeZeroEq :
+      route.getD 0 (0, 0) = descriptor.metadata.sourceClause.position := by
+    cases routeEq : route with
+    | nil =>
+        rw [routeEq] at routeLength
+        simp at routeLength
+    | cons first rest =>
+        rw [routeEq] at routeHead
+        simpa using Option.some.inj routeHead
+  have sourceMargin := refinedSource_clause_position_margin
+    presentation descriptor.sourceClauseMember
+  have reservedBounds := routePoints_one_two_inSquare
+    presentation descriptor.sourceClauseMember descriptor.sourceLiteralMember
+  have zeroBounds :
+      0 < (route.getD 0 (0, 0)).1 ∧
+        (route.getD 0 (0, 0)).1 <
+          (refinedPlacement sourcePlacement).period ∧
+        0 < (route.getD 0 (0, 0)).2 ∧
+        (route.getD 0 (0, 0)).2 <
+          (refinedPlacement sourcePlacement).period := by
+    rw [routeZeroEq]
+    omega
+  have oneTwoBounds :
+      (0 < (route.getD 1 (0, 0)).1 ∧
+        (route.getD 1 (0, 0)).1 <
+          (refinedPlacement sourcePlacement).period ∧
+        0 < (route.getD 1 (0, 0)).2 ∧
+        (route.getD 1 (0, 0)).2 <
+          (refinedPlacement sourcePlacement).period) ∧
+      (0 < (route.getD 2 (0, 0)).1 ∧
+        (route.getD 2 (0, 0)).1 <
+          (refinedPlacement sourcePlacement).period ∧
+        0 < (route.getD 2 (0, 0)).2 ∧
+        (route.getD 2 (0, 0)).2 <
+          (refinedPlacement sourcePlacement).period) := by
+    simpa [route, routePoint] using reservedBounds
+  apply PeriodicGridDrawing.positionInExpandedSquare_of_fundamental
+  apply finalPositionInFundamentalSquare_of_refinedBounds presentation
+  rcases pointCases with pointEq | pointOne | pointTwo
+  · simpa [pointEq] using zeroBounds
+  · simpa [pointOne] using oneTwoBounds.1
+  · simpa [pointTwo] using oneTwoBounds.2
+
+/-- Descriptor shape determines the exact raw output literal, and hence
+whether the final fresh-variable gauge is zero or cancels the source
+occurrence offset. -/
+theorem outputLiteral_classify
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {sourcePlacement : PeriodicVariablePlacement Variable}
+    {presentation :
+      PositionedPeriodicCNF.ContinuousPlanarIncidencePresentation
+        source sourcePlacement}
+    {taggedIncidence :
+      CNFIncidence (PolarityNormalizedVariable Variable) × Nat}
+    (taggedIncidenceMember :
+      taggedIncidence ∈
+        (PeriodicCNF.incidencesWithMetadata
+          (rawFormula source sourcePlacement presentation.routes).erase).zipIdx)
+    (descriptor : RawRouteDescriptor presentation taggedIncidence) :
+    (descriptor.fragment = .whole ∧
+        taggedIncidence.1.literal =
+          liftLiteral descriptor.sourceLiteral) ∨
+      (descriptor.fragment = .prefix ∧
+        taggedIncidence.1.literal =
+          complementLiteral descriptor.metadata.sourceClauseIndex
+            descriptor.sourceLiteralIndex descriptor.sourceLiteral) ∨
+      (descriptor.fragment = .middle ∧
+        taggedIncidence.1.literal =
+          complementFalseLiteral descriptor.metadata.sourceClauseIndex
+            descriptor.sourceLiteralIndex descriptor.sourceLiteral) ∨
+      (descriptor.fragment = .suffix ∧
+        taggedIncidence.1.literal =
+          originalFalseLiteral descriptor.sourceLiteral) := by
+  rcases PositionedPeriodicCNF.incidenceMetadata_of_tagged
+      (rawFormula source sourcePlacement presentation.routes)
+      taggedIncidenceMember with
+    ⟨outputClause, outputLiteral, outputClauseMember,
+      outputLiteralMember, incidenceEq⟩
+  have outputClauseEq : outputClause = descriptor.metadata.clause :=
+    descriptor.outputClause_eq_metadataClause outputClauseMember
+  subst outputClause
+  have taggedLiteralEq : taggedIncidence.1.literal = outputLiteral :=
+    congrArg CNFIncidence.literal incidenceEq
+  have metadataMember :
+      descriptor.metadata ∈
+        PeriodicOneInThreePolarityNormalizationPositioned.formulaClauseMetadata
+          (rawPositions sourcePlacement presentation.routes)
+          (refinedSource source sourcePlacement) := by
+    have rawMember : descriptor.metadata ∈
+        clauseMetadata source sourcePlacement presentation.routes := by
+      rcases List.getElem?_eq_some_iff.mp descriptor.metadataLookup with
+        ⟨metadataIndexLt, metadataAt⟩
+      rw [← metadataAt]
+      exact List.getElem_mem metadataIndexLt
+    simpa only [clauseMetadata] using rawMember
+  rcases descriptor.shape.classifyWithShift with
+      wholeCase | prefixCase | middleCase | suffixCase
+  · rcases wholeCase with
+      ⟨fragmentEq, _shiftEq, originEq, sourceIndex, compatible⟩
+    refine Or.inl ⟨fragmentEq, taggedLiteralEq.trans ?_⟩
+    have normalizedClauseEq :=
+      PeriodicOneInThreePolarityNormalizationPositioned.formulaClauseMetadata_normalized_clause_eq
+        (rawPositions sourcePlacement presentation.routes)
+        (refinedSource source sourcePlacement) metadataMember originEq
+    have normalizedLiteralMember :
+        (outputLiteral, descriptor.sourceLiteralIndex) ∈
+          (PeriodicOneInThreePolarityNormalizationPositioned.normalizedClause
+            descriptor.metadata.sourceClauseIndex
+            descriptor.metadata.sourceClause).literals.zipIdx := by
+      rw [sourceIndex, ← normalizedClauseEq]
+      exact outputLiteralMember
+    have outputLiteralLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp normalizedLiteralMember
+    have sourceLiteralLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp descriptor.sourceLiteralMember
+    rw [PeriodicOneInThreePolarityNormalizationPositioned.normalizedClause,
+      PeriodicOneInThreePolarityNormalization.normalizeClause_getElem?,
+      sourceLiteralLookup] at outputLiteralLookup
+    have normalizedEq :
+        normalizeLiteral descriptor.metadata.sourceClauseIndex
+            descriptor.sourceLiteralIndex descriptor.sourceLiteral =
+          outputLiteral := by
+      simpa using Option.some.inj outputLiteralLookup
+    simpa [normalizeLiteral, compatible] using normalizedEq.symm
+  · rcases prefixCase with
+      ⟨fragmentEq, _shiftEq, originEq, sourceIndex, incompatible⟩
+    refine Or.inr (Or.inl ⟨fragmentEq, taggedLiteralEq.trans ?_⟩)
+    have normalizedClauseEq :=
+      PeriodicOneInThreePolarityNormalizationPositioned.formulaClauseMetadata_normalized_clause_eq
+        (rawPositions sourcePlacement presentation.routes)
+        (refinedSource source sourcePlacement) metadataMember originEq
+    have normalizedLiteralMember :
+        (outputLiteral, descriptor.sourceLiteralIndex) ∈
+          (PeriodicOneInThreePolarityNormalizationPositioned.normalizedClause
+            descriptor.metadata.sourceClauseIndex
+            descriptor.metadata.sourceClause).literals.zipIdx := by
+      rw [sourceIndex, ← normalizedClauseEq]
+      exact outputLiteralMember
+    have outputLiteralLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp normalizedLiteralMember
+    have sourceLiteralLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp descriptor.sourceLiteralMember
+    rw [PeriodicOneInThreePolarityNormalizationPositioned.normalizedClause,
+      PeriodicOneInThreePolarityNormalization.normalizeClause_getElem?,
+      sourceLiteralLookup] at outputLiteralLookup
+    have normalizedEq :
+        normalizeLiteral descriptor.metadata.sourceClauseIndex
+            descriptor.sourceLiteralIndex descriptor.sourceLiteral =
+          outputLiteral := by
+      simpa using Option.some.inj outputLiteralLookup
+    simpa [normalizeLiteral, incompatible] using normalizedEq.symm
+  · rcases middleCase with
+      ⟨fragmentEq, _shiftEq, originEq, outputIndex, _incompatible⟩
+    refine Or.inr (Or.inr (Or.inl
+      ⟨fragmentEq, taggedLiteralEq.trans ?_⟩))
+    have complementClauseEq :=
+      PeriodicOneInThreePolarityNormalizationPositioned.formulaClauseMetadata_complement_clause_eq
+        (rawPositions sourcePlacement presentation.routes)
+        (refinedSource source sourcePlacement) metadataMember originEq
+    have outputLiteralLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp outputLiteralMember
+    rw [outputIndex, complementClauseEq] at outputLiteralLookup
+    have outputLiteralEq :
+        complementFalseLiteral descriptor.metadata.sourceClauseIndex
+            descriptor.sourceLiteralIndex descriptor.sourceLiteral =
+          outputLiteral := by
+      simpa [PeriodicOneInThreePolarityNormalizationPositioned.positionedComplementClause,
+        complementClause] using outputLiteralLookup
+    exact outputLiteralEq.symm
+  · rcases suffixCase with
+      ⟨fragmentEq, _shiftEq, originEq, outputIndex, _incompatible⟩
+    refine Or.inr (Or.inr (Or.inr
+      ⟨fragmentEq, taggedLiteralEq.trans ?_⟩))
+    have complementClauseEq :=
+      PeriodicOneInThreePolarityNormalizationPositioned.formulaClauseMetadata_complement_clause_eq
+        (rawPositions sourcePlacement presentation.routes)
+        (refinedSource source sourcePlacement) metadataMember originEq
+    have outputLiteralLookup :=
+      (List.mem_zipIdx_iff_getElem?).mp outputLiteralMember
+    rw [outputIndex, complementClauseEq] at outputLiteralLookup
+    have outputLiteralEq :
+        originalFalseLiteral descriptor.sourceLiteral = outputLiteral := by
+      simpa [PeriodicOneInThreePolarityNormalizationPositioned.positionedComplementClause,
+        complementClause] using outputLiteralLookup
+    exact outputLiteralEq.symm
+
 end RawRouteDescriptor
 
 /-- Every raw split incidence route stays in the same ordinary open halo as

@@ -59,6 +59,48 @@ theorem RawRouteFragment.select_subset
                       exact List.mem_cons_of_mem first
                         (List.mem_cons_of_mem second pointMember)
 
+/-- Prefix and middle fragments use only the clause endpoint and the first
+two reserved subdivision points. -/
+theorem RawRouteFragment.select_mem_getD_zero_one_two
+    (fragment : RawRouteFragment)
+    (route : List Cell)
+    (length : 4 ≤ route.length)
+    (nearClause : fragment = .prefix ∨ fragment = .middle)
+    {point : Cell}
+    (pointMember : point ∈ fragment.select route) :
+    point = route.getD 0 (0, 0) ∨
+      point = route.getD 1 (0, 0) ∨
+      point = route.getD 2 (0, 0) := by
+  rcases nearClause with rfl | rfl
+  · cases route with
+    | nil => simp at length
+    | cons first rest =>
+        cases rest with
+        | nil => simp at length
+        | cons second rest =>
+            cases rest with
+            | nil => simp at length
+            | cons third rest =>
+                cases rest with
+                | nil => simp at length
+                | cons fourth rest =>
+                    simp [RawRouteFragment.select] at pointMember
+                    rcases pointMember with rfl | rfl <;> simp
+  · cases route with
+    | nil => simp at length
+    | cons first rest =>
+        cases rest with
+        | nil => simp at length
+        | cons second rest =>
+            cases rest with
+            | nil => simp at length
+            | cons third rest =>
+                cases rest with
+                | nil => simp at length
+                | cons fourth rest =>
+                    simp [RawRouteFragment.select] at pointMember
+                    rcases pointMember with rfl | rfl <;> simp
+
 /-- Every raw route shape is supported on its complete refined source route,
 and retained source endpoints remain endpoints of the selected fragment. -/
 theorem RawRouteFragment.endpointSubroute
