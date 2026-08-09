@@ -7087,6 +7087,18 @@ The representation choices for this target are:
   also certified: their two red continuations are proved to reference the
   current and successor cycle links in one fixed geometric order, using the
   common outer-face boundary coordinates of all three connector kinds.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalization.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalization.lean)
+  supplies the logical preprocessing demanded by the variable-ribbon
+  geometry.  It normalizes clause positions to the fixed-red/fixed-blue/
+  fixed-green polarity pattern `false`, `false`, `true`.  An incompatible
+  occurrence is replaced by a fresh complement variable and the binary
+  exact-one clause `[original = false, fresh = false]`; the file proves both
+  directions of satisfiability preservation, locality, binary-or-ternary
+  arity, and the polarity certificate for every generated clause.  The
+  remaining work is to splice this preprocessing into the positioned planar
+  presentation (subdividing the affected incidence routes) and to finish the
+  site-wide fixed-green/true strand, whose route cannot be chosen independently
+  in each occurrence slot.
 - [`LeanTrominoes/PlanarThreeDMClauseGadget.lean`](LeanTrominoes/PlanarThreeDMClauseGadget.lean)
   gives a smaller paired-port clause relation tailored to that variable cycle.
   Literal ports share one blue exact-one element, while complementary ports
