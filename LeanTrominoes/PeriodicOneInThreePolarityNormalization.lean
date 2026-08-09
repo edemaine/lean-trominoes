@@ -84,6 +84,16 @@ def normalizeClauseFrom {Variable : Type*} (clauseIndex literalStart : Nat)
   (source.zipIdx literalStart).map fun tagged =>
     normalizeLiteral clauseIndex tagged.2 tagged.1
 
+@[simp]
+theorem normalizeClauseFrom_cons {Variable : Type*}
+    (clauseIndex literalStart : Nat)
+    (literal : PeriodicLiteral Variable)
+    (rest : PeriodicClause Variable) :
+    normalizeClauseFrom clauseIndex literalStart (literal :: rest) =
+      normalizeLiteral clauseIndex literalStart literal ::
+        normalizeClauseFrom clauseIndex (literalStart + 1) rest := by
+  rfl
+
 /-- Normalize every literal occurrence in one source clause. -/
 def normalizeClause {Variable : Type*} (clauseIndex : Nat)
     (source : PeriodicClause Variable) :
@@ -101,11 +111,34 @@ def complementClausesFrom {Variable : Type*}
     else
       some (complementClause clauseIndex tagged.2 tagged.1)
 
+@[simp]
+theorem complementClausesFrom_cons {Variable : Type*}
+    (clauseIndex literalStart : Nat)
+    (literal : PeriodicLiteral Variable)
+    (rest : PeriodicClause Variable) :
+    complementClausesFrom clauseIndex literalStart (literal :: rest) =
+      if literal.value = normalizedPolarity literalStart then
+        complementClausesFrom clauseIndex (literalStart + 1) rest
+      else
+        complementClause clauseIndex literalStart literal ::
+          complementClausesFrom clauseIndex (literalStart + 1) rest := by
+  unfold complementClausesFrom
+  by_cases compatible : literal.value = normalizedPolarity literalStart <;>
+    simp [compatible]
+
 /-- All complement clauses belonging to one source clause. -/
 def complementClauses {Variable : Type*} (clauseIndex : Nat)
     (source : PeriodicClause Variable) :
     List (PeriodicClause (PolarityNormalizedVariable Variable)) :=
   complementClausesFrom clauseIndex 0 source
+
+/-- A normalized literal suffix followed by its occurrence-local complement
+clauses, retaining the absolute starting literal index. -/
+def clauseClausesFrom {Variable : Type*}
+    (clauseIndex literalStart : Nat) (source : PeriodicClause Variable) :
+    List (PeriodicClause (PolarityNormalizedVariable Variable)) :=
+  normalizeClauseFrom clauseIndex literalStart source ::
+    complementClausesFrom clauseIndex literalStart source
 
 /-- One normalized clause followed by its occurrence-local complement
 clauses. -/
@@ -114,6 +147,13 @@ def clauseClauses {Variable : Type*} (clauseIndex : Nat)
     List (PeriodicClause (PolarityNormalizedVariable Variable)) :=
   normalizeClause clauseIndex source ::
     complementClauses clauseIndex source
+
+@[simp]
+theorem clauseClausesFrom_zero {Variable : Type*}
+    (clauseIndex : Nat) (source : PeriodicClause Variable) :
+    clauseClausesFrom clauseIndex 0 source =
+      clauseClauses clauseIndex source := by
+  rfl
 
 /-- Normalize every occurrence of a unit-free periodic exact-one formula. -/
 def formula {Variable : Type*} (source : PeriodicCNF Variable) :

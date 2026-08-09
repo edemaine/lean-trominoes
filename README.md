@@ -7099,6 +7099,12 @@ The representation choices for this target are:
   presentation (subdividing the affected incidence routes) and to finish the
   site-wide fixed-green/true strand, whose route cannot be chosen independently
   in each occurrence slot.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean)
+  proves that the same preprocessing preserves the occurrence-three
+  restriction.  Every embedded source variable has exactly its original
+  occurrence count, while each occurrence-indexed fresh complement variable
+  appears at most twice: once in its normalized source clause and once in its
+  binary complement clause.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
