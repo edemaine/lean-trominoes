@@ -750,5 +750,70 @@ theorem
     |>.variableGaugeCanonicalIncidenceRoutes gauge
     |>.relative
 
+/-- Translating each canonical route by its whole-period gauge shift
+preserves route-local simplicity throughout the incidence drawing. -/
+theorem routesSimple_variableGaugeCanonicalIncidenceRoutes
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (gauge : Variable → Cell)
+    (routes : IncidenceRoutes)
+    (simple :
+      ∀ route ∈ (incidenceDrawing source placement routes).edgeRoutes,
+        LocalIncidenceDrawing.RouteIsSimple route) :
+    ∀ route ∈
+        (incidenceDrawing
+          (source.variableGauge gauge)
+          (placement.variableGauge gauge)
+          (variableGaugeCanonicalIncidenceRoutes
+            source placement gauge routes)).edgeRoutes,
+      LocalIncidenceDrawing.RouteIsSimple route := by
+  intro gaugedRoute gaugedRouteMember
+  change gaugedRoute ∈
+    incidenceEdgeRoutes
+      (source.variableGauge gauge)
+      (variableGaugeCanonicalIncidenceRoutes
+        source placement gauge routes)
+    at gaugedRouteMember
+  rw [incidenceEdgeRoutes_eq_metadata_map,
+    erase_variableGauge,
+    PeriodicCNF.incidencesWithMetadata_variableGauge,
+    List.map_map] at gaugedRouteMember
+  rcases List.mem_map.mp gaugedRouteMember with
+    ⟨incidence, incidenceMember, gaugedRouteEq⟩
+  rcases List.mem_iff_getElem.mp incidenceMember with
+    ⟨incidenceIndex, incidenceIndexLt, incidenceAt⟩
+  have taggedMember :
+      (incidence, incidenceIndex) ∈
+        (PeriodicCNF.incidencesWithMetadata source.erase).zipIdx := by
+    rw [List.mem_zipIdx_iff_getElem?, List.getElem?_eq_some_iff]
+    exact ⟨incidenceIndexLt, incidenceAt⟩
+  rcases incidenceMetadata_of_tagged source taggedMember with
+    ⟨clause, _literal, clauseMember, _literalMember, _incidenceEq⟩
+  have sourceRouteMember :
+      routes incidence.clauseIndex incidence.literalIndex ∈
+        (incidenceDrawing source placement routes).edgeRoutes := by
+    change routes incidence.clauseIndex incidence.literalIndex ∈
+      incidenceEdgeRoutes source routes
+    rw [incidenceEdgeRoutes_eq_metadata_map]
+    exact List.mem_map.mpr
+      ⟨incidence, List.fst_mem_of_mem_zipIdx taggedMember, rfl⟩
+  have transportedRouteEq :
+      gaugedRoute =
+        PeriodicOrthocrossing.translatePolyline
+          (placement.translation
+            (variableGaugeCanonicalRouteShift gauge clause))
+          (routes incidence.clauseIndex incidence.literalIndex) := by
+    rw [← gaugedRouteEq]
+    change
+      variableGaugeCanonicalIncidenceRoutes
+          source placement gauge routes
+          incidence.clauseIndex incidence.literalIndex = _
+    exact variableGaugeCanonicalIncidenceRoutes_of_clause_mem
+      source placement gauge routes clauseMember
+  rw [transportedRouteEq]
+  exact routeIsSimple_translate
+    (simple _ sourceRouteMember) _
+
 end PositionedPeriodicCNF
 end LeanTrominoes
