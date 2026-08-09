@@ -86,6 +86,11 @@ build; an imported proof counts when its statement matches the paper.
   single tromino is co-r.e.-complete; the 1.5D problem is PSPACE-complete.
   - [x] Prove co-r.e. membership of the 2D problem for each tromino.
   - [ ] Prove co-r.e.-hardness of the 2D problem for each tromino.
+    - [x] Normalize exact-one literal polarities while preserving
+      satisfiability, occurrence and arity bounds, and the complete
+      halo-bounded ribbon-ready planar presentation.
+    - [ ] Connect the normalized presentation to the planar 3DM ribbon
+      assembly and the I- and L-tromino gadget reductions.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -7095,10 +7100,8 @@ The representation choices for this target are:
   exact-one clause `[fresh = false, original = false]`; the file proves both
   directions of satisfiability preservation, locality, binary-or-ternary
   arity, and the polarity certificate for every generated clause.  The
-  geometric route subdivision is described below; the remaining work is to
-  prove its global separation and planarity properties and to finish the
-  site-wide fixed-green/true strand, whose route cannot be chosen independently
-  in each occurrence slot.
+  geometric route subdivision described below now proves the complete
+  halo-bounded ribbon-ready interface for the normalized formula.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean)
   proves that the same preprocessing preserves the occurrence-three
   restriction.  Every embedded source variable has exactly its original
@@ -7166,6 +7169,27 @@ The representation choices for this target are:
   fundamental-square bounds for the complete vertex list and packages those
   bounds, vertex injectivity, and exact route endpoints into the final finite
   compatibility certificate.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRawRouteBounds.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRawRouteBounds.lean)
+  classifies every split incidence as a fragment of one refined source route.
+  It cancels each fragment's canonical lattice shift after rebasing and
+  transports the source route's open-halo bound to all raw normalized routes.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRawLiftedSeparation.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRawLiftedSeparation.lean)
+  combines fragment provenance, source simplicity, and translated source-route
+  separation to prove complete lifted separation and simplicity for the raw
+  normalized route family.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationEndpointContacts.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationEndpointContacts.lean)
+  transports raw relative separation and simplicity through the final
+  fresh-variable gauge, yielding endpoint-only listed-point contacts for the
+  final normalized drawing.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationHaloBounds.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationHaloBounds.lean)
+  transports the raw halo certificate through that gauge.  Embedded-original
+  routes have zero gauge; on fresh-variable routes the inverse gauge cancels
+  the occurrence offset, leaving only the first three bounded refined-route
+  vertices.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRibbonReadyPresentation.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRibbonReadyPresentation.lean)
+  packages continuous planarity, halo bounds, and endpoint-only contacts as
+  the complete `HaloBoundedRibbonReadyIncidencePresentation` consumed by the
+  planar 3DM ribbon construction.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
