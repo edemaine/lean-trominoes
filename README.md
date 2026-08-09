@@ -6621,6 +6621,11 @@ The representation choices for this target are:
   element (equivalently, each degree-three element) has exactly three
   contracted endpoint occurrences, while all other element blocks
   contribute zero ends to that vertex.
+- [`LeanTrominoes/PeriodicThreeDMContractedEndpointRays.lean`](LeanTrominoes/PeriodicThreeDMContractedEndpointRays.lean)
+  realizes each contracted source or target end as the actual first
+  axis-aligned segment leaving the base vertex occurrence.  Target rays are
+  reversed and period-translated back from their stored endpoint, while
+  retaining the indexed segment occurrence needed for planarity arguments.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose

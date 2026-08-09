@@ -91,6 +91,28 @@ theorem sum_range_indicator
         rw [allZero]
         simp
 
+/-- The unique selected index can additionally carry a decidable local
+predicate known to hold there. -/
+theorem sum_range_indicator_and
+    (bound wanted weight : Nat) (predicate : Nat → Prop)
+    [DecidablePred predicate]
+    (wantedLt : wanted < bound) (wantedHolds : predicate wanted) :
+    ((List.range bound).map fun index =>
+      if index = wanted ∧ predicate index then weight else 0).sum = weight := by
+  have pointwise :
+      (List.range bound).map (fun index =>
+        if index = wanted ∧ predicate index then weight else 0) =
+      (List.range bound).map (fun index =>
+        if index = wanted then weight else 0) := by
+    apply List.map_congr_left
+    intro index indexMember
+    by_cases equal : index = wanted
+    · subst index
+      simp [wantedHolds]
+    · simp [equal]
+  rw [pointwise]
+  exact sum_range_indicator bound wanted weight wantedLt
+
 /-- The complete contracted graph has degree three at every retained
 monochromatic element vertex. -/
 theorem contractedGraph_element_degree_eq_three
@@ -131,71 +153,20 @@ theorem contractedGraph_element_degree_eq_three
     _ = 3 := by
       cases color with
       | red =>
-        simp only [incidenceColors, List.map_cons, List.map_nil,
-          List.sum_cons, List.sum_nil, Nat.add_zero]
-        rw [show
-          ((List.range problem.redCount).map fun blockAtom =>
-            if WireColor.red = WireColor.red ∧ blockAtom = atom ∧
-                problem.degree .red blockAtom = 3 then 3 else 0).sum = 3 by
-              have pointwise :
-                  (List.range problem.redCount).map (fun blockAtom =>
-                    if WireColor.red = WireColor.red ∧ blockAtom = atom ∧
-                        problem.degree .red blockAtom = 3 then 3 else 0) =
-                    (List.range problem.redCount).map (fun blockAtom =>
-                      if blockAtom = atom then 3 else 0) := by
-                apply List.map_congr_left
-                intro blockAtom blockAtomMember
-                by_cases equal : blockAtom = atom
-                · subst blockAtom
-                  simp [degree]
-                · simp [equal]
-              rw [pointwise]
-              exact sum_range_indicator problem.redCount atom 3 atomLt]
-        simp
+          simpa [incidenceColors, PeriodicThreeDM.elementCount] using
+            sum_range_indicator_and problem.redCount atom 3
+              (fun blockAtom => problem.degree .red blockAtom = 3)
+              atomLt degree
       | green =>
-        simp only [incidenceColors, List.map_cons, List.map_nil,
-          List.sum_cons, List.sum_nil, Nat.add_zero]
-        rw [show
-          ((List.range problem.greenCount).map fun blockAtom =>
-            if WireColor.green = WireColor.green ∧ blockAtom = atom ∧
-                problem.degree .green blockAtom = 3 then 3 else 0).sum = 3 by
-              have pointwise :
-                  (List.range problem.greenCount).map (fun blockAtom =>
-                    if WireColor.green = WireColor.green ∧ blockAtom = atom ∧
-                        problem.degree .green blockAtom = 3 then 3 else 0) =
-                    (List.range problem.greenCount).map (fun blockAtom =>
-                      if blockAtom = atom then 3 else 0) := by
-                apply List.map_congr_left
-                intro blockAtom blockAtomMember
-                by_cases equal : blockAtom = atom
-                · subst blockAtom
-                  simp [degree]
-                · simp [equal]
-              rw [pointwise]
-              exact sum_range_indicator problem.greenCount atom 3 atomLt]
-        simp
+          simpa [incidenceColors, PeriodicThreeDM.elementCount] using
+            sum_range_indicator_and problem.greenCount atom 3
+              (fun blockAtom => problem.degree .green blockAtom = 3)
+              atomLt degree
       | blue =>
-        simp only [incidenceColors, List.map_cons, List.map_nil,
-          List.sum_cons, List.sum_nil, Nat.add_zero]
-        rw [show
-          ((List.range problem.blueCount).map fun blockAtom =>
-            if WireColor.blue = WireColor.blue ∧ blockAtom = atom ∧
-                problem.degree .blue blockAtom = 3 then 3 else 0).sum = 3 by
-              have pointwise :
-                  (List.range problem.blueCount).map (fun blockAtom =>
-                    if WireColor.blue = WireColor.blue ∧ blockAtom = atom ∧
-                        problem.degree .blue blockAtom = 3 then 3 else 0) =
-                    (List.range problem.blueCount).map (fun blockAtom =>
-                      if blockAtom = atom then 3 else 0) := by
-                apply List.map_congr_left
-                intro blockAtom blockAtomMember
-                by_cases equal : blockAtom = atom
-                · subst blockAtom
-                  simp [degree]
-                · simp [equal]
-              rw [pointwise]
-              exact sum_range_indicator problem.blueCount atom 3 atomLt]
-        simp
+          simpa [incidenceColors, PeriodicThreeDM.elementCount] using
+            sum_range_indicator_and problem.blueCount atom 3
+              (fun blockAtom => problem.degree .blue blockAtom = 3)
+              atomLt degree
 
 /-- Every retained monochromatic vertex has exactly three executable
 endpoint occurrences. -/
