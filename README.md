@@ -6607,6 +6607,11 @@ The representation choices for this target are:
   It selects the unique unused cardinal side and proves that the Figure 2
   permutation transports all three old edge colors, including both the
   monochromatic and distinct-RGB cases, to the canonical ports.
+- [`LeanTrominoes/PeriodicThreeDMContractedEndpointFans.lean`](LeanTrominoes/PeriodicThreeDMContractedEndpointFans.lean)
+  enumerates the source and target ends of the executable contracted 3DM
+  edges, carrying their vertex, color, route, and outward direction.  It
+  proves contraction creates no prototype loops and that every actual end
+  has a genuine cardinal direction in the certified orthogonal drawing.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
