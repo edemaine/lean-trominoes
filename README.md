@@ -6725,6 +6725,11 @@ The representation choices for this target are:
   four-point route window compiles to adjacent routing cells with matching
   colored ports, assuming only the remaining global assignment-collision
   certificate.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationDrawing.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationDrawing.lean)
+  packages the final normalized positions and routes as a standard
+  `PeriodicGridDrawing`, with exact vertex/edge lookup lemmas and the proved
+  unit-step invariant.  This occurrence-indexed drawing is the interface for
+  the remaining global separation and assignment-collision proof.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
