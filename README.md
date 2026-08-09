@@ -6592,6 +6592,11 @@ The representation choices for this target are:
   intersection, and segment provenance transports any alleged contracted
   overlap to two distinct original occurrences, contradicting the source
   certificate.
+- [`LeanTrominoes/DegreeThreeVertexNormalizationTemplates.lean`](LeanTrominoes/DegreeThreeVertexNormalizationTemplates.lean)
+  transcribes the four `6 × 6` replacement templates and the cyclic
+  port-rotation template from Lemma 2.3.  Finite computation verifies exact
+  endpoints, unit rectilinear steps, square containment, the omitted-side
+  permutation, and disjointness away from the common vertex center.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
