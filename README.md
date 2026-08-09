@@ -7112,6 +7112,13 @@ The representation choices for this target are:
   with the two new vertex positions abstracted for the planar route layer.
   Erasure is proved equal to the logical normalization, so satisfiability,
   locality, arity, polarity, and occurrence bounds transfer immediately.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteSubdivision.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteSubdivision.lean)
+  begins the geometric realization of that three-edge path.  It
+  anchor-normalizes and refines each source route by a factor of three, proving
+  that two interior unit-subdivision points are available.  The fresh
+  complement variable and binary clause occupy those points, while a
+  fresh-only variable gauge makes the fresh literal offset zero and preserves
+  both physical placement and exact-one satisfiability.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
