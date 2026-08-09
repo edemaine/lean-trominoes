@@ -1,4 +1,5 @@
 import LeanTrominoes.OrthogonalPolylineScaling
+import LeanTrominoes.OrthogonalPolylineNoImmediateReversalJoin
 import LeanTrominoes.OrthogonalPolylineUnitSubdivisionJoin
 import LeanTrominoes.PeriodicGridDrawingNoImmediateReversal
 import LeanTrominoes.PeriodicThreeDMContractionContinuousPlanarity
@@ -807,6 +808,28 @@ theorem trimmedMagnifiedRoute_reverse_tail_head?_of_endpoints
   rw [equation]
   exact trimmedMagnifiedRoute_reverse_tail_head?_of_append_pair
     leading before last aligned
+
+/-- Exact initial and second-point lookups identify a route's first
+direction. -/
+theorem polylineFirstDirection_eq_between_of_endpoints
+    (points : List Cell) {first second : Cell}
+    (headLookup : points.head? = some first)
+    (secondLookup : points.tail.head? = some second) :
+    AxisDirection.polylineFirstDirection points =
+      AxisDirection.between first second := by
+  cases points with
+  | nil => simp at headLookup
+  | cons actualFirst rest =>
+      cases rest with
+      | nil => simp at secondLookup
+      | cons actualSecond rest =>
+          have firstEqual : actualFirst = first :=
+            Option.some.inj headLookup
+          have secondEqual : actualSecond = second := by
+            simpa using Option.some.inj secondLookup
+          subst actualFirst
+          subst actualSecond
+          rfl
 
 /-- Exact final and penultimate lookups identify the final direction of an
 orthogonal route. -/
@@ -1733,6 +1756,216 @@ theorem trimmedMagnifiedRoute_hasNoImmediateReversal
   exact hasNoImmediateReversal_take
     (hasNoImmediateReversal_drop
       (magnifiedUnitRoute_hasNoImmediateReversal orthogonal noReversal) 3) _
+
+/-- A complete normalization splice is nonreversing when its local templates
+finish in the two old endpoint directions. -/
+theorem normalizeRouteWithTemplates_hasNoImmediateReversal
+    (sourcePosition targetPosition : Cell)
+    (sourceTemplate targetTemplate oldRoute : List Cell)
+    {sourceNext targetBefore : Cell}
+    {sourceDirection targetDirection : AxisDirection}
+    (oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute)
+    (oldNoReversal : AxisDirection.HasNoImmediateReversal oldRoute)
+    (oldHead : oldRoute.head? = some sourcePosition)
+    (oldSourceNext : oldRoute.tail.head? = some sourceNext)
+    (oldTarget : oldRoute.getLast? = some targetPosition)
+    (oldTargetBefore : oldRoute.reverse.tail.head? = some targetBefore)
+    (sourceAligned :
+      (GridSegment.mk sourcePosition sourceNext).IsAxisAligned)
+    (targetAligned :
+      (GridSegment.mk targetBefore targetPosition).IsAxisAligned)
+    (sourceDirectionEq :
+      AxisDirection.between sourcePosition sourceNext = sourceDirection)
+    (targetDirectionEq :
+      AxisDirection.between targetPosition targetBefore = targetDirection)
+    (sourceLength : 2 ≤ sourceTemplate.length)
+    (targetLength : 2 ≤ targetTemplate.length)
+    (sourceUnitSteps :
+      sourceTemplate.IsChain AxisDirection.IsUnitAxisStep)
+    (targetUnitSteps :
+      targetTemplate.IsChain AxisDirection.IsUnitAxisStep)
+    (sourceNoReversal :
+      AxisDirection.HasNoImmediateReversal sourceTemplate)
+    (targetNoReversal :
+      AxisDirection.HasNoImmediateReversal targetTemplate)
+    (sourceLast : sourceTemplate.getLast? =
+      some (Cell.add center (Cell.scale 3 sourceDirection.step)))
+    (targetLast : targetTemplate.getLast? =
+      some (Cell.add center (Cell.scale 3 targetDirection.step)))
+    (sourceLastDirection :
+      AxisDirection.polylineLastDirection sourceTemplate = sourceDirection)
+    (targetLastDirection :
+      AxisDirection.polylineLastDirection targetTemplate = targetDirection) :
+    AxisDirection.HasNoImmediateReversal
+      (normalizeRouteWithTemplates sourcePosition targetPosition
+        sourceTemplate targetTemplate oldRoute) := by
+  let sourceRoute := normalizationTemplateAt sourcePosition sourceTemplate
+  let middleRoute := trimmedMagnifiedRoute oldRoute
+  let translatedTarget :=
+    normalizationTemplateAt targetPosition targetTemplate
+  let targetRoute := translatedTarget.reverse
+  let innerRoute := joinAtEndpoint middleRoute targetRoute
+  have oldLength : 2 ≤ oldRoute.length :=
+    List.two_le_length_of_tail_head?_eq_some oldSourceNext
+  have sourceRouteUnitSteps :
+      sourceRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    normalizationTemplateAt_unitSteps sourcePosition sourceUnitSteps
+  have middleRouteUnitSteps :
+      middleRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    trimmedMagnifiedRoute_unitSteps oldOrthogonal
+  have translatedTargetUnitSteps :
+      translatedTarget.IsChain AxisDirection.IsUnitAxisStep :=
+    normalizationTemplateAt_unitSteps targetPosition targetUnitSteps
+  have targetRouteUnitSteps :
+      targetRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    unitSteps_reverse translatedTargetUnitSteps
+  have sourceRouteOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline sourceRoute :=
+    sourceRouteUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have middleRouteOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline middleRoute :=
+    middleRouteUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have translatedTargetOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline translatedTarget :=
+    translatedTargetUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have targetRouteOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline targetRoute :=
+    targetRouteUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have sourceRouteNoReversal :
+      AxisDirection.HasNoImmediateReversal sourceRoute :=
+    normalizationTemplateAt_hasNoImmediateReversal
+      sourcePosition sourceNoReversal
+  have middleRouteNoReversal :
+      AxisDirection.HasNoImmediateReversal middleRoute :=
+    trimmedMagnifiedRoute_hasNoImmediateReversal
+      oldOrthogonal oldNoReversal
+  have translatedTargetNoReversal :
+      AxisDirection.HasNoImmediateReversal translatedTarget :=
+    normalizationTemplateAt_hasNoImmediateReversal
+      targetPosition targetNoReversal
+  have targetRouteNoReversal :
+      AxisDirection.HasNoImmediateReversal targetRoute :=
+    translatedTargetNoReversal.reverse translatedTargetOrthogonal
+  have middleLength : 2 ≤ middleRoute.length :=
+    le_trans (by omega)
+      (trimmedMagnifiedRoute_length_ge_seven_of_length_ge_two
+        oldLength oldOrthogonal)
+  have sourceRouteLength : 2 ≤ sourceRoute.length := by
+    simpa [sourceRoute, normalizationTemplateAt_length] using sourceLength
+  have translatedTargetLength : 2 ≤ translatedTarget.length := by
+    simpa [translatedTarget, normalizationTemplateAt_length] using targetLength
+  have targetRouteLength : 2 ≤ targetRoute.length := by
+    simpa [targetRoute] using translatedTargetLength
+  have sourceRouteLast : sourceRoute.getLast? =
+      some (Cell.add (normalizeVertexPosition sourcePosition)
+        (Cell.scale 3 sourceDirection.step)) :=
+    normalizationTemplateAt_getLast?_of_three_steps
+      sourcePosition sourceLast
+  have middleRouteHead : middleRoute.head? =
+      some (Cell.add (normalizeVertexPosition sourcePosition)
+        (Cell.scale 3 sourceDirection.step)) := by
+    rw [← sourceDirectionEq]
+    exact trimmedMagnifiedRoute_head?_of_endpoints
+      oldRoute oldHead oldSourceNext sourceAligned
+  have middleRouteLast : middleRoute.getLast? =
+      some (Cell.add (normalizeVertexPosition targetPosition)
+        (Cell.scale 3 targetDirection.step)) := by
+    rw [← targetDirectionEq]
+    exact trimmedMagnifiedRoute_getLast?_of_endpoints
+      oldRoute oldTarget oldTargetBefore targetAligned
+  have targetRouteHead : targetRoute.head? =
+      some (Cell.add (normalizeVertexPosition targetPosition)
+        (Cell.scale 3 targetDirection.step)) := by
+    simp only [targetRoute, List.head?_reverse]
+    exact normalizationTemplateAt_getLast?_of_three_steps
+      targetPosition targetLast
+  have sourceRouteLastDirection :
+      AxisDirection.polylineLastDirection sourceRoute = sourceDirection := by
+    simpa [sourceRoute, normalizationTemplateAt] using sourceLastDirection
+  have middleRouteFirstDirection :
+      AxisDirection.polylineFirstDirection middleRoute = sourceDirection := by
+    rw [trimmedMagnifiedRoute_firstDirection oldLength oldOrthogonal]
+    rw [polylineFirstDirection_eq_between_of_endpoints
+      oldRoute oldHead oldSourceNext]
+    exact sourceDirectionEq
+  have sourceGenuine : sourceDirection.IsGenuine := by
+    rw [← sourceDirectionEq]
+    exact AxisDirection.between_isGenuine_of_axisAligned sourceAligned
+  have sourceCompatible :
+      AxisDirection.polylineFirstDirection middleRoute ≠
+        (AxisDirection.polylineLastDirection sourceRoute).opposite := by
+    rw [middleRouteFirstDirection, sourceRouteLastDirection]
+    exact AxisDirection.ne_opposite_of_isGenuine sourceGenuine
+  have translatedTargetLastDirection :
+      AxisDirection.polylineLastDirection translatedTarget =
+        targetDirection := by
+    simpa [translatedTarget, normalizationTemplateAt] using
+      targetLastDirection
+  have targetRouteFirstDirection :
+      AxisDirection.polylineFirstDirection targetRoute =
+        targetDirection.opposite := by
+    have oppositeEquality := congrArg AxisDirection.opposite
+      translatedTargetLastDirection
+    simpa [targetRoute, AxisDirection.polylineLastDirection] using
+      oppositeEquality
+  have middleRouteLastDirection :
+      AxisDirection.polylineLastDirection middleRoute =
+        targetDirection.opposite := by
+    rw [trimmedMagnifiedRoute_lastDirection oldLength oldOrthogonal]
+    rw [polylineLastDirection_eq_between_of_endpoints
+      oldRoute oldOrthogonal oldTarget oldTargetBefore]
+    have reversed := AxisDirection.between_reverse_eq_opposite
+      (AxisDirection.between_isGenuine_of_axisAligned targetAligned)
+    rw [targetDirectionEq] at reversed
+    have oppositeEquality := congrArg AxisDirection.opposite reversed
+    simpa using oppositeEquality.symm
+  have targetGenuine : targetDirection.IsGenuine := by
+    rw [← targetDirectionEq]
+    apply AxisDirection.between_isGenuine_of_axisAligned
+    rcases targetAligned with horizontal | vertical
+    · exact Or.inl ⟨horizontal.1.symm, horizontal.2.symm⟩
+    · exact Or.inr ⟨vertical.1.symm, vertical.2.symm⟩
+  have targetCompatible :
+      AxisDirection.polylineFirstDirection targetRoute ≠
+        (AxisDirection.polylineLastDirection middleRoute).opposite := by
+    rw [targetRouteFirstDirection, middleRouteLastDirection,
+      AxisDirection.opposite_opposite]
+    simpa using AxisDirection.ne_opposite_of_isGenuine
+      (AxisDirection.opposite_isGenuine targetGenuine)
+  have innerNoReversal : AxisDirection.HasNoImmediateReversal innerRoute :=
+    AxisDirection.HasNoImmediateReversal.joinAtEndpoint_of_compatible
+      middleRouteNoReversal targetRouteNoReversal
+      middleRouteOrthogonal targetRouteOrthogonal
+      middleLength targetRouteLength middleRouteLast targetRouteHead
+      targetCompatible
+  have innerUnitSteps : innerRoute.IsChain AxisDirection.IsUnitAxisStep :=
+    List.IsChain.joinAtEndpoint middleRouteUnitSteps targetRouteUnitSteps
+      middleRouteLast targetRouteHead
+  have innerOrthogonal : PeriodicOrthocrossing.OrthogonalPolyline innerRoute :=
+    innerUnitSteps.imp fun _ _ step => step.isAxisAligned
+  have innerLength : 2 ≤ innerRoute.length := by
+    simp only [innerRoute, joinAtEndpoint, List.length_append,
+      List.length_tail]
+    omega
+  have innerHead : innerRoute.head? =
+      some (Cell.add (normalizeVertexPosition sourcePosition)
+        (Cell.scale 3 sourceDirection.step)) :=
+    joinAtEndpoint_head? middleRouteHead
+  have innerFirstDirection :
+      AxisDirection.polylineFirstDirection innerRoute = sourceDirection := by
+    rw [AxisDirection.polylineFirstDirection_joinAtEndpoint middleLength]
+    exact middleRouteFirstDirection
+  have outerCompatible :
+      AxisDirection.polylineFirstDirection innerRoute ≠
+        (AxisDirection.polylineLastDirection sourceRoute).opposite := by
+    rw [innerFirstDirection, sourceRouteLastDirection]
+    exact AxisDirection.ne_opposite_of_isGenuine sourceGenuine
+  unfold normalizeRouteWithTemplates
+  exact AxisDirection.HasNoImmediateReversal.joinAtEndpoint_of_compatible
+    sourceRouteNoReversal innerNoReversal
+    sourceRouteOrthogonal innerOrthogonal
+    sourceRouteLength innerLength sourceRouteLast innerHead outerCompatible
 
 /-- Continuous planarity excludes immediate reversals from every emitted
 contracted edge route. -/

@@ -6715,7 +6715,8 @@ The representation choices for this target are:
   cyclic-rotation templates are also certified nonreversing, with their final
   directed steps identified as the exact incoming old endpoint directions;
   trimming is now proved to preserve both endpoint directions as well.  These
-  are the local facts needed to verify both splice boundaries.
+  facts feed a generic two-ended splice theorem proving that neither join can
+  introduce an immediate reversal.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
