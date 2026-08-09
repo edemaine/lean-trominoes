@@ -108,5 +108,77 @@ theorem RawRouteFragment.endpointSubroute
                         · right
                           simpa using sourceLast
 
+/-- Selecting any of the four raw fragments preserves route-local
+simplicity. -/
+theorem RawRouteFragment.routeIsSimple
+    (fragment : RawRouteFragment)
+    (route : List Cell)
+    (length : 4 ≤ route.length)
+    (simple : LocalIncidenceDrawing.RouteIsSimple route) :
+    LocalIncidenceDrawing.RouteIsSimple (fragment.select route) := by
+  cases route with
+  | nil => simp at length
+  | cons first rest =>
+      cases rest with
+      | nil => simp at length
+      | cons second rest =>
+          cases rest with
+          | nil => simp at length
+          | cons third rest =>
+              cases rest with
+              | nil => simp at length
+              | cons fourth rest =>
+                  cases fragment with
+                  | whole => exact simple
+                  | «prefix» =>
+                      have subroute := RawRouteFragment.endpointSubroute
+                        .prefix (first :: second :: third :: fourth :: rest)
+                        length simple.1
+                      refine ⟨?_, ?_, ?_⟩
+                      · have firstNeSecond : first ≠ second := by
+                          intro equal
+                          exact (List.nodup_cons.mp simple.1).1
+                            (by simp [equal])
+                        simp [RawRouteFragment.select, firstNeSecond]
+                      · intro point pointMember segment segmentMember
+                        exact
+                          (routeIsSimple_endpointSubroutePointsAvoidInteriors
+                            simple subroute subroute).not_interior_of_mem
+                              pointMember segmentMember
+                      · intro firstSegment firstMember
+                          secondSegment secondMember indicesDifferent
+                        simp [RawRouteFragment.select,
+                          gridPolylineSegments] at firstMember secondMember
+                        subst firstSegment
+                        subst secondSegment
+                        exact (indicesDifferent rfl).elim
+                  | middle =>
+                      have subroute := RawRouteFragment.endpointSubroute
+                        .middle (first :: second :: third :: fourth :: rest)
+                        length simple.1
+                      refine ⟨?_, ?_, ?_⟩
+                      · have secondNeThird : second ≠ third := by
+                          intro equal
+                          exact (List.nodup_cons.mp
+                            (List.nodup_cons.mp simple.1).2).1
+                              (by simp [equal])
+                        simp [RawRouteFragment.select, secondNeThird,
+                          Ne.symm secondNeThird]
+                      · intro point pointMember segment segmentMember
+                        exact
+                          (routeIsSimple_endpointSubroutePointsAvoidInteriors
+                            simple subroute subroute).not_interior_of_mem
+                              pointMember segmentMember
+                      · intro firstSegment firstMember
+                          secondSegment secondMember indicesDifferent
+                        simp [RawRouteFragment.select,
+                          gridPolylineSegments] at firstMember secondMember
+                        subst firstSegment
+                        subst secondSegment
+                        exact (indicesDifferent rfl).elim
+                  | suffix =>
+                      simpa [RawRouteFragment.select, List.drop] using
+                        simple.tail.tail
+
 end PeriodicOneInThreePolarityNormalizationRouteSubdivision
 end LeanTrominoes
