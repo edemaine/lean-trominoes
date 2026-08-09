@@ -1993,5 +1993,129 @@ theorem ContinuousPlanarPresentation.contractedEdgeRoute_hasNoImmediateReversal
     exact (List.mem_zipIdx' routeMember).2.symm
   simpa [lookup] using stored
 
+/-- The Figure 2 replacement preserves nonreversal for every contracted edge
+route. -/
+theorem ContinuousPlanarPresentation.normalizationRoute1_hasNoImmediateReversal
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges) :
+    AxisDirection.HasNoImmediateReversal
+      (presentation.toPlanarPresentation.normalizationRoute1 edge) := by
+  let planar := presentation.toPlanarPresentation
+  let oldRoute := planar.contractedEdgeRoute edge
+  let sourceEndpoint := ContractedEndpoint.source edge
+  let targetEndpoint := ContractedEndpoint.target edge
+  have sourceMember : sourceEndpoint ∈ problem.contractedEndpoints := by
+    simp [sourceEndpoint, contractedEndpoints, edgeMember]
+  have targetMember : targetEndpoint ∈ problem.contractedEndpoints := by
+    simp [targetEndpoint, contractedEndpoints, edgeMember]
+  have routeLength : 2 ≤ oldRoute.length :=
+    planar.contractedEdgeRoute_length_ge_two degree edgeMember
+  have oldOrthogonal :
+      PeriodicOrthocrossing.OrthogonalPolyline oldRoute :=
+    planar.contractedEdgeRoute_orthogonal_of_mem edgeMember
+  have oldNoReversal : AxisDirection.HasNoImmediateReversal oldRoute :=
+    presentation.contractedEdgeRoute_hasNoImmediateReversal
+      degree edgeMember
+  obtain ⟨first, second, rest, sourceEquation⟩ :=
+    List.exists_eq_cons_cons_of_length_ge_two routeLength
+  obtain ⟨leading, before, last, targetEquation⟩ :=
+    AxisDirection.exists_eq_append_pair_of_length_ge_two routeLength
+  have endpoints :=
+    planar.contractedEdgeRoute_normalizationEndpoints edgeMember
+  have firstEqual : first =
+      planar.normalizationPosition0 edge.toPeriodicEdge.source := by
+    have oldHead := endpoints.1
+    change oldRoute.head? = _ at oldHead
+    rw [sourceEquation] at oldHead
+    exact Option.some.inj oldHead
+  have lastEqual : last = planar.normalizationTarget0 edge := by
+    have oldLast := endpoints.2
+    change oldRoute.getLast? = _ at oldLast
+    rw [targetEquation] at oldLast
+    apply Option.some.inj
+    simpa using oldLast
+  subst first
+  subst last
+  have sourceAligned :
+      (GridSegment.mk
+        (planar.normalizationPosition0 edge.toPeriodicEdge.source)
+        second).IsAxisAligned := by
+    rw [sourceEquation] at oldOrthogonal
+    exact (List.isChain_cons_cons.mp oldOrthogonal).1
+  have targetAligned :
+      (GridSegment.mk before (planar.normalizationTarget0 edge)).IsAxisAligned := by
+    rw [targetEquation] at oldOrthogonal
+    exact (List.isChain_append_cons_cons.mp oldOrthogonal).2.1
+  have sourceDirection :
+      AxisDirection.between
+          (planar.normalizationPosition0 edge.toPeriodicEdge.source) second =
+        (sourceEndpoint.outwardSide planar).direction := by
+    rw [sourceEndpoint.outwardSide_direction planar degree sourceMember]
+    change AxisDirection.between
+        (planar.normalizationPosition0 edge.toPeriodicEdge.source) second =
+      AxisDirection.polylineFirstDirection oldRoute
+    rw [sourceEquation]
+    rfl
+  have targetDirection :
+      AxisDirection.between (planar.normalizationTarget0 edge) before =
+        (targetEndpoint.outwardSide planar).direction := by
+    rw [targetEndpoint.outwardSide_direction planar degree targetMember]
+    change AxisDirection.between (planar.normalizationTarget0 edge) before =
+      (AxisDirection.polylineLastDirection oldRoute).opposite
+    rw [targetEquation]
+    rw [AxisDirection.polylineLastDirection_append_pair_of_axisAligned
+      leading targetAligned]
+    exact AxisDirection.between_reverse_eq_opposite
+      (AxisDirection.between_isGenuine_of_axisAligned targetAligned)
+  have sourceUsed := sourceEndpoint.outwardSide_ne_omittedSideAt
+    presentation wellFormed degree sourceMember
+  have targetUsed := targetEndpoint.outwardSide_ne_omittedSideAt
+    presentation wellFormed degree targetMember
+  have sourceGeometry :=
+    sourceEndpoint.firstNormalizationTemplate_geometry planar
+  have targetGeometry :=
+    targetEndpoint.firstNormalizationTemplate_geometry planar
+  unfold PlanarPresentation.normalizationRoute1
+  apply normalizeRouteWithTemplates_hasNoImmediateReversal
+    (sourceNext := second) (targetBefore := before)
+    (sourceDirection := (sourceEndpoint.outwardSide planar).direction)
+    (targetDirection := (targetEndpoint.outwardSide planar).direction)
+  · exact oldOrthogonal
+  · exact oldNoReversal
+  · change oldRoute.head? = _
+    rw [sourceEquation]
+    simp [planar]
+  · change oldRoute.tail.head? = _
+    rw [sourceEquation]
+    simp
+  · change oldRoute.getLast? = _
+    rw [targetEquation]
+    simp [planar]
+  · change oldRoute.reverse.tail.head? = _
+    rw [targetEquation]
+    simp
+  · exact sourceAligned
+  · exact targetAligned
+  · exact sourceDirection
+  · exact targetDirection
+  · exact le_trans (by omega) sourceGeometry.2.1
+  · exact le_trans (by omega) targetGeometry.2.1
+  · exact sourceEndpoint.firstNormalizationTemplate_unitSteps planar
+  · exact targetEndpoint.firstNormalizationTemplate_unitSteps planar
+  · exact sourceEndpoint.firstNormalizationTemplate_noImmediateReversal planar
+  · exact targetEndpoint.firstNormalizationTemplate_noImmediateReversal planar
+  · exact sourceEndpoint.firstNormalizationTemplate_getLast?
+      planar sourceUsed
+  · exact targetEndpoint.firstNormalizationTemplate_getLast?
+      planar targetUsed
+  · exact sourceEndpoint.firstNormalizationTemplate_lastDirection
+      planar sourceUsed
+  · exact targetEndpoint.firstNormalizationTemplate_lastDirection
+      planar targetUsed
+
 end PeriodicThreeDM
 end LeanTrominoes

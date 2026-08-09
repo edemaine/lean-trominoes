@@ -6716,7 +6716,9 @@ The representation choices for this target are:
   directed steps identified as the exact incoming old endpoint directions;
   trimming is now proved to preserve both endpoint directions as well.  These
   facts feed a generic two-ended splice theorem proving that neither join can
-  introduce an immediate reversal.
+  introduce an immediate reversal.  The theorem has been instantiated for
+  the Figure 2 replacement, so every first-round `normalizationRoute1` is now
+  nonreversing as well as unit-step.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
