@@ -4502,6 +4502,11 @@ The representation choices for this target are:
   presentation.  Every colored element has degree two or three, and both
   perfect matching and abstract trichromatic orientation are proved
   equivalent to satisfiability of the original local periodic CNF.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonContraction.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonContraction.lean)
+  suppresses every degree-two colored element in that concrete endpoint.
+  The resulting executable colored graph has a compatible, orthogonal, and
+  continuously planar drawing, and its suppressed orientation predicate is
+  still equivalent to satisfiability of the original periodic CNF.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitAngularBoundaryRoutes.lean)
   isolates the remaining global obligation for copied source incidences:
   route each copied clause to its angular fan boundary.  Joining any such
