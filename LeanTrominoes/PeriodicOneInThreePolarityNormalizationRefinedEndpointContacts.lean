@@ -114,9 +114,9 @@ theorem scaledSource_liftedRoutesAvoidEachOther
   exact PeriodicGridDrawing.liftedRoutesAvoidEachOther_scale
     refinementFactor_positive sourceDrawing sourceLifted
 
-/-- The refined source route family has no listed-point contacts except at
-the outer endpoints of both complete refined routes. -/
-theorem refinedRouteFamily_routePointsMeetOnlyAtEndpoints
+/-- The complete refined route family inherits complete lifted separation
+after ordered unit subdivision. -/
+theorem refinedRouteFamily_liftedRoutesAvoidEachOther
     {Variable : Type*} [DecidableEq Variable]
     {source : PositionedPeriodicCNF Variable}
     {sourcePlacement : PeriodicVariablePlacement Variable}
@@ -131,7 +131,7 @@ theorem refinedRouteFamily_routePointsMeetOnlyAtEndpoints
       (refinedPlacement sourcePlacement)
       (refinedRouteFamily
         presentation.toContinuousPlanarIncidencePresentation).routes)
-        |>.RoutePointsMeetOnlyAtEndpoints := by
+        |>.LiftedRoutesAvoidEachOther := by
   let continuous := presentation.toContinuousPlanarIncidencePresentation
   let scaled := scaledSourcePresentation continuous
   let scaledDrawing := PositionedPeriodicCNF.incidenceDrawing
@@ -167,10 +167,80 @@ theorem refinedRouteFamily_routePointsMeetOnlyAtEndpoints
     exact PeriodicGridDrawing.routesSimple_scale
       refinementFactor_positive _ sourceSimple
   rw [refinedIncidenceDrawing_eq_scaled_unitSubdivide continuous]
-  exact
-    PeriodicGridDrawing.routePointsMeetOnlyAtEndpoints_unitSubdivide
-      scaledDrawing scaledSeparated scaledOrthogonal
+  exact PeriodicGridDrawing.liftedRoutesAvoidEachOther_unitSubdivide
+    scaledDrawing scaledSeparated scaledOrthogonal
       scaledNonempty scaledSimple
+
+/-- Every complete refined route remains simple after scaling and ordered
+unit subdivision. -/
+theorem refinedRouteFamily_routesSimple
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {sourcePlacement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.HaloBoundedRibbonReadyIncidencePresentation
+        source sourcePlacement) :
+    ∀ route ∈
+        (PositionedPeriodicCNF.incidenceDrawing
+          (refinedSource source sourcePlacement)
+          (refinedPlacement sourcePlacement)
+          (refinedRouteFamily
+            presentation.toContinuousPlanarIncidencePresentation).routes)
+          |>.edgeRoutes,
+      LocalIncidenceDrawing.RouteIsSimple route := by
+  let continuous := presentation.toContinuousPlanarIncidencePresentation
+  let scaled := scaledSourcePresentation continuous
+  let scaledDrawing := PositionedPeriodicCNF.incidenceDrawing
+    (refinedSource source sourcePlacement)
+    (refinedPlacement sourcePlacement) scaled.routes
+  have scaledOrthogonal : scaledDrawing.IsOrthogonal := scaled.orthogonal
+  have scaledLengths : ∀ route ∈ scaledDrawing.edgeRoutes,
+      2 ≤ route.length :=
+    scaled.toPlanarIncidencePresentation.routes_length_ge_two
+  have scaledNonempty : ∀ route ∈ scaledDrawing.edgeRoutes,
+      route ≠ [] := by
+    intro route routeMember routeEmpty
+    have length := scaledLengths route routeMember
+    rw [routeEmpty] at length
+    simp at length
+  have scaledSimple : ∀ route ∈ scaledDrawing.edgeRoutes,
+      LocalIncidenceDrawing.RouteIsSimple route := by
+    have scaledDrawingEqual :
+        scaledDrawing =
+          (PositionedPeriodicCNF.incidenceDrawing
+            source sourcePlacement presentation.routes).scale
+              refinementFactor :=
+      scaledSource_incidenceDrawing_eq_scale continuous
+    rw [scaledDrawingEqual]
+    exact PeriodicGridDrawing.routesSimple_scale
+      refinementFactor_positive _ presentation.routesSimple
+  rw [refinedIncidenceDrawing_eq_scaled_unitSubdivide continuous]
+  exact PeriodicGridDrawing.routesSimple_unitSubdivide
+    scaledDrawing scaledOrthogonal scaledNonempty scaledSimple
+
+/-- The refined source route family has no listed-point contacts except at
+the outer endpoints of both complete refined routes. -/
+theorem refinedRouteFamily_routePointsMeetOnlyAtEndpoints
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {sourcePlacement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.HaloBoundedRibbonReadyIncidencePresentation
+        source sourcePlacement)
+    (sourceUnitSteps :
+      (PositionedPeriodicCNF.incidenceDrawing
+        source sourcePlacement presentation.routes).HasUnitSteps) :
+    (PositionedPeriodicCNF.incidenceDrawing
+      (refinedSource source sourcePlacement)
+      (refinedPlacement sourcePlacement)
+      (refinedRouteFamily
+        presentation.toContinuousPlanarIncidencePresentation).routes)
+        |>.RoutePointsMeetOnlyAtEndpoints := by
+  exact
+    PeriodicGridDrawing.routePointsMeetOnlyAtEndpoints_of_liftedRoutesAvoidEachOther
+      (refinedRouteFamily_liftedRoutesAvoidEachOther
+        presentation sourceUnitSteps)
+      (refinedRouteFamily_routesSimple presentation)
 
 end PeriodicOneInThreePolarityNormalizationRouteSubdivision
 end LeanTrominoes
