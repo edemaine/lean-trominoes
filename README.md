@@ -4360,6 +4360,11 @@ The representation choices for this target are:
   to every stored route.  This discharges all nonzero relative lifted
   contacts and proves continuous planarity of the final padded coordinated
   assembly without any remaining finite-neighbor hypothesis.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedContinuousPresentation.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedContinuousPresentation.lean)
+  combines that continuous-planarity theorem with the already proved
+  normalized vertex distinctness and fundamental-square bounds.  The final
+  padded coordinated assembly is thereby packaged as a concrete continuously
+  planar periodic 3DM presentation, with no residual geometric assumption.
 - [`LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean)
   proves the reusable finite-to-infinite bridge behind that reduction.  A
   halo-bounded route pair at any shift outside the `5 × 5` block
