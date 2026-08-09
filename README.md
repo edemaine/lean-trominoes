@@ -7154,6 +7154,12 @@ The representation choices for this target are:
   source segment.  Source planarity then proves that no inserted vertex is an
   old source vertex, that the two vertices of one split incidence differ, and
   that vertices reserved for distinct source occurrences differ.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertexInjectivity.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteVertexInjectivity.lean)
+  recovers the exact source occurrence carried by every appearing fresh
+  variable and gives every generated clause a duplicate-free origin key.
+  Combining those provenance results with subdivision-point separation proves
+  that the final variable prefix, clause suffix, and their concatenation are
+  all duplicate-free.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
