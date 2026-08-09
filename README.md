@@ -6616,6 +6616,11 @@ The representation choices for this target are:
   identifies endpoint-fan length with graph-theoretic degree and uses the
   incidence-tag permutation preserved by contraction to prove that every
   indexed trichromatic triple still has exactly three endpoint occurrences.
+- [`LeanTrominoes/PeriodicThreeDMContractedElementDegree.lean`](LeanTrominoes/PeriodicThreeDMContractedElementDegree.lean)
+  proves the complementary monochromatic invariant: every retained colored
+  element (equivalently, each degree-three element) has exactly three
+  contracted endpoint occurrences, while all other element blocks
+  contribute zero ends to that vertex.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
