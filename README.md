@@ -7095,8 +7095,8 @@ The representation choices for this target are:
   exact-one clause `[fresh = false, original = false]`; the file proves both
   directions of satisfiability preservation, locality, binary-or-ternary
   arity, and the polarity certificate for every generated clause.  The
-  remaining work is to splice this preprocessing into the positioned planar
-  presentation (subdividing the affected incidence routes) and to finish the
+  geometric route subdivision is described below; the remaining work is to
+  prove its global separation and planarity properties and to finish the
   site-wide fixed-green/true strand, whose route cannot be chosen independently
   in each occurrence slot.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean)
@@ -7127,6 +7127,15 @@ The representation choices for this target are:
   route family keeps a compatible route whole and splits every incompatible
   route into the clause-side prefix, reversed middle edge, and translated
   original-variable suffix.
+- [`LeanTrominoes/PositionedPeriodicCNFPresentationCanonicalRoutes.lean`](LeanTrominoes/PositionedPeriodicCNFPresentationCanonicalRoutes.lean)
+  converts an assembled planar incidence presentation into the pointwise
+  canonical endpoint/orthogonality interface and proves that unit subdivision
+  preserves that interface.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteCorrectness.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteCorrectness.lean)
+  certifies the complete subdivided route table.  Every normalized-main and
+  complement-clause incidence has its exact canonical endpoints, every route
+  is orthogonal, and both properties are transported through the fresh-variable
+  gauge to the final normalized incidence drawing.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence

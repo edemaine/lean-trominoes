@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicOneInThreeNoUnits
+import LeanTrominoes.PeriodicGraph
 
 /-!
 # Polarity normalization for the planar 3DM connector order
@@ -100,6 +101,40 @@ def normalizeClause {Variable : Type*} (clauseIndex : Nat)
     (source : PeriodicClause Variable) :
     PeriodicClause (PolarityNormalizedVariable Variable) :=
   normalizeClauseFrom clauseIndex 0 source
+
+/-- Indexed lookup through a normalized suffix retains the source literal
+and adds its absolute presentation index to the normalization tag. -/
+theorem normalizeClauseFrom_getElem? {Variable : Type*}
+    (clauseIndex literalStart : Nat)
+    (source : PeriodicClause Variable)
+    (index : Nat) :
+    (normalizeClauseFrom clauseIndex literalStart source)[index]? =
+      (source[index]?).map fun literal =>
+        normalizeLiteral clauseIndex (literalStart + index) literal := by
+  induction source generalizing literalStart index with
+  | nil => simp [normalizeClauseFrom]
+  | cons literal rest induction =>
+      cases index with
+      | zero => simp [normalizeClauseFrom_cons]
+      | succ index =>
+          have indexEq :
+              literalStart + 1 + index = literalStart + (index + 1) := by
+            omega
+          simp [normalizeClauseFrom_cons,
+            induction (literalStart + 1) index, indexEq]
+
+/-- Indexed lookup in a complete normalized clause uses the same source
+literal and presentation index. -/
+@[simp]
+theorem normalizeClause_getElem? {Variable : Type*}
+    (clauseIndex : Nat)
+    (source : PeriodicClause Variable)
+    (literalIndex : Nat) :
+    (normalizeClause clauseIndex source)[literalIndex]? =
+      (source[literalIndex]?).map fun literal =>
+        normalizeLiteral clauseIndex literalIndex literal := by
+  simpa [normalizeClause] using
+    normalizeClauseFrom_getElem? clauseIndex 0 source literalIndex
 
 /-- Emit one binary complement clause for every occurrence whose polarity
 must be changed. -/
@@ -564,6 +599,19 @@ theorem normalizeLiteral_offset {Variable : Type*}
       source.offset := by
   unfold normalizeLiteral
   split <;> rfl
+
+/-- Polarity normalization changes no clause anchor because it retains every
+literal offset in presentation order. -/
+@[simp]
+theorem clauseAnchor_normalizeClause {Variable : Type*}
+    (clauseIndex : Nat) (source : PeriodicClause Variable) :
+    PeriodicCNF.clauseAnchor (normalizeClause clauseIndex source) =
+      PeriodicCNF.clauseAnchor source := by
+  cases source with
+  | nil => rfl
+  | cons literal rest =>
+      simp [normalizeClause, normalizeClauseFrom_cons,
+        PeriodicCNF.clauseAnchor]
 
 /-- The normalized occurrence list has the same length as its source. -/
 @[simp]
