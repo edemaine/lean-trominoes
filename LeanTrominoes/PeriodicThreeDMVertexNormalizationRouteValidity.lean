@@ -2270,5 +2270,42 @@ theorem ContinuousPlanarPresentation.finalNormalizationRoute_hasNoImmediateRever
   · exact sourceEndpoint.finalNormalizationTemplate_lastDirection planar
   · exact targetEndpoint.finalNormalizationTemplate_lastDirection planar
 
+/-- Every four-point window in a listed final route therefore compiles to
+two routing cells with matching common ports, without route-validity
+hypotheses at the call site. -/
+theorem ContinuousPlanarPresentation.finalCellTypeAt_routeWindow_port_matches
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    (collisionFree :
+      presentation.toPlanarPresentation.FinalAssignmentsCollisionFree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges)
+    (leading : List Cell) (before current next after : Cell)
+    (rest : List Cell)
+    (routeEquation :
+      presentation.toPlanarPresentation.finalNormalizationRoute edge =
+        leading ++ before :: current :: next :: after :: rest) :
+    (presentation.toPlanarPresentation.finalCellTypeAt
+      (rasterLocation
+        presentation.toPlanarPresentation.finalNormalizationPeriod
+        current)).portColor
+        (Side.ofAxisDirection (AxisDirection.between current next)) =
+      (presentation.toPlanarPresentation.finalCellTypeAt
+        (rasterLocation
+          presentation.toPlanarPresentation.finalNormalizationPeriod
+          next)).portColor
+          (Side.ofAxisDirection
+            (AxisDirection.between current next)).opposite := by
+  exact presentation.toPlanarPresentation
+    |>.finalCellTypeAt_routeWindow_port_matches
+      collisionFree edgeMember
+      (presentation.finalNormalizationRoute_unitSteps
+        wellFormed degree edgeMember)
+      (presentation.finalNormalizationRoute_hasNoImmediateReversal
+        wellFormed degree edgeMember)
+      leading before current next after rest routeEquation
+
 end PeriodicThreeDM
 end LeanTrominoes

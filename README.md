@@ -6721,7 +6721,10 @@ The representation choices for this target are:
   nonreversing as well as unit-step.  The invariant is then lifted through
   both cyclic replacements: every `finalNormalizationRoute` is now formally
   certified as a nonreversing unit-step route, discharging both validity
-  hypotheses of the normalized-route rasterizer.
+  hypotheses of the normalized-route rasterizer.  Consequently every
+  four-point route window compiles to adjacent routing cells with matching
+  colored ports, assuming only the remaining global assignment-collision
+  certificate.
 - [`LeanTrominoes/PeriodicPlanarThreeDM.lean`](LeanTrominoes/PeriodicPlanarThreeDM.lean)
   defines the geometric certificate still required for planar hardness: a
   compatible orthogonal drawing of the periodic 3DM incidence graph whose
