@@ -132,6 +132,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Encode periodic planar-SAT protovariables and prove retained
       finite-block periodicization and opaque variable wrapping primitive
       recursive.
+    - [x] Prove positioned periodic-CNF erasure, variable renaming,
+      anchor normalization, and clause-orbit deduplication primitive
+      recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6518,6 +6521,11 @@ The representation choices for this target are:
   encodings, computes canonical crossing representatives and literal period
   shifts, and proves retained finite-block periodicization and formula
   wrapping primitive recursive.
+- [`LeanTrominoes/PositionedPeriodicCNFComputability.lean`](LeanTrominoes/PositionedPeriodicCNFComputability.lean)
+  proves the reusable positioned-formula bookkeeping executable: erasure,
+  input-dependent variable renaming, total clause-position lookup, physical
+  clause-anchor normalization, and first-representative literal-list
+  deduplication are all primitive recursive.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
