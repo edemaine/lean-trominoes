@@ -6850,6 +6850,10 @@ The representation choices for this target are:
   feeds the final endpoint-contact certificate into the generic assignment
   geometry theorem, proving all compiled vertex and route-interior raster
   locations pairwise distinct.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationVertexPortCompleteness.lean`](LeanTrominoes/PeriodicThreeDMNormalizationVertexPortCompleteness.lean)
+  proves the converse of endpoint color correctness: every exposed port of a
+  final normalized vertex belongs to one of its three contracted endpoints,
+  with the same side and edge color.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
