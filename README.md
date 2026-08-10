@@ -105,6 +105,8 @@ build; an imported proof counts when its statement matches the paper.
       and the proper-crossing filter.
     - [x] Prove the canonical fundamental-square crossings and their
       horizontal-first representatives primitive recursive.
+    - [x] Give segment terminals, crossing boundaries, carrier nodes, and
+      positioned equality links canonical primitive-recursive encodings.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6448,6 +6450,10 @@ The representation choices for this target are:
   proves the finite fundamental-square point enumeration, full canonical
   crossing candidate product and filter, and horizontal-first representative
   list primitive recursive.
+- [`LeanTrominoes/PeriodicOrthocrossingCarrierEncodingComputability.lean`](LeanTrominoes/PeriodicOrthocrossingCarrierEncodingComputability.lean)
+  gives segment endpoints and terminals, crossing sides and boundaries,
+  carrier nodes, equality positions, and generic positioned equality links
+  canonical product/sum encodings with primitive-recursive accessors.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
