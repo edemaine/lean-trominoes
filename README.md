@@ -6879,6 +6879,10 @@ The representation choices for this target are:
   augments every nonblank raster assignment with its contracted vertex or
   displayed route-triple provenance and proves that erasing this metadata
   recovers the existing collision-free lookup exactly.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationOrientationLift.lean`](LeanTrominoes/PeriodicThreeDMNormalizationOrientationLift.lean)
+  lifts finite provenance lookup to arbitrary cells of the infinite drawing
+  and reconstructs the unique geometric period translate represented by
+  every successful lookup.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB

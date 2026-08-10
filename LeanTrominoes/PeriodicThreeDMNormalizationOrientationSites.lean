@@ -77,6 +77,34 @@ theorem routeOrientationSites_map_cellType
       exact routeOrientationSites_map_cellType presentation edge
         (current :: after :: rest)
 
+/-- Every route-site key is the rasterization of the geometric point stored
+in its provenance record. -/
+theorem routeOrientationSites_key_eq_point
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    (edge : ContractedEdge) :
+    ∀ route {location : Cell} {site : FinalOrientationSite},
+      (location, site) ∈
+          routeOrientationSites presentation.finalNormalizationPeriod
+            edge route →
+        location = rasterLocation presentation.finalNormalizationPeriod
+          (site.point presentation)
+  | [], _, _, member => by
+      simp [routeOrientationSites] at member
+  | [_], _, _, member => by
+      simp [routeOrientationSites] at member
+  | [_, _], _, _, member => by
+      simp [routeOrientationSites] at member
+  | before :: current :: after :: rest, location, site, member => by
+      simp only [routeOrientationSites, List.mem_cons] at member
+      rcases member with member | member
+      · injection member with locationEq siteEq
+        subst location
+        subst site
+        rfl
+      · exact routeOrientationSites_key_eq_point presentation edge
+          (current :: after :: rest) member
+
 /-- Complete provenance list in the same vertex-before-route lookup order as
 `finalCellAssignments`. -/
 def PlanarPresentation.finalOrientationSites
@@ -108,6 +136,29 @@ theorem PlanarPresentation.finalOrientationSites_map_cellType
   intro edge edgeMember
   exact routeOrientationSites_map_cellType presentation edge
     (presentation.finalNormalizationRoute edge)
+
+/-- Every complete provenance record carries precisely the geometric point
+whose rasterization produced its stored lookup key. -/
+theorem PlanarPresentation.finalOrientationSite_key_eq_point
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {location : Cell} {site : FinalOrientationSite}
+    (member : (location, site) ∈ presentation.finalOrientationSites) :
+    location = rasterLocation presentation.finalNormalizationPeriod
+      (site.point presentation) := by
+  unfold PlanarPresentation.finalOrientationSites at member
+  simp only [List.mem_append] at member
+  rcases member with vertexMember | routeMember
+  · simp only [List.mem_map] at vertexMember
+    rcases vertexMember with ⟨vertex, vertexListMember, equality⟩
+    injection equality with locationEq siteEq
+    subst location
+    subst site
+    rfl
+  · simp only [List.mem_flatMap] at routeMember
+    rcases routeMember with ⟨edge, edgeMember, siteMember⟩
+    exact routeOrientationSites_key_eq_point presentation edge
+      (presentation.finalNormalizationRoute edge) siteMember
 
 /-- Provenance and cell assignments have exactly the same location keys. -/
 theorem PlanarPresentation.finalOrientationSiteLocations_eq
