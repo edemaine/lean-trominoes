@@ -6764,6 +6764,10 @@ The representation choices for this target are:
   proves strict-separation inheritance for the symmetric three-point
   corridor trim and separates a trimmed magnified corridor from every local
   template centered at an old point avoided by the source route.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCorridorOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCorridorOccurrenceSeparation.lean)
+  decomposes every lifted first-round route into its source template,
+  trimmed corridor, and reversed target template, and proves strict
+  separation of the middle corridors of distinct contracted occurrences.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationIncidentCorridorSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationIncidentCorridorSeparation.lean)
   splits an incident trimmed corridor into its initial outward ray and its
   remote tail, then proves that it strictly avoids every different-port
