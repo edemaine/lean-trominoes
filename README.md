@@ -129,8 +129,8 @@ build; an imported proof counts when its statement matches the paper.
           endpoint-template normalization round.
       - [x] Deduce global assignment collision freedom from the completed
         endpoint-contact certificate.
-      - [ ] Prove matching ports for the compiled drawing, then package the
-        computable reduction.
+      - [x] Prove matching ports for the compiled drawing.
+      - [ ] Package the computable reduction.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -6864,6 +6864,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMNormalizationExposedPortMatching.lean`](LeanTrominoes/PeriodicThreeDMNormalizationExposedPortMatching.lean)
   classifies every nonblank compiled lookup result and proves that each
   exposed port meets the same color at its finite-torus neighbor.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationWellFormed.lean`](LeanTrominoes/PeriodicThreeDMNormalizationWellFormed.lean)
+  proves the compiled normalized drawing well formed by combining forward
+  exposed-port matching with the reverse empty-port case.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
