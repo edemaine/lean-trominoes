@@ -6914,6 +6914,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMNormalizationForwardRoutePortCompatibility.lean`](LeanTrominoes/PeriodicThreeDMNormalizationForwardRoutePortCompatibility.lean)
   classifies every exposed route port as a predecessor or successor interface
   and dispatches endpoint and internal cases to their compatibility laws.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationForwardCompatibility.lean`](LeanTrominoes/PeriodicThreeDMNormalizationForwardCompatibility.lean)
+  lifts finite vertex/route compatibility to arbitrary cells of the infinite
+  periodic drawing and proves a suppressed 3DM orientation induces a valid
+  global orientation of the compiled normalized drawing.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
