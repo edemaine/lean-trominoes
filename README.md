@@ -6752,6 +6752,10 @@ The representation choices for this target are:
   their radius-three bound, separates templates based at distinct old
   lattice points after scale twelve, and handles distinct ports at one
   contracted vertex.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCorridorSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCorridorSeparation.lean)
+  proves strict-separation inheritance for the symmetric three-point
+  corridor trim and separates a trimmed magnified corridor from every local
+  template centered at an old point avoided by the source route.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
