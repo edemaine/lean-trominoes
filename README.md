@@ -6739,6 +6739,10 @@ The representation choices for this target are:
   existing certificates; endpoint-contact preservation therefore has only
   the contracted drawing's endpoint-contact certificate as a geometric
   premise.  The later local endpoint-template splices remain to be handled.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationStageDrawings.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationStageDrawings.lean)
+  packages the periodic drawings after the first and second local template
+  rounds, giving the contact proof explicit invariant boundaries between
+  the three repeated magnify-and-splice operations.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
