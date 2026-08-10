@@ -6776,6 +6776,10 @@ The representation choices for this target are:
   classifies every lifted template--corridor pairing as source-incident,
   target-incident, or remote; endpoint keys identify shared centers, while
   complete old-route separation handles the remote case.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationOccurrenceSeparation.lean)
+  records the exact splice junctions of lifted first-round pieces and
+  assembles their local contact classifications into complete normalized
+  route-occurrence separation.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
