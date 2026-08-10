@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDM
 import LeanTrominoes.PeriodicThreeDMNormalizationCompiler
 import LeanTrominoes.PeriodicThreeDMFiniteDrawingCertificate
+import LeanTrominoes.PeriodicThreeDMFiniteDrawingSearch
 import LeanTrominoes.PeriodicThreeSATThreeNonempty
 
 /-!
@@ -266,6 +267,25 @@ theorem presentation_verifies (tiles : LeanWang.TileSet) :
       (presentation_endpointBounds tiles)
       (presentation tiles).continuouslyPlanar
       (presentation_endpointContacts tiles)
+
+/-- The concrete construction proves that exhaustive finite-certificate
+search is total on every Wang input. -/
+theorem problem_hasVerifiedDrawing (tiles : LeanWang.TileSet) :
+    PeriodicThreeDM.FiniteDrawingSearch.HasVerifiedDrawing (problem tiles) :=
+  ⟨(presentation tiles).drawing, presentation_verifies tiles⟩
+
+/-- A presentation reconstructed from the first finite drawing certificate
+in the standard natural-number encoding.  Its definition no longer depends
+on the concrete geometric construction, except through the proof that search
+terminates. -/
+noncomputable def searchedCertifiedPresentation (tiles : LeanWang.TileSet) :
+    PeriodicThreeDM.FiniteDrawingCertificate.CertifiedPresentation
+      (problem tiles) :=
+  PeriodicThreeDM.FiniteDrawingSearch.searchCertifiedPresentation
+    problem
+    (fun tiles => (presentation tiles).problemWellFormed)
+    problem_hasVerifiedDrawing
+    tiles
 
 /-- The generated continuously planar periodic 3DM problem is satisfiable
 exactly when the input Wang tile set tiles the plane. -/

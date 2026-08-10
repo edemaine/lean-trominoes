@@ -99,6 +99,10 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Reduce the planar drawing obligations to a finite Boolean
       certificate and prove every accepted drawing supplies the continuous
       planarity, separation, and route-simplicity data needed by the compiler.
+      - [x] Enumerate encoded periodic grid drawings, select the first
+        accepted certificate by total unbounded search, prove the selector
+        computable from a computable source and verifier, and instantiate
+        search termination for every Wang input.
     - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
@@ -6622,6 +6626,11 @@ The representation choices for this target are:
   candidate reconstructs a continuously planar 3DM presentation together
   with complete lifted-route separation and route simplicity; the concrete
   Wang construction is proved to pass this verifier.
+- [`LeanTrominoes/PeriodicThreeDMFiniteDrawingSearch.lean`](LeanTrominoes/PeriodicThreeDMFiniteDrawingSearch.lean)
+  enumerates the standard natural-number encoding of periodic grid drawings
+  and chooses the first accepted certificate.  It proves this total search
+  computable whenever the source problem and verifier are computable; the
+  Wang construction supplies termination for every tile set.
 - [`LeanTrominoes/PeriodicThreeDMGraphOrientation.lean`](LeanTrominoes/PeriodicThreeDMGraphOrientation.lean)
   expresses orientations directly as values on those colored incidence-edge
   orbits.  It proves this tagged graph presentation equivalent to the
