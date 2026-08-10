@@ -132,7 +132,7 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove matching ports for the compiled drawing.
       - [x] Transport suppressed 3DM orientations through the normalized
         routed drawing in both directions.
-      - [ ] Prove the concrete normalized-drawing compiler computable.
+      - [x] Prove the concrete normalized-drawing compiler computable.
       - [ ] Assemble the final many-one reductions for both trominoes.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
