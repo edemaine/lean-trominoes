@@ -94,8 +94,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Specialize the continuously planar 3DM construction to Wang tile
       sets, including a fixed contradictory fallback for the empty tile set
       and the lifted-route separation and route-simplicity certificates.
-    - [x] Prove the total Wang source-formula map and the logical
-      polarity-normalization transform computable.
+    - [x] Prove the total Wang source-formula map primitive recursive and the
+      logical polarity-normalization transform computable.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
