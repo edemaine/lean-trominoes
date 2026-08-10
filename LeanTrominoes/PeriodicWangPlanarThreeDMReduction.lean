@@ -94,6 +94,15 @@ def sourceFormula (tiles : LeanWang.TileSet) : PeriodicCNF Variable :=
   if tiles = [] then fallbackFormula
   else PeriodicThreeSATThree.wangFormula tiles
 
+theorem sourceFormula_computable : Computable sourceFormula := by
+  have empty : Computable fun tiles : LeanWang.TileSet => decide (tiles = []) :=
+    (Primrec.eq.comp Primrec.id (Primrec.const [])).decide.to_comp
+  exact (Computable.cond empty
+    (Computable.const fallbackFormula)
+    PeriodicThreeSATThree.wangFormula_computable).of_eq fun tiles => by
+      by_cases isEmpty : tiles = [] <;>
+        simp [sourceFormula, isEmpty]
+
 theorem sourceFormula_isLocal (tiles : LeanWang.TileSet) :
     (sourceFormula tiles).IsLocal := by
   by_cases empty : tiles = []

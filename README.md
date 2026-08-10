@@ -94,6 +94,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Specialize the continuously planar 3DM construction to Wang tile
       sets, including a fixed contradictory fallback for the empty tile set
       and the lifted-route separation and route-simplicity certificates.
+    - [x] Prove the total Wang source-formula map and the logical
+      polarity-normalization transform computable.
     - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
@@ -7390,6 +7392,11 @@ The representation choices for this target are:
   arity, and the polarity certificate for every generated clause.  The
   geometric route subdivision described below now proves the complete
   halo-bounded ribbon-ready interface for the normalized formula.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationComputability.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationComputability.lean)
+  implements the logical polarity normalization as primitive-recursive list
+  traversals.  This includes occurrence indexing, literal replacement, and
+  generation of the binary complement clauses, independently of the later
+  geometric subdivision choices.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean)
   proves that the same preprocessing preserves the occurrence-three
   restriction.  Every embedded source variable has exactly its original
@@ -7484,6 +7491,12 @@ The representation choices for this target are:
   is well formed, has colored degree two or three, has a concrete continuously
   planar presentation, and admits a graph orientation exactly when the
   original exact-one source is satisfiable.
+- [`LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean`](LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean)
+  specializes the construction to Wang tile sets.  Its total source-formula
+  map uses the standard Wang reduction for nonempty inputs and a fixed
+  contradictory fallback for the empty tileset, and is proved computable;
+  the resulting degree-two-or-three planar 3DM instance is satisfiable exactly
+  when the Wang tileset tiles the plane.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
