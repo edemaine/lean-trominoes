@@ -126,6 +126,9 @@ build; an imported proof counts when its statement matches the paper.
       instantiation primitive recursive.
     - [x] Prove the retained crossover family and its combination with the
       retained route-wire formula primitive recursive.
+    - [x] Prove the ordered routed clause and variable-duplicator families,
+      and the resulting complete retained planar-SAT formula, primitive
+      recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6502,6 +6505,11 @@ The representation choices for this target are:
   proves the canonical crossing ports and fixed crossover family primitive
   recursive, scopes the retained route-wire formula into the gadget variable
   type, and combines both parts into an executable retained planar core.
+- [`LeanTrominoes/PeriodicCNFPlanarVertexGadgetsComputability.lean`](LeanTrominoes/PeriodicCNFPlanarVertexGadgetsComputability.lean)
+  computes neighboring clause and variable sites, their stable routed
+  incidence orders and endpoint terminals, the positioned signed-clause and
+  active duplicator-arm families, and their composition with the retained
+  crossover/wire core into the complete retained planar-SAT formula.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
