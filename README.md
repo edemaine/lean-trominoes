@@ -6874,6 +6874,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMNormalizationWellFormed.lean`](LeanTrominoes/PeriodicThreeDMNormalizationWellFormed.lean)
   proves the compiled normalized drawing well formed by combining forward
   exposed-port matching with the reverse empty-port case.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationOrientationSites.lean`](LeanTrominoes/PeriodicThreeDMNormalizationOrientationSites.lean)
+  augments every nonblank raster assignment with its contracted vertex or
+  displayed route-triple provenance and proves that erasing this metadata
+  recovers the existing collision-free lookup exactly.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
