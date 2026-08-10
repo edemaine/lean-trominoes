@@ -6887,6 +6887,10 @@ The representation choices for this target are:
   selects the unique contracted endpoint at every exposed normalized vertex
   port and identifies its inward value with the appropriate original 3DM
   incidence value at the lifted vertex translate.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationVertexOrientation.lean`](LeanTrominoes/PeriodicThreeDMNormalizationVertexOrientation.lean)
+  proves the three normalized port selectors permute the contracted endpoint
+  fan and transports suppressed triple coherence and retained-element
+  exact-one constraints to the local trichromatic and monochromatic cells.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
