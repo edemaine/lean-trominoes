@@ -6854,6 +6854,10 @@ The representation choices for this target are:
   proves the converse of endpoint color correctness: every exposed port of a
   final normalized vertex belongs to one of its three contracted endpoints,
   with the same side and edge color.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationRoutePortCompleteness.lean`](LeanTrominoes/PeriodicThreeDMNormalizationRoutePortCompleteness.lean)
+  inverts the recursive route rasterizer, recovering the displayed route
+  triple behind every emitted interior assignment and proving that its only
+  exposed sides point to the predecessor and successor.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
