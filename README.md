@@ -119,8 +119,14 @@ build; an imported proof counts when its statement matches the paper.
           incidence routes.
         - [x] Lift endpoint-only contacts to stored routes and all relevant
           periodic translates.
-        - [ ] Preserve endpoint-only contacts through degree-two contraction
-          and all three local endpoint-template normalization rounds.
+        - [x] Preserve endpoint-only contacts through degree-two contraction,
+          including uniqueness of every suppressed splice occurrence.
+        - [ ] Preserve endpoint-only contacts through the first local
+          endpoint-template normalization round.
+        - [ ] Preserve endpoint-only contacts through the second local
+          endpoint-template normalization round.
+        - [ ] Preserve endpoint-only contacts through the third local
+          endpoint-template normalization round.
       - [ ] Deduce global assignment collision freedom and matching ports for
         the compiled drawing, then package the computable reduction.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
@@ -4427,6 +4433,11 @@ The representation choices for this target are:
   normalized vertex distinctness and fundamental-square bounds.  The final
   padded coordinated assembly is thereby packaged as a concrete continuously
   planar periodic 3DM presentation, with no residual geometric assumption.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedContractionEndpointContacts.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonPaddedContractionEndpointContacts.lean)
+  applies the generic contraction theorem to that concrete padded assembly.
+  Its previously proved simple routes and complete lifted separation now
+  yield endpoint-only contacts for the actual contracted drawing consumed by
+  vertex normalization.
 - [`LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean`](LeanTrominoes/PeriodicGridDrawingExpandedLiftedInteriorContactSeparation.lean)
   proves the reusable finite-to-infinite bridge behind that reduction.  A
   halo-bounded route pair at any shift outside the `5 × 5` block
@@ -6657,6 +6668,13 @@ The representation choices for this target are:
   intersection, and segment provenance transports any alleged contracted
   overlap to two distinct original occurrences, contradicting the source
   certificate.
+- [`LeanTrominoes/PeriodicThreeDMContractionEndpointContacts.lean`](LeanTrominoes/PeriodicThreeDMContractionEndpointContacts.lean)
+  proves the complementary listed-point invariant.  Original incidence
+  routes are represented as optionally reversed lifted pieces; duplicate-free
+  contracted metadata and the degree-two singleton block make every
+  suppressed splice occurrence unique.  Retained/through and through/through
+  joins therefore preserve complete lifted separation and route simplicity,
+  which together imply endpoint-only contacts for the contracted drawing.
 - [`LeanTrominoes/DegreeThreeVertexNormalizationTemplates.lean`](LeanTrominoes/DegreeThreeVertexNormalizationTemplates.lean)
   transcribes the four `6 × 6` replacement templates and the cyclic
   port-rotation template from Lemma 2.3.  Finite computation verifies exact
