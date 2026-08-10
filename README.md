@@ -130,7 +130,7 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Deduce global assignment collision freedom from the completed
         endpoint-contact certificate.
       - [x] Prove matching ports for the compiled drawing.
-      - [ ] Transport suppressed 3DM orientations through the normalized
+      - [x] Transport suppressed 3DM orientations through the normalized
         routed drawing in both directions.
       - [ ] Prove the concrete normalized-drawing compiler computable.
       - [ ] Assemble the final many-one reductions for both trominoes.
@@ -6934,6 +6934,10 @@ The representation choices for this target are:
   recovers the suppressed wire constraint at degree-two elements and exact-one
   at retained monochromatic vertices, completing validity of the graph
   orientation extracted from any valid normalized drawing orientation.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationOrientationEquivalence.lean`](LeanTrominoes/PeriodicThreeDMNormalizationOrientationEquivalence.lean)
+  packages both semantic directions, proving that the normalized drawing is
+  orientable exactly when the contracted graph has a suppressed orientation
+  and exactly when the original periodic 3DM instance is satisfiable.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
