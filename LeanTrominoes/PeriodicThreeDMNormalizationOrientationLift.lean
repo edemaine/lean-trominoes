@@ -17,6 +17,25 @@ open Gadget
 
 namespace PeriodicThreeDM
 
+/-- Changing only association-list values preserves a failed key lookup. -/
+theorem List.lookup_map_value_eq_none
+    {α β γ : Type*} [BEq α] [LawfulBEq α]
+    (entries : List (α × β)) (key : α) (mapValue : β → γ)
+    (lookup : entries.lookup key = none) :
+    (entries.map fun entry => (entry.1, mapValue entry.2)).lookup key = none := by
+  induction entries with
+  | nil => rfl
+  | cons entry entries induction =>
+      rcases entry with ⟨entryKey, entryValue⟩
+      by_cases equal : key = entryKey
+      · subst entryKey
+        simp at lookup
+      · have beqFalse : (key == entryKey) = false :=
+          beq_eq_false_iff_ne.mpr equal
+        simp only [List.lookup_cons, beqFalse] at lookup
+        simp only [List.map_cons, List.lookup_cons, beqFalse]
+        exact induction lookup
+
 /-- Look up the finite provenance record underneath an arbitrary cell of the
 infinite drawing lift.  Reflecting the drawing row coordinate first returns
 to the geometric convention used by normalized routes. -/
@@ -65,6 +84,28 @@ theorem PlanarPresentation.normalizedOrthogonalDrawing_getAt_eq_of_site_lookup
   rw [presentation.normalizedOrthogonalDrawing_getAt_eq_finalCellTypeAt]
   exact presentation.finalCellTypeAt_eq_of_orientationSite_lookup
     collisionFree lookup
+
+/-- If lifted provenance lookup fails, the compiled drawing cell is blank. -/
+theorem PlanarPresentation.normalizedOrthogonalDrawing_getAt_eq_blank_of_site_none
+    {problem : PeriodicThreeDM}
+    {presentation : problem.PlanarPresentation}
+    {location : Cell}
+    (lookup : presentation.finalOrientationSiteAt location = none) :
+    presentation.normalizedOrthogonalDrawing.getAt location = .blank := by
+  rw [presentation.normalizedOrthogonalDrawing_getAt_eq_finalCellTypeAt]
+  unfold PlanarPresentation.finalOrientationSiteAt at lookup
+  unfold PlanarPresentation.finalCellTypeAt
+  rw [← presentation.finalOrientationSites_map_cellType]
+  have mappedLookup :
+      (presentation.finalOrientationSites.map fun entry =>
+        (entry.1, entry.2.cellType presentation)).lookup
+          (rasterLocation presentation.finalNormalizationPeriod
+            (reflectedLocation location)) = none := by
+    exact List.lookup_map_value_eq_none
+      presentation.finalOrientationSites _
+        (FinalOrientationSite.cellType presentation) lookup
+  rw [mappedLookup]
+  rfl
 
 /-- A successful lifted lookup says that the location and its provenance
 point have the same finite raster representative. -/

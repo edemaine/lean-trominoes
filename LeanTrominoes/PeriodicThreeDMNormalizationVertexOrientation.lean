@@ -393,6 +393,43 @@ theorem PlanarPresentation.finalVertexCellType_satisfiesOrientation_element
   rw [valuesPerm.count_eq]
   exact retainedExactlyOne
 
+/-- A valid suppressed orientation satisfies the compiled local constraint
+at every retained contracted vertex. -/
+theorem PlanarPresentation.finalVertexCellType_satisfiesOrientation
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    (values : problem.GraphOrientation)
+    (valid : problem.IsSuppressedOrientation values)
+    {vertex : PeriodicThreeDMVertex}
+    (vertexMember : vertex ∈ problem.contractedGraph.vertices)
+    (translate : Cell) :
+    PeriodicOrthogonalDrawing.satisfiesOrientation
+      (presentation.toPlanarPresentation.finalVertexCellType vertex)
+      (presentation.toPlanarPresentation.vertexPortInward values
+        vertex translate) := by
+  cases vertex with
+  | triple tripleIndex =>
+      have indexLt : tripleIndex < problem.triples.length := by
+        simpa [contractedGraph, tripleVertices,
+          contractedElementVertices,
+          contractedElementVerticesForColor] using vertexMember
+      exact PlanarPresentation.finalVertexCellType_satisfiesOrientation_triple
+        presentation wellFormed degree values valid tripleIndex indexLt
+          translate
+  | element color atom =>
+      have atomData : atom < problem.elementCount color ∧
+          problem.degree color atom = 3 := by
+        simp [contractedGraph, tripleVertices,
+          contractedElementVertices,
+          contractedElementVerticesForColor,
+          incidenceColors] at vertexMember
+        cases color <;> simp_all
+      exact PlanarPresentation.finalVertexCellType_satisfiesOrientation_element
+        presentation wellFormed degree values valid color atom atomData.1
+          atomData.2 translate
+
 end PeriodicThreeDM
 
 end LeanTrominoes

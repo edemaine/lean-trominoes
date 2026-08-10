@@ -6891,6 +6891,10 @@ The representation choices for this target are:
   proves the three normalized port selectors permute the contracted endpoint
   fan and transports suppressed triple coherence and retained-element
   exact-one constraints to the local trichromatic and monochromatic cells.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationForwardOrientation.lean`](LeanTrominoes/PeriodicThreeDMNormalizationForwardOrientation.lean)
+  defines the plane-wide normalized drawing orientation induced by a
+  suppressed 3DM solution and proves every blank, routing, trichromatic, and
+  monochromatic cell satisfies its local orientation constraint.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
