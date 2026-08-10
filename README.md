@@ -6838,6 +6838,9 @@ The representation choices for this target are:
   proves the exact final-round splice junctions and assembles all nine
   pairwise piece invariants into complete separation of distinct lifted
   final route occurrences.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicDrawingSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicDrawingSeparation.lean)
+  recovers the contracted edge owning each stored final route and lifts
+  occurrence separation to the complete periodic final drawing.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
