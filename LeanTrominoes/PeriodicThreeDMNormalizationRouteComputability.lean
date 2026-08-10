@@ -98,6 +98,32 @@ theorem omittedSideAt_primrec :
       unfold omittedSideAt
       cases input.1.problem.endpointTripleAt input.2 <;> rfl
 
+/-! ## Finite template control -/
+
+theorem boundarySide_primrec :
+    Primrec fun input : VertexSide × CanonicalVertexPort =>
+      boundarySide input.1 input.2 :=
+  Primrec.dom_finite _
+
+theorem canonicalPortForSide_primrec :
+    Primrec fun input : VertexSide × VertexSide =>
+      canonicalPortForSide input.1 input.2 :=
+  Primrec.dom_finite _
+
+theorem rotationsToNorth_primrec :
+    Primrec rotationsToNorth :=
+  Primrec.dom_finite _
+
+theorem normalizationTemplateRoute_primrec :
+    Primrec fun input : VertexSide × CanonicalVertexPort =>
+      route input.1 input.2 :=
+  Primrec.dom_finite _
+
+theorem rotationRoundPortAndRoute_primrec :
+    Primrec fun input : Bool × CanonicalVertexPort =>
+      rotationRoundPortAndRoute input.1 input.2 :=
+  Primrec.dom_finite _
+
 end NormalizationCompiler
 end PeriodicThreeDM
 end LeanTrominoes
