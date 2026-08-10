@@ -564,6 +564,248 @@ theorem contractedDrawing_primrec : Primrec contractedDrawing := by
   exact (PeriodicGridDrawing.equivData_symm_primrec.comp data).of_eq
     fun _ => rfl
 
+/-! ## Contracted endpoint fans -/
+
+theorem axisDirection_between_primrec : Primrec₂ AxisDirection.between := by
+  change Primrec fun input : Cell × Cell =>
+    AxisDirection.between input.1 input.2
+  let firstX : Primrec (fun input : Cell × Cell => input.1.1) :=
+    Primrec.fst.comp Primrec.fst
+  let firstY : Primrec (fun input : Cell × Cell => input.1.2) :=
+    Primrec.snd.comp Primrec.fst
+  let secondX : Primrec (fun input : Cell × Cell => input.2.1) :=
+    Primrec.fst.comp Primrec.snd
+  let secondY : Primrec (fun input : Cell × Cell => input.2.2) :=
+    Primrec.snd.comp Primrec.snd
+  let sameX := Primrec.eq.comp firstX secondX
+  let sameY := Primrec.eq.comp firstY secondY
+  let east := int_lt_primrec.comp firstX secondX
+  let west := int_lt_primrec.comp secondX firstX
+  let north := int_lt_primrec.comp firstY secondY
+  let south := int_lt_primrec.comp secondY firstY
+  exact (Primrec.ite sameY
+    (Primrec.ite east (Primrec.const .east)
+      (Primrec.ite west (Primrec.const .west)
+        (Primrec.const .invalid)))
+    (Primrec.ite sameX
+      (Primrec.ite north (Primrec.const .north)
+        (Primrec.ite south (Primrec.const .south)
+          (Primrec.const .invalid)))
+      (Primrec.const .invalid))).of_eq fun _ => rfl
+
+theorem axisDirection_opposite_primrec :
+    Primrec AxisDirection.opposite :=
+  Primrec.dom_finite AxisDirection.opposite
+
+theorem polylineFirstDirection_primrec :
+    Primrec AxisDirection.polylineFirstDirection := by
+  let enough : PrimrecPred fun points : List Cell => 2 ≤ points.length :=
+    Primrec.nat_le.comp (Primrec.const 2) Primrec.list_length
+  let itemAt (index : Nat) : Primrec (fun points : List Cell =>
+      points.getD index (0, 0)) :=
+    (Primrec.list_getD (0, 0)).comp Primrec.id (Primrec.const index)
+  refine (Primrec.ite enough
+    (axisDirection_between_primrec.comp (itemAt 0) (itemAt 1))
+    (Primrec.const .invalid)).of_eq ?_
+  intro points
+  rcases points with _ | ⟨first, points⟩
+  · rfl
+  rcases points with _ | ⟨second, points⟩ <;> rfl
+
+theorem polylineLastDirection_primrec :
+    Primrec AxisDirection.polylineLastDirection := by
+  exact (axisDirection_opposite_primrec.comp
+    (polylineFirstDirection_primrec.comp Primrec.list_reverse)).of_eq
+      fun _ => rfl
+
+theorem vertexSide_ofDirection_primrec :
+    Primrec VertexSide.ofDirection :=
+  Primrec.dom_finite VertexSide.ofDirection
+
+theorem periodicEdge_mk_primrec :
+    Primrec fun input :
+        (PeriodicThreeDMVertex × PeriodicThreeDMVertex) × Cell =>
+      (PeriodicEdge.mk input.1.1 input.1.2 input.2) := by
+  have inverse : Primrec
+      (@PeriodicEdge.equivData PeriodicThreeDMVertex).symm :=
+    Primrec.of_equiv_symm
+  exact inverse.comp
+    (Primrec.pair
+      (Primrec.fst.comp Primrec.fst)
+      (Primrec.pair
+        (Primrec.snd.comp Primrec.fst) Primrec.snd))
+
+theorem contractedEdge_toPeriodicEdge_primrec :
+    Primrec ContractedEdge.toPeriodicEdge := by
+  have edgeData := ContractedEdge.equivData_primrec
+  have retained : Primrec₂ fun (_edge : ContractedEdge)
+      (data : WireColor × Nat × Incidence) =>
+      (PeriodicEdge.mk
+        (PeriodicThreeDMVertex.triple data.2.2.tripleIndex)
+        (PeriodicThreeDMVertex.element data.1 data.2.1)
+        data.2.2.offset) := by
+    exact (periodicEdge_mk_primrec.comp
+      (Primrec.pair
+        (Primrec.pair
+          (periodicThreeDMVertex_triple_primrec.comp
+            (Incidence.tripleIndex_primrec.comp
+              (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))))
+          (periodicThreeDMVertex_element_primrec.comp
+            (Primrec.fst.comp Primrec.snd)
+            (Primrec.fst.comp (Primrec.snd.comp Primrec.snd))))
+        (Incidence.offset_primrec.comp
+          (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))))).to₂
+  have through : Primrec₂ fun (_edge : ContractedEdge)
+      (data : WireColor × Nat × Incidence × Incidence) =>
+      (PeriodicEdge.mk
+        (PeriodicThreeDMVertex.triple data.2.2.1.tripleIndex)
+        (PeriodicThreeDMVertex.triple data.2.2.2.tripleIndex)
+        (Cell.sub data.2.2.1.offset data.2.2.2.offset)) := by
+    exact (periodicEdge_mk_primrec.comp
+      (Primrec.pair
+        (Primrec.pair
+          (periodicThreeDMVertex_triple_primrec.comp
+            (Incidence.tripleIndex_primrec.comp
+              (Primrec.fst.comp
+                (Primrec.snd.comp (Primrec.snd.comp Primrec.snd)))))
+          (periodicThreeDMVertex_triple_primrec.comp
+            (Incidence.tripleIndex_primrec.comp
+              (Primrec.snd.comp
+                (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))))))
+        (cell_sub_primrec.comp
+          (Incidence.offset_primrec.comp
+            (Primrec.fst.comp
+              (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))))
+          (Incidence.offset_primrec.comp
+            (Primrec.snd.comp
+              (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))))))).to₂
+  exact (Primrec.sumCasesOn edgeData retained through).of_eq fun edge => by
+    cases edge <;> rfl
+
+theorem periodicEdge_source_primrec :
+    Primrec (PeriodicEdge.source :
+      PeriodicEdge PeriodicThreeDMVertex → PeriodicThreeDMVertex) := by
+  have forward : Primrec
+      (@PeriodicEdge.equivData PeriodicThreeDMVertex) :=
+    Primrec.of_equiv
+  exact (Primrec.fst.comp forward).of_eq fun _ => rfl
+
+theorem periodicEdge_target_primrec :
+    Primrec (PeriodicEdge.target :
+      PeriodicEdge PeriodicThreeDMVertex → PeriodicThreeDMVertex) := by
+  have forward : Primrec
+      (@PeriodicEdge.equivData PeriodicThreeDMVertex) :=
+    Primrec.of_equiv
+  exact ((Primrec.fst.comp Primrec.snd).comp forward).of_eq fun _ => rfl
+
+theorem contractedEdge_color_primrec : Primrec ContractedEdge.color := by
+  have edgeData := ContractedEdge.equivData_primrec
+  exact (Primrec.sumCasesOn edgeData
+    (Primrec.fst.comp Primrec.snd).to₂
+    (Primrec.fst.comp Primrec.snd).to₂).of_eq fun edge => by
+      cases edge <;> rfl
+
+theorem contractedEndpoint_source_primrec :
+    Primrec ContractedEndpoint.source :=
+  ContractedEndpoint.equivData_symm_primrec.comp Primrec.sumInl
+
+theorem contractedEndpoint_target_primrec :
+    Primrec ContractedEndpoint.target :=
+  ContractedEndpoint.equivData_symm_primrec.comp Primrec.sumInr
+
+theorem contractedEndpoint_edge_primrec :
+    Primrec ContractedEndpoint.edge := by
+  exact (Primrec.sumCasesOn ContractedEndpoint.equivData_primrec
+    Primrec.snd.to₂ Primrec.snd.to₂).of_eq fun endpoint => by
+      cases endpoint <;> rfl
+
+theorem contractedEndpoint_isSource_primrec :
+    Primrec ContractedEndpoint.isSource := by
+  exact (Primrec.sumCasesOn ContractedEndpoint.equivData_primrec
+    (Primrec.const true).to₂ (Primrec.const false).to₂).of_eq
+      fun endpoint => by cases endpoint <;> rfl
+
+theorem contractedEndpoint_vertex_primrec :
+    Primrec ContractedEndpoint.vertex := by
+  have edge := contractedEndpoint_edge_primrec
+  have periodicEdge := contractedEdge_toPeriodicEdge_primrec.comp edge
+  let sourceEndpoint : PrimrecPred fun endpoint : ContractedEndpoint =>
+      endpoint.isSource = true := by
+    exact Primrec.eq.comp
+      contractedEndpoint_isSource_primrec
+      (Primrec.const true)
+  exact (Primrec.ite sourceEndpoint
+    (periodicEdge_source_primrec.comp periodicEdge)
+    (periodicEdge_target_primrec.comp periodicEdge)).of_eq fun endpoint => by
+      cases endpoint <;> rfl
+
+theorem contractedEndpoint_color_primrec :
+    Primrec ContractedEndpoint.color :=
+  contractedEdge_color_primrec.comp contractedEndpoint_edge_primrec
+
+theorem contractedEndpoints_primrec :
+    Primrec PeriodicThreeDM.contractedEndpoints := by
+  exact Primrec.list_flatMap contractedEdges_primrec
+    (Primrec.list_cons.comp
+      (contractedEndpoint_source_primrec.comp Primrec.snd)
+      (Primrec.list_cons.comp
+        (contractedEndpoint_target_primrec.comp Primrec.snd)
+        (Primrec.const []))).to₂
+
+theorem contractedEndpointsAt_primrec :
+    Primrec fun input : PeriodicThreeDM × PeriodicThreeDMVertex =>
+      input.1.contractedEndpointsAt input.2 := by
+  have same : PrimrecRel fun (endpoint : ContractedEndpoint)
+      (vertex : PeriodicThreeDMVertex) => endpoint.vertex = vertex :=
+    Primrec.eq.comp₂
+      (contractedEndpoint_vertex_primrec.comp₂ Primrec₂.left)
+      Primrec₂.right
+  exact same.listFilter.comp
+    (contractedEndpoints_primrec.comp Primrec.fst)
+    Primrec.snd
+
+def defaultContractedEndpoint : ContractedEndpoint :=
+  .source (.retained .red 0 defaultIncidence)
+
+theorem endpointTripleAt_primrec :
+    Primrec fun input : PeriodicThreeDM × PeriodicThreeDMVertex =>
+      input.1.endpointTripleAt input.2 := by
+  have endpoints := contractedEndpointsAt_primrec
+  let itemAt (index : Nat) : Primrec (fun input :
+      PeriodicThreeDM × PeriodicThreeDMVertex =>
+        (input.1.contractedEndpointsAt input.2).getD index
+          defaultContractedEndpoint) :=
+    (Primrec.list_getD defaultContractedEndpoint).comp endpoints
+      (Primrec.const index)
+  have exactlyThree : PrimrecPred fun input :
+      PeriodicThreeDM × PeriodicThreeDMVertex =>
+      (input.1.contractedEndpointsAt input.2).length = 3 :=
+    Primrec.eq.comp (Primrec.list_length.comp endpoints)
+      (Primrec.const 3)
+  have selected : Primrec (fun input :
+      PeriodicThreeDM × PeriodicThreeDMVertex =>
+      some ((input.1.contractedEndpointsAt input.2).getD 0
+          defaultContractedEndpoint,
+        (input.1.contractedEndpointsAt input.2).getD 1
+          defaultContractedEndpoint,
+        (input.1.contractedEndpointsAt input.2).getD 2
+          defaultContractedEndpoint)) :=
+    Primrec.option_some.comp
+      (Primrec.pair (itemAt 0)
+        (Primrec.pair (itemAt 1) (itemAt 2)))
+  refine (Primrec.ite exactlyThree selected
+    (Primrec.const none)).of_eq ?_
+  intro input
+  unfold endpointTripleAt
+  generalize input.1.contractedEndpointsAt input.2 = endpoints
+  rcases endpoints with _ | ⟨first, endpoints⟩
+  · rfl
+  rcases endpoints with _ | ⟨second, endpoints⟩
+  · rfl
+  rcases endpoints with _ | ⟨third, endpoints⟩
+  · rfl
+  rcases endpoints with _ | ⟨fourth, endpoints⟩ <;> rfl
+
 end NormalizationCompiler
 end PeriodicThreeDM
 end LeanTrominoes
