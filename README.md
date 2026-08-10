@@ -132,6 +132,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Give the five retained planar-SAT clause-source kinds canonical
       encodings and prove their exact global metadata enumeration primitive
       recursive in formula order.
+    - [x] Prove the five retained local incidence-route templates and their
+      exact metadata-indexed route lookup primitive recursive.
     - [x] Encode periodic planar-SAT protovariables and prove retained
       finite-block periodicization and opaque variable wrapping primitive
       recursive.
@@ -6527,6 +6529,17 @@ The representation choices for this target are:
   routed-variable source kinds canonical encodings, computes each local
   embedded formula with its source indices, and proves their exact global
   metadata enumeration primitive recursive in retained formula order.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedLocalIncidenceRoutesComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedLocalIncidenceRoutesComputability.lean)
+  computes the fixed crossover rays, retained carrier lenses, routed-clause
+  ports, routed-variable arms, and translated corner-table routes used by the
+  retained local incidence drawing.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedBendRouteComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedBendRouteComputability.lean)
+  computes each retained bend route directly from the CNF presentation size
+  and proves it equals the corresponding semantic corner-drawing route.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedLocalIncidenceRouteLookupComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedLocalIncidenceRouteLookupComputability.lean)
+  decodes all five clause-source constructors, selects their exact local
+  route, and proves the complete metadata-indexed semantic route family
+  primitive recursive and computable.
 - [`LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean)
   gives periodic planar-SAT protovariables and their opaque wrappers canonical
   encodings, computes canonical crossing representatives and literal period
