@@ -6651,7 +6651,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMContractedTagEndpoints.lean`](LeanTrominoes/PeriodicThreeDMContractedTagEndpoints.lean)
   enumerates the triple endpoints represented by retained and through edges
   and proves their incidence tags form a duplicate-free permutation of the
-  original tag list, giving every tag one unique contracted endpoint.
+  original tag list, giving every tag one unique contracted endpoint and a
+  canonical executable selector for decoding it.
 - [`LeanTrominoes/PeriodicThreeDMContractionGeometry.lean`](LeanTrominoes/PeriodicThreeDMContractionGeometry.lean)
   proves the first geometric invariant of contraction: translating,
   reversing, and joining the original incidence polylines preserves

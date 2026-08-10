@@ -98,6 +98,94 @@ theorem exists_unique_contractedTripleEndpoint
   exact (List.inj_on_of_nodup_map tagsNodup endpointMember otherData.1
     (endpointTag.trans otherData.2.symm)).symm
 
+/-- A harmless fallback used only for incidence tags outside a problem's
+finite presentation.  Valid tags are proved below never to select it unless
+it is itself the genuine endpoint. -/
+def defaultContractedTripleEndpoint : ContractedEndpoint :=
+  .source (.retained .red 0 ⟨0, (0, 0)⟩)
+
+/-- Executably select the first contracted triple endpoint carrying a given
+original incidence tag. -/
+def contractedTripleEndpointForTag (problem : PeriodicThreeDM)
+    (tag : IncidenceTag) : ContractedEndpoint :=
+  (problem.contractedTripleEndpoints.find? fun endpoint =>
+      decide (endpoint.incidenceTag = tag)).getD
+    defaultContractedTripleEndpoint
+
+/-- Every valid incidence tag's selected endpoint belongs to the complete
+contracted triple-endpoint enumeration. -/
+theorem contractedTripleEndpointForTag_mem
+    (problem : PeriodicThreeDM)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {tag : IncidenceTag}
+    (tagMember : tag ∈ problem.incidenceTags) :
+    problem.contractedTripleEndpointForTag tag ∈
+      problem.contractedTripleEndpoints := by
+  unfold contractedTripleEndpointForTag
+  generalize foundEq :
+      problem.contractedTripleEndpoints.find? (fun endpoint =>
+        decide (endpoint.incidenceTag = tag)) = found
+  cases found with
+  | some endpoint =>
+      simp only [Option.getD_some]
+      exact List.mem_of_find?_eq_some foundEq
+  | none =>
+      rcases (problem.contractedTripleEndpoint_tag_mem_iff
+          wellFormed degree tag).mpr tagMember with
+        ⟨endpoint, endpointMember, endpointTag⟩
+      have predicateFalse :=
+        List.find?_eq_none.mp foundEq endpoint endpointMember
+      simp [endpointTag] at predicateFalse
+
+/-- Every valid incidence tag is recovered exactly from its selected
+contracted triple endpoint. -/
+theorem contractedTripleEndpointForTag_incidenceTag
+    (problem : PeriodicThreeDM)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {tag : IncidenceTag}
+    (tagMember : tag ∈ problem.incidenceTags) :
+    (problem.contractedTripleEndpointForTag tag).incidenceTag = tag := by
+  unfold contractedTripleEndpointForTag
+  generalize foundEq :
+      problem.contractedTripleEndpoints.find? (fun endpoint =>
+        decide (endpoint.incidenceTag = tag)) = found
+  cases found with
+  | some endpoint =>
+      simp only [Option.getD_some]
+      have predicateTrue := List.find?_some foundEq
+      simpa using predicateTrue
+  | none =>
+      rcases (problem.contractedTripleEndpoint_tag_mem_iff
+          wellFormed degree tag).mpr tagMember with
+        ⟨endpoint, endpointMember, endpointTag⟩
+      have predicateFalse :=
+        List.find?_eq_none.mp foundEq endpoint endpointMember
+      simp [endpointTag] at predicateFalse
+
+/-- The executable selector agrees with any endpoint known to carry the
+requested valid tag. -/
+theorem contractedTripleEndpointForTag_eq
+    (problem : PeriodicThreeDM)
+    (wellFormed : problem.IsWellFormed)
+    (degree : problem.DegreeTwoOrThree)
+    {tag : IncidenceTag}
+    (tagMember : tag ∈ problem.incidenceTags)
+    {endpoint : ContractedEndpoint}
+    (endpointMember : endpoint ∈ problem.contractedTripleEndpoints)
+    (endpointTag : endpoint.incidenceTag = tag) :
+    problem.contractedTripleEndpointForTag tag = endpoint := by
+  have selectedMember := problem.contractedTripleEndpointForTag_mem
+    wellFormed degree tagMember
+  have selectedTag := problem.contractedTripleEndpointForTag_incidenceTag
+    wellFormed degree tagMember
+  exact List.inj_on_of_nodup_map
+    (by
+      rw [problem.contractedTripleEndpoints_map_incidenceTag]
+      exact contractedIncidenceTags_nodup problem degree)
+    selectedMember endpointMember (selectedTag.trans endpointTag.symm)
+
 end PeriodicThreeDM
 
 end LeanTrominoes
