@@ -382,5 +382,245 @@ theorem retainedCompleteCarrierNodes_primrec
         first.orderCoordinate input.1 ≤ second.orderCoordinate input.1)
       (fun _ _ => by simp [lessEq]) _
 
+theorem CarrierNode.sameCrossoverSite_primrec :
+    Primrec₂ CarrierNode.sameCrossoverSite := by
+  change Primrec fun input : CarrierNode × CarrierNode =>
+    input.1.sameCrossoverSite input.2
+  let crossing? : CarrierNode → Option CrossingRecord := fun node =>
+    Sum.casesOn (CarrierNode.equivData node)
+      (fun boundary => some boundary.crossing) (fun _ => none)
+  have crossingPrimrec : Primrec crossing? :=
+    Primrec.sumCasesOn CarrierNode.equivData_primrec
+      ((Primrec.option_some.comp
+        CrossingBoundary.crossing_primrec).comp₂ Primrec₂.right)
+      (Primrec.const none).to₂
+  have first : Primrec fun input : CarrierNode × CarrierNode =>
+      crossing? input.1 := crossingPrimrec.comp Primrec.fst
+  have second : Primrec fun input : CarrierNode × CarrierNode =>
+      crossing? input.2 := crossingPrimrec.comp Primrec.snd
+  let optionEqual : Option CrossingRecord → Option CrossingRecord → Bool :=
+    fun first second => decide (first = second)
+  have optionEq : Primrec₂ optionEqual := Primrec.eq.decide
+  have same : Primrec fun input : CarrierNode × CarrierNode =>
+      optionEqual (crossing? input.1) (crossing? input.2) :=
+    optionEq.comp first second
+  have result : Primrec fun input : CarrierNode × CarrierNode =>
+      (crossing? input.1).isSome &&
+        optionEqual (crossing? input.1) (crossing? input.2) :=
+    Primrec.and.comp (Primrec.option_isSome.comp first) same
+  exact result.of_eq fun input => by
+    rcases input with ⟨first, second⟩
+    cases first <;> cases second <;>
+      simp [CarrierNode.sameCrossoverSite, crossing?, optionEqual,
+        CarrierNode.equivData]
+
+theorem consecutivePairs_primrec
+    {Value : Type*} [Primcodable Value] :
+    Primrec (@consecutivePairs Value) := by
+  have step : Primrec₂ fun (_list : List Value)
+      (state : Value × List Value × List (Value × Value)) =>
+      match state.2.1.head? with
+      | none => []
+      | some second => (state.1, second) :: state.2.2 := by
+    change Primrec fun combined : List Value ×
+        (Value × List Value × List (Value × Value)) =>
+      match combined.2.2.1.head? with
+      | none => []
+      | some second =>
+          (combined.2.1, second) :: combined.2.2.2
+    have next : Primrec fun combined : List Value ×
+        (Value × List Value × List (Value × Value)) =>
+        combined.2.2.1.head? :=
+      Primrec.list_head?.comp
+        (Primrec.fst.comp (Primrec.snd.comp Primrec.snd))
+    have selected : Primrec fun input :
+        (List Value × (Value × List Value × List (Value × Value))) ×
+          Value =>
+        (input.1.2.1, input.2) :: input.1.2.2.2 := by
+      exact Primrec.list_cons.comp
+        (Primrec.pair
+          (Primrec.fst.comp (Primrec.snd.comp Primrec.fst))
+          Primrec.snd)
+        (Primrec.snd.comp
+          (Primrec.snd.comp (Primrec.snd.comp Primrec.fst)))
+    exact (Primrec.option_casesOn next
+      (Primrec.const []) selected.to₂).of_eq fun combined => by
+        cases combined.2.2.1.head? <;> rfl
+  have recursion := Primrec.list_rec
+    (f := fun list : List Value => list)
+    (g := fun _ => ([] : List (Value × Value)))
+    (h := fun _ state =>
+      match state.2.1.head? with
+      | none => []
+      | some second => (state.1, second) :: state.2.2)
+    Primrec.id (Primrec.const []) step
+  exact recursion.of_eq fun list => by
+    induction list with
+    | nil => rfl
+    | cons first rest induction =>
+        cases rest with
+        | nil => rfl
+        | cons second tail =>
+            change (first, second) ::
+                (List.recOn (second :: tail) [] fun head rest recursive =>
+                  match rest.head? with
+                  | none => []
+                  | some next => (head, next) :: recursive) =
+              (first, second) :: consecutivePairs (second :: tail)
+            exact congrArg (List.cons (first, second)) induction
+
+theorem carrierNodeEqualityPositions_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec fun input :
+        (PeriodicGraph Vertex × CarrierNode) × CarrierNode =>
+      carrierNodeEqualityPositions input.1.1 input.1.2 input.2 := by
+  let Input := (PeriodicGraph Vertex × CarrierNode) × CarrierNode
+  have graph : Primrec fun input : Input => input.1.1 :=
+    Primrec.fst.comp Primrec.fst
+  have firstNode : Primrec fun input : Input => input.1.2 :=
+    Primrec.snd.comp Primrec.fst
+  have firstPosition : Primrec fun input : Input =>
+      input.1.2.position input.1.1 :=
+    CarrierNode.position_primrec.comp graph firstNode
+  have secondPosition : Primrec fun input : Input =>
+      input.2.position input.1.1 :=
+    CarrierNode.position_primrec.comp graph Primrec.snd
+  have horizontal : PrimrecPred fun input : Input =>
+      input.1.2.isHorizontal = true :=
+    Primrec.eq.comp
+      (CarrierNode.isHorizontal_primrec.comp firstNode)
+      (Primrec.const true)
+  have xForward : PrimrecPred fun input : Input =>
+      (input.1.2.position input.1.1).1 ≤
+        (input.2.position input.1.1).1 :=
+    Computability.int_le_primrec.comp
+      (Primrec.fst.comp firstPosition)
+      (Primrec.fst.comp secondPosition)
+  have yForward : PrimrecPred fun input : Input =>
+      (input.1.2.position input.1.1).2 ≤
+        (input.2.position input.1.1).2 :=
+    Computability.int_le_primrec.comp
+      (Primrec.snd.comp firstPosition)
+      (Primrec.snd.comp secondPosition)
+  let xStep : Input → Int := fun input =>
+    if (input.1.2.position input.1.1).1 ≤
+        (input.2.position input.1.1).1 then 1 else -1
+  let yStep : Input → Int := fun input =>
+    if (input.1.2.position input.1.1).2 ≤
+        (input.2.position input.1.1).2 then 1 else -1
+  have xStepPrimrec : Primrec xStep :=
+    Primrec.ite xForward (Primrec.const (1 : Int))
+      (Primrec.const (-1 : Int))
+  have yStepPrimrec : Primrec yStep :=
+    Primrec.ite yForward (Primrec.const (1 : Int))
+      (Primrec.const (-1 : Int))
+  have scaled (coefficient : Int) (step : Input → Int)
+      (stepPrimrec : Primrec step) : Primrec fun input : Input =>
+      coefficient * step input :=
+    Computability.int_multiply_primrec.comp
+      (Primrec.const coefficient) stepPrimrec
+  have horizontalOffset (coefficient : Int) :
+      Primrec fun input : Input =>
+        (coefficient * xStep input, (0 : Int)) :=
+    Primrec.pair (scaled coefficient xStep xStepPrimrec)
+      (Primrec.const (0 : Int))
+  have verticalOffset (coefficient : Int) :
+      Primrec fun input : Input =>
+        ((0 : Int), coefficient * yStep input) :=
+    Primrec.pair (Primrec.const (0 : Int))
+      (scaled coefficient yStep yStepPrimrec)
+  have forward : Primrec fun input : Input =>
+      if input.1.2.isHorizontal then
+        Cell.add (input.1.2.position input.1.1)
+          (3 * xStep input, 0)
+      else
+        Cell.add (input.1.2.position input.1.1)
+          (0, 3 * yStep input) :=
+    Primrec.ite horizontal
+      (Computability.cell_add_primrec.comp firstPosition
+        (horizontalOffset 3))
+      (Computability.cell_add_primrec.comp firstPosition
+        (verticalOffset 3))
+  have backward : Primrec fun input : Input =>
+      if input.1.2.isHorizontal then
+        Cell.add (input.1.2.position input.1.1)
+          (6 * xStep input, 0)
+      else
+        Cell.add (input.1.2.position input.1.1)
+          (0, 6 * yStep input) :=
+    Primrec.ite horizontal
+      (Computability.cell_add_primrec.comp firstPosition
+        (horizontalOffset 6))
+      (Computability.cell_add_primrec.comp firstPosition
+        (verticalOffset 6))
+  exact (EqualityPositions.mk_primrec.comp
+    (Primrec.pair forward backward)).of_eq fun input => by
+      by_cases isHorizontal : input.1.2.isHorizontal = true
+      · simp [carrierNodeEqualityPositions, xStep, isHorizontal]
+      · simp [carrierNodeEqualityPositions, yStep, isHorizontal]
+
+theorem carrierNodePairLink_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec₂ (carrierNodePairLink :
+      PeriodicGraph Vertex → CarrierNode × CarrierNode →
+        PlanarThreeSAT.EqualityLink CarrierNode) := by
+  change Primrec fun input :
+      PeriodicGraph Vertex × (CarrierNode × CarrierNode) =>
+    carrierNodePairLink input.1 input.2
+  have positions : Primrec fun input :
+      PeriodicGraph Vertex × (CarrierNode × CarrierNode) =>
+      carrierNodeEqualityPositions input.1 input.2.1 input.2.2 :=
+    carrierNodeEqualityPositions_primrec.comp
+      (Primrec.pair
+        (Primrec.pair Primrec.fst
+          (Primrec.fst.comp Primrec.snd))
+        (Primrec.snd.comp Primrec.snd))
+  exact (EqualityLink.mk_primrec.comp
+    (Primrec.pair Primrec.snd positions)).of_eq fun _ => rfl
+
+theorem retainedCompleteCarrierLinks_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec₂ (retainedCompleteCarrierLinks :
+      PeriodicGraph Vertex → (Nat × Nat × Cell) →
+        List (PlanarThreeSAT.EqualityLink CarrierNode)) := by
+  let Input := PeriodicGraph Vertex × (Nat × Nat × Cell)
+  have pairs : Primrec fun input : Input =>
+      consecutivePairs
+        (retainedCompleteCarrierNodes input.1 input.2) :=
+    consecutivePairs_primrec.comp retainedCompleteCarrierNodes_primrec
+  have distinctSite : PrimrecPred fun pair : CarrierNode × CarrierNode =>
+      pair.1.sameCrossoverSite pair.2 = false :=
+    Primrec.eq.comp CarrierNode.sameCrossoverSite_primrec
+      (Primrec.const false)
+  have selected : Primrec fun input : Input =>
+      (consecutivePairs
+        (retainedCompleteCarrierNodes input.1 input.2)).filter fun pair =>
+          !pair.1.sameCrossoverSite pair.2 :=
+    ((Primrec.listFilter distinctSite).comp pairs).of_eq fun _ => by
+      apply List.filter_congr
+      intro pair _
+      cases pair.1.sameCrossoverSite pair.2 <;> rfl
+  exact Primrec.list_map selected
+    (carrierNodePairLink_primrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.left) Primrec₂.right)
+
+theorem retainedDrawingCompleteCarrierKeys_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec (retainedDrawingCompleteCarrierKeys :
+      PeriodicGraph Vertex → List (Nat × Nat × Cell)) := by
+  have keys : Primrec fun graph : PeriodicGraph Vertex =>
+      (retainedDrawingCarrierNodes graph).map CarrierNode.carrierKey :=
+    Primrec.list_map retainedDrawingCarrierNodes_primrec
+      (CarrierNode.carrierKey_primrec.comp₂ Primrec₂.right)
+  exact PeriodicThreeSATThree.dedup_primrec.comp keys
+
+theorem retainedDrawingCompleteCarrierLinksRaw_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec (retainedDrawingCompleteCarrierLinksRaw :
+      PeriodicGraph Vertex →
+        List (PlanarThreeSAT.EqualityLink CarrierNode)) :=
+  Primrec.list_flatMap retainedDrawingCompleteCarrierKeys_primrec
+    retainedCompleteCarrierLinks_primrec
+
 end PeriodicOrthocrossing
 end LeanTrominoes

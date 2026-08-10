@@ -109,6 +109,8 @@ build; an imported proof counts when its statement matches the paper.
       positioned equality links canonical primitive-recursive encodings.
     - [x] Prove the retained crossing orbit, carrier-node geometry, and stable
       per-carrier chain sorting primitive recursive.
+    - [x] Prove consecutive retained carrier links and their positioned raw
+      equality-link family primitive recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6459,7 +6461,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierComputability.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierComputability.lean)
   proves the bounded canonical crossing orbit, retained boundary and terminal
   enumerations, carrier keys and macro-grid positions, axial order, and stable
-  per-carrier chain sorting primitive recursive.
+  per-carrier chain sorting primitive recursive.  It also certifies adjacent
+  pairs, crossover-site suppression, equality-clause positions, and the raw
+  flattened carrier-link family.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula

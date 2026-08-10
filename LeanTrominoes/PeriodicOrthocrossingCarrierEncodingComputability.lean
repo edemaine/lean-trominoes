@@ -174,6 +174,8 @@ theorem terminal_primrec : Primrec fun terminal : SegmentTerminal =>
 
 end CarrierNode
 
+end PeriodicOrthocrossing
+
 namespace PlanarThreeSAT.EqualityPositions
 
 def equivData : EqualityPositions ≃ Cell × Cell where
@@ -248,5 +250,4 @@ theorem mk_primrec {Variable : Type*} [Primcodable Variable] :
 
 end PlanarThreeSAT.EqualityLink
 
-end PeriodicOrthocrossing
 end LeanTrominoes
