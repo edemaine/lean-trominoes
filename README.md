@@ -6788,6 +6788,10 @@ The representation choices for this target are:
   proves that each first-round splice remains duplicate-free and hence
   geometrically simple, completing the first intermediate drawing's
   endpoint-only route-contact invariant for reuse by the cyclic rounds.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicOccurrences.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicOccurrences.lean)
+  names the lifted endpoint centers, templates, corridors, and complete
+  routes of the first cyclic-rotation round, and gives its exact translated
+  three-piece splice formula.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
