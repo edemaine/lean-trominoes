@@ -100,6 +100,9 @@ build; an imported proof counts when its statement matches the paper.
       including its tagged bipartite vertices and literal-indexed edges.
     - [x] Prove the executable orthocrossing track drawing primitive recursive,
       from ranked edge-end ports through complete protoedge polylines.
+    - [x] Prove the finite retained crossing-halo enumeration primitive
+      recursive, including translated segment occurrences, crossing records,
+      and the proper-crossing filter.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6435,6 +6438,10 @@ The representation choices for this target are:
   encodes edge-end ports and proves their ranks, private track coordinates,
   case-split edge cores, complete polylines, and the resulting periodic grid
   drawing primitive recursive from a finite periodic graph.
+- [`LeanTrominoes/PeriodicOrthocrossingCrossingHaloComputability.lean`](LeanTrominoes/PeriodicOrthocrossingCrossingHaloComputability.lean)
+  encodes retained crossing records and proves the neighboring translated
+  segment occurrences, oriented intersection candidates, genuine-crossing
+  predicate, filtering, and deduplication primitive recursive.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
