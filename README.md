@@ -6930,6 +6930,10 @@ The representation choices for this target are:
   iterates that invariant along every complete normalized route, reconciles
   source and target period coordinates, and proves the two contracted endpoint
   inward values are opposite in any valid drawing orientation.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationReverseElementOrientation.lean`](LeanTrominoes/PeriodicThreeDMNormalizationReverseElementOrientation.lean)
+  recovers the suppressed wire constraint at degree-two elements and exact-one
+  at retained monochromatic vertices, completing validity of the graph
+  orientation extracted from any valid normalized drawing orientation.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
