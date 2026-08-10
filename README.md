@@ -96,6 +96,8 @@ build; an imported proof counts when its statement matches the paper.
       and the lifted-route separation and route-simplicity certificates.
     - [x] Prove the total Wang source-formula map primitive recursive and the
       logical polarity-normalization transform computable.
+    - [x] Prove the finite periodic-CNF incidence graph primitive recursive,
+      including its tagged bipartite vertices and literal-indexed edges.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6423,6 +6425,10 @@ The representation choices for this target are:
   occurrence-splitting reduction computable and composes it with the Wang and
   width-three reductions to establish co-r.e.-hardness of local periodic
   3SAT-3.
+- [`LeanTrominoes/PeriodicCNFIncidenceGraphComputability.lean`](LeanTrominoes/PeriodicCNFIncidenceGraphComputability.lean)
+  gives tagged clause/variable incidence vertices primitive-recursive
+  constructors and proves the complete finite incidence-graph presentation
+  primitive recursive from a periodic CNF source.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
