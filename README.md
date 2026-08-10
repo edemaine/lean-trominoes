@@ -6823,6 +6823,10 @@ The representation choices for this target are:
   names the lifted templates, corridors, endpoint centers, and complete
   routes of the final cyclic round and proves its exact translated
   three-piece splice formula.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicTemplateSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicTemplateSeparation.lean)
+  proves that the preceding cyclic port permutation preserves distinctness
+  and lifts the reusable finite Figure 3 separation facts to every pair of
+  final-round endpoint-template occurrences.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
