@@ -129,6 +129,75 @@ noncomputable def
       presentation.variableRoutesInOccurrenceOrder
       presentation.ternaryClauseRoutesInClockwiseOrder
 
+/-- Distinct lifted routes in the concrete corrected composition stay
+disjoint, including across distinct period translates. -/
+theorem
+    retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation_separated
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    (retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).drawing.LiftedRoutesAvoidEachOther := by
+  let presentation :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedClockwiseOrderedPresentation
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  exact
+    PeriodicOneInThreePolarityNormalizationRouteSubdivision.paddedPeriodicThreeDMContinuousPlanarPresentation_separated
+      presentation.toHaloBoundedRibbonReadyIncidencePresentation
+      presentation.unitSteps
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_allAtomsNodup
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_occurrencesAtMostThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).occurrencesAtMostThree
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_arityTwoOrThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      presentation.variableRoutesInOccurrenceOrder
+      presentation.ternaryClauseRoutesInClockwiseOrder
+
+/-- Every stored route in the concrete corrected composition is simple. -/
+theorem
+    retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation_routesSimple
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    ∀ route ∈
+        (retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty).drawing.edgeRoutes,
+      LocalIncidenceDrawing.RouteIsSimple route := by
+  let presentation :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedClockwiseOrderedPresentation
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  exact
+    PeriodicOneInThreePolarityNormalizationRouteSubdivision.paddedPeriodicThreeDMContinuousPlanarPresentation_routesSimple
+      presentation.toHaloBoundedRibbonReadyIncidencePresentation
+      presentation.unitSteps
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_allAtomsNodup
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_occurrencesAtMostThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).occurrencesAtMostThree
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_arityTwoOrThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      presentation.variableRoutesInOccurrenceOrder
+      presentation.ternaryClauseRoutesInClockwiseOrder
+
 /-- The polarity-normalized padded target preserves the promised degree-two
 or degree-three incidence bound. -/
 theorem

@@ -91,6 +91,9 @@ build; an imported proof counts when its statement matches the paper.
       halo-bounded ribbon-ready planar presentation.
     - [x] Connect the normalized presentation to the padded planar 3DM ribbon
       assembly, retaining degree two or three and exact orientation semantics.
+    - [x] Specialize the continuously planar 3DM construction to Wang tile
+      sets, including a fixed contradictory fallback for the empty tile set
+      and the lifted-route separation and route-simplicity certificates.
     - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
