@@ -287,9 +287,9 @@ theorem magnifiedUnitRoute_eq_translate_scale
   constructor <;> ring
 
 /-- If an old orthogonal route completely avoids an old lattice point,
-then its trimmed magnified corridor is strictly separated from every
+then its full magnified unit subdivision is strictly separated from every
 Figure 2 template installed at that point. -/
-theorem trimmedMagnifiedRoute_strictlyAvoids_normalizationTemplateAt_route
+theorem magnifiedUnitRoute_strictlyAvoids_normalizationTemplateAt_route
     {oldRoute : List Cell} {position : Cell}
     (oldOrthogonal : OrthogonalPolyline oldRoute)
     (oldPointsAvoid : ∀ point ∈ oldRoute, point ≠ position)
@@ -298,7 +298,7 @@ theorem trimmedMagnifiedRoute_strictlyAvoids_normalizationTemplateAt_route
         segment.IsAxisAligned → ¬segment.Contains position)
     (omitted : VertexSide) (port : CanonicalVertexPort) :
     RoutesStrictlyAvoidEachOther
-      (trimmedMagnifiedRoute oldRoute)
+      (magnifiedUnitRoute oldRoute)
       (normalizationTemplateAt position (route omitted port)) := by
   have scaledStrict :=
     routesStrictlyAvoidEachOther_translateScalePolyline_pointNeighborhood
@@ -326,14 +326,27 @@ theorem trimmedMagnifiedRoute_strictlyAvoids_normalizationTemplateAt_route
         (fun _ _ step => step.isAxisAligned)
     unfold normalizationTemplateAt
     exact localOrthogonal.translate _
-  have refinedStrict :
-      RoutesStrictlyAvoidEachOther
-        (magnifiedUnitRoute oldRoute)
-        (normalizationTemplateAt position (route omitted port)) := by
-    rw [magnifiedUnitRoute_eq_translate_scale]
-    exact scaledStrict.refine_left
-      scaledOrthogonal templateOrthogonal
-      (AxisDirection.unitSubdividePolyline_refines scaledOrthogonal)
+  rw [magnifiedUnitRoute_eq_translate_scale]
+  exact scaledStrict.refine_left
+    scaledOrthogonal templateOrthogonal
+    (AxisDirection.unitSubdividePolyline_refines scaledOrthogonal)
+
+/-- The preceding remote-center theorem persists after the symmetric
+three-point endpoint trim used by normalized routes. -/
+theorem trimmedMagnifiedRoute_strictlyAvoids_normalizationTemplateAt_route
+    {oldRoute : List Cell} {position : Cell}
+    (oldOrthogonal : OrthogonalPolyline oldRoute)
+    (oldPointsAvoid : ∀ point ∈ oldRoute, point ≠ position)
+    (oldSegmentsAvoid :
+      ∀ segment ∈ gridPolylineSegments oldRoute,
+        segment.IsAxisAligned → ¬segment.Contains position)
+    (omitted : VertexSide) (port : CanonicalVertexPort) :
+    RoutesStrictlyAvoidEachOther
+      (trimmedMagnifiedRoute oldRoute)
+      (normalizationTemplateAt position (route omitted port)) := by
+  have refinedStrict :=
+    magnifiedUnitRoute_strictlyAvoids_normalizationTemplateAt_route
+      oldOrthogonal oldPointsAvoid oldSegmentsAvoid omitted port
   exact
     (refinedStrict.drop_left 3).take_left
       ((magnifiedUnitRoute oldRoute).length - 6)

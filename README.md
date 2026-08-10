@@ -6756,6 +6756,10 @@ The representation choices for this target are:
   proves strict-separation inheritance for the symmetric three-point
   corridor trim and separates a trimmed magnified corridor from every local
   template centered at an old point avoided by the source route.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationIncidentCorridorSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationIncidentCorridorSeparation.lean)
+  splits an incident trimmed corridor into its initial outward ray and its
+  remote tail, then proves that it strictly avoids every different-port
+  Figure 2 arm at the same vertex center.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
