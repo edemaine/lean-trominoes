@@ -6808,6 +6808,10 @@ The representation choices for this target are:
   classifies every lifted cyclic template--corridor pairing as source-
   incident, target-incident, or remote and proves strict separation in all
   three cases.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicOccurrenceSeparation.lean)
+  proves the exact cyclic-template/corridor splice junctions and assembles
+  all pairwise piece invariants into complete separation of distinct lifted
+  second-round route occurrences.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
