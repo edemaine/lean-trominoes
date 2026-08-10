@@ -6796,6 +6796,10 @@ The representation choices for this target are:
   verifies the finite identity/clockwise Figure 3 route families and lifts
   their radius-three and same-center head-contact separation to arbitrary
   endpoint occurrences of the first intermediate drawing.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicCorridorSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicCorridorSeparation.lean)
+  transports the first drawing's complete lifted separation and route
+  simplicity through another scale/subdivide/trim stage, making the middle
+  corridors of distinct second-round occurrences strictly disjoint.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
