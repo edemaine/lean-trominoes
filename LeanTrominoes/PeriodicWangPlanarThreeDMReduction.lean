@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDM
 import LeanTrominoes.PeriodicThreeDMNormalizationCompiler
+import LeanTrominoes.PeriodicThreeDMFiniteDrawingCertificate
 import LeanTrominoes.PeriodicThreeSATThreeNonempty
 
 /-!
@@ -210,6 +211,18 @@ theorem problem_degreeTwoOrThree (tiles : LeanWang.TileSet) :
       (sourceFormula_occurrencesAtMostThree_canonicalBEq tiles)
       (sourceFormula_clausesNonempty tiles)
 
+/-- The generated drawing lies in the open halo used by the executable
+finite planarity checker. -/
+theorem presentation_endpointBounds (tiles : LeanWang.TileSet) :
+    (presentation tiles).drawing.SegmentEndpointsInExpandedSquare := by
+  exact
+    PeriodicOrthocrossing.retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation_endpointBounds
+      (sourceFormula tiles)
+      (sourceFormula_isLocal tiles)
+      (sourceFormula_widthAtMostThree tiles)
+      (sourceFormula_occurrencesAtMostThree_canonicalBEq tiles)
+      (sourceFormula_clausesNonempty tiles)
+
 /-- Distinct lifted routes of the generated drawing are separated. -/
 theorem presentation_separated (tiles : LeanWang.TileSet) :
     (presentation tiles).drawing.LiftedRoutesAvoidEachOther := by
@@ -232,6 +245,27 @@ theorem presentation_routesSimple (tiles : LeanWang.TileSet) :
       (sourceFormula_widthAtMostThree tiles)
       (sourceFormula_occurrencesAtMostThree_canonicalBEq tiles)
       (sourceFormula_clausesNonempty tiles)
+
+/-- Listed points of distinct lifted routes meet only at genuine route
+endpoints. -/
+theorem presentation_endpointContacts (tiles : LeanWang.TileSet) :
+    (presentation tiles).drawing.RoutePointsMeetOnlyAtEndpoints := by
+  exact
+    PeriodicGridDrawing.routePointsMeetOnlyAtEndpoints_of_liftedRoutesAvoidEachOther
+      (presentation_separated tiles) (presentation_routesSimple tiles)
+
+/-- The existing concrete drawing is a witness that the combined finite
+drawing verifier always succeeds on the generated problem. -/
+theorem presentation_verifies (tiles : LeanWang.TileSet) :
+    PeriodicThreeDM.FiniteDrawingCertificate.verifies
+      (problem tiles) (presentation tiles).drawing = true := by
+  exact
+    PeriodicThreeDM.FiniteDrawingCertificate.verifies_complete
+      (presentation tiles).compatible
+      (presentation tiles).orthogonal
+      (presentation_endpointBounds tiles)
+      (presentation tiles).continuouslyPlanar
+      (presentation_endpointContacts tiles)
 
 /-- The generated continuously planar periodic 3DM problem is satisfiable
 exactly when the input Wang tile set tiles the plane. -/

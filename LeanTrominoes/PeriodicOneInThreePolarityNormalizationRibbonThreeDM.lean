@@ -157,6 +157,64 @@ noncomputable def paddedPeriodicThreeDMContinuousPlanarPresentation
       (incidenceRoutes_ternaryClauseRoutesInClockwiseOrder
         presentation.toContinuousPlanarIncidencePresentation clauseOrdered)
 
+/-- The final padded drawing's stored segment endpoints lie in the open
+one-cell halo used by the finite periodic planarity checks. -/
+theorem paddedPeriodicThreeDMContinuousPlanarPresentation_endpointBounds
+    {Variable : Type*} [DecidableEq Variable]
+    {source : PositionedPeriodicCNF Variable}
+    {sourcePlacement : PeriodicVariablePlacement Variable}
+    (presentation :
+      PositionedPeriodicCNF.HaloBoundedRibbonReadyIncidencePresentation
+        source sourcePlacement)
+    (sourceUnitSteps :
+      (PositionedPeriodicCNF.incidenceDrawing
+        source sourcePlacement presentation.routes).HasUnitSteps)
+    (sourceDistinct : source.AllAtomsNodup)
+    (occurrences : source.erase.OccurrencesAtMost 3)
+    (arity : PeriodicOneInThreeNoUnits.ArityTwoOrThree source.erase)
+    (variableOrdered :
+      source.VariableRoutesInOccurrenceOrder presentation.routes)
+    (clauseOrdered :
+      source.TernaryClauseRoutesInClockwiseOrder presentation.routes) :
+    (paddedPeriodicThreeDMContinuousPlanarPresentation
+      presentation sourceUnitSteps sourceDistinct occurrences arity
+      variableOrdered clauseOrdered).drawing
+        |>.SegmentEndpointsInExpandedSquare := by
+  let normalizedPresentation :=
+    haloBoundedRibbonReadyPresentation presentation sourceUnitSteps
+  change
+    (PeriodicPlanarOneInThreeToThreeDM.assembledDrawing
+      (PeriodicPlanarOneInThreeToThreeDM.paddedNormalizedCoordinatedRibbonThreeStrandRouting
+        normalizedPresentation
+        (formula_widthAtMostThree
+          source sourcePlacement presentation.routes arity)
+        (formula_occurrencesAtMostThree_canonicalBEq
+          source sourcePlacement presentation.routes occurrences)
+        (formula_arityTwoOrThree
+          source sourcePlacement presentation.routes arity)
+        (incidenceRoutes_variableRoutesInOccurrenceOrder
+          presentation.toContinuousPlanarIncidencePresentation
+          sourceDistinct variableOrdered)
+        (incidenceRoutes_ternaryClauseRoutesInClockwiseOrder
+          presentation.toContinuousPlanarIncidencePresentation clauseOrdered)))
+      |>.SegmentEndpointsInExpandedSquare
+  apply
+    PeriodicGridDrawing.segmentEndpointsInExpandedSquare_of_routePoints
+  exact
+    PeriodicPlanarOneInThreeToThreeDM.paddedNormalizedCoordinatedAssembledRoutePointsInExpandedSquare
+      normalizedPresentation
+      (formula_widthAtMostThree
+        source sourcePlacement presentation.routes arity)
+      (formula_occurrencesAtMostThree_canonicalBEq
+        source sourcePlacement presentation.routes occurrences)
+      (formula_arityTwoOrThree
+        source sourcePlacement presentation.routes arity)
+      (incidenceRoutes_variableRoutesInOccurrenceOrder
+        presentation.toContinuousPlanarIncidencePresentation
+        sourceDistinct variableOrdered)
+      (incidenceRoutes_ternaryClauseRoutesInClockwiseOrder
+        presentation.toContinuousPlanarIncidencePresentation clauseOrdered)
+
 /-- The drawing stored by the padded polarity-normalized presentation keeps
 distinct lifted route occurrences disjoint.  This is the stronger separation
 certificate consumed by the later degree-three normalization compiler. -/

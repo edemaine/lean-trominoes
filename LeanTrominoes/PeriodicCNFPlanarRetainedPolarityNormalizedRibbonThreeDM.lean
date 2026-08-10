@@ -129,6 +129,40 @@ noncomputable def
       presentation.variableRoutesInOccurrenceOrder
       presentation.ternaryClauseRoutesInClockwiseOrder
 
+/-- The concrete corrected composition also exposes the finite checker's
+open-halo endpoint bound. -/
+theorem
+    retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation_endpointBounds
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ []) :
+    (retainedOrderedFixedEightPolarityNormalizedPaddedContinuousPlanarPresentation
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty).drawing.SegmentEndpointsInExpandedSquare := by
+  let presentation :=
+    retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedClockwiseOrderedPresentation
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty
+  exact
+    PeriodicOneInThreePolarityNormalizationRouteSubdivision.paddedPeriodicThreeDMContinuousPlanarPresentation_endpointBounds
+      presentation.toHaloBoundedRibbonReadyIncidencePresentation
+      presentation.unitSteps
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_allAtomsNodup
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_occurrencesAtMostThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty).occurrencesAtMostThree
+      (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula_arityTwoOrThree
+        source sourceLocal sourceWidth sourceOccurrences
+        sourceClausesNonempty)
+      presentation.variableRoutesInOccurrenceOrder
+      presentation.ternaryClauseRoutesInClockwiseOrder
+
 /-- Distinct lifted routes in the concrete corrected composition stay
 disjoint, including across distinct period translates. -/
 theorem

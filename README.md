@@ -96,6 +96,9 @@ build; an imported proof counts when its statement matches the paper.
       and the lifted-route separation and route-simplicity certificates.
     - [x] Prove the total Wang source-formula map and the logical
       polarity-normalization transform computable.
+    - [x] Reduce the planar drawing obligations to a finite Boolean
+      certificate and prove every accepted drawing supplies the continuous
+      planarity, separation, and route-simplicity data needed by the compiler.
     - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
@@ -6613,6 +6616,12 @@ The representation choices for this target are:
   three promise, has no isolated vertices.  Consequently every compatible
   nondegenerate incidence drawing covers all of its stored vertex positions
   by lifted route-segment endpoints.
+- [`LeanTrominoes/PeriodicThreeDMFiniteDrawingCertificate.lean`](LeanTrominoes/PeriodicThreeDMFiniteDrawingCertificate.lean)
+  combines finite compatibility, orthogonality, halo-bound, integer
+  planarity, continuous-interior, and endpoint-contact checks.  Any accepted
+  candidate reconstructs a continuously planar 3DM presentation together
+  with complete lifted-route separation and route simplicity; the concrete
+  Wang construction is proved to pass this verifier.
 - [`LeanTrominoes/PeriodicThreeDMGraphOrientation.lean`](LeanTrominoes/PeriodicThreeDMGraphOrientation.lean)
   expresses orientations directly as values on those colored incidence-edge
   orbits.  It proves this tagged graph presentation equivalent to the

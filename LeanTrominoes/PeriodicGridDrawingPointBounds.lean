@@ -226,5 +226,53 @@ theorem routePointsInFundamentalSquare_of_segmentEndpoints
   · exact bounds.1
   · exact bounds.2
 
+/-- Halo segment-endpoint bounds likewise control every listed route point
+when stored routes are nondegenerate. -/
+theorem routePointsInExpandedSquare_of_segmentEndpoints
+    {drawing : PeriodicGridDrawing}
+    (endpointBounds : drawing.SegmentEndpointsInExpandedSquare)
+    (routesNondegenerate :
+      ∀ route ∈ drawing.edgeRoutes, 2 ≤ route.length) :
+    drawing.RoutePointsInExpandedSquare := by
+  intro route routeMember point pointMember
+  rcases exists_gridPolylineSegment_of_mem
+      (routesNondegenerate route routeMember) pointMember with
+    ⟨segment, segmentMember, endpoint⟩
+  let routeIndex := drawing.edgeRoutes.idxOf route
+  have routeIndexLt :
+      routeIndex < drawing.edgeRoutes.length :=
+    List.idxOf_lt_length_of_mem routeMember
+  have routeLookup :
+      drawing.edgeRoutes[routeIndex] = route :=
+    List.getElem_idxOf routeIndexLt
+  let segmentIndex :=
+    (gridPolylineSegments route).idxOf segment
+  have segmentIndexLt :
+      segmentIndex < (gridPolylineSegments route).length :=
+    List.idxOf_lt_length_of_mem segmentMember
+  have segmentLookup :
+      (gridPolylineSegments route)[segmentIndex] = segment :=
+    List.getElem_idxOf segmentIndexLt
+  let indexed : IndexedGridSegment :=
+    ⟨routeIndex, segmentIndex, segment⟩
+  have indexedMember :
+      indexed ∈ drawing.indexedSegments := by
+    unfold indexedSegments
+    apply List.mem_flatMap.mpr
+    refine
+      ⟨(route, routeIndex), ?_, ?_⟩
+    · rw [List.mem_zipIdx_iff_getElem?,
+        List.getElem?_eq_some_iff]
+      exact ⟨routeIndexLt, routeLookup⟩
+    · apply List.mem_map.mpr
+      refine ⟨(segment, segmentIndex), ?_, rfl⟩
+      rw [List.mem_zipIdx_iff_getElem?,
+        List.getElem?_eq_some_iff]
+      exact ⟨segmentIndexLt, segmentLookup⟩
+  have bounds := endpointBounds indexed indexedMember
+  rcases endpoint with rfl | rfl
+  · exact bounds.1
+  · exact bounds.2
+
 end PeriodicGridDrawing
 end LeanTrominoes
