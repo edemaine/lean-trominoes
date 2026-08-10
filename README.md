@@ -130,7 +130,10 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Deduce global assignment collision freedom from the completed
         endpoint-contact certificate.
       - [x] Prove matching ports for the compiled drawing.
-      - [ ] Package the computable reduction.
+      - [ ] Transport suppressed 3DM orientations through the normalized
+        routed drawing in both directions.
+      - [ ] Prove the concrete normalized-drawing compiler computable.
+      - [ ] Assemble the final many-one reductions for both trominoes.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -6645,6 +6648,10 @@ The representation choices for this target are:
   is a duplicate-free permutation of all original incidence tags, so every
   original route is consumed exactly once; the endpoint-opposition law is
   also lifted from one element block to every executable contracted edge.
+- [`LeanTrominoes/PeriodicThreeDMContractedTagEndpoints.lean`](LeanTrominoes/PeriodicThreeDMContractedTagEndpoints.lean)
+  enumerates the triple endpoints represented by retained and through edges
+  and proves their incidence tags form a duplicate-free permutation of the
+  original tag list, giving every tag one unique contracted endpoint.
 - [`LeanTrominoes/PeriodicThreeDMContractionGeometry.lean`](LeanTrominoes/PeriodicThreeDMContractionGeometry.lean)
   proves the first geometric invariant of contraction: translating,
   reversing, and joining the original incidence polylines preserves
