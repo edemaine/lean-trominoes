@@ -6804,6 +6804,10 @@ The representation choices for this target are:
   proves the reusable local half-plane and remote-neighborhood lemmas showing
   that a trimmed cyclic-round corridor strictly avoids every different
   template arm at either incident endpoint.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicTemplateCorridorOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicTemplateCorridorOccurrenceSeparation.lean)
+  classifies every lifted cyclic template--corridor pairing as source-
+  incident, target-incident, or remote and proves strict separation in all
+  three cases.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB

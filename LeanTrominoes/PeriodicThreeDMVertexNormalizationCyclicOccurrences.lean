@@ -214,5 +214,70 @@ theorem ContinuousPlanarPresentation.normalizationRouteOccurrence1_normalization
     endpoints.1, endpoints.2.2.1, Option.map_some]
   constructor <;> trivial
 
+/-- The lifted first-round route also preserves the endpoint-adjacent unit
+steps needed to splice the first cyclic template at either end. -/
+theorem ContinuousPlanarPresentation.normalizationRouteOccurrence1_endpointGeometry
+    {problem : PeriodicThreeDM}
+    (presentation : problem.ContinuousPlanarPresentation)
+    (degree : problem.DegreeTwoOrThree)
+    {edge : ContractedEdge}
+    (edgeMember : edge ∈ problem.contractedEdges)
+    (routeTranslate : Cell) :
+    let planar := presentation.toPlanarPresentation
+    let sourceEndpoint := ContractedEndpoint.source edge
+    let targetEndpoint := ContractedEndpoint.target edge
+    let sourcePort := sourceEndpoint.firstNormalizedPort planar
+    let targetPort := targetEndpoint.firstNormalizedPort planar
+    let route := planar.normalizationRouteOccurrence1 edge routeTranslate
+    route.head? = some
+        (planar.normalizationEndpointOccurrencePosition1
+          sourceEndpoint routeTranslate) ∧
+      route.tail.head? = some (Cell.add
+        (planar.normalizationEndpointOccurrencePosition1
+          sourceEndpoint routeTranslate)
+        sourcePort.direction.step) ∧
+      route.getLast? = some
+        (planar.normalizationEndpointOccurrencePosition1
+          targetEndpoint routeTranslate) ∧
+      route.reverse.tail.head? = some (Cell.add
+        (planar.normalizationEndpointOccurrencePosition1
+          targetEndpoint routeTranslate)
+        targetPort.direction.step) := by
+  dsimp only
+  let planar := presentation.toPlanarPresentation
+  have geometry := presentation.normalizationRoute1_endpointGeometry
+    degree edgeMember
+  let offset :=
+    planar.normalizationGridDrawing1.periodTranslation routeTranslate
+  have tailHeadMap (items : List Cell) :
+      (items.map (Cell.add offset)).tail.head? =
+        items.tail.head?.map (Cell.add offset) := by
+    cases items with
+    | nil => rfl
+    | cons first rest =>
+        cases rest <;> rfl
+  have reverseTailHeadMap (items : List Cell) :
+      (items.map (Cell.add offset)).reverse.tail.head? =
+        items.reverse.tail.head?.map (Cell.add offset) := by
+    rw [← List.map_reverse]
+    exact tailHeadMap items.reverse
+  unfold PlanarPresentation.normalizationRouteOccurrence1
+    PlanarPresentation.normalizationEndpointOccurrencePosition1
+    PeriodicOrthocrossing.translatePolyline
+  change
+    ((planar.normalizationRoute1 edge).map
+        (Cell.add offset)).head? = _ ∧
+      ((planar.normalizationRoute1 edge).map
+          (Cell.add offset)).tail.head? = _ ∧
+      ((planar.normalizationRoute1 edge).map
+          (Cell.add offset)).getLast? = _ ∧
+      ((planar.normalizationRoute1 edge).map
+          (Cell.add offset)).reverse.tail.head? = _
+  rw [List.head?_map, tailHeadMap, List.getLast?_map,
+    reverseTailHeadMap, geometry.1, geometry.2.1,
+    geometry.2.2.1, geometry.2.2.2]
+  simp only [Option.map_some]
+  constructor <;> simp [offset, planar, Cell.add, add_assoc]
+
 end PeriodicThreeDM
 end LeanTrominoes
