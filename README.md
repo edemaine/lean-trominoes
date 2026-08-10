@@ -121,14 +121,16 @@ build; an imported proof counts when its statement matches the paper.
           periodic translates.
         - [x] Preserve endpoint-only contacts through degree-two contraction,
           including uniqueness of every suppressed splice occurrence.
-        - [ ] Preserve endpoint-only contacts through the first local
+        - [x] Preserve endpoint-only contacts through the first local
           endpoint-template normalization round.
-        - [ ] Preserve endpoint-only contacts through the second local
+        - [x] Preserve endpoint-only contacts through the second local
           endpoint-template normalization round.
-        - [ ] Preserve endpoint-only contacts through the third local
+        - [x] Preserve endpoint-only contacts through the third local
           endpoint-template normalization round.
-      - [ ] Deduce global assignment collision freedom and matching ports for
-        the compiled drawing, then package the computable reduction.
+      - [x] Deduce global assignment collision freedom from the completed
+        endpoint-contact certificate.
+      - [ ] Prove matching ports for the compiled drawing, then package the
+        computable reduction.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -6844,6 +6846,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicRouteSimplicity.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicRouteSimplicity.lean)
   proves every final splice duplicate-free and geometrically simple,
   completing the final drawing's endpoint-only route-contact certificate.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationFinalAssignmentCollisionFreedom.lean`](LeanTrominoes/PeriodicThreeDMNormalizationFinalAssignmentCollisionFreedom.lean)
+  feeds the final endpoint-contact certificate into the generic assignment
+  geometry theorem, proving all compiled vertex and route-interior raster
+  locations pairwise distinct.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
