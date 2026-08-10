@@ -6895,6 +6895,10 @@ The representation choices for this target are:
   defines the plane-wide normalized drawing orientation induced by a
   suppressed 3DM solution and proves every blank, routing, trichromatic, and
   monochromatic cell satisfies its local orientation constraint.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationOrientationOccurrence.lean`](LeanTrominoes/PeriodicThreeDMNormalizationOrientationOccurrence.lean)
+  evaluates that orientation at every explicit period translate of a listed
+  provenance site and identifies drawing-lattice neighbors with translated
+  geometric unit steps.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
