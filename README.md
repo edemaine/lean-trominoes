@@ -107,6 +107,8 @@ build; an imported proof counts when its statement matches the paper.
       horizontal-first representatives primitive recursive.
     - [x] Give segment terminals, crossing boundaries, carrier nodes, and
       positioned equality links canonical primitive-recursive encodings.
+    - [x] Prove the retained crossing orbit, carrier-node geometry, and stable
+      per-carrier chain sorting primitive recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6454,6 +6456,10 @@ The representation choices for this target are:
   gives segment endpoints and terminals, crossing sides and boundaries,
   carrier nodes, equality positions, and generic positioned equality links
   canonical product/sum encodings with primitive-recursive accessors.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedCarrierComputability.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedCarrierComputability.lean)
+  proves the bounded canonical crossing orbit, retained boundary and terminal
+  enumerations, carrier keys and macro-grid positions, axial order, and stable
+  per-carrier chain sorting primitive recursive.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
