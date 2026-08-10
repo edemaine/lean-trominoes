@@ -100,6 +100,8 @@ build; an imported proof counts when its statement matches the paper.
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
       primitive recursive from a primitive-recursive route lookup.
+    - [x] Prove fixed-eight occurrence splitting primitive recursive from a
+      primitive-recursive source formula and compass-port lookup.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -6419,6 +6421,11 @@ The representation choices for this target are:
   occurrence-splitting reduction computable and composes it with the Wang and
   width-three reductions to establish co-r.e.-hardness of local periodic
   3SAT-3.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
+  gives the eight compass ports a canonical finite encoding and proves the
+  fixed-eight copied clauses, separator implication rings, and full formula
+  primitive recursive from a primitive-recursive source and total
+  clause/literal-indexed port lookup.
 - [`LeanTrominoes/PeriodicOneInThree.lean`](LeanTrominoes/PeriodicOneInThree.lean)
   defines periodic exact-one satisfaction and the paper's three-clause
   reduction from a width-three disjunction, padding short clauses with fresh
