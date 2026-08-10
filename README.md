@@ -6834,6 +6834,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicTemplateCorridorOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicTemplateCorridorOccurrenceSeparation.lean)
   classifies every final template--corridor pair as source-incident,
   target-incident, or remote and proves strict separation in all three cases.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicOccurrenceSeparation.lean)
+  proves the exact final-round splice junctions and assembles all nine
+  pairwise piece invariants into complete separation of distinct lifted
+  final route occurrences.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
