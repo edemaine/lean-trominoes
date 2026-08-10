@@ -129,6 +129,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the ordered routed clause and variable-duplicator families,
       and the resulting complete retained planar-SAT formula, primitive
       recursive.
+    - [x] Give the five retained planar-SAT clause-source kinds canonical
+      encodings and prove their exact global metadata enumeration primitive
+      recursive in formula order.
     - [x] Encode periodic planar-SAT protovariables and prove retained
       finite-block periodicization and opaque variable wrapping primitive
       recursive.
@@ -6519,6 +6522,11 @@ The representation choices for this target are:
   incidence orders and endpoint terminals, the positioned signed-clause and
   active duplicator-arm families, and their composition with the retained
   crossover/wire core into the complete retained planar-SAT formula.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedClauseMetadataComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedClauseMetadataComputability.lean)
+  gives the five crossover, retained-carrier, bend, routed-clause, and
+  routed-variable source kinds canonical encodings, computes each local
+  embedded formula with its source indices, and proves their exact global
+  metadata enumeration primitive recursive in retained formula order.
 - [`LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean)
   gives periodic planar-SAT protovariables and their opaque wrappers canonical
   encodings, computes canonical crossing representatives and literal period
