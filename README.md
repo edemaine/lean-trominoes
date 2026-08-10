@@ -6922,6 +6922,10 @@ The representation choices for this target are:
   reads each original incidence value from its unique contracted triple
   endpoint in an arbitrary valid drawing orientation and proves the extracted
   values are coherent at every translated trichromatic vertex.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationReverseRouteStep.lean`](LeanTrominoes/PeriodicThreeDMNormalizationReverseRouteStep.lean)
+  derives the two-port inequality of every normalized wire or bend and proves
+  that an arbitrary valid drawing orientation preserves its forward-facing
+  value across each internal route cell.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
