@@ -129,6 +129,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the ordered routed clause and variable-duplicator families,
       and the resulting complete retained planar-SAT formula, primitive
       recursive.
+    - [x] Encode periodic planar-SAT protovariables and prove retained
+      finite-block periodicization and opaque variable wrapping primitive
+      recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6510,6 +6513,11 @@ The representation choices for this target are:
   incidence orders and endpoint terminals, the positioned signed-clause and
   active duplicator-arm families, and their composition with the retained
   crossover/wire core into the complete retained planar-SAT formula.
+- [`LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean)
+  gives periodic planar-SAT protovariables and their opaque wrappers canonical
+  encodings, computes canonical crossing representatives and literal period
+  shifts, and proves retained finite-block periodicization and formula
+  wrapping primitive recursive.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
