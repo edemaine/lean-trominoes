@@ -6827,6 +6827,10 @@ The representation choices for this target are:
   proves that the preceding cyclic port permutation preserves distinctness
   and lifts the reusable finite Figure 3 separation facts to every pair of
   final-round endpoint-template occurrences.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicCorridorSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicCorridorSeparation.lean)
+  transports the second drawing's lifted separation and simplicity through
+  the final scale/subdivide/trim operation, proving strict separation of all
+  distinct final-round middle corridors.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
