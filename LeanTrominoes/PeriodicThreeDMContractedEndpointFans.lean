@@ -120,6 +120,22 @@ theorem ContractedEndpoint.edge_mem_of_mem
   simp only [List.mem_cons, List.not_mem_nil, or_false] at endpointMember
   rcases endpointMember with rfl | rfl <;> exact edgeMember
 
+/-- Every enumerated contracted endpoint is based at a listed contracted
+vertex. -/
+theorem ContractedEndpoint.vertex_mem_of_mem
+    {problem : PeriodicThreeDM} {endpoint : ContractedEndpoint}
+    (member : endpoint ∈ problem.contractedEndpoints) :
+    endpoint.vertex ∈ problem.contractedGraph.vertices := by
+  have edgeMember := endpoint.edge_mem_of_mem member
+  have graphEdgeMember :
+      endpoint.edge.toPeriodicEdge ∈ problem.contractedGraph.edges := by
+    exact List.mem_map.mpr ⟨endpoint.edge, edgeMember, rfl⟩
+  have endpoints :=
+    (contractedGraph_isWellFormed problem).2 _ graphEdgeMember
+  cases endpoint with
+  | source edge => exact endpoints.1
+  | target edge => exact endpoints.2
+
 /-- Suppression never creates a prototype loop.  For a through edge, the
 two original incidence tags are distinct by the global tag-cover theorem. -/
 theorem contractedGraph_edgesAreLoopless

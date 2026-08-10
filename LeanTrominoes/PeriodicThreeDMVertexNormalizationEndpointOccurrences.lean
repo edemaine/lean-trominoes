@@ -199,6 +199,24 @@ theorem PlanarPresentation.contractedEndpointOccurrencePosition_injective
       firstMember secondMember recovered.1)
     recovered.2
 
+/-- Equal endpoint keys give equal old-scale geometric centers. -/
+theorem PlanarPresentation.contractedEndpointOccurrencePosition_eq_of_key_eq
+    {problem : PeriodicThreeDM}
+    (presentation : problem.PlanarPresentation)
+    {first second : ContractedEndpoint}
+    {firstTranslate secondTranslate : Cell}
+    (equal : first.occurrenceKey firstTranslate =
+      second.occurrenceKey secondTranslate) :
+    presentation.contractedEndpointOccurrencePosition
+        first firstTranslate =
+      presentation.contractedEndpointOccurrencePosition
+        second secondTranslate := by
+  have vertexEqual := congrArg Prod.fst equal
+  have translateEqual := congrArg Prod.snd equal
+  simp only [ContractedEndpoint.occurrenceKey] at vertexEqual translateEqual
+  unfold PlanarPresentation.contractedEndpointOccurrencePosition
+  rw [vertexEqual, translateEqual]
+
 /-- Distinct endpoint-occurrence keys have distinct old-scale template
 centers. -/
 theorem PlanarPresentation.contractedEndpointOccurrencePositions_ne

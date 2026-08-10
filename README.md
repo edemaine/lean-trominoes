@@ -6756,6 +6756,10 @@ The representation choices for this target are:
   their radius-three bound, separates templates based at distinct old
   lattice points after scale twelve, and handles distinct ports at one
   contracted vertex.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationTemplateOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationTemplateOccurrenceSeparation.lean)
+  lifts the local Figure 2 checks to arbitrary endpoint occurrences:
+  distinct centers are strictly separated, while distinct ports at one
+  center can meet only at source heads or reversed target tails.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCorridorSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCorridorSeparation.lean)
   proves strict-separation inheritance for the symmetric three-point
   corridor trim and separates a trimmed magnified corridor from every local
