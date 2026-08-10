@@ -6792,6 +6792,10 @@ The representation choices for this target are:
   names the lifted endpoint centers, templates, corridors, and complete
   routes of the first cyclic-rotation round, and gives its exact translated
   three-piece splice formula.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicTemplateSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicTemplateSeparation.lean)
+  verifies the finite identity/clockwise Figure 3 route families and lifts
+  their radius-three and same-center head-contact separation to arbitrary
+  endpoint occurrences of the first intermediate drawing.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
