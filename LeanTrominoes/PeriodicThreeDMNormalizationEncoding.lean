@@ -1,15 +1,15 @@
-import LeanTrominoes.PeriodicThreeDMComputability
+import LeanTrominoes.PeriodicGridDrawingComputability
 import LeanTrominoes.PeriodicThreeDMNormalizationRasterization
 
 /-!
 # Computability encodings for periodic 3DM normalization
 
 The normalized-drawing compiler uses only finite data: a natural-number 3DM
-instance and its finite periodic grid drawing.  This file gives the
-intermediate vertex, incidence, contracted-edge, endpoint, and direction
-types canonical encodings, together with primitive-recursive projections for
-the grid drawing.  Later compiler proofs can therefore ignore the geometric
-proof fields of `PlanarPresentation`.
+instance and its finite periodic grid drawing.  Building on the shared graph
+and drawing encodings, this file gives the compiler-specific incidence,
+contracted-edge, endpoint, and direction types canonical encodings.  Later
+compiler proofs can therefore ignore the geometric proof fields of
+`PlanarPresentation`.
 -/
 
 noncomputable section
@@ -18,30 +18,6 @@ namespace LeanTrominoes
 
 open Gadget
 open DegreeThreeVertexNormalization
-
-namespace PeriodicThreeDMVertex
-
-/-- Sum representation used by the normalization compiler. -/
-def equivData : PeriodicThreeDMVertex ≃ Nat ⊕ (WireColor × Nat) where
-  toFun
-    | .triple index => .inl index
-    | .element color atom => .inr (color, atom)
-  invFun
-    | .inl index => .triple index
-    | .inr data => .element data.1 data.2
-  left_inv vertex := by cases vertex <;> rfl
-  right_inv data := by rcases data with index | ⟨color, atom⟩ <;> rfl
-
-noncomputable instance : Primcodable PeriodicThreeDMVertex :=
-  Primcodable.ofEquiv (Nat ⊕ (WireColor × Nat)) equivData
-
-theorem equivData_primrec : Primrec equivData :=
-  Primrec.of_equiv
-
-theorem equivData_symm_primrec : Primrec equivData.symm :=
-  Primrec.of_equiv_symm
-
-end PeriodicThreeDMVertex
 
 namespace PeriodicThreeDM
 
@@ -179,32 +155,5 @@ noncomputable instance : Primcodable PortRotationCount :=
     (Fintype.equivFin PortRotationCount)
 
 end DegreeThreeVertexNormalization
-
-namespace PeriodicGridDrawing
-
-theorem equivData_primrec : Primrec equivData :=
-  Primrec.of_equiv
-
-theorem equivData_symm_primrec : Primrec equivData.symm :=
-  Primrec.of_equiv_symm
-
-theorem gridSizePred_primrec :
-    Primrec PeriodicGridDrawing.gridSizePred :=
-  (Primrec.fst.comp equivData_primrec).of_eq fun _ => rfl
-
-theorem vertexPositions_primrec :
-    Primrec PeriodicGridDrawing.vertexPositions :=
-  ((Primrec.fst.comp Primrec.snd).comp
-    equivData_primrec).of_eq fun _ => rfl
-
-theorem edgeRoutes_primrec :
-    Primrec PeriodicGridDrawing.edgeRoutes :=
-  ((Primrec.snd.comp Primrec.snd).comp
-    equivData_primrec).of_eq fun _ => rfl
-
-theorem gridSize_primrec : Primrec gridSize :=
-  (Primrec.succ.comp gridSizePred_primrec).of_eq fun _ => rfl
-
-end PeriodicGridDrawing
 
 end LeanTrominoes
