@@ -132,6 +132,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Encode periodic planar-SAT protovariables and prove retained
       finite-block periodicization and opaque variable wrapping primitive
       recursive.
+    - [x] Prove the retained positioned planar-SAT presentation, its
+      clause-anchor gauge, and its periodic clause-orbit representatives
+      primitive recursive.
     - [x] Prove positioned periodic-CNF erasure, variable renaming,
       anchor normalization, and clause-orbit deduplication primitive
       recursive.
@@ -6521,6 +6524,11 @@ The representation choices for this target are:
   encodings, computes canonical crossing representatives and literal period
   shifts, and proves retained finite-block periodicization and formula
   wrapping primitive recursive.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPeriodicizationComputability.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPeriodicizationComputability.lean)
+  lifts that construction to positioned clauses, applies the opaque wrapper,
+  computes the physical drawing period, normalizes every retained clause to
+  its canonical anchor gauge, and selects one representative per periodic
+  clause orbit, all by primitive recursion.
 - [`LeanTrominoes/PositionedPeriodicCNFComputability.lean`](LeanTrominoes/PositionedPeriodicCNFComputability.lean)
   proves the reusable positioned-formula bookkeeping executable: erasure,
   input-dependent variable renaming, total clause-position lookup, physical
