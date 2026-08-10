@@ -6784,6 +6784,10 @@ The representation choices for this target are:
   recovers each stored first-round route's contracted edge and transfers the
   occurrence-level theorem to complete lifted-route separation of the first
   intermediate normalization drawing.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteSimplicity.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationRouteSimplicity.lean)
+  proves that each first-round splice remains duplicate-free and hence
+  geometrically simple, completing the first intermediate drawing's
+  endpoint-only route-contact invariant for reuse by the cyclic rounds.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
