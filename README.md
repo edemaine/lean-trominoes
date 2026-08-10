@@ -6772,6 +6772,10 @@ The representation choices for this target are:
   splits an incident trimmed corridor into its initial outward ray and its
   remote tail, then proves that it strictly avoids every different-port
   Figure 2 arm at the same vertex center.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationTemplateCorridorOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationTemplateCorridorOccurrenceSeparation.lean)
+  classifies every lifted template--corridor pairing as source-incident,
+  target-incident, or remote; endpoint keys identify shared centers, while
+  complete old-route separation handles the remote case.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
