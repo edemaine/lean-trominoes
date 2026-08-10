@@ -96,6 +96,9 @@ build; an imported proof counts when its statement matches the paper.
       and the lifted-route separation and route-simplicity certificates.
     - [x] Prove the total Wang source-formula map and the logical
       polarity-normalization transform computable.
+    - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
+      encoding primitive recursive, including its connector references and
+      natural-number color-class numbering.
     - [x] Reduce the planar drawing obligations to a finite Boolean
       certificate and prove every accepted drawing supplies the continuous
       planarity, separation, and route-simplicity data needed by the compiler.
@@ -7375,6 +7378,14 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncode.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncode.lean)
   assigns those typed prototypes faithful natural-number names, proves all
   encoded references are in range, and defines matching round trips.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEnumerationComputability.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEnumerationComputability.lean)
+  gives primitive-recursive encodings to the planar construction's typed
+  elements and triples, then proves its source-occurrence, connector-module,
+  color-class, and prototype-triple enumerations primitive recursive.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingComputability.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingComputability.lean)
+  proves the complete Dyer--Frieze connector-reference calculation,
+  first-index color numbering, and natural-number `PeriodicThreeDM` encoding
+  primitive recursive and hence computable.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingSemantics.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMEncodingSemantics.lean)
   proves that numbered and typed incidence enumerations agree up to
   permutation.
