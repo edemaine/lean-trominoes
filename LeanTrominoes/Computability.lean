@@ -416,6 +416,74 @@ theorem int_toNat_primrec : Primrec Int.toNat := by
           rw [intCodeNegative_encode_negSucc]
           rfl
 
+/-- Divide an encoded integer by a natural divisor.  For a positive divisor,
+the odd code `2*n+1` of `-(n+1)` maps to the odd code for
+`-((n / divisor) + 1)`, exactly Lean's Euclidean integer quotient. -/
+def intCodeEdivNat (code divisor : Nat) : Nat :=
+  if divisor = 0 then
+    0
+  else bif intCodeNegative code then
+    2 * (code.div2 / divisor) + 1
+  else
+    2 * (code.div2 / divisor)
+
+theorem intCodeEdivNat_primrec : Primrec₂ intCodeEdivNat := by
+  change Primrec fun input : Nat × Nat =>
+    intCodeEdivNat input.1 input.2
+  let quotient : Nat × Nat → Nat := fun input =>
+    input.1.div2 / input.2
+  have quotientPrimrec : Primrec quotient :=
+    Primrec.nat_div.comp
+      (Primrec.nat_div2.comp Primrec.fst) Primrec.snd
+  have positive : Primrec fun input : Nat × Nat =>
+      2 * quotient input :=
+    Primrec.nat_mul.comp (Primrec.const 2) quotientPrimrec
+  have negative : Primrec fun input : Nat × Nat =>
+      2 * quotient input + 1 :=
+    Primrec.nat_add.comp positive (Primrec.const 1)
+  simpa only [intCodeEdivNat, quotient] using (Primrec.ite
+    (Primrec.eq.comp Primrec.snd (Primrec.const 0))
+    (Primrec.const 0)
+    (Primrec.cond
+      (intCodeNegative_primrec.comp Primrec.fst)
+      negative positive))
+
+@[simp]
+theorem intCodeEdivNat_correct (integer : Int) (divisor : Nat) :
+    intCodeEdivNat (encode integer) divisor =
+      encode (integer / (divisor : Int)) := by
+  cases divisor with
+  | zero =>
+      change intCodeEdivNat (encode integer) 0 =
+        encode (integer / (0 : Int))
+      rw [Int.ediv_zero]
+      change intCodeEdivNat (encode integer) 0 = encode (Int.ofNat 0)
+      rw [show intCodeEdivNat (encode integer) 0 = 0 by
+        simp [intCodeEdivNat], encode_int_ofNat]
+  | succ divisor =>
+      cases integer with
+      | ofNat value =>
+          change intCodeEdivNat (encode (Int.ofNat value)) (divisor + 1) =
+            encode (Int.ofNat (value / (divisor + 1)))
+          rw [encode_int_ofNat, encode_int_ofNat]
+          simp [intCodeEdivNat, intCodeNegative, Nat.bodd,
+            Nat.div2_bit0]
+      | negSucc value =>
+          change intCodeEdivNat (encode (Int.negSucc value)) (divisor + 1) =
+            encode (Int.negSucc (value / (divisor + 1)))
+          rw [encode_int_negSucc, encode_int_negSucc]
+          simp [intCodeEdivNat, intCodeNegative, Nat.bodd]
+
+/-- Euclidean division of an integer by a natural divisor is primitive
+recursive (including Lean's total zero-divisor case). -/
+theorem int_edivNat_primrec :
+    Primrec₂ fun integer : Int => fun divisor : Nat =>
+      integer / (divisor : Int) := by
+  apply Primrec₂.encode_iff.mp
+  exact (intCodeEdivNat_primrec.comp₂
+    (Primrec.encode.comp₂ Primrec₂.left)
+    Primrec₂.right).of_eq intCodeEdivNat_correct
+
 /-- Integer subtraction is primitive recursive. -/
 theorem int_subtract_primrec : Primrec₂ ((· - ·) : Int → Int → Int) := by
   simpa only [sub_eq_add_neg] using

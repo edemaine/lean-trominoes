@@ -622,5 +622,108 @@ theorem retainedDrawingCompleteCarrierLinksRaw_primrec
   Primrec.list_flatMap retainedDrawingCompleteCarrierKeys_primrec
     retainedCompleteCarrierLinks_primrec
 
+theorem crossingPeriodShift_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec₂ (crossingPeriodShift :
+      PeriodicGraph Vertex → CrossingRecord → Cell) := by
+  change Primrec fun input : PeriodicGraph Vertex × CrossingRecord =>
+    crossingPeriodShift input.1 input.2
+  have point : Primrec fun input :
+      PeriodicGraph Vertex × CrossingRecord => input.2.point :=
+    CrossingRecord.point_primrec.comp Primrec.snd
+  have size : Primrec fun input :
+      PeriodicGraph Vertex × CrossingRecord => drawingGridSize input.1 :=
+    drawingGridSize_primrec.comp Primrec.fst
+  exact Primrec.pair
+    (Computability.int_edivNat_primrec.comp
+      (Primrec.fst.comp point) size)
+    (Computability.int_edivNat_primrec.comp
+      (Primrec.snd.comp point) size)
+
+theorem carrierLinkRepresentativeShift_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec₂ (carrierLinkRepresentativeShift :
+      PeriodicGraph Vertex →
+        PlanarThreeSAT.EqualityLink CarrierNode → Cell) := by
+  let Input := PeriodicGraph Vertex ×
+    PlanarThreeSAT.EqualityLink CarrierNode
+  have firstData : Primrec fun input : Input =>
+      CarrierNode.equivData input.2.first :=
+    CarrierNode.equivData_primrec.comp
+      (EqualityLink.first_primrec.comp Primrec.snd)
+  have firstBoundary : Primrec₂ fun (input : Input)
+      (boundary : CrossingBoundary) =>
+      crossingPeriodShift input.1 boundary.crossing :=
+    crossingPeriodShift_primrec.comp₂
+      (Primrec.fst.comp₂ Primrec₂.left)
+      (CrossingBoundary.crossing_primrec.comp₂ Primrec₂.right)
+  have firstTerminal : Primrec₂ fun (input : Input)
+      (terminal : SegmentTerminal) =>
+      match input.2.second with
+      | .boundary boundary =>
+          crossingPeriodShift input.1 boundary.crossing
+      | .terminal _ => terminal.translate := by
+    have secondData : Primrec fun input : Input × SegmentTerminal =>
+        CarrierNode.equivData input.1.2.second :=
+      CarrierNode.equivData_primrec.comp
+        (EqualityLink.second_primrec.comp
+          (Primrec.snd.comp Primrec.fst))
+    have secondBoundary : Primrec₂ fun
+        (input : Input × SegmentTerminal)
+        (boundary : CrossingBoundary) =>
+        crossingPeriodShift input.1.1 boundary.crossing :=
+      crossingPeriodShift_primrec.comp₂
+        ((Primrec.fst.comp Primrec.fst).comp₂ Primrec₂.left)
+        (CrossingBoundary.crossing_primrec.comp₂ Primrec₂.right)
+    have secondTerminal : Primrec₂ fun
+        (input : Input × SegmentTerminal)
+        (_second : SegmentTerminal) => input.2.translate :=
+      SegmentTerminal.translate_primrec.comp₂
+        (Primrec.snd.comp₂ Primrec₂.left)
+    exact (Primrec.sumCasesOn secondData
+      secondBoundary secondTerminal).of_eq fun input => by
+        rcases input with ⟨⟨graph, link⟩, terminal⟩
+        cases secondEq : link.second <;>
+          simp [CarrierNode.equivData, secondEq]
+  exact (Primrec.sumCasesOn firstData
+    firstBoundary firstTerminal).of_eq fun input => by
+      rcases input with ⟨graph, link⟩
+      cases firstEq : link.first with
+      | boundary boundary =>
+          simp [carrierLinkRepresentativeShift, CarrierNode.equivData,
+            firstEq]
+      | terminal terminal =>
+          cases secondEq : link.second <;>
+            simp [carrierLinkRepresentativeShift, CarrierNode.equivData,
+              firstEq, secondEq]
+
+theorem carrierLinkIsRepresentative_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    PrimrecRel fun (link : PlanarThreeSAT.EqualityLink CarrierNode)
+        (graph : PeriodicGraph Vertex) =>
+      CarrierLinkIsRepresentative graph link := by
+  change PrimrecPred fun input :
+      PlanarThreeSAT.EqualityLink CarrierNode × PeriodicGraph Vertex =>
+    carrierLinkRepresentativeShift input.2 input.1 = (0, 0)
+  exact Primrec.eq.comp
+    (carrierLinkRepresentativeShift_primrec.comp
+      Primrec.snd Primrec.fst)
+    (Primrec.const (0, 0))
+
+theorem retainedDrawingCompleteCarrierLinks_primrec
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Primrec (retainedDrawingCompleteCarrierLinks :
+      PeriodicGraph Vertex →
+        List (PlanarThreeSAT.EqualityLink CarrierNode)) :=
+  carrierLinkIsRepresentative_primrec.listFilter.comp
+    retainedDrawingCompleteCarrierLinksRaw_primrec Primrec.id
+
+theorem retainedDrawingCompleteCarrierLinks_computable
+    {Vertex : Type*} [Primcodable Vertex] [DecidableEq Vertex] :
+    Computable (retainedDrawingCompleteCarrierLinks :
+      PeriodicGraph Vertex →
+        List (PlanarThreeSAT.EqualityLink CarrierNode)) :=
+  retainedDrawingCompleteCarrierLinks_primrec.to_comp
+
 end PeriodicOrthocrossing
 end LeanTrominoes
