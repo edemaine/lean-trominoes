@@ -6926,6 +6926,10 @@ The representation choices for this target are:
   derives the two-port inequality of every normalized wire or bend and proves
   that an arbitrary valid drawing orientation preserves its forward-facing
   value across each internal route cell.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationReverseRouteCompatibility.lean`](LeanTrominoes/PeriodicThreeDMNormalizationReverseRouteCompatibility.lean)
+  iterates that invariant along every complete normalized route, reconciles
+  source and target period coordinates, and proves the two contracted endpoint
+  inward values are opposite in any valid drawing orientation.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
