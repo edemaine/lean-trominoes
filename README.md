@@ -6812,6 +6812,9 @@ The representation choices for this target are:
   proves the exact cyclic-template/corridor splice junctions and assembles
   all pairwise piece invariants into complete separation of distinct lifted
   second-round route occurrences.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicDrawingSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicDrawingSeparation.lean)
+  recovers the contracted edge owning each stored second-round route and
+  lifts occurrence separation to the complete periodic drawing invariant.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
