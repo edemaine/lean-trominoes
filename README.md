@@ -6883,6 +6883,10 @@ The representation choices for this target are:
   lifts finite provenance lookup to arbitrary cells of the infinite drawing
   and reconstructs the unique geometric period translate represented by
   every successful lookup.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationEndpointOrientation.lean`](LeanTrominoes/PeriodicThreeDMNormalizationEndpointOrientation.lean)
+  selects the unique contracted endpoint at every exposed normalized vertex
+  port and identifies its inward value with the appropriate original 3DM
+  incidence value at the lifted vertex translate.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
