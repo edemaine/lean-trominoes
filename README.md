@@ -103,6 +103,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the finite retained crossing-halo enumeration primitive
       recursive, including translated segment occurrences, crossing records,
       and the proper-crossing filter.
+    - [x] Prove the canonical fundamental-square crossings and their
+      horizontal-first representatives primitive recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6442,6 +6444,10 @@ The representation choices for this target are:
   encodes retained crossing records and proves the neighboring translated
   segment occurrences, oriented intersection candidates, genuine-crossing
   predicate, filtering, and deduplication primitive recursive.
+- [`LeanTrominoes/PeriodicOrthocrossingCanonicalComputability.lean`](LeanTrominoes/PeriodicOrthocrossingCanonicalComputability.lean)
+  proves the finite fundamental-square point enumeration, full canonical
+  crossing candidate product and filter, and horizontal-first representative
+  list primitive recursive.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
