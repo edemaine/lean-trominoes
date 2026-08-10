@@ -58,6 +58,23 @@ theorem rotationCountFromData_primrec :
     Primrec rotationCountFromData :=
   Primrec.dom_finite _
 
+theorem rotationCountFromData_at
+    (input : Input × PeriodicThreeDMVertex) :
+    rotationCountFromData
+        (vertexIsTriple input.2, endpointTripleDataAt input) =
+      rotationCountAt input.1 input.2 := by
+  rcases input with ⟨compilerInput, vertex⟩
+  cases vertex with
+  | element color atom =>
+      rfl
+  | triple index =>
+      simp only [rotationCountFromData, vertexIsTriple, if_true,
+        rotationCountAt]
+      congr 2
+      funext port
+      exact canonicalColorFromData_endpointTripleDataAt
+        (compilerInput, .triple index) port
+
 theorem rotationCountAt_primrec :
     Primrec fun input : Input × PeriodicThreeDMVertex =>
       rotationCountAt input.1 input.2 := by
@@ -68,18 +85,7 @@ theorem rotationCountAt_primrec :
       endpointTripleDataAt input) :=
     endpointTripleDataAt_primrec
   exact (rotationCountFromData_primrec.comp
-    (Primrec.pair isTriple data)).of_eq fun input => by
-      rcases input with ⟨compilerInput, vertex⟩
-      cases vertex with
-      | element color atom =>
-          rfl
-      | triple index =>
-          simp only [rotationCountFromData, vertexIsTriple, if_true,
-            rotationCountAt]
-          congr 2
-          funext port
-          exact canonicalColorFromData_endpointTripleDataAt
-            (compilerInput, .triple index) port
+    (Primrec.pair isTriple data)).of_eq rotationCountFromData_at
 
 end NormalizationCompiler
 end PeriodicThreeDM
