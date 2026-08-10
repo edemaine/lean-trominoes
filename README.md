@@ -98,6 +98,8 @@ build; an imported proof counts when its statement matches the paper.
       polarity-normalization transform computable.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
+    - [x] Prove stable route-direction sorting of positioned periodic clauses
+      primitive recursive from a primitive-recursive route lookup.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -7456,6 +7458,14 @@ The representation choices for this target are:
   primitive recursive.  Its family interface allows the finite formula and
   per-variable offset function to depend on the same reduction input, as
   required by the canonical gauges in the planar Wang construction.
+- [`LeanTrominoes/PrimrecListSort.lean`](LeanTrominoes/PrimrecListSort.lean)
+  supplies a stable Boolean insertion sort with a common external parameter,
+  proves it primitive recursive, and identifies it with Mathlib's relational
+  `List.insertionSort` whenever the Boolean comparison decides that relation.
+- [`LeanTrominoes/PositionedPeriodicCNFClauseOrderingComputability.lean`](LeanTrominoes/PositionedPeriodicCNFClauseOrderingComputability.lean)
+  encodes finite positioned periodic formulas and proves their stable
+  clockwise route-direction clause ordering primitive recursive from a
+  primitive-recursive route lookup.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean)
   proves that the same preprocessing preserves the occurrence-three
   restriction.  Every embedded source variable has exactly its original
