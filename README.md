@@ -6747,6 +6747,11 @@ The representation choices for this target are:
   proves translation-equivariance of magnification, endpoint trimming, and
   template splicing, and identifies every lifted first-round route with the
   same replacement applied directly to its lifted contracted occurrence.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationLocalTemplateSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationLocalTemplateSeparation.lean)
+  strengthens the finite Figure 2 checks to full route separation, proves
+  their radius-three bound, separates templates based at distinct old
+  lattice points after scale twelve, and handles distinct ports at one
+  contracted vertex.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
