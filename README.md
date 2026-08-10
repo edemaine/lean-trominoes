@@ -115,6 +115,9 @@ build; an imported proof counts when its statement matches the paper.
       representative filter for retained carrier links primitive recursive.
     - [x] Give embedded clauses a canonical encoding and prove the retained
       positioned carrier-equality formula primitive recursive.
+    - [x] Encode route bends and prove their neighboring-occurrence
+      enumeration, equality links, and retained wire formula primitive
+      recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6473,6 +6476,10 @@ The representation choices for this target are:
   gives embedded clauses their canonical product encoding, proves positioned
   equality instances and finite equality families primitive recursive, and
   specializes this construction to the retained carrier formula.
+- [`LeanTrominoes/PeriodicOrthocrossingBendComputability.lean`](LeanTrominoes/PeriodicOrthocrossingBendComputability.lean)
+  encodes route bends, enumerates every bend in the neighboring route block,
+  constructs their positioned equality links, and combines them with the
+  retained carriers into the executable wire formula.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
