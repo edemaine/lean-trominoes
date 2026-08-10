@@ -235,6 +235,38 @@ theorem anchorNormalize_primrec
     Primrec.list_map sourceClauses one
   exact (mk_primrec.comp clauses).of_eq fun _ => rfl
 
+theorem variableGauge_primrec
+    {Input Variable : Type*} [Primcodable Input] [Primcodable Variable]
+    (source : Input → PositionedPeriodicCNF Variable)
+    (gauge : Input → Variable → Cell)
+    (sourcePrimrec : Primrec source)
+    (gaugePrimrec : Primrec fun input : Input × Variable =>
+      gauge input.1 input.2) :
+    Primrec fun input => (source input).variableGauge (gauge input) := by
+  have sourceClauses : Primrec fun input : Input =>
+      (source input).clauses :=
+    clauses_primrec.comp sourcePrimrec
+  have one : Primrec₂ fun (input : Input)
+      (clause : PositionedPeriodicClause Variable) =>
+      PositionedPeriodicClause.mk clause.position
+        (clause.literals.variableGauge (gauge input)) := by
+    change Primrec fun combined :
+        Input × PositionedPeriodicClause Variable =>
+      PositionedPeriodicClause.mk combined.2.position
+        (combined.2.literals.variableGauge (gauge combined.1))
+    exact PositionedPeriodicClause.mk_primrec.comp
+      (Primrec.pair
+        (PositionedPeriodicClause.position_primrec.comp Primrec.snd)
+        (PeriodicClause.variableGauge_primrec gauge gaugePrimrec |>.comp
+          (Primrec.pair Primrec.fst
+            (PositionedPeriodicClause.literals_primrec.comp Primrec.snd))))
+  have clauses : Primrec fun input : Input =>
+      (source input).clauses.map fun clause =>
+        PositionedPeriodicClause.mk clause.position
+          (clause.literals.variableGauge (gauge input)) :=
+    Primrec.list_map sourceClauses one
+  exact (mk_primrec.comp clauses).of_eq fun _ => rfl
+
 theorem deduplicateByLiterals_primrec
     {Input Variable : Type*}
     [Primcodable Input] [Primcodable Variable] [DecidableEq Variable]
@@ -269,5 +301,31 @@ theorem deduplicateByLiterals_primrec
   exact (mk_primrec.comp clauses).of_eq fun _ => rfl
 
 end PositionedPeriodicCNF
+
+namespace PeriodicVariablePlacement
+
+theorem canonicalPositionGauge_primrec
+    {Input Variable : Type*} [Primcodable Input] [Primcodable Variable]
+    (period : Input → Nat) (position : Input → Variable → Cell)
+    (periodPrimrec : Primrec period)
+    (positionPrimrec : Primrec fun input : Input × Variable =>
+      position input.1 input.2) :
+    Primrec fun input : Input × Variable =>
+      ({ period := period input.1
+         position := position input.1 } :
+        PeriodicVariablePlacement Variable).canonicalPositionGauge input.2 := by
+  have point : Primrec fun input : Input × Variable =>
+      position input.1 input.2 :=
+    positionPrimrec
+  have divisor : Primrec fun input : Input × Variable =>
+      period input.1 :=
+    periodPrimrec.comp Primrec.fst
+  exact Primrec.pair
+    (Computability.int_edivNat_primrec.comp
+      (Primrec.fst.comp point) divisor)
+    (Computability.int_edivNat_primrec.comp
+      (Primrec.snd.comp point) divisor)
+
+end PeriodicVariablePlacement
 
 end LeanTrominoes

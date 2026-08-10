@@ -133,8 +133,8 @@ build; an imported proof counts when its statement matches the paper.
       finite-block periodicization and opaque variable wrapping primitive
       recursive.
     - [x] Prove the retained positioned planar-SAT presentation, its
-      clause-anchor gauge, and its periodic clause-orbit representatives
-      primitive recursive.
+      canonical variable and clause-anchor gauges, and its periodic
+      clause-orbit representatives primitive recursive.
     - [x] Prove positioned periodic-CNF erasure, variable renaming,
       anchor normalization, and clause-orbit deduplication primitive
       recursive.
@@ -6526,14 +6526,16 @@ The representation choices for this target are:
   wrapping primitive recursive.
 - [`LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPeriodicizationComputability.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPlanarSATPeriodicizationComputability.lean)
   lifts that construction to positioned clauses, applies the opaque wrapper,
-  computes the physical drawing period, normalizes every retained clause to
-  its canonical anchor gauge, and selects one representative per periodic
-  clause orbit, all by primitive recursion.
+  computes every periodic variable position and its canonical period-cell
+  quotient, applies the variable and clause-anchor gauges, and selects one
+  representative per periodic clause orbit.  Thus the final
+  `retainedPlanarSATFormula` is primitive recursive.
 - [`LeanTrominoes/PositionedPeriodicCNFComputability.lean`](LeanTrominoes/PositionedPeriodicCNFComputability.lean)
   proves the reusable positioned-formula bookkeeping executable: erasure,
-  input-dependent variable renaming, total clause-position lookup, physical
-  clause-anchor normalization, and first-representative literal-list
-  deduplication are all primitive recursive.
+  input-dependent variable renaming and gauging, total clause-position
+  lookup, canonical position quotients, physical clause-anchor normalization,
+  and first-representative literal-list deduplication are all primitive
+  recursive.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
