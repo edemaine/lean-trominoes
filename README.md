@@ -6819,6 +6819,10 @@ The representation choices for this target are:
   proves each second-round splice duplicate-free and geometrically simple,
   completing the second intermediate drawing's endpoint-only route-contact
   certificate for the final cyclic round.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicOccurrences.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicOccurrences.lean)
+  names the lifted templates, corridors, endpoint centers, and complete
+  routes of the final cyclic round and proves its exact translated
+  three-piece splice formula.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
