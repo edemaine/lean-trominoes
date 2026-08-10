@@ -6815,6 +6815,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicDrawingSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicDrawingSeparation.lean)
   recovers the contracted edge owning each stored second-round route and
   lifts occurrence separation to the complete periodic drawing invariant.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicRouteSimplicity.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicRouteSimplicity.lean)
+  proves each second-round splice duplicate-free and geometrically simple,
+  completing the second intermediate drawing's endpoint-only route-contact
+  certificate for the final cyclic round.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
