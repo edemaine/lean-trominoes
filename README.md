@@ -6858,6 +6858,9 @@ The representation choices for this target are:
   inverts the recursive route rasterizer, recovering the displayed route
   triple behind every emitted interior assignment and proving that its only
   exposed sides point to the predecessor and successor.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationRoutePortMatching.lean`](LeanTrominoes/PeriodicThreeDMNormalizationRoutePortMatching.lean)
+  proves that every exposed final route-interior port matches its geometric
+  unit-step neighbor, including the source and target boundary cases.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
