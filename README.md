@@ -6800,6 +6800,10 @@ The representation choices for this target are:
   transports the first drawing's complete lifted separation and route
   simplicity through another scale/subdivide/trim stage, making the middle
   corridors of distinct second-round occurrences strictly disjoint.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicIncidentCorridorSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationCyclicIncidentCorridorSeparation.lean)
+  proves the reusable local half-plane and remote-neighborhood lemmas showing
+  that a trimmed cyclic-round corridor strictly avoids every different
+  template arm at either incident endpoint.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
