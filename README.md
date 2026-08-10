@@ -102,6 +102,8 @@ build; an imported proof counts when its statement matches the paper.
       primitive recursive from a primitive-recursive route lookup.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
+    - [x] Prove stable terminal-angle occurrence sorting and its induced
+      fixed-eight compass-port lookup primitive recursive from finite routes.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -6426,6 +6428,10 @@ The representation choices for this target are:
   fixed-eight copied clauses, separator implication rings, and full formula
   primitive recursive from a primitive-recursive source and total
   clause/literal-indexed port lookup.
+- [`LeanTrominoes/PeriodicThreeSATThreeAngularOrderComputability.lean`](LeanTrominoes/PeriodicThreeSATThreeAngularOrderComputability.lean)
+  proves the terminal-vector angular-radial comparison, stable angular
+  occurrence ordering, east-first compass-port lookup, and resulting
+  fixed-eight split primitive recursive from a finite source and route lookup.
 - [`LeanTrominoes/PeriodicOneInThree.lean`](LeanTrominoes/PeriodicOneInThree.lean)
   defines periodic exact-one satisfaction and the paper's three-clause
   reduction from a width-three disjunction, padding short clauses with fresh
@@ -7469,6 +7475,8 @@ The representation choices for this target are:
   supplies a stable Boolean insertion sort with a common external parameter,
   proves it primitive recursive, and identifies it with Mathlib's relational
   `List.insertionSort` whenever the Boolean comparison decides that relation.
+  Its indexed stable-sort interface is additionally proved equal to Lean's
+  `List.mergeSort` for every total transitive Boolean comparison.
 - [`LeanTrominoes/PositionedPeriodicCNFClauseOrderingComputability.lean`](LeanTrominoes/PositionedPeriodicCNFClauseOrderingComputability.lean)
   encodes finite positioned periodic formulas and proves their stable
   clockwise route-direction clause ordering primitive recursive from a
