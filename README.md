@@ -102,6 +102,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Give the graph, grid-drawing, indexed-segment, and indexed-route-
         point data canonical encodings, and prove the 3DM incidence-graph and
         finite drawing enumerations primitive recursive.
+      - [x] Prove the integer interval enumeration and all segment predicates
+        used by the verifier primitive recursive.
       - [ ] Prove the complete finite drawing verifier primitive recursive.
       - [x] Enumerate encoded periodic grid drawings, select the first
         accepted certificate by total unbounded search, prove the selector
@@ -6625,6 +6627,11 @@ The representation choices for this target are:
   canonical primitive-recursive encodings.  It proves that polyline segment
   enumeration, indexed drawing enumeration, and the complete periodic 3DM
   incidence-graph construction are primitive recursive.
+- [`LeanTrominoes/PeriodicGridDrawingGeometryComputability.lean`](LeanTrominoes/PeriodicGridDrawingGeometryComputability.lean)
+  proves primitive recursiveness of integer interval enumeration, segment
+  translation, all exact axis-aligned containment and intersection
+  predicates, interior lattice-point enumeration, occurrence keys, and the
+  route-endpoint test used by finite drawing certificates.
 - [`LeanTrominoes/PeriodicThreeDMIncidenceVertexCoverage.lean`](LeanTrominoes/PeriodicThreeDMIncidenceVertexCoverage.lean)
   shows that this incidence graph is loopless and, under the degree-two-or-
   three promise, has no isolated vertices.  Consequently every compatible

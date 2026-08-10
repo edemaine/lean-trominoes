@@ -401,6 +401,21 @@ theorem int_ofNat_primrec : Primrec (Int.ofNat : Nat → Int) := by
   exact (Primrec.nat_mul.comp (Primrec.const 2) Primrec.id).of_eq
     encode_int_ofNat
 
+/-- Truncating an integer to a natural number is primitive recursive. -/
+theorem int_toNat_primrec : Primrec Int.toNat := by
+  exact (Primrec.cond
+    (intCodeNegative_primrec.comp Primrec.encode)
+    (Primrec.const 0)
+    (intCodeMagnitude_primrec.comp Primrec.encode)).of_eq fun integer => by
+      cases integer with
+      | ofNat n =>
+          rw [intCodeNegative_encode_ofNat,
+            intCodeMagnitude_encode_ofNat]
+          rfl
+      | negSucc n =>
+          rw [intCodeNegative_encode_negSucc]
+          rfl
+
 /-- Integer subtraction is primitive recursive. -/
 theorem int_subtract_primrec : Primrec₂ ((· - ·) : Int → Int → Int) := by
   simpa only [sub_eq_add_neg] using
