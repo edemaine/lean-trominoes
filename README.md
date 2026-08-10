@@ -6902,6 +6902,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicThreeDMNormalizationForwardSourceCompatibility.lean`](LeanTrominoes/PeriodicThreeDMNormalizationForwardSourceCompatibility.lean)
   proves the forward orientation assigns opposite values to every normalized
   source-vertex port and its first routing-cell neighbor.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationForwardTargetCompatibility.lean`](LeanTrominoes/PeriodicThreeDMNormalizationForwardTargetCompatibility.lean)
+  reconciles source- and target-based period translates and proves the last
+  routing-cell port is compatible with its translated target vertex.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
