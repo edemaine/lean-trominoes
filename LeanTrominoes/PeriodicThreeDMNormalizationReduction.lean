@@ -103,6 +103,35 @@ def normalizedOrientationReduction :
           (reduction.separated value)
           (reduction.sourceSimple value)).symm
 
+/-- It is enough to construct the continuously planar compiler on Wang tile
+sets: the standard domino-problem reduction supplies the universal co-r.e.
+source map. -/
+theorem normalizedOrientationCoREHard_of_tilesReduction
+    (tilesReduction :
+      ContinuousPlanarReduction LeanWang.TilesPlane) :
+    Gadget.NormalizedOrientationCoREHard := by
+  intro α _ source sourceCoRE
+  obtain ⟨reduce, reduceComputable, reduceCorrect⟩ :=
+    LeanWang.domino_problem_coRE_hard source sourceCoRE
+  let reduction : ContinuousPlanarReduction source :=
+    { input := tilesReduction.input ∘ reduce
+      input_computable :=
+        tilesReduction.input_computable.comp reduceComputable
+      presentation := fun value =>
+        tilesReduction.presentation (reduce value)
+      drawing_eq := fun value =>
+        tilesReduction.drawing_eq (reduce value)
+      degree := fun value =>
+        tilesReduction.degree (reduce value)
+      separated := fun value =>
+        tilesReduction.separated (reduce value)
+      sourceSimple := fun value route member =>
+        tilesReduction.sourceSimple (reduce value) route member
+      correct := fun value =>
+        (reduceCorrect value).trans
+          (tilesReduction.correct (reduce value)) }
+  exact ⟨reduction.normalizedOrientationReduction⟩
+
 end ContinuousPlanarReduction
 
 end NormalizationCompiler
