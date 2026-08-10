@@ -118,6 +118,11 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Encode route bends and prove their neighboring-occurrence
       enumeration, equality links, and retained wire formula primitive
       recursive.
+    - [x] Encode the fixed crossover variables and ports, and prove generic
+      embedded-formula renaming, placement, and crossover-family
+      instantiation primitive recursive.
+    - [x] Prove the retained crossover family and its combination with the
+      retained route-wire formula primitive recursive.
     - [x] Prove clause-anchor normalization and input-dependent variable
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
@@ -6480,6 +6485,15 @@ The representation choices for this target are:
   encodes route bends, enumerates every bend in the neighboring route block,
   constructs their positioned equality links, and combines them with the
   retained carriers into the executable wire formula.
+- [`LeanTrominoes/PlanarThreeSATComputability.lean`](LeanTrominoes/PlanarThreeSATComputability.lean)
+  gives the fixed crossover variables, internal variables, and four-port
+  records canonical encodings, then proves generic embedded-clause renaming,
+  placement, gadget instantiation, and finite crossover families primitive
+  recursive.
+- [`LeanTrominoes/PeriodicOrthocrossingCrossoverComputability.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverComputability.lean)
+  proves the canonical crossing ports and fixed crossover family primitive
+  recursive, scopes the retained route-wire formula into the gadget variable
+  type, and combines both parts into an executable retained planar core.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitComputability.lean)
   gives the eight compass ports a canonical finite encoding and proves the
   fixed-eight copied clauses, separator implication rings, and full formula
