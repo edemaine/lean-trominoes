@@ -96,6 +96,8 @@ build; an imported proof counts when its statement matches the paper.
       and the lifted-route separation and route-simplicity certificates.
     - [x] Prove the total Wang source-formula map and the logical
       polarity-normalization transform computable.
+    - [x] Prove clause-anchor normalization and input-dependent variable
+      gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -7449,6 +7451,11 @@ The representation choices for this target are:
   traversals.  This includes occurrence indexing, literal replacement, and
   generation of the binary complement clauses, independently of the later
   geometric subdivision choices.
+- [`LeanTrominoes/PeriodicCNFGaugeComputability.lean`](LeanTrominoes/PeriodicCNFGaugeComputability.lean)
+  proves clause-anchor normalization and source-dependent variable gauging
+  primitive recursive.  Its family interface allows the finite formula and
+  per-variable offset function to depend on the same reduction input, as
+  required by the canonical gauges in the planar Wang construction.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean)
   proves that the same preprocessing preserves the occurrence-three
   restriction.  Every embedded source variable has exactly its original
