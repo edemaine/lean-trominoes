@@ -1,5 +1,5 @@
 import LeanTrominoes.PeriodicThreeDMComputability
-import LeanTrominoes.PeriodicThreeDMFiniteDrawingCertificate
+import LeanTrominoes.PeriodicThreeDMFiniteDrawingCertificateComputability
 import Mathlib.Computability.RE
 
 /-!
@@ -7,9 +7,9 @@ import Mathlib.Computability.RE
 
 The finite drawing verifier can be searched by enumerating the standard
 `Primcodable` encoding of `PeriodicGridDrawing`.  This module isolates that
-generic minimization argument: if a source map always admits a verified
-drawing, and both the source map and verifier are computable, then choosing
-the first verified drawing is a total computable function.
+generic minimization argument: if a computable source map always admits a
+verified drawing, then choosing the first verified drawing is a total
+computable function.
 -/
 
 namespace LeanTrominoes
@@ -114,20 +114,18 @@ noncomputable def searchCertifiedPresentation {Input : Type*}
   FiniteDrawingCertificate.certifiedPresentationOfVerified
     (wellFormed input) (searchDrawing_spec problemOf available input)
 
-/-- The predicate searched by `searchIndex` is computable once the source
-problem and finite verifier are computable. -/
+/-- The predicate searched by `searchIndex` is computable for every
+computable source problem. -/
 theorem verifiedCandidate_computable {Input : Type*} [Primcodable Input]
     {problemOf : Input → PeriodicThreeDM}
-    (problemOfComputable : Computable problemOf)
-    (verifierComputable :
-      Computable₂ FiniteDrawingCertificate.verifies) :
+    (problemOfComputable : Computable problemOf) :
     ComputablePred fun input : Input × Nat =>
       FiniteDrawingCertificate.verifies
         (problemOf input.1) (drawingAt input.2) = true := by
   have checkComputable : Computable fun input : Input × Nat =>
       FiniteDrawingCertificate.verifies
         (problemOf input.1) (drawingAt input.2) :=
-    verifierComputable.comp
+    FiniteDrawingCertificate.verifies_computable.comp
       (problemOfComputable.comp Computable.fst)
       (drawingAt_primrec.to_comp.comp Computable.snd)
   apply ComputablePred.computable_iff.mpr
@@ -143,15 +141,13 @@ the searched source family always has a certificate. -/
 theorem searchIndex_computable {Input : Type*} [Primcodable Input]
     {problemOf : Input → PeriodicThreeDM}
     (problemOfComputable : Computable problemOf)
-    (verifierComputable :
-      Computable₂ FiniteDrawingCertificate.verifies)
     (available : ∀ input, HasVerifiedDrawing (problemOf input)) :
     Computable (searchIndex problemOf available) := by
   have found := Computable.find
     (P := fun input index =>
       FiniteDrawingCertificate.verifies
         (problemOf input) (drawingAt index) = true)
-    (verifiedCandidate_computable problemOfComputable verifierComputable)
+    (verifiedCandidate_computable problemOfComputable)
     (fun input =>
       exists_verifiedAt_of_hasVerifiedDrawing (available input))
   apply found.of_eq
@@ -164,12 +160,10 @@ computable function of the source input. -/
 theorem searchDrawing_computable {Input : Type*} [Primcodable Input]
     {problemOf : Input → PeriodicThreeDM}
     (problemOfComputable : Computable problemOf)
-    (verifierComputable :
-      Computable₂ FiniteDrawingCertificate.verifies)
     (available : ∀ input, HasVerifiedDrawing (problemOf input)) :
     Computable (searchDrawing problemOf available) := by
   exact drawingAt_primrec.to_comp.comp
-    (searchIndex_computable problemOfComputable verifierComputable available)
+    (searchIndex_computable problemOfComputable available)
 
 end FiniteDrawingSearch
 end PeriodicThreeDM

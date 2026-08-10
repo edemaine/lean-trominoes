@@ -104,11 +104,11 @@ build; an imported proof counts when its statement matches the paper.
         finite drawing enumerations primitive recursive.
       - [x] Prove the integer interval enumeration and all segment predicates
         used by the verifier primitive recursive.
-      - [ ] Prove the complete finite drawing verifier primitive recursive.
+      - [x] Prove the complete finite drawing verifier primitive recursive.
       - [x] Enumerate encoded periodic grid drawings, select the first
         accepted certificate by total unbounded search, prove the selector
-        computable from a computable source and verifier, and instantiate
-        search termination for every Wang input.
+        computable from a computable source, and instantiate search
+        termination for every Wang input.
     - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
@@ -6643,11 +6643,17 @@ The representation choices for this target are:
   candidate reconstructs a continuously planar 3DM presentation together
   with complete lifted-route separation and route simplicity; the concrete
   Wang construction is proved to pass this verifier.
+- [`LeanTrominoes/PeriodicThreeDMFiniteDrawingCertificateComputability.lean`](LeanTrominoes/PeriodicThreeDMFiniteDrawingCertificateComputability.lean)
+  proves every compatibility and exact integer-geometry check primitive
+  recursive, including the nested finite segment, route-point, and relative-
+  translation scans, and therefore proves the complete certificate verifier
+  primitive recursive and computable.
 - [`LeanTrominoes/PeriodicThreeDMFiniteDrawingSearch.lean`](LeanTrominoes/PeriodicThreeDMFiniteDrawingSearch.lean)
   enumerates the standard natural-number encoding of periodic grid drawings
   and chooses the first accepted certificate.  It proves this total search
-  computable whenever the source problem and verifier are computable; the
-  Wang construction supplies termination for every tile set.
+  computable for every computable source problem that always admits a
+  certificate; the Wang construction supplies termination for every tile
+  set.
 - [`LeanTrominoes/PeriodicThreeDMGraphOrientation.lean`](LeanTrominoes/PeriodicThreeDMGraphOrientation.lean)
   expresses orientations directly as values on those colored incidence-edge
   orbits.  It proves this tagged graph presentation equivalent to the
