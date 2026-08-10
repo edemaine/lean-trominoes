@@ -6747,6 +6747,10 @@ The representation choices for this target are:
   proves translation-equivariance of magnification, endpoint trimming, and
   template splicing, and identifies every lifted first-round route with the
   same replacement applied directly to its lifted contracted occurrence.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationEndpointOccurrences.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationEndpointOccurrences.lean)
+  packages source and offset-adjusted target occurrences of contracted
+  endpoints and proves that their old-scale geometric centers uniquely
+  determine the lifted prototype-vertex occurrence.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationLocalTemplateSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationLocalTemplateSeparation.lean)
   strengthens the finite Figure 2 checks to full route separation, proves
   their radius-three bound, separates templates based at distinct old
