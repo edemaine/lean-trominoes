@@ -6831,6 +6831,9 @@ The representation choices for this target are:
   transports the second drawing's lifted separation and simplicity through
   the final scale/subdivide/trim operation, proving strict separation of all
   distinct final-round middle corridors.
+- [`LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicTemplateCorridorOccurrenceSeparation.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationFinalCyclicTemplateCorridorOccurrenceSeparation.lean)
+  classifies every final template--corridor pair as source-incident,
+  target-incident, or remote and proves strict separation in all three cases.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
