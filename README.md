@@ -6899,6 +6899,9 @@ The representation choices for this target are:
   evaluates that orientation at every explicit period translate of a listed
   provenance site and identifies drawing-lattice neighbors with translated
   geometric unit steps.
+- [`LeanTrominoes/PeriodicThreeDMNormalizationForwardSourceCompatibility.lean`](LeanTrominoes/PeriodicThreeDMNormalizationForwardSourceCompatibility.lean)
+  proves the forward orientation assigns opposite values to every normalized
+  source-vertex port and its first routing-cell neighbor.
 - [`LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean`](LeanTrominoes/PeriodicThreeDMVertexNormalizationColors.lean)
   identifies the executable list-based color lookups with the certified
   contracted fans.  It proves the selected final cell has the normalized RGB
