@@ -20,6 +20,8 @@ structure ClockwiseOrderedHaloBoundedRibbonReadyIncidencePresentation
     (source : PositionedPeriodicCNF Variable)
     (placement : PeriodicVariablePlacement Variable)
     extends HaloBoundedRibbonReadyIncidencePresentation source placement where
+  unitSteps :
+    (incidenceDrawing source placement routes).HasUnitSteps
   variableRoutesInOccurrenceOrder :
     source.VariableRoutesInOccurrenceOrder routes
   ternaryClauseRoutesInClockwiseOrder :
@@ -248,6 +250,13 @@ noncomputable def
         (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauged_isRibbonReady
           source sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty).2
+  unitSteps := by
+    simpa only [
+      retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceDrawing]
+      using
+        retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauged_hasUnitSteps
+          source sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty
   variableRoutesInOccurrenceOrder :=
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauged_variableRoutesInOccurrenceOrder
       source sourceLocal sourceWidth sourceOccurrences
