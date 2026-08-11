@@ -191,6 +191,8 @@ build; an imported proof counts when its statement matches the paper.
       and rasterized source boundary splice primitive recursive.
     - [x] Assemble each exceptional final escaped-fallback occurrence route
       primitive recursively with its exact slot and Figure 7 suffix.
+    - [x] Compute the established ordinary copied-occurrence and translated
+      implication-cycle fallback route lookup primitive recursively.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -3209,6 +3211,10 @@ The representation choices for this target are:
   exceptional branch classifies and source-scales its raw terminal, applies
   the computable escaped boundary splice, and joins the exact unchanged
   Figure 7 suffix, yielding a primitive-recursive complete occurrence route.
+  The ordinary copied-occurrence path is computed from the scaled source
+  terminal and the same suffix; a flattened metadata lookup also computes
+  every translated implication-cycle route.  Together they recover the exact
+  established total fallback family primitive recursively.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
   proves that each validated coordinated prefix meets that unchanged suffix
   at exactly the same fan-boundary point.  The resulting substituted route

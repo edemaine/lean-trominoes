@@ -888,5 +888,674 @@ theorem retainedFinalEscapedFallbackOccurrenceRoute_primrec
     (retainedFinalEscapedFallbackOccurrenceRouteQuery_eq_computed
       input).symm
 
+/-! ## Ordinary fallback occurrence route -/
+
+private def finalCoordinatedOrdinaryScaledTerminal
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedSuffixQuery Variable) :
+    RetainedTerminalData :=
+  classifiedRetainedTerminalData
+    (routeTerminalVector (finalCoordinatedEscapedScaledRoute input))
+
+private theorem finalCoordinatedOrdinaryScaledTerminal_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedOrdinaryScaledTerminal
+      (Variable := Variable)) := by
+  exact (classifiedRetainedTerminalData_primrec.comp
+    (routeTerminalVector_primrec.comp
+      finalCoordinatedEscapedScaledRoute_primrec)).of_eq fun _ => rfl
+
+private def finalCoordinatedOrdinaryBoundaryInput
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedSuffixQuery Variable) :
+    RetainedBoundaryQuery :=
+  ((finalCoordinatedEscapedScaledRoute input,
+    finalCoordinatedOrdinaryScaledTerminal input),
+    retainedFinalCoordinatedOccurrenceSlot
+      input.1.1.1.1 (angularLiteralOfRouteData input.1.1.2)
+      input.1.2 input.2)
+
+private theorem finalCoordinatedOrdinaryBoundaryInput_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedOrdinaryBoundaryInput
+      (Variable := Variable)) := by
+  exact Primrec.pair
+    (Primrec.pair
+      finalCoordinatedEscapedScaledRoute_primrec
+      finalCoordinatedOrdinaryScaledTerminal_primrec)
+    retainedFinalCoordinatedOccurrenceSlot_query_primrec
+
+private def finalCoordinatedOrdinaryPrefix
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedSuffixQuery Variable) : List Cell :=
+  retainedAngularFanSplicedBoundaryRouteQuery
+    (finalCoordinatedOrdinaryBoundaryInput input)
+
+private theorem finalCoordinatedOrdinaryPrefix_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedOrdinaryPrefix
+      (Variable := Variable)) :=
+  retainedAngularFanSplicedBoundaryRouteQuery_primrec.comp
+    finalCoordinatedOrdinaryBoundaryInput_primrec
+
+private def finalCoordinatedOrdinaryRouteComputed
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedSuffixQuery Variable) : List Cell :=
+  joinAtEndpoint
+    (finalCoordinatedOrdinaryPrefix input)
+    (finalCoordinatedEscapedSuffix input)
+
+private theorem finalCoordinatedOrdinaryRouteComputed_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedOrdinaryRouteComputed
+      (Variable := Variable)) := by
+  exact joinAtEndpoint_primrec _ _
+    finalCoordinatedOrdinaryPrefix_primrec
+    finalCoordinatedEscapedSuffix_primrec
+
+/-! ## Established ordinary/cycle fallback lookup -/
+
+private abbrev FinalCoordinatedSelectedOccurrenceData
+    (Variable : Type*) :=
+  AngularClauseRouteData (FinalCoordinatedVariable Variable) ×
+    AngularLiteralRouteData (FinalCoordinatedVariable Variable)
+
+private def finalCoordinatedSelectedLiteralData?
+    {Variable : Type*}
+    (input : RetainedFinalFallbackQuery Variable ×
+      PositionedPeriodicClause (FinalCoordinatedVariable Variable)) :
+    Option (FinalCoordinatedSelectedOccurrenceData Variable) :=
+  input.2.literals[input.1.2]?.map fun literal =>
+    (angularClauseRouteData input.2, PeriodicLiteral.equivData literal)
+
+private theorem finalCoordinatedSelectedLiteralData?_primrec
+    {Variable : Type*} [Primcodable Variable] :
+    Primrec (finalCoordinatedSelectedLiteralData?
+      (Variable := Variable)) := by
+  let Combined := RetainedFinalFallbackQuery Variable ×
+    PositionedPeriodicClause (FinalCoordinatedVariable Variable)
+  have selectedLiteral : Primrec fun input : Combined =>
+      input.2.literals[input.1.2]? :=
+    Primrec.list_getElem?.comp
+      (PositionedPeriodicClause.literals_primrec.comp Primrec.snd)
+      (Primrec.snd.comp Primrec.fst)
+  have data : Primrec₂ fun (input : Combined)
+      (literal : PeriodicLiteral
+        (FinalCoordinatedVariable Variable)) =>
+      (angularClauseRouteData input.2,
+        PeriodicLiteral.equivData literal) := by
+    change Primrec fun input : Combined ×
+        PeriodicLiteral (FinalCoordinatedVariable Variable) =>
+      (angularClauseRouteData input.1.2,
+        PeriodicLiteral.equivData input.2)
+    exact (Primrec.pair
+      (angularClauseRouteData_primrec.comp
+        (Primrec.snd.comp Primrec.fst))
+      (PeriodicLiteral.equivData_primrec.comp Primrec.snd)).to₂
+  exact (Primrec.option_map selectedLiteral data).of_eq fun _ => rfl
+
+private def finalCoordinatedSelectedOccurrenceData?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    Option (FinalCoordinatedSelectedOccurrenceData Variable) :=
+  match finalCoordinatedScaledClause? input.1.1 input.1.2 with
+  | none => none
+  | some clause => finalCoordinatedSelectedLiteralData? (input, clause)
+
+private theorem finalCoordinatedSelectedOccurrenceData?_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedSelectedOccurrenceData?
+      (Variable := Variable)) := by
+  let Query := RetainedFinalFallbackQuery Variable
+  have selectedClause : Primrec fun input : Query =>
+      finalCoordinatedScaledClause? input.1.1 input.1.2 :=
+    finalCoordinatedScaledClauseQuery?_primrec.comp
+      (Primrec.pair
+        (Primrec.fst.comp Primrec.fst)
+        (Primrec.snd.comp Primrec.fst))
+  have none : Primrec fun _input : Query =>
+      (none : Option (FinalCoordinatedSelectedOccurrenceData Variable)) :=
+    Primrec.const none
+  have some : Primrec₂ fun (input : Query)
+      (clause : PositionedPeriodicClause
+        (FinalCoordinatedVariable Variable)) =>
+      finalCoordinatedSelectedLiteralData? (input, clause) :=
+    finalCoordinatedSelectedLiteralData?_primrec.to₂
+  exact (Primrec.option_casesOn selectedClause none some).of_eq
+    fun input => by
+      unfold finalCoordinatedSelectedOccurrenceData?
+      cases finalCoordinatedScaledClause? input.1.1 input.1.2 <;> rfl
+
+private def finalCoordinatedSelectedOccurrenceInput
+    {Variable : Type*}
+    (input : RetainedFinalFallbackQuery Variable ×
+      FinalCoordinatedSelectedOccurrenceData Variable) :
+    FinalCoordinatedSuffixQuery Variable :=
+  ((((input.1.1.1, input.2.1), input.2.2), input.1.1.2), input.1.2)
+
+private theorem finalCoordinatedSelectedOccurrenceInput_primrec
+    {Variable : Type*} [Primcodable Variable] :
+    Primrec (finalCoordinatedSelectedOccurrenceInput
+      (Variable := Variable)) := by
+  exact Primrec.pair
+    (Primrec.pair
+      (Primrec.pair
+        (Primrec.pair
+          (Primrec.fst.comp
+            (Primrec.fst.comp Primrec.fst))
+          (Primrec.fst.comp Primrec.snd))
+        (Primrec.snd.comp Primrec.snd))
+      (Primrec.snd.comp (Primrec.fst.comp Primrec.fst)))
+    (Primrec.snd.comp Primrec.fst)
+
+private def finalCoordinatedSelectedOrdinaryRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable ×
+      FinalCoordinatedSelectedOccurrenceData Variable) : List Cell :=
+  finalCoordinatedOrdinaryRouteComputed
+    (finalCoordinatedSelectedOccurrenceInput input)
+
+private theorem finalCoordinatedSelectedOrdinaryRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedSelectedOrdinaryRoute
+      (Variable := Variable)) :=
+  finalCoordinatedOrdinaryRouteComputed_primrec.comp
+    finalCoordinatedSelectedOccurrenceInput_primrec
+
+private def finalCoordinatedOrdinaryOccurrenceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  match finalCoordinatedSelectedOccurrenceData? input with
+  | none => []
+  | some data => finalCoordinatedSelectedOrdinaryRoute (input, data)
+
+private theorem finalCoordinatedOrdinaryOccurrenceLookup_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedOrdinaryOccurrenceLookup
+      (Variable := Variable)) := by
+  exact (Primrec.option_casesOn
+    finalCoordinatedSelectedOccurrenceData?_primrec
+    (Primrec.const [])
+    finalCoordinatedSelectedOrdinaryRoute_primrec.to₂).of_eq
+      fun input => by
+        unfold finalCoordinatedOrdinaryOccurrenceLookup
+        cases finalCoordinatedSelectedOccurrenceData? input <;> rfl
+
+private theorem finalCoordinatedSelectedOrdinaryRoute_eq_spliced
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable)
+    (clause : PositionedPeriodicClause
+      (FinalCoordinatedVariable Variable))
+    (literal : PeriodicLiteral (FinalCoordinatedVariable Variable))
+    (clauseLookup :
+      (finalCoordinatedScaledSource input.1.1).clauses[input.1.2]? =
+        some clause)
+    (literalLookup : clause.literals[input.2]? = some literal) :
+    finalCoordinatedSelectedOrdinaryRoute
+        (input, (angularClauseRouteData clause,
+          PeriodicLiteral.equivData literal)) =
+      retainedAngularFanSplicedOccurrenceRoute
+        (finalCoordinatedScaledSource input.1.1)
+        (finalCoordinatedScaledPlacement input.1.1)
+        (PositionedPeriodicCNF.scaleIncidenceRoutes
+          retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes input.1.1))
+        clause literal input.1.2 input.2 := by
+  unfold finalCoordinatedSelectedOrdinaryRoute
+    finalCoordinatedSelectedOccurrenceInput
+    finalCoordinatedOrdinaryRouteComputed
+    finalCoordinatedOrdinaryPrefix
+    finalCoordinatedOrdinaryBoundaryInput
+    finalCoordinatedOrdinaryScaledTerminal
+    finalCoordinatedEscapedScaledRoute
+    finalCoordinatedEscapedRawRoute
+    finalCoordinatedEscapedSuffix
+    retainedAngularFanSplicedBoundaryRouteQuery
+    retainedAngularFanSplicedOccurrenceRoute
+    retainedAngularFanBoundaryIncidenceRoutes
+    PositionedPeriodicCNF.scaleIncidenceRoutes
+  simp only [angularLiteralOfRouteData_equivData,
+    clauseLookup, literalLookup]
+  have suffixEq := finalCoordinatedOccurrenceSuffix_eq_flat
+    (finalCoordinatedSelectedOccurrenceInput
+      (input, (angularClauseRouteData clause,
+        PeriodicLiteral.equivData literal)))
+  simp only [finalCoordinatedSelectedOccurrenceInput,
+    angularClauseOfRouteData_routeData,
+    angularLiteralOfRouteData_equivData] at suffixEq
+  have slotEq :
+      retainedFinalCoordinatedOccurrenceSlot
+          input.1.1 literal input.1.2 input.2 =
+        boundedRetainedTerminalSlot
+          (angularOccurrenceIndex
+            (angularOccurrenceOrder
+              (finalCoordinatedScaledSource input.1.1).erase
+              (PositionedPeriodicCNF.scaleIncidenceRoutes
+                retainedAngularFanSourceClearanceFactor
+                (finalCoordinatedSourceRoutes input.1.1)))
+            literal input.1.2 input.2) := by
+    rfl
+  have suffixEq' :
+      angularOccurrenceSuffix
+          (finalCoordinatedScaledPlacement input.1.1)
+          (angularOccurrenceOrder
+            (finalCoordinatedScaledSource input.1.1).erase
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              retainedAngularFanSourceClearanceFactor
+              (finalCoordinatedSourceRoutes input.1.1)))
+          clause literal input.1.2 input.2 =
+        finalCoordinatedFlatOccurrenceSuffix
+          ((((input.1.1, angularClauseRouteData clause),
+            PeriodicLiteral.equivData literal), input.1.2), input.2) := by
+    simpa [finalCoordinatedScaledOrder] using suffixEq
+  have slotEq' :
+      retainedFinalCoordinatedOccurrenceSlot
+          input.1.1 literal input.1.2 input.2 =
+        boundedRetainedTerminalSlot
+          (angularOccurrenceIndex
+            (angularOccurrenceOrder
+              (finalCoordinatedScaledSource input.1.1).erase
+              (fun clauseIndex literalIndex =>
+                scalePolyline retainedAngularFanSourceClearanceFactor
+                  (finalCoordinatedSourceRoutes input.1.1
+                    clauseIndex literalIndex)))
+            literal input.1.2 input.2) :=
+    slotEq
+  have suffixEq'' :
+      angularOccurrenceSuffix
+          (finalCoordinatedScaledPlacement input.1.1)
+          (angularOccurrenceOrder
+            (finalCoordinatedScaledSource input.1.1).erase
+            (fun clauseIndex literalIndex =>
+              scalePolyline retainedAngularFanSourceClearanceFactor
+                (finalCoordinatedSourceRoutes input.1.1
+                  clauseIndex literalIndex)))
+          clause literal input.1.2 input.2 =
+        finalCoordinatedFlatOccurrenceSuffix
+          ((((input.1.1, angularClauseRouteData clause),
+            PeriodicLiteral.equivData literal), input.1.2), input.2) :=
+    suffixEq'
+  rw [slotEq', suffixEq'']
+
+private theorem finalCoordinatedOrdinaryOccurrenceLookup_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    finalCoordinatedOrdinaryOccurrenceLookup input =
+      retainedAngularFanSplicedOccurrenceRoutes
+        (finalCoordinatedScaledSource input.1.1)
+        (finalCoordinatedScaledPlacement input.1.1)
+        (PositionedPeriodicCNF.scaleIncidenceRoutes
+          retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes input.1.1))
+        input.1.2 input.2 := by
+  have clauseQueryEq :
+      finalCoordinatedScaledClause? input.1.1 input.1.2 =
+        (finalCoordinatedScaledSource input.1.1).clauses[input.1.2]? := by
+    rfl
+  cases clauseLookup :
+      (finalCoordinatedScaledSource input.1.1).clauses[input.1.2]? with
+  | none =>
+      have queryLookup :
+          finalCoordinatedScaledClause? input.1.1 input.1.2 = none :=
+        clauseQueryEq.trans clauseLookup
+      have selectedNone :
+          finalCoordinatedSelectedOccurrenceData? input = none := by
+        simp [finalCoordinatedSelectedOccurrenceData?, queryLookup]
+      rw [show finalCoordinatedOrdinaryOccurrenceLookup input = [] by
+        simp [finalCoordinatedOrdinaryOccurrenceLookup, selectedNone]]
+      simp [retainedAngularFanSplicedOccurrenceRoutes, clauseLookup]
+  | some clause =>
+      have queryLookup :
+          finalCoordinatedScaledClause? input.1.1 input.1.2 = some clause :=
+        clauseQueryEq.trans clauseLookup
+      cases literalLookup : clause.literals[input.2]? with
+      | none =>
+          have selectedNone :
+              finalCoordinatedSelectedOccurrenceData? input = none := by
+            simp [finalCoordinatedSelectedOccurrenceData?,
+              finalCoordinatedSelectedLiteralData?, queryLookup,
+              literalLookup]
+          rw [show finalCoordinatedOrdinaryOccurrenceLookup input = [] by
+            simp [finalCoordinatedOrdinaryOccurrenceLookup, selectedNone]]
+          simp [retainedAngularFanSplicedOccurrenceRoutes,
+            clauseLookup, literalLookup]
+      | some literal =>
+          have selectedSome :
+              finalCoordinatedSelectedOccurrenceData? input =
+                some (angularClauseRouteData clause,
+                  PeriodicLiteral.equivData literal) := by
+            simp [finalCoordinatedSelectedOccurrenceData?,
+              finalCoordinatedSelectedLiteralData?, queryLookup,
+              literalLookup]
+          rw [show finalCoordinatedOrdinaryOccurrenceLookup input =
+              finalCoordinatedSelectedOrdinaryRoute
+                (input, (angularClauseRouteData clause,
+                  PeriodicLiteral.equivData literal)) by
+            simp [finalCoordinatedOrdinaryOccurrenceLookup, selectedSome]]
+          rw [show retainedAngularFanSplicedOccurrenceRoutes
+              (finalCoordinatedScaledSource input.1.1)
+              (finalCoordinatedScaledPlacement input.1.1)
+              (PositionedPeriodicCNF.scaleIncidenceRoutes
+                retainedAngularFanSourceClearanceFactor
+                (finalCoordinatedSourceRoutes input.1.1))
+              input.1.2 input.2 =
+                retainedAngularFanSplicedOccurrenceRoute
+                  (finalCoordinatedScaledSource input.1.1)
+                  (finalCoordinatedScaledPlacement input.1.1)
+                  (PositionedPeriodicCNF.scaleIncidenceRoutes
+                    retainedAngularFanSourceClearanceFactor
+                    (finalCoordinatedSourceRoutes input.1.1))
+                  clause literal input.1.2 input.2 by
+            simp [retainedAngularFanSplicedOccurrenceRoutes,
+              clauseLookup, literalLookup]]
+          exact finalCoordinatedSelectedOrdinaryRoute_eq_spliced
+            input clause literal clauseLookup literalLookup
+
+private def finalCoordinatedScaledSourceClauseLength
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) : Nat :=
+  (finalCoordinatedScaledSource formula).clauses.length
+
+private theorem finalCoordinatedScaledSourceClauseLength_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedScaledSourceClauseLength
+      (Variable := Variable)) :=
+  Primrec.list_length.comp
+    (PositionedPeriodicCNF.clauses_primrec.comp
+      finalCoordinatedScaledSource_primrec)
+
+private def finalCoordinatedCycleMetadataList
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :=
+  allCycleClauseMetadata
+    (finalCoordinatedScaledSource formula)
+    (finalCoordinatedScaledPlacement formula)
+
+private theorem finalCoordinatedCycleMetadataList_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedCycleMetadataList
+      (Variable := Variable)) := by
+  exact (PeriodicEightOccurrenceSplitPositioned.allCycleClauseMetadata_primrec
+    (Input := PeriodicCNF Variable)
+    (Variable := FinalCoordinatedVariable Variable)
+    finalCoordinatedScaledSource finalCoordinatedScaledPlacement
+    finalCoordinatedScaledSource_primrec
+    finalCoordinatedScaledPlacement_position_primrec).of_eq fun _ => rfl
+
+private abbrev FinalCoordinatedCycleOriginQuery (Variable : Type*) :=
+  PeriodicCNF Variable × FinalCoordinatedVariable Variable
+
+private def finalCoordinatedCycleOrigin
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedCycleOriginQuery Variable) : Cell :=
+  Cell.sub
+    (Cell.scale refinementScale
+      ((finalCoordinatedScaledPlacement input.1).position input.2))
+    (12, 12)
+
+private theorem finalCoordinatedCycleOrigin_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedCycleOrigin
+      (Variable := Variable)) := by
+  have scaled : Primrec fun input :
+      FinalCoordinatedCycleOriginQuery Variable =>
+      Cell.scale refinementScale
+        ((finalCoordinatedScaledPlacement input.1).position input.2) :=
+    Computability.cell_scale_primrec.comp
+      (Primrec.const refinementScale)
+      finalCoordinatedScaledPlacement_position_primrec
+  exact (Computability.cell_sub_primrec.comp scaled
+    (Primrec.const ((12, 12) : Cell))).of_eq fun _ => rfl
+
+private abbrev FinalCoordinatedSelectedCycleQuery (Variable : Type*) :=
+  RetainedFinalFallbackQuery Variable ×
+    CycleClauseMetadata (FinalCoordinatedVariable Variable)
+
+private def finalCoordinatedSelectedCycleRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedSelectedCycleQuery Variable) : List Cell :=
+  (OccurrenceSplitRing.cycleRoutes
+    input.2.localClauseIndex input.1.2).map fun point =>
+      Cell.add
+        (finalCoordinatedCycleOrigin (input.1.1.1, input.2.atom))
+        point
+
+private theorem finalCoordinatedSelectedCycleRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedSelectedCycleRoute
+      (Variable := Variable)) := by
+  let Query := FinalCoordinatedSelectedCycleQuery Variable
+  have route : Primrec fun input : Query =>
+      OccurrenceSplitRing.cycleRoutes
+        input.2.localClauseIndex input.1.2 :=
+    OccurrenceSplitRing.cycleRoutes_primrec.comp
+      (Primrec.pair
+        (CycleClauseMetadata.localClauseIndex_primrec.comp Primrec.snd)
+        (Primrec.snd.comp Primrec.fst))
+  have origin : Primrec fun input : Query =>
+      finalCoordinatedCycleOrigin (input.1.1.1, input.2.atom) :=
+    finalCoordinatedCycleOrigin_primrec.comp
+      (Primrec.pair
+        (Primrec.fst.comp
+          (Primrec.fst.comp Primrec.fst))
+        (CycleClauseMetadata.atom_primrec.comp Primrec.snd))
+  exact (Primrec.list_map route
+    (Computability.cell_add_primrec.comp
+      (origin.comp Primrec.fst) Primrec.snd).to₂).of_eq fun _ => rfl
+
+private theorem finalCoordinatedSelectedCycleRoute_eq_positioned
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedSelectedCycleQuery Variable) :
+    finalCoordinatedSelectedCycleRoute input =
+      positionedCycleRoutes
+        (finalCoordinatedScaledPlacement input.1.1.1)
+        input.2.atom input.2.localClauseIndex input.1.2 := by
+  rfl
+
+private def finalCoordinatedSelectedCycleMetadata?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :=
+  (finalCoordinatedCycleMetadataList input.1.1)[
+    input.1.2 - finalCoordinatedScaledSourceClauseLength input.1.1]?
+
+private theorem finalCoordinatedSelectedCycleMetadata?_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedSelectedCycleMetadata?
+      (Variable := Variable)) := by
+  have items : Primrec fun input : RetainedFinalFallbackQuery Variable =>
+      finalCoordinatedCycleMetadataList input.1.1 :=
+    finalCoordinatedCycleMetadataList_primrec.comp
+      (Primrec.fst.comp Primrec.fst)
+  have index : Primrec fun input : RetainedFinalFallbackQuery Variable =>
+      input.1.2 - finalCoordinatedScaledSourceClauseLength input.1.1 :=
+    Primrec.nat_sub.comp
+      (Primrec.snd.comp Primrec.fst)
+      (finalCoordinatedScaledSourceClauseLength_primrec.comp
+        (Primrec.fst.comp Primrec.fst))
+  exact (Primrec.list_getElem?.comp items index).of_eq fun _ => rfl
+
+private def finalCoordinatedRawCycleRouteComputed
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  match finalCoordinatedSelectedCycleMetadata? input with
+  | none => []
+  | some metadata => finalCoordinatedSelectedCycleRoute (input, metadata)
+
+private theorem finalCoordinatedRawCycleRouteComputed_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedRawCycleRouteComputed
+      (Variable := Variable)) := by
+  exact (Primrec.option_casesOn
+    finalCoordinatedSelectedCycleMetadata?_primrec
+    (Primrec.const [])
+    finalCoordinatedSelectedCycleRoute_primrec.to₂).of_eq fun input => by
+      unfold finalCoordinatedRawCycleRouteComputed
+      cases finalCoordinatedSelectedCycleMetadata? input <;> rfl
+
+private def finalCoordinatedCycleRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  scalePolyline retainedTerminalFanRoutingRefinement
+    (allCycleRoutes
+      (finalCoordinatedScaledSource input.1.1)
+      (finalCoordinatedScaledPlacement input.1.1)
+      (input.1.2 - finalCoordinatedScaledSourceClauseLength input.1.1)
+      input.2)
+
+private def finalCoordinatedCycleRouteComputed
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  scalePolyline retainedTerminalFanRoutingRefinement
+    (finalCoordinatedRawCycleRouteComputed input)
+
+private theorem finalCoordinatedCycleRouteComputed_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedCycleRouteComputed
+      (Variable := Variable)) := by
+  exact (scalePolyline_primrec.comp
+    (Primrec.const (retainedTerminalFanRoutingRefinement : Int))
+    finalCoordinatedRawCycleRouteComputed_primrec).of_eq fun _ => rfl
+
+private theorem finalCoordinatedCycleRouteComputed_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    finalCoordinatedCycleRouteComputed input =
+      finalCoordinatedCycleRoute input := by
+  unfold finalCoordinatedCycleRouteComputed finalCoordinatedCycleRoute
+    finalCoordinatedRawCycleRouteComputed
+    finalCoordinatedSelectedCycleMetadata?
+    finalCoordinatedCycleMetadataList allCycleRoutes
+  cases h : (allCycleClauseMetadata
+    (finalCoordinatedScaledSource input.1.1)
+    (finalCoordinatedScaledPlacement input.1.1))[
+      input.1.2 -
+        finalCoordinatedScaledSourceClauseLength input.1.1]? with
+  | none => rfl
+  | some metadata =>
+      change scalePolyline retainedTerminalFanRoutingRefinement
+          (finalCoordinatedSelectedCycleRoute (input, metadata)) =
+        scalePolyline retainedTerminalFanRoutingRefinement
+          (positionedCycleRoutes
+            (finalCoordinatedScaledPlacement input.1.1)
+            metadata.atom metadata.localClauseIndex input.2)
+      rw [finalCoordinatedSelectedCycleRoute_eq_positioned]
+
+private theorem finalCoordinatedCycleRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedCycleRoute
+      (Variable := Variable)) :=
+  finalCoordinatedCycleRouteComputed_primrec.of_eq fun input =>
+    finalCoordinatedCycleRouteComputed_eq input
+
+private def finalCoordinatedEstablishedRouteComputed
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  if input.1.2 <
+      finalCoordinatedScaledSourceClauseLength input.1.1 then
+    finalCoordinatedOrdinaryOccurrenceLookup input
+  else
+    finalCoordinatedCycleRoute input
+
+private theorem finalCoordinatedEstablishedRouteComputed_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    finalCoordinatedEstablishedRouteComputed input =
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        input.1.1 input.1.2 input.2 := by
+  unfold retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+    retainedAngularFanSourceScaledSplicedIncidenceRoutes
+  change finalCoordinatedEstablishedRouteComputed input =
+    retainedAngularFanSplicedIncidenceRoutes
+      (finalCoordinatedScaledSource input.1.1)
+      (finalCoordinatedScaledPlacement input.1.1)
+      (PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes input.1.1))
+      input.1.2 input.2
+  have occurrenceCount :
+      (occurrenceClauses
+        (finalCoordinatedScaledSource input.1.1)
+        (occurrencePortsOfAngularOrder
+          (finalCoordinatedScaledSource input.1.1).erase
+          (angularOccurrenceOrder
+            (finalCoordinatedScaledSource input.1.1).erase
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              retainedAngularFanSourceClearanceFactor
+              (finalCoordinatedSourceRoutes input.1.1))))).length =
+        finalCoordinatedScaledSourceClauseLength input.1.1 := by
+    simp [PeriodicEightOccurrenceSplitPositioned.occurrenceClauses,
+      finalCoordinatedScaledSourceClauseLength]
+  by_cases occurrenceIndex : input.1.2 <
+      finalCoordinatedScaledSourceClauseLength input.1.1
+  · have occurrenceIndex' :
+        input.1.2 <
+          (occurrenceClauses
+            (finalCoordinatedScaledSource input.1.1)
+            (occurrencePortsOfAngularOrder
+              (finalCoordinatedScaledSource input.1.1).erase
+              (angularOccurrenceOrder
+                (finalCoordinatedScaledSource input.1.1).erase
+                (PositionedPeriodicCNF.scaleIncidenceRoutes
+                  retainedAngularFanSourceClearanceFactor
+                  (finalCoordinatedSourceRoutes input.1.1))))).length := by
+      rwa [occurrenceCount]
+    rw [retainedAngularFanSplicedIncidenceRoutes_occurrence
+      _ _ _ input.1.2 input.2 occurrenceIndex']
+    unfold finalCoordinatedEstablishedRouteComputed
+    rw [if_pos occurrenceIndex]
+    exact finalCoordinatedOrdinaryOccurrenceLookup_eq input
+  · have occurrenceIndex' :
+        ¬ input.1.2 <
+          (occurrenceClauses
+            (finalCoordinatedScaledSource input.1.1)
+            (occurrencePortsOfAngularOrder
+              (finalCoordinatedScaledSource input.1.1).erase
+              (angularOccurrenceOrder
+                (finalCoordinatedScaledSource input.1.1).erase
+                (PositionedPeriodicCNF.scaleIncidenceRoutes
+                  retainedAngularFanSourceClearanceFactor
+                  (finalCoordinatedSourceRoutes input.1.1))))).length := by
+      rwa [occurrenceCount]
+    unfold finalCoordinatedEstablishedRouteComputed
+      retainedAngularFanSplicedIncidenceRoutes
+    rw [if_neg occurrenceIndex, if_neg occurrenceIndex', occurrenceCount]
+    rfl
+
+private theorem finalCoordinatedEstablishedRouteComputed_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEstablishedRouteComputed
+      (Variable := Variable)) := by
+  let Query := RetainedFinalFallbackQuery Variable
+  have beforeCycles : PrimrecPred fun input : Query =>
+      input.1.2 <
+        finalCoordinatedScaledSourceClauseLength input.1.1 :=
+    Primrec.nat_lt.comp
+      (Primrec.snd.comp Primrec.fst)
+      (finalCoordinatedScaledSourceClauseLength_primrec.comp
+        (Primrec.fst.comp Primrec.fst))
+  exact Primrec.ite beforeCycles
+    finalCoordinatedOrdinaryOccurrenceLookup_primrec
+    finalCoordinatedCycleRoute_primrec
+
+abbrev RetainedFinalEstablishedRouteQuery (Variable : Type*) :=
+  RetainedFinalFallbackQuery Variable
+
+/-- Uncurried exact lookup for the established source-scaled retained route
+family used by every non-substituted final branch. -/
+def retainedFinalEstablishedRouteQuery
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalEstablishedRouteQuery Variable) : List Cell :=
+  retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+    input.1.1 input.1.2 input.2
+
+/-- The established ordinary-occurrence and implication-cycle route lookup
+is primitive recursive. -/
+theorem retainedFinalEstablishedRouteQuery_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (retainedFinalEstablishedRouteQuery
+      (Variable := Variable)) := by
+  exact finalCoordinatedEstablishedRouteComputed_primrec.of_eq fun input =>
+    finalCoordinatedEstablishedRouteComputed_eq input
+
 end PeriodicOrthocrossing
 end LeanTrominoes
