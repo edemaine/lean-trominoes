@@ -219,6 +219,11 @@ build; an imported proof counts when its statement matches the paper.
       complete route family.
     - [x] Normalize the complete retained routes and compute the second,
       final clockwise clause ordering primitive recursively.
+    - [x] Compute the canonical final variable gauge and the resulting gauged
+      clockwise exact-one formula primitive recursively.
+    - [x] Compute the final factor-two padded, clause-anchor-normalized planar
+      3DM instance and prove exact equality with the continuously planar
+      proof-backed endpoint.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -4789,6 +4794,11 @@ The representation choices for this target are:
   above supplies it.  Every colored element has degree two or three, and both
   perfect matching and abstract trichromatic orientation are proved equivalent
   to satisfiability of the original local periodic CNF.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonThreeDMComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonThreeDMComputability.lean)
+  computes the final quotient gauge, gauged clockwise formula, factor-two
+  padding, clause-anchor normalization, and finite Dyer--Frieze encoding
+  primitive recursively.  Its proof-free `PeriodicThreeDM` endpoint is proved
+  exactly equal to the proof-backed continuously planar instance above.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonContraction.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonContraction.lean)
   suppresses every degree-two colored element in that concrete endpoint.
   Under the same explicit polarity convention, the resulting executable
