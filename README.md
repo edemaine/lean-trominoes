@@ -202,6 +202,9 @@ build; an imported proof counts when its statement matches the paper.
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
       fixed-eight compass-port lookup primitive recursive from finite routes.
+    - [x] Compute the first clockwise retained clause ordering, its Figure 9
+      clearance scale, and the twice-replaced raw unit-free exact-one formula
+      primitive recursively.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -6261,6 +6264,12 @@ The representation choices for this target are:
   the later exact-one reductions.  Thus the later factor-72 inheritance sees a source
   lattice spacing of `144`, safely larger than the connector fan's radius-73
   reach.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderingComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderingComputability.lean)
+  instantiates the generic stable route-direction sorter with the exact
+  primitive-recursive normalized retained route query.  It computes the
+  first clockwise fixed-eight formula, the factor-two Figure 9 clearance
+  scale, and both finite positioned exact-one replacements, yielding the
+  twice-replaced raw unit-free exact-one formula primitive recursively.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearanceVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearanceVariableRouteOrder.lean)
   specializes variable-order preservation to the retained clockwise source.
   Positive factor-two scaling preserves all terminal directions, while
