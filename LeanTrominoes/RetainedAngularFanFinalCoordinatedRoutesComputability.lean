@@ -1548,6 +1548,14 @@ def retainedFinalEstablishedRouteQuery
   retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
     input.1.1 input.1.2 input.2
 
+private theorem retainedFinalEstablishedRouteQuery_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalEstablishedRouteQuery Variable) :
+    retainedFinalEstablishedRouteQuery input =
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        input.1.1 input.1.2 input.2 := by
+  rfl
+
 /-- The established ordinary-occurrence and implication-cycle route lookup
 is primitive recursive. -/
 theorem retainedFinalEstablishedRouteQuery_primrec
@@ -1556,6 +1564,389 @@ theorem retainedFinalEstablishedRouteQuery_primrec
       (Variable := Variable)) := by
   exact finalCoordinatedEstablishedRouteComputed_primrec.of_eq fun input =>
     finalCoordinatedEstablishedRouteComputed_eq input
+
+/-! ## Total coordinated route dispatcher -/
+
+private def finalCoordinatedSelectedEscapedRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable ×
+      FinalCoordinatedSelectedOccurrenceData Variable) : List Cell :=
+  retainedFinalEscapedFallbackOccurrenceRouteQuery
+    (finalCoordinatedSelectedOccurrenceInput input)
+
+private theorem finalCoordinatedSelectedEscapedRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedSelectedEscapedRoute
+      (Variable := Variable)) :=
+  retainedFinalEscapedFallbackOccurrenceRoute_primrec.comp
+    finalCoordinatedSelectedOccurrenceInput_primrec
+
+private theorem finalCoordinatedSelectedEscapedRoute_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable)
+    (clause : PositionedPeriodicClause
+      (FinalCoordinatedVariable Variable))
+    (literal : PeriodicLiteral (FinalCoordinatedVariable Variable)) :
+    finalCoordinatedSelectedEscapedRoute
+        (input, (angularClauseRouteData clause,
+          PeriodicLiteral.equivData literal)) =
+      retainedFinalEscapedFallbackOccurrenceRoute
+        input.1.1 clause literal input.1.2 input.2 := by
+  unfold finalCoordinatedSelectedEscapedRoute
+    finalCoordinatedSelectedOccurrenceInput
+    retainedFinalEscapedFallbackOccurrenceRouteQuery
+  simp
+
+private abbrev FinalCoordinatedSelectedChoiceQuery (Variable : Type*) :=
+  (RetainedFinalFallbackQuery Variable × RetainedDirectSourceRouteChoice) ×
+    FinalCoordinatedSelectedOccurrenceData Variable
+
+private def finalCoordinatedSelectedDirectInput
+    {Variable : Type*}
+    (input : FinalCoordinatedSelectedChoiceQuery Variable) :
+    RetainedFinalCoordinatedDirectRouteQuery Variable :=
+  (((((input.1.1.1.1, input.1.2), input.2.1), input.2.2),
+    input.1.1.1.2), input.1.1.2)
+
+private theorem finalCoordinatedSelectedDirectInput_primrec
+    {Variable : Type*} [Primcodable Variable] :
+    Primrec (finalCoordinatedSelectedDirectInput
+      (Variable := Variable)) := by
+  exact Primrec.pair
+    (Primrec.pair
+      (Primrec.pair
+        (Primrec.pair
+          (Primrec.pair
+            (Primrec.fst.comp
+              (Primrec.fst.comp
+                (Primrec.fst.comp Primrec.fst)))
+            (Primrec.snd.comp Primrec.fst))
+          (Primrec.fst.comp Primrec.snd))
+        (Primrec.snd.comp Primrec.snd))
+      (Primrec.snd.comp
+        (Primrec.fst.comp (Primrec.fst.comp Primrec.fst))))
+    (Primrec.snd.comp (Primrec.fst.comp Primrec.fst))
+
+private def finalCoordinatedSelectedDirectRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedSelectedChoiceQuery Variable) : List Cell :=
+  retainedFinalCoordinatedDirectOccurrenceRouteQuery
+    (finalCoordinatedSelectedDirectInput input)
+
+private theorem finalCoordinatedSelectedDirectRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedSelectedDirectRoute
+      (Variable := Variable)) :=
+  retainedFinalCoordinatedDirectOccurrenceRoute_primrec.comp
+    finalCoordinatedSelectedDirectInput_primrec
+
+private theorem finalCoordinatedSelectedDirectRoute_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable)
+    (choice : RetainedDirectSourceRouteChoice)
+    (clause : PositionedPeriodicClause
+      (FinalCoordinatedVariable Variable))
+    (literal : PeriodicLiteral (FinalCoordinatedVariable Variable)) :
+    finalCoordinatedSelectedDirectRoute
+        ((input, choice), (angularClauseRouteData clause,
+          PeriodicLiteral.equivData literal)) =
+      retainedFinalCoordinatedDirectOccurrenceRoute
+        input.1.1 choice clause literal input.1.2 input.2 := by
+  unfold finalCoordinatedSelectedDirectRoute
+    finalCoordinatedSelectedDirectInput
+    retainedFinalCoordinatedDirectOccurrenceRouteQuery
+  simp
+
+private def finalCoordinatedEscapedOccurrenceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  match finalCoordinatedSelectedOccurrenceData? input with
+  | none => retainedFinalEstablishedRouteQuery input
+  | some data => finalCoordinatedSelectedEscapedRoute (input, data)
+
+private theorem finalCoordinatedEscapedOccurrenceLookup_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedOccurrenceLookup
+      (Variable := Variable)) := by
+  exact (Primrec.option_casesOn
+    finalCoordinatedSelectedOccurrenceData?_primrec
+    retainedFinalEstablishedRouteQuery_primrec
+    finalCoordinatedSelectedEscapedRoute_primrec.to₂).of_eq fun input => by
+      unfold finalCoordinatedEscapedOccurrenceLookup
+      cases finalCoordinatedSelectedOccurrenceData? input <;> rfl
+
+private def finalCoordinatedNoChoiceRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  bif retainedFinalFallbackUsesEscapeQuery input then
+    finalCoordinatedEscapedOccurrenceLookup input
+  else
+    retainedFinalEstablishedRouteQuery input
+
+private theorem finalCoordinatedNoChoiceRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedNoChoiceRoute
+      (Variable := Variable)) := by
+  exact Primrec.cond retainedFinalFallbackUsesEscapeQuery_primrec
+    finalCoordinatedEscapedOccurrenceLookup_primrec
+    retainedFinalEstablishedRouteQuery_primrec
+
+private abbrev FinalCoordinatedChoiceQuery (Variable : Type*) :=
+  RetainedFinalFallbackQuery Variable × RetainedDirectSourceRouteChoice
+
+private def finalCoordinatedChoiceRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedChoiceQuery Variable) : List Cell :=
+  match finalCoordinatedSelectedOccurrenceData? input.1 with
+  | none => retainedFinalEstablishedRouteQuery input.1
+  | some data => finalCoordinatedSelectedDirectRoute (input, data)
+
+private theorem finalCoordinatedChoiceRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedChoiceRoute
+      (Variable := Variable)) := by
+  have selected : Primrec fun input : FinalCoordinatedChoiceQuery Variable =>
+      finalCoordinatedSelectedOccurrenceData? input.1 :=
+    finalCoordinatedSelectedOccurrenceData?_primrec.comp Primrec.fst
+  have established : Primrec fun input :
+      FinalCoordinatedChoiceQuery Variable =>
+      retainedFinalEstablishedRouteQuery input.1 :=
+    retainedFinalEstablishedRouteQuery_primrec.comp Primrec.fst
+  exact (Primrec.option_casesOn selected established
+    finalCoordinatedSelectedDirectRoute_primrec.to₂).of_eq fun input => by
+      unfold finalCoordinatedChoiceRoute
+      cases finalCoordinatedSelectedOccurrenceData? input.1 <;> rfl
+
+/-- Proof-free staged implementation of the final direct/escaped/ordinary
+route dispatcher. -/
+def retainedFinalCoordinatedRouteComputed
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  match retainedFinalDirectSourceRouteChoice?
+      input.1.1 input.1.2 input.2 with
+  | none => finalCoordinatedNoChoiceRoute input
+  | some choice => finalCoordinatedChoiceRoute (input, choice)
+
+/-- The staged total route dispatcher is primitive recursive. -/
+theorem retainedFinalCoordinatedRouteComputed_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (retainedFinalCoordinatedRouteComputed
+      (Variable := Variable)) := by
+  exact (Primrec.option_casesOn
+    retainedFinalDirectSourceRouteChoice?_primrec
+    finalCoordinatedNoChoiceRoute_primrec
+    finalCoordinatedChoiceRoute_primrec.to₂).of_eq fun input => by
+      unfold retainedFinalCoordinatedRouteComputed
+      cases retainedFinalDirectSourceRouteChoice?
+        input.1.1 input.1.2 input.2 <;> rfl
+
+private def finalCoordinatedEscapedRouteFromSourceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : List Cell :=
+  match finalCoordinatedScaledClause? input.1.1 input.1.2 with
+  | none =>
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        input.1.1 input.1.2 input.2
+  | some clause =>
+      match clause.literals[input.2]? with
+      | none =>
+          retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+            input.1.1 input.1.2 input.2
+      | some literal =>
+          retainedFinalEscapedFallbackOccurrenceRoute
+            input.1.1 clause literal input.1.2 input.2
+
+private theorem finalCoordinatedEscapedOccurrenceLookup_eq_sourceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    finalCoordinatedEscapedOccurrenceLookup input =
+      finalCoordinatedEscapedRouteFromSourceLookup input := by
+  unfold finalCoordinatedEscapedOccurrenceLookup
+    finalCoordinatedEscapedRouteFromSourceLookup
+  cases clauseLookup :
+      finalCoordinatedScaledClause? input.1.1 input.1.2 with
+  | none =>
+      have selectedNone :
+          finalCoordinatedSelectedOccurrenceData? input = none := by
+        simp [finalCoordinatedSelectedOccurrenceData?, clauseLookup]
+      rw [selectedNone]
+      simpa only using retainedFinalEstablishedRouteQuery_eq input
+  | some clause =>
+      cases literalLookup : clause.literals[input.2]? with
+      | none =>
+          have selectedNone :
+              finalCoordinatedSelectedOccurrenceData? input = none := by
+            simp [finalCoordinatedSelectedOccurrenceData?,
+              finalCoordinatedSelectedLiteralData?, clauseLookup,
+              literalLookup]
+          rw [selectedNone]
+          simp [literalLookup]
+          exact retainedFinalEstablishedRouteQuery_eq input
+      | some literal =>
+          have selectedSome :
+              finalCoordinatedSelectedOccurrenceData? input =
+                some (angularClauseRouteData clause,
+                  PeriodicLiteral.equivData literal) := by
+            simp [finalCoordinatedSelectedOccurrenceData?,
+              finalCoordinatedSelectedLiteralData?, clauseLookup,
+              literalLookup]
+          rw [selectedSome]
+          simp only [literalLookup]
+          exact finalCoordinatedSelectedEscapedRoute_eq
+            input clause literal
+
+private def finalCoordinatedDirectRouteFromSourceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedChoiceQuery Variable) : List Cell :=
+  match finalCoordinatedScaledClause? input.1.1.1 input.1.1.2 with
+  | none =>
+      retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+        input.1.1.1 input.1.1.2 input.1.2
+  | some clause =>
+      match clause.literals[input.1.2]? with
+      | none =>
+          retainedDrawingSourceScaledRefinedEightOccurrenceSplitIncidenceRoutes
+            input.1.1.1 input.1.1.2 input.1.2
+      | some literal =>
+          retainedFinalCoordinatedDirectOccurrenceRoute
+            input.1.1.1 input.2 clause literal input.1.1.2 input.1.2
+
+private theorem finalCoordinatedChoiceRoute_eq_sourceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedChoiceQuery Variable) :
+    finalCoordinatedChoiceRoute input =
+      finalCoordinatedDirectRouteFromSourceLookup input := by
+  unfold finalCoordinatedChoiceRoute
+    finalCoordinatedDirectRouteFromSourceLookup
+  cases clauseLookup :
+      finalCoordinatedScaledClause? input.1.1.1 input.1.1.2 with
+  | none =>
+      have selectedNone :
+          finalCoordinatedSelectedOccurrenceData? input.1 = none := by
+        simp [finalCoordinatedSelectedOccurrenceData?, clauseLookup]
+      rw [selectedNone]
+      rfl
+  | some clause =>
+      cases literalLookup : clause.literals[input.1.2]? with
+      | none =>
+          have selectedNone :
+              finalCoordinatedSelectedOccurrenceData? input.1 = none := by
+            simp [finalCoordinatedSelectedOccurrenceData?,
+              finalCoordinatedSelectedLiteralData?, clauseLookup,
+              literalLookup]
+          rw [selectedNone]
+          simp [literalLookup]
+          rfl
+      | some literal =>
+          have selectedSome :
+              finalCoordinatedSelectedOccurrenceData? input.1 =
+                some (angularClauseRouteData clause,
+                  PeriodicLiteral.equivData literal) := by
+            simp [finalCoordinatedSelectedOccurrenceData?,
+              finalCoordinatedSelectedLiteralData?, clauseLookup,
+              literalLookup]
+          rw [selectedSome]
+          simp only [literalLookup]
+          exact finalCoordinatedSelectedDirectRoute_eq
+            input.1 input.2 clause literal
+
+private theorem finalCoordinatedNoChoiceRoute_eq_sourceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    finalCoordinatedNoChoiceRoute input =
+      bif retainedFinalFallbackUsesEscapeQuery input then
+        finalCoordinatedEscapedRouteFromSourceLookup input
+      else
+        retainedFinalEstablishedRouteQuery input := by
+  unfold finalCoordinatedNoChoiceRoute
+  rw [finalCoordinatedEscapedOccurrenceLookup_eq_sourceLookup]
+
+private theorem finalCoordinatedPublicRoute_eq_sourceLookup
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        input.1.1 input.1.2 input.2 =
+      match retainedFinalDirectSourceRouteChoice?
+          input.1.1 input.1.2 input.2 with
+      | none =>
+          bif retainedFinalFallbackUsesEscapeQuery input then
+            finalCoordinatedEscapedRouteFromSourceLookup input
+          else
+            retainedFinalEstablishedRouteQuery input
+      | some choice =>
+          finalCoordinatedDirectRouteFromSourceLookup (input, choice) := by
+  cases choiceLookup : retainedFinalDirectSourceRouteChoice?
+      input.1.1 input.1.2 input.2 with
+  | none =>
+      unfold
+        retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+      rw [choiceLookup]
+      simp only
+      cases escapeLookup : retainedFinalFallbackUsesEscape
+          input.1.1 input.1.2 input.2 with
+      | false =>
+          unfold retainedFinalFallbackUsesEscapeQuery
+          rw [escapeLookup]
+          simp only [Bool.false_eq_true, ↓reduceIte, cond_false]
+          rfl
+      | true =>
+          unfold retainedFinalFallbackUsesEscapeQuery
+          rw [escapeLookup]
+          simp only [↓reduceIte, cond_true]
+          unfold finalCoordinatedEscapedRouteFromSourceLookup
+          cases finalCoordinatedScaledClause?
+              input.1.1 input.1.2 with
+          | none => rfl
+          | some clause =>
+              cases clause.literals[input.2]? <;> rfl
+  | some choice =>
+      unfold
+        retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+      rw [choiceLookup]
+      simp only
+      unfold finalCoordinatedDirectRouteFromSourceLookup
+      cases finalCoordinatedScaledClause?
+          input.1.1 input.1.2 with
+      | none => rfl
+      | some clause =>
+          cases clause.literals[input.2]? <;> rfl
+
+/-- The staged dispatcher is extensionally the exact final coordinated route
+family, including all malformed-index fallbacks. -/
+theorem retainedFinalCoordinatedRouteComputed_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) :
+    retainedFinalCoordinatedRouteComputed input =
+      retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+        input.1.1 input.1.2 input.2 := by
+  rw [finalCoordinatedPublicRoute_eq_sourceLookup]
+  unfold retainedFinalCoordinatedRouteComputed
+  cases choiceLookup : retainedFinalDirectSourceRouteChoice?
+      input.1.1 input.1.2 input.2 with
+  | none =>
+      exact finalCoordinatedNoChoiceRoute_eq_sourceLookup input
+  | some choice =>
+      exact finalCoordinatedChoiceRoute_eq_sourceLookup (input, choice)
+
+abbrev RetainedFinalCoordinatedRouteQuery (Variable : Type*) :=
+  RetainedFinalFallbackQuery Variable
+
+/-- Uncurried lookup of the exact final coordinated fixed-eight incidence
+route family. -/
+def retainedFinalCoordinatedRouteQuery
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedRouteQuery Variable) : List Cell :=
+  retainedDrawingSourceScaledCoordinatedEightOccurrenceSplitIncidenceRoutes
+    input.1.1 input.1.2 input.2
+
+/-- The exact final direct/escaped/ordinary/cycle route dispatcher is
+primitive recursive. -/
+theorem retainedFinalCoordinatedRouteQuery_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (retainedFinalCoordinatedRouteQuery
+      (Variable := Variable)) :=
+  retainedFinalCoordinatedRouteComputed_primrec.of_eq fun input =>
+    retainedFinalCoordinatedRouteComputed_eq input
 
 end PeriodicOrthocrossing
 end LeanTrominoes

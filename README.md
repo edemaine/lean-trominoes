@@ -193,6 +193,9 @@ build; an imported proof counts when its statement matches the paper.
       primitive recursively with its exact slot and Figure 7 suffix.
     - [x] Compute the established ordinary copied-occurrence and translated
       implication-cycle fallback route lookup primitive recursively.
+    - [x] Assemble the exact final direct, escaped, ordinary, and cycle route
+      dispatcher primitive recursively, including every malformed-index
+      fallback.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -3214,7 +3217,10 @@ The representation choices for this target are:
   The ordinary copied-occurrence path is computed from the scaled source
   terminal and the same suffix; a flattened metadata lookup also computes
   every translated implication-cycle route.  Together they recover the exact
-  established total fallback family primitive recursively.
+  established total fallback family primitive recursively.  A proof-free
+  staged dispatcher then selects among the direct, escaped, ordinary, and
+  cycle routes, and is proved primitive recursive and extensionally equal to
+  the published total route family, including malformed-index fallbacks.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
   proves that each validated coordinated prefix meets that unchanged suffix
   at exactly the same fan-boundary point.  The resulting substituted route
