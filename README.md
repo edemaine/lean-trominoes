@@ -140,6 +140,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the retained positioned planar-SAT presentation, its
       canonical variable and clause-anchor gauges, and its periodic
       clause-orbit representatives primitive recursive.
+    - [x] Transport the exact retained incidence routes through variable
+      gauging, clause-anchor normalization, and clause-orbit deduplication,
+      then compute their angular fixed-eight occurrence split.
     - [x] Prove positioned periodic-CNF erasure, variable renaming,
       anchor normalization, and clause-orbit deduplication primitive
       recursive.
@@ -6540,6 +6543,10 @@ The representation choices for this target are:
   decodes all five clause-source constructors, selects their exact local
   route, and proves the complete metadata-indexed semantic route family
   primitive recursive and computable.
+- [`LeanTrominoes/PositionedPeriodicCNFRouteTransportComputability.lean`](LeanTrominoes/PositionedPeriodicCNFRouteTransportComputability.lean)
+  proves the generic clause-anchor route normalization and first-orbit
+  representative reindexing primitive recursive from a positioned formula,
+  physical period, and finite route lookup.
 - [`LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean)
   gives periodic planar-SAT protovariables and their opaque wrappers canonical
   encodings, computes canonical crossing representatives and literal period
@@ -6551,6 +6558,14 @@ The representation choices for this target are:
   quotient, applies the variable and clause-anchor gauges, and selects one
   representative per periodic clause orbit.  Thus the final
   `retainedPlanarSATFormula` is primitive recursive.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedGaugedRoutesComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedGaugedRoutesComputability.lean)
+  specializes generic route transport to the retained planar-SAT source,
+  proving its exact anchor-normalized and clause-orbit-deduplicated incidence
+  route lookups primitive recursive and computable.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitComputability.lean)
+  computes the angular east-first compass port at every retained incidence and
+  proves the exact retained fixed-eight occurrence-split formula primitive
+  recursive and computable.
 - [`LeanTrominoes/PositionedPeriodicCNFComputability.lean`](LeanTrominoes/PositionedPeriodicCNFComputability.lean)
   proves the reusable positioned-formula bookkeeping executable: erasure,
   input-dependent variable renaming and gauging, total clause-position

@@ -42,6 +42,20 @@ def retainedDrawingAngularOccurrencePorts
     (retainedPlanarSATFormula source)
     (retainedDrawingAngularOccurrenceOrder source)
 
+/-- Unfolding equation exposing only the computational inputs to the retained
+angular port assignment. -/
+theorem retainedDrawingAngularOccurrencePorts_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    retainedDrawingAngularOccurrencePorts source =
+      occurrencePortsOfAngularOrder
+        (retainedPlanarSATFormula source)
+        (PeriodicThreeSATThree.angularOccurrenceOrder
+          (retainedPlanarSATFormula source)
+          (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+            source)) :=
+  rfl
+
 /-- The final retained planar-SAT source after fixed-eight occurrence
 splitting. -/
 def retainedDrawingEightOccurrenceSplitFormula
@@ -53,6 +67,21 @@ def retainedDrawingEightOccurrenceSplitFormula
   PeriodicEightOccurrenceSplit.formula
     (retainedPlanarSATFormula source)
     (retainedDrawingAngularOccurrencePorts source)
+
+/-- Unfolding equation exposing the route-induced angular occurrence split. -/
+theorem retainedDrawingEightOccurrenceSplitFormula_eq
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    retainedDrawingEightOccurrenceSplitFormula source =
+      PeriodicEightOccurrenceSplit.formula
+        (retainedPlanarSATFormula source)
+        (occurrencePortsOfAngularOrder
+          (retainedPlanarSATFormula source)
+          (PeriodicThreeSATThree.angularOccurrenceOrder
+            (retainedPlanarSATFormula source)
+            (retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+              source))) :=
+  rfl
 
 /-- The retained terminal order fits into the eight fixed ports. -/
 theorem retainedDrawingAngularOccurrenceOrder_fitsEightSlots
