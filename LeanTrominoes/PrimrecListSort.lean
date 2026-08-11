@@ -15,6 +15,160 @@ noncomputable section
 
 namespace LeanTrominoes.Computability
 
+set_option maxHeartbeats 200000
+
+/-! ## Computable list folds -/
+
+/-- Left folds preserve computability even when the folding step is merely
+computable rather than primitive recursive.  Mathlib exposes the
+primitive-recursive closure theorem directly; this total tail-recursive
+implementation supplies the corresponding `Computable` interface. -/
+theorem listFoldl_computable
+    {Input Item State : Type*}
+    [Primcodable Input] [Primcodable Item] [Primcodable State]
+    (items : Input → List Item)
+    (initial : Input → State)
+    (step : Input → State → Item → State)
+    (itemsComputable : Computable items)
+    (initialComputable : Computable initial)
+    (stepComputable :
+      Computable fun input : (Input × State) × Item =>
+        step input.1.1 input.1.2 input.2) :
+    Computable fun input =>
+      (items input).foldl (step input) (initial input) := by
+  let FoldState := (Input × State) × List Item
+  let transition : FoldState → State ⊕ FoldState := fun state =>
+    match state.2 with
+    | [] => Sum.inl state.1.2
+    | head :: tail =>
+        Sum.inr ((state.1.1,
+          step state.1.1 state.1.2 head), tail)
+  have headComputable : Computable fun state : FoldState =>
+      state.2.head? :=
+    Primrec.list_head?.to_comp.comp Computable.snd
+  have stopComputable : Computable fun state : FoldState =>
+      (Sum.inl state.1.2 : State ⊕ FoldState) :=
+    Computable.sumInl.comp
+      (Computable.snd.comp Computable.fst)
+  have advanceComputable : Computable₂ fun (state : FoldState)
+      (head : Item) =>
+      (Sum.inr ((state.1.1,
+        step state.1.1 state.1.2 head), state.2.tail) :
+        State ⊕ FoldState) := by
+    change Computable fun combined : FoldState × Item =>
+      (Sum.inr ((combined.1.1.1,
+        step combined.1.1.1 combined.1.1.2 combined.2),
+        combined.1.2.tail) : State ⊕ FoldState)
+    have updated : Computable fun combined : FoldState × Item =>
+        step combined.1.1.1 combined.1.1.2 combined.2 :=
+      stepComputable.to₂.comp
+        (Computable.fst.comp Computable.fst)
+        Computable.snd
+    have source : Computable fun combined : FoldState × Item =>
+        combined.1.1.1 :=
+      (Primrec.fst.comp
+        (Primrec.fst.comp Primrec.fst)).to_comp
+    have tail : Computable fun combined : FoldState × Item =>
+        combined.1.2.tail :=
+      (Primrec.list_tail.comp
+        (Primrec.snd.comp Primrec.fst)).to_comp
+    exact Computable.sumInr.comp
+      (Computable.pair (Computable.pair source updated) tail)
+  have transitionComputable : Computable transition := by
+    exact (Computable.option_casesOn headComputable
+      stopComputable advanceComputable).of_eq fun state => by
+        rcases state with ⟨state, remaining⟩
+        cases remaining <;> rfl
+  have initialized : Computable fun input : Input =>
+      (((input, initial input), items input) : FoldState) :=
+    Computable.pair
+      (Computable.pair Computable.id initialComputable)
+      itemsComputable
+  have fixed : Partrec
+      (PFun.fix (transition : FoldState →. State ⊕ FoldState)) :=
+    Partrec.fix transitionComputable.partrec
+  have run : Partrec fun input : Input =>
+      PFun.fix (transition : FoldState →. State ⊕ FoldState)
+        ((input, initial input), items input) :=
+    fixed.comp initialized
+  apply run.of_eq
+  intro input
+  apply Part.eq_some_iff.mpr
+  have terminates : ∀ (state : State) (remaining : List Item),
+      remaining.foldl (step input) state ∈
+        PFun.fix (transition : FoldState →. State ⊕ FoldState)
+          ((input, state), remaining) := by
+    intro state remaining
+    induction remaining generalizing state with
+    | nil =>
+        apply PFun.mem_fix_iff.mpr
+        left
+        simp [transition]
+    | cons head tail induction =>
+        apply PFun.mem_fix_iff.mpr
+        right
+        refine ⟨((input, step input state head), tail), ?_, ?_⟩
+        · simp [transition]
+        · simpa using induction (step input state head)
+  exact terminates (initial input) (items input)
+
+/-- Right folds preserve computability for a computable folding step. -/
+theorem listFoldr_computable
+    {Input Item State : Type*}
+    [Primcodable Input] [Primcodable Item] [Primcodable State]
+    (items : Input → List Item)
+    (initial : Input → State)
+    (step : Input → Item → State → State)
+    (itemsComputable : Computable items)
+    (initialComputable : Computable initial)
+    (stepComputable :
+      Computable fun input : (Input × Item) × State =>
+        step input.1.1 input.1.2 input.2) :
+    Computable fun input =>
+      (items input).foldr (step input) (initial input) := by
+  have reversed : Computable fun input => (items input).reverse :=
+    Computable.list_reverse.comp itemsComputable
+  have flippedStep : Computable fun input : (Input × State) × Item =>
+      step input.1.1 input.2 input.1.2 :=
+    stepComputable.comp
+      (show Computable fun input : (Input × State) × Item =>
+          ((input.1.1, input.2), input.1.2) from
+        (Primrec.pair
+          (Primrec.pair
+            (Primrec.fst.comp Primrec.fst)
+            Primrec.snd)
+          (Primrec.snd.comp Primrec.fst)).to_comp)
+  exact (listFoldl_computable
+    (fun input => (items input).reverse) initial
+    (fun input state item => step input item state)
+    reversed initialComputable flippedStep).of_eq fun input => by
+      simp only [List.foldr_eq_foldl_reverse]
+
+/-- Mapping a computable function over a computable finite list is
+computable. -/
+theorem listMap_computable
+    {Input Item Output : Type*}
+    [Primcodable Input] [Primcodable Item] [Primcodable Output]
+    (items : Input → List Item)
+    (mapping : Input → Item → Output)
+    (itemsComputable : Computable items)
+    (mappingComputable : Computable₂ mapping) :
+    Computable fun input => (items input).map (mapping input) := by
+  have stepComputable : Computable fun input :
+      (Input × Item) × List Output =>
+      mapping input.1.1 input.1.2 :: input.2 := by
+    have mapped : Computable fun input :
+        (Input × Item) × List Output =>
+        mapping input.1.1 input.1.2 :=
+      mappingComputable.comp
+        (Computable.fst.comp Computable.fst)
+        (Computable.snd.comp Computable.fst)
+    exact Computable.list_cons.comp mapped Computable.snd
+  exact (listFoldr_computable items (fun _ => [])
+    (fun input item outputs => mapping input item :: outputs)
+    itemsComputable (Computable.const []) stepComputable).of_eq
+      fun input => by simp
+
 /-- Insert one item into a sorted list using a Boolean comparison. -/
 def boolOrderedInsert {Item : Type*}
     (lessEq : Item → Item → Bool) (item : Item) : List Item → List Item
@@ -29,6 +183,116 @@ def boolOrderedInsert {Item : Type*}
 def boolInsertionSort {Item : Type*}
     (lessEq : Item → Item → Bool) (items : List Item) : List Item :=
   items.foldr (boolOrderedInsert lessEq) []
+
+/-- Boolean ordered insertion is computable for a computable comparison. -/
+theorem boolOrderedInsert_computable
+    {Input Item : Type*} [Primcodable Input] [Primcodable Item]
+    (lessEq : Input → Item → Item → Bool)
+    (lessEqComputable :
+      Computable fun input : (Input × Item) × Item =>
+        lessEq input.1.1 input.1.2 input.2) :
+    Computable fun input : (Input × Item) × List Item =>
+      boolOrderedInsert (lessEq input.1.1) input.1.2 input.2 := by
+  let OrderInput := (Input × Item) × List Item
+  let FoldState := List Item × List Item
+  let foldStep : OrderInput → Item → FoldState → FoldState :=
+    fun input head state =>
+      let original := head :: state.1
+      let inserted :=
+        if lessEq input.1.1 input.1.2 head then
+          input.1.2 :: original
+        else
+          head :: state.2
+      (original, inserted)
+  have foldStepComputable : Computable fun input :
+      (OrderInput × Item) × FoldState =>
+      foldStep input.1.1 input.1.2 input.2 := by
+    have original : Computable fun input :
+        (OrderInput × Item) × FoldState =>
+        input.1.2 :: input.2.1 :=
+      Computable.list_cons.comp
+        (Computable.snd.comp Computable.fst)
+        (Computable.fst.comp Computable.snd)
+    have comparison : Computable fun input :
+        (OrderInput × Item) × FoldState =>
+        lessEq input.1.1.1.1 input.1.1.1.2 input.1.2 :=
+      lessEqComputable.to₂.comp
+        (Computable.fst.comp
+          (Computable.fst.comp Computable.fst))
+        (Computable.snd.comp Computable.fst)
+    have before : Computable fun input :
+        (OrderInput × Item) × FoldState =>
+        input.1.1.1.2 :: input.1.2 :: input.2.1 :=
+      Computable.list_cons.comp
+        (Computable.snd.comp
+          (Computable.fst.comp
+            (Computable.fst.comp Computable.fst)))
+        original
+    have after : Computable fun input :
+        (OrderInput × Item) × FoldState =>
+        input.1.2 :: input.2.2 :=
+      Computable.list_cons.comp
+        (Computable.snd.comp Computable.fst)
+        (Computable.snd.comp Computable.snd)
+    have inserted : Computable fun input :
+        (OrderInput × Item) × FoldState =>
+        if lessEq input.1.1.1.1 input.1.1.1.2 input.1.2 then
+          input.1.1.1.2 :: input.1.2 :: input.2.1
+        else
+          input.1.2 :: input.2.2 :=
+      (Computable.cond comparison before after).of_eq fun input => by
+        cases lessEq input.1.1.1.1 input.1.1.1.2 input.1.2 <;> rfl
+    exact Computable.pair original inserted
+  have folded : Computable fun input : OrderInput =>
+      (input.2.foldr (foldStep input)
+        ([], [input.1.2])).2 := by
+    have initial : Computable fun input : OrderInput =>
+        (([], [input.1.2]) : FoldState) :=
+      Computable.pair (Computable.const [])
+        (Computable.list_cons.comp
+          (Computable.snd.comp Computable.fst)
+          (Computable.const []))
+    exact Computable.snd.comp
+      (listFoldr_computable (fun input : OrderInput => input.2)
+        (fun input => ([], [input.1.2])) foldStep
+        Computable.snd initial foldStepComputable)
+  apply folded.of_eq
+  rintro ⟨⟨input, item⟩, items⟩
+  simp only
+  have equality :
+      List.foldr (foldStep ((input, item), items))
+          ([], [item]) items =
+        (items, boolOrderedInsert (lessEq input) item items) := by
+    induction items with
+    | nil => rfl
+    | cons head tail induction =>
+        simp only [List.foldr_cons, foldStep]
+        rw [induction]
+        simp only [boolOrderedInsert]
+  exact congrArg Prod.snd equality
+
+/-- Boolean insertion sort is computable for a computable comparison and
+computable input list. -/
+theorem boolInsertionSort_computable
+    {Input Item : Type*} [Primcodable Input] [Primcodable Item]
+    (items : Input → List Item)
+    (lessEq : Input → Item → Item → Bool)
+    (itemsComputable : Computable items)
+    (lessEqComputable :
+      Computable fun input : (Input × Item) × Item =>
+        lessEq input.1.1 input.1.2 input.2) :
+    Computable fun input =>
+      boolInsertionSort (lessEq input) (items input) := by
+  have insertComputable : Computable fun input :
+      (Input × Item) × List Item =>
+      boolOrderedInsert (lessEq input.1.1)
+        input.1.2 input.2 :=
+    boolOrderedInsert_computable lessEq lessEqComputable
+  exact (listFoldr_computable items (fun _ => [])
+    (fun input item sorted =>
+      boolOrderedInsert (lessEq input) item sorted)
+    itemsComputable (Computable.const []) insertComputable).of_eq
+      fun _ => rfl
 
 theorem boolOrderedInsert_primrec
     {Input Item : Type*} [Primcodable Input] [Primcodable Item]

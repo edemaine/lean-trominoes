@@ -166,6 +166,9 @@ build; an imported proof counts when its statement matches the paper.
       gauges primitive recursive on finite periodic CNF presentations.
     - [x] Prove stable route-direction sorting of positioned periodic clauses
       primitive recursive from a primitive-recursive route lookup.
+    - [x] Prove computable finite-list folds, maps, and stable insertion sort,
+      then lift route-direction clause sorting to computable source formulas
+      and merely computable route lookups.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
