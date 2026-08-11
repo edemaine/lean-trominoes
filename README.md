@@ -183,6 +183,8 @@ build; an imported proof counts when its statement matches the paper.
       coordinated direct occurrence route primitive recursively.
     - [x] Prove the final singleton-prefix escape test and scaled-source
       clause lookup primitive recursive for total-route branch selection.
+    - [x] Prove the exact eleven-direction retained-ray classifiers,
+      staircase generators, and whole-polyline rasterizer primitive recursive.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -1911,6 +1913,12 @@ The representation choices for this target are:
   soundness, preservation under positive integral scaling, exact endpoints,
   and orthogonality after rasterizing supported segments, polylines, and
   whole incidence-route families.
+- [`LeanTrominoes/RetainedRayRasterizationComputability.lean`](LeanTrominoes/RetainedRayRasterizationComputability.lean)
+  equips the retained direction and ray types with primitive-recursive
+  encodings, computes both exact ray classifiers and their length data, and
+  proves the compass and routed-clause staircase generators primitive
+  recursive.  Segment fallback and structural whole-polyline rasterization
+  are therefore primitive recursive as well.
 - [`LeanTrominoes/RetainedRayRasterizationCorridor.lean`](LeanTrominoes/RetainedRayRasterizationCorridor.lean)
   gives the staircase construction a uniform quantitative bound.  Every
   listed rasterized point lies within coordinate radius nine of an exact
