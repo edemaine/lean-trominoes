@@ -18,7 +18,7 @@ namespace PeriodicOrthocrossing
 
 set_option maxHeartbeats 1200000
 
-private theorem retainedGaugedWrappedDrawingPeriodicPlanarSATPeriod_primrec
+theorem retainedGaugedWrappedDrawingPeriodicPlanarSATPeriod_primrec
     {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
     Primrec fun formula : PeriodicCNF Variable =>
       (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement
@@ -30,7 +30,7 @@ private theorem retainedGaugedWrappedDrawingPeriodicPlanarSATPeriod_primrec
     (Primrec.const planarMacroScale.toNat)
     (drawingGridSize_primrec.comp PeriodicCNF.incidenceGraph_primrec)
 
-private theorem
+theorem
     retainedGaugedWrappedDrawingPeriodicPlanarSATPosition_primrec
     {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
     Primrec fun input : PeriodicCNF Variable ×

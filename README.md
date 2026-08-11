@@ -146,6 +146,10 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the positioned fixed-eight ring compiler primitive recursive,
       including its clause coordinates and companion placement queries, and
       specialize it to the exact retained positioned split.
+    - [x] Prove the exact canonical angular-spliced Figure 7 route lookup
+      computable for positioned fixed-eight splits, including copied
+      incidences and appended implication rings, and specialize it to the
+      retained planar-SAT source.
     - [x] Prove the positioned Figure 9 and unit-elimination compilers
       primitive recursive, including their placement queries, and specialize
       them through the retained unit-free exact-one endpoint.
@@ -1796,6 +1800,12 @@ The representation choices for this target are:
   prefixes intentionally make no noncrossing claim; replacing those prefixes
   by geometry inherited from the retained planar drawing is the remaining
   global planarity obligation.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitRoutesComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitRoutesComputability.lean)
+  proves that exact retained angular-spliced route lookup computable from the
+  retained positioned formula, placement, compass ports, and ordered copies.
+  An explicit proof-free equality connects the computation to the certified
+  route family; every local Figure 7 geometry operation is primitive
+  recursive.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositioned.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositioned.lean)
   threads the retained fixed-eight formula through the positioned Figure 9
   exact-one reduction, opaque wrapping, and unit-clause elimination.  The
@@ -5937,6 +5947,21 @@ The representation choices for this target are:
   metadata index.  The spliced family is proved to retain the complete
   periodic endpoint condition and orthogonality; its remaining obligation is
   global noncrossing geometry for the copied source incidences.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedRoutesComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedRoutesComputability.lean)
+  proves primitive recursiveness of the Manhattan detours, angular fan
+  geometry, translated Figure 7 ring routes, and flattened cycle metadata
+  used by the positioned fixed-eight route family.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceRouteComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedOccurrenceRouteComputability.lean)
+  gives proof-free data definitions for copied and complete angular-spliced
+  route lookup, identifies them with the certified construction, and proves
+  one copied occurrence route primitive recursive.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCopiedRouteComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedCopiedRouteComputability.lean)
+  computes the nested copied-clause route lookup through balanced, flattened
+  clause and literal data while retaining primitive-recursive local geometry.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedRouteLookupComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedRouteLookupComputability.lean)
+  combines copied incidences with appended Figure 7 implication-ring routes
+  and proves both the proof-free and certified total route families
+  computable.
 - [`LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean`](LeanTrominoes/PeriodicCNFPlanarEightOccurrenceTerminalSplit.lean)
   assigns the eight copies by their actual routed terminal rays rather than
   by an arbitrary starting point in the cyclic angular order.  The resulting
