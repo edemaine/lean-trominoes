@@ -149,25 +149,90 @@ theorem retainedFinalDirectSourceRouteChoiceFromMetadata_exists_raw
       subst choice
       exact ⟨rawChoice, rfl, rfl⟩
 
-/-- Canonical retained metadata representative used by a final clause
-index, when both the final clause and its representative exist. -/
-def retainedFinalDirectSourceMetadata?
-    {Variable : Type*} [DecidableEq Variable]
-    (formula : PeriodicCNF Variable)
-    (clauseIndex : Nat) :
-    Option (DrawingPlanarSATClauseMetadata Variable) :=
-  match
-      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-        formula).clauses[clauseIndex]? with
-  | none => none
-  | some finalClause =>
-      (retainedDrawingPlanarSATClauseMetadata formula)[
-        (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-          formula).representativeClauseIndex finalClause.literals]?
-
 /-- Every successful final choice comes from the canonical metadata
 representative and one successful raw choice, translated by that
 representative's physical anchor shift. -/
+private theorem retainedFinalDirectSourceCheckedOption_exists_candidate
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex literalIndex : Nat)
+    (candidate? : Option RetainedDirectSourceRouteChoice)
+    (choice : RetainedDirectSourceRouteChoice)
+    (lookup :
+      retainedFinalDirectSourceRouteChoiceSelect?
+          formula clauseIndex literalIndex candidate? = some choice) :
+    ∃ candidate, candidate? = some candidate ∧ choice = candidate := by
+  unfold retainedFinalDirectSourceRouteChoiceSelect? at lookup
+  cases candidate? with
+  | none =>
+      simp only at lookup
+      cases lookup
+  | some candidate =>
+      simp only at lookup
+      split at lookup
+      next =>
+        simp only [Option.some.injEq] at lookup
+        subst choice
+        exact ⟨candidate, rfl, rfl⟩
+      next => cases lookup
+
+private theorem retainedFinalDirectSourceRouteChoiceFromMetadata_exists_input
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (literalIndex : Nat)
+    (metadata? : Option (DrawingPlanarSATClauseMetadata Variable))
+    (choice : RetainedDirectSourceRouteChoice)
+    (lookup :
+      retainedFinalDirectSourceRouteChoiceFromMetadata?
+          formula literalIndex metadata? = some choice) :
+    ∃ metadata,
+      metadata? = some metadata ∧
+      retainedFinalDirectSourceRouteChoiceFromMetadata?
+          formula literalIndex (some metadata) = some choice := by
+  cases metadata? with
+  | none =>
+      simp [retainedFinalDirectSourceRouteChoiceFromMetadata?] at lookup
+  | some metadata =>
+      exact ⟨metadata, rfl, lookup⟩
+
+private theorem retainedFinalDirectSourceRouteChoiceQuery_exists_candidate
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalDirectQuery Variable)
+    (candidate? : Option RetainedDirectSourceRouteChoice)
+    (candidateEq :
+      retainedFinalDirectSourceRouteChoiceCandidate? input = candidate?)
+    (choice : RetainedDirectSourceRouteChoice)
+    (lookup :
+      retainedFinalDirectSourceRouteChoiceQuery? input = some choice) :
+    ∃ candidate,
+      candidate? = some candidate ∧
+      choice = candidate := by
+  unfold retainedFinalDirectSourceRouteChoiceQuery? at lookup
+  unfold retainedFinalDirectSourceRouteChoiceSelectInput? at lookup
+  rw [candidateEq] at lookup
+  exact retainedFinalDirectSourceCheckedOption_exists_candidate
+    input.1.1 input.1.2 input.2 candidate? choice lookup
+
+private theorem retainedFinalDirectSourceRouteChoiceCandidate_exists_metadata
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalDirectQuery Variable)
+    (metadata? : Option (DrawingPlanarSATClauseMetadata Variable))
+    (metadataEq :
+      retainedFinalDirectSourceMetadata? input.1.1 input.1.2 = metadata?)
+    (choice : RetainedDirectSourceRouteChoice)
+    (lookup :
+      retainedFinalDirectSourceRouteChoiceCandidate? input = some choice) :
+    ∃ metadata,
+      metadata? = some metadata ∧
+      retainedFinalDirectSourceRouteChoiceFromMetadata?
+        input.1.1 input.2 (some metadata) = some choice := by
+  unfold retainedFinalDirectSourceRouteChoiceCandidate? at lookup
+  unfold retainedFinalDirectSourceRouteChoiceCandidateInput at lookup
+  unfold retainedFinalDirectSourceRouteChoiceFromMetadataInput? at lookup
+  rw [metadataEq] at lookup
+  exact retainedFinalDirectSourceRouteChoiceFromMetadata_exists_input
+    input.1.1 input.2 metadata? choice lookup
+
 theorem retainedFinalDirectSourceRouteChoice_exists_raw
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
@@ -188,47 +253,22 @@ theorem retainedFinalDirectSourceRouteChoice_exists_raw
           (retainedFinalDirectSourceMetadataTranslation
             formula metadata) := by
   unfold retainedFinalDirectSourceRouteChoice? at lookup
-  generalize finalLookup :
-      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-        formula).clauses[clauseIndex]? = finalClause? at lookup
-  cases finalClause? with
-  | none =>
-      simp only at lookup
-      cases lookup
-  | some finalClause =>
-      simp only at lookup
-      generalize metadataLookup :
-          (retainedDrawingPlanarSATClauseMetadata formula)[
-            (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-              formula).representativeClauseIndex finalClause.literals]? =
-            metadata? at lookup
-      cases metadata? with
-      | none =>
-          cases lookup
-      | some metadata =>
-          generalize selectedLookup :
-              retainedFinalDirectSourceRouteChoiceFromMetadata?
-                formula literalIndex (some metadata) = selected? at lookup
-          cases selected? with
-          | none =>
-              simp only at lookup
-              cases lookup
-          | some selected =>
-              simp only at lookup
-              split at lookup
-              next =>
-                simp only [Option.some.injEq] at lookup
-                subst choice
-                rcases
-                    retainedFinalDirectSourceRouteChoiceFromMetadata_exists_raw
-                    formula literalIndex metadata selected selectedLookup with
-                  ⟨rawChoice, rawLookup, selectedEq⟩
-                subst selected
-                refine ⟨metadata, rawChoice, ?_, rawLookup, rfl⟩
-                unfold retainedFinalDirectSourceMetadata?
-                rw [finalLookup]
-                exact metadataLookup
-              next => cases lookup
+  rcases retainedFinalDirectSourceRouteChoiceQuery_exists_candidate
+      ((formula, clauseIndex), literalIndex)
+      (retainedFinalDirectSourceRouteChoiceCandidate?
+        ((formula, clauseIndex), literalIndex))
+      rfl choice lookup with
+    ⟨candidate, candidateLookup, choiceEq⟩
+  rcases retainedFinalDirectSourceRouteChoiceCandidate_exists_metadata
+      ((formula, clauseIndex), literalIndex)
+      (retainedFinalDirectSourceMetadata? formula clauseIndex)
+      rfl candidate candidateLookup with
+    ⟨metadata, metadataLookup, selectedLookup⟩
+  rcases retainedFinalDirectSourceRouteChoiceFromMetadata_exists_raw
+      formula literalIndex metadata candidate selectedLookup with
+    ⟨rawChoice, rawLookup, candidateEq⟩
+  refine ⟨metadata, rawChoice, metadataLookup, rawLookup, ?_⟩
+  exact choiceEq.trans candidateEq
 
 /-- Successful direct-source choices for distinct literals of one final
 clause have separated complete routes, with their common heads as the only

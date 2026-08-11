@@ -1,5 +1,6 @@
 import LeanTrominoes.RetainedAngularFanDirectSourceRouteChoice
 import LeanTrominoes.RetainedFinalRouteMacrocellBounds
+import LeanTrominoes.PeriodicCNFPlanarRetainedRepresentativeItem
 
 /-!
 # Direct-source route choices in the final retained quotient
@@ -20,6 +21,16 @@ namespace PeriodicEightOccurrenceSplit
 open PeriodicOrthocrossing
 
 set_option maxHeartbeats 1200000
+
+/-- Uncurried clause/literal query used by the final direct-source selector. -/
+abbrev RetainedFinalDirectQuery (Variable : Type*) :=
+  (PeriodicCNF Variable × Nat) × Nat
+
+/-- Uncurried optional-metadata input used by the final direct-source
+selector. -/
+abbrev RetainedFinalDirectMetadataOptionInput (Variable : Type*) :=
+  (PeriodicCNF Variable × Nat) ×
+    Option (DrawingPlanarSATClauseMetadata Variable)
 
 /-- Translate only the component origin of a checked route choice. -/
 def RetainedDirectSourceRouteChoice.translateOrigin
@@ -92,6 +103,80 @@ def retainedFinalDirectSourceRouteChoiceFromMetadata?
               (retainedFinalDirectSourceMetadataTranslation
                 formula metadata))
 
+/-- Uncurried form of the optional-metadata route-choice stage. -/
+def retainedFinalDirectSourceRouteChoiceFromMetadataInput?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalDirectMetadataOptionInput Variable) :
+    Option RetainedDirectSourceRouteChoice :=
+  retainedFinalDirectSourceRouteChoiceFromMetadata?
+    input.1.1 input.1.2 input.2
+
+/-- Canonical retained metadata representative used by a final clause
+index, when both the final clause and its representative exist. -/
+def retainedFinalDirectSourceMetadata?
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex : Nat) :
+    Option (DrawingPlanarSATClauseMetadata Variable) :=
+  retainedRepresentativeItem?
+    formula
+    (retainedDrawingPlanarSATClauseMetadata formula)
+    clauseIndex
+
+/-- Input to the optional-metadata route-choice stage for one final query. -/
+def retainedFinalDirectSourceRouteChoiceCandidateInput
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalDirectQuery Variable) :
+    RetainedFinalDirectMetadataOptionInput Variable :=
+  ((input.1.1, input.2),
+    retainedFinalDirectSourceMetadata? input.1.1 input.1.2)
+
+/-- Optional translated-atlas candidate attached to one final query. -/
+def retainedFinalDirectSourceRouteChoiceCandidate?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalDirectQuery Variable) :
+    Option RetainedDirectSourceRouteChoice :=
+  retainedFinalDirectSourceRouteChoiceFromMetadataInput?
+    (retainedFinalDirectSourceRouteChoiceCandidateInput input)
+
+/-- Check one optional translated-atlas candidate against the actual final
+quotient route. -/
+def retainedFinalDirectSourceRouteChoiceSelect?
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex literalIndex : Nat)
+    (candidate? : Option RetainedDirectSourceRouteChoice) :
+    Option RetainedDirectSourceRouteChoice :=
+  match candidate? with
+  | none => none
+  | some choice =>
+      if
+          translatePolyline choice.origin
+              (retainedDirectSourceLocalRouteAt
+                choice.kind choice.index) =
+            retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
+              formula clauseIndex literalIndex then
+        some choice
+      else
+        none
+
+/-- Uncurried form of the checked final candidate selector. -/
+def retainedFinalDirectSourceRouteChoiceSelectInput?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalDirectQuery Variable ×
+      Option RetainedDirectSourceRouteChoice) :
+    Option RetainedDirectSourceRouteChoice :=
+  retainedFinalDirectSourceRouteChoiceSelect?
+    input.1.1.1 input.1.1.2 input.1.2 input.2
+
+/-- Complete uncurried checked selector for one final clause/literal query. -/
+def retainedFinalDirectSourceRouteChoiceQuery?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalDirectQuery Variable) :
+    Option RetainedDirectSourceRouteChoice :=
+  retainedFinalDirectSourceRouteChoiceSelectInput?
+    (input, retainedFinalDirectSourceRouteChoiceCandidate? input)
+
 /-- Checked direct-source choice for one clause/literal index of the final
 retained source.  A candidate is accepted only when its translated atlas
 route equals the actual final quotient route.  Missing
@@ -102,36 +187,13 @@ def retainedFinalDirectSourceRouteChoice?
     (formula : PeriodicCNF Variable)
     (clauseIndex literalIndex : Nat) :
     Option RetainedDirectSourceRouteChoice :=
-  match
-      (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-        formula).clauses[clauseIndex]? with
-  | none =>
-      none
-  | some finalClause =>
-      let metadataIndex :=
-        (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
-          formula).representativeClauseIndex finalClause.literals
-      match retainedFinalDirectSourceRouteChoiceFromMetadata?
-          formula literalIndex
-          ((retainedDrawingPlanarSATClauseMetadata
-            formula)[metadataIndex]?) with
-      | none =>
-          none
-      | some choice =>
-          if
-              translatePolyline choice.origin
-                  (retainedDirectSourceLocalRouteAt
-                    choice.kind choice.index) =
-                retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes
-                  formula clauseIndex literalIndex then
-            some choice
-          else
-            none
+  retainedFinalDirectSourceRouteChoiceQuery?
+    ((formula, clauseIndex), literalIndex)
 
 /-- Explicit final-clause, representative-metadata, and raw-atlas lookups
 compose to the corresponding successful final choice. -/
 theorem retainedFinalDirectSourceRouteChoice_eq_some_of_lookups
-    {Variable : Type*} [DecidableEq Variable]
+    {Variable : Type*} [variableDecEq : DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (clauseIndex literalIndex : Nat)
     (finalClause :
@@ -163,10 +225,35 @@ theorem retainedFinalDirectSourceRouteChoice_eq_some_of_lookups
           (retainedFinalDirectSourceMetadataTranslation
             formula metadata)) := by
   unfold RetainedDirectSourceRouteChoice.RepresentsFinalRoute at represents
+  have wrappedDecidableEqEq :
+      (@instDecidableEqWrappedPeriodicVariable
+          (PeriodicPlanarSATVariable Variable)
+          (@instDecidableEqPeriodicPlanarSATVariable
+            Variable variableDecEq)) =
+        (@drawingOrderedWrappedPeriodicPlanarSATVariableInstDecidableEq
+          Variable variableDecEq) := by
+    funext first second
+    exact Subsingleton.elim _ _
+  have metadataLookupGeneric := metadataLookup
+  rw [← wrappedDecidableEqEq] at metadataLookupGeneric
+  have finalMetadataLookup :
+      retainedFinalDirectSourceMetadata? formula clauseIndex =
+        some metadata := by
+    unfold retainedFinalDirectSourceMetadata?
+    exact retainedRepresentativeItem?_eq_some_of_lookups
+      (Variable := Variable)
+      (Item := DrawingPlanarSATClauseMetadata Variable)
+      formula (retainedDrawingPlanarSATClauseMetadata formula)
+      clauseIndex finalClause metadata finalClauseLookup
+      metadataLookupGeneric
   unfold retainedFinalDirectSourceRouteChoice?
-  rw [finalClauseLookup]
-  simp only
-  rw [metadataLookup]
+  unfold retainedFinalDirectSourceRouteChoiceQuery?
+  unfold retainedFinalDirectSourceRouteChoiceSelectInput?
+  unfold retainedFinalDirectSourceRouteChoiceCandidate?
+  unfold retainedFinalDirectSourceRouteChoiceCandidateInput
+  unfold retainedFinalDirectSourceRouteChoiceFromMetadataInput?
+  unfold retainedFinalDirectSourceRouteChoiceSelect?
+  rw [finalMetadataLookup]
   simp [retainedFinalDirectSourceRouteChoiceFromMetadata?,
     rawLookup, represents]
 
@@ -184,19 +271,21 @@ theorem retainedFinalDirectSourceRouteChoice_representsFinalRoute
     choice.RepresentsFinalRoute
       formula clauseIndex literalIndex := by
   unfold retainedFinalDirectSourceRouteChoice? at choiceLookup
+  unfold retainedFinalDirectSourceRouteChoiceQuery? at choiceLookup
+  unfold retainedFinalDirectSourceRouteChoiceSelectInput? at choiceLookup
+  unfold retainedFinalDirectSourceRouteChoiceCandidate? at choiceLookup
+  unfold retainedFinalDirectSourceRouteChoiceCandidateInput at choiceLookup
+  unfold retainedFinalDirectSourceRouteChoiceFromMetadataInput? at choiceLookup
+  unfold retainedFinalDirectSourceRouteChoiceSelect? at choiceLookup
   split at choiceLookup
   next => cases choiceLookup
-  next =>
-    simp only at choiceLookup
+  next selected =>
     split at choiceLookup
+    next represented =>
+      simp only [Option.some.injEq] at choiceLookup
+      subst choice
+      exact represented
     next => cases choiceLookup
-    next selected =>
-      split at choiceLookup
-      next represented =>
-        simp only [Option.some.injEq] at choiceLookup
-        subst choice
-        exact represented
-      next => cases choiceLookup
 
 /-- Translation commutes with the defaulted head of a nonempty polyline. -/
 private theorem translatePolyline_headD

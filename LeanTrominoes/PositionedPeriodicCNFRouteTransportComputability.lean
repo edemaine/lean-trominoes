@@ -45,6 +45,48 @@ theorem representativeClauseIndex_primrec
     fun input => clause_idxOf_decidableEq_eq
       input.2 input.1.erase.clauses
 
+/-- Representative-indexed lookup into a primitive-recursive auxiliary list
+is primitive recursive. -/
+theorem representativeItem?_primrec
+    {Input Variable Item : Type*}
+    [Primcodable Input] [Primcodable Variable] [Primcodable Item]
+    [DecidableEq Variable]
+    (source finalSource : Input → PositionedPeriodicCNF Variable)
+    (items : Input → List Item)
+    (sourcePrimrec : Primrec source)
+    (finalSourcePrimrec : Primrec finalSource)
+    (itemsPrimrec : Primrec items) :
+    Primrec fun input : Input × Nat =>
+      representativeItem? (source input.1) (finalSource input.1)
+        (items input.1) input.2 := by
+  let Query := Input × Nat
+  have finalClauses : Primrec fun input : Query =>
+      (finalSource input.1).clauses :=
+    clauses_primrec.comp (finalSourcePrimrec.comp Primrec.fst)
+  have selected : Primrec fun input : Query =>
+      (finalSource input.1).clauses[input.2]? :=
+    Primrec.list_getElem?.comp finalClauses Primrec.snd
+  have someClause : Primrec₂ fun (input : Query)
+      (finalClause : PositionedPeriodicClause Variable) =>
+      (items input.1)[
+        (source input.1).representativeClauseIndex
+          finalClause.literals]? := by
+    let Combined := Query × PositionedPeriodicClause Variable
+    have representativeIndex : Primrec fun input : Combined =>
+        (source input.1.1).representativeClauseIndex
+          input.2.literals :=
+      representativeClauseIndex_primrec.comp
+        (Primrec.pair
+          (sourcePrimrec.comp (Primrec.fst.comp Primrec.fst))
+          (PositionedPeriodicClause.literals_primrec.comp Primrec.snd))
+    exact Primrec.list_getElem?.comp
+      (itemsPrimrec.comp (Primrec.fst.comp Primrec.fst))
+      representativeIndex
+  exact (Primrec.option_casesOn selected
+    (Primrec.const none) someClause).of_eq fun input => by
+      unfold representativeItem?
+      cases (finalSource input.1).clauses[input.2]? <;> rfl
+
 /-- Primitive-recursive route normalization, parameterized only by the
 computational data it actually uses: period, positioned clause, and route.
 The variable-position function is carried through for exact agreement with

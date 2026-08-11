@@ -175,6 +175,9 @@ build; an imported proof counts when its statement matches the paper.
       encodings and compute their complete positioned routes.
     - [x] Prove the raw metadata-indexed coordinated direct-route choice
       selector primitive recursive, including its checked source cases.
+    - [x] Prove the final representative-metadata lookup and checked
+      translated direct-route selector primitive recursive through
+      clause-anchor normalization and clause-orbit deduplication.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -781,9 +784,14 @@ The representation choices for this target are:
   indexing.  It also proves that normalizing every source clause and its
   physical routes together preserves their endpoints.  Each retained clause
   then selects its first anchor-normalized representative and reuses the
-  matching literal route.  The transported family is proved to satisfy every
-  periodic incidence endpoint, and compatibility is reduced to finite
-  distinctness and fundamental-square bounds for the retained vertices.
+  matching literal route; the same representative-index operation is exposed
+  generically for arbitrary finite auxiliary data.  The transported family is
+  proved to satisfy every periodic incidence endpoint, and compatibility is
+  reduced to finite distinctness and fundamental-square bounds for the
+  retained vertices.
+  [`LeanTrominoes/PeriodicCNFPlanarRetainedRepresentativeItem.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedRepresentativeItem.lean)
+  specializes that auxiliary-data lookup to the retained wrapped planar-SAT
+  source and proves the exact final-clause/source-representative lookup bridge.
   [`LeanTrominoes/PositionedPeriodicCNFVariableGauge.lean`](LeanTrominoes/PositionedPeriodicCNFVariableGauge.lean)
   moves each periodic protovariable by an independently chosen lattice
   period while compensating every literal offset.  Periodic satisfiability
@@ -3124,13 +3132,20 @@ The representation choices for this target are:
   origin by the exact physical anchor shift used by the quotient route.  The
   selector fails closed unless that translated atlas route equals the actual
   deduplicated source route, so every successful final choice carries exact
-  route equality and exact translated head and last-point formulas.
+  route equality and exact translated head and last-point formulas.  Named
+  uncurried metadata, candidate, and checked-selection stages expose the same
+  pipeline compositionally.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoicePairs.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoicePairs.lean)
   inverts successful final choices to their canonical raw metadata
   representative and atlas entry.  Choices at distinct literal indices of
   one final clause therefore share one source and one anchor-normalization
   offset; transporting the raw pair certificate proves their complete
   coordinated routes avoid each other and meet only at their common heads.
+- [`LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceComputability.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceRouteChoiceComputability.lean)
+  proves every stage of that final selector primitive recursive: canonical
+  representative metadata, physical anchor translation, optional raw-atlas
+  selection, and the exact equality check against the deduplicated gauged
+  route.
 - [`LeanTrominoes/RetainedAngularFanFinalDirectSourceChoiceUniformity.lean`](LeanTrominoes/RetainedAngularFanFinalDirectSourceChoiceUniformity.lean)
   proves that one successful direct-source choice determines a direct
   canonical metadata representative for the entire final clause.  Every
@@ -6606,7 +6621,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PositionedPeriodicCNFRouteTransportComputability.lean`](LeanTrominoes/PositionedPeriodicCNFRouteTransportComputability.lean)
   proves the generic clause-anchor route normalization and first-orbit
   representative reindexing primitive recursive from a positioned formula,
-  physical period, and finite route lookup.
+  physical period, and finite route lookup, together with the corresponding
+  representative-indexed lookup for arbitrary primitive-recursive auxiliary
+  lists.
 - [`LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean`](LeanTrominoes/PeriodicCNFPlanarPeriodicizationComputability.lean)
   gives periodic planar-SAT protovariables and their opaque wrappers canonical
   encodings, computes canonical crossing representatives and literal period
@@ -6622,6 +6639,10 @@ The representation choices for this target are:
   specializes generic route transport to the retained planar-SAT source,
   proving its exact anchor-normalized and clause-orbit-deduplicated incidence
   route lookups primitive recursive and computable.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedRepresentativeItemComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedRepresentativeItemComputability.lean)
+  specializes the generic auxiliary representative lookup once to the large
+  retained wrapped planar-SAT quotient, keeping that type-level construction
+  out of downstream selector proofs.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitComputability.lean)
   computes the angular east-first compass port at every retained incidence and
   proves the exact retained fixed-eight occurrence-split formula primitive

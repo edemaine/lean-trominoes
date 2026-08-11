@@ -250,8 +250,11 @@ theorem retainedFinalDirectSourceRouteChoice_exists_of_sameClause_choice_some
   rw [wrappedDecidableEqEq] at secondRepresentativeLookup
   have firstRepresentativeLookup := firstMetadataLookup
   unfold retainedFinalDirectSourceMetadata? at firstRepresentativeLookup
+  unfold retainedRepresentativeItem? at firstRepresentativeLookup
+  unfold PositionedPeriodicCNF.representativeItem? at firstRepresentativeLookup
   rw [finalClauseLookup] at firstRepresentativeLookup
   simp only at firstRepresentativeLookup
+  rw [wrappedDecidableEqEq] at firstRepresentativeLookup
   have metadataEq : firstMetadata = secondWitness.metadata := by
     rw [firstRepresentativeLookup] at secondRepresentativeLookup
     exact Option.some.inj secondRepresentativeLookup

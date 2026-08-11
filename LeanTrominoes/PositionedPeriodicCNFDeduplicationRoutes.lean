@@ -300,6 +300,37 @@ def representativeClauseIndex
     (clause : PeriodicClause Variable) : Nat :=
   source.erase.clauses.idxOf clause
 
+/-- Look up auxiliary data through the first source representative of a
+selected final clause.  This packages the common
+final-clause/representative-index/item-list pipeline without exposing its
+potentially large variable type to downstream definitions. -/
+def representativeItem?
+    {Variable Item : Type*} [DecidableEq Variable]
+    (source finalSource : PositionedPeriodicCNF Variable)
+    (items : List Item) (finalClauseIndex : Nat) : Option Item :=
+  match finalSource.clauses[finalClauseIndex]? with
+  | none => none
+  | some finalClause =>
+      items[source.representativeClauseIndex finalClause.literals]?
+
+/-- Successful final-clause and representative-item lookups compose to a
+successful representative-indexed lookup. -/
+theorem representativeItem?_eq_some_of_lookups
+    {Variable Item : Type*} [DecidableEq Variable]
+    (source finalSource : PositionedPeriodicCNF Variable)
+    (items : List Item) (finalClauseIndex : Nat)
+    (finalClause : PositionedPeriodicClause Variable) (item : Item)
+    (finalClauseLookup :
+      finalSource.clauses[finalClauseIndex]? = some finalClause)
+    (itemLookup :
+      items[source.representativeClauseIndex finalClause.literals]? =
+        some item) :
+    representativeItem? source finalSource items finalClauseIndex =
+      some item := by
+  unfold representativeItem?
+  rw [finalClauseLookup]
+  exact itemLookup
+
 /-- Every retained literal list retrieves an original positioned
 representative at its declared first-source index. -/
 theorem exists_representativeClause

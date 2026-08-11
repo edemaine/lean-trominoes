@@ -322,6 +322,48 @@ theorem retainedDrawingWrappedPeriodicPlanarSATVariableGauge_primrec
     drawingPeriodicPlanarSATPeriod_primrec
     wrappedDrawingPeriodicPlanarSATVariablePosition_primrec
 
+/-- The unwrapped periodic planar-SAT variable gauge underlying the retained
+opaque wrapper is primitive recursive. -/
+theorem drawingPeriodicPlanarSATVariableGauge_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec fun input : PeriodicCNF Variable ×
+        PeriodicPlanarSATVariable Variable =>
+      (drawingPeriodicPlanarSATPlacement input.1).canonicalPositionGauge
+        input.2 := by
+  exact PeriodicVariablePlacement.canonicalPositionGauge_primrec
+    (drawingPeriodicPlanarSATPeriod (Variable := Variable))
+    (fun formula =>
+      (drawingPeriodicPlanarSATPlacement formula).position)
+    drawingPeriodicPlanarSATPeriod_primrec
+    drawingPeriodicPlanarSATVariablePosition_primrec
+
+/-- The unwrapped canonical gauge at the normalized atom of one finite
+planar-SAT literal. -/
+def drawingPeriodicizedPlanarSATLiteralGauge
+    {Variable : Type*} [DecidableEq Variable]
+    (input : PeriodicCNF Variable ×
+      (PlanarSATVariable Variable × Bool)) : Cell :=
+  (drawingPeriodicPlanarSATPlacement input.1).canonicalPositionGauge
+    (periodicizePlanarSATLiteral input.1 input.2).atom
+
+/-- Evaluating that normalized literal gauge is primitive recursive. -/
+theorem drawingPeriodicizedPlanarSATLiteralGauge_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (drawingPeriodicizedPlanarSATLiteralGauge
+      (Variable := Variable)) := by
+  have periodicized : Primrec fun input : PeriodicCNF Variable ×
+      (PlanarSATVariable Variable × Bool) =>
+      periodicizePlanarSATLiteral input.1 input.2 :=
+    periodicizePlanarSATLiteral_primrec
+  have gaugeInput : Primrec fun input : PeriodicCNF Variable ×
+      (PlanarSATVariable Variable × Bool) =>
+      ((input.1, (periodicizePlanarSATLiteral input.1 input.2).atom) :
+        PeriodicCNF Variable × PeriodicPlanarSATVariable Variable) :=
+    Primrec.pair Primrec.fst
+      (PeriodicThreeCNF.literal_atom_primrec.comp periodicized)
+  exact (drawingPeriodicPlanarSATVariableGauge_primrec.comp
+    gaugeInput).of_eq fun _ => rfl
+
 theorem retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_primrec
     {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
     Primrec (retainedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula :

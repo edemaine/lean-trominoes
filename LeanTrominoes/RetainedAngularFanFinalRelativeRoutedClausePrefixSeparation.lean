@@ -48,20 +48,14 @@ theorem FinalGaugedRouteOccurrenceWitness.exists_rawChoice_of_finalChoiceSome
   have witnessMetadataLookup :
       retainedFinalDirectSourceMetadata? formula clauseIndex =
         some witness.metadata := by
-    unfold retainedFinalDirectSourceMetadata?
-    rw [witness.finalClauseLookup]
     have representativeLookup := witness.representativeMetadataLookup
-    have wrappedDecidableEqEq :
-        (@instDecidableEqWrappedPeriodicVariable
-            (PeriodicPlanarSATVariable Variable)
-            (@instDecidableEqPeriodicPlanarSATVariable
-              Variable variableDecEq)) =
-          (@drawingOrderedWrappedPeriodicPlanarSATVariableInstDecidableEq
-            Variable variableDecEq) := by
-      funext first second
-      exact Subsingleton.elim _ _
-    rw [wrappedDecidableEqEq] at representativeLookup
-    exact representativeLookup
+    unfold retainedFinalDirectSourceMetadata?
+    exact retainedRepresentativeItem?_eq_some_of_lookups
+      (Variable := Variable)
+      (Item := DrawingPlanarSATClauseMetadata Variable)
+      formula (retainedDrawingPlanarSATClauseMetadata formula)
+      clauseIndex witness.finalClause witness.metadata
+      witness.finalClauseLookup representativeLookup
   have metadataEq : metadata = witness.metadata :=
     Option.some.inj (metadataLookup.symm.trans witnessMetadataLookup)
   subst metadata

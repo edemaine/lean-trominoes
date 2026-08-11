@@ -348,6 +348,8 @@ theorem retainedFinalDirectSourceMetadata_retainedValid
         some metadata) :
     metadata.RetainedValid formula := by
   unfold retainedFinalDirectSourceMetadata? at lookup
+  unfold retainedRepresentativeItem? at lookup
+  unfold PositionedPeriodicCNF.representativeItem? at lookup
   split at lookup
   next => cases lookup
   next finalClause =>
