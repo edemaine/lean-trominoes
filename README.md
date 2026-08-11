@@ -146,6 +146,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the positioned fixed-eight ring compiler primitive recursive,
       including its clause coordinates and companion placement queries, and
       specialize it to the exact retained positioned split.
+    - [x] Prove the positioned Figure 9 and unit-elimination compilers
+      primitive recursive, including their placement queries, and specialize
+      them through the retained unit-free exact-one endpoint.
     - [x] Compose the retained fixed-eight split through Figure 9 exact-one
       conversion, opaque wrapping, unit elimination, anchor normalization,
       and the finite planar 3DM encoding primitive recursively.
@@ -6580,6 +6583,16 @@ The representation choices for this target are:
   specializes the positioned compiler to the gauged retained planar-SAT
   construction, proving its exact positioned fixed-eight formula computable
   and its retained period and variable-position queries primitive recursive.
+- [`LeanTrominoes/PeriodicOneInThreePositionedComputability.lean`](LeanTrominoes/PeriodicOneInThreePositionedComputability.lean)
+  computes the positioned Figure 9 clause gadgets and full formula, together
+  with the induced period and every original or auxiliary variable position.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedComputability.lean)
+  does the same for the empty- and unit-clause exact-one replacements,
+  including the arity-dependent generated clause coordinates.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean)
+  composes the positioned retained fixed-eight source through Figure 9,
+  opaque wrapping, and unit elimination, proving the exact final positioned
+  formula computable and all companion placement queries primitive recursive.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDMComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDMComputability.lean)
   composes that split through Figure 9 exact-one conversion, opaque variable
   wrapping, unit-clause elimination, canonical clause-anchor normalization,
