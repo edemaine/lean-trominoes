@@ -60,6 +60,46 @@ open PeriodicEightOccurrenceSplitPositioned
 open PeriodicThreeSATThree
 open OccurrenceSplitRing
 
+/-! ## Final fallback branch metadata -/
+
+namespace PositionedPeriodicClause
+
+/-- Scaling one positioned clause by a fixed natural factor is primitive
+recursive. -/
+theorem scale_primrec
+    {Variable : Type*} [Primcodable Variable]
+    (factor : Nat) :
+    Primrec (PositionedPeriodicClause.scale factor :
+      PositionedPeriodicClause Variable → _) := by
+  have position : Primrec fun clause : PositionedPeriodicClause Variable =>
+      Cell.scale factor clause.position :=
+    Computability.cell_scale_primrec.comp
+      (Primrec.const (factor : Int))
+      PositionedPeriodicClause.position_primrec
+  exact (PositionedPeriodicClause.mk_primrec.comp
+    (Primrec.pair position
+      PositionedPeriodicClause.literals_primrec)).of_eq fun _ => rfl
+
+end PositionedPeriodicClause
+
+namespace PositionedPeriodicCNF
+
+/-- Scaling every clause position in a finite positioned formula by a fixed
+natural factor is primitive recursive. -/
+theorem scale_primrec
+    {Variable : Type*} [Primcodable Variable]
+    (factor : Nat) :
+    Primrec (PositionedPeriodicCNF.scale factor :
+      PositionedPeriodicCNF Variable → _) := by
+  have scaledClauses : Primrec fun source : PositionedPeriodicCNF Variable =>
+      source.clauses.map (PositionedPeriodicClause.scale factor) :=
+    Primrec.list_map PositionedPeriodicCNF.clauses_primrec
+      ((PositionedPeriodicClause.scale_primrec factor).comp Primrec.snd).to₂
+  exact (PositionedPeriodicCNF.mk_primrec.comp scaledClauses).of_eq
+    fun _ => rfl
+
+end PositionedPeriodicCNF
+
 private abbrev FinalCoordinatedVariable (Variable : Type*) :=
   WrappedPeriodicPlanarSATVariable Variable
 
@@ -156,6 +196,72 @@ private theorem finalCoordinatedScaledPlacement_position_primrec
   exact Computability.cell_scale_primrec.comp
     (Primrec.const (retainedAngularFanSourceClearanceFactor : Int))
     retainedGaugedWrappedDrawingPeriodicPlanarSATPosition_primrec
+
+private theorem finalCoordinatedScaledSource_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedScaledSource :
+      PeriodicCNF Variable → _) := by
+  exact (PositionedPeriodicCNF.scale_primrec
+    retainedAngularFanSourceClearanceFactor).comp
+      retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_primrec
+
+abbrev RetainedFinalFallbackQuery (Variable : Type*) :=
+  (PeriodicCNF Variable × Nat) × Nat
+
+/-- Uncurried singleton-prefix escape test for one final retained route. -/
+def retainedFinalFallbackUsesEscapeQuery
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalFallbackQuery Variable) : Bool :=
+  retainedFinalFallbackUsesEscape input.1.1 input.1.2 input.2
+
+/-- The exceptional escaped-fallback test is primitive recursive.  Its
+`dropLast` has length one exactly when the original route has length two. -/
+theorem retainedFinalFallbackUsesEscapeQuery_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (retainedFinalFallbackUsesEscapeQuery
+      (Variable := Variable)) := by
+  let Query := RetainedFinalFallbackQuery Variable
+  have route : Primrec fun input : Query =>
+      finalCoordinatedSourceRoutes input.1.1 input.1.2 input.2 := by
+    unfold finalCoordinatedSourceRoutes
+    exact retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_primrec
+  have length : Primrec fun input : Query =>
+      (finalCoordinatedSourceRoutes
+        input.1.1 input.1.2 input.2).length :=
+    Primrec.list_length.comp route
+  have lengthTwo : PrimrecPred fun input : Query =>
+      (finalCoordinatedSourceRoutes
+        input.1.1 input.1.2 input.2).length = 2 :=
+    Primrec.eq.comp length (Primrec.const 2)
+  exact lengthTwo.decide.of_eq fun input => by
+    unfold retainedFinalFallbackUsesEscapeQuery
+      retainedFinalFallbackUsesEscape
+    apply Bool.eq_iff_iff.mpr
+    simp only [decide_eq_true_eq]
+    rw [List.length_dropLast]
+    omega
+
+abbrev FinalCoordinatedScaledClauseQuery (Variable : Type*) :=
+  PeriodicCNF Variable × Nat
+
+/-- Uncurried scaled-source clause lookup used by both final route branches. -/
+def finalCoordinatedScaledClauseQuery?
+    {Variable : Type*} [DecidableEq Variable]
+    (input : FinalCoordinatedScaledClauseQuery Variable) :=
+  finalCoordinatedScaledClause? input.1 input.2
+
+/-- The exact scaled-source clause lookup is primitive recursive. -/
+theorem finalCoordinatedScaledClauseQuery?_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedScaledClauseQuery?
+      (Variable := Variable)) := by
+  have clauses : Primrec fun input :
+      FinalCoordinatedScaledClauseQuery Variable =>
+      (finalCoordinatedScaledSource input.1).clauses :=
+    PositionedPeriodicCNF.clauses_primrec.comp
+      (finalCoordinatedScaledSource_primrec.comp Primrec.fst)
+  exact (Primrec.list_getElem?.comp clauses Primrec.snd).of_eq
+    fun _ => rfl
 
 private abbrev FinalCoordinatedSuffixQuery (Variable : Type*) :=
   (((PeriodicCNF Variable ×

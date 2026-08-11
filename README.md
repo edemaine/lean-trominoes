@@ -181,6 +181,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the exact source-scaled occurrence-slot and Figure 7 suffix
       queries primitive recursive, and assemble each successful final
       coordinated direct occurrence route primitive recursively.
+    - [x] Prove the final singleton-prefix escape test and scaled-source
+      clause lookup primitive recursive for total-route branch selection.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -3187,7 +3189,9 @@ The representation choices for this target are:
   computes the exact source-scaled angular slot and Figure 7 occurrence
   suffix through flat clause/literal data, then combines them with a checked
   direct-source atlas choice.  The resulting complete successful direct
-  occurrence route is primitive recursive, including its endpoint join.
+  occurrence route is primitive recursive, including its endpoint join.  It
+  also computes the exact singleton-prefix escape test and scaled-source
+  clause lookup used to dispatch the remaining fallback branches.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
   proves that each validated coordinated prefix meets that unchanged suffix
   at exactly the same fan-boundary point.  The resulting substituted route
