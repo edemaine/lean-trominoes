@@ -173,6 +173,8 @@ build; an imported proof counts when its statement matches the paper.
       identifying `Walk.bypass` support with a proof-free list algorithm.
     - [x] Give dependent coordinated direct-route atlas choices canonical
       encodings and compute their complete positioned routes.
+    - [x] Prove the raw metadata-indexed coordinated direct-route choice
+      selector primitive recursive, including its checked source cases.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -2954,8 +2956,10 @@ The representation choices for this target are:
   encodes the finite clause kind and its kind-dependent literal index as
   canonical primitive-recursive data.  It provides checked and total choice
   constructors and proves that the complete positioned coordinated route is
-  primitive recursive, separating the finite local atlas lookup from the
-  unbounded component-origin translation.
+  primitive recursive.  It also computes the raw retained clause-source
+  selector, including bounded crossover and duplicator cases and routed-clause
+  port lookup, separating the finite local atlas choice from the unbounded
+  component-origin translation.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceTransverseBounds.lean`](LeanTrominoes/RetainedAngularFanDirectSourceTransverseBounds.lean)
   gives finite transverse envelopes for complete coordinated atlas routes.
   Every direct route fits in radius 3103 around its represented terminal
