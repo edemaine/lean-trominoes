@@ -187,6 +187,8 @@ build; an imported proof counts when its statement matches the paper.
       staircase generators, and whole-polyline rasterizer primitive recursive.
     - [x] Prove the generic delayed-lane escaped fan, variable-tail
       replacement, and rasterized source boundary splice primitive recursive.
+    - [x] Prove the generic ordinary retained fan, variable-tail replacement,
+      and rasterized source boundary splice primitive recursive.
     - [x] Assemble each exceptional final escaped-fallback occurrence route
       primitive recursively with its exact slot and Figure 7 suffix.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
@@ -3505,10 +3507,11 @@ The representation choices for this target are:
   endpoint, and orthogonality contract.  An additional pre-rasterization
   theorem preserves orthogonality from an already orthogonal source route.
 - [`LeanTrominoes/RetainedAngularFanSourceEscapedSpliceComputability.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSpliceComputability.lean)
-  computes the exact delayed-lane radial escape, finite lane and fan
-  adapters, variable-tail replacement, and whole-polyline rasterization.
-  Consequently the complete generic source-escaped boundary route is
-  primitive recursive in its source route, terminal datum, and slot.
+  computes both the ordinary retained radial lane and the delayed-lane
+  escape, their finite fan adapters, variable-tail replacement, and
+  whole-polyline rasterization.  Consequently both complete generic boundary
+  routes are primitive recursive in their source route, terminal datum, and
+  slot.
 - [`LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean)
   packages the asymmetric same-clause tail replacement used by a singleton
   failed-choice route against an ordinary non-singleton fallback.  The

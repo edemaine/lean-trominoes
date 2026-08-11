@@ -136,6 +136,14 @@ theorem retainedTerminalFanOuterInwardRayOfLength_primrec :
   exact (Primrec.sumCasesOn encoded compass routed).of_eq fun input => by
     cases input.1 <;> rfl
 
+theorem retainedTerminalFanOuterInwardRay_primrec :
+    Primrec retainedTerminalFanOuterInwardRay := by
+  exact (retainedTerminalFanOuterInwardRayOfLength_primrec.comp
+    (Primrec.pair Primrec.fst
+      retainedTerminalFanOuterRadialLength_primrec)).of_eq fun terminal => by
+        rcases terminal with ⟨direction, length⟩
+        cases direction <;> rfl
+
 theorem retainedTerminalFanOuterSourceEscapeRay_primrec :
     Primrec retainedTerminalFanOuterSourceEscapeRay := by
   exact (retainedTerminalFanOuterInwardRayOfLength_primrec.comp
@@ -175,11 +183,6 @@ theorem RetainedRay.vector_primrec : Primrec RetainedRay.vector := by
   exact (Primrec.sumCasesOn encoded compass routed).of_eq fun ray => by
     cases ray <;> rfl
 
-/-! ## Escaped outer fan route -/
-
-abbrev RetainedEscapedFanQuery :=
-  (Cell × RetainedTerminalData) × RetainedTerminalSlot
-
 private theorem retainedTerminalSplicePoint_primrec :
     Primrec fun input : Cell × RetainedTerminalData =>
       retainedTerminalSplicePoint input.1 input.2 := by
@@ -190,6 +193,128 @@ private theorem retainedTerminalSplicePoint_primrec :
       (retainedTerminalDirection_primitive_primrec.comp
         (Primrec.fst.comp Primrec.snd))
   exact (cell_add_primrec.comp Primrec.fst scaled).of_eq fun _ => rfl
+
+/-! ## Ordinary outer fan route -/
+
+abbrev RetainedFanQuery :=
+  (Cell × RetainedTerminalData) × RetainedTerminalSlot
+
+private def retainedFanGateQuery
+    (input : RetainedFanQuery) : Cell :=
+  (retainedAngularFanOuterDemand input.1.1 input.1.2 input.2).gate
+
+private theorem retainedFanGateQuery_primrec :
+    Primrec retainedFanGateQuery := by
+  have scaledTerminal : Primrec fun input : RetainedFanQuery =>
+      scaleRetainedTerminalData retainedTerminalFanTotalRefinement
+        input.1.2 :=
+    scaleRetainedTerminalData_primrec.comp
+      (Primrec.pair
+        (Primrec.const retainedTerminalFanTotalRefinement)
+        (Primrec.snd.comp Primrec.fst))
+  exact (retainedTerminalSplicePoint_primrec.comp
+    (Primrec.pair (Primrec.fst.comp Primrec.fst)
+      scaledTerminal)).of_eq fun _ => rfl
+
+private def retainedFanShiftedGateQuery
+    (input : RetainedFanQuery) : Cell :=
+  Cell.add
+    (retainedFanGateQuery input)
+    (retainedTerminalFanOuterLaneOffset input.1.2.1 input.2)
+
+private theorem retainedFanShiftedGateQuery_primrec :
+    Primrec retainedFanShiftedGateQuery := by
+  have offset : Primrec fun input : RetainedFanQuery =>
+      retainedTerminalFanOuterLaneOffset input.1.2.1 input.2 :=
+    retainedTerminalFanOuterLaneOffset_primrec.comp
+      (Primrec.pair
+        (Primrec.fst.comp (Primrec.snd.comp Primrec.fst))
+        Primrec.snd)
+  exact cell_add_primrec.comp retainedFanGateQuery_primrec offset
+
+private def retainedFanLaneShiftQuery
+    (input : RetainedFanQuery) : List Cell :=
+  retainedTerminalFanOuterLaneShiftRouteAt
+    (retainedFanGateQuery input)
+    input.1.2.1 input.2
+
+private theorem retainedFanLaneShiftQuery_primrec :
+    Primrec retainedFanLaneShiftQuery := by
+  have template : Primrec fun input : RetainedFanQuery =>
+      retainedTerminalFanOuterLaneShiftRoute input.1.2.1 input.2 :=
+    retainedTerminalFanOuterLaneShiftRoute_primrec.comp
+      (Primrec.pair
+        (Primrec.fst.comp (Primrec.snd.comp Primrec.fst))
+        Primrec.snd)
+  have translated : Primrec₂ fun
+      (input : RetainedFanQuery) (point : Cell) =>
+      Cell.add (retainedFanGateQuery input) point :=
+    cell_add_primrec.comp₂
+      (retainedFanGateQuery_primrec.comp₂ Primrec₂.left)
+      Primrec₂.right
+  exact (Primrec.list_map template translated).of_eq fun _ => rfl
+
+private def retainedFanInwardRasterQuery
+    (input : RetainedFanQuery) : List Cell :=
+  (retainedTerminalFanOuterInwardRay input.1.2).rasterize
+    (retainedFanShiftedGateQuery input)
+
+private theorem retainedFanInwardRasterQuery_primrec :
+    Primrec retainedFanInwardRasterQuery := by
+  have ray : Primrec fun input : RetainedFanQuery =>
+      retainedTerminalFanOuterInwardRay input.1.2 :=
+    retainedTerminalFanOuterInwardRay_primrec.comp
+      (Primrec.snd.comp Primrec.fst)
+  exact (RetainedRay.rasterize_primrec.comp
+    (Primrec.pair ray retainedFanShiftedGateQuery_primrec)).of_eq
+      fun _ => rfl
+
+private def retainedFanRadialRouteQuery
+    (input : RetainedFanQuery) : List Cell :=
+  retainedTerminalFanOuterRadialRoute
+    input.1.1 input.1.2 input.2
+
+private theorem retainedFanRadialRouteQuery_primrec :
+    Primrec retainedFanRadialRouteQuery := by
+  exact (PeriodicThreeDM.NormalizationCompiler.joinAtEndpoint_primrec.comp
+    retainedFanLaneShiftQuery_primrec
+    retainedFanInwardRasterQuery_primrec).of_eq fun _ => rfl
+
+private def retainedFanLocalRouteQuery
+    (input : RetainedFanQuery) : List Cell :=
+  retainedTerminalFanOuterLocalRouteAt
+    input.1.1 input.1.2.1 input.2
+
+private theorem retainedFanLocalRouteQuery_primrec :
+    Primrec retainedFanLocalRouteQuery := by
+  have template : Primrec fun input : RetainedFanQuery =>
+      retainedTerminalFanOuterLocalRoute input.1.2.1 input.2 :=
+    retainedTerminalFanOuterLocalRoute_primrec.comp
+      (Primrec.pair
+        (Primrec.fst.comp (Primrec.snd.comp Primrec.fst))
+        Primrec.snd)
+  have translated : Primrec₂ fun
+      (input : RetainedFanQuery) (point : Cell) =>
+      Cell.add input.1.1 point :=
+    cell_add_primrec.comp₂
+      ((Primrec.fst.comp Primrec.fst).comp₂ Primrec₂.left)
+      Primrec₂.right
+  exact (Primrec.list_map template translated).of_eq fun _ => rfl
+
+def retainedTerminalFanOuterCompleteRouteQuery
+    (input : RetainedFanQuery) : List Cell :=
+  retainedTerminalFanOuterCompleteRoute
+    input.1.1 input.1.2 input.2
+
+theorem retainedTerminalFanOuterCompleteRouteQuery_primrec :
+    Primrec retainedTerminalFanOuterCompleteRouteQuery := by
+  exact (PeriodicThreeDM.NormalizationCompiler.joinAtEndpoint_primrec.comp
+    retainedFanRadialRouteQuery_primrec
+    retainedFanLocalRouteQuery_primrec).of_eq fun _ => rfl
+
+/-! ## Escaped outer fan route -/
+
+abbrev RetainedEscapedFanQuery := RetainedFanQuery
 
 private def retainedAngularFanOuterDemandGateQuery
     (input : RetainedEscapedFanQuery) : Cell :=
@@ -406,6 +531,46 @@ theorem retainedAngularFanEscapedSplicedBoundaryRouteQuery_primrec :
     Primrec retainedAngularFanEscapedSplicedBoundaryRouteQuery := by
   exact (rasterizeRetainedPolyline_primrec.comp
     retainedAngularFanEscapedSplicedBoundaryPolylineQuery_primrec).of_eq
+      fun _ => rfl
+
+/-! ## Ordinary tail replacement and final boundary rasterization -/
+
+abbrev RetainedBoundaryQuery :=
+  (List Cell × RetainedTerminalData) × RetainedTerminalSlot
+
+private def retainedBoundaryReplacementQuery
+    (input : RetainedBoundaryQuery) : List Cell :=
+  retainedTerminalFanOuterCompleteRoute
+    (retainedEscapedBoundaryCenterQuery input) input.1.2 input.2
+
+private theorem retainedBoundaryReplacementQuery_primrec :
+    Primrec retainedBoundaryReplacementQuery := by
+  exact (retainedTerminalFanOuterCompleteRouteQuery_primrec.comp
+    (Primrec.pair
+      (Primrec.pair retainedEscapedBoundaryCenterQuery_primrec
+        (Primrec.snd.comp Primrec.fst))
+      Primrec.snd)).of_eq fun _ => rfl
+
+def retainedAngularFanSplicedBoundaryPolylineQuery
+    (input : RetainedBoundaryQuery) : List Cell :=
+  retainedAngularFanSplicedBoundaryPolyline
+    input.1.1 input.1.2 input.2
+
+theorem retainedAngularFanSplicedBoundaryPolylineQuery_primrec :
+    Primrec retainedAngularFanSplicedBoundaryPolylineQuery := by
+  exact (replacePolylineTail_primrec.comp
+    (Primrec.pair retainedEscapedBoundaryScaledRouteQuery_primrec
+      retainedBoundaryReplacementQuery_primrec)).of_eq fun _ => rfl
+
+def retainedAngularFanSplicedBoundaryRouteQuery
+    (input : RetainedBoundaryQuery) : List Cell :=
+  retainedAngularFanSplicedBoundaryRoute
+    input.1.1 input.1.2 input.2
+
+theorem retainedAngularFanSplicedBoundaryRouteQuery_primrec :
+    Primrec retainedAngularFanSplicedBoundaryRouteQuery := by
+  exact (rasterizeRetainedPolyline_primrec.comp
+    retainedAngularFanSplicedBoundaryPolylineQuery_primrec).of_eq
       fun _ => rfl
 
 end PeriodicEightOccurrenceSplit
