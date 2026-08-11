@@ -143,6 +143,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Transport the exact retained incidence routes through variable
       gauging, clause-anchor normalization, and clause-orbit deduplication,
       then compute their angular fixed-eight occurrence split.
+    - [x] Compose the retained fixed-eight split through Figure 9 exact-one
+      conversion, opaque wrapping, unit elimination, anchor normalization,
+      and the finite planar 3DM encoding primitive recursively.
     - [x] Prove positioned periodic-CNF erasure, variable renaming,
       anchor normalization, and clause-orbit deduplication primitive
       recursive.
@@ -6566,6 +6569,11 @@ The representation choices for this target are:
   computes the angular east-first compass port at every retained incidence and
   proves the exact retained fixed-eight occurrence-split formula primitive
   recursive and computable.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDMComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDMComputability.lean)
+  composes that split through Figure 9 exact-one conversion, opaque variable
+  wrapping, unit-clause elimination, canonical clause-anchor normalization,
+  and the finite planar 3DM encoding, proving the exact named retained 3DM
+  endpoint primitive recursive and computable.
 - [`LeanTrominoes/PositionedPeriodicCNFComputability.lean`](LeanTrominoes/PositionedPeriodicCNFComputability.lean)
   proves the reusable positioned-formula bookkeeping executable: erasure,
   input-dependent variable renaming and gauging, total clause-position
