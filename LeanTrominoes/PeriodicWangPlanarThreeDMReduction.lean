@@ -1,7 +1,9 @@
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDM
+import LeanTrominoes.PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDMComputability
 import LeanTrominoes.PeriodicThreeDMNormalizationCompiler
 import LeanTrominoes.PeriodicThreeDMFiniteDrawingCertificate
 import LeanTrominoes.PeriodicThreeDMFiniteDrawingSearch
+import LeanTrominoes.PeriodicThreeDMNormalizationReduction
 import LeanTrominoes.PeriodicThreeSATThreeNonempty
 
 /-!
@@ -186,6 +188,23 @@ noncomputable def problem (tiles : LeanWang.TileSet) : PeriodicThreeDM :=
     (sourceFormula_occurrencesAtMostThree_canonicalBEq tiles)
     (sourceFormula_clausesNonempty tiles)
 
+/-- The exact proof-backed planar 3DM endpoint is computable from the Wang
+tile set. -/
+theorem problem_computable : Computable problem := by
+  have computed : Computable fun tiles : LeanWang.TileSet =>
+      PeriodicOrthocrossing.retainedOrderedFixedEightPolarityNormalizedPaddedPeriodicThreeDMProblemComputed
+        (sourceFormula tiles) :=
+    PeriodicOrthocrossing.retainedOrderedFixedEightPolarityNormalizedPaddedPeriodicThreeDMProblemComputed_computable.comp
+      sourceFormula_computable
+  exact computed.of_eq fun tiles => by
+    simpa only [problem] using
+      PeriodicOrthocrossing.retainedOrderedFixedEightPolarityNormalizedPaddedPeriodicThreeDMProblemComputed_eq
+        (sourceFormula tiles)
+        (sourceFormula_isLocal tiles)
+        (sourceFormula_widthAtMostThree tiles)
+        (sourceFormula_occurrencesAtMostThree_canonicalBEq tiles)
+        (sourceFormula_clausesNonempty tiles)
+
 /-- A concrete continuously planar drawing of the generated 3DM problem. -/
 noncomputable def presentation (tiles : LeanWang.TileSet) :
     (problem tiles).ContinuousPlanarPresentation :=
@@ -297,6 +316,37 @@ noncomputable def searchedCertifiedPresentation (tiles : LeanWang.TileSet) :
     problem_hasVerifiedDrawing
     tiles
 
+/-- Data-only normalization input using the first verified finite drawing,
+rather than the proof-oriented concrete drawing term. -/
+noncomputable def searchedInput (tiles : LeanWang.TileSet) :
+    PeriodicThreeDM.NormalizationCompiler.Input where
+  problem := problem tiles
+  drawing := PeriodicThreeDM.FiniteDrawingSearch.searchDrawing
+    problem problem_hasVerifiedDrawing tiles
+
+@[simp]
+theorem searchedInput_problem (tiles : LeanWang.TileSet) :
+    (searchedInput tiles).problem = problem tiles := rfl
+
+@[simp]
+theorem searchedInput_drawing (tiles : LeanWang.TileSet) :
+    (searchedInput tiles).drawing =
+      PeriodicThreeDM.FiniteDrawingSearch.searchDrawing
+        problem problem_hasVerifiedDrawing tiles := rfl
+
+/-- The problem together with its first verified finite drawing is a total
+computable function of the Wang input. -/
+theorem searchedInput_computable : Computable searchedInput := by
+  have drawingComputable : Computable
+      (PeriodicThreeDM.FiniteDrawingSearch.searchDrawing
+        problem problem_hasVerifiedDrawing) :=
+    PeriodicThreeDM.FiniteDrawingSearch.searchDrawing_computable
+      problem_computable problem_hasVerifiedDrawing
+  exact
+    (PeriodicThreeDM.NormalizationCompiler.Input.equivData_symm_primrec.to_comp.comp
+      (Computable.pair problem_computable drawingComputable)).of_eq
+        fun _ => rfl
+
 /-- The generated continuously planar periodic 3DM problem is satisfiable
 exactly when the input Wang tile set tiles the plane. -/
 theorem problem_correct (tiles : LeanWang.TileSet) :
@@ -308,6 +358,35 @@ theorem problem_correct (tiles : LeanWang.TileSet) :
       (sourceFormula_widthAtMostThree tiles)
       (sourceFormula_occurrencesAtMostThree_canonicalBEq tiles)
       (sourceFormula_clausesNonempty tiles)).symm
+
+/-- The searched finite presentation supplies the complete executable
+continuously planar reduction expected by the normalization compiler. -/
+noncomputable def continuousPlanarReduction :
+    PeriodicThreeDM.NormalizationCompiler.ContinuousPlanarReduction
+      LeanWang.TilesPlane where
+  input := searchedInput
+  input_computable := searchedInput_computable
+  presentation := fun tiles =>
+    (searchedCertifiedPresentation tiles).presentation
+  drawing_eq := fun _ => rfl
+  degree := problem_degreeTwoOrThree
+  separated := fun tiles =>
+    (searchedCertifiedPresentation tiles).separated
+  sourceSimple := fun tiles route member =>
+    (searchedCertifiedPresentation tiles).routesSimple route member
+  correct := problem_correct
+
+/-- Normalized periodic trichromatic orientation is co-r.e.-hard. -/
+theorem normalizedOrientationCoREHard :
+    Gadget.NormalizedOrientationCoREHard :=
+  PeriodicThreeDM.NormalizationCompiler.ContinuousPlanarReduction.normalizedOrientationCoREHard_of_tilesReduction
+    continuousPlanarReduction
+
+/-- The completed source reduction discharges the entire two-dimensional
+statement of Theorem 5.2 for both trominoes. -/
+theorem theorem52_planeStatement : Theorem52.planeStatement :=
+  Gadget.theorem52_planeStatement_of_normalizedOrientation
+    normalizedOrientationCoREHard
 
 end PeriodicWangPlanarThreeDMReduction
 end LeanTrominoes

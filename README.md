@@ -85,7 +85,7 @@ build; an imported proof counts when its statement matches the paper.
 - [ ] **Theorem 5.2:** Tiling a periodic subset of $\mathbb Z^2$ by either
   single tromino is co-r.e.-complete; the 1.5D problem is PSPACE-complete.
   - [x] Prove co-r.e. membership of the 2D problem for each tromino.
-  - [ ] Prove co-r.e.-hardness of the 2D problem for each tromino.
+  - [x] Prove co-r.e.-hardness of the 2D problem for each tromino.
     - [x] Normalize exact-one literal polarities while preserving
       satisfiability, occurrence and arity bounds, and the complete
       halo-bounded ribbon-ready planar presentation.
@@ -224,6 +224,11 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Compute the final factor-two padded, clause-anchor-normalized planar
       3DM instance and prove exact equality with the continuously planar
       proof-backed endpoint.
+    - [x] Compute the routed polarity-normalized erased formula and its final
+      padded planar 3DM endpoint, and prove exact equality with the
+      proof-backed construction.
+    - [x] Prove the exact Wang-to-planar-3DM problem map computable and pair it
+      computably with the first verified finite drawing.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -240,7 +245,7 @@ build; an imported proof counts when its statement matches the paper.
         accepted certificate by total unbounded search, prove the selector
         computable from a computable source, and instantiate search
         termination for every Wang input.
-    - [ ] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
+    - [x] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
         normalized vertex lattice and that adjacent cells are nonvertices.
@@ -256,7 +261,7 @@ build; an imported proof counts when its statement matches the paper.
         endpoint-clear tables (fixed-red/false, fixed-blue/false, and
         fixed-green/true), and preserve that prerequisite through scaling,
         anchor normalization, padded assembly, and continuous planarity.
-      - [ ] Prove contracted-drawing endpoint contacts and preserve them
+      - [x] Prove contracted-drawing endpoint contacts and preserve them
         through the local endpoint-template splices.
         - [x] Lift the normalized endpoint-aware variable-core/gate tables
           through source coordinates, coordinated fans, complete occurrence
@@ -282,7 +287,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Transport suppressed 3DM orientations through the normalized
         routed drawing in both directions.
       - [x] Prove the concrete normalized-drawing compiler computable.
-      - [ ] Assemble the final many-one reductions for both trominoes.
+      - [x] Assemble the final many-one reductions for both trominoes and
+        derive the complete 2D `planeStatement` of Theorem 5.2.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -333,9 +339,10 @@ the exact fetched dependency revision in the committed `lake-manifest.json`.
 
 ## Status
 
-The definition layer needed to state Theorem 5.2 is complete.  Its 2D
-co-r.e. upper bound is now proved by `periodicTrominoTiling_coRE`, using a
-primitive-recursive exhaustive search for a finite obstruction.  The complete
+The definition layer needed to state Theorem 5.2 is complete.  Its entire 2D
+conjunct is now proved: `periodicTrominoTiling_coRE` supplies the upper bound,
+and `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` supplies the
+matching Wang-tiling hardness reductions for both trominoes.  The complete
 formal target remains `LeanTrominoes.Theorem52.statement`, the conjunction of:
 
 - `planeStatement`: co-r.e.-completeness in 2D for each of the I and L
@@ -1834,9 +1841,9 @@ The representation choices for this target are:
   well-formed, vertex-separated drawing with orientation equivalence.
   Such certificates compose with either gadget library to give computable
   many-one reductions, and `theorem52_planeStatement_of_normalizedOrientation`
-  proves the entire 2D conjunct conditionally on the isolated
-  `NormalizedOrientationCoREHard` interface.  Establishing that source
-  interface remains the 2D hardness gap.
+  proves the entire 2D conjunct from the isolated
+  `NormalizedOrientationCoREHard` interface.  The Wang-to-planar-3DM
+  construction now supplies that interface.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCertificate.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCertificate.lean)
   packages the complete retained planar-SAT endpoint behind the standard
   local 3SAT-3 hypotheses (and source-clause nonemptiness).  The output is
@@ -7941,12 +7948,19 @@ The representation choices for this target are:
   is well formed, has colored degree two or three, has a concrete continuously
   planar presentation, and admits a graph orientation exactly when the
   original exact-one source is satisfiable.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDMComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDMComputability.lean)
+  computes the erased routed polarity normalization independently of its
+  proof-oriented positions, applies the fresh-variable gauge and final padded
+  3DM encoding, and proves exact equality with the continuously planar
+  proof-backed endpoint.
 - [`LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean`](LeanTrominoes/PeriodicWangPlanarThreeDMReduction.lean)
   specializes the construction to Wang tile sets.  Its total source-formula
   map uses the standard Wang reduction for nonempty inputs and a fixed
-  contradictory fallback for the empty tileset, and is proved computable;
-  the resulting degree-two-or-three planar 3DM instance is satisfiable exactly
-  when the Wang tileset tiles the plane.
+  contradictory fallback for the empty tileset.  The exact planar 3DM problem
+  and its first verified finite drawing are computable; together they form the
+  normalization compiler input.  Composing that compiler with both tromino
+  gadget reductions proves co-r.e.-hardness and the complete 2D
+  `Theorem52.planeStatement`.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMPolarityNormalization.lean)
   transports that formula-level certificate through the actual occurrence
   lookup table used by the typed planar 3DM assembly.  Every active occurrence
