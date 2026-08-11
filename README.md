@@ -205,6 +205,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Compute the first clockwise retained clause ordering, its Figure 9
       clearance scale, and the twice-replaced raw unit-free exact-one formula
       primitive recursively.
+    - [x] Compute the flattened composed Figure 9 metadata, twice-refined
+      placement, finite local route tables, and anchor-normalized local route
+      lookup primitive recursively.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -6721,6 +6724,14 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsPositionedComputability.lean)
   does the same for the empty- and unit-clause exact-one replacements,
   including the arity-dependent generated clause coordinates.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineMetadataComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineMetadataComputability.lean)
+  flattens the proof-oriented composed Figure 9 metadata to its source and
+  presentation indices, proves exact agreement with the certified metadata,
+  and computes the resulting clause-index table primitive recursively.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalRouteComputability.lean)
+  computes the finite arity-specific Figure 9 route tables, the twice-refined
+  placement, and the exact anchor-normalized local route lookup primitive
+  recursively.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean)
   composes the positioned retained fixed-eight source through Figure 9,
   opaque wrapping, and unit elimination, proving the exact final positioned
