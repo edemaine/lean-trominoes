@@ -171,6 +171,8 @@ build; an imported proof counts when its statement matches the paper.
       and merely computable route lookups.
     - [x] Prove verified orthogonal-route loop erasure primitive recursive by
       identifying `Walk.bypass` support with a proof-free list algorithm.
+    - [x] Give dependent coordinated direct-route atlas choices canonical
+      encodings and compute their complete positioned routes.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -2948,6 +2950,12 @@ The representation choices for this target are:
   choice also exposes its exact fully scaled local head and fan-boundary
   endpoint, together with an orthogonality certificate for its complete
   coordinated route.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceRouteChoiceComputability.lean`](LeanTrominoes/RetainedAngularFanDirectSourceRouteChoiceComputability.lean)
+  encodes the finite clause kind and its kind-dependent literal index as
+  canonical primitive-recursive data.  It provides checked and total choice
+  constructors and proves that the complete positioned coordinated route is
+  primitive recursive, separating the finite local atlas lookup from the
+  unbounded component-origin translation.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceTransverseBounds.lean`](LeanTrominoes/RetainedAngularFanDirectSourceTransverseBounds.lean)
   gives finite transverse envelopes for complete coordinated atlas routes.
   Every direct route fits in radius 3103 around its represented terminal
