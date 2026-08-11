@@ -150,6 +150,9 @@ build; an imported proof counts when its statement matches the paper.
       computable for positioned fixed-eight splits, including copied
       incidences and appended implication rings, and specialize it to the
       retained planar-SAT source.
+    - [x] Prove the flattened positioned Figure 9 clause metadata and exact
+      arity-selected local route lookup primitive recursive, including
+      clause-anchor normalization in the induced Figure 9 placement.
     - [x] Prove the positioned Figure 9 and unit-elimination compilers
       primitive recursive, including their placement queries, and specialize
       them through the retained unit-free exact-one endpoint.
