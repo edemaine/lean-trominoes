@@ -208,6 +208,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Compute the flattened composed Figure 9 metadata, twice-refined
       placement, finite local route tables, and anchor-normalized local route
       lookup primitive recursively.
+    - [x] Compute the inherited Figure 9 connector-and-source suffix lookup
+      primitive recursively and prove exact pointwise agreement with the
+      proof-backed ordered fan suffix family.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -6732,6 +6735,14 @@ The representation choices for this target are:
   computes the finite arity-specific Figure 9 route tables, the twice-refined
   placement, and the exact anchor-normalized local route lookup primitive
   recursively.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSuffixCoreComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSuffixCoreComputability.lean)
+  computes source-literal indices, bounded connector slots, finite connector
+  routes, and the translated connector-plus-source-tail suffix, proving exact
+  agreement with the certified ordered fan construction.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSuffixComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineSuffixComputability.lean)
+  combines the proof-free connector core with flattened clause metadata,
+  proves the total inherited-suffix dispatcher primitive recursive, and
+  identifies it pointwise with the existing proof-backed suffix family.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean)
   composes the positioned retained fixed-eight source through Figure 9,
   opaque wrapping, and unit elimination, proving the exact final positioned
