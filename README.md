@@ -196,6 +196,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Assemble the exact final direct, escaped, ordinary, and cycle route
       dispatcher primitive recursively, including every malformed-index
       fallback.
+    - [x] Compute each final unit-subdivided, loop-erased route and its first
+      direction primitive recursively.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -3221,6 +3223,8 @@ The representation choices for this target are:
   staged dispatcher then selects among the direct, escaped, ordinary, and
   cycle routes, and is proved primitive recursive and extensionally equal to
   the published total route family, including malformed-index fallbacks.
+  Composing this dispatcher with verified loop erasure computes the exact
+  final normalized route and its first direction primitive recursively.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
   proves that each validated coordinated prefix meets that unchanged suffix
   at exactly the same fan-boundary point.  The resulting substituted route

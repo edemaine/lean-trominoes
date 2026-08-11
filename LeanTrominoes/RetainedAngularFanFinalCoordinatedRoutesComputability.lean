@@ -2,6 +2,7 @@ import LeanTrominoes.OrthogonalPolylineLoopErasureComputability
 import LeanTrominoes.PeriodicCNFPlanarRetainedEightOccurrenceSplitRoutesComputability
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutes
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceRouteChoiceComputability
+import LeanTrominoes.RetainedAngularFanFinalNormalizedRouteFamily
 import LeanTrominoes.RetainedAngularFanSourceEscapedSpliceComputability
 
 /-!
@@ -1947,6 +1948,47 @@ theorem retainedFinalCoordinatedRouteQuery_primrec
       (Variable := Variable)) :=
   retainedFinalCoordinatedRouteComputed_primrec.of_eq fun input =>
     retainedFinalCoordinatedRouteComputed_eq input
+
+/-! ## Normalized routes and first directions -/
+
+abbrev RetainedFinalNormalizedRouteQuery (Variable : Type*) :=
+  RetainedFinalFallbackQuery Variable
+
+/-- Uncurried lookup of the final unit-subdivided, loop-erased route family. -/
+def retainedFinalNormalizedRouteQuery
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalNormalizedRouteQuery Variable) : List Cell :=
+  retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+    input.1.1 input.1.2 input.2
+
+/-- The exact final normalized route lookup is primitive recursive. -/
+theorem retainedFinalNormalizedRouteQuery_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (retainedFinalNormalizedRouteQuery
+      (Variable := Variable)) := by
+  exact (AxisDirection.normalizeOrthogonalPolyline_primrec.comp
+    retainedFinalCoordinatedRouteQuery_primrec).of_eq fun input => by
+      rfl
+
+abbrev RetainedFinalNormalizedFirstDirectionQuery (Variable : Type*) :=
+  RetainedFinalNormalizedRouteQuery Variable
+
+/-- First direction of one final normalized route, with `.invalid` on a
+route containing fewer than two points. -/
+def retainedFinalNormalizedFirstDirectionQuery
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalNormalizedFirstDirectionQuery Variable) :
+    AxisDirection :=
+  AxisDirection.polylineFirstDirection
+    (retainedFinalNormalizedRouteQuery input)
+
+/-- Final normalized-route first directions are primitive recursive. -/
+theorem retainedFinalNormalizedFirstDirectionQuery_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (retainedFinalNormalizedFirstDirectionQuery
+      (Variable := Variable)) :=
+  PeriodicThreeDM.NormalizationCompiler.polylineFirstDirection_primrec.comp
+    retainedFinalNormalizedRouteQuery_primrec
 
 end PeriodicOrthocrossing
 end LeanTrominoes
