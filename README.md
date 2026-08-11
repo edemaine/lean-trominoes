@@ -169,6 +169,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove computable finite-list folds, maps, and stable insertion sort,
       then lift route-direction clause sorting to computable source formulas
       and merely computable route lookups.
+    - [x] Prove verified orthogonal-route loop erasure primitive recursive by
+      identifying `Walk.bypass` support with a proof-free list algorithm.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -2357,6 +2359,12 @@ The representation choices for this target are:
   remains orthogonal, and is geometrically simple.  A total computable
   wrapper makes this operation available to the final incidence-route
   family without proof arguments in its definition.
+- [`LeanTrominoes/OrthogonalPolylineLoopErasureComputability.lean`](LeanTrominoes/OrthogonalPolylineLoopErasureComputability.lean)
+  makes that verified normalizer executable.  It defines a proof-free
+  right-to-left list loop erasure, proves that it selects exactly the support
+  of Mathlib's dependent `Walk.bypass`, proves orthogonality testing primitive
+  recursive, and derives primitive recursiveness of the total route
+  normalizer.
 - [`LeanTrominoes/RetainedAngularFanFinalNormalizedRouteFamily.lean`](LeanTrominoes/RetainedAngularFanFinalNormalizedRouteFamily.lean)
   applies the loop-erasure normalizer to every final coordinated incidence
   route.  For every genuine incidence it proves that normalization preserves
