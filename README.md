@@ -143,6 +143,9 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Transport the exact retained incidence routes through variable
       gauging, clause-anchor normalization, and clause-orbit deduplication,
       then compute their angular fixed-eight occurrence split.
+    - [x] Prove the positioned fixed-eight ring compiler primitive recursive,
+      including its clause coordinates and companion placement queries, and
+      specialize it to the exact retained positioned split.
     - [x] Compose the retained fixed-eight split through Figure 9 exact-one
       conversion, opaque wrapping, unit elimination, anchor normalization,
       and the finite planar 3DM encoding primitive recursively.
@@ -6569,6 +6572,14 @@ The representation choices for this target are:
   computes the angular east-first compass port at every retained incidence and
   proves the exact retained fixed-eight occurrence-split formula primitive
   recursive and computable.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitPositionedComputability.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitPositionedComputability.lean)
+  encodes the fixed nine-copy ring vertices and proves all local ring
+  coordinates, positioned clauses, positioned split formulas, and companion
+  placement queries primitive recursive from finite source data.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitPositionedComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedEightOccurrenceSplitPositionedComputability.lean)
+  specializes the positioned compiler to the gauged retained planar-SAT
+  construction, proving its exact positioned fixed-eight formula computable
+  and its retained period and variable-position queries primitive recursive.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDMComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightThreeDMComputability.lean)
   composes that split through Figure 9 exact-one conversion, opaque variable
   wrapping, unit-clause elimination, canonical clause-anchor normalization,
