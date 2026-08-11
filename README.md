@@ -185,6 +185,8 @@ build; an imported proof counts when its statement matches the paper.
       clause lookup primitive recursive for total-route branch selection.
     - [x] Prove the exact eleven-direction retained-ray classifiers,
       staircase generators, and whole-polyline rasterizer primitive recursive.
+    - [x] Prove the generic delayed-lane escaped fan, variable-tail
+      replacement, and rasterized source boundary splice primitive recursive.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -3497,6 +3499,11 @@ The representation choices for this target are:
   retaining the ordinary splice's exact clause endpoint, Figure 7 boundary
   endpoint, and orthogonality contract.  An additional pre-rasterization
   theorem preserves orthogonality from an already orthogonal source route.
+- [`LeanTrominoes/RetainedAngularFanSourceEscapedSpliceComputability.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSpliceComputability.lean)
+  computes the exact delayed-lane radial escape, finite lane and fan
+  adapters, variable-tail replacement, and whole-polyline rasterization.
+  Consequently the complete generic source-escaped boundary route is
+  primitive recursive in its source route, terminal datum, and slot.
 - [`LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean`](LeanTrominoes/RetainedAngularFanSourceEscapedSpliceSeparation.lean)
   packages the asymmetric same-clause tail replacement used by a singleton
   failed-choice route against an ordinary non-singleton fallback.  The
