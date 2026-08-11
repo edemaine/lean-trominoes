@@ -240,6 +240,183 @@ theorem orderClausesByRouteDirection_primrec
   exact (PositionedPeriodicCNF.equivData_symm_primrec.comp clauses).of_eq
     fun _ => rfl
 
+/-- Reindexing a route family through the primitive-recursive stable clause
+sort is itself primitive recursive. -/
+theorem orderRoutesByClauseDirection_primrec
+    {Input Variable : Type*} [Primcodable Input] [Primcodable Variable]
+    (source : Input → PositionedPeriodicCNF Variable)
+    (routes : Input → IncidenceRoutes)
+    (sourcePrimrec : Primrec source)
+    (routesPrimrec :
+      Primrec fun input : (Input × Nat) × Nat =>
+        routes input.1.1 input.1.2 input.2) :
+    Primrec fun input : (Input × Nat) × Nat =>
+      orderRoutesByClauseDirection
+        (source input.1.1) (routes input.1.1)
+        input.1.2 input.2 := by
+  let Query := (Input × Nat) × Nat
+  have selectedClause : Primrec fun input : Query =>
+      (source input.1.1).clauses[input.1.2]? :=
+    Primrec.list_getElem?.comp
+      (PositionedPeriodicCNF.clauses_primrec.comp
+        (sourcePrimrec.comp (Primrec.fst.comp Primrec.fst)))
+      (Primrec.snd.comp Primrec.fst)
+  have noClause : Primrec fun _input : Query => ([] : List Cell) :=
+    Primrec.const []
+  have some : Primrec₂ fun (input : Query)
+      (clause : PositionedPeriodicClause Variable) =>
+      match
+          (clauseLiteralOrder (routes input.1.1)
+            input.1.2 clause)[input.2]? with
+      | Option.none => []
+      | Option.some taggedLiteral =>
+          routes input.1.1 input.1.2 taggedLiteral.2 := by
+    let Combined := Query × PositionedPeriodicClause Variable
+    have ordered : Primrec fun input : Combined =>
+        clauseLiteralOrder (routes input.1.1.1)
+          input.1.1.2 input.2 :=
+      (clauseLiteralOrder_primrec routes routesPrimrec).comp
+        (Primrec.pair
+          (Primrec.fst.comp Primrec.fst)
+          Primrec.snd)
+    have selectedLiteral : Primrec fun input : Combined =>
+        (clauseLiteralOrder (routes input.1.1.1)
+          input.1.1.2 input.2)[input.1.2]? :=
+      Primrec.list_getElem?.comp ordered
+        (Primrec.snd.comp Primrec.fst)
+    have noLiteral : Primrec fun _input : Combined =>
+        ([] : List Cell) :=
+      Primrec.const []
+    have oneLiteral : Primrec₂ fun (input : Combined)
+        (taggedLiteral : PeriodicLiteral Variable × Nat) =>
+        routes input.1.1.1 input.1.1.2 taggedLiteral.2 := by
+      change Primrec fun input : Combined ×
+          (PeriodicLiteral Variable × Nat) =>
+        routes input.1.1.1.1 input.1.1.1.2 input.2.2
+      exact routesPrimrec.comp
+        (Primrec.pair
+          (Primrec.pair
+            (Primrec.fst.comp (Primrec.fst.comp
+              (Primrec.fst.comp Primrec.fst)))
+            (Primrec.snd.comp (Primrec.fst.comp
+              (Primrec.fst.comp Primrec.fst))))
+          (Primrec.snd.comp Primrec.snd))
+    change Primrec fun input : Combined =>
+      match
+          (clauseLiteralOrder (routes input.1.1.1)
+            input.1.1.2 input.2)[input.1.2]? with
+      | Option.none => []
+      | Option.some taggedLiteral =>
+          routes input.1.1.1 input.1.1.2 taggedLiteral.2
+    exact (Primrec.option_casesOn
+      selectedLiteral noLiteral oneLiteral).of_eq fun input => by
+        cases (clauseLiteralOrder (routes input.1.1.1)
+          input.1.1.2 input.2)[input.1.2]? <;> rfl
+  exact (Primrec.option_casesOn selectedClause noClause some).of_eq
+    fun input => by
+      unfold orderRoutesByClauseDirection
+      cases (source input.1.1).clauses[input.1.2]? <;> rfl
+
+/-- Canonical route reindexing, including the whole-period change of clause
+anchor gauge, is primitive recursive from the source formula, placement
+period, and route lookup. -/
+theorem orderCanonicalRoutesByClauseDirection_primrec
+    {Input Variable : Type*} [Primcodable Input] [Primcodable Variable]
+    (source : Input → PositionedPeriodicCNF Variable)
+    (placement : Input → PeriodicVariablePlacement Variable)
+    (routes : Input → IncidenceRoutes)
+    (sourcePrimrec : Primrec source)
+    (periodPrimrec : Primrec fun input => (placement input).period)
+    (routesPrimrec :
+      Primrec fun input : (Input × Nat) × Nat =>
+        routes input.1.1 input.1.2 input.2) :
+    Primrec fun input : (Input × Nat) × Nat =>
+      orderCanonicalRoutesByClauseDirection
+        (source input.1.1) (placement input.1.1)
+        (routes input.1.1) input.1.2 input.2 := by
+  let Query := (Input × Nat) × Nat
+  have selectedClause : Primrec fun input : Query =>
+      (source input.1.1).clauses[input.1.2]? :=
+    Primrec.list_getElem?.comp
+      (PositionedPeriodicCNF.clauses_primrec.comp
+        (sourcePrimrec.comp (Primrec.fst.comp Primrec.fst)))
+      (Primrec.snd.comp Primrec.fst)
+  have noClause : Primrec fun _input : Query => ([] : List Cell) :=
+    Primrec.const []
+  have some : Primrec₂ fun (input : Query)
+      (sourceClause : PositionedPeriodicClause Variable) =>
+      let orderedClause := orderClauseByRouteDirection
+        (routes input.1.1) input.1.2 sourceClause
+      PeriodicOrthocrossing.translatePolyline
+        ((placement input.1.1).translation
+          (Cell.sub
+            (PeriodicCNF.clauseAnchor sourceClause.literals)
+            (PeriodicCNF.clauseAnchor orderedClause.literals)))
+        (orderRoutesByClauseDirection
+          (source input.1.1) (routes input.1.1)
+          input.1.2 input.2) := by
+    let Combined := Query × PositionedPeriodicClause Variable
+    have orderedClause : Primrec fun input : Combined =>
+        orderClauseByRouteDirection
+          (routes input.1.1.1) input.1.1.2 input.2 :=
+      (orderClauseByRouteDirection_primrec routes routesPrimrec).comp
+        (Primrec.pair
+          (Primrec.fst.comp Primrec.fst)
+          Primrec.snd)
+    have sourceAnchor : Primrec fun input : Combined =>
+        PeriodicCNF.clauseAnchor input.2.literals :=
+      PeriodicCNF.clauseAnchor_primrec.comp
+        (PositionedPeriodicClause.literals_primrec.comp Primrec.snd)
+    have orderedAnchor : Primrec fun input : Combined =>
+        PeriodicCNF.clauseAnchor
+          (orderClauseByRouteDirection
+            (routes input.1.1.1) input.1.1.2 input.2).literals :=
+      PeriodicCNF.clauseAnchor_primrec.comp
+        (PositionedPeriodicClause.literals_primrec.comp orderedClause)
+    have anchorDifference : Primrec fun input : Combined => Cell.sub
+        (PeriodicCNF.clauseAnchor input.2.literals)
+        (PeriodicCNF.clauseAnchor
+          (orderClauseByRouteDirection
+            (routes input.1.1.1) input.1.1.2 input.2).literals) :=
+      Computability.cell_sub_primrec.comp sourceAnchor orderedAnchor
+    have physicalPeriod : Primrec fun input : Combined =>
+        ((placement input.1.1.1).period : Int) :=
+      Computability.int_ofNat_primrec.comp
+        (periodPrimrec.comp
+          (Primrec.fst.comp (Primrec.fst.comp Primrec.fst)))
+    have translation : Primrec fun input : Combined =>
+        (placement input.1.1.1).translation
+          (Cell.sub
+            (PeriodicCNF.clauseAnchor input.2.literals)
+            (PeriodicCNF.clauseAnchor
+              (orderClauseByRouteDirection
+                (routes input.1.1.1) input.1.1.2 input.2).literals)) :=
+      Computability.cell_scale_primrec.comp
+        physicalPeriod anchorDifference
+    have reorderedRoute : Primrec fun input : Combined =>
+        orderRoutesByClauseDirection
+          (source input.1.1.1) (routes input.1.1.1)
+          input.1.1.2 input.1.2 :=
+      (orderRoutesByClauseDirection_primrec
+        source routes sourcePrimrec routesPrimrec).comp Primrec.fst
+    change Primrec fun input : Combined =>
+      PeriodicOrthocrossing.translatePolyline
+        ((placement input.1.1.1).translation
+          (Cell.sub
+            (PeriodicCNF.clauseAnchor input.2.literals)
+            (PeriodicCNF.clauseAnchor
+              (orderClauseByRouteDirection
+                (routes input.1.1.1) input.1.1.2 input.2).literals)))
+        (orderRoutesByClauseDirection
+          (source input.1.1.1) (routes input.1.1.1)
+          input.1.1.2 input.1.2)
+    exact PeriodicThreeDM.NormalizationCompiler.translatePolyline_primrec.comp
+      (Primrec.pair translation reorderedRoute)
+  exact (Primrec.option_casesOn selectedClause noClause some).of_eq
+    fun input => by
+      unfold orderCanonicalRoutesByClauseDirection
+      cases (source input.1.1).clauses[input.1.2]? <;> rfl
+
 /-! ## Computable route lookup -/
 
 /-- The direction rank remains computable when route lookup is merely

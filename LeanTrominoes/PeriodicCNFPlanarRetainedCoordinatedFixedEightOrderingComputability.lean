@@ -18,7 +18,7 @@ noncomputable section
 namespace LeanTrominoes
 namespace PeriodicOrthocrossing
 
-set_option maxHeartbeats 800000
+set_option maxHeartbeats 2000000
 
 open PeriodicEightOccurrenceSplit
 open PeriodicEightOccurrenceSplitPositioned
@@ -124,6 +124,54 @@ theorem
   retainedSourceScaledSplitComputed_primrec.of_eq fun source =>
     retainedSourceScaledSplitComputed_eq source
 
+/-- The physical period paired with the source-scaled fixed-eight formula is
+primitive recursive. -/
+theorem
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement_period_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec fun source : PeriodicCNF Variable =>
+      (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+        source).period := by
+  let scaledPlacement := fun source : PeriodicCNF Variable =>
+    (retainedGaugedWrappedDrawingPeriodicPlanarSATPlacement source).scale
+      retainedAngularFanSourceClearanceFactor
+  have scaledPeriod : Primrec fun source : PeriodicCNF Variable =>
+      (scaledPlacement source).period :=
+    Primrec.nat_mul.comp
+      (Primrec.const retainedAngularFanSourceClearanceFactor)
+      retainedGaugedWrappedDrawingPeriodicPlanarSATPeriod_primrec
+  have splitPeriod : Primrec fun source : PeriodicCNF Variable =>
+      (PeriodicEightOccurrenceSplitPositioned.placement
+        (scaledPlacement source)).period :=
+    PeriodicEightOccurrenceSplitPositioned.placement_period_primrec
+      scaledPlacement scaledPeriod
+  have computed : Primrec fun source : PeriodicCNF Variable =>
+      retainedTerminalFanRoutingRefinement *
+        (PeriodicEightOccurrenceSplitPositioned.placement
+          (scaledPlacement source)).period :=
+    Primrec.nat_mul.comp
+      (Primrec.const retainedTerminalFanRoutingRefinement)
+      splitPeriod
+  exact computed.of_eq fun source => by
+    rfl
+
+/-- The reindexed canonical routes paired with the first clockwise clause
+ordering have a primitive-recursive presentation-index lookup. -/
+theorem
+    retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec fun input : (PeriodicCNF Variable × Nat) × Nat =>
+      retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+        input.1.1 input.1.2 input.2 := by
+  unfold retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+  exact PositionedPeriodicCNF.orderCanonicalRoutesByClauseDirection_primrec
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula_primrec
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement_period_primrec
+    retainedFinalNormalizedRouteQuery_primrec
+
 /-- The first stable clockwise ordering of the normalized retained source is
 primitive recursive. -/
 theorem
@@ -146,6 +194,35 @@ theorem retainedFigureNineClearancePositionedFormula_primrec
   exact (PositionedPeriodicCNF.scale_primrec
     retainedFigureNineSourceClearanceFactor).comp
       retainedDrawingSourceScaledClockwiseEightOccurrenceSplitPositionedFormula_primrec
+
+/-- The extra Figure 9 source-clearance scale has a primitive-recursive
+physical period. -/
+theorem retainedFigureNineClearancePlacement_period_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec fun source : PeriodicCNF Variable =>
+      (retainedFigureNineClearancePlacement source).period := by
+  unfold retainedFigureNineClearancePlacement
+  exact Primrec.nat_mul.comp
+    (Primrec.const retainedFigureNineSourceClearanceFactor)
+    retainedDrawingSourceScaledRefinedEightOccurrenceSplitPlacement_period_primrec
+
+/-- Scaling and re-normalizing the first clockwise route family preserves a
+primitive-recursive presentation-index lookup. -/
+theorem retainedFigureNineClearanceIncidenceRoutes_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec fun input : (PeriodicCNF Variable × Nat) × Nat =>
+      retainedFigureNineClearanceIncidenceRoutes
+        input.1.1 input.1.2 input.2 := by
+  have scaled : Primrec fun input :
+      (PeriodicCNF Variable × Nat) × Nat =>
+      scalePolyline retainedFigureNineSourceClearanceFactor
+        (retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes
+          input.1.1 input.1.2 input.2) :=
+    LeanTrominoes.scalePolyline_primrec.comp
+      (Primrec.const (retainedFigureNineSourceClearanceFactor : Int))
+      retainedDrawingSourceScaledClockwiseEightOccurrenceSplitIncidenceRoutes_primrec
+  exact (AxisDirection.normalizeOrthogonalPolyline_primrec.comp scaled).of_eq
+    fun _ => rfl
 
 /-- The twice-replaced raw unit-free exact-one formula after the first
 clockwise ordering is primitive recursive. -/

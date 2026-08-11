@@ -211,6 +211,14 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Compute the inherited Figure 9 connector-and-source suffix lookup
       primitive recursively and prove exact pointwise agreement with the
       proof-backed ordered fan suffix family.
+    - [x] Complete the proof-free Figure 9 suffix lookup for both auxiliary
+      generations and prove exact agreement with the certified complete
+      suffix family.
+    - [x] Splice every computed local Figure 9 route to its complete suffix
+      primitive recursively and identify the result with the proof-backed
+      complete route family.
+    - [x] Normalize the complete retained routes and compute the second,
+      final clockwise clause ordering primitive recursively.
     - [x] Prove the finite Dyer--Frieze planar exact-one-to-3DM problem
       encoding primitive recursive, including its connector references and
       natural-number color-class numbering.
@@ -6276,6 +6284,12 @@ The representation choices for this target are:
   first clockwise fixed-eight formula, the factor-two Figure 9 clearance
   scale, and both finite positioned exact-one replacements, yielding the
   twice-replaced raw unit-free exact-one formula primitive recursively.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalOrderingComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalOrderingComputability.lean)
+  specializes the proof-free complete Figure 9 route computation to the
+  retained source, normalizes each complete route, and computes the second
+  and final clockwise clause ordering primitive recursively.  Pointwise
+  agreement lemmas identify all three computed lookups with their existing
+  proof-backed geometric definitions.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearanceVariableRouteOrder.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFigureNineClearanceVariableRouteOrder.lean)
   specializes variable-order preservation to the retained clockwise source.
   Positive factor-two scaling preserves all terminal directions, while
@@ -6743,6 +6757,11 @@ The representation choices for this target are:
   combines the proof-free connector core with flattened clause metadata,
   proves the total inherited-suffix dispatcher primitive recursive, and
   identifies it pointwise with the existing proof-backed suffix family.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineCompleteRouteComputability.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineCompleteRouteComputability.lean)
+  extends the inherited dispatcher with singleton suffixes for both auxiliary
+  generations, computes each complete local-plus-suffix splice primitive
+  recursively, and proves exact pointwise agreement with the certified
+  complete Figure 9 route family.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedFixedEightOneInThreePositionedComputability.lean)
   composes the positioned retained fixed-eight source through Figure 9,
   opaque wrapping, and unit elimination, proving the exact final positioned
@@ -7815,7 +7834,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PositionedPeriodicCNFClauseOrderingComputability.lean`](LeanTrominoes/PositionedPeriodicCNFClauseOrderingComputability.lean)
   encodes finite positioned periodic formulas and proves their stable
   clockwise route-direction clause ordering primitive recursive from a
-  primitive-recursive route lookup.
+  primitive-recursive route lookup.  It also exposes the corresponding
+  reindexed route dispatcher, including the canonical whole-period gauge
+  translation, as a reusable primitive-recursive operation.
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationOccurrences.lean)
   proves that the same preprocessing preserves the occurrence-three
   restriction.  Every embedded source variable has exactly its original
