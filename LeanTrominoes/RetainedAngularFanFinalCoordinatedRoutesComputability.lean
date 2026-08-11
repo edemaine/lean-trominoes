@@ -2,6 +2,7 @@ import LeanTrominoes.OrthogonalPolylineLoopErasureComputability
 import LeanTrominoes.PeriodicCNFPlanarRetainedEightOccurrenceSplitRoutesComputability
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutes
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceRouteChoiceComputability
+import LeanTrominoes.RetainedAngularFanSourceEscapedSpliceComputability
 
 /-!
 # Computability of final coordinated retained routes
@@ -680,6 +681,211 @@ theorem retainedFinalCoordinatedDirectOccurrenceRoute_primrec
       (Variable := Variable)) := by
   exact finalCoordinatedDirectRouteComputed_primrec.of_eq fun input =>
     (retainedFinalCoordinatedDirectOccurrenceRouteQuery_eq_computed
+      input).symm
+
+/-! ## Escaped fallback occurrence route -/
+
+abbrev RetainedFinalCoordinatedEscapedRouteQuery (Variable : Type*) :=
+  FinalCoordinatedSuffixQuery Variable
+
+/-- Uncurried exceptional delayed-lane fallback occurrence route. -/
+def retainedFinalEscapedFallbackOccurrenceRouteQuery
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    List Cell :=
+  retainedFinalEscapedFallbackOccurrenceRoute
+    input.1.1.1.1
+    (angularClauseOfRouteData input.1.1.1.2)
+    (angularLiteralOfRouteData input.1.1.2)
+    input.1.2 input.2
+
+private def finalCoordinatedEscapedRawRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    List Cell :=
+  finalCoordinatedSourceRoutes input.1.1.1.1 input.1.2 input.2
+
+private theorem finalCoordinatedEscapedRawRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedRawRoute
+      (Variable := Variable)) := by
+  have route : Primrec fun input : (PeriodicCNF Variable × Nat) × Nat =>
+      finalCoordinatedSourceRoutes input.1.1 input.1.2 input.2 := by
+    unfold finalCoordinatedSourceRoutes
+    exact retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATIncidenceRoutes_primrec
+  have query : Primrec fun input :
+      RetainedFinalCoordinatedEscapedRouteQuery Variable =>
+      ((input.1.1.1.1, input.1.2), input.2) :=
+    Primrec.pair
+      (Primrec.pair
+        (Primrec.fst.comp
+          (Primrec.fst.comp (Primrec.fst.comp Primrec.fst)))
+        (Primrec.snd.comp Primrec.fst))
+      Primrec.snd
+  exact (route.comp query).of_eq fun _ => rfl
+
+private def finalCoordinatedEscapedRawTerminal
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    RetainedTerminalData :=
+  classifiedRetainedTerminalData
+    (routeTerminalVector (finalCoordinatedEscapedRawRoute input))
+
+private theorem finalCoordinatedEscapedRawTerminal_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedRawTerminal
+      (Variable := Variable)) := by
+  exact (classifiedRetainedTerminalData_primrec.comp
+    (routeTerminalVector_primrec.comp
+      finalCoordinatedEscapedRawRoute_primrec)).of_eq fun _ => rfl
+
+private def finalCoordinatedEscapedScaledRoute
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    List Cell :=
+  scalePolyline retainedAngularFanSourceClearanceFactor
+    (finalCoordinatedEscapedRawRoute input)
+
+private theorem finalCoordinatedEscapedScaledRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedScaledRoute
+      (Variable := Variable)) := by
+  exact (scalePolyline_primrec.comp
+    (Primrec.const (retainedAngularFanSourceClearanceFactor : Int))
+    finalCoordinatedEscapedRawRoute_primrec).of_eq fun _ => rfl
+
+private def finalCoordinatedEscapedScaledTerminal
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    RetainedTerminalData :=
+  scaleRetainedTerminalData retainedAngularFanSourceClearanceFactor
+    (finalCoordinatedEscapedRawTerminal input)
+
+private theorem finalCoordinatedEscapedScaledTerminal_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedScaledTerminal
+      (Variable := Variable)) := by
+  have direction : Primrec fun input :
+      RetainedFinalCoordinatedEscapedRouteQuery Variable =>
+      (finalCoordinatedEscapedRawTerminal input).1 :=
+    Primrec.fst.comp finalCoordinatedEscapedRawTerminal_primrec
+  have length : Primrec fun input :
+      RetainedFinalCoordinatedEscapedRouteQuery Variable =>
+      retainedAngularFanSourceClearanceFactor *
+        (finalCoordinatedEscapedRawTerminal input).2 :=
+    Primrec.nat_mul.comp
+      (Primrec.const retainedAngularFanSourceClearanceFactor)
+      (Primrec.snd.comp finalCoordinatedEscapedRawTerminal_primrec)
+  exact (Primrec.pair direction length).of_eq fun _ => rfl
+
+private def finalCoordinatedEscapedBoundaryInput
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    RetainedEscapedBoundaryQuery :=
+  ((finalCoordinatedEscapedScaledRoute input,
+    finalCoordinatedEscapedScaledTerminal input),
+    retainedFinalCoordinatedOccurrenceSlot
+      input.1.1.1.1 (angularLiteralOfRouteData input.1.1.2)
+      input.1.2 input.2)
+
+private theorem finalCoordinatedEscapedBoundaryInput_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedBoundaryInput
+      (Variable := Variable)) := by
+  exact Primrec.pair
+    (Primrec.pair
+      finalCoordinatedEscapedScaledRoute_primrec
+      finalCoordinatedEscapedScaledTerminal_primrec)
+    retainedFinalCoordinatedOccurrenceSlot_query_primrec
+
+private def finalCoordinatedEscapedPrefix
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    List Cell :=
+  retainedAngularFanEscapedSplicedBoundaryRouteQuery
+    (finalCoordinatedEscapedBoundaryInput input)
+
+private theorem finalCoordinatedEscapedPrefix_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedPrefix
+      (Variable := Variable)) :=
+  retainedAngularFanEscapedSplicedBoundaryRouteQuery_primrec.comp
+    finalCoordinatedEscapedBoundaryInput_primrec
+
+private def finalCoordinatedEscapedSuffix
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    List Cell :=
+  scalePolyline retainedTerminalFanRoutingRefinement
+    (finalCoordinatedFlatOccurrenceSuffix input)
+
+private theorem finalCoordinatedEscapedSuffix_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedSuffix
+      (Variable := Variable)) := by
+  exact (scalePolyline_primrec.comp
+    (Primrec.const (retainedTerminalFanRoutingRefinement : Int))
+    finalCoordinatedFlatOccurrenceSuffix_primrec).of_eq fun _ => rfl
+
+private def finalCoordinatedEscapedRouteComputed
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    List Cell :=
+  joinAtEndpoint
+    (finalCoordinatedEscapedPrefix input)
+    (finalCoordinatedEscapedSuffix input)
+
+private theorem finalCoordinatedEscapedRouteComputed_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (finalCoordinatedEscapedRouteComputed
+      (Variable := Variable)) := by
+  exact joinAtEndpoint_primrec _ _
+    finalCoordinatedEscapedPrefix_primrec
+    finalCoordinatedEscapedSuffix_primrec
+
+private theorem retainedFinalEscapedFallbackOccurrenceRouteQuery_eq_computed
+    {Variable : Type*} [DecidableEq Variable]
+    (input : RetainedFinalCoordinatedEscapedRouteQuery Variable) :
+    retainedFinalEscapedFallbackOccurrenceRouteQuery input =
+      finalCoordinatedEscapedRouteComputed input := by
+  unfold retainedFinalEscapedFallbackOccurrenceRouteQuery
+    retainedFinalEscapedFallbackOccurrenceRoute
+    finalCoordinatedEscapedRouteComputed finalCoordinatedEscapedPrefix
+    finalCoordinatedEscapedBoundaryInput
+    finalCoordinatedEscapedScaledRoute
+    finalCoordinatedEscapedScaledTerminal
+    finalCoordinatedEscapedRawTerminal
+    finalCoordinatedEscapedRawRoute
+    finalCoordinatedEscapedSuffix
+    retainedAngularFanEscapedSplicedBoundaryRouteQuery
+  dsimp only
+  have suffixEq :
+      angularOccurrenceSuffix
+          ((finalCoordinatedPlacement input.1.1.1.1).scale
+            retainedAngularFanSourceClearanceFactor)
+          (angularOccurrenceOrder
+            ((finalCoordinatedSource input.1.1.1.1).scale
+              retainedAngularFanSourceClearanceFactor).erase
+            (PositionedPeriodicCNF.scaleIncidenceRoutes
+              retainedAngularFanSourceClearanceFactor
+              (finalCoordinatedSourceRoutes input.1.1.1.1)))
+          (angularClauseOfRouteData input.1.1.1.2)
+          (angularLiteralOfRouteData input.1.1.2)
+          input.1.2 input.2 =
+        finalCoordinatedFlatOccurrenceSuffix input := by
+    simpa [finalCoordinatedScaledPlacement, finalCoordinatedScaledOrder,
+      finalCoordinatedScaledSource] using
+      (finalCoordinatedOccurrenceSuffix_eq_flat input)
+  rw [suffixEq]
+
+/-- The exceptional delayed-lane fallback occurrence route, including its
+unchanged source-scaled Figure 7 suffix, is primitive recursive. -/
+theorem retainedFinalEscapedFallbackOccurrenceRoute_primrec
+    {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
+    Primrec (retainedFinalEscapedFallbackOccurrenceRouteQuery
+      (Variable := Variable)) := by
+  exact finalCoordinatedEscapedRouteComputed_primrec.of_eq fun input =>
+    (retainedFinalEscapedFallbackOccurrenceRouteQuery_eq_computed
       input).symm
 
 end PeriodicOrthocrossing

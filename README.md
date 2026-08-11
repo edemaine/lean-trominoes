@@ -187,6 +187,8 @@ build; an imported proof counts when its statement matches the paper.
       staircase generators, and whole-polyline rasterizer primitive recursive.
     - [x] Prove the generic delayed-lane escaped fan, variable-tail
       replacement, and rasterized source boundary splice primitive recursive.
+    - [x] Assemble each exceptional final escaped-fallback occurrence route
+      primitive recursively with its exact slot and Figure 7 suffix.
     - [x] Prove fixed-eight occurrence splitting primitive recursive from a
       primitive-recursive source formula and compass-port lookup.
     - [x] Prove stable terminal-angle occurrence sorting and its induced
@@ -3201,7 +3203,10 @@ The representation choices for this target are:
   direct-source atlas choice.  The resulting complete successful direct
   occurrence route is primitive recursive, including its endpoint join.  It
   also computes the exact singleton-prefix escape test and scaled-source
-  clause lookup used to dispatch the remaining fallback branches.
+  clause lookup used to dispatch the remaining fallback branches.  The
+  exceptional branch classifies and source-scales its raw terminal, applies
+  the computable escaped boundary splice, and joins the exact unchanged
+  Figure 7 suffix, yielding a primitive-recursive complete occurrence route.
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedRouteValidity.lean)
   proves that each validated coordinated prefix meets that unchanged suffix
   at exactly the same fan-boundary point.  The resulting substituted route
