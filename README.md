@@ -306,7 +306,7 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Lift the inner scan through the complete first-endpoint countdown.
     - [x] Fit the fixed initialization and result projection around the complete
       nested endpoint scan at the exact frontier-index count.
-    - [ ] Extend the endpoint and reachability certificates to the padded
+    - [x] Extend the endpoint and reachability certificates to the padded
       power-of-two state bound used by the compiled unary driver.
     - [ ] Fit parameter assembly and the guarded cycle-search driver.
     - [ ] Fit the unary input wrapper and package the verified evaluator as a
@@ -1849,9 +1849,11 @@ The representation choices for this target are:
   `StripCandidateStep.CycleSearch.exact_polynomial` adds the fixed initializer
   and Boolean projection around that nested scan, obtaining a polynomial-space
   certificate for the complete parameterized search at the exact frontier
-  index count.  The next layer generalizes the same payload and leaf bounds to
-  the unary driver's padded power-of-two count before parameter assembly and
-  the well-formedness guard are connected.
+  index count.  The parallel `StripCandidateStep.Padded` hierarchy generalizes
+  the reachability calls, candidate update, both synchronized endpoint scans,
+  initializer, and Boolean projection to any count at most the unary driver's
+  padded power-of-two bound.  The remaining layer connects parameter assembly
+  and the well-formedness guard.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
