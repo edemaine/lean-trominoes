@@ -327,6 +327,8 @@ build; an imported proof counts when its statement matches the paper.
         with fresh-root, exact clause-count, and forward-locality proofs.
       - [x] Prove semantic soundness of the structural compiler: every model
         assigns the root atom the direct expression value.
+      - [x] Prove the generated-atom range invariant needed for constructive
+        completeness and noninterference between compiled subexpressions.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1220,6 +1222,10 @@ The representation choices for this target are:
   proves semantic soundness compositionally: satisfying every generated
   clause forces the fresh root atom to equal direct evaluation of the source
   transition expression.
+- [`LeanTrominoes/PeriodicCNFTransitionExprBounds.lean`](LeanTrominoes/PeriodicCNFTransitionExprBounds.lean)
+  proves the complementary freshness invariant: when all source atoms precede
+  the initial fresh index, every atom mentioned by the generated clauses lies
+  below the returned `nextFresh`, including across nested subexpressions.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
