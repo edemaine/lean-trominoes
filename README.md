@@ -335,6 +335,8 @@ build; an imported proof counts when its statement matches the paper.
         fields, current/next equality, and no-overflow binary succession.
       - [x] Allocate a collision-free finite atom vocabulary for bounded
         labels, states, stack cells, and reset-clock bits.
+      - [x] Define the canonical Boolean valuation of a bounded clocked
+        configuration and verify all label/state/stack exact-one fields.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1247,6 +1249,11 @@ The representation choices for this target are:
   cell, and little-endian clock bits.  A finite equivalence allocates these
   constructors injectively below one `atomCount` fresh boundary, with
   field-specific vectors and bounds.
+- [`LeanTrominoes/PeriodicCNFMachineValuation.lean`](LeanTrominoes/PeriodicCNFMachineValuation.lean)
+  maps a bounded clocked TM2 configuration to its canonical Boolean slice.
+  Labels, finite control states, and optional values in every bounded stack
+  cell are proved exactly-one; the combined structural expression holds on
+  every encoding and mentions only atoms below `atomCount`.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
