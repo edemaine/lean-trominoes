@@ -795,6 +795,368 @@ theorem packedTransition
   simpa [Code.packedTransitionCode, packedTransitionCost,
     normalized, center, overlap, Bool.and_assoc] using result
 
+/-- A common polynomial majorant for every leaf called by the packed
+transition and for all six-field adapters. -/
+def packedTransitionComponentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  10000000000000000000000000000000000000000000000000000 *
+      packedNormalizationAllUnit periodicStrip current +
+    packedCenterValidPolynomialSpaceBound tromino periodicStrip current +
+    10000000000000000000000000000000000000000000000 *
+      packedOverlapColumnsUnit periodicStrip current next +
+    100000000000000000000000000000000 *
+      packedTransitionNativeSpaceUnit periodicStrip current next +
+    10000000 *
+      packedTransitionNativeSpaceUnit periodicStrip current next + 1
+
+/-- The phase/column conjunction adds one fixed Boolean-combinator layer. -/
+def packedTransitionOverlapSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  1000 * (packedTransitionComponentSpaceBound
+    tromino periodicStrip current next + 1)
+
+/-- The center/overlap conjunction adds the second Boolean layer. -/
+def packedTransitionTailSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  1000 * (packedTransitionOverlapSpaceBound
+    tromino periodicStrip current next + 1)
+
+/-- Explicit polynomial evaluator-space envelope for the complete packed
+transition predicate. -/
+def packedTransitionPolynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  1000 * (packedTransitionTailSpaceBound
+    tromino periodicStrip current next + 1)
+
+private theorem packedTransitionComponentSpaceBound_pos
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    1 ≤ packedTransitionComponentSpaceBound
+      tromino periodicStrip current next := by
+  simp [packedTransitionComponentSpaceBound]
+
+private theorem packedTransitionInputSpace_le_componentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    encodedListSpace
+        (Code.packedTransitionInput periodicStrip current next) ≤
+      packedTransitionComponentSpaceBound
+        tromino periodicStrip current next := by
+  have raw := packedTransitionInputSpace_le_nativeUnit
+    periodicStrip current next
+  simp only [packedTransitionComponentSpaceBound]
+  omega
+
+private theorem packedTransitionInputHeadSpace_le_componentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    (Computability.encodeNat
+        (Code.packedTransitionInput periodicStrip current next).headI).length ≤
+      packedTransitionComponentSpaceBound
+        tromino periodicStrip current next := by
+  have raw := packedTransitionInputHeadSpace_le_nativeUnit
+    periodicStrip current next
+  simp only [packedTransitionComponentSpaceBound]
+  omega
+
+private theorem packedTransitionInputHeadSuccSpace_le_componentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    (Computability.encodeNat
+        ((Code.packedTransitionInput periodicStrip current next).headI + 1)).length ≤
+      packedTransitionComponentSpaceBound
+        tromino periodicStrip current next := by
+  have raw := packedTransitionInputHeadSuccSpace_le_nativeUnit
+    periodicStrip current next
+  simp only [packedTransitionComponentSpaceBound]
+  omega
+
+private theorem packedTransitionNormalizationCost_le_componentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionNormalizationCost periodicStrip current next ≤
+      packedTransitionComponentSpaceBound
+        tromino periodicStrip current next := by
+  have normalization := packedNormalizationAllCost_le_linear
+    periodicStrip current
+  have arguments := packedTransitionCurrentArgumentsCost_le_linear
+    periodicStrip current next
+  simp only [packedTransitionNormalizationCost,
+    packedTransitionComponentSpaceBound]
+  omega
+
+private theorem packedTransitionCenterCost_le_componentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionCenterCost tromino periodicStrip current next ≤
+      packedTransitionComponentSpaceBound
+        tromino periodicStrip current next := by
+  have center := packedCenterValidCost_le_polynomialSpaceBound
+    tromino periodicStrip current
+  have arguments := packedTransitionCurrentArgumentsCost_le_linear
+    periodicStrip current next
+  simp only [packedTransitionCenterCost,
+    packedTransitionComponentSpaceBound]
+  omega
+
+private theorem packedTransitionOverlapColumnsCost_le_componentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionOverlapColumnsCost periodicStrip current next ≤
+      packedTransitionComponentSpaceBound
+        tromino periodicStrip current next := by
+  have columns := packedOverlapColumnsCost_le_linear
+    periodicStrip current next
+  have arguments := packedTransitionOverlapArgumentsCost_le_linear
+    periodicStrip current next
+  simp only [packedTransitionOverlapColumnsCost,
+    packedTransitionComponentSpaceBound]
+  omega
+
+private theorem packedTransitionPhaseCost_le_componentSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionPhaseCost periodicStrip current next ≤
+      packedTransitionComponentSpaceBound
+        tromino periodicStrip current next := by
+  have phase := packedTransitionPhaseCost_le_polynomialSpaceBound
+    periodicStrip current next
+  simp only [packedTransitionComponentSpaceBound]
+  omega
+
+set_option maxHeartbeats 1000000 in
+theorem packedTransitionOverlapCost_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionOverlapCost periodicStrip current next ≤
+      packedTransitionOverlapSpaceBound
+        tromino periodicStrip current next := by
+  let values := Code.packedTransitionInput periodicStrip current next
+  let phase := decide
+    (next.phase = (current.phase + 1) % periodicStrip.period)
+  let columns := (List.finRange 4).all fun column =>
+    current.overlapsColumnBool periodicStrip next column
+  let budget := packedTransitionComponentSpaceBound
+    tromino periodicStrip current next
+  have phaseTag : phase.toNat ≤ 1 := by
+    cases phase <;> simp
+  have columnsTag : columns.toNat ≤ 1 := by
+    cases columns <;> simp
+  have valuesBound : encodedListSpace values ≤ budget := by
+    simpa [values, budget] using
+      (packedTransitionInputSpace_le_componentSpaceBound
+        tromino periodicStrip current next)
+  have headBound :
+      (Computability.encodeNat values.headI).length ≤ budget := by
+    simpa [values, budget] using
+      (packedTransitionInputHeadSpace_le_componentSpaceBound
+        tromino periodicStrip current next)
+  have headSuccBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget := by
+    simpa [values, budget] using
+      (packedTransitionInputHeadSuccSpace_le_componentSpaceBound
+        tromino periodicStrip current next)
+  have phaseCost :
+      packedTransitionPhaseCost periodicStrip current next ≤ budget := by
+    simpa [budget] using
+      (packedTransitionPhaseCost_le_componentSpaceBound
+        tromino periodicStrip current next)
+  have columnsCost :
+      packedTransitionOverlapColumnsCost periodicStrip current next ≤
+        budget := by
+    simpa [budget] using
+      (packedTransitionOverlapColumnsCost_le_componentSpaceBound
+        tromino periodicStrip current next)
+  have positive : 1 ≤ budget := by
+    simpa [budget] using
+      (packedTransitionComponentSpaceBound_pos
+        tromino periodicStrip current next)
+  have bound := boolAndCost_le_budget values
+    phase.toNat columns.toNat
+    (packedTransitionPhaseCost periodicStrip current next)
+    (packedTransitionOverlapColumnsCost periodicStrip current next)
+    budget phaseTag columnsTag valuesBound headBound headSuccBound
+    phaseCost columnsCost positive
+  simpa [packedTransitionOverlapCost,
+    packedTransitionOverlapSpaceBound,
+    values, phase, columns, budget] using bound
+
+set_option maxHeartbeats 1000000 in
+private theorem packedTransitionTailCost_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionTailCost tromino periodicStrip current next ≤
+      packedTransitionTailSpaceBound
+        tromino periodicStrip current next := by
+  let values := Code.packedTransitionInput periodicStrip current next
+  let center := current.isCenterValidBool tromino periodicStrip
+  let overlap := current.overlapsBool periodicStrip next
+  let componentBudget := packedTransitionComponentSpaceBound
+    tromino periodicStrip current next
+  let budget := packedTransitionOverlapSpaceBound
+    tromino periodicStrip current next
+  have componentPositive : 1 ≤ componentBudget := by
+    simpa [componentBudget] using
+      (packedTransitionComponentSpaceBound_pos
+        tromino periodicStrip current next)
+  have componentLe : componentBudget ≤ budget := by
+    simp only [budget, packedTransitionOverlapSpaceBound]
+    omega
+  have centerTag : center.toNat ≤ 1 := by
+    cases center <;> simp
+  have overlapTag : overlap.toNat ≤ 1 := by
+    cases overlap <;> simp
+  have valuesBound : encodedListSpace values ≤ budget :=
+    (by
+      have raw := packedTransitionInputSpace_le_componentSpaceBound
+        tromino periodicStrip current next
+      have raw' : encodedListSpace values ≤ componentBudget := by
+        simpa [values, componentBudget] using raw
+      exact raw'.trans componentLe)
+  have headBound :
+      (Computability.encodeNat values.headI).length ≤ budget :=
+    (by
+      have raw := packedTransitionInputHeadSpace_le_componentSpaceBound
+        tromino periodicStrip current next
+      have raw' :
+          (Computability.encodeNat values.headI).length ≤
+            componentBudget := by
+        simpa [values, componentBudget] using raw
+      exact raw'.trans componentLe)
+  have headSuccBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget :=
+    (by
+      have raw := packedTransitionInputHeadSuccSpace_le_componentSpaceBound
+        tromino periodicStrip current next
+      have raw' :
+          (Computability.encodeNat (values.headI + 1)).length ≤
+            componentBudget := by
+        simpa [values, componentBudget] using raw
+      exact raw'.trans componentLe)
+  have centerCost :
+      packedTransitionCenterCost tromino periodicStrip current next ≤
+        budget :=
+    (packedTransitionCenterCost_le_componentSpaceBound
+      tromino periodicStrip current next).trans componentLe
+  have overlapCost :
+      packedTransitionOverlapCost periodicStrip current next ≤ budget := by
+    simpa [budget] using
+      (packedTransitionOverlapCost_le_polynomialSpaceBound
+        tromino periodicStrip current next)
+  have positive : 1 ≤ budget := componentPositive.trans componentLe
+  have bound := boolAndCost_le_budget values
+    center.toNat overlap.toNat
+    (packedTransitionCenterCost tromino periodicStrip current next)
+    (packedTransitionOverlapCost periodicStrip current next)
+    budget centerTag overlapTag valuesBound headBound headSuccBound
+    centerCost overlapCost positive
+  simpa [packedTransitionTailCost,
+    packedTransitionTailSpaceBound,
+    values, center, overlap, budget] using bound
+
+set_option maxHeartbeats 1200000 in
+/-- The complete packed transition evaluator uses polynomial workspace in its
+six native fields and the already-bounded center scan. -/
+theorem packedTransitionCost_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionCost tromino periodicStrip current next ≤
+      packedTransitionPolynomialSpaceBound
+        tromino periodicStrip current next := by
+  let values := Code.packedTransitionInput periodicStrip current next
+  let normalized := current.isNormalizedBool periodicStrip
+  let tail := current.isCenterValidBool tromino periodicStrip &&
+    current.overlapsBool periodicStrip next
+  let componentBudget := packedTransitionComponentSpaceBound
+    tromino periodicStrip current next
+  let overlapBudget := packedTransitionOverlapSpaceBound
+    tromino periodicStrip current next
+  let budget := packedTransitionTailSpaceBound
+    tromino periodicStrip current next
+  have componentPositive : 1 ≤ componentBudget := by
+    simpa [componentBudget] using
+      (packedTransitionComponentSpaceBound_pos
+        tromino periodicStrip current next)
+  have componentLeOverlap : componentBudget ≤ overlapBudget := by
+    simp only [overlapBudget, packedTransitionOverlapSpaceBound]
+    omega
+  have overlapLe : overlapBudget ≤ budget := by
+    simp only [budget, packedTransitionTailSpaceBound]
+    omega
+  have componentLe : componentBudget ≤ budget :=
+    componentLeOverlap.trans overlapLe
+  have normalizedTag : normalized.toNat ≤ 1 := by
+    cases normalized <;> simp
+  have tailTag : tail.toNat ≤ 1 := by
+    cases tail <;> simp
+  have valuesBound : encodedListSpace values ≤ budget :=
+    (by
+      have raw := packedTransitionInputSpace_le_componentSpaceBound
+        tromino periodicStrip current next
+      have raw' : encodedListSpace values ≤ componentBudget := by
+        simpa [values, componentBudget] using raw
+      exact raw'.trans componentLe)
+  have headBound :
+      (Computability.encodeNat values.headI).length ≤ budget :=
+    (by
+      have raw := packedTransitionInputHeadSpace_le_componentSpaceBound
+        tromino periodicStrip current next
+      have raw' :
+          (Computability.encodeNat values.headI).length ≤
+            componentBudget := by
+        simpa [values, componentBudget] using raw
+      exact raw'.trans componentLe)
+  have headSuccBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget :=
+    (by
+      have raw := packedTransitionInputHeadSuccSpace_le_componentSpaceBound
+        tromino periodicStrip current next
+      have raw' :
+          (Computability.encodeNat (values.headI + 1)).length ≤
+            componentBudget := by
+        simpa [values, componentBudget] using raw
+      exact raw'.trans componentLe)
+  have normalizationCost :
+      packedTransitionNormalizationCost periodicStrip current next ≤
+        budget :=
+    (packedTransitionNormalizationCost_le_componentSpaceBound
+      tromino periodicStrip current next).trans componentLe
+  have tailCost :
+      packedTransitionTailCost tromino periodicStrip current next ≤
+        budget := by
+    simpa [budget] using
+      (packedTransitionTailCost_le_polynomialSpaceBound
+        tromino periodicStrip current next)
+  have positive : 1 ≤ budget := componentPositive.trans componentLe
+  have bound := boolAndCost_le_budget values
+    normalized.toNat tail.toNat
+    (packedTransitionNormalizationCost periodicStrip current next)
+    (packedTransitionTailCost tromino periodicStrip current next)
+    budget normalizedTag tailTag valuesBound headBound headSuccBound
+    normalizationCost tailCost positive
+  simpa [packedTransitionCost,
+    packedTransitionPolynomialSpaceBound,
+    values, normalized, tail, budget] using bound
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

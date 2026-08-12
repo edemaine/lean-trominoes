@@ -1672,8 +1672,9 @@ The representation choices for this target are:
   modulo-period phase comparison and both final Boolean conjunctions, with an
   exact continuation-independent evaluator-space cost.  Its six-field input
   adapters and cyclic phase computation now share one explicit polynomial
-  workspace envelope; the remaining composition task is to absorb the three
-  fitted geometric predicates and the final conjunctions into that envelope.
+  workspace envelope.  The fitted normalization, center-validity, and overlap
+  majorants and all three final Boolean conjunction layers are absorbed into
+  one explicit polynomial-space bound for the complete transition program.
 - [`LeanTrominoes/PartrecStripTransition.lean`](LeanTrominoes/PartrecStripTransition.lean)
   and
   [`LeanTrominoes/PartrecStripTransitionSpace.lean`](LeanTrominoes/PartrecStripTransitionSpace.lean)
