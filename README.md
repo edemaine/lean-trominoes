@@ -339,6 +339,8 @@ build; an imported proof counts when its statement matches the paper.
         configuration and verify all label/state/stack exact-one fields.
       - [x] Enforce that every bounded stack is an occupied prefix followed by
         an unused suffix, and verify canonical list encodings satisfy it.
+      - [x] Decode every structurally well-formed valuation into a unique
+        bounded machine slice and recover every source field bit.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1261,6 +1263,11 @@ The representation choices for this target are:
   suffix-closed at every adjacent pair.  Canonical list encodings satisfy the
   resulting constraint, which combines with exact-one fields into the full
   structural well-formedness expression and retains the source-atom bound.
+- [`LeanTrominoes/PeriodicCNFMachineDecode.lean`](LeanTrominoes/PeriodicCNFMachineDecode.lean)
+  proves that each exact-one field has a unique selected value and decodes an
+  arbitrary well-formed valuation to a bounded machine slice.  Every label,
+  state, stack-cell, and clock source bit is recovered exactly, and the stack
+  suffix constraints make each decoded fixed-width stack list-shaped.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
