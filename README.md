@@ -1562,7 +1562,9 @@ The representation choices for this target are:
   `List.all` center-containment condition.
 - [`LeanTrominoes/PartrecPackedCenterSymmetriesSpace.lean`](LeanTrominoes/PartrecPackedCenterSymmetriesSpace.lean)
   fits that eight-way conjunction compositionally, with an exact recursive
-  evaluator cost built from the already fitted candidate leaves.
+  evaluator cost built from the already fitted candidate leaves.  A matching
+  recursive workspace envelope now lifts the candidate bound through every
+  Boolean node and specializes to the fixed list of eight symmetries.
 - [`LeanTrominoes/PartrecPackedCenterCoveringCandidate.lean`](LeanTrominoes/PartrecPackedCenterCoveringCandidate.lean)
   constructs the canonical assignment lookup for one of the 24 fixed
   symmetry/source pairs that can cover a center target and proves that it is

@@ -103,12 +103,133 @@ theorem packedCenterSymmetryListInside
         packedCenterSymmetryListInsideCost, head, tail] using
         boolAnd_fit_bool head tail headFit tailFit
 
+theorem packedCenterSymmetryListOneCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    oneCost (Code.packedCenterCandidateInput
+        periodicStrip packed base) ≤
+      200000 *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let values := Code.packedCenterCandidateInput periodicStrip packed base
+  have zeroBound := listCodeZeroCost_le_linear values
+  have successorSmall : succCost [0] ≤ 100000 := by
+    native_decide
+  change oneCost values ≤
+    200000 * (encodedListSpace values + 1)
+  simp only [oneCost]
+  omega
+
+/-- A recursive workspace envelope for a compile-time list of symmetry
+candidates.  The exported checker specializes this recurrence to eight
+entries. -/
+def packedCenterSymmetryListInsideSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    List SquareSymmetry → Nat
+  | [] =>
+      200000 *
+        packedCenterCandidateInputUnit periodicStrip packed base
+  | symmetry :: symmetries =>
+      let budget :=
+        packedCenterCandidateInsideSpaceBound tromino symmetry
+            periodicStrip packed base +
+          packedCenterSymmetryListInsideSpaceBound tromino
+            periodicStrip packed base symmetries +
+          packedCenterCandidateInputUnit periodicStrip packed base + 100
+      1000 * (budget + 1)
+
+set_option maxHeartbeats 800000 in
+theorem packedCenterSymmetryListInsideCost_le_linear
+    (tromino : Tromino) (symmetries : List SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterSymmetryListInsideCost tromino
+        periodicStrip packed base symmetries ≤
+      packedCenterSymmetryListInsideSpaceBound tromino
+        periodicStrip packed base symmetries := by
+  let values := Code.packedCenterCandidateInput periodicStrip packed base
+  induction symmetries with
+  | nil =>
+      exact packedCenterSymmetryListOneCost_le_linear
+        periodicStrip packed base
+  | cons symmetry symmetries induction =>
+      let head := packed.centerSymmetryInsideBool tromino
+        periodicStrip base symmetry
+      let tail := symmetries.all fun remaining =>
+        packed.centerSymmetryInsideBool tromino periodicStrip
+          base remaining
+      let headCost := packedCenterCandidateInsideCost tromino symmetry
+        periodicStrip packed base
+      let tailCost := packedCenterSymmetryListInsideCost tromino
+        periodicStrip packed base symmetries
+      let budget :=
+        packedCenterCandidateInsideSpaceBound tromino symmetry
+            periodicStrip packed base +
+          packedCenterSymmetryListInsideSpaceBound tromino
+            periodicStrip packed base symmetries +
+          packedCenterCandidateInputUnit periodicStrip packed base + 100
+      have valuesBound : encodedListSpace values + 1 ≤ budget := by
+        simp only [values, budget, packedCenterCandidateInputUnit]
+        omega
+      have budgetPositive : 1 ≤ budget := by omega
+      have headCostBound : headCost ≤ budget := by
+        have bound := packedCenterCandidateInsideCost_le_linear
+          tromino symmetry periodicStrip packed base
+        simp only [headCost, budget]
+        omega
+      have tailCostBound : tailCost ≤ budget := by
+        simp only [tailCost, budget]
+        omega
+      have headSpace :=
+        listCodeEncodedListSpace_singleton_headI_le values
+      have headBitsInput :
+          (Computability.encodeNat values.headI).length ≤
+            encodedListSpace values := by
+        simpa [encodedListSpace_cons] using headSpace
+      have headBits :
+          (Computability.encodeNat values.headI).length ≤ budget := by
+        omega
+      have successorBits :=
+        listCodeEncodeNat_succ_length_le values.headI
+      have headSuccessorBits :
+          (Computability.encodeNat (values.headI + 1)).length ≤
+            budget := by
+        rw [← Nat.succ_eq_add_one]
+        omega
+      have result := boolAndCost_le_budget values head.toNat tail.toNat
+        headCost tailCost budget
+        (by cases head <;> simp) (by cases tail <;> simp)
+        (by omega) headBits headSuccessorBits
+        headCostBound tailCostBound budgetPositive
+      change boolAndCost values head.toNat tail.toNat
+          headCost tailCost ≤ 1000 * (budget + 1)
+      exact result
+
 def packedCenterAllSymmetriesInsideCost
     (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) (base : Cell) : Nat :=
   packedCenterSymmetryListInsideCost tromino periodicStrip
     packed base TrominoAssignment.squareSymmetryList
+
+def packedCenterAllSymmetriesInsideSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) : Nat :=
+  packedCenterSymmetryListInsideSpaceBound tromino periodicStrip
+    packed base TrominoAssignment.squareSymmetryList
+
+theorem packedCenterAllSymmetriesInsideCost_le_linear
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterAllSymmetriesInsideCost tromino
+        periodicStrip packed base ≤
+      packedCenterAllSymmetriesInsideSpaceBound tromino
+        periodicStrip packed base :=
+  packedCenterSymmetryListInsideCost_le_linear tromino
+    TrominoAssignment.squareSymmetryList periodicStrip packed base
 
 /-- Exact fitted execution of the eight-way center-containment conjunction. -/
 theorem packedCenterAllSymmetriesInside
