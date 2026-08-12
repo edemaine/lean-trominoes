@@ -1442,9 +1442,10 @@ The representation choices for this target are:
   low base-nine digit and residual quotient on demand.  Repeated digit steps
   are proved extensionally equal to the existing assignment-list decoder,
   and every projection, period division, and paired digit step has a
-  compositional evaluator-space certificate.  Thus later motif scans can
-  stream both frontier assignments without allocating either assignment
-  list.
+  compositional evaluator-space certificate.  The complete paired frontier
+  quotient/remainder decoder now also has one explicit input-linear workspace
+  bound.  Thus later motif scans can stream both frontier assignments without
+  allocating either assignment list.
 - [`LeanTrominoes/PartrecPackedAssignmentLookup.lean`](LeanTrominoes/PartrecPackedAssignmentLookup.lean)
   implements one streaming motif-column lookup over that packed word.  Its
   fixed-width state peels one base-nine digit per motif cell and freezes at

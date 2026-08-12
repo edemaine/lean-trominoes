@@ -161,6 +161,113 @@ theorem frontierPairView
       (frontierIndexFieldAt 1 0 [period, first, last])
       (frontierPairFirstPhase period first last)
 
+/-- One arithmetic envelope for both quotient/remainder decodings in a
+frontier-index pair. -/
+def frontierPairPolynomialSpaceLimit
+    (period first last : Nat) : Nat :=
+  16 * (period + first + last + 20) + 100
+
+/-- Native encoded-list unit for the decoded frontier pair. -/
+def frontierPairPolynomialSpaceUnit
+    (period first last : Nat) : Nat :=
+  encodedListSpace
+    [frontierPairPolynomialSpaceLimit period first last] + 1
+
+set_option maxHeartbeats 1200000 in
+/-- Dividing two frontier indices by the period and assembling their four
+fields uses workspace linear in the native binary input lengths. -/
+theorem frontierPairViewCost_le_linear
+    (period first last : Nat) :
+    frontierPairViewCost period first last ≤
+      1000000000000000000000000000000 *
+        frontierPairPolynomialSpaceUnit period first last := by
+  let limit := frontierPairPolynomialSpaceLimit period first last
+  let unit := frontierPairPolynomialSpaceUnit period first last
+  have periodBound : period ≤ limit := by
+    simp only [limit, frontierPairPolynomialSpaceLimit]
+    omega
+  have firstBound : first ≤ limit := by
+    simp only [limit, frontierPairPolynomialSpaceLimit]
+    omega
+  have lastBound : last ≤ limit := by
+    simp only [limit, frontierPairPolynomialSpaceLimit]
+    omega
+  have firstDivisionBound : 8 * (first + period) + 16 ≤ limit := by
+    simp only [limit, frontierPairPolynomialSpaceLimit]
+    omega
+  have lastDivisionBound : 8 * (last + period) + 16 ≤ limit := by
+    simp only [limit, frontierPairPolynomialSpaceLimit]
+    omega
+  have firstQuotientBound : first / period ≤ limit :=
+    (Nat.div_le_self first period).trans firstBound
+  have firstRemainderBound : first % period ≤ limit :=
+    (Nat.mod_le first period).trans firstBound
+  have lastQuotientBound : last / period ≤ limit :=
+    (Nat.div_le_self last period).trans lastBound
+  have lastRemainderBound : last % period ≤ limit :=
+    (Nat.mod_le last period).trans lastBound
+  have periodBits := encodeNat_length_mono periodBound
+  have firstBits := encodeNat_length_mono firstBound
+  have lastBits := encodeNat_length_mono lastBound
+  have firstDivisionBits := encodeNat_length_mono firstDivisionBound
+  have lastDivisionBits := encodeNat_length_mono lastDivisionBound
+  have firstQuotientBits := encodeNat_length_mono firstQuotientBound
+  have firstRemainderBits := encodeNat_length_mono firstRemainderBound
+  have lastQuotientBits := encodeNat_length_mono lastQuotientBound
+  have lastRemainderBits := encodeNat_length_mono lastRemainderBound
+  have periodSuccBits := encodeNat_length_mono
+    (show period + 1 ≤ limit by
+      simp only [limit, frontierPairPolynomialSpaceLimit]
+      omega)
+  have firstSuccBits := encodeNat_length_mono
+    (show first + 1 ≤ limit by
+      simp only [limit, frontierPairPolynomialSpaceLimit]
+      omega)
+  have lastSuccBits := encodeNat_length_mono
+    (show last + 1 ≤ limit by
+      simp only [limit, frontierPairPolynomialSpaceLimit]
+      omega)
+  have firstQuotientSuccBits := encodeNat_length_mono
+    (show first / period + 1 ≤ limit by
+      have raw := Nat.div_le_self first period
+      simp only [limit, frontierPairPolynomialSpaceLimit]
+      omega)
+  have firstRemainderSuccBits := encodeNat_length_mono
+    (show first % period + 1 ≤ limit by
+      have raw := Nat.mod_le first period
+      simp only [limit, frontierPairPolynomialSpaceLimit]
+      omega)
+  have lastQuotientSuccBits := encodeNat_length_mono
+    (show last / period + 1 ≤ limit by
+      have raw := Nat.div_le_self last period
+      simp only [limit, frontierPairPolynomialSpaceLimit]
+      omega)
+  have lastRemainderSuccBits := encodeNat_length_mono
+    (show last % period + 1 ≤ limit by
+      have raw := Nat.mod_le last period
+      simp only [limit, frontierPairPolynomialSpaceLimit]
+      omega)
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, frontierPairPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [frontierPairViewCost, frontierPairFirstPhaseCost,
+    frontierPairLastCost, frontierIndexFieldAtCost,
+    frontierIndexViewAtCost, frontierIndexArgumentsAtCost,
+    divisionSpaceBound, prependCost, getCost, dropCost,
+    headCost, idCost, nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+  clear * - periodBits firstBits lastBits
+    firstDivisionBits lastDivisionBits
+    firstQuotientBits firstRemainderBits
+    lastQuotientBits lastRemainderBits
+    periodSuccBits firstSuccBits lastSuccBits
+    firstQuotientSuccBits firstRemainderSuccBits
+    lastQuotientSuccBits lastRemainderSuccBits unitEq
+  omega
+
 def assignmentWordStepArgumentsAtCost
     (wordField : Nat) (values : List Nat) : Nat :=
   prependCost values
