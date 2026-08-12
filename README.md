@@ -323,6 +323,8 @@ build; an imported proof counts when its statement matches the paper.
         paths through their induced Boolean transition relation.
       - [x] Verify constant-size forward-local CNF encodings for constants,
         equality, negation, conjunction, and disjunction.
+      - [x] Assemble the gates into a linear-size structural Tseitin compiler
+        with fresh-root, exact clause-count, and forward-locality proofs.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1208,6 +1210,10 @@ The representation choices for this target are:
   supplies truth-table-verified constant-size Tseitin clauses for constants,
   equality, negation, conjunction, and disjunction over current- and
   next-slice wires; every generated clause is forward-local.
+- [`LeanTrominoes/PeriodicCNFTransitionExpr.lean`](LeanTrominoes/PeriodicCNFTransitionExpr.lean)
+  assembles those gates into a structural Tseitin compiler.  It allocates one
+  fresh current-slice atom per expression node and proves the exact fresh
+  range, root bounds, linear clause count, and forward locality of the result.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
