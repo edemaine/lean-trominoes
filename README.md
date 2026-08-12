@@ -1647,6 +1647,14 @@ The representation choices for this target are:
   fits every adapter and component of that complete transition, including the
   modulo-period phase comparison and both final Boolean conjunctions, with an
   exact continuation-independent evaluator-space cost.
+- [`LeanTrominoes/PartrecStripTransition.lean`](LeanTrominoes/PartrecStripTransition.lean)
+  and
+  [`LeanTrominoes/PartrecStripTransitionSpace.lean`](LeanTrominoes/PartrecStripTransitionSpace.lean)
+  connect the packed predicate to the indexed-search leaf.  They explicitly
+  decode `[encodedStrip, firstIndex, lastIndex]`, retain the motif and two
+  assignment words in packed form, permute the seven native context fields,
+  and prove both semantic correctness and an exact fitted evaluator cost for
+  `indexedTransitionRawBool`.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
