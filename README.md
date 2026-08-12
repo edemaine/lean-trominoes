@@ -1501,7 +1501,8 @@ The representation choices for this target are:
   lookup without appealing to an opaque primitive-recursive compiler.
   [`LeanTrominoes/PartrecPairSpace.lean`](LeanTrominoes/PartrecPairSpace.lean)
   fits both square-and-add branches and their explicit comparison selector,
-  yielding an exact evaluator-space certificate for forward pairing.
+  yielding an exact evaluator-space certificate and a common input-linear
+  workspace majorant for forward pairing.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
