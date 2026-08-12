@@ -329,6 +329,8 @@ build; an imported proof counts when its statement matches the paper.
         assigns the root atom the direct expression value.
       - [x] Prove the generated-atom range invariant needed for constructive
         completeness and noninterference between compiled subexpressions.
+      - [x] Prove constructive semantic completeness by canonically assigning
+        every generated atom while preserving the source valuation.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1226,6 +1228,10 @@ The representation choices for this target are:
   proves the complementary freshness invariant: when all source atoms precede
   the initial fresh index, every atom mentioned by the generated clauses lies
   below the returned `nextFresh`, including across nested subexpressions.
+- [`LeanTrominoes/PeriodicCNFTransitionExprCompleteness.lean`](LeanTrominoes/PeriodicCNFTransitionExprCompleteness.lean)
+  constructs the canonical valuation of all fresh Tseitin atoms.  It preserves
+  every source atom, satisfies every compiled clause, and makes the compiled
+  root equal direct evaluation of the transition expression.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
