@@ -337,6 +337,8 @@ build; an imported proof counts when its statement matches the paper.
         labels, states, stack cells, and reset-clock bits.
       - [x] Define the canonical Boolean valuation of a bounded clocked
         configuration and verify all label/state/stack exact-one fields.
+      - [x] Enforce that every bounded stack is an occupied prefix followed by
+        an unused suffix, and verify canonical list encodings satisfy it.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1254,6 +1256,11 @@ The representation choices for this target are:
   Labels, finite control states, and optional values in every bounded stack
   cell are proved exactly-one; the combined structural expression holds on
   every encoding and mentions only atoms below `atomCount`.
+- [`LeanTrominoes/PeriodicCNFMachineWellFormed.lean`](LeanTrominoes/PeriodicCNFMachineWellFormed.lean)
+  excludes one-hot stack assignments with holes by requiring `none` to be
+  suffix-closed at every adjacent pair.  Canonical list encodings satisfy the
+  resulting constraint, which combines with exact-one fields into the full
+  structural well-formedness expression and retains the source-atom bound.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
