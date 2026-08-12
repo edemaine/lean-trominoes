@@ -1578,6 +1578,9 @@ The representation choices for this target are:
   streams the combined one-base checker across the encoded motif, recovers
   each head cell's row code on demand, and proves that the final accumulator
   is exactly `PackedWindowState.isCenterValidBool`.
+- [`LeanTrominoes/PartrecPackedCenterLoopSpace.lean`](LeanTrominoes/PartrecPackedCenterLoopSpace.lean)
+  fits every streaming center step and the complete motif scan under one exact
+  reachable-suffix workspace envelope.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)

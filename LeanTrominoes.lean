@@ -817,6 +817,7 @@ import LeanTrominoes.PartrecPackedCenterCoverageSpace
 import LeanTrominoes.PartrecPackedCenterBase
 import LeanTrominoes.PartrecPackedCenterBaseSpace
 import LeanTrominoes.PartrecPackedCenterLoop
+import LeanTrominoes.PartrecPackedCenterLoopSpace
 import LeanTrominoes.PartrecPackedCenterSymmetries
 import LeanTrominoes.PartrecPackedCenterSymmetriesSpace
 import LeanTrominoes.PartrecAddSpace
