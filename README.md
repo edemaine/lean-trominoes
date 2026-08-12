@@ -1553,6 +1553,13 @@ The representation choices for this target are:
 - [`LeanTrominoes/PartrecPackedCenterSymmetriesSpace.lean`](LeanTrominoes/PartrecPackedCenterSymmetriesSpace.lean)
   fits that eight-way conjunction compositionally, with an exact recursive
   evaluator cost built from the already fitted candidate leaves.
+- [`LeanTrominoes/PartrecPackedCenterCoveringCandidate.lean`](LeanTrominoes/PartrecPackedCenterCoveringCandidate.lean)
+  constructs the canonical assignment lookup for one of the 24 fixed
+  symmetry/source pairs that can cover a center target and proves that it is
+  exactly the packed active-placement filter predicate.
+- [`LeanTrominoes/PartrecPackedCenterCoveringCandidateSpace.lean`](LeanTrominoes/PartrecPackedCenterCoveringCandidateSpace.lean)
+  fits that active-candidate lookup compositionally from the canonical target
+  constructor and fixed-assignment predicate.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
