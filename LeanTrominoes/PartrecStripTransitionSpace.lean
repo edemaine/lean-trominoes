@@ -235,6 +235,374 @@ theorem stripPackedTransitionArgumentsCost_le_polynomialSpaceBound
     motifBitsRaw motifSuccBitsRaw
   omega
 
+/-- The four native fields used by center validation occupy only a constant
+multiple of the common strip-context workspace. -/
+theorem stripPackedNormalizationInputUnit_le_contextUnit
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    packedNormalizationInputUnit periodicStrip
+        (PackedWindowState.ofIndex periodicStrip first) ≤
+      10 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  have stripBound : stripCode ≤ limit := by
+    simp only [stripCode, limit,
+      stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have firstBound : first ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have restStrip :
+      Nat.pair periodicStrip.period motifCode ≤ stripCode := by
+    simp only [stripCode, motifCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.right_le_pair _ _
+  have periodBound : periodicStrip.period ≤ limit :=
+    (Nat.left_le_pair _ _).trans (restStrip.trans stripBound)
+  have motifBound : motifCode ≤ limit :=
+    (Nat.right_le_pair _ _).trans (restStrip.trans stripBound)
+  have phaseBound : first % periodicStrip.period ≤ limit :=
+    (Nat.mod_le first periodicStrip.period).trans firstBound
+  have wordBound : first / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self first periodicStrip.period).trans firstBound
+  have periodBits := encodeNat_length_mono periodBound
+  have phaseBits := encodeNat_length_mono phaseBound
+  have motifBits := encodeNat_length_mono motifBound
+  have wordBits := encodeNat_length_mono wordBound
+  have motifBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif)).length ≤
+        (Computability.encodeNat limit).length := by
+    simpa only [motifCode] using motifBits
+  have contextEq :
+      stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last =
+        (Computability.encodeNat limit).length + 2 := by
+    simp [limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  simp only [packedNormalizationInputUnit,
+    PackedWindowState.ofIndex, encodedListSpace_cons,
+    encodedListSpace_nil]
+  rw [contextEq]
+  omega
+
+/-- The five-column normalization envelope remains linear in the encoded
+strip and the two queried frontier indices. -/
+theorem stripPackedNormalizationAllUnit_le_contextUnit
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    packedNormalizationAllUnit periodicStrip
+        (PackedWindowState.ofIndex periodicStrip first) ≤
+      100 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  have stripBound : stripCode ≤ limit := by
+    simp only [stripCode, limit,
+      stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have firstBound : first ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have restStrip :
+      Nat.pair periodicStrip.period motifCode ≤ stripCode := by
+    simp only [stripCode, motifCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.right_le_pair _ _
+  have periodBound : periodicStrip.period ≤ limit :=
+    (Nat.left_le_pair _ _).trans (restStrip.trans stripBound)
+  have motifBound : motifCode ≤ limit :=
+    (Nat.right_le_pair _ _).trans (restStrip.trans stripBound)
+  have phaseBound : first % periodicStrip.period ≤ limit :=
+    (Nat.mod_le first periodicStrip.period).trans firstBound
+  have wordBound : first / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self first periodicStrip.period).trans firstBound
+  have limitLarge : 1000 ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have rawBound :
+      packedNormalizationAllLimit periodicStrip
+          (PackedWindowState.ofIndex periodicStrip first) ≤
+        1000000 * limit := by
+    simp only [packedNormalizationAllLimit,
+      PackedWindowState.ofIndex]
+    simp only [motifCode] at motifBound
+    omega
+  have rawBits := encodeNat_length_mono rawBound
+  have scaledBits := encodeNat_mul_length_le_sum 1000000 limit
+  have coefficientBits :
+      (Computability.encodeNat 1000000).length = 20 := by native_decide
+  have contextEq :
+      stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last =
+        (Computability.encodeNat limit).length + 2 := by
+    simp [limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  simp only [packedNormalizationAllUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  rw [contextEq]
+  rw [coefficientBits] at scaledBits
+  omega
+
+/-- The four-column overlap envelope remains linear in the encoded strip and
+the two queried frontier indices. -/
+theorem stripPackedOverlapColumnsUnit_le_contextUnit
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    packedOverlapColumnsUnit periodicStrip
+        (PackedWindowState.ofIndex periodicStrip first)
+        (PackedWindowState.ofIndex periodicStrip last) ≤
+      100 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  have stripBound : stripCode ≤ limit := by
+    simp only [stripCode, limit,
+      stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have firstBound : first ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have lastBound : last ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have motifStrip : motifCode ≤ stripCode := by
+    simp only [stripCode, motifCode, PeriodicStrip.encode_eq_pair]
+    exact (Nat.right_le_pair _ _).trans (Nat.right_le_pair _ _)
+  have motifBound := motifStrip.trans stripBound
+  have firstWordBound : first / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self first periodicStrip.period).trans firstBound
+  have lastWordBound : last / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self last periodicStrip.period).trans lastBound
+  have limitLarge : 1000 ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have rawBound :
+      packedOverlapColumnsLimit periodicStrip
+          (PackedWindowState.ofIndex periodicStrip first)
+          (PackedWindowState.ofIndex periodicStrip last) ≤
+        1000000 * limit := by
+    simp only [packedOverlapColumnsLimit,
+      PackedWindowState.ofIndex]
+    simp only [motifCode] at motifBound
+    omega
+  have rawBits := encodeNat_length_mono rawBound
+  have scaledBits := encodeNat_mul_length_le_sum 1000000 limit
+  have coefficientBits :
+      (Computability.encodeNat 1000000).length = 20 := by native_decide
+  have contextEq :
+      stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last =
+        (Computability.encodeNat limit).length + 2 := by
+    simp [limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  simp only [packedOverlapColumnsUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  rw [contextEq]
+  rw [coefficientBits] at scaledBits
+  omega
+
+/-- The native packed-transition envelope remains linear in the encoded strip
+and the two queried frontier indices. -/
+theorem stripPackedTransitionNativeSpaceUnit_le_contextUnit
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    packedTransitionNativeSpaceUnit periodicStrip
+        (PackedWindowState.ofIndex periodicStrip first)
+        (PackedWindowState.ofIndex periodicStrip last) ≤
+      100 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  have stripBound : stripCode ≤ limit := by
+    simp only [stripCode, limit,
+      stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have firstBound : first ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have lastBound : last ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have restStrip :
+      Nat.pair periodicStrip.period motifCode ≤ stripCode := by
+    simp only [stripCode, motifCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.right_le_pair _ _
+  have periodBound : periodicStrip.period ≤ limit :=
+    (Nat.left_le_pair _ _).trans (restStrip.trans stripBound)
+  have motifBound : motifCode ≤ limit :=
+    (Nat.right_le_pair _ _).trans (restStrip.trans stripBound)
+  have firstPhaseBound : first % periodicStrip.period ≤ limit :=
+    (Nat.mod_le first periodicStrip.period).trans firstBound
+  have firstWordBound : first / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self first periodicStrip.period).trans firstBound
+  have lastPhaseBound : last % periodicStrip.period ≤ limit :=
+    (Nat.mod_le last periodicStrip.period).trans lastBound
+  have lastWordBound : last / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self last periodicStrip.period).trans lastBound
+  have limitLarge : 1000 ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have rawBound :
+      packedTransitionPolynomialSpaceLimit periodicStrip
+          (PackedWindowState.ofIndex periodicStrip first)
+          (PackedWindowState.ofIndex periodicStrip last) ≤
+        1000000 * limit := by
+    simp only [packedTransitionPolynomialSpaceLimit,
+      PackedWindowState.ofIndex]
+    simp only [motifCode] at motifBound
+    omega
+  have rawBits := encodeNat_length_mono rawBound
+  have scaledBits := encodeNat_mul_length_le_sum 1000000 limit
+  have coefficientBits :
+      (Computability.encodeNat 1000000).length = 20 := by native_decide
+  have contextEq :
+      stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last =
+        (Computability.encodeNat limit).length + 2 := by
+    simp [limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  simp only [packedTransitionNativeSpaceUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  rw [contextEq]
+  rw [coefficientBits] at scaledBits
+  omega
+
+/-- Constant coefficient that absorbs every primitive leaf of one packed
+transition into the common strip-context unit. -/
+def stripPackedTransitionComponentSpaceCoefficient
+    (tromino : Tromino) : Nat :=
+  10000000000000000000000000000000000000000000000000000 * 100 +
+    packedCenterValidPolynomialSpaceBoundLinearCoefficient tromino * 10 +
+    10000000000000000000000000000000000000000000000 * 100 +
+    100000000000000000000000000000000 * 100 +
+    10000000 * 100 + 1
+
+private theorem scaledSucc_le_scaledUnit
+    (value coefficient unit : Nat)
+    (bounded : value ≤ coefficient * unit)
+    (unitPositive : 1 ≤ unit) :
+    1000 * (value + 1) ≤
+      (1000 * (coefficient + 1)) * unit := by
+  calc
+    1000 * (value + 1) ≤
+        1000 * (coefficient * unit + unit) := by
+      exact Nat.mul_le_mul_left _
+        (Nat.add_le_add bounded unitPositive)
+    _ = (1000 * (coefficient + 1)) * unit := by ring
+
+/-- The complete primitive-leaf sum of a packed indexed transition is linear
+in the common strip-context workspace. -/
+theorem stripPackedTransitionComponentSpaceBound_le_contextUnit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    packedTransitionComponentSpaceBound tromino periodicStrip
+        (PackedWindowState.ofIndex periodicStrip first)
+        (PackedWindowState.ofIndex periodicStrip last) ≤
+      stripPackedTransitionComponentSpaceCoefficient tromino *
+        stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := by
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have unitPositive : 1 ≤ unit := by
+    simp [unit, stripFrontierContextPolynomialSpaceUnit]
+  have normalization :=
+    stripPackedNormalizationAllUnit_le_contextUnit
+      periodicStrip first last
+  have centerInput :=
+    stripPackedNormalizationInputUnit_le_contextUnit
+      periodicStrip first last
+  have centerRaw :=
+    packedCenterValidPolynomialSpaceBound_le_input tromino periodicStrip
+      (PackedWindowState.ofIndex periodicStrip first)
+  have center :
+      packedCenterValidPolynomialSpaceBound tromino periodicStrip
+          (PackedWindowState.ofIndex periodicStrip first) ≤
+        (packedCenterValidPolynomialSpaceBoundLinearCoefficient tromino * 10) *
+          unit := by
+    calc
+      _ ≤ packedCenterValidPolynomialSpaceBoundLinearCoefficient tromino *
+            packedNormalizationInputUnit periodicStrip
+              (PackedWindowState.ofIndex periodicStrip first) := centerRaw
+      _ ≤ packedCenterValidPolynomialSpaceBoundLinearCoefficient tromino *
+            (10 * unit) := Nat.mul_le_mul_left _ centerInput
+      _ = _ := by ring
+  have overlap := stripPackedOverlapColumnsUnit_le_contextUnit
+    periodicStrip first last
+  have native := stripPackedTransitionNativeSpaceUnit_le_contextUnit
+    periodicStrip first last
+  simp only [packedTransitionComponentSpaceBound]
+  change _ ≤ stripPackedTransitionComponentSpaceCoefficient tromino * unit
+  calc
+    _ ≤
+        10000000000000000000000000000000000000000000000000000 *
+            (100 * unit) +
+          (packedCenterValidPolynomialSpaceBoundLinearCoefficient tromino * 10) *
+            unit +
+          10000000000000000000000000000000000000000000000 *
+            (100 * unit) +
+          100000000000000000000000000000000 * (100 * unit) +
+          10000000 * (100 * unit) + unit := by
+      gcongr
+    _ = stripPackedTransitionComponentSpaceCoefficient tromino * unit := by
+      simp only [stripPackedTransitionComponentSpaceCoefficient]
+      ring
+
+/-- Constant coefficient for all three Boolean-combinator layers of a packed
+transition. -/
+def stripPackedTransitionSpaceCoefficient (tromino : Tromino) : Nat :=
+  1000 *
+    (1000 *
+      (1000 *
+        (stripPackedTransitionComponentSpaceCoefficient tromino + 1) + 1) +
+      1)
+
+/-- The complete packed indexed-transition evaluator envelope is linear in
+the common strip-context workspace. -/
+theorem packedTransitionPolynomialSpaceBound_le_stripContextUnit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    packedTransitionPolynomialSpaceBound tromino periodicStrip
+        (PackedWindowState.ofIndex periodicStrip first)
+        (PackedWindowState.ofIndex periodicStrip last) ≤
+      stripPackedTransitionSpaceCoefficient tromino *
+        stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := by
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have unitPositive : 1 ≤ unit := by
+    simp [unit, stripFrontierContextPolynomialSpaceUnit]
+  have component :=
+    stripPackedTransitionComponentSpaceBound_le_contextUnit
+      tromino periodicStrip first last
+  have overlap := scaledSucc_le_scaledUnit
+    (packedTransitionComponentSpaceBound tromino periodicStrip
+      (PackedWindowState.ofIndex periodicStrip first)
+      (PackedWindowState.ofIndex periodicStrip last))
+    (stripPackedTransitionComponentSpaceCoefficient tromino)
+    unit component unitPositive
+  have tail := scaledSucc_le_scaledUnit
+    (packedTransitionOverlapSpaceBound tromino periodicStrip
+      (PackedWindowState.ofIndex periodicStrip first)
+      (PackedWindowState.ofIndex periodicStrip last))
+    (1000 * (stripPackedTransitionComponentSpaceCoefficient tromino + 1))
+    unit (by simpa [packedTransitionOverlapSpaceBound] using overlap)
+    unitPositive
+  have whole := scaledSucc_le_scaledUnit
+    (packedTransitionTailSpaceBound tromino periodicStrip
+      (PackedWindowState.ofIndex periodicStrip first)
+      (PackedWindowState.ofIndex periodicStrip last))
+    (1000 *
+      (1000 *
+        (stripPackedTransitionComponentSpaceCoefficient tromino + 1) + 1))
+    unit (by simpa [packedTransitionTailSpaceBound] using tail)
+    unitPositive
+  simpa [packedTransitionPolynomialSpaceBound,
+    stripPackedTransitionSpaceCoefficient, unit] using whole
+
 /-- Polynomial-space envelope for the packed transition after its fixed
 seven-to-six-field adapter. -/
 def stripPackedTransitionPolynomialSpaceBound
@@ -245,6 +613,33 @@ def stripPackedTransitionPolynomialSpaceBound
       (PackedWindowState.ofIndex periodicStrip last) +
     10000000 * stripFrontierContextPolynomialSpaceUnit
       periodicStrip first last
+
+/-- Constant coefficient for the packed transition together with its fixed
+seven-to-six-field argument adapter. -/
+def stripPackedTransitionPolynomialSpaceCoefficient
+    (tromino : Tromino) : Nat :=
+  stripPackedTransitionSpaceCoefficient tromino + 10000000
+
+theorem stripPackedTransitionPolynomialSpaceBound_le_contextUnit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    stripPackedTransitionPolynomialSpaceBound
+        tromino periodicStrip first last ≤
+      stripPackedTransitionPolynomialSpaceCoefficient tromino *
+        stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := by
+  have packed :=
+    packedTransitionPolynomialSpaceBound_le_stripContextUnit
+      tromino periodicStrip first last
+  simp only [stripPackedTransitionPolynomialSpaceBound,
+    stripPackedTransitionPolynomialSpaceCoefficient]
+  calc
+    _ ≤ stripPackedTransitionSpaceCoefficient tromino *
+          stripFrontierContextPolynomialSpaceUnit periodicStrip first last +
+        10000000 *
+          stripFrontierContextPolynomialSpaceUnit periodicStrip first last :=
+      Nat.add_le_add_right packed _
+    _ = _ := by ring
 
 theorem stripPackedTransitionCost_le_polynomialSpaceBound
     (tromino : Tromino) (periodicStrip : PeriodicStrip)
@@ -295,6 +690,33 @@ def stripTransitionPolynomialSpaceBound
       tromino periodicStrip first last +
     1000000000000000000000000000000000000000000000 *
       stripFrontierContextPolynomialSpaceUnit periodicStrip first last
+
+/-- Constant coefficient for the complete indexed strip edge. -/
+def stripTransitionPolynomialSpaceCoefficient
+    (tromino : Tromino) : Nat :=
+  stripPackedTransitionPolynomialSpaceCoefficient tromino +
+    1000000000000000000000000000000000000000000000
+
+theorem stripTransitionPolynomialSpaceBound_le_contextUnit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    stripTransitionPolynomialSpaceBound
+        tromino periodicStrip first last ≤
+      stripTransitionPolynomialSpaceCoefficient tromino *
+        stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := by
+  have packed :=
+    stripPackedTransitionPolynomialSpaceBound_le_contextUnit
+      tromino periodicStrip first last
+  simp only [stripTransitionPolynomialSpaceBound,
+    stripTransitionPolynomialSpaceCoefficient]
+  calc
+    _ ≤ stripPackedTransitionPolynomialSpaceCoefficient tromino *
+          stripFrontierContextPolynomialSpaceUnit periodicStrip first last +
+        1000000000000000000000000000000000000000000000 *
+          stripFrontierContextPolynomialSpaceUnit periodicStrip first last :=
+      Nat.add_le_add_right packed _
+    _ = _ := by ring
 
 theorem stripTransitionCost_le_polynomialSpaceBound
     (tromino : Tromino) (periodicStrip : PeriodicStrip)
@@ -530,12 +952,71 @@ def stripBaseTransitionComponentSpaceBound
     10000000 *
       stripFrontierContextPolynomialSpaceUnit periodicStrip first last + 1
 
+/-- Constant coefficient absorbing the equality test, edge test, and their
+shared native input. -/
+def stripBaseTransitionComponentSpaceCoefficient
+    (tromino : Tromino) : Nat :=
+  stripTransitionPolynomialSpaceCoefficient tromino +
+    10000000000000000000000 + 10000000 + 1
+
+theorem stripBaseTransitionComponentSpaceBound_le_contextUnit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    stripBaseTransitionComponentSpaceBound
+        tromino periodicStrip first last ≤
+      stripBaseTransitionComponentSpaceCoefficient tromino *
+        stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := by
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have unitPositive : 1 ≤ unit := by
+    simp [unit, stripFrontierContextPolynomialSpaceUnit]
+  have transition := stripTransitionPolynomialSpaceBound_le_contextUnit
+    tromino periodicStrip first last
+  simp only [stripBaseTransitionComponentSpaceBound]
+  change _ ≤ stripBaseTransitionComponentSpaceCoefficient tromino * unit
+  calc
+    _ ≤ stripTransitionPolynomialSpaceCoefficient tromino * unit +
+          10000000000000000000000 * unit + 10000000 * unit + unit := by
+      gcongr
+    _ = stripBaseTransitionComponentSpaceCoefficient tromino * unit := by
+      simp only [stripBaseTransitionComponentSpaceCoefficient]
+      ring
+
 /-- Polynomial-space envelope for the reflexive-or-edge Savitch leaf. -/
 def stripBaseTransitionPolynomialSpaceBound
     (tromino : Tromino) (periodicStrip : PeriodicStrip)
     (first last : Nat) : Nat :=
   1000 * (stripBaseTransitionComponentSpaceBound
     tromino periodicStrip first last + 1)
+
+/-- Constant coefficient for the complete reflexive-or-edge Savitch leaf. -/
+def stripBaseTransitionPolynomialSpaceCoefficient
+    (tromino : Tromino) : Nat :=
+  1000 * (stripBaseTransitionComponentSpaceCoefficient tromino + 1)
+
+theorem stripBaseTransitionPolynomialSpaceBound_le_contextUnit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    stripBaseTransitionPolynomialSpaceBound
+        tromino periodicStrip first last ≤
+      stripBaseTransitionPolynomialSpaceCoefficient tromino *
+        stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := by
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have unitPositive : 1 ≤ unit := by
+    simp [unit, stripFrontierContextPolynomialSpaceUnit]
+  have component :=
+    stripBaseTransitionComponentSpaceBound_le_contextUnit
+      tromino periodicStrip first last
+  simpa [stripBaseTransitionPolynomialSpaceBound,
+    stripBaseTransitionPolynomialSpaceCoefficient, unit] using
+      scaledSucc_le_scaledUnit
+        (stripBaseTransitionComponentSpaceBound
+          tromino periodicStrip first last)
+        (stripBaseTransitionComponentSpaceCoefficient tromino)
+        unit component unitPositive
 
 /-- Exact fitted certificate for the explicit depth-zero Savitch predicate. -/
 theorem stripBaseTransition

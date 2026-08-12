@@ -1705,6 +1705,12 @@ The representation choices for this target are:
   for this indexed edge.  They also explicitly implement and fit the
   reflexive-or-edge predicate used at Savitch recursion depth zero, including
   a polynomial-space bound for its equality test and final disjunction.
+  Binary-length bounds now absorb the packed normalization, center,
+  overlap, and native-transition envelopes into one common strip-context
+  unit.  The complete indexed edge and reflexive-or-edge leaf therefore each
+  have an explicit constant-linear bound in the encoded strip and the two
+  queried frontier indices; only the final conversion of bounded indices to
+  the unary evaluator input budget remains for the leaf-call interface.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
