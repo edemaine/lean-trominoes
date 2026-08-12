@@ -314,6 +314,14 @@ build; an imported proof counts when its statement matches the paper.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
+      - [x] Define the horizontal CNF fragment and prove its line semantics
+        equivalent to the existing plane semantics.
+      - [x] Prove that a clocked accepting-reset system has a directed cycle
+        exactly when the original deterministic system has a bounded
+        accepting trace.
+      - [ ] Encode polynomial-space machine configurations and their local
+        clocked transitions as a polynomial-size horizontal CNF formula.
+      - [ ] Certify the resulting reduction as polynomial-time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1179,6 +1187,15 @@ The representation choices for this target are:
   pumping fact underlying the 1.5D upper bound: a finite transition system has
   a bi-infinite path exactly when it has a nonempty directed cycle.  The strip
   argument will instantiate its states with bounded tiling frontiers.
+- [`LeanTrominoes/PeriodicCNFOneDimensional.lean`](LeanTrominoes/PeriodicCNFOneDimensional.lean)
+  identifies the horizontal fragment of the existing periodic-CNF syntax,
+  defines direct line assignments and locality, and proves that both agree
+  with the existing plane semantics.
+- [`LeanTrominoes/PeriodicComputationCycle.lean`](LeanTrominoes/PeriodicComputationCycle.lean)
+  formalizes the cyclic-computation core of the PSPACE-hardness proof.  A
+  bounded clock advances on ordinary deterministic steps and an accepting
+  state resets to the initial configuration; the reset system has a directed
+  cycle exactly when the original system has a bounded accepting trace.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
