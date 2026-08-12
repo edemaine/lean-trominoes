@@ -42,17 +42,20 @@ theorem divideEvalFuelCode_eval (stateCount depth : Nat) :
       pure [divideEvalFuel stateCount depth] := by
   simp [divideEvalFuelCode]
 
-private def fuelArguments : Code :=
+/-- Project the graph-state count and search depth used by the exact-fuel
+subprogram. -/
+def stripReachFuelArguments : Code :=
   Code.prepend (Code.get 1) <|
     Code.prepend (Code.get 2) Code.nil
 
-private noncomputable def fuelOnReachInput : Code :=
-  divideEvalFuelCode.comp fuelArguments
+/-- Compute exact Savitch fuel from a five-field reachability request. -/
+noncomputable def stripReachFuelOnInput : Code :=
+  divideEvalFuelCode.comp stripReachFuelArguments
 
 /-- Convert `[context, stateCount, depth, first, last]` into the countdown
 input for the flat evaluator. -/
-private noncomputable def reachInputCode : Code :=
-  Code.prepend fuelOnReachInput <|
+noncomputable def stripReachInputCode : Code :=
+  Code.prepend stripReachFuelOnInput <|
     Code.prepend (Code.get 0) <|
       Code.prepend (Code.get 1) <|
         Code.prepend Code.zero <|
@@ -61,13 +64,14 @@ private noncomputable def reachInputCode : Code :=
               Code.prepend (Code.get 3) <|
                 Code.prepend (Code.get 4) Code.nil
 
-private theorem reachInputCode_eval
+theorem stripReachInputCode_eval
     (context stateCount depth first last : Nat) :
-    reachInputCode.eval [context, stateCount, depth, first, last] =
+    stripReachInputCode.eval [context, stateCount, depth, first, last] =
       pure (divideEvalFuel stateCount depth ::
         divideEvalProgramList context stateCount
           (divideEvalInitial depth first last)) := by
-  simp [reachInputCode, fuelOnReachInput, fuelArguments,
+  simp [stripReachInputCode, stripReachFuelOnInput,
+    stripReachFuelArguments,
     divideEvalFuelCode_eval, divideEvalProgramList,
     divideEvalInitial, DivideEvalState.toNatList,
     divideOptionBoolTag, divideStackToNatList]
@@ -79,7 +83,7 @@ noncomputable def stripReachBoolCode (tromino : Tromino) : Code :=
     (Code.get 3).comp <|
       (Code.flatIterate
         (FiniteState.DivideEvalPartrec.stepCode
-          (stripBaseBoolCode tromino))).comp reachInputCode
+          (stripBaseBoolCode tromino))).comp stripReachInputCode
 
 theorem stripReachBoolCode_eval (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -102,8 +106,8 @@ theorem stripReachBoolCode_eval (tromino : Tromino)
       (divideEvalInitial depth first last)
   have flatRun :
       ((Code.flatIterate
-        (FiniteState.DivideEvalPartrec.stepCode
-          (stripBaseBoolCode tromino))).comp reachInputCode).eval
+          (FiniteState.DivideEvalPartrec.stepCode
+            (stripBaseBoolCode tromino))).comp stripReachInputCode).eval
           [Encodable.encode periodicStrip, stateCount, depth, first, last] =
         pure (divideEvalProgramList (Encodable.encode periodicStrip)
           stateCount finalState) := by
@@ -115,13 +119,13 @@ theorem stripReachBoolCode_eval (tromino : Tromino)
             divideEvalProgramList (Encodable.encode periodicStrip)
               stateCount (divideEvalInitial depth first last)) :=
         comp_eval_pure _ _ _ _
-          (reachInputCode_eval _ _ _ _ _)
+          (stripReachInputCode_eval _ _ _ _ _)
       _ = _ := run
   have answerRun :
       ((Code.get 3).comp
         ((Code.flatIterate
           (FiniteState.DivideEvalPartrec.stepCode
-            (stripBaseBoolCode tromino))).comp reachInputCode)).eval
+            (stripBaseBoolCode tromino))).comp stripReachInputCode)).eval
           [Encodable.encode periodicStrip, stateCount, depth, first, last] =
         pure [divideOptionBoolTag finalState.answer] := by
     calc

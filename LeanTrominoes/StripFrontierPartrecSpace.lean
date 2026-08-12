@@ -565,15 +565,43 @@ theorem stripSavitchBodySpacePolynomial_eval (inputLength : Nat) :
       stripSavitchBodySpaceBound inputLength := by
   simp [stripSavitchBodySpacePolynomial, stripSavitchBodySpaceBound]
 
+/-- Workspace for assembling, running, and reading one complete indexed
+reachability query.  The generous coefficient absorbs the fixed list-code
+adapters surrounding the exact-fuel Savitch iterator. -/
+def stripReachCallSpaceBound (inputLength : Nat) : Nat :=
+  1000000 *
+    (stripFuelComputationSpaceBound inputLength +
+      stripLoopPayloadSpaceBound inputLength +
+      stripReachPayloadSpaceBound inputLength +
+      stripSavitchBodySpaceBound inputLength + 1)
+
+noncomputable def stripReachCallSpacePolynomial : Polynomial Nat :=
+  1000000 *
+    (1000000000000000000000000000000000000000000000000000000000000 *
+        (((21 * Polynomial.X + 2) *
+          (21 * Polynomial.X + 5) + 1) +
+          100 * Polynomial.X + 100) +
+      stripLoopPayloadSpacePolynomial +
+      stripReachPayloadSpacePolynomial +
+      stripSavitchBodySpacePolynomial + 1)
+
+@[simp]
+theorem stripReachCallSpacePolynomial_eval (inputLength : Nat) :
+    stripReachCallSpacePolynomial.eval inputLength =
+      stripReachCallSpaceBound inputLength := by
+  simp [stripReachCallSpacePolynomial, stripReachCallSpaceBound,
+    stripFuelComputationSpaceBound, stripFuelBits]
+
 /-- One common polynomial envelope for search payloads and explicit
 search-depth and fuel arithmetic. -/
 def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
   stripEvaluatorCoreSpaceBound inputLength +
     stripArithmeticSpaceBound inputLength +
       stripStateBoundComputationSpaceBound inputLength +
-        stripFuelComputationSpaceBound inputLength +
+          stripFuelComputationSpaceBound inputLength +
           stripTransitionLeafSpaceBound inputLength +
-            stripSavitchBodySpaceBound inputLength
+            stripSavitchBodySpaceBound inputLength +
+              stripReachCallSpaceBound inputLength
 
 /-- Polynomial packaging of `stripEvaluatorSpaceBound`. -/
 noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
@@ -587,7 +615,8 @@ noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
               (21 * Polynomial.X + 5) + 1) +
               100 * Polynomial.X + 100) +
             stripTransitionLeafSpacePolynomial +
-              stripSavitchBodySpacePolynomial
+              stripSavitchBodySpacePolynomial +
+                stripReachCallSpacePolynomial
 
 @[simp]
 theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
@@ -598,7 +627,7 @@ theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
     stripStateBoundComputationSpaceBound,
     stripFuelComputationSpaceBound, stripTransitionLeafSpaceBound,
     stripSavitchBodySpaceBound, stripSavitchStepSpaceBound,
-    stripFuelBits]
+    stripReachCallSpaceBound, stripFuelBits]
 
 theorem stripReachPayloadSpaceBound_le_evaluator
     (inputLength : Nat) :
@@ -2711,6 +2740,164 @@ theorem exactStep
                   omega
 
 end StripSavitchStep
+
+/-- Exact evaluator cost of the two projections feeding the fuel program. -/
+def stripReachFuelArgumentsCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values
+    [StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values]
+    [] (EvaluatorCodeFits.nilCost values)
+
+theorem stripReachFuelArguments_fits (values : List Nat) :
+    EvaluatorCodeFits stripReachFuelArguments values
+      [values[1]?.getD 0, values[2]?.getD 0]
+      (stripReachFuelArgumentsCost values) := by
+  have fit := StripSavitchStep.fields values
+    [StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values]
+    (EvaluatorCodeFits.nil values)
+  simpa [stripReachFuelArguments, stripReachFuelArgumentsCost,
+    StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    StripSavitchStep.getField] using fit
+
+/-- Exact evaluator cost of computing the fuel field from a reachability
+request. -/
+def stripReachFuelOnInputCost (values : List Nat) : Nat :=
+  EvaluatorCodeFits.divideEvalFuelCost
+      [values[1]?.getD 0, values[2]?.getD 0] +
+    stripReachFuelArgumentsCost values
+
+theorem stripReachFuelOnInput_fits (values : List Nat) :
+    EvaluatorCodeFits stripReachFuelOnInput values
+      [FiniteState.divideEvalFuel
+        (values[1]?.getD 0) (values[2]?.getD 0)]
+      (stripReachFuelOnInputCost values) := by
+  have fit := EvaluatorCodeFits.comp
+    (EvaluatorCodeFits.divideEvalFuel
+      [values[1]?.getD 0, values[2]?.getD 0])
+    (stripReachFuelArguments_fits values)
+  simpa [stripReachFuelOnInput, divideEvalFuelCode,
+    stripReachFuelOnInputCost] using fit
+
+private noncomputable def stripReachFuelField (values : List Nat) :
+    StripSavitchStep.FieldFit values where
+  code := stripReachFuelOnInput
+  output := FiniteState.divideEvalFuel
+    (values[1]?.getD 0) (values[2]?.getD 0)
+  cost := stripReachFuelOnInputCost values
+  fits := stripReachFuelOnInput_fits values
+
+private noncomputable def stripReachInputFields (values : List Nat) :
+    List (StripSavitchStep.FieldFit values) :=
+  [stripReachFuelField values,
+    StripSavitchStep.getField 0 values,
+    StripSavitchStep.getField 1 values,
+    StripSavitchStep.zeroField values,
+    StripSavitchStep.zeroField values,
+    StripSavitchStep.getField 2 values,
+    StripSavitchStep.getField 3 values,
+    StripSavitchStep.getField 4 values]
+
+/-- Exact evaluator cost of assembling the countdown and initial flat DFS
+state for one indexed reachability query. -/
+noncomputable def stripReachInputCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values (stripReachInputFields values)
+    [] (EvaluatorCodeFits.nilCost values)
+
+theorem stripReachInput_fits (values : List Nat) :
+    EvaluatorCodeFits stripReachInputCode values
+      [FiniteState.divideEvalFuel
+          (values[1]?.getD 0) (values[2]?.getD 0),
+        values[0]?.getD 0, values[1]?.getD 0, 0, 0,
+        values[2]?.getD 0, values[3]?.getD 0, values[4]?.getD 0]
+      (stripReachInputCost values) := by
+  have fit := StripSavitchStep.fields values
+    (stripReachInputFields values) (EvaluatorCodeFits.nil values)
+  simpa [stripReachInputCode, stripReachInputCost,
+    stripReachInputFields, stripReachFuelField,
+    StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    StripSavitchStep.getField, StripSavitchStep.zeroField] using fit
+
+/-- The five-field request passed to one reachability query fits the common
+outer-loop payload envelope. -/
+theorem stripReachQueryPayload_encodedListSpace_le
+    (periodicStrip : PeriodicStrip) (first last : Nat)
+    (firstBelow : first < indexCount periodicStrip)
+    (lastBelow : last < indexCount periodicStrip) :
+    encodedListSpace
+        [Encodable.encode periodicStrip, indexCount periodicStrip,
+          stripSearchDepth periodicStrip, first, last] ≤
+      stripLoopPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  have bound := stripCandidatePayload_encodedListSpace_le periodicStrip
+    (indexCount periodicStrip) first last false
+    (Nat.le_refl _) (Nat.le_of_lt firstBelow) (Nat.le_of_lt lastBelow)
+  simp [encodedListSpace_cons, FiniteState.divideBoolTag] at bound ⊢
+  omega
+
+private theorem stripReachNilCost_le_linear (values : List Nat) :
+    EvaluatorCodeFits.nilCost values ≤
+      1000 * (encodedListSpace values + 1) := by
+  have headSpace := encodedListSpace_singleton_headI_le values
+  have successorBits := encodeNat_succ_length_le values.headI
+  simp [EvaluatorCodeFits.nilCost, EvaluatorCodeFits.tailCost,
+    EvaluatorCodeFits.succCost, encodedListSpace_cons]
+    at headSpace successorBits ⊢
+  omega
+
+set_option maxHeartbeats 1000000 in
+/-- The complete input adapter, including exact-fuel computation, fits the
+reserve assigned to one reachability call. -/
+theorem stripReachInputCost_le
+    (periodicStrip : PeriodicStrip) (first last : Nat)
+    (firstBelow : first < indexCount periodicStrip)
+    (lastBelow : last < indexCount periodicStrip) :
+    stripReachInputCost
+        [Encodable.encode periodicStrip, indexCount periodicStrip,
+          stripSearchDepth periodicStrip, first, last] ≤
+      stripReachCallSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, last]
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have inputBound : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using
+      stripReachQueryPayload_encodedListSpace_le
+        periodicStrip first last firstBelow lastBelow
+  have outputBound := stripReachPayload_encodedListSpace_le
+    Tromino.I periodicStrip first last 0 firstBelow lastBelow
+  have fuelCost := stripFuelCodeCost_le periodicStrip
+  have get0 := EvaluatorCodeFits.listCodeGetCost_le_linear 0 values
+  have get1 := EvaluatorCodeFits.listCodeGetCost_le_linear 1 values
+  have get2 := EvaluatorCodeFits.listCodeGetCost_le_linear 2 values
+  have get3 := EvaluatorCodeFits.listCodeGetCost_le_linear 3 values
+  have get4 := EvaluatorCodeFits.listCodeGetCost_le_linear 4 values
+  have zero := EvaluatorCodeFits.listCodeZeroCost_le_linear values
+  have nil := stripReachNilCost_le_linear values
+  simp [stripReachInputCost, stripReachInputFields,
+    stripReachFuelField, stripReachFuelOnInputCost,
+    stripReachFuelArgumentsCost, StripSavitchStep.fieldsCost,
+    EvaluatorCodeFits.prependCost, StripSavitchStep.getField,
+    StripSavitchStep.zeroField, values, inputLength,
+    FiniteState.divideEvalProgramList,
+    FiniteState.divideEvalInitial,
+    FiniteState.DivideEvalState.toNatList,
+    FiniteState.divideOptionBoolTag,
+    FiniteState.divideStackToNatList,
+    encodedListSpace_cons, encodedListSpace_nil,
+    stripReachCallSpaceBound]
+    at inputBound outputBound fuelCost get0 get1 get2 get3 get4 zero nil ⊢
+  omega
 
 /-- Every reachable strip-specialized Savitch transition has the common
 input-polynomial cost needed by the tail iterator. -/

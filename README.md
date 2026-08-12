@@ -1803,6 +1803,9 @@ The representation choices for this target are:
   indices.  `stripSavitchFlatUniform` then carries the reachable-state
   invariant through the complete exact-fuel tail iterator, so the entire
   indexed reachability search reuses one polynomial workspace reserve.
+  `stripReachInput_fits` certifies the preceding fixed-width adapter,
+  including its exact-fuel subcall, and `stripReachInputCost_le` absorbs that
+  adapter into the polynomial reserve for one complete reachability query.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
