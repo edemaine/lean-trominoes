@@ -325,6 +325,8 @@ build; an imported proof counts when its statement matches the paper.
         equality, negation, conjunction, and disjunction.
       - [x] Assemble the gates into a linear-size structural Tseitin compiler
         with fresh-root, exact clause-count, and forward-locality proofs.
+      - [x] Prove semantic soundness of the structural compiler: every model
+        assigns the root atom the direct expression value.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1214,6 +1216,10 @@ The representation choices for this target are:
   assembles those gates into a structural Tseitin compiler.  It allocates one
   fresh current-slice atom per expression node and proves the exact fresh
   range, root bounds, linear clause count, and forward locality of the result.
+- [`LeanTrominoes/PeriodicCNFTransitionExprSoundness.lean`](LeanTrominoes/PeriodicCNFTransitionExprSoundness.lean)
+  proves semantic soundness compositionally: satisfying every generated
+  clause forces the fresh root atom to equal direct evaluation of the source
+  transition expression.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
