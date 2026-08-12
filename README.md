@@ -1490,6 +1490,11 @@ The representation choices for this target are:
   repeated-addition countdown with the fixed payload
   `[left, partialProduct]`.  This is the arithmetic foundation for explicitly
   constructing the paired cell encodings needed by the center-validity leaf.
+- [`LeanTrominoes/PartrecPair.lean`](LeanTrominoes/PartrecPair.lean) combines
+  explicit comparison, multiplication, and addition into the forward
+  `Nat.pair` program inverse to the existing unpairer.  In particular, later
+  transition code can build encoded `Cell` queries for the packed frontier
+  lookup without appealing to an opaque primitive-recursive compiler.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
