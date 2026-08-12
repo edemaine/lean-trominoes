@@ -1525,6 +1525,11 @@ The representation choices for this target are:
   proves that well-formed strip carrier membership is exactly finite motif
   membership at the unique fundamental-domain representative, and specializes
   this bridge to the physical and canonical coordinates of packed columns.
+- [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
+  composes canonical-cell construction with the five-column motif scanner and
+  projects its `found` bit.  The resulting explicit program is proved equal to
+  physical periodic-strip membership for every translated source cell of a
+  packed center candidate.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)

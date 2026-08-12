@@ -806,6 +806,7 @@ import LeanTrominoes.PartrecIntOffsetSpace
 import LeanTrominoes.PartrecPackedTargetCell
 import LeanTrominoes.PartrecPackedTargetCellSpace
 import LeanTrominoes.PeriodicStripCanonicalMembership
+import LeanTrominoes.PartrecPackedTargetMembership
 import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecBinaryLengthSpace
