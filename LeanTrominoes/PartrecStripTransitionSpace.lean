@@ -118,6 +118,151 @@ theorem stripPackedTransition
       tromino periodicStrip wellFormed current next)
       (stripPackedTransitionArguments periodicStrip first last)
 
+set_option maxHeartbeats 1000000 in
+/-- The fixed permutation from the seven-field strip context to the six-field
+packed-transition input uses workspace linear in the encoded strip and two
+frontier indices. -/
+theorem stripPackedTransitionArgumentsCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    stripPackedTransitionArgumentsCost periodicStrip first last ≤
+      10000000 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  let stripCode := Encodable.encode periodicStrip
+  let motifCode := Encodable.encode periodicStrip.motif
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have stripBound : stripCode ≤ limit := by
+    simp only [stripCode, limit,
+      stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have firstBound : first ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have lastBound : last ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have widthStrip : periodicStrip.width ≤ stripCode := by
+    simp only [stripCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.left_le_pair _ _
+  have restStrip :
+      Nat.pair periodicStrip.period motifCode ≤ stripCode := by
+    simp only [stripCode, motifCode, PeriodicStrip.encode_eq_pair]
+    exact Nat.right_le_pair _ _
+  have periodStrip : periodicStrip.period ≤ stripCode :=
+    (Nat.left_le_pair _ _).trans restStrip
+  have motifStrip : motifCode ≤ stripCode :=
+    (Nat.right_le_pair _ _).trans restStrip
+  have widthBound := widthStrip.trans stripBound
+  have periodBound := periodStrip.trans stripBound
+  have motifBound := motifStrip.trans stripBound
+  have firstQuotientBound : first / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self first periodicStrip.period).trans firstBound
+  have firstRemainderBound : first % periodicStrip.period ≤ limit :=
+    (Nat.mod_le first periodicStrip.period).trans firstBound
+  have lastQuotientBound : last / periodicStrip.period ≤ limit :=
+    (Nat.div_le_self last periodicStrip.period).trans lastBound
+  have lastRemainderBound : last % periodicStrip.period ≤ limit :=
+    (Nat.mod_le last periodicStrip.period).trans lastBound
+  have widthBits := encodeNat_length_mono widthBound
+  have periodBits := encodeNat_length_mono periodBound
+  have motifBits := encodeNat_length_mono motifBound
+  have firstQuotientBits := encodeNat_length_mono firstQuotientBound
+  have firstRemainderBits := encodeNat_length_mono firstRemainderBound
+  have lastQuotientBits := encodeNat_length_mono lastQuotientBound
+  have lastRemainderBits := encodeNat_length_mono lastRemainderBound
+  have widthSuccBits := encodeNat_length_mono
+    (show periodicStrip.width + 1 ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have periodSuccBits := encodeNat_length_mono
+    (show periodicStrip.period + 1 ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have motifSuccBits := encodeNat_length_mono
+    (show motifCode + 1 ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit,
+        motifCode]
+      omega)
+  have firstQuotientSuccBits := encodeNat_length_mono
+    (show first / periodicStrip.period + 1 ≤ limit by
+      have raw := Nat.div_le_self first periodicStrip.period
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have firstRemainderSuccBits := encodeNat_length_mono
+    (show first % periodicStrip.period + 1 ≤ limit by
+      have raw := Nat.mod_le first periodicStrip.period
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have lastQuotientSuccBits := encodeNat_length_mono
+    (show last / periodicStrip.period + 1 ≤ limit by
+      have raw := Nat.div_le_self last periodicStrip.period
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have lastRemainderSuccBits := encodeNat_length_mono
+    (show last % periodicStrip.period + 1 ≤ limit by
+      have raw := Nat.mod_le last periodicStrip.period
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have motifBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif)).length ≤
+        (Computability.encodeNat limit).length := by
+    simpa only [motifCode] using motifBits
+  have motifSuccBitsRaw :
+      (Computability.encodeNat
+        (Encodable.encode periodicStrip.motif + 1)).length ≤
+        (Computability.encodeNat limit).length := by
+    simpa only [motifCode] using motifSuccBits
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [stripPackedTransitionArgumentsCost,
+    prependCost, getCost, dropCost, headCost, idCost,
+    nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    zeroBits]
+  clear * - widthBits periodBits motifBits
+    firstQuotientBits firstRemainderBits
+    lastQuotientBits lastRemainderBits
+    widthSuccBits periodSuccBits motifSuccBits
+    firstQuotientSuccBits firstRemainderSuccBits
+    lastQuotientSuccBits lastRemainderSuccBits unitEq
+    motifBitsRaw motifSuccBitsRaw
+  omega
+
+/-- Polynomial-space envelope for the packed transition after its fixed
+seven-to-six-field adapter. -/
+def stripPackedTransitionPolynomialSpaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) : Nat :=
+  packedTransitionPolynomialSpaceBound tromino periodicStrip
+      (PackedWindowState.ofIndex periodicStrip first)
+      (PackedWindowState.ofIndex periodicStrip last) +
+    10000000 * stripFrontierContextPolynomialSpaceUnit
+      periodicStrip first last
+
+theorem stripPackedTransitionCost_le_polynomialSpaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    stripPackedTransitionCost tromino periodicStrip first last ≤
+      stripPackedTransitionPolynomialSpaceBound
+        tromino periodicStrip first last := by
+  have transition := packedTransitionCost_le_polynomialSpaceBound
+    tromino periodicStrip
+    (PackedWindowState.ofIndex periodicStrip first)
+    (PackedWindowState.ofIndex periodicStrip last)
+  have arguments :=
+    stripPackedTransitionArgumentsCost_le_polynomialSpaceBound
+      periodicStrip first last
+  simp only [stripPackedTransitionCost,
+    stripPackedTransitionPolynomialSpaceBound]
+  omega
+
 def stripTransitionCost
     (tromino : Tromino) (periodicStrip : PeriodicStrip)
     (first last : Nat) : Nat :=
@@ -141,6 +286,29 @@ theorem stripTransition
     comp (stripPackedTransition
       tromino periodicStrip wellFormed first last)
       (stripFrontierContext periodicStrip first last)
+
+/-- Complete polynomial-space envelope for the explicit indexed strip edge. -/
+def stripTransitionPolynomialSpaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) : Nat :=
+  stripPackedTransitionPolynomialSpaceBound
+      tromino periodicStrip first last +
+    1000000000000000000000000000000000000000000000 *
+      stripFrontierContextPolynomialSpaceUnit periodicStrip first last
+
+theorem stripTransitionCost_le_polynomialSpaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    stripTransitionCost tromino periodicStrip first last ≤
+      stripTransitionPolynomialSpaceBound
+        tromino periodicStrip first last := by
+  have transition := stripPackedTransitionCost_le_polynomialSpaceBound
+    tromino periodicStrip first last
+  have context := stripFrontierContextCost_le_polynomialSpaceBound
+    periodicStrip first last
+  simp only [stripTransitionCost,
+    stripTransitionPolynomialSpaceBound]
+  omega
 
 def stripTransitionEqualityArgumentsCost
     (periodicStrip : PeriodicStrip) (first last : Nat) : Nat :=

@@ -1683,7 +1683,9 @@ The representation choices for this target are:
   decode `[encodedStrip, firstIndex, lastIndex]`, retain the motif and two
   assignment words in packed form, permute the seven native context fields,
   and prove both semantic correctness and an exact fitted evaluator cost for
-  `indexedTransitionRawBool`.  They also explicitly implement and fit the
+  `indexedTransitionRawBool`.  The context decoder, fixed field permutation,
+  and complete packed predicate now compose into one polynomial-space bound
+  for this indexed edge.  They also explicitly implement and fit the
   reflexive-or-edge predicate used at Savitch recursion depth zero.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
