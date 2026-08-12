@@ -8285,10 +8285,6 @@ private theorem cost_le (periodicStrip : PeriodicStrip) :
       stripSearchDepth periodicStrip]
   have inputSpace : encodedListSpace values = inputLength := by
     simpa [values, inputLength] using stripInput_encodedListSpace periodicStrip
-  have inputLengthEq :
-      (Computability.encodeNat (Encodable.encode periodicStrip)).length + 1 =
-        inputLength := by
-    simp [inputLength]
   have outputBound : encodedListSpace outputValues ≤
       stripLoopPayloadSpaceBound inputLength := by
     simpa [outputValues, inputLength] using
@@ -8346,6 +8342,146 @@ theorem exact_polynomial (periodicStrip : PeriodicStrip) :
   (exact periodicStrip).mono (cost_le periodicStrip)
 
 end StripCycleParameters
+
+namespace StripGuardedCycle
+
+private def testCost (periodicStrip : PeriodicStrip) : Nat :=
+  Turing.PartrecToTM2.EvaluatorCodeFits.stripWellFormedInputSpaceBound
+    (Encodable.encode periodicStrip)
+
+private theorem test (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits stripWellFormedCode
+      [Encodable.encode periodicStrip]
+      [FiniteState.divideBoolTag periodicStrip.wellFormed]
+      (testCost periodicStrip) := by
+  have fit :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripWellFormedExplicitInputSpace
+      periodicStrip
+  cases wellFormed : periodicStrip.wellFormed <;>
+    simpa [stripWellFormedCode, testCost, wellFormed,
+      FiniteState.divideBoolTag] using fit
+
+set_option maxHeartbeats 1000000 in
+/-- The well-formedness guard, parameter assembly, and complete padded cycle
+search together fit the polynomial reserve allocated to the guarded driver. -/
+theorem exact_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    let result := FiniteState.cycleSearchIndexDFSBoolAtDepth
+      (stripStateBound periodicStrip) (stripSearchDepth periodicStrip)
+      (indexedTransitionRawBool tromino periodicStrip)
+    EvaluatorCodeFits (guardedStripCycleCode tromino)
+      [Encodable.encode periodicStrip]
+      [FiniteState.divideBoolTag (periodicStrip.wellFormed && result)]
+      (stripGuardedCycleSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values := [Encodable.encode periodicStrip]
+  let result := FiniteState.cycleSearchIndexDFSBoolAtDepth
+    (stripStateBound periodicStrip) (stripSearchDepth periodicStrip)
+    (indexedTransitionRawBool tromino periodicStrip)
+  have inputSpace : encodedListSpace values = inputLength := by
+    simpa [values, inputLength] using stripInput_encodedListSpace periodicStrip
+  have inputPositive : 1 ≤ inputLength := by
+    rw [← inputSpace]
+    simp [values, encodedListSpace_cons]
+  have testFit := test periodicStrip
+  have testCostEq : testCost periodicStrip =
+      stripArithmeticSpaceBound inputLength := by
+    simp [testCost,
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripWellFormedInputSpaceBound,
+      stripArithmeticSpaceBound, ← inputSpace, values]
+  have identity := StripSavitchStep.idCost_le_linear values
+  have zeroBranchCost := EvaluatorCodeFits.listCodeZeroCost_le_linear values
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  by_cases wellFormed : periodicStrip.IsWellFormed
+  · have wellFormedBool : periodicStrip.wellFormed = true :=
+      (periodicStrip.wellFormed_eq_true_iff).mpr wellFormed
+    have parameters := StripCycleParameters.exact_polynomial periodicStrip
+    have search := StripCandidateStep.Padded.CycleSearch.exact_polynomial
+      tromino periodicStrip wellFormed (stripStateBound periodicStrip)
+      (Nat.le_refl _)
+    have branchFit := EvaluatorCodeFits.comp search parameters
+    have selected := EvaluatorCodeFits.branchZero_succ
+      (whenZero := Turing.ToPartrec.Code.zero)
+      (show 0 < FiniteState.divideBoolTag periodicStrip.wellFormed by
+        simp [wellFormedBool, FiniteState.divideBoolTag])
+      testFit branchFit
+    have outputSpace : encodedListSpace
+        [FiniteState.divideBoolTag result] ≤ 2 := by
+      cases result <;> decide
+    have tailInput := listCodeEncodedListSpace_tail_le (0 :: values)
+    have fit : EvaluatorCodeFits (guardedStripCycleCode tromino) values
+        [FiniteState.divideBoolTag result]
+        (EvaluatorCodeFits.branchZeroSuccCost values
+          [FiniteState.divideBoolTag result]
+          (FiniteState.divideBoolTag periodicStrip.wellFormed)
+          (testCost periodicStrip)
+          (stripCycleSearchSpaceBound inputLength +
+            stripCycleParametersSpaceBound inputLength)) := by
+      simpa [guardedStripCycleCode, values, inputLength] using selected
+    have bounded : EvaluatorCodeFits (guardedStripCycleCode tromino) values
+        [FiniteState.divideBoolTag result]
+        (stripGuardedCycleSpaceBound inputLength) := fit.mono (by
+      rw [testCostEq]
+      simp [EvaluatorCodeFits.branchZeroSuccCost,
+        EvaluatorCodeFits.branchZeroTestCost,
+        EvaluatorCodeFits.prependCost, EvaluatorCodeFits.tailCost,
+        wellFormedBool, FiniteState.divideBoolTag,
+        stripGuardedCycleSpaceBound, encodedListSpace_cons,
+        encodedListSpace_nil, zeroBits, oneBits]
+        at identity outputSpace tailInput ⊢
+      rw [inputSpace] at identity ⊢
+      dsimp only [inputLength] at *
+      omega)
+    change EvaluatorCodeFits (guardedStripCycleCode tromino) values
+      [FiniteState.divideBoolTag (periodicStrip.wellFormed && result)]
+      (stripGuardedCycleSpaceBound inputLength)
+    rw [wellFormedBool]
+    exact bounded
+  · have wellFormedBool : periodicStrip.wellFormed = false := by
+      apply Bool.eq_false_iff.mpr
+      intro true
+      exact wellFormed
+        ((periodicStrip.wellFormed_eq_true_iff).mp true)
+    have branchFit := EvaluatorCodeFits.zero values
+    have selected := EvaluatorCodeFits.branchZero_zero
+      (whenSucc :=
+        (stripCycleSearchCode tromino).comp stripCycleParametersCode)
+      (show FiniteState.divideBoolTag periodicStrip.wellFormed = 0 by
+        simp [wellFormedBool, FiniteState.divideBoolTag])
+      testFit branchFit
+    have outputSpace : encodedListSpace [0] ≤ 2 := by decide
+    have fit : EvaluatorCodeFits (guardedStripCycleCode tromino) values [0]
+        (EvaluatorCodeFits.branchZeroZeroCost values [0]
+          (FiniteState.divideBoolTag periodicStrip.wellFormed)
+          (testCost periodicStrip) (EvaluatorCodeFits.zeroCost values)) := by
+      simpa [guardedStripCycleCode, values] using selected
+    have bounded : EvaluatorCodeFits (guardedStripCycleCode tromino) values [0]
+        (stripGuardedCycleSpaceBound inputLength) := fit.mono (by
+      rw [testCostEq]
+      simp [EvaluatorCodeFits.branchZeroZeroCost,
+        EvaluatorCodeFits.branchZeroTestCost,
+        EvaluatorCodeFits.prependCost, wellFormedBool,
+        FiniteState.divideBoolTag, stripGuardedCycleSpaceBound,
+        encodedListSpace_cons, encodedListSpace_nil, zeroBits, oneBits]
+        at identity zeroBranchCost outputSpace ⊢
+      rw [inputSpace] at identity zeroBranchCost ⊢
+      dsimp only [inputLength] at *
+      omega)
+    change EvaluatorCodeFits (guardedStripCycleCode tromino) values
+      [FiniteState.divideBoolTag (periodicStrip.wellFormed && result)]
+      (stripGuardedCycleSpaceBound inputLength)
+    have outputEq :
+        [FiniteState.divideBoolTag (periodicStrip.wellFormed && result)] =
+          [0] := by simp [wellFormedBool, FiniteState.divideBoolTag]
+    rw [outputEq]
+    exact bounded
+
+end StripGuardedCycle
 
 /-- Fitted-call obligations for the two explicit transition leaves used by
 the strip evaluator.  Each field is continuation-passing: the caller reserves

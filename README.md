@@ -308,7 +308,7 @@ build; an imported proof counts when its statement matches the paper.
       nested endpoint scan at the exact frontier-index count.
     - [x] Extend the endpoint and reachability certificates to the padded
       power-of-two state bound used by the compiled unary driver.
-    - [ ] Fit parameter assembly and the guarded cycle-search driver.
+    - [x] Fit parameter assembly and the guarded cycle-search driver.
     - [ ] Fit the unary input wrapper and package the verified evaluator as a
       PSPACE decision procedure for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
@@ -1852,8 +1852,11 @@ The representation choices for this target are:
   index count.  The parallel `StripCandidateStep.Padded` hierarchy generalizes
   the reachability calls, candidate update, both synchronized endpoint scans,
   initializer, and Boolean projection to any count at most the unary driver's
-  padded power-of-two bound.  The remaining layer connects parameter assembly
-  and the well-formedness guard.
+  padded power-of-two bound.  `StripCycleParameters.exact_polynomial` then
+  assembles that count and the certified depth, while
+  `StripGuardedCycle.exact_polynomial` connects the complete search to the
+  malformed-input rejection guard.  The remaining layer fits the unary input
+  wrapper and packages the resulting evaluator as a PSPACE procedure.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
