@@ -331,6 +331,8 @@ build; an imported proof counts when its statement matches the paper.
         completeness and noninterference between compiled subexpressions.
       - [x] Prove constructive semantic completeness by canonically assigning
         every generated atom while preserving the source valuation.
+      - [x] Build verified Boolean-vector expressions for exact-one finite
+        fields, current/next equality, and no-overflow binary succession.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1232,6 +1234,11 @@ The representation choices for this target are:
   constructs the canonical valuation of all fresh Tseitin atoms.  It preserves
   every source atom, satisfies every compiled clause, and makes the compiled
   root equal direct evaluation of the transition expression.
+- [`LeanTrominoes/PeriodicCNFTransitionExprVectors.lean`](LeanTrominoes/PeriodicCNFTransitionExprVectors.lean)
+  provides the verified Boolean-vector layer for bounded configurations:
+  finite conjunction and disjunction, exact-one fields, equality between
+  adjacent slices, and a little-endian no-overflow successor relation.  It
+  also proves the source-atom bounds needed by constructive CNF compilation.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
