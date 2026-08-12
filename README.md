@@ -1693,7 +1693,8 @@ The representation choices for this target are:
   fixed-width native context
   `[width, period, motifCode, firstWord, firstPhase, lastWord, lastPhase]`;
   its fitted certificate composes only the verified strip-header decoder,
-  quotient/remainder calls, field projections, and native-list assembly.
+  quotient/remainder calls, field projections, and native-list assembly.  A
+  common encoded-input envelope now bounds that complete seven-field decoder.
 - [`LeanTrominoes/PartrecStripCellBounds.lean`](LeanTrominoes/PartrecStripCellBounds.lean)
   and
   [`LeanTrominoes/PartrecStripCellBoundsSpace.lean`](LeanTrominoes/PartrecStripCellBoundsSpace.lean)
