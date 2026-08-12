@@ -112,6 +112,66 @@ theorem stripDivideEvalIterate_encodedListSpace_le
       (stripSearchDepth_lt_pow_succ periodicStrip)
   simpa [stripSearchDepth, stripDFSPartrecSpaceBound] using generic
 
+/-- The same flat configuration bound for any ambient graph count no larger
+than the padded power-of-two strip bound.  This is the form consumed by the
+compiled unary driver. -/
+theorem stripDivideEvalIterate_flatSpace_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (relation : Nat → Nat → Bool)
+    (first last steps : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount)
+    (lastBelow : last < stateCount) :
+    (((FiniteState.divideEvalStep stateCount relation)^[steps]
+      (FiniteState.divideEvalInitial (stripSearchDepth periodicStrip)
+        first last)).flatSpace) ≤
+      stripDFSSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  have countPower :
+      stateCount ≤ 2 ^ (stripSearchDepth periodicStrip + 1) :=
+    stateCountBound.trans (by
+      simp [stripStateBound]
+      exact Nat.pow_le_pow_right (by omega) (Nat.le_succ _))
+  have generic :=
+    FiniteState.divideEvalIterate_flatSpace_le
+      stateCount
+      (stripSearchDepth periodicStrip)
+      (stripSearchDepth periodicStrip + 1)
+      first last steps relation firstBelow lastBelow countPower
+      (stripSearchDepth_lt_pow_succ periodicStrip)
+  simpa [stripSearchDepth, stripDFSSpaceBound] using generic
+
+/-- Serialized evaluator configurations retain the same quadratic bound for
+every ambient count below the padded power-of-two strip bound. -/
+theorem stripDivideEvalIterate_encodedListSpace_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (relation : Nat → Nat → Bool)
+    (first last steps : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount)
+    (lastBelow : last < stateCount) :
+    Turing.PartrecToTM2.encodedListSpace
+        (((FiniteState.divideEvalStep stateCount relation)^[steps]
+          (FiniteState.divideEvalInitial (stripSearchDepth periodicStrip)
+            first last)).toNatList) ≤
+      stripDFSPartrecSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  have countPower :
+      stateCount ≤ 2 ^ (stripSearchDepth periodicStrip + 1) :=
+    stateCountBound.trans (by
+      simp [stripStateBound]
+      exact Nat.pow_le_pow_right (by omega) (Nat.le_succ _))
+  have generic :=
+    FiniteState.divideEvalIterate_encodedListSpace_le
+      stateCount
+      (stripSearchDepth periodicStrip)
+      (stripSearchDepth periodicStrip + 1)
+      first last steps relation firstBelow lastBelow countPower
+      (stripSearchDepth_lt_pow_succ periodicStrip)
+  simpa [stripSearchDepth, stripDFSPartrecSpaceBound] using generic
+
 end RawWindowState
 end PeriodicStrip
 end LeanTrominoes

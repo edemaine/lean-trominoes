@@ -135,6 +135,34 @@ theorem stripFuel_encodeNat_length_le (periodicStrip : PeriodicStrip) :
   simpa [inputLength, depth, bits, stripSearchDepth, stripFuelBits] using
     encodedBound
 
+/-- The exact Savitch fuel retains the same quadratic bit bound for every
+ambient graph count below the padded strip state bound. -/
+theorem stripFuel_encodeNat_length_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip) (stateCount : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip) :
+    (Computability.encodeNat
+      (FiniteState.divideEvalFuel stateCount
+        (stripSearchDepth periodicStrip))).length ≤
+      stripFuelBits
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let depth := stripSearchDepth periodicStrip
+  let bits := depth + 1
+  have stateCountPower : stateCount ≤ 2 ^ bits := by
+    exact stateCountBound.trans (by
+      simp [bits, depth, stripStateBound]
+      exact Nat.pow_le_pow_right (by omega) (Nat.le_succ _))
+  have fuelBound :=
+    FiniteState.divideEvalFuel_lt_pow_succ
+      stateCount depth bits stateCountPower
+  have encodedBound :=
+    FiniteState.encodeNat_length_le_of_lt_pow _ _ fuelBound
+  simpa [inputLength, depth, bits, stripSearchDepth, stripFuelBits] using
+    encodedBound
+
 /-- Every semantic milestone of one exact-fuel reachability loop, including
 the leading countdown and immutable strip context, has quadratic native-list
 space. -/
@@ -275,6 +303,129 @@ theorem stripReachStatePayload_encodedListSpace_le
   simp only [encodedListSpace_cons] at original
   omega
 
+/-- Padded-count version of the complete exact-fuel reachability payload
+bound. -/
+theorem stripReachPayload_encodedListSpace_le_of_le_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last steps : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    encodedListSpace
+        (FiniteState.divideEvalFuel stateCount
+            (stripSearchDepth periodicStrip) ::
+          FiniteState.divideEvalProgramList
+            (Encodable.encode periodicStrip) stateCount
+            ((FiniteState.divideEvalStep stateCount
+              (indexedTransitionRawBool tromino periodicStrip))^[steps]
+                (FiniteState.divideEvalInitial
+                  (stripSearchDepth periodicStrip) first last))) ≤
+      stripReachPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let depth := stripSearchDepth periodicStrip
+  let bits := depth + 1
+  let state :=
+    ((FiniteState.divideEvalStep stateCount
+      (indexedTransitionRawBool tromino periodicStrip))^[steps]
+        (FiniteState.divideEvalInitial depth first last))
+  have fuelBits := stripFuel_encodeNat_length_le_of_le_stateBound
+    periodicStrip stateCount stateCountBound
+  have stateSpace :=
+    stripDivideEvalIterate_encodedListSpace_le_of_le_stateBound periodicStrip
+      stateCount (indexedTransitionRawBool tromino periodicStrip)
+      first last steps stateCountBound firstBelow lastBelow
+  have countPow : stateCount < 2 ^ (bits + 1) :=
+    stateCountBound.trans_lt (by
+      simp [stripStateBound, bits, depth]
+      exact Nat.pow_lt_pow_right (by omega) (by omega))
+  have countBits :
+      (Computability.encodeNat stateCount).length ≤ bits + 1 :=
+    FiniteState.encodeNat_length_le_of_lt_pow _ _ countPow
+  have stackLength : state.stack.length ≤ depth :=
+    FiniteState.divideEvalIterate_stack_length_le_depth
+      stateCount depth first last steps
+      (indexedTransitionRawBool tromino periodicStrip)
+  have stackPow : state.stack.length < 2 ^ bits :=
+    stackLength.trans_lt (stripSearchDepth_lt_pow_succ periodicStrip)
+  have stackBits :
+      (Computability.encodeNat state.stack.length).length ≤ bits :=
+    FiniteState.encodeNat_length_le_of_lt_pow _ _ stackPow
+  have contextSpace :
+      (Computability.encodeNat (Encodable.encode periodicStrip)).length + 1 =
+        inputLength := by
+    simp [inputLength]
+  have fuelBits' :
+      (Computability.encodeNat
+        (FiniteState.divideEvalFuel stateCount depth)).length ≤
+          stripFuelBits inputLength := by
+    simpa [depth, inputLength] using fuelBits
+  have stateSpace' : encodedListSpace state.toNatList ≤
+      stripDFSPartrecSpaceBound inputLength := by
+    simpa [state, depth, inputLength] using stateSpace
+  have bitsEq : bits = 21 * inputLength + 2 := by
+    simp [bits, depth, inputLength, stripSearchDepth]
+  change encodedListSpace
+    (FiniteState.divideEvalFuel stateCount depth ::
+      Encodable.encode periodicStrip :: stateCount :: state.stack.length ::
+        state.toNatList) ≤ _
+  simp only [encodedListSpace_cons]
+  rw [contextSpace]
+  change _ ≤ stripReachPayloadSpaceBound inputLength
+  simp only [stripReachPayloadSpaceBound]
+  omega
+
+/-- Replacing the padded-count exact fuel by a smaller remaining countdown
+preserves the reachability payload bound. -/
+theorem stripReachCountdownPayload_encodedListSpace_le_of_le_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last steps remaining : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount)
+    (remainingBound : remaining ≤ FiniteState.divideEvalFuel stateCount
+      (stripSearchDepth periodicStrip)) :
+    encodedListSpace
+        (remaining :: FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount
+          ((FiniteState.divideEvalStep stateCount
+            (indexedTransitionRawBool tromino periodicStrip))^[steps]
+              (FiniteState.divideEvalInitial
+                (stripSearchDepth periodicStrip) first last))) ≤
+      stripReachPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  have original := stripReachPayload_encodedListSpace_le_of_le_stateBound
+    tromino periodicStrip stateCount first last steps stateCountBound
+    firstBelow lastBelow
+  have remainingBits := encodeNat_length_mono remainingBound
+  simp only [encodedListSpace_cons] at original ⊢
+  omega
+
+/-- Dropping the padded-count fuel field also preserves the common payload
+bound. -/
+theorem stripReachStatePayload_encodedListSpace_le_of_le_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last steps : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    encodedListSpace
+        (FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount
+          ((FiniteState.divideEvalStep stateCount
+            (indexedTransitionRawBool tromino periodicStrip))^[steps]
+              (FiniteState.divideEvalInitial
+                (stripSearchDepth periodicStrip) first last))) ≤
+      stripReachPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  have original := stripReachPayload_encodedListSpace_le_of_le_stateBound
+    tromino periodicStrip stateCount first last steps stateCountBound
+    firstBelow lastBelow
+  simp only [encodedListSpace_cons] at original
+  omega
+
 /-- A uniform linear bound for the serialized counters surrounding one
 reachability call.  The larger seven-field inner-loop shape also bounds the
 six-field outer-loop shape. -/
@@ -310,6 +461,24 @@ theorem stripCounter_encodeNat_length_le
   have encodedBound :=
     FiniteState.encodeNat_length_le_of_lt_pow _ _ counterPow
   simpa [depth, stripSearchDepth] using encodedBound
+
+/-- Any counter bounded by the unary driver's padded graph size has the same
+linear binary-length envelope as an exact frontier index. -/
+theorem stripPaddedCounter_encodeNat_length_le
+    (periodicStrip : PeriodicStrip) (counter : Nat)
+    (counterBound : counter ≤ stripStateBound periodicStrip) :
+    (Computability.encodeNat counter).length ≤
+      21 *
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length + 2 := by
+  have counterPow : counter <
+      2 ^ (stripSearchDepth periodicStrip + 1) :=
+    counterBound.trans_lt (by
+      simp [stripStateBound]
+      exact Nat.pow_lt_pow_right (by omega) (by omega))
+  have encodedBound :=
+    FiniteState.encodeNat_length_le_of_lt_pow _ _ counterPow
+  simpa [stripSearchDepth] using encodedBound
 
 /-- For bounded frontier indices, the common transition-context envelope is
 linear in the original encoded strip input length. -/
@@ -439,6 +608,47 @@ theorem stripCandidatePayload_encodedListSpace_le
   simp only [inputLength] at remainingBits countBits firstBits secondBits depthBits ⊢
   omega
 
+/-- Padded-count version of the inner endpoint payload bound used by the
+compiled unary cycle-search driver. -/
+theorem stripCandidatePayload_encodedListSpace_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip) (stateCount : Nat)
+    (remaining first secondRemaining : Nat) (found : Bool)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (remainingBound : remaining ≤ stateCount)
+    (firstBound : first ≤ stateCount)
+    (secondBound : secondRemaining ≤ stateCount) :
+    encodedListSpace
+        (remaining ::
+          [Encodable.encode periodicStrip, stateCount,
+            stripSearchDepth periodicStrip, first, secondRemaining,
+            FiniteState.divideBoolTag found]) ≤
+      stripLoopPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have remainingBits := stripPaddedCounter_encodeNat_length_le periodicStrip
+    remaining (remainingBound.trans stateCountBound)
+  have countBits := stripPaddedCounter_encodeNat_length_le periodicStrip
+    stateCount stateCountBound
+  have firstBits := stripPaddedCounter_encodeNat_length_le periodicStrip
+    first (firstBound.trans stateCountBound)
+  have secondBits := stripPaddedCounter_encodeNat_length_le periodicStrip
+    secondRemaining (secondBound.trans stateCountBound)
+  have depthBits := stripDepth_encodeNat_length_le periodicStrip
+  have foundSpace := divideBoolTag_flatSpace_le found
+  have contextSpace :
+      (Computability.encodeNat (Encodable.encode periodicStrip)).length + 1 =
+        inputLength := by
+    simp [inputLength]
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  rw [contextSpace]
+  change _ ≤ stripLoopPayloadSpaceBound inputLength
+  simp only [stripLoopPayloadSpaceBound]
+  simp only [inputLength] at remainingBits countBits firstBits secondBits depthBits ⊢
+  omega
+
 /-- The outer endpoint countdown is a field shorter than the inner payload
 and therefore obeys the same uniform linear bound. -/
 theorem stripOuterPayload_encodedListSpace_le
@@ -465,6 +675,43 @@ theorem stripOuterPayload_encodedListSpace_le
   have firstBits :=
     stripCounter_encodeNat_length_le periodicStrip
       firstRemaining firstBound
+  have depthBits := stripDepth_encodeNat_length_le periodicStrip
+  have foundSpace := divideBoolTag_flatSpace_le found
+  have contextSpace :
+      (Computability.encodeNat (Encodable.encode periodicStrip)).length + 1 =
+        inputLength := by
+    simp [inputLength]
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  rw [contextSpace]
+  change _ ≤ stripLoopPayloadSpaceBound inputLength
+  simp only [stripLoopPayloadSpaceBound]
+  simp only [inputLength] at remainingBits countBits firstBits depthBits ⊢
+  omega
+
+/-- Padded-count version of the outer endpoint payload bound. -/
+theorem stripOuterPayload_encodedListSpace_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip) (stateCount : Nat)
+    (remaining firstRemaining : Nat) (found : Bool)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (remainingBound : remaining ≤ stateCount)
+    (firstBound : firstRemaining ≤ stateCount) :
+    encodedListSpace
+        (remaining ::
+          [Encodable.encode periodicStrip, stateCount,
+            stripSearchDepth periodicStrip, firstRemaining,
+            FiniteState.divideBoolTag found]) ≤
+      stripLoopPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have remainingBits := stripPaddedCounter_encodeNat_length_le periodicStrip
+    remaining (remainingBound.trans stateCountBound)
+  have countBits := stripPaddedCounter_encodeNat_length_le periodicStrip
+    stateCount stateCountBound
+  have firstBits := stripPaddedCounter_encodeNat_length_le periodicStrip
+    firstRemaining (firstBound.trans stateCountBound)
   have depthBits := stripDepth_encodeNat_length_le periodicStrip
   have foundSpace := divideBoolTag_flatSpace_le found
   have contextSpace :
