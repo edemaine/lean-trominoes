@@ -546,6 +546,17 @@ def intOffsetAmount : Int → Nat
   | .ofNat amount => amount
   | .negSucc amount => amount + 1
 
+theorem intOffsetResultCode_le (offset : Int) (number : Nat) :
+    intOffsetResultCode offset number ≤
+      number + 2 * intOffsetAmount offset := by
+  cases offset with
+  | ofNat amount =>
+      simpa [intOffsetResultCode, intOffsetAmount] using
+        intCodeAddNat_le amount number
+  | negSucc amount =>
+      simpa [intOffsetResultCode, intOffsetAmount] using
+        intCodeSubtractNat_le (amount + 1) number
+
 /-- Every fixed encoded-integer offset uses space linear in one encoded
 envelope.  The coefficient depends only linearly on the compile-time offset.-/
 theorem intOffsetCost_le_linear (offset : Int) (number : Nat) :

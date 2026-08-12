@@ -1518,7 +1518,9 @@ The representation choices for this target are:
   coordinates in Mathlib's standard `Cell` encoding.
 - [`LeanTrominoes/PartrecPackedTargetCellSpace.lean`](LeanTrominoes/PartrecPackedTargetCellSpace.lean)
   fits every stage of that target-cell constructor, culminating in an exact
-  evaluator-space certificate for the encoded canonical cell.
+  evaluator-space certificate for the encoded canonical cell.  Its final
+  theorem combines one affine arithmetic envelope with the existing pairing
+  envelope to give a linear encoded-space majorant.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)

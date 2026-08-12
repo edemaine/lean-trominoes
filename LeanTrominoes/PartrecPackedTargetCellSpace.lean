@@ -208,6 +208,260 @@ theorem packedTargetCell_encode
     Encodable.encode_prod_val,
     IntEncoding.encode_ofNat] using fitted
 
+def packedTargetAuxLimit
+    (verticalOffset : Int)
+    (period phase column rowCode : Nat) : Nat :=
+  256 * (period + phase + column + rowCode +
+    2 * intOffsetAmount verticalOffset + 64) + 1000
+
+def packedTargetAuxUnit
+    (verticalOffset : Int)
+    (period phase column rowCode : Nat) : Nat :=
+  encodedListSpace
+    [packedTargetAuxLimit verticalOffset
+      period phase column rowCode] + 1
+
+def packedTargetCellUnit
+    (verticalOffset : Int)
+    (period phase column rowCode : Nat) : Nat :=
+  let x := Code.packedColumnPhaseNumerator period phase column % period
+  let yCode := intOffsetResultCode verticalOffset rowCode
+  packedTargetAuxUnit verticalOffset period phase column rowCode +
+    natPairUnit (2 * x) yCode
+
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 1600000 in
+/-- The complete canonical-cell constructor is linear in the sum of one
+affine arithmetic envelope and the established forward-pairing envelope. -/
+theorem packedTargetCellCost_le_linear
+    (verticalOffset : Int)
+    (period phase column rowCode : Nat) :
+    packedTargetCellCost verticalOffset
+        period phase column rowCode ≤
+      1000000000000000000000000000000000000000000000 *
+        (intOffsetAmount verticalOffset + 1) *
+        packedTargetCellUnit verticalOffset
+          period phase column rowCode := by
+  let amount := intOffsetAmount verticalOffset
+  let numerator :=
+    Code.packedColumnPhaseNumerator period phase column
+  let x := numerator % period
+  let yCode := intOffsetResultCode verticalOffset rowCode
+  let auxLimit := packedTargetAuxLimit verticalOffset
+    period phase column rowCode
+  let auxUnit := packedTargetAuxUnit verticalOffset
+    period phase column rowCode
+  let pairUnit := natPairUnit (2 * x) yCode
+  let unit := packedTargetCellUnit verticalOffset
+    period phase column rowCode
+  let scaledUnit := (amount + 1) * unit
+  change
+    packedTargetCellCost verticalOffset
+        period phase column rowCode ≤
+      1000000000000000000000000000000000000000000000 *
+        (amount + 1) * unit
+  rw [Nat.mul_assoc]
+  change
+    packedTargetCellCost verticalOffset
+        period phase column rowCode ≤
+      1000000000000000000000000000000000000000000000 *
+        scaledUnit
+
+  have numeratorBound :
+      numerator ≤ phase + column + (period + period) := by
+    simp only [numerator, Code.packedColumnPhaseNumerator,
+      Code.packedColumnPhaseSum]
+    omega
+  have xBound :
+      x ≤ phase + column + (period + period) :=
+    (Nat.mod_le numerator period).trans numeratorBound
+  have yBound : yCode ≤ rowCode + 2 * amount := by
+    simpa [yCode, amount] using
+      intOffsetResultCode_le verticalOffset rowCode
+
+  have periodBound : period ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have phaseBound : phase ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have columnBound : column ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have rowBound : rowCode ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have xAuxBound : x ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have doubleXBound : 2 * x ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have yAuxBound : yCode ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have periodSuccBound : period + 1 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have phaseSuccBound : phase + 1 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have columnSuccBound : column + 1 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have rowSuccBound : rowCode + 1 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have xSuccBound : x + 1 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have doubleXSuccBound : 2 * x + 1 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have ySuccBound : yCode + 1 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+
+  have phaseLimitBound :
+      128 * (period + phase + column + 32) + 200 ≤
+        auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have offsetLimitBound :
+      2 * (rowCode + 2 * amount) + 8 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+  have addLimitBound :
+      2 * (x + x) + 4 ≤ auxLimit := by
+    simp only [auxLimit, packedTargetAuxLimit]
+    omega
+
+  have phaseLimitBits := encodeNat_length_mono phaseLimitBound
+  have offsetLimitBits := encodeNat_length_mono offsetLimitBound
+  have addLimitBits := encodeNat_length_mono addLimitBound
+  have periodBits := encodeNat_length_mono periodBound
+  have phaseBits := encodeNat_length_mono phaseBound
+  have columnBits := encodeNat_length_mono columnBound
+  have rowBits := encodeNat_length_mono rowBound
+  have xBits := encodeNat_length_mono xAuxBound
+  have doubleXBits := encodeNat_length_mono doubleXBound
+  have yBits := encodeNat_length_mono yAuxBound
+  have periodSuccBits := encodeNat_length_mono periodSuccBound
+  have phaseSuccBits := encodeNat_length_mono phaseSuccBound
+  have columnSuccBits := encodeNat_length_mono columnSuccBound
+  have rowSuccBits := encodeNat_length_mono rowSuccBound
+  have xSuccBits := encodeNat_length_mono xSuccBound
+  have doubleXSuccBits := encodeNat_length_mono doubleXSuccBound
+  have ySuccBits := encodeNat_length_mono ySuccBound
+
+  have auxUnitEq :
+      auxUnit = encodedListSpace [auxLimit] + 1 := by
+    rfl
+  have pairUnitEq : pairUnit = natPairUnit (2 * x) yCode := by
+    rfl
+  have unitEq : unit = auxUnit + pairUnit := by
+    simp [unit, packedTargetCellUnit, auxUnit, pairUnit,
+      x, yCode, numerator]
+  have auxLeUnit : auxUnit ≤ unit := by
+    rw [unitEq]
+    omega
+  have pairLeUnit : pairUnit ≤ unit := by
+    rw [unitEq]
+    omega
+  have unitLeScaled : unit ≤ scaledUnit := by
+    rw [show unit = 1 * unit by simp]
+    exact Nat.mul_le_mul_right unit (by omega : 1 ≤ amount + 1)
+  have auxLeScaled : auxUnit ≤ scaledUnit :=
+    auxLeUnit.trans unitLeScaled
+  have pairLeScaled : pairUnit ≤ scaledUnit :=
+    pairLeUnit.trans unitLeScaled
+
+  have phaseUnitLeAux :
+      encodedListSpace
+          [128 * (period + phase + column + 32) + 200] + 1 ≤
+        auxUnit := by
+    rw [auxUnitEq]
+    simpa [encodedListSpace_cons,
+      encodedListSpace_nil] using phaseLimitBits
+  have offsetUnitLeAux :
+      intOffsetUnit amount rowCode ≤ auxUnit := by
+    rw [auxUnitEq]
+    simpa [intOffsetUnit, encodedListSpace_cons,
+      encodedListSpace_nil] using offsetLimitBits
+  have addUnitLeAux :
+      encodedListSpace [2 * (x + x) + 4] + 1 ≤ auxUnit := by
+    rw [auxUnitEq]
+    simpa [encodedListSpace_cons,
+      encodedListSpace_nil] using addLimitBits
+
+  have phaseLocal :=
+    packedColumnPhaseCost_le_linear period phase column
+  have phaseCostBound :
+      packedColumnPhaseCost period phase column ≤
+        10000000000000000 * scaledUnit :=
+    phaseLocal.trans
+      (Nat.mul_le_mul_left _
+        (phaseUnitLeAux.trans auxLeScaled))
+  have offsetLocal :=
+    intOffsetCost_le_linear verticalOffset rowCode
+  have offsetCostBound :
+      intOffsetCost verticalOffset rowCode ≤
+        10000000000 * scaledUnit := by
+    have enlarged := offsetLocal.trans
+      (Nat.mul_le_mul_left (10000000000 * (amount + 1))
+        (offsetUnitLeAux.trans auxLeUnit))
+    simpa [amount, scaledUnit, Nat.mul_assoc] using enlarged
+  have addLocal := natAddCost_le_linear x x
+  have addCostBound :
+      natAddCost x x ≤ 100000000 * scaledUnit :=
+    addLocal.trans
+      (Nat.mul_le_mul_left _
+        (addUnitLeAux.trans auxLeScaled))
+  have pairLocal := natPairCost_le_linear (2 * x) yCode
+  have pairCostBound :
+      natPairCost (2 * x) yCode ≤
+        10000000000000000000000000000000000000000 *
+          scaledUnit := by
+    exact pairLocal.trans
+      (Nat.mul_le_mul_left _ pairLeScaled)
+
+  have auxLengthLeScaled :
+      (Computability.encodeNat auxLimit).length ≤ scaledUnit := by
+    rw [auxUnitEq] at auxLeScaled
+    simp only [encodedListSpace_cons,
+      encodedListSpace_nil] at auxLeScaled
+    omega
+  have periodBitsScaled := periodBits.trans auxLengthLeScaled
+  have phaseBitsScaled := phaseBits.trans auxLengthLeScaled
+  have columnBitsScaled := columnBits.trans auxLengthLeScaled
+  have rowBitsScaled := rowBits.trans auxLengthLeScaled
+  have xBitsScaled := xBits.trans auxLengthLeScaled
+  have doubleXBitsScaled := doubleXBits.trans auxLengthLeScaled
+  have yBitsScaled := yBits.trans auxLengthLeScaled
+  have periodSuccBitsScaled := periodSuccBits.trans auxLengthLeScaled
+  have phaseSuccBitsScaled := phaseSuccBits.trans auxLengthLeScaled
+  have columnSuccBitsScaled := columnSuccBits.trans auxLengthLeScaled
+  have rowSuccBitsScaled := rowSuccBits.trans auxLengthLeScaled
+  have xSuccBitsScaled := xSuccBits.trans auxLengthLeScaled
+  have doubleXSuccBitsScaled :=
+    doubleXSuccBits.trans auxLengthLeScaled
+  have ySuccBitsScaled := ySuccBits.trans auxLengthLeScaled
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+
+  simp only [packedTargetCellCost,
+    packedTargetCellArgumentsCost,
+    packedTargetXCost, packedTargetXArgumentsCost,
+    packedTargetColumnPhaseCost,
+    packedTargetColumnArgumentsCost,
+    packedTargetColumnArgumentsTailCost,
+    packedTargetYCost]
+  simp [prependCost, getCost, dropCost, headCost,
+    idCost, nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    x, yCode, numerator, zeroBits] at *
+  omega
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
