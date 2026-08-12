@@ -1499,6 +1499,9 @@ The representation choices for this target are:
   `Nat.pair` program inverse to the existing unpairer.  In particular, later
   transition code can build encoded `Cell` queries for the packed frontier
   lookup without appealing to an opaque primitive-recursive compiler.
+  [`LeanTrominoes/PartrecPairSpace.lean`](LeanTrominoes/PartrecPairSpace.lean)
+  fits both square-and-add branches and their explicit comparison selector,
+  yielding an exact evaluator-space certificate for forward pairing.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)

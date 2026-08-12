@@ -800,6 +800,7 @@ import LeanTrominoes.PartrecAdd
 import LeanTrominoes.PartrecMultiply
 import LeanTrominoes.PartrecMultiplySpace
 import LeanTrominoes.PartrecPair
+import LeanTrominoes.PartrecPairSpace
 import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecBinaryLengthSpace
