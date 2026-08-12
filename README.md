@@ -1517,7 +1517,8 @@ The representation choices for this target are:
   [`LeanTrominoes/PartrecPackedNormalizationAllSpace.lean`](LeanTrominoes/PartrecPackedNormalizationAllSpace.lean)
   composes the five fitted column calls through the four short-circuiting
   conjunctions, giving an exact continuation-independent evaluator-space
-  certificate for the complete normalization program.
+  certificate for the complete normalization program and a single explicit
+  input-linear workspace majorant shared by all five calls.
 - [`LeanTrominoes/PartrecPackedOverlapAt.lean`](LeanTrominoes/PartrecPackedOverlapAt.lean)
   and
   [`LeanTrominoes/PartrecPackedOverlapAtSpace.lean`](LeanTrominoes/PartrecPackedOverlapAtSpace.lean)
