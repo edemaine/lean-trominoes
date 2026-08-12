@@ -1542,6 +1542,10 @@ The representation choices for this target are:
   membership leaves of a tromino placement.  For either tromino and every
   square symmetry, the explicit program computes exactly the corresponding
   center-containment implication at one motif base.
+- [`LeanTrominoes/PartrecPackedCenterCandidateSpace.lean`](LeanTrominoes/PartrecPackedCenterCandidateSpace.lean)
+  fits that candidate implication end to end, including center assignment
+  selection, three canonical membership calls, both fixed conjunctions, and
+  the final Boolean implication, all without decoding the packed frontier.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)

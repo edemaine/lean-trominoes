@@ -242,6 +242,73 @@ theorem packedTargetMembership
       (packedTargetMembershipLookup
         column verticalOffset period phase motif row word)
 
+theorem packedTargetMembership_contains
+    (column : WindowColumn) (verticalOffset : Int)
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (packed : PackedWindowState) (row : Int) :
+    EvaluatorCodeFits
+      (Code.packedTargetMembershipCode column verticalOffset)
+      [periodicStrip.period, packed.phase,
+        Encodable.encode periodicStrip.motif,
+        Encodable.encode row, packed.assignmentWord]
+      [(periodicStrip.contains
+        ((packed.phase : Int) + column.displacement,
+          row + verticalOffset)).toNat]
+      (packedTargetMembershipCost column verticalOffset
+        periodicStrip.period packed.phase periodicStrip.motif
+          row packed.assignmentWord) := by
+  let x :=
+    Code.packedColumnPhaseNumerator periodicStrip.period
+      packed.phase column.val % periodicStrip.period
+  let target : Cell := (Int.ofNat x, row + verticalOffset)
+  let canonical : Cell :=
+    ((packed.columnPhase periodicStrip column : Int),
+      row + verticalOffset)
+  let outcome :=
+    Code.packedAssignmentLookupOutcome periodicStrip.motif
+      column.val target packed.assignmentWord
+  have targetEq : target = canonical := by
+    apply Prod.ext
+    · simp only [target, canonical, x,
+        PackedWindowState.columnPhase,
+        Code.packedColumnPhaseNumerator,
+        Code.packedColumnPhaseSum]
+      congr 2
+      omega
+    · rfl
+  have foundEq :
+      outcome.2.2 =
+        periodicStrip.contains
+          ((packed.phase : Int) + column.displacement,
+            row + verticalOffset) := by
+    rw [show outcome.2.2 = decide (target ∈ periodicStrip.motif) by
+      simpa [outcome] using
+        Code.packedAssignmentLookupOutcome_found_eq_decide_mem
+          periodicStrip.motif column target packed.assignmentWord]
+    rw [targetEq]
+    apply Eq.symm
+    apply Bool.eq_iff_iff.mpr
+    rw [decide_eq_true_eq]
+    exact PackedWindowState.contains_column_eq_true_iff_mem_motif
+      periodicStrip wellFormed packed column (row + verticalOffset)
+  have fitted := packedTargetMembership column verticalOffset
+    periodicStrip.period packed.phase periodicStrip.motif
+      row packed.assignmentWord
+  change EvaluatorCodeFits
+    (Code.packedTargetMembershipCode column verticalOffset)
+    (packedTargetMembershipValues periodicStrip.period packed.phase
+      (Encodable.encode periodicStrip.motif) (Encodable.encode row)
+      packed.assignmentWord)
+    [(periodicStrip.contains
+      ((packed.phase : Int) + column.displacement,
+        row + verticalOffset)).toNat]
+    (packedTargetMembershipCost column verticalOffset
+      periodicStrip.period packed.phase periodicStrip.motif
+        row packed.assignmentWord)
+  rw [← foundEq]
+  simpa [x, target, outcome] using fitted
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

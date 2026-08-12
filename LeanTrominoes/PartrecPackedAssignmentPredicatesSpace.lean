@@ -147,6 +147,58 @@ theorem packedAssignmentIs
       (packedAssignmentIsArguments
         state motif queriedColumn target word)
 
+theorem packedAssignmentIs_semantic
+    (state : Option SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState)
+    (column : WindowColumn) (target : Cell) :
+    EvaluatorCodeFits (Code.packedAssignmentIsCode state)
+      [Encodable.encode periodicStrip.motif, column.val,
+        Encodable.encode target, packed.assignmentWord]
+      [(decide
+        (packed.assignmentAtCell periodicStrip column target =
+          state)).toNat]
+      (packedAssignmentIsCost state periodicStrip.motif
+        column.val target packed.assignmentWord) := by
+  let digit :=
+    (Code.packedAssignmentLookupOutcome periodicStrip.motif
+      column.val target packed.assignmentWord).2.1
+  have digitBound : digit < 9 := by
+    simpa [digit] using
+      Code.packedAssignmentLookupOutcome_digit_lt
+        periodicStrip.motif column.val target packed.assignmentWord
+  have decoded :=
+    Code.assignmentOfDigit_packedAssignmentLookupOutcome
+      periodicStrip packed column target
+  have equivalent :
+      digit = RawWindowState.assignmentDigit state ↔
+        packed.assignmentAtCell periodicStrip column target = state := by
+    rw [← decoded]
+    exact (Code.assignmentOfDigit_eq_state_iff
+      digit digitBound state).symm
+  have outputEq :
+      (if digit = RawWindowState.assignmentDigit state then 1 else 0) =
+        (decide
+          (packed.assignmentAtCell periodicStrip column target =
+            state)).toNat := by
+    by_cases selected :
+        packed.assignmentAtCell periodicStrip column target = state
+    · rw [if_pos (equivalent.mpr selected)]
+      have selectedRaw :
+          (packed.toRaw periodicStrip).assignmentAtCell
+              periodicStrip column target = state := by
+        simpa using selected
+      simp [selectedRaw]
+    · rw [if_neg (fun equal => selected (equivalent.mp equal))]
+      have selectedRaw : ¬
+          (packed.toRaw periodicStrip).assignmentAtCell
+              periodicStrip column target = state := by
+        simpa using selected
+      simp [selectedRaw]
+  have fitted := packedAssignmentIs state periodicStrip.motif
+    column.val target packed.assignmentWord
+  simpa [digit, outputEq] using fitted
+
 def packedAssignmentLookupDigitSpaceBound
     (motifCode queriedColumn targetCode word : Nat) : Nat :=
   800000000000000000000 *

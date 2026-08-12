@@ -809,6 +809,7 @@ import LeanTrominoes.PeriodicStripCanonicalMembership
 import LeanTrominoes.PartrecPackedTargetMembership
 import LeanTrominoes.PartrecPackedTargetMembershipSpace
 import LeanTrominoes.PartrecPackedCenterCandidate
+import LeanTrominoes.PartrecPackedCenterCandidateSpace
 import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecBinaryLengthSpace
