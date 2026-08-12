@@ -343,6 +343,8 @@ build; an imported proof counts when its statement matches the paper.
         bounded machine slice and recover every source field bit.
       - [x] Verify fixed-width little-endian clock decoding, no-overflow
         succession, and accepting reset expressions.
+      - [x] Reconstruct ordinary TM2 configurations from list-shaped decoded
+        slices and prove bounded canonical encodings round-trip exactly.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1276,6 +1278,11 @@ The representation choices for this target are:
   natural-number values.  It verifies the canonical clock encoding and both
   ordinary-step successor and accepting-step reset expressions, including
   their generated-atom bounds.
+- [`LeanTrominoes/PeriodicCNFMachineConfiguration.lean`](LeanTrominoes/PeriodicCNFMachineConfiguration.lean)
+  recovers ordinary variable-length TM2 stacks from the occupied prefixes of
+  decoded fixed-width cell vectors.  Suffix-shaped vectors preserve every
+  represented cell, and bounded canonical encodings reconstruct both the TM2
+  configuration and reset-clock state exactly.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
