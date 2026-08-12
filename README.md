@@ -1537,6 +1537,11 @@ The representation choices for this target are:
   fits the complete membership leaf compositionally: fixed-column input
   assembly, canonical target construction, streaming motif lookup, and the
   final normalized `found` projection all have exact evaluator-space costs.
+- [`LeanTrominoes/PartrecPackedCenterCandidate.lean`](LeanTrominoes/PartrecPackedCenterCandidate.lean)
+  combines one fixed assignment-selection test with the three translated
+  membership leaves of a tromino placement.  For either tromino and every
+  square symmetry, the explicit program computes exactly the corresponding
+  center-containment implication at one motif base.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
