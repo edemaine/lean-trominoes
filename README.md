@@ -1521,6 +1521,10 @@ The representation choices for this target are:
   evaluator-space certificate for the encoded canonical cell.  Its final
   theorem combines one affine arithmetic envelope with the existing pairing
   envelope to give a linear encoded-space majorant.
+- [`LeanTrominoes/PeriodicStripCanonicalMembership.lean`](LeanTrominoes/PeriodicStripCanonicalMembership.lean)
+  proves that well-formed strip carrier membership is exactly finite motif
+  membership at the unique fundamental-domain representative, and specializes
+  this bridge to the physical and canonical coordinates of packed columns.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
