@@ -1546,6 +1546,13 @@ The representation choices for this target are:
   fits that candidate implication end to end, including center assignment
   selection, three canonical membership calls, both fixed conjunctions, and
   the final Boolean implication, all without decoding the packed frontier.
+- [`LeanTrominoes/PartrecPackedCenterSymmetries.lean`](LeanTrominoes/PartrecPackedCenterSymmetries.lean)
+  folds the eight fixed square-symmetry candidate implications at one motif
+  base and proves that the explicit program computes exactly the semantic
+  `List.all` center-containment condition.
+- [`LeanTrominoes/PartrecPackedCenterSymmetriesSpace.lean`](LeanTrominoes/PartrecPackedCenterSymmetriesSpace.lean)
+  fits that eight-way conjunction compositionally, with an exact recursive
+  evaluator cost built from the already fitted candidate leaves.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
