@@ -285,6 +285,25 @@ theorem intOffsetResultCode_encode (offset value : Int) :
 def intOffsetUnit (amount number : Nat) : Nat :=
   encodedListSpace [2 * (number + 2 * amount) + 8] + 1
 
+/-- The fixed-offset workspace unit is linear in the bit lengths of the
+encoded integer and the offset magnitude. -/
+theorem intOffsetUnit_le_linear (amount number : Nat) :
+    intOffsetUnit amount number ≤
+      20 * ((Computability.encodeNat number).length +
+        (Computability.encodeNat amount).length + 1) := by
+  have doubledAmount := encodeNat_mul_length_le_sum 2 amount
+  have inner := encodeNat_add_length_le_sum number (2 * amount)
+  have doubled := encodeNat_mul_length_le_sum 2 (number + 2 * amount)
+  have final := encodeNat_add_length_le_sum
+    (2 * (number + 2 * amount)) 8
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := by native_decide
+  have eightBits :
+      (Computability.encodeNat 8).length = 4 := by native_decide
+  simp only [intOffsetUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
 private theorem intPrimitiveCost_le_unit
     (number limit : Nat) (bounded : 2 * number + 8 ≤ limit) :
     intSuccessorCost number ≤
@@ -556,6 +575,23 @@ theorem intOffsetResultCode_le (offset : Int) (number : Nat) :
   | negSucc amount =>
       simpa [intOffsetResultCode, intOffsetAmount] using
         intCodeSubtractNat_le (amount + 1) number
+
+/-- Applying a fixed integer offset increases encoded length by at most a
+constant-factor expression in the input and offset-magnitude lengths. -/
+theorem intOffsetResultCode_length_le (offset : Int) (number : Nat) :
+    (Computability.encodeNat
+      (intOffsetResultCode offset number)).length ≤
+      10 * ((Computability.encodeNat number).length +
+        (Computability.encodeNat (intOffsetAmount offset)).length + 1) := by
+  have result := encodeNat_length_mono
+    (intOffsetResultCode_le offset number)
+  have doubled := encodeNat_mul_length_le_sum 2
+    (intOffsetAmount offset)
+  have summed := encodeNat_add_length_le_sum number
+    (2 * intOffsetAmount offset)
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := by native_decide
+  omega
 
 /-- Every fixed encoded-integer offset uses space linear in one encoded
 envelope.  The coefficient depends only linearly on the compile-time offset.-/

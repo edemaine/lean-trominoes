@@ -1512,7 +1512,8 @@ The representation choices for this target are:
   [`LeanTrominoes/PartrecPairSpace.lean`](LeanTrominoes/PartrecPairSpace.lean)
   fits both square-and-add branches and their explicit comparison selector,
   yielding an exact evaluator-space certificate and a common input-linear
-  workspace majorant for forward pairing.
+  workspace majorant for forward pairing.  That workspace unit is now also
+  bounded directly by the two operand bit lengths.
 - [`LeanTrominoes/PartrecIntOffset.lean`](LeanTrominoes/PartrecIntOffset.lean)
   implements successor, predecessor, and addition by a fixed integer directly
   on Mathlib's even/odd integer encoding.  These programs construct the
@@ -1520,7 +1521,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PartrecIntOffsetSpace.lean`](LeanTrominoes/PartrecIntOffsetSpace.lean)
   follows every parity branch of those offset programs with exact evaluator
   costs, composes them over arbitrary fixed offsets, and bounds the result
-  linearly in one encoded arithmetic envelope.
+  linearly in one encoded arithmetic envelope.  Both the envelope and the
+  shifted result code have explicit bit-length bounds in the input and fixed
+  offset magnitude.
 - [`LeanTrominoes/PartrecPackedTargetCell.lean`](LeanTrominoes/PartrecPackedTargetCell.lean)
   constructs the canonical encoded cell addressed by a packed frontier
   column and a fixed vertical source offset.  It explicitly computes and

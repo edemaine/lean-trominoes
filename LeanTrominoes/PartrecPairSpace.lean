@@ -191,6 +191,40 @@ def natPairLimit (left right : Nat) : Nat :=
 def natPairUnit (left right : Nat) : Nat :=
   encodedListSpace [natPairLimit left right] + 1
 
+/-- The forward-pairing workspace unit is linear in the two operand bit
+lengths. -/
+theorem natPairUnit_le_linear (left right : Nat) :
+    natPairUnit left right ≤
+      100 * ((Computability.encodeNat left).length +
+        (Computability.encodeNat right).length + 1) := by
+  have leftSquare := encodeNat_mul_length_le_sum left left
+  have rightSquare := encodeNat_mul_length_le_sum right right
+  have paired := encodeNat_pair_length_le left right
+  have sum1 := encodeNat_add_length_le_sum left right
+  have sum2 := encodeNat_add_length_le_sum
+    (left + right) (left * left)
+  have sum3 := encodeNat_add_length_le_sum
+    (left + right + left * left) (right * right)
+  have sum4 := encodeNat_add_length_le_sum
+    (left + right + left * left + right * right) (Nat.pair left right)
+  have sum5 := encodeNat_add_length_le_sum
+    (left + right + left * left + right * right + Nat.pair left right) 100
+  have scaled := encodeNat_mul_length_le_sum 64
+    (left + right + left * left + right * right +
+      Nat.pair left right + 100)
+  have final := encodeNat_add_length_le_sum
+    (64 * (left + right + left * left + right * right +
+      Nat.pair left right + 100)) 1000
+  have hundredBits :
+      (Computability.encodeNat 100).length = 7 := by native_decide
+  have sixtyFourBits :
+      (Computability.encodeNat 64).length = 7 := by native_decide
+  have thousandBits :
+      (Computability.encodeNat 1000).length = 10 := by native_decide
+  simp only [natPairUnit, natPairLimit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
 private theorem natPairValueBits_le_unit
     (left right value : Nat)
     (bound : value ≤ natPairLimit left right) :
