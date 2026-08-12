@@ -1560,6 +1560,13 @@ The representation choices for this target are:
 - [`LeanTrominoes/PartrecPackedCenterCoveringCandidateSpace.lean`](LeanTrominoes/PartrecPackedCenterCoveringCandidateSpace.lean)
   fits that active-candidate lookup compositionally from the canonical target
   constructor and fixed-assignment predicate.
+- [`LeanTrominoes/PartrecPackedCenterCoverage.lean`](LeanTrominoes/PartrecPackedCenterCoverage.lean)
+  sums the 24 fixed covering-candidate bits and compares the result with one;
+  the program is proved equal to the length-one test on the semantic packed
+  `activePlacementList`.
+- [`LeanTrominoes/PartrecPackedCenterCoverageSpace.lean`](LeanTrominoes/PartrecPackedCenterCoverageSpace.lean)
+  fits the complete fixed candidate sum and exact-one comparison, with exact
+  evaluator costs for every addition and list-composition node.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
