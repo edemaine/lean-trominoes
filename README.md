@@ -333,6 +333,8 @@ build; an imported proof counts when its statement matches the paper.
         every generated atom while preserving the source valuation.
       - [x] Build verified Boolean-vector expressions for exact-one finite
         fields, current/next equality, and no-overflow binary succession.
+      - [x] Allocate a collision-free finite atom vocabulary for bounded
+        labels, states, stack cells, and reset-clock bits.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1239,6 +1241,12 @@ The representation choices for this target are:
   finite conjunction and disjunction, exact-one fields, equality between
   adjacent slices, and a little-endian no-overflow successor relation.  It
   also proves the source-atom bounds needed by constructive CNF compilation.
+- [`LeanTrominoes/PeriodicCNFMachineAtoms.lean`](LeanTrominoes/PeriodicCNFMachineAtoms.lean)
+  defines the finite atom vocabulary of a bounded machine slice: optional
+  control labels, internal states, optional symbols in every bounded stack
+  cell, and little-endian clock bits.  A finite equivalence allocates these
+  constructors injectively below one `atomCount` fresh boundary, with
+  field-specific vectors and bounds.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
