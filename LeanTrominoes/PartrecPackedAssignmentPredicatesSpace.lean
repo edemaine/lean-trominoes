@@ -357,6 +357,23 @@ theorem packedAssignmentIsSpaceBound_le_linear
           packedAssignmentLookupInputUnit
             motifCode queriedColumn targetCode word := by ring
 
+/-- The fixed-state test and raw lookup use the same affine envelope, so the
+former is bounded by a fixed multiple of the latter. -/
+theorem packedAssignmentIsSpaceBound_le_lookupSpaceBound
+    (motifCode queriedColumn targetCode word : Nat) :
+    packedAssignmentIsSpaceBound
+        motifCode queriedColumn targetCode word ≤
+      10000000000000000 *
+        packedAssignmentLookupSpaceBound
+          motifCode queriedColumn targetCode word := by
+  let unit := encodedListSpace
+    [32 * (motifCode + motifCode + motifCode +
+      targetCode + queriedColumn + word + 40 + 32) + 200] + 1
+  change 1000000000000000000000000000000000000 * unit ≤
+    10000000000000000 * (700000000000000000000 * unit)
+  rw [← Nat.mul_assoc]
+  exact Nat.mul_le_mul_right unit (by norm_num)
+
 set_option maxRecDepth 10000 in
 set_option maxHeartbeats 1200000 in
 theorem packedAssignmentIsCost_le_linear

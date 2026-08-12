@@ -150,6 +150,38 @@ theorem packedCenterAssignmentIsCost_le_linear
     (packedCenterAssignmentArgumentsCost_le_linear
       periodicStrip packed base)
 
+/-- Uniform coefficient converting center-assignment selection to the shared
+six-field center input footprint. -/
+def packedCenterAssignmentIsLinearCoefficient : Nat :=
+  100000000000000000000000000000000000000 + 1000000000
+
+theorem packedCenterAssignmentIsSpaceBound_le_input
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterAssignmentIsSpaceBound periodicStrip packed base ≤
+      packedCenterAssignmentIsLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  have assignment := packedAssignmentIsSpaceBound_le_linear
+    (Encodable.encode periodicStrip.motif) WindowState.center.val
+    (Encodable.encode base) packed.assignmentWord
+  have lookupInput :
+      packedAssignmentLookupInputUnit
+          (Encodable.encode periodicStrip.motif) WindowState.center.val
+          (Encodable.encode base) packed.assignmentWord ≤
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+    have centerBits :
+        (Computability.encodeNat WindowState.center.val).length = 2 := by
+      native_decide
+    simp only [packedAssignmentLookupInputUnit,
+      packedCenterCandidateInputUnit, Code.packedCenterCandidateInput,
+      encodedListSpace_cons, encodedListSpace_nil]
+    omega
+  have assignmentGlobal := assignment.trans
+    (Nat.mul_le_mul_left _ lookupInput)
+  simp only [packedCenterAssignmentIsSpaceBound,
+    packedCenterAssignmentIsLinearCoefficient]
+  omega
+
 def packedCenterSourceInputCost
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) (base : Cell) : Nat :=
@@ -296,6 +328,67 @@ theorem packedCenterSourceInsideCost_le_linear
       periodicStrip.motif base.2 packed.assignmentWord)
     (packedCenterSourceInputCost_le_linear
       periodicStrip packed base)
+
+/-- A translated target-membership unit is controlled by the shared center
+input whenever its fixed vertical offset lies in the tromino range. -/
+theorem packedCenterTargetMembershipUnit_le_input
+    (column : WindowColumn) (verticalOffset : Int)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell)
+    (offsetSmall : intOffsetAmount verticalOffset ≤ 4) :
+    packedTargetMembershipUnit column verticalOffset
+        periodicStrip.period packed.phase periodicStrip.motif
+        base.2 packed.assignmentWord ≤
+      100000000000000000000000000 *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  have membership := packedTargetMembershipUnit_le_linear
+    column verticalOffset periodicStrip.period packed.phase
+    periodicStrip.motif base.2 packed.assignmentWord
+  have fourBits :
+      (Computability.encodeNat 4).length = 3 := by native_decide
+  have columnSmall : column.val ≤ 4 := by
+    exact Nat.le_pred_of_lt column.isLt
+  have columnBits := encodeNat_length_mono columnSmall
+  have offsetBits := encodeNat_length_mono offsetSmall
+  have targetBits :
+      packedTargetMembershipBitUnit column verticalOffset
+          periodicStrip.period packed.phase periodicStrip.motif
+          base.2 packed.assignmentWord ≤
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+    simp only [packedTargetMembershipBitUnit,
+      packedCenterCandidateInputUnit, Code.packedCenterCandidateInput,
+      encodedListSpace_cons, encodedListSpace_nil]
+    omega
+  exact membership.trans (Nat.mul_le_mul_left _ targetBits)
+
+/-- Uniform coefficient for any translated source query whose fixed column
+and vertical offset fit the tromino geometry. -/
+def packedCenterSourceInsideLinearCoefficient : Nat :=
+  1000000000000000000000000000000000000000000000000000000 *
+      5 * 100000000000000000000000000 +
+    1000000000
+
+theorem packedCenterSourceInsideSpaceBound_le_input
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell)
+    (offsetSmall : intOffsetAmount (symmetry.act source).2 ≤ 4) :
+    packedCenterSourceInsideSpaceBound symmetry source
+        periodicStrip packed base ≤
+      packedCenterSourceInsideLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  have membershipGlobal := packedCenterTargetMembershipUnit_le_input
+    (Code.packedSourceColumn symmetry source) (symmetry.act source).2
+    periodicStrip packed base offsetSmall
+  have factorBound :
+      1000000000000000000000000000000000000000000000000000000 *
+          (intOffsetAmount (symmetry.act source).2 + 1) ≤
+        1000000000000000000000000000000000000000000000000000000 * 5 := by
+    exact Nat.mul_le_mul_left _ (by omega)
+  have sourceGlobal := Nat.mul_le_mul factorBound membershipGlobal
+  simp only [packedCenterSourceInsideSpaceBound,
+    packedCenterSourceInsideLinearCoefficient]
+  omega
 
 private def boolAndThreeCost
     (values : List Nat)
@@ -517,6 +610,126 @@ theorem packedCenterAllSourcesInsideCost_le_linear
           symmetry (0, 1) periodicStrip packed base
         simp only [packedCenterAllSourcesInsideSpaceUnit]
         omega
+
+/-- Uniform coefficient for the fixed three translated membership tests and
+their Boolean conjunction. -/
+def packedCenterAllSourcesInsideLinearCoefficient : Nat :=
+  2000000 * (3 * packedCenterSourceInsideLinearCoefficient + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterAllSourcesInsideSpaceBound_le_input
+    (tromino : Tromino) (symmetry : SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterAllSourcesInsideSpaceBound tromino symmetry
+        periodicStrip packed base ≤
+      packedCenterAllSourcesInsideLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have inputPositive :
+      1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  have first := packedCenterSourceInsideSpaceBound_le_input
+    symmetry (0, 0) periodicStrip packed base
+    (by cases symmetry <;> native_decide)
+  have second := packedCenterSourceInsideSpaceBound_le_input
+    symmetry (1, 0) periodicStrip packed base
+    (by cases symmetry <;> native_decide)
+  cases tromino with
+  | I =>
+      have third := packedCenterSourceInsideSpaceBound_le_input
+        symmetry (2, 0) periodicStrip packed base
+        (by cases symmetry <;> native_decide)
+      have sumBound :
+          packedCenterSourceInsideSpaceBound symmetry (0, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (1, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (2, 0)
+                periodicStrip packed base + input + 100 + 1 ≤
+            (3 * packedCenterSourceInsideLinearCoefficient + 102) * input := by
+        simp only [input] at first second third ⊢
+        calc
+          _ ≤ packedCenterSourceInsideLinearCoefficient * input +
+                packedCenterSourceInsideLinearCoefficient * input +
+                packedCenterSourceInsideLinearCoefficient * input +
+                input + 100 + 1 := by
+            dsimp only [input]
+            omega
+          _ = (3 * packedCenterSourceInsideLinearCoefficient + 1) *
+                input + 101 := by ring
+          _ ≤ (3 * packedCenterSourceInsideLinearCoefficient + 1) *
+                input + 101 * input :=
+            Nat.add_le_add_left
+              (Nat.mul_le_mul_left 101 inputPositive) _
+          _ = (3 * packedCenterSourceInsideLinearCoefficient + 102) *
+                input := by ring
+      change
+        2000000 *
+            (packedCenterSourceInsideSpaceBound symmetry (0, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (1, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (2, 0)
+                periodicStrip packed base + input + 100 + 1) ≤
+          packedCenterAllSourcesInsideLinearCoefficient * input
+      calc
+        _ ≤ 2000000 *
+              ((3 * packedCenterSourceInsideLinearCoefficient + 102) *
+                input) :=
+          Nat.mul_le_mul_left _ sumBound
+        _ = (2000000 *
+              (3 * packedCenterSourceInsideLinearCoefficient + 102)) *
+                input :=
+          (Nat.mul_assoc _ _ _).symm
+        _ = _ := rfl
+  | L =>
+      have third := packedCenterSourceInsideSpaceBound_le_input
+        symmetry (0, 1) periodicStrip packed base
+        (by cases symmetry <;> native_decide)
+      have sumBound :
+          packedCenterSourceInsideSpaceBound symmetry (0, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (1, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (0, 1)
+                periodicStrip packed base + input + 100 + 1 ≤
+            (3 * packedCenterSourceInsideLinearCoefficient + 102) * input := by
+        simp only [input] at first second third ⊢
+        calc
+          _ ≤ packedCenterSourceInsideLinearCoefficient * input +
+                packedCenterSourceInsideLinearCoefficient * input +
+                packedCenterSourceInsideLinearCoefficient * input +
+                input + 100 + 1 := by
+            dsimp only [input]
+            omega
+          _ = (3 * packedCenterSourceInsideLinearCoefficient + 1) *
+                input + 101 := by ring
+          _ ≤ (3 * packedCenterSourceInsideLinearCoefficient + 1) *
+                input + 101 * input :=
+            Nat.add_le_add_left
+              (Nat.mul_le_mul_left 101 inputPositive) _
+          _ = (3 * packedCenterSourceInsideLinearCoefficient + 102) *
+                input := by ring
+      change
+        2000000 *
+            (packedCenterSourceInsideSpaceBound symmetry (0, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (1, 0)
+                periodicStrip packed base +
+              packedCenterSourceInsideSpaceBound symmetry (0, 1)
+                periodicStrip packed base + input + 100 + 1) ≤
+          packedCenterAllSourcesInsideLinearCoefficient * input
+      calc
+        _ ≤ 2000000 *
+              ((3 * packedCenterSourceInsideLinearCoefficient + 102) *
+                input) :=
+          Nat.mul_le_mul_left _ sumBound
+        _ = (2000000 *
+              (3 * packedCenterSourceInsideLinearCoefficient + 102)) *
+                input :=
+          (Nat.mul_assoc _ _ _).symm
+        _ = _ := rfl
 
 theorem packedCenterAllSourcesInside
     (tromino : Tromino) (symmetry : SquareSymmetry)
@@ -748,6 +961,70 @@ theorem packedCenterCandidateInsideCost_le_linear
   exact result.trans (by
     simp only [outerBudget]
     omega)
+
+/-- Uniform coefficient for one fixed-symmetry center-containment
+implication. -/
+def packedCenterCandidateInsideLinearCoefficient : Nat :=
+  2000000 * (packedCenterAssignmentIsLinearCoefficient +
+    packedCenterAllSourcesInsideLinearCoefficient + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterCandidateInsideSpaceBound_le_input
+    (tromino : Tromino) (symmetry : SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterCandidateInsideSpaceBound tromino symmetry
+        periodicStrip packed base ≤
+      packedCenterCandidateInsideLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have inputPositive :
+      1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  have assignment := packedCenterAssignmentIsSpaceBound_le_input
+    periodicStrip packed base
+  have sources := packedCenterAllSourcesInsideSpaceBound_le_input
+    tromino symmetry periodicStrip packed base
+  have sumBound :
+      packedCenterAssignmentIsSpaceBound periodicStrip packed base +
+          packedCenterAllSourcesInsideSpaceBound tromino symmetry
+            periodicStrip packed base + input + 100 + 1 ≤
+        (packedCenterAssignmentIsLinearCoefficient +
+          packedCenterAllSourcesInsideLinearCoefficient + 102) * input := by
+    simp only [input] at assignment sources ⊢
+    calc
+      _ ≤ packedCenterAssignmentIsLinearCoefficient * input +
+            packedCenterAllSourcesInsideLinearCoefficient * input + input +
+            100 + 1 := by
+        dsimp only [input]
+        omega
+      _ = (packedCenterAssignmentIsLinearCoefficient +
+            packedCenterAllSourcesInsideLinearCoefficient + 1) * input +
+          101 := by ring
+      _ ≤ (packedCenterAssignmentIsLinearCoefficient +
+            packedCenterAllSourcesInsideLinearCoefficient + 1) * input +
+          101 * input :=
+        Nat.add_le_add_left
+          (Nat.mul_le_mul_left 101 inputPositive) _
+      _ = (packedCenterAssignmentIsLinearCoefficient +
+            packedCenterAllSourcesInsideLinearCoefficient + 102) * input := by
+          ring
+  change
+    2000000 *
+        (packedCenterAssignmentIsSpaceBound periodicStrip packed base +
+          packedCenterAllSourcesInsideSpaceBound tromino symmetry
+            periodicStrip packed base + input + 100 + 1) ≤
+      packedCenterCandidateInsideLinearCoefficient * input
+  calc
+    _ ≤ 2000000 *
+          ((packedCenterAssignmentIsLinearCoefficient +
+            packedCenterAllSourcesInsideLinearCoefficient + 102) * input) :=
+      Nat.mul_le_mul_left _ sumBound
+    _ = (2000000 *
+          (packedCenterAssignmentIsLinearCoefficient +
+            packedCenterAllSourcesInsideLinearCoefficient + 102)) * input :=
+      (Nat.mul_assoc _ _ _).symm
+    _ = _ := rfl
 
 /-- Exact fitted execution of one center-containment implication. -/
 theorem packedCenterCandidateInside

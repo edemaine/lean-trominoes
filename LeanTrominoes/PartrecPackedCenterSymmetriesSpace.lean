@@ -206,6 +206,79 @@ theorem packedCenterSymmetryListInsideCost_le_linear
           headCost tailCost ≤ 1000 * (budget + 1)
       exact result
 
+/-- Coefficient obtained by lifting the uniform candidate bound through a
+compile-time conjunction list. -/
+def packedCenterSymmetryListInsideLinearCoefficient :
+    List SquareSymmetry → Nat
+  | [] => 200000
+  | _ :: symmetries =>
+      1000 * (packedCenterCandidateInsideLinearCoefficient +
+        packedCenterSymmetryListInsideLinearCoefficient symmetries + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterSymmetryListInsideSpaceBound_le_input
+    (tromino : Tromino) (symmetries : List SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterSymmetryListInsideSpaceBound tromino periodicStrip
+        packed base symmetries ≤
+      packedCenterSymmetryListInsideLinearCoefficient symmetries *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have inputPositive : 1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  induction symmetries with
+  | nil => rfl
+  | cons symmetry symmetries induction =>
+      have head := packedCenterCandidateInsideSpaceBound_le_input
+        tromino symmetry periodicStrip packed base
+      have sumBound :
+          packedCenterCandidateInsideSpaceBound tromino symmetry
+                periodicStrip packed base +
+              packedCenterSymmetryListInsideSpaceBound tromino
+                periodicStrip packed base symmetries + input + 100 + 1 ≤
+            (packedCenterCandidateInsideLinearCoefficient +
+              packedCenterSymmetryListInsideLinearCoefficient symmetries +
+              102) * input := by
+        simp only [input] at head induction ⊢
+        calc
+          _ ≤ packedCenterCandidateInsideLinearCoefficient * input +
+                packedCenterSymmetryListInsideLinearCoefficient symmetries *
+                  input + input + 100 + 1 := by
+            dsimp only [input]
+            omega
+          _ = (packedCenterCandidateInsideLinearCoefficient +
+                packedCenterSymmetryListInsideLinearCoefficient symmetries +
+                1) * input + 101 := by ring
+          _ ≤ (packedCenterCandidateInsideLinearCoefficient +
+                packedCenterSymmetryListInsideLinearCoefficient symmetries +
+                1) * input + 101 * input :=
+            Nat.add_le_add_left
+              (Nat.mul_le_mul_left 101 inputPositive) _
+          _ = (packedCenterCandidateInsideLinearCoefficient +
+                packedCenterSymmetryListInsideLinearCoefficient symmetries +
+                102) * input := by ring
+      change
+        1000 *
+            (packedCenterCandidateInsideSpaceBound tromino symmetry
+                periodicStrip packed base +
+              packedCenterSymmetryListInsideSpaceBound tromino
+                periodicStrip packed base symmetries + input + 100 + 1) ≤
+          packedCenterSymmetryListInsideLinearCoefficient
+            (symmetry :: symmetries) * input
+      calc
+        _ ≤ 1000 *
+              ((packedCenterCandidateInsideLinearCoefficient +
+                packedCenterSymmetryListInsideLinearCoefficient symmetries +
+                102) * input) :=
+          Nat.mul_le_mul_left _ sumBound
+        _ = (1000 *
+              (packedCenterCandidateInsideLinearCoefficient +
+                packedCenterSymmetryListInsideLinearCoefficient symmetries +
+                102)) * input :=
+          (Nat.mul_assoc _ _ _).symm
+        _ = _ := rfl
+
 def packedCenterAllSymmetriesInsideCost
     (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -219,6 +292,21 @@ def packedCenterAllSymmetriesInsideSpaceBound
     (packed : PackedWindowState) (base : Cell) : Nat :=
   packedCenterSymmetryListInsideSpaceBound tromino periodicStrip
     packed base TrominoAssignment.squareSymmetryList
+
+def packedCenterAllSymmetriesInsideLinearCoefficient : Nat :=
+  packedCenterSymmetryListInsideLinearCoefficient
+    TrominoAssignment.squareSymmetryList
+
+theorem packedCenterAllSymmetriesInsideSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterAllSymmetriesInsideSpaceBound tromino
+        periodicStrip packed base ≤
+      packedCenterAllSymmetriesInsideLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base :=
+  packedCenterSymmetryListInsideSpaceBound_le_input tromino
+    TrominoAssignment.squareSymmetryList periodicStrip packed base
 
 theorem packedCenterAllSymmetriesInsideCost_le_linear
     (tromino : Tromino)

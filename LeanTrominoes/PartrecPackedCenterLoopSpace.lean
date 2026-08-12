@@ -403,6 +403,97 @@ theorem packedCenterBaseValidSpaceBound_le_maximum
       · exact Nat.le_max_left _ _
       · exact (induction member).trans (Nat.le_max_right _ _)
 
+theorem packedCenter_encode_member_le_list
+    (cell : Cell) (cells : List Cell) (member : cell ∈ cells) :
+    Encodable.encode cell ≤ Encodable.encode cells := by
+  induction cells with
+  | nil => simp at member
+  | cons head cells induction =>
+      simp only [List.mem_cons] at member
+      rcases member with rfl | member
+      · change Encodable.encode cell ≤
+          Nat.pair (Encodable.encode cell) (Encodable.encode cells) + 1
+        have paired := Nat.left_le_pair
+          (Encodable.encode cell) (Encodable.encode cells)
+        omega
+      · have tail := encode_list_suffix_le [head] cells
+        exact (induction member).trans (by
+          simpa only [List.singleton_append] using tail)
+
+theorem packedCenterCandidateInputUnit_le_normalizationInput
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell)
+    (member : base ∈ periodicStrip.motif) :
+    packedCenterCandidateInputUnit periodicStrip packed base ≤
+      3 * packedNormalizationInputUnit periodicStrip packed := by
+  have baseCode := packedCenter_encode_member_le_list
+    base periodicStrip.motif member
+  have baseBits := encodeNat_length_mono baseCode
+  have rowCode : Encodable.encode base.2 ≤ Encodable.encode base := by
+    change Encodable.encode base.2 ≤
+      Nat.pair (Encodable.encode base.1) (Encodable.encode base.2)
+    exact Nat.right_le_pair _ _
+  have rowBits := encodeNat_length_mono rowCode
+  simp only [packedCenterCandidateInputUnit,
+    Code.packedCenterCandidateInput, packedNormalizationInputUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
+def packedCenterBaseMaximumLinearCoefficient (tromino : Tromino) : Nat :=
+  packedCenterBaseValidLinearCoefficient tromino * 3
+
+set_option maxRecDepth 100000 in
+theorem packedCenterBaseSpaceMaximum_le_input_of_subset
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (cells : List Cell)
+    (subset : ∀ cell ∈ cells, cell ∈ periodicStrip.motif) :
+    packedCenterBaseSpaceMaximum tromino periodicStrip packed cells ≤
+      packedCenterBaseMaximumLinearCoefficient tromino *
+        packedNormalizationInputUnit periodicStrip packed := by
+  induction cells with
+  | nil => simp [packedCenterBaseSpaceMaximum]
+  | cons cell cells induction =>
+      have member := subset cell (by simp)
+      have tailSubset : ∀ remaining ∈ cells,
+          remaining ∈ periodicStrip.motif := by
+        intro remaining remainingMember
+        exact subset remaining (by simp [remainingMember])
+      have tail := induction tailSubset
+      have base := packedCenterBaseValidSpaceBound_le_input
+        tromino periodicStrip packed cell
+      have input := packedCenterCandidateInputUnit_le_normalizationInput
+        periodicStrip packed cell member
+      have head :
+          packedCenterBaseValidSpaceBound tromino periodicStrip packed cell ≤
+            packedCenterBaseMaximumLinearCoefficient tromino *
+              packedNormalizationInputUnit periodicStrip packed := by
+        calc
+          _ ≤ packedCenterBaseValidLinearCoefficient tromino *
+                packedCenterCandidateInputUnit periodicStrip packed cell :=
+            base
+          _ ≤ packedCenterBaseValidLinearCoefficient tromino *
+                (3 * packedNormalizationInputUnit periodicStrip packed) :=
+            Nat.mul_le_mul_left _ input
+          _ = packedCenterBaseMaximumLinearCoefficient tromino *
+                packedNormalizationInputUnit periodicStrip packed := by
+            rw [packedCenterBaseMaximumLinearCoefficient]
+            exact (Nat.mul_assoc _ _ _).symm
+      simp only [packedCenterBaseSpaceMaximum]
+      exact max_le head tail
+
+theorem packedCenterBaseSpaceMaximum_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) :
+    packedCenterBaseSpaceMaximum tromino periodicStrip packed
+        periodicStrip.motif ≤
+      packedCenterBaseMaximumLinearCoefficient tromino *
+        packedNormalizationInputUnit periodicStrip packed := by
+  apply packedCenterBaseSpaceMaximum_le_input_of_subset
+  intro cell member
+  exact member
+
 def packedCenterPolynomialSpaceLimit
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) : Nat :=
@@ -423,12 +514,81 @@ def packedCenterPolynomialSpaceUnit
     (encodedListSpace
       [packedCenterPolynomialSpaceLimit periodicStrip packed] + 1)
 
+def packedCenterPolynomialSpaceUnitLinearCoefficient
+    (tromino : Tromino) : Nat :=
+  packedCenterBaseMaximumLinearCoefficient tromino +
+    (1000000000000000000000000000000000 * 100) + 100
+
+set_option maxRecDepth 100000 in
+theorem packedCenterPolynomialSpaceUnit_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) :
+    packedCenterPolynomialSpaceUnit tromino periodicStrip packed ≤
+      packedCenterPolynomialSpaceUnitLinearCoefficient tromino *
+        packedNormalizationInputUnit periodicStrip packed := by
+  have bases := packedCenterBaseSpaceMaximum_le_input
+    tromino periodicStrip packed
+  have normalization := packedNormalizationPolynomialSpaceBound_le_input
+    periodicStrip packed WindowState.center
+  have nativeRaw := packedNormalizationPolynomialEnvelopeUnit_le_linear
+    periodicStrip packed WindowState.center
+  have native :
+      encodedListSpace
+          [packedCenterPolynomialSpaceLimit periodicStrip packed] + 1 ≤
+        100 * packedNormalizationInputUnit periodicStrip packed := by
+    simpa [packedCenterPolynomialSpaceLimit] using nativeRaw
+  change
+    packedCenterBaseSpaceMaximum tromino periodicStrip packed
+          periodicStrip.motif +
+        packedNormalizationPolynomialSpaceBound periodicStrip packed
+          WindowState.center +
+        (encodedListSpace
+          [packedCenterPolynomialSpaceLimit periodicStrip packed] + 1) ≤ _
+  calc
+    _ ≤ packedCenterBaseMaximumLinearCoefficient tromino *
+            packedNormalizationInputUnit periodicStrip packed +
+          (1000000000000000000000000000000000 * 100) *
+            packedNormalizationInputUnit periodicStrip packed +
+          100 * packedNormalizationInputUnit periodicStrip packed :=
+      Nat.add_le_add (Nat.add_le_add bases normalization) native
+    _ = packedCenterPolynomialSpaceUnitLinearCoefficient tromino *
+          packedNormalizationInputUnit periodicStrip packed := by
+      rw [packedCenterPolynomialSpaceUnitLinearCoefficient]
+      ring
+
 def packedCenterPolynomialSpaceBound
     (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) : Nat :=
   10000000000000000000000000000000000000000 *
     packedCenterPolynomialSpaceUnit tromino periodicStrip packed
+
+def packedCenterPolynomialSpaceBoundLinearCoefficient
+    (tromino : Tromino) : Nat :=
+  10000000000000000000000000000000000000000 *
+    packedCenterPolynomialSpaceUnitLinearCoefficient tromino
+
+theorem packedCenterPolynomialSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) :
+    packedCenterPolynomialSpaceBound tromino periodicStrip packed ≤
+      packedCenterPolynomialSpaceBoundLinearCoefficient tromino *
+        packedNormalizationInputUnit periodicStrip packed := by
+  have unit := packedCenterPolynomialSpaceUnit_le_input
+    tromino periodicStrip packed
+  change
+    10000000000000000000000000000000000000000 *
+        packedCenterPolynomialSpaceUnit tromino periodicStrip packed ≤ _
+  calc
+    _ ≤ 10000000000000000000000000000000000000000 *
+          (packedCenterPolynomialSpaceUnitLinearCoefficient tromino *
+            packedNormalizationInputUnit periodicStrip packed) :=
+      Nat.mul_le_mul_left _ unit
+    _ = _ := by
+      rw [packedCenterPolynomialSpaceBoundLinearCoefficient]
+      exact (Nat.mul_assoc _ _ _).symm
 
 set_option maxRecDepth 10000 in
 set_option maxHeartbeats 1200000 in
@@ -1192,6 +1352,48 @@ def packedCenterValidPolynomialSpaceBound
     (packed : PackedWindowState) : Nat :=
   100000000000000000000000000000000000000000 *
     (packedCenterPolynomialSpaceUnit tromino periodicStrip packed + 1)
+
+def packedCenterValidPolynomialSpaceBoundLinearCoefficient
+    (tromino : Tromino) : Nat :=
+  100000000000000000000000000000000000000000 *
+    (packedCenterPolynomialSpaceUnitLinearCoefficient tromino + 1)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterValidPolynomialSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) :
+    packedCenterValidPolynomialSpaceBound tromino periodicStrip packed ≤
+      packedCenterValidPolynomialSpaceBoundLinearCoefficient tromino *
+        packedNormalizationInputUnit periodicStrip packed := by
+  let input := packedNormalizationInputUnit periodicStrip packed
+  have inputPositive : 1 ≤ input := by
+    simp [input, packedNormalizationInputUnit]
+  have unit := packedCenterPolynomialSpaceUnit_le_input
+    tromino periodicStrip packed
+  have plus :
+      packedCenterPolynomialSpaceUnit tromino periodicStrip packed + 1 ≤
+        (packedCenterPolynomialSpaceUnitLinearCoefficient tromino + 1) *
+          input := by
+    simp only [input] at unit ⊢
+    calc
+      _ ≤ packedCenterPolynomialSpaceUnitLinearCoefficient tromino * input +
+            1 := Nat.add_le_add_right unit _
+      _ ≤ packedCenterPolynomialSpaceUnitLinearCoefficient tromino * input +
+            input := Nat.add_le_add_left inputPositive _
+      _ = (packedCenterPolynomialSpaceUnitLinearCoefficient tromino + 1) *
+            input := by ring
+  change
+    100000000000000000000000000000000000000000 *
+        (packedCenterPolynomialSpaceUnit tromino periodicStrip packed + 1) ≤
+      packedCenterValidPolynomialSpaceBoundLinearCoefficient tromino * input
+  calc
+    _ ≤ 100000000000000000000000000000000000000000 *
+          ((packedCenterPolynomialSpaceUnitLinearCoefficient tromino + 1) *
+            input) := Nat.mul_le_mul_left _ plus
+    _ = _ := by
+      rw [packedCenterValidPolynomialSpaceBoundLinearCoefficient]
+      exact (Nat.mul_assoc _ _ _).symm
 
 theorem packedCenterValidCost_le_polynomialSpaceBound
     (tromino : Tromino)

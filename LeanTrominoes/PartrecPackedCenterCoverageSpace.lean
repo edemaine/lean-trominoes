@@ -322,6 +322,104 @@ theorem packedCenterCoveringCandidateListCountCost_le_linear
             headCost tailCost ≤ 200000000 * (budget + 1)
       omega
 
+/-- Coefficient obtained by lifting the uniform covering-candidate bound
+through a fixed candidate-count list. -/
+def packedCenterCoveringCandidateListCountLinearCoefficient :
+    List (SquareSymmetry × Cell) → Nat
+  | [] => 10000
+  | _ :: candidates =>
+      200000000 *
+        (packedCenterCoveringCandidateLinearCoefficient +
+          packedCenterCoveringCandidateListCountLinearCoefficient candidates +
+          (encodedListSpace [1, candidates.length] + 1) +
+          (encodedListSpace [2 * (candidates.length + 1) + 4] + 1) + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterCoveringCandidateListCountSpaceBound_le_input
+    (tromino : Tromino)
+    (candidates : List (SquareSymmetry × Cell))
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell)
+    (offsetSmall : ∀ candidate ∈ candidates,
+      intOffsetAmount (-(candidate.1.act candidate.2).2) ≤ 4) :
+    packedCenterCoveringCandidateListCountSpaceBound tromino periodicStrip
+        packed base candidates ≤
+      packedCenterCoveringCandidateListCountLinearCoefficient candidates *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have inputPositive : 1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  induction candidates with
+  | nil => rfl
+  | cons candidate candidates induction =>
+      have headSmall := offsetSmall candidate (by simp)
+      have tailSmall : ∀ remaining ∈ candidates,
+          intOffsetAmount (-(remaining.1.act remaining.2).2) ≤ 4 := by
+        intro remaining member
+        exact offsetSmall remaining (by simp [member])
+      have tail := induction tailSmall
+      have head := packedCenterCoveringCandidateSpaceBound_le_input
+        candidate.1 candidate.2 periodicStrip packed base headSmall
+      let firstExtra := encodedListSpace [1, candidates.length] + 1
+      let secondExtra :=
+        encodedListSpace [2 * (candidates.length + 1) + 4] + 1
+      have constantsBound :
+          firstExtra + secondExtra + 101 ≤
+            (firstExtra + secondExtra + 101) * input :=
+        by simpa using
+          Nat.mul_le_mul_left (firstExtra + secondExtra + 101) inputPositive
+      have sumBound :
+          packedCenterCoveringCandidateSpaceBound candidate.1 candidate.2
+                periodicStrip packed base +
+              packedCenterCoveringCandidateListCountSpaceBound tromino
+                periodicStrip packed base candidates + input +
+              firstExtra + secondExtra + 100 + 1 ≤
+            (packedCenterCoveringCandidateLinearCoefficient +
+              packedCenterCoveringCandidateListCountLinearCoefficient
+                candidates + firstExtra + secondExtra + 102) * input := by
+        simp only [input] at head tail ⊢
+        calc
+          _ ≤ packedCenterCoveringCandidateLinearCoefficient * input +
+                packedCenterCoveringCandidateListCountLinearCoefficient
+                  candidates * input + input + firstExtra + secondExtra +
+                100 + 1 := by
+            dsimp only [input]
+            omega
+          _ = (packedCenterCoveringCandidateLinearCoefficient +
+                packedCenterCoveringCandidateListCountLinearCoefficient
+                  candidates + 1) * input +
+              (firstExtra + secondExtra + 101) := by ring
+          _ ≤ (packedCenterCoveringCandidateLinearCoefficient +
+                packedCenterCoveringCandidateListCountLinearCoefficient
+                  candidates + 1) * input +
+              (firstExtra + secondExtra + 101) * input :=
+            Nat.add_le_add_left constantsBound _
+          _ = (packedCenterCoveringCandidateLinearCoefficient +
+                packedCenterCoveringCandidateListCountLinearCoefficient
+                  candidates + firstExtra + secondExtra + 102) * input := by
+            ring
+      change
+        200000000 *
+            (packedCenterCoveringCandidateSpaceBound
+                candidate.1 candidate.2 periodicStrip packed base +
+              packedCenterCoveringCandidateListCountSpaceBound tromino
+                periodicStrip packed base candidates + input +
+              firstExtra + secondExtra + 100 + 1) ≤
+          packedCenterCoveringCandidateListCountLinearCoefficient
+            (candidate :: candidates) * input
+      calc
+        _ ≤ 200000000 *
+              ((packedCenterCoveringCandidateLinearCoefficient +
+                packedCenterCoveringCandidateListCountLinearCoefficient
+                  candidates + firstExtra + secondExtra + 102) * input) :=
+          Nat.mul_le_mul_left _ sumBound
+        _ = (200000000 *
+              (packedCenterCoveringCandidateLinearCoefficient +
+                packedCenterCoveringCandidateListCountLinearCoefficient
+                  candidates + firstExtra + secondExtra + 102)) * input :=
+          (Nat.mul_assoc _ _ _).symm
+        _ = _ := rfl
+
 def packedCenterCoveringCountCost
     (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -337,6 +435,38 @@ def packedCenterCoveringCountSpaceBound
   packedCenterCoveringCandidateListCountSpaceBound tromino
     periodicStrip packed base
     (Code.packedCenterCoveringCandidateList tromino)
+
+def packedCenterCoveringCountLinearCoefficient (tromino : Tromino) : Nat :=
+  packedCenterCoveringCandidateListCountLinearCoefficient
+    (Code.packedCenterCoveringCandidateList tromino)
+
+theorem packedCenterCoveringCandidateList_offset_small
+    (tromino : Tromino) (candidate : SquareSymmetry × Cell)
+    (member : candidate ∈ Code.packedCenterCoveringCandidateList tromino) :
+    intOffsetAmount (-(candidate.1.act candidate.2).2) ≤ 4 := by
+  rcases candidate with ⟨symmetry, source⟩
+  have sourceMember :
+      source ∈ TrominoAssignment.trominoCellList tromino := by
+    have pairMember :
+        symmetry ∈ TrominoAssignment.squareSymmetryList ∧
+          source ∈ TrominoAssignment.trominoCellList tromino := by
+      simpa [Code.packedCenterCoveringCandidateList] using member
+    exact pairMember.2
+  cases tromino <;> cases symmetry <;>
+    simp [TrominoAssignment.trominoCellList] at sourceMember
+  all_goals rcases sourceMember with rfl | rfl | rfl <;> native_decide
+
+theorem packedCenterCoveringCountSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterCoveringCountSpaceBound tromino periodicStrip packed base ≤
+      packedCenterCoveringCountLinearCoefficient tromino *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  apply packedCenterCoveringCandidateListCountSpaceBound_le_input
+  intro candidate member
+  exact packedCenterCoveringCandidateList_offset_small
+    tromino candidate member
 
 theorem packedCenterCoveringCountCost_le_linear
     (tromino : Tromino)
@@ -546,6 +676,68 @@ theorem packedCenterExactlyOneCoveringCost_le_linear
       packedCenterExactlyOneCoveringArgumentsCost tromino
         periodicStrip packed base ≤ 20000000000 * (unit + 1)
   omega
+
+def packedCenterExactlyOneCoveringLinearCoefficient
+    (tromino : Tromino) : Nat :=
+  20000000000 *
+    (packedCenterCoveringCountLinearCoefficient tromino + 1000000 +
+      (encodedListSpace [24, 1] + 1) +
+      (encodedListSpace [54] + 1) + 101)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterExactlyOneCoveringSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterExactlyOneCoveringSpaceBound tromino
+        periodicStrip packed base ≤
+      packedCenterExactlyOneCoveringLinearCoefficient tromino *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  let firstExtra := encodedListSpace [24, 1] + 1
+  let secondExtra := encodedListSpace [54] + 1
+  have inputPositive : 1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  have count := packedCenterCoveringCountSpaceBound_le_input
+    tromino periodicStrip packed base
+  have constantsBound :
+      firstExtra + secondExtra + 101 ≤
+        (firstExtra + secondExtra + 101) * input := by
+    simpa using Nat.mul_le_mul_left
+      (firstExtra + secondExtra + 101) inputPositive
+  have sumBound :
+      packedCenterCoveringCountSpaceBound tromino periodicStrip packed base +
+          1000000 * input + firstExtra + secondExtra + 100 + 1 ≤
+        (packedCenterCoveringCountLinearCoefficient tromino + 1000000 +
+          firstExtra + secondExtra + 101) * input := by
+    simp only [input] at count ⊢
+    calc
+      _ ≤ packedCenterCoveringCountLinearCoefficient tromino * input +
+            1000000 * input + firstExtra + secondExtra + 100 + 1 := by
+        dsimp only [input]
+        omega
+      _ = (packedCenterCoveringCountLinearCoefficient tromino + 1000000) *
+            input + (firstExtra + secondExtra + 101) := by ring
+      _ ≤ (packedCenterCoveringCountLinearCoefficient tromino + 1000000) *
+            input + (firstExtra + secondExtra + 101) * input :=
+        Nat.add_le_add_left constantsBound _
+      _ = (packedCenterCoveringCountLinearCoefficient tromino + 1000000 +
+            firstExtra + secondExtra + 101) * input := by ring
+  change
+    20000000000 *
+        (packedCenterCoveringCountSpaceBound tromino periodicStrip packed base +
+          1000000 * input + firstExtra + secondExtra + 100 + 1) ≤
+      packedCenterExactlyOneCoveringLinearCoefficient tromino * input
+  calc
+    _ ≤ 20000000000 *
+          ((packedCenterCoveringCountLinearCoefficient tromino + 1000000 +
+            firstExtra + secondExtra + 101) * input) :=
+      Nat.mul_le_mul_left _ sumBound
+    _ = (20000000000 *
+          (packedCenterCoveringCountLinearCoefficient tromino + 1000000 +
+            firstExtra + secondExtra + 101)) * input :=
+      (Nat.mul_assoc _ _ _).symm
+    _ = _ := rfl
 
 /-- Exact fitted execution of the 24-candidate exact-one coverage test. -/
 theorem packedCenterExactlyOneCovering

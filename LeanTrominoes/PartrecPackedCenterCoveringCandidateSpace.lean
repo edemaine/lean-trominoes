@@ -72,6 +72,26 @@ theorem packedCenterCoveringAssignmentArguments
   simpa only [Code.packedCenterCoveringAssignmentArgumentsCode,
     packedCenterCoveringAssignmentArgumentsCost] using result
 
+theorem packedCenterCoveringTarget_eq_targetMembership
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    Code.packedCenterCoveringTarget
+        periodicStrip packed base symmetry source =
+      (Int.ofNat
+          (Code.packedColumnPhaseNumerator periodicStrip.period
+            packed.phase (Code.packedCoveringColumn symmetry source).val %
+            periodicStrip.period),
+        base.2 + -(symmetry.act source).2) := by
+  apply Prod.ext
+  · simp only [Code.packedCenterCoveringTarget,
+      PackedWindowState.columnPhase,
+      Code.packedColumnPhaseNumerator, Code.packedColumnPhaseSum]
+    congr 2
+    omega
+  · simp only [Code.packedCenterCoveringTarget]
+    omega
+
 /-- Workspace envelope for constructing the assignment query associated
 with one possible center-covering placement. -/
 def packedCenterCoveringAssignmentArgumentsSpaceBound
@@ -101,6 +121,33 @@ theorem packedCenterCoveringAssignmentArgumentsCost_le_linear
       (-(symmetry.act source).2) periodicStrip.period packed.phase
       periodicStrip.motif base.2 packed.assignmentWord)
     (packedCenterSourceInputCost_le_linear periodicStrip packed base)
+
+def packedCenterCoveringAssignmentArgumentsLinearCoefficient : Nat :=
+  packedCenterSourceInsideLinearCoefficient
+
+theorem packedCenterCoveringAssignmentArgumentsSpaceBound_le_input
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell)
+    (offsetSmall :
+      intOffsetAmount (-(symmetry.act source).2) ≤ 4) :
+    packedCenterCoveringAssignmentArgumentsSpaceBound symmetry source
+        periodicStrip packed base ≤
+      packedCenterCoveringAssignmentArgumentsLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  have membershipGlobal := packedCenterTargetMembershipUnit_le_input
+    (Code.packedCoveringColumn symmetry source)
+    (-(symmetry.act source).2) periodicStrip packed base offsetSmall
+  have factorBound :
+      1000000000000000000000000000000000000000000000000000000 *
+          (intOffsetAmount (-(symmetry.act source).2) + 1) ≤
+        1000000000000000000000000000000000000000000000000000000 * 5 := by
+    exact Nat.mul_le_mul_left _ (by omega)
+  have targetGlobal := Nat.mul_le_mul factorBound membershipGlobal
+  simp only [packedCenterCoveringAssignmentArgumentsSpaceBound,
+    packedCenterCoveringAssignmentArgumentsLinearCoefficient,
+    packedCenterSourceInsideLinearCoefficient]
+  omega
 
 def packedCenterCoveringCandidateCost
     (symmetry : SquareSymmetry) (source : Cell)
@@ -144,6 +191,83 @@ theorem packedCenterCoveringCandidateCost_le_linear
       packed.assignmentWord)
     (packedCenterCoveringAssignmentArgumentsCost_le_linear
       symmetry source periodicStrip packed base)
+
+/-- Uniform coefficient for one fixed covering-placement candidate. -/
+def packedCenterCoveringCandidateLinearCoefficient : Nat :=
+  10000000000000000 * 100000000000000000000000000 +
+    packedCenterCoveringAssignmentArgumentsLinearCoefficient
+
+set_option maxRecDepth 100000 in
+theorem packedCenterCoveringCandidateSpaceBound_le_input
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell)
+    (offsetSmall :
+      intOffsetAmount (-(symmetry.act source).2) ≤ 4) :
+    packedCenterCoveringCandidateSpaceBound symmetry source
+        periodicStrip packed base ≤
+      packedCenterCoveringCandidateLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let column := Code.packedCoveringColumn symmetry source
+  let offset := -(symmetry.act source).2
+  let motifCode := Encodable.encode periodicStrip.motif
+  let targetCode := Encodable.encode (Code.packedCenterCoveringTarget
+    periodicStrip packed base symmetry source)
+  let word := packed.assignmentWord
+  have assignment := packedAssignmentIsSpaceBound_le_lookupSpaceBound
+    motifCode column.val targetCode word
+  have lookupLe :
+      packedAssignmentLookupSpaceBound motifCode column.val targetCode word ≤
+        packedTargetMembershipUnit column offset periodicStrip.period
+          packed.phase periodicStrip.motif base.2 word := by
+    simp only [packedTargetMembershipUnit]
+    simp only [column, offset, motifCode, targetCode, word,
+      packedCenterCoveringTarget_eq_targetMembership]
+    omega
+  have membership := packedCenterTargetMembershipUnit_le_input
+    column offset periodicStrip packed base (by simpa [offset] using offsetSmall)
+  have assignmentMembership := assignment.trans
+    (Nat.mul_le_mul_left _ lookupLe)
+  have assignmentGlobal := assignmentMembership.trans
+    (Nat.mul_le_mul_left _ membership)
+  have arguments :=
+    packedCenterCoveringAssignmentArgumentsSpaceBound_le_input
+      symmetry source periodicStrip packed base offsetSmall
+  have assignmentGlobal' :
+      packedAssignmentIsSpaceBound
+          (Encodable.encode periodicStrip.motif)
+          (Code.packedCoveringColumn symmetry source).val
+          (Encodable.encode (Code.packedCenterCoveringTarget
+            periodicStrip packed base symmetry source))
+          packed.assignmentWord ≤
+        (10000000000000000 *
+          100000000000000000000000000) *
+          packedCenterCandidateInputUnit periodicStrip packed base := by
+    simpa only [column, motifCode, targetCode, word,
+      Nat.mul_assoc] using assignmentGlobal
+  change
+    packedAssignmentIsSpaceBound
+          (Encodable.encode periodicStrip.motif)
+          (Code.packedCoveringColumn symmetry source).val
+          (Encodable.encode (Code.packedCenterCoveringTarget
+            periodicStrip packed base symmetry source))
+          packed.assignmentWord +
+        packedCenterCoveringAssignmentArgumentsSpaceBound symmetry source
+          periodicStrip packed base ≤
+      packedCenterCoveringCandidateLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base
+  calc
+    _ ≤ (10000000000000000 *
+            100000000000000000000000000) *
+          packedCenterCandidateInputUnit periodicStrip packed base +
+        packedCenterCoveringAssignmentArgumentsLinearCoefficient *
+          packedCenterCandidateInputUnit periodicStrip packed base :=
+      Nat.add_le_add assignmentGlobal' arguments
+    _ = (10000000000000000 *
+            100000000000000000000000000 +
+          packedCenterCoveringAssignmentArgumentsLinearCoefficient) *
+        packedCenterCandidateInputUnit periodicStrip packed base := by ring
+    _ = _ := rfl
 
 /-- Exact fitted execution of one active covering-placement test. -/
 theorem packedCenterCoveringCandidate

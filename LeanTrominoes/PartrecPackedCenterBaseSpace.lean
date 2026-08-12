@@ -284,6 +284,110 @@ theorem packedCenterBasePhaseEqualCost_le_linear
     (packedCenterBaseCoordinateArgumentsCost_le_linear
       periodicStrip packed base)
 
+def packedCenterBasePhaseEqualLinearCoefficient : Nat :=
+  (1000000000000000000000000000000 * 100) * 2 + 10000000000
+
+set_option maxRecDepth 100000 in
+theorem packedCenterBasePhaseEqualSpaceBound_le_input
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterBasePhaseEqualSpaceBound periodicStrip packed base ≤
+      packedCenterBasePhaseEqualLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let normalizedInput := packedNormalizedAtInputUnit
+    (packed.phase + 1) packed.phase
+    (Encodable.encode periodicStrip.motif) WindowState.center.val
+    (Encodable.encode base) packed.assignmentWord
+  let centerInput :=
+    packedCenterCandidateInputUnit periodicStrip packed base
+  have phaseSucc := encodeNat_add_length_le_sum packed.phase 1
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have centerBits :
+      (Computability.encodeNat WindowState.center.val).length = 2 := by
+    native_decide
+  have inputBound : normalizedInput ≤ 2 * centerInput := by
+    simp only [normalizedInput, centerInput,
+      packedNormalizedAtInputUnit, packedCenterCandidateInputUnit,
+      Code.packedCenterCandidateInput, encodedListSpace_cons,
+      encodedListSpace_nil]
+    omega
+  have normalized := packedNormalizedAtSpaceBound_le_linear
+    (packed.phase + 1) packed.phase
+    (Encodable.encode periodicStrip.motif) WindowState.center.val
+    (Encodable.encode base) packed.assignmentWord
+  have normalizedGlobal :
+      packedNormalizedAtSpaceBound (packed.phase + 1) packed.phase
+          (Encodable.encode periodicStrip.motif) WindowState.center.val
+          (Encodable.encode base) packed.assignmentWord ≤
+        ((1000000000000000000000000000000 * 100) * 2) *
+          centerInput := by
+    calc
+      _ ≤ (1000000000000000000000000000000 * 100) *
+            normalizedInput := normalized
+      _ ≤ (1000000000000000000000000000000 * 100) *
+            (2 * centerInput) := Nat.mul_le_mul_left _ inputBound
+      _ = ((1000000000000000000000000000000 * 100) * 2) *
+            centerInput := (Nat.mul_assoc _ _ _).symm
+  change
+    packedNormalizedAtSpaceBound (packed.phase + 1) packed.phase
+          (Encodable.encode periodicStrip.motif) WindowState.center.val
+          (Encodable.encode base) packed.assignmentWord +
+        10000000000 * centerInput ≤
+      packedCenterBasePhaseEqualLinearCoefficient * centerInput
+  calc
+    _ ≤ ((1000000000000000000000000000000 * 100) * 2) *
+          centerInput + 10000000000 * centerInput :=
+      Nat.add_le_add_right normalizedGlobal _
+    _ = _ := by
+      rw [packedCenterBasePhaseEqualLinearCoefficient]
+      ring
+
+private theorem packedCenterOneChildSpaceBound_le_input
+    (scale child coefficient input : Nat)
+    (inputPositive : 1 ≤ input)
+    (childBound : child ≤ coefficient * input) :
+    scale * (child + input + 100 + 1) ≤
+      (scale * (coefficient + 102)) * input := by
+  have constantsBound : 101 ≤ 101 * input := by
+    simpa using Nat.mul_le_mul_left 101 inputPositive
+  have sumBound : child + input + 100 + 1 ≤
+      (coefficient + 102) * input := by
+    calc
+      _ ≤ coefficient * input + input + 100 + 1 := by omega
+      _ = (coefficient + 1) * input + 101 := by ring
+      _ ≤ (coefficient + 1) * input + 101 * input :=
+        Nat.add_le_add_left constantsBound _
+      _ = (coefficient + 102) * input := by ring
+  calc
+    _ ≤ scale * ((coefficient + 102) * input) :=
+      Nat.mul_le_mul_left _ sumBound
+    _ = _ := (Nat.mul_assoc _ _ _).symm
+
+private theorem packedCenterTwoChildSpaceBound_le_input
+    (scale first second firstCoefficient secondCoefficient input : Nat)
+    (inputPositive : 1 ≤ input)
+    (firstBound : first ≤ firstCoefficient * input)
+    (secondBound : second ≤ secondCoefficient * input) :
+    scale * (first + second + input + 100 + 1) ≤
+      (scale * (firstCoefficient + secondCoefficient + 102)) * input := by
+  have constantsBound : 101 ≤ 101 * input := by
+    simpa using Nat.mul_le_mul_left 101 inputPositive
+  have sumBound : first + second + input + 100 + 1 ≤
+      (firstCoefficient + secondCoefficient + 102) * input := by
+    calc
+      _ ≤ firstCoefficient * input + secondCoefficient * input +
+            input + 100 + 1 := by omega
+      _ = (firstCoefficient + secondCoefficient + 1) * input + 101 := by
+        ring
+      _ ≤ (firstCoefficient + secondCoefficient + 1) * input +
+            101 * input := Nat.add_le_add_left constantsBound _
+      _ = (firstCoefficient + secondCoefficient + 102) * input := by ring
+  calc
+    _ ≤ scale *
+          ((firstCoefficient + secondCoefficient + 102) * input) :=
+      Nat.mul_le_mul_left _ sumBound
+    _ = _ := (Nat.mul_assoc _ _ _).symm
+
 def packedCenterBasePhaseDifferentCost
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) (base : Cell) : Nat :=
@@ -352,6 +456,30 @@ theorem packedCenterBasePhaseDifferentCost_le_linear
     omega
   · simp only [budget, packedCenterBasePhaseDifferentSpaceUnit]
     omega
+
+def packedCenterBasePhaseDifferentLinearCoefficient : Nat :=
+  1000 * (packedCenterBasePhaseEqualLinearCoefficient + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterBasePhaseDifferentSpaceBound_le_input
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterBasePhaseDifferentSpaceBound periodicStrip packed base ≤
+      packedCenterBasePhaseDifferentLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have positive : 1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  have child := packedCenterBasePhaseEqualSpaceBound_le_input
+    periodicStrip packed base
+  change
+    1000 *
+        (packedCenterBasePhaseEqualSpaceBound periodicStrip packed base +
+          input + 100 + 1) ≤
+      (1000 * (packedCenterBasePhaseEqualLinearCoefficient + 102)) * input
+  exact packedCenterOneChildSpaceBound_le_input 1000
+    (packedCenterBasePhaseEqualSpaceBound periodicStrip packed base)
+    packedCenterBasePhaseEqualLinearCoefficient input positive child
 
 def packedCenterBaseInsideCost
     (tromino : Tromino)
@@ -441,6 +569,40 @@ theorem packedCenterBaseInsideCost_le_linear
     simp only [insideCost, budget, packedCenterBaseInsideSpaceUnit]
     omega
 
+def packedCenterBaseInsideLinearCoefficient : Nat :=
+  1000 * (packedCenterBasePhaseDifferentLinearCoefficient +
+    packedCenterAllSymmetriesInsideLinearCoefficient + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterBaseInsideSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterBaseInsideSpaceBound tromino periodicStrip packed base ≤
+      packedCenterBaseInsideLinearCoefficient *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have positive : 1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  have first := packedCenterBasePhaseDifferentSpaceBound_le_input
+    periodicStrip packed base
+  have second := packedCenterAllSymmetriesInsideSpaceBound_le_input
+    tromino periodicStrip packed base
+  change
+    1000 *
+        (packedCenterBasePhaseDifferentSpaceBound periodicStrip packed base +
+          packedCenterAllSymmetriesInsideSpaceBound tromino
+            periodicStrip packed base + input + 100 + 1) ≤
+      (1000 * (packedCenterBasePhaseDifferentLinearCoefficient +
+        packedCenterAllSymmetriesInsideLinearCoefficient + 102)) * input
+  exact packedCenterTwoChildSpaceBound_le_input 1000
+    (packedCenterBasePhaseDifferentSpaceBound periodicStrip packed base)
+    (packedCenterAllSymmetriesInsideSpaceBound tromino
+      periodicStrip packed base)
+    packedCenterBasePhaseDifferentLinearCoefficient
+    packedCenterAllSymmetriesInsideLinearCoefficient input positive
+    first second
+
 def packedCenterBaseCoveredCost
     (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -529,6 +691,40 @@ theorem packedCenterBaseCoveredCost_le_linear
     simp only [coveredCost, budget, packedCenterBaseCoveredSpaceUnit]
     omega
 
+def packedCenterBaseCoveredLinearCoefficient (tromino : Tromino) : Nat :=
+  1000 * (packedCenterBasePhaseDifferentLinearCoefficient +
+    packedCenterExactlyOneCoveringLinearCoefficient tromino + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterBaseCoveredSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterBaseCoveredSpaceBound tromino periodicStrip packed base ≤
+      packedCenterBaseCoveredLinearCoefficient tromino *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have positive : 1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  have first := packedCenterBasePhaseDifferentSpaceBound_le_input
+    periodicStrip packed base
+  have second := packedCenterExactlyOneCoveringSpaceBound_le_input
+    tromino periodicStrip packed base
+  change
+    1000 *
+        (packedCenterBasePhaseDifferentSpaceBound periodicStrip packed base +
+          packedCenterExactlyOneCoveringSpaceBound tromino
+            periodicStrip packed base + input + 100 + 1) ≤
+      (1000 * (packedCenterBasePhaseDifferentLinearCoefficient +
+        packedCenterExactlyOneCoveringLinearCoefficient tromino + 102)) * input
+  exact packedCenterTwoChildSpaceBound_le_input 1000
+    (packedCenterBasePhaseDifferentSpaceBound periodicStrip packed base)
+    (packedCenterExactlyOneCoveringSpaceBound tromino
+      periodicStrip packed base)
+    packedCenterBasePhaseDifferentLinearCoefficient
+    (packedCenterExactlyOneCoveringLinearCoefficient tromino) input positive
+    first second
+
 def packedCenterBaseValidCost
     (tromino : Tromino)
     (periodicStrip : PeriodicStrip)
@@ -585,6 +781,39 @@ theorem packedCenterBaseValidCost_le_linear
       tromino periodicStrip packed base
     simp only [coveredCost, budget, packedCenterBaseValidSpaceUnit]
     omega
+
+def packedCenterBaseValidLinearCoefficient (tromino : Tromino) : Nat :=
+  1000 * (packedCenterBaseInsideLinearCoefficient +
+    packedCenterBaseCoveredLinearCoefficient tromino + 102)
+
+set_option maxRecDepth 100000 in
+theorem packedCenterBaseValidSpaceBound_le_input
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterBaseValidSpaceBound tromino periodicStrip packed base ≤
+      packedCenterBaseValidLinearCoefficient tromino *
+        packedCenterCandidateInputUnit periodicStrip packed base := by
+  let input := packedCenterCandidateInputUnit periodicStrip packed base
+  have positive : 1 ≤ input := by
+    simp [input, packedCenterCandidateInputUnit]
+  have first := packedCenterBaseInsideSpaceBound_le_input
+    tromino periodicStrip packed base
+  have second := packedCenterBaseCoveredSpaceBound_le_input
+    tromino periodicStrip packed base
+  change
+    1000 *
+        (packedCenterBaseInsideSpaceBound tromino periodicStrip packed base +
+          packedCenterBaseCoveredSpaceBound tromino periodicStrip packed base +
+          input + 100 + 1) ≤
+      (1000 * (packedCenterBaseInsideLinearCoefficient +
+        packedCenterBaseCoveredLinearCoefficient tromino + 102)) * input
+  exact packedCenterTwoChildSpaceBound_le_input 1000
+    (packedCenterBaseInsideSpaceBound tromino periodicStrip packed base)
+    (packedCenterBaseCoveredSpaceBound tromino periodicStrip packed base)
+    packedCenterBaseInsideLinearCoefficient
+    (packedCenterBaseCoveredLinearCoefficient tromino) input positive
+    first second
 
 /-- Exact fitted execution of both center conditions at one motif base. -/
 theorem packedCenterBaseValid

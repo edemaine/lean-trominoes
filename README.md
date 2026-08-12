@@ -1615,7 +1615,12 @@ The representation choices for this target are:
   reachable-suffix workspace envelope.  The local center-base bounds and
   shared normalization projections now yield one explicit polynomial
   envelope for every reachable suffix state and for the closed center-validity
-  program.
+  program.  Every fixed assignment, translated-membership, symmetry, and
+  covering-candidate layer is now bounded by the shared six-field center
+  input size.  A motif member's encoded base and row are bounded by the
+  encoded motif itself, so the maximum over all bases introduces no motif
+  length factor; consequently the complete center-validity envelope is
+  linear in the four native normalization-scan field lengths.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)

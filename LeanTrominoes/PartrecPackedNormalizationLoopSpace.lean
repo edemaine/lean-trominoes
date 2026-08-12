@@ -1006,6 +1006,98 @@ def packedNormalizationPolynomialSpaceBound
         column.val + packed.assignmentWord + 100) + 2000] +
       1)
 
+/-- Native four-field footprint of one packed normalization scan. -/
+def packedNormalizationInputUnit
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) : Nat :=
+  encodedListSpace
+    [periodicStrip.period, packed.phase,
+      Encodable.encode periodicStrip.motif, packed.assignmentWord] + 1
+
+set_option maxHeartbeats 800000 in
+theorem packedNormalizationPolynomialEnvelopeUnit_le_linear
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    encodedListSpace
+        [4096 * (periodicStrip.period + packed.phase +
+          Encodable.encode periodicStrip.motif +
+          Encodable.encode periodicStrip.motif +
+          Encodable.encode periodicStrip.motif +
+          Encodable.encode periodicStrip.motif +
+          Encodable.encode periodicStrip.motif +
+          Encodable.encode periodicStrip.motif +
+          Encodable.encode periodicStrip.motif +
+          column.val + packed.assignmentWord + 100) + 2000] + 1 ≤
+      100 * packedNormalizationInputUnit periodicStrip packed := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  have sum1 := encodeNat_add_length_le_sum
+    periodicStrip.period packed.phase
+  have sum2 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase) motifCode
+  have sum3 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode) motifCode
+  have sum4 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode) motifCode
+  have sum5 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode)
+    motifCode
+  have sum6 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode +
+      motifCode) motifCode
+  have sum7 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode +
+      motifCode + motifCode) motifCode
+  have sum8 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode) motifCode
+  have sum9 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode) column.val
+  have sum10 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode + column.val)
+    packed.assignmentWord
+  have sum11 := encodeNat_add_length_le_sum
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode + column.val +
+      packed.assignmentWord) 100
+  have scaled := encodeNat_mul_length_le_sum 4096
+    (periodicStrip.period + packed.phase + motifCode + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode + column.val +
+      packed.assignmentWord + 100)
+  have final := encodeNat_add_length_le_sum
+    (4096 * (periodicStrip.period + packed.phase + motifCode + motifCode +
+      motifCode + motifCode + motifCode + motifCode + motifCode + column.val +
+      packed.assignmentWord + 100)) 2000
+  have columnSmall : column.val ≤ 4 := Nat.le_pred_of_lt column.isLt
+  have columnBits := encodeNat_length_mono columnSmall
+  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  have hundredBits :
+      (Computability.encodeNat 100).length = 7 := by native_decide
+  have scaleBits :
+      (Computability.encodeNat 4096).length = 13 := by native_decide
+  have twoThousandBits :
+      (Computability.encodeNat 2000).length = 11 := by native_decide
+  simp only [motifCode] at sum2 sum3 sum4 sum5 sum6 sum7 sum8 sum9 sum10
+  simp only [motifCode] at sum11 scaled final
+  simp only [packedNormalizationInputUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
+theorem packedNormalizationPolynomialSpaceBound_le_input
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn) :
+    packedNormalizationPolynomialSpaceBound periodicStrip packed column ≤
+      (1000000000000000000000000000000000 * 100) *
+        packedNormalizationInputUnit periodicStrip packed := by
+  calc
+    _ ≤ 1000000000000000000000000000000000 *
+          (100 * packedNormalizationInputUnit periodicStrip packed) :=
+      Nat.mul_le_mul_left _
+        (packedNormalizationPolynomialEnvelopeUnit_le_linear
+          periodicStrip packed column)
+    _ = _ := (Nat.mul_assoc _ _ _).symm
+
 theorem packedNormalizationBodyCost_le_polynomialSpaceBound
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) (column : WindowColumn)
