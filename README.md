@@ -1600,7 +1600,10 @@ The representation choices for this target are:
   is exactly `PackedWindowState.isCenterValidBool`.
 - [`LeanTrominoes/PartrecPackedCenterLoopSpace.lean`](LeanTrominoes/PartrecPackedCenterLoopSpace.lean)
   fits every streaming center step and the complete motif scan under one exact
-  reachable-suffix workspace envelope.
+  reachable-suffix workspace envelope.  The local center-base bounds and
+  shared normalization projections now yield one explicit polynomial
+  envelope for every reachable suffix state and for the closed center-validity
+  program.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)

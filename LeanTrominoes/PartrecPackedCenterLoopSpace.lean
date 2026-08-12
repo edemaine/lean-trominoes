@@ -373,6 +373,375 @@ theorem packedCenterBody
           (values := (countdown + 1) :: payload)
           (predecessor := countdown) (by rfl) branch
 
+/-- Maximum of the already-polynomial one-base envelopes over a motif. -/
+def packedCenterBaseSpaceMaximum
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) : List Cell → Nat
+  | [] => 0
+  | cell :: cells => max
+      (packedCenterBaseValidSpaceBound tromino
+        periodicStrip packed cell)
+      (packedCenterBaseSpaceMaximum tromino
+        periodicStrip packed cells)
+
+theorem packedCenterBaseValidSpaceBound_le_maximum
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (cell : Cell) (cells : List Cell)
+    (member : cell ∈ cells) :
+    packedCenterBaseValidSpaceBound tromino
+        periodicStrip packed cell ≤
+      packedCenterBaseSpaceMaximum tromino
+        periodicStrip packed cells := by
+  induction cells with
+  | nil => simp at member
+  | cons head cells induction =>
+      simp only [List.mem_cons] at member
+      simp only [packedCenterBaseSpaceMaximum]
+      rcases member with rfl | member
+      · exact Nat.le_max_left _ _
+      · exact (induction member).trans (Nat.le_max_right _ _)
+
+def packedCenterPolynomialSpaceLimit
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) : Nat :=
+  let motifCode := Encodable.encode periodicStrip.motif
+  4096 * (periodicStrip.period + packed.phase +
+    motifCode + motifCode + motifCode + motifCode +
+    motifCode + motifCode + motifCode +
+    WindowState.center.val + packed.assignmentWord + 100) + 2000
+
+def packedCenterPolynomialSpaceUnit
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) : Nat :=
+  packedCenterBaseSpaceMaximum tromino periodicStrip packed
+      periodicStrip.motif +
+    packedNormalizationPolynomialSpaceBound periodicStrip packed
+      WindowState.center +
+    (encodedListSpace
+      [packedCenterPolynomialSpaceLimit periodicStrip packed] + 1)
+
+def packedCenterPolynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) : Nat :=
+  10000000000000000000000000000000000000000 *
+    packedCenterPolynomialSpaceUnit tromino periodicStrip packed
+
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 1200000 in
+set_option linter.unusedSimpArgs false in
+theorem packedCenterBodyCost_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState)
+    (countdown : Nat) (valid : Bool)
+    (remaining leading : List Cell)
+    (countdownBound : countdown ≤ Encodable.encode periodicStrip.motif)
+    (suffix : periodicStrip.motif = leading ++ remaining) :
+    packedCenterBodyCost tromino periodicStrip packed
+        countdown valid remaining ≤
+      packedCenterPolynomialSpaceBound tromino periodicStrip packed := by
+  let motifCode := Encodable.encode periodicStrip.motif
+  let remainingCode := Encodable.encode remaining
+  let limit := packedCenterPolynomialSpaceLimit periodicStrip packed
+  let nativeUnit := encodedListSpace [limit] + 1
+  let unit := packedCenterPolynomialSpaceUnit
+    tromino periodicStrip packed
+  change packedCenterBodyCost tromino periodicStrip packed
+      countdown valid remaining ≤
+    10000000000000000000000000000000000000000 * unit
+  have remainingBound : remainingCode ≤ motifCode := by
+    simp only [remainingCode, motifCode]
+    rw [suffix]
+    exact encode_list_suffix_le leading remaining
+  have countdownLimit : countdown ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+    omega
+  have motifLimit : motifCode ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+    omega
+  have remainingLimit : remainingCode ≤ limit :=
+    remainingBound.trans motifLimit
+  have periodLimit : periodicStrip.period ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+    omega
+  have phaseLimit : packed.phase ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+    omega
+  have columnLimit : WindowState.center.val ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+    omega
+  have wordLimit : packed.assignmentWord ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+    omega
+  have countdownBits := listCodeEncodeNat_length_mono countdownLimit
+  have countdownPredBits := listCodeEncodeNat_length_mono
+    ((Nat.pred_le countdown).trans countdownLimit)
+  have motifBits := listCodeEncodeNat_length_mono motifLimit
+  have remainingBits := listCodeEncodeNat_length_mono remainingLimit
+  have periodBits := listCodeEncodeNat_length_mono periodLimit
+  have phaseBits := listCodeEncodeNat_length_mono phaseLimit
+  have columnBits := listCodeEncodeNat_length_mono columnLimit
+  have wordBits := listCodeEncodeNat_length_mono wordLimit
+  have countdownSuccBits := listCodeEncodeNat_length_mono
+    (show countdown + 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have motifSuccBits := listCodeEncodeNat_length_mono
+    (show motifCode + 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have remainingSuccBits := listCodeEncodeNat_length_mono
+    (show remainingCode + 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have periodSuccBits := listCodeEncodeNat_length_mono
+    (show periodicStrip.period + 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have phaseSuccBits := listCodeEncodeNat_length_mono
+    (show packed.phase + 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have columnSuccBits := listCodeEncodeNat_length_mono
+    (show WindowState.center.val + 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have wordSuccBits := listCodeEncodeNat_length_mono
+    (show packed.assignmentWord + 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := rfl
+  have oneLimitBits := listCodeEncodeNat_length_mono
+    (show 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+      omega)
+  have positiveLimitBits :
+      1 ≤ (Computability.encodeNat limit).length := by
+    simpa [oneBits] using oneLimitBits
+  have validBits :
+      (Computability.encodeNat valid.toNat).length ≤
+        (Computability.encodeNat limit).length := by
+    cases valid
+    · simp [zeroBits]
+    · simpa [oneBits] using positiveLimitBits
+  have nativeUnitLe : nativeUnit ≤ unit := by
+    simp only [nativeUnit, unit, packedCenterPolynomialSpaceUnit,
+      limit]
+    omega
+  cases remaining with
+  | nil =>
+      have nextStateSpace :
+          encodedListSpace
+              (Code.packedCenterNativeStep tromino periodicStrip packed
+                (Code.packedCenterState periodicStrip packed valid [])) ≤
+            10 * ((Computability.encodeNat limit).length + 2) := by
+        rw [Code.packedCenterNativeStep_state_nil]
+        cases valid <;>
+          simp [Code.packedCenterState,
+            Code.packedNormalizationState,
+            encodedListSpace_cons, encodedListSpace_nil,
+            motifCode, zeroBits, oneBits] at * <;>
+          omega
+      cases countdown <;> cases valid <;>
+        simp [packedCenterBodyCost, packedCenterStepCost,
+          flatCountdownBodyCost, flatCountdownSuccBranchCost,
+          branchZeroZeroCost, branchZeroTestCost,
+          prependCost, getCost, dropCost, idCost, headCost,
+          nilCost, oneCost, zeroCost, zeroPrimeCost,
+          tailCost, succCost, Code.packedCenterState,
+          Code.packedNormalizationState,
+          encodedListSpace_cons, encodedListSpace_nil,
+          motifCode, remainingCode, limit, nativeUnit,
+          zeroBits, oneBits, twoBits] at * <;>
+        clear * - countdownBits countdownPredBits motifBits
+          remainingBits periodBits phaseBits columnBits wordBits
+          countdownSuccBits motifSuccBits remainingSuccBits
+          periodSuccBits phaseSuccBits columnSuccBits wordSuccBits
+          nextStateSpace nativeUnitLe <;>
+        omega
+  | cons cell remaining =>
+      let cellCode := Encodable.encode cell
+      let tailCode := Encodable.encode remaining
+      have cellRemaining :
+          cellCode ≤ Encodable.encode (cell :: remaining) := by
+        simp only [Encodable.encode_list_cons, cellCode]
+        exact (Nat.left_le_pair cellCode tailCode).trans (Nat.le_succ _)
+      have tailRemaining :
+          tailCode ≤ Encodable.encode (cell :: remaining) := by
+        simp only [Encodable.encode_list_cons, tailCode]
+        exact (Nat.right_le_pair cellCode tailCode).trans (Nat.le_succ _)
+      have cellLimit : cellCode ≤ limit :=
+        cellRemaining.trans (by simpa [remainingCode] using remainingLimit)
+      have tailLimit : tailCode ≤ limit :=
+        tailRemaining.trans (by simpa [remainingCode] using remainingLimit)
+      have cellBits := listCodeEncodeNat_length_mono cellLimit
+      have tailBits := listCodeEncodeNat_length_mono tailLimit
+      have constructorBits := listCodeEncodeNat_length_mono
+        (show Nat.pair cellCode tailCode ≤ limit by
+          exact (Nat.le_succ _).trans
+            (by simpa [remainingCode] using remainingLimit))
+      have cellSuccLimit : cellCode + 1 ≤ limit := by
+        simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+        omega
+      have tailSuccLimit : tailCode + 1 ≤ limit := by
+        simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+        omega
+      have cellSuccBits := listCodeEncodeNat_length_mono cellSuccLimit
+      have tailSuccBits := listCodeEncodeNat_length_mono tailSuccLimit
+      have firstCodeCell : Encodable.encode cell.1 ≤ cellCode := by
+        exact Nat.left_le_pair _ _
+      have secondCodeCell : Encodable.encode cell.2 ≤ cellCode := by
+        exact Nat.right_le_pair _ _
+      have firstCodeLimit : Encodable.encode cell.1 ≤ limit :=
+        firstCodeCell.trans cellLimit
+      have secondCodeLimit : Encodable.encode cell.2 ≤ limit :=
+        secondCodeCell.trans cellLimit
+      have firstBits := listCodeEncodeNat_length_mono firstCodeLimit
+      have secondBits := listCodeEncodeNat_length_mono secondCodeLimit
+      have firstSuccBits := listCodeEncodeNat_length_mono
+        (show Encodable.encode cell.1 + 1 ≤ limit by omega)
+      have secondSuccBits := listCodeEncodeNat_length_mono
+        (show Encodable.encode cell.2 + 1 ≤ limit by omega)
+      have unpairLocal := unpairCost_le_linear cellCode
+      have unpairArgumentBits := listCodeEncodeNat_length_mono
+        (show 2 * cellCode + 4 ≤ limit by
+          simp only [limit, packedCenterPolynomialSpaceLimit, motifCode]
+          omega)
+      have unpairGlobal : unpairCost cellCode ≤
+          1000000000 * nativeUnit := by
+        simp only [nativeUnit, encodedListSpace_cons,
+          encodedListSpace_nil] at unpairLocal ⊢
+        omega
+      have motifSuffix :
+          periodicStrip.motif = leading ++ cell :: remaining := suffix
+      have normalizationHead :=
+        packedNormalizationHeadCost_le_polynomialSpaceBound
+          periodicStrip packed WindowState.center valid cell remaining
+          leading motifSuffix
+      have normalizationTail :=
+        packedNormalizationTailCost_le_polynomialSpaceBound
+          periodicStrip packed WindowState.center valid cell remaining
+          leading motifSuffix
+      have normalizationHeadUnit :
+          packedNormalizationHeadCost periodicStrip packed
+              WindowState.center valid cell remaining ≤ unit := by
+        simp only [unit, packedCenterPolynomialSpaceUnit]
+        omega
+      have normalizationTailUnit :
+          packedNormalizationTailCost periodicStrip packed
+              WindowState.center valid cell remaining ≤ unit := by
+        simp only [unit, packedCenterPolynomialSpaceUnit]
+        omega
+      have cellMember : cell ∈ periodicStrip.motif := by
+        rw [suffix]
+        simp
+      have baseLocal := packedCenterBaseValidCost_le_linear
+        tromino periodicStrip packed cell
+      have baseMaximum := packedCenterBaseValidSpaceBound_le_maximum
+        tromino periodicStrip packed cell periodicStrip.motif cellMember
+      have baseGlobal :
+          packedCenterBaseValidCost tromino periodicStrip packed cell ≤
+            unit := by
+        simp only [unit, packedCenterPolynomialSpaceUnit]
+        omega
+      have motifBitsRaw :
+          (Computability.encodeNat
+            (Encodable.encode periodicStrip.motif)).length ≤
+              (Computability.encodeNat limit).length := by
+        simpa [motifCode] using motifBits
+      have tailBitsRaw :
+          (Computability.encodeNat
+            (Encodable.encode remaining)).length ≤
+              (Computability.encodeNat limit).length := by
+        simpa [tailCode] using tailBits
+      have nextStateFieldBits :
+          (Computability.encodeNat
+                (Encodable.encode periodicStrip.motif)).length +
+              (Computability.encodeNat
+                (Encodable.encode remaining)).length +
+              (Computability.encodeNat periodicStrip.period).length +
+              (Computability.encodeNat packed.phase).length +
+              (Computability.encodeNat WindowState.center.val).length +
+              (Computability.encodeNat packed.assignmentWord).length ≤
+            6 * (Computability.encodeNat limit).length := by
+        clear * - motifBitsRaw tailBitsRaw periodBits phaseBits
+          columnBits wordBits
+        omega
+      have nextStateSpace :
+          encodedListSpace
+              (Code.packedCenterNativeStep tromino periodicStrip packed
+                (Code.packedCenterState periodicStrip packed valid
+                  (cell :: remaining))) ≤
+            10 * ((Computability.encodeNat limit).length + 2) := by
+        rw [Code.packedCenterNativeStep_state_cons]
+        cases valid <;>
+          cases inside : packed.centerBaseInsideBool
+            tromino periodicStrip cell <;>
+          cases covered : packed.centerBaseCoveredBool
+            tromino periodicStrip cell <;>
+          simp [Code.packedCenterState,
+            Code.packedNormalizationState,
+            encodedListSpace_cons, encodedListSpace_nil,
+            motifCode, tailCode, zeroBits, oneBits,
+            inside, covered] <;>
+          clear * - nextStateFieldBits <;> omega
+      cases countdown with
+      | zero =>
+          cases valid <;>
+            simp [packedCenterBodyCost, flatCountdownBodyCost,
+              zeroPrimeCost, Code.packedCenterState,
+              Code.packedNormalizationState,
+              encodedListSpace_cons, encodedListSpace_nil,
+              motifCode, remainingCode, cellCode, tailCode,
+              limit, nativeUnit, zeroBits, oneBits, twoBits] at * <;>
+            clear * - countdownBits countdownPredBits motifBits
+              remainingBits periodBits phaseBits columnBits wordBits
+              countdownSuccBits motifSuccBits remainingSuccBits
+              periodSuccBits phaseSuccBits columnSuccBits wordSuccBits
+              cellBits tailBits constructorBits cellSuccBits
+              tailSuccBits firstBits secondBits firstSuccBits
+              secondSuccBits nextStateSpace nativeUnitLe <;>
+            omega
+      | succ countdown =>
+          cases valid <;>
+            cases inside : packed.centerBaseInsideBool
+              tromino periodicStrip cell <;>
+            cases covered : packed.centerBaseCoveredBool
+              tromino periodicStrip cell <;>
+            simp [packedCenterBodyCost, packedCenterStepCost,
+              packedCenterConsStepCost, packedCenterUpdatedValidCost,
+              packedCenterHeadValidCost, packedCenterBaseArgumentsCost,
+              packedCenterHeadRowCost,
+              flatCountdownBodyCost, flatCountdownSuccBranchCost,
+              branchZeroZeroCost, branchZeroSuccCost,
+              branchZeroTestCost, boolAndCost, normalizeBoolCost,
+              prependCost, getCost, dropCost, idCost, headCost,
+              nilCost, oneCost, zeroCost, zeroPrimeCost,
+              tailCost, succCost, Code.packedCenterState,
+              Code.packedNormalizationState,
+              encodedListSpace_cons, encodedListSpace_nil,
+              motifCode, remainingCode, cellCode, tailCode,
+              limit, nativeUnit, inside, covered,
+              zeroBits, oneBits, twoBits] at * <;>
+            clear * - countdownBits countdownPredBits motifBits
+              remainingBits periodBits phaseBits columnBits wordBits
+              countdownSuccBits motifSuccBits remainingSuccBits
+              periodSuccBits phaseSuccBits columnSuccBits wordSuccBits
+              cellBits tailBits constructorBits cellSuccBits tailSuccBits
+              firstBits secondBits firstSuccBits secondSuccBits
+              unpairGlobal normalizationHeadUnit normalizationTailUnit
+              baseGlobal nextStateSpace nativeUnitLe <;>
+            omega
+
 def packedCenterLoopInputCost
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) : Nat :=
@@ -433,6 +802,84 @@ theorem packedCenterLoopInput
     packedCenterLoopInputCost, Code.packedCenterState,
     Code.packedNormalizationState, Code.numeral,
     numeralCost, prependCost, values] using result
+
+theorem packedCenterLoopInputCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) :
+    packedCenterLoopInputCost periodicStrip packed ≤
+      10000000000 *
+        (encodedListSpace
+          [packedCenterPolynomialSpaceLimit periodicStrip packed] + 1) := by
+  let values := [periodicStrip.period, packed.phase,
+    Encodable.encode periodicStrip.motif, packed.assignmentWord]
+  let limit := packedCenterPolynomialSpaceLimit periodicStrip packed
+  let unit := encodedListSpace [limit] + 1
+  have periodBound : periodicStrip.period ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit]
+    omega
+  have phaseBound : packed.phase ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit]
+    omega
+  have motifBound : Encodable.encode periodicStrip.motif ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit]
+    omega
+  have wordBound : packed.assignmentWord ≤ limit := by
+    simp only [limit, packedCenterPolynomialSpaceLimit]
+    omega
+  have periodBits := listCodeEncodeNat_length_mono periodBound
+  have phaseBits := listCodeEncodeNat_length_mono phaseBound
+  have motifBits := listCodeEncodeNat_length_mono motifBound
+  have wordBits := listCodeEncodeNat_length_mono wordBound
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have oneLimitBits := listCodeEncodeNat_length_mono
+    (show 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit]
+      omega)
+  have positiveLimitBits :
+      1 ≤ (Computability.encodeNat limit).length := by
+    simpa [oneBits] using oneLimitBits
+  have inputSpace : encodedListSpace values ≤ 5 * unit := by
+    have raw := encodedListSpace_le_of_fields_le values limit (by
+      intro value member
+      simp only [values, List.mem_cons] at member
+      rcases member with rfl | rfl | rfl | rfl | impossible
+      · exact periodBound
+      · exact phaseBound
+      · exact motifBound
+      · exact wordBound
+      · simp at impossible)
+    simp only [values, List.length_cons, List.length_nil] at raw
+    exact raw.trans (by
+      simp only [unit, encodedListSpace_cons,
+        encodedListSpace_nil]
+      omega)
+  have get0 := listCodeGetCost_le_linear 0 values
+  have get1 := listCodeGetCost_le_linear 1 values
+  have get2 := listCodeGetCost_le_linear 2 values
+  have get3 := listCodeGetCost_le_linear 3 values
+  have zeroBound := listCodeZeroCost_le_linear values
+  have addSmall :
+      addConstCost WindowState.center.val [0] ≤ 100000 := by
+    native_decide
+  have centerBits :
+      (Computability.encodeNat WindowState.center.val).length ≤ 100 := by
+    native_decide
+  have numeralBound : numeralCost WindowState.center.val values ≤
+      1000000 * unit := by
+    simp only [numeralCost]
+    omega
+  have oneCostBound : oneCost values ≤ 200000 * unit := by
+    simp only [oneCost]
+    have successorSmall : succCost [0] ≤ 100000 := by
+      native_decide
+    omega
+  change packedCenterLoopInputCost periodicStrip packed ≤
+    10000000000 * unit
+  dsimp only [unit] at *
+  simp [packedCenterLoopInputCost, prependCost, values,
+    encodedListSpace_cons, encodedListSpace_nil] at *
+  omega
 
 /-- Maximum exact body cost over every suffix and accumulator value. -/
 def packedCenterSuffixSpaceBound
@@ -533,6 +980,74 @@ theorem packedCenterBodyCost_le_spaceBound
   exact bodyToSuffix.trans
     (packedCenterSuffixSpaceBound_le_upTo tromino periodicStrip packed
       countdown (Encodable.encode periodicStrip.motif) countdownBound)
+
+theorem packedCenterSuffixSpaceBound_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState)
+    (countdown : Nat) (remaining leading : List Cell)
+    (countdownBound : countdown ≤ Encodable.encode periodicStrip.motif)
+    (suffix : periodicStrip.motif = leading ++ remaining) :
+    packedCenterSuffixSpaceBound tromino periodicStrip packed
+        countdown remaining ≤
+      packedCenterPolynomialSpaceBound tromino periodicStrip packed := by
+  induction remaining generalizing leading with
+  | nil =>
+      simp only [packedCenterSuffixSpaceBound]
+      apply Nat.max_le.mpr
+      constructor
+      · exact packedCenterBodyCost_le_polynomialSpaceBound
+          tromino periodicStrip packed countdown false [] leading
+          countdownBound suffix
+      · exact packedCenterBodyCost_le_polynomialSpaceBound
+          tromino periodicStrip packed countdown true [] leading
+          countdownBound suffix
+  | cons cell remaining induction =>
+      simp only [packedCenterSuffixSpaceBound]
+      apply Nat.max_le.mpr
+      constructor
+      · exact packedCenterBodyCost_le_polynomialSpaceBound
+          tromino periodicStrip packed countdown false
+          (cell :: remaining) leading countdownBound suffix
+      · apply Nat.max_le.mpr
+        constructor
+        · exact packedCenterBodyCost_le_polynomialSpaceBound
+            tromino periodicStrip packed countdown true
+            (cell :: remaining) leading countdownBound suffix
+        · apply induction (leading := leading ++ [cell])
+          simpa [List.append_assoc] using suffix
+
+theorem packedCenterSpaceBoundUpTo_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (limit : Nat)
+    (limitBound : limit ≤ Encodable.encode periodicStrip.motif) :
+    packedCenterSpaceBoundUpTo tromino periodicStrip packed limit ≤
+      packedCenterPolynomialSpaceBound tromino periodicStrip packed := by
+  induction limit with
+  | zero =>
+      simpa [packedCenterSpaceBoundUpTo] using
+        (packedCenterSuffixSpaceBound_le_polynomialSpaceBound
+          tromino periodicStrip packed 0 periodicStrip.motif []
+          (Nat.zero_le _) (by simp))
+  | succ limit induction =>
+      simp only [packedCenterSpaceBoundUpTo]
+      apply Nat.max_le.mpr
+      constructor
+      · exact packedCenterSuffixSpaceBound_le_polynomialSpaceBound
+          tromino periodicStrip packed (limit + 1)
+          periodicStrip.motif [] limitBound (by simp)
+      · exact induction (by omega)
+
+theorem packedCenterSpaceBound_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) :
+    packedCenterSpaceBound tromino periodicStrip packed ≤
+      packedCenterPolynomialSpaceBound tromino periodicStrip packed :=
+  packedCenterSpaceBoundUpTo_le_polynomialSpaceBound tromino
+    periodicStrip packed (Encodable.encode periodicStrip.motif)
+    (Nat.le_refl _)
 
 def PackedCenterReachable
     (_tromino : Tromino)
@@ -670,6 +1185,95 @@ theorem packedCenterValid
   simpa [Code.packedCenterValidCode, packedCenterValidCost,
     result, Code.packedCenterState,
     Code.packedNormalizationState] using projected
+
+def packedCenterValidPolynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) : Nat :=
+  100000000000000000000000000000000000000000 *
+    (packedCenterPolynomialSpaceUnit tromino periodicStrip packed + 1)
+
+theorem packedCenterValidCost_le_polynomialSpaceBound
+    (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) :
+    packedCenterValidCost tromino periodicStrip packed ≤
+      packedCenterValidPolynomialSpaceBound
+        tromino periodicStrip packed := by
+  let resultBool := packed.isCenterValidBool tromino periodicStrip
+  let result := Code.packedCenterState periodicStrip packed resultBool []
+  let limit := packedCenterPolynomialSpaceLimit periodicStrip packed
+  let nativeUnit := encodedListSpace [limit] + 1
+  let unit := packedCenterPolynomialSpaceUnit
+    tromino periodicStrip packed
+  have nativeUnitLe : nativeUnit ≤ unit := by
+    simp only [nativeUnit, unit, packedCenterPolynomialSpaceUnit,
+      limit]
+    omega
+  have motifBits := listCodeEncodeNat_length_mono
+    (show Encodable.encode periodicStrip.motif ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit]
+      omega)
+  have periodBits := listCodeEncodeNat_length_mono
+    (show periodicStrip.period ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit]
+      omega)
+  have phaseBits := listCodeEncodeNat_length_mono
+    (show packed.phase ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit]
+      omega)
+  have columnBits := listCodeEncodeNat_length_mono
+    (show WindowState.center.val ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit]
+      omega)
+  have wordBits := listCodeEncodeNat_length_mono
+    (show packed.assignmentWord ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit]
+      omega)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have oneLimitBits := listCodeEncodeNat_length_mono
+    (show 1 ≤ limit by
+      simp only [limit, packedCenterPolynomialSpaceLimit]
+      omega)
+  have positiveLimitBits :
+      1 ≤ (Computability.encodeNat limit).length := by
+    simpa [oneBits] using oneLimitBits
+  have resultSpace : encodedListSpace result ≤ 10 * nativeUnit := by
+    have nativeUnitEq :
+        nativeUnit = (Computability.encodeNat limit).length + 2 := by
+      simp [nativeUnit, encodedListSpace_cons, encodedListSpace_nil]
+    have boolBits :
+        (Computability.encodeNat resultBool.toNat).length ≤
+          (Computability.encodeNat limit).length := by
+      cases resultBool
+      · simp [zeroBits]
+      · simpa [oneBits] using positiveLimitBits
+    cases resultBool <;>
+      simp [result, Code.packedCenterState,
+        Code.packedNormalizationState, nativeUnit,
+        encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits] at * <;> omega
+  have getRaw := listCodeGetCost_le_linear 6 result
+  have getBound : getCost 6 result ≤ 1000000 * unit := by
+    omega
+  have bodyBound := packedCenterSpaceBound_le_polynomialSpaceBound
+    tromino periodicStrip packed
+  have bodyBound' : packedCenterSpaceBound tromino periodicStrip packed ≤
+      10000000000000000000000000000000000000000 * unit := by
+    simpa [packedCenterPolynomialSpaceBound, unit] using bodyBound
+  have inputRaw := packedCenterLoopInputCost_le_linear
+    periodicStrip packed
+  have inputBound : packedCenterLoopInputCost periodicStrip packed ≤
+      10000000000 * unit := by
+    exact inputRaw.trans (Nat.mul_le_mul_left _ nativeUnitLe)
+  change getCost 6 result +
+      (packedCenterSpaceBound tromino periodicStrip packed +
+        packedCenterLoopInputCost periodicStrip packed) ≤
+    100000000000000000000000000000000000000000 * (unit + 1)
+  omega
 
 end EvaluatorCodeFits
 

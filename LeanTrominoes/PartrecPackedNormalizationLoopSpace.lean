@@ -1062,6 +1062,106 @@ theorem packedNormalizationBodyCost_le_polynomialSpaceBound
       1000000000000000000000000000000000
       (by omega))
 
+theorem packedNormalizationHeadCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (valid : Bool) (cell : Cell) (remaining leading : List Cell)
+    (suffix : periodicStrip.motif = leading ++ cell :: remaining) :
+    packedNormalizationHeadCost periodicStrip packed column
+        valid cell remaining ≤
+      packedNormalizationPolynomialSpaceBound
+        periodicStrip packed column := by
+  have countdownBound : 1 ≤ Encodable.encode periodicStrip.motif := by
+    have tailPositive : 1 ≤ Encodable.encode (cell :: remaining) := by
+      simp [Encodable.encode_list_cons]
+    rw [suffix]
+    exact tailPositive.trans (encode_list_suffix_le leading _)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  have headToTrue :
+      packedNormalizationHeadCost periodicStrip packed column
+          valid cell remaining ≤
+        packedNormalizationHeadCost periodicStrip packed column
+          true cell remaining := by
+    cases valid
+    · simp [packedNormalizationHeadCost,
+        packedNormalizationViewCost,
+        Code.packedNormalizationState,
+        getCost, dropCost, headCost, idCost, nilCost,
+        tailCost, zeroPrimeCost, succCost,
+        encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits]
+      omega
+    · rfl
+  calc
+    packedNormalizationHeadCost periodicStrip packed column
+          valid cell remaining ≤
+        packedNormalizationHeadCost periodicStrip packed column
+          true cell remaining := headToTrue
+    _ ≤ packedNormalizationBodyCost periodicStrip packed column
+          1 true (cell :: remaining) := by
+      cases normalized :
+        packed.normalizedAtBool periodicStrip column cell <;>
+        simp [packedNormalizationBodyCost,
+          packedNormalizationStepCost,
+          packedNormalizationConsStepCost,
+          packedNormalizationUpdatedValidCost,
+          packedNormalizationHeadValidCost,
+          packedNormalizationAtArgumentsCost,
+          flatCountdownBodyCost, flatCountdownSuccBranchCost,
+          branchZeroZeroCost, branchZeroSuccCost,
+          branchZeroTestCost,
+          boolAndCost, normalizeBoolCost, prependCost,
+          encodedListSpace_cons, encodedListSpace_nil,
+          zeroBits, oneBits, normalized] <;> omega
+    _ ≤ _ := packedNormalizationBodyCost_le_polynomialSpaceBound
+      periodicStrip packed column 1 true (cell :: remaining)
+      leading countdownBound suffix
+
+theorem packedNormalizationTailCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (column : WindowColumn)
+    (valid : Bool) (cell : Cell) (remaining leading : List Cell)
+    (suffix : periodicStrip.motif = leading ++ cell :: remaining) :
+    packedNormalizationTailCost periodicStrip packed column
+        valid cell remaining ≤
+      packedNormalizationPolynomialSpaceBound
+        periodicStrip packed column := by
+  have countdownBound : 1 ≤ Encodable.encode periodicStrip.motif := by
+    have tailPositive : 1 ≤ Encodable.encode (cell :: remaining) := by
+      simp [Encodable.encode_list_cons]
+    rw [suffix]
+    exact tailPositive.trans (encode_list_suffix_le leading _)
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits :
+      (Computability.encodeNat 1).length = 1 := rfl
+  calc
+    packedNormalizationTailCost periodicStrip packed column
+          valid cell remaining ≤
+        packedNormalizationBodyCost periodicStrip packed column
+          1 valid (cell :: remaining) := by
+      cases valid <;>
+        cases normalized :
+          packed.normalizedAtBool periodicStrip column cell <;>
+        simp [packedNormalizationBodyCost,
+          packedNormalizationStepCost,
+          packedNormalizationConsStepCost,
+          packedNormalizationUpdatedValidCost,
+          packedNormalizationHeadValidCost,
+          packedNormalizationAtArgumentsCost,
+          flatCountdownBodyCost, flatCountdownSuccBranchCost,
+          branchZeroZeroCost, branchZeroSuccCost,
+          branchZeroTestCost,
+          boolAndCost, normalizeBoolCost, prependCost,
+          encodedListSpace_cons, encodedListSpace_nil,
+          zeroBits, oneBits, normalized] <;> omega
+    _ ≤ _ := packedNormalizationBodyCost_le_polynomialSpaceBound
+      periodicStrip packed column 1 valid (cell :: remaining)
+      leading countdownBound suffix
+
 theorem packedNormalizationSuffixSpaceBound_le_polynomialSpaceBound
     (periodicStrip : PeriodicStrip)
     (packed : PackedWindowState) (column : WindowColumn)
