@@ -1322,7 +1322,10 @@ The representation choices for this target are:
   instruction layer for compiling the flat DFS transition.
 - [`LeanTrominoes/PartrecListCodeSpace.lean`](LeanTrominoes/PartrecListCodeSpace.lean)
   gives those list combinators compositional evaluator data costs, including
-  selected `branchZero` paths and a generic tagged-countdown body rule.
+  selected `branchZero` paths and a generic tagged-countdown body rule.  It
+  also exposes reusable input-linear estimates for tail, fixed-index `get`,
+  and `prepend`, so the remaining transition majorants can share one
+  fixed-width adapter calculation.
 - [`LeanTrominoes/PartrecBinaryLengthSpace.lean`](LeanTrominoes/PartrecBinaryLengthSpace.lean)
   gives the matching quantitative proof for the explicit binary search-depth
   computation.  Division by two is a fully fitted evaluator call: its

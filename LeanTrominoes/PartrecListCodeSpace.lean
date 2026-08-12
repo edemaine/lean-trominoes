@@ -1,6 +1,8 @@
+import LeanTrominoes.EncodingLengthComputability
 import LeanTrominoes.PartrecCodeSpace
 import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecListCode
+import Mathlib.Data.Nat.Size
 
 /-!
 # Evaluator-space costs for direct list combinators
@@ -17,6 +19,28 @@ namespace PartrecToTM2
 open ToPartrec
 
 namespace EvaluatorCodeFits
+
+private theorem listCodeEncodeNat_eq_bits (number : Nat) :
+    Computability.encodeNat number = number.bits := by
+  induction number using Nat.binaryRec' with
+  | zero => rfl
+  | bit bit number nonzero induction =>
+      rw [LeanTrominoes.Computability.encodeNat_cons
+        (Nat.bit bit number)
+          (Nat.pos_of_ne_zero
+            (Nat.bit_ne_zero_iff.mpr nonzero))]
+      simp only [Nat.bodd_bit, Nat.div2_bit,
+        Nat.bits_append_bit number bit nonzero]
+      rw [induction]
+
+theorem listCodeEncodeNat_succ_length_le (number : Nat) :
+    (Computability.encodeNat number.succ).length ≤
+      (Computability.encodeNat number).length + 1 := by
+  rw [listCodeEncodeNat_eq_bits, listCodeEncodeNat_eq_bits,
+    Nat.size_eq_bits_len, Nat.size_eq_bits_len, Nat.size_le]
+  have current := Nat.lt_size_self number
+  rw [pow_succ]
+  omega
 
 def zeroPrimeCost (values : List Nat) : Nat :=
   encodedListSpace values +
@@ -135,6 +159,85 @@ theorem get (index : Nat) (values : List Nat) :
       (head (values.drop index))
       (drop index values)
 
+/-- Removing fields cannot increase the native delimited-list footprint. -/
+theorem listCodeEncodedListSpace_tail_le (values : List Nat) :
+    encodedListSpace values.tail ≤ encodedListSpace values := by
+  cases values <;> simp [encodedListSpace_cons]
+
+theorem listCodeEncodedListSpace_singleton_headI_le (values : List Nat) :
+    encodedListSpace [values.headI] ≤ encodedListSpace values + 1 := by
+  cases values with
+  | nil => rfl
+  | cons head tail =>
+      simp only [List.headI_cons, encodedListSpace_cons,
+        encodedListSpace_nil]
+      omega
+
+theorem listCodeGetZeroCost_le (values : List Nat) :
+    getCost 0 values ≤
+      10000 * (encodedListSpace values + 1) := by
+  have headSpace := listCodeEncodedListSpace_singleton_headI_le values
+  have headBits :
+      (Computability.encodeNat values.headI).length ≤
+        encodedListSpace values := by
+    simpa [encodedListSpace_cons] using headSpace
+  have successorBits := listCodeEncodeNat_succ_length_le values.headI
+  have headPlusBits :
+      (Computability.encodeNat (values.headI + 1)).length ≤
+        (Computability.encodeNat values.headI).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using successorBits
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [getCost, dropCost, idCost, headCost, nilCost,
+    zeroPrimeCost, tailCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+  omega
+
+/-- The direct tail program has a uniform linear workspace estimate. -/
+theorem listCodeTailCost_le_linear (values : List Nat) :
+    tailCost values ≤ 3 * (encodedListSpace values + 1) := by
+  have tailSpace := listCodeEncodedListSpace_tail_le values
+  simp only [tailCost]
+  omega
+
+/-- A fixed field projection is linear in the input-list footprint.  The
+index-dependent coefficient is harmless for all fixed-width adapters. -/
+theorem listCodeGetCost_le_linear (index : Nat) (values : List Nat) :
+    getCost index values ≤
+      (10000 * (index + 1)) * (encodedListSpace values + 1) := by
+  induction index generalizing values with
+  | zero =>
+      simpa using listCodeGetZeroCost_le values
+  | succ index induction =>
+      have recurrence :
+          getCost (index + 1) values =
+            getCost index values.tail + tailCost values := by
+        cases values <;>
+          simp [getCost, dropCost, Nat.add_assoc]
+      rw [recurrence]
+      calc
+        getCost index values.tail + tailCost values ≤
+            (10000 * (index + 1)) *
+                (encodedListSpace values.tail + 1) +
+              3 * (encodedListSpace values + 1) :=
+          Nat.add_le_add (induction values.tail)
+            (listCodeTailCost_le_linear values)
+        _ ≤
+            (10000 * (index + 1)) *
+                (encodedListSpace values + 1) +
+              3 * (encodedListSpace values + 1) := by
+          gcongr
+          exact listCodeEncodedListSpace_tail_le values
+        _ ≤
+            (10000 * (index + 1)) *
+                (encodedListSpace values + 1) +
+              10000 * (encodedListSpace values + 1) := by
+          omega
+        _ =
+            (10000 * (index + 1 + 1)) *
+              (encodedListSpace values + 1) := by
+          ring
+
 def addConstCost : Nat → List Nat → Nat
   | 0, values => headCost values
   | increment + 1, values =>
@@ -172,6 +275,21 @@ def prependCost
     encodedListSpace values +
     encodedListSpace fieldOutput +
     encodedListSpace (fieldOutput.headI :: restOutput) + 2
+
+/-- A generic arithmetic estimate for a fitted prepend node.  Callers can
+bound the three list footprints by a shared local unit and then account only
+for the two child costs. -/
+theorem listCodePrependCost_le_of
+    (values fieldOutput restOutput : List Nat)
+    (fieldCost restCost unit : Nat)
+    (valuesBound : encodedListSpace values ≤ unit)
+    (fieldBound : encodedListSpace fieldOutput ≤ unit)
+    (outputBound :
+      encodedListSpace (fieldOutput.headI :: restOutput) ≤ unit) :
+    prependCost values fieldOutput restOutput fieldCost restCost ≤
+      fieldCost + restCost + 3 * unit + 2 := by
+  simp only [prependCost]
+  omega
 
 theorem prepend
     {field rest : Code} {values fieldOutput restOutput : List Nat}
