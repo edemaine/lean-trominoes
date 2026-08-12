@@ -1574,6 +1574,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PartrecPackedCenterBaseSpace.lean`](LeanTrominoes/PartrecPackedCenterBaseSpace.lean)
   fits the direct phase comparison and both guarded center conditions through
   their final one-base conjunction.
+- [`LeanTrominoes/PartrecPackedCenterLoop.lean`](LeanTrominoes/PartrecPackedCenterLoop.lean)
+  streams the combined one-base checker across the encoded motif, recovers
+  each head cell's row code on demand, and proves that the final accumulator
+  is exactly `PackedWindowState.isCenterValidBool`.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
