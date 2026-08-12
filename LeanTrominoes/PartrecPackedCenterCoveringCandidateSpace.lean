@@ -72,6 +72,36 @@ theorem packedCenterCoveringAssignmentArguments
   simpa only [Code.packedCenterCoveringAssignmentArgumentsCode,
     packedCenterCoveringAssignmentArgumentsCost] using result
 
+/-- Workspace envelope for constructing the assignment query associated
+with one possible center-covering placement. -/
+def packedCenterCoveringAssignmentArgumentsSpaceBound
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) : Nat :=
+  1000000000000000000000000000000000000000000000000000000 *
+      (intOffsetAmount (-(symmetry.act source).2) + 1) *
+      packedTargetMembershipUnit
+        (Code.packedCoveringColumn symmetry source)
+        (-(symmetry.act source).2) periodicStrip.period packed.phase
+        periodicStrip.motif base.2 packed.assignmentWord +
+    1000000000 *
+      packedCenterCandidateInputUnit periodicStrip packed base
+
+theorem packedCenterCoveringAssignmentArgumentsCost_le_linear
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterCoveringAssignmentArgumentsCost symmetry source
+        periodicStrip packed base ≤
+      packedCenterCoveringAssignmentArgumentsSpaceBound symmetry source
+        periodicStrip packed base := by
+  exact Nat.add_le_add
+    (packedTargetMembershipLookupArgumentsCost_le_linear
+      (Code.packedCoveringColumn symmetry source)
+      (-(symmetry.act source).2) periodicStrip.period packed.phase
+      periodicStrip.motif base.2 packed.assignmentWord)
+    (packedCenterSourceInputCost_le_linear periodicStrip packed base)
+
 def packedCenterCoveringCandidateCost
     (symmetry : SquareSymmetry) (source : Cell)
     (periodicStrip : PeriodicStrip)
@@ -83,6 +113,37 @@ def packedCenterCoveringCandidateCost
       packed.assignmentWord +
     packedCenterCoveringAssignmentArgumentsCost
       symmetry source periodicStrip packed base
+
+def packedCenterCoveringCandidateSpaceBound
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) : Nat :=
+  packedAssignmentIsSpaceBound
+      (Encodable.encode periodicStrip.motif)
+      (Code.packedCoveringColumn symmetry source).val
+      (Encodable.encode (Code.packedCenterCoveringTarget
+        periodicStrip packed base symmetry source))
+      packed.assignmentWord +
+    packedCenterCoveringAssignmentArgumentsSpaceBound
+      symmetry source periodicStrip packed base
+
+theorem packedCenterCoveringCandidateCost_le_linear
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) :
+    packedCenterCoveringCandidateCost symmetry source
+        periodicStrip packed base ≤
+      packedCenterCoveringCandidateSpaceBound symmetry source
+        periodicStrip packed base := by
+  exact Nat.add_le_add
+    (packedAssignmentIsCost_le_linear (some symmetry)
+      periodicStrip.motif
+      (Code.packedCoveringColumn symmetry source).val
+      (Code.packedCenterCoveringTarget
+        periodicStrip packed base symmetry source)
+      packed.assignmentWord)
+    (packedCenterCoveringAssignmentArgumentsCost_le_linear
+      symmetry source periodicStrip packed base)
 
 /-- Exact fitted execution of one active covering-placement test. -/
 theorem packedCenterCoveringCandidate

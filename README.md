@@ -1543,7 +1543,8 @@ The representation choices for this target are:
   final normalized `found` projection all have exact evaluator-space costs.
   A shared unit combining the target constructor, lookup scanner, and bounded
   list adapters now gives the whole leaf an explicit input-linear workspace
-  majorant, ready to be reused by the center-candidate layer.
+  majorant; the lookup-input prefix inherits the same envelope for reuse by
+  covering-candidate queries.
 - [`LeanTrominoes/PartrecPackedCenterCandidate.lean`](LeanTrominoes/PartrecPackedCenterCandidate.lean)
   combines one fixed assignment-selection test with the three translated
   membership leaves of a tromino placement.  For either tromino and every
@@ -1571,7 +1572,9 @@ The representation choices for this target are:
   exactly the packed active-placement filter predicate.
 - [`LeanTrominoes/PartrecPackedCenterCoveringCandidateSpace.lean`](LeanTrominoes/PartrecPackedCenterCoveringCandidateSpace.lean)
   fits that active-candidate lookup compositionally from the canonical target
-  constructor and fixed-assignment predicate.
+  constructor and fixed-assignment predicate.  Both its query adapter and
+  complete selection test now have explicit workspace bounds assembled from
+  those two reusable envelopes.
 - [`LeanTrominoes/PartrecPackedCenterCoverage.lean`](LeanTrominoes/PartrecPackedCenterCoverage.lean)
   sums the 24 fixed covering-candidate bits and compares the result with one;
   the program is proved equal to the length-one test on the semantic packed

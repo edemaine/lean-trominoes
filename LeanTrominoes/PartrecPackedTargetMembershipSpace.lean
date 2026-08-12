@@ -702,6 +702,29 @@ theorem packedTargetMembershipCost_le_linear
   simp only [Nat.mul_assoc] at lookupArgumentsBound ⊢
   omega
 
+/-- The lookup-input adapter is itself dominated by the complete membership
+leaf, so callers that reuse only this prefix inherit the same envelope. -/
+theorem packedTargetMembershipLookupArgumentsCost_le_linear
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) :
+    packedTargetMembershipLookupArgumentsCost column verticalOffset
+        period phase motif row word ≤
+      1000000000000000000000000000000000000000000000000000000 *
+        (intOffsetAmount verticalOffset + 1) *
+        packedTargetMembershipUnit column verticalOffset
+          period phase motif row word := by
+  calc
+    packedTargetMembershipLookupArgumentsCost column verticalOffset
+          period phase motif row word ≤
+        packedTargetMembershipCost column verticalOffset
+          period phase motif row word := by
+      simp only [packedTargetMembershipCost,
+        packedTargetMembershipLookupCost]
+      omega
+    _ ≤ _ := packedTargetMembershipCost_le_linear column
+      verticalOffset period phase motif row word
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
