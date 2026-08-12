@@ -1511,6 +1511,11 @@ The representation choices for this target are:
   follows every parity branch of those offset programs with exact evaluator
   costs, composes them over arbitrary fixed offsets, and bounds the result
   linearly in one encoded arithmetic envelope.
+- [`LeanTrominoes/PartrecPackedTargetCell.lean`](LeanTrominoes/PartrecPackedTargetCell.lean)
+  constructs the canonical encoded cell addressed by a packed frontier
+  column and a fixed vertical source offset.  It explicitly computes and
+  encodes the wrapped horizontal phase, offsets the row, and pairs the two
+  coordinates in Mathlib's standard `Cell` encoding.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
