@@ -1581,7 +1581,10 @@ The representation choices for this target are:
   `activePlacementList`.
 - [`LeanTrominoes/PartrecPackedCenterCoverageSpace.lean`](LeanTrominoes/PartrecPackedCenterCoverageSpace.lean)
   fits the complete fixed candidate sum and exact-one comparison, with exact
-  evaluator costs for every addition and list-composition node.
+  evaluator costs for every addition and list-composition node.  A recursive
+  bound controls the counter by the remaining candidate-list length; after
+  specializing to the 24 candidates, it yields an explicit workspace bound
+  for the complete exact-one predicate.
 - [`LeanTrominoes/PartrecPackedCenterBase.lean`](LeanTrominoes/PartrecPackedCenterBase.lean)
   adds the horizontal phase guard to containment and exact-one coverage,
   yielding explicit programs for both semantic center conditions and their
