@@ -1670,7 +1670,10 @@ The representation choices for this target are:
   [`LeanTrominoes/PartrecPackedTransitionSpace.lean`](LeanTrominoes/PartrecPackedTransitionSpace.lean)
   fits every adapter and component of that complete transition, including the
   modulo-period phase comparison and both final Boolean conjunctions, with an
-  exact continuation-independent evaluator-space cost.
+  exact continuation-independent evaluator-space cost.  Its six-field input
+  adapters and cyclic phase computation now share one explicit polynomial
+  workspace envelope; the remaining composition task is to absorb the three
+  fitted geometric predicates and the final conjunctions into that envelope.
 - [`LeanTrominoes/PartrecStripTransition.lean`](LeanTrominoes/PartrecStripTransition.lean)
   and
   [`LeanTrominoes/PartrecStripTransitionSpace.lean`](LeanTrominoes/PartrecStripTransitionSpace.lean)

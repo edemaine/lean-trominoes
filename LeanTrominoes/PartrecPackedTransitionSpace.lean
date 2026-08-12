@@ -213,6 +213,423 @@ theorem packedTransitionPhase
   simpa [Code.packedTransitionPhaseCode,
     packedTransitionPhaseCost] using result
 
+/-- One native-number envelope for the six packed-transition fields and the
+intermediate phase arithmetic.  The repeated motif terms also make this
+envelope large enough to absorb the normalization, center, and overlap
+component envelopes below. -/
+def packedTransitionPolynomialSpaceLimit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  let motifCode := Encodable.encode periodicStrip.motif
+  8192 * (periodicStrip.period + current.phase +
+    motifCode + motifCode + motifCode + motifCode +
+    motifCode + motifCode + motifCode +
+    current.assignmentWord + next.phase + next.assignmentWord + 200) + 4000
+
+/-- Native encoded-list workspace unit for the packed transition. -/
+def packedTransitionNativeSpaceUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  encodedListSpace
+    [packedTransitionPolynomialSpaceLimit periodicStrip current next] + 1
+
+private theorem packedTransitionNativeSpaceUnit_eq
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionNativeSpaceUnit periodicStrip current next =
+      (Computability.encodeNat
+        (packedTransitionPolynomialSpaceLimit
+          periodicStrip current next)).length + 2 := by
+  simp [packedTransitionNativeSpaceUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+
+private theorem packedTransitionInputSpace_le_nativeUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    encodedListSpace
+        (Code.packedTransitionInput periodicStrip current next) ≤
+      10 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  let limit := packedTransitionPolynomialSpaceLimit
+    periodicStrip current next
+  let unit := packedTransitionNativeSpaceUnit
+    periodicStrip current next
+  have periodBound : periodicStrip.period ≤ limit := by
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have currentPhaseBound : current.phase ≤ limit := by
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have motifBound : Encodable.encode periodicStrip.motif ≤ limit := by
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have currentWordBound : current.assignmentWord ≤ limit := by
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have nextPhaseBound : next.phase ≤ limit := by
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have nextWordBound : next.assignmentWord ≤ limit := by
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have periodBits := encodeNat_length_mono periodBound
+  have currentPhaseBits := encodeNat_length_mono currentPhaseBound
+  have motifBits := encodeNat_length_mono motifBound
+  have currentWordBits := encodeNat_length_mono currentWordBound
+  have nextPhaseBits := encodeNat_length_mono nextPhaseBound
+  have nextWordBits := encodeNat_length_mono nextWordBound
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, packedTransitionNativeSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  simp only [Code.packedTransitionInput,
+    encodedListSpace_cons, encodedListSpace_nil]
+  rw [show packedTransitionNativeSpaceUnit periodicStrip current next =
+      unit by rfl, unitEq]
+  omega
+
+private theorem packedTransitionInputHeadSpace_le_nativeUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    (Computability.encodeNat
+        (Code.packedTransitionInput periodicStrip current next).headI).length ≤
+      10 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  have inputSpace := packedTransitionInputSpace_le_nativeUnit
+    periodicStrip current next
+  simp [Code.packedTransitionInput] at inputSpace ⊢
+  omega
+
+private theorem packedTransitionInputHeadSuccSpace_le_nativeUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    (Computability.encodeNat
+        ((Code.packedTransitionInput periodicStrip current next).headI + 1)).length ≤
+      20 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  have headSpace := packedTransitionInputHeadSpace_le_nativeUnit
+    periodicStrip current next
+  have successor := encodeNat_succ_length_le
+    (Code.packedTransitionInput periodicStrip current next).headI
+  have successor' :
+      (Computability.encodeNat
+          ((Code.packedTransitionInput periodicStrip current next).headI + 1)).length ≤
+        (Computability.encodeNat
+          (Code.packedTransitionInput periodicStrip current next).headI).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using successor
+  have unitPositive :
+      1 ≤ packedTransitionNativeSpaceUnit periodicStrip current next := by
+    simp [packedTransitionNativeSpaceUnit]
+  omega
+
+set_option maxHeartbeats 800000 in
+theorem packedTransitionCurrentArgumentsCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionCurrentArgumentsCost periodicStrip current next ≤
+      1000000 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  let limit := packedTransitionPolynomialSpaceLimit
+    periodicStrip current next
+  let unit := packedTransitionNativeSpaceUnit
+    periodicStrip current next
+  have periodBits := encodeNat_length_mono
+    (show periodicStrip.period ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentPhaseBits := encodeNat_length_mono
+    (show current.phase ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have motifBits := encodeNat_length_mono
+    (show Encodable.encode periodicStrip.motif ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentWordBits := encodeNat_length_mono
+    (show current.assignmentWord ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have periodSuccBits := encodeNat_length_mono
+    (show periodicStrip.period + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentPhaseSuccBits := encodeNat_length_mono
+    (show current.phase + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have motifSuccBits := encodeNat_length_mono
+    (show Encodable.encode periodicStrip.motif + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentWordSuccBits := encodeNat_length_mono
+    (show current.assignmentWord + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, packedTransitionNativeSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have inputSpace := packedTransitionInputSpace_le_nativeUnit
+    periodicStrip current next
+  simp only [Code.packedTransitionInput,
+    encodedListSpace_cons, encodedListSpace_nil] at inputSpace
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [packedTransitionCurrentArgumentsCost,
+    Code.packedTransitionInput, prependCost,
+    getCost, dropCost, headCost, idCost,
+    nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
+set_option maxHeartbeats 800000 in
+theorem packedTransitionOverlapArgumentsCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionOverlapArgumentsCost periodicStrip current next ≤
+      1000000 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  let limit := packedTransitionPolynomialSpaceLimit
+    periodicStrip current next
+  let unit := packedTransitionNativeSpaceUnit
+    periodicStrip current next
+  have motifBits := encodeNat_length_mono
+    (show Encodable.encode periodicStrip.motif ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentWordBits := encodeNat_length_mono
+    (show current.assignmentWord ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have nextWordBits := encodeNat_length_mono
+    (show next.assignmentWord ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have motifSuccBits := encodeNat_length_mono
+    (show Encodable.encode periodicStrip.motif + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentWordSuccBits := encodeNat_length_mono
+    (show current.assignmentWord + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have nextWordSuccBits := encodeNat_length_mono
+    (show next.assignmentWord + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, packedTransitionNativeSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have inputSpace := packedTransitionInputSpace_le_nativeUnit
+    periodicStrip current next
+  simp only [Code.packedTransitionInput,
+    encodedListSpace_cons, encodedListSpace_nil] at inputSpace
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [packedTransitionOverlapArgumentsCost,
+    Code.packedTransitionInput, prependCost,
+    getCost, dropCost, headCost, idCost,
+    nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
+set_option maxHeartbeats 800000 in
+theorem packedTransitionPhaseDivisionArgumentsCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionPhaseDivisionArgumentsCost periodicStrip current next ≤
+      1000000 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  let limit := packedTransitionPolynomialSpaceLimit
+    periodicStrip current next
+  let unit := packedTransitionNativeSpaceUnit
+    periodicStrip current next
+  have periodBits := encodeNat_length_mono
+    (show periodicStrip.period ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentPhaseBits := encodeNat_length_mono
+    (show current.phase ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentPhaseSuccBits := encodeNat_length_mono
+    (show current.phase + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have periodSuccBits := encodeNat_length_mono
+    (show periodicStrip.period + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have currentPhaseSuccSuccBits := encodeNat_length_mono
+    (show current.phase + 1 + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, packedTransitionNativeSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have inputSpace := packedTransitionInputSpace_le_nativeUnit
+    periodicStrip current next
+  simp only [Code.packedTransitionInput,
+    encodedListSpace_cons, encodedListSpace_nil] at inputSpace
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [packedTransitionPhaseDivisionArgumentsCost,
+    Code.packedTransitionInput, prependCost,
+    getCost, dropCost, headCost, idCost,
+    nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
+set_option maxHeartbeats 800000 in
+theorem packedTransitionPhaseRemainderCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionPhaseRemainderCost periodicStrip current next ≤
+      1000000000000000000 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  let limit := packedTransitionPolynomialSpaceLimit
+    periodicStrip current next
+  let unit := packedTransitionNativeSpaceUnit
+    periodicStrip current next
+  have divisionBound := divisionUniformCost_le_input
+    (current.phase + 1) periodicStrip.period
+  have divisionLimit :
+      8 * (current.phase + 1 + periodicStrip.period) + 16 ≤ limit := by
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have divisionBits := encodeNat_length_mono divisionLimit
+  have argumentsBound :=
+    packedTransitionPhaseDivisionArgumentsCost_le_linear
+      periodicStrip current next
+  have remainderBound :
+      (current.phase + 1) % periodicStrip.period ≤ limit := by
+    exact (Nat.mod_le (current.phase + 1) periodicStrip.period).trans
+      (show current.phase + 1 ≤ limit by
+        simp only [limit, packedTransitionPolynomialSpaceLimit]
+        omega)
+  have remainderBits := encodeNat_length_mono remainderBound
+  have remainderSuccBits := encodeNat_length_mono
+    (show (current.phase + 1) % periodicStrip.period + 1 ≤ limit by
+      have raw := Nat.mod_le (current.phase + 1) periodicStrip.period
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have quotientBits := encodeNat_length_mono
+    (show (current.phase + 1) / periodicStrip.period ≤ limit by
+      exact (Nat.div_le_self (current.phase + 1)
+        periodicStrip.period).trans
+          (show current.phase + 1 ≤ limit by
+            simp only [limit, packedTransitionPolynomialSpaceLimit]
+            omega))
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, packedTransitionNativeSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have nativeUnitEq := packedTransitionNativeSpaceUnit_eq
+    periodicStrip current next
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [packedTransitionPhaseRemainderCost,
+    divisionSpaceBound, encodedListSpace_cons, encodedListSpace_nil,
+    getCost, dropCost, headCost, idCost, nilCost,
+    tailCost, zeroPrimeCost, succCost]
+  simp only [packedTransitionNativeSpaceUnit,
+    encodedListSpace_cons, encodedListSpace_nil] at argumentsBound
+  clear * - divisionBits argumentsBound remainderBits
+    remainderSuccBits quotientBits unitEq nativeUnitEq zeroBits
+  omega
+
+set_option maxHeartbeats 800000 in
+theorem packedTransitionPhaseEqualityArgumentsCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionPhaseEqualityArgumentsCost periodicStrip current next ≤
+      10000000000000000000 * packedTransitionNativeSpaceUnit
+        periodicStrip current next := by
+  let limit := packedTransitionPolynomialSpaceLimit
+    periodicStrip current next
+  let unit := packedTransitionNativeSpaceUnit
+    periodicStrip current next
+  have nextPhaseBits := encodeNat_length_mono
+    (show next.phase ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have nextPhaseSuccBits := encodeNat_length_mono
+    (show next.phase + 1 ≤ limit by
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have remainderBits := encodeNat_length_mono
+    (show (current.phase + 1) % periodicStrip.period ≤ limit by
+      exact (Nat.mod_le (current.phase + 1) periodicStrip.period).trans
+        (show current.phase + 1 ≤ limit by
+          simp only [limit, packedTransitionPolynomialSpaceLimit]
+          omega))
+  have remainderSuccBits := encodeNat_length_mono
+    (show (current.phase + 1) % periodicStrip.period + 1 ≤ limit by
+      have raw := Nat.mod_le (current.phase + 1) periodicStrip.period
+      simp only [limit, packedTransitionPolynomialSpaceLimit]
+      omega)
+  have remainderCost := packedTransitionPhaseRemainderCost_le_linear
+    periodicStrip current next
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, packedTransitionNativeSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have inputSpace := packedTransitionInputSpace_le_nativeUnit
+    periodicStrip current next
+  simp only [Code.packedTransitionInput,
+    encodedListSpace_cons, encodedListSpace_nil] at inputSpace
+  have nativeUnitEq := packedTransitionNativeSpaceUnit_eq
+    periodicStrip current next
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [packedTransitionPhaseEqualityArgumentsCost,
+    Code.packedTransitionInput, prependCost,
+    getCost, dropCost, headCost, idCost,
+    nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil]
+  simp only [packedTransitionNativeSpaceUnit,
+    encodedListSpace_cons, encodedListSpace_nil] at remainderCost
+  omega
+
+set_option maxHeartbeats 1000000 in
+theorem packedTransitionPhaseCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedTransitionPhaseCost periodicStrip current next ≤
+      100000000000000000000000000000000 *
+        packedTransitionNativeSpaceUnit periodicStrip current next := by
+  let limit := packedTransitionPolynomialSpaceLimit
+    periodicStrip current next
+  let unit := packedTransitionNativeSpaceUnit
+    periodicStrip current next
+  have equalityCost := natEqCost_le_linear next.phase
+    ((current.phase + 1) % periodicStrip.period)
+  have equalityLimit :
+      2 * (next.phase +
+        (current.phase + 1) % periodicStrip.period) + 4 ≤ limit := by
+    have remainderLe := Nat.mod_le
+      (current.phase + 1) periodicStrip.period
+    simp only [limit, packedTransitionPolynomialSpaceLimit]
+    omega
+  have equalityBits := encodeNat_length_mono equalityLimit
+  have argumentsCost :=
+    packedTransitionPhaseEqualityArgumentsCost_le_linear
+      periodicStrip current next
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, packedTransitionNativeSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have nativeUnitEq := packedTransitionNativeSpaceUnit_eq
+    periodicStrip current next
+  simp only [packedTransitionPhaseCost,
+    encodedListSpace_cons, encodedListSpace_nil] at equalityCost ⊢
+  simp only [packedTransitionNativeSpaceUnit,
+    encodedListSpace_cons, encodedListSpace_nil] at argumentsCost
+  clear * - equalityCost equalityBits argumentsCost unitEq nativeUnitEq
+  omega
+
 def packedTransitionNormalizationCost
     (periodicStrip : PeriodicStrip)
     (current next : PackedWindowState) : Nat :=
