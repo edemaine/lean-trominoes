@@ -592,6 +592,44 @@ theorem stripReachCallSpacePolynomial_eval (inputLength : Nat) :
   simp [stripReachCallSpacePolynomial, stripReachCallSpaceBound,
     stripFuelComputationSpaceBound, stripFuelBits]
 
+/-- Workspace for one second-endpoint update: a raw edge test, a reverse
+reachability call, Boolean accumulation, and fixed-width payload rebuilding. -/
+def stripCandidateStepSpaceBound (inputLength : Nat) : Nat :=
+  1000000000000000000 *
+    (stripReachCallSpaceBound inputLength +
+      stripTransitionLeafSpaceBound inputLength +
+      stripLoopPayloadSpaceBound inputLength + 1)
+
+noncomputable def stripCandidateStepSpacePolynomial : Polynomial Nat :=
+  1000000000000000000 *
+    (stripReachCallSpacePolynomial +
+      stripTransitionLeafSpacePolynomial +
+      stripLoopPayloadSpacePolynomial + 1)
+
+@[simp]
+theorem stripCandidateStepSpacePolynomial_eval (inputLength : Nat) :
+    stripCandidateStepSpacePolynomial.eval inputLength =
+      stripCandidateStepSpaceBound inputLength := by
+  simp [stripCandidateStepSpacePolynomial, stripCandidateStepSpaceBound]
+
+/-- Uniform reserve for the countdown wrapper around a second-endpoint
+candidate update. -/
+def stripCandidateBodySpaceBound (inputLength : Nat) : Nat :=
+  100000 *
+    (stripCandidateStepSpaceBound inputLength +
+      stripLoopPayloadSpaceBound inputLength + 1)
+
+noncomputable def stripCandidateBodySpacePolynomial : Polynomial Nat :=
+  100000 *
+    (stripCandidateStepSpacePolynomial +
+      stripLoopPayloadSpacePolynomial + 1)
+
+@[simp]
+theorem stripCandidateBodySpacePolynomial_eval (inputLength : Nat) :
+    stripCandidateBodySpacePolynomial.eval inputLength =
+      stripCandidateBodySpaceBound inputLength := by
+  simp [stripCandidateBodySpacePolynomial, stripCandidateBodySpaceBound]
+
 /-- One common polynomial envelope for search payloads and explicit
 search-depth and fuel arithmetic. -/
 def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
@@ -601,7 +639,9 @@ def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
           stripFuelComputationSpaceBound inputLength +
           stripTransitionLeafSpaceBound inputLength +
             stripSavitchBodySpaceBound inputLength +
-              stripReachCallSpaceBound inputLength
+              stripReachCallSpaceBound inputLength +
+                stripCandidateStepSpaceBound inputLength +
+                  stripCandidateBodySpaceBound inputLength
 
 /-- Polynomial packaging of `stripEvaluatorSpaceBound`. -/
 noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
@@ -616,7 +656,9 @@ noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
               100 * Polynomial.X + 100) +
             stripTransitionLeafSpacePolynomial +
               stripSavitchBodySpacePolynomial +
-                stripReachCallSpacePolynomial
+                stripReachCallSpacePolynomial +
+                  stripCandidateStepSpacePolynomial +
+                    stripCandidateBodySpacePolynomial
 
 @[simp]
 theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
@@ -627,7 +669,8 @@ theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
     stripStateBoundComputationSpaceBound,
     stripFuelComputationSpaceBound, stripTransitionLeafSpaceBound,
     stripSavitchBodySpaceBound, stripSavitchStepSpaceBound,
-    stripReachCallSpaceBound, stripFuelBits]
+    stripReachCallSpaceBound, stripCandidateStepSpaceBound,
+    stripCandidateBodySpaceBound, stripFuelBits]
 
 theorem stripReachPayloadSpaceBound_le_evaluator
     (inputLength : Nat) :
@@ -1611,6 +1654,51 @@ theorem fields
       simpa [FiniteState.DivideEvalPartrec.fields, fieldsCost,
         prependCost] using combined
 
+set_option maxHeartbeats 10000 in
+/-- A list of fitted fields can be assembled without re-expanding every
+nested prepend node: only the child costs, the number of fields, and a common
+bound on the input and assembled-output footprints matter. -/
+theorem fieldsCost_le_of
+    (values : List Nat) (fieldFits : List (FieldFit values))
+    (restOutput : List Nat) (restCost unit : Nat)
+    (valuesBound : encodedListSpace values ≤ unit)
+    (outputBound :
+      encodedListSpace (fieldFits.map FieldFit.output ++ restOutput) ≤ unit) :
+    fieldsCost values fieldFits restOutput restCost ≤
+      restCost + (fieldFits.map FieldFit.cost).sum +
+        fieldFits.length * (3 * (unit + 2) + 2) := by
+  induction fieldFits with
+  | nil => simp [fieldsCost]
+  | cons field fieldFits induction =>
+      let tailOutput := fieldFits.map FieldFit.output ++ restOutput
+      have tailSpace : encodedListSpace tailOutput ≤ unit := by
+        have tail := listCodeEncodedListSpace_tail_le
+          (field.output :: tailOutput)
+        exact tail.trans (by
+          simpa [tailOutput] using outputBound)
+      have fieldSpace : encodedListSpace [field.output] ≤ unit + 1 := by
+        have head := encodedListSpace_singleton_headI_le
+          (field.output :: tailOutput)
+        exact head.trans (Nat.add_le_add_right
+          (by simpa [tailOutput] using outputBound) 1)
+      have combinedSpace :
+          encodedListSpace (field.output :: tailOutput) ≤ unit + 1 := by
+        have currentSpace :
+            encodedListSpace (field.output :: tailOutput) ≤ unit := by
+          simpa [tailOutput] using outputBound
+        exact currentSpace.trans (Nat.le_succ unit)
+      have prepend := EvaluatorCodeFits.listCodePrependCost_le_of
+        values [field.output] tailOutput field.cost
+        (fieldsCost values fieldFits restOutput restCost) (unit + 1)
+        (valuesBound.trans (Nat.le_succ unit)) fieldSpace
+        (by simpa using combinedSpace)
+      have rest := induction tailSpace
+      simp only [fieldsCost]
+      apply prepend.trans
+      simp only [List.map_cons, List.sum_cons, List.length_cons,
+        Nat.add_mul, one_mul]
+      omega
+
 def getField (index : Nat) (values : List Nat) : FieldFit values where
   code := FiniteState.DivideEvalPartrec.field index
   output := values[index]?.getD 0
@@ -1628,6 +1716,15 @@ def predecessorField (index : Nat) (values : List Nat) : FieldFit values where
     simpa [FiniteState.DivideEvalPartrec.predecessorField,
       FiniteState.DivideEvalPartrec.field,
       Turing.ToPartrec.Code.subtractStepList] using result
+
+@[simp]
+theorem getField_cost (index : Nat) (values : List Nat) :
+    (getField index values).cost = getCost index values := rfl
+
+@[simp]
+theorem predecessorField_cost (index : Nat) (values : List Nat) :
+    (predecessorField index values).cost =
+      predCost [values[index]?.getD 0] + getCost index values := rfl
 
 def zeroField (values : List Nat) : FieldFit values where
   code := Turing.ToPartrec.Code.zero
@@ -3433,6 +3530,848 @@ theorem stripReachBool_fits_polynomial
     first last firstBelow lastBelow).mono
       (stripReachBoolCost_le tromino periodicStrip
         first last firstBelow lastBelow)
+
+namespace StripCandidateStep
+
+/-- Exact evaluator cost of the three-field adapter feeding the raw edge
+test in one second-endpoint update. -/
+def edgeArgumentsCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values
+    [StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 3 values,
+      StripSavitchStep.predecessorField 4 values]
+    [] (EvaluatorCodeFits.nilCost values)
+
+theorem edgeArguments (values : List Nat) :
+    EvaluatorCodeFits candidateEdgeArguments values
+      [values[0]?.getD 0, values[3]?.getD 0,
+        (values[4]?.getD 0).pred]
+      (edgeArgumentsCost values) := by
+  have fit := StripSavitchStep.fields values
+    [StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 3 values,
+      StripSavitchStep.predecessorField 4 values]
+    (EvaluatorCodeFits.nil values)
+  simpa [candidateEdgeArguments, candidateSecond,
+    edgeArgumentsCost, StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    FiniteState.DivideEvalPartrec.predecessorField,
+    StripSavitchStep.getField,
+    StripSavitchStep.predecessorField] using fit
+
+/-- Exact evaluator cost of the five-field adapter feeding reverse
+reachability in one second-endpoint update. -/
+def reachArgumentsCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values
+    [StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.predecessorField 4 values,
+      StripSavitchStep.getField 3 values]
+    [] (EvaluatorCodeFits.nilCost values)
+
+theorem reachArguments (values : List Nat) :
+    EvaluatorCodeFits candidateReachArguments values
+      [values[0]?.getD 0, values[1]?.getD 0,
+        values[2]?.getD 0, (values[4]?.getD 0).pred,
+        values[3]?.getD 0]
+      (reachArgumentsCost values) := by
+  have fit := StripSavitchStep.fields values
+    [StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.predecessorField 4 values,
+      StripSavitchStep.getField 3 values]
+    (EvaluatorCodeFits.nil values)
+  simpa [candidateReachArguments, candidateSecond,
+    reachArgumentsCost, StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    FiniteState.DivideEvalPartrec.predecessorField,
+    StripSavitchStep.getField,
+    StripSavitchStep.predecessorField] using fit
+
+private theorem singletonGetDSpace_le
+    (index : Nat) (values : List Nat) :
+    encodedListSpace [values[index]?.getD 0] ≤
+      encodedListSpace values + 1 := by
+  induction index generalizing values with
+  | zero =>
+      cases values with
+      | nil => rfl
+      | cons value values =>
+          simp only [List.getElem?_cons_zero, Option.getD_some]
+          exact encodedListSpace_singleton_headI_le (value :: values)
+  | succ index induction =>
+      cases values with
+      | nil => rfl
+      | cons value values =>
+          have tail := induction values
+          simp only [List.getElem?_cons_succ] at tail ⊢
+          exact tail.trans (Nat.add_le_add_right
+            (listCodeEncodedListSpace_tail_le (value :: values)) 1)
+
+private theorem predecessorSingletonSpace_le (value : Nat) :
+    encodedListSpace [value.pred] ≤ encodedListSpace [value] := by
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  exact Nat.add_le_add_right
+    (listCodeEncodeNat_length_mono (Nat.pred_le value)) 1
+
+private theorem nilCost_le_linear (values : List Nat) :
+    EvaluatorCodeFits.nilCost values ≤
+      1000 * (encodedListSpace values + 1) := by
+  have headSpace := encodedListSpace_singleton_headI_le values
+  have successorBits := encodeNat_succ_length_le values.headI
+  simp [EvaluatorCodeFits.nilCost, EvaluatorCodeFits.tailCost,
+    EvaluatorCodeFits.succCost, encodedListSpace_cons]
+    at headSpace successorBits ⊢
+  omega
+
+private theorem candidateScaledFieldSpace_le (value : Nat) :
+    encodedListSpace [2 * value + 4] ≤
+      10 * (encodedListSpace [value] + 1) := by
+  have product := encodeNat_mul_length_le_sum 2 value
+  have sum := encodeNat_add_length_le_sum (2 * value) 4
+  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  rw [twoBits] at product
+  rw [fourBits] at sum
+  omega
+
+private theorem predecessorFieldCost_le_linear
+    (index : Nat) (values : List Nat) (indexBound : index ≤ 12) :
+    (StripSavitchStep.predecessorField index values).cost ≤
+      30000000 * (encodedListSpace values + 1) := by
+  let value := values[index]?.getD 0
+  have projected := singletonGetDSpace_le index values
+  have scaled := candidateScaledFieldSpace_le value
+  have predecessor := EvaluatorCodeFits.predCost_singleton_le_linear value
+  have projection := EvaluatorCodeFits.listCodeGetCost_le_linear index values
+  have projectionBound : EvaluatorCodeFits.getCost index values ≤
+      130000 * (encodedListSpace values + 1) :=
+    projection.trans (Nat.mul_le_mul_right _
+      (Nat.mul_le_mul_left 10000 (Nat.add_le_add_right indexBound 1)))
+  dsimp only [value] at projected scaled predecessor ⊢
+  simp only [StripSavitchStep.predecessorField]
+  omega
+
+/-- The edge-test adapter is linear in its six-field candidate payload. -/
+theorem edgeArgumentsCost_le_linear (values : List Nat) :
+    edgeArgumentsCost values ≤
+      100000000 * (encodedListSpace values + 1) := by
+  have get0 := EvaluatorCodeFits.listCodeGetCost_le_linear 0 values
+  have get3 := EvaluatorCodeFits.listCodeGetCost_le_linear 3 values
+  have pred4 := predecessorFieldCost_le_linear 4 values (by omega)
+  have nil := nilCost_le_linear values
+  have field0 := singletonGetDSpace_le 0 values
+  have field3 := singletonGetDSpace_le 3 values
+  have field4 := singletonGetDSpace_le 4 values
+  have pred4Space := predecessorSingletonSpace_le (values[4]?.getD 0)
+  simp [edgeArgumentsCost, StripSavitchStep.fieldsCost,
+    EvaluatorCodeFits.prependCost, StripSavitchStep.getField,
+    StripSavitchStep.predecessorField] at get0 get3 pred4 nil field0 field3 field4 pred4Space ⊢
+  omega
+
+/-- The reachability adapter is linear in its six-field candidate payload. -/
+theorem reachArgumentsCost_le_linear (values : List Nat) :
+    reachArgumentsCost values ≤
+      100000000 * (encodedListSpace values + 1) := by
+  have get0 := EvaluatorCodeFits.listCodeGetCost_le_linear 0 values
+  have get1 := EvaluatorCodeFits.listCodeGetCost_le_linear 1 values
+  have get2 := EvaluatorCodeFits.listCodeGetCost_le_linear 2 values
+  have get3 := EvaluatorCodeFits.listCodeGetCost_le_linear 3 values
+  have pred4 := predecessorFieldCost_le_linear 4 values (by omega)
+  have nil := nilCost_le_linear values
+  have field0 := singletonGetDSpace_le 0 values
+  have field1 := singletonGetDSpace_le 1 values
+  have field2 := singletonGetDSpace_le 2 values
+  have field3 := singletonGetDSpace_le 3 values
+  have field4 := singletonGetDSpace_le 4 values
+  have pred4Space := predecessorSingletonSpace_le (values[4]?.getD 0)
+  simp [reachArgumentsCost, StripSavitchStep.fieldsCost,
+    EvaluatorCodeFits.prependCost, StripSavitchStep.getField,
+    StripSavitchStep.predecessorField] at get0 get1 get2 get3 pred4 nil field0 field1 field2 field3 field4 pred4Space ⊢
+  omega
+
+def edgeCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (values : List Nat) : Nat :=
+  EvaluatorCodeFits.stripTransitionCost tromino periodicStrip
+      first secondRemaining.pred + edgeArgumentsCost values
+
+theorem edge
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (found : Bool) :
+    let values :=
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag found]
+    EvaluatorCodeFits (candidateEdgeCode tromino) values
+      [FiniteState.divideBoolTag
+        (indexedTransitionRawBool tromino periodicStrip
+          first secondRemaining.pred)]
+      (edgeCost tromino periodicStrip first secondRemaining values) := by
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag found]
+  have leaf := EvaluatorCodeFits.stripTransition
+    tromino periodicStrip wellFormed first secondRemaining.pred
+  have adapted := edgeArguments values
+  have fit := EvaluatorCodeFits.comp leaf adapted
+  have outputEq :
+      [(indexedTransitionRawBool tromino periodicStrip
+        first secondRemaining.pred).toNat] =
+      [FiniteState.divideBoolTag
+        (indexedTransitionRawBool tromino periodicStrip
+          first secondRemaining.pred)] := by
+    cases indexedTransitionRawBool tromino periodicStrip
+      first secondRemaining.pred <;> rfl
+  rw [outputEq] at fit
+  simpa [candidateEdgeCode, stripEdgeVectorCode,
+    edgeCost, values] using fit
+
+def reachCost
+    (periodicStrip : PeriodicStrip) (values : List Nat) : Nat :=
+  stripReachCallSpaceBound
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length +
+    reachArgumentsCost values
+
+theorem reach
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (found : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    EvaluatorCodeFits (candidateReachCode tromino)
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag found]
+      [FiniteState.divideBoolTag
+        (FiniteState.divideReachIndexDFSBool
+          (indexCount periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip)
+          (stripSearchDepth periodicStrip) secondRemaining.pred first)]
+      (reachCost periodicStrip
+        [Encodable.encode periodicStrip, indexCount periodicStrip,
+          stripSearchDepth periodicStrip, first, secondRemaining,
+          FiniteState.divideBoolTag found]) := by
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag found]
+  have endpointBelow : secondRemaining.pred < indexCount periodicStrip := by
+    exact (Nat.pred_lt (Nat.ne_of_gt secondPositive)).trans_le secondBound
+  have query := stripReachBool_fits_polynomial tromino periodicStrip
+    wellFormed secondRemaining.pred first endpointBelow firstBelow
+  have adapted := reachArguments values
+  have fit := EvaluatorCodeFits.comp query adapted
+  simpa [candidateReachCode, reachCost, values] using fit
+
+private def candidateBaseUnit (inputLength : Nat) : Nat :=
+  stripReachCallSpaceBound inputLength +
+    stripTransitionLeafSpaceBound inputLength +
+    stripLoopPayloadSpaceBound inputLength + 1
+
+private theorem candidateValuesSpace_le
+    (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (found : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    encodedListSpace
+        [Encodable.encode periodicStrip, indexCount periodicStrip,
+          stripSearchDepth periodicStrip, first, secondRemaining,
+          FiniteState.divideBoolTag found] ≤
+      stripLoopPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag found]
+  have payload := stripCandidatePayload_encodedListSpace_le periodicStrip
+    0 first secondRemaining found (Nat.zero_le _)
+    (Nat.le_of_lt firstBelow) secondBound
+  have tail := listCodeEncodedListSpace_tail_le (0 :: values)
+  exact tail.trans (by simpa [values] using payload)
+
+theorem edgeCost_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (found : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    let inputLength :=
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length
+    let values :=
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag found]
+    edgeCost tromino periodicStrip first secondRemaining values ≤
+      100000000 * candidateBaseUnit inputLength := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag found]
+  have endpointBelow : secondRemaining.pred < indexCount periodicStrip :=
+    (Nat.pred_lt (Nat.ne_of_gt secondPositive)).trans_le secondBound
+  have valuesBound : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using candidateValuesSpace_le periodicStrip
+      first secondRemaining found firstBelow secondBound
+  have adapter := edgeArgumentsCost_le_linear values
+  have leafPolynomial :=
+    EvaluatorCodeFits.stripTransitionCost_le_polynomialSpaceBound
+      tromino periodicStrip first secondRemaining.pred
+  have leafReserve := stripTransitionPolynomialSpaceBound_le_leaf
+    tromino periodicStrip first secondRemaining.pred firstBelow endpointBelow
+  have leaf := leafPolynomial.trans leafReserve
+  have adapter' : edgeArgumentsCost values ≤
+      100000000 * (stripLoopPayloadSpaceBound inputLength + 1) :=
+    adapter.trans (Nat.mul_le_mul_left _ (Nat.add_le_add_right valuesBound 1))
+  calc
+    edgeCost tromino periodicStrip first secondRemaining values =
+        EvaluatorCodeFits.stripTransitionCost tromino periodicStrip
+          first secondRemaining.pred + edgeArgumentsCost values := rfl
+    _ ≤ stripTransitionLeafSpaceBound inputLength +
+          100000000 * (stripLoopPayloadSpaceBound inputLength + 1) :=
+      Nat.add_le_add (by simpa [inputLength] using leaf) adapter'
+    _ ≤ 100000000 * candidateBaseUnit inputLength := by
+      simp [candidateBaseUnit]
+      omega
+
+theorem reachCost_le
+    (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (found : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    let inputLength :=
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length
+    let values :=
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag found]
+    reachCost periodicStrip values ≤
+      100000000 * candidateBaseUnit inputLength := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag found]
+  have valuesBound : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using candidateValuesSpace_le periodicStrip
+      first secondRemaining found firstBelow secondBound
+  have adapter := reachArgumentsCost_le_linear values
+  have adapter' : reachArgumentsCost values ≤
+      100000000 * (stripLoopPayloadSpaceBound inputLength + 1) :=
+    adapter.trans (Nat.mul_le_mul_left _ (Nat.add_le_add_right valuesBound 1))
+  calc
+    reachCost periodicStrip values =
+        stripReachCallSpaceBound inputLength + reachArgumentsCost values := by
+      simp [reachCost, inputLength]
+    _ ≤ stripReachCallSpaceBound inputLength +
+          100000000 * (stripLoopPayloadSpaceBound inputLength + 1) :=
+      Nat.add_le_add_left adapter' _
+    _ ≤ 100000000 * candidateBaseUnit inputLength := by
+      simp [candidateBaseUnit]
+      omega
+
+def foundCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (found : Bool)
+    (values : List Nat) : Nat :=
+  let edge := indexedTransitionRawBool tromino periodicStrip
+    first secondRemaining.pred
+  let reachable := FiniteState.divideReachIndexDFSBool
+    (indexCount periodicStrip)
+    (indexedTransitionRawBool tromino periodicStrip)
+    (stripSearchDepth periodicStrip) secondRemaining.pred first
+  let bothCost := EvaluatorCodeFits.boolAndCost values
+    (FiniteState.divideBoolTag edge)
+    (FiniteState.divideBoolTag reachable)
+    (edgeCost tromino periodicStrip first secondRemaining values)
+    (reachCost periodicStrip values)
+  EvaluatorCodeFits.boolOrCost values
+    (FiniteState.divideBoolTag found)
+    (FiniteState.divideBoolTag (edge && reachable))
+    (EvaluatorCodeFits.getCost 5 values) bothCost
+
+theorem found
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (found : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    let values :=
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag found]
+    EvaluatorCodeFits (candidateFoundCode tromino) values
+      [FiniteState.divideBoolTag
+        (found || cycleCandidateBool tromino periodicStrip
+          (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+          first secondRemaining.pred)]
+      (foundCost tromino periodicStrip first secondRemaining found values) := by
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag found]
+  let edgeValue := indexedTransitionRawBool tromino periodicStrip
+    first secondRemaining.pred
+  let reachValue := FiniteState.divideReachIndexDFSBool
+    (indexCount periodicStrip)
+    (indexedTransitionRawBool tromino periodicStrip)
+    (stripSearchDepth periodicStrip) secondRemaining.pred first
+  have edgeFit := edge tromino periodicStrip wellFormed
+    first secondRemaining found
+  have reachFit := reach tromino periodicStrip wellFormed
+    first secondRemaining found firstBelow secondPositive secondBound
+  have both := EvaluatorCodeFits.boolAnd edgeFit reachFit
+  have bothTag :
+      (if FiniteState.divideBoolTag edgeValue = 0 ∨
+          FiniteState.divideBoolTag reachValue = 0 then 0 else 1) =
+        FiniteState.divideBoolTag (edgeValue && reachValue) := by
+    cases edgeValue <;> cases reachValue <;> rfl
+  rw [bothTag] at both
+  have old : EvaluatorCodeFits (Turing.ToPartrec.Code.get 5) values
+      [FiniteState.divideBoolTag found]
+      (EvaluatorCodeFits.getCost 5 values) := by
+    simpa [values] using EvaluatorCodeFits.get 5 values
+  have accumulated := EvaluatorCodeFits.boolOr old both
+  have accumulatedTag :
+      (if FiniteState.divideBoolTag found = 0 ∧
+          FiniteState.divideBoolTag (edgeValue && reachValue) = 0
+        then 0 else 1) =
+        FiniteState.divideBoolTag (found || (edgeValue && reachValue)) := by
+    cases found <;> cases edgeValue <;> cases reachValue <;> rfl
+  rw [accumulatedTag] at accumulated
+  simpa [candidateFoundCode, foundCost, values, edgeValue, reachValue,
+    cycleCandidateBool] using accumulated
+
+private theorem candidateFoundBudget_le (unit : Nat) (positive : 1 ≤ unit) :
+    1000 * (1000 * (100000000 * unit + 1) + 1) ≤
+      1000000000000000 * unit := by
+  omega
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 1000000 in
+theorem foundCost_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (foundValue : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    let inputLength :=
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length
+    let values :=
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag foundValue]
+    foundCost tromino periodicStrip first secondRemaining foundValue values ≤
+      1000000000000000 * candidateBaseUnit inputLength := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag foundValue]
+  let edgeValue := indexedTransitionRawBool tromino periodicStrip
+    first secondRemaining.pred
+  let reachValue := FiniteState.divideReachIndexDFSBool
+    (indexCount periodicStrip)
+    (indexedTransitionRawBool tromino periodicStrip)
+    (stripSearchDepth periodicStrip) secondRemaining.pred first
+  let firstBudget := 100000000 * candidateBaseUnit inputLength
+  have valuesLoop : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using candidateValuesSpace_le periodicStrip
+      first secondRemaining foundValue firstBelow secondBound
+  have basePositive : 1 ≤ candidateBaseUnit inputLength := by
+    simp [candidateBaseUnit]
+  have firstPositive : 1 ≤ firstBudget := by
+    simp [firstBudget]
+    omega
+  have valuesBound : encodedListSpace values ≤ firstBudget := by
+    simp [firstBudget, candidateBaseUnit]
+    omega
+  have valuesStrict : encodedListSpace values + 1 ≤ firstBudget := by
+    simp [firstBudget, candidateBaseUnit]
+    omega
+  have headSpace := encodedListSpace_singleton_headI_le values
+  have headBound :
+      (Computability.encodeNat values.headI).length ≤ firstBudget := by
+    simp [encodedListSpace_cons] at headSpace
+    omega
+  have headSuccessor := encodeNat_succ_length_le values.headI
+  have headSuccessorBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ firstBudget := by
+    simp only [Nat.succ_eq_add_one] at headSuccessor
+    simp [encodedListSpace_cons] at headSpace
+    omega
+  have edgeBound :
+      edgeCost tromino periodicStrip first secondRemaining values ≤
+        firstBudget := by
+    simpa [values, inputLength, firstBudget] using
+      edgeCost_le tromino periodicStrip first secondRemaining foundValue
+        firstBelow secondPositive secondBound
+  have reachBound : reachCost periodicStrip values ≤ firstBudget := by
+    simpa [values, inputLength, firstBudget] using
+      reachCost_le periodicStrip first secondRemaining foundValue
+        firstBelow secondBound
+  have edgeValueBound : FiniteState.divideBoolTag edgeValue ≤ 1 := by
+    cases edgeValue <;> decide
+  have reachValueBound : FiniteState.divideBoolTag reachValue ≤ 1 := by
+    cases reachValue <;> decide
+  have both := EvaluatorCodeFits.boolAndCost_le_budget values
+    (FiniteState.divideBoolTag edgeValue)
+    (FiniteState.divideBoolTag reachValue)
+    (edgeCost tromino periodicStrip first secondRemaining values)
+    (reachCost periodicStrip values) firstBudget edgeValueBound
+    reachValueBound valuesBound headBound headSuccessorBound edgeBound
+    reachBound firstPositive
+  let secondBudget := 1000 * (firstBudget + 1)
+  have secondPositive : 1 ≤ secondBudget := by
+    dsimp only [secondBudget]
+    omega
+  have firstSecond : firstBudget ≤ secondBudget := by
+    simp [secondBudget]
+    omega
+  have valuesSecond := valuesBound.trans firstSecond
+  have headSecond := headBound.trans firstSecond
+  have headSuccessorSecond := headSuccessorBound.trans firstSecond
+  have get5 := EvaluatorCodeFits.listCodeGetCost_le_linear 5 values
+  have get5Bound : EvaluatorCodeFits.getCost 5 values ≤ secondBudget := by
+    simp [secondBudget, firstBudget, candidateBaseUnit] at valuesLoop get5 ⊢
+    omega
+  have bothBound :
+      EvaluatorCodeFits.boolAndCost values
+          (FiniteState.divideBoolTag edgeValue)
+          (FiniteState.divideBoolTag reachValue)
+          (edgeCost tromino periodicStrip first secondRemaining values)
+          (reachCost periodicStrip values) ≤ secondBudget := by
+    simpa [secondBudget] using both
+  have foundTagBound : FiniteState.divideBoolTag foundValue ≤ 1 := by
+    cases foundValue <;> decide
+  have bothTagBound :
+      FiniteState.divideBoolTag (edgeValue && reachValue) ≤ 1 := by
+    cases edgeValue <;> cases reachValue <;> decide
+  have combined := EvaluatorCodeFits.boolOrCost_le_budget values
+    (FiniteState.divideBoolTag foundValue)
+    (FiniteState.divideBoolTag (edgeValue && reachValue))
+    (EvaluatorCodeFits.getCost 5 values)
+    (EvaluatorCodeFits.boolAndCost values
+      (FiniteState.divideBoolTag edgeValue)
+      (FiniteState.divideBoolTag reachValue)
+      (edgeCost tromino periodicStrip first secondRemaining values)
+      (reachCost periodicStrip values))
+    secondBudget foundTagBound bothTagBound valuesSecond headSecond
+    headSuccessorSecond get5Bound bothBound secondPositive
+  have result :
+      foundCost tromino periodicStrip first secondRemaining foundValue values ≤
+        1000 * (secondBudget + 1) := by
+    simpa [foundCost, edgeValue, reachValue] using combined
+  apply result.trans
+  dsimp only [secondBudget, firstBudget]
+  exact candidateFoundBudget_le _ basePositive
+
+private noncomputable def foundField
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (foundValue : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip)
+    (values : List Nat)
+    (valuesEq : values =
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag foundValue]) :
+    StripSavitchStep.FieldFit values where
+  code := candidateFoundCode tromino
+  output := FiniteState.divideBoolTag
+    (foundValue || cycleCandidateBool tromino periodicStrip
+      (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+      first secondRemaining.pred)
+  cost := foundCost tromino periodicStrip first secondRemaining
+    foundValue values
+  fits := by
+    subst values
+    exact found tromino periodicStrip wellFormed first secondRemaining
+      foundValue firstBelow secondPositive secondBound
+
+@[simp]
+private theorem foundField_cost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (foundValue : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip)
+    (values : List Nat)
+    (valuesEq : values =
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag foundValue]) :
+    (foundField tromino periodicStrip wellFormed first secondRemaining
+      foundValue firstBelow secondPositive secondBound values valuesEq).cost =
+        foundCost tromino periodicStrip first secondRemaining
+          foundValue values := rfl
+
+/-- Exact compositional evaluator cost of one complete second-endpoint
+update. -/
+noncomputable def stepCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (foundValue : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) : Nat :=
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag foundValue]
+  StripSavitchStep.fieldsCost values
+    [StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.getField 3 values,
+      StripSavitchStep.predecessorField 4 values,
+      foundField tromino periodicStrip wellFormed first secondRemaining
+        foundValue firstBelow secondPositive secondBound values rfl]
+    [] (EvaluatorCodeFits.nilCost values)
+
+theorem exactStep
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (foundValue : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    EvaluatorCodeFits (candidateStepCode tromino)
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag foundValue]
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining.pred,
+        FiniteState.divideBoolTag
+          (foundValue || cycleCandidateBool tromino periodicStrip
+            (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+            first secondRemaining.pred)]
+      (stepCost tromino periodicStrip wellFormed first secondRemaining
+        foundValue firstBelow secondPositive secondBound) := by
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag foundValue]
+  let resultField := foundField tromino periodicStrip wellFormed
+    first secondRemaining foundValue firstBelow secondPositive secondBound
+    values rfl
+  have fit := StripSavitchStep.fields values
+    [StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.getField 3 values,
+      StripSavitchStep.predecessorField 4 values,
+      resultField]
+    (EvaluatorCodeFits.nil values)
+  simpa [candidateStepCode, candidateSecond, stepCost,
+    values, resultField, foundField,
+    StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    FiniteState.DivideEvalPartrec.predecessorField,
+    StripSavitchStep.getField,
+    StripSavitchStep.predecessorField] using fit
+
+private theorem candidateFieldsBudget_le
+    (unit nil get0 get1 get2 get3 predecessor found : Nat)
+    (positive : 1 ≤ unit)
+    (nilBound : nil ≤ 1000 * unit)
+    (get0Bound : get0 ≤ 10000 * unit)
+    (get1Bound : get1 ≤ 20000 * unit)
+    (get2Bound : get2 ≤ 30000 * unit)
+    (get3Bound : get3 ≤ 40000 * unit)
+    (predecessorBound : predecessor ≤ 30000000 * unit)
+    (foundBound : found ≤ 1000000000000000 * unit) :
+    nil + (get0 + get1 + get2 + get3 + predecessor + found) +
+        6 * (3 * (unit + 2) + 2) ≤
+      1000000000000000000 * unit := by
+  omega
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 300000 in
+/-- One complete candidate update has a uniform polynomial-space cost. -/
+theorem stepCost_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (foundValue : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    stepCost tromino periodicStrip wellFormed first secondRemaining
+        foundValue firstBelow secondPositive secondBound ≤
+      stripCandidateStepSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let foundResult :=
+    foundValue || cycleCandidateBool tromino periodicStrip
+      (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+      first secondRemaining.pred
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining,
+      FiniteState.divideBoolTag foundValue]
+  let output :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, secondRemaining.pred,
+      FiniteState.divideBoolTag foundResult]
+  have valuesBound : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using candidateValuesSpace_le periodicStrip
+      first secondRemaining foundValue firstBelow secondBound
+  have predecessorBound : secondRemaining.pred ≤ indexCount periodicStrip :=
+    (Nat.pred_le secondRemaining).trans secondBound
+  have outputBound : encodedListSpace output ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [output, inputLength] using candidateValuesSpace_le periodicStrip
+      first secondRemaining.pred foundResult firstBelow predecessorBound
+  let unit := candidateBaseUnit inputLength
+  have unitPositive : 1 ≤ unit := by
+    simp [unit, candidateBaseUnit]
+  have valuesUnit : encodedListSpace values ≤ unit := by
+    simp [unit, candidateBaseUnit]
+    omega
+  have outputUnit : encodedListSpace output ≤ unit := by
+    simp [unit, candidateBaseUnit]
+    omega
+  let resultField := foundField tromino periodicStrip wellFormed first
+    secondRemaining foundValue firstBelow secondPositive secondBound values rfl
+  let fieldFits : List (StripSavitchStep.FieldFit values) :=
+    [StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.getField 3 values,
+      StripSavitchStep.predecessorField 4 values,
+      resultField]
+  have outputEq : fieldFits.map StripSavitchStep.FieldFit.output = output := by
+    simp [fieldFits, resultField, foundField, output, foundResult, values,
+      StripSavitchStep.getField, StripSavitchStep.predecessorField]
+  have assembled := StripSavitchStep.fieldsCost_le_of values fieldFits []
+    (EvaluatorCodeFits.nilCost values) unit valuesUnit (by
+      simpa [outputEq] using outputUnit)
+  have get0 := EvaluatorCodeFits.listCodeGetCost_le_linear 0 values
+  have get1 := EvaluatorCodeFits.listCodeGetCost_le_linear 1 values
+  have get2 := EvaluatorCodeFits.listCodeGetCost_le_linear 2 values
+  have get3 := EvaluatorCodeFits.listCodeGetCost_le_linear 3 values
+  have pred4 := predecessorFieldCost_le_linear 4 values (by omega)
+  have foundBound := foundCost_le tromino periodicStrip first
+    secondRemaining foundValue firstBelow secondPositive secondBound
+  have nil := nilCost_le_linear values
+  have assembled' :
+      stepCost tromino periodicStrip wellFormed first secondRemaining
+          foundValue firstBelow secondPositive secondBound ≤
+        EvaluatorCodeFits.nilCost values +
+          (EvaluatorCodeFits.getCost 0 values +
+            EvaluatorCodeFits.getCost 1 values +
+            EvaluatorCodeFits.getCost 2 values +
+            EvaluatorCodeFits.getCost 3 values +
+            (StripSavitchStep.predecessorField 4 values).cost +
+            foundCost tromino periodicStrip first secondRemaining
+              foundValue values) +
+          6 * (3 * (unit + 2) + 2) := by
+    rw [show stepCost tromino periodicStrip wellFormed first secondRemaining
+        foundValue firstBelow secondPositive secondBound =
+      StripSavitchStep.fieldsCost values fieldFits []
+        (EvaluatorCodeFits.nilCost values) by rfl]
+    have costsEq :
+        (fieldFits.map StripSavitchStep.FieldFit.cost).sum =
+          EvaluatorCodeFits.getCost 0 values +
+            EvaluatorCodeFits.getCost 1 values +
+            EvaluatorCodeFits.getCost 2 values +
+            EvaluatorCodeFits.getCost 3 values +
+            (StripSavitchStep.predecessorField 4 values).cost +
+            foundCost tromino periodicStrip first secondRemaining
+              foundValue values := by
+      simp only [fieldFits, List.map_cons, List.map_nil, List.sum_cons,
+        List.sum_nil,
+        StripSavitchStep.getField_cost, resultField, foundField_cost]
+      omega
+    have lengthEq : fieldFits.length = 6 := by
+      simp only [fieldFits, List.length_cons, List.length_nil]
+    rw [costsEq, lengthEq] at assembled
+    exact assembled
+  have valuesPlus : encodedListSpace values + 1 ≤ unit := by
+    simp [unit, candidateBaseUnit]
+    omega
+  have get0' : EvaluatorCodeFits.getCost 0 values ≤ 10000 * unit :=
+    get0.trans (by omega)
+  have get1' : EvaluatorCodeFits.getCost 1 values ≤ 20000 * unit := by
+    simpa only [Nat.reduceAdd, Nat.reduceMul] using get1.trans (by gcongr)
+  have get2' : EvaluatorCodeFits.getCost 2 values ≤ 30000 * unit := by
+    simpa only [Nat.reduceAdd, Nat.reduceMul] using get2.trans (by gcongr)
+  have get3' : EvaluatorCodeFits.getCost 3 values ≤ 40000 * unit := by
+    simpa only [Nat.reduceAdd, Nat.reduceMul] using get3.trans (by gcongr)
+  have pred4' : (StripSavitchStep.predecessorField 4 values).cost ≤
+      30000000 * unit := pred4.trans (by gcongr)
+  have nil' : EvaluatorCodeFits.nilCost values ≤ 1000 * unit :=
+    nil.trans (by gcongr)
+  have foundBound' :
+      foundCost tromino periodicStrip first secondRemaining foundValue values ≤
+        1000000000000000 * unit := by
+    simpa [values, inputLength, unit] using foundBound
+  apply assembled'.trans
+  rw [show stripCandidateStepSpaceBound inputLength =
+      1000000000000000000 * unit by rfl]
+  exact candidateFieldsBudget_le unit _ _ _ _ _ _ _ unitPositive nil'
+    get0' get1' get2' get3' pred4' foundBound'
+
+/-- Polynomial-cost form of `exactStep`, ready for the inner endpoint
+countdown. -/
+theorem exactStep_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first secondRemaining : Nat) (foundValue : Bool)
+    (firstBelow : first < indexCount periodicStrip)
+    (secondPositive : 0 < secondRemaining)
+    (secondBound : secondRemaining ≤ indexCount periodicStrip) :
+    EvaluatorCodeFits (candidateStepCode tromino)
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining,
+        FiniteState.divideBoolTag foundValue]
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, secondRemaining.pred,
+        FiniteState.divideBoolTag
+          (foundValue || cycleCandidateBool tromino periodicStrip
+            (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+            first secondRemaining.pred)]
+      (stripCandidateStepSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) :=
+  (exactStep tromino periodicStrip wellFormed first secondRemaining foundValue
+    firstBelow secondPositive secondBound).mono
+      (stepCost_le tromino periodicStrip wellFormed first secondRemaining
+        foundValue firstBelow secondPositive secondBound)
+
+end StripCandidateStep
 
 /-- Fitted-call obligations for the two explicit transition leaves used by
 the strip evaluator.  Each field is continuation-passing: the caller reserves

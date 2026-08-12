@@ -290,6 +290,23 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Assemble the final many-one reductions for both trominoes and
         derive the complete 2D `planeStatement` of Theorem 5.2.
   - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
+    - [x] Characterize tilings by directed cycles in the finite strip-frontier
+      graph and compile its indexed transition predicate.
+    - [x] Compute a polynomial-bit state bound and a sufficient Savitch search
+      depth from the periodic-strip input.
+    - [x] Implement and verify the flat depth-first Savitch evaluator and its
+      exact finite fuel.
+    - [x] Bound every reachable Savitch configuration and one complete
+      reachability call by a polynomial in the encoded strip length.
+    - [x] Fit one complete second-endpoint candidate update, including its raw
+      edge test, reverse-reachability query, Boolean accumulation, and rebuilt
+      countdown payload, into a uniform polynomial reserve.
+    - [ ] Lift the candidate-step certificate through the complete
+      second-endpoint countdown.
+    - [ ] Lift the inner scan through the first-endpoint countdown and bound
+      the guarded cycle-search driver.
+    - [ ] Fit the unary input wrapper and package the verified evaluator as a
+      PSPACE decision procedure for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
@@ -1809,6 +1826,13 @@ The representation choices for this target are:
   `stripReachBool_fits_polynomial` composes the adapter, full Savitch search,
   answer-field projection, and Boolean normalization into the bounded
   reachability call consumed by the outer endpoint scans.
+  `StripCandidateStep.exactStep_polynomial` now composes that call with the
+  raw edge leaf and both Boolean combinators, rebuilds the six-field inner
+  countdown payload, and bounds the entire candidate update by the common
+  input polynomial.  A generic bounded-field assembly lemma keeps this
+  fixed-width accounting reusable without expanding every nested list
+  prepend; the next remaining lift is the complete second-endpoint
+  countdown.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

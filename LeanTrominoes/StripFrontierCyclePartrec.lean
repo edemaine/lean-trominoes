@@ -154,15 +154,19 @@ theorem stripReachBoolCode_eval (tromino : Tromino)
       rw [answerTag]
       rfl
 
-private def candidateSecond : Code :=
+/-- Predecessor of the current second-endpoint countdown. -/
+def candidateSecond : Code :=
   Code.pred.comp (Code.get 4)
 
-private def candidateEdgeArguments : Code :=
+/-- Arguments supplied to the raw frontier-edge predicate by one candidate
+step. -/
+def candidateEdgeArguments : Code :=
   Code.prepend (Code.get 0) <|
     Code.prepend (Code.get 3) <|
       Code.prepend candidateSecond Code.nil
 
-private noncomputable def candidateEdgeCode
+/-- Raw edge test used by one directed-cycle candidate. -/
+noncomputable def candidateEdgeCode
     (tromino : Tromino) : Code :=
   (stripEdgeVectorCode tromino).comp candidateEdgeArguments
 
@@ -190,14 +194,16 @@ private theorem candidateEdgeCode_eval (tromino : Tromino)
     _ = _ := stripEdgeVectorCode_eval
       tromino periodicStrip wellFormed first secondRemaining.pred
 
-private def candidateReachArguments : Code :=
+/-- Reverse-reachability arguments used by one directed-cycle candidate. -/
+def candidateReachArguments : Code :=
   Code.prepend (Code.get 0) <|
     Code.prepend (Code.get 1) <|
       Code.prepend (Code.get 2) <|
         Code.prepend candidateSecond <|
           Code.prepend (Code.get 3) Code.nil
 
-private noncomputable def candidateReachCode
+/-- Reverse reachability test used by one directed-cycle candidate. -/
+noncomputable def candidateReachCode
     (tromino : Tromino) : Code :=
   (stripReachBoolCode tromino).comp candidateReachArguments
 
@@ -227,8 +233,8 @@ private theorem candidateReachCode_eval (tromino : Tromino)
     _ = _ := stripReachBoolCode_eval tromino periodicStrip wellFormed
       stateCount depth secondRemaining.pred first
 
-/-- Predicate tested for one directed-cycle candidate edge. -/
-private def cycleCandidateBool (tromino : Tromino)
+/-- Whether one ordered pair witnesses a directed cycle. -/
+def cycleCandidateBool (tromino : Tromino)
     (periodicStrip : PeriodicStrip) (stateCount depth first last : Nat) :
     Bool :=
   indexedTransitionRawBool tromino periodicStrip first last &&
@@ -236,7 +242,8 @@ private def cycleCandidateBool (tromino : Tromino)
       (indexedTransitionRawBool tromino periodicStrip)
       depth last first
 
-private noncomputable def candidateFoundCode
+/-- Accumulate the result of one directed-cycle candidate test. -/
+noncomputable def candidateFoundCode
     (tromino : Tromino) : Code :=
   Code.boolOr (Code.get 5)
     (Code.boolAnd (candidateEdgeCode tromino)
@@ -310,7 +317,7 @@ private theorem candidateFoundCode_eval (tromino : Tromino)
 
 /-- One inner-loop update.  The second-state countdown is decremented and
 the candidate result is accumulated in a normalized Boolean field. -/
-private noncomputable def candidateStepCode
+noncomputable def candidateStepCode
     (tromino : Tromino) : Code :=
   Code.prepend (Code.get 0) <|
     Code.prepend (Code.get 1) <|
@@ -400,12 +407,13 @@ private theorem candidateCountdownCode_eval (tromino : Tromino)
               cycleCandidateBool tromino periodicStrip stateCount
                 depth first remaining)
 
-private def previousFirst : Code :=
+/-- Predecessor of the current first-endpoint countdown. -/
+def previousFirst : Code :=
   Code.pred.comp (Code.get 3)
 
 /-- Build the inner countdown from an outer-loop payload
 `[context, count, depth, firstRemaining, found]`. -/
-private def innerScanInputCode : Code :=
+def innerScanInputCode : Code :=
   Code.prepend (Code.get 1) <|
     Code.prepend (Code.get 0) <|
       Code.prepend (Code.get 1) <|
@@ -424,7 +432,7 @@ private theorem innerScanInputCode_eval
           stateCount, divideBoolTag found]) := by
   simp [innerScanInputCode, previousFirst]
 
-private def innerScanOutputCode : Code :=
+def innerScanOutputCode : Code :=
   Code.prepend (Code.get 0) <|
     Code.prepend (Code.get 1) <|
       Code.prepend (Code.get 2) <|
@@ -433,7 +441,7 @@ private def innerScanOutputCode : Code :=
 
 /-- One outer-loop step: scan every possible second endpoint for the current
 first endpoint, then decrement the first-state countdown. -/
-private noncomputable def innerScanCode (tromino : Tromino) : Code :=
+noncomputable def innerScanCode (tromino : Tromino) : Code :=
   innerScanOutputCode.comp <|
     (Code.flatIterate (candidateStepCode tromino)).comp
       innerScanInputCode
@@ -561,7 +569,7 @@ private theorem outerCountdownCode_eval (tromino : Tromino)
                   depth remaining)
                 stateCount)
 
-private def cycleScanInputCode : Code :=
+def cycleScanInputCode : Code :=
   Code.prepend (Code.get 1) <|
     Code.prepend (Code.get 0) <|
       Code.prepend (Code.get 1) <|
