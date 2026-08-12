@@ -1800,7 +1800,9 @@ The representation choices for this target are:
   stack-frame rewrites, and Boolean accumulator updates.
   `stripSavitchStepCost_le` absorbs that exact branch certificate into one
   input-polynomial allowance for every reachable state with bounded frontier
-  indices, ready for the exact-fuel flat-iteration lifting theorem.
+  indices.  `stripSavitchFlatUniform` then carries the reachable-state
+  invariant through the complete exact-fuel tail iterator, so the entire
+  indexed reachability search reuses one polynomial workspace reserve.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
