@@ -304,8 +304,11 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Lift the candidate-step certificate through the complete
       second-endpoint countdown.
     - [x] Lift the inner scan through the complete first-endpoint countdown.
-    - [ ] Fit the initialization, result projection, and guarded
-      cycle-search driver.
+    - [x] Fit the fixed initialization and result projection around the complete
+      nested endpoint scan at the exact frontier-index count.
+    - [ ] Extend the endpoint and reachability certificates to the padded
+      power-of-two state bound used by the compiled unary driver.
+    - [ ] Fit parameter assembly and the guarded cycle-search driver.
     - [ ] Fit the unary input wrapper and package the verified evaluator as a
       PSPACE decision procedure for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
@@ -1842,9 +1845,13 @@ The representation choices for this target are:
   second-endpoint scan is now available as a polynomial-space outer-loop
   step.  `StripCandidateStep.OuterScan.flatUniform` carries that step through
   every first endpoint with a canonical five-field invariant and proves that
-  the resulting accumulator checks every ordered endpoint pair.  The next
-  remaining layer is the initialization, projection, and well-formedness
-  guard around this complete nested scan.
+  the resulting accumulator checks every ordered endpoint pair.
+  `StripCandidateStep.CycleSearch.exact_polynomial` adds the fixed initializer
+  and Boolean projection around that nested scan, obtaining a polynomial-space
+  certificate for the complete parameterized search at the exact frontier
+  index count.  The next layer generalizes the same payload and leaf bounds to
+  the unary driver's padded power-of-two count before parameter assembly and
+  the well-formedness guard are connected.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

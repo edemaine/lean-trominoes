@@ -665,6 +665,67 @@ theorem stripOuterBodySpacePolynomial_eval (inputLength : Nat) :
       stripOuterBodySpaceBound inputLength := by
   simp [stripOuterBodySpacePolynomial, stripOuterBodySpaceBound]
 
+/-- Workspace for the fixed initializer and Boolean projection surrounding
+the complete two-endpoint cycle scan. -/
+def stripCycleSearchSpaceBound (inputLength : Nat) : Nat :=
+  1000000000 *
+    (stripOuterBodySpaceBound inputLength +
+      stripLoopPayloadSpaceBound inputLength + 1)
+
+noncomputable def stripCycleSearchSpacePolynomial : Polynomial Nat :=
+  1000000000 *
+    (stripOuterBodySpacePolynomial +
+      stripLoopPayloadSpacePolynomial + 1)
+
+@[simp]
+theorem stripCycleSearchSpacePolynomial_eval (inputLength : Nat) :
+    stripCycleSearchSpacePolynomial.eval inputLength =
+      stripCycleSearchSpaceBound inputLength := by
+  simp [stripCycleSearchSpacePolynomial, stripCycleSearchSpaceBound]
+
+/-- Workspace for assembling the encoded strip, padded graph bound, and
+certified search depth consumed by the parameterized cycle search. -/
+def stripCycleParametersSpaceBound (inputLength : Nat) : Nat :=
+  1000000 *
+    (stripArithmeticSpaceBound inputLength +
+      stripStateBoundComputationSpaceBound inputLength +
+      stripLoopPayloadSpaceBound inputLength + 1)
+
+noncomputable def stripCycleParametersSpacePolynomial : Polynomial Nat :=
+  1000000 *
+    (1000000000000000 * (Polynomial.X + 1) +
+      1000000000000000000000000000000000000000000000000000000000000 *
+        (100 * Polynomial.X + 100) +
+      stripLoopPayloadSpacePolynomial + 1)
+
+@[simp]
+theorem stripCycleParametersSpacePolynomial_eval (inputLength : Nat) :
+    stripCycleParametersSpacePolynomial.eval inputLength =
+      stripCycleParametersSpaceBound inputLength := by
+  simp [stripCycleParametersSpacePolynomial, stripCycleParametersSpaceBound,
+    stripArithmeticSpaceBound, stripStateBoundComputationSpaceBound]
+
+/-- Workspace for the outer well-formedness branch selecting the complete
+cycle search or the constant-false answer. -/
+def stripGuardedCycleSpaceBound (inputLength : Nat) : Nat :=
+  1000000 *
+    (stripArithmeticSpaceBound inputLength +
+      stripCycleParametersSpaceBound inputLength +
+      stripCycleSearchSpaceBound inputLength + inputLength + 2)
+
+noncomputable def stripGuardedCycleSpacePolynomial : Polynomial Nat :=
+  1000000 *
+    (1000000000000000 * (Polynomial.X + 1) +
+      stripCycleParametersSpacePolynomial +
+      stripCycleSearchSpacePolynomial + Polynomial.X + 2)
+
+@[simp]
+theorem stripGuardedCycleSpacePolynomial_eval (inputLength : Nat) :
+    stripGuardedCycleSpacePolynomial.eval inputLength =
+      stripGuardedCycleSpaceBound inputLength := by
+  simp [stripGuardedCycleSpacePolynomial, stripGuardedCycleSpaceBound,
+    stripArithmeticSpaceBound]
+
 /-- One common polynomial envelope for search payloads and explicit
 search-depth and fuel arithmetic. -/
 def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
@@ -678,7 +739,10 @@ def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
                   stripCandidateStepSpaceBound inputLength +
                     stripCandidateBodySpaceBound inputLength +
                       stripInnerScanSpaceBound inputLength +
-                        stripOuterBodySpaceBound inputLength
+                        stripOuterBodySpaceBound inputLength +
+                          stripCycleSearchSpaceBound inputLength +
+                            stripCycleParametersSpaceBound inputLength +
+                              stripGuardedCycleSpaceBound inputLength
 
 /-- Polynomial packaging of `stripEvaluatorSpaceBound`. -/
 noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
@@ -697,7 +761,10 @@ noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
                     stripCandidateStepSpacePolynomial +
                     stripCandidateBodySpacePolynomial +
                       stripInnerScanSpacePolynomial +
-                        stripOuterBodySpacePolynomial
+                        stripOuterBodySpacePolynomial +
+                          stripCycleSearchSpacePolynomial +
+                            stripCycleParametersSpacePolynomial +
+                              stripGuardedCycleSpacePolynomial
 
 @[simp]
 theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
@@ -710,7 +777,9 @@ theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
     stripSavitchBodySpaceBound, stripSavitchStepSpaceBound,
     stripReachCallSpaceBound, stripCandidateStepSpaceBound,
     stripCandidateBodySpaceBound, stripInnerScanSpaceBound,
-    stripOuterBodySpaceBound, stripFuelBits]
+    stripOuterBodySpaceBound, stripCycleSearchSpaceBound,
+    stripCycleParametersSpaceBound, stripGuardedCycleSpaceBound,
+    stripFuelBits]
 
 theorem stripReachPayloadSpaceBound_le_evaluator
     (inputLength : Nat) :
@@ -5292,6 +5361,265 @@ theorem flatUniform
       exact after
 
 end OuterScan
+
+namespace CycleSearch
+
+/-- Exact evaluator cost of the fixed six-field initializer for the nested
+endpoint countdowns. -/
+def inputCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values
+    [StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.zeroField values]
+    [] (EvaluatorCodeFits.nilCost values)
+
+theorem input (values : List Nat) :
+    EvaluatorCodeFits cycleScanInputCode values
+      [values[1]?.getD 0, values[0]?.getD 0, values[1]?.getD 0,
+        values[2]?.getD 0, values[1]?.getD 0, 0]
+      (inputCost values) := by
+  have fit := StripSavitchStep.fields values
+    [StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.zeroField values]
+    (EvaluatorCodeFits.nil values)
+  simpa [cycleScanInputCode, inputCost,
+    StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    StripSavitchStep.getField, StripSavitchStep.zeroField] using fit
+
+private theorem parametersSpace_le (periodicStrip : PeriodicStrip) :
+    encodedListSpace
+        [Encodable.encode periodicStrip, indexCount periodicStrip,
+          stripSearchDepth periodicStrip] ≤
+      stripLoopPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have countBits := stripCounter_encodeNat_length_le periodicStrip
+    (indexCount periodicStrip) (Nat.le_refl _)
+  have depthBits := stripDepth_encodeNat_length_le periodicStrip
+  have contextSpace :
+      (Computability.encodeNat (Encodable.encode periodicStrip)).length + 1 =
+        inputLength := by
+    simp [inputLength]
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  rw [contextSpace]
+  change _ ≤ stripLoopPayloadSpaceBound inputLength
+  simp only [stripLoopPayloadSpaceBound]
+  simp only [inputLength] at countBits depthBits ⊢
+  omega
+
+private theorem inputCost_le (periodicStrip : PeriodicStrip) :
+    inputCost
+        [Encodable.encode periodicStrip, indexCount periodicStrip,
+          stripSearchDepth periodicStrip] ≤
+      100000000 *
+        (stripLoopPayloadSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length + 1) := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip]
+  let fieldFits : List (StripSavitchStep.FieldFit values) :=
+    [StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 0 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.getField 2 values,
+      StripSavitchStep.getField 1 values,
+      StripSavitchStep.zeroField values]
+  let outputValues := indexCount periodicStrip ::
+    InnerScan.outerPayload periodicStrip (indexCount periodicStrip) false
+  have valuesBound : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using parametersSpace_le periodicStrip
+  have outputBound : encodedListSpace outputValues ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [outputValues, InnerScan.outerPayload, inputLength] using
+      stripOuterPayload_encodedListSpace_le periodicStrip
+        (indexCount periodicStrip) (indexCount periodicStrip) false
+        (Nat.le_refl _) (Nat.le_refl _)
+  have outputEq : fieldFits.map StripSavitchStep.FieldFit.output =
+      outputValues := by
+    simp [fieldFits, outputValues, values, InnerScan.outerPayload,
+      StripSavitchStep.getField, StripSavitchStep.zeroField,
+      FiniteState.divideBoolTag]
+  have assembled := StripSavitchStep.fieldsCost_le_of values fieldFits []
+    (EvaluatorCodeFits.nilCost values)
+    (stripLoopPayloadSpaceBound inputLength) valuesBound (by
+      simpa [outputEq] using outputBound)
+  have get0 := EvaluatorCodeFits.listCodeGetCost_le_linear 0 values
+  have get1 := EvaluatorCodeFits.listCodeGetCost_le_linear 1 values
+  have get2 := EvaluatorCodeFits.listCodeGetCost_le_linear 2 values
+  have zero := EvaluatorCodeFits.listCodeZeroCost_le_linear values
+  have nil := nilCost_le_linear values
+  have costsEq : (fieldFits.map StripSavitchStep.FieldFit.cost).sum =
+      EvaluatorCodeFits.getCost 1 values +
+        EvaluatorCodeFits.getCost 0 values +
+        EvaluatorCodeFits.getCost 1 values +
+        EvaluatorCodeFits.getCost 2 values +
+        EvaluatorCodeFits.getCost 1 values +
+        EvaluatorCodeFits.zeroCost values := by
+    simp [fieldFits, StripSavitchStep.getField,
+      StripSavitchStep.zeroField]
+    ring
+  have lengthEq : fieldFits.length = 6 := by simp [fieldFits]
+  rw [costsEq, lengthEq] at assembled
+  change StripSavitchStep.fieldsCost values fieldFits []
+      (EvaluatorCodeFits.nilCost values) ≤
+    100000000 * (stripLoopPayloadSpaceBound inputLength + 1)
+  apply assembled.trans
+  omega
+
+/-- Exact evaluator cost of projecting the accumulated Boolean from the
+completed outer payload. -/
+def outputCost (values : List Nat) : Nat :=
+  EvaluatorCodeFits.getCost 4 values
+
+theorem output (periodicStrip : PeriodicStrip) (result : Bool) :
+    EvaluatorCodeFits (Turing.ToPartrec.Code.get 4)
+      (InnerScan.outerPayload periodicStrip 0 result)
+      [FiniteState.divideBoolTag result]
+      (outputCost (InnerScan.outerPayload periodicStrip 0 result)) := by
+  simpa [outputCost, InnerScan.outerPayload] using
+    EvaluatorCodeFits.get 4
+      (InnerScan.outerPayload periodicStrip 0 result)
+
+private theorem outputCost_le
+    (periodicStrip : PeriodicStrip) (result : Bool) :
+    outputCost (InnerScan.outerPayload periodicStrip 0 result) ≤
+      100000 *
+        (stripLoopPayloadSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length + 1) := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values := InnerScan.outerPayload periodicStrip 0 result
+  have valuesBound : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using
+      InnerScan.outerPayload_space_le periodicStrip 0 result (Nat.zero_le _)
+  have projected := EvaluatorCodeFits.listCodeGetCost_le_linear 4 values
+  change encodedListSpace values ≤
+    stripLoopPayloadSpaceBound inputLength at valuesBound
+  change EvaluatorCodeFits.getCost 4 values ≤
+    100000 * (stripLoopPayloadSpaceBound inputLength + 1)
+  exact projected.trans (by omega)
+
+/-- Complete parameterized cycle search, including initialization, both
+endpoint countdowns, and final Boolean projection. -/
+theorem exact
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed) :
+    let result := FiniteState.cycleSearchIndexDFSBoolAtDepth
+      (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+      (indexedTransitionRawBool tromino periodicStrip)
+    EvaluatorCodeFits (stripCycleSearchCode tromino)
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip]
+      [FiniteState.divideBoolTag result]
+      (outputCost (InnerScan.outerPayload periodicStrip 0 result) +
+        stripOuterBodySpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        inputCost
+          [Encodable.encode periodicStrip, indexCount periodicStrip,
+            stripSearchDepth periodicStrip]) := by
+  let result := FiniteState.cycleSearchIndexDFSBoolAtDepth
+    (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+    (indexedTransitionRawBool tromino periodicStrip)
+  let scanResult := FiniteState.boundedAny
+    (fun first => FiniteState.boundedAny
+      (cycleCandidateBool tromino periodicStrip
+        (indexCount periodicStrip) (stripSearchDepth periodicStrip) first)
+      (indexCount periodicStrip))
+    (indexCount periodicStrip)
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip]
+  have inputFit := input values
+  have loopFit := OuterScan.flatUniform tromino periodicStrip wellFormed false
+  have loopFit' : EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatIterate (innerScanCode tromino))
+      (indexCount periodicStrip ::
+        InnerScan.outerPayload periodicStrip (indexCount periodicStrip) false)
+      (InnerScan.outerPayload periodicStrip 0 scanResult)
+      (stripOuterBodySpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) := by
+    simpa [scanResult, OuterScan.rowFound] using loopFit
+  have resultEq : scanResult = result := by
+    rfl
+  rw [resultEq] at loopFit'
+  have scanFit := EvaluatorCodeFits.comp loopFit' inputFit
+  have outputFit := output periodicStrip result
+  have fit := EvaluatorCodeFits.comp outputFit scanFit
+  change EvaluatorCodeFits
+    ((Turing.ToPartrec.Code.get 4).comp
+      ((Turing.ToPartrec.Code.flatIterate (innerScanCode tromino)).comp
+        cycleScanInputCode)) _ _ _
+  dsimp only [result, scanResult, values] at fit ⊢
+  apply fit.mono
+  omega
+
+theorem exactCost_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    let result := FiniteState.cycleSearchIndexDFSBoolAtDepth
+      (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+      (indexedTransitionRawBool tromino periodicStrip)
+    outputCost (InnerScan.outerPayload periodicStrip 0 result) +
+        stripOuterBodySpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        inputCost
+          [Encodable.encode periodicStrip, indexCount periodicStrip,
+            stripSearchDepth periodicStrip] ≤
+      stripCycleSearchSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let result := FiniteState.cycleSearchIndexDFSBoolAtDepth
+    (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+    (indexedTransitionRawBool tromino periodicStrip)
+  have inputBound := inputCost_le periodicStrip
+  have outputBound := outputCost_le periodicStrip result
+  simp [stripCycleSearchSpaceBound, inputLength, result]
+    at inputBound outputBound ⊢
+  omega
+
+/-- Polynomial-cost form of the complete parameterized cycle search. -/
+theorem exact_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed) :
+    EvaluatorCodeFits (stripCycleSearchCode tromino)
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip]
+      [FiniteState.divideBoolTag
+        (FiniteState.cycleSearchIndexDFSBoolAtDepth
+          (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip))]
+      (stripCycleSearchSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) :=
+  (exact tromino periodicStrip wellFormed).mono
+    (exactCost_le tromino periodicStrip)
+
+end CycleSearch
 
 end StripCandidateStep
 
