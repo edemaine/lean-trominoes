@@ -42,6 +42,44 @@ theorem listCodeEncodeNat_succ_length_le (number : Nat) :
   rw [pow_succ]
   omega
 
+theorem listCodeEncodeNat_length_mono
+    {smaller larger : Nat} (bounded : smaller ≤ larger) :
+    (Computability.encodeNat smaller).length ≤
+      (Computability.encodeNat larger).length := by
+  rw [listCodeEncodeNat_eq_bits, listCodeEncodeNat_eq_bits,
+    Nat.size_eq_bits_len, Nat.size_eq_bits_len]
+  exact Nat.size_le_size bounded
+
+/-- A fixed-width native list whose fields are numerically bounded by
+`limit` occupies at most one bounded binary field per entry, plus its final
+delimiter. -/
+theorem encodedListSpace_le_of_fields_le
+    (values : List Nat) (limit : Nat)
+    (fields : ∀ value ∈ values, value ≤ limit) :
+    encodedListSpace values ≤
+      values.length *
+        ((Computability.encodeNat limit).length + 1) + 1 := by
+  induction values with
+  | nil => simp [encodedListSpace_nil]
+  | cons value values induction =>
+      have valueBound := fields value (by simp)
+      have restFields : ∀ entry ∈ values, entry ≤ limit := by
+        intro entry member
+        exact fields entry (by simp [member])
+      have valueBits := listCodeEncodeNat_length_mono valueBound
+      have rest := induction restFields
+      rw [encodedListSpace_cons, List.length_cons]
+      calc
+        (Computability.encodeNat value).length + 1 +
+              encodedListSpace values ≤
+            ((Computability.encodeNat limit).length + 1) +
+              (values.length *
+                ((Computability.encodeNat limit).length + 1) + 1) := by
+          omega
+        _ = (values.length + 1) *
+              ((Computability.encodeNat limit).length + 1) + 1 := by
+          ring
+
 def zeroPrimeCost (values : List Nat) : Nat :=
   encodedListSpace values +
     encodedListSpace (0 :: values) + 1
@@ -172,6 +210,26 @@ theorem listCodeEncodedListSpace_singleton_headI_le (values : List Nat) :
       simp only [List.headI_cons, encodedListSpace_cons,
         encodedListSpace_nil]
       omega
+
+/-- Producing the constant-zero singleton is linear in the footprint of its
+input list. -/
+theorem listCodeZeroCost_le_linear (values : List Nat) :
+    zeroCost values ≤ 10000 * (encodedListSpace values + 1) := by
+  have headSpace := listCodeEncodedListSpace_singleton_headI_le values
+  have headBits :
+      (Computability.encodeNat values.headI).length ≤
+        encodedListSpace values := by
+    simpa [encodedListSpace_cons] using headSpace
+  have successorBits := listCodeEncodeNat_succ_length_le values.headI
+  have headPlusBits :
+      (Computability.encodeNat (values.headI + 1)).length ≤
+        (Computability.encodeNat values.headI).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using successorBits
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [zeroCost, nilCost, zeroPrimeCost, tailCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+  omega
 
 theorem listCodeGetZeroCost_le (values : List Nat) :
     getCost 0 values ≤
