@@ -1529,8 +1529,9 @@ The representation choices for this target are:
   body.  Its motif-suffix invariant lifts the local bound through the
   complete flat countdown, and the fitted one-column program has an explicit
   linear envelope in the motif encoding and both packed words.  The four
-  fixed column adapters and their nested conjunction are also fitted exactly;
-  only their final shared linear majorant remains on the membership track.
+  fixed column adapters and their nested conjunction are fitted exactly, and
+  the complete conjunction now has one shared input-linear evaluator-space
+  majorant.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

@@ -1552,6 +1552,380 @@ theorem packedOverlapColumns
       packedOverlapColumnsCost, List.finRange_succ,
       zero, one, two, three] using combined
 
+/-- One arithmetic envelope shared by all four fixed overlap-column calls.
+The deliberately repeated motif term absorbs every encoded suffix retained by
+the streaming implementation; the fixed column indices are absorbed by the
+constant slack. -/
+def packedOverlapColumnsLimit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  4096 * (
+    Encodable.encode periodicStrip.motif +
+    Encodable.encode periodicStrip.motif +
+    Encodable.encode periodicStrip.motif +
+    Encodable.encode periodicStrip.motif +
+    Encodable.encode periodicStrip.motif +
+    Encodable.encode periodicStrip.motif +
+    Encodable.encode periodicStrip.motif +
+    current.assignmentWord + next.assignmentWord + 200) + 3000
+
+/-- Uniform workspace unit for the complete four-column overlap predicate. -/
+def packedOverlapColumnsUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) : Nat :=
+  encodedListSpace
+    [packedOverlapColumnsLimit periodicStrip current next] + 1
+
+private theorem packedOverlapColumnUnit_le_columnsUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    encodedListSpace
+          [4096 * (
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            Encodable.encode periodicStrip.motif +
+            column.val + current.assignmentWord +
+            next.assignmentWord + 100) + 2000] + 1 ≤
+      packedOverlapColumnsUnit periodicStrip current next := by
+  let small :=
+    4096 * (
+      Encodable.encode periodicStrip.motif +
+      Encodable.encode periodicStrip.motif +
+      Encodable.encode periodicStrip.motif +
+      Encodable.encode periodicStrip.motif +
+      Encodable.encode periodicStrip.motif +
+      Encodable.encode periodicStrip.motif +
+      Encodable.encode periodicStrip.motif +
+      column.val + current.assignmentWord +
+      next.assignmentWord + 100) + 2000
+  let large := packedOverlapColumnsLimit periodicStrip current next
+  have valueBound : small ≤ large := by
+    simp only [small, large, packedOverlapColumnsLimit]
+    have columnLt : column.val < 4 := column.isLt
+    omega
+  have bitsBound := encodeNat_length_mono valueBound
+  simpa [small, large, packedOverlapColumnsUnit,
+    encodedListSpace_cons, encodedListSpace_nil] using bitsBound
+
+private theorem packedOverlapColumnCost_le_columnsUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    packedOverlapColumnCost periodicStrip current next column ≤
+      2000000000000000000000000000000000 *
+        packedOverlapColumnsUnit periodicStrip current next := by
+  exact (packedOverlapColumnCost_le_linear
+    periodicStrip current next column).trans
+      (Nat.mul_le_mul_left _
+        (packedOverlapColumnUnit_le_columnsUnit
+          periodicStrip current next column))
+
+set_option maxHeartbeats 800000 in
+private theorem packedOverlapColumnArgumentsCost_le_columnsUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    packedOverlapColumnArgumentsCost periodicStrip current next column ≤
+      1000000000 * packedOverlapColumnsUnit periodicStrip current next := by
+  let limit := packedOverlapColumnsLimit periodicStrip current next
+  let unit := packedOverlapColumnsUnit periodicStrip current next
+  have motifBound : Encodable.encode periodicStrip.motif ≤ limit := by
+    simp only [limit, packedOverlapColumnsLimit]
+    omega
+  have columnBound : column.val ≤ limit := by
+    simp only [limit, packedOverlapColumnsLimit]
+    omega
+  have columnSuccBound : column.val + 1 ≤ limit := by
+    simp only [limit, packedOverlapColumnsLimit]
+    omega
+  have currentWordBound : current.assignmentWord ≤ limit := by
+    simp only [limit, packedOverlapColumnsLimit]
+    omega
+  have nextWordBound : next.assignmentWord ≤ limit := by
+    simp only [limit, packedOverlapColumnsLimit]
+    omega
+  have motifBits := encodeNat_length_mono motifBound
+  have columnBits := encodeNat_length_mono columnBound
+  have columnSuccBits := encodeNat_length_mono columnSuccBound
+  have currentWordBits := encodeNat_length_mono currentWordBound
+  have nextWordBits := encodeNat_length_mono nextWordBound
+  have motifSuccBits := encodeNat_length_mono
+    (show Encodable.encode periodicStrip.motif + 1 ≤ limit by
+      simp only [limit, packedOverlapColumnsLimit]
+      omega)
+  have currentWordSuccBits := encodeNat_length_mono
+    (show current.assignmentWord + 1 ≤ limit by
+      simp only [limit, packedOverlapColumnsLimit]
+      omega)
+  have nextWordSuccBits := encodeNat_length_mono
+    (show next.assignmentWord + 1 ≤ limit by
+      simp only [limit, packedOverlapColumnsLimit]
+      omega)
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    dsimp only [unit, limit]
+    simp [packedOverlapColumnsUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have numeralColumnCost :
+      addConstCost column.val [0] ≤ 1000000 * unit := by
+    have raw := addConstCost_le column.val [0]
+    have columnLt : column.val < 4 := column.isLt
+    have unitPositive : 1 ≤ unit := by
+      simp [unit, packedOverlapColumnsUnit]
+    have zeroBits :
+        (Computability.encodeNat 0).length = 0 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil,
+      zeroBits] at raw
+    nlinarith
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [packedOverlapColumnArgumentsCost,
+    prependCost, numeralCost, addConstCost,
+    getCost, dropCost, headCost, idCost,
+    nilCost, zeroCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    zeroBits]
+  clear * - motifBits columnBits columnSuccBits
+    currentWordBits nextWordBits motifSuccBits
+    currentWordSuccBits nextWordSuccBits numeralColumnCost unitEq
+  omega
+
+private theorem packedOverlapColumnAtCost_le_columnsUnit
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) (column : Fin 4) :
+    packedOverlapColumnAtCost periodicStrip current next column ≤
+      3000000000000000000000000000000000 *
+        packedOverlapColumnsUnit periodicStrip current next := by
+  have columnCost := packedOverlapColumnCost_le_columnsUnit
+    periodicStrip current next column
+  have argumentsCost := packedOverlapColumnArgumentsCost_le_columnsUnit
+    periodicStrip current next column
+  simp only [packedOverlapColumnAtCost]
+  omega
+
+set_option maxHeartbeats 2000000 in
+/-- The complete fixed four-column conjunction has one input-linear
+evaluator-space majorant. -/
+theorem packedOverlapColumnsCost_le_linear
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    packedOverlapColumnsCost periodicStrip current next ≤
+      10000000000000000000000000000000000000000000000 *
+        packedOverlapColumnsUnit periodicStrip current next := by
+  let unit := packedOverlapColumnsUnit periodicStrip current next
+  let values :=
+    [Encodable.encode periodicStrip.motif,
+      current.assignmentWord, next.assignmentWord]
+  let baseBudget :=
+    3000000000000000000000000000000000 * unit
+  let secondBudget := 1000 * (baseBudget + 1)
+  let thirdBudget := 1000 * (secondBudget + 1)
+  let finalBudget := 1000 * (thirdBudget + 1)
+  have unitPositive : 1 ≤ unit := by
+    simp [unit, packedOverlapColumnsUnit]
+  have unitEq :
+      unit =
+        (Computability.encodeNat
+          (packedOverlapColumnsLimit periodicStrip current next)).length +
+            2 := by
+    simp [unit, packedOverlapColumnsUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have valuesSpace : encodedListSpace values ≤ 10 * unit := by
+    have motifBound :
+        Encodable.encode periodicStrip.motif ≤
+          packedOverlapColumnsLimit periodicStrip current next := by
+      simp only [packedOverlapColumnsLimit]
+      omega
+    have currentBound :
+        current.assignmentWord ≤
+          packedOverlapColumnsLimit periodicStrip current next := by
+      simp only [packedOverlapColumnsLimit]
+      omega
+    have nextBound :
+        next.assignmentWord ≤
+          packedOverlapColumnsLimit periodicStrip current next := by
+      simp only [packedOverlapColumnsLimit]
+      omega
+    have motifBits := encodeNat_length_mono motifBound
+    have currentBits := encodeNat_length_mono currentBound
+    have nextBits := encodeNat_length_mono nextBound
+    simp only [values, encodedListSpace_cons, encodedListSpace_nil]
+    rw [unitEq]
+    omega
+  have headBits :
+      (Computability.encodeNat values.headI).length ≤ 10 * unit := by
+    simp [values] at valuesSpace ⊢
+    omega
+  have headSuccBits :
+      (Computability.encodeNat (values.headI + 1)).length ≤
+        20 * unit := by
+    have successor := encodeNat_succ_length_le values.headI
+    have successor' :
+        (Computability.encodeNat (values.headI + 1)).length ≤
+          (Computability.encodeNat values.headI).length + 1 := by
+      simpa [Nat.succ_eq_add_one] using successor
+    omega
+  have cost0 := packedOverlapColumnAtCost_le_columnsUnit
+    periodicStrip current next (0 : Fin 4)
+  have cost1 := packedOverlapColumnAtCost_le_columnsUnit
+    periodicStrip current next (1 : Fin 4)
+  have cost2 := packedOverlapColumnAtCost_le_columnsUnit
+    periodicStrip current next (2 : Fin 4)
+  have cost3 := packedOverlapColumnAtCost_le_columnsUnit
+    periodicStrip current next (3 : Fin 4)
+  have valuesBase : encodedListSpace values ≤ baseBudget := by
+    simp only [baseBudget]
+    omega
+  have headBase :
+      (Computability.encodeNat values.headI).length ≤ baseBudget := by
+    simp only [baseBudget]
+    omega
+  have headSuccBase :
+      (Computability.encodeNat (values.headI + 1)).length ≤
+        baseBudget := by
+    simp only [baseBudget]
+    omega
+  have cost0Base :
+      packedOverlapColumnAtCost periodicStrip current next (0 : Fin 4) ≤
+        baseBudget := by simpa [baseBudget, unit] using cost0
+  have cost1Base :
+      packedOverlapColumnAtCost periodicStrip current next (1 : Fin 4) ≤
+        baseBudget := by simpa [baseBudget, unit] using cost1
+  have cost2Base :
+      packedOverlapColumnAtCost periodicStrip current next (2 : Fin 4) ≤
+        baseBudget := by simpa [baseBudget, unit] using cost2
+  have cost3Base :
+      packedOverlapColumnAtCost periodicStrip current next (3 : Fin 4) ≤
+        baseBudget := by simpa [baseBudget, unit] using cost3
+  have tag0 :
+      (current.overlapsColumnBool
+        periodicStrip next (0 : Fin 4)).toNat ≤ 1 := by
+    cases current.overlapsColumnBool periodicStrip next (0 : Fin 4) <;>
+      simp
+  have tag1 :
+      (current.overlapsColumnBool
+        periodicStrip next (1 : Fin 4)).toNat ≤ 1 := by
+    cases current.overlapsColumnBool periodicStrip next (1 : Fin 4) <;>
+      simp
+  have tag2 :
+      (current.overlapsColumnBool
+        periodicStrip next (2 : Fin 4)).toNat ≤ 1 := by
+    cases current.overlapsColumnBool periodicStrip next (2 : Fin 4) <;>
+      simp
+  have tag3 :
+      (current.overlapsColumnBool
+        periodicStrip next (3 : Fin 4)).toNat ≤ 1 := by
+    cases current.overlapsColumnBool periodicStrip next (3 : Fin 4) <;>
+      simp
+  have lastTwoBound :
+      packedOverlapLastTwoCost periodicStrip current next ≤
+        secondBudget := by
+    have bound := boolAndCost_le_budget values
+      (current.overlapsColumnBool
+        periodicStrip next (2 : Fin 4)).toNat
+      (current.overlapsColumnBool
+        periodicStrip next (3 : Fin 4)).toNat
+      (packedOverlapColumnAtCost
+        periodicStrip current next (2 : Fin 4))
+      (packedOverlapColumnAtCost
+        periodicStrip current next (3 : Fin 4))
+      baseBudget tag2 tag3 valuesBase headBase headSuccBase
+      cost2Base cost3Base (by
+        simp only [baseBudget]
+        exact Nat.mul_pos (by norm_num) (by omega))
+    simpa [packedOverlapLastTwoCost, values,
+      secondBudget] using bound
+  have valuesSecond : encodedListSpace values ≤ secondBudget := by
+    simp only [secondBudget]
+    exact valuesBase.trans (by omega)
+  have headSecond :
+      (Computability.encodeNat values.headI).length ≤ secondBudget := by
+    exact headBase.trans (by simp only [secondBudget]; omega)
+  have headSuccSecond :
+      (Computability.encodeNat (values.headI + 1)).length ≤
+        secondBudget := by
+    exact headSuccBase.trans (by simp only [secondBudget]; omega)
+  have cost1Second :
+      packedOverlapColumnAtCost periodicStrip current next (1 : Fin 4) ≤
+        secondBudget :=
+    cost1Base.trans (by simp only [secondBudget]; omega)
+  have tagLastTwo :
+      (current.overlapsColumnBool periodicStrip next (2 : Fin 4) &&
+        current.overlapsColumnBool
+          periodicStrip next (3 : Fin 4)).toNat ≤ 1 := by
+    cases current.overlapsColumnBool periodicStrip next (2 : Fin 4) <;>
+      cases current.overlapsColumnBool
+        periodicStrip next (3 : Fin 4) <;> simp
+  have lastThreeBound :
+      packedOverlapLastThreeCost periodicStrip current next ≤
+        thirdBudget := by
+    have bound := boolAndCost_le_budget values
+      (current.overlapsColumnBool
+        periodicStrip next (1 : Fin 4)).toNat
+      (current.overlapsColumnBool periodicStrip next (2 : Fin 4) &&
+        current.overlapsColumnBool
+          periodicStrip next (3 : Fin 4)).toNat
+      (packedOverlapColumnAtCost
+        periodicStrip current next (1 : Fin 4))
+      (packedOverlapLastTwoCost periodicStrip current next)
+      secondBudget tag1 tagLastTwo valuesSecond headSecond
+      headSuccSecond cost1Second lastTwoBound
+      (by
+        simp only [secondBudget]
+        exact Nat.mul_pos (by norm_num) (Nat.succ_pos _))
+    simpa [packedOverlapLastThreeCost, values,
+      thirdBudget] using bound
+  have valuesThird : encodedListSpace values ≤ thirdBudget :=
+    valuesSecond.trans (by simp only [thirdBudget]; omega)
+  have headThird :
+      (Computability.encodeNat values.headI).length ≤ thirdBudget :=
+    headSecond.trans (by simp only [thirdBudget]; omega)
+  have headSuccThird :
+      (Computability.encodeNat (values.headI + 1)).length ≤
+        thirdBudget :=
+    headSuccSecond.trans (by simp only [thirdBudget]; omega)
+  have cost0Third :
+      packedOverlapColumnAtCost periodicStrip current next (0 : Fin 4) ≤
+        thirdBudget :=
+    cost0Base.trans (by
+      simp only [thirdBudget, secondBudget]
+      omega)
+  have tagLastThree :
+      (current.overlapsColumnBool periodicStrip next (1 : Fin 4) &&
+        (current.overlapsColumnBool periodicStrip next (2 : Fin 4) &&
+          current.overlapsColumnBool
+            periodicStrip next (3 : Fin 4))).toNat ≤ 1 := by
+    cases current.overlapsColumnBool periodicStrip next (1 : Fin 4) <;>
+      cases current.overlapsColumnBool
+        periodicStrip next (2 : Fin 4) <;>
+      cases current.overlapsColumnBool
+        periodicStrip next (3 : Fin 4) <;> simp
+  have wholeBound :
+      packedOverlapColumnsCost periodicStrip current next ≤
+        finalBudget := by
+    have bound := boolAndCost_le_budget values
+      (current.overlapsColumnBool
+        periodicStrip next (0 : Fin 4)).toNat
+      (current.overlapsColumnBool periodicStrip next (1 : Fin 4) &&
+        (current.overlapsColumnBool periodicStrip next (2 : Fin 4) &&
+          current.overlapsColumnBool
+            periodicStrip next (3 : Fin 4))).toNat
+      (packedOverlapColumnAtCost
+        periodicStrip current next (0 : Fin 4))
+      (packedOverlapLastThreeCost periodicStrip current next)
+      thirdBudget tag0 tagLastThree valuesThird headThird
+      headSuccThird cost0Third lastThreeBound
+      (by
+        simp only [thirdBudget]
+        exact Nat.mul_pos (by norm_num) (Nat.succ_pos _))
+    simpa [packedOverlapColumnsCost, values,
+      finalBudget] using bound
+  exact wholeBound.trans (by
+    simp only [finalBudget, thirdBudget, secondBudget, baseBudget]
+    omega)
+
 end EvaluatorCodeFits
 
 end PartrecToTM2
