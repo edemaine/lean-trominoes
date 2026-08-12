@@ -1530,6 +1530,10 @@ The representation choices for this target are:
   projects its `found` bit.  The resulting explicit program is proved equal to
   physical periodic-strip membership for every translated source cell of a
   packed center candidate.
+- [`LeanTrominoes/PartrecPackedTargetMembershipSpace.lean`](LeanTrominoes/PartrecPackedTargetMembershipSpace.lean)
+  fits the complete membership leaf compositionally: fixed-column input
+  assembly, canonical target construction, streaming motif lookup, and the
+  final normalized `found` projection all have exact evaluator-space costs.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
