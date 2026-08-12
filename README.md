@@ -1567,6 +1567,13 @@ The representation choices for this target are:
 - [`LeanTrominoes/PartrecPackedCenterCoverageSpace.lean`](LeanTrominoes/PartrecPackedCenterCoverageSpace.lean)
   fits the complete fixed candidate sum and exact-one comparison, with exact
   evaluator costs for every addition and list-composition node.
+- [`LeanTrominoes/PartrecPackedCenterBase.lean`](LeanTrominoes/PartrecPackedCenterBase.lean)
+  adds the horizontal phase guard to containment and exact-one coverage,
+  yielding explicit programs for both semantic center conditions and their
+  conjunction at one motif occurrence.
+- [`LeanTrominoes/PartrecPackedCenterBaseSpace.lean`](LeanTrominoes/PartrecPackedCenterBaseSpace.lean)
+  fits the direct phase comparison and both guarded center conditions through
+  their final one-base conjunction.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
