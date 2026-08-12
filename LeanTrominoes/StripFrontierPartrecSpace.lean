@@ -8345,6 +8345,27 @@ end StripCycleParameters
 
 namespace StripGuardedCycle
 
+theorem result_eq
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    periodicStripTrominoTilingIndexBool tromino periodicStrip =
+      (periodicStrip.wellFormed &&
+        FiniteState.cycleSearchIndexDFSBoolAtDepth
+          (stripStateBound periodicStrip) (stripSearchDepth periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip)) := by
+  by_cases wellFormed : periodicStrip.IsWellFormed
+  · have wellFormedBool : periodicStrip.wellFormed = true :=
+      (periodicStrip.wellFormed_eq_true_iff).mpr wellFormed
+    simp [periodicStripTrominoTilingIndexBool, wellFormed,
+      wellFormedBool]
+    rfl
+  · have wellFormedBool : periodicStrip.wellFormed = false := by
+      apply Bool.eq_false_iff.mpr
+      intro true
+      exact wellFormed
+        ((periodicStrip.wellFormed_eq_true_iff).mp true)
+    simp [periodicStripTrominoTilingIndexBool, wellFormed,
+      wellFormedBool]
+
 private def testCost (periodicStrip : PeriodicStrip) : Nat :=
   Turing.PartrecToTM2.EvaluatorCodeFits.stripWellFormedInputSpaceBound
     (Encodable.encode periodicStrip)
@@ -8482,6 +8503,66 @@ theorem exact_polynomial
     exact bounded
 
 end StripGuardedCycle
+
+/-- The unary strip-tiling evaluator fits an explicit polynomial in the
+standard encoded input length. -/
+theorem periodicStripTrominoTilingCode_fits
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits (periodicStripTrominoTilingCode tromino)
+      [Encodable.encode periodicStrip]
+      [Encodable.encode
+        (periodicStripTrominoTilingIndexBool tromino periodicStrip)]
+      (stripGuardedCycleSpacePolynomial.eval
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) := by
+  have fit := StripGuardedCycle.exact_polynomial tromino periodicStrip
+  rw [StripGuardedCycle.result_eq tromino periodicStrip]
+  cases result :
+      (periodicStrip.wellFormed &&
+        FiniteState.cycleSearchIndexDFSBoolAtDepth
+          (stripStateBound periodicStrip) (stripSearchDepth periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip)) <;>
+    simpa [periodicStripTrominoTilingCode, result,
+      FiniteState.divideBoolTag] using fit
+
+/-- Complete run-level space certificate for the unary evaluator. -/
+theorem periodicStripTrominoTilingCode_run_fits
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    EvaluatorRunFits (periodicStripTrominoTilingCode tromino)
+      [Encodable.encode periodicStrip]
+      (stripGuardedCycleSpacePolynomial.eval
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) := by
+  have fit := periodicStripTrominoTilingCode_fits tromino periodicStrip
+  let bound := stripGuardedCycleSpacePolynomial.eval
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have after : EvaluatorExecutionFits bound
+      (.ret Turing.ToPartrec.Cont.halt
+        [Encodable.encode
+          (periodicStripTrominoTilingIndexBool tromino periodicStrip)]) :=
+    EvaluatorExecutionFits.ret_halt (by
+      simpa [bound] using fit.output_space)
+  have call := fit.call Turing.ToPartrec.Cont.halt bound (by
+    simp [bound, continuationSpace, trContStack]) after
+  exact EvaluatorRunFits.of_call call
+
+/-- The 1.5D periodic tromino tiling problem belongs to PSPACE for every
+tromino. -/
+theorem periodicStripTrominoTiling_inPSPACE (tromino : Tromino) :
+    Complexity.InPSPACE
+      (Complexity.primcodableFinEncoding PeriodicStrip)
+      (PeriodicStripTrominoTiling tromino) := by
+  exact Turing.PartrecToTM2.inPSPACE_of_evaluatorRunFits
+    (periodicStripTrominoTilingCode tromino)
+    (periodicStripTrominoTilingIndexBool tromino)
+    (periodicStripTrominoTilingIndexBool_eq_true_iff tromino)
+    (by
+      intro periodicStrip
+      rw [periodicStripTrominoTilingCode_eval]
+      simp)
+    stripGuardedCycleSpacePolynomial
+    (periodicStripTrominoTilingCode_run_fits tromino)
 
 /-- Fitted-call obligations for the two explicit transition leaves used by
 the strip evaluator.  Each field is continuation-passing: the caller reserves

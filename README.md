@@ -289,7 +289,7 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove the concrete normalized-drawing compiler computable.
       - [x] Assemble the final many-one reductions for both trominoes and
         derive the complete 2D `planeStatement` of Theorem 5.2.
-  - [ ] Prove PSPACE membership of the 1.5D problem for each tromino.
+  - [x] Prove PSPACE membership of the 1.5D problem for each tromino.
     - [x] Characterize tilings by directed cycles in the finite strip-frontier
       graph and compile its indexed transition predicate.
     - [x] Compute a polynomial-bit state bound and a sufficient Savitch search
@@ -309,7 +309,7 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Extend the endpoint and reachability certificates to the padded
       power-of-two state bound used by the compiled unary driver.
     - [x] Fit parameter assembly and the guarded cycle-search driver.
-    - [ ] Fit the unary input wrapper and package the verified evaluator as a
+    - [x] Fit the unary input wrapper and package the verified evaluator as a
       PSPACE decision procedure for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -363,8 +363,10 @@ the exact fetched dependency revision in the committed `lake-manifest.json`.
 The definition layer needed to state Theorem 5.2 is complete.  Its entire 2D
 conjunct is now proved: `periodicTrominoTiling_coRE` supplies the upper bound,
 and `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` supplies the
-matching Wang-tiling hardness reductions for both trominoes.  The complete
-formal target remains `LeanTrominoes.Theorem52.statement`, the conjunction of:
+matching Wang-tiling hardness reductions for both trominoes.  The 1.5D
+membership half is also proved by `periodicStripTrominoTiling_inPSPACE`; only
+its PSPACE-hardness half remains.  The complete formal target remains
+`LeanTrominoes.Theorem52.statement`, the conjunction of:
 
 - `planeStatement`: co-r.e.-completeness in 2D for each of the I and L
   trominoes; and
@@ -1855,8 +1857,12 @@ The representation choices for this target are:
   padded power-of-two bound.  `StripCycleParameters.exact_polynomial` then
   assembles that count and the certified depth, while
   `StripGuardedCycle.exact_polynomial` connects the complete search to the
-  malformed-input rejection guard.  The remaining layer fits the unary input
-  wrapper and packages the resulting evaluator as a PSPACE procedure.
+  malformed-input rejection guard.  Finally,
+  `periodicStripTrominoTilingCode_fits` and
+  `periodicStripTrominoTilingCode_run_fits` package the unary evaluator and its
+  complete run under the explicit polynomial, and
+  `periodicStripTrominoTiling_inPSPACE` derives the PSPACE decision procedure
+  for every tromino.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
