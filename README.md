@@ -349,6 +349,8 @@ build; an imported proof counts when its statement matches the paper.
         expressions against arbitrary decoded one-hot valuations.
       - [x] Normalize atomic push/pop sequences to prepend/drop stack
         transforms and verify their linear-size bounded expressions.
+      - [x] Generate finite guarded paths through TM2 statements without
+        enumerating stacks, and assemble their bounded step expression.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1297,6 +1299,11 @@ The representation choices for this target are:
   by a fixed drop from the source stack.  Its linear-width expression checks
   overflow and every output cell; on suffix-shaped decoded vectors this is
   equivalent to the same transformation of ordinary TM2 stack lists.
+- [`LeanTrominoes/PeriodicCNFMachineStatementPaths.lean`](LeanTrominoes/PeriodicCNFMachineStatementPaths.lean)
+  symbolically executes an atomic TM2 statement after specializing its finite
+  control value.  Unknown `peek` and `pop` observations branch only over one
+  finite optional alphabet, while stacks remain normalized transforms; the
+  terminal paths assemble a complete bounded ordinary-step expression.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
