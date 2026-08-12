@@ -351,6 +351,8 @@ build; an imported proof counts when its statement matches the paper.
         transforms and verify their linear-size bounded expressions.
       - [x] Generate finite guarded paths through TM2 statements without
         enumerating stacks, and assemble their bounded step expression.
+      - [x] Prove the bounded ordinary-step expression equivalent to Mathlib's
+        TM2 step semantics on decoded and canonically encoded configurations.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1304,6 +1306,11 @@ The representation choices for this target are:
   control value.  Unknown `peek` and `pop` observations branch only over one
   finite optional alphabet, while stacks remain normalized transforms; the
   terminal paths assemble a complete bounded ordinary-step expression.
+- [`LeanTrominoes/PeriodicCNFMachineStatementSemantics.lean`](LeanTrominoes/PeriodicCNFMachineStatementSemantics.lean)
+  proves by structural induction that the generated guarded paths realize
+  exactly Mathlib's `TM2.stepAux`.  Consequently the complete bounded step
+  expression is equivalent to `FinTM2.step` on every well-formed decoded slice
+  and on canonical encodings whose stacks fit the selected width.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
