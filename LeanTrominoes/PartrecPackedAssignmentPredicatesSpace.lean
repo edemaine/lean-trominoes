@@ -14,6 +14,7 @@ namespace PartrecToTM2
 
 open ToPartrec
 open LeanTrominoes
+open LeanTrominoes.PeriodicStrip
 
 namespace EvaluatorCodeFits
 
@@ -68,6 +69,83 @@ theorem packedAssignmentIsNone
     packedAssignmentIsNoneCost] using
     isZero
       (packedAssignmentLookupDigit motif queriedColumn target word)
+
+def packedAssignmentIsArgumentsCost
+    (state : Option SquareSymmetry)
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) : Nat :=
+  let values :=
+    [Encodable.encode motif, queriedColumn,
+      Encodable.encode target, word]
+  let digit :=
+    (Code.packedAssignmentLookupOutcome motif queriedColumn
+      target word).2.1
+  prependCost values [digit] [RawWindowState.assignmentDigit state]
+    (packedAssignmentLookupDigitCost
+      motif queriedColumn target word)
+    (numeralCost (RawWindowState.assignmentDigit state) values)
+
+theorem packedAssignmentIsArguments
+    (state : Option SquareSymmetry)
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    let digit :=
+      (Code.packedAssignmentLookupOutcome motif queriedColumn
+        target word).2.1
+    EvaluatorCodeFits
+      (Code.packedAssignmentIsArgumentsCode state)
+      [Encodable.encode motif, queriedColumn,
+        Encodable.encode target, word]
+      [digit, RawWindowState.assignmentDigit state]
+      (packedAssignmentIsArgumentsCost
+        state motif queriedColumn target word) := by
+  simp only
+  let values :=
+    [Encodable.encode motif, queriedColumn,
+      Encodable.encode target, word]
+  simpa [Code.packedAssignmentIsArgumentsCode,
+    packedAssignmentIsArgumentsCost, prependCost,
+    values] using
+    prepend
+      (packedAssignmentLookupDigit
+        motif queriedColumn target word)
+      (numeral (RawWindowState.assignmentDigit state) values)
+
+def packedAssignmentIsCost
+    (state : Option SquareSymmetry)
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) : Nat :=
+  let digit :=
+    (Code.packedAssignmentLookupOutcome motif queriedColumn
+      target word).2.1
+  natEqCost digit (RawWindowState.assignmentDigit state) +
+    packedAssignmentIsArgumentsCost
+      state motif queriedColumn target word
+
+theorem packedAssignmentIs
+    (state : Option SquareSymmetry)
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    let digit :=
+      (Code.packedAssignmentLookupOutcome motif queriedColumn
+        target word).2.1
+    EvaluatorCodeFits (Code.packedAssignmentIsCode state)
+      [Encodable.encode motif, queriedColumn,
+        Encodable.encode target, word]
+      [if digit = RawWindowState.assignmentDigit state
+        then 1 else 0]
+      (packedAssignmentIsCost
+        state motif queriedColumn target word) := by
+  simp only
+  simpa [Code.packedAssignmentIsCode,
+    packedAssignmentIsCost] using
+    comp
+      (natEq
+        (Code.packedAssignmentLookupOutcome motif queriedColumn
+          target word).2.1
+        (RawWindowState.assignmentDigit state))
+      (packedAssignmentIsArguments
+        state motif queriedColumn target word)
 
 def packedAssignmentLookupDigitSpaceBound
     (motifCode queriedColumn targetCode word : Nat) : Nat :=

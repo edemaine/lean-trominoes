@@ -1476,8 +1476,11 @@ The representation choices for this target are:
   turn that lookup into the first semantic packed-frontier predicate:
   digit zero is proved equivalent to an absent assignment, and the resulting
   `none` test is fitted by composing the lookup, one projection, and one
-  zero test.  The projected lookup digit also has its own named input-linear
-  evaluator-space bound for reuse by later packed predicates.
+  zero test.  They also compare the selected digit with the canonical digit
+  of any fixed assignment state, proved semantically equivalent to selecting
+  that state and fitted through explicit equality arguments.  The projected
+  lookup digit has its own named input-linear evaluator-space bound for reuse
+  by later packed predicates.
 - [`LeanTrominoes/PartrecPackedColumnPhase.lean`](LeanTrominoes/PartrecPackedColumnPhase.lean)
   and
   [`LeanTrominoes/PartrecPackedColumnPhaseSpace.lean`](LeanTrominoes/PartrecPackedColumnPhaseSpace.lean)
