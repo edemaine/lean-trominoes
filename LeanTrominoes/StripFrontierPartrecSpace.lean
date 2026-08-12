@@ -5040,6 +5040,259 @@ theorem exact_polynomial
 
 end InnerScan
 
+namespace OuterScan
+
+private def rowFound (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (first : Nat) : Bool :=
+  FiniteState.boundedAny
+    (cycleCandidateBool tromino periodicStrip
+      (indexCount periodicStrip) (stripSearchDepth periodicStrip) first)
+    (indexCount periodicStrip)
+
+/-- Total payload transformer corresponding to one complete row scan. -/
+def programStep (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (values : List Nat) : List Nat :=
+  let firstRemaining := values[3]?.getD 0
+  let found := boolOfTag (values[4]?.getD 0)
+  InnerScan.outerPayload periodicStrip firstRemaining.pred
+    (found || rowFound tromino periodicStrip firstRemaining.pred)
+
+@[simp]
+theorem programStep_outerPayload
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (firstRemaining : Nat) (found : Bool) :
+    programStep tromino periodicStrip
+        (InnerScan.outerPayload periodicStrip firstRemaining found) =
+      InnerScan.outerPayload periodicStrip firstRemaining.pred
+        (found || rowFound tromino periodicStrip firstRemaining.pred) := by
+  simp [programStep, InnerScan.outerPayload]
+
+/-- Iterating the complete-row transformer checks exactly all ordered
+endpoint pairs whose first endpoint is below the synchronized countdown. -/
+theorem programStep_iterate
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (found : Bool) :
+    ((programStep tromino periodicStrip)^[remaining])
+        (InnerScan.outerPayload periodicStrip remaining found) =
+      InnerScan.outerPayload periodicStrip 0
+        (found || FiniteState.boundedAny
+          (fun first => rowFound tromino periodicStrip first)
+          remaining) := by
+  induction remaining generalizing found with
+  | zero => simp [FiniteState.boundedAny]
+  | succ remaining induction =>
+      rw [Function.iterate_succ_apply]
+      rw [programStep_outerPayload]
+      simpa [FiniteState.boundedAny, Bool.or_assoc] using
+        induction (found || rowFound tromino periodicStrip remaining)
+
+/-- Canonical outer payloads reachable during the first-endpoint countdown. -/
+def Reachable (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (values : List Nat) : Prop :=
+  ∃ found,
+    values = InnerScan.outerPayload periodicStrip remaining found ∧
+    remaining ≤ indexCount periodicStrip
+
+theorem reachable_initial
+    (periodicStrip : PeriodicStrip) (found : Bool) :
+    Reachable periodicStrip (indexCount periodicStrip)
+      (InnerScan.outerPayload periodicStrip
+        (indexCount periodicStrip) found) :=
+  ⟨found, rfl, Nat.le_refl _⟩
+
+theorem reachable_step
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (values : List Nat)
+    (reachable : Reachable periodicStrip (remaining + 1) values) :
+    Reachable periodicStrip remaining
+      (programStep tromino periodicStrip values) := by
+  obtain ⟨found, rfl, bound⟩ := reachable
+  refine ⟨found || rowFound tromino periodicStrip remaining, ?_, by omega⟩
+  simpa using programStep_outerPayload tromino periodicStrip
+    (remaining + 1) found
+
+private theorem zeroBody
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (values : List Nat) :
+    EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatCountdownBody
+        (innerScanCode tromino))
+      (0 :: values)
+      (Turing.PartrecToTM2.flatCountdownOutput
+        (programStep tromino periodicStrip) 0 values)
+      (flatCountdownBodyCost
+        (programStep tromino periodicStrip)
+        (fun _ => stripInnerScanSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+        0 values) := by
+  simpa [Turing.ToPartrec.Code.flatCountdownBody,
+    Turing.PartrecToTM2.flatCountdownOutput,
+    flatCountdownBodyCost, EvaluatorCodeFits.zeroPrimeCost] using
+      EvaluatorCodeFits.case_zero
+        (successorBranch :=
+          .cons Turing.ToPartrec.Code.one
+            (.cons Turing.ToPartrec.Code.head
+              ((innerScanCode tromino).comp Turing.ToPartrec.Code.tail)))
+        (values := 0 :: values) (by rfl)
+        (EvaluatorCodeFits.zero'_named values)
+
+private theorem bodyCost_le
+    (inputLength remaining : Nat) (input output : List Nat)
+    (inputBound :
+      encodedListSpace (remaining :: input) ≤
+        stripLoopPayloadSpaceBound inputLength)
+    (outputBound :
+      encodedListSpace output ≤
+        stripLoopPayloadSpaceBound inputLength) :
+    flatCountdownBodyCost (fun _ => output)
+        (fun _ => stripInnerScanSpaceBound inputLength)
+        remaining input ≤
+      stripOuterBodySpaceBound inputLength := by
+  cases remaining with
+  | zero =>
+      have inputTail := listCodeEncodedListSpace_tail_le (0 :: input)
+      simp [flatCountdownBodyCost, EvaluatorCodeFits.zeroPrimeCost,
+        stripOuterBodySpaceBound, encodedListSpace_cons] at *
+      omega
+  | succ remaining =>
+      let values := remaining :: input
+      have predecessorBits := listCodeEncodeNat_length_mono
+        (show remaining ≤ remaining + 1 by omega)
+      have valuesBound : encodedListSpace values ≤
+          stripLoopPayloadSpaceBound inputLength := by
+        simp [values, encodedListSpace_cons] at inputBound ⊢
+        omega
+      have tailBound := EvaluatorCodeFits.listCodeTailCost_le_linear values
+      have headBound := EvaluatorCodeFits.headCost_le values
+      have zeroBound := EvaluatorCodeFits.listCodeZeroCost_le_linear values
+      have successorZero := EvaluatorCodeFits.succCost_le [0]
+      have remainingField :
+          (Computability.encodeNat remaining).length + 1 ≤
+            encodedListSpace values := by
+        simp [values, encodedListSpace_cons]
+      have outputWithCounter :
+          encodedListSpace (remaining :: output) ≤
+            2 * (stripLoopPayloadSpaceBound inputLength + 1) := by
+        simp [encodedListSpace_cons] at outputBound ⊢
+        omega
+      have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+      have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+      simp [flatCountdownBodyCost, flatCountdownSuccBranchCost,
+        EvaluatorCodeFits.prependCost, EvaluatorCodeFits.oneCost,
+        values, stripOuterBodySpaceBound,
+        encodedListSpace_cons, encodedListSpace_nil, zeroBits, oneBits]
+        at inputBound outputBound tailBound headBound zeroBound successorZero
+          outputWithCounter ⊢
+      omega
+
+set_option maxHeartbeats 1000000 in
+/-- The complete first-endpoint countdown reuses one polynomial reserve while
+each step invokes the already bounded complete second-endpoint scan. -/
+theorem flatUniform
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (found : Bool) :
+    EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatIterate (innerScanCode tromino))
+      (indexCount periodicStrip ::
+        InnerScan.outerPayload periodicStrip
+          (indexCount periodicStrip) found)
+      (InnerScan.outerPayload periodicStrip 0
+        (found || FiniteState.boundedAny
+          (fun first => rowFound tromino periodicStrip first)
+          (indexCount periodicStrip)))
+      (stripOuterBodySpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) where
+  input_space := by
+    simpa [InnerScan.outerPayload] using
+      (stripOuterPayload_encodedListSpace_le periodicStrip
+        (indexCount periodicStrip) (indexCount periodicStrip) found
+        (Nat.le_refl _) (Nat.le_refl _)).trans (by
+          simp [stripOuterBodySpaceBound]
+          omega)
+  output_space := by
+    have output := InnerScan.outerPayload_space_le periodicStrip 0
+      (found || FiniteState.boundedAny
+        (fun first => rowFound tromino periodicStrip first)
+        (indexCount periodicStrip)) (Nat.zero_le _)
+    exact output.trans (by
+      simp [stripOuterBodySpaceBound]
+      omega)
+  call continuation bound budget after := by
+    let inputLength :=
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length
+    apply Turing.PartrecToTM2.EvaluatorCallFits.flatIterate_of_reachable_code_fits
+      (step := programStep tromino periodicStrip)
+      (bodyCost := fun _ _ => stripOuterBodySpaceBound inputLength)
+      (invariant := Reachable periodicStrip)
+    · intro remaining values reachable
+      obtain ⟨reachableFound, rfl, remainingBound⟩ := reachable
+      cases remaining with
+      | zero =>
+          exact (zeroBody tromino periodicStrip
+            (InnerScan.outerPayload periodicStrip 0 reachableFound)).mono (by
+              apply bodyCost_le inputLength 0
+                (InnerScan.outerPayload periodicStrip 0 reachableFound)
+                (InnerScan.outerPayload periodicStrip 0 reachableFound)
+              · simpa [InnerScan.outerPayload, inputLength] using
+                  stripOuterPayload_encodedListSpace_le periodicStrip 0 0
+                    reachableFound (Nat.zero_le _) (Nat.zero_le _)
+              · simpa [inputLength] using
+                  InnerScan.outerPayload_space_le periodicStrip 0
+                    reachableFound (Nat.zero_le _))
+      | succ remaining =>
+          have step := InnerScan.exact_polynomial tromino periodicStrip
+            wellFormed (remaining + 1) reachableFound (by omega)
+            remainingBound
+          have body := EvaluatorCodeFits.flatCountdownBody_of_fit step
+            (remaining + 1)
+          have bodyOutput :
+              Turing.PartrecToTM2.flatCountdownOutput
+                  (fun _ => InnerScan.outerPayload periodicStrip
+                    (remaining + 1).pred
+                    (reachableFound || FiniteState.boundedAny
+                      (cycleCandidateBool tromino periodicStrip
+                        (indexCount periodicStrip)
+                        (stripSearchDepth periodicStrip)
+                        (remaining + 1).pred)
+                      (indexCount periodicStrip)))
+                  (remaining + 1)
+                  (InnerScan.outerPayload periodicStrip
+                    (remaining + 1) reachableFound) =
+                Turing.PartrecToTM2.flatCountdownOutput
+                  (programStep tromino periodicStrip)
+                  (remaining + 1)
+                  (InnerScan.outerPayload periodicStrip
+                    (remaining + 1) reachableFound) := by
+            simp [Turing.PartrecToTM2.flatCountdownOutput,
+              programStep, rowFound, InnerScan.outerPayload]
+          rw [bodyOutput] at body
+          apply body.mono
+          apply bodyCost_le inputLength (remaining + 1)
+            (InnerScan.outerPayload periodicStrip
+              (remaining + 1) reachableFound)
+            (InnerScan.outerPayload periodicStrip remaining
+              (reachableFound || rowFound tromino periodicStrip remaining))
+          · simpa [InnerScan.outerPayload, inputLength] using
+              stripOuterPayload_encodedListSpace_le periodicStrip
+                (remaining + 1) (remaining + 1) reachableFound
+                remainingBound remainingBound
+          · simpa [inputLength] using
+              InnerScan.outerPayload_space_le periodicStrip remaining
+                (reachableFound || rowFound tromino periodicStrip remaining)
+                (by omega)
+    · exact reachable_initial periodicStrip found
+    · exact reachable_step tromino periodicStrip
+    · intro remaining values reachable
+      simpa [inputLength] using budget
+    · rw [programStep_iterate]
+      exact after
+
+end OuterScan
+
 end StripCandidateStep
 
 /-- Fitted-call obligations for the two explicit transition leaves used by

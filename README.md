@@ -303,8 +303,9 @@ build; an imported proof counts when its statement matches the paper.
       countdown payload, into a uniform polynomial reserve.
     - [x] Lift the candidate-step certificate through the complete
       second-endpoint countdown.
-    - [ ] Lift the inner scan through the first-endpoint countdown and bound
-      the guarded cycle-search driver.
+    - [x] Lift the inner scan through the complete first-endpoint countdown.
+    - [ ] Fit the initialization, result projection, and guarded
+      cycle-search driver.
     - [ ] Fit the unary input wrapper and package the verified evaluator as a
       PSPACE decision procedure for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
@@ -1839,7 +1840,11 @@ The representation choices for this target are:
   graph states.  `StripCandidateStep.InnerScan.exact_polynomial` wraps that
   loop with verified fixed-width input and output adapters, so one complete
   second-endpoint scan is now available as a polynomial-space outer-loop
-  step.  The next remaining lift is the outer first-endpoint countdown.
+  step.  `StripCandidateStep.OuterScan.flatUniform` carries that step through
+  every first endpoint with a canonical five-field invariant and proves that
+  the resulting accumulator checks every ordered endpoint pair.  The next
+  remaining layer is the initialization, projection, and well-formedness
+  guard around this complete nested scan.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
