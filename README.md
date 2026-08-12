@@ -345,6 +345,8 @@ build; an imported proof counts when its statement matches the paper.
         succession, and accepting reset expressions.
       - [x] Reconstruct ordinary TM2 configurations from list-shaped decoded
         slices and prove bounded canonical encodings round-trip exactly.
+      - [x] Verify label, control, stack-cell selection, and field-preservation
+        expressions against arbitrary decoded one-hot valuations.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1283,6 +1285,11 @@ The representation choices for this target are:
   decoded fixed-width cell vectors.  Suffix-shaped vectors preserve every
   represented cell, and bounded canonical encodings reconstruct both the TM2
   configuration and reset-clock state exactly.
+- [`LeanTrominoes/PeriodicCNFMachineFields.lean`](LeanTrominoes/PeriodicCNFMachineFields.lean)
+  defines current/next tests for labels, finite control, and optional stack
+  cells, together with field and whole-stack preservation expressions.  Their
+  semantics are bidirectional for arbitrary one-hot valuations, and every
+  expression retains the bounded source-atom invariant.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
