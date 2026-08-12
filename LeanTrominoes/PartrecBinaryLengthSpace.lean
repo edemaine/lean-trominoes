@@ -74,6 +74,70 @@ theorem encodeNat_succ_length_le (number : Nat) :
   rw [pow_succ]
   omega
 
+/-- Binary length of a sum is bounded by the sum of the operand lengths plus
+one carry bit. -/
+theorem encodeNat_add_length_le_sum (left right : Nat) :
+    (Computability.encodeNat (left + right)).length ≤
+      (Computability.encodeNat left).length +
+        (Computability.encodeNat right).length + 1 := by
+  let leftBits := (Computability.encodeNat left).length
+  let rightBits := (Computability.encodeNat right).length
+  have leftPower : left < 2 ^ leftBits := by
+    simpa [leftBits, encodeNat_eq_bits, Nat.size_eq_bits_len] using
+      Nat.lt_size_self left
+  have rightPower : right < 2 ^ rightBits := by
+    simpa [rightBits, encodeNat_eq_bits, Nat.size_eq_bits_len] using
+      Nat.lt_size_self right
+  apply encodeNat_length_le_of_lt_pow
+  have leftPowerPositive : 1 ≤ 2 ^ leftBits := one_le_pow₀ (by omega)
+  have rightPowerPositive : 1 ≤ 2 ^ rightBits := one_le_pow₀ (by omega)
+  rw [show leftBits + rightBits + 1 =
+      (leftBits + rightBits) + 1 by omega,
+    pow_add, pow_add]
+  norm_num
+  nlinarith
+
+/-- Binary length of a product is at most the sum of the operand lengths. -/
+theorem encodeNat_mul_length_le_sum (left right : Nat) :
+    (Computability.encodeNat (left * right)).length ≤
+      (Computability.encodeNat left).length +
+        (Computability.encodeNat right).length := by
+  by_cases leftZero : left = 0
+  · subst left
+    simp
+  by_cases rightZero : right = 0
+  · subst right
+    simp
+  let leftBits := (Computability.encodeNat left).length
+  let rightBits := (Computability.encodeNat right).length
+  have leftPower : left < 2 ^ leftBits := by
+    simpa [leftBits, encodeNat_eq_bits, Nat.size_eq_bits_len] using
+      Nat.lt_size_self left
+  have rightPower : right < 2 ^ rightBits := by
+    simpa [rightBits, encodeNat_eq_bits, Nat.size_eq_bits_len] using
+      Nat.lt_size_self right
+  have leftPositive : 0 < left := Nat.pos_of_ne_zero leftZero
+  have rightPositive : 0 < right := Nat.pos_of_ne_zero rightZero
+  apply encodeNat_length_le_of_lt_pow
+  rw [pow_add]
+  nlinarith
+
+/-- Cantor-style natural pairing grows by only a constant factor in binary
+length. -/
+theorem encodeNat_pair_length_le (left right : Nat) :
+    (Computability.encodeNat (Nat.pair left right)).length ≤
+      3 * ((Computability.encodeNat left).length +
+        (Computability.encodeNat right).length + 1) := by
+  rw [Nat.pair]
+  split_ifs with less
+  · have square := encodeNat_mul_length_le_sum right right
+    have total := encodeNat_add_length_le_sum (right * right) left
+    omega
+  · have square := encodeNat_mul_length_le_sum left left
+    have firstSum := encodeNat_add_length_le_sum (left * left) left
+    have total := encodeNat_add_length_le_sum (left * left + left) right
+    omega
+
 theorem encodeNat_length_le_self (number : Nat) :
     (Computability.encodeNat number).length ≤ number := by
   rw [encodeNat_eq_bits, Nat.size_eq_bits_len, Nat.size_le]

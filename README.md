@@ -1334,7 +1334,9 @@ The representation choices for this target are:
   monotonicity of binary encoding length bounds every live quotient by the
   original input's bit length.  The outer binary-length loop preserves the
   sum of its counter and remaining bit length, after which a fixed fitted
-  countdown computes `21 × length + 22`.
+  countdown computes `21 × length + 22`.  Reusable lemmas now also bound the
+  binary lengths of sums, products, and natural pairs by the operand lengths,
+  supporting polynomial input-length bounds for nested geometric codes.
 - [`LeanTrominoes/PartrecFuel.lean`](LeanTrominoes/PartrecFuel.lean)
   computes the exact Savitch evaluator fuel with explicit nested flat
   countdowns.  The innermost loop increments a monotone partial total, the
