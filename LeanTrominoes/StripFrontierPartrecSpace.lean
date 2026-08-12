@@ -8204,6 +8204,149 @@ end Padded
 
 end StripCandidateStep
 
+namespace StripCycleParameters
+
+private theorem depth
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits stripSearchDepthCode
+      [Encodable.encode periodicStrip]
+      [stripSearchDepth periodicStrip]
+      (EvaluatorCodeFits.binaryLengthAffine21Cost
+        (Encodable.encode periodicStrip)) := by
+  have fit := EvaluatorCodeFits.binaryLengthAffine21Code
+    (Encodable.encode periodicStrip)
+  have depthEq :
+      22 + 21 * LeanTrominoes.Computability.binaryEncodingLength
+          (Encodable.encode periodicStrip) =
+        stripSearchDepth periodicStrip := by
+    simp [stripSearchDepth,
+      LeanTrominoes.Computability.binaryEncodingLength_eq,
+      Complexity.primcodableFinEncoding_encode_length]
+    ring
+  rw [← depthEq]
+  simpa [stripSearchDepthCode] using fit
+
+private theorem stateBound
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits stripStateBoundCode
+      [Encodable.encode periodicStrip]
+      [stripStateBound periodicStrip]
+      (EvaluatorCodeFits.powerTwoCost (stripSearchDepth periodicStrip) +
+        EvaluatorCodeFits.binaryLengthAffine21Cost
+          (Encodable.encode periodicStrip)) := by
+  have fit := EvaluatorCodeFits.comp
+    (EvaluatorCodeFits.powerTwo (stripSearchDepth periodicStrip))
+    (depth periodicStrip)
+  simpa [stripStateBoundCode, stripStateBound] using fit
+
+/-- Exact evaluator cost of assembling the three cycle-search parameters. -/
+def cost (periodicStrip : PeriodicStrip) : Nat :=
+  let values := [Encodable.encode periodicStrip]
+  EvaluatorCodeFits.prependCost values [Encodable.encode periodicStrip]
+    [stripStateBound periodicStrip, stripSearchDepth periodicStrip]
+    (EvaluatorCodeFits.getCost 0 values)
+    (EvaluatorCodeFits.prependCost values [stripStateBound periodicStrip]
+      [stripSearchDepth periodicStrip]
+      (EvaluatorCodeFits.powerTwoCost (stripSearchDepth periodicStrip) +
+        EvaluatorCodeFits.binaryLengthAffine21Cost
+          (Encodable.encode periodicStrip))
+      (EvaluatorCodeFits.prependCost values [stripSearchDepth periodicStrip] []
+        (EvaluatorCodeFits.binaryLengthAffine21Cost
+          (Encodable.encode periodicStrip))
+        (EvaluatorCodeFits.nilCost values)))
+
+theorem exact (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits stripCycleParametersCode
+      [Encodable.encode periodicStrip]
+      [Encodable.encode periodicStrip, stripStateBound periodicStrip,
+        stripSearchDepth periodicStrip]
+      (cost periodicStrip) := by
+  let values := [Encodable.encode periodicStrip]
+  have depthWithNil := EvaluatorCodeFits.prepend (depth periodicStrip)
+    (EvaluatorCodeFits.nil values)
+  have stateWithDepth := EvaluatorCodeFits.prepend (stateBound periodicStrip)
+    depthWithNil
+  have fit := EvaluatorCodeFits.prepend (EvaluatorCodeFits.get 0 values)
+    stateWithDepth
+  simpa [stripCycleParametersCode, cost, values,
+    EvaluatorCodeFits.prependCost] using fit
+
+private theorem cost_le (periodicStrip : PeriodicStrip) :
+    cost periodicStrip ≤
+      stripCycleParametersSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values := [Encodable.encode periodicStrip]
+  let outputValues :=
+    [Encodable.encode periodicStrip, stripStateBound periodicStrip,
+      stripSearchDepth periodicStrip]
+  have inputSpace : encodedListSpace values = inputLength := by
+    simpa [values, inputLength] using stripInput_encodedListSpace periodicStrip
+  have inputLengthEq :
+      (Computability.encodeNat (Encodable.encode periodicStrip)).length + 1 =
+        inputLength := by
+    simp [inputLength]
+  have outputBound : encodedListSpace outputValues ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [outputValues, inputLength] using
+      StripCandidateStep.Padded.CycleSearch.parametersSpace_le periodicStrip
+        (stripStateBound periodicStrip) (Nat.le_refl _)
+  have stateDepthBound : encodedListSpace
+      [stripStateBound periodicStrip, stripSearchDepth periodicStrip] ≤
+        stripLoopPayloadSpaceBound inputLength := by
+    have tail := listCodeEncodedListSpace_tail_le outputValues
+    exact tail.trans (by simpa [outputValues] using outputBound)
+  have depthBound : encodedListSpace [stripSearchDepth periodicStrip] ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    have tail := listCodeEncodedListSpace_tail_le
+      [stripStateBound periodicStrip, stripSearchDepth periodicStrip]
+    exact tail.trans stateDepthBound
+  have stateSingletonBound :
+      encodedListSpace [stripStateBound periodicStrip] ≤
+        stripLoopPayloadSpaceBound inputLength + 1 := by
+    have head := encodedListSpace_singleton_headI_le
+      [stripStateBound periodicStrip, stripSearchDepth periodicStrip]
+    exact head.trans (Nat.add_le_add_right stateDepthBound 1)
+  have get0 := EvaluatorCodeFits.listCodeGetCost_le_linear 0 values
+  have nil := StripCandidateStep.nilCost_le_linear values
+  have powerBound := stripStateBoundCodeCost_le periodicStrip
+  have depthCost :
+      EvaluatorCodeFits.binaryLengthAffine21Cost
+          (Encodable.encode periodicStrip) =
+        stripArithmeticSpaceBound inputLength := by
+    change 1000000000000000 * (encodedListSpace values + 1) =
+      1000000000000000 * (inputLength + 1)
+    rw [inputSpace]
+  change EvaluatorCodeFits.powerTwoCost (stripSearchDepth periodicStrip) ≤
+    stripStateBoundComputationSpaceBound inputLength at powerBound
+  simp only [cost, EvaluatorCodeFits.prependCost, List.headI_cons]
+  rw [depthCost]
+  simp only [stripCycleParametersSpaceBound]
+  simp [values, outputValues, encodedListSpace_cons, encodedListSpace_nil]
+    at inputSpace outputBound stateDepthBound depthBound stateSingletonBound
+      get0 nil ⊢
+  have arithmeticEq := congrArg stripArithmeticSpaceBound inputSpace
+  have stateEq := congrArg stripStateBoundComputationSpaceBound inputSpace
+  have loopEq := congrArg stripLoopPayloadSpaceBound inputSpace
+  rw [arithmeticEq, stateEq, loopEq]
+  omega
+
+/-- Polynomial-space form of the complete parameter assembly. -/
+theorem exact_polynomial (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits stripCycleParametersCode
+      [Encodable.encode periodicStrip]
+      [Encodable.encode periodicStrip, stripStateBound periodicStrip,
+        stripSearchDepth periodicStrip]
+      (stripCycleParametersSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) :=
+  (exact periodicStrip).mono (cost_le periodicStrip)
+
+end StripCycleParameters
+
 /-- Fitted-call obligations for the two explicit transition leaves used by
 the strip evaluator.  Each field is continuation-passing: the caller reserves
 the common leaf allowance alongside its continuation and supplies the fitted
