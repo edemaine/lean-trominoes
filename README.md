@@ -1686,7 +1686,8 @@ The representation choices for this target are:
   `indexedTransitionRawBool`.  The context decoder, fixed field permutation,
   and complete packed predicate now compose into one polynomial-space bound
   for this indexed edge.  They also explicitly implement and fit the
-  reflexive-or-edge predicate used at Savitch recursion depth zero.
+  reflexive-or-edge predicate used at Savitch recursion depth zero, including
+  a polynomial-space bound for its equality test and final disjunction.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

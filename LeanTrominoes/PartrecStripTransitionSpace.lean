@@ -350,6 +350,149 @@ theorem stripTransitionEquality
   simpa [Code.stripTransitionEqualityCode,
     stripTransitionEqualityCost] using result
 
+private theorem stripTransitionInputSpace_le_contextUnit
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    encodedListSpace [Encodable.encode periodicStrip, first, last] ≤
+      10 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have stripBits := encodeNat_length_mono
+    (show Encodable.encode periodicStrip ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have firstBits := encodeNat_length_mono
+    (show first ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have lastBits := encodeNat_length_mono
+    (show last ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  rw [show stripFrontierContextPolynomialSpaceUnit
+      periodicStrip first last = unit by rfl, unitEq]
+  omega
+
+private theorem stripTransitionInputHeadSpace_le_contextUnit
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    (Computability.encodeNat
+      [Encodable.encode periodicStrip, first, last].headI).length ≤
+      10 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  have raw := stripTransitionInputSpace_le_contextUnit
+    periodicStrip first last
+  simp at raw ⊢
+  omega
+
+private theorem stripTransitionInputHeadSuccSpace_le_contextUnit
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    (Computability.encodeNat
+      ([Encodable.encode periodicStrip, first, last].headI + 1)).length ≤
+      20 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  have headBits := stripTransitionInputHeadSpace_le_contextUnit
+    periodicStrip first last
+  have successor := encodeNat_succ_length_le
+    [Encodable.encode periodicStrip, first, last].headI
+  have successor' :
+      (Computability.encodeNat
+        ([Encodable.encode periodicStrip, first, last].headI + 1)).length ≤
+      (Computability.encodeNat
+        [Encodable.encode periodicStrip, first, last].headI).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using successor
+  have unitPositive :
+      1 ≤ stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+    simp [stripFrontierContextPolynomialSpaceUnit]
+  omega
+
+set_option maxHeartbeats 800000 in
+theorem stripTransitionEqualityArgumentsCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    stripTransitionEqualityArgumentsCost periodicStrip first last ≤
+      1000000 * stripFrontierContextPolynomialSpaceUnit
+        periodicStrip first last := by
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have inputSpace := stripTransitionInputSpace_le_contextUnit
+    periodicStrip first last
+  simp only [encodedListSpace_cons, encodedListSpace_nil] at inputSpace
+  have firstBits := encodeNat_length_mono
+    (show first ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have lastBits := encodeNat_length_mono
+    (show last ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have firstSuccBits := encodeNat_length_mono
+    (show first + 1 ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have lastSuccBits := encodeNat_length_mono
+    (show last + 1 ≤ limit by
+      simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+      omega)
+  have stripPairBitsRaw := encodeNat_length_mono
+    (show Nat.pair periodicStrip.width
+        (Nat.pair periodicStrip.period
+          (Encodable.encode periodicStrip.motif)) ≤ limit by
+      simpa only [PeriodicStrip.encode_eq_pair] using
+        (show Encodable.encode periodicStrip ≤ limit by
+          simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+          omega))
+  have unitEq :
+      unit = (Computability.encodeNat limit).length + 2 := by
+    simp [unit, limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  have zeroBits :
+      (Computability.encodeNat 0).length = 0 := rfl
+  simp [stripTransitionEqualityArgumentsCost,
+    prependCost, getCost, dropCost, headCost, idCost,
+    nilCost, tailCost, zeroPrimeCost, succCost,
+    encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+  clear * - inputSpace firstBits lastBits firstSuccBits lastSuccBits
+    stripPairBitsRaw unitEq
+  omega
+
+theorem stripTransitionEqualityCost_le_polynomialSpaceBound
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    stripTransitionEqualityCost periodicStrip first last ≤
+      10000000000000000000000 *
+        stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := by
+  let limit := stripFrontierContextPolynomialSpaceLimit
+    periodicStrip first last
+  let unit := stripFrontierContextPolynomialSpaceUnit
+    periodicStrip first last
+  have equality := natEqCost_le_linear first last
+  have equalityLimit : 2 * (first + last) + 4 ≤ limit := by
+    simp only [limit, stripFrontierContextPolynomialSpaceLimit]
+    omega
+  have equalityBits := encodeNat_length_mono equalityLimit
+  have arguments :=
+    stripTransitionEqualityArgumentsCost_le_polynomialSpaceBound
+      periodicStrip first last
+  have equalityUnitLe :
+      encodedListSpace [2 * (first + last) + 4] + 1 ≤ unit := by
+    simpa [unit, limit, stripFrontierContextPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil] using equalityBits
+  have equalityGlobal :
+      natEqCost first last ≤ 10000000000 * unit :=
+    equality.trans (Nat.mul_le_mul_left _ equalityUnitLe)
+  simp only [stripTransitionEqualityCost]
+  clear * - equalityGlobal arguments
+  omega
+
 private theorem boolOr_fit_bool
     {leftCode rightCode : Code} {values : List Nat}
     {leftCost rightCost : Nat}
@@ -376,6 +519,24 @@ def stripBaseTransitionCost
     (stripTransitionEqualityCost periodicStrip first last)
     (stripTransitionCost tromino periodicStrip first last)
 
+/-- Common budget for equality, the indexed edge, and their shared input. -/
+def stripBaseTransitionComponentSpaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) : Nat :=
+  stripTransitionPolynomialSpaceBound
+      tromino periodicStrip first last +
+    10000000000000000000000 *
+      stripFrontierContextPolynomialSpaceUnit periodicStrip first last +
+    10000000 *
+      stripFrontierContextPolynomialSpaceUnit periodicStrip first last + 1
+
+/-- Polynomial-space envelope for the reflexive-or-edge Savitch leaf. -/
+def stripBaseTransitionPolynomialSpaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) : Nat :=
+  1000 * (stripBaseTransitionComponentSpaceBound
+    tromino periodicStrip first last + 1)
+
 /-- Exact fitted certificate for the explicit depth-zero Savitch predicate. -/
 theorem stripBaseTransition
     (tromino : Tromino) (periodicStrip : PeriodicStrip)
@@ -398,6 +559,69 @@ theorem stripBaseTransition
       (stripTransition tromino periodicStrip wellFormed first last))
   simpa [Code.stripBaseTransitionCode,
     stripBaseTransitionCost, equal, edge] using result
+
+set_option maxHeartbeats 1000000 in
+theorem stripBaseTransitionCost_le_polynomialSpaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    stripBaseTransitionCost tromino periodicStrip first last ≤
+      stripBaseTransitionPolynomialSpaceBound
+        tromino periodicStrip first last := by
+  let values := [Encodable.encode periodicStrip, first, last]
+  let equal := decide (first = last)
+  let edge := RawWindowState.indexedTransitionRawBool
+    tromino periodicStrip first last
+  let budget := stripBaseTransitionComponentSpaceBound
+    tromino periodicStrip first last
+  have equalTag : equal.toNat ≤ 1 := by
+    cases equal <;> simp
+  have edgeTag : edge.toNat ≤ 1 := by
+    cases edge <;> simp
+  have valuesNative := stripTransitionInputSpace_le_contextUnit
+    periodicStrip first last
+  have headNative := stripTransitionInputHeadSpace_le_contextUnit
+    periodicStrip first last
+  have headSuccNative :=
+    stripTransitionInputHeadSuccSpace_le_contextUnit
+      periodicStrip first last
+  have valuesBound : encodedListSpace values ≤ budget := by
+    simp only [values, budget,
+      stripBaseTransitionComponentSpaceBound] at valuesNative ⊢
+    omega
+  have headBound :
+      (Computability.encodeNat values.headI).length ≤ budget := by
+    simp only [values, budget,
+      stripBaseTransitionComponentSpaceBound] at headNative ⊢
+    omega
+  have headSuccBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget := by
+    simp only [values, budget,
+      stripBaseTransitionComponentSpaceBound] at headSuccNative ⊢
+    omega
+  have equalityCost :=
+    stripTransitionEqualityCost_le_polynomialSpaceBound
+      periodicStrip first last
+  have transitionCost := stripTransitionCost_le_polynomialSpaceBound
+    tromino periodicStrip first last
+  have equalityBound :
+      stripTransitionEqualityCost periodicStrip first last ≤ budget := by
+    simp only [budget, stripBaseTransitionComponentSpaceBound]
+    omega
+  have transitionBound :
+      stripTransitionCost tromino periodicStrip first last ≤ budget := by
+    simp only [budget, stripBaseTransitionComponentSpaceBound]
+    omega
+  have positive : 1 ≤ budget := by
+    simp [budget, stripBaseTransitionComponentSpaceBound]
+  have bound := boolOrCost_le_budget values
+    equal.toNat edge.toNat
+    (stripTransitionEqualityCost periodicStrip first last)
+    (stripTransitionCost tromino periodicStrip first last)
+    budget equalTag edgeTag valuesBound headBound headSuccBound
+    equalityBound transitionBound positive
+  simpa [stripBaseTransitionCost,
+    stripBaseTransitionPolynomialSpaceBound,
+    values, equal, edge, budget] using bound
 
 end EvaluatorCodeFits
 
