@@ -321,6 +321,8 @@ build; an imported proof counts when its statement matches the paper.
         accepting trace.
       - [x] Identify forward-local horizontal CNF models with bi-infinite
         paths through their induced Boolean transition relation.
+      - [x] Verify constant-size forward-local CNF encodings for constants,
+        equality, negation, conjunction, and disjunction.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1202,6 +1204,10 @@ The representation choices for this target are:
   views every forward-local horizontal CNF formula as a transition relation
   between consecutive Boolean slices and proves that satisfying line
   assignments are exactly its bi-infinite paths.
+- [`LeanTrominoes/PeriodicCNFTransitionGates.lean`](LeanTrominoes/PeriodicCNFTransitionGates.lean)
+  supplies truth-table-verified constant-size Tseitin clauses for constants,
+  equality, negation, conjunction, and disjunction over current- and
+  next-slice wires; every generated clause is forward-local.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
