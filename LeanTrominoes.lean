@@ -798,6 +798,7 @@ import LeanTrominoes.PartrecEncodedListDecode
 import LeanTrominoes.PartrecEncodedListDecodeSpace
 import LeanTrominoes.PartrecAdd
 import LeanTrominoes.PartrecMultiply
+import LeanTrominoes.PartrecMultiplySpace
 import LeanTrominoes.PartrecPair
 import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLength

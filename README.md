@@ -1486,9 +1486,13 @@ The representation choices for this target are:
   quotient/remainder primitive implement the semantic phase formula on a
   fixed-width native state.
 - [`LeanTrominoes/PartrecMultiply.lean`](LeanTrominoes/PartrecMultiply.lean)
-  supplies the missing forward natural-multiplication program as a flat
+  and
+  [`LeanTrominoes/PartrecMultiplySpace.lean`](LeanTrominoes/PartrecMultiplySpace.lean)
+  supply the missing forward natural-multiplication program as a flat
   repeated-addition countdown with the fixed payload
-  `[left, partialProduct]`.  This is the arithmetic foundation for explicitly
+  `[right, left, partialProduct]`.  Its nested fixed-width accumulator and
+  outer countdown have an exact evaluator certificate and one explicit
+  input-linear workspace majorant.  This is the arithmetic foundation for
   constructing the paired cell encodings needed by the center-validity leaf.
 - [`LeanTrominoes/PartrecPair.lean`](LeanTrominoes/PartrecPair.lean) combines
   explicit comparison, multiplication, and addition into the forward

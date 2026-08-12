@@ -1,4 +1,5 @@
 import LeanTrominoes.PartrecMultiply
+import LeanTrominoes.PartrecAdd
 import LeanTrominoes.PartrecNatCompare
 
 /-!
