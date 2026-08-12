@@ -1123,6 +1123,652 @@ theorem stripTransitionPolynomialSpaceBound_le_leaf
       Nat.mul_le_mul_right _ coefficient
     _ = _ := by simp [stripTransitionLeafSpaceBound, inputLength]
 
+namespace StripSavitchStep
+
+open Turing.PartrecToTM2.EvaluatorCodeFits
+
+def baseArgumentsCost
+    (context stateCount : Nat) (state : FiniteState.DivideEvalState) : Nat :=
+  let values := FiniteState.divideEvalProgramList context stateCount state
+  let last := prependCost values [state.query.last] []
+    (getCost 6 values) (nilCost values)
+  let first := prependCost values [state.query.first] [state.query.last]
+    (getCost 5 values) last
+  prependCost values [context] [state.query.first, state.query.last]
+    (getCost 0 values) first
+
+theorem baseArguments
+    (context stateCount : Nat) (state : FiniteState.DivideEvalState) :
+    Turing.PartrecToTM2.EvaluatorCodeFits
+      LeanTrominoes.PeriodicStrip.RawWindowState.stripBaseArguments
+      (FiniteState.divideEvalProgramList context stateCount state)
+      [context, state.query.first, state.query.last]
+      (baseArgumentsCost context stateCount state) := by
+  let values := FiniteState.divideEvalProgramList context stateCount state
+  have last := prepend (get 6 values) (nil values)
+  have first := prepend (get 5 values) last
+  have result := prepend (get 0 values) first
+  simpa [LeanTrominoes.PeriodicStrip.RawWindowState.stripBaseArguments,
+    baseArgumentsCost, values,
+    FiniteState.divideEvalProgramList,
+    FiniteState.DivideEvalState.toNatList, prependCost] using result
+
+def baseBoolCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState) : Nat :=
+  Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost
+      tromino periodicStrip state.query.first state.query.last +
+    baseArgumentsCost (Encodable.encode periodicStrip) stateCount state
+
+theorem baseBool
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState) :
+    Turing.PartrecToTM2.EvaluatorCodeFits
+      (stripBaseBoolCode tromino)
+      (FiniteState.divideEvalProgramList
+        (Encodable.encode periodicStrip) stateCount state)
+      [FiniteState.divideBoolTag
+        (decide (state.query.first = state.query.last) ||
+          indexedTransitionRawBool tromino periodicStrip
+            state.query.first state.query.last)]
+      (baseBoolCost tromino periodicStrip stateCount state) := by
+  let leaf :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransition
+      tromino periodicStrip wellFormed
+      state.query.first state.query.last
+  have result := Turing.PartrecToTM2.EvaluatorCodeFits.comp leaf
+    (StripSavitchStep.baseArguments
+      (Encodable.encode periodicStrip) stateCount state)
+  cases answer :
+      (decide (state.query.first = state.query.last) ||
+        indexedTransitionRawBool tromino periodicStrip
+          state.query.first state.query.last) <;>
+    simpa [stripBaseBoolCode, baseBoolCost,
+      stripBaseVectorCode, answer, FiniteState.divideBoolTag] using result
+
+def someBoolTagCost
+    (values : List Nat) (result valueCost : Nat) : Nat :=
+  succCost [if result = 0 then 0 else 1] +
+    normalizeBoolCost values result valueCost
+
+theorem someBoolTag
+    {value : Turing.ToPartrec.Code} {values : List Nat}
+    {result valueCost : Nat}
+    (valueFits :
+      Turing.PartrecToTM2.EvaluatorCodeFits value values [result] valueCost) :
+    Turing.PartrecToTM2.EvaluatorCodeFits
+      (Turing.ToPartrec.Code.someBoolTag value) values
+      [if result = 0 then 1 else 2]
+      (someBoolTagCost values result valueCost) := by
+  have normalized := normalizeBool valueFits
+  have incremented := Turing.PartrecToTM2.EvaluatorCodeFits.comp
+    (succ_named [if result = 0 then 0 else 1]) normalized
+  by_cases zero : result = 0 <;>
+    simp [Turing.ToPartrec.Code.someBoolTag, someBoolTagCost,
+      zero] at incremented ⊢ <;>
+    exact incremented
+
+structure FieldFit (values : List Nat) where
+  code : Turing.ToPartrec.Code
+  output : Nat
+  cost : Nat
+  fits : Turing.PartrecToTM2.EvaluatorCodeFits code values [output] cost
+
+def fieldsCost (values : List Nat) :
+    List (FieldFit values) → List Nat → Nat → Nat
+  | [], _, restCost => restCost
+  | field :: fields, restOutput, restCost =>
+      prependCost values [field.output]
+        (fields.map FieldFit.output ++ restOutput)
+        field.cost (fieldsCost values fields restOutput restCost)
+
+theorem fields
+    (values : List Nat) (fieldFits : List (FieldFit values))
+    {restCode : Turing.ToPartrec.Code}
+    {restOutput : List Nat} {restCost : Nat}
+    (restFits :
+      Turing.PartrecToTM2.EvaluatorCodeFits
+        restCode values restOutput restCost) :
+    Turing.PartrecToTM2.EvaluatorCodeFits
+      (FiniteState.DivideEvalPartrec.fields
+        (fieldFits.map FieldFit.code) restCode)
+      values (fieldFits.map FieldFit.output ++ restOutput)
+      (fieldsCost values fieldFits restOutput restCost) := by
+  induction fieldFits with
+  | nil => simpa [FiniteState.DivideEvalPartrec.fields, fieldsCost] using restFits
+  | cons field fieldFits induction =>
+      have combined := prepend field.fits induction
+      simpa [FiniteState.DivideEvalPartrec.fields, fieldsCost,
+        prependCost] using combined
+
+def getField (index : Nat) (values : List Nat) : FieldFit values where
+  code := FiniteState.DivideEvalPartrec.field index
+  output := values[index]?.getD 0
+  cost := getCost index values
+  fits := by
+    simpa [FiniteState.DivideEvalPartrec.field] using get index values
+
+def predecessorField (index : Nat) (values : List Nat) : FieldFit values where
+  code := FiniteState.DivideEvalPartrec.predecessorField index
+  output := (values[index]?.getD 0).pred
+  cost := predCost [values[index]?.getD 0] + getCost index values
+  fits := by
+    have result := Turing.PartrecToTM2.EvaluatorCodeFits.comp
+      (pred_named [values[index]?.getD 0]) (get index values)
+    simpa [FiniteState.DivideEvalPartrec.predecessorField,
+      FiniteState.DivideEvalPartrec.field,
+      Turing.ToPartrec.Code.subtractStepList] using result
+
+def zeroField (values : List Nat) : FieldFit values where
+  code := Turing.ToPartrec.Code.zero
+  output := 0
+  cost := zeroCost values
+  fits := zero values
+
+def oneField (values : List Nat) : FieldFit values where
+  code := Turing.ToPartrec.Code.one
+  output := 1
+  cost := oneCost values
+  fits := one values
+
+def succField (index : Nat) (values : List Nat) : FieldFit values where
+  code := Turing.ToPartrec.Code.succ.comp
+    (FiniteState.DivideEvalPartrec.field index)
+  output := (values[index]?.getD 0).succ
+  cost := succCost [values[index]?.getD 0] + getCost index values
+  fits := by
+    have result := Turing.PartrecToTM2.EvaluatorCodeFits.comp
+      (succ_named [values[index]?.getD 0]) (get index values)
+    simpa [FiniteState.DivideEvalPartrec.field] using result
+
+def someBoolField
+    (values : List Nat) (valueCode : Turing.ToPartrec.Code)
+    (result valueCost : Nat)
+    (valueFits :
+      Turing.PartrecToTM2.EvaluatorCodeFits
+        valueCode values [result] valueCost) : FieldFit values where
+  code := Turing.ToPartrec.Code.someBoolTag valueCode
+  output := if result = 0 then 1 else 2
+  cost := someBoolTagCost values result valueCost
+  fits := someBoolTag valueFits
+
+private theorem existsCost
+    {code : Turing.ToPartrec.Code} {values output : List Nat}
+    {cost : Nat}
+    (fits : Turing.PartrecToTM2.EvaluatorCodeFits code values output cost) :
+    ∃ cost, Turing.PartrecToTM2.EvaluatorCodeFits
+      code values output cost :=
+  ⟨cost, fits⟩
+
+/-- Every semantic branch of the strip-specialized Savitch transition has a
+finite compositional evaluator-space certificate.  The next layer replaces
+the branch-dependent witness by one uniform polynomial allowance. -/
+theorem exactStepExists
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState) :
+    ∃ cost,
+      Turing.PartrecToTM2.EvaluatorCodeFits
+        (FiniteState.DivideEvalPartrec.stepCode
+          (stripBaseBoolCode tromino))
+        (FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount state)
+        (FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount
+          (FiniteState.divideEvalStep stateCount
+            (indexedTransitionRawBool tromino periodicStrip) state))
+        cost := by
+  cases state with
+  | mk query stack answer =>
+    cases query with
+    | mk depth first last =>
+      let values :=
+        FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount
+          { query := { depth := depth, first := first, last := last },
+            stack := stack, answer := answer }
+      cases answer with
+      | none =>
+        cases depth with
+        | zero =>
+          let state : FiniteState.DivideEvalState :=
+            { query := { depth := 0, first := first, last := last },
+              stack := stack, answer := none }
+          have base := baseBool tromino periodicStrip wellFormed stateCount state
+          let baseResult :=
+            FiniteState.divideBoolTag
+              (decide (first = last) ||
+                indexedTransitionRawBool tromino periodicStrip first last)
+          let tag := someBoolField values
+            (stripBaseBoolCode tromino) baseResult
+            (baseBoolCost tromino periodicStrip stateCount state)
+            (by simpa [values, state, baseResult] using base)
+          let fieldFits : List (FieldFit values) :=
+            [getField 0 values, getField 1 values, getField 2 values, tag,
+              getField 4 values, getField 5 values, getField 6 values]
+          have branch := fields values fieldFits (drop 7 values)
+          have depthBranch := branchZero_zero
+            (whenSucc := FiniteState.DivideEvalPartrec.noneDepthSucc)
+            (testValue := 0) rfl
+            (get 4 values) (by simpa [values, state, fieldFits, tag] using branch)
+          have whole := branchZero_zero
+            (whenSucc := FiniteState.DivideEvalPartrec.answerSome)
+            (testValue := 0) rfl
+            (get 3 values) depthBranch
+          cases baseAnswer :
+              (decide (first = last) ||
+                indexedTransitionRawBool tromino periodicStrip first last) <;>
+            apply existsCost <;>
+            simpa [FiniteState.DivideEvalPartrec.stepCode,
+              FiniteState.DivideEvalPartrec.answerNone,
+              FiniteState.DivideEvalPartrec.noneDepthZero,
+              FiniteState.DivideEvalPartrec.field,
+              FiniteState.DivideEvalPartrec.fields,
+              FiniteState.divideEvalProgramList,
+              FiniteState.DivideEvalState.toNatList,
+              FiniteState.divideEvalStep, values, state, fieldFits, tag,
+              baseResult, baseAnswer, getField, someBoolField,
+              FiniteState.divideBoolTag,
+              FiniteState.divideOptionBoolTag] using whole
+        | succ depth =>
+          cases stateCount with
+          | zero =>
+            let state : FiniteState.DivideEvalState :=
+              { query := { depth := depth + 1, first := first, last := last },
+                stack := stack, answer := none }
+            let fieldFits : List (FieldFit values) :=
+              [getField 0 values, getField 1 values, getField 2 values,
+                oneField values, getField 4 values, getField 5 values,
+                getField 6 values]
+            have countBranch := fields values fieldFits (drop 7 values)
+            have depthBranch := branchZero_zero
+              (whenSucc := FiniteState.DivideEvalPartrec.noneCountSucc)
+              (testValue := 0) rfl
+              (get 1 values)
+              (by simpa [values, state, fieldFits] using countBranch)
+            have answerBranch := branchZero_succ
+              (whenZero := FiniteState.DivideEvalPartrec.noneDepthZero
+                (stripBaseBoolCode tromino))
+              (testValue := depth + 1)
+              (by omega) (get 4 values)
+              (by simpa [values, state] using depthBranch)
+            have whole := branchZero_zero
+              (whenSucc := FiniteState.DivideEvalPartrec.answerSome)
+              (testValue := 0) rfl
+              (get 3 values) answerBranch
+            exact existsCost (by
+              simpa [FiniteState.DivideEvalPartrec.stepCode,
+              FiniteState.DivideEvalPartrec.answerNone,
+              FiniteState.DivideEvalPartrec.noneDepthSucc,
+              FiniteState.DivideEvalPartrec.noneCountZero,
+              FiniteState.DivideEvalPartrec.field,
+              FiniteState.DivideEvalPartrec.fields,
+              FiniteState.divideEvalProgramList,
+              FiniteState.DivideEvalState.toNatList,
+              FiniteState.divideEvalStep, values, state, fieldFits,
+              getField, oneField,
+              FiniteState.divideOptionBoolTag] using whole)
+          | succ middle =>
+            let state : FiniteState.DivideEvalState :=
+              { query := { depth := depth + 1, first := first, last := last },
+                stack := stack, answer := none }
+            let fieldFits : List (FieldFit values) :=
+              [getField 0 values, getField 1 values, succField 2 values,
+                zeroField values, predecessorField 4 values,
+                getField 5 values, predecessorField 1 values,
+                predecessorField 4 values, getField 5 values,
+                getField 6 values, predecessorField 1 values,
+                zeroField values, zeroField values]
+            have countBranch := fields values fieldFits (drop 7 values)
+            have depthBranch := branchZero_succ
+              (whenZero := FiniteState.DivideEvalPartrec.noneCountZero)
+              (testValue := middle + 1)
+              (by omega) (get 1 values)
+              (by simpa [values, state, fieldFits] using countBranch)
+            have answerBranch := branchZero_succ
+              (whenZero := FiniteState.DivideEvalPartrec.noneDepthZero
+                (stripBaseBoolCode tromino))
+              (testValue := depth + 1)
+              (by omega) (get 4 values)
+              (by simpa [values, state] using depthBranch)
+            have whole := branchZero_zero
+              (whenSucc := FiniteState.DivideEvalPartrec.answerSome)
+              (testValue := 0) rfl
+              (get 3 values) answerBranch
+            exact existsCost (by
+              simpa [FiniteState.DivideEvalPartrec.stepCode,
+              FiniteState.DivideEvalPartrec.answerNone,
+              FiniteState.DivideEvalPartrec.noneDepthSucc,
+              FiniteState.DivideEvalPartrec.noneCountSucc,
+              FiniteState.DivideEvalPartrec.field,
+              FiniteState.DivideEvalPartrec.predecessorField,
+              FiniteState.DivideEvalPartrec.fields,
+              FiniteState.divideEvalProgramList,
+              FiniteState.DivideEvalState.toNatList,
+              FiniteState.DivideFrame.toNatList,
+              FiniteState.divideStackToNatList,
+              FiniteState.divideEvalStep, values, state, fieldFits,
+              getField, succField, zeroField, predecessorField,
+              FiniteState.divideBoolTag,
+              FiniteState.divideOptionBoolTag] using whole)
+      | some answerValue =>
+        cases stack with
+        | nil =>
+          let state : FiniteState.DivideEvalState :=
+            { query := { depth := depth, first := first, last := last },
+              stack := [], answer := some answerValue }
+          have answerTest :
+              Turing.PartrecToTM2.EvaluatorCodeFits
+                (Turing.ToPartrec.Code.get 3) values
+                [FiniteState.divideBoolTag answerValue + 1]
+                (Turing.PartrecToTM2.EvaluatorCodeFits.getCost 3 values) := by
+            cases answerValue <;>
+            simpa [values, state, FiniteState.divideEvalProgramList,
+              FiniteState.DivideEvalState.toNatList,
+              FiniteState.divideBoolTag,
+              FiniteState.divideOptionBoolTag] using
+                Turing.PartrecToTM2.EvaluatorCodeFits.get 3 values
+          have stackBranch := branchZero_zero
+            (whenSucc := FiniteState.DivideEvalPartrec.someFrame)
+            (testValue := 0) rfl
+            (get 2 values) (id values)
+          have whole := branchZero_succ
+            (whenZero := FiniteState.DivideEvalPartrec.answerNone
+              (stripBaseBoolCode tromino))
+            (testValue := FiniteState.divideBoolTag answerValue + 1)
+            (by cases answerValue <;> simp [FiniteState.divideBoolTag])
+            answerTest
+            (by simpa [values, state] using stackBranch)
+          cases answerValue <;>
+            apply existsCost <;>
+            simpa [FiniteState.DivideEvalPartrec.stepCode,
+              FiniteState.DivideEvalPartrec.answerSome,
+              FiniteState.DivideEvalPartrec.field,
+              FiniteState.divideEvalProgramList,
+              FiniteState.DivideEvalState.toNatList,
+              FiniteState.divideEvalStep, values, state,
+              FiniteState.divideBoolTag,
+              FiniteState.divideOptionBoolTag] using whole
+        | cons frame rest =>
+          cases frame with
+          | mk frameDepth frameFirst frameLast middle accumulated leftAnswer =>
+            cases leftAnswer with
+            | none =>
+              let state : FiniteState.DivideEvalState :=
+                { query := { depth := depth, first := first, last := last },
+                  stack := (⟨frameDepth, frameFirst, frameLast, middle,
+                    accumulated, none⟩ : FiniteState.DivideFrame) :: rest,
+                  answer := some answerValue }
+              let fieldFits : List (FieldFit values) :=
+                [getField 0 values, getField 1 values, getField 2 values,
+                  zeroField values, getField 7 values, getField 10 values,
+                  getField 9 values, getField 7 values, getField 8 values,
+                  getField 9 values, getField 10 values, getField 11 values,
+                  getField 3 values]
+              have answerTest :
+                  Turing.PartrecToTM2.EvaluatorCodeFits
+                    (Turing.ToPartrec.Code.get 3) values
+                    [FiniteState.divideBoolTag answerValue + 1]
+                    (Turing.PartrecToTM2.EvaluatorCodeFits.getCost 3 values) := by
+                cases answerValue <;>
+                simpa [values, state, FiniteState.divideEvalProgramList,
+                  FiniteState.DivideEvalState.toNatList,
+                  FiniteState.DivideFrame.toNatList,
+                  FiniteState.divideStackToNatList,
+                  FiniteState.divideBoolTag,
+                  FiniteState.divideOptionBoolTag] using
+                    Turing.PartrecToTM2.EvaluatorCodeFits.get 3 values
+              have leftBranch := fields values fieldFits (drop 13 values)
+              have frameBranch := branchZero_zero
+                (whenSucc := FiniteState.DivideEvalPartrec.someLeftSome)
+                (testValue := 0) rfl
+                (get 12 values)
+                (by simpa [values, state, fieldFits] using leftBranch)
+              have stackBranch := branchZero_succ
+                (whenZero := Turing.ToPartrec.Code.id)
+                (testValue := rest.length + 1)
+                (by omega) (get 2 values)
+                (by simpa [values, state] using frameBranch)
+              have whole := branchZero_succ
+                (whenZero := FiniteState.DivideEvalPartrec.answerNone
+                  (stripBaseBoolCode tromino))
+                (testValue := FiniteState.divideBoolTag answerValue + 1)
+                (by cases answerValue <;> simp [FiniteState.divideBoolTag])
+                answerTest
+                (by simpa [values, state] using stackBranch)
+              cases answerValue <;> cases accumulated <;>
+                apply existsCost <;>
+                simpa [FiniteState.DivideEvalPartrec.stepCode,
+                  FiniteState.DivideEvalPartrec.answerSome,
+                  FiniteState.DivideEvalPartrec.someFrame,
+                  FiniteState.DivideEvalPartrec.someLeftNone,
+                  FiniteState.DivideEvalPartrec.field,
+                  FiniteState.DivideEvalPartrec.fields,
+                  FiniteState.divideEvalProgramList,
+                  FiniteState.DivideEvalState.toNatList,
+                  FiniteState.DivideFrame.toNatList,
+                  FiniteState.divideStackToNatList,
+                  FiniteState.divideEvalStep, values, state, fieldFits,
+                  getField, zeroField,
+                  FiniteState.divideBoolTag,
+                  FiniteState.divideOptionBoolTag] using whole
+            | some leftValue =>
+              cases middle with
+              | zero =>
+                let state : FiniteState.DivideEvalState :=
+                  { query := { depth := depth, first := first, last := last },
+                    stack := (⟨frameDepth, frameFirst, frameLast, 0,
+                      accumulated, some leftValue⟩ :
+                        FiniteState.DivideFrame) :: rest,
+                    answer := some answerValue }
+                let leftFit := predecessorField 12 values
+                let answerFit := predecessorField 3 values
+                let both := boolAnd leftFit.fits answerFit.fits
+                let accumulatedFit := boolOr (get 11 values) both
+                let rawAccumulatedField : FieldFit values :=
+                  { code := FiniteState.DivideEvalPartrec.accumulatedCode,
+                    output := if values[11]?.getD 0 = 0 ∧
+                        (¬(values[12]?.getD 0).pred = 0 →
+                          (values[3]?.getD 0).pred = 0)
+                      then 0 else 1,
+                    cost := _,
+                    fits := by
+                      simpa [FiniteState.DivideEvalPartrec.accumulatedCode,
+                        FiniteState.DivideEvalPartrec.predecessorField,
+                        FiniteState.DivideEvalPartrec.field, leftFit,
+                        answerFit, StripSavitchStep.predecessorField] using
+                          accumulatedFit }
+                let accumulatedField : FieldFit values :=
+                  someBoolField values
+                    FiniteState.DivideEvalPartrec.accumulatedCode
+                    rawAccumulatedField.output rawAccumulatedField.cost
+                    rawAccumulatedField.fits
+                let fieldFits : List (FieldFit values) :=
+                  [getField 0 values, getField 1 values,
+                    predecessorField 2 values, accumulatedField,
+                    getField 4 values, getField 5 values, getField 6 values]
+                have answerTest :
+                    Turing.PartrecToTM2.EvaluatorCodeFits
+                      (Turing.ToPartrec.Code.get 3) values
+                      [FiniteState.divideBoolTag answerValue + 1]
+                      (Turing.PartrecToTM2.EvaluatorCodeFits.getCost 3 values) := by
+                  cases answerValue <;>
+                  simpa [values, state, FiniteState.divideEvalProgramList,
+                    FiniteState.DivideEvalState.toNatList,
+                    FiniteState.DivideFrame.toNatList,
+                    FiniteState.divideStackToNatList,
+                    FiniteState.divideBoolTag,
+                    FiniteState.divideOptionBoolTag] using
+                      Turing.PartrecToTM2.EvaluatorCodeFits.get 3 values
+                have leftTest :
+                    Turing.PartrecToTM2.EvaluatorCodeFits
+                      (Turing.ToPartrec.Code.get 12) values
+                      [FiniteState.divideBoolTag leftValue + 1]
+                      (Turing.PartrecToTM2.EvaluatorCodeFits.getCost 12 values) := by
+                  cases leftValue <;>
+                  simpa [values, state, FiniteState.divideEvalProgramList,
+                    FiniteState.DivideEvalState.toNatList,
+                    FiniteState.DivideFrame.toNatList,
+                    FiniteState.divideStackToNatList,
+                    FiniteState.divideBoolTag,
+                    FiniteState.divideOptionBoolTag] using
+                      Turing.PartrecToTM2.EvaluatorCodeFits.get 12 values
+                have middleBranch := fields values fieldFits (drop 13 values)
+                have leftBranch := branchZero_succ
+                  (whenZero := FiniteState.DivideEvalPartrec.someLeftNone)
+                  (testValue := FiniteState.divideBoolTag leftValue + 1)
+                  (by cases leftValue <;> simp [FiniteState.divideBoolTag])
+                  leftTest
+                  (by
+                    have zeroBranch := branchZero_zero
+                      (whenSucc :=
+                        FiniteState.DivideEvalPartrec.someLeftSomeMiddleSucc)
+                      (testValue := 0) rfl
+                      (get 10 values)
+                      (by simpa [values, state, fieldFits,
+                          accumulatedField] using middleBranch)
+                    simpa [FiniteState.DivideEvalPartrec.someLeftSome] using
+                      zeroBranch)
+                have frameBranch := branchZero_succ
+                  (whenZero := Turing.ToPartrec.Code.id)
+                  (testValue := rest.length + 1)
+                  (by omega) (get 2 values)
+                  (by simpa [values, state] using leftBranch)
+                have whole := branchZero_succ
+                  (whenZero := FiniteState.DivideEvalPartrec.answerNone
+                    (stripBaseBoolCode tromino))
+                  (testValue := FiniteState.divideBoolTag answerValue + 1)
+                  (by cases answerValue <;> simp [FiniteState.divideBoolTag])
+                    answerTest
+                  (by simpa [values, state] using frameBranch)
+                cases answerValue <;> cases leftValue <;> cases accumulated <;>
+                  apply existsCost <;>
+                  simpa [FiniteState.DivideEvalPartrec.stepCode,
+                    FiniteState.DivideEvalPartrec.answerSome,
+                    FiniteState.DivideEvalPartrec.someFrame,
+                    FiniteState.DivideEvalPartrec.someLeftSome,
+                    FiniteState.DivideEvalPartrec.someLeftSomeMiddleZero,
+                    FiniteState.DivideEvalPartrec.accumulatedCode,
+                    FiniteState.DivideEvalPartrec.field,
+                    FiniteState.DivideEvalPartrec.predecessorField,
+                    FiniteState.DivideEvalPartrec.fields,
+                    FiniteState.divideEvalProgramList,
+                    FiniteState.DivideEvalState.toNatList,
+                    FiniteState.DivideFrame.toNatList,
+                    FiniteState.divideStackToNatList,
+                    FiniteState.divideEvalStep, values, state, fieldFits,
+                    accumulatedField, rawAccumulatedField, someBoolField,
+                    getField, StripSavitchStep.predecessorField,
+                    FiniteState.divideBoolTag,
+                    FiniteState.divideOptionBoolTag] using whole
+              | succ previousMiddle =>
+                let state : FiniteState.DivideEvalState :=
+                  { query := { depth := depth, first := first, last := last },
+                    stack := (⟨frameDepth, frameFirst, frameLast,
+                      previousMiddle + 1, accumulated, some leftValue⟩ :
+                        FiniteState.DivideFrame) :: rest,
+                    answer := some answerValue }
+                let leftFit := predecessorField 12 values
+                let answerFit := predecessorField 3 values
+                let both := boolAnd leftFit.fits answerFit.fits
+                let accumulatedFit := boolOr (get 11 values) both
+                let accumulatedField : FieldFit values :=
+                  { code := FiniteState.DivideEvalPartrec.accumulatedCode,
+                    output := if values[11]?.getD 0 = 0 ∧
+                        (¬(values[12]?.getD 0).pred = 0 →
+                          (values[3]?.getD 0).pred = 0)
+                      then 0 else 1,
+                    cost := _,
+                    fits := by
+                      simpa [FiniteState.DivideEvalPartrec.accumulatedCode,
+                        FiniteState.DivideEvalPartrec.predecessorField,
+                        FiniteState.DivideEvalPartrec.field, leftFit,
+                        answerFit, StripSavitchStep.predecessorField] using
+                          accumulatedFit }
+                let fieldFits : List (FieldFit values) :=
+                  [getField 0 values, getField 1 values, getField 2 values,
+                    zeroField values, getField 7 values, getField 8 values,
+                    predecessorField 10 values, getField 7 values,
+                    getField 8 values, getField 9 values,
+                    predecessorField 10 values, accumulatedField,
+                    zeroField values]
+                have answerTest :
+                    Turing.PartrecToTM2.EvaluatorCodeFits
+                      (Turing.ToPartrec.Code.get 3) values
+                      [FiniteState.divideBoolTag answerValue + 1]
+                      (Turing.PartrecToTM2.EvaluatorCodeFits.getCost 3 values) := by
+                  cases answerValue <;>
+                  simpa [values, state, FiniteState.divideEvalProgramList,
+                    FiniteState.DivideEvalState.toNatList,
+                    FiniteState.DivideFrame.toNatList,
+                    FiniteState.divideStackToNatList,
+                    FiniteState.divideBoolTag,
+                    FiniteState.divideOptionBoolTag] using
+                      Turing.PartrecToTM2.EvaluatorCodeFits.get 3 values
+                have leftTest :
+                    Turing.PartrecToTM2.EvaluatorCodeFits
+                      (Turing.ToPartrec.Code.get 12) values
+                      [FiniteState.divideBoolTag leftValue + 1]
+                      (Turing.PartrecToTM2.EvaluatorCodeFits.getCost 12 values) := by
+                  cases leftValue <;>
+                  simpa [values, state, FiniteState.divideEvalProgramList,
+                    FiniteState.DivideEvalState.toNatList,
+                    FiniteState.DivideFrame.toNatList,
+                    FiniteState.divideStackToNatList,
+                    FiniteState.divideBoolTag,
+                    FiniteState.divideOptionBoolTag] using
+                      Turing.PartrecToTM2.EvaluatorCodeFits.get 12 values
+                have middleFields := fields values fieldFits (drop 13 values)
+                have middleBranch := branchZero_succ
+                  (whenZero :=
+                    FiniteState.DivideEvalPartrec.someLeftSomeMiddleZero)
+                  (testValue := previousMiddle + 1) (by omega)
+                  (get 10 values)
+                  (by simpa [values, state, fieldFits,
+                      accumulatedField] using middleFields)
+                have leftBranch := branchZero_succ
+                  (whenZero := FiniteState.DivideEvalPartrec.someLeftNone)
+                  (testValue := FiniteState.divideBoolTag leftValue + 1)
+                  (by cases leftValue <;> simp [FiniteState.divideBoolTag])
+                  leftTest
+                  (by simpa [FiniteState.DivideEvalPartrec.someLeftSome] using
+                    middleBranch)
+                have frameBranch := branchZero_succ
+                  (whenZero := Turing.ToPartrec.Code.id)
+                  (testValue := rest.length + 1)
+                  (by omega) (get 2 values)
+                  (by simpa [values, state] using leftBranch)
+                have whole := branchZero_succ
+                  (whenZero := FiniteState.DivideEvalPartrec.answerNone
+                    (stripBaseBoolCode tromino))
+                  (testValue := FiniteState.divideBoolTag answerValue + 1)
+                  (by cases answerValue <;> simp [FiniteState.divideBoolTag])
+                  answerTest
+                  (by simpa [values, state] using frameBranch)
+                cases answerValue <;> cases leftValue <;> cases accumulated <;>
+                  apply existsCost <;>
+                  simpa [FiniteState.DivideEvalPartrec.stepCode,
+                    FiniteState.DivideEvalPartrec.answerSome,
+                    FiniteState.DivideEvalPartrec.someFrame,
+                    FiniteState.DivideEvalPartrec.someLeftSome,
+                    FiniteState.DivideEvalPartrec.someLeftSomeMiddleSucc,
+                    FiniteState.DivideEvalPartrec.accumulatedCode,
+                    FiniteState.DivideEvalPartrec.field,
+                    FiniteState.DivideEvalPartrec.predecessorField,
+                    FiniteState.DivideEvalPartrec.fields,
+                    FiniteState.divideEvalProgramList,
+                    FiniteState.DivideEvalState.toNatList,
+                    FiniteState.DivideFrame.toNatList,
+                    FiniteState.divideStackToNatList,
+                    FiniteState.divideEvalStep, values, state, fieldFits,
+                    accumulatedField, getField, zeroField,
+                    StripSavitchStep.predecessorField,
+                    FiniteState.divideBoolTag,
+                    FiniteState.divideOptionBoolTag] using whole
+
+end StripSavitchStep
+
 /-- Fitted-call obligations for the two explicit transition leaves used by
 the strip evaluator.  Each field is continuation-passing: the caller reserves
 the common leaf allowance alongside its continuation and supplies the fitted

@@ -34,27 +34,27 @@ private theorem natRec_two
     Nat.rec (motive := motive) zero succ 2 =
       succ 1 (succ 0 zero) := rfl
 
-private def field (index : Nat) : Code :=
+def field (index : Nat) : Code :=
   Code.get index
 
-private def predecessorField (index : Nat) : Code :=
+def predecessorField (index : Nat) : Code :=
   Code.pred.comp (field index)
 
-private def fields (codes : List Code) (rest : Code) : Code :=
+def fields (codes : List Code) (rest : Code) : Code :=
   codes.foldr Code.prepend rest
 
-private def noneDepthZero (baseBoolCode : Code) : Code :=
+def noneDepthZero (baseBoolCode : Code) : Code :=
   fields
     [field 0, field 1, field 2, Code.someBoolTag baseBoolCode,
       field 4, field 5, field 6]
     (Code.drop 7)
 
-private def noneCountZero : Code :=
+def noneCountZero : Code :=
   fields
     [field 0, field 1, field 2, Code.one, field 4, field 5, field 6]
     (Code.drop 7)
 
-private def noneCountSucc : Code :=
+def noneCountSucc : Code :=
   fields
     [field 0, field 1, Code.succ.comp (field 2), Code.zero,
       predecessorField 4, field 5, predecessorField 1,
@@ -62,30 +62,30 @@ private def noneCountSucc : Code :=
       Code.zero, Code.zero]
     (Code.drop 7)
 
-private def noneDepthSucc : Code :=
+def noneDepthSucc : Code :=
   Code.branchZero (field 1) noneCountZero noneCountSucc
 
-private def answerNone (baseBoolCode : Code) : Code :=
+def answerNone (baseBoolCode : Code) : Code :=
   Code.branchZero (field 4) (noneDepthZero baseBoolCode) noneDepthSucc
 
-private def someLeftNone : Code :=
+def someLeftNone : Code :=
   fields
     [field 0, field 1, field 2, Code.zero,
       field 7, field 10, field 9,
       field 7, field 8, field 9, field 10, field 11, field 3]
     (Code.drop 13)
 
-private def accumulatedCode : Code :=
+def accumulatedCode : Code :=
   Code.boolOr (field 11)
     (Code.boolAnd (predecessorField 12) (predecessorField 3))
 
-private def someLeftSomeMiddleZero : Code :=
+def someLeftSomeMiddleZero : Code :=
   fields
     [field 0, field 1, predecessorField 2,
       Code.someBoolTag accumulatedCode, field 4, field 5, field 6]
     (Code.drop 13)
 
-private def someLeftSomeMiddleSucc : Code :=
+def someLeftSomeMiddleSucc : Code :=
   fields
     [field 0, field 1, field 2, Code.zero,
       field 7, field 8, predecessorField 10,
@@ -93,14 +93,14 @@ private def someLeftSomeMiddleSucc : Code :=
       accumulatedCode, Code.zero]
     (Code.drop 13)
 
-private def someLeftSome : Code :=
+def someLeftSome : Code :=
   Code.branchZero (field 10) someLeftSomeMiddleZero
     someLeftSomeMiddleSucc
 
-private def someFrame : Code :=
+def someFrame : Code :=
   Code.branchZero (field 12) someLeftNone someLeftSome
 
-private def answerSome : Code :=
+def answerSome : Code :=
   Code.branchZero (field 2) Code.id someFrame
 
 /-- Direct code for one structural DFS transition.  `baseBoolCode` is called

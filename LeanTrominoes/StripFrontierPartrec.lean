@@ -210,7 +210,7 @@ theorem stripEdgeVectorCode_eval (tromino : Tromino)
     simpa [stripEdgeVectorCode,
       FiniteState.divideBoolTag, result] using run
 
-private def stripBaseArguments : Code :=
+def stripBaseArguments : Code :=
   Code.prepend (Code.get 0) <|
     Code.prepend (Code.get 5) <|
       Code.prepend (Code.get 6) Code.nil

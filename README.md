@@ -1794,6 +1794,10 @@ The representation choices for this target are:
   `StripEvaluatorLeafCallsFit` records the continuation-passing reserve
   contract, while `stripEvaluatorLeafCallsFit_explicit` discharges it for
   both the base relation and raw edge using the fitted transition programs.
+  `StripSavitchStep.exactStepExists` then gives an exact compositional
+  evaluator certificate for every control-flow branch of one compiled
+  strip-specialized Savitch DFS transition, including its depth-zero leaf,
+  stack-frame rewrites, and Boolean accumulator updates.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
