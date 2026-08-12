@@ -1553,6 +1553,9 @@ The representation choices for this target are:
   fits that candidate implication end to end, including center assignment
   selection, three canonical membership calls, both fixed conjunctions, and
   the final Boolean implication, all without decoding the packed frontier.
+  Linear bounds for both six-field adapters feed explicit envelopes for each
+  source-cell test, their fixed three-way conjunction, and the complete
+  center-candidate predicate.
 - [`LeanTrominoes/PartrecPackedCenterSymmetries.lean`](LeanTrominoes/PartrecPackedCenterSymmetries.lean)
   folds the eight fixed square-symmetry candidate implications at one motif
   base and proves that the explicit program computes exactly the semantic
