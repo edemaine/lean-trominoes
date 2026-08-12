@@ -1836,7 +1836,10 @@ The representation choices for this target are:
   second-endpoint countdown.  Its semantic iterate theorem proves that the
   Boolean accumulator checks exactly all smaller endpoint indices, while the
   evaluator reuses one polynomial body reserve independent of the number of
-  graph states.  The next remaining lift is the outer first-endpoint scan.
+  graph states.  `StripCandidateStep.InnerScan.exact_polynomial` wraps that
+  loop with verified fixed-width input and output adapters, so one complete
+  second-endpoint scan is now available as a polynomial-space outer-loop
+  step.  The next remaining lift is the outer first-endpoint countdown.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
