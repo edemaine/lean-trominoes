@@ -1485,6 +1485,11 @@ The representation choices for this target are:
   frontier columns.  Three fitted additions, two predecessors, and the
   quotient/remainder primitive implement the semantic phase formula on a
   fixed-width native state.
+- [`LeanTrominoes/PartrecMultiply.lean`](LeanTrominoes/PartrecMultiply.lean)
+  supplies the missing forward natural-multiplication program as a flat
+  repeated-addition countdown with the fixed payload
+  `[left, partialProduct]`.  This is the arithmetic foundation for explicitly
+  constructing the paired cell encodings needed by the center-validity leaf.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
