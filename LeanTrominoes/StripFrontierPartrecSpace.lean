@@ -5,6 +5,7 @@ import LeanTrominoes.PartrecBinaryLengthSpace
 import LeanTrominoes.PartrecFuelSpace
 import LeanTrominoes.PartrecPowerTwoSpace
 import LeanTrominoes.PartrecStripWellFormedSpace
+import LeanTrominoes.PartrecStripTransitionSpace
 
 /-!
 # Space bounds for compiled strip-search payloads
@@ -255,6 +256,75 @@ theorem stripCounter_encodeNat_length_le
     FiniteState.encodeNat_length_le_of_lt_pow _ _ counterPow
   simpa [depth, stripSearchDepth] using encodedBound
 
+/-- For bounded frontier indices, the common transition-context envelope is
+linear in the original encoded strip input length. -/
+theorem stripFrontierContextPolynomialSpaceUnit_le_inputLength
+    (periodicStrip : PeriodicStrip) (first last : Nat)
+    (firstBound : first < indexCount periodicStrip)
+    (lastBound : last < indexCount periodicStrip) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last ≤
+      100 *
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length + 100 := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let stripCode := Encodable.encode periodicStrip
+  let limit :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceLimit
+        periodicStrip first last
+  have stripBits :
+      (Computability.encodeNat stripCode).length + 1 = inputLength := by
+    simp [stripCode, inputLength]
+  have firstBits := stripCounter_encodeNat_length_le periodicStrip first
+    (Nat.le_of_lt firstBound)
+  have lastBits := stripCounter_encodeNat_length_le periodicStrip last
+    (Nat.le_of_lt lastBound)
+  have sum1 :=
+    Turing.PartrecToTM2.encodeNat_add_length_le_sum
+      stripCode first
+  have sum2 :=
+    Turing.PartrecToTM2.encodeNat_add_length_le_sum
+      (stripCode + first) last
+  have sum3 :=
+    Turing.PartrecToTM2.encodeNat_add_length_le_sum
+      (stripCode + first + last) 100
+  have scaled :=
+    Turing.PartrecToTM2.encodeNat_mul_length_le_sum
+      64 (stripCode + first + last + 100)
+  have final :=
+    Turing.PartrecToTM2.encodeNat_add_length_le_sum
+      (64 * (stripCode + first + last + 100)) 1000
+  have sixtyFourBits :
+      (Computability.encodeNat 64).length = 7 := by native_decide
+  have hundredBits :
+      (Computability.encodeNat 100).length = 7 := by native_decide
+  have thousandBits :
+      (Computability.encodeNat 1000).length = 10 := by native_decide
+  have limitEq :
+      limit = 64 * (stripCode + first + last + 100) + 1000 := by
+    simp [limit,
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceLimit,
+      stripCode]
+  rw [← limitEq] at final
+  rw [sixtyFourBits] at scaled
+  rw [hundredBits] at sum3
+  rw [thousandBits] at final
+  have contextEq :
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+            periodicStrip first last =
+        (Computability.encodeNat limit).length + 2 := by
+    simp [limit,
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit,
+      Turing.PartrecToTM2.encodedListSpace_cons,
+      Turing.PartrecToTM2.encodedListSpace_nil]
+  rw [contextEq]
+  change (Computability.encodeNat limit).length + 2 ≤
+    100 * inputLength + 100
+  simp only [inputLength] at firstBits lastBits ⊢
+  omega
+
 theorem stripDepth_encodeNat_length_le
     (periodicStrip : PeriodicStrip) :
     (Computability.encodeNat
@@ -376,13 +446,43 @@ def stripFuelComputationSpaceBound (inputLength : Nat) : Nat :=
   1000000000000000000000000000000000000000000000000000000000000 *
     (stripFuelBits inputLength + 100 * inputLength + 100)
 
+/-- One tromino-independent coefficient large enough for either explicit
+transition leaf used by the strip evaluator. -/
+def stripTransitionLeafSpaceCoefficient : Nat :=
+  max
+    (Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+      Tromino.I)
+    (Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+      Tromino.L)
+
+/-- Space reserve for one explicit indexed-transition leaf call. -/
+def stripTransitionLeafSpaceBound (inputLength : Nat) : Nat :=
+  stripTransitionLeafSpaceCoefficient * (100 * inputLength + 100)
+
+noncomputable def stripTransitionLeafSpacePolynomial : Polynomial Nat :=
+  Polynomial.C stripTransitionLeafSpaceCoefficient *
+    (100 * Polynomial.X + 100)
+
+set_option maxRecDepth 100000 in
+@[simp]
+theorem stripTransitionLeafSpacePolynomial_eval (inputLength : Nat) :
+    stripTransitionLeafSpacePolynomial.eval inputLength =
+      stripTransitionLeafSpaceBound inputLength := by
+  unfold stripTransitionLeafSpacePolynomial
+  rw [Polynomial.eval_mul, Polynomial.eval_C]
+  rw [show Polynomial.eval inputLength (100 * Polynomial.X + 100) =
+      100 * inputLength + 100 by simp]
+  unfold stripTransitionLeafSpaceBound
+  rfl
+
 /-- One common polynomial envelope for search payloads and explicit
 search-depth and fuel arithmetic. -/
 def stripEvaluatorSpaceBound (inputLength : Nat) : Nat :=
   stripEvaluatorCoreSpaceBound inputLength +
     stripArithmeticSpaceBound inputLength +
       stripStateBoundComputationSpaceBound inputLength +
-        stripFuelComputationSpaceBound inputLength
+        stripFuelComputationSpaceBound inputLength +
+          stripTransitionLeafSpaceBound inputLength
 
 /-- Polynomial packaging of `stripEvaluatorSpaceBound`. -/
 noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
@@ -394,7 +494,8 @@ noncomputable def stripEvaluatorSpacePolynomial : Polynomial Nat :=
           1000000000000000000000000000000000000000000000000000000000000 *
             (((21 * Polynomial.X + 2) *
               (21 * Polynomial.X + 5) + 1) +
-              100 * Polynomial.X + 100)
+              100 * Polynomial.X + 100) +
+            stripTransitionLeafSpacePolynomial
 
 @[simp]
 theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
@@ -403,7 +504,8 @@ theorem stripEvaluatorSpacePolynomial_eval (inputLength : Nat) :
   simp [stripEvaluatorSpacePolynomial, stripEvaluatorSpaceBound,
     stripEvaluatorCoreSpaceBound, stripArithmeticSpaceBound,
     stripStateBoundComputationSpaceBound,
-    stripFuelComputationSpaceBound, stripFuelBits]
+    stripFuelComputationSpaceBound, stripTransitionLeafSpaceBound,
+    stripFuelBits]
 
 theorem stripReachPayloadSpaceBound_le_evaluator
     (inputLength : Nat) :
@@ -924,13 +1026,107 @@ theorem stripWellFormedCode_fits
       after'
   simpa [stripWellFormedCode, inputLength] using call
 
-/-- Fitted-call obligations for the two remaining opaque primitive-recursive
-leaves used by the otherwise explicit strip evaluator.  Each field is
-continuation-passing: given a fitted execution after the leaf returns its
-verified result, it supplies a fitted execution of the leaf call itself.
+/-- Either tromino's base-leaf coefficient is covered by the common evaluator
+reserve. -/
+theorem stripBaseTransitionPolynomialSpaceCoefficient_le_leaf
+    (tromino : Tromino) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+        tromino ≤
+      stripTransitionLeafSpaceCoefficient := by
+  cases tromino <;> simp [stripTransitionLeafSpaceCoefficient]
 
-Separating this interface prevents correctness-only code selection from
-silently being treated as a space bound. -/
+/-- The edge coefficient is no larger than the base leaf that contains it. -/
+theorem stripTransitionPolynomialSpaceCoefficient_le_base
+    (tromino : Tromino) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceCoefficient
+        tromino ≤
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+        tromino := by
+  simp only [
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient,
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionComponentSpaceCoefficient]
+  omega
+
+/-- A bounded depth-zero transition leaf fits the common input-length
+reserve. -/
+theorem stripBaseTransitionPolynomialSpaceBound_le_leaf
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat)
+    (firstBound : first < indexCount periodicStrip)
+    (lastBound : last < indexCount periodicStrip) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceBound
+          tromino periodicStrip first last ≤
+      stripTransitionLeafSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have localBound :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceBound_le_contextUnit
+        tromino periodicStrip first last
+  have context :=
+    stripFrontierContextPolynomialSpaceUnit_le_inputLength
+      periodicStrip first last firstBound lastBound
+  have coefficient :=
+    stripBaseTransitionPolynomialSpaceCoefficient_le_leaf tromino
+  calc
+    _ ≤
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+            tromino *
+          Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+              periodicStrip first last := localBound
+    _ ≤
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+            tromino *
+          (100 * inputLength + 100) := Nat.mul_le_mul_left _ context
+    _ ≤ stripTransitionLeafSpaceCoefficient *
+          (100 * inputLength + 100) :=
+      Nat.mul_le_mul_right _ coefficient
+    _ = _ := by simp [stripTransitionLeafSpaceBound, inputLength]
+
+/-- A bounded raw-edge leaf fits the same common input-length reserve. -/
+theorem stripTransitionPolynomialSpaceBound_le_leaf
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat)
+    (firstBound : first < indexCount periodicStrip)
+    (lastBound : last < indexCount periodicStrip) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceBound
+          tromino periodicStrip first last ≤
+      stripTransitionLeafSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have localBound :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceBound_le_contextUnit
+        tromino periodicStrip first last
+  have context :=
+    stripFrontierContextPolynomialSpaceUnit_le_inputLength
+      periodicStrip first last firstBound lastBound
+  have coefficient :=
+    (stripTransitionPolynomialSpaceCoefficient_le_base tromino).trans
+      (stripBaseTransitionPolynomialSpaceCoefficient_le_leaf tromino)
+  calc
+    _ ≤
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceCoefficient
+            tromino *
+          Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+              periodicStrip first last := localBound
+    _ ≤
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceCoefficient
+            tromino *
+          (100 * inputLength + 100) := Nat.mul_le_mul_left _ context
+    _ ≤ stripTransitionLeafSpaceCoefficient *
+          (100 * inputLength + 100) :=
+      Nat.mul_le_mul_right _ coefficient
+    _ = _ := by simp [stripTransitionLeafSpaceBound, inputLength]
+
+/-- Fitted-call obligations for the two explicit transition leaves used by
+the strip evaluator.  Each field is continuation-passing: the caller reserves
+the common leaf allowance alongside its continuation and supplies the fitted
+execution after the verified Boolean result is returned. -/
 structure StripEvaluatorLeafCallsFit
     (tromino : Tromino) (periodicStrip : PeriodicStrip)
     (bound : Nat) : Prop where
@@ -938,6 +1134,10 @@ structure StripEvaluatorLeafCallsFit
     ∀ first last continuation,
       first < indexCount periodicStrip →
       last < indexCount periodicStrip →
+      stripTransitionLeafSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        continuationSpace continuation ≤ bound →
       EvaluatorExecutionFits bound
         (.ret continuation
           [FiniteState.divideBoolTag
@@ -951,6 +1151,10 @@ structure StripEvaluatorLeafCallsFit
     ∀ first last continuation,
       first < indexCount periodicStrip →
       last < indexCount periodicStrip →
+      stripTransitionLeafSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        continuationSpace continuation ≤ bound →
       EvaluatorExecutionFits bound
         (.ret continuation
           [FiniteState.divideBoolTag
@@ -959,6 +1163,69 @@ structure StripEvaluatorLeafCallsFit
       EvaluatorCallFits (stripEdgeVectorCode tromino)
         continuation
         [Encodable.encode periodicStrip, first, last] bound
+
+/-- The explicit transition programs discharge the complete leaf-call
+interface whenever the caller sets aside the common leaf reserve. -/
+theorem stripEvaluatorLeafCallsFit_explicit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed) (bound : Nat) :
+    StripEvaluatorLeafCallsFit tromino periodicStrip bound := by
+  constructor
+  · intro first last continuation firstBound lastBound reserve after
+    have fits :=
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransition
+        tromino periodicStrip wellFormed first last
+    have costPolynomial :=
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost_le_polynomialSpaceBound
+          tromino periodicStrip first last
+    have polynomialLeaf :=
+      stripBaseTransitionPolynomialSpaceBound_le_leaf
+        tromino periodicStrip first last firstBound lastBound
+    have costLeaf := costPolynomial.trans polynomialLeaf
+    have costReserve :
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost
+            tromino periodicStrip first last +
+          continuationSpace continuation ≤ bound := by
+      omega
+    have after' :
+        EvaluatorExecutionFits bound
+          (.ret continuation
+            [((decide (first = last)) ||
+              indexedTransitionRawBool tromino periodicStrip
+                first last).toNat]) := by
+      cases result :
+          ((decide (first = last)) ||
+            indexedTransitionRawBool tromino periodicStrip first last) <;>
+        simpa [result, FiniteState.divideBoolTag] using after
+    have call := fits.call continuation bound costReserve after'
+    simpa [stripBaseVectorCode] using call
+  · intro first last continuation firstBound lastBound reserve after
+    have fits :=
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripTransition
+        tromino periodicStrip wellFormed first last
+    have costPolynomial :=
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionCost_le_polynomialSpaceBound
+          tromino periodicStrip first last
+    have polynomialLeaf :=
+      stripTransitionPolynomialSpaceBound_le_leaf
+        tromino periodicStrip first last firstBound lastBound
+    have costLeaf := costPolynomial.trans polynomialLeaf
+    have costReserve :
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionCost
+            tromino periodicStrip first last +
+          continuationSpace continuation ≤ bound := by
+      omega
+    have after' :
+        EvaluatorExecutionFits bound
+          (.ret continuation
+            [(indexedTransitionRawBool tromino periodicStrip
+              first last).toNat]) := by
+      cases result :
+          indexedTransitionRawBool
+            tromino periodicStrip first last <;>
+        simpa [result, FiniteState.divideBoolTag] using after
+    have call := fits.call continuation bound costReserve after'
+    simpa [stripEdgeVectorCode] using call
 
 end RawWindowState
 end PeriodicStrip

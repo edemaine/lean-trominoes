@@ -1709,8 +1709,7 @@ The representation choices for this target are:
   overlap, and native-transition envelopes into one common strip-context
   unit.  The complete indexed edge and reflexive-or-edge leaf therefore each
   have an explicit constant-linear bound in the encoded strip and the two
-  queried frontier indices; only the final conversion of bounded indices to
-  the unary evaluator input budget remains for the leaf-call interface.
+  queried frontier indices.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
@@ -1789,10 +1788,12 @@ The representation choices for this target are:
   `stripFuelCode_fits` similarly certifies the explicit exact-fuel
   computation within a quadratic reserve.  `stripWellFormedCode_fits`
   certifies the complete explicit well-formedness program within the shared
-  arithmetic reserve.  `StripEvaluatorLeafCallsFit` isolates the two
-  remaining leaf calls as continuation-passing fitted-call obligations:
-  only the base relation and raw edge still use correctness-only code
-  selection while their explicit fitted implementations are developed.
+  arithmetic reserve.  Bounded frontier indices are now converted to the
+  original unary strip input length, and one tromino-independent polynomial
+  reserve covers both explicit transition leaves.
+  `StripEvaluatorLeafCallsFit` records the continuation-passing reserve
+  contract, while `stripEvaluatorLeafCallsFit_explicit` discharges it for
+  both the base relation and raw edge using the fitted transition programs.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
