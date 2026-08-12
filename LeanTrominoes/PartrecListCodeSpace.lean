@@ -480,6 +480,49 @@ def flatCountdownBodyCost
         encodedListSpace ((remaining + 1) :: payload) +
         encodedListSpace (1 :: remaining :: step payload) + 1
 
+/-- Lift a certificate for one particular payload transformation to the
+corresponding tagged countdown-body call.  Unlike `flatCountdownBody`, this
+local form does not require the step certificate away from the reachable
+payload. -/
+theorem flatCountdownBody_of_fit
+    {stepCode : Code} {payload output : List Nat} {stepCost : Nat}
+    (stepFits :
+      EvaluatorCodeFits stepCode payload output stepCost)
+    (remaining : Nat) :
+    EvaluatorCodeFits (Code.flatCountdownBody stepCode)
+      (remaining :: payload)
+      (flatCountdownOutput (fun _ => output) remaining payload)
+      (flatCountdownBodyCost (fun _ => output) (fun _ => stepCost)
+        remaining payload) := by
+  cases remaining with
+  | zero =>
+      simpa [Code.flatCountdownBody, flatCountdownOutput,
+        flatCountdownBodyCost, zeroPrimeCost] using
+        EvaluatorCodeFits.case_zero
+          (successorBranch :=
+            .cons Code.one
+              (.cons Code.head (stepCode.comp Code.tail)))
+          (values := 0 :: payload)
+          (by rfl)
+          (zero'_named payload)
+  | succ remaining =>
+      let values := remaining :: payload
+      have transformed :=
+        EvaluatorCodeFits.comp stepFits (tail_named values)
+      have payloadResult :=
+        prepend (head values) transformed
+      have branch :=
+        prepend (one values) payloadResult
+      simpa [Code.flatCountdownBody, flatCountdownOutput,
+        flatCountdownBodyCost, flatCountdownSuccBranchCost,
+        values, prependCost, Code.prepend] using
+        EvaluatorCodeFits.case_succ
+          (zeroBranch := Code.zero')
+          (values := (remaining + 1) :: payload)
+          (predecessor := remaining)
+          (by rfl)
+          branch
+
 /-- Lift a finite data-cost certificate for one payload transformation to one
 tagged flat-countdown body call. -/
 theorem flatCountdownBody
