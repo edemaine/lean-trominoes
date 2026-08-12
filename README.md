@@ -347,6 +347,8 @@ build; an imported proof counts when its statement matches the paper.
         slices and prove bounded canonical encodings round-trip exactly.
       - [x] Verify label, control, stack-cell selection, and field-preservation
         expressions against arbitrary decoded one-hot valuations.
+      - [x] Normalize atomic push/pop sequences to prepend/drop stack
+        transforms and verify their linear-size bounded expressions.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1290,6 +1292,11 @@ The representation choices for this target are:
   cells, together with field and whole-stack preservation expressions.  Their
   semantics are bidirectional for arbitrary one-hot valuations, and every
   expression retains the bounded source-atom invariant.
+- [`LeanTrominoes/PeriodicCNFMachineStackTransform.lean`](LeanTrominoes/PeriodicCNFMachineStackTransform.lean)
+  normalizes any atomic sequence of pushes and pops to a known prefix followed
+  by a fixed drop from the source stack.  Its linear-width expression checks
+  overflow and every output cell; on suffix-shaped decoded vectors this is
+  equivalent to the same transformation of ordinary TM2 stack lists.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
