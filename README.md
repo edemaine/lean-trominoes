@@ -1503,6 +1503,10 @@ The representation choices for this target are:
   fits both square-and-add branches and their explicit comparison selector,
   yielding an exact evaluator-space certificate and a common input-linear
   workspace majorant for forward pairing.
+- [`LeanTrominoes/PartrecIntOffset.lean`](LeanTrominoes/PartrecIntOffset.lean)
+  implements successor, predecessor, and addition by a fixed integer directly
+  on Mathlib's even/odd integer encoding.  These programs construct the
+  vertically shifted motif coordinates inspected by center validity.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
