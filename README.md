@@ -1654,7 +1654,8 @@ The representation choices for this target are:
   decode `[encodedStrip, firstIndex, lastIndex]`, retain the motif and two
   assignment words in packed form, permute the seven native context fields,
   and prove both semantic correctness and an exact fitted evaluator cost for
-  `indexedTransitionRawBool`.
+  `indexedTransitionRawBool`.  They also explicitly implement and fit the
+  reflexive-or-edge predicate used at Savitch recursion depth zero.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)
@@ -1694,10 +1695,13 @@ The representation choices for this target are:
   The compiled step is proved equal to the semantic DFS transition, and its
   tail-recursive countdown loop is proved equal to repeated semantic steps.
 - [`LeanTrominoes/StripFrontierPartrec.lean`](LeanTrominoes/StripFrontierPartrec.lean)
-  supplies the evaluator's strip-specific depth-zero program.  It extracts
+  supplies the evaluator's strip-specific depth-zero program from the
+  concrete indexed transition code, replacing the earlier noncomputable
+  code-choice leaves.  It extracts
   the encoded strip and two queried frontier indices from the flat payload,
   computes equality or the indexed frontier edge relation, and is connected
-  to both the verified small step and the tail-recursive iterator.  A
+  to both the verified small step and the tail-recursive iterator under the
+  well-formed strip invariant.  A
   separately verified raw-edge program supports the outer cycle scan.
 - [`LeanTrominoes/StripFrontierCyclePartrec.lean`](LeanTrominoes/StripFrontierCyclePartrec.lean)
   builds the complete parameterized cycle-search driver.  One wrapper
@@ -1706,7 +1710,8 @@ The representation choices for this target are:
   only loop counters, a Boolean accumulator, and the current flat DFS stack.
   The parameterized driver is proved equal to
   `cycleSearchIndexDFSBoolAtDepth`; a unary front end computes the strip's
-  padded state bound and certified search depth, rejects malformed presentations,
+  padded state bound and certified search depth, branches before search to
+  reject malformed presentations,
   and is proved equal to `periodicStripTrominoTilingIndexBool`.
   Its state-bound, depth, well-formedness, parameter-assembly, and guarded
   driver codes are named public control points for the evaluator-space proof.

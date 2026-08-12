@@ -142,6 +142,95 @@ theorem stripTransition
       tromino periodicStrip wellFormed first last)
       (stripFrontierContext periodicStrip first last)
 
+def stripTransitionEqualityArgumentsCost
+    (periodicStrip : PeriodicStrip) (first last : Nat) : Nat :=
+  let values := [Encodable.encode periodicStrip, first, last]
+  prependCost values [first] [last]
+    (getCost 1 values) (getCost 2 values)
+
+theorem stripTransitionEqualityArguments
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    EvaluatorCodeFits Code.stripTransitionEqualityArgumentsCode
+      [Encodable.encode periodicStrip, first, last]
+      [first, last]
+      (stripTransitionEqualityArgumentsCost
+        periodicStrip first last) := by
+  simpa [Code.stripTransitionEqualityArgumentsCode,
+    stripTransitionEqualityArgumentsCost, prependCost] using
+    prepend
+      (get 1 [Encodable.encode periodicStrip, first, last])
+      (get 2 [Encodable.encode periodicStrip, first, last])
+
+def stripTransitionEqualityCost
+    (periodicStrip : PeriodicStrip) (first last : Nat) : Nat :=
+  natEqCost first last +
+    stripTransitionEqualityArgumentsCost periodicStrip first last
+
+theorem stripTransitionEquality
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    EvaluatorCodeFits Code.stripTransitionEqualityCode
+      [Encodable.encode periodicStrip, first, last]
+      [(decide (first = last)).toNat]
+      (stripTransitionEqualityCost periodicStrip first last) := by
+  have result := comp (natEq first last)
+    (stripTransitionEqualityArguments periodicStrip first last)
+  have tagEq :
+      (decide (first = last)).toNat =
+        if first = last then 1 else 0 := by
+    by_cases equal : first = last <;> simp [equal]
+  rw [tagEq]
+  simpa [Code.stripTransitionEqualityCode,
+    stripTransitionEqualityCost] using result
+
+private theorem boolOr_fit_bool
+    {leftCode rightCode : Code} {values : List Nat}
+    {leftCost rightCost : Nat}
+    (left right : Bool)
+    (leftFit : EvaluatorCodeFits leftCode values
+      [left.toNat] leftCost)
+    (rightFit : EvaluatorCodeFits rightCode values
+      [right.toNat] rightCost) :
+    EvaluatorCodeFits (Code.boolOr leftCode rightCode) values
+      [(left || right).toNat]
+      (boolOrCost values left.toNat right.toNat
+        leftCost rightCost) := by
+  have combined := boolOr leftFit rightFit
+  cases left <;> cases right <;> simpa using combined
+
+def stripBaseTransitionCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) : Nat :=
+  let values := [Encodable.encode periodicStrip, first, last]
+  let equal := decide (first = last)
+  let edge := RawWindowState.indexedTransitionRawBool
+    tromino periodicStrip first last
+  boolOrCost values equal.toNat edge.toNat
+    (stripTransitionEqualityCost periodicStrip first last)
+    (stripTransitionCost tromino periodicStrip first last)
+
+/-- Exact fitted certificate for the explicit depth-zero Savitch predicate. -/
+theorem stripBaseTransition
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first last : Nat) :
+    EvaluatorCodeFits (Code.stripBaseTransitionCode tromino)
+      [Encodable.encode periodicStrip, first, last]
+      [((decide (first = last)) ||
+        RawWindowState.indexedTransitionRawBool
+          tromino periodicStrip first last).toNat]
+      (stripBaseTransitionCost
+        tromino periodicStrip first last) := by
+  let equal := decide (first = last)
+  let edge := RawWindowState.indexedTransitionRawBool
+    tromino periodicStrip first last
+  have result := boolOr_fit_bool equal edge
+    (by simpa [equal] using
+      (stripTransitionEquality periodicStrip first last))
+    (by simpa [edge] using
+      (stripTransition tromino periodicStrip wellFormed first last))
+  simpa [Code.stripBaseTransitionCode,
+    stripBaseTransitionCost, equal, edge] using result
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

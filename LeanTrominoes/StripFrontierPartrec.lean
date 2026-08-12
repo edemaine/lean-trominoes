@@ -1,4 +1,5 @@
 import LeanTrominoes.IndexedSavitchDFSPartrec
+import LeanTrominoes.PartrecStripTransition
 import LeanTrominoes.StripFrontierIndexedSearchComputability
 
 /-!
@@ -17,6 +18,14 @@ namespace RawWindowState
 open LeanTrominoes.Computability
 open LeanTrominoes.FiniteState
 open Turing ToPartrec
+
+attribute [local simp] Part.bind_eq_bind
+
+private theorem comp_eval_pure (outer inner : Code)
+    (input output : List Nat)
+    (innerCorrect : inner.eval input = pure output) :
+    (outer.comp inner).eval input = outer.eval output := by
+  simp [innerCorrect, Part.bind_eq_bind]
 
 private def emptyPeriodicStrip : PeriodicStrip :=
   { width := 0, period := 0, motif := [] }
@@ -89,22 +98,31 @@ private theorem exists_stripBaseVectorCode (tromino : Tromino) :
     Nat.Partrec'.prim vectorPrimrec
   simpa using Code.exists_code vectorPartrec
 
-/-- A fixed three-argument code for the strip base-case predicate. -/
-noncomputable def stripBaseVectorCode (tromino : Tromino) : Code :=
-  Classical.choose (exists_stripBaseVectorCode tromino)
+/-- The explicit fixed three-argument code for the strip base-case
+predicate. -/
+def stripBaseVectorCode (tromino : Tromino) : Code :=
+  Code.stripBaseTransitionCode tromino
 
 theorem stripBaseVectorCode_eval (tromino : Tromino)
-    (encodedStrip first last : Nat) :
-    (stripBaseVectorCode tromino).eval [encodedStrip, first, last] =
-      pure [stripBaseBoolValue tromino encodedStrip first last] := by
-  let values : List.Vector Nat 3 :=
-    ⟨[encodedStrip, first, last], rfl⟩
-  have correctness :=
-    Classical.choose_spec (exists_stripBaseVectorCode tromino) values
-  change
-    (stripBaseVectorCode tromino).eval [encodedStrip, first, last] =
-      pure [stripBaseBoolValue tromino encodedStrip first last] at correctness
-  exact correctness
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first last : Nat) :
+    (stripBaseVectorCode tromino).eval
+        [Encodable.encode periodicStrip, first, last] =
+      pure [stripBaseBoolValue tromino
+        (Encodable.encode periodicStrip) first last] := by
+  have run := Code.stripBaseTransitionCode_eval
+    tromino periodicStrip wellFormed first last
+  have decode :
+      Encodable.decode (Encodable.encode periodicStrip) =
+        some periodicStrip := Encodable.encodek periodicStrip
+  simp only [stripBaseBoolValue, decode, Option.getD_some]
+  cases result :
+      (decide (first = last) ||
+        indexedTransitionRawBool
+          tromino periodicStrip first last) <;>
+    simpa [stripBaseVectorCode,
+      FiniteState.divideBoolTag, result] using run
 
 /-- Natural-valued raw edge test, without the reflexive base case used by
 Savitch reachability. -/
@@ -171,39 +189,26 @@ private theorem exists_stripEdgeVectorCode (tromino : Tromino) :
     Nat.Partrec'.prim vectorPrimrec
   simpa using Code.exists_code vectorPartrec
 
-/-- Fixed three-argument code for the raw indexed frontier edge relation. -/
-noncomputable def stripEdgeVectorCode (tromino : Tromino) : Code :=
-  Classical.choose (exists_stripEdgeVectorCode tromino)
-
-theorem stripEdgeVectorCode_spec (tromino : Tromino)
-    (values : List.Vector Nat 3) :
-    (stripEdgeVectorCode tromino).eval values.1 =
-      pure [stripEdgeVectorValue tromino values] := by
-  unfold stripEdgeVectorCode
-  exact Classical.choose_spec
-    (exists_stripEdgeVectorCode tromino) values
+/-- Explicit fixed three-argument code for the raw indexed frontier edge
+relation. -/
+def stripEdgeVectorCode (tromino : Tromino) : Code :=
+  Code.stripTransitionCode tromino
 
 theorem stripEdgeVectorCode_eval (tromino : Tromino)
-    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first last : Nat) :
     (stripEdgeVectorCode tromino).eval
         [Encodable.encode periodicStrip, first, last] =
       pure [divideBoolTag
         (indexedTransitionRawBool tromino periodicStrip first last)] := by
-  let values : List.Vector Nat 3 :=
-    ⟨[Encodable.encode periodicStrip, first, last], rfl⟩
-  have correctness := stripEdgeVectorCode_spec tromino values
-  have valueEq :
-      stripEdgeVectorValue tromino values =
-        divideBoolTag
-          (indexedTransitionRawBool tromino periodicStrip first last) := by
-    change
-      stripEdgeBoolValue tromino (Encodable.encode periodicStrip)
-          first last =
-        divideBoolTag
-          (indexedTransitionRawBool tromino periodicStrip first last)
-    simp [stripEdgeBoolValue]
-  rw [valueEq] at correctness
-  simpa only [values] using correctness
+  have run := Code.stripTransitionCode_eval
+    tromino periodicStrip wellFormed first last
+  cases result :
+      indexedTransitionRawBool
+        tromino periodicStrip first last <;>
+    simpa [stripEdgeVectorCode,
+      FiniteState.divideBoolTag, result] using run
 
 private def stripBaseArguments : Code :=
   Code.prepend (Code.get 0) <|
@@ -215,7 +220,9 @@ noncomputable def stripBaseBoolCode (tromino : Tromino) : Code :=
   (stripBaseVectorCode tromino).comp stripBaseArguments
 
 theorem stripBaseBoolCode_eval (tromino : Tromino)
-    (periodicStrip : PeriodicStrip) (stateCount : Nat)
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount : Nat)
     (state : DivideEvalState) :
     (stripBaseBoolCode tromino).eval
         (divideEvalProgramList (Encodable.encode periodicStrip)
@@ -224,12 +231,40 @@ theorem stripBaseBoolCode_eval (tromino : Tromino)
         (decide (state.query.first = state.query.last) ||
           indexedTransitionRawBool tromino periodicStrip
             state.query.first state.query.last)] := by
-  simp [stripBaseBoolCode, stripBaseArguments, divideEvalProgramList,
-    DivideEvalState.toNatList, stripBaseVectorCode_eval,
-    stripBaseBoolValue]
+  have arguments :
+      stripBaseArguments.eval
+          (divideEvalProgramList (Encodable.encode periodicStrip)
+            stateCount state) =
+        pure [Encodable.encode periodicStrip,
+          state.query.first, state.query.last] := by
+    simp [stripBaseArguments, divideEvalProgramList,
+      DivideEvalState.toNatList]
+  calc
+    _ = (stripBaseVectorCode tromino).eval
+        [Encodable.encode periodicStrip,
+          state.query.first, state.query.last] :=
+      comp_eval_pure _ _ _ _ arguments
+    _ = _ := by
+      have decode :
+          Encodable.decode (Encodable.encode periodicStrip) =
+            some periodicStrip := Encodable.encodek periodicStrip
+      have valueEq :
+          stripBaseBoolValue tromino
+              (Encodable.encode periodicStrip)
+              state.query.first state.query.last =
+            divideBoolTag
+              (decide (state.query.first = state.query.last) ||
+                indexedTransitionRawBool tromino periodicStrip
+                  state.query.first state.query.last) := by
+        simp only [stripBaseBoolValue, decode, Option.getD_some]
+      rw [← valueEq]
+      exact stripBaseVectorCode_eval tromino periodicStrip wellFormed
+        state.query.first state.query.last
 
 theorem stripStepCode_eval (tromino : Tromino)
-    (periodicStrip : PeriodicStrip) (stateCount : Nat)
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount : Nat)
     (state : DivideEvalState) :
     (DivideEvalPartrec.stepCode (stripBaseBoolCode tromino)).eval
         (divideEvalProgramList (Encodable.encode periodicStrip)
@@ -239,12 +274,15 @@ theorem stripStepCode_eval (tromino : Tromino)
         (FiniteState.divideEvalStep stateCount
           (indexedTransitionRawBool tromino periodicStrip) state)) :=
   DivideEvalPartrec.stepCode_eval _ _ _ _ _
-    (stripBaseBoolCode_eval tromino periodicStrip stateCount state)
+    (stripBaseBoolCode_eval
+      tromino periodicStrip wellFormed stateCount state)
 
 /-- The compiled countdown evaluator computes exactly the requested number of
 strip-specialized DFS transitions. -/
 theorem stripFlatIterate_eval (tromino : Tromino)
-    (periodicStrip : PeriodicStrip) (stateCount steps : Nat)
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount steps : Nat)
     (state : DivideEvalState) :
     (Code.flatIterate
         (DivideEvalPartrec.stepCode (stripBaseBoolCode tromino))).eval
@@ -257,7 +295,8 @@ theorem stripFlatIterate_eval (tromino : Tromino)
           (indexedTransitionRawBool tromino periodicStrip))^[steps]
             state)) :=
   DivideEvalPartrec.flatIterate_stepCode_eval _ _ _ _
-    (stripBaseBoolCode_eval tromino periodicStrip stateCount)
+    (stripBaseBoolCode_eval
+      tromino periodicStrip wellFormed stateCount)
     steps state
 
 end RawWindowState

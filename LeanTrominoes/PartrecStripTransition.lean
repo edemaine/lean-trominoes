@@ -102,4 +102,75 @@ theorem stripTransitionCode_eval
   simpa [stripTransitionCode] using
     (comp_eval_pure _ _ _ _ context).trans transition
 
+/-- Select the two search indices for the reflexive Savitch base case. -/
+def stripTransitionEqualityArgumentsCode : Code :=
+  prepend (get 1) (get 2)
+
+@[simp]
+theorem stripTransitionEqualityArgumentsCode_eval
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    stripTransitionEqualityArgumentsCode.eval
+        [Encodable.encode periodicStrip, first, last] =
+      pure [first, last] := by
+  simp [stripTransitionEqualityArgumentsCode]
+
+/-- Test equality of the two indexed frontier states. -/
+def stripTransitionEqualityCode : Code :=
+  natEqCode.comp stripTransitionEqualityArgumentsCode
+
+@[simp]
+theorem stripTransitionEqualityCode_eval
+    (periodicStrip : PeriodicStrip) (first last : Nat) :
+    stripTransitionEqualityCode.eval
+        [Encodable.encode periodicStrip, first, last] =
+      pure [(decide (first = last)).toNat] := by
+  have arguments := stripTransitionEqualityArgumentsCode_eval
+    periodicStrip first last
+  have compared :=
+    (comp_eval_pure natEqCode stripTransitionEqualityArgumentsCode
+      [Encodable.encode periodicStrip, first, last]
+      [first, last] arguments).trans (natEqCode_eval first last)
+  have tagEq :
+      (decide (first = last)).toNat =
+        if first = last then 1 else 0 := by
+    by_cases equal : first = last <;> simp [equal]
+  rw [tagEq]
+  simpa [stripTransitionEqualityCode] using compared
+
+private theorem boolOr_eval_at_bool
+    (leftCode rightCode : Code) (values : List Nat)
+    (left right : Bool)
+    (leftCorrect : leftCode.eval values = pure [left.toNat])
+    (rightCorrect : rightCode.eval values = pure [right.toNat]) :
+    (boolOr leftCode rightCode).eval values =
+      pure [(left || right).toNat] := by
+  have combined := boolOr_eval_at leftCode rightCode values
+    left.toNat right.toNat leftCorrect rightCorrect
+  cases left <;> cases right <;> simpa using combined
+
+/-- Explicit reflexive-or-edge predicate used at Savitch recursion depth
+zero. -/
+def stripBaseTransitionCode (tromino : Tromino) : Code :=
+  boolOr stripTransitionEqualityCode (stripTransitionCode tromino)
+
+@[simp]
+theorem stripBaseTransitionCode_eval
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first last : Nat) :
+    (stripBaseTransitionCode tromino).eval
+        [Encodable.encode periodicStrip, first, last] =
+      pure [((decide (first = last)) ||
+        PeriodicStrip.RawWindowState.indexedTransitionRawBool
+          tromino periodicStrip first last).toNat] := by
+  exact boolOr_eval_at_bool
+    stripTransitionEqualityCode (stripTransitionCode tromino)
+    [Encodable.encode periodicStrip, first, last]
+    (decide (first = last))
+    (PeriodicStrip.RawWindowState.indexedTransitionRawBool
+      tromino periodicStrip first last)
+    (stripTransitionEqualityCode_eval periodicStrip first last)
+    (stripTransitionCode_eval
+      tromino periodicStrip wellFormed first last)
+
 end Turing.ToPartrec.Code
