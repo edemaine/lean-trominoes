@@ -1142,6 +1142,73 @@ def packedAssignmentLookupSpaceBound
       [32 * (motifCode + motifCode + motifCode +
         targetCode + queriedColumn + word + 40 + 32) + 200] + 1)
 
+/-- Native bit-length footprint of one packed assignment query. -/
+def packedAssignmentLookupInputUnit
+    (motifCode queriedColumn targetCode word : Nat) : Nat :=
+  encodedListSpace [motifCode, queriedColumn, targetCode, word] + 1
+
+private theorem packedAssignmentLookupEnvelopeUnit_le_linear
+    (motifCode queriedColumn targetCode word : Nat) :
+    encodedListSpace
+        [32 * (motifCode + motifCode + motifCode +
+          targetCode + queriedColumn + word + 40 + 32) + 200] + 1 ≤
+      100 * packedAssignmentLookupInputUnit
+        motifCode queriedColumn targetCode word := by
+  have motifDouble := encodeNat_add_length_le_sum motifCode motifCode
+  have motifTriple := encodeNat_add_length_le_sum
+    (motifCode + motifCode) motifCode
+  have targetSum := encodeNat_add_length_le_sum
+    (motifCode + motifCode + motifCode) targetCode
+  have columnSum := encodeNat_add_length_le_sum
+    (motifCode + motifCode + motifCode + targetCode) queriedColumn
+  have wordSum := encodeNat_add_length_le_sum
+    (motifCode + motifCode + motifCode + targetCode + queriedColumn) word
+  have fortySum := encodeNat_add_length_le_sum
+    (motifCode + motifCode + motifCode + targetCode + queriedColumn + word) 40
+  have thirtyTwoSum := encodeNat_add_length_le_sum
+    (motifCode + motifCode + motifCode + targetCode + queriedColumn + word + 40) 32
+  have scaled := encodeNat_mul_length_le_sum 32
+    (motifCode + motifCode + motifCode + targetCode +
+      queriedColumn + word + 40 + 32)
+  have final := encodeNat_add_length_le_sum
+    (32 * (motifCode + motifCode + motifCode + targetCode +
+      queriedColumn + word + 40 + 32)) 200
+  have fortyBits :
+      (Computability.encodeNat 40).length = 6 := by native_decide
+  have thirtyTwoBits :
+      (Computability.encodeNat 32).length = 6 := by native_decide
+  have twoHundredBits :
+      (Computability.encodeNat 200).length = 8 := by native_decide
+  simp only [packedAssignmentLookupInputUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
+/-- The established lookup-space envelope is linear in the four query-field
+bit lengths. -/
+theorem packedAssignmentLookupSpaceBound_le_linear
+    (motifCode queriedColumn targetCode word : Nat) :
+    packedAssignmentLookupSpaceBound
+        motifCode queriedColumn targetCode word ≤
+      70000000000000000000000 *
+        packedAssignmentLookupInputUnit
+          motifCode queriedColumn targetCode word := by
+  calc
+    packedAssignmentLookupSpaceBound
+        motifCode queriedColumn targetCode word =
+        700000000000000000000 *
+          (encodedListSpace
+            [32 * (motifCode + motifCode + motifCode +
+              targetCode + queriedColumn + word + 40 + 32) + 200] + 1) := rfl
+    _ ≤ 700000000000000000000 *
+          (100 * packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word) :=
+      Nat.mul_le_mul_left _
+        (packedAssignmentLookupEnvelopeUnit_le_linear
+          motifCode queriedColumn targetCode word)
+    _ = 70000000000000000000000 *
+          packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word := by ring
+
 theorem packedAssignmentLookupCodeCost_le_linear
     (motif : List Cell) (queriedColumn : Nat)
     (target : Cell) (word : Nat) :

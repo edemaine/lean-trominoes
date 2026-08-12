@@ -229,6 +229,159 @@ def packedTargetCellUnit
   packedTargetAuxUnit verticalOffset period phase column rowCode +
     natPairUnit (2 * x) yCode
 
+set_option maxHeartbeats 800000 in
+/-- The target-cell construction unit is linear in the bit lengths of its
+five native arithmetic inputs. -/
+theorem packedTargetCellUnit_le_linear
+    (verticalOffset : Int)
+    (period phase column rowCode : Nat) :
+    packedTargetCellUnit verticalOffset period phase column rowCode ≤
+      100000 * ((Computability.encodeNat period).length +
+        (Computability.encodeNat phase).length +
+        (Computability.encodeNat column).length +
+        (Computability.encodeNat rowCode).length +
+        (Computability.encodeNat
+          (intOffsetAmount verticalOffset)).length + 1) := by
+  let amount := intOffsetAmount verticalOffset
+  let numerator := Code.packedColumnPhaseNumerator period phase column
+  let x := numerator % period
+  let yCode := intOffsetResultCode verticalOffset rowCode
+  let rawSum := period + phase + column + rowCode + 2 * amount + 64
+  have twoAmount := encodeNat_mul_length_le_sum 2 amount
+  have sum1 := encodeNat_add_length_le_sum period phase
+  have sum2 := encodeNat_add_length_le_sum (period + phase) column
+  have sum3 := encodeNat_add_length_le_sum
+    (period + phase + column) rowCode
+  have sum4 := encodeNat_add_length_le_sum
+    (period + phase + column + rowCode) (2 * amount)
+  have sum5 := encodeNat_add_length_le_sum
+    (period + phase + column + rowCode + 2 * amount) 64
+  have scaled := encodeNat_mul_length_le_sum 256 rawSum
+  have auxLimitBits := encodeNat_add_length_le_sum
+    (256 * rawSum) 1000
+  have numeratorBound :
+      numerator ≤ phase + column + (period + period) := by
+    simp only [numerator, Code.packedColumnPhaseNumerator,
+      Code.packedColumnPhaseSum]
+    omega
+  have xBound : x ≤ phase + column + (period + period) :=
+    (Nat.mod_le numerator period).trans numeratorBound
+  have periodDouble := encodeNat_add_length_le_sum period period
+  have phaseColumn := encodeNat_add_length_le_sum phase column
+  have xLimit := encodeNat_add_length_le_sum
+    (phase + column) (period + period)
+  have xBits := (encodeNat_length_mono xBound).trans xLimit
+  have doubleX := encodeNat_mul_length_le_sum 2 x
+  have yBits := intOffsetResultCode_length_le verticalOffset rowCode
+  have pairUnit := natPairUnit_le_linear (2 * x) yCode
+  have twoAmountRaw :
+      (Computability.encodeNat
+        (2 * intOffsetAmount verticalOffset)).length ≤
+        (Computability.encodeNat 2).length +
+          (Computability.encodeNat
+            (intOffsetAmount verticalOffset)).length := by
+    simpa [amount] using twoAmount
+  have sum4Raw :
+      (Computability.encodeNat
+        (period + phase + column + rowCode +
+          2 * intOffsetAmount verticalOffset)).length ≤
+        (Computability.encodeNat
+          (period + phase + column + rowCode)).length +
+          (Computability.encodeNat
+            (2 * intOffsetAmount verticalOffset)).length + 1 := by
+    simpa [amount] using sum4
+  have rawSumBitsRaw :
+      (Computability.encodeNat
+        (period + phase + column + rowCode +
+          2 * intOffsetAmount verticalOffset + 64)).length ≤
+        (Computability.encodeNat
+          (period + phase + column + rowCode +
+            2 * intOffsetAmount verticalOffset)).length +
+          (Computability.encodeNat 64).length + 1 := by
+    simpa [amount] using sum5
+  have scaledBitsRaw :
+      (Computability.encodeNat
+        (256 * (period + phase + column + rowCode +
+          2 * intOffsetAmount verticalOffset + 64))).length ≤
+        (Computability.encodeNat 256).length +
+          (Computability.encodeNat
+            (period + phase + column + rowCode +
+              2 * intOffsetAmount verticalOffset + 64)).length := by
+    simpa [rawSum, amount] using scaled
+  have auxLimitBitsRaw :
+      (Computability.encodeNat
+        (256 * (period + phase + column + rowCode +
+          2 * intOffsetAmount verticalOffset + 64) + 1000)).length ≤
+        (Computability.encodeNat 256).length +
+          (Computability.encodeNat
+            (period + phase + column + rowCode +
+              2 * intOffsetAmount verticalOffset + 64)).length + 1 +
+          (Computability.encodeNat 1000).length + 1 := by
+    have raw :
+        (Computability.encodeNat
+          (256 * (period + phase + column + rowCode +
+            2 * intOffsetAmount verticalOffset + 64) + 1000)).length ≤
+          (Computability.encodeNat
+            (256 * (period + phase + column + rowCode +
+              2 * intOffsetAmount verticalOffset + 64))).length +
+            (Computability.encodeNat 1000).length + 1 := by
+      simpa [rawSum, amount] using auxLimitBits
+    omega
+  have xBitsRaw :
+      (Computability.encodeNat
+        (Code.packedColumnPhaseNumerator period phase column % period)).length ≤
+        (Computability.encodeNat (phase + column)).length +
+          (Computability.encodeNat (period + period)).length + 1 := by
+    simpa [x, numerator] using xBits
+  have doubleXRaw :
+      (Computability.encodeNat
+        (2 * (Code.packedColumnPhaseNumerator
+          period phase column % period))).length ≤
+        (Computability.encodeNat 2).length +
+          (Computability.encodeNat
+            (Code.packedColumnPhaseNumerator
+              period phase column % period)).length := by
+    simpa [x] using doubleX
+  have yBitsRaw :
+      (Computability.encodeNat
+        (intOffsetResultCode verticalOffset rowCode)).length ≤
+        10 * ((Computability.encodeNat rowCode).length +
+          (Computability.encodeNat
+            (intOffsetAmount verticalOffset)).length + 1) := by
+    simpa using yBits
+  have pairUnitRaw :
+      natPairUnit
+          (2 * (Code.packedColumnPhaseNumerator
+            period phase column % period))
+          (intOffsetResultCode verticalOffset rowCode) ≤
+        100 * ((Computability.encodeNat
+            (2 * (Code.packedColumnPhaseNumerator
+              period phase column % period))).length +
+          (Computability.encodeNat
+            (intOffsetResultCode verticalOffset rowCode)).length + 1) := by
+    simpa [x, yCode] using pairUnit
+  have twoBits :
+      (Computability.encodeNat 2).length = 2 := by native_decide
+  have sixtyFourBits :
+      (Computability.encodeNat 64).length = 7 := by native_decide
+  have twoFiftySixBits :
+      (Computability.encodeNat 256).length = 9 := by native_decide
+  have thousandBits :
+      (Computability.encodeNat 1000).length = 10 := by native_decide
+  simp only [packedTargetCellUnit, packedTargetAuxUnit,
+    packedTargetAuxLimit, encodedListSpace_cons,
+    encodedListSpace_nil]
+  change
+    (Computability.encodeNat (256 * rawSum + 1000)).length + 2 +
+        natPairUnit (2 * x) yCode ≤ _
+  simp only [rawSum, amount, x, numerator, yCode]
+  clear * - sum1 sum2 sum3 twoAmountRaw sum4Raw
+    rawSumBitsRaw scaledBitsRaw auxLimitBitsRaw
+    periodDouble phaseColumn xLimit xBitsRaw
+    doubleXRaw yBitsRaw pairUnitRaw
+    twoBits sixtyFourBits twoFiftySixBits thousandBits
+  omega
+
 set_option maxRecDepth 10000 in
 set_option maxHeartbeats 1600000 in
 /-- The complete canonical-cell constructor is linear in the sum of one

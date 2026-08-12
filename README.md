@@ -1476,7 +1476,8 @@ The representation choices for this target are:
   `[digit, found]` projection.  The accumulator word is proved never to grow,
   while its digit offset grows by at most eight per column and hence remains
   at most forty.  These invariants yield a named input-linear workspace bound
-  for the complete packed assignment lookup.
+  for the complete packed assignment lookup; the named envelope itself is now
+  bounded directly by the four native query-field bit lengths.
 - [`LeanTrominoes/PartrecPackedAssignmentPredicates.lean`](LeanTrominoes/PartrecPackedAssignmentPredicates.lean)
   and
   [`LeanTrominoes/PartrecPackedAssignmentPredicatesSpace.lean`](LeanTrominoes/PartrecPackedAssignmentPredicatesSpace.lean)
@@ -1533,7 +1534,8 @@ The representation choices for this target are:
   fits every stage of that target-cell constructor, culminating in an exact
   evaluator-space certificate for the encoded canonical cell.  Its final
   theorem combines one affine arithmetic envelope with the existing pairing
-  envelope to give a linear encoded-space majorant.
+  envelope to give a linear encoded-space majorant, and that unit is now
+  bounded directly by the five native arithmetic-field bit lengths.
 - [`LeanTrominoes/PeriodicStripCanonicalMembership.lean`](LeanTrominoes/PeriodicStripCanonicalMembership.lean)
   proves that well-formed strip carrier membership is exactly finite motif
   membership at the unique fundamental-domain representative, and specializes
