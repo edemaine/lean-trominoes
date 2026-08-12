@@ -341,6 +341,8 @@ build; an imported proof counts when its statement matches the paper.
         an unused suffix, and verify canonical list encodings satisfy it.
       - [x] Decode every structurally well-formed valuation into a unique
         bounded machine slice and recover every source field bit.
+      - [x] Verify fixed-width little-endian clock decoding, no-overflow
+        succession, and accepting reset expressions.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1268,6 +1270,12 @@ The representation choices for this target are:
   arbitrary well-formed valuation to a bounded machine slice.  Every label,
   state, stack-cell, and clock source bit is recovered exactly, and the stack
   suffix constraints make each decoded fixed-width stack list-shaped.
+- [`LeanTrominoes/PeriodicCNFMachineClock.lean`](LeanTrominoes/PeriodicCNFMachineClock.lean)
+  interprets fixed-width little-endian clock fields and proves that the
+  no-overflow ripple-carry expression is equivalent to incrementing their
+  natural-number values.  It verifies the canonical clock encoding and both
+  ordinary-step successor and accepting-step reset expressions, including
+  their generated-atom bounds.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
