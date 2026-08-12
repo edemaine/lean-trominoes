@@ -549,6 +549,68 @@ theorem stripFrontierContextPolynomialSpaceUnit_le_inputLength
   simp only [inputLength] at firstBits lastBits ⊢
   omega
 
+/-- The transition-context envelope remains linear for every padded frontier
+index used by the unary driver. -/
+theorem stripFrontierContextPolynomialSpaceUnit_le_inputLength_of_lt_stateBound
+    (periodicStrip : PeriodicStrip) (first last : Nat)
+    (firstBound : first < stripStateBound periodicStrip)
+    (lastBound : last < stripStateBound periodicStrip) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last ≤
+      100 *
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length + 100 := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let stripCode := Encodable.encode periodicStrip
+  let limit :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceLimit
+      periodicStrip first last
+  have stripBits :
+      (Computability.encodeNat stripCode).length + 1 = inputLength := by
+    simp [stripCode, inputLength]
+  have firstBits := stripPaddedCounter_encodeNat_length_le periodicStrip first
+    (Nat.le_of_lt firstBound)
+  have lastBits := stripPaddedCounter_encodeNat_length_le periodicStrip last
+    (Nat.le_of_lt lastBound)
+  have sum1 := Turing.PartrecToTM2.encodeNat_add_length_le_sum stripCode first
+  have sum2 := Turing.PartrecToTM2.encodeNat_add_length_le_sum
+    (stripCode + first) last
+  have sum3 := Turing.PartrecToTM2.encodeNat_add_length_le_sum
+    (stripCode + first + last) 100
+  have scaled := Turing.PartrecToTM2.encodeNat_mul_length_le_sum
+    64 (stripCode + first + last + 100)
+  have final := Turing.PartrecToTM2.encodeNat_add_length_le_sum
+    (64 * (stripCode + first + last + 100)) 1000
+  have sixtyFourBits : (Computability.encodeNat 64).length = 7 := by
+    native_decide
+  have hundredBits : (Computability.encodeNat 100).length = 7 := by
+    native_decide
+  have thousandBits : (Computability.encodeNat 1000).length = 10 := by
+    native_decide
+  have limitEq : limit = 64 * (stripCode + first + last + 100) + 1000 := by
+    simp [limit,
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceLimit,
+      stripCode]
+  rw [← limitEq] at final
+  rw [sixtyFourBits] at scaled
+  rw [hundredBits] at sum3
+  rw [thousandBits] at final
+  have contextEq :
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last =
+        (Computability.encodeNat limit).length + 2 := by
+    simp [limit,
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit,
+      Turing.PartrecToTM2.encodedListSpace_cons,
+      Turing.PartrecToTM2.encodedListSpace_nil]
+  rw [contextEq]
+  change (Computability.encodeNat limit).length + 2 ≤
+    100 * inputLength + 100
+  simp only [inputLength] at firstBits lastBits ⊢
+  omega
+
 theorem stripDepth_encodeNat_length_le
     (periodicStrip : PeriodicStrip) :
     (Computability.encodeNat
@@ -1275,6 +1337,113 @@ theorem stripFuelCodeCost_le
     zeroBits, oneBits]
   omega
 
+/-- The explicit fuel computation has the same quadratic reserve for every
+ambient graph count below the padded strip state bound. -/
+theorem stripFuelCodeCost_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip) (stateCount : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip) :
+    EvaluatorCodeFits.divideEvalFuelCost
+        [stateCount, stripSearchDepth periodicStrip] ≤
+      stripFuelComputationSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let depth := stripSearchDepth periodicStrip
+  let fuel := FiniteState.divideEvalFuel stateCount depth
+  have countBits : (Computability.encodeNat stateCount).length ≤
+      21 * inputLength + 2 := by
+    simpa [inputLength] using
+      stripPaddedCounter_encodeNat_length_le periodicStrip stateCount
+        stateCountBound
+  have depthBits : (Computability.encodeNat depth).length ≤
+      21 * inputLength + 2 := by
+    simpa [depth, inputLength] using stripDepth_encodeNat_length_le periodicStrip
+  have fuelBits : (Computability.encodeNat fuel).length ≤
+      stripFuelBits inputLength := by
+    simpa [fuel, depth, inputLength] using
+      stripFuel_encodeNat_length_le_of_le_stateBound periodicStrip stateCount
+        stateCountBound
+  have countSuccessorBits := encodeNat_succ_length_le stateCount
+  have countPlusBits :
+      (Computability.encodeNat (stateCount + 1)).length ≤
+        (Computability.encodeNat stateCount).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using countSuccessorBits
+  have depthSuccessorBits := encodeNat_succ_length_le depth
+  have depthPlusBits :
+      (Computability.encodeNat (depth + 1)).length ≤
+        (Computability.encodeNat depth).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using depthSuccessorBits
+  have fuelSuccessorBits := encodeNat_succ_length_le fuel
+  have fuelPlusBits :
+      (Computability.encodeNat (fuel + 1)).length ≤
+        (Computability.encodeNat fuel).length + 1 := by
+    simpa [Nat.succ_eq_add_one] using fuelSuccessorBits
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have pairBits := stripEncodingPairBits periodicStrip
+  have pairFuelBits :
+      stripFuelBits
+          ((Computability.encodeNat
+            (Nat.pair periodicStrip.width
+              (Nat.pair periodicStrip.period
+                (Encodable.encode periodicStrip.motif)))).length + 1) =
+        stripFuelBits
+          ((Computability.encodeNat
+            (Encodable.encode periodicStrip)).length + 1) := by
+    rw [pairBits]
+  have inputLengthDirect :
+      (Computability.encodeNat (Encodable.encode periodicStrip)).length + 1 =
+        inputLength := by
+    simp [inputLength]
+  have fuelBoundDirect :
+      stripFuelBits
+          ((Computability.encodeNat
+            (Encodable.encode periodicStrip)).length + 1) =
+        stripFuelBits inputLength := by
+    rw [inputLengthDirect]
+  have depthDirectBits :
+      (Computability.encodeNat
+        (stripSearchDepth periodicStrip)).length =
+        (Computability.encodeNat depth).length := by
+    rfl
+  have fuelDirectBits :
+      (Computability.encodeNat
+        (FiniteState.divideEvalFuel stateCount
+          (stripSearchDepth periodicStrip))).length =
+        (Computability.encodeNat fuel).length := by
+    rfl
+  have depthPlusDirectBits :
+      (Computability.encodeNat
+        (stripSearchDepth periodicStrip + 1)).length =
+        (Computability.encodeNat (depth + 1)).length := by
+    rfl
+  have fuelPlusDirectBits :
+      (Computability.encodeNat
+        (FiniteState.divideEvalFuel stateCount
+          (stripSearchDepth periodicStrip) + 1)).length =
+        (Computability.encodeNat (fuel + 1)).length := by
+    rfl
+  simp [EvaluatorCodeFits.divideEvalFuelCost,
+    EvaluatorCodeFits.divideEvalFuelInputCost,
+    EvaluatorCodeFits.fuelOuterLoopCost,
+    stripFuelComputationSpaceBound,
+    EvaluatorCodeFits.prependCost,
+    EvaluatorCodeFits.getCost,
+    EvaluatorCodeFits.dropCost,
+    EvaluatorCodeFits.idCost,
+    EvaluatorCodeFits.headCost,
+    EvaluatorCodeFits.nilCost,
+    EvaluatorCodeFits.oneCost,
+    EvaluatorCodeFits.zeroCost,
+    EvaluatorCodeFits.zeroPrimeCost,
+    EvaluatorCodeFits.tailCost,
+    EvaluatorCodeFits.succCost,
+    encodedListSpace_cons, encodedListSpace_nil,
+    zeroBits, oneBits]
+  omega
+
 /-- The explicit search-depth program fits the arithmetic part of the strip
 budget whenever the surrounding continuation fits the reserved core. -/
 theorem stripSearchDepthCode_fits
@@ -1639,6 +1808,77 @@ theorem stripTransitionPolynomialSpaceBound_le_leaf
         Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceCoefficient
             tromino *
           (100 * inputLength + 100) := Nat.mul_le_mul_left _ context
+    _ ≤ stripTransitionLeafSpaceCoefficient *
+          (100 * inputLength + 100) :=
+      Nat.mul_le_mul_right _ coefficient
+    _ = _ := by simp [stripTransitionLeafSpaceBound, inputLength]
+
+/-- Padded-index version of the depth-zero transition-leaf reserve. -/
+theorem stripBaseTransitionPolynomialSpaceBound_le_leaf_of_lt_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat)
+    (firstBound : first < stripStateBound periodicStrip)
+    (lastBound : last < stripStateBound periodicStrip) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceBound
+          tromino periodicStrip first last ≤
+      stripTransitionLeafSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have localBound :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceBound_le_contextUnit
+      tromino periodicStrip first last
+  have context :=
+    stripFrontierContextPolynomialSpaceUnit_le_inputLength_of_lt_stateBound
+      periodicStrip first last firstBound lastBound
+  have coefficient :=
+    stripBaseTransitionPolynomialSpaceCoefficient_le_leaf tromino
+  calc
+    _ ≤ Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+          tromino *
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := localBound
+    _ ≤ Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionPolynomialSpaceCoefficient
+          tromino * (100 * inputLength + 100) :=
+      Nat.mul_le_mul_left _ context
+    _ ≤ stripTransitionLeafSpaceCoefficient *
+          (100 * inputLength + 100) :=
+      Nat.mul_le_mul_right _ coefficient
+    _ = _ := by simp [stripTransitionLeafSpaceBound, inputLength]
+
+/-- Padded-index version of the raw-edge transition-leaf reserve. -/
+theorem stripTransitionPolynomialSpaceBound_le_leaf_of_lt_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat)
+    (firstBound : first < stripStateBound periodicStrip)
+    (lastBound : last < stripStateBound periodicStrip) :
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceBound
+          tromino periodicStrip first last ≤
+      stripTransitionLeafSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have localBound :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceBound_le_contextUnit
+      tromino periodicStrip first last
+  have context :=
+    stripFrontierContextPolynomialSpaceUnit_le_inputLength_of_lt_stateBound
+      periodicStrip first last firstBound lastBound
+  have coefficient :=
+    (stripTransitionPolynomialSpaceCoefficient_le_base tromino).trans
+      (stripBaseTransitionPolynomialSpaceCoefficient_le_leaf tromino)
+  calc
+    _ ≤ Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceCoefficient
+          tromino *
+        Turing.PartrecToTM2.EvaluatorCodeFits.stripFrontierContextPolynomialSpaceUnit
+          periodicStrip first last := localBound
+    _ ≤ Turing.PartrecToTM2.EvaluatorCodeFits.stripTransitionPolynomialSpaceCoefficient
+          tromino * (100 * inputLength + 100) :=
+      Nat.mul_le_mul_left _ context
     _ ≤ stripTransitionLeafSpaceCoefficient *
           (100 * inputLength + 100) :=
       Nat.mul_le_mul_right _ coefficient
@@ -3293,6 +3533,23 @@ theorem stripReachQueryPayload_encodedListSpace_le
   simp [encodedListSpace_cons, FiniteState.divideBoolTag] at bound ⊢
   omega
 
+/-- Padded-count five-field reachability request bound. -/
+theorem stripReachQueryPayload_encodedListSpace_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip) (stateCount first last : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    encodedListSpace
+        [Encodable.encode periodicStrip, stateCount,
+          stripSearchDepth periodicStrip, first, last] ≤
+      stripLoopPayloadSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  have bound := stripCandidatePayload_encodedListSpace_le_of_le_stateBound
+    periodicStrip stateCount stateCount first last false stateCountBound
+    (Nat.le_refl _) (Nat.le_of_lt firstBelow) (Nat.le_of_lt lastBelow)
+  simp [encodedListSpace_cons, FiniteState.divideBoolTag] at bound ⊢
+  omega
+
 private theorem stripReachNilCost_le_linear (values : List Nat) :
     EvaluatorCodeFits.nilCost values ≤
       1000 * (encodedListSpace values + 1) := by
@@ -3358,6 +3615,62 @@ theorem stripReachInputCost_le
     at inputBound outputBound fuelCost get0 get1 get2 get3 get4 zero nil ⊢
   omega
 
+/-- The complete reachability initializer retains its polynomial reserve for
+any padded ambient state count. -/
+theorem stripReachInputCost_le_of_le_stateBound
+    (periodicStrip : PeriodicStrip) (stateCount first last : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    stripReachInputCost
+        [Encodable.encode periodicStrip, stateCount,
+          stripSearchDepth periodicStrip, first, last] ≤
+      1000000 *
+        (stripFuelComputationSpaceBound
+            ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+              periodicStrip).length +
+          stripLoopPayloadSpaceBound
+            ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+              periodicStrip).length +
+          stripReachPayloadSpaceBound
+            ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+              periodicStrip).length + 1) := by
+  let values :=
+    [Encodable.encode periodicStrip, stateCount,
+      stripSearchDepth periodicStrip, first, last]
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have inputBound : encodedListSpace values ≤
+      stripLoopPayloadSpaceBound inputLength := by
+    simpa [values, inputLength] using
+      stripReachQueryPayload_encodedListSpace_le_of_le_stateBound
+        periodicStrip stateCount first last stateCountBound firstBelow lastBelow
+  have outputBound := stripReachPayload_encodedListSpace_le_of_le_stateBound
+    Tromino.I periodicStrip stateCount first last 0 stateCountBound
+    firstBelow lastBelow
+  have fuelCost := stripFuelCodeCost_le_of_le_stateBound periodicStrip
+    stateCount stateCountBound
+  have get0 := EvaluatorCodeFits.listCodeGetCost_le_linear 0 values
+  have get1 := EvaluatorCodeFits.listCodeGetCost_le_linear 1 values
+  have get2 := EvaluatorCodeFits.listCodeGetCost_le_linear 2 values
+  have get3 := EvaluatorCodeFits.listCodeGetCost_le_linear 3 values
+  have get4 := EvaluatorCodeFits.listCodeGetCost_le_linear 4 values
+  have zero := EvaluatorCodeFits.listCodeZeroCost_le_linear values
+  have nil := stripReachNilCost_le_linear values
+  simp [stripReachInputCost, stripReachInputFields,
+    stripReachFuelField, stripReachFuelOnInputCost,
+    stripReachFuelArgumentsCost, StripSavitchStep.fieldsCost,
+    EvaluatorCodeFits.prependCost, StripSavitchStep.getField,
+    StripSavitchStep.zeroField, values, inputLength,
+    FiniteState.divideEvalProgramList,
+    FiniteState.divideEvalInitial,
+    FiniteState.DivideEvalState.toNatList,
+    FiniteState.divideOptionBoolTag,
+    FiniteState.divideStackToNatList,
+    encodedListSpace_cons, encodedListSpace_nil]
+    at inputBound outputBound fuelCost get0 get1 get2 get3 get4 zero nil ⊢
+  omega
+
 /-- Every reachable strip-specialized Savitch transition has the common
 input-polynomial cost needed by the tail iterator. -/
 theorem stripSavitchStepCost_le
@@ -3399,6 +3712,64 @@ theorem stripSavitchStepCost_le
   have leafGlobal := stripBaseTransitionPolynomialSpaceBound_le_leaf
     tromino periodicStrip state.query.first state.query.last
       firstBound lastBound
+  have leafCost :
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost
+          tromino periodicStrip state.query.first state.query.last ≤
+        stripTransitionLeafSpaceBound inputLength :=
+    leafLocal.trans (by simpa [inputLength] using leafGlobal)
+  simp only [StripSavitchStep.stepCost, StripSavitchStep.stepSpaceUnit,
+    StripSavitchStep.baseBoolCost]
+  change _ ≤ stripSavitchStepSpaceBound inputLength
+  simp only [stripSavitchStepSpaceBound]
+  omega
+
+/-- Every reachable Savitch transition under a padded ambient count has the
+same polynomial step reserve. -/
+theorem stripSavitchStepCost_le_of_le_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (indices : state.IndicesBelow stateCount)
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList
+            (Encodable.encode periodicStrip) stateCount state) ≤
+        stripReachPayloadSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length) :
+    StripSavitchStep.stepCost tromino periodicStrip stateCount state ≤
+      stripSavitchStepSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have firstBound := indices.1.1
+  have lastBound := indices.1.2
+  have firstPadded : state.query.first < stripStateBound periodicStrip :=
+    firstBound.trans_le stateCountBound
+  have lastPadded : state.query.last < stripStateBound periodicStrip :=
+    lastBound.trans_le stateCountBound
+  have adapter := StripSavitchStep.baseArgumentsCost_le_linear
+    (Encodable.encode periodicStrip) stateCount state
+  have stateSpace' :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList
+            (Encodable.encode periodicStrip) stateCount state) ≤
+        stripReachPayloadSpaceBound inputLength := by
+    simpa [inputLength] using stateSpace
+  have adapterBound :
+      StripSavitchStep.baseArgumentsCost
+          (Encodable.encode periodicStrip) stateCount state ≤
+        10000000 * (stripReachPayloadSpaceBound inputLength + 1) :=
+    adapter.trans (by gcongr)
+  have leafLocal :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost_le_polynomialSpaceBound
+      tromino periodicStrip state.query.first state.query.last
+  have leafGlobal :=
+    stripBaseTransitionPolynomialSpaceBound_le_leaf_of_lt_stateBound
+      tromino periodicStrip state.query.first state.query.last
+      firstPadded lastPadded
   have leafCost :
       Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost
           tromino periodicStrip state.query.first state.query.last ≤
@@ -3697,6 +4068,189 @@ theorem stripSavitchFlatUniform
     · rw [stripSavitchProgramStep_iterate]
       exact after
 
+/-- Reachable configurations for a Savitch countdown over an arbitrary padded
+ambient graph count. -/
+def StripSavitchReachablePadded
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last remaining : Nat) (values : List Nat) : Prop :=
+  ∃ taken,
+    remaining + taken = FiniteState.divideEvalFuel stateCount
+      (stripSearchDepth periodicStrip) ∧
+    values = FiniteState.divideEvalProgramList
+      (Encodable.encode periodicStrip) stateCount
+      (((FiniteState.divideEvalStep stateCount
+        (indexedTransitionRawBool tromino periodicStrip))^[taken])
+          (FiniteState.divideEvalInitial
+            (stripSearchDepth periodicStrip) first last))
+
+theorem stripSavitchReachablePadded_initial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last : Nat) :
+    StripSavitchReachablePadded tromino periodicStrip stateCount first last
+      (FiniteState.divideEvalFuel stateCount (stripSearchDepth periodicStrip))
+      (FiniteState.divideEvalProgramList
+        (Encodable.encode periodicStrip) stateCount
+        (FiniteState.divideEvalInitial
+          (stripSearchDepth periodicStrip) first last)) :=
+  ⟨0, by omega, rfl⟩
+
+theorem stripSavitchReachablePadded_step
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last remaining : Nat) (values : List Nat)
+    (reachable : StripSavitchReachablePadded tromino periodicStrip stateCount
+      first last (remaining + 1) values) :
+    StripSavitchReachablePadded tromino periodicStrip stateCount first last
+      remaining
+      (stripSavitchProgramStep tromino periodicStrip stateCount values) := by
+  obtain ⟨taken, total, rfl⟩ := reachable
+  refine ⟨taken + 1, by omega, ?_⟩
+  rw [stripSavitchProgramStep_programList, Function.iterate_succ_apply']
+
+set_option maxHeartbeats 1000000 in
+/-- Complete exact-fuel Savitch countdown for every ambient graph count below
+the padded strip state bound. -/
+theorem stripSavitchFlatUniform_of_le_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount first last : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatIterate
+        (FiniteState.DivideEvalPartrec.stepCode (stripBaseBoolCode tromino)))
+      (FiniteState.divideEvalFuel stateCount
+          (stripSearchDepth periodicStrip) ::
+        FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount
+          (FiniteState.divideEvalInitial
+            (stripSearchDepth periodicStrip) first last))
+      (FiniteState.divideEvalProgramList
+        (Encodable.encode periodicStrip) stateCount
+        (((FiniteState.divideEvalStep stateCount
+          (indexedTransitionRawBool tromino periodicStrip))^[
+            FiniteState.divideEvalFuel stateCount
+              (stripSearchDepth periodicStrip)])
+          (FiniteState.divideEvalInitial
+            (stripSearchDepth periodicStrip) first last)))
+      (stripSavitchBodySpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) where
+  input_space := by
+    have input :=
+      stripReachCountdownPayload_encodedListSpace_le_of_le_stateBound
+        tromino periodicStrip stateCount first last 0
+        (FiniteState.divideEvalFuel stateCount
+          (stripSearchDepth periodicStrip)) stateCountBound
+        firstBelow lastBelow (Nat.le_refl _)
+    exact input.trans (by
+      simp [stripSavitchBodySpaceBound, stripSavitchStepSpaceBound]
+      omega)
+  output_space := by
+    have output := stripReachStatePayload_encodedListSpace_le_of_le_stateBound
+      tromino periodicStrip stateCount first last
+      (FiniteState.divideEvalFuel stateCount (stripSearchDepth periodicStrip))
+      stateCountBound firstBelow lastBelow
+    exact output.trans (by
+      simp [stripSavitchBodySpaceBound, stripSavitchStepSpaceBound]
+      omega)
+  call continuation bound budget after := by
+    let inputLength :=
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length
+    apply Turing.PartrecToTM2.EvaluatorCallFits.flatIterate_of_reachable_code_fits
+      (step := stripSavitchProgramStep tromino periodicStrip stateCount)
+      (bodyCost := fun _ _ => stripSavitchBodySpaceBound inputLength)
+      (invariant := StripSavitchReachablePadded tromino periodicStrip
+        stateCount first last)
+    · intro remaining values reachable
+      obtain ⟨taken, total, rfl⟩ := reachable
+      let state :=
+        ((FiniteState.divideEvalStep stateCount
+          (indexedTransitionRawBool tromino periodicStrip))^[taken])
+            (FiniteState.divideEvalInitial
+              (stripSearchDepth periodicStrip) first last)
+      have indices : state.IndicesBelow stateCount := by
+        dsimp only [state]
+        exact FiniteState.divideEvalIterate_initial_indicesBelow
+          stateCount (stripSearchDepth periodicStrip) first last taken
+          (indexedTransitionRawBool tromino periodicStrip)
+          firstBelow lastBelow
+      have stateSpace :
+          encodedListSpace
+              (FiniteState.divideEvalProgramList
+                (Encodable.encode periodicStrip) stateCount state) ≤
+            stripReachPayloadSpaceBound inputLength := by
+        simpa [state, inputLength] using
+          stripReachStatePayload_encodedListSpace_le_of_le_stateBound
+            tromino periodicStrip stateCount first last taken stateCountBound
+            firstBelow lastBelow
+      have stepFit := StripSavitchStep.exactStep tromino periodicStrip
+        wellFormed stateCount state
+      have stepBound := stripSavitchStepCost_le_of_le_stateBound
+        tromino periodicStrip stateCount state stateCountBound indices stateSpace
+      have body := flatCountdownBody_of_fit stepFit remaining
+      have body' : EvaluatorCodeFits
+          (Turing.ToPartrec.Code.flatCountdownBody
+            (FiniteState.DivideEvalPartrec.stepCode
+              (stripBaseBoolCode tromino)))
+          (remaining :: FiniteState.divideEvalProgramList
+            (Encodable.encode periodicStrip) stateCount state)
+          (Turing.PartrecToTM2.flatCountdownOutput
+            (stripSavitchProgramStep tromino periodicStrip stateCount)
+            remaining
+            (FiniteState.divideEvalProgramList
+              (Encodable.encode periodicStrip) stateCount state))
+          (flatCountdownBodyCost
+            (fun _ => FiniteState.divideEvalProgramList
+              (Encodable.encode periodicStrip) stateCount
+              (FiniteState.divideEvalStep stateCount
+                (indexedTransitionRawBool tromino periodicStrip) state))
+            (fun _ => StripSavitchStep.stepCost tromino periodicStrip
+              stateCount state)
+            remaining
+            (FiniteState.divideEvalProgramList
+              (Encodable.encode periodicStrip) stateCount state)) := by
+        cases remaining with
+        | zero =>
+            simpa [Turing.PartrecToTM2.flatCountdownOutput] using body
+        | succ remaining =>
+            simp only [Turing.PartrecToTM2.flatCountdownOutput]
+            rw [stripSavitchProgramStep_programList]
+            simpa [Turing.PartrecToTM2.flatCountdownOutput] using body
+      apply body'.mono
+      have remainingBound : remaining ≤ FiniteState.divideEvalFuel stateCount
+          (stripSearchDepth periodicStrip) := by
+        omega
+      have inputBound :=
+        stripReachCountdownPayload_encodedListSpace_le_of_le_stateBound
+          tromino periodicStrip stateCount first last taken remaining
+          stateCountBound firstBelow lastBelow remainingBound
+      have outputBound :=
+        stripReachStatePayload_encodedListSpace_le_of_le_stateBound
+          tromino periodicStrip stateCount first last (taken + 1)
+          stateCountBound firstBelow lastBelow
+      exact stripSavitchBodyCost_le inputLength remaining
+        (FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount state)
+        (FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount
+          (FiniteState.divideEvalStep stateCount
+            (indexedTransitionRawBool tromino periodicStrip) state))
+        (StripSavitchStep.stepCost tromino periodicStrip stateCount state)
+        (by simpa [state, inputLength] using inputBound)
+        (by
+          simpa [state, inputLength, Function.iterate_succ_apply'] using
+            outputBound)
+        (by simpa [inputLength] using stepBound)
+    · exact stripSavitchReachablePadded_initial tromino periodicStrip
+        stateCount first last
+    · exact stripSavitchReachablePadded_step tromino periodicStrip
+        stateCount first last
+    · intro remaining values reachable
+      simpa [inputLength] using budget
+    · rw [stripSavitchProgramStep_iterate]
+      exact after
+
 /-- Final semantic DFS state reached by one canonical exact-fuel strip
 reachability query. -/
 def stripReachFinalState
@@ -3886,6 +4440,181 @@ theorem stripReachBool_fits_polynomial
     first last firstBelow lastBelow).mono
       (stripReachBoolCost_le tromino periodicStrip
         first last firstBelow lastBelow)
+
+/-- Final exact-fuel DFS state for an explicitly supplied ambient count. -/
+def stripReachFinalStateAt
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last : Nat) : FiniteState.DivideEvalState :=
+  ((FiniteState.divideEvalStep stateCount
+      (indexedTransitionRawBool tromino periodicStrip))^[
+        FiniteState.divideEvalFuel stateCount (stripSearchDepth periodicStrip)])
+    (FiniteState.divideEvalInitial
+      (stripSearchDepth periodicStrip) first last)
+
+/-- Exact compositional evaluator cost of the reachability wrapper at an
+explicit ambient count. -/
+noncomputable def stripReachBoolCostAt
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last : Nat) : Nat :=
+  let values := [Encodable.encode periodicStrip, stateCount,
+    stripSearchDepth periodicStrip, first, last]
+  let output := FiniteState.divideEvalProgramList
+    (Encodable.encode periodicStrip) stateCount
+    (stripReachFinalStateAt tromino periodicStrip stateCount first last)
+  EvaluatorCodeFits.predCost
+      [FiniteState.divideOptionBoolTag
+        (stripReachFinalStateAt tromino periodicStrip stateCount first last).answer] +
+    (EvaluatorCodeFits.getCost 3 output +
+      (stripSavitchBodySpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        stripReachInputCost values))
+
+/-- Exact complete reachability-wrapper certificate for a padded ambient
+count. -/
+theorem stripReachBool_fits_of_le_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount first last : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    EvaluatorCodeFits (stripReachBoolCode tromino)
+      [Encodable.encode periodicStrip, stateCount,
+        stripSearchDepth periodicStrip, first, last]
+      [FiniteState.divideBoolTag
+        (FiniteState.divideReachIndexDFSBool stateCount
+          (indexedTransitionRawBool tromino periodicStrip)
+          (stripSearchDepth periodicStrip) first last)]
+      (stripReachBoolCostAt tromino periodicStrip stateCount first last) := by
+  let values := [Encodable.encode periodicStrip, stateCount,
+    stripSearchDepth periodicStrip, first, last]
+  let finalState :=
+    stripReachFinalStateAt tromino periodicStrip stateCount first last
+  let output := FiniteState.divideEvalProgramList
+    (Encodable.encode periodicStrip) stateCount finalState
+  have inputFit : EvaluatorCodeFits stripReachInputCode values
+      (FiniteState.divideEvalFuel stateCount (stripSearchDepth periodicStrip) ::
+        FiniteState.divideEvalProgramList
+          (Encodable.encode periodicStrip) stateCount
+          (FiniteState.divideEvalInitial
+            (stripSearchDepth periodicStrip) first last))
+      (stripReachInputCost values) := by
+    simpa [values, FiniteState.divideEvalProgramList,
+      FiniteState.divideEvalInitial,
+      FiniteState.DivideEvalState.toNatList,
+      FiniteState.divideOptionBoolTag,
+      FiniteState.divideStackToNatList] using stripReachInput_fits values
+  have loopFit := stripSavitchFlatUniform_of_le_stateBound
+    tromino periodicStrip wellFormed stateCount first last stateCountBound
+    firstBelow lastBelow
+  have loopWithInput := EvaluatorCodeFits.comp loopFit inputFit
+  have loopWithInput' : EvaluatorCodeFits
+      ((Turing.ToPartrec.Code.flatIterate
+        (FiniteState.DivideEvalPartrec.stepCode
+          (stripBaseBoolCode tromino))).comp stripReachInputCode)
+      values output
+      (stripSavitchBodySpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length + stripReachInputCost values) := by
+    simpa [finalState, stripReachFinalStateAt, output] using loopWithInput
+  have projected := EvaluatorCodeFits.comp
+    (EvaluatorCodeFits.get 3 output) loopWithInput'
+  have normalized := EvaluatorCodeFits.comp
+    (EvaluatorCodeFits.pred_named
+      [FiniteState.divideOptionBoolTag finalState.answer]) projected
+  have answerTag :
+      (FiniteState.divideOptionBoolTag finalState.answer).pred =
+        FiniteState.divideBoolTag (finalState.answer.getD false) := by
+    cases finalState.answer with
+    | none => rfl
+    | some answerValue => cases answerValue <;> rfl
+  have outputEq :
+      [FiniteState.divideOptionBoolTag finalState.answer - 1] =
+        [FiniteState.divideBoolTag
+          (FiniteState.divideReachIndexDFSBool stateCount
+            (indexedTransitionRawBool tromino periodicStrip)
+            (stripSearchDepth periodicStrip) first last)] := by
+    rw [Nat.sub_one, answerTag]
+    rfl
+  have outputEq' :
+      Turing.ToPartrec.Code.subtractStepList
+          [FiniteState.divideOptionBoolTag finalState.answer] =
+        [FiniteState.divideBoolTag
+          (FiniteState.divideReachIndexDFSBool stateCount
+            (indexedTransitionRawBool tromino periodicStrip)
+            (stripSearchDepth periodicStrip) first last)] := by
+    simpa [Turing.ToPartrec.Code.subtractStepList] using outputEq
+  rw [outputEq'] at normalized
+  simpa [stripReachBoolCode, stripReachBoolCostAt, values, output,
+    finalState, stripReachFinalStateAt, EvaluatorCodeFits.predCost,
+    Turing.ToPartrec.Code.subtractStepList] using normalized
+
+theorem stripReachBoolCostAt_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount first last : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    stripReachBoolCostAt tromino periodicStrip stateCount first last ≤
+      stripReachCallSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values := [Encodable.encode periodicStrip, stateCount,
+    stripSearchDepth periodicStrip, first, last]
+  let finalState :=
+    stripReachFinalStateAt tromino periodicStrip stateCount first last
+  let output := FiniteState.divideEvalProgramList
+    (Encodable.encode periodicStrip) stateCount finalState
+  have inputCost : stripReachInputCost values ≤
+      1000000 *
+        (stripFuelComputationSpaceBound inputLength +
+          stripLoopPayloadSpaceBound inputLength +
+          stripReachPayloadSpaceBound inputLength + 1) := by
+    simpa [values, inputLength] using
+      stripReachInputCost_le_of_le_stateBound periodicStrip stateCount
+        first last stateCountBound firstBelow lastBelow
+  have outputBound : encodedListSpace output ≤
+      stripReachPayloadSpaceBound inputLength := by
+    simpa [output, finalState, stripReachFinalStateAt, inputLength] using
+      stripReachStatePayload_encodedListSpace_le_of_le_stateBound
+        tromino periodicStrip stateCount first last
+        (FiniteState.divideEvalFuel stateCount (stripSearchDepth periodicStrip))
+        stateCountBound firstBelow lastBelow
+  have projected := EvaluatorCodeFits.listCodeGetCost_le_linear 3 output
+  have normalized : EvaluatorCodeFits.predCost
+      [FiniteState.divideOptionBoolTag finalState.answer] ≤ 1000000 := by
+    cases answer : finalState.answer with
+    | none => native_decide
+    | some answerValue => cases answerValue <;> native_decide
+  simp [stripReachBoolCostAt, values, output, finalState, inputLength,
+    stripReachCallSpaceBound, stripSavitchBodySpaceBound,
+    stripSavitchStepSpaceBound]
+    at inputCost outputBound projected normalized ⊢
+  omega
+
+/-- Polynomial-cost complete reachability wrapper for padded counts. -/
+theorem stripReachBool_fits_polynomial_of_le_stateBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount first last : Nat)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip)
+    (firstBelow : first < stateCount) (lastBelow : last < stateCount) :
+    EvaluatorCodeFits (stripReachBoolCode tromino)
+      [Encodable.encode periodicStrip, stateCount,
+        stripSearchDepth periodicStrip, first, last]
+      [FiniteState.divideBoolTag
+        (FiniteState.divideReachIndexDFSBool stateCount
+          (indexedTransitionRawBool tromino periodicStrip)
+          (stripSearchDepth periodicStrip) first last)]
+      (stripReachCallSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) :=
+  (stripReachBool_fits_of_le_stateBound tromino periodicStrip wellFormed
+    stateCount first last stateCountBound firstBelow lastBelow).mono
+      (stripReachBoolCostAt_le tromino periodicStrip stateCount first last
+        stateCountBound firstBelow lastBelow)
 
 namespace StripCandidateStep
 
