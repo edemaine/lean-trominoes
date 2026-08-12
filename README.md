@@ -1638,6 +1638,15 @@ The representation choices for this target are:
   fixed column adapters and their nested conjunction are fitted exactly, and
   the complete conjunction now has one shared input-linear evaluator-space
   majorant.
+- [`LeanTrominoes/PartrecPackedTransition.lean`](LeanTrominoes/PartrecPackedTransition.lean)
+  composes packed normalization, center validity, cyclic phase advance, and
+  the four shared-column checks into one explicit six-field transition
+  program.  Its acceptance theorem identifies the computed Boolean exactly
+  with the raw semantic `Transition` relation used by the strip proof.
+  [`LeanTrominoes/PartrecPackedTransitionSpace.lean`](LeanTrominoes/PartrecPackedTransitionSpace.lean)
+  fits every adapter and component of that complete transition, including the
+  modulo-period phase comparison and both final Boolean conjunctions, with an
+  exact continuation-independent evaluator-space cost.
 - [`LeanTrominoes/PartrecStripFrontierContext.lean`](LeanTrominoes/PartrecStripFrontierContext.lean)
   and
   [`LeanTrominoes/PartrecStripFrontierContextSpace.lean`](LeanTrominoes/PartrecStripFrontierContextSpace.lean)

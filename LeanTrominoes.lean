@@ -861,6 +861,8 @@ import LeanTrominoes.PartrecPackedOverlapAt
 import LeanTrominoes.PartrecPackedOverlapAtSpace
 import LeanTrominoes.PartrecPackedOverlapLoop
 import LeanTrominoes.PartrecPackedOverlapLoopSpace
+import LeanTrominoes.PartrecPackedTransition
+import LeanTrominoes.PartrecPackedTransitionSpace
 import LeanTrominoes.PartrecPeriodicStripDecode
 import LeanTrominoes.PartrecPeriodicStripDecodeSpace
 import LeanTrominoes.PartrecPolySpace
