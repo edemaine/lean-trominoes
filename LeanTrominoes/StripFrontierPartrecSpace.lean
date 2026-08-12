@@ -1187,6 +1187,24 @@ theorem baseBool
     simpa [stripBaseBoolCode, baseBoolCost,
       stripBaseVectorCode, answer, FiniteState.divideBoolTag] using result
 
+/-- A shared local unit for the structural step: its serialized input, its
+only non-structural leaf, and one slack cell. -/
+def stepSpaceUnit
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState) : Nat :=
+  encodedListSpace
+      (FiniteState.divideEvalProgramList
+        (Encodable.encode periodicStrip) stateCount state) +
+    baseBoolCost tromino periodicStrip stateCount state + 1
+
+/-- Generous fixed coefficient absorbing every constructor in one compiled
+Savitch transition. -/
+def stepCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState) : Nat :=
+  1000000000000000000000000000000 *
+    stepSpaceUnit tromino periodicStrip stateCount state
+
 def someBoolTagCost
     (values : List Nat) (result valueCost : Nat) : Nat :=
   succCost [if result = 0 then 0 else 1] +
@@ -1208,6 +1226,235 @@ theorem someBoolTag
     simp [Turing.ToPartrec.Code.someBoolTag, someBoolTagCost,
       zero] at incremented ⊢ <;>
     exact incremented
+
+private theorem idCost_le_linear (values : List Nat) :
+    idCost values ≤ 10 * (encodedListSpace values + 1) := by
+  have tailSpace := listCodeEncodedListSpace_tail_le (0 :: values)
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  simp [idCost, tailCost, zeroPrimeCost,
+    encodedListSpace_cons, zeroBits] at tailSpace ⊢
+  omega
+
+private theorem encodedListSpace_cons_le_of
+    (value : Nat) (values : List Nat) (budget : Nat)
+    (valueBound : encodedListSpace [value] ≤ budget)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    encodedListSpace (value :: values) ≤ 2 * budget := by
+  rw [show value :: values = [value] ++ values by rfl,
+    FiniteState.encodedListSpace_append]
+  omega
+
+private theorem predecessorSingletonSpace_le (value : Nat) :
+    encodedListSpace [value.pred] ≤ encodedListSpace [value] := by
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  exact Nat.add_le_add_right
+    (listCodeEncodeNat_length_mono (Nat.pred_le value)) 1
+
+private theorem singletonGetDSpace_le
+    (index : Nat) (values : List Nat) :
+    encodedListSpace [values[index]?.getD 0] ≤
+      encodedListSpace values + 1 := by
+  induction index generalizing values with
+  | zero =>
+      cases values with
+      | nil => rfl
+      | cons value values =>
+          simp only [List.getElem?_cons_zero, Option.getD_some,
+            List.headI_cons] at *
+          exact encodedListSpace_singleton_headI_le (value :: values)
+  | succ index induction =>
+      cases values with
+      | nil => rfl
+      | cons value values =>
+          have tail := induction values
+          simp only [List.getElem?_cons_succ, Option.getD_some] at tail ⊢
+          exact tail.trans (Nat.add_le_add_right
+            (listCodeEncodedListSpace_tail_le (value :: values)) 1)
+
+private theorem dropCost_le_linear (index : Nat) (values : List Nat) :
+    dropCost index values ≤
+      (10000 * (index + 1)) * (encodedListSpace values + 1) := by
+  have whole := listCodeGetCost_le_linear index values
+  have part : dropCost index values ≤ getCost index values := by
+    simp only [getCost]
+    omega
+  exact part.trans whole
+
+private theorem nilCost_le_linear (values : List Nat) :
+    nilCost values ≤ 1000 * (encodedListSpace values + 1) := by
+  have headSpace := encodedListSpace_singleton_headI_le values
+  have successorBits := encodeNat_succ_length_le values.headI
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  simp [nilCost, tailCost, succCost, encodedListSpace_cons,
+    zeroBits] at headSpace successorBits ⊢
+  omega
+
+private theorem oneCost_le_linear (values : List Nat) :
+    oneCost values ≤ 20000 * (encodedListSpace values + 1) := by
+  have zeroBound := listCodeZeroCost_le_linear values
+  have successor := succCost_le [0]
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  simp only [oneCost]
+  simp [encodedListSpace_cons, zeroBits] at successor
+  omega
+
+private theorem getCost_le_budget
+    (index : Nat) (values : List Nat) (budget : Nat)
+    (indexBound : index ≤ 12)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    getCost index values ≤ 130000 * (budget + 1) := by
+  calc
+    getCost index values ≤
+        (10000 * (index + 1)) * (encodedListSpace values + 1) :=
+      listCodeGetCost_le_linear index values
+    _ ≤ (10000 * 13) * (budget + 1) := by
+      gcongr
+      omega
+    _ = 130000 * (budget + 1) := by ring
+
+private theorem dropCost_le_budget
+    (index : Nat) (values : List Nat) (budget : Nat)
+    (indexBound : index ≤ 12)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    dropCost index values ≤ 130000 * (budget + 1) := by
+  exact (dropCost_le_linear index values).trans (by
+    gcongr
+    omega)
+
+private theorem idCost_le_budget
+    (values : List Nat) (budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    idCost values ≤ 10 * (budget + 1) :=
+  (idCost_le_linear values).trans (by gcongr)
+
+private theorem zeroCost_le_budget
+    (values : List Nat) (budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    zeroCost values ≤ 10000 * (budget + 1) :=
+  (listCodeZeroCost_le_linear values).trans (by gcongr)
+
+private theorem oneCost_le_budget
+    (values : List Nat) (budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    oneCost values ≤ 20000 * (budget + 1) :=
+  (oneCost_le_linear values).trans (by gcongr)
+
+private theorem scaledFieldSpace_le
+    (value : Nat) :
+    encodedListSpace [2 * value + 4] ≤
+      10 * (encodedListSpace [value] + 1) := by
+  have product := encodeNat_mul_length_le_sum 2 value
+  have sum := encodeNat_add_length_le_sum (2 * value) 4
+  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+  have fourBits : (Computability.encodeNat 4).length = 3 := by native_decide
+  simp only [encodedListSpace_cons, encodedListSpace_nil]
+  rw [twoBits] at product
+  rw [fourBits] at sum
+  omega
+
+private theorem branchZeroZeroCost_le_budget
+    (values output : List Nat) (testValue testCost branchCost budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (outputBound : encodedListSpace output ≤ budget)
+    (testValueBound : encodedListSpace [testValue] ≤ budget)
+    (testCostBound : testCost ≤ budget)
+    (branchCostBound : branchCost ≤ budget) :
+    branchZeroZeroCost values output testValue testCost branchCost ≤
+      40 * (budget + 1) := by
+  have testedInput := encodedListSpace_cons_le_of
+    testValue values budget testValueBound valuesBound
+  have identity := idCost_le_linear values
+  have testHead : [testValue].headI = testValue := by simp
+  simp only [branchZeroZeroCost, branchZeroTestCost, prependCost]
+  rw [testHead]
+  omega
+
+private theorem branchZeroSuccCost_le_budget
+    (values output : List Nat) (testValue testCost branchCost budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (outputBound : encodedListSpace output ≤ budget)
+    (testValueBound : encodedListSpace [testValue] ≤ budget)
+    (testCostBound : testCost ≤ budget)
+    (branchCostBound : branchCost ≤ budget) :
+    branchZeroSuccCost values output testValue testCost branchCost ≤
+      50 * (budget + 1) := by
+  have testedInput := encodedListSpace_cons_le_of
+    testValue values budget testValueBound valuesBound
+  have predecessorBound := predecessorSingletonSpace_le testValue
+  have predecessorInput := encodedListSpace_cons_le_of
+    testValue.pred values budget (predecessorBound.trans testValueBound)
+      valuesBound
+  have identity := idCost_le_linear values
+  have tail := listCodeTailCost_le_linear (testValue.pred :: values)
+  have testHead : [testValue].headI = testValue := by simp
+  simp only [branchZeroSuccCost, branchZeroTestCost, prependCost]
+  rw [testHead]
+  omega
+
+set_option maxRecDepth 100000 in
+private theorem normalizeBoolCost_le_budget
+    (values : List Nat) (result valueCost budget : Nat)
+    (resultBound : result ≤ 1)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (valueCostBound : valueCost ≤ budget)
+    (positive : 1 ≤ budget) :
+    normalizeBoolCost values result valueCost ≤
+      2000000 * (budget + 1) := by
+  have zeroSpace : encodedListSpace [0] ≤ 2 * (budget + 1) := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    simp only [encodedListSpace_cons, encodedListSpace_nil, zeroBits,
+      Nat.zero_add]
+    omega
+  have oneSpace : encodedListSpace [1] ≤ 2 * (budget + 1) := by
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    simp [encodedListSpace_cons, oneBits]
+  have valuesLarge : encodedListSpace values ≤ 2 * (budget + 1) := by omega
+  have valueCostLarge : valueCost ≤ 2 * (budget + 1) := by omega
+  have zeroCostLarge : zeroCost values ≤ 2 * (10000 * (budget + 1)) := by
+    have bound := listCodeZeroCost_le_linear values
+    calc
+      zeroCost values ≤ 10000 * (encodedListSpace values + 1) := bound
+      _ ≤ 10000 * (budget + 1) := by gcongr
+      _ ≤ 2 * (10000 * (budget + 1)) := by omega
+  have oneCostLarge : oneCost values ≤ 2 * (10000 * (budget + 1)) := by
+    have zeroBound := listCodeZeroCost_le_linear values
+    have successor := succCost_le [0]
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    simp only [oneCost]
+    simp [encodedListSpace_cons, zeroBits] at successor
+    omega
+  rcases (show result = 0 ∨ result = 1 by omega) with rfl | rfl
+  · simp only [normalizeBoolCost, if_pos]
+    exact (branchZeroZeroCost_le_budget values [0] 0 valueCost
+      (zeroCost values) (2 * (10000 * (budget + 1)))
+      (by omega) (by omega) (by omega) (by omega) zeroCostLarge).trans
+        (by omega)
+  · simp only [normalizeBoolCost, if_neg (by decide : (1 : Nat) ≠ 0)]
+    exact (branchZeroSuccCost_le_budget values [1] 1 valueCost
+      (oneCost values) (2 * (10000 * (budget + 1)))
+      (by omega) (by omega) (by omega) (by omega) oneCostLarge).trans
+        (by omega)
+
+private theorem someBoolTagCost_le_budget
+    (values : List Nat) (result valueCost budget : Nat)
+    (resultBound : result ≤ 1)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (valueCostBound : valueCost ≤ budget)
+    (positive : 1 ≤ budget) :
+    someBoolTagCost values result valueCost ≤
+      100000000 * (budget + 1) := by
+  have normalized := normalizeBoolCost_le_budget values result valueCost budget
+    resultBound valuesBound valueCostBound positive
+  have normalizedValue : (if result = 0 then 0 else 1) ≤ 1 := by
+    split <;> omega
+  have normalizedSpace :
+      encodedListSpace [if result = 0 then 0 else 1] ≤ budget + 2 := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    split <;> simp [encodedListSpace_cons, zeroBits, oneBits]
+  have successor := succCost_le [if result = 0 then 0 else 1]
+  simp only [someBoolTagCost]
+  omega
 
 structure FieldFit (values : List Nat) where
   code : Turing.ToPartrec.Code
@@ -1293,23 +1540,195 @@ def someBoolField
   cost := someBoolTagCost values result valueCost
   fits := someBoolTag valueFits
 
-private theorem existsCost
-    {code : Turing.ToPartrec.Code} {values output : List Nat}
-    {cost : Nat}
-    (fits : Turing.PartrecToTM2.EvaluatorCodeFits code values output cost) :
-    ∃ cost, Turing.PartrecToTM2.EvaluatorCodeFits
-      code values output cost :=
-  ⟨cost, fits⟩
+private theorem successorFieldCost_le_budget
+    (index : Nat) (values : List Nat) (budget : Nat)
+    (indexBound : index ≤ 12)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    (succField index values).cost ≤ 1000000 * (budget + 1) := by
+  have projected := singletonGetDSpace_le index values
+  have successor := succCost_le [values[index]?.getD 0]
+  have projection := getCost_le_budget index values budget indexBound valuesBound
+  simp only [succField]
+  omega
 
+private theorem predecessorFieldCost_le_budget
+    (index : Nat) (values : List Nat) (budget : Nat)
+    (indexBound : index ≤ 12)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    (predecessorField index values).cost ≤
+      30000000 * (budget + 1) := by
+  let value := values[index]?.getD 0
+  have projected := singletonGetDSpace_le index values
+  have scaled := scaledFieldSpace_le value
+  have predecessor := predCost_singleton_le_linear value
+  have projection := getCost_le_budget index values budget indexBound valuesBound
+  dsimp only [value] at projected scaled predecessor ⊢
+  simp only [predecessorField]
+  omega
+
+/-- The fixed three-field adapter feeding the base leaf is linear in the
+serialized DFS state. -/
+theorem baseArgumentsCost_le_linear
+    (context stateCount : Nat) (state : FiniteState.DivideEvalState) :
+    baseArgumentsCost context stateCount state ≤
+      10000000 *
+        (encodedListSpace
+          (FiniteState.divideEvalProgramList context stateCount state) + 1) := by
+  let values := FiniteState.divideEvalProgramList context stateCount state
+  let budget := encodedListSpace values
+  have valuesBound : encodedListSpace values ≤ budget := Nat.le_refl _
+  have get0 := getCost_le_budget 0 values budget (by omega) valuesBound
+  have get5 := getCost_le_budget 5 values budget (by omega) valuesBound
+  have get6 := getCost_le_budget 6 values budget (by omega) valuesBound
+  have nil := nilCost_le_linear values
+  have field0 := singletonGetDSpace_le 0 values
+  have field5 := singletonGetDSpace_le 5 values
+  have field6 := singletonGetDSpace_le 6 values
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  simp [baseArgumentsCost, prependCost, values, budget,
+    FiniteState.divideEvalProgramList,
+    FiniteState.DivideEvalState.toNatList,
+    FiniteState.divideOptionBoolTag, zeroBits]
+    at get0 get5 get6 nil field0 field5 field6 ⊢
+  omega
+
+private def accumulatedRawBudget (budget : Nat) : Nat :=
+  1000 * (1000 * (60000000 * (budget + 1) + 1) + 1)
+
+private def accumulatedTagBudget (budget : Nat) : Nat :=
+  100000000 * (accumulatedRawBudget budget + 1)
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 2000000 in
+private theorem accumulatedRawCost_le_budget
+    (values : List Nat)
+    (accumulatedValue leftValue rightValue : Nat)
+    (accumulatedCost leftCost rightCost budget : Nat)
+    (accumulatedValueBound : accumulatedValue ≤ 1)
+    (leftValueBound : leftValue ≤ 1)
+    (rightValueBound : rightValue ≤ 1)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (accumulatedCostBound : accumulatedCost ≤ 130000 * (budget + 1))
+    (leftCostBound : leftCost ≤ 30000000 * (budget + 1))
+    (rightCostBound : rightCost ≤ 30000000 * (budget + 1)) :
+    boolOrCost values accumulatedValue
+        (if leftValue = 0 ∨ rightValue = 0 then 0 else 1)
+        accumulatedCost
+        (boolAndCost values leftValue rightValue leftCost rightCost) ≤
+      accumulatedRawBudget budget := by
+  have headSpace := encodedListSpace_singleton_headI_le values
+  have headBitsInput :
+      (Computability.encodeNat values.headI).length ≤
+        encodedListSpace values := by
+    simpa [encodedListSpace_cons] using headSpace
+  have headSuccessorInput := encodeNat_succ_length_le values.headI
+  let firstBudget := 60000000 * (budget + 1)
+  have firstPositive : 1 ≤ firstBudget := by
+    dsimp only [firstBudget]
+    omega
+  have firstValues : encodedListSpace values ≤ firstBudget := by
+    dsimp only [firstBudget]
+    omega
+  have firstHead :
+      (Computability.encodeNat values.headI).length ≤ firstBudget := by
+    dsimp only [firstBudget]
+    omega
+  have firstHeadSuccessor :
+      (Computability.encodeNat (values.headI + 1)).length ≤ firstBudget := by
+    simp only [Nat.succ_eq_add_one] at headSuccessorInput
+    dsimp only [firstBudget]
+    omega
+  have firstLeft : leftCost ≤ firstBudget := by
+    dsimp only [firstBudget]
+    omega
+  have firstRight : rightCost ≤ firstBudget := by
+    dsimp only [firstBudget]
+    omega
+  have both := boolAndCost_le_budget values leftValue rightValue
+    leftCost rightCost firstBudget leftValueBound rightValueBound
+    firstValues firstHead firstHeadSuccessor firstLeft firstRight firstPositive
+  let secondBudget := 1000 * (firstBudget + 1)
+  have firstSecond : firstBudget ≤ secondBudget := by
+    dsimp only [secondBudget]
+    omega
+  have secondPositive : 1 ≤ secondBudget := by
+    exact firstPositive.trans firstSecond
+  have secondValues : encodedListSpace values ≤ secondBudget :=
+    firstValues.trans firstSecond
+  have secondHead :
+      (Computability.encodeNat values.headI).length ≤ secondBudget := by
+    exact firstHead.trans firstSecond
+  have secondHeadSuccessor :
+      (Computability.encodeNat (values.headI + 1)).length ≤ secondBudget := by
+    exact firstHeadSuccessor.trans firstSecond
+  have firstAccumulated : accumulatedCost ≤ firstBudget := by
+    dsimp only [firstBudget]
+    omega
+  have secondAccumulated : accumulatedCost ≤ secondBudget :=
+    firstAccumulated.trans firstSecond
+  have secondBoth :
+      boolAndCost values leftValue rightValue leftCost rightCost ≤
+        secondBudget := by
+    simpa [secondBudget] using both
+  have bothValueBound :
+      (if leftValue = 0 ∨ rightValue = 0 then 0 else 1) ≤ 1 := by
+    split <;> omega
+  have combined := boolOrCost_le_budget values accumulatedValue
+    (if leftValue = 0 ∨ rightValue = 0 then 0 else 1)
+    accumulatedCost
+    (boolAndCost values leftValue rightValue leftCost rightCost)
+    secondBudget accumulatedValueBound bothValueBound secondValues
+    secondHead secondHeadSuccessor secondAccumulated secondBoth secondPositive
+  simpa [accumulatedRawBudget, secondBudget, firstBudget] using combined
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 2000000 in
+private theorem accumulatedTagCost_le_budget
+    (values : List Nat)
+    (result accumulatedValue leftValue rightValue : Nat)
+    (accumulatedCost leftCost rightCost budget : Nat)
+    (resultBound : result ≤ 1)
+    (accumulatedValueBound : accumulatedValue ≤ 1)
+    (leftValueBound : leftValue ≤ 1)
+    (rightValueBound : rightValue ≤ 1)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (accumulatedCostBound : accumulatedCost ≤ 130000 * (budget + 1))
+    (leftCostBound : leftCost ≤ 30000000 * (budget + 1))
+    (rightCostBound : rightCost ≤ 30000000 * (budget + 1)) :
+    someBoolTagCost values result
+        (boolOrCost values accumulatedValue
+          (if leftValue = 0 ∨ rightValue = 0 then 0 else 1)
+          accumulatedCost
+          (boolAndCost values leftValue rightValue leftCost rightCost)) ≤
+      accumulatedTagBudget budget := by
+  have raw := accumulatedRawCost_le_budget values accumulatedValue
+    leftValue rightValue accumulatedCost leftCost rightCost budget
+    accumulatedValueBound leftValueBound rightValueBound valuesBound
+    accumulatedCostBound leftCostBound rightCostBound
+  let tagBudget := accumulatedRawBudget budget
+  have tagPositive : 1 ≤ tagBudget := by
+    dsimp only [tagBudget, accumulatedRawBudget]
+    omega
+  have tagValues : encodedListSpace values ≤ tagBudget := by
+    dsimp only [tagBudget, accumulatedRawBudget]
+    omega
+  have tagged := someBoolTagCost_le_budget values result
+    (boolOrCost values accumulatedValue
+      (if leftValue = 0 ∨ rightValue = 0 then 0 else 1)
+      accumulatedCost
+      (boolAndCost values leftValue rightValue leftCost rightCost))
+    tagBudget resultBound tagValues (by simpa [tagBudget] using raw) tagPositive
+  simpa [accumulatedTagBudget, tagBudget] using tagged
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 2000000 in
 /-- Every semantic branch of the strip-specialized Savitch transition has a
-finite compositional evaluator-space certificate.  The next layer replaces
-the branch-dependent witness by one uniform polynomial allowance. -/
-theorem exactStepExists
+compositional evaluator-space certificate at one common structural cost. -/
+theorem exactStep
     (tromino : Tromino) (periodicStrip : PeriodicStrip)
     (wellFormed : periodicStrip.IsWellFormed)
     (stateCount : Nat) (state : FiniteState.DivideEvalState) :
-    ∃ cost,
-      Turing.PartrecToTM2.EvaluatorCodeFits
+    Turing.PartrecToTM2.EvaluatorCodeFits
         (FiniteState.DivideEvalPartrec.stepCode
           (stripBaseBoolCode tromino))
         (FiniteState.divideEvalProgramList
@@ -1318,7 +1737,7 @@ theorem exactStepExists
           (Encodable.encode periodicStrip) stateCount
           (FiniteState.divideEvalStep stateCount
             (indexedTransitionRawBool tromino periodicStrip) state))
-        cost := by
+        (stepCost tromino periodicStrip stateCount state) := by
   cases state with
   | mk query stack answer =>
     cases query with
@@ -1356,21 +1775,101 @@ theorem exactStepExists
             (whenSucc := FiniteState.DivideEvalPartrec.answerSome)
             (testValue := 0) rfl
             (get 3 values) depthBranch
+          let unit := stepSpaceUnit tromino periodicStrip stateCount state
+          have valuesBound : encodedListSpace values ≤ unit := by
+            simp [unit, stepSpaceUnit, values, state]
+            omega
+          have baseCostBound :
+              baseBoolCost tromino periodicStrip stateCount state ≤ unit := by
+            simp [unit, stepSpaceUnit]
+            omega
+          have unitPositive : 1 ≤ unit := by
+            simp [unit, stepSpaceUnit]
+          have baseResultBound : baseResult ≤ 1 := by
+            cases result :
+                (decide (first = last) ||
+                  indexedTransitionRawBool tromino periodicStrip first last) <;>
+              simp [baseResult, result, FiniteState.divideBoolTag]
+          have tagCostBound : tag.cost ≤ 100000000 * (unit + 1) := by
+            simpa [tag, someBoolField] using
+              someBoolTagCost_le_budget values baseResult
+                (baseBoolCost tromino periodicStrip stateCount state) unit
+                baseResultBound valuesBound baseCostBound unitPositive
+          dsimp [tag, someBoolField] at tagCostBound
+          have get0 := listCodeGetCost_le_linear 0 values
+          have get1 := listCodeGetCost_le_linear 1 values
+          have get2 := listCodeGetCost_le_linear 2 values
+          have get3 := listCodeGetCost_le_linear 3 values
+          have get4 := listCodeGetCost_le_linear 4 values
+          have get5 := listCodeGetCost_le_linear 5 values
+          have get6 := listCodeGetCost_le_linear 6 values
+          have drop7 := dropCost_le_linear 7 values
+          have identity := idCost_le_linear values
+          have get0Bound : getCost 0 values ≤ 10000 * (unit + 1) :=
+            get0.trans (by gcongr)
+          have get1Bound : getCost 1 values ≤ 20000 * (unit + 1) := by
+            simpa only [Nat.reduceAdd, Nat.reduceMul] using
+              get1.trans (Nat.mul_le_mul_left 20000
+                (Nat.add_le_add_right valuesBound 1))
+          have get2Bound : getCost 2 values ≤ 30000 * (unit + 1) := by
+            simpa only [Nat.reduceAdd, Nat.reduceMul] using
+              get2.trans (Nat.mul_le_mul_left 30000
+                (Nat.add_le_add_right valuesBound 1))
+          have get3Bound : getCost 3 values ≤ 40000 * (unit + 1) := by
+            simpa only [Nat.reduceAdd, Nat.reduceMul] using
+              get3.trans (Nat.mul_le_mul_left 40000
+                (Nat.add_le_add_right valuesBound 1))
+          have get4Bound : getCost 4 values ≤ 50000 * (unit + 1) := by
+            simpa only [Nat.reduceAdd, Nat.reduceMul] using
+              get4.trans (Nat.mul_le_mul_left 50000
+                (Nat.add_le_add_right valuesBound 1))
+          have get5Bound : getCost 5 values ≤ 60000 * (unit + 1) := by
+            simpa only [Nat.reduceAdd, Nat.reduceMul] using
+              get5.trans (Nat.mul_le_mul_left 60000
+                (Nat.add_le_add_right valuesBound 1))
+          have get6Bound : getCost 6 values ≤ 70000 * (unit + 1) := by
+            simpa only [Nat.reduceAdd, Nat.reduceMul] using
+              get6.trans (Nat.mul_le_mul_left 70000
+                (Nat.add_le_add_right valuesBound 1))
+          have drop7Bound : dropCost 7 values ≤ 80000 * (unit + 1) := by
+            simpa only [Nat.reduceAdd, Nat.reduceMul] using
+              drop7.trans (Nat.mul_le_mul_left 80000
+                (Nat.add_le_add_right valuesBound 1))
+          have identityBound : idCost values ≤ 10 * (unit + 1) :=
+            identity.trans (Nat.mul_le_mul_left 10
+              (Nat.add_le_add_right valuesBound 1))
+          have explicitValuesBound := valuesBound
+          have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+          have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+          have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
           cases baseAnswer :
               (decide (first = last) ||
-                indexedTransitionRawBool tromino periodicStrip first last) <;>
-            apply existsCost <;>
-            simpa [FiniteState.DivideEvalPartrec.stepCode,
-              FiniteState.DivideEvalPartrec.answerNone,
-              FiniteState.DivideEvalPartrec.noneDepthZero,
-              FiniteState.DivideEvalPartrec.field,
-              FiniteState.DivideEvalPartrec.fields,
-              FiniteState.divideEvalProgramList,
-              FiniteState.DivideEvalState.toNatList,
-              FiniteState.divideEvalStep, values, state, fieldFits, tag,
-              baseResult, baseAnswer, getField, someBoolField,
-              FiniteState.divideBoolTag,
-              FiniteState.divideOptionBoolTag] using whole
+                indexedTransitionRawBool tromino periodicStrip first last)
+          all_goals
+            apply Turing.PartrecToTM2.EvaluatorCodeFits.mono
+            · simpa [FiniteState.DivideEvalPartrec.stepCode,
+                FiniteState.DivideEvalPartrec.answerNone,
+                FiniteState.DivideEvalPartrec.noneDepthZero,
+                FiniteState.DivideEvalPartrec.field,
+                FiniteState.DivideEvalPartrec.fields,
+                FiniteState.divideEvalProgramList,
+                FiniteState.DivideEvalState.toNatList,
+                FiniteState.divideEvalStep, values, state, fieldFits, tag,
+                baseResult, baseAnswer, getField, someBoolField,
+                FiniteState.divideBoolTag,
+                FiniteState.divideOptionBoolTag] using whole
+            · rw [show stepCost tromino periodicStrip stateCount state =
+                  1000000000000000000000000000000 * unit by rfl]
+              simp [fieldsCost,
+                branchZeroZeroCost, branchZeroTestCost, prependCost,
+                baseResult, baseAnswer, values, state,
+                getField, someBoolField,
+                FiniteState.divideEvalProgramList,
+                FiniteState.DivideEvalState.toNatList,
+                FiniteState.divideOptionBoolTag,
+                FiniteState.divideBoolTag,
+                zeroBits, oneBits, twoBits] at tagCostBound get0Bound get1Bound get2Bound get3Bound get4Bound get5Bound get6Bound drop7Bound identityBound explicitValuesBound ⊢
+              omega
         | succ depth =>
           cases stateCount with
           | zero =>
@@ -1397,7 +1896,7 @@ theorem exactStepExists
               (whenSucc := FiniteState.DivideEvalPartrec.answerSome)
               (testValue := 0) rfl
               (get 3 values) answerBranch
-            exact existsCost (by
+            have wholeFits := (by
               simpa [FiniteState.DivideEvalPartrec.stepCode,
               FiniteState.DivideEvalPartrec.answerNone,
               FiniteState.DivideEvalPartrec.noneDepthSucc,
@@ -1409,6 +1908,36 @@ theorem exactStepExists
               FiniteState.divideEvalStep, values, state, fieldFits,
               getField, oneField,
               FiniteState.divideOptionBoolTag] using whole)
+            apply wholeFits.mono
+            let unit := stepSpaceUnit tromino periodicStrip 0 state
+            have valuesBound : encodedListSpace values ≤ unit := by
+              simp [unit, stepSpaceUnit, values, state]
+              omega
+            have get0 := getCost_le_budget 0 values unit (by omega) valuesBound
+            have get1 := getCost_le_budget 1 values unit (by omega) valuesBound
+            have get2 := getCost_le_budget 2 values unit (by omega) valuesBound
+            have get3 := getCost_le_budget 3 values unit (by omega) valuesBound
+            have get4 := getCost_le_budget 4 values unit (by omega) valuesBound
+            have get5 := getCost_le_budget 5 values unit (by omega) valuesBound
+            have get6 := getCost_le_budget 6 values unit (by omega) valuesBound
+            have drop7 := dropCost_le_budget 7 values unit (by omega) valuesBound
+            have identity := idCost_le_budget values unit valuesBound
+            have one := oneCost_le_budget values unit valuesBound
+            have tail := listCodeTailCost_le_linear (depth :: values)
+            have depthBits := listCodeEncodeNat_length_mono
+              (show depth ≤ depth + 1 by omega)
+            have explicitValuesBound := valuesBound
+            have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+            have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+            rw [show stepCost tromino periodicStrip 0 state =
+                1000000000000000000000000000000 * unit by rfl]
+            simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
+              branchZeroTestCost, prependCost, values, state, fieldFits,
+              getField, oneField, FiniteState.divideEvalProgramList,
+              FiniteState.DivideEvalState.toNatList,
+              FiniteState.divideOptionBoolTag, zeroBits, oneBits]
+              at get0 get1 get2 get3 get4 get5 get6 drop7 identity one tail depthBits explicitValuesBound ⊢
+            omega
           | succ middle =>
             let state : FiniteState.DivideEvalState :=
               { query := { depth := depth + 1, first := first, last := last },
@@ -1436,7 +1965,7 @@ theorem exactStepExists
               (whenSucc := FiniteState.DivideEvalPartrec.answerSome)
               (testValue := 0) rfl
               (get 3 values) answerBranch
-            exact existsCost (by
+            have wholeFits := (by
               simpa [FiniteState.DivideEvalPartrec.stepCode,
               FiniteState.DivideEvalPartrec.answerNone,
               FiniteState.DivideEvalPartrec.noneDepthSucc,
@@ -1452,6 +1981,50 @@ theorem exactStepExists
               getField, succField, zeroField, predecessorField,
               FiniteState.divideBoolTag,
               FiniteState.divideOptionBoolTag] using whole)
+            apply wholeFits.mono
+            let unit := stepSpaceUnit tromino periodicStrip (middle + 1) state
+            have valuesBound : encodedListSpace values ≤ unit := by
+              simp [unit, stepSpaceUnit, values, state]
+              omega
+            have get0 := getCost_le_budget 0 values unit (by omega) valuesBound
+            have get1 := getCost_le_budget 1 values unit (by omega) valuesBound
+            have get2 := getCost_le_budget 2 values unit (by omega) valuesBound
+            have get3 := getCost_le_budget 3 values unit (by omega) valuesBound
+            have get4 := getCost_le_budget 4 values unit (by omega) valuesBound
+            have get5 := getCost_le_budget 5 values unit (by omega) valuesBound
+            have get6 := getCost_le_budget 6 values unit (by omega) valuesBound
+            have drop7 := dropCost_le_budget 7 values unit (by omega) valuesBound
+            have identity := idCost_le_budget values unit valuesBound
+            have zero := zeroCost_le_budget values unit valuesBound
+            have successor := successorFieldCost_le_budget 2 values unit
+              (by omega) valuesBound
+            have predecessor1 := predecessorFieldCost_le_budget 1 values unit
+              (by omega) valuesBound
+            have predecessor4 := predecessorFieldCost_le_budget 4 values unit
+              (by omega) valuesBound
+            have middleTail := listCodeTailCost_le_linear (middle :: values)
+            have depthTail := listCodeTailCost_le_linear (depth :: values)
+            have middleBits := listCodeEncodeNat_length_mono
+              (show middle ≤ middle + 1 by omega)
+            have depthBits := listCodeEncodeNat_length_mono
+              (show depth ≤ depth + 1 by omega)
+            have stackBits := encodeNat_succ_length_le stack.length
+            have explicitValuesBound := valuesBound
+            have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+            have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+            rw [show stepCost tromino periodicStrip (middle + 1) state =
+                1000000000000000000000000000000 * unit by rfl]
+            simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
+              branchZeroTestCost, prependCost, values, state, fieldFits,
+              getField, succField, zeroField, predecessorField,
+              FiniteState.divideEvalProgramList,
+              FiniteState.DivideEvalState.toNatList,
+              FiniteState.DivideFrame.toNatList,
+              FiniteState.divideStackToNatList,
+              FiniteState.divideOptionBoolTag, FiniteState.divideBoolTag,
+              zeroBits, oneBits]
+              at get0 get1 get2 get3 get4 get5 get6 drop7 identity zero successor predecessor1 predecessor4 middleTail depthTail middleBits depthBits stackBits explicitValuesBound ⊢
+            omega
       | some answerValue =>
         cases stack with
         | nil =>
@@ -1480,16 +2053,41 @@ theorem exactStepExists
             (by cases answerValue <;> simp [FiniteState.divideBoolTag])
             answerTest
             (by simpa [values, state] using stackBranch)
-          cases answerValue <;>
-            apply existsCost <;>
-            simpa [FiniteState.DivideEvalPartrec.stepCode,
-              FiniteState.DivideEvalPartrec.answerSome,
-              FiniteState.DivideEvalPartrec.field,
+          cases answerValue
+          all_goals
+            have wholeFits := (by
+              simpa [FiniteState.DivideEvalPartrec.stepCode,
+                FiniteState.DivideEvalPartrec.answerSome,
+                FiniteState.DivideEvalPartrec.field,
+                FiniteState.divideEvalProgramList,
+                FiniteState.DivideEvalState.toNatList,
+                FiniteState.divideEvalStep, values, state,
+                FiniteState.divideBoolTag,
+                FiniteState.divideOptionBoolTag] using whole)
+            apply wholeFits.mono
+            let unit := stepSpaceUnit tromino periodicStrip stateCount state
+            have valuesBound : encodedListSpace values ≤ unit := by
+              simp [unit, stepSpaceUnit, values, state]
+              omega
+            have get2 := getCost_le_budget 2 values unit (by omega) valuesBound
+            have get3 := getCost_le_budget 3 values unit (by omega) valuesBound
+            have identity := idCost_le_budget values unit valuesBound
+            have tail0 := listCodeTailCost_le_linear (0 :: values)
+            have tail1 := listCodeTailCost_le_linear (1 :: values)
+            have explicitValuesBound := valuesBound
+            have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+            have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+            have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+            rw [show stepCost tromino periodicStrip stateCount state =
+                1000000000000000000000000000000 * unit by rfl]
+            simp [branchZeroZeroCost, branchZeroSuccCost,
+              branchZeroTestCost, prependCost, values, state,
               FiniteState.divideEvalProgramList,
               FiniteState.DivideEvalState.toNatList,
-              FiniteState.divideEvalStep, values, state,
-              FiniteState.divideBoolTag,
-              FiniteState.divideOptionBoolTag] using whole
+              FiniteState.divideOptionBoolTag, FiniteState.divideBoolTag,
+              zeroBits, oneBits, twoBits]
+              at get2 get3 identity tail0 tail1 explicitValuesBound ⊢
+            omega
         | cons frame rest =>
           cases frame with
           | mk frameDepth frameFirst frameLast middle accumulated leftAnswer =>
@@ -1537,22 +2135,65 @@ theorem exactStepExists
                 (by cases answerValue <;> simp [FiniteState.divideBoolTag])
                 answerTest
                 (by simpa [values, state] using stackBranch)
-              cases answerValue <;> cases accumulated <;>
-                apply existsCost <;>
-                simpa [FiniteState.DivideEvalPartrec.stepCode,
-                  FiniteState.DivideEvalPartrec.answerSome,
-                  FiniteState.DivideEvalPartrec.someFrame,
-                  FiniteState.DivideEvalPartrec.someLeftNone,
-                  FiniteState.DivideEvalPartrec.field,
-                  FiniteState.DivideEvalPartrec.fields,
-                  FiniteState.divideEvalProgramList,
+              cases answerValue <;> cases accumulated
+              all_goals
+                have wholeFits := (by
+                  simpa [FiniteState.DivideEvalPartrec.stepCode,
+                    FiniteState.DivideEvalPartrec.answerSome,
+                    FiniteState.DivideEvalPartrec.someFrame,
+                    FiniteState.DivideEvalPartrec.someLeftNone,
+                    FiniteState.DivideEvalPartrec.field,
+                    FiniteState.DivideEvalPartrec.fields,
+                    FiniteState.divideEvalProgramList,
+                    FiniteState.DivideEvalState.toNatList,
+                    FiniteState.DivideFrame.toNatList,
+                    FiniteState.divideStackToNatList,
+                    FiniteState.divideEvalStep, values, state, fieldFits,
+                    getField, zeroField,
+                    FiniteState.divideBoolTag,
+                    FiniteState.divideOptionBoolTag] using whole)
+                apply wholeFits.mono
+                let unit := stepSpaceUnit tromino periodicStrip stateCount state
+                have valuesBound : encodedListSpace values ≤ unit := by
+                  simp [unit, stepSpaceUnit, values, state]
+                  omega
+                have get0 := getCost_le_budget 0 values unit (by omega) valuesBound
+                have get1 := getCost_le_budget 1 values unit (by omega) valuesBound
+                have get2 := getCost_le_budget 2 values unit (by omega) valuesBound
+                have get3 := getCost_le_budget 3 values unit (by omega) valuesBound
+                have get7 := getCost_le_budget 7 values unit (by omega) valuesBound
+                have get8 := getCost_le_budget 8 values unit (by omega) valuesBound
+                have get9 := getCost_le_budget 9 values unit (by omega) valuesBound
+                have get10 := getCost_le_budget 10 values unit (by omega) valuesBound
+                have get11 := getCost_le_budget 11 values unit (by omega) valuesBound
+                have get12 := getCost_le_budget 12 values unit (by omega) valuesBound
+                have drop13 : dropCost 13 values ≤ 140000 * (unit + 1) := by
+                  exact (dropCost_le_linear 13 values).trans (by
+                    norm_num
+                    gcongr)
+                have identity := idCost_le_budget values unit valuesBound
+                have zero := zeroCost_le_budget values unit valuesBound
+                have restTail := listCodeTailCost_le_linear (rest.length :: values)
+                have tail0 := listCodeTailCost_le_linear (0 :: values)
+                have tail1 := listCodeTailCost_le_linear (1 :: values)
+                have restBits := listCodeEncodeNat_length_mono
+                  (show rest.length ≤ rest.length + 1 by omega)
+                have explicitValuesBound := valuesBound
+                have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+                have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+                have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+                rw [show stepCost tromino periodicStrip stateCount state =
+                    1000000000000000000000000000000 * unit by rfl]
+                simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
+                  branchZeroTestCost, prependCost, values, state, fieldFits,
+                  getField, zeroField, FiniteState.divideEvalProgramList,
                   FiniteState.DivideEvalState.toNatList,
                   FiniteState.DivideFrame.toNatList,
                   FiniteState.divideStackToNatList,
-                  FiniteState.divideEvalStep, values, state, fieldFits,
-                  getField, zeroField,
-                  FiniteState.divideBoolTag,
-                  FiniteState.divideOptionBoolTag] using whole
+                  FiniteState.divideOptionBoolTag, FiniteState.divideBoolTag,
+                  zeroBits, oneBits, twoBits]
+                  at get0 get1 get2 get3 get7 get8 get9 get10 get11 get12 drop13 identity zero restTail tail0 tail1 restBits explicitValuesBound ⊢
+                omega
             | some leftValue =>
               cases middle with
               | zero =>
@@ -1642,26 +2283,130 @@ theorem exactStepExists
                   (by cases answerValue <;> simp [FiniteState.divideBoolTag])
                     answerTest
                   (by simpa [values, state] using frameBranch)
-                cases answerValue <;> cases leftValue <;> cases accumulated <;>
-                  apply existsCost <;>
-                  simpa [FiniteState.DivideEvalPartrec.stepCode,
-                    FiniteState.DivideEvalPartrec.answerSome,
-                    FiniteState.DivideEvalPartrec.someFrame,
-                    FiniteState.DivideEvalPartrec.someLeftSome,
-                    FiniteState.DivideEvalPartrec.someLeftSomeMiddleZero,
-                    FiniteState.DivideEvalPartrec.accumulatedCode,
-                    FiniteState.DivideEvalPartrec.field,
-                    FiniteState.DivideEvalPartrec.predecessorField,
-                    FiniteState.DivideEvalPartrec.fields,
+                cases answerValue <;> cases leftValue <;> cases accumulated
+                all_goals
+                  have wholeFits := (by
+                    simpa [FiniteState.DivideEvalPartrec.stepCode,
+                      FiniteState.DivideEvalPartrec.answerSome,
+                      FiniteState.DivideEvalPartrec.someFrame,
+                      FiniteState.DivideEvalPartrec.someLeftSome,
+                      FiniteState.DivideEvalPartrec.someLeftSomeMiddleZero,
+                      FiniteState.DivideEvalPartrec.accumulatedCode,
+                      FiniteState.DivideEvalPartrec.field,
+                      FiniteState.DivideEvalPartrec.predecessorField,
+                      FiniteState.DivideEvalPartrec.fields,
+                      FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideEvalStep, values, state, fieldFits,
+                      accumulatedField, rawAccumulatedField, someBoolField,
+                      getField, StripSavitchStep.predecessorField,
+                      FiniteState.divideBoolTag,
+                      FiniteState.divideOptionBoolTag] using whole)
+                  apply wholeFits.mono
+                  let unit := stepSpaceUnit tromino periodicStrip stateCount state
+                  have valuesBound : encodedListSpace values ≤ unit := by
+                    simp [unit, stepSpaceUnit, values, state]
+                    omega
+                  have get0 := getCost_le_budget 0 values unit (by omega) valuesBound
+                  have get1 := getCost_le_budget 1 values unit (by omega) valuesBound
+                  have get2 := getCost_le_budget 2 values unit (by omega) valuesBound
+                  have get3 := getCost_le_budget 3 values unit (by omega) valuesBound
+                  have get4 := getCost_le_budget 4 values unit (by omega) valuesBound
+                  have get5 := getCost_le_budget 5 values unit (by omega) valuesBound
+                  have get6 := getCost_le_budget 6 values unit (by omega) valuesBound
+                  have get10 := getCost_le_budget 10 values unit (by omega) valuesBound
+                  have get11 := getCost_le_budget 11 values unit (by omega) valuesBound
+                  have get12 := getCost_le_budget 12 values unit (by omega) valuesBound
+                  have pred2 := predecessorFieldCost_le_budget 2 values unit
+                    (by omega) valuesBound
+                  have pred3 := predecessorFieldCost_le_budget 3 values unit
+                    (by omega) valuesBound
+                  have pred12 := predecessorFieldCost_le_budget 12 values unit
+                    (by omega) valuesBound
+                  have drop13 : dropCost 13 values ≤ 140000 * (unit + 1) := by
+                    exact (dropCost_le_linear 13 values).trans (by
+                      norm_num
+                      gcongr)
+                  have identity := idCost_le_budget values unit valuesBound
+                  have leftOutput : (predecessorField 12 values).output ≤ 1 := by
+                    simp [predecessorField, values, state,
+                      FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideOptionBoolTag,
+                      FiniteState.divideBoolTag]
+                  have answerOutput : (predecessorField 3 values).output ≤ 1 := by
+                    simp [predecessorField, values, state,
+                      FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideOptionBoolTag,
+                      FiniteState.divideBoolTag]
+                  have accumulatedOutput : values[11]?.getD 0 ≤ 1 := by
+                    simp [values, state, FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideBoolTag,
+                      FiniteState.divideOptionBoolTag]
+                  have rawOutputBound : rawAccumulatedField.output ≤ 1 := by
+                    dsimp only [rawAccumulatedField]
+                    split <;> omega
+                  have rawCost : rawAccumulatedField.cost =
+                      boolOrCost values (values[11]?.getD 0)
+                        (if (predecessorField 12 values).output = 0 ∨
+                            (predecessorField 3 values).output = 0
+                          then 0 else 1)
+                        (getCost 11 values)
+                        (boolAndCost values
+                          (predecessorField 12 values).output
+                          (predecessorField 3 values).output
+                          (predecessorField 12 values).cost
+                          (predecessorField 3 values).cost) := by
+                    rfl
+                  have accumulatedFieldBound :
+                      accumulatedField.cost ≤
+                        accumulatedTagBudget unit := by
+                    change someBoolTagCost values rawAccumulatedField.output
+                      rawAccumulatedField.cost ≤ _
+                    rw [rawCost]
+                    exact accumulatedTagCost_le_budget values
+                      rawAccumulatedField.output (values[11]?.getD 0)
+                      (predecessorField 12 values).output
+                      (predecessorField 3 values).output
+                      (getCost 11 values)
+                      (predecessorField 12 values).cost
+                      (predecessorField 3 values).cost unit
+                      rawOutputBound accumulatedOutput leftOutput answerOutput
+                      valuesBound get11 pred12 pred3
+                  have restTail := listCodeTailCost_le_linear (rest.length :: values)
+                  have tail0 := listCodeTailCost_le_linear (0 :: values)
+                  have tail1 := listCodeTailCost_le_linear (1 :: values)
+                  have restBits := listCodeEncodeNat_length_mono
+                    (show rest.length ≤ rest.length + 1 by omega)
+                  have explicitValuesBound := valuesBound
+                  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+                  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+                  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+                  rw [show stepCost tromino periodicStrip stateCount state =
+                      1000000000000000000000000000000 * unit by rfl]
+                  simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
+                    branchZeroTestCost, prependCost, values, state, fieldFits,
+                    accumulatedField, rawAccumulatedField, someBoolField,
+                    getField, predecessorField,
                     FiniteState.divideEvalProgramList,
                     FiniteState.DivideEvalState.toNatList,
                     FiniteState.DivideFrame.toNatList,
                     FiniteState.divideStackToNatList,
-                    FiniteState.divideEvalStep, values, state, fieldFits,
-                    accumulatedField, rawAccumulatedField, someBoolField,
-                    getField, StripSavitchStep.predecessorField,
-                    FiniteState.divideBoolTag,
-                    FiniteState.divideOptionBoolTag] using whole
+                    FiniteState.divideOptionBoolTag, FiniteState.divideBoolTag,
+                    zeroBits, oneBits, twoBits]
+                    at get0 get1 get2 get3 get4 get5 get6 get10 get11 get12 pred2 pred3 pred12 drop13 identity accumulatedFieldBound restTail tail0 tail1 restBits explicitValuesBound ⊢
+                  simp [accumulatedTagBudget, accumulatedRawBudget] at accumulatedFieldBound
+                  omega
               | succ previousMiddle =>
                 let state : FiniteState.DivideEvalState :=
                   { query := { depth := depth, first := first, last := last },
@@ -1746,28 +2491,203 @@ theorem exactStepExists
                   (by cases answerValue <;> simp [FiniteState.divideBoolTag])
                   answerTest
                   (by simpa [values, state] using frameBranch)
-                cases answerValue <;> cases leftValue <;> cases accumulated <;>
-                  apply existsCost <;>
-                  simpa [FiniteState.DivideEvalPartrec.stepCode,
-                    FiniteState.DivideEvalPartrec.answerSome,
-                    FiniteState.DivideEvalPartrec.someFrame,
-                    FiniteState.DivideEvalPartrec.someLeftSome,
-                    FiniteState.DivideEvalPartrec.someLeftSomeMiddleSucc,
-                    FiniteState.DivideEvalPartrec.accumulatedCode,
-                    FiniteState.DivideEvalPartrec.field,
-                    FiniteState.DivideEvalPartrec.predecessorField,
-                    FiniteState.DivideEvalPartrec.fields,
+                cases answerValue <;> cases leftValue <;> cases accumulated
+                all_goals
+                  have wholeFits := (by
+                    simpa [FiniteState.DivideEvalPartrec.stepCode,
+                      FiniteState.DivideEvalPartrec.answerSome,
+                      FiniteState.DivideEvalPartrec.someFrame,
+                      FiniteState.DivideEvalPartrec.someLeftSome,
+                      FiniteState.DivideEvalPartrec.someLeftSomeMiddleSucc,
+                      FiniteState.DivideEvalPartrec.accumulatedCode,
+                      FiniteState.DivideEvalPartrec.field,
+                      FiniteState.DivideEvalPartrec.predecessorField,
+                      FiniteState.DivideEvalPartrec.fields,
+                      FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideEvalStep, values, state, fieldFits,
+                      accumulatedField, getField, zeroField,
+                      StripSavitchStep.predecessorField,
+                      FiniteState.divideBoolTag,
+                      FiniteState.divideOptionBoolTag] using whole)
+                  apply wholeFits.mono
+                  let unit := stepSpaceUnit tromino periodicStrip stateCount state
+                  have valuesBound : encodedListSpace values ≤ unit := by
+                    simp [unit, stepSpaceUnit, values, state]
+                    omega
+                  have get0 := getCost_le_budget 0 values unit (by omega) valuesBound
+                  have get1 := getCost_le_budget 1 values unit (by omega) valuesBound
+                  have get2 := getCost_le_budget 2 values unit (by omega) valuesBound
+                  have get3 := getCost_le_budget 3 values unit (by omega) valuesBound
+                  have get7 := getCost_le_budget 7 values unit (by omega) valuesBound
+                  have get8 := getCost_le_budget 8 values unit (by omega) valuesBound
+                  have get9 := getCost_le_budget 9 values unit (by omega) valuesBound
+                  have get10 := getCost_le_budget 10 values unit (by omega) valuesBound
+                  have get11 := getCost_le_budget 11 values unit (by omega) valuesBound
+                  have get12 := getCost_le_budget 12 values unit (by omega) valuesBound
+                  have pred3 := predecessorFieldCost_le_budget 3 values unit
+                    (by omega) valuesBound
+                  have pred10 := predecessorFieldCost_le_budget 10 values unit
+                    (by omega) valuesBound
+                  have pred12 := predecessorFieldCost_le_budget 12 values unit
+                    (by omega) valuesBound
+                  have drop13 : dropCost 13 values ≤ 140000 * (unit + 1) := by
+                    exact (dropCost_le_linear 13 values).trans (by
+                      norm_num
+                      gcongr)
+                  have identity := idCost_le_budget values unit valuesBound
+                  have zero := zeroCost_le_budget values unit valuesBound
+                  have leftOutput : (predecessorField 12 values).output ≤ 1 := by
+                    simp [predecessorField, values, state,
+                      FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideOptionBoolTag,
+                      FiniteState.divideBoolTag]
+                  have answerOutput : (predecessorField 3 values).output ≤ 1 := by
+                    simp [predecessorField, values, state,
+                      FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideOptionBoolTag,
+                      FiniteState.divideBoolTag]
+                  have accumulatedOutput : values[11]?.getD 0 ≤ 1 := by
+                    simp [values, state, FiniteState.divideEvalProgramList,
+                      FiniteState.DivideEvalState.toNatList,
+                      FiniteState.DivideFrame.toNatList,
+                      FiniteState.divideStackToNatList,
+                      FiniteState.divideBoolTag,
+                      FiniteState.divideOptionBoolTag]
+                  have accumulatedFieldOutput : accumulatedField.output ≤ 1 := by
+                    dsimp only [accumulatedField]
+                    split <;> omega
+                  have accumulatedFieldCost : accumulatedField.cost =
+                      boolOrCost values (values[11]?.getD 0)
+                        (if (predecessorField 12 values).output = 0 ∨
+                            (predecessorField 3 values).output = 0
+                          then 0 else 1)
+                        (getCost 11 values)
+                        (boolAndCost values
+                          (predecessorField 12 values).output
+                          (predecessorField 3 values).output
+                          (predecessorField 12 values).cost
+                          (predecessorField 3 values).cost) := by
+                    rfl
+                  have accumulatedFieldBound :
+                      accumulatedField.cost ≤ accumulatedRawBudget unit := by
+                    rw [accumulatedFieldCost]
+                    exact accumulatedRawCost_le_budget values
+                      (values[11]?.getD 0)
+                      (predecessorField 12 values).output
+                      (predecessorField 3 values).output
+                      (getCost 11 values)
+                      (predecessorField 12 values).cost
+                      (predecessorField 3 values).cost unit
+                      accumulatedOutput leftOutput answerOutput valuesBound
+                      get11 pred12 pred3
+                  have middleTail := listCodeTailCost_le_linear
+                    (previousMiddle :: values)
+                  have restTail := listCodeTailCost_le_linear (rest.length :: values)
+                  have tail0 := listCodeTailCost_le_linear (0 :: values)
+                  have tail1 := listCodeTailCost_le_linear (1 :: values)
+                  have middleBits := listCodeEncodeNat_length_mono
+                    (show previousMiddle ≤ previousMiddle + 1 by omega)
+                  have restBits := listCodeEncodeNat_length_mono
+                    (show rest.length ≤ rest.length + 1 by omega)
+                  have explicitValuesBound := valuesBound
+                  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+                  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+                  have twoBits : (Computability.encodeNat 2).length = 2 := by native_decide
+                  rw [show stepCost tromino periodicStrip stateCount state =
+                      1000000000000000000000000000000 * unit by rfl]
+                  simp [fieldsCost, branchZeroZeroCost, branchZeroSuccCost,
+                    branchZeroTestCost, prependCost, values, state, fieldFits,
+                    accumulatedField, getField, zeroField, predecessorField,
                     FiniteState.divideEvalProgramList,
                     FiniteState.DivideEvalState.toNatList,
                     FiniteState.DivideFrame.toNatList,
                     FiniteState.divideStackToNatList,
-                    FiniteState.divideEvalStep, values, state, fieldFits,
-                    accumulatedField, getField, zeroField,
-                    StripSavitchStep.predecessorField,
-                    FiniteState.divideBoolTag,
-                    FiniteState.divideOptionBoolTag] using whole
+                    FiniteState.divideOptionBoolTag, FiniteState.divideBoolTag,
+                    zeroBits, oneBits, twoBits]
+                    at get0 get1 get2 get3 get7 get8 get9 get10 get11 get12 pred3 pred10 pred12 drop13 identity zero accumulatedFieldBound middleTail restTail tail0 tail1 middleBits restBits explicitValuesBound ⊢
+                  simp [accumulatedRawBudget] at accumulatedFieldBound
+                  omega
 
 end StripSavitchStep
+
+/-- Input-length envelope for one complete strip-specialized Savitch
+transition. -/
+def stripSavitchStepSpaceBound (inputLength : Nat) : Nat :=
+  1000000000000000000000000000000 *
+    (20000000 * (stripReachPayloadSpaceBound inputLength + 1) +
+      stripTransitionLeafSpaceBound inputLength + 1)
+
+noncomputable def stripSavitchStepSpacePolynomial : Polynomial Nat :=
+  1000000000000000000000000000000 *
+    (20000000 * (stripReachPayloadSpacePolynomial + 1) +
+      stripTransitionLeafSpacePolynomial + 1)
+
+@[simp]
+theorem stripSavitchStepSpacePolynomial_eval (inputLength : Nat) :
+    stripSavitchStepSpacePolynomial.eval inputLength =
+      stripSavitchStepSpaceBound inputLength := by
+  simp [stripSavitchStepSpacePolynomial, stripSavitchStepSpaceBound]
+
+/-- Every reachable strip-specialized Savitch transition has the common
+input-polynomial cost needed by the tail iterator. -/
+theorem stripSavitchStepCost_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (indexCount periodicStrip))
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList
+            (Encodable.encode periodicStrip) stateCount state) ≤
+        stripReachPayloadSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length) :
+    StripSavitchStep.stepCost tromino periodicStrip stateCount state ≤
+      stripSavitchStepSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  have firstBound := indices.1.1
+  have lastBound := indices.1.2
+  have adapter := StripSavitchStep.baseArgumentsCost_le_linear
+    (Encodable.encode periodicStrip) stateCount state
+  have stateSpace' :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList
+            (Encodable.encode periodicStrip) stateCount state) ≤
+        stripReachPayloadSpaceBound inputLength := by
+    simpa [inputLength] using stateSpace
+  have adapterBound :
+      StripSavitchStep.baseArgumentsCost
+          (Encodable.encode periodicStrip) stateCount state ≤
+        10000000 * (stripReachPayloadSpaceBound inputLength + 1) :=
+    adapter.trans (by gcongr)
+  have leafLocal :=
+    Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost_le_polynomialSpaceBound
+      tromino periodicStrip state.query.first state.query.last
+  have leafGlobal := stripBaseTransitionPolynomialSpaceBound_le_leaf
+    tromino periodicStrip state.query.first state.query.last
+      firstBound lastBound
+  have leafCost :
+      Turing.PartrecToTM2.EvaluatorCodeFits.stripBaseTransitionCost
+          tromino periodicStrip state.query.first state.query.last ≤
+        stripTransitionLeafSpaceBound inputLength :=
+    leafLocal.trans (by simpa [inputLength] using leafGlobal)
+  simp only [StripSavitchStep.stepCost, StripSavitchStep.stepSpaceUnit,
+    StripSavitchStep.baseBoolCost]
+  change _ ≤ stripSavitchStepSpaceBound inputLength
+  simp only [stripSavitchStepSpaceBound]
+  omega
 
 /-- Fitted-call obligations for the two explicit transition leaves used by
 the strip evaluator.  Each field is continuation-passing: the caller reserves
