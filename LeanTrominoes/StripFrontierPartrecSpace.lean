@@ -7766,6 +7766,189 @@ theorem exact_polynomial
 
 end InnerScan
 
+namespace OuterScan
+
+private def rowFound (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (stateCount first : Nat) : Bool :=
+  FiniteState.boundedAny
+    (cycleCandidateBool tromino periodicStrip stateCount
+      (stripSearchDepth periodicStrip) first) stateCount
+
+/-- Total payload transformer for one complete padded row scan. -/
+def programStep (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (values : List Nat) : List Nat :=
+  let firstRemaining := values[3]?.getD 0
+  let found := boolOfTag (values[4]?.getD 0)
+  InnerScan.outerPayload periodicStrip stateCount firstRemaining.pred
+    (found || rowFound tromino periodicStrip stateCount firstRemaining.pred)
+
+@[simp]
+theorem programStep_outerPayload
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount firstRemaining : Nat) (found : Bool) :
+    programStep tromino periodicStrip stateCount
+        (InnerScan.outerPayload periodicStrip stateCount firstRemaining found) =
+      InnerScan.outerPayload periodicStrip stateCount firstRemaining.pred
+        (found || rowFound tromino periodicStrip stateCount
+          firstRemaining.pred) := by
+  simp [programStep, InnerScan.outerPayload]
+
+theorem programStep_iterate
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount remaining : Nat) (found : Bool) :
+    ((programStep tromino periodicStrip stateCount)^[remaining])
+        (InnerScan.outerPayload periodicStrip stateCount remaining found) =
+      InnerScan.outerPayload periodicStrip stateCount 0
+        (found || FiniteState.boundedAny
+          (fun first => rowFound tromino periodicStrip stateCount first)
+          remaining) := by
+  induction remaining generalizing found with
+  | zero => simp [FiniteState.boundedAny]
+  | succ remaining induction =>
+      rw [Function.iterate_succ_apply]
+      rw [programStep_outerPayload]
+      simpa [FiniteState.boundedAny, Bool.or_assoc] using
+        induction
+          (found || rowFound tromino periodicStrip stateCount remaining)
+
+/-- Canonical outer payloads reachable during a padded first-endpoint scan. -/
+def Reachable (periodicStrip : PeriodicStrip) (stateCount remaining : Nat)
+    (values : List Nat) : Prop :=
+  ∃ found,
+    values = InnerScan.outerPayload periodicStrip stateCount remaining found ∧
+    remaining ≤ stateCount
+
+theorem reachable_initial
+    (periodicStrip : PeriodicStrip) (stateCount : Nat) (found : Bool) :
+    Reachable periodicStrip stateCount stateCount
+      (InnerScan.outerPayload periodicStrip stateCount stateCount found) :=
+  ⟨found, rfl, Nat.le_refl _⟩
+
+theorem reachable_step
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount remaining : Nat) (values : List Nat)
+    (reachable :
+      Reachable periodicStrip stateCount (remaining + 1) values) :
+    Reachable periodicStrip stateCount remaining
+      (programStep tromino periodicStrip stateCount values) := by
+  obtain ⟨found, rfl, bound⟩ := reachable
+  refine ⟨found || rowFound tromino periodicStrip stateCount remaining,
+    ?_, by omega⟩
+  simpa using programStep_outerPayload tromino periodicStrip stateCount
+    (remaining + 1) found
+
+set_option maxHeartbeats 1000000 in
+/-- The complete padded first-endpoint countdown reuses one polynomial
+reserve while each step invokes a bounded complete second-endpoint scan. -/
+theorem flatUniform
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (stateCount : Nat) (found : Bool)
+    (stateCountBound : stateCount ≤ stripStateBound periodicStrip) :
+    EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatIterate (innerScanCode tromino))
+      (stateCount ::
+        InnerScan.outerPayload periodicStrip stateCount stateCount found)
+      (InnerScan.outerPayload periodicStrip stateCount 0
+        (found || FiniteState.boundedAny
+          (fun first => rowFound tromino periodicStrip stateCount first)
+          stateCount))
+      (stripOuterBodySpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) where
+  input_space := by
+    simpa [InnerScan.outerPayload] using
+      (stripOuterPayload_encodedListSpace_le_of_le_stateBound periodicStrip
+        stateCount stateCount stateCount found stateCountBound
+        (Nat.le_refl _) (Nat.le_refl _)).trans (by
+          simp [stripOuterBodySpaceBound]
+          omega)
+  output_space := by
+    have output := InnerScan.outerPayload_space_le periodicStrip stateCount 0
+      (found || FiniteState.boundedAny
+        (fun first => rowFound tromino periodicStrip stateCount first)
+        stateCount) stateCountBound (Nat.zero_le _)
+    exact output.trans (by
+      simp [stripOuterBodySpaceBound]
+      omega)
+  call continuation bound budget after := by
+    let inputLength :=
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length
+    apply Turing.PartrecToTM2.EvaluatorCallFits.flatIterate_of_reachable_code_fits
+      (step := programStep tromino periodicStrip stateCount)
+      (bodyCost := fun _ _ => stripOuterBodySpaceBound inputLength)
+      (invariant := Reachable periodicStrip stateCount)
+    · intro remaining values reachable
+      obtain ⟨reachableFound, rfl, remainingBound⟩ := reachable
+      cases remaining with
+      | zero =>
+          exact (StripCandidateStep.OuterScan.zeroBody tromino periodicStrip
+            (InnerScan.outerPayload periodicStrip stateCount 0
+              reachableFound)).mono (by
+              apply StripCandidateStep.OuterScan.bodyCost_le inputLength 0
+                (InnerScan.outerPayload periodicStrip stateCount 0
+                  reachableFound)
+                (InnerScan.outerPayload periodicStrip stateCount 0
+                  reachableFound)
+              · simpa [InnerScan.outerPayload, inputLength] using
+                  stripOuterPayload_encodedListSpace_le_of_le_stateBound
+                    periodicStrip stateCount 0 0 reachableFound
+                    stateCountBound (Nat.zero_le _) (Nat.zero_le _)
+              · simpa [inputLength] using
+                  InnerScan.outerPayload_space_le periodicStrip stateCount 0
+                    reachableFound stateCountBound (Nat.zero_le _))
+      | succ remaining =>
+          have step := InnerScan.exact_polynomial tromino periodicStrip
+            wellFormed stateCount (remaining + 1) reachableFound
+            stateCountBound (by omega) remainingBound
+          have body := EvaluatorCodeFits.flatCountdownBody_of_fit step
+            (remaining + 1)
+          have bodyOutput :
+              Turing.PartrecToTM2.flatCountdownOutput
+                  (fun _ => InnerScan.outerPayload periodicStrip stateCount
+                    (remaining + 1).pred
+                    (reachableFound || FiniteState.boundedAny
+                      (cycleCandidateBool tromino periodicStrip stateCount
+                        (stripSearchDepth periodicStrip)
+                        (remaining + 1).pred) stateCount))
+                  (remaining + 1)
+                  (InnerScan.outerPayload periodicStrip stateCount
+                    (remaining + 1) reachableFound) =
+                Turing.PartrecToTM2.flatCountdownOutput
+                  (programStep tromino periodicStrip stateCount)
+                  (remaining + 1)
+                  (InnerScan.outerPayload periodicStrip stateCount
+                    (remaining + 1) reachableFound) := by
+            simp [Turing.PartrecToTM2.flatCountdownOutput,
+              programStep, rowFound, InnerScan.outerPayload]
+          rw [bodyOutput] at body
+          apply body.mono
+          apply StripCandidateStep.OuterScan.bodyCost_le inputLength
+            (remaining + 1)
+            (InnerScan.outerPayload periodicStrip stateCount
+              (remaining + 1) reachableFound)
+            (InnerScan.outerPayload periodicStrip stateCount remaining
+              (reachableFound || rowFound tromino periodicStrip stateCount
+                remaining))
+          · simpa [InnerScan.outerPayload, inputLength] using
+              stripOuterPayload_encodedListSpace_le_of_le_stateBound
+                periodicStrip stateCount (remaining + 1) (remaining + 1)
+                reachableFound stateCountBound remainingBound remainingBound
+          · simpa [inputLength] using
+              InnerScan.outerPayload_space_le periodicStrip stateCount
+                remaining
+                (reachableFound || rowFound tromino periodicStrip stateCount
+                  remaining) stateCountBound (by omega)
+    · exact reachable_initial periodicStrip stateCount found
+    · exact reachable_step tromino periodicStrip stateCount
+    · intro remaining values reachable
+      simpa [inputLength] using budget
+    · rw [programStep_iterate]
+      exact after
+
+end OuterScan
+
 end Padded
 
 end StripCandidateStep
