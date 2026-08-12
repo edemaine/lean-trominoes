@@ -319,6 +319,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove that a clocked accepting-reset system has a directed cycle
         exactly when the original deterministic system has a bounded
         accepting trace.
+      - [x] Identify forward-local horizontal CNF models with bi-infinite
+        paths through their induced Boolean transition relation.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1196,6 +1198,10 @@ The representation choices for this target are:
   bounded clock advances on ordinary deterministic steps and an accepting
   state resets to the initial configuration; the reset system has a directed
   cycle exactly when the original system has a bounded accepting trace.
+- [`LeanTrominoes/PeriodicCNFTransition.lean`](LeanTrominoes/PeriodicCNFTransition.lean)
+  views every forward-local horizontal CNF formula as a transition relation
+  between consecutive Boolean slices and proves that satisfying line
+  assignments are exactly its bi-infinite paths.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
