@@ -1551,8 +1551,10 @@ The representation choices for this target are:
   final normalized `found` projection all have exact evaluator-space costs.
   A shared unit combining the target constructor, lookup scanner, and bounded
   list adapters now gives the whole leaf an explicit input-linear workspace
-  majorant; the lookup-input prefix inherits the same envelope for reuse by
-  covering-candidate queries.
+  majorant.  That unit is itself bounded linearly by the bit lengths of the
+  period, phase, encoded motif and row, assignment word, column, and fixed
+  vertical-offset magnitude; the lookup-input prefix inherits the same
+  envelope for reuse by covering-candidate queries.
 - [`LeanTrominoes/PartrecPackedCenterCandidate.lean`](LeanTrominoes/PartrecPackedCenterCandidate.lean)
   combines one fixed assignment-selection test with the three translated
   membership leaves of a tromino placement.  For either tromino and every

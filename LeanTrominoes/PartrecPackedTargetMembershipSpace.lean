@@ -342,6 +342,145 @@ def packedTargetMembershipUnit
       [packedTargetMembershipLimit column verticalOffset
         period phase motif row word] + 1)
 
+/-- Direct bit-length unit for one translated target-membership query. -/
+def packedTargetMembershipBitUnit
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) : Nat :=
+  (Computability.encodeNat period).length +
+    (Computability.encodeNat phase).length +
+    (Computability.encodeNat (Encodable.encode motif)).length +
+    (Computability.encodeNat (Encodable.encode row)).length +
+    (Computability.encodeNat word).length +
+    (Computability.encodeNat column.val).length +
+    (Computability.encodeNat
+      (intOffsetAmount verticalOffset)).length + 1
+
+set_option maxHeartbeats 1200000 in
+/-- The composed target-construction and assignment-lookup unit is linear in
+the original query-field bit lengths. -/
+theorem packedTargetMembershipUnit_le_linear
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) :
+    packedTargetMembershipUnit column verticalOffset
+        period phase motif row word ≤
+      100000000000000000000000000 * packedTargetMembershipBitUnit
+        column verticalOffset period phase motif row word := by
+  let amount := intOffsetAmount verticalOffset
+  let motifCode := Encodable.encode motif
+  let rowCode := Encodable.encode row
+  let numerator := Code.packedColumnPhaseNumerator period phase column.val
+  let x := numerator % period
+  let yCode := intOffsetResultCode verticalOffset rowCode
+  let target : Cell := (Int.ofNat x, row + verticalOffset)
+  let targetCode := Encodable.encode target
+  let bitUnit := packedTargetMembershipBitUnit
+    column verticalOffset period phase motif row word
+  have bitUnitPositive : 0 < bitUnit := by
+    simp [bitUnit, packedTargetMembershipBitUnit]
+  have cellUnit := packedTargetCellUnit_le_linear
+    verticalOffset period phase column.val rowCode
+  have numeratorBound :
+      numerator ≤ phase + column.val + (period + period) := by
+    simp only [numerator, Code.packedColumnPhaseNumerator,
+      Code.packedColumnPhaseSum]
+    omega
+  have xBound : x ≤ phase + column.val + (period + period) :=
+    (Nat.mod_le numerator period).trans numeratorBound
+  have periodDouble := encodeNat_add_length_le_sum period period
+  have phaseColumn := encodeNat_add_length_le_sum phase column.val
+  have xLimit := encodeNat_add_length_le_sum
+    (phase + column.val) (period + period)
+  have xBits :
+      (Computability.encodeNat x).length ≤
+        (Computability.encodeNat phase).length +
+          (Computability.encodeNat column.val).length +
+          2 * (Computability.encodeNat period).length + 3 := by
+    have raw := (encodeNat_length_mono xBound).trans xLimit
+    omega
+  have firstCodeBits := encodeNat_mul_length_le_sum 2 x
+  have yCodeBits :
+      (Computability.encodeNat yCode).length ≤
+        10 * ((Computability.encodeNat rowCode).length +
+          (Computability.encodeNat amount).length + 1) := by
+    simpa [yCode, amount] using
+      intOffsetResultCode_length_le verticalOffset rowCode
+  have targetPairBits := encodeNat_pair_length_le (2 * x) yCode
+  have targetCodeBits :
+      (Computability.encodeNat targetCode).length ≤
+        100 * bitUnit := by
+    have twoBits :
+        (Computability.encodeNat 2).length = 2 := by native_decide
+    have targetEq : targetCode = Nat.pair (2 * x) yCode := by
+      change Encodable.encode
+          ((Int.ofNat x, row + verticalOffset) : Cell) =
+        Nat.pair (2 * x) yCode
+      rw [Encodable.encode_prod_val, IntEncoding.encode_ofNat]
+      congr 1
+      simp [yCode, rowCode]
+    rw [targetEq]
+    simp only [bitUnit, packedTargetMembershipBitUnit]
+    simp only [amount, rowCode] at yCodeBits
+    clear * - xBits firstCodeBits yCodeBits targetPairBits twoBits
+    omega
+  have lookup := packedAssignmentLookupSpaceBound_le_linear
+    motifCode column.val targetCode word
+  have lookupGlobal :
+      packedAssignmentLookupSpaceBound
+          motifCode column.val targetCode word ≤
+        10000000000000000000000000 * bitUnit := by
+    simp only [packedAssignmentLookupInputUnit,
+      encodedListSpace_cons, encodedListSpace_nil] at lookup
+    simp only [bitUnit, packedTargetMembershipBitUnit,
+      motifCode] at lookup targetCodeBits ⊢
+    clear * - lookup targetCodeBits
+    omega
+  have limit1 := encodeNat_add_length_le_sum period phase
+  have limit2 := encodeNat_add_length_le_sum (period + phase) motifCode
+  have limit3 := encodeNat_add_length_le_sum
+    (period + phase + motifCode) rowCode
+  have limit4 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + rowCode) word
+  have limit5 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + rowCode + word) column.val
+  have limit6 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + rowCode + word + column.val) targetCode
+  have limit7 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + rowCode + word + column.val + targetCode) 100
+  have limitBits :
+      (Computability.encodeNat
+        (period + phase + motifCode + rowCode + word +
+          column.val + targetCode + 100)).length ≤
+        1000 * bitUnit := by
+    have hundredBits :
+        (Computability.encodeNat 100).length = 7 := by native_decide
+    simp only [motifCode, rowCode] at limit1 limit2 limit3
+    simp only [motifCode, rowCode] at limit4 limit5 limit6 limit7
+    simp only [bitUnit, packedTargetMembershipBitUnit,
+      motifCode, rowCode] at targetCodeBits ⊢
+    clear * - limit1 limit2 limit3 limit4 limit5 limit6 limit7
+      targetCodeBits hundredBits
+    omega
+  have cellGlobal :
+      packedTargetCellUnit verticalOffset period phase column.val rowCode ≤
+        100000 * bitUnit := by
+    simp only [rowCode] at cellUnit
+    simp only [bitUnit, packedTargetMembershipBitUnit, rowCode]
+    omega
+  simp only [packedTargetMembershipUnit,
+    packedTargetMembershipLimit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  change
+    packedTargetCellUnit verticalOffset period phase column.val rowCode +
+        packedAssignmentLookupSpaceBound
+          motifCode column.val targetCode word +
+        ((Computability.encodeNat
+          (period + phase + motifCode + rowCode + word +
+            column.val + targetCode + 100)).length + 2) ≤ _
+  simp only [bitUnit, motifCode, rowCode] at cellGlobal lookupGlobal limitBits ⊢
+  omega
+
 set_option maxRecDepth 10000 in
 set_option maxHeartbeats 1200000 in
 set_option linter.unusedSimpArgs false in
