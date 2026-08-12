@@ -1225,6 +1225,28 @@ theorem packedNormalizedAtCost_le_linear
     (packedNormalizedAtFinalBudgetGrowth
       unit unitPositive)
 
+/-- The coordinate test is the always-evaluated left child of the complete
+normalization predicate, so it inherits the latter's workspace envelope. -/
+theorem packedNormalizedAtCoordinateCost_le_linear
+    (period phase : Nat) (motif : List Cell)
+    (column : Nat) (cell : Cell) (word : Nat) :
+    packedNormalizedAtCoordinateCost period phase motif
+        column cell word ≤
+      packedNormalizedAtSpaceBound period phase
+        (Encodable.encode motif) column
+        (Encodable.encode cell) word := by
+  calc
+    packedNormalizedAtCoordinateCost period phase motif
+          column cell word ≤
+        packedNormalizedAtCost period phase motif
+          column cell word := by
+      simp [packedNormalizedAtCost, boolOrCost,
+        branchZeroZeroCost, branchZeroSuccCost,
+        branchZeroTestCost, prependCost]
+      split <;> omega
+    _ ≤ _ := packedNormalizedAtCost_le_linear
+      period phase motif column cell word
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

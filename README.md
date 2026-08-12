@@ -1591,7 +1591,9 @@ The representation choices for this target are:
   conjunction at one motif occurrence.
 - [`LeanTrominoes/PartrecPackedCenterBaseSpace.lean`](LeanTrominoes/PartrecPackedCenterBaseSpace.lean)
   fits the direct phase comparison and both guarded center conditions through
-  their final one-base conjunction.
+  their final one-base conjunction.  Explicit envelopes now cover the phase
+  adapter and test, the guarded containment and coverage branches, and the
+  complete validity predicate for one motif base.
 - [`LeanTrominoes/PartrecPackedCenterLoop.lean`](LeanTrominoes/PartrecPackedCenterLoop.lean)
   streams the combined one-base checker across the encoded motif, recovers
   each head cell's row code on demand, and proves that the final accumulator
@@ -1608,7 +1610,8 @@ The representation choices for this target are:
   equal to `PackedWindowState.normalizedAtBool`.  Its evaluator cost is
   bounded explicitly by a fixed constant times the encoded size of one
   arithmetic envelope containing the period, phase, motif, cell, column,
-  and packed word.
+  and packed word; its always-evaluated coordinate-test prefix inherits that
+  envelope for reuse by center phase guards.
 - [`LeanTrominoes/PartrecPackedNormalizationLoop.lean`](LeanTrominoes/PartrecPackedNormalizationLoop.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean`](LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean)
