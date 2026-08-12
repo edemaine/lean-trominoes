@@ -802,6 +802,7 @@ import LeanTrominoes.PartrecMultiplySpace
 import LeanTrominoes.PartrecPair
 import LeanTrominoes.PartrecPairSpace
 import LeanTrominoes.PartrecIntOffset
+import LeanTrominoes.PartrecIntOffsetSpace
 import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLength
 import LeanTrominoes.PartrecBinaryLengthSpace

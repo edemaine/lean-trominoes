@@ -1507,6 +1507,10 @@ The representation choices for this target are:
   implements successor, predecessor, and addition by a fixed integer directly
   on Mathlib's even/odd integer encoding.  These programs construct the
   vertically shifted motif coordinates inspected by center validity.
+- [`LeanTrominoes/PartrecIntOffsetSpace.lean`](LeanTrominoes/PartrecIntOffsetSpace.lean)
+  follows every parity branch of those offset programs with exact evaluator
+  costs, composes them over arbitrary fixed offsets, and bounds the result
+  linearly in one encoded arithmetic envelope.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
