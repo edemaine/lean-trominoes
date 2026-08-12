@@ -442,6 +442,82 @@ def packedNormalizedAtSpaceBound
         motifCode + motifCode + motifCode +
         cellCode + column + word + 100) + 1000] + 1)
 
+/-- Native bit-length footprint of one packed normalization query. -/
+def packedNormalizedAtInputUnit
+    (period phase motifCode column cellCode word : Nat) : Nat :=
+  encodedListSpace
+    [period, phase, motifCode, column, cellCode, word] + 1
+
+/-- The affine arithmetic envelope used by normalization is linear in its six
+encoded input fields. -/
+theorem packedNormalizedAtEnvelopeUnit_le_linear
+    (period phase motifCode column cellCode word : Nat) :
+    encodedListSpace
+        [1024 * (period + phase +
+          motifCode + motifCode + motifCode +
+          cellCode + column + word + 100) + 1000] + 1 ≤
+      100 * packedNormalizedAtInputUnit
+        period phase motifCode column cellCode word := by
+  have sum1 := encodeNat_add_length_le_sum period phase
+  have sum2 := encodeNat_add_length_le_sum
+    (period + phase) motifCode
+  have sum3 := encodeNat_add_length_le_sum
+    (period + phase + motifCode) motifCode
+  have sum4 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + motifCode) motifCode
+  have sum5 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + motifCode + motifCode) cellCode
+  have sum6 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + motifCode + motifCode + cellCode) column
+  have sum7 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + motifCode + motifCode +
+      cellCode + column) word
+  have sum8 := encodeNat_add_length_le_sum
+    (period + phase + motifCode + motifCode + motifCode +
+      cellCode + column + word) 100
+  have scaled := encodeNat_mul_length_le_sum 1024
+    (period + phase + motifCode + motifCode + motifCode +
+      cellCode + column + word + 100)
+  have final := encodeNat_add_length_le_sum
+    (1024 * (period + phase + motifCode + motifCode + motifCode +
+      cellCode + column + word + 100)) 1000
+  have hundredBits :
+      (Computability.encodeNat 100).length = 7 := by native_decide
+  have thousandBits :
+      (Computability.encodeNat 1000).length = 10 := by native_decide
+  have scaleBits :
+      (Computability.encodeNat 1024).length = 11 := by native_decide
+  simp only [packedNormalizedAtInputUnit,
+    encodedListSpace_cons, encodedListSpace_nil]
+  omega
+
+/-- The complete normalization workspace envelope is linear in the bit
+lengths of its six encoded input fields. -/
+theorem packedNormalizedAtSpaceBound_le_linear
+    (period phase motifCode column cellCode word : Nat) :
+    packedNormalizedAtSpaceBound
+        period phase motifCode column cellCode word ≤
+      (1000000000000000000000000000000 * 100) *
+        packedNormalizedAtInputUnit
+          period phase motifCode column cellCode word := by
+  calc
+    packedNormalizedAtSpaceBound
+        period phase motifCode column cellCode word =
+        1000000000000000000000000000000 *
+          (encodedListSpace
+            [1024 * (period + phase +
+              motifCode + motifCode + motifCode +
+              cellCode + column + word + 100) + 1000] + 1) := rfl
+    _ ≤ 1000000000000000000000000000000 *
+          (100 * packedNormalizedAtInputUnit
+            period phase motifCode column cellCode word) :=
+      Nat.mul_le_mul_left _
+        (packedNormalizedAtEnvelopeUnit_le_linear
+          period phase motifCode column cellCode word)
+    _ = (1000000000000000000000000000000 * 100) *
+          packedNormalizedAtInputUnit
+            period phase motifCode column cellCode word := by ring
+
 private theorem packedNormalizedAtNonnegativeBudgetGrowth
     (unit : Nat) (positive : 1 ≤ unit) :
     1000 * (1000000000000000000 * unit + 1) ≤

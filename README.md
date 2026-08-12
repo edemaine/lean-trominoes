@@ -1488,7 +1488,9 @@ The representation choices for this target are:
   of any fixed assignment state, proved semantically equivalent to selecting
   that state and fitted through explicit equality arguments.  The projected
   lookup digit and the complete fixed-state equality test now each have named
-  input-linear evaluator-space bounds for reuse by later packed predicates.
+  evaluator-space bounds, and all three predicate envelopes are bounded
+  directly by the four native query-field bit lengths for reuse by later
+  packed predicates.
 - [`LeanTrominoes/PartrecPackedColumnPhase.lean`](LeanTrominoes/PartrecPackedColumnPhase.lean)
   and
   [`LeanTrominoes/PartrecPackedColumnPhaseSpace.lean`](LeanTrominoes/PartrecPackedColumnPhaseSpace.lean)
@@ -1623,8 +1625,9 @@ The representation choices for this target are:
   equal to `PackedWindowState.normalizedAtBool`.  Its evaluator cost is
   bounded explicitly by a fixed constant times the encoded size of one
   arithmetic envelope containing the period, phase, motif, cell, column,
-  and packed word; its always-evaluated coordinate-test prefix inherits that
-  envelope for reuse by center phase guards.
+  and packed word.  This envelope is now bounded linearly by those six native
+  field bit lengths; its always-evaluated coordinate-test prefix inherits the
+  same bound for reuse by center phase guards.
 - [`LeanTrominoes/PartrecPackedNormalizationLoop.lean`](LeanTrominoes/PartrecPackedNormalizationLoop.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean`](LeanTrominoes/PartrecPackedNormalizationLoopSpace.lean)

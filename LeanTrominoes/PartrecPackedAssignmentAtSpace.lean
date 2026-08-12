@@ -1147,7 +1147,7 @@ def packedAssignmentLookupInputUnit
     (motifCode queriedColumn targetCode word : Nat) : Nat :=
   encodedListSpace [motifCode, queriedColumn, targetCode, word] + 1
 
-private theorem packedAssignmentLookupEnvelopeUnit_le_linear
+theorem packedAssignmentLookupEnvelopeUnit_le_linear
     (motifCode queriedColumn targetCode word : Nat) :
     encodedListSpace
         [32 * (motifCode + motifCode + motifCode +

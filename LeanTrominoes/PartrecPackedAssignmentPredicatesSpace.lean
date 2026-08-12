@@ -206,6 +206,32 @@ def packedAssignmentLookupDigitSpaceBound
       [32 * (motifCode + motifCode + motifCode +
         targetCode + queriedColumn + word + 40 + 32) + 200] + 1)
 
+/-- Projecting the lookup digit preserves a linear bound in the four encoded
+query fields. -/
+theorem packedAssignmentLookupDigitSpaceBound_le_linear
+    (motifCode queriedColumn targetCode word : Nat) :
+    packedAssignmentLookupDigitSpaceBound
+        motifCode queriedColumn targetCode word ≤
+      (800000000000000000000 * 100) *
+        packedAssignmentLookupInputUnit
+          motifCode queriedColumn targetCode word := by
+  calc
+    packedAssignmentLookupDigitSpaceBound
+        motifCode queriedColumn targetCode word =
+        800000000000000000000 *
+          (encodedListSpace
+            [32 * (motifCode + motifCode + motifCode +
+              targetCode + queriedColumn + word + 40 + 32) + 200] + 1) := rfl
+    _ ≤ 800000000000000000000 *
+          (100 * packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word) :=
+      Nat.mul_le_mul_left _
+        (packedAssignmentLookupEnvelopeUnit_le_linear
+          motifCode queriedColumn targetCode word)
+    _ = (800000000000000000000 * 100) *
+          packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word := by ring
+
 set_option maxHeartbeats 800000 in
 theorem packedAssignmentLookupDigitCost_le_linear
     (motif : List Cell) (queriedColumn : Nat)
@@ -304,6 +330,32 @@ def packedAssignmentIsSpaceBound
     (encodedListSpace
       [32 * (motifCode + motifCode + motifCode +
         targetCode + queriedColumn + word + 40 + 32) + 200] + 1)
+
+/-- Testing a fixed assignment digit uses space linear in the four encoded
+query fields. -/
+theorem packedAssignmentIsSpaceBound_le_linear
+    (motifCode queriedColumn targetCode word : Nat) :
+    packedAssignmentIsSpaceBound
+        motifCode queriedColumn targetCode word ≤
+      100000000000000000000000000000000000000 *
+        packedAssignmentLookupInputUnit
+          motifCode queriedColumn targetCode word := by
+  calc
+    packedAssignmentIsSpaceBound
+        motifCode queriedColumn targetCode word =
+        1000000000000000000000000000000000000 *
+          (encodedListSpace
+            [32 * (motifCode + motifCode + motifCode +
+              targetCode + queriedColumn + word + 40 + 32) + 200] + 1) := rfl
+    _ ≤ 1000000000000000000000000000000000000 *
+          (100 * packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word) :=
+      Nat.mul_le_mul_left _
+        (packedAssignmentLookupEnvelopeUnit_le_linear
+          motifCode queriedColumn targetCode word)
+    _ = 100000000000000000000000000000000000000 *
+          packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word := by ring
 
 set_option maxRecDepth 10000 in
 set_option maxHeartbeats 1200000 in
@@ -425,6 +477,32 @@ def packedAssignmentIsNoneSpaceBound
     (encodedListSpace
       [32 * (motifCode + motifCode + motifCode +
         targetCode + queriedColumn + word + 40 + 32) + 200] + 1)
+
+/-- Testing for an absent assignment preserves a linear bound in the four
+encoded query fields. -/
+theorem packedAssignmentIsNoneSpaceBound_le_linear
+    (motifCode queriedColumn targetCode word : Nat) :
+    packedAssignmentIsNoneSpaceBound
+        motifCode queriedColumn targetCode word ≤
+      (1000000000000000000000000 * 100) *
+        packedAssignmentLookupInputUnit
+          motifCode queriedColumn targetCode word := by
+  calc
+    packedAssignmentIsNoneSpaceBound
+        motifCode queriedColumn targetCode word =
+        1000000000000000000000000 *
+          (encodedListSpace
+            [32 * (motifCode + motifCode + motifCode +
+              targetCode + queriedColumn + word + 40 + 32) + 200] + 1) := rfl
+    _ ≤ 1000000000000000000000000 *
+          (100 * packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word) :=
+      Nat.mul_le_mul_left _
+        (packedAssignmentLookupEnvelopeUnit_le_linear
+          motifCode queriedColumn targetCode word)
+    _ = (1000000000000000000000000 * 100) *
+          packedAssignmentLookupInputUnit
+            motifCode queriedColumn targetCode word := by ring
 
 set_option maxHeartbeats 800000 in
 theorem packedAssignmentIsNoneCost_le_linear
