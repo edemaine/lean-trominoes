@@ -1806,6 +1806,9 @@ The representation choices for this target are:
   `stripReachInput_fits` certifies the preceding fixed-width adapter,
   including its exact-fuel subcall, and `stripReachInputCost_le` absorbs that
   adapter into the polynomial reserve for one complete reachability query.
+  `stripReachBool_fits_polynomial` composes the adapter, full Savitch search,
+  answer-field projection, and Boolean normalization into the bounded
+  reachability call consumed by the outer endpoint scans.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse

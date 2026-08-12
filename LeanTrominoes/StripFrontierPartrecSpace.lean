@@ -2860,9 +2860,16 @@ theorem stripReachInputCost_le
     stripReachInputCost
         [Encodable.encode periodicStrip, indexCount periodicStrip,
           stripSearchDepth periodicStrip, first, last] ≤
-      stripReachCallSpaceBound
-        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
-          periodicStrip).length := by
+      1000000 *
+        (stripFuelComputationSpaceBound
+            ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+              periodicStrip).length +
+          stripLoopPayloadSpaceBound
+            ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+              periodicStrip).length +
+          stripReachPayloadSpaceBound
+            ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+              periodicStrip).length + 1) := by
   let values :=
     [Encodable.encode periodicStrip, indexCount periodicStrip,
       stripSearchDepth periodicStrip, first, last]
@@ -2894,8 +2901,7 @@ theorem stripReachInputCost_le
     FiniteState.DivideEvalState.toNatList,
     FiniteState.divideOptionBoolTag,
     FiniteState.divideStackToNatList,
-    encodedListSpace_cons, encodedListSpace_nil,
-    stripReachCallSpaceBound]
+    encodedListSpace_cons, encodedListSpace_nil]
     at inputBound outputBound fuelCost get0 get1 get2 get3 get4 zero nil ⊢
   omega
 
@@ -3237,6 +3243,196 @@ theorem stripSavitchFlatUniform
       simpa [inputLength] using budget
     · rw [stripSavitchProgramStep_iterate]
       exact after
+
+/-- Final semantic DFS state reached by one canonical exact-fuel strip
+reachability query. -/
+def stripReachFinalState
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) : FiniteState.DivideEvalState :=
+  ((FiniteState.divideEvalStep (indexCount periodicStrip)
+      (indexedTransitionRawBool tromino periodicStrip))^[
+        FiniteState.divideEvalFuel
+          (indexCount periodicStrip) (stripSearchDepth periodicStrip)])
+    (FiniteState.divideEvalInitial
+      (stripSearchDepth periodicStrip) first last)
+
+/-- Exact compositional evaluator cost of a complete indexed reachability
+wrapper, from its five input fields through normalized Boolean output. -/
+noncomputable def stripReachBoolCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) : Nat :=
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, last]
+  let output := FiniteState.divideEvalProgramList
+    (Encodable.encode periodicStrip) (indexCount periodicStrip)
+    (stripReachFinalState tromino periodicStrip first last)
+  EvaluatorCodeFits.predCost
+      [FiniteState.divideOptionBoolTag
+        (stripReachFinalState tromino periodicStrip first last).answer] +
+    (EvaluatorCodeFits.getCost 3 output +
+      (stripSavitchBodySpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length +
+        stripReachInputCost values))
+
+/-- The complete compiled reachability wrapper has an exact evaluator-space
+certificate, including fuel construction, Savitch search, answer projection,
+and option-tag normalization. -/
+theorem stripReachBool_fits
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first last : Nat)
+    (firstBelow : first < indexCount periodicStrip)
+    (lastBelow : last < indexCount periodicStrip) :
+    EvaluatorCodeFits (stripReachBoolCode tromino)
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, last]
+      [FiniteState.divideBoolTag
+        (FiniteState.divideReachIndexDFSBool
+          (indexCount periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip)
+          (stripSearchDepth periodicStrip) first last)]
+      (stripReachBoolCost tromino periodicStrip first last) := by
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, last]
+  let finalState := stripReachFinalState tromino periodicStrip first last
+  let output := FiniteState.divideEvalProgramList
+    (Encodable.encode periodicStrip) (indexCount periodicStrip) finalState
+  have inputFit :
+      EvaluatorCodeFits stripReachInputCode values
+        (FiniteState.divideEvalFuel
+            (indexCount periodicStrip) (stripSearchDepth periodicStrip) ::
+          FiniteState.divideEvalProgramList
+            (Encodable.encode periodicStrip) (indexCount periodicStrip)
+            (FiniteState.divideEvalInitial
+              (stripSearchDepth periodicStrip) first last))
+        (stripReachInputCost values) := by
+    simpa [values, FiniteState.divideEvalProgramList,
+      FiniteState.divideEvalInitial,
+      FiniteState.DivideEvalState.toNatList,
+      FiniteState.divideOptionBoolTag,
+      FiniteState.divideStackToNatList] using
+      stripReachInput_fits values
+  have loopFit := stripSavitchFlatUniform tromino periodicStrip wellFormed
+    first last firstBelow lastBelow
+  have loopWithInput := EvaluatorCodeFits.comp loopFit inputFit
+  have loopWithInput' :
+      EvaluatorCodeFits
+        ((Turing.ToPartrec.Code.flatIterate
+          (FiniteState.DivideEvalPartrec.stepCode
+            (stripBaseBoolCode tromino))).comp stripReachInputCode)
+        values output
+        (stripSavitchBodySpaceBound
+            ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+              periodicStrip).length + stripReachInputCost values) := by
+    simpa [finalState, stripReachFinalState, output] using loopWithInput
+  have projected := EvaluatorCodeFits.comp
+    (EvaluatorCodeFits.get 3 output) loopWithInput'
+  have normalized := EvaluatorCodeFits.comp
+    (EvaluatorCodeFits.pred_named
+      [FiniteState.divideOptionBoolTag finalState.answer]) projected
+  have answerTag :
+      (FiniteState.divideOptionBoolTag finalState.answer).pred =
+        FiniteState.divideBoolTag (finalState.answer.getD false) := by
+    cases finalState.answer with
+    | none => rfl
+    | some answerValue => cases answerValue <;> rfl
+  have outputEq :
+      [FiniteState.divideOptionBoolTag finalState.answer - 1] =
+        [FiniteState.divideBoolTag
+          (FiniteState.divideReachIndexDFSBool
+            (indexCount periodicStrip)
+            (indexedTransitionRawBool tromino periodicStrip)
+            (stripSearchDepth periodicStrip) first last)] := by
+    rw [Nat.sub_one, answerTag]
+    rfl
+  have outputEq' :
+      Turing.ToPartrec.Code.subtractStepList
+          [FiniteState.divideOptionBoolTag finalState.answer] =
+        [FiniteState.divideBoolTag
+          (FiniteState.divideReachIndexDFSBool
+            (indexCount periodicStrip)
+            (indexedTransitionRawBool tromino periodicStrip)
+            (stripSearchDepth periodicStrip) first last)] := by
+    simpa [Turing.ToPartrec.Code.subtractStepList] using outputEq
+  rw [outputEq'] at normalized
+  simpa [stripReachBoolCode, stripReachBoolCost, values, output,
+    finalState, stripReachFinalState, EvaluatorCodeFits.predCost,
+    Turing.ToPartrec.Code.subtractStepList] using normalized
+
+/-- Every bounded canonical reachability call fits the one-query polynomial
+reserve, independently of its exponential iteration count. -/
+theorem stripReachBoolCost_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat)
+    (firstBelow : first < indexCount periodicStrip)
+    (lastBelow : last < indexCount periodicStrip) :
+    stripReachBoolCost tromino periodicStrip first last ≤
+      stripReachCallSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length := by
+  let inputLength :=
+    ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+      periodicStrip).length
+  let values :=
+    [Encodable.encode periodicStrip, indexCount periodicStrip,
+      stripSearchDepth periodicStrip, first, last]
+  let finalState := stripReachFinalState tromino periodicStrip first last
+  let output := FiniteState.divideEvalProgramList
+    (Encodable.encode periodicStrip) (indexCount periodicStrip) finalState
+  have inputCost : stripReachInputCost values ≤
+      1000000 *
+        (stripFuelComputationSpaceBound inputLength +
+          stripLoopPayloadSpaceBound inputLength +
+          stripReachPayloadSpaceBound inputLength + 1) := by
+    simpa [values, inputLength] using
+      stripReachInputCost_le periodicStrip first last firstBelow lastBelow
+  have outputBound : encodedListSpace output ≤
+      stripReachPayloadSpaceBound inputLength := by
+    simpa [output, finalState, stripReachFinalState, inputLength] using
+      stripReachStatePayload_encodedListSpace_le tromino periodicStrip
+        first last
+        (FiniteState.divideEvalFuel
+          (indexCount periodicStrip) (stripSearchDepth periodicStrip))
+        firstBelow lastBelow
+  have projected := EvaluatorCodeFits.listCodeGetCost_le_linear 3 output
+  have normalized :
+      EvaluatorCodeFits.predCost
+          [FiniteState.divideOptionBoolTag finalState.answer] ≤ 1000000 := by
+    cases answer : finalState.answer with
+    | none => native_decide
+    | some answerValue => cases answerValue <;> native_decide
+  simp [stripReachBoolCost, values, output, finalState, inputLength,
+    stripReachCallSpaceBound, stripSavitchBodySpaceBound,
+    stripSavitchStepSpaceBound]
+    at inputCost outputBound projected normalized ⊢
+  omega
+
+/-- Polynomial-cost form of `stripReachBool_fits`, ready to be nested inside
+the endpoint cycle-search loops. -/
+theorem stripReachBool_fits_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first last : Nat)
+    (firstBelow : first < indexCount periodicStrip)
+    (lastBelow : last < indexCount periodicStrip) :
+    EvaluatorCodeFits (stripReachBoolCode tromino)
+      [Encodable.encode periodicStrip, indexCount periodicStrip,
+        stripSearchDepth periodicStrip, first, last]
+      [FiniteState.divideBoolTag
+        (FiniteState.divideReachIndexDFSBool
+          (indexCount periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip)
+          (stripSearchDepth periodicStrip) first last)]
+      (stripReachCallSpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) :=
+  (stripReachBool_fits tromino periodicStrip wellFormed
+    first last firstBelow lastBelow).mono
+      (stripReachBoolCost_le tromino periodicStrip
+        first last firstBelow lastBelow)
 
 /-- Fitted-call obligations for the two explicit transition leaves used by
 the strip evaluator.  Each field is continuation-passing: the caller reserves
