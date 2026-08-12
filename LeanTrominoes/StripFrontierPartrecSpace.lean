@@ -4371,6 +4371,306 @@ theorem exactStep_polynomial
       (stepCost_le tromino periodicStrip wellFormed first secondRemaining
         foundValue firstBelow secondPositive secondBound)
 
+/-- Canonical six-field payload of the second-endpoint scan. -/
+def payload (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (found : Bool) : List Nat :=
+  [Encodable.encode periodicStrip, indexCount periodicStrip,
+    stripSearchDepth periodicStrip, first, secondRemaining,
+    FiniteState.divideBoolTag found]
+
+private def boolOfTag (value : Nat) : Bool := decide (value ≠ 0)
+
+@[simp]
+private theorem boolOfTag_divideBoolTag (found : Bool) :
+    boolOfTag (FiniteState.divideBoolTag found) = found := by
+  cases found <;> decide
+
+/-- Total payload transformer corresponding to one candidate update.  Its
+definition is total so it can serve as the semantic step supplied to the
+generic flat-iteration space theorem; the reachable invariant below keeps it
+on canonical six-field payloads. -/
+def programStep (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first : Nat) (values : List Nat) : List Nat :=
+  let secondRemaining := values[4]?.getD 0
+  let found := boolOfTag (values[5]?.getD 0)
+  payload periodicStrip first secondRemaining.pred
+    (found || cycleCandidateBool tromino periodicStrip
+      (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+      first secondRemaining.pred)
+
+@[simp]
+theorem programStep_payload
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first secondRemaining : Nat) (found : Bool) :
+    programStep tromino periodicStrip first
+        (payload periodicStrip first secondRemaining found) =
+      payload periodicStrip first secondRemaining.pred
+        (found || cycleCandidateBool tromino periodicStrip
+          (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+          first secondRemaining.pred) := by
+  simp [programStep, payload]
+
+/-- Iterating the total payload step over a synchronized countdown checks
+exactly the endpoint indices below that countdown, in descending order. -/
+theorem programStep_iterate
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first remaining : Nat) (found : Bool) :
+    ((programStep tromino periodicStrip first)^[remaining])
+        (payload periodicStrip first remaining found) =
+      payload periodicStrip first 0
+        (found || FiniteState.boundedAny
+          (cycleCandidateBool tromino periodicStrip
+            (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+            first)
+          remaining) := by
+  induction remaining generalizing found with
+  | zero => simp [FiniteState.boundedAny]
+  | succ remaining induction =>
+      rw [Function.iterate_succ_apply]
+      rw [programStep_payload]
+      simpa [FiniteState.boundedAny, Bool.or_assoc] using
+        induction
+          (found || cycleCandidateBool tromino periodicStrip
+            (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+            first remaining)
+
+/-- Canonical payloads reachable while a synchronized second-endpoint
+countdown is running. -/
+def Reachable (periodicStrip : PeriodicStrip) (first : Nat)
+    (remaining : Nat) (values : List Nat) : Prop :=
+  ∃ found,
+    values = payload periodicStrip first remaining found ∧
+    remaining ≤ indexCount periodicStrip
+
+theorem reachable_initial
+    (periodicStrip : PeriodicStrip) (first : Nat) (found : Bool) :
+    Reachable periodicStrip first (indexCount periodicStrip)
+      (payload periodicStrip first (indexCount periodicStrip) found) :=
+  ⟨found, rfl, Nat.le_refl _⟩
+
+theorem reachable_step
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first remaining : Nat) (values : List Nat)
+    (reachable : Reachable periodicStrip first (remaining + 1) values) :
+    Reachable periodicStrip first remaining
+      (programStep tromino periodicStrip first values) := by
+  obtain ⟨found, rfl, bound⟩ := reachable
+  refine ⟨found || cycleCandidateBool tromino periodicStrip
+    (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+    first remaining, ?_, by omega⟩
+  simpa using programStep_payload tromino periodicStrip first
+    (remaining + 1) found
+
+private theorem zeroBody
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first : Nat) (values : List Nat) :
+    EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatCountdownBody
+        (candidateStepCode tromino))
+      (0 :: values)
+      (Turing.PartrecToTM2.flatCountdownOutput
+        (programStep tromino periodicStrip first) 0 values)
+      (flatCountdownBodyCost
+        (programStep tromino periodicStrip first)
+        (fun _ => stripCandidateStepSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length)
+        0 values) := by
+  simpa [Turing.ToPartrec.Code.flatCountdownBody,
+    Turing.PartrecToTM2.flatCountdownOutput,
+    flatCountdownBodyCost, EvaluatorCodeFits.zeroPrimeCost] using
+      EvaluatorCodeFits.case_zero
+        (successorBranch :=
+          .cons Turing.ToPartrec.Code.one
+            (.cons Turing.ToPartrec.Code.head
+              ((candidateStepCode tromino).comp
+                Turing.ToPartrec.Code.tail)))
+        (values := 0 :: values) (by rfl)
+        (EvaluatorCodeFits.zero'_named values)
+
+private theorem bodyCost_le
+    (inputLength remaining : Nat) (input output : List Nat)
+    (inputBound :
+      encodedListSpace (remaining :: input) ≤
+        stripLoopPayloadSpaceBound inputLength)
+    (outputBound :
+      encodedListSpace output ≤
+        stripLoopPayloadSpaceBound inputLength) :
+    flatCountdownBodyCost (fun _ => output)
+        (fun _ => stripCandidateStepSpaceBound inputLength)
+        remaining input ≤
+      stripCandidateBodySpaceBound inputLength := by
+  cases remaining with
+  | zero =>
+      have inputTail := listCodeEncodedListSpace_tail_le (0 :: input)
+      simp [flatCountdownBodyCost, EvaluatorCodeFits.zeroPrimeCost,
+        stripCandidateBodySpaceBound, encodedListSpace_cons] at *
+      omega
+  | succ remaining =>
+      let values := remaining :: input
+      have predecessorBits := listCodeEncodeNat_length_mono
+        (show remaining ≤ remaining + 1 by omega)
+      have valuesBound : encodedListSpace values ≤
+          stripLoopPayloadSpaceBound inputLength := by
+        simp [values, encodedListSpace_cons] at inputBound ⊢
+        omega
+      have tailBound := EvaluatorCodeFits.listCodeTailCost_le_linear values
+      have headBound := EvaluatorCodeFits.headCost_le values
+      have zeroBound := EvaluatorCodeFits.listCodeZeroCost_le_linear values
+      have successorZero := EvaluatorCodeFits.succCost_le [0]
+      have remainingField :
+          (Computability.encodeNat remaining).length + 1 ≤
+            encodedListSpace values := by
+        simp [values, encodedListSpace_cons]
+      have outputWithCounter :
+          encodedListSpace (remaining :: output) ≤
+            2 * (stripLoopPayloadSpaceBound inputLength + 1) := by
+        simp [encodedListSpace_cons] at outputBound ⊢
+        omega
+      have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+      have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+      simp [flatCountdownBodyCost, flatCountdownSuccBranchCost,
+        EvaluatorCodeFits.prependCost, EvaluatorCodeFits.oneCost,
+        values, stripCandidateBodySpaceBound,
+        encodedListSpace_cons, encodedListSpace_nil, zeroBits, oneBits]
+        at inputBound outputBound tailBound headBound zeroBound successorZero
+          outputWithCounter ⊢
+      omega
+
+set_option maxHeartbeats 1000000 in
+/-- The complete second-endpoint countdown reuses one polynomial body reserve
+at every iteration. -/
+theorem flatUniform
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first : Nat) (found : Bool)
+    (firstBelow : first < indexCount periodicStrip) :
+    EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatIterate (candidateStepCode tromino))
+      (indexCount periodicStrip ::
+        payload periodicStrip first (indexCount periodicStrip) found)
+      (payload periodicStrip first 0
+        (found || FiniteState.boundedAny
+          (cycleCandidateBool tromino periodicStrip
+            (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+            first)
+          (indexCount periodicStrip)))
+      (stripCandidateBodySpaceBound
+        ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+          periodicStrip).length) where
+  input_space := by
+    have input := stripCandidatePayload_encodedListSpace_le
+      periodicStrip (indexCount periodicStrip) first
+      (indexCount periodicStrip) found (Nat.le_refl _)
+      (Nat.le_of_lt firstBelow) (Nat.le_refl _)
+    have input' : encodedListSpace
+        (indexCount periodicStrip ::
+          payload periodicStrip first (indexCount periodicStrip) found) ≤
+        stripLoopPayloadSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length := by
+      simpa [payload] using input
+    exact input'.trans (by
+        simp [stripCandidateBodySpaceBound]
+        omega)
+  output_space := by
+    have output := candidateValuesSpace_le periodicStrip first 0
+      (found || FiniteState.boundedAny
+        (cycleCandidateBool tromino periodicStrip
+          (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+          first)
+        (indexCount periodicStrip)) firstBelow (Nat.zero_le _)
+    have output' : encodedListSpace
+        (payload periodicStrip first 0
+          (found || FiniteState.boundedAny
+            (cycleCandidateBool tromino periodicStrip
+              (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+              first)
+            (indexCount periodicStrip))) ≤
+        stripLoopPayloadSpaceBound
+          ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+            periodicStrip).length := by
+      simpa [payload] using output
+    exact output'.trans (by
+      simp [stripCandidateBodySpaceBound]
+      omega)
+  call continuation bound budget after := by
+    let inputLength :=
+      ((Complexity.primcodableFinEncoding PeriodicStrip).encode
+        periodicStrip).length
+    apply Turing.PartrecToTM2.EvaluatorCallFits.flatIterate_of_reachable_code_fits
+      (step := programStep tromino periodicStrip first)
+      (bodyCost := fun _ _ => stripCandidateBodySpaceBound inputLength)
+      (invariant := Reachable periodicStrip first)
+    · intro remaining values reachable
+      obtain ⟨reachableFound, rfl, remainingBound⟩ := reachable
+      cases remaining with
+      | zero =>
+          exact (zeroBody tromino periodicStrip first
+            (payload periodicStrip first 0 reachableFound)).mono (by
+              apply bodyCost_le inputLength 0
+                (payload periodicStrip first 0 reachableFound)
+                (payload periodicStrip first 0 reachableFound)
+              · simpa [payload, inputLength] using
+                  stripCandidatePayload_encodedListSpace_le periodicStrip
+                    0 first 0 reachableFound (Nat.zero_le _)
+                    (Nat.le_of_lt firstBelow) (Nat.zero_le _)
+              · simpa [payload, inputLength] using
+                  candidateValuesSpace_le periodicStrip first 0
+                    reachableFound firstBelow (Nat.zero_le _))
+      | succ remaining =>
+          have step := exactStep_polynomial tromino periodicStrip wellFormed
+            first (remaining + 1) reachableFound firstBelow (by omega)
+            remainingBound
+          have body := EvaluatorCodeFits.flatCountdownBody_of_fit step
+            (remaining + 1)
+          have bodyOutput :
+              Turing.PartrecToTM2.flatCountdownOutput
+                  (fun _ =>
+                    [Encodable.encode periodicStrip, indexCount periodicStrip,
+                      stripSearchDepth periodicStrip, first,
+                      (remaining + 1).pred,
+                      FiniteState.divideBoolTag
+                        (reachableFound || cycleCandidateBool tromino
+                          periodicStrip (indexCount periodicStrip)
+                          (stripSearchDepth periodicStrip) first
+                          (remaining + 1).pred)])
+                  (remaining + 1)
+                  [Encodable.encode periodicStrip, indexCount periodicStrip,
+                    stripSearchDepth periodicStrip, first, remaining + 1,
+                    FiniteState.divideBoolTag reachableFound] =
+                Turing.PartrecToTM2.flatCountdownOutput
+                  (programStep tromino periodicStrip first)
+                  (remaining + 1)
+                  [Encodable.encode periodicStrip, indexCount periodicStrip,
+                    stripSearchDepth periodicStrip, first, remaining + 1,
+                    FiniteState.divideBoolTag reachableFound] := by
+            simp [Turing.PartrecToTM2.flatCountdownOutput, programStep, payload]
+          rw [bodyOutput] at body
+          apply body.mono
+          apply bodyCost_le inputLength (remaining + 1)
+            (payload periodicStrip first (remaining + 1) reachableFound)
+            (payload periodicStrip first remaining
+              (reachableFound || cycleCandidateBool tromino periodicStrip
+                (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+                first remaining))
+          · simpa [payload, inputLength] using
+              stripCandidatePayload_encodedListSpace_le periodicStrip
+                (remaining + 1) first (remaining + 1) reachableFound
+                remainingBound (Nat.le_of_lt firstBelow) remainingBound
+          · simpa [payload, inputLength] using
+              candidateValuesSpace_le periodicStrip first remaining
+                (reachableFound || cycleCandidateBool tromino periodicStrip
+                  (indexCount periodicStrip) (stripSearchDepth periodicStrip)
+                  first remaining)
+                firstBelow (by omega)
+    · exact reachable_initial periodicStrip first found
+    · exact reachable_step tromino periodicStrip first
+    · intro remaining values reachable
+      simpa [inputLength] using budget
+    · rw [programStep_iterate]
+      exact after
+
 end StripCandidateStep
 
 /-- Fitted-call obligations for the two explicit transition leaves used by

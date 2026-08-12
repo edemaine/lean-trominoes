@@ -301,7 +301,7 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Fit one complete second-endpoint candidate update, including its raw
       edge test, reverse-reachability query, Boolean accumulation, and rebuilt
       countdown payload, into a uniform polynomial reserve.
-    - [ ] Lift the candidate-step certificate through the complete
+    - [x] Lift the candidate-step certificate through the complete
       second-endpoint countdown.
     - [ ] Lift the inner scan through the first-endpoint countdown and bound
       the guarded cycle-search driver.
@@ -1831,8 +1831,12 @@ The representation choices for this target are:
   countdown payload, and bounds the entire candidate update by the common
   input polynomial.  A generic bounded-field assembly lemma keeps this
   fixed-width accounting reusable without expanding every nested list
-  prepend; the next remaining lift is the complete second-endpoint
-  countdown.
+  prepend.  `StripCandidateStep.flatUniform` then carries a canonical
+  six-field reachable-payload invariant through the complete synchronized
+  second-endpoint countdown.  Its semantic iterate theorem proves that the
+  Boolean accumulator checks exactly all smaller endpoint indices, while the
+  evaluator reuses one polynomial body reserve independent of the number of
+  graph states.  The next remaining lift is the outer first-endpoint scan.
 - [`LeanTrominoes/StripFrontier.lean`](LeanTrominoes/StripFrontier.lean)
   defines that finite system using overlapping five-column windows.  Its
   states store assignments only at cells from the finite motif, so sparse
