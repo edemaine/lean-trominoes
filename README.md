@@ -1516,6 +1516,9 @@ The representation choices for this target are:
   column and a fixed vertical source offset.  It explicitly computes and
   encodes the wrapped horizontal phase, offsets the row, and pairs the two
   coordinates in Mathlib's standard `Cell` encoding.
+- [`LeanTrominoes/PartrecPackedTargetCellSpace.lean`](LeanTrominoes/PartrecPackedTargetCellSpace.lean)
+  fits every stage of that target-cell constructor, culminating in an exact
+  evaluator-space certificate for the encoded canonical cell.
 - [`LeanTrominoes/PartrecPackedNormalizedAt.lean`](LeanTrominoes/PartrecPackedNormalizedAt.lean)
   and
   [`LeanTrominoes/PartrecPackedNormalizedAtSpace.lean`](LeanTrominoes/PartrecPackedNormalizedAtSpace.lean)
