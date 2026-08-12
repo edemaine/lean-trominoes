@@ -1509,6 +1509,11 @@ The representation choices for this target are:
   `packedNormalizationColumnCost_le_linear` bounds that entire program by a
   fixed constant times one encoded arithmetic envelope for the period, phase,
   motif, column, and packed word.
+- [`LeanTrominoes/PartrecPackedNormalizationAll.lean`](LeanTrominoes/PartrecPackedNormalizationAll.lean)
+  invokes that streaming checker at each of the five fixed frontier columns
+  and conjoins the results directly.  Its four-field program is proved
+  exactly equal to `PackedWindowState.isNormalizedBool` without constructing
+  either the motif assignment list or a list of columns.
 - [`LeanTrominoes/PartrecPackedOverlapAt.lean`](LeanTrominoes/PartrecPackedOverlapAt.lean)
   and
   [`LeanTrominoes/PartrecPackedOverlapAtSpace.lean`](LeanTrominoes/PartrecPackedOverlapAtSpace.lean)
