@@ -312,6 +312,14 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Fit the unary input wrapper and package the verified evaluator as a
       PSPACE decision procedure for each tromino.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
+    - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
+      polynomial-space computation histories.
+    - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
+      trichromatic-orientation reductions.
+    - [ ] Compile the normalized periodic drawing into a polynomial-height
+      strip drawing.
+    - [ ] Specialize the tromino gadget substitution to that strip drawing and
+      assemble the polynomial-time reductions for both trominoes.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
