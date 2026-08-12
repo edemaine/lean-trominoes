@@ -1483,8 +1483,8 @@ The representation choices for this target are:
   zero test.  They also compare the selected digit with the canonical digit
   of any fixed assignment state, proved semantically equivalent to selecting
   that state and fitted through explicit equality arguments.  The projected
-  lookup digit has its own named input-linear evaluator-space bound for reuse
-  by later packed predicates.
+  lookup digit and the complete fixed-state equality test now each have named
+  input-linear evaluator-space bounds for reuse by later packed predicates.
 - [`LeanTrominoes/PartrecPackedColumnPhase.lean`](LeanTrominoes/PartrecPackedColumnPhase.lean)
   and
   [`LeanTrominoes/PartrecPackedColumnPhaseSpace.lean`](LeanTrominoes/PartrecPackedColumnPhaseSpace.lean)

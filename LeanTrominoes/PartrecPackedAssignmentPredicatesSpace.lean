@@ -296,6 +296,129 @@ theorem packedAssignmentLookupDigitCost_le_linear
       outcome, digit, found, zeroBits, oneBits] at * <;>
     omega
 
+/-- A common polynomial envelope for testing a packed assignment digit
+against any fixed frontier state. -/
+def packedAssignmentIsSpaceBound
+    (motifCode queriedColumn targetCode word : Nat) : Nat :=
+  1000000000000000000000000000000000000 *
+    (encodedListSpace
+      [32 * (motifCode + motifCode + motifCode +
+        targetCode + queriedColumn + word + 40 + 32) + 200] + 1)
+
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 1200000 in
+theorem packedAssignmentIsCost_le_linear
+    (state : Option SquareSymmetry)
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    packedAssignmentIsCost state motif queriedColumn target word ≤
+      packedAssignmentIsSpaceBound
+        (Encodable.encode motif) queriedColumn
+        (Encodable.encode target) word := by
+  let motifCode := Encodable.encode motif
+  let targetCode := Encodable.encode target
+  let outcome :=
+    Code.packedAssignmentLookupOutcome motif queriedColumn target word
+  let digit := outcome.2.1
+  let selected := RawWindowState.assignmentDigit state
+  let values := [motifCode, queriedColumn, targetCode, word]
+  let limit :=
+    32 * (motifCode + motifCode + motifCode +
+      targetCode + queriedColumn + word + 40 + 32) + 200
+  let unit := encodedListSpace [limit] + 1
+  change packedAssignmentIsCost state motif queriedColumn target word ≤
+    1000000000000000000000000000000000000 * unit
+  have unitPositive : 1 ≤ unit := by simp [unit]
+  have motifBound : motifCode ≤ limit := by
+    simp only [limit]
+    omega
+  have targetBound : targetCode ≤ limit := by
+    simp only [limit]
+    omega
+  have queryBound : queriedColumn ≤ limit := by
+    simp only [limit]
+    omega
+  have wordBound : word ≤ limit := by
+    simp only [limit]
+    omega
+  have digitSmall : digit ≤ 40 := by
+    simpa [digit, outcome] using
+      Code.packedAssignmentLookupOutcome_digit_le
+        motif queriedColumn target word
+  have digitBound : digit ≤ limit := by
+    simp only [limit]
+    omega
+  have selectedSmall : selected < 9 := by
+    simpa [selected] using RawWindowState.assignmentDigit_lt state
+  have selectedBound : selected ≤ limit := by
+    simp only [limit]
+    omega
+  have inputSpace : encodedListSpace values ≤ 5 * unit := by
+    have raw := encodedListSpace_le_of_fields_le values limit (by
+      intro value member
+      simp only [values, List.mem_cons] at member
+      rcases member with rfl | rfl | rfl | rfl | impossible
+      · exact motifBound
+      · exact queryBound
+      · exact targetBound
+      · exact wordBound
+      · simp at impossible)
+    simp only [values, List.length_cons, List.length_nil] at raw
+    change encodedListSpace
+      [motifCode, queriedColumn, targetCode, word] ≤ 5 * unit
+    simp only [unit, encodedListSpace_cons,
+      encodedListSpace_nil] at raw ⊢
+    omega
+  have digitBits := listCodeEncodeNat_length_mono digitBound
+  have selectedBits := listCodeEncodeNat_length_mono selectedBound
+  have digitCost := packedAssignmentLookupDigitCost_le_linear
+    motif queriedColumn target word
+  have digitCostBound :
+      packedAssignmentLookupDigitCost motif queriedColumn target word ≤
+        800000000000000000000 * unit := by
+    simpa [packedAssignmentLookupDigitSpaceBound,
+      motifCode, targetCode, limit, unit] using digitCost
+  have equalityLimit : 2 * (digit + selected) + 4 ≤ limit := by
+    simp only [limit]
+    omega
+  have equalityBits := listCodeEncodeNat_length_mono equalityLimit
+  have equalityCost := natEqCost_le_linear digit selected
+  have equalityCostBound :
+      natEqCost digit selected ≤ 10000000000 * unit := by
+    exact equalityCost.trans (by
+      simp only [unit, encodedListSpace_cons,
+        encodedListSpace_nil] at equalityBits ⊢
+      omega)
+  have zeroCostBound := listCodeZeroCost_le_linear values
+  have addCostSmall : addConstCost selected [0] ≤ 1000000 := by
+    cases state with
+    | none => native_decide
+    | some symmetry => fin_cases symmetry <;> native_decide
+  have numeralCostBound :
+      numeralCost selected values ≤ 100000000 * unit := by
+    simp only [numeralCost]
+    omega
+  have argumentsCostBound :
+      packedAssignmentIsArgumentsCost state motif queriedColumn
+          target word ≤
+        1000000000000000000000000 * unit := by
+    change
+      prependCost values [digit] [selected]
+          (packedAssignmentLookupDigitCost
+            motif queriedColumn target word)
+          (numeralCost selected values) ≤
+        1000000000000000000000000 * unit
+    simp only [prependCost]
+    simp only [unit, encodedListSpace_cons,
+      encodedListSpace_nil, List.headI_cons] at *
+    omega
+  change
+    natEqCost digit selected +
+        packedAssignmentIsArgumentsCost state motif queriedColumn
+          target word ≤
+      1000000000000000000000000000000000000 * unit
+  omega
+
 def packedAssignmentIsNoneSpaceBound
     (motifCode queriedColumn targetCode word : Nat) : Nat :=
   1000000000000000000000000 *
