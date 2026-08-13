@@ -292,6 +292,242 @@ theorem encodedListSpaceLoop_fits (fields : List Nat) :
   · simpa [encodedListSpaceStep_iterate,
       encodedListSpace_eq_fieldPayloadSpace] using after
 
+/-! ## Native input preparation and complete streamed length -/
+
+def flatStripFieldCountCost (values : List Nat) : Nat :=
+  let motifLength := values[2]?.getD 0
+  let argumentsCost := prependCost values [motifLength] [motifLength]
+    (getCost 2 values) (getCost 2 values)
+  let doubleCost := natAddCost motifLength motifLength + argumentsCost
+  addConstCost 3 [motifLength + motifLength] + doubleCost
+
+theorem flatStripFieldCount_fits (values : List Nat) :
+    EvaluatorCodeFits flatStripFieldCountCode values
+      [values[2]?.getD 0 + values[2]?.getD 0 + 3]
+      (flatStripFieldCountCost values) := by
+  let motifLength := values[2]?.getD 0
+  have arguments := prepend (get 2 values) (get 2 values)
+  have doubled := EvaluatorCodeFits.comp
+    (natAdd motifLength motifLength) arguments
+  have result := EvaluatorCodeFits.comp
+    (addConst 3 [motifLength + motifLength]) doubled
+  simpa [flatStripFieldCountCode, flatStripFieldCountCost, motifLength,
+    prependCost] using result
+
+def flatStripEncodedListSpaceInputCost (values : List Nat) : Nat :=
+  let motifLength := values[2]?.getD 0
+  let restCost := prependCost values [0] values
+    (zeroCost values) (idCost values)
+  prependCost values
+    [motifLength + motifLength + 3] (0 :: values)
+    (flatStripFieldCountCost values) restCost
+
+theorem flatStripEncodedListSpaceInput_fits
+    (periodicStrip : PeriodicStrip) :
+    let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+    EvaluatorCodeFits flatStripEncodedListSpaceInputCode fields
+      (fields.length :: 0 :: fields)
+      (flatStripEncodedListSpaceInputCost fields) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  change EvaluatorCodeFits flatStripEncodedListSpaceInputCode fields
+    (fields.length :: 0 :: fields)
+    (flatStripEncodedListSpaceInputCost fields)
+  have getMotifLength : fields[2]?.getD 0 = periodicStrip.motif.length := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have fieldsLength : fields.length = 3 + 2 * periodicStrip.motif.length := by
+    simpa [fields] using
+      PeriodicStripFlatEncoding.stripFields_length periodicStrip
+  have result := prepend (flatStripFieldCount_fits fields)
+    (prepend (zero fields) (id fields))
+  have countEq : fields[2]?.getD 0 + fields[2]?.getD 0 + 3 =
+      fields.length := by
+    rw [getMotifLength, fieldsLength]
+    omega
+  rw [countEq] at result
+  simpa [flatStripEncodedListSpaceInputCode,
+    flatStripEncodedListSpaceInputCost, countEq, prependCost] using result
+
+def flatStripEncodedListSpaceCost (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  encodedListSpaceLoopSpaceBound (encodedListSpace fields) +
+    flatStripEncodedListSpaceInputCost fields
+
+/-- The public native-field length program has a complete evaluator-space
+certificate, not just a semantic evaluation theorem. -/
+theorem flatStripEncodedListSpace_fits (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits flatStripEncodedListSpaceCode
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [(PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length]
+      (flatStripEncodedListSpaceCost periodicStrip) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  have result := EvaluatorCodeFits.comp
+    (encodedListSpaceLoop_fits fields)
+    (flatStripEncodedListSpaceInput_fits periodicStrip)
+  simpa [flatStripEncodedListSpaceCode, flatStripEncodedListSpaceCost, fields,
+    PeriodicStripFlatEncoding.finEncoding_encode_length,
+    encodedListSpace_eq_sum] using result
+
+/-! ## Savitch depth and padded state bound -/
+
+def flatStripSearchDepthInputCost (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  prependCost fields [inputLength] [1]
+    (flatStripEncodedListSpaceCost periodicStrip) (oneCost fields)
+
+theorem flatStripSearchDepthInput_fits (periodicStrip : PeriodicStrip) :
+    let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+    let inputLength :=
+      (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+    EvaluatorCodeFits flatStripSearchDepthInputCode fields
+      [inputLength, 1] (flatStripSearchDepthInputCost periodicStrip) := by
+  simpa [flatStripSearchDepthInputCode, flatStripSearchDepthInputCost,
+    prependCost] using
+    prepend (flatStripEncodedListSpace_fits periodicStrip)
+      (one (PeriodicStripFlatEncoding.stripFields periodicStrip))
+
+def SearchDepthInvariant (steps remaining : Nat)
+    (payload : List Nat) : Prop :=
+  ∃ processed,
+    processed + remaining = steps ∧
+      payload = ((Code.addConstListStep 21)^[processed]) [1]
+
+theorem searchDepthInvariant_initial (steps : Nat) :
+    SearchDepthInvariant steps steps [1] := by
+  exact ⟨0, by simp, rfl⟩
+
+theorem searchDepthInvariant_preserved
+    (steps remaining : Nat) (payload : List Nat)
+    (invariant : SearchDepthInvariant steps (remaining + 1) payload) :
+    SearchDepthInvariant steps remaining
+      (Code.addConstListStep 21 payload) := by
+  obtain ⟨processed, sum, rfl⟩ := invariant
+  refine ⟨processed + 1, by omega, ?_⟩
+  rw [Function.iterate_succ_apply']
+
+def flatStripSearchDepthLoopCost (inputLength : Nat) : Nat :=
+  1000000000000 * (inputLength + 1)
+
+theorem flatStripSearchDepthBodyCost_le
+    (inputLength remaining : Nat) (payload : List Nat)
+    (invariant : SearchDepthInvariant inputLength remaining payload) :
+    binaryLengthAffine21BodyCost remaining payload ≤
+      flatStripSearchDepthLoopCost inputLength := by
+  obtain ⟨processed, sum, rfl⟩ := invariant
+  have processedBound : processed ≤ inputLength := by omega
+  have remainingBound : remaining ≤ inputLength := by omega
+  have remainingBits := encodeNat_length_le_self remaining
+  have currentBits := encodeNat_length_le_self (1 + processed * 21)
+  have nextBits := encodeNat_length_le_self (1 + (processed + 1) * 21)
+  have currentList := Code.addConstListStep_iterate 21 processed 1
+  have nextList := Code.addConstListStep_iterate 21 (processed + 1) 1
+  have nextPayload :
+      Code.addConstListStep 21
+          (((Code.addConstListStep 21)^[processed]) [1]) =
+        ((Code.addConstListStep 21)^[processed + 1]) [1] := by
+    rw [Function.iterate_succ_apply']
+  have bodyBound := binaryLengthAffine21BodyCost_le remaining
+    (((Code.addConstListStep 21)^[processed]) [1])
+  rw [nextPayload, currentList, nextList] at bodyBound
+  simp only [encodedListSpace_cons, encodedListSpace_nil] at bodyBound
+  rw [currentList]
+  apply bodyBound.trans
+  unfold flatStripSearchDepthLoopCost
+  omega
+
+theorem flatStripSearchDepthLoop_fits (inputLength : Nat) :
+    EvaluatorCodeFits (Code.flatIterate (Code.addConst 21))
+      [inputLength, 1] [1 + inputLength * 21]
+      (flatStripSearchDepthLoopCost inputLength) := by
+  have inputLengthBits := encodeNat_length_le_self inputLength
+  have outputBits := encodeNat_length_le_self (1 + inputLength * 21)
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have inputSpace : encodedListSpace [inputLength, 1] ≤
+      flatStripSearchDepthLoopCost inputLength := by
+    simp [flatStripSearchDepthLoopCost, encodedListSpace_cons, oneBits]
+    omega
+  have outputSpace : encodedListSpace [1 + inputLength * 21] ≤
+      flatStripSearchDepthLoopCost inputLength := by
+    simp [flatStripSearchDepthLoopCost, encodedListSpace_cons]
+    omega
+  refine
+    { input_space := inputSpace
+      output_space := outputSpace
+      call := ?_ }
+  intro continuation bound budget after
+  apply EvaluatorCallFits.flatIterate_of_code_fits_invariant
+      binaryLengthAffine21Body (searchDepthInvariant_initial inputLength)
+      (searchDepthInvariant_preserved inputLength)
+  · intro remaining payload invariant
+    have localCost := flatStripSearchDepthBodyCost_le
+      inputLength remaining payload invariant
+    omega
+  · simpa [Code.addConstListStep_iterate] using after
+
+def flatStripSearchDepthCost (periodicStrip : PeriodicStrip) : Nat :=
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  flatStripSearchDepthLoopCost inputLength +
+    flatStripSearchDepthInputCost periodicStrip
+
+theorem flatStripSearchDepth_fits (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits flatStripSearchDepthCode
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [flatStripSearchDepth periodicStrip]
+      (flatStripSearchDepthCost periodicStrip) := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  have result := EvaluatorCodeFits.comp
+    (flatStripSearchDepthLoop_fits inputLength)
+    (flatStripSearchDepthInput_fits periodicStrip)
+  have outputEq : 1 + inputLength * 21 =
+      flatStripSearchDepth periodicStrip := by
+    simp [flatStripSearchDepth, inputLength]
+    omega
+  rw [outputEq] at result
+  simpa [flatStripSearchDepthCode, flatStripSearchDepthCost,
+    inputLength] using result
+
+def flatStripStateBoundCost (periodicStrip : PeriodicStrip) : Nat :=
+  powerTwoCost (flatStripSearchDepth periodicStrip) +
+    flatStripSearchDepthCost periodicStrip
+
+theorem flatStripStateBound_fits (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits flatStripStateBoundCode
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [flatStripStateBound periodicStrip]
+      (flatStripStateBoundCost periodicStrip) := by
+  simpa [flatStripStateBoundCode, flatStripStateBoundCost,
+    flatStripStateBound] using
+    EvaluatorCodeFits.comp
+      (powerTwo (flatStripSearchDepth periodicStrip))
+      (flatStripSearchDepth_fits periodicStrip)
+
+def flatStripCycleParametersCost (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let depth := flatStripSearchDepth periodicStrip
+  let stateBound := flatStripStateBound periodicStrip
+  let restCost := prependCost fields [depth] fields
+    (flatStripSearchDepthCost periodicStrip) (idCost fields)
+  prependCost fields [stateBound] (depth :: fields)
+    (flatStripStateBoundCost periodicStrip) restCost
+
+/-- Complete search-parameter assembly retains the native fields after the
+computed padded state bound and depth. -/
+theorem flatStripCycleParameters_fits (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits flatStripCycleParametersCode
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      ([flatStripStateBound periodicStrip,
+          flatStripSearchDepth periodicStrip] ++
+        PeriodicStripFlatEncoding.stripFields periodicStrip)
+      (flatStripCycleParametersCost periodicStrip) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  have result := prepend (flatStripStateBound_fits periodicStrip)
+    (prepend (flatStripSearchDepth_fits periodicStrip) (id fields))
+  simpa [flatStripCycleParametersCode, flatStripCycleParametersCost,
+    fields, prependCost] using result
+
 end FlatStripDeciderPartrec
 end RawWindowState
 end PeriodicStrip

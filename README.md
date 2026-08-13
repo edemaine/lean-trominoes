@@ -497,7 +497,7 @@ build; an imported proof counts when its statement matches the paper.
               - [ ] Fit and polynomially bound the complete guarded evaluator.
                 - [x] Fit the exact streamed target-encoding-length fold in a
                   polynomial reserve over the native flat input footprint.
-                - [ ] Fit the depth and padded-state-bound parameter pipeline.
+                - [x] Fit the depth and padded-state-bound parameter pipeline.
                 - [ ] Fit the well-formedness guard and final cycle-search
                   composition.
               - [ ] Package the evaluator certificate as flat-encoding PSPACE
