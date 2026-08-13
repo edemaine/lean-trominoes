@@ -313,6 +313,8 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Fit the unary input wrapper and package the verified evaluator as a
       PSPACE decision procedure for each tromino under the legacy standard
       `Primcodable` encoding.
+    - [x] Reprove the motif-length, period-bit-length, and linear Savitch-depth
+      bounds for the target flat strip encoding.
     - [ ] Port the input decoder and input-size certificates to the target flat
       strip encoding.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
@@ -1810,6 +1812,10 @@ The representation choices for this target are:
   serializes width, period, motif length, and motif coordinates as one flat
   delimiter-separated binary stream and proves its executable decoder is a
   left inverse.  This is the finite encoding now used by `Theorem52.stripStatement`.
+- [`LeanTrominoes/PeriodicStripFlatEncodingSize.lean`](LeanTrominoes/PeriodicStripFlatEncodingSize.lean)
+  proves the flat symbol length dominates motif length and the period's binary
+  length.  Consequently the existing sparse frontier graph still has Savitch
+  depth at most a linear function of the new input size.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
