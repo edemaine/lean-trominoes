@@ -640,12 +640,12 @@ build; an imported proof counts when its statement matches the paper.
             isolate request generation as the sole remaining certificate.
           - [ ] Generate the bounded compact request from native source
             fields in polynomial time.
-            - [ ] Materialize the source decider's fixed space polynomial as
+            - [x] Materialize the source decider's fixed space polynomial as
               unary loop padding while preserving the native source stream.
               - [x] Implement the finite Horner machine and prove exact
                 source scanning, restoration, and one complete
                 multiply-and-add phase.
-              - [ ] Lift execution across every coefficient, emit the padded
+              - [x] Lift execution across every coefficient, emit the padded
                 word, and package its polynomial-time certificate.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
@@ -1749,11 +1749,13 @@ The representation choices for this target are:
   presents the output as the semantic flat formula, and proves both the
   many-one reduction and uniform PSPACE-hardness statement.
 - [`LeanTrominoes/UnaryPolynomialPaddingMachine.lean`](LeanTrominoes/UnaryPolynomialPaddingMachine.lean)
-  starts the remaining request generator with a reusable finite Horner
+  supplies the remaining request generator with a reusable finite Horner
   machine.  It retains a native source word, counts selected delimiters,
   multiplies a unary accumulator by that count, adds one fixed coefficient,
-  and proves the exact machine path and runtime for a complete phase while
-  restoring the source word unchanged.
+  lifts the execution across every coefficient, and emits the source followed
+  by exactly the resulting number of unary markers.  Exact execution and
+  runtime proofs package the construction as an explicit polynomial-time
+  machine certificate.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population

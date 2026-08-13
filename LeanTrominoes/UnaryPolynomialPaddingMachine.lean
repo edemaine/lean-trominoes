@@ -212,6 +212,34 @@ def paddedOutput {Source : Type} (selected : Source → Bool)
       (evalCoefficients coefficients (selectedCount selected sources))
       (Sum.inr ())
 
+/-- Accumulator after a given number of Horner coefficients.  Positions past
+the coefficient list are harmlessly stationary. -/
+def hornerAccumulator (coefficients : List Nat) (input : Nat) : Nat → Nat
+  | 0 => 0
+  | position + 1 =>
+      if inRange : position < coefficients.length then
+        hornerAccumulator coefficients input position * input +
+          coefficientAt coefficients ⟨position, inRange⟩
+      else
+        hornerAccumulator coefficients input position
+
+def sideAt : Nat → Side
+  | 0 => .first
+  | position + 1 => (sideAt position).swap
+
+@[simp]
+theorem sideAt_succ (position : Nat) :
+    sideAt (position + 1) = (sideAt position).swap := rfl
+
+/-- Exact statement-step allowance accumulated through a Horner prefix. -/
+def hornerPrefixTime (coefficients : List Nat) (inputLength input : Nat) :
+    Nat → Nat
+  | 0 => 0
+  | position + 1 =>
+      hornerPrefixTime coefficients inputLength input position +
+        hornerAccumulator coefficients input position *
+          (2 * inputLength + 3) + 1
+
 def tapes {Source : Type} (currentSide : Side)
     (source sourceReverse : List Source)
     (current next : List Unit)
@@ -255,6 +283,64 @@ def afterCoefficientCfg {Source : Type} (coefficients : List Nat)
     TM2.Cfg (Alphabet Source) (Label coefficients.length) (State Source) :=
   ⟨some (afterCoefficient coefficients index currentSide), none,
     tapes currentSide.swap source [] result [] [] []⟩
+
+def emitSourceDataCfg {Source : Type} {coefficients : List Nat}
+    (resultSide : Side) (source : List Source) (result : List Unit) :
+    List (Source ⊕ Unit) →
+    TM2.Cfg (Alphabet Source) (Label coefficients.length) (State Source) :=
+  fun outputReverse =>
+    ⟨some (.emitSource resultSide), none,
+      tapes resultSide source [] result [] outputReverse []⟩
+
+def emitSourceCfg {Source : Type} {coefficients : List Nat}
+    (resultSide : Side) (source : List Source) (result : List Unit) :
+    TM2.Cfg (Alphabet Source) (Label coefficients.length) (State Source) :=
+  emitSourceDataCfg resultSide source result []
+
+def emitPaddingCfg {Source : Type} {coefficients : List Nat}
+    (resultSide : Side) (result : List Unit)
+    (outputReverse : List (Source ⊕ Unit)) :
+    TM2.Cfg (Alphabet Source) (Label coefficients.length) (State Source) :=
+  ⟨some (.emitPadding resultSide), none,
+    tapes resultSide [] [] result [] outputReverse []⟩
+
+def reverseOutputCfg {Source : Type} {coefficients : List Nat}
+    (outputReverse output : List (Source ⊕ Unit)) :
+    TM2.Cfg (Alphabet Source) (Label coefficients.length) (State Source) :=
+  ⟨some .reverseOutput, none,
+    tapes .first [] [] [] [] outputReverse output⟩
+
+def haltCfg {Source : Type} {coefficients : List Nat}
+    (output : List (Source ⊕ Unit)) :
+    TM2.Cfg (Alphabet Source) (Label coefficients.length) (State Source) :=
+  ⟨none, none, tapes .first [] [] [] [] [] output⟩
+
+/-- Milestone after `position` Horner coefficients. -/
+def hornerCfg {Source : Type} (coefficients : List Nat) (input : Nat)
+    (position : Nat) (source : List Source) :
+    TM2.Cfg (Alphabet Source) (Label coefficients.length) (State Source) :=
+  if inRange : position < coefficients.length then
+    multiplyCfg ⟨position, inRange⟩ (sideAt position) source
+      (List.replicate (hornerAccumulator coefficients input position) ()) []
+  else
+    emitSourceCfg (coefficients := coefficients) (sideAt position) source
+      (List.replicate (hornerAccumulator coefficients input position) ())
+
+theorem afterCoefficientCfg_eq_hornerCfg {Source : Type}
+    (coefficients : List Nat) (input : Nat)
+    (index : Fin coefficients.length) (source : List Source) :
+    afterCoefficientCfg coefficients index (sideAt index.val) source
+        (List.replicate
+          (hornerAccumulator coefficients input index.val * input +
+            coefficientAt coefficients index) ()) =
+      hornerCfg coefficients input (index.val + 1) source := by
+  unfold afterCoefficientCfg hornerCfg afterCoefficient
+  simp only [sideAt_succ]
+  rw [show hornerAccumulator coefficients input (index.val + 1) =
+      hornerAccumulator coefficients input index.val * input +
+        coefficientAt coefficients index by
+    simp [hornerAccumulator, index.isLt]]
+  split <;> rfl
 
 theorem step_multiply_cons {Source : Type} [Fintype Source]
     [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
@@ -371,6 +457,105 @@ theorem step_multiply_nil {Source : Type} [Fintype Source]
     funext stack <;> cases stack <;> simp [tapes, Function.update] <;>
     rfl
 
+theorem step_start {Source : Type} [Fintype Source] [Inhabited Source]
+    (selected : Source → Bool) (coefficients : List Nat)
+    (sources : List Source) :
+    TM2.step (program selected coefficients)
+        (initList (machine Source selected coefficients) sources) =
+      some (hornerCfg coefficients (selectedCount selected sources) 0
+        sources) := by
+  unfold initList machine
+  by_cases nonempty : 0 < coefficients.length
+  · simp [TM2.step, program, hornerCfg, nonempty, hornerAccumulator,
+      sideAt, multiplyCfg]
+    congr 1
+    funext stack
+    cases stack <;> simp [tapes]
+  · simp [TM2.step, program, hornerCfg, nonempty, hornerAccumulator,
+      sideAt, emitSourceCfg, emitSourceDataCfg]
+    congr 1
+    funext stack
+    cases stack <;> simp [tapes]
+
+theorem step_emitSource_cons {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (side : Side) (source : Source) (sources : List Source)
+    (result : List Unit) (outputReverse : List (Source ⊕ Unit)) :
+    TM2.step (program selected coefficients)
+        (emitSourceDataCfg side (source :: sources) result outputReverse) =
+      some (emitSourceDataCfg side sources result
+        (Sum.inl source :: outputReverse)) := by
+  cases side <;>
+    simp [TM2.step, program, emitSourceDataCfg, tapes,
+      outputFromState, Function.update] <;>
+    funext stack <;> cases stack <;> simp [tapes, Function.update]
+
+theorem step_emitSource_nil {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (side : Side) (result : List Unit)
+    (outputReverse : List (Source ⊕ Unit)) :
+    TM2.step (program selected coefficients)
+        (emitSourceDataCfg side [] result outputReverse) =
+      some (emitPaddingCfg side result outputReverse) := by
+  cases side <;>
+    simp [TM2.step, program, emitSourceDataCfg, emitPaddingCfg, tapes,
+      Function.update]
+
+theorem step_emitPadding_cons {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (side : Side) (unit : Unit) (result : List Unit)
+    (outputReverse : List (Source ⊕ Unit)) :
+    TM2.step (program selected coefficients)
+        (emitPaddingCfg side (unit :: result) outputReverse) =
+      some (emitPaddingCfg side result (Sum.inr () :: outputReverse)) := by
+  have unitEq : unit = () := Subsingleton.elim _ _
+  subst unit
+  cases side <;>
+    simp [TM2.step, program, emitPaddingCfg, tapes,
+      outputFromState, Function.update] <;>
+    funext stack <;> cases stack <;> simp [tapes, Function.update]
+
+theorem step_emitPadding_nil {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (side : Side) (outputReverse : List (Source ⊕ Unit)) :
+    TM2.step (program selected coefficients)
+        (emitPaddingCfg side [] outputReverse) =
+      some (reverseOutputCfg outputReverse []) := by
+  cases side <;>
+    simp [TM2.step, program, emitPaddingCfg, reverseOutputCfg, tapes,
+      Function.update] <;>
+    funext stack <;> cases stack <;> simp [tapes, Function.update]
+
+theorem step_reverseOutput_cons {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (symbol : Source ⊕ Unit) (outputReverse output : List (Source ⊕ Unit)) :
+    TM2.step (program selected coefficients)
+        (reverseOutputCfg (symbol :: outputReverse) output) =
+      some (reverseOutputCfg outputReverse (symbol :: output)) := by
+  simp [TM2.step, program, reverseOutputCfg, tapes,
+    outputFromState, Function.update]
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_reverseOutput_nil {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (output : List (Source ⊕ Unit)) :
+    TM2.step (program selected coefficients)
+        (reverseOutputCfg [] output) =
+      some (haltCfg output) := by
+  simp [TM2.step, program, reverseOutputCfg, haltCfg, tapes,
+    Function.update]
+
+theorem haltList_eq_haltCfg {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (output : List (Source ⊕ Unit)) :
+    haltList (machine Source selected coefficients) output =
+      haltCfg output := by
+  unfold haltList machine haltCfg
+  congr 1
+  funext stack
+  cases stack <;> simp [tapes]
+
 def oneStep {Configuration : Type}
     {transition : Configuration → Option Configuration}
     {first last : Configuration} (step : transition first = some last) :
@@ -381,6 +566,14 @@ def oneStep {Configuration : Type}
     change (some first).bind transition = some last
     simpa using step
   steps_le_m := Nat.le_refl 1
+
+def zeroSteps {Configuration : Type}
+    {transition : Configuration → Option Configuration}
+    (configuration : Configuration) :
+    EvalsToInTime transition configuration (some configuration) 0 where
+  steps := 0
+  evals_in_steps := rfl
+  steps_le_m := Nat.le_refl 0
 
 def restore_evalsInTime {Source : Type} [Fintype Source]
     [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
@@ -537,6 +730,448 @@ def multiply_evalsInTime {Source : Type} [Fintype Source]
         (current.length * (2 * sources.length + 3) + 1)
         _ _ _ first rest
       convert whole using 1 <;> simp <;> ring
+
+/-- Exact execution through any bounded prefix of the fixed coefficient
+list. -/
+def hornerPrefix_evalsInTime {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (sources : List Source) (position : Nat)
+    (bounded : position ≤ coefficients.length) :
+    EvalsToInTime (TM2.step (program selected coefficients))
+      (hornerCfg coefficients (selectedCount selected sources) 0 sources)
+      (some (hornerCfg coefficients (selectedCount selected sources)
+        position sources))
+      (hornerPrefixTime coefficients sources.length
+        (selectedCount selected sources) position) := by
+  induction position with
+  | zero =>
+      simpa [hornerPrefixTime] using
+        (zeroSteps (transition := TM2.step (program selected coefficients))
+          (hornerCfg coefficients (selectedCount selected sources) 0 sources))
+  | succ position induction =>
+      have positionLt : position < coefficients.length := by omega
+      let index : Fin coefficients.length := ⟨position, positionLt⟩
+      have prefixRun := induction (by omega)
+      have phase := multiply_evalsInTime selected coefficients index
+        (sideAt position) sources
+        (List.replicate
+          (hornerAccumulator coefficients (selectedCount selected sources)
+            position) ()) []
+      have phase' : EvalsToInTime (TM2.step (program selected coefficients))
+          (hornerCfg coefficients (selectedCount selected sources)
+            position sources)
+          (some (hornerCfg coefficients (selectedCount selected sources)
+            (position + 1) sources))
+          (hornerAccumulator coefficients (selectedCount selected sources)
+              position * (2 * sources.length + 3) + 1) := by
+        rw [show hornerCfg coefficients (selectedCount selected sources)
+            position sources =
+            multiplyCfg index (sideAt position) sources
+              (List.replicate
+                (hornerAccumulator coefficients
+                  (selectedCount selected sources) position) ()) [] by
+          simp [hornerCfg, index, positionLt]]
+        rw [← afterCoefficientCfg_eq_hornerCfg coefficients
+          (selectedCount selected sources) index sources]
+        convert phase using 1 <;> simp [index]
+      have whole := EvalsToInTime.trans _
+        (hornerPrefixTime coefficients sources.length
+          (selectedCount selected sources) position)
+        (hornerAccumulator coefficients (selectedCount selected sources)
+            position * (2 * sources.length + 3) + 1)
+        _ _ _ prefixRun phase'
+      convert whole using 1 <;> simp [hornerPrefixTime] <;> omega
+
+theorem hornerAccumulator_eq_foldl_take (coefficients : List Nat)
+    (input position : Nat) (bounded : position ≤ coefficients.length) :
+    hornerAccumulator coefficients input position =
+      (coefficients.reverse.take position).foldl
+        (fun accumulator coefficient => accumulator * input + coefficient) 0 := by
+  induction position with
+  | zero => rfl
+  | succ position induction =>
+      have positionLt : position < coefficients.length := by omega
+      rw [hornerAccumulator]
+      simp only [dif_pos positionLt]
+      rw [List.take_succ, List.foldl_append]
+      have getEq : coefficients.reverse[position]? =
+          some (coefficientAt coefficients ⟨position, positionLt⟩) := by
+        rw [List.getElem?_eq_getElem (by simpa using positionLt)]
+        rfl
+      rw [getEq]
+      simp only [Option.toList_some, List.foldl_cons, List.foldl_nil]
+      rw [induction (by omega)]
+
+@[simp]
+theorem hornerAccumulator_length (coefficients : List Nat) (input : Nat) :
+    hornerAccumulator coefficients input coefficients.length =
+      evalCoefficients coefficients input := by
+  rw [hornerAccumulator_eq_foldl_take coefficients input
+    coefficients.length (Nat.le_refl _)]
+  rw [show coefficients.length = coefficients.reverse.length by simp,
+    List.take_length]
+  rfl
+
+def emitSource_evalsInTime {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (side : Side) (sources : List Source) (result : List Unit)
+    (outputReverse : List (Source ⊕ Unit)) :
+    EvalsToInTime (TM2.step (program selected coefficients))
+      (emitSourceDataCfg side sources result outputReverse)
+      (some (emitPaddingCfg side result
+        ((sources.map Sum.inl).reverse ++ outputReverse)))
+      (sources.length + 1) := by
+  induction sources generalizing outputReverse with
+  | nil =>
+      simpa using oneStep
+        (step_emitSource_nil selected coefficients side result outputReverse)
+  | cons source sources induction =>
+      have first : EvalsToInTime (TM2.step (program selected coefficients))
+          (emitSourceDataCfg side (source :: sources) result outputReverse)
+          (some (emitSourceDataCfg side sources result
+            (Sum.inl source :: outputReverse))) 1 :=
+        oneStep (step_emitSource_cons selected coefficients side source
+          sources result outputReverse)
+      have rest := induction (Sum.inl source :: outputReverse)
+      have whole := EvalsToInTime.trans _ 1
+        (sources.length + 1) _ _ _ first rest
+      simpa [List.reverse_cons, List.append_assoc] using whole
+
+def emitPadding_evalsInTime {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (side : Side) (result : List Unit)
+    (outputReverse : List (Source ⊕ Unit)) :
+    EvalsToInTime (TM2.step (program selected coefficients))
+      (emitPaddingCfg side result outputReverse)
+      (some (reverseOutputCfg
+        ((result.map fun _ => Sum.inr ()).reverse ++ outputReverse) []))
+      (result.length + 1) := by
+  induction result generalizing outputReverse with
+  | nil =>
+      simpa using oneStep
+        (step_emitPadding_nil selected coefficients side outputReverse)
+  | cons unit result induction =>
+      have first : EvalsToInTime (TM2.step (program selected coefficients))
+          (emitPaddingCfg side (unit :: result) outputReverse)
+          (some (emitPaddingCfg side result
+            (Sum.inr () :: outputReverse))) 1 :=
+        oneStep (step_emitPadding_cons selected coefficients side unit result
+          outputReverse)
+      have rest := induction (Sum.inr () :: outputReverse)
+      have whole := EvalsToInTime.trans _ 1
+        (result.length + 1) _ _ _ first rest
+      simpa [List.reverse_cons, List.append_assoc] using whole
+
+def reverseOutput_evalsInTime {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (outputReverse output : List (Source ⊕ Unit)) :
+    EvalsToInTime (TM2.step (program selected coefficients))
+      (reverseOutputCfg outputReverse output)
+      (some (haltCfg (outputReverse.reverse ++ output)))
+      (outputReverse.length + 1) := by
+  induction outputReverse generalizing output with
+  | nil =>
+      simpa using oneStep
+        (step_reverseOutput_nil selected coefficients output)
+  | cons symbol outputReverse induction =>
+      have first : EvalsToInTime (TM2.step (program selected coefficients))
+          (reverseOutputCfg (symbol :: outputReverse) output)
+          (some (reverseOutputCfg outputReverse (symbol :: output))) 1 :=
+        oneStep (step_reverseOutput_cons selected coefficients symbol
+          outputReverse output)
+      have rest := induction (symbol :: output)
+      have whole := EvalsToInTime.trans _ 1
+        (outputReverse.length + 1) _ _ _ first rest
+      simpa [List.reverse_cons, List.append_assoc] using whole
+
+/-- Exact complete runtime of the unary polynomial padding machine. -/
+def totalTime {Source : Type} (selected : Source → Bool)
+    (coefficients : List Nat)
+    (sources : List Source) : Nat :=
+  let result := evalCoefficients coefficients (selectedCount selected sources)
+  1 + hornerPrefixTime coefficients sources.length
+      (selectedCount selected sources) coefficients.length +
+    (2 * sources.length + 2 * result + 3)
+
+noncomputable def machine_outputsInTime {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat)
+    (sources : List Source) :
+    TM2OutputsInTime (machine Source selected coefficients) sources
+      (some (paddedOutput selected coefficients sources))
+      (totalTime selected coefficients sources) := by
+  let input := selectedCount selected sources
+  let result := evalCoefficients coefficients input
+  let resultList := List.replicate result ()
+  have start : EvalsToInTime (TM2.step (program selected coefficients))
+      (initList (machine Source selected coefficients) sources)
+      (some (hornerCfg coefficients input 0 sources)) 1 :=
+    oneStep (step_start selected coefficients sources)
+  have horner := hornerPrefix_evalsInTime selected coefficients sources
+    coefficients.length (Nat.le_refl _)
+  have finalCfg : hornerCfg coefficients input coefficients.length sources =
+      emitSourceCfg (coefficients := coefficients)
+        (sideAt coefficients.length) sources resultList := by
+    simp [hornerCfg, input, result, resultList]
+  rw [finalCfg] at horner
+  have sourceRun := emitSource_evalsInTime selected coefficients
+    (sideAt coefficients.length) sources resultList []
+  have paddingRun := emitPadding_evalsInTime selected coefficients
+    (sideAt coefficients.length) resultList
+      ((sources.map Sum.inl).reverse ++ [])
+  let outputReverse :=
+    (resultList.map fun _ => Sum.inr ()).reverse ++
+      (sources.map Sum.inl).reverse
+  have paddingRun' : EvalsToInTime (TM2.step (program selected coefficients))
+      (emitPaddingCfg (sideAt coefficients.length) resultList
+        ((sources.map Sum.inl).reverse ++ []))
+      (some (reverseOutputCfg outputReverse []))
+      (resultList.length + 1) := by
+    simpa [outputReverse] using paddingRun
+  have reverseRun := reverseOutput_evalsInTime selected coefficients
+    outputReverse []
+  have outputEq : outputReverse.reverse =
+      paddedOutput selected coefficients sources := by
+    simp [outputReverse, paddedOutput, resultList, result, input,
+      List.reverse_append]
+  rw [outputEq] at reverseRun
+  have reverseRun' : EvalsToInTime (TM2.step (program selected coefficients))
+      (reverseOutputCfg outputReverse [])
+      (some (haltCfg (paddedOutput selected coefficients sources)))
+      (outputReverse.length + 1) := by
+    simpa using reverseRun
+  have throughHorner := EvalsToInTime.trans _ 1
+    (hornerPrefixTime coefficients sources.length input coefficients.length)
+    _ _ _ start horner
+  have throughSource := EvalsToInTime.trans _
+    (hornerPrefixTime coefficients sources.length input coefficients.length + 1)
+    (sources.length + 1) _ _ _ throughHorner sourceRun
+  have throughPadding := EvalsToInTime.trans _
+    (sources.length + 1 +
+      (hornerPrefixTime coefficients sources.length input coefficients.length + 1))
+    (resultList.length + 1) _ _ _ throughSource paddingRun'
+  have whole := EvalsToInTime.trans _
+    (resultList.length + 1 +
+      (sources.length + 1 +
+        (hornerPrefixTime coefficients sources.length input coefficients.length + 1)))
+    (outputReverse.length + 1) _ _ _ throughPadding reverseRun'
+  unfold TM2OutputsInTime
+  change EvalsToInTime (TM2.step (program selected coefficients))
+    (initList (machine Source selected coefficients) sources)
+    (some (haltList (machine Source selected coefficients)
+      (paddedOutput selected coefficients sources)))
+    (totalTime selected coefficients sources)
+  rw [haltList_eq_haltCfg selected coefficients]
+  convert whole using 1
+  simp [totalTime, outputReverse, resultList, result, input, paddedOutput]
+  omega
+
+theorem selectedCount_le_length {Source : Type} (selected : Source → Bool)
+    (sources : List Source) :
+    selectedCount selected sources ≤ sources.length := by
+  induction sources with
+  | nil => rfl
+  | cons source sources induction =>
+      cases choice : selected source <;>
+        simp [selectedCount, choice] at * <;> omega
+
+theorem le_sum_of_mem {value : Nat} {values : List Nat}
+    (member : value ∈ values) : value ≤ values.sum := by
+  induction values with
+  | nil => simp at member
+  | cons head tail induction =>
+      simp only [List.mem_cons] at member
+      rcases member with rfl | member
+      · simp
+      · have tailBound := induction member
+        simp only [List.sum_cons]
+        omega
+
+theorem coefficientAt_le_sum (coefficients : List Nat)
+    (index : Fin coefficients.length) :
+    coefficientAt coefficients index ≤ coefficients.sum := by
+  have member : coefficientAt coefficients index ∈ coefficients.reverse :=
+    List.get_mem coefficients.reverse
+      ⟨index.val, by simpa using index.isLt⟩
+  have bounded := le_sum_of_mem member
+  simpa using bounded
+
+/-- Every intermediate Horner accumulator is bounded by a simple power in
+the source length and fixed coefficient mass. -/
+theorem hornerAccumulator_add_one_le
+    (coefficients : List Nat) (input inputBound position : Nat)
+    (inputLe : input ≤ inputBound)
+    (positionLe : position ≤ coefficients.length) :
+    hornerAccumulator coefficients input position + 1 ≤
+      (inputBound + coefficients.sum + 1) ^ (position + 1) := by
+  induction position with
+  | zero =>
+      simp [hornerAccumulator]
+  | succ position induction =>
+      have positionLt : position < coefficients.length := by omega
+      let coefficient := coefficientAt coefficients ⟨position, positionLt⟩
+      have coefficientLe : coefficient ≤ coefficients.sum :=
+        coefficientAt_le_sum coefficients ⟨position, positionLt⟩
+      have accumulatorLe := induction (by omega)
+      have factorLe : input + coefficient + 1 ≤
+          inputBound + coefficients.sum + 1 := by omega
+      have productLe := Nat.mul_le_mul accumulatorLe factorLe
+      rw [hornerAccumulator]
+      simp only [dif_pos positionLt]
+      change hornerAccumulator coefficients input position * input +
+          coefficient + 1 ≤ _
+      calc
+        hornerAccumulator coefficients input position * input +
+              coefficient + 1 ≤
+            (hornerAccumulator coefficients input position + 1) *
+              (input + coefficient + 1) := by
+          rw [show
+            (hornerAccumulator coefficients input position + 1) *
+                (input + coefficient + 1) =
+              hornerAccumulator coefficients input position * input +
+                coefficient + 1 +
+                (hornerAccumulator coefficients input position *
+                  coefficient +
+                  hornerAccumulator coefficients input position + input) by
+            ring]
+          omega
+        _ ≤ (inputBound + coefficients.sum + 1) ^ (position + 1) *
+              (inputBound + coefficients.sum + 1) := productLe
+        _ = (inputBound + coefficients.sum + 1) ^ (position + 1 + 1) := by
+          exact (pow_succ _ (position + 1)).symm
+
+theorem hornerAccumulator_le_commonBound
+    (coefficients : List Nat) (input inputBound position : Nat)
+    (inputLe : input ≤ inputBound)
+    (positionLe : position ≤ coefficients.length) :
+    hornerAccumulator coefficients input position ≤
+      (inputBound + coefficients.sum + 1) ^ (coefficients.length + 1) := by
+  have localBound := hornerAccumulator_add_one_le coefficients input inputBound
+    position inputLe positionLe
+  have exponent := Nat.pow_le_pow_right (by omega :
+      0 < inputBound + coefficients.sum + 1)
+    (Nat.add_le_add_right positionLe 1)
+  exact (Nat.le_succ _).trans (localBound.trans exponent)
+
+theorem hornerPrefixTime_le (coefficients : List Nat)
+    (inputLength input position : Nat)
+    (inputLe : input ≤ inputLength)
+    (positionLe : position ≤ coefficients.length) :
+    hornerPrefixTime coefficients inputLength input position ≤
+      position *
+        ((inputLength + coefficients.sum + 1) ^
+            (coefficients.length + 1) * (2 * inputLength + 3) + 1) := by
+  induction position with
+  | zero => simp [hornerPrefixTime]
+  | succ position induction =>
+      have accumulatorLe := hornerAccumulator_le_commonBound coefficients
+        input inputLength position inputLe (by omega)
+      have phaseLe :
+          hornerAccumulator coefficients input position *
+                (2 * inputLength + 3) + 1 ≤
+            (inputLength + coefficients.sum + 1) ^
+                (coefficients.length + 1) * (2 * inputLength + 3) + 1 :=
+        Nat.add_le_add_right
+          (Nat.mul_le_mul_right (2 * inputLength + 3) accumulatorLe) 1
+      have combined := Nat.add_le_add (induction (by omega)) phaseLe
+      rw [hornerPrefixTime]
+      calc
+        hornerPrefixTime coefficients inputLength input position +
+              hornerAccumulator coefficients input position *
+                (2 * inputLength + 3) + 1 =
+            hornerPrefixTime coefficients inputLength input position +
+              (hornerAccumulator coefficients input position *
+                (2 * inputLength + 3) + 1) := by omega
+        _ ≤
+            position *
+                ((inputLength + coefficients.sum + 1) ^
+                    (coefficients.length + 1) *
+                    (2 * inputLength + 3) + 1) +
+              ((inputLength + coefficients.sum + 1) ^
+                    (coefficients.length + 1) *
+                    (2 * inputLength + 3) + 1) := combined
+        _ = (position + 1) *
+              ((inputLength + coefficients.sum + 1) ^
+                  (coefficients.length + 1) *
+                  (2 * inputLength + 3) + 1) := by ring
+
+noncomputable def commonBoundPolynomial (coefficients : List Nat) :
+    Polynomial Nat :=
+  (Polynomial.X + Polynomial.C (coefficients.sum + 1)) ^
+    (coefficients.length + 1)
+
+noncomputable def timePolynomial (coefficients : List Nat) : Polynomial Nat :=
+  let common := commonBoundPolynomial coefficients
+  Polynomial.C coefficients.length *
+      (common * (Polynomial.C 2 * Polynomial.X + Polynomial.C 3) +
+        Polynomial.C 1) +
+    Polynomial.C 2 * Polynomial.X + Polynomial.C 2 * common +
+      Polynomial.C 4
+
+@[simp]
+theorem commonBoundPolynomial_eval (coefficients : List Nat) (length : Nat) :
+    (commonBoundPolynomial coefficients).eval length =
+      (length + coefficients.sum + 1) ^ (coefficients.length + 1) := by
+  simp only [commonBoundPolynomial, Polynomial.eval_pow,
+    Polynomial.eval_add, Polynomial.eval_X, Polynomial.eval_C]
+  congr 1 <;> omega
+
+@[simp]
+theorem timePolynomial_eval (coefficients : List Nat) (length : Nat) :
+    (timePolynomial coefficients).eval length =
+      coefficients.length *
+          ((length + coefficients.sum + 1) ^ (coefficients.length + 1) *
+              (2 * length + 3) + 1) +
+        2 * length +
+        2 * (length + coefficients.sum + 1) ^
+          (coefficients.length + 1) + 4 := by
+  simp only [timePolynomial, Polynomial.eval_add, Polynomial.eval_mul,
+    Polynomial.eval_C, Polynomial.eval_X, commonBoundPolynomial_eval]
+
+theorem totalTime_le_polynomial_eval {Source : Type}
+    (selected : Source → Bool) (coefficients : List Nat)
+    (sources : List Source) :
+    totalTime selected coefficients sources ≤
+      (timePolynomial coefficients).eval sources.length := by
+  let input := selectedCount selected sources
+  let common :=
+    (sources.length + coefficients.sum + 1) ^
+      (coefficients.length + 1)
+  have inputLe : input ≤ sources.length :=
+    selectedCount_le_length selected sources
+  have prefixLe := hornerPrefixTime_le coefficients sources.length input
+    coefficients.length inputLe (Nat.le_refl _)
+  have resultLe : evalCoefficients coefficients input ≤ common := by
+    rw [← hornerAccumulator_length]
+    exact hornerAccumulator_le_commonBound coefficients input sources.length
+      coefficients.length inputLe (Nat.le_refl _)
+  rw [timePolynomial_eval]
+  unfold totalTime
+  dsimp only [input, common] at prefixLe resultLe ⊢
+  omega
+
+/-- The fixed Horner padding machine runs in polynomial time in the complete
+source-word length. -/
+noncomputable def computableInPolyTime {Source : Type} [Fintype Source]
+    [Inhabited Source] (selected : Source → Bool) (coefficients : List Nat) :
+    @TM2ComputableInPolyTime
+      (List Source) (List (Source ⊕ Unit)) Source (Source ⊕ Unit)
+      id id (paddedOutput selected coefficients) where
+  tm := machine Source selected coefficients
+  inputAlphabet := Equiv.refl _
+  outputAlphabet := Equiv.refl _
+  time := timePolynomial coefficients
+  outputsFun sources := by
+    have run := machine_outputsInTime selected coefficients sources
+    have run' : TM2OutputsInTime (machine Source selected coefficients)
+        (List.map (Equiv.refl Source).invFun (id sources))
+        (some (List.map (Equiv.refl (Source ⊕ Unit)).invFun
+          (id (paddedOutput selected coefficients sources))))
+        (totalTime selected coefficients sources) := by
+      simpa only [FiniteBlockTransducer.map_refl_invFun, id_eq] using run
+    refine
+      { toEvalsTo := run'.toEvalsTo
+        steps_le_m := run'.steps_le_m.trans ?_ }
+    exact totalTime_le_polynomial_eval selected coefficients sources
 
 end UnaryPolynomialPaddingMachine
 end LeanTrominoes
