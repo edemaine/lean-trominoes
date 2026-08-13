@@ -590,6 +590,9 @@ build; an imported proof counts when its statement matches the paper.
             polynomial number of native fields.
           - [ ] Implement the field-to-formula evaluator and certify its
             polynomial running time.
+            - [x] Verify the finite-machine variable-width atom emitter: it
+              appends one native binary field, restores its source register,
+              and takes exactly two steps per bit plus two.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
@@ -1531,6 +1534,11 @@ The representation choices for this target are:
   and identifies a total request evaluator with the verified formula-field
   stream.  A request carries the clause header and fresh-atom boundary before
   the compact postorder program.
+- [`LeanTrominoes/PeriodicCNFTransitionEvaluatorMachine.lean`](LeanTrominoes/PeriodicCNFTransitionEvaluatorMachine.lean)
+  begins the fixed finite-machine implementation of that request evaluator.
+  Its reusable variable-width primitive copies a binary atom into the reverse
+  output accumulator as one complete native field, restores the source stack
+  exactly, and has an exact linear step count.
 - [`LeanTrominoes/PeriodicCNFTransitionExprSize.lean`](LeanTrominoes/PeriodicCNFTransitionExprSize.lean)
   begins the quantitative hardness certificate.  It bounds Tseitin clauses
   by three per expression node, accounts for the forced root clause exactly,
