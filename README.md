@@ -481,12 +481,12 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Preserve the native strip suffix through both endpoint
               countdowns and prove that the nested scan decides existence of
               a directed frontier cycle.
-            - [ ] Fit and polynomially bound both native-flat endpoint scans.
+            - [x] Fit and polynomially bound both native-flat endpoint scans.
               - [x] Fit and uniformly bound one edge/reverse-reachability
                 candidate update.
               - [x] Lift that update through the second-endpoint countdown.
               - [x] Fit one complete inner scan.
-              - [ ] Lift complete row scans through the first-endpoint
+              - [x] Lift complete row scans through the first-endpoint
                 countdown.
             - [ ] Assemble the flat well-formedness guard, search parameters,
               and cycle scan into the final PSPACE decider.

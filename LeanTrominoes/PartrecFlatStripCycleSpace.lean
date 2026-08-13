@@ -1389,6 +1389,422 @@ theorem innerScan_fits_polynomial
   simp [flatStripCycleInnerScanSpaceBound] at inputBound outputBound' ⊢
   omega
 
+/-! ## First-endpoint countdown -/
+
+private def rowFound (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (first : Nat) : Bool :=
+  boundedAny
+    (cycleCandidateBool tromino periodicStrip
+      (flatStripStateBound periodicStrip)
+      (flatStripSearchDepth periodicStrip) first)
+    (flatStripStateBound periodicStrip)
+
+/-- Total transformer corresponding to one complete row scan. -/
+def outerProgramStep (tromino : Tromino)
+    (periodicStrip : PeriodicStrip) (values : List Nat) : List Nat :=
+  let firstRemaining := values[2]?.getD 0
+  let found := boolOfTag (values[3]?.getD 0)
+  outerPayload periodicStrip firstRemaining.pred
+    (found || rowFound tromino periodicStrip firstRemaining.pred)
+
+@[simp]
+theorem outerProgramStep_payload
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (firstRemaining : Nat) (found : Bool) :
+    outerProgramStep tromino periodicStrip
+        (outerPayload periodicStrip firstRemaining found) =
+      outerPayload periodicStrip firstRemaining.pred
+        (found || rowFound tromino periodicStrip firstRemaining.pred) := by
+  simp [outerProgramStep, outerPayload]
+
+theorem outerProgramStep_iterate
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (found : Bool) :
+    ((outerProgramStep tromino periodicStrip)^[remaining])
+        (outerPayload periodicStrip remaining found) =
+      outerPayload periodicStrip 0
+        (found || boundedAny
+          (fun first => rowFound tromino periodicStrip first) remaining) := by
+  induction remaining generalizing found with
+  | zero => simp [boundedAny]
+  | succ remaining induction =>
+      rw [Function.iterate_succ_apply]
+      rw [outerProgramStep_payload]
+      simpa [boundedAny, Bool.or_assoc] using
+        induction (found || rowFound tromino periodicStrip remaining)
+
+def OuterReachable (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (values : List Nat) : Prop :=
+  ∃ found, values = outerPayload periodicStrip remaining found ∧
+    remaining ≤ flatStripStateBound periodicStrip
+
+private theorem outerReachable_initial
+    (periodicStrip : PeriodicStrip) (found : Bool) :
+    OuterReachable periodicStrip (flatStripStateBound periodicStrip)
+      (outerPayload periodicStrip (flatStripStateBound periodicStrip) found) :=
+  ⟨found, rfl, Nat.le_refl _⟩
+
+private theorem outerReachable_step
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (values : List Nat)
+    (reachable : OuterReachable periodicStrip (remaining + 1) values) :
+    OuterReachable periodicStrip remaining
+      (outerProgramStep tromino periodicStrip values) := by
+  obtain ⟨found, rfl, bound⟩ := reachable
+  refine ⟨found || rowFound tromino periodicStrip remaining, ?_, by omega⟩
+  simpa using outerProgramStep_payload tromino periodicStrip
+    (remaining + 1) found
+
+def flatStripCycleOuterBodySpaceBound (inputLength : Nat) : Nat :=
+  100000 * (flatStripCycleInnerScanSpaceBound inputLength +
+    flatStripCycleLoopSpaceBound inputLength + 1)
+
+private theorem outerZeroBody
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (values : List Nat) :
+    EvaluatorCodeFits
+      (ToPartrec.Code.flatCountdownBody (innerScanCode tromino))
+      (0 :: values)
+      (flatCountdownOutput (outerProgramStep tromino periodicStrip) 0 values)
+      (flatCountdownBodyCost (outerProgramStep tromino periodicStrip)
+        (fun _ => flatStripCycleInnerScanSpaceBound
+          (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length)
+        0 values) := by
+  simpa [ToPartrec.Code.flatCountdownBody, flatCountdownOutput,
+    flatCountdownBodyCost, zeroPrimeCost] using
+      EvaluatorCodeFits.case_zero
+        (successorBranch :=
+          .cons ToPartrec.Code.one
+            (.cons ToPartrec.Code.head
+              ((innerScanCode tromino).comp ToPartrec.Code.tail)))
+        (values := 0 :: values) (by rfl)
+        (EvaluatorCodeFits.zero'_named values)
+
+private theorem outerBodyCost_le
+    (inputLength remaining : Nat) (input output : List Nat)
+    (inputBound : encodedListSpace (remaining :: input) ≤
+      flatStripCycleLoopSpaceBound inputLength)
+    (outputBound : encodedListSpace output ≤
+      flatStripCycleLoopSpaceBound inputLength) :
+    flatCountdownBodyCost (fun _ => output)
+        (fun _ => flatStripCycleInnerScanSpaceBound inputLength)
+        remaining input ≤ flatStripCycleOuterBodySpaceBound inputLength := by
+  cases remaining with
+  | zero =>
+      have inputTail := listCodeEncodedListSpace_tail_le (0 :: input)
+      simp [flatCountdownBodyCost, zeroPrimeCost,
+        flatStripCycleOuterBodySpaceBound, encodedListSpace_cons] at *
+      omega
+  | succ remaining =>
+      let values := remaining :: input
+      have predecessorBits := listCodeEncodeNat_length_mono
+        (show remaining ≤ remaining + 1 by omega)
+      have valuesBound : encodedListSpace values ≤
+          flatStripCycleLoopSpaceBound inputLength := by
+        simp [values, encodedListSpace_cons] at inputBound ⊢
+        omega
+      have tailBound := listCodeTailCost_le_linear values
+      have headBound := headCost_le values
+      have zeroBound := listCodeZeroCost_le_linear values
+      have successorZero := succCost_le [0]
+      have remainingField :
+          (Computability.encodeNat remaining).length + 1 ≤
+            encodedListSpace values := by
+        simp [values, encodedListSpace_cons]
+      have outputWithCounter :
+          encodedListSpace (remaining :: output) ≤
+            2 * (flatStripCycleLoopSpaceBound inputLength + 1) := by
+        simp [encodedListSpace_cons] at outputBound ⊢
+        omega
+      have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+      have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+      simp [flatCountdownBodyCost, flatCountdownSuccBranchCost,
+        prependCost, oneCost, values, flatStripCycleOuterBodySpaceBound,
+        encodedListSpace_cons, encodedListSpace_nil, zeroBits, oneBits]
+        at inputBound outputBound tailBound headBound zeroBound successorZero
+          outputWithCounter ⊢
+      omega
+
+set_option maxHeartbeats 1000000 in
+/-- The complete first-endpoint countdown has a uniform polynomial-space
+certificate. -/
+theorem outerCountdown_fits_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed) (found : Bool) :
+    EvaluatorCodeFits
+      (ToPartrec.Code.flatIterate (innerScanCode tromino))
+      (flatStripStateBound periodicStrip ::
+        outerPayload periodicStrip (flatStripStateBound periodicStrip) found)
+      (outerPayload periodicStrip 0
+        (found || boundedAny
+          (fun first => rowFound tromino periodicStrip first)
+          (flatStripStateBound periodicStrip)))
+      (flatStripCycleOuterBodySpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) where
+  input_space := by
+    have raw := outerCounted_space_le periodicStrip
+      (flatStripStateBound periodicStrip)
+      (flatStripStateBound periodicStrip) found (Nat.le_refl _)
+      (Nat.le_refl _)
+    exact raw.trans (by
+      simp [flatStripCycleOuterBodySpaceBound,
+        flatStripCycleLoopSpaceBound]
+      omega)
+  output_space := by
+    have raw := outerPayload_space_le periodicStrip 0
+      (found || boundedAny
+        (fun first => rowFound tromino periodicStrip first)
+        (flatStripStateBound periodicStrip)) (Nat.zero_le _)
+    exact raw.trans (by
+      simp [flatStripCycleOuterBodySpaceBound,
+        flatStripCycleLoopSpaceBound]
+      omega)
+  call continuation bound budget after := by
+    let inputLength :=
+      (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+    apply EvaluatorCallFits.flatIterate_of_reachable_code_fits
+      (step := outerProgramStep tromino periodicStrip)
+      (bodyCost := fun _ _ => flatStripCycleOuterBodySpaceBound inputLength)
+      (invariant := OuterReachable periodicStrip)
+    · intro remaining values reachable
+      obtain ⟨reachableFound, rfl, remainingBound⟩ := reachable
+      cases remaining with
+      | zero =>
+          exact (outerZeroBody tromino periodicStrip
+            (outerPayload periodicStrip 0 reachableFound)).mono (by
+              apply outerBodyCost_le inputLength 0
+                (outerPayload periodicStrip 0 reachableFound)
+                (outerPayload periodicStrip 0 reachableFound)
+              · simpa [inputLength, flatStripCycleLoopSpaceBound] using
+                  outerCounted_space_le periodicStrip 0 0 reachableFound
+                    (Nat.zero_le _) (Nat.zero_le _)
+              · have raw := outerPayload_space_le periodicStrip 0
+                    reachableFound (Nat.zero_le _)
+                exact raw.trans (by
+                  simp [inputLength, flatStripCycleLoopSpaceBound]
+                  omega))
+      | succ remaining =>
+          have step := innerScan_fits_polynomial tromino periodicStrip
+            wellFormed (remaining + 1) reachableFound (by omega)
+            remainingBound
+          have body := flatCountdownBody_of_fit step (remaining + 1)
+          have bodyOutput :
+              flatCountdownOutput
+                  (fun _ => outerPayload periodicStrip
+                    (remaining + 1).pred
+                    (reachableFound || boundedAny
+                      (cycleCandidateBool tromino periodicStrip
+                        (flatStripStateBound periodicStrip)
+                        (flatStripSearchDepth periodicStrip)
+                        (remaining + 1).pred)
+                      (flatStripStateBound periodicStrip)))
+                  (remaining + 1)
+                  (outerPayload periodicStrip (remaining + 1)
+                    reachableFound) =
+                flatCountdownOutput
+                  (outerProgramStep tromino periodicStrip)
+                  (remaining + 1)
+                  (outerPayload periodicStrip (remaining + 1)
+                    reachableFound) := by
+            simp [flatCountdownOutput, outerProgramStep, outerPayload,
+              rowFound]
+          rw [bodyOutput] at body
+          apply body.mono
+          apply outerBodyCost_le inputLength (remaining + 1)
+            (outerPayload periodicStrip (remaining + 1) reachableFound)
+            (outerPayload periodicStrip remaining
+              (reachableFound || rowFound tromino periodicStrip remaining))
+          · simpa [inputLength, flatStripCycleLoopSpaceBound] using
+              outerCounted_space_le periodicStrip (remaining + 1)
+                (remaining + 1) reachableFound remainingBound remainingBound
+          · have raw := outerPayload_space_le periodicStrip remaining
+                (reachableFound || rowFound tromino periodicStrip remaining)
+                (by omega)
+            exact raw.trans (by
+              simp [inputLength, flatStripCycleLoopSpaceBound]
+              omega)
+    · exact outerReachable_initial periodicStrip found
+    · exact outerReachable_step tromino periodicStrip
+    · intro remaining values reachable
+      simpa [inputLength] using budget
+    · rw [outerProgramStep_iterate]
+      exact after
+
+/-! ## Complete parameterized cycle search -/
+
+private noncomputable def cycleInputFields (values : List Nat) :
+    List (StripSavitchStep.FieldFit values) :=
+  [StripSavitchStep.getField 0 values,
+    StripSavitchStep.getField 0 values,
+    StripSavitchStep.getField 1 values,
+    StripSavitchStep.getField 0 values,
+    StripSavitchStep.zeroField values]
+
+noncomputable def cycleInputCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values (cycleInputFields values)
+    (values.drop 2) (dropCost 2 values)
+
+theorem cycleInput_fits (periodicStrip : PeriodicStrip) :
+    let values := [flatStripStateBound periodicStrip,
+      flatStripSearchDepth periodicStrip] ++
+        PeriodicStripFlatEncoding.stripFields periodicStrip
+    EvaluatorCodeFits cycleScanInputCode values
+      (flatStripStateBound periodicStrip ::
+        outerPayload periodicStrip (flatStripStateBound periodicStrip) false)
+      (cycleInputCost values) := by
+  let values := [flatStripStateBound periodicStrip,
+    flatStripSearchDepth periodicStrip] ++
+      PeriodicStripFlatEncoding.stripFields periodicStrip
+  have fit := StripSavitchStep.fields values (cycleInputFields values)
+    (drop 2 values)
+  simpa [cycleScanInputCode, cycleInputCost, cycleInputFields,
+    outerPayload, values, divideBoolTag,
+    StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    StripSavitchStep.getField, StripSavitchStep.zeroField] using fit
+
+set_option maxHeartbeats 1000000 in
+private theorem cycleInputCost_le (periodicStrip : PeriodicStrip) :
+    let values := [flatStripStateBound periodicStrip,
+      flatStripSearchDepth periodicStrip] ++
+        PeriodicStripFlatEncoding.stripFields periodicStrip
+    cycleInputCost values ≤ flatStripCycleAdapterSpaceBound
+      (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let values := [flatStripStateBound periodicStrip,
+    flatStripSearchDepth periodicStrip] ++
+      PeriodicStripFlatEncoding.stripFields periodicStrip
+  let fields := cycleInputFields values
+  let unit := flatStripCycleLoopSpaceBound inputLength
+  have positive : 0 < flatStripStateBound periodicStrip := by
+    simp [flatStripStateBound]
+  have query := flatStripReachQuerySpace_le periodicStrip 0 0
+    positive positive
+  have queryTail := listCodeEncodedListSpace_tail_le
+    ([flatStripStateBound periodicStrip,
+      flatStripSearchDepth periodicStrip, 0, 0] ++
+        PeriodicStripFlatEncoding.stripFields periodicStrip)
+  have queryTail2 := listCodeEncodedListSpace_tail_le
+    ([flatStripSearchDepth periodicStrip, 0, 0] ++
+        PeriodicStripFlatEncoding.stripFields periodicStrip)
+  have valuesBase : encodedListSpace values ≤
+      flatStripReachQuerySpaceBound inputLength := by
+    have removed : encodedListSpace values ≤ encodedListSpace
+        ([flatStripStateBound periodicStrip,
+          flatStripSearchDepth periodicStrip, 0, 0] ++
+          PeriodicStripFlatEncoding.stripFields periodicStrip) := by
+      simp [values, encodedListSpace_cons]
+      omega
+    exact removed.trans (by simpa [inputLength] using query)
+  have valuesBound : encodedListSpace values ≤ unit :=
+    valuesBase.trans (by
+      simp [unit, flatStripCycleLoopSpaceBound,
+        flatStripCycleListSpaceBound]
+      omega)
+  have outputBound : encodedListSpace
+      (fields.map StripSavitchStep.FieldFit.output ++ values.drop 2) ≤ unit := by
+    have raw := outerCounted_space_le periodicStrip
+      (flatStripStateBound periodicStrip)
+      (flatStripStateBound periodicStrip) false (Nat.le_refl _)
+      (Nat.le_refl _)
+    simpa [fields, cycleInputFields, values, outerPayload,
+      StripSavitchStep.getField, StripSavitchStep.zeroField,
+      divideBoolTag, inputLength, unit, flatStripCycleLoopSpaceBound] using raw
+  have assembled := StripSavitchStep.fieldsCost_le_of values fields
+    (values.drop 2) (dropCost 2 values) unit valuesBound outputBound
+  have get0 := StripSavitchStep.getCost_le_budget 0 values unit
+    (by omega) valuesBound
+  have get1 := StripSavitchStep.getCost_le_budget 1 values unit
+    (by omega) valuesBound
+  have zero := StripSavitchStep.zeroCost_le_budget values unit valuesBound
+  have dropped := StripSavitchStep.dropCost_le_budget
+    2 values unit (by omega) valuesBound
+  have sumEq : (fields.map StripSavitchStep.FieldFit.cost).sum =
+      getCost 0 values + getCost 0 values + getCost 1 values +
+        getCost 0 values + zeroCost values := by
+    simp [fields, cycleInputFields, StripSavitchStep.getField,
+      StripSavitchStep.zeroField]
+    ring
+  have lengthEq : fields.length = 5 := by simp [fields, cycleInputFields]
+  rw [sumEq, lengthEq] at assembled
+  change cycleInputCost values ≤ flatStripCycleAdapterSpaceBound inputLength
+  simp only [cycleInputCost]
+  apply assembled.trans
+  simp [flatStripCycleAdapterSpaceBound, unit,
+    flatStripCycleLoopSpaceBound] at get0 get1 zero dropped ⊢
+  omega
+
+def flatStripCycleSearchSpaceBound (inputLength : Nat) : Nat :=
+  100000 * (flatStripCycleOuterBodySpaceBound inputLength +
+    flatStripCycleAdapterSpaceBound inputLength +
+    flatStripCycleListSpaceBound inputLength + 1)
+
+/-- Complete native-flat parameterized cycle search with a polynomial-space
+evaluator certificate. -/
+theorem flatStripCycleSearch_fits_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed) :
+    EvaluatorCodeFits (flatStripCycleSearchCode tromino)
+      ([flatStripStateBound periodicStrip,
+        flatStripSearchDepth periodicStrip] ++
+          PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [divideBoolTag
+        (cycleSearchIndexDFSBoolAtDepth
+          (flatStripStateBound periodicStrip)
+          (flatStripSearchDepth periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip))]
+      (flatStripCycleSearchSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let result := cycleSearchIndexDFSBoolAtDepth
+    (flatStripStateBound periodicStrip) (flatStripSearchDepth periodicStrip)
+    (indexedTransitionRawBool tromino periodicStrip)
+  let scanResult := boundedAny
+    (fun first => boundedAny
+      (cycleCandidateBool tromino periodicStrip
+        (flatStripStateBound periodicStrip)
+        (flatStripSearchDepth periodicStrip) first)
+      (flatStripStateBound periodicStrip))
+    (flatStripStateBound periodicStrip)
+  let values := [flatStripStateBound periodicStrip,
+    flatStripSearchDepth periodicStrip] ++
+      PeriodicStripFlatEncoding.stripFields periodicStrip
+  have inputFit := cycleInput_fits periodicStrip
+  have loopFit := outerCountdown_fits_polynomial tromino periodicStrip
+    wellFormed false
+  have loopFit' : EvaluatorCodeFits
+      (ToPartrec.Code.flatIterate (innerScanCode tromino))
+      (flatStripStateBound periodicStrip ::
+        outerPayload periodicStrip (flatStripStateBound periodicStrip) false)
+      (outerPayload periodicStrip 0 scanResult)
+      (flatStripCycleOuterBodySpaceBound inputLength) := by
+    simpa [scanResult, rowFound, inputLength] using loopFit
+  have scanFit := EvaluatorCodeFits.comp loopFit' inputFit
+  have projected := EvaluatorCodeFits.comp
+    (EvaluatorCodeFits.get 3 (outerPayload periodicStrip 0 scanResult))
+    scanFit
+  have resultEq : scanResult = result := by rfl
+  rw [resultEq] at projected
+  have inputBound : cycleInputCost values ≤
+      flatStripCycleAdapterSpaceBound inputLength := by
+    simpa [values, inputLength] using cycleInputCost_le periodicStrip
+  have outputSpace := outerPayload_space_le periodicStrip 0 result
+    (Nat.zero_le _)
+  have projectedCost := listCodeGetCost_le_linear 3
+    (outerPayload periodicStrip 0 result)
+  change EvaluatorCodeFits
+    ((ToPartrec.Code.get 3).comp
+      ((ToPartrec.Code.flatIterate (innerScanCode tromino)).comp
+        cycleScanInputCode)) _ _ _
+  dsimp only [values, result, scanResult] at projected ⊢
+  apply projected.mono
+  dsimp only [values, result, inputLength] at inputBound outputSpace projectedCost ⊢
+  simp [flatStripCycleSearchSpaceBound] at inputBound outputSpace projectedCost ⊢
+  omega
+
 end FlatStripCyclePartrec
 end RawWindowState
 end PeriodicStrip
