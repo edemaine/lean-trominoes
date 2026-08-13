@@ -1277,6 +1277,11 @@ The representation choices for this target are:
   gates remain edge-local: the next endpoint is read only through source
   atoms, which yields an exact equivalence between line satisfiability and
   bi-infinite paths through the direct Boolean expression relation.
+- [`LeanTrominoes/PeriodicCNFTransitionExprSize.lean`](LeanTrominoes/PeriodicCNFTransitionExprSize.lean)
+  begins the quantitative hardness certificate.  It bounds Tseitin clauses
+  by three per expression node, accounts for the forced root clause exactly,
+  and proves quadratic node bounds for finite exact-one fields and binary
+  clock succession.
 - [`LeanTrominoes/PeriodicCNFMachineAtoms.lean`](LeanTrominoes/PeriodicCNFMachineAtoms.lean)
   defines the finite atom vocabulary of a bounded machine slice: optional
   control labels, internal states, optional symbols in every bounded stack
