@@ -203,6 +203,14 @@ theorem bitsValue_fixedBits_of_lt {width number : Nat}
         have division := Nat.mod_add_div number 2
         omega
 
+/-- Re-encoding the numeric value of a Boolean vector at the same width
+recovers the vector exactly. -/
+theorem fixedBits_bitsValue (bits : List Bool) :
+    fixedBits bits.length (bitsValue bits) = bits := by
+  apply bitsValue_injective_of_length_eq
+  · simp
+  · rw [bitsValue_fixedBits_of_lt (bitsValue_lt_two_pow_length bits)]
+
 /-- Fixed-width representations implement ordinary successor exactly when
 the result still fits in the width. -/
 theorem binarySuccessor_fixedBits {width number : Nat}

@@ -1325,6 +1325,12 @@ The representation choices for this target are:
   no-overflow successor clock, and a halted-label reset to a fixed initial
   configuration.  Canonical bounded encodings satisfy the resulting local
   expression exactly when their semantic states satisfy `ResetClockRelation`.
+- [`LeanTrominoes/PeriodicCNFMachineFormula.lean`](LeanTrominoes/PeriodicCNFMachineFormula.lean)
+  compiles that accepting-reset expression to a forward-local horizontal CNF.
+  Every satisfying line model is decoded into a genuine bounded accepting
+  machine trace; this soundness argument also covers noncanonical Boolean
+  slices by proving that well-formed decoding and re-encoding preserves every
+  source atom.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.

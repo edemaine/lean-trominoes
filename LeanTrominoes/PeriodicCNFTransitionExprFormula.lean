@@ -1,4 +1,4 @@
-import LeanTrominoes.PeriodicCNFTransitionExprCompleteness
+import LeanTrominoes.PeriodicCNFTransitionExprVectors
 
 /-!
 # Requiring a compiled transition expression
@@ -12,6 +12,75 @@ on the line exactly when the direct Boolean relation has a bi-infinite path.
 namespace LeanTrominoes
 
 namespace PeriodicCNF
+
+namespace TransitionExpr
+
+/-- An expression is current-only when none of its wires reads the next
+transition endpoint. -/
+def CurrentOnly : TransitionExpr → Prop
+  | .constant _ => True
+  | .wire input => input.slice = .current
+  | .not input => input.CurrentOnly
+  | .and first second => first.CurrentOnly ∧ second.CurrentOnly
+  | .or first second => first.CurrentOnly ∧ second.CurrentOnly
+
+theorem CurrentOnly.eval_eq {expression : TransitionExpr}
+    (currentOnly : expression.CurrentOnly)
+    (current firstNext secondNext : Nat → Bool) :
+    expression.eval current firstNext = expression.eval current secondNext := by
+  induction expression with
+  | constant value => rfl
+  | wire input =>
+      cases input with
+      | mk slice atom =>
+          cases slice <;> simp_all [CurrentOnly, TransitionExpr.eval,
+            TransitionWire.value]
+  | not input ih =>
+      simp only [TransitionExpr.eval]
+      rw [ih currentOnly]
+  | and first second firstIH secondIH =>
+      simp only [TransitionExpr.eval]
+      rw [firstIH currentOnly.1, secondIH currentOnly.2]
+  | or first second firstIH secondIH =>
+      simp only [TransitionExpr.eval]
+      rw [firstIH currentOnly.1, secondIH currentOnly.2]
+
+theorem current_currentOnly (atom : Nat) :
+    (current atom).CurrentOnly :=
+  rfl
+
+theorem CurrentOnly.all {expressions : List TransitionExpr}
+    (allCurrent : ∀ expression ∈ expressions, expression.CurrentOnly) :
+    (TransitionExpr.all expressions).CurrentOnly := by
+  induction expressions with
+  | nil => trivial
+  | cons expression expressions ih =>
+      exact ⟨allCurrent expression (by simp),
+        ih (fun member memberMem => allCurrent member (by simp [memberMem]))⟩
+
+theorem CurrentOnly.exactlyOne {expressions : List TransitionExpr}
+    (allCurrent : ∀ expression ∈ expressions, expression.CurrentOnly) :
+    (TransitionExpr.exactlyOne expressions).CurrentOnly := by
+  induction expressions with
+  | nil => trivial
+  | cons expression expressions ih =>
+      have head := allCurrent expression (by simp)
+      have tail : ∀ member ∈ expressions, member.CurrentOnly :=
+        fun member memberMem => allCurrent member (by simp [memberMem])
+      exact ⟨⟨head, CurrentOnly.all (by
+        intro negated negatedMem
+        obtain ⟨member, memberMem, rfl⟩ := List.mem_map.mp negatedMem
+        exact tail member memberMem)⟩,
+        head, ih tail⟩
+
+theorem currentExactlyOne_currentOnly (atoms : List Nat) :
+    (currentExactlyOne atoms).CurrentOnly := by
+  apply CurrentOnly.exactlyOne
+  intro expression expressionMem
+  obtain ⟨atom, _, rfl⟩ := List.mem_map.mp expressionMem
+  exact current_currentOnly atom
+
+end TransitionExpr
 
 /-- Compile a transition expression and require its edge-local root to be
 true at every translate. -/
@@ -148,6 +217,31 @@ theorem clausesHoldBetween_congr_next
     exact ⟨literal, literalMem,
       (literal_holdsBetween_congr_next
         (atoms clause clauseMem literal literalMem) agree).mpr literalHolds⟩
+
+/-- Expression evaluation is unchanged when next-slice source atoms agree
+below their declared bound. -/
+theorem TransitionExpr.eval_congr_next {expression : TransitionExpr}
+    {bound : Nat} (atoms : expression.AtomsBelow bound)
+    {current first second : Nat → Bool}
+    (agree : ∀ atom < bound, first atom = second atom) :
+    expression.eval current first = expression.eval current second := by
+  induction expression with
+  | constant value => rfl
+  | wire input =>
+      cases input with
+      | mk slice atom =>
+          cases slice with
+          | current => rfl
+          | next => exact agree atom atoms
+  | not input ih =>
+      simp only [TransitionExpr.eval]
+      rw [ih atoms]
+  | and firstExpr secondExpr firstIH secondIH =>
+      simp only [TransitionExpr.eval]
+      rw [firstIH atoms.1, secondIH atoms.2]
+  | or firstExpr secondExpr firstIH secondIH =>
+      simp only [TransitionExpr.eval]
+      rw [firstIH atoms.1, secondIH atoms.2]
 
 /-- Requiring a compiled expression preserves the forward-local fragment. -/
 theorem requireTransitionExpr_forward (expression : TransitionExpr)

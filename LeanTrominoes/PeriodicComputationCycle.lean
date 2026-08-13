@@ -240,6 +240,97 @@ theorem acceptingTrace_of_hasCycle {Config : Type*}
   · exact (beforeLength index.val index.isLt reset.1).elim
   · simpa using ordinary.2.2.2
 
+private theorem exists_accepting_nat_of_biInfinitePath {Config : Type*}
+    {initial : Config} {step : Config → Option Config}
+    {accepts : Config → Prop} {limit : Nat}
+    {path : Int → ResetClockState Config}
+    (follows : FiniteState.IsBiInfinitePath
+      (ResetClockRelation initial step accepts limit) path)
+    (start : Int) :
+    ∃ index ≤ limit, accepts (path (start + index)).config := by
+  by_contra noAcceptance
+  push Not at noAcceptance
+  have clock_eq : ∀ index ≤ limit + 1,
+      (path (start + index)).clock = (path start).clock + index := by
+    intro index indexLe
+    induction index with
+    | zero => simp
+    | succ index ih =>
+        have indexLeLimit : index ≤ limit := by omega
+        have edge : ResetClockRelation initial step accepts limit
+            (path (start + index)) (path (start + (index + 1))) := by
+          simpa only [Nat.cast_add, Nat.cast_one, add_assoc] using
+            follows (start + (index : Int))
+        rcases edge.2.2 with reset | ordinary
+        · exact (noAcceptance index indexLeLimit reset.1).elim
+        · norm_num only [Nat.cast_add, Nat.cast_one]
+          rw [ordinary.2.2.1, ih (by omega)]
+          omega
+  have finalEdge : ResetClockRelation initial step accepts limit
+      (path (start + limit)) (path (start + (limit + 1))) := by
+    simpa only [Nat.cast_add, Nat.cast_one, add_assoc] using
+      follows (start + (limit : Int))
+  have nextBound := finalEdge.2.1
+  have finalClock := clock_eq (limit + 1) (by omega)
+  norm_num only [Nat.cast_add, Nat.cast_one] at finalClock
+  rw [finalClock] at nextBound
+  omega
+
+/-- Every bi-infinite reset-clock path contains a bounded accepting trace.
+The clock bound supplies the well-foundedness; the configuration type itself
+need not be finite. -/
+theorem acceptingTrace_of_hasBiInfinitePath {Config : Type*}
+    {initial : Config} {step : Config → Option Config}
+    {accepts : Config → Prop} {limit : Nat}
+    (infinite : FiniteState.HasBiInfinitePath
+      (ResetClockRelation initial step accepts limit)) :
+    Nonempty (AcceptingTrace Config initial step accepts limit) := by
+  classical
+  obtain ⟨path, follows⟩ := infinite
+  obtain ⟨acceptedIndex, _, acceptedAt⟩ :=
+    exists_accepting_nat_of_biInfinitePath follows 0
+  let start : Int := acceptedIndex + 1
+  let segment : Nat → ResetClockState Config := fun index =>
+    path (start + index)
+  have startState : segment 0 = ⟨0, initial⟩ := by
+    have edge := follows (acceptedIndex : Int)
+    rcases edge.2.2 with reset | ordinary
+    · simpa [segment, start] using reset.2
+    · exact (ordinary.1 (by simpa using acceptedAt)).elim
+  obtain ⟨acceptedLength, acceptedLengthLe, acceptsLength⟩ :=
+    exists_accepting_nat_of_biInfinitePath follows start
+  have eventuallyAccepts : ∃ length,
+      length ≤ limit ∧ accepts (segment length).config :=
+    ⟨acceptedLength, acceptedLengthLe, acceptsLength⟩
+  let length := Nat.find eventuallyAccepts
+  have lengthSpec : length ≤ limit ∧ accepts (segment length).config :=
+    Nat.find_spec eventuallyAccepts
+  have beforeLength : ∀ index < length,
+      ¬ accepts (segment index).config := by
+    intro index indexLt accepted
+    exact Nat.find_min eventuallyAccepts indexLt
+      ⟨by omega, accepted⟩
+  have segmentStep (index : Nat) :
+      ResetClockRelation initial step accepts limit
+        (segment index) (segment (index + 1)) := by
+    simpa only [segment, Nat.cast_add, Nat.cast_one, add_assoc] using
+      follows (start + (index : Int))
+  refine ⟨
+    { length := length
+      length_le := lengthSpec.1
+      states := fun index => (segment index.val).config
+      starts := by simp [startState]
+      accepts_last := by simpa using lengthSpec.2
+      not_accepts := ?_
+      steps := ?_ }⟩
+  · intro index
+    exact beforeLength index.val index.isLt
+  · intro index
+    have edge := segmentStep index.val
+    rcases edge.2.2 with reset | ordinary
+    · exact (beforeLength index.val index.isLt reset.1).elim
+    · simpa using ordinary.2.2.2
+
 /-- The cyclic reset system characterizes bounded acceptance. -/
 theorem hasCycle_iff_acceptingTrace {Config : Type*}
     (initial : Config) (step : Config → Option Config)
