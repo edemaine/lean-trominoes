@@ -84,6 +84,42 @@ def computableInPolyTime {Symbol : Type}
   simpa only [flatMap_symbolBlock_eq_encode] using
     certificate.outputsFun symbols
 
+/-- The same physical transducer, presented with its semantic output as the
+list of natural fields rather than as the already-encoded native symbol
+stream.  This is the interface needed for composition with an evaluator whose
+input encoding is `PartrecToTM2.trList`. -/
+def fieldsComputableInPolyTime {Symbol : Type}
+    [Fintype Symbol] :
+    @TM2ComputableInPolyTime
+      (List Symbol) (List Nat)
+      Symbol PartrecToTM2.Γ' id PartrecToTM2.trList fields := by
+  let certificate := computableInPolyTime (Symbol := Symbol)
+  refine
+    { tm := certificate.tm
+      inputAlphabet := certificate.inputAlphabet
+      outputAlphabet := certificate.outputAlphabet
+      time := certificate.time
+      outputsFun := ?_ }
+  intro symbols
+  simpa only [encode, id_eq] using certificate.outputsFun symbols
+
+@[simp]
+theorem fields_length {Symbol : Type} [Fintype Symbol]
+    (symbols : List Symbol) :
+    (fields symbols).length = symbols.length := by
+  simp [fields]
+
+/-- Every natural field contributes at least its terminating delimiter. -/
+theorem fields_length_le_encode_length
+    {Symbol : Type} [Fintype Symbol] (symbols : List Symbol) :
+    (fields symbols).length ≤ (encode symbols).length := by
+  rw [encode_length, fields_length]
+  induction symbols with
+  | nil => simp
+  | cons symbol symbols induction =>
+      simp only [List.length_cons, List.map_cons, List.sum_cons]
+      omega
+
 /-- The preprocessing time polynomial is explicitly linear. -/
 theorem time_eq_linear {Symbol : Type} [Fintype Symbol] :
     (computableInPolyTime (Symbol := Symbol)).time =

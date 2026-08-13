@@ -575,6 +575,11 @@ build; an imported proof counts when its statement matches the paper.
           delimiter-terminated natural fields.
         - [ ] Implement the native-field formula compiler and bound its
           evaluator runtime by an explicit polynomial.
+          - [x] Expose a total natural-field compiler interface, prove that
+            generated source fields recover the original symbols, and identify
+            its native output with the verified flat formula encoding.
+          - [ ] Implement the field-to-formula evaluator and certify its
+            polynomial running time.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
@@ -1629,7 +1634,14 @@ The representation choices for this target are:
   numbers any finite source alphabet and specializes the block transducer to
   emit canonical delimiter-terminated natural fields over the evaluator's
   native alphabet.  This supplies the polynomial-time input front end needed
-  by the pending machine-to-periodic-CNF compiler certificate.
+  by the pending machine-to-periodic-CNF compiler certificate.  The same
+  transducer is also presented semantically as computing the natural field
+  list under its native `trList` encoding, ready for machine composition.
+- [`LeanTrominoes/PeriodicCNFPolySpaceNativeCompiler.lean`](LeanTrominoes/PeriodicCNFPolySpaceNativeCompiler.lean)
+  gives the formula generator a total evaluator-native natural-field
+  interface.  It proves generated fields recover the original finite-alphabet
+  stream, identifies the re-encoded output with the verified flat formula,
+  and transfers its polynomial output-size bound to native input length.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population
