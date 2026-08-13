@@ -627,6 +627,9 @@ build; an imported proof counts when its statement matches the paper.
               `TM2ComputableInPolyTime` compiler.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
+          - [x] Package every decoded source-field list as a bounded compiler
+            request and identify its encoded request and compiled output with
+            the native frontend definitions.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
             an explicit polynomial using its fixed statement-push allowance.
           - [x] Construct and verify polynomial-time sequential composition
@@ -1722,7 +1725,9 @@ The representation choices for this target are:
   intermediate clause list, factors generation through the compact postorder
   request and fixed evaluator, identifies that output with the verified flat
   formula, and gives explicit polynomial bounds for both request field count
-  and native output length.
+  and native output length.  It also packages every total decoded-field input
+  as the evaluator's bounded semantic request, proving both encoding and
+  compiled-output identities needed for machine composition.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population

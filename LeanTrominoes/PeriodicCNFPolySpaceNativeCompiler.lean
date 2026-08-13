@@ -1,6 +1,7 @@
 import LeanTrominoes.PeriodicCNFPolySpaceCompiler
 import LeanTrominoes.PeriodicCNFTransitionExprFields
 import LeanTrominoes.PeriodicCNFTransitionProgramEncoding
+import LeanTrominoes.PeriodicCNFTransitionEvaluatorTime
 import LeanTrominoes.FiniteEncodingNativeFields
 import LeanTrominoes.TM2CompositionMachine
 
@@ -120,6 +121,31 @@ def nativeCompilerProgramInput (fields : List Nat) : List Nat :=
   transitionCompilerInputFields
     (nativeCompilerExpression decider fields)
     (nativeCompilerFresh decider fields)
+
+/-- The semantic request handed to the verified structural evaluator.  The
+freshness proof is uniform, including for malformed source-field lists. -/
+def nativeCompilerRequest (fields : List Nat) :
+    TransitionEvaluatorMachine.TransitionCompilerRequest where
+  expression := nativeCompilerExpression decider fields
+  fresh := nativeCompilerFresh decider fields
+  sourceBound := by
+    exact
+      BoundedMachineAtom.designatedMachineResetClockExpression_atomsBelow
+        (PolySpaceCompiler.initialConfigurationOfSymbols decider
+          (symbolsOfFields encoding.Γ fields))
+        (PolySpaceReduction.acceptingConfiguration decider)
+
+@[simp]
+theorem nativeCompilerRequest_encode (fields : List Nat) :
+    (nativeCompilerRequest decider fields).encode =
+      PartrecToTM2.trList (nativeCompilerProgramInput decider fields) := by
+  rfl
+
+@[simp]
+theorem nativeCompilerRequest_compile (fields : List Nat) :
+    (nativeCompilerRequest decider fields).compile =
+      nativeCompilerFields decider fields := by
+  rfl
 
 /-- The fixed field evaluator maps the compact postorder request to the direct
 native compiler stream on every input. -/
