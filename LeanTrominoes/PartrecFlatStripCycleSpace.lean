@@ -1137,6 +1137,258 @@ theorem candidateCountdown_fits_polynomial
     · rw [candidateProgramStep_iterate]
       exact after
 
+/-! ## One complete row scan -/
+
+private noncomputable def innerInputFields (values : List Nat) :
+    List (StripSavitchStep.FieldFit values) :=
+  [StripSavitchStep.getField 0 values,
+    StripSavitchStep.getField 0 values,
+    StripSavitchStep.getField 1 values,
+    StripSavitchStep.predecessorField 2 values,
+    StripSavitchStep.getField 0 values,
+    StripSavitchStep.getField 3 values]
+
+noncomputable def innerInputCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values (innerInputFields values)
+    (values.drop 4) (dropCost 4 values)
+
+theorem innerInput_fits
+    (periodicStrip : PeriodicStrip)
+    (firstRemaining : Nat) (found : Bool) :
+    EvaluatorCodeFits innerScanInputCode
+      (outerPayload periodicStrip firstRemaining found)
+      (flatStripStateBound periodicStrip ::
+        candidatePayload periodicStrip firstRemaining.pred
+          (flatStripStateBound periodicStrip) found)
+      (innerInputCost
+        (outerPayload periodicStrip firstRemaining found)) := by
+  let values := outerPayload periodicStrip firstRemaining found
+  have fit := StripSavitchStep.fields values (innerInputFields values)
+    (drop 4 values)
+  simpa [innerScanInputCode, previousFirst, innerInputCost,
+    innerInputFields, outerPayload, candidatePayload, values,
+    StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    FiniteState.DivideEvalPartrec.predecessorField,
+    StripSavitchStep.getField,
+    StripSavitchStep.predecessorField] using fit
+
+private noncomputable def innerOutputFields (values : List Nat) :
+    List (StripSavitchStep.FieldFit values) :=
+  [StripSavitchStep.getField 0 values,
+    StripSavitchStep.getField 1 values,
+    StripSavitchStep.getField 2 values,
+    StripSavitchStep.getField 4 values]
+
+noncomputable def innerOutputCost (values : List Nat) : Nat :=
+  StripSavitchStep.fieldsCost values (innerOutputFields values)
+    (values.drop 5) (dropCost 5 values)
+
+theorem innerOutput_fits
+    (periodicStrip : PeriodicStrip) (first : Nat) (found : Bool) :
+    EvaluatorCodeFits innerScanOutputCode
+      (candidatePayload periodicStrip first 0 found)
+      (outerPayload periodicStrip first found)
+      (innerOutputCost (candidatePayload periodicStrip first 0 found)) := by
+  let values := candidatePayload periodicStrip first 0 found
+  have fit := StripSavitchStep.fields values (innerOutputFields values)
+    (drop 5 values)
+  simpa [innerScanOutputCode, innerOutputCost, innerOutputFields,
+    outerPayload, candidatePayload, values,
+    StripSavitchStep.fieldsCost,
+    FiniteState.DivideEvalPartrec.fields,
+    FiniteState.DivideEvalPartrec.field,
+    StripSavitchStep.getField] using fit
+
+set_option maxHeartbeats 1000000 in
+private theorem innerInputCost_le
+    (periodicStrip : PeriodicStrip)
+    (firstRemaining : Nat) (found : Bool)
+    (firstPositive : 0 < firstRemaining)
+    (firstBound : firstRemaining ≤ flatStripStateBound periodicStrip) :
+    innerInputCost (outerPayload periodicStrip firstRemaining found) ≤
+      flatStripCycleAdapterSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let values := outerPayload periodicStrip firstRemaining found
+  let fields := innerInputFields values
+  let unit := flatStripCycleLoopSpaceBound inputLength
+  have valuesBound : encodedListSpace values ≤ unit := by
+    have raw := outerPayload_space_le periodicStrip firstRemaining found
+      firstBound
+    have listToUnit : flatStripCycleListSpaceBound inputLength ≤ unit := by
+      simp [unit, flatStripCycleLoopSpaceBound]
+      omega
+    simpa [values, inputLength] using raw.trans listToUnit
+  have firstBelow : firstRemaining.pred <
+      flatStripStateBound periodicStrip :=
+    (Nat.pred_lt (Nat.ne_of_gt firstPositive)).trans_le firstBound
+  have outputBound : encodedListSpace
+      (fields.map StripSavitchStep.FieldFit.output ++ values.drop 4) ≤ unit := by
+    have raw := candidateCounted_space_le periodicStrip
+      (flatStripStateBound periodicStrip) firstRemaining.pred
+      (flatStripStateBound periodicStrip) found (Nat.le_refl _)
+      firstBelow (Nat.le_refl _)
+    simpa [fields, innerInputFields, values, outerPayload, candidatePayload,
+      StripSavitchStep.getField, StripSavitchStep.predecessorField,
+      inputLength, unit] using raw.trans (by
+        simp [unit, flatStripCycleLoopSpaceBound]
+        )
+  have assembled := StripSavitchStep.fieldsCost_le_of values fields
+    (values.drop 4) (dropCost 4 values) unit valuesBound outputBound
+  have get0 := StripSavitchStep.getCost_le_budget 0 values unit
+    (by omega) valuesBound
+  have get1 := StripSavitchStep.getCost_le_budget 1 values unit
+    (by omega) valuesBound
+  have get3 := StripSavitchStep.getCost_le_budget 3 values unit
+    (by omega) valuesBound
+  have pred2 := StripSavitchStep.predecessorFieldCost_le_budget
+    2 values unit (by omega) valuesBound
+  change predCost [values[2]?.getD 0] + getCost 2 values ≤
+    30000000 * (unit + 1) at pred2
+  have dropped := StripSavitchStep.dropCost_le_budget
+    4 values unit (by omega) valuesBound
+  have sumEq : (fields.map StripSavitchStep.FieldFit.cost).sum =
+      getCost 0 values + getCost 0 values + getCost 1 values +
+        (predCost [values[2]?.getD 0] + getCost 2 values) +
+        getCost 0 values + getCost 3 values := by
+    simp [fields, innerInputFields, StripSavitchStep.getField]
+    ring
+  have lengthEq : fields.length = 6 := by simp [fields, innerInputFields]
+  rw [sumEq, lengthEq] at assembled
+  change innerInputCost values ≤
+    flatStripCycleAdapterSpaceBound inputLength
+  simp only [innerInputCost]
+  apply assembled.trans
+  simp [flatStripCycleAdapterSpaceBound, unit,
+    flatStripCycleLoopSpaceBound] at get0 get1 get3 pred2 dropped ⊢
+  omega
+
+set_option maxHeartbeats 1000000 in
+private theorem innerOutputCost_le
+    (periodicStrip : PeriodicStrip) (first : Nat) (found : Bool)
+    (firstBelow : first < flatStripStateBound periodicStrip) :
+    innerOutputCost (candidatePayload periodicStrip first 0 found) ≤
+      flatStripCycleAdapterSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let values := candidatePayload periodicStrip first 0 found
+  let fields := innerOutputFields values
+  let unit := flatStripCycleLoopSpaceBound inputLength
+  have valuesBound : encodedListSpace values ≤ unit := by
+    have raw := candidatePayload_space_le periodicStrip first 0 found
+      firstBelow (Nat.zero_le _)
+    have listToUnit : flatStripCycleListSpaceBound inputLength ≤ unit := by
+      simp [unit, flatStripCycleLoopSpaceBound]
+      omega
+    simpa [values, inputLength] using raw.trans listToUnit
+  have outputBound : encodedListSpace
+      (fields.map StripSavitchStep.FieldFit.output ++ values.drop 5) ≤ unit := by
+    have raw := outerPayload_space_le periodicStrip first found
+      (Nat.le_of_lt firstBelow)
+    simpa [fields, innerOutputFields, values, outerPayload, candidatePayload,
+      StripSavitchStep.getField, inputLength, unit] using raw.trans (by
+        simp [unit, flatStripCycleLoopSpaceBound]
+        omega)
+  have assembled := StripSavitchStep.fieldsCost_le_of values fields
+    (values.drop 5) (dropCost 5 values) unit valuesBound outputBound
+  have get0 := StripSavitchStep.getCost_le_budget 0 values unit
+    (by omega) valuesBound
+  have get1 := StripSavitchStep.getCost_le_budget 1 values unit
+    (by omega) valuesBound
+  have get2 := StripSavitchStep.getCost_le_budget 2 values unit
+    (by omega) valuesBound
+  have get4 := StripSavitchStep.getCost_le_budget 4 values unit
+    (by omega) valuesBound
+  have dropped := StripSavitchStep.dropCost_le_budget
+    5 values unit (by omega) valuesBound
+  have sumEq : (fields.map StripSavitchStep.FieldFit.cost).sum =
+      getCost 0 values + getCost 1 values + getCost 2 values +
+        getCost 4 values := by
+    simp [fields, innerOutputFields, StripSavitchStep.getField]
+    ring
+  have lengthEq : fields.length = 4 := by simp [fields, innerOutputFields]
+  rw [sumEq, lengthEq] at assembled
+  change innerOutputCost values ≤
+    flatStripCycleAdapterSpaceBound inputLength
+  simp only [innerOutputCost]
+  apply assembled.trans
+  simp [flatStripCycleAdapterSpaceBound, unit,
+    flatStripCycleLoopSpaceBound] at get0 get1 get2 get4 dropped ⊢
+  omega
+
+/-- Uniform reserve for the adapters and complete inner countdown forming
+one row scan. -/
+def flatStripCycleInnerScanSpaceBound (inputLength : Nat) : Nat :=
+  1000 * (flatStripCycleCandidateBodySpaceBound inputLength +
+    2 * flatStripCycleAdapterSpaceBound inputLength + 1)
+
+/-- One complete first-endpoint row scan has polynomial evaluator space. -/
+theorem innerScan_fits_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (firstRemaining : Nat) (found : Bool)
+    (firstPositive : 0 < firstRemaining)
+    (firstBound : firstRemaining ≤ flatStripStateBound periodicStrip) :
+    let first := firstRemaining.pred
+    let result := found || boundedAny
+      (cycleCandidateBool tromino periodicStrip
+        (flatStripStateBound periodicStrip)
+        (flatStripSearchDepth periodicStrip) first)
+      (flatStripStateBound periodicStrip)
+    EvaluatorCodeFits (innerScanCode tromino)
+      (outerPayload periodicStrip firstRemaining found)
+      (outerPayload periodicStrip first result)
+      (flatStripCycleInnerScanSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let first := firstRemaining.pred
+  let result := found || boundedAny
+    (cycleCandidateBool tromino periodicStrip
+      (flatStripStateBound periodicStrip)
+      (flatStripSearchDepth periodicStrip) first)
+    (flatStripStateBound periodicStrip)
+  have firstBelow : first < flatStripStateBound periodicStrip :=
+    (Nat.pred_lt (Nat.ne_of_gt firstPositive)).trans_le firstBound
+  have inputFit := innerInput_fits periodicStrip firstRemaining found
+  have loopFit := candidateCountdown_fits_polynomial tromino periodicStrip
+    wellFormed first found firstBelow
+  have scanFit := EvaluatorCodeFits.comp loopFit inputFit
+  have outputFit := innerOutput_fits periodicStrip first result
+  have fit := EvaluatorCodeFits.comp outputFit scanFit
+  have inputBound : innerInputCost
+      (outerPayload periodicStrip firstRemaining found) ≤
+      flatStripCycleAdapterSpaceBound inputLength := by
+    simpa [inputLength] using innerInputCost_le periodicStrip
+      firstRemaining found firstPositive firstBound
+  have outputBound : innerOutputCost
+      (candidatePayload periodicStrip first 0 result) ≤
+      flatStripCycleAdapterSpaceBound inputLength := by
+    simpa [inputLength] using innerOutputCost_le periodicStrip
+      first result firstBelow
+  have outputBound' : innerOutputCost
+      (candidatePayload periodicStrip firstRemaining.pred 0
+        (found || boundedAny
+          (cycleCandidateBool tromino periodicStrip
+            (flatStripStateBound periodicStrip)
+            (flatStripSearchDepth periodicStrip) firstRemaining.pred)
+          (flatStripStateBound periodicStrip))) ≤
+      flatStripCycleAdapterSpaceBound inputLength := by
+    simpa [first, result] using outputBound
+  change EvaluatorCodeFits
+    (innerScanOutputCode.comp
+      ((ToPartrec.Code.flatIterate (candidateStepCode tromino)).comp
+        innerScanInputCode)) _ _ _
+  dsimp only [first, result] at fit ⊢
+  dsimp only [inputLength] at fit inputBound outputBound' ⊢
+  apply fit.mono
+  simp [flatStripCycleInnerScanSpaceBound] at inputBound outputBound' ⊢
+  omega
+
 end FlatStripCyclePartrec
 end RawWindowState
 end PeriodicStrip

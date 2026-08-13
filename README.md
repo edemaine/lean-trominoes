@@ -485,8 +485,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Fit and uniformly bound one edge/reverse-reachability
                 candidate update.
               - [x] Lift that update through the second-endpoint countdown.
-              - [ ] Fit one complete inner scan and lift it through the
-                first-endpoint countdown.
+              - [x] Fit one complete inner scan.
+              - [ ] Lift complete row scans through the first-endpoint
+                countdown.
             - [ ] Assemble the flat well-formedness guard, search parameters,
               and cycle scan into the final PSPACE decider.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
