@@ -357,6 +357,8 @@ build; an imported proof counts when its statement matches the paper.
           scans.
         - [x] Conjoin all eight fixed center-placement candidates into the
           complete containment predicate for one motif base.
+        - [x] Port one fixed center-covering placement query to the flat motif
+          stream as the leaf of the exact-one coverage count.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
