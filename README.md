@@ -352,6 +352,9 @@ build; an imported proof counts when its statement matches the paper.
           the established packed-state normalization predicate.
         - [x] Port canonical target-cell membership to flat motif fields and
           connect it to center-source containment on well-formed strips.
+        - [x] Port one fixed center-placement candidate to flat motif fields,
+          retaining the coordinate stream across assignment and containment
+          scans.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
