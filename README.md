@@ -476,7 +476,7 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Assemble and fit the native-suffix reachability request,
               complete exact-fuel call, answer projection, and Boolean
               normalization.
-            - [ ] Bound the complete reachability wrapper uniformly by the
+            - [x] Bound the complete reachability wrapper uniformly by the
               target flat input length.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
@@ -2008,7 +2008,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PartrecFlatStripReachSpace.lean`](LeanTrominoes/PartrecFlatStripReachSpace.lean)
   gives the corresponding exact evaluator-space composition, including fuel
   construction, retained-suffix input assembly, the complete Savitch call,
-  answer projection, and Boolean normalization.
+  answer projection, and Boolean normalization.  Its final theorem absorbs
+  all of these costs into one polynomial bound in the target flat encoding
+  length.
 - [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
   fits the strip-suffix projections, decodes both queried frontier indices
   into word and phase, and assembles the native seven-field packed-transition
