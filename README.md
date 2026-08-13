@@ -344,6 +344,8 @@ build; an imported proof counts when its statement matches the paper.
           values, with semantic theorems against packed frontier states.
         - [x] Implement dynamic indexed access to a flat motif cell while
           retaining the complete coordinate stream for nested lookups.
+        - [x] Port the one-cell packed normalization predicate to the shared
+          indexed flat transition-scan state.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
