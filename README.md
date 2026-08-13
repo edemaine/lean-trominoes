@@ -599,6 +599,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Implement the reusable fixed-field phase emitter and verify
               the complete constant-gate machine script against its native
               field block with an exact linear runtime bound.
+            - [x] Verify the shared equality/negation machine script against
+              its native two-clause field block, restoring both source
+              registers with an exact linear runtime bound.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by

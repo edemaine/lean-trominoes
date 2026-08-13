@@ -59,6 +59,31 @@ theorem stack_ne_scratch (source : AtomSource) :
 
 end AtomSource
 
+/-- Equality gates differ only by their source slice; negation uses the same
+two-clause emission skeleton with different desired input bits. -/
+inductive UnaryGateKind
+  | equalityCurrent
+  | equalityNext
+  | negation
+  deriving DecidableEq, Fintype
+
+namespace UnaryGateKind
+
+def sliceCode : UnaryGateKind → Nat
+  | .equalityCurrent => 0
+  | .equalityNext => 2
+  | .negation => 0
+
+def firstInputDesired : UnaryGateKind → Nat
+  | .equalityCurrent | .equalityNext => 1
+  | .negation => 0
+
+def secondInputDesired : UnaryGateKind → Nat
+  | .equalityCurrent | .equalityNext => 0
+  | .negation => 1
+
+end UnaryGateKind
+
 /-- Continuations of variable-atom emission.  More gate phases are added by
 the evaluator layer; `done` is enough to state and test the primitive in
 isolation. -/
@@ -67,6 +92,11 @@ inductive Phase
   | gateDone
   | constantStart (value : Bool)
   | constantTail (value : Bool)
+  | unaryStart (kind : UnaryGateKind)
+  | unaryAfterOutput₁ (kind : UnaryGateKind)
+  | unaryAfterInput₁ (kind : UnaryGateKind)
+  | unaryAfterOutput₂ (kind : UnaryGateKind)
+  | unaryAfterInput₂ (kind : UnaryGateKind)
   deriving DecidableEq, Fintype
 
 /-- Control labels for copying and restoring a binary atom. -/
@@ -136,6 +166,21 @@ def program : Label → TM2.Stmt Alphabet Label State
       emitFixedFields [1] (.copyAtom .fresh (.constantTail value))
   | .phase (.constantTail value) =>
       emitFixedFields [0, 0, if value then 1 else 0] (.phase .gateDone)
+  | .phase (.unaryStart kind) =>
+      emitFixedFields [2] (.copyAtom .fresh (.unaryAfterOutput₁ kind))
+  | .phase (.unaryAfterOutput₁ kind) =>
+      emitFixedFields [0, 0, 0] (.copyAtom .first (.unaryAfterInput₁ kind))
+  | .phase (.unaryAfterInput₁ kind) =>
+      emitFixedFields
+        [kind.sliceCode, 0, kind.firstInputDesired, 2]
+        (.copyAtom .fresh (.unaryAfterOutput₂ kind))
+  | .phase (.unaryAfterOutput₂ kind) =>
+      emitFixedFields [0, 0, 1]
+        (.copyAtom .first (.unaryAfterInput₂ kind))
+  | .phase (.unaryAfterInput₂ kind) =>
+      emitFixedFields
+        [kind.sliceCode, 0, kind.secondInputDesired]
+        (.phase .gateDone)
 
 /-- The finite machine containing the atom-emission primitive.  Subsequent
 layers extend its phase language into the complete compiler evaluator. -/
@@ -268,6 +313,28 @@ theorem stepAux_pushOutputWord (word : List Γ')
 def emittedWordData (data : TapeData) (word : List Γ') : TapeData :=
   { data with outputReverse := word.reverse ++ data.outputReverse }
 
+@[simp]
+theorem emittedWordData_atom (data : TapeData) (word : List Γ')
+    (source : AtomSource) :
+    (emittedWordData data word).atom source = data.atom source := by
+  cases data
+  cases source <;> rfl
+
+@[simp]
+theorem emittedWordData_scratch (data : TapeData) (word : List Γ') :
+    (emittedWordData data word).scratch = data.scratch := by
+  rfl
+
+@[simp]
+theorem emittedWordData_fresh (data : TapeData) (word : List Γ') :
+    (emittedWordData data word).fresh = data.fresh := by
+  rfl
+
+@[simp]
+theorem emittedWordData_first (data : TapeData) (word : List Γ') :
+    (emittedWordData data word).first = data.first := by
+  rfl
+
 theorem step_constantStart (data : TapeData) (value : Bool) :
     TM2.step program (phaseCfg (.constantStart value) data) =
       some (copyCfg .fresh (.constantTail value)
@@ -281,6 +348,52 @@ theorem step_constantTail (data : TapeData) (value : Bool) :
       some (phaseCfg .gateDone
         (emittedWordData data
           (trList [0, 0, if value then 1 else 0]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [phaseCfg, emittedWordData, tapes]
+
+theorem step_unaryStart (data : TapeData) (kind : UnaryGateKind) :
+    TM2.step program (phaseCfg (.unaryStart kind) data) =
+      some (copyCfg .fresh (.unaryAfterOutput₁ kind)
+        (emittedWordData data (trList [2]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [copyCfg, emittedWordData, tapes]
+
+theorem step_unaryAfterOutput₁ (data : TapeData)
+    (kind : UnaryGateKind) :
+    TM2.step program (phaseCfg (.unaryAfterOutput₁ kind) data) =
+      some (copyCfg .first (.unaryAfterInput₁ kind)
+        (emittedWordData data (trList [0, 0, 0]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [copyCfg, emittedWordData, tapes]
+
+theorem step_unaryAfterInput₁ (data : TapeData)
+    (kind : UnaryGateKind) :
+    TM2.step program (phaseCfg (.unaryAfterInput₁ kind) data) =
+      some (copyCfg .fresh (.unaryAfterOutput₂ kind)
+        (emittedWordData data
+          (trList [kind.sliceCode, 0, kind.firstInputDesired, 2]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [copyCfg, emittedWordData, tapes]
+
+theorem step_unaryAfterOutput₂ (data : TapeData)
+    (kind : UnaryGateKind) :
+    TM2.step program (phaseCfg (.unaryAfterOutput₂ kind) data) =
+      some (copyCfg .first (.unaryAfterInput₂ kind)
+        (emittedWordData data (trList [0, 0, 1]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [copyCfg, emittedWordData, tapes]
+
+theorem step_unaryAfterInput₂ (data : TapeData)
+    (kind : UnaryGateKind) :
+    TM2.step program (phaseCfg (.unaryAfterInput₂ kind) data) =
+      some (phaseCfg .gateDone
+        (emittedWordData data
+          (trList [kind.sliceCode, 0, kind.secondInputDesired]))) := by
   simp only [TM2.step, program, phaseCfg, emitFixedFields]
   rw [stepAux_pushOutputWord]
   simp [phaseCfg, emittedWordData, tapes]
@@ -812,6 +925,26 @@ theorem constantGateFields_native (output : Nat) (value : Bool) :
       [1, output, 0, 0, if value then 1 else 0] := by
   cases value <;> rfl
 
+/-- The common native-field interface for equality and negation gates. -/
+def unaryGateFields (kind : UnaryGateKind) (output input : Nat) : List Nat :=
+  match kind with
+  | .equalityCurrent =>
+      equalityGateFields output ⟨.current, input⟩
+  | .equalityNext =>
+      equalityGateFields output ⟨.next, input⟩
+  | .negation =>
+      notGateFields output (gateOutput input)
+
+@[simp]
+theorem unaryGateFields_native (kind : UnaryGateKind) (output input : Nat) :
+    unaryGateFields kind output input =
+      [2, output, 0, 0, 0, input, kind.sliceCode, 0,
+        kind.firstInputDesired,
+       2, output, 0, 0, 1, input, kind.sliceCode, 0,
+        kind.secondInputDesired] := by
+  cases kind <;>
+    rfl
+
 /-- The complete finite-control script for a constant Tseitin gate emits its
 verified native field block in linear time in the output-atom width. -/
 def emitConstantGate (data : TapeData) (output : Nat) (value : Bool)
@@ -868,6 +1001,160 @@ def emitConstantGate (data : TapeData) (output : Nat) (value : Bool)
     cases value <;>
       simp [firstData, secondData, emittedWordData, trList,
         List.reverse_append, List.append_assoc]
+  rw [finalData] at composed
+  convert composed using 1 <;> omega
+
+/-- The shared finite-control script for equality and negation Tseitin gates
+emits the exact native field block and restores both atom registers. -/
+def emitUnaryGate (kind : UnaryGateKind) (data : TapeData)
+    (output input : Nat)
+    (freshValue : data.fresh = trNat output)
+    (firstValue : data.first = trNat input)
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryStart kind) data)
+      (some (phaseCfg .gateDone
+        { data with
+          outputReverse :=
+            (trList (unaryGateFields kind output input)).reverse ++
+              data.outputReverse }))
+      (4 * (trNat output).length + 4 * (trNat input).length + 13) := by
+  let d₁ := emittedWordData data (trList [2])
+  let d₂ := emittedWordData d₁ (trList [output])
+  let d₃ := emittedWordData d₂ (trList [0, 0, 0])
+  let d₄ := emittedWordData d₃ (trList [input])
+  let d₅ := emittedWordData d₄
+    (trList [kind.sliceCode, 0, kind.firstInputDesired, 2])
+  let d₆ := emittedWordData d₅ (trList [output])
+  let d₇ := emittedWordData d₆ (trList [0, 0, 1])
+  let d₈ := emittedWordData d₇ (trList [input])
+  let d₉ := emittedWordData d₈
+    (trList [kind.sliceCode, 0, kind.secondInputDesired])
+  have h₁ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryStart kind) data)
+      (some (copyCfg .fresh (.unaryAfterOutput₁ kind) d₁)) 1 := by
+    simpa [d₁] using oneStep (step_unaryStart data kind)
+  have h₂ : EvalsToInTime (TM2.step program)
+      (copyCfg .fresh (.unaryAfterOutput₁ kind) d₁)
+      (some (phaseCfg (.unaryAfterOutput₁ kind) d₂))
+      (2 * (trNat output).length + 2) := by
+    simpa [d₂, emittedWordData] using
+      emitAtomField_trNat .fresh (.unaryAfterOutput₁ kind) d₁ output
+        (by simpa [d₁, TapeData.atom] using freshValue)
+        (by simpa [d₁] using scratchValue)
+  have h₃ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryAfterOutput₁ kind) d₂)
+      (some (copyCfg .first (.unaryAfterInput₁ kind) d₃)) 1 := by
+    simpa [d₃] using oneStep (step_unaryAfterOutput₁ d₂ kind)
+  have h₄ : EvalsToInTime (TM2.step program)
+      (copyCfg .first (.unaryAfterInput₁ kind) d₃)
+      (some (phaseCfg (.unaryAfterInput₁ kind) d₄))
+      (2 * (trNat input).length + 2) := by
+    simpa [d₄, emittedWordData] using
+      emitAtomField_trNat .first (.unaryAfterInput₁ kind) d₃ input
+        (by simpa [d₃, d₂, d₁, TapeData.atom] using firstValue)
+        (by simpa [d₃, d₂, d₁] using scratchValue)
+  have h₅ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryAfterInput₁ kind) d₄)
+      (some (copyCfg .fresh (.unaryAfterOutput₂ kind) d₅)) 1 := by
+    simpa [d₅] using oneStep (step_unaryAfterInput₁ d₄ kind)
+  have h₆ : EvalsToInTime (TM2.step program)
+      (copyCfg .fresh (.unaryAfterOutput₂ kind) d₅)
+      (some (phaseCfg (.unaryAfterOutput₂ kind) d₆))
+      (2 * (trNat output).length + 2) := by
+    simpa [d₆, emittedWordData] using
+      emitAtomField_trNat .fresh (.unaryAfterOutput₂ kind) d₅ output
+        (by
+          simpa [d₅, d₄, d₃, d₂, d₁, TapeData.atom]
+            using freshValue)
+        (by
+          simpa [d₅, d₄, d₃, d₂, d₁]
+            using scratchValue)
+  have h₇ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryAfterOutput₂ kind) d₆)
+      (some (copyCfg .first (.unaryAfterInput₂ kind) d₇)) 1 := by
+    simpa [d₇] using oneStep (step_unaryAfterOutput₂ d₆ kind)
+  have h₈ : EvalsToInTime (TM2.step program)
+      (copyCfg .first (.unaryAfterInput₂ kind) d₇)
+      (some (phaseCfg (.unaryAfterInput₂ kind) d₈))
+      (2 * (trNat input).length + 2) := by
+    simpa [d₈, emittedWordData] using
+      emitAtomField_trNat .first (.unaryAfterInput₂ kind) d₇ input
+        (by
+          simpa [d₇, d₆, d₅, d₄, d₃, d₂, d₁,
+            TapeData.atom] using firstValue)
+        (by
+          simpa [d₇, d₆, d₅, d₄, d₃, d₂, d₁]
+            using scratchValue)
+  have h₉ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryAfterInput₂ kind) d₈)
+      (some (phaseCfg .gateDone d₉)) 1 := by
+    simpa [d₉] using oneStep (step_unaryAfterInput₂ d₈ kind)
+  have h₁₂ := EvalsToInTime.trans (TM2.step program)
+    1 (2 * (trNat output).length + 2)
+    (phaseCfg (.unaryStart kind) data)
+    (copyCfg .fresh (.unaryAfterOutput₁ kind) d₁)
+    (some (phaseCfg (.unaryAfterOutput₁ kind) d₂)) h₁ h₂
+  have h₁₂₃ := EvalsToInTime.trans (TM2.step program)
+    (2 * (trNat output).length + 2 + 1) 1
+    (phaseCfg (.unaryStart kind) data)
+    (phaseCfg (.unaryAfterOutput₁ kind) d₂)
+    (some (copyCfg .first (.unaryAfterInput₁ kind) d₃)) h₁₂ h₃
+  have h₁₂₃₄ := EvalsToInTime.trans (TM2.step program)
+    (1 + (2 * (trNat output).length + 2 + 1))
+    (2 * (trNat input).length + 2)
+    (phaseCfg (.unaryStart kind) data)
+    (copyCfg .first (.unaryAfterInput₁ kind) d₃)
+    (some (phaseCfg (.unaryAfterInput₁ kind) d₄)) h₁₂₃ h₄
+  have h₁₂₃₄₅ := EvalsToInTime.trans (TM2.step program)
+    (2 * (trNat input).length + 2 +
+      (1 + (2 * (trNat output).length + 2 + 1))) 1
+    (phaseCfg (.unaryStart kind) data)
+    (phaseCfg (.unaryAfterInput₁ kind) d₄)
+    (some (copyCfg .fresh (.unaryAfterOutput₂ kind) d₅)) h₁₂₃₄ h₅
+  have h₁₂₃₄₅₆ := EvalsToInTime.trans (TM2.step program)
+    (1 + (2 * (trNat input).length + 2 +
+      (1 + (2 * (trNat output).length + 2 + 1))))
+    (2 * (trNat output).length + 2)
+    (phaseCfg (.unaryStart kind) data)
+    (copyCfg .fresh (.unaryAfterOutput₂ kind) d₅)
+    (some (phaseCfg (.unaryAfterOutput₂ kind) d₆)) h₁₂₃₄₅ h₆
+  have h₁₂₃₄₅₆₇ := EvalsToInTime.trans (TM2.step program)
+    (2 * (trNat output).length + 2 +
+      (1 + (2 * (trNat input).length + 2 +
+        (1 + (2 * (trNat output).length + 2 + 1))))) 1
+    (phaseCfg (.unaryStart kind) data)
+    (phaseCfg (.unaryAfterOutput₂ kind) d₆)
+    (some (copyCfg .first (.unaryAfterInput₂ kind) d₇)) h₁₂₃₄₅₆ h₇
+  have h₁₂₃₄₅₆₇₈ := EvalsToInTime.trans (TM2.step program)
+    (1 + (2 * (trNat output).length + 2 +
+      (1 + (2 * (trNat input).length + 2 +
+        (1 + (2 * (trNat output).length + 2 + 1))))))
+    (2 * (trNat input).length + 2)
+    (phaseCfg (.unaryStart kind) data)
+    (copyCfg .first (.unaryAfterInput₂ kind) d₇)
+    (some (phaseCfg (.unaryAfterInput₂ kind) d₈)) h₁₂₃₄₅₆₇ h₈
+  have composed := EvalsToInTime.trans (TM2.step program)
+    (2 * (trNat input).length + 2 +
+      (1 + (2 * (trNat output).length + 2 +
+        (1 + (2 * (trNat input).length + 2 +
+          (1 + (2 * (trNat output).length + 2 + 1))))))) 1
+    (phaseCfg (.unaryStart kind) data)
+    (phaseCfg (.unaryAfterInput₂ kind) d₈)
+    (some (phaseCfg .gateDone d₉)) h₁₂₃₄₅₆₇₈ h₉
+  have finalData :
+      d₉ =
+        { data with
+          outputReverse :=
+            (trList (unaryGateFields kind output input)).reverse ++
+              data.outputReverse } := by
+    rw [unaryGateFields_native]
+    rcases data with
+      ⟨inputWord, outputReverse, finalOutput, fresh, roots, firstRoot,
+        secondRoot, scratch⟩
+    cases kind <;>
+      simp [d₉, d₈, d₇, d₆, d₅, d₄, d₃, d₂, d₁,
+        emittedWordData, trList, List.reverse_append, List.append_assoc]
   rw [finalData] at composed
   convert composed using 1 <;> omega
 
