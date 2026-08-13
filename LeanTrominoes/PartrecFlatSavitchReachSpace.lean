@@ -485,6 +485,43 @@ theorem flatPackedTransitionSpaceBound_le_flat_uniform
   rw [flatPackedTransitionSpaceBound_eq_envelope]
   exact flatPackedTransitionSpaceEnvelope_mono packedUnit
 
+/-- Uniform allowance for the recovered raw edge call alone.  This is the
+transition component of the complete depth-zero oracle bound. -/
+def flatStripTransitionUniformSpaceBound (inputLength : Nat) : Nat :=
+  flatStripPackedTransitionUniformSpaceBound inputLength +
+    100 * flatStripContextUniformSpaceBound inputLength
+
+theorem flatStripTransitionSpaceBound_le_uniform
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (flatStripStateBound periodicStrip))
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList 0
+            (flatStripStateBound periodicStrip) state ++
+            PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound
+          (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) :
+    flatStripTransitionSpaceBound tromino 0
+        (flatStripStateBound periodicStrip) state periodicStrip ≤
+      flatStripTransitionUniformSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  have packed := flatPackedTransitionSpaceBound_le_flat_uniform
+    periodicStrip state indices stateSpace
+  have contextBase := flatStripContextBaseSpaceBound_le_uniform
+    periodicStrip state indices stateSpace
+  have context : flatStripContextSpaceBound 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      100 * flatStripContextUniformSpaceBound inputLength := by
+    simp only [flatStripContextSpaceBound]
+    exact Nat.mul_le_mul_left 100 (by
+      simpa [inputLength] using contextBase)
+  simp only [flatStripTransitionSpaceBound,
+    flatStripTransitionUniformSpaceBound]
+  exact Nat.add_le_add (by simpa [inputLength] using packed) context
+
 private theorem flatStripEqualityArgumentSpace_le_leaf
     (periodicStrip : PeriodicStrip) (state : FiniteState.DivideEvalState)
     (indices : state.IndicesBelow (flatStripStateBound periodicStrip)) :
