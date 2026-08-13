@@ -64,16 +64,24 @@ private theorem fin_add_last_wraps {length : Nat}
     simp [Fin.val_add, Nat.succ_eq_add_one, Nat.add_comm]
   rw [add_assoc, one_add_last, add_zero]
 
-/-- An accepting trace closes into a directed reset cycle. -/
-theorem hasCycle_of_acceptingTrace {Config : Type*}
+/-- The clocked state at one position of the reset cycle closed from an
+accepting trace. -/
+def AcceptingTrace.resetClockState {Config : Type*}
     {initial : Config} {step : Config → Option Config}
     {accepts : Config → Prop} {limit : Nat}
-    (trace : AcceptingTrace Config initial step accepts limit) :
-    FiniteState.HasCycle
-      (ResetClockRelation initial step accepts limit) := by
-  refine ⟨trace.length,
-    fun index => (⟨index.val, trace.states index⟩ : ResetClockState Config), ?_⟩
-  intro index
+    (trace : AcceptingTrace Config initial step accepts limit)
+    (index : Fin (trace.length + 1)) : ResetClockState Config :=
+  ⟨index.val, trace.states index⟩
+
+/-- Consecutive clocked states of a closed accepting trace satisfy the reset
+relation, including the accepting edge that wraps back to the initial state. -/
+theorem AcceptingTrace.resetClockRelation {Config : Type*}
+    {initial : Config} {step : Config → Option Config}
+    {accepts : Config → Prop} {limit : Nat}
+    (trace : AcceptingTrace Config initial step accepts limit)
+    (index : Fin (trace.length + 1)) :
+    ResetClockRelation initial step accepts limit
+      (trace.resetClockState index) (trace.resetClockState (index + 1)) := by
   change ResetClockRelation initial step accepts limit
     ⟨index.val, trace.states index⟩
     ⟨(index + 1).val, trace.states (index + 1)⟩
@@ -120,6 +128,15 @@ theorem hasCycle_of_acceptingTrace {Config : Type*}
       simp [atLast]
     refine ⟨by simpa [atLast] using trace.accepts_last, ?_⟩
     simp [nextZero, trace.starts]
+
+/-- An accepting trace closes into a directed reset cycle. -/
+theorem hasCycle_of_acceptingTrace {Config : Type*}
+    {initial : Config} {step : Config → Option Config}
+    {accepts : Config → Prop} {limit : Nat}
+    (trace : AcceptingTrace Config initial step accepts limit) :
+    FiniteState.HasCycle
+      (ResetClockRelation initial step accepts limit) :=
+  ⟨trace.length, trace.resetClockState, trace.resetClockRelation⟩
 
 private theorem exists_accepting_index_of_cycleStep {Config : Type*}
     {initial : Config} {step : Config → Option Config}

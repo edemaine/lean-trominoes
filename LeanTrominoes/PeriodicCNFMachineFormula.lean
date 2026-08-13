@@ -299,6 +299,61 @@ theorem acceptingTrace_of_machinePeriodicCNF_satisfiableOnLine
   exact (machineResetClockExpression_eval_iff initial initialStacksFit
     currentWellFormed nextWellFormed).mp currentTruth
 
+/-- A bounded accepting trace closes into a periodic Boolean model of the
+compiled machine formula. -/
+theorem machinePeriodicCNF_satisfiableOnLine_of_acceptingTrace
+    (initial : tm.Cfg)
+    (trace : PeriodicComputation.AcceptingTrace tm.Cfg initial tm.step
+      (machineAccepts (tm := tm)) (2 ^ clockBits - 1))
+    (stacksFit : ∀ index : Fin (trace.length + 1), ∀ stack,
+      ((trace.states index).stk stack).length ≤ space) :
+    (machinePeriodicCNF (tm := tm) (space := space)
+      (clockBits := clockBits) initial).SatisfiableOnLine := by
+  let expression := machineResetClockExpression (tm := tm) (space := space)
+    (clockBits := clockBits) initial
+  let values : Fin (trace.length + 1) → Nat → Bool := fun index =>
+    encode (space := space) (clockBits := clockBits)
+      (trace.resetClockState index)
+  have initialStacksFit : ∀ stack, (initial.stk stack).length ≤ space := by
+    intro stack
+    rw [← trace.starts]
+    exact stacksFit 0 stack
+  have directCycle : FiniteState.HasCycle
+      (fun current next => expression.eval current next = true) := by
+    refine ⟨trace.length, values, ?_⟩
+    intro index
+    have currentClockFits : (trace.resetClockState index).clock <
+        2 ^ clockBits := by
+      change index.val < 2 ^ clockBits
+      have indexBound := index.isLt
+      have traceBound := trace.length_le
+      have powerPositive : 0 < 2 ^ clockBits := by positivity
+      omega
+    have nextClockFits : (trace.resetClockState (index + 1)).clock <
+        2 ^ clockBits := by
+      change (index + 1).val < 2 ^ clockBits
+      have indexBound := (index + 1).isLt
+      have traceBound := trace.length_le
+      have powerPositive : 0 < 2 ^ clockBits := by positivity
+      omega
+    change expression.eval
+      (encode (space := space) (clockBits := clockBits)
+        (trace.resetClockState index))
+      (encode (space := space) (clockBits := clockBits)
+        (trace.resetClockState (index + 1))) = true
+    apply (machineResetClockExpression_encode_iff initial
+      (trace.resetClockState index) (trace.resetClockState (index + 1))
+      initialStacksFit (stacksFit index) (stacksFit (index + 1))
+      currentClockFits nextClockFits).mpr
+    exact trace.resetClockRelation index
+  change (requireTransitionExpr expression
+    (atomCount (tm := tm) (space := space)
+      (clockBits := clockBits))).SatisfiableOnLine
+  apply (requireTransitionExpr_satisfiableOnLine_iff expression
+    (atomCount (tm := tm) (space := space) (clockBits := clockBits))
+    (machineResetClockExpression_atomsBelow initial)).mpr
+  exact FiniteState.hasBiInfinitePath_of_hasCycle directCycle
+
 end BoundedMachineAtom
 
 end PeriodicCNF

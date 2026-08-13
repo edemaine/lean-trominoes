@@ -1328,9 +1328,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFMachineFormula.lean`](LeanTrominoes/PeriodicCNFMachineFormula.lean)
   compiles that accepting-reset expression to a forward-local horizontal CNF.
   Every satisfying line model is decoded into a genuine bounded accepting
-  machine trace; this soundness argument also covers noncanonical Boolean
-  slices by proving that well-formed decoding and re-encoding preserves every
-  source atom.
+  machine trace, while every accepting trace that respects the selected stack
+  width closes into a satisfying periodic model.  Soundness also covers
+  noncanonical Boolean slices by proving that well-formed decoding and
+  re-encoding preserves every source atom.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
