@@ -473,6 +473,11 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Bound the structural-step cost uniformly over every
               reachable native flat state.
             - [x] Lift that uniform bound through the exact-fuel iteration.
+            - [x] Assemble and fit the native-suffix reachability request,
+              complete exact-fuel call, answer projection, and Boolean
+              normalization.
+            - [ ] Bound the complete reachability wrapper uniformly by the
+              target flat input length.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1996,6 +2001,14 @@ The representation choices for this target are:
   input-polynomial allowance for every reachable structural step.  A
   suffix-aware invariant lifts that allowance through the entire exact-fuel
   tail iteration without parsing motif fields as continuation frames.
+- [`LeanTrominoes/PartrecFlatStripReach.lean`](LeanTrominoes/PartrecFlatStripReach.lean)
+  initializes one indexed reachability query from four search fields followed
+  by the native strip suffix, runs the suffix-preserving Savitch program, and
+  proves that its projected output is the verified DFS reachability Boolean.
+- [`LeanTrominoes/PartrecFlatStripReachSpace.lean`](LeanTrominoes/PartrecFlatStripReachSpace.lean)
+  gives the corresponding exact evaluator-space composition, including fuel
+  construction, retained-suffix input assembly, the complete Savitch call,
+  answer projection, and Boolean normalization.
 - [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
   fits the strip-suffix projections, decodes both queried frontier indices
   into word and phase, and assembles the native seven-field packed-transition
