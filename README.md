@@ -357,6 +357,9 @@ build; an imported proof counts when its statement matches the paper.
         reset expressions and prove their reset-clock relation semantics.
       - [x] Force a compiled transition-expression root and identify the
         resulting horizontal CNF models with direct bi-infinite paths.
+      - [x] Instantiate the construction for any certified polynomial-space
+        decider and prove that its designated-output formula is satisfiable
+        exactly on accepted inputs.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1348,6 +1351,12 @@ The representation choices for this target are:
   This distinction is essential for total deciders, whose `true` and `false`
   outputs are both halted: the designated formula cycles exactly through the
   chosen output, while retaining the same forward-local 1D CNF guarantees.
+- [`LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean`](LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean)
+  instantiates the clocked formula for an arbitrary certified polynomial-space
+  decider.  The reset clock is sized by the finite bounded-configuration count,
+  and the resulting local 1D periodic CNF is satisfiable exactly when the
+  source input belongs to the decider's language; only the quantitative
+  polynomial-time certificate remains for the many-one reduction.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.

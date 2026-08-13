@@ -89,6 +89,71 @@ theorem stateAt_step {State : Type*}
   rw [successorValue, Function.iterate_succ_apply', current] at next
   exact next
 
+/-- Every bounded prefix state of a terminating run is reachable from its
+initial state. -/
+theorem stateAt_reaches {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last))
+    (index : Fin (run.steps + 1)) :
+    Reaches transition first (stateAt run index) := by
+  have reachable : ∀ value (valueLt : value < run.steps + 1),
+      Reaches transition first (stateAt run ⟨value, valueLt⟩) := by
+    intro value
+    induction value with
+    | zero =>
+        intro valueLt
+        have indexEq : (⟨0, valueLt⟩ : Fin (run.steps + 1)) = 0 :=
+          Fin.ext rfl
+        rw [indexEq, stateAt_zero]
+        exact Relation.ReflTransGen.refl
+    | succ value induction =>
+        intro valueLt
+        have beforeLt : value < run.steps + 1 := by omega
+        let stepIndex : Fin run.steps := ⟨value, by omega⟩
+        apply Relation.ReflTransGen.tail (induction beforeLt)
+        have beforeEq : (⟨value, beforeLt⟩ : Fin (run.steps + 1)) =
+            stepIndex.castSucc := by
+          apply Fin.ext
+          simp [stepIndex]
+        have afterEq : (⟨value + 1, valueLt⟩ : Fin (run.steps + 1)) =
+            stepIndex.succ := by
+          apply Fin.ext
+          simp [stepIndex]
+        rw [beforeEq, afterEq]
+        exact stateAt_step run stepIndex
+  exact reachable index.val index.isLt
+
+/-- The endpoint of a terminating counted run is reachable. -/
+theorem evalsTo_reaches {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last)) :
+    Reaches transition first last := by
+  simpa using stateAt_reaches run (Fin.last run.steps)
+
+/-- Determinism makes a terminal state reachable from one start unique. -/
+theorem eq_of_reachable_terminals {State : Type*}
+    {transition : State → Option State} {first left right : State}
+    (leftReachable : Reaches transition first left)
+    (rightReachable : Reaches transition first right)
+    (leftTerminal : transition left = none)
+    (rightTerminal : transition right = none) :
+    left = right := by
+  rcases reaches_total leftReachable rightReachable with
+      leftToRight | rightToLeft
+  · have rightEqLeft := (Relation.reflTransGen_iff_eq
+      (r := fun before after => after ∈ transition before)
+      (a := left) (b := right) (fun next nextStep => by
+        change transition left = some next at nextStep
+        rw [leftTerminal] at nextStep
+        contradiction)).mp leftToRight
+    exact rightEqLeft.symm
+  · exact (Relation.reflTransGen_iff_eq
+      (r := fun before after => after ∈ transition before)
+      (a := right) (b := left) (fun next nextStep => by
+        change transition right = some next at nextStep
+        rw [rightTerminal] at nextStep
+        contradiction)).mp rightToLeft
+
 /-- A terminating deterministic run never repeats a configuration before its
 terminal endpoint. -/
 theorem stateAt_injective {State : Type*}
