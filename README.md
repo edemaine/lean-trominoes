@@ -634,6 +634,10 @@ build; an imported proof counts when its statement matches the paper.
             an explicit polynomial using its fixed statement-push allowance.
           - [x] Construct and verify polynomial-time sequential composition
             of two finite multi-stack machines.
+          - [x] Assemble the source encoder, an abstract native request
+            generator, the quadratic formula evaluator, and semantic
+            correctness into the final reduction and PSPACE-hardness theorem;
+            isolate request generation as the sole remaining certificate.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1728,6 +1732,13 @@ The representation choices for this target are:
   and native output length.  It also packages every total decoded-field input
   as the evaluator's bounded semantic request, proving both encoding and
   compiled-output identities needed for machine composition.
+- [`LeanTrominoes/PeriodicCNFPolySpaceHardness.lean`](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean)
+  packages the complete complexity-theoretic endpoint around one explicit
+  remaining contract: a polynomial-time machine from decoded native source
+  fields to bounded compact compiler requests.  Given that certificate, it
+  composes the finite source encoder and quadratic structural evaluator,
+  presents the output as the semantic flat formula, and proves both the
+  many-one reduction and uniform PSPACE-hardness statement.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population
