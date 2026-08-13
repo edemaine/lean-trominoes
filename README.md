@@ -1373,12 +1373,22 @@ The representation choices for this target are:
   enumeration contribute only fixed machine constants.  Combining this with
   the structural and reset-clock estimates gives a complete explicit clause
   bound for the designated horizontal CNF, with no residual expression term.
+- [`LeanTrominoes/PeriodicCNFMachineStepAffine.lean`](LeanTrominoes/PeriodicCNFMachineStepAffine.lean)
+  exposes the ordinary-step budget as an exact slope-times-width plus intercept.
+  Both coefficients are closed finite sums over the fixed machine's labels,
+  controls, statement paths, and stack alphabets, making polynomial
+  composition with a source space certificate direct.
 - [`LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean`](LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean)
   instantiates the clocked formula for an arbitrary certified polynomial-space
   decider.  The reset clock is sized by the finite bounded-configuration count,
   and the resulting local 1D periodic CNF is satisfiable exactly when the
-  source input belongs to the decider's language; only the quantitative
-  polynomial-time certificate remains for the many-one reduction.
+  source input belongs to the decider's language.
+- [`LeanTrominoes/PeriodicCNFPolySpaceReductionSize.lean`](LeanTrominoes/PeriodicCNFPolySpaceReductionSize.lean)
+  composes those machine bounds with the source decider's polynomial space
+  certificate.  The selected stack width and clock width are exact evaluations
+  of explicit natural polynomials, and a final explicit polynomial bounds the
+  emitted horizontal CNF's clause count in encoded source input length.  The
+  polynomial-time machine certificate for emitting its binary encoding remains.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
