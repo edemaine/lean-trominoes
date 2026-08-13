@@ -376,8 +376,9 @@ build; an imported proof counts when its statement matches the paper.
         - [ ] Prove evaluator-space certificates for the flat edge oracle.
           - [x] Fit one coordinate-pair assignment-lookup step
             compositionally.
-          - [ ] Fit the complete one-column countdown and bound it by the
-            original flat motif stream.
+          - [x] Fit the complete one-column countdown with an exact additive
+            evaluator cost.
+          - [ ] Bound that countdown cost by the original flat motif stream.
           - [ ] Fit the five-column assignment lookup and its predicate
             wrappers.
           - [ ] Fit normalization, center validity, overlap, and the complete
