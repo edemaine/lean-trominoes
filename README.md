@@ -615,6 +615,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Compose decoding, operand-stack reads, native gate emission,
               register cleanup, root replacement, and fresh increment into
               exact linear-time execution theorems for every instruction.
+            - [x] Lift instruction execution over complete expression
+              postorder programs and prove exact agreement with the direct
+              structural compiler's fields, fresh boundary, and unique root.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by

@@ -3138,6 +3138,276 @@ def executeBinaryInstruction (kind : BinaryGateKind) (data : TapeData)
       TapeData.atom, scratchValue, Nat.add_comm] <;>
     ring
 
+@[simp]
+theorem trList_append (first second : List Nat) :
+    trList (first ++ second) = trList first ++ trList second := by
+  induction first with
+  | nil => rfl
+  | cons head tail induction =>
+      simp only [List.cons_append, trList]
+      rw [induction]
+      simp [List.append_assoc]
+
+/-- Exact cost obtained by recursively composing the verified instruction
+scripts for an expression's postorder program. -/
+def transitionExpressionTime : TransitionExpr → Nat → Nat
+  | .constant value, fresh =>
+      constantTagTime value + 6 * (trNat fresh).length + 17
+  | .wire wire, fresh =>
+      wireTagTime wire.slice + 8 * (trNat fresh).length +
+        7 * (trNat wire.atom).length + 28
+  | .not input, fresh =>
+      let compiled := compileTransitionFields input fresh
+      transitionExpressionTime input fresh +
+        (8 * (trNat compiled.nextFresh).length +
+          7 * (trNat compiled.root).length + 31)
+  | .and first second, fresh =>
+      let firstCompiled := compileTransitionFields first fresh
+      let secondCompiled :=
+        compileTransitionFields second firstCompiled.nextFresh
+      transitionExpressionTime first fresh +
+        transitionExpressionTime second firstCompiled.nextFresh +
+        (binaryTagTime .conjunction +
+          10 * (trNat secondCompiled.nextFresh).length +
+          7 * (trNat firstCompiled.root).length +
+          7 * (trNat secondCompiled.root).length + 40)
+  | .or first second, fresh =>
+      let firstCompiled := compileTransitionFields first fresh
+      let secondCompiled :=
+        compileTransitionFields second firstCompiled.nextFresh
+      transitionExpressionTime first fresh +
+        transitionExpressionTime second firstCompiled.nextFresh +
+        (binaryTagTime .disjunction +
+          10 * (trNat secondCompiled.nextFresh).length +
+          7 * (trNat firstCompiled.root).length +
+          7 * (trNat secondCompiled.root).length + 40)
+
+/-- Running the compact postorder program for one expression produces exactly
+the direct structural compiler's native fields and leaves its unique root on
+top of the existing root stack. -/
+noncomputable def executeExpressionProgram (expression : TransitionExpr)
+    (data : TapeData)
+    (fresh : Nat) (roots : List Nat) (rest : List Γ')
+    (inputValue :
+      data.input =
+        trList (transitionProgramFields expression.program) ++ rest)
+    (freshValue : data.fresh = trNat fresh)
+    (rootsValue : data.roots = trList roots)
+    (firstValue : data.first = [])
+    (secondValue : data.second = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext data)
+      (some (phaseCfg .decodeNext
+        { data with
+          input := rest
+          outputReverse :=
+            (trList (compileTransitionFields expression fresh).fields).reverse ++
+              data.outputReverse
+          fresh := trNat (compileTransitionFields expression fresh).nextFresh
+          roots :=
+            trList ((compileTransitionFields expression fresh).root :: roots)
+          first := []
+          second := [] }))
+      (transitionExpressionTime expression fresh) := by
+  induction expression generalizing data fresh roots rest with
+  | constant value =>
+      simpa [transitionExpressionTime, TransitionExpr.program,
+        transitionProgramFields, compileTransitionFields, trList,
+        List.append_assoc, rootsValue] using
+        executeConstantInstruction value data fresh rest
+          (by simpa [TransitionExpr.program, transitionProgramFields]
+            using inputValue)
+          freshValue firstValue secondValue scratchValue
+  | wire wire =>
+      simpa [transitionExpressionTime, TransitionExpr.program,
+        transitionProgramFields, compileTransitionFields, trList,
+        List.append_assoc, rootsValue] using
+        executeWireInstruction wire data fresh rest
+          (by simpa [TransitionExpr.program, transitionProgramFields]
+            using inputValue)
+          freshValue firstValue secondValue scratchValue
+  | not input induction =>
+      let compiled := compileTransitionFields input fresh
+      let instructionTail :=
+        trList (TransitionInstruction.fields .negate) ++ rest
+      let d₁ :=
+        { data with
+          input := instructionTail
+          outputReverse :=
+            (trList compiled.fields).reverse ++ data.outputReverse
+          fresh := trNat compiled.nextFresh
+          roots := trList (compiled.root :: roots)
+          first := []
+          second := [] }
+      have firstRun : EvalsToInTime (TM2.step program)
+          (phaseCfg .decodeNext data)
+          (some (phaseCfg .decodeNext d₁))
+          (transitionExpressionTime input fresh) := by
+        simpa [d₁, compiled] using
+          induction data fresh roots instructionTail
+            (by
+              simpa [TransitionExpr.program, transitionProgramFields,
+                instructionTail, trList, List.append_assoc]
+                using inputValue)
+            freshValue rootsValue firstValue secondValue scratchValue
+      have lastRun := executeNegateInstruction d₁ compiled.nextFresh
+        compiled.root (trList roots) rest
+        (by simp [d₁, instructionTail])
+        (by simp [d₁])
+        (by simp [d₁, trList, List.append_assoc])
+        (by simp [d₁])
+        (by simp [d₁])
+        (by simpa [d₁] using scratchValue)
+      have composed := thenRun firstRun lastRun
+      convert composed using 1 <;>
+        simp [d₁, compiled, instructionTail, transitionExpressionTime,
+          compileTransitionFields, trList, List.reverse_append,
+          List.append_assoc, scratchValue] <;>
+        ring
+  | and first second firstIH secondIH =>
+      let firstCompiled := compileTransitionFields first fresh
+      let secondCompiled :=
+        compileTransitionFields second firstCompiled.nextFresh
+      let binaryTail :=
+        trList (TransitionInstruction.fields .conjoin) ++ rest
+      let secondTail :=
+        trList (transitionProgramFields second.program) ++ binaryTail
+      let d₁ :=
+        { data with
+          input := secondTail
+          outputReverse :=
+            (trList firstCompiled.fields).reverse ++ data.outputReverse
+          fresh := trNat firstCompiled.nextFresh
+          roots := trList (firstCompiled.root :: roots)
+          first := []
+          second := [] }
+      let d₂ :=
+        { d₁ with
+          input := binaryTail
+          outputReverse :=
+            (trList secondCompiled.fields).reverse ++ d₁.outputReverse
+          fresh := trNat secondCompiled.nextFresh
+          roots := trList
+            (secondCompiled.root :: firstCompiled.root :: roots)
+          first := []
+          second := [] }
+      have firstRun : EvalsToInTime (TM2.step program)
+          (phaseCfg .decodeNext data)
+          (some (phaseCfg .decodeNext d₁))
+          (transitionExpressionTime first fresh) := by
+        simpa [d₁, firstCompiled] using
+          firstIH data fresh roots secondTail
+            (by
+              simpa [TransitionExpr.program, transitionProgramFields,
+                secondTail, binaryTail, trList, List.append_assoc]
+                using inputValue)
+            freshValue rootsValue firstValue secondValue scratchValue
+      have secondRun : EvalsToInTime (TM2.step program)
+          (phaseCfg .decodeNext d₁)
+          (some (phaseCfg .decodeNext d₂))
+          (transitionExpressionTime second firstCompiled.nextFresh) := by
+        simpa [d₂, secondCompiled] using
+          secondIH d₁ firstCompiled.nextFresh (firstCompiled.root :: roots)
+            binaryTail
+            (by simp [d₁, secondTail])
+            (by simp [d₁])
+            (by simp [d₁])
+            (by simp [d₁])
+            (by simp [d₁])
+            (by simpa [d₁] using scratchValue)
+      have lastRun := executeBinaryInstruction .conjunction d₂
+        secondCompiled.nextFresh firstCompiled.root secondCompiled.root
+        (trList roots) rest
+        (by simp [d₂, binaryTail, binaryInstruction])
+        (by simp [d₂])
+        (by simp [d₂, trList, List.append_assoc])
+        (by simp [d₂])
+        (by simp [d₂])
+        (by simpa [d₂, d₁] using scratchValue)
+      rw [show binaryGateFields .conjunction secondCompiled.nextFresh
+          firstCompiled.root secondCompiled.root =
+          andGateFields secondCompiled.nextFresh
+            (gateOutput firstCompiled.root)
+            (gateOutput secondCompiled.root) by rfl] at lastRun
+      have composed := thenRun (thenRun firstRun secondRun) lastRun
+      convert composed using 1 <;>
+        simp [d₂, d₁, firstCompiled, secondCompiled, secondTail,
+          binaryTail, transitionExpressionTime, compileTransitionFields,
+          trList, List.reverse_append, List.append_assoc, scratchValue] <;>
+        ring
+  | or first second firstIH secondIH =>
+      let firstCompiled := compileTransitionFields first fresh
+      let secondCompiled :=
+        compileTransitionFields second firstCompiled.nextFresh
+      let binaryTail :=
+        trList (TransitionInstruction.fields .disjoin) ++ rest
+      let secondTail :=
+        trList (transitionProgramFields second.program) ++ binaryTail
+      let d₁ :=
+        { data with
+          input := secondTail
+          outputReverse :=
+            (trList firstCompiled.fields).reverse ++ data.outputReverse
+          fresh := trNat firstCompiled.nextFresh
+          roots := trList (firstCompiled.root :: roots)
+          first := []
+          second := [] }
+      let d₂ :=
+        { d₁ with
+          input := binaryTail
+          outputReverse :=
+            (trList secondCompiled.fields).reverse ++ d₁.outputReverse
+          fresh := trNat secondCompiled.nextFresh
+          roots := trList
+            (secondCompiled.root :: firstCompiled.root :: roots)
+          first := []
+          second := [] }
+      have firstRun : EvalsToInTime (TM2.step program)
+          (phaseCfg .decodeNext data)
+          (some (phaseCfg .decodeNext d₁))
+          (transitionExpressionTime first fresh) := by
+        simpa [d₁, firstCompiled] using
+          firstIH data fresh roots secondTail
+            (by
+              simpa [TransitionExpr.program, transitionProgramFields,
+                secondTail, binaryTail, trList, List.append_assoc]
+                using inputValue)
+            freshValue rootsValue firstValue secondValue scratchValue
+      have secondRun : EvalsToInTime (TM2.step program)
+          (phaseCfg .decodeNext d₁)
+          (some (phaseCfg .decodeNext d₂))
+          (transitionExpressionTime second firstCompiled.nextFresh) := by
+        simpa [d₂, secondCompiled] using
+          secondIH d₁ firstCompiled.nextFresh (firstCompiled.root :: roots)
+            binaryTail
+            (by simp [d₁, secondTail])
+            (by simp [d₁])
+            (by simp [d₁])
+            (by simp [d₁])
+            (by simp [d₁])
+            (by simpa [d₁] using scratchValue)
+      have lastRun := executeBinaryInstruction .disjunction d₂
+        secondCompiled.nextFresh firstCompiled.root secondCompiled.root
+        (trList roots) rest
+        (by simp [d₂, binaryTail, binaryInstruction])
+        (by simp [d₂])
+        (by simp [d₂, trList, List.append_assoc])
+        (by simp [d₂])
+        (by simp [d₂])
+        (by simpa [d₂, d₁] using scratchValue)
+      rw [show binaryGateFields .disjunction secondCompiled.nextFresh
+          firstCompiled.root secondCompiled.root =
+          orGateFields secondCompiled.nextFresh
+            (gateOutput firstCompiled.root)
+            (gateOutput secondCompiled.root) by rfl] at lastRun
+      have composed := thenRun (thenRun firstRun secondRun) lastRun
+      convert composed using 1 <;>
+        simp [d₂, d₁, firstCompiled, secondCompiled, secondTail,
+          binaryTail, transitionExpressionTime, compileTransitionFields,
+          trList, List.reverse_append, List.append_assoc, scratchValue] <;>
+        ring
+
 end TransitionEvaluatorMachine
 end PeriodicCNF
 end LeanTrominoes
