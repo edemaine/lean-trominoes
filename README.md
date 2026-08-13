@@ -657,6 +657,8 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Verify a quadratic finite machine that preserves a word and
               converts any selected unary marker class to canonical native
               binary.
+            - [x] Specialize and compose that converter for the stack, clock,
+              and fresh blocks, preserving their tagged separation.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1781,7 +1783,9 @@ The representation choices for this target are:
   reset-clock width and a third phase that appends the exact source-atom
   boundary used as the request's `fresh` header.  The resulting polynomial-time
   certificate exposes the preserved native source and all three dynamic
-  counters as distinct finite marker blocks.
+  counters as distinct finite marker blocks.  Three subsequent verified
+  binary-count passes append their exact canonical native encodings without
+  allowing any later appendix to affect an earlier marker count.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population

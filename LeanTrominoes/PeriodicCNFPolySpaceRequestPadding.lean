@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import Mathlib.Algebra.Polynomial.CoeffList
+import LeanTrominoes.BinaryCountPaddingMachine
 import LeanTrominoes.PeriodicCNFPolySpaceNativeCompiler
 import LeanTrominoes.UnaryPolynomialPaddingMachine
 
@@ -491,6 +492,351 @@ def freshComputableInPolyTime :
     (widthsComputableInPolyTime decider)
     (appendFreshComputableInPolyTime decider)
   exact composed
+
+/-- Select the unary stack-width block in the fully padded word. -/
+def isSpaceMarker : FreshPaddedSymbol → Bool
+  | .inl (.inl (.inr _)) => true
+  | _ => false
+
+/-- Word type after appending the native binary stack width. -/
+abbrev SpaceBinarySymbol := FreshPaddedSymbol ⊕ PartrecToTM2.Γ'
+
+/-- Select the unary reset-clock block before binary counter appendices. -/
+def isClockMarker : FreshPaddedSymbol → Bool
+  | .inl (.inr _) => true
+  | _ => false
+
+/-- Select the retained unary reset-clock block after binary stack-width
+padding. -/
+def isClockMarkerAfterSpace : SpaceBinarySymbol → Bool
+  | .inl source => isClockMarker source
+  | .inr _ => false
+
+/-- Word type after appending native binary stack and clock widths. -/
+abbrev WidthsBinarySymbol := SpaceBinarySymbol ⊕ PartrecToTM2.Γ'
+
+/-- Select the unary fresh-boundary block before binary appendices. -/
+def isFreshMarker : FreshPaddedSymbol → Bool
+  | .inr _ => true
+  | _ => false
+
+def isFreshMarkerAfterSpace : SpaceBinarySymbol → Bool
+  | .inl source => isFreshMarker source
+  | .inr _ => false
+
+/-- Select the retained unary fresh-boundary block after the first two binary
+counter appendices. -/
+def isFreshMarkerAfterWidths : WidthsBinarySymbol → Bool
+  | .inl source => isFreshMarkerAfterSpace source
+  | .inr _ => false
+
+/-- Final preprocessing alphabet: retained tagged source and unary blocks,
+followed by three separately tagged native binary counters. -/
+abbrev RequestPreparedSymbol := WidthsBinarySymbol ⊕ PartrecToTM2.Γ'
+
+def spaceBinaryNativeFields (fields : List Nat) :
+    List SpaceBinarySymbol :=
+  BinaryCountPaddingMachine.paddedOutput isSpaceMarker
+    (freshPaddedNativeFields decider fields)
+
+def widthsBinaryNativeFields (fields : List Nat) :
+    List WidthsBinarySymbol :=
+  BinaryCountPaddingMachine.paddedOutput isClockMarkerAfterSpace
+    (spaceBinaryNativeFields decider fields)
+
+def requestPreparedNativeFields (fields : List Nat) :
+    List RequestPreparedSymbol :=
+  BinaryCountPaddingMachine.paddedOutput isFreshMarkerAfterWidths
+    (widthsBinaryNativeFields decider fields)
+
+theorem binarySelectedCount_append {Source : Type}
+    (selected : Source → Bool) (first second : List Source) :
+    BinaryCountPaddingMachine.selectedCount selected (first ++ second) =
+      BinaryCountPaddingMachine.selectedCount selected first +
+        BinaryCountPaddingMachine.selectedCount selected second := by
+  induction first with
+  | nil => simp [BinaryCountPaddingMachine.selectedCount]
+  | cons source first induction =>
+      simp only [List.cons_append,
+        BinaryCountPaddingMachine.selectedCount_cons, induction]
+      omega
+
+theorem binarySelectedCount_eq_zero_of {Source : Type}
+    (selected : Source → Bool) (sources : List Source)
+    (noneSelected : ∀ source ∈ sources, selected source = false) :
+    BinaryCountPaddingMachine.selectedCount selected sources = 0 := by
+  induction sources with
+  | nil => rfl
+  | cons source sources induction =>
+      rw [BinaryCountPaddingMachine.selectedCount_cons,
+        noneSelected source (by simp)]
+      simp only [Bool.false_eq_true, if_false, zero_add]
+      exact induction (by
+        intro tailSource membership
+        exact noneSelected tailSource (by simp [membership]))
+
+theorem binarySelectedCount_replicate_true {Source : Type}
+    (selected : Source → Bool) (source : Source)
+    (isSelected : selected source = true) (count : Nat) :
+    BinaryCountPaddingMachine.selectedCount selected
+      (List.replicate count source) = count := by
+  induction count with
+  | zero => rfl
+  | succ count induction =>
+      rw [List.replicate_succ,
+        BinaryCountPaddingMachine.selectedCount_cons, isSelected]
+      simp only [if_true, induction]
+      omega
+
+theorem binarySelectedCount_map_retained {Source Extra : Type}
+    (selected : Source → Bool) (sources : List Source) :
+    BinaryCountPaddingMachine.selectedCount
+        (fun symbol : Source ⊕ Extra =>
+          match symbol with
+          | .inl source => selected source
+          | .inr _ => false)
+        (sources.map Sum.inl) =
+      BinaryCountPaddingMachine.selectedCount selected sources := by
+  induction sources with
+  | nil => rfl
+  | cons source sources induction =>
+      simp [BinaryCountPaddingMachine.selectedCount, induction]
+
+theorem binarySelectedCount_appendedCounter {Source : Type}
+    (appended selected : Source → Bool) (sources : List Source) :
+    BinaryCountPaddingMachine.selectedCount
+        (fun symbol : Source ⊕ PartrecToTM2.Γ' =>
+          match symbol with
+          | .inl source => selected source
+          | .inr _ => false)
+        (BinaryCountPaddingMachine.paddedOutput appended sources) =
+      BinaryCountPaddingMachine.selectedCount selected sources := by
+  unfold BinaryCountPaddingMachine.paddedOutput
+  rw [binarySelectedCount_append]
+  have retained :
+      BinaryCountPaddingMachine.selectedCount
+          (fun symbol : Source ⊕ PartrecToTM2.Γ' =>
+            match symbol with
+            | .inl source => selected source
+            | .inr _ => false)
+          (sources.map fun source =>
+            (Sum.inl source : Source ⊕ PartrecToTM2.Γ')) =
+        BinaryCountPaddingMachine.selectedCount selected sources := by
+    induction sources with
+    | nil => rfl
+    | cons source sources induction =>
+        simp [BinaryCountPaddingMachine.selectedCount, induction]
+  rw [retained]
+  have noneCounter :
+      BinaryCountPaddingMachine.selectedCount
+          (fun symbol : Source ⊕ PartrecToTM2.Γ' =>
+            match symbol with
+            | .inl source => selected source
+            | .inr _ => false)
+          ((PartrecToTM2.trNat
+            (BinaryCountPaddingMachine.selectedCount appended sources)).map
+              fun bit => (Sum.inr bit : Source ⊕ PartrecToTM2.Γ')) = 0 := by
+    apply binarySelectedCount_eq_zero_of
+    intro symbol membership
+    obtain ⟨bit, _, rfl⟩ := List.mem_map.mp membership
+    rfl
+  rw [noneCounter, Nat.add_zero]
+
+@[simp]
+theorem binarySelectedCount_isSpaceMarker_fields
+    (symbols : List encoding.Γ) :
+    BinaryCountPaddingMachine.selectedCount isSpaceMarker
+      (freshPaddedNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols)) =
+      PolySpaceCompiler.spaceOfSymbols decider symbols := by
+  rw [freshPaddedNativeFields_fields]
+  rw [binarySelectedCount_append, binarySelectedCount_append,
+    binarySelectedCount_append]
+  have sourceZero :
+      BinaryCountPaddingMachine.selectedCount isSpaceMarker
+          ((FiniteEncodingNativeFields.encode symbols).map
+            (fun symbol => Sum.inl (Sum.inl (Sum.inl symbol)))) = 0 := by
+    apply binarySelectedCount_eq_zero_of
+    intro symbol membership
+    obtain ⟨source, _, rfl⟩ := List.mem_map.mp membership
+    rfl
+  rw [sourceZero,
+    binarySelectedCount_replicate_true isSpaceMarker
+      (Sum.inl (Sum.inl (Sum.inr ()))) rfl]
+  simp [binarySelectedCount_eq_zero_of, isSpaceMarker]
+
+@[simp]
+theorem binarySelectedCount_isClockMarkerAfterSpace_fields
+    (symbols : List encoding.Γ) :
+    BinaryCountPaddingMachine.selectedCount isClockMarkerAfterSpace
+      (spaceBinaryNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols)) =
+      PolySpaceCompiler.clockBitsOfSymbols decider symbols := by
+  unfold spaceBinaryNativeFields BinaryCountPaddingMachine.paddedOutput
+  rw [binarySelectedCount_append]
+  have retained :
+      BinaryCountPaddingMachine.selectedCount isClockMarkerAfterSpace
+          ((freshPaddedNativeFields decider
+            (FiniteEncodingNativeFields.fields symbols)).map Sum.inl) =
+        BinaryCountPaddingMachine.selectedCount isClockMarker
+          (freshPaddedNativeFields decider
+            (FiniteEncodingNativeFields.fields symbols)) := by
+    induction freshPaddedNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols) with
+    | nil => rfl
+    | cons symbol rest induction =>
+        simp [BinaryCountPaddingMachine.selectedCount,
+          isClockMarkerAfterSpace, induction]
+  rw [retained]
+  have counterZero :
+      BinaryCountPaddingMachine.selectedCount isClockMarkerAfterSpace
+          ((PartrecToTM2.trNat
+            (BinaryCountPaddingMachine.selectedCount isSpaceMarker
+              (freshPaddedNativeFields decider
+                (FiniteEncodingNativeFields.fields symbols)))).map
+              fun bit =>
+                (Sum.inr bit : FreshPaddedSymbol ⊕ PartrecToTM2.Γ')) = 0 := by
+    apply binarySelectedCount_eq_zero_of
+    intro symbol membership
+    obtain ⟨bit, _, rfl⟩ := List.mem_map.mp membership
+    rfl
+  rw [counterZero, Nat.add_zero]
+  rw [freshPaddedNativeFields_fields]
+  rw [binarySelectedCount_append, binarySelectedCount_append,
+    binarySelectedCount_append]
+  simp [binarySelectedCount_eq_zero_of,
+    binarySelectedCount_replicate_true, isClockMarker]
+
+@[simp]
+theorem binarySelectedCount_isFreshMarkerAfterWidths_fields
+    (symbols : List encoding.Γ) :
+    BinaryCountPaddingMachine.selectedCount isFreshMarkerAfterWidths
+      (widthsBinaryNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols)) =
+      BoundedMachineAtom.atomCount (tm := decider.tm)
+        (space := PolySpaceCompiler.spaceOfSymbols decider symbols)
+        (clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols) := by
+  unfold widthsBinaryNativeFields
+  unfold BinaryCountPaddingMachine.paddedOutput
+  rw [binarySelectedCount_append]
+  have outerRetained :
+      BinaryCountPaddingMachine.selectedCount isFreshMarkerAfterWidths
+          ((spaceBinaryNativeFields decider
+            (FiniteEncodingNativeFields.fields symbols)).map Sum.inl) =
+        BinaryCountPaddingMachine.selectedCount isFreshMarkerAfterSpace
+          (spaceBinaryNativeFields decider
+            (FiniteEncodingNativeFields.fields symbols)) := by
+    induction spaceBinaryNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols) with
+    | nil => rfl
+    | cons symbol rest induction =>
+        simp [BinaryCountPaddingMachine.selectedCount,
+          isFreshMarkerAfterWidths, induction]
+  rw [outerRetained]
+  have outerCounterZero :
+      BinaryCountPaddingMachine.selectedCount isFreshMarkerAfterWidths
+          ((PartrecToTM2.trNat
+            (BinaryCountPaddingMachine.selectedCount
+              isClockMarkerAfterSpace
+              (spaceBinaryNativeFields decider
+                (FiniteEncodingNativeFields.fields symbols)))).map
+              fun bit =>
+                (Sum.inr bit : SpaceBinarySymbol ⊕
+                  PartrecToTM2.Γ')) = 0 := by
+    apply binarySelectedCount_eq_zero_of
+    intro symbol membership
+    obtain ⟨bit, _, rfl⟩ := List.mem_map.mp membership
+    rfl
+  rw [outerCounterZero, Nat.add_zero]
+  unfold spaceBinaryNativeFields BinaryCountPaddingMachine.paddedOutput
+  rw [binarySelectedCount_append]
+  have innerRetained :
+      BinaryCountPaddingMachine.selectedCount isFreshMarkerAfterSpace
+          ((freshPaddedNativeFields decider
+            (FiniteEncodingNativeFields.fields symbols)).map Sum.inl) =
+        BinaryCountPaddingMachine.selectedCount isFreshMarker
+          (freshPaddedNativeFields decider
+            (FiniteEncodingNativeFields.fields symbols)) := by
+    induction freshPaddedNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols) with
+    | nil => rfl
+    | cons symbol rest induction =>
+        simp [BinaryCountPaddingMachine.selectedCount,
+          isFreshMarkerAfterSpace, induction]
+  rw [innerRetained]
+  have innerCounterZero :
+      BinaryCountPaddingMachine.selectedCount isFreshMarkerAfterSpace
+          ((PartrecToTM2.trNat
+            (BinaryCountPaddingMachine.selectedCount isSpaceMarker
+              (freshPaddedNativeFields decider
+                (FiniteEncodingNativeFields.fields symbols)))).map
+              fun bit =>
+                (Sum.inr bit : FreshPaddedSymbol ⊕
+                  PartrecToTM2.Γ')) = 0 := by
+    apply binarySelectedCount_eq_zero_of
+    intro symbol membership
+    obtain ⟨bit, _, rfl⟩ := List.mem_map.mp membership
+    rfl
+  rw [innerCounterZero, Nat.add_zero]
+  rw [freshPaddedNativeFields_fields]
+  rw [binarySelectedCount_append, binarySelectedCount_append,
+    binarySelectedCount_append]
+  simp [binarySelectedCount_eq_zero_of,
+    binarySelectedCount_replicate_true, isFreshMarker]
+
+/-- Exact final counter layout on canonical source fields. -/
+@[simp]
+theorem requestPreparedNativeFields_fields (symbols : List encoding.Γ) :
+    requestPreparedNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols) =
+      (widthsBinaryNativeFields decider
+          (FiniteEncodingNativeFields.fields symbols)).map Sum.inl ++
+        (PartrecToTM2.trNat
+          (BoundedMachineAtom.atomCount (tm := decider.tm)
+            (space := PolySpaceCompiler.spaceOfSymbols decider symbols)
+            (clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols))).map
+          Sum.inr := by
+  unfold requestPreparedNativeFields
+  rw [BinaryCountPaddingMachine.paddedOutput,
+    binarySelectedCount_isFreshMarkerAfterWidths_fields]
+
+def appendSpaceBinaryComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List FreshPaddedSymbol) (List SpaceBinarySymbol)
+      FreshPaddedSymbol SpaceBinarySymbol id id
+      (BinaryCountPaddingMachine.paddedOutput isSpaceMarker) :=
+  BinaryCountPaddingMachine.computableInPolyTime isSpaceMarker
+
+def appendClockBinaryComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List SpaceBinarySymbol) (List WidthsBinarySymbol)
+      SpaceBinarySymbol WidthsBinarySymbol id id
+      (BinaryCountPaddingMachine.paddedOutput
+        isClockMarkerAfterSpace) :=
+  BinaryCountPaddingMachine.computableInPolyTime isClockMarkerAfterSpace
+
+def appendFreshBinaryComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List WidthsBinarySymbol) (List RequestPreparedSymbol)
+      WidthsBinarySymbol RequestPreparedSymbol id id
+      (BinaryCountPaddingMachine.paddedOutput
+        isFreshMarkerAfterWidths) :=
+  BinaryCountPaddingMachine.computableInPolyTime isFreshMarkerAfterWidths
+
+/-- The complete arithmetic preprocessing pipeline is polynomial-time. -/
+def requestPreparedComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List Nat) (List RequestPreparedSymbol)
+      PartrecToTM2.Γ' RequestPreparedSymbol PartrecToTM2.trList id
+      (requestPreparedNativeFields decider) := by
+  let space := TM2CompositionMachine.computableInPolyTime
+    (freshComputableInPolyTime decider)
+    appendSpaceBinaryComputableInPolyTime
+  let clock := TM2CompositionMachine.computableInPolyTime space
+    appendClockBinaryComputableInPolyTime
+  let fresh := TM2CompositionMachine.computableInPolyTime clock
+    appendFreshBinaryComputableInPolyTime
+  exact fresh
 
 end PolySpaceRequestPadding
 end PeriodicCNF
