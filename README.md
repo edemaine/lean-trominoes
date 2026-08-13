@@ -442,6 +442,12 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Sum the fixed candidate list and compare with one.
               - [x] Combine phase, containment, and coverage at one base.
             - [x] Lift bounded center validity across the motif.
+            - [x] Fit and bound one-cell overlap using the two native flat
+              assignment lookups.
+            - [ ] Lift bounded overlap across the motif and four shared
+              columns.
+            - [ ] Fit cyclic phase advance and combine normalization, center
+              validity, and overlap into the complete flat transition.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
               - [x] Bound target-header reconstruction and both coordinate
@@ -1980,6 +1986,11 @@ The representation choices for this target are:
   bound for checking center validity over the complete flat motif.  The public
   wrapper computes `isCenterValidBool` directly and includes initialization,
   the full scan, and final result projection in its workspace certificate.
+- [`LeanTrominoes/PartrecFlatPackedOverlapAtSpace.lean`](LeanTrominoes/PartrecFlatPackedOverlapAtSpace.lean)
+  fits both native assignment-query adapters and their verified lookup calls
+  for one shared-cell overlap comparison.  The final digit equality and all
+  adapter overhead have a common quadratic bound in the seven-field flat
+  overlap input, specialized to the semantic `overlapsAtBool` predicate.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
