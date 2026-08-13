@@ -379,6 +379,10 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Fit the complete one-column countdown with an exact additive
             evaluator cost.
           - [ ] Bound that countdown cost by the original flat motif stream.
+            - [x] Bound every reachable motif suffix, scanner payload, and
+              countdown input by one original native-field envelope.
+            - [ ] Bound each positive and zero countdown body by that
+              envelope, then sum the exact additive cost.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.
           - [ ] Bound the five-column assignment lookup and fit its predicate
