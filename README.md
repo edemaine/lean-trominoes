@@ -576,7 +576,7 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Build an exact linear-time finite block transducer and use it to
           encode every arbitrary finite source alphabet as evaluator-native
           delimiter-terminated natural fields.
-        - [ ] Implement the native-field formula compiler and bound its
+        - [x] Implement the native-field formula compiler and bound its
           evaluator runtime by an explicit polynomial.
           - [x] Expose a total natural-field compiler interface, prove that
             generated source fields recover the original symbols, and identify
@@ -588,7 +588,7 @@ build; an imported proof counts when its statement matches the paper.
             verify the one-pass stack interpreter against structural
             compilation, and bound generated requests by an explicit
             polynomial number of native fields.
-          - [ ] Implement the field-to-formula evaluator and certify its
+          - [x] Implement the field-to-formula evaluator and certify its
             polynomial running time.
             - [x] Verify the finite-machine variable-width atom emitter: it
               appends one native binary field, restores its source register,
@@ -622,6 +622,9 @@ build; an imported proof counts when its statement matches the paper.
               read the initial fresh atom, run the postorder compiler, force
               its root, clear internal stacks, reverse output, and halt with
               the exact required-formula native encoding.
+            - [x] Bound complete evaluator execution quadratically in its
+              bounded native request length and package the machine as a
+              `TM2ComputableInPolyTime` compiler.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
@@ -1564,7 +1567,7 @@ The representation choices for this target are:
   stream.  A request carries the clause header and fresh-atom boundary before
   the compact postorder program.
 - [`LeanTrominoes/PeriodicCNFTransitionEvaluatorMachine.lean`](LeanTrominoes/PeriodicCNFTransitionEvaluatorMachine.lean)
-  begins the fixed finite-machine implementation of that request evaluator.
+  implements the fixed finite-machine request evaluator.
   Its reusable variable-width primitive copies a binary atom into the reverse
   output accumulator as one complete native field, restores the source stack
   exactly, and has an exact linear step count.  Its carry-and-restore routine
@@ -1572,6 +1575,11 @@ The representation choices for this target are:
   time, including the possible new high bit.  A finite-control fixed-field
   emitter now combines with those primitives to produce the complete verified
   constant-gate block in linear time.
+- [`LeanTrominoes/PeriodicCNFTransitionEvaluatorTime.lean`](LeanTrominoes/PeriodicCNFTransitionEvaluatorTime.lean)
+  bounds the exact complete evaluator execution quadratically in its native
+  request length.  A bounded semantic request type records the fresh-atom
+  invariant supplied by the machine front end, and the resulting compiler is
+  packaged as an explicit `TM2ComputableInPolyTime` certificate.
 - [`LeanTrominoes/PeriodicCNFTransitionExprSize.lean`](LeanTrominoes/PeriodicCNFTransitionExprSize.lean)
   begins the quantitative hardness certificate.  It bounds Tseitin clauses
   by three per expression node, accounts for the forced root clause exactly,
