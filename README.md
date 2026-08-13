@@ -426,7 +426,8 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Bound dynamic motif indexing on reachable transition scan
               states.
             - [x] Fit the exact one-cell flat normalization predicate.
-            - [ ] Bound one-cell normalization and lift it across the motif.
+            - [x] Bound one-cell normalization in the native scan footprint.
+            - [ ] Lift bounded normalization across the motif.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
               - [x] Bound target-header reconstruction and both coordinate
