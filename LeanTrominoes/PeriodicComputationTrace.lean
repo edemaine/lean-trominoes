@@ -1,0 +1,201 @@
+import LeanTrominoes.Complexity
+import LeanTrominoes.PeriodicComputationCycle
+
+/-!
+# Extracting explicit traces from terminating computations
+
+Mathlib's `StateTransition.EvalsTo` records only a step count and an iterate
+equation.  The periodic-CNF compiler instead consumes an indexed list of all
+configurations.  This file reconstructs that list, proves its consecutive-step
+equations, and specializes the construction to finite TM2 computations.
+-/
+
+noncomputable section
+
+namespace LeanTrominoes
+
+namespace PeriodicComputation
+
+open StateTransition
+open Turing
+
+private theorem iterate_none {State : Type*}
+    (transition : State → Option State) (steps : Nat) :
+    (flip bind transition)^[steps] none = none := by
+  induction steps with
+  | zero => rfl
+  | succ steps induction =>
+      rw [Function.iterate_succ_apply]
+      change (flip bind transition)^[steps] none = none
+      exact induction
+
+theorem existsStateAt {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last))
+    (index : Nat) (indexLe : index ≤ run.steps) :
+    ∃ state, (flip bind transition)^[index] (some first) = some state := by
+  cases equality : (flip bind transition)^[index] (some first) with
+  | none =>
+      have stepsEq : run.steps = (run.steps - index) + index := by omega
+      have final := run.evals_in_steps
+      rw [stepsEq, Function.iterate_add_apply, equality,
+        iterate_none] at final
+      cases final
+  | some state => exact ⟨state, rfl⟩
+
+/-- The configuration reached at a bounded prefix of a terminating run. -/
+def stateAt {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last))
+    (index : Fin (run.steps + 1)) : State :=
+  Classical.choose (existsStateAt run index.val (by omega))
+
+theorem stateAt_iterate {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last))
+    (index : Fin (run.steps + 1)) :
+    (flip bind transition)^[index.val] (some first) =
+      some (stateAt run index) :=
+  Classical.choose_spec (existsStateAt run index.val (by omega))
+
+@[simp]
+theorem stateAt_zero {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last)) :
+    stateAt run 0 = first := by
+  have atZero := stateAt_iterate run (0 : Fin (run.steps + 1))
+  simpa using atZero.symm
+
+@[simp]
+theorem stateAt_last {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last)) :
+    stateAt run (Fin.last run.steps) = last := by
+  have atLast := stateAt_iterate run (Fin.last run.steps)
+  have final := run.evals_in_steps
+  simp only [Fin.val_last] at atLast
+  rw [final] at atLast
+  exact Option.some.inj atLast.symm
+
+theorem stateAt_step {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last))
+    (index : Fin run.steps) :
+    transition (stateAt run index.castSucc) =
+      some (stateAt run index.succ) := by
+  have current := stateAt_iterate run index.castSucc
+  have next := stateAt_iterate run index.succ
+  have successorValue : index.succ.val = index.castSucc.val + 1 := by simp
+  rw [successorValue, Function.iterate_succ_apply', current] at next
+  exact next
+
+/-- A terminating computation whose terminal state is accepting and whose
+accepting states cannot step yields the explicit bounded trace required by the
+reset-clock construction. -/
+theorem acceptingTrace_of_evalsTo {State : Type*}
+    {transition : State → Option State} {first last : State}
+    {accepts : State → Prop} {limit : Nat}
+    (run : EvalsTo transition first (some last))
+    (lengthLe : run.steps ≤ limit)
+    (acceptsLast : accepts last)
+    (acceptingTerminal : ∀ state, accepts state → transition state = none) :
+    Nonempty (AcceptingTrace State first transition accepts limit) := by
+  refine ⟨
+    { length := run.steps
+      length_le := lengthLe
+      states := stateAt run
+      starts := stateAt_zero run
+      accepts_last := by simpa using acceptsLast
+      not_accepts := ?_
+      steps := stateAt_step run }⟩
+  intro index accepted
+  have step := stateAt_step run index
+  rw [acceptingTerminal _ accepted] at step
+  cases step
+
+/-- Every state explicitly listed by an accepting trace is reachable from its
+initial state. -/
+theorem AcceptingTrace.reaches {State : Type*}
+    {first : State} {transition : State → Option State}
+    {accepts : State → Prop} {limit : Nat}
+    (trace : AcceptingTrace State first transition accepts limit)
+    (index : Fin (trace.length + 1)) :
+    Reaches transition first (trace.states index) := by
+  have reachable : ∀ value (valueLt : value < trace.length + 1),
+      Reaches transition first (trace.states ⟨value, valueLt⟩) := by
+    intro value
+    induction value with
+    | zero =>
+        intro valueLt
+        have indexEq : (⟨0, valueLt⟩ : Fin (trace.length + 1)) = 0 :=
+          Fin.ext rfl
+        rw [indexEq, trace.starts]
+        exact Relation.ReflTransGen.refl
+    | succ value induction =>
+        intro valueLt
+        have beforeLt : value < trace.length + 1 := by omega
+        let stepIndex : Fin trace.length := ⟨value, by omega⟩
+        apply Relation.ReflTransGen.tail (induction beforeLt)
+        have beforeEq : (⟨value, beforeLt⟩ : Fin (trace.length + 1)) =
+            stepIndex.castSucc := by
+          apply Fin.ext
+          simp [stepIndex]
+        have afterEq : (⟨value + 1, valueLt⟩ : Fin (trace.length + 1)) =
+            stepIndex.succ := by
+          apply Fin.ext
+          simp [stepIndex]
+        rw [beforeEq, afterEq]
+        exact trace.steps stepIndex
+  exact reachable index.val index.isLt
+
+/-- A finite TM2 output computation gives an accepting trace whose final
+condition is precisely the halted (`none`) control label. -/
+theorem machineAcceptingTrace_of_evalsTo {tm : FinTM2}
+    {initial terminal : tm.Cfg} {limit : Nat}
+    (run : EvalsTo tm.step initial (some terminal))
+    (lengthLe : run.steps ≤ limit)
+    (terminalHalted : terminal.l = none) :
+    Nonempty (AcceptingTrace tm.Cfg initial tm.step
+      (fun config => config.l = none) limit) := by
+  apply acceptingTrace_of_evalsTo run lengthLe terminalHalted
+  intro config halted
+  rcases config with ⟨label, state, stackContents⟩
+  simp only at halted
+  subst label
+  rfl
+
+/-- One stack is no larger than the total configuration-space measure. -/
+theorem stack_length_le_configurationSpace (tm : FinTM2)
+    (configuration : tm.Cfg) (stack : tm.K) :
+    (configuration.stk stack).length ≤
+      Complexity.configurationSpace tm configuration := by
+  letI : DecidableEq tm.K := tm.kDecidableEq
+  letI : Fintype tm.K := tm.kFin
+  unfold Complexity.configurationSpace
+  exact Finset.single_le_sum
+    (f := fun stack => (configuration.stk stack).length)
+    (fun _ _ => Nat.zero_le _)
+    (Finset.mem_univ stack)
+
+/-- Every state of a trace starting from a certified polynomial-space
+decider input respects the decider's global polynomial space bound, hence so
+does each individual stack. -/
+theorem AcceptingTrace.stacksFit_decider
+    {Input : Type} {encoding : Computability.FinEncoding Input}
+    {language : Input → Prop}
+    (decider : Complexity.DeciderInPolySpace encoding language)
+    (input : Input) {accepts : decider.tm.Cfg → Prop} {limit : Nat}
+    (trace : AcceptingTrace decider.tm.Cfg
+      (initList decider.tm
+        (List.map decider.inputAlphabet.invFun (encoding.encode input)))
+      decider.tm.step accepts limit)
+    (index : Fin (trace.length + 1)) (stack : decider.tm.K) :
+    ((trace.states index).stk stack).length ≤
+      decider.space.eval (encoding.encode input).length := by
+  apply (stack_length_le_configurationSpace decider.tm
+    (trace.states index) stack).trans
+  exact decider.space_le input (trace.states index) (trace.reaches index)
+
+end PeriodicComputation
+
+end LeanTrominoes

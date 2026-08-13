@@ -1234,6 +1234,12 @@ The representation choices for this target are:
   bounded clock advances on ordinary deterministic steps and an accepting
   state resets to the initial configuration; the reset system has a directed
   cycle exactly when the original system has a bounded accepting trace.
+- [`LeanTrominoes/PeriodicComputationTrace.lean`](LeanTrominoes/PeriodicComputationTrace.lean)
+  reconstructs every intermediate state from Mathlib's counted `EvalsTo`
+  iterate witness and packages a terminating TM2 computation as an explicit
+  accepting trace.  Each trace state is proved reachable, so a source PSPACE
+  decider's global configuration-space certificate bounds every encoded
+  stack throughout the trace.
 - [`LeanTrominoes/PeriodicCNFTransition.lean`](LeanTrominoes/PeriodicCNFTransition.lean)
   views every forward-local horizontal CNF formula as a transition relation
   between consecutive Boolean slices and proves that satisfying line
