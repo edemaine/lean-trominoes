@@ -652,6 +652,8 @@ build; an imported proof counts when its statement matches the paper.
                 agrees with source-field count.
             - [x] Materialize the affine reset-clock width as a second unary
               marker block and compose both padding phases in polynomial time.
+            - [x] Materialize the exact source-atom boundary used as the
+              request's first fresh Tseitin atom as a third marker block.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1767,9 +1769,10 @@ The representation choices for this target are:
   list evaluates correctly, counts one delimiter per canonical source field,
   identifies the resulting padding with the bounded compiler's selected
   stack width, then composes a second Horner phase that appends the exact
-  reset-clock width.  The resulting polynomial-time certificate exposes the
-  preserved native source and both dynamic loop dimensions as distinct finite
-  marker blocks.
+  reset-clock width and a third phase that appends the exact source-atom
+  boundary used as the request's `fresh` header.  The resulting polynomial-time
+  certificate exposes the preserved native source and all three dynamic
+  counters as distinct finite marker blocks.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population

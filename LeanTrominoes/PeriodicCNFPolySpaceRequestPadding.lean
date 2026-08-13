@@ -213,6 +213,40 @@ theorem selectedCount_replicate_of_false {Source : Type}
       rw [List.replicate_succ, selectedCount_cons, notSelected]
       simpa using induction
 
+/-- Appending padding does not change the count of a predicate lifted from
+the retained source alphabet. -/
+theorem selectedCount_paddedOutput {Source : Type}
+    (selected : Source → Bool) (coefficients : List Nat)
+    (sources : List Source) :
+    selectedCount
+        (fun symbol : Source ⊕ Unit =>
+          match symbol with
+          | .inl source => selected source
+          | .inr _ => false)
+        (paddedOutput selected coefficients sources) =
+      selectedCount selected sources := by
+  unfold paddedOutput
+  rw [selectedCount_append]
+  have sourceCount :
+      selectedCount
+          (fun symbol : Source ⊕ Unit =>
+            match symbol with
+            | .inl source => selected source
+            | .inr _ => false)
+          (sources.map Sum.inl) = selectedCount selected sources := by
+    induction sources with
+    | nil => rfl
+    | cons source sources induction =>
+        simp [selectedCount, induction]
+  rw [sourceCount,
+    selectedCount_replicate_of_false
+      (fun symbol : Source ⊕ Unit =>
+        match symbol with
+        | .inl source => selected source
+        | .inr _ => false)
+      (Sum.inr ()) rfl]
+  omega
+
 @[simp]
 theorem selectedCount_spacePaddedNativeFields (fields : List Nat) :
     selectedCount isSourceDelimiter
@@ -324,6 +358,133 @@ def widthsComputableInPolyTime :
   let composed := TM2CompositionMachine.computableInPolyTime
     (computableInPolyTime decider)
     (appendClockComputableInPolyTime decider)
+  exact composed
+
+/-- Alphabet after also appending the first fresh Tseitin atom boundary. -/
+abbrev FreshPaddedSymbol := WidthPaddedSymbol ⊕ Unit
+
+/-- Source delimiters remain recognizable after both width blocks. -/
+def isSourceDelimiterAfterWidths : WidthPaddedSymbol → Bool
+  | .inl symbol => isSourceDelimiter symbol
+  | .inr _ => false
+
+@[simp]
+theorem selectedCount_widthsPaddedNativeFields (fields : List Nat) :
+    selectedCount isSourceDelimiterAfterWidths
+      (widthsPaddedNativeFields decider fields) = fields.length := by
+  unfold widthsPaddedNativeFields
+  change selectedCount
+      (fun symbol : SpacePaddedSymbol ⊕ Unit =>
+        match symbol with
+        | .inl source => isSourceDelimiter source
+        | .inr _ => false)
+      (paddedOutput isSourceDelimiter (clockCoefficients decider)
+        (spacePaddedNativeFields decider fields)) = fields.length
+  unfold paddedOutput
+  rw [selectedCount_append]
+  have sourceCount :
+      selectedCount
+          (fun symbol : SpacePaddedSymbol ⊕ Unit =>
+            match symbol with
+            | .inl source => isSourceDelimiter source
+            | .inr _ => false)
+          ((spacePaddedNativeFields decider fields).map Sum.inl) =
+        selectedCount isSourceDelimiter
+          (spacePaddedNativeFields decider fields) := by
+    induction spacePaddedNativeFields decider fields with
+    | nil => rfl
+    | cons symbol symbols induction =>
+        simp [selectedCount, induction]
+  rw [sourceCount,
+    selectedCount_replicate_of_false
+      (fun symbol : SpacePaddedSymbol ⊕ Unit =>
+        match symbol with
+        | .inl source => isSourceDelimiter source
+        | .inr _ => false)
+      (Sum.inr ()) rfl,
+    selectedCount_spacePaddedNativeFields]
+  omega
+
+/-- Fixed coefficients for the exact source-atom boundary at which the
+structural Tseitin evaluator starts allocating fresh atoms. -/
+def freshCoefficients : List Nat :=
+  polynomialCoefficients
+    (PolySpaceReduction.sourceAtomPolynomial decider)
+
+/-- Physical preprocessing output carrying source, space, clock, and fresh
+blocks in that order. -/
+def freshPaddedNativeFields (fields : List Nat) :
+    List FreshPaddedSymbol :=
+  paddedOutput isSourceDelimiterAfterWidths (freshCoefficients decider)
+    (widthsPaddedNativeFields decider fields)
+
+@[simp]
+theorem evalCoefficients_freshCoefficients (fieldCount : Nat) :
+    evalCoefficients (freshCoefficients decider) fieldCount =
+      (PolySpaceReduction.sourceAtomPolynomial decider).eval
+        fieldCount := by
+  simp [freshCoefficients]
+
+theorem atomCountOfSymbols_eq_polynomial_eval
+    (symbols : List encoding.Γ) :
+    BoundedMachineAtom.atomCount (tm := decider.tm)
+        (space := PolySpaceCompiler.spaceOfSymbols decider symbols)
+        (clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols) =
+      (PolySpaceReduction.sourceAtomPolynomial decider).eval
+        symbols.length := by
+  rw [BoundedMachineAtom.atomCount_eq]
+  simp only [PolySpaceReduction.sourceAtomPolynomial,
+    Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_C]
+  rw [← spaceOfSymbols_eq_polynomial_eval,
+    ← clockBitsOfSymbols_eq_polynomial_eval]
+
+/-- On canonical source fields, the third marker block is exactly the `fresh`
+header field of the compact compiler request. -/
+@[simp]
+theorem freshPaddedNativeFields_fields (symbols : List encoding.Γ) :
+    freshPaddedNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols) =
+      (FiniteEncodingNativeFields.encode symbols).map
+          (fun symbol => Sum.inl (Sum.inl (Sum.inl symbol))) ++
+        List.replicate (PolySpaceCompiler.spaceOfSymbols decider symbols)
+          (Sum.inl (Sum.inl (Sum.inr ()))) ++
+        List.replicate (PolySpaceCompiler.clockBitsOfSymbols decider symbols)
+          (Sum.inl (Sum.inr ())) ++
+        List.replicate
+          (BoundedMachineAtom.atomCount (tm := decider.tm)
+            (space := PolySpaceCompiler.spaceOfSymbols decider symbols)
+            (clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols))
+          (Sum.inr ()) := by
+  unfold freshPaddedNativeFields paddedOutput
+  rw [selectedCount_widthsPaddedNativeFields,
+    FiniteEncodingNativeFields.fields_length,
+    evalCoefficients_freshCoefficients,
+    ← atomCountOfSymbols_eq_polynomial_eval,
+    widthsPaddedNativeFields_fields]
+  simp only [List.map_append, List.map_map, List.map_replicate,
+    List.append_assoc]
+  rfl
+
+/-- The third Horner phase as a transformation of the doubly padded word. -/
+def appendFreshComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List WidthPaddedSymbol) (List FreshPaddedSymbol)
+      WidthPaddedSymbol FreshPaddedSymbol id id
+      (paddedOutput isSourceDelimiterAfterWidths
+        (freshCoefficients decider)) :=
+  UnaryPolynomialPaddingMachine.computableInPolyTime
+    isSourceDelimiterAfterWidths (freshCoefficients decider)
+
+/-- Source, both widths, and the fresh-atom boundary can all be materialized
+sequentially in polynomial time. -/
+def freshComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List Nat) (List FreshPaddedSymbol)
+      PartrecToTM2.Γ' FreshPaddedSymbol PartrecToTM2.trList id
+      (freshPaddedNativeFields decider) := by
+  let composed := TM2CompositionMachine.computableInPolyTime
+    (widthsComputableInPolyTime decider)
+    (appendFreshComputableInPolyTime decider)
   exact composed
 
 end PolySpaceRequestPadding
