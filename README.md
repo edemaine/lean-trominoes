@@ -371,6 +371,8 @@ build; an imported proof counts when its statement matches the paper.
           conjoin all four shared-column scans.
         - [x] Compose flat normalization, center validity, cyclic phase
           advance, and overlap into the complete packed transition predicate.
+        - [x] Connect the flat transition and reflexive equality test to the
+          recovered Savitch context, preserving the native strip suffix.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.

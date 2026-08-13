@@ -891,6 +891,7 @@ import LeanTrominoes.PartrecFlatPackedOverlapAt
 import LeanTrominoes.PartrecFlatPackedOverlapLoop
 import LeanTrominoes.PartrecFlatPackedTransition
 import LeanTrominoes.PartrecFlatStripFrontierContext
+import LeanTrominoes.PartrecFlatStripTransition
 import LeanTrominoes.PartrecFrontierIndexDecode
 import LeanTrominoes.PartrecFrontierIndexDecodeSpace
 import LeanTrominoes.PartrecFuel
