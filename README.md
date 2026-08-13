@@ -378,7 +378,8 @@ build; an imported proof counts when its statement matches the paper.
             compositionally.
           - [x] Fit the complete one-column countdown with an exact additive
             evaluator cost.
-          - [ ] Bound that countdown cost by the original flat motif stream.
+          - [x] Bound that countdown cost quadratically in the original flat
+            motif stream and actual iterator input.
             - [x] Bound every reachable motif suffix, scanner payload, and
               countdown input by one original native-field envelope.
             - [x] Establish compositional budget lemmas for primitive list
@@ -397,7 +398,7 @@ build; an imported proof counts when its statement matches the paper.
                 exact countdown bodies.
               - [x] Sum frozen and consuming countdown recurrences into the
                 complete one-pass bound.
-              - [ ] Convert the motif-length factor and affine accumulator
+              - [x] Convert the motif-length factor and affine accumulator
                 envelope to a quadratic bound in the actual flat input.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.

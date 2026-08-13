@@ -1749,6 +1749,130 @@ theorem flatPackedLookupFlatCost_le_input_mul
           simp [flatPackedLookupInputUnit]
         nlinarith)
 
+/-- Each motif cell contributes two delimited native coordinate fields, so
+the motif cardinality is bounded by its flat coordinate footprint. -/
+theorem flatPackedLookupMotifLength_le_coordinateSpace
+    (motif : List Cell) :
+    motif.length ≤ encodedListSpace
+      (motif.flatMap PeriodicStripFlatEncoding.cellFields) := by
+  induction motif with
+  | nil => simp
+  | cons cell motif induction =>
+      simp [PeriodicStripFlatEncoding.cellFields,
+        encodedListSpace_cons] at induction ⊢
+      omega
+
+theorem flatPackedLookupMotifLength_le_inputUnit
+    (target : Cell) (motif : List Cell)
+    (wordLimit digitLimit : Nat) :
+    motif.length + 1 ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  have lengthBound := flatPackedLookupMotifLength_le_coordinateSpace motif
+  have coordinatesBound := flatLookupEncodedListSpace_suffix_le
+    [motif.length, Encodable.encode target.1, Encodable.encode target.2,
+      wordLimit, digitLimit]
+    (motif.flatMap PeriodicStripFlatEncoding.cellFields)
+  simp only [flatPackedLookupInputUnit,
+    flatPackedLookupEnvelopeFields]
+  omega
+
+/-- Quadratic envelope for one complete native-field motif-column pass. -/
+def flatPackedLookupSpaceBound
+    (target : Cell) (motif : List Cell) (word digit : Nat) : Nat :=
+  100000000000000000000000000000000000 *
+    (flatPackedLookupInputUnit target motif word (digit + 8)) ^ 2
+
+theorem flatPackedLookupFlatCost_le_quadratic
+    (target : Cell) (selected : Bool) (motif : List Cell)
+    (word digit : Nat) (found : Bool) :
+    flatPackedLookupFlatCost target selected motif word digit found ≤
+      flatPackedLookupSpaceBound target motif word digit := by
+  have additive := flatPackedLookupFlatCost_le_input_mul target selected
+    motif motif [] word digit word (digit + 8) found (by simp)
+    (by omega) (by omega) (by omega)
+  have factor := flatPackedLookupMotifLength_le_inputUnit
+    target motif word (digit + 8)
+  calc
+    flatPackedLookupFlatCost target selected motif word digit found ≤
+        100000000000000000000000000000000000 *
+          flatPackedLookupInputUnit target motif word (digit + 8) *
+          (motif.length + 1) := additive
+    _ ≤ 100000000000000000000000000000000000 *
+          flatPackedLookupInputUnit target motif word (digit + 8) *
+          flatPackedLookupInputUnit target motif word (digit + 8) := by
+      exact Nat.mul_le_mul_left _ factor
+    _ = flatPackedLookupSpaceBound target motif word digit := by
+      simp [flatPackedLookupSpaceBound, pow_two, Nat.mul_assoc]
+
+/-- Actual countdown-plus-payload footprint presented to the flat iterator. -/
+def flatPackedLookupNativeInputSpace
+    (target : Cell) (selected : Bool) (motif : List Cell)
+    (word digit : Nat) (found : Bool) : Nat :=
+  encodedListSpace
+      (motif.length :: Code.flatPackedLookupColumnState target word digit
+        found selected motif) + 1
+
+theorem flatPackedLookupInputUnit_le_native
+    (target : Cell) (selected : Bool) (motif : List Cell)
+    (word digit : Nat) (found : Bool) :
+    flatPackedLookupInputUnit target motif word (digit + 8) ≤
+      10 * flatPackedLookupNativeInputSpace
+        target selected motif word digit found := by
+  have digitBits := encodeNat_add_length_le_sum digit 8
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have eightBits : (Computability.encodeNat 8).length = 4 := rfl
+  rw [eightBits] at digitBits
+  cases found <;> cases selected <;>
+    simp [flatPackedLookupInputUnit, flatPackedLookupEnvelopeFields,
+      flatPackedLookupNativeInputSpace,
+      Code.flatPackedLookupColumnState, encodedListSpace_cons,
+      zeroBits, oneBits] <;>
+    omega
+
+/-- The one-pass evaluator allowance is quadratic in the bit footprint of its
+actual native flat input. -/
+theorem flatPackedLookupSpaceBound_le_native_quadratic
+    (target : Cell) (selected : Bool) (motif : List Cell)
+    (word digit : Nat) (found : Bool) :
+    flatPackedLookupSpaceBound target motif word digit ≤
+      10000000000000000000000000000000000000 *
+        (flatPackedLookupNativeInputSpace
+          target selected motif word digit found) ^ 2 := by
+  let unit := flatPackedLookupInputUnit target motif word (digit + 8)
+  let native := flatPackedLookupNativeInputSpace
+    target selected motif word digit found
+  have linear : unit ≤ 10 * native := by
+    simpa [unit, native] using flatPackedLookupInputUnit_le_native
+      target selected motif word digit found
+  have squared : unit ^ 2 ≤ 100 * native ^ 2 := by
+    nlinarith
+  calc
+    flatPackedLookupSpaceBound target motif word digit =
+        100000000000000000000000000000000000 * unit ^ 2 := by
+      rfl
+    _ ≤ 100000000000000000000000000000000000 *
+          (100 * native ^ 2) := Nat.mul_le_mul_left _ squared
+    _ = 10000000000000000000000000000000000000 *
+          native ^ 2 := by ring
+
+/-- One complete flat lookup pass fitted directly to its quadratic native
+input allowance. -/
+theorem flatPackedLookupFlatBounded
+    (target : Cell) (selected : Bool) (motif : List Cell)
+    (word digit : Nat) (found : Bool) :
+    EvaluatorCodeFits
+      (Code.flatIterate Code.flatPackedLookupStepCode)
+      (motif.length ::
+        Code.flatPackedLookupColumnState target word digit found selected
+          motif)
+      (Code.flatPackedLookupColumnProcess target selected motif
+        word digit found)
+      (flatPackedLookupSpaceBound target motif word digit) :=
+  (flatPackedLookupFlat target selected motif word digit found).mono
+    (flatPackedLookupFlatCost_le_quadratic
+      target selected motif word digit found)
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing
