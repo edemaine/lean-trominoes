@@ -419,6 +419,8 @@ build; an imported proof counts when its statement matches the paper.
               footprint.
           - [ ] Fit normalization, center validity, overlap, and the complete
             flat packed transition.
+            - [x] Fit and linearly bound runtime suffix selection for dynamic
+              flat motif indexing.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
               - [x] Bound target-header reconstruction and both coordinate
