@@ -317,8 +317,12 @@ build; an imported proof counts when its statement matches the paper.
       bounds for the target flat strip encoding.
     - [x] Generalize the verified finite-evaluator PSPACE packaging from one
       nested natural code to evaluator-native flat natural fields.
-    - [ ] Port the input decoder and input-size certificates to the target flat
-      strip encoding.
+    - [x] Port the structural well-formedness scan to the target flat fields,
+      consuming one coordinate pair per iteration without recursive list
+      packing.
+    - [ ] Prove the flat well-formedness scan's evaluator-space certificate.
+    - [ ] Port the cycle-search input/context assembly and its evaluator-space
+      certificates to the target flat strip fields.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1823,6 +1827,11 @@ The representation choices for this target are:
   representation as the project's explicit finite-machine PSPACE certificate.
   The native `trList` input identity avoids constructing a nested code or an
   alphabet-conversion machine.
+- [`LeanTrominoes/PartrecFlatStripWellFormed.lean`](LeanTrominoes/PartrecFlatStripWellFormed.lean)
+  ports periodic-strip structural validation to those native flat fields.  Its
+  exact motif-length countdown consumes two coordinate fields per cell,
+  reuses the verified cell-bounds predicate, and never constructs the legacy
+  recursively paired motif code.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
