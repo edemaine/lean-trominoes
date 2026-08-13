@@ -459,6 +459,8 @@ build; an imported proof counts when its statement matches the paper.
             then package the flat evaluator as a PSPACE decider.
             - [x] Fit and linearly bound variable-stack offset computation and
               dynamic recovery of the complete flat context suffix.
+            - [x] Fit and polynomially bound reconstruction of the native
+              seven-field transition context from that recovered suffix.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1968,6 +1970,12 @@ The representation choices for this target are:
   per continuation frame, preserves the complete evaluator payload, and
   bounds the ensuing dynamic suffix drop linearly in the native-list input
   footprint.
+- [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
+  fits the strip-suffix projections, decodes both queried frontier indices
+  into word and phase, and assembles the native seven-field packed-transition
+  context while retaining the motif-coordinate stream.  Its explicit bound
+  charges suffix recovery, arithmetic decoding, every field projection, and
+  all intermediate list assembly to one polynomial native-input envelope.
 - [`LeanTrominoes/PartrecFlatStripWellFormed.lean`](LeanTrominoes/PartrecFlatStripWellFormed.lean)
   ports periodic-strip structural validation to those native flat fields.  Its
   exact motif-length countdown consumes two coordinate fields per cell,
