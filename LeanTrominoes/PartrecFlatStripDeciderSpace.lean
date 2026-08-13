@@ -1156,6 +1156,316 @@ theorem flatStripGuardLoop_fits
     · rw [Code.flatStripMotifNativeStep_iterate]
       exact after
 
+/-! ## Complete well-formedness guard -/
+
+def flatStripGuardDimensionWidthCost
+    (periodicStrip : PeriodicStrip) : Nat :=
+  natPositiveCost periodicStrip.width +
+    getCost 0 (PeriodicStripFlatEncoding.stripFields periodicStrip)
+
+theorem flatStripGuardDimensionWidth_fits
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits
+      (Code.natPositiveCode.comp (Code.get 0))
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [(decide (0 < periodicStrip.width)).toNat]
+      (flatStripGuardDimensionWidthCost periodicStrip) := by
+  by_cases positive : 0 < periodicStrip.width <;>
+    simpa [flatStripGuardDimensionWidthCost, positive,
+      PeriodicStripFlatEncoding.stripFields] using
+      EvaluatorCodeFits.comp (natPositive periodicStrip.width)
+        (get 0 (PeriodicStripFlatEncoding.stripFields periodicStrip))
+
+def flatStripGuardDimensionPeriodCost
+    (periodicStrip : PeriodicStrip) : Nat :=
+  natPositiveCost periodicStrip.period +
+    getCost 1 (PeriodicStripFlatEncoding.stripFields periodicStrip)
+
+theorem flatStripGuardDimensionPeriod_fits
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits
+      (Code.natPositiveCode.comp (Code.get 1))
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [(decide (0 < periodicStrip.period)).toNat]
+      (flatStripGuardDimensionPeriodCost periodicStrip) := by
+  by_cases positive : 0 < periodicStrip.period <;>
+    simpa [flatStripGuardDimensionPeriodCost, positive,
+      PeriodicStripFlatEncoding.stripFields] using
+      EvaluatorCodeFits.comp (natPositive periodicStrip.period)
+        (get 1 (PeriodicStripFlatEncoding.stripFields periodicStrip))
+
+def flatStripGuardDimensionsValidCost
+    (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  boolAndCost fields
+    (decide (0 < periodicStrip.width)).toNat
+    (decide (0 < periodicStrip.period)).toNat
+    (flatStripGuardDimensionWidthCost periodicStrip)
+    (flatStripGuardDimensionPeriodCost periodicStrip)
+
+theorem flatStripGuardDimensionsValid_fits
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits Code.stripDimensionsValidCode
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [(decide (0 < periodicStrip.width) &&
+        decide (0 < periodicStrip.period)).toNat]
+      (flatStripGuardDimensionsValidCost periodicStrip) := by
+  have fitted := boolAnd
+    (flatStripGuardDimensionWidth_fits periodicStrip)
+    (flatStripGuardDimensionPeriod_fits periodicStrip)
+  by_cases widthPositive : 0 < periodicStrip.width <;>
+    by_cases periodPositive : 0 < periodicStrip.period <;>
+    simpa [Code.stripDimensionsValidCode,
+      flatStripGuardDimensionsValidCost,
+      widthPositive, periodPositive] using fitted
+
+def flatStripGuardPeriodAndCoordinatesCost
+    (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let coordinates :=
+    periodicStrip.motif.flatMap PeriodicStripFlatEncoding.cellFields
+  prependCost fields [periodicStrip.period] coordinates
+    (getCost 1 fields) (dropCost 3 fields)
+
+theorem flatStripGuardPeriodAndCoordinates_fits
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits
+      (Code.prepend (Code.get 1) (Code.drop 3))
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      (periodicStrip.period ::
+        periodicStrip.motif.flatMap PeriodicStripFlatEncoding.cellFields)
+      (flatStripGuardPeriodAndCoordinatesCost periodicStrip) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  simpa [flatStripGuardPeriodAndCoordinatesCost, fields, prependCost,
+    PeriodicStripFlatEncoding.stripFields] using
+    prepend (get 1 fields) (drop 3 fields)
+
+def flatStripGuardDimensionsAndCoordinatesCost
+    (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let rest := periodicStrip.period ::
+    periodicStrip.motif.flatMap PeriodicStripFlatEncoding.cellFields
+  prependCost fields [periodicStrip.width] rest
+    (getCost 0 fields)
+    (flatStripGuardPeriodAndCoordinatesCost periodicStrip)
+
+theorem flatStripGuardDimensionsAndCoordinates_fits
+    (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits
+      (Code.prepend (Code.get 0) <|
+        Code.prepend (Code.get 1) (Code.drop 3))
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      (periodicStrip.width :: periodicStrip.period ::
+        periodicStrip.motif.flatMap PeriodicStripFlatEncoding.cellFields)
+      (flatStripGuardDimensionsAndCoordinatesCost periodicStrip) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  simpa [flatStripGuardDimensionsAndCoordinatesCost, fields, prependCost,
+    PeriodicStripFlatEncoding.stripFields] using
+    prepend (get 0 fields)
+      (flatStripGuardPeriodAndCoordinates_fits periodicStrip)
+
+def flatStripGuardPayloadCost (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) && decide (0 < periodicStrip.period)
+  let rest := periodicStrip.width :: periodicStrip.period ::
+    periodicStrip.motif.flatMap PeriodicStripFlatEncoding.cellFields
+  prependCost fields [dimensionsValid.toNat] rest
+    (flatStripGuardDimensionsValidCost periodicStrip)
+    (flatStripGuardDimensionsAndCoordinatesCost periodicStrip)
+
+theorem flatStripGuardPayload_fits (periodicStrip : PeriodicStrip) :
+    let dimensionsValid :=
+      decide (0 < periodicStrip.width) && decide (0 < periodicStrip.period)
+    EvaluatorCodeFits
+      (Code.prepend Code.stripDimensionsValidCode <|
+        Code.prepend (Code.get 0) <|
+          Code.prepend (Code.get 1) (Code.drop 3))
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      (Code.flatStripMotifState periodicStrip.width periodicStrip.period
+        dimensionsValid periodicStrip.motif)
+      (flatStripGuardPayloadCost periodicStrip) := by
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) && decide (0 < periodicStrip.period)
+  simpa [flatStripGuardPayloadCost, dimensionsValid, prependCost,
+    Code.flatStripMotifState] using
+    prepend (flatStripGuardDimensionsValid_fits periodicStrip)
+      (flatStripGuardDimensionsAndCoordinates_fits periodicStrip)
+
+def flatStripGuardLoopInputCost (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) && decide (0 < periodicStrip.period)
+  let payload := Code.flatStripMotifState periodicStrip.width
+    periodicStrip.period dimensionsValid periodicStrip.motif
+  prependCost fields [periodicStrip.motif.length] payload
+    (getCost 2 fields) (flatStripGuardPayloadCost periodicStrip)
+
+theorem flatStripGuardLoopInput_fits (periodicStrip : PeriodicStrip) :
+    let dimensionsValid :=
+      decide (0 < periodicStrip.width) && decide (0 < periodicStrip.period)
+    EvaluatorCodeFits Code.flatStripWellFormedLoopInputCode
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      (periodicStrip.motif.length ::
+        Code.flatStripMotifState periodicStrip.width periodicStrip.period
+          dimensionsValid periodicStrip.motif)
+      (flatStripGuardLoopInputCost periodicStrip) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) && decide (0 < periodicStrip.period)
+  simpa [Code.flatStripWellFormedLoopInputCode,
+    flatStripGuardLoopInputCost, fields, dimensionsValid,
+    prependCost, PeriodicStripFlatEncoding.stripFields] using
+    prepend (get 2 fields) (flatStripGuardPayload_fits periodicStrip)
+
+set_option maxHeartbeats 1000000 in
+theorem flatStripGuardLoopInputCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    flatStripGuardLoopInputCost periodicStrip ≤
+      1000000000 *
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip) + 1) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let coordinates :=
+    periodicStrip.motif.flatMap PeriodicStripFlatEncoding.cellFields
+  let inputSpace := encodedListSpace fields
+  have inputExpanded :
+      inputSpace =
+        (Computability.encodeNat periodicStrip.width).length + 1 +
+        ((Computability.encodeNat periodicStrip.period).length + 1 +
+        ((Computability.encodeNat periodicStrip.motif.length).length + 1 +
+          encodedListSpace coordinates)) := by
+    simp [inputSpace, fields, coordinates,
+      PeriodicStripFlatEncoding.stripFields, encodedListSpace_cons]
+  have widthSuccBits :=
+    listCodeEncodeNat_succ_length_le periodicStrip.width
+  have periodSuccBits :=
+    listCodeEncodeNat_succ_length_le periodicStrip.period
+  have lengthSuccBits :=
+    listCodeEncodeNat_succ_length_le periodicStrip.motif.length
+  have widthPredBits := listCodeEncodeNat_length_mono
+    (Nat.sub_le periodicStrip.width 1)
+  have periodPredBits := listCodeEncodeNat_length_mono
+    (Nat.sub_le periodicStrip.period 1)
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have widthZeroIff : periodicStrip.width = 0 ↔
+      ¬ 0 < periodicStrip.width := by omega
+  have periodZeroIff : periodicStrip.period = 0 ↔
+      ¬ 0 < periodicStrip.period := by omega
+  by_cases widthPositive : 0 < periodicStrip.width <;>
+    by_cases periodPositive : 0 < periodicStrip.period <;>
+    simp [flatStripGuardLoopInputCost, flatStripGuardPayloadCost,
+      flatStripGuardDimensionsAndCoordinatesCost,
+      flatStripGuardPeriodAndCoordinatesCost,
+      flatStripGuardDimensionsValidCost,
+      flatStripGuardDimensionWidthCost,
+      flatStripGuardDimensionPeriodCost, natPositiveCost,
+      boolAndCost, normalizeBoolCost, prependCost,
+      branchZeroZeroCost, branchZeroSuccCost, branchZeroTestCost,
+      getCost, dropCost, idCost, headCost, nilCost, oneCost,
+      zeroCost, zeroPrimeCost, tailCost, succCost,
+      Code.flatStripMotifState, PeriodicStripFlatEncoding.cellFields,
+      PeriodicStripFlatEncoding.stripFields,
+      fields, coordinates, inputSpace, inputExpanded,
+      widthPositive, periodPositive, widthZeroIff, periodZeroIff,
+      encodedListSpace_cons, encodedListSpace_nil,
+      zeroBits, oneBits] at * <;>
+    omega
+
+theorem flatStripGuardProjectionCost_le_input
+    (periodicStrip : PeriodicStrip) (result : Bool) :
+    getCost 0
+        (Code.flatStripMotifState periodicStrip.width periodicStrip.period
+          result []) ≤
+      1000 *
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip) + 1) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputSpace := encodedListSpace fields
+  have widthMember : periodicStrip.width ∈ fields := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have periodMember : periodicStrip.period ∈ fields := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have widthSpace := guardEncodedFieldSpace_le_of_mem
+    periodicStrip.width fields widthMember
+  have periodSpace := guardEncodedFieldSpace_le_of_mem
+    periodicStrip.period fields periodMember
+  have widthSuccBits :=
+    listCodeEncodeNat_succ_length_le periodicStrip.width
+  have periodSuccBits :=
+    listCodeEncodeNat_succ_length_le periodicStrip.period
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have twoBits : (Computability.encodeNat 2).length = 2 := rfl
+  cases result <;>
+    simp [getCost, dropCost, idCost, headCost, nilCost,
+      zeroPrimeCost, tailCost, succCost,
+      Code.flatStripMotifState, fields, inputSpace,
+      encodedListSpace_cons, encodedListSpace_nil,
+      zeroBits, oneBits, twoBits] at * <;>
+    omega
+
+def flatStripWellFormedSpaceBound (inputSpace : Nat) : Nat :=
+  3 * flatStripGuardLoopSpaceBound inputSpace
+
+/-- Complete native flat well-formedness validation, including preparation and
+result projection, in a linear reserve over the original flat fields. -/
+theorem flatStripWellFormed_fits (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits Code.flatStripWellFormedCode
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [periodicStrip.wellFormed.toNat]
+      (flatStripWellFormedSpaceBound
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip))) := by
+  let inputSpace := encodedListSpace
+    (PeriodicStripFlatEncoding.stripFields periodicStrip)
+  let dimensionsValid :=
+    decide (0 < periodicStrip.width) && decide (0 < periodicStrip.period)
+  let result := dimensionsValid &&
+    motifInStripBounds periodicStrip.width periodicStrip.period
+      periodicStrip.motif
+  let loopBound := flatStripGuardLoopSpaceBound inputSpace
+  have preparedBound : flatStripGuardLoopInputCost periodicStrip ≤
+      loopBound := by
+    have prepared := flatStripGuardLoopInputCost_le_input periodicStrip
+    simp only [loopBound, flatStripGuardLoopSpaceBound, inputSpace]
+    omega
+  have projectionBound : getCost 0
+      (Code.flatStripMotifState periodicStrip.width periodicStrip.period
+        result []) ≤ loopBound := by
+    have projected := flatStripGuardProjectionCost_le_input
+      periodicStrip result
+    simp only [loopBound, flatStripGuardLoopSpaceBound, inputSpace]
+    omega
+  have prepared := EvaluatorCodeFits.comp
+    (flatStripGuardLoop_fits periodicStrip dimensionsValid)
+    (flatStripGuardLoopInput_fits periodicStrip)
+  have preparedUniform := prepared.mono (show
+      flatStripGuardLoopSpaceBound
+            (encodedListSpace
+              (PeriodicStripFlatEncoding.stripFields periodicStrip)) +
+          flatStripGuardLoopInputCost periodicStrip ≤ 2 * loopBound by
+    change loopBound + flatStripGuardLoopInputCost periodicStrip ≤
+      2 * loopBound
+    omega)
+  have projected := EvaluatorCodeFits.comp
+    (get 0 (Code.flatStripMotifState periodicStrip.width
+      periodicStrip.period result [])) preparedUniform
+  have final := projected.mono (show
+      getCost 0
+            (Code.flatStripMotifState periodicStrip.width
+              periodicStrip.period result []) +
+          2 * loopBound ≤ flatStripWellFormedSpaceBound inputSpace by
+    change getCost 0
+          (Code.flatStripMotifState periodicStrip.width
+            periodicStrip.period result []) +
+        2 * loopBound ≤ 3 * loopBound
+    omega)
+  simpa [Code.flatStripWellFormedCode, dimensionsValid, result,
+    inputSpace, Code.stripWellFormedAccumulator_eq,
+    Code.flatStripMotifState] using final
+
 end FlatStripDeciderPartrec
 end RawWindowState
 end PeriodicStrip

@@ -504,6 +504,8 @@ build; an imported proof counts when its statement matches the paper.
                     body within one input-linear workspace reserve.
                   - [x] Lift the body bound through the full guard loop with
                     an exact reachable-suffix invariant.
+                  - [x] Assemble and fit dimension checks, loop input, and
+                    final projection into the complete well-formedness guard.
                   - [ ] Compose the guarded cycle search.
               - [ ] Package the evaluator certificate as flat-encoding PSPACE
                 membership.
