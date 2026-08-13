@@ -461,6 +461,8 @@ build; an imported proof counts when its statement matches the paper.
               dynamic recovery of the complete flat context suffix.
             - [x] Fit and polynomially bound reconstruction of the native
               seven-field transition context from that recovered suffix.
+            - [x] Fit and polynomially bound the recovered indexed edge and
+              reflexive-or-edge Savitch base oracle.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1976,6 +1978,11 @@ The representation choices for this target are:
   context while retaining the motif-coordinate stream.  Its explicit bound
   charges suffix recovery, arithmetic decoding, every field projection, and
   all intermediate list assembly to one polynomial native-input envelope.
+- [`LeanTrominoes/PartrecFlatStripTransitionSpace.lean`](LeanTrominoes/PartrecFlatStripTransitionSpace.lean)
+  composes that recovered context with the bounded complete packed transition,
+  then fits query-index equality and their reflexive disjunction.  The public
+  certificates bound both the indexed edge and the full depth-zero Savitch
+  oracle in the original variable-suffix input representation.
 - [`LeanTrominoes/PartrecFlatStripWellFormed.lean`](LeanTrominoes/PartrecFlatStripWellFormed.lean)
   ports periodic-strip structural validation to those native flat fields.  Its
   exact motif-length countdown consumes two coordinate fields per cell,

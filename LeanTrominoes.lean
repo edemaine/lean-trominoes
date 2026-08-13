@@ -911,6 +911,7 @@ import LeanTrominoes.PartrecFlatPackedTransitionSpace
 import LeanTrominoes.PartrecFlatStripFrontierContext
 import LeanTrominoes.PartrecFlatStripFrontierContextSpace
 import LeanTrominoes.PartrecFlatStripTransition
+import LeanTrominoes.PartrecFlatStripTransitionSpace
 import LeanTrominoes.PartrecFrontierIndexDecode
 import LeanTrominoes.PartrecFrontierIndexDecodeSpace
 import LeanTrominoes.PartrecFuel

@@ -542,7 +542,7 @@ private theorem flatStripFieldCost_le_base
   simp only [flatStripContextBaseSpaceBound]
   omega
 
-private theorem flatStripPairArgumentsTailCost_le_base
+theorem flatStripPairArgumentsTailCost_le_base
     (context stateCount : Nat) (state : DivideEvalState)
     (periodicStrip : PeriodicStrip) :
     flatStripPairArgumentsTailCost context stateCount state periodicStrip ≤
