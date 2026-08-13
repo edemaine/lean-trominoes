@@ -362,6 +362,8 @@ build; an imported proof counts when its statement matches the paper.
         exactly on accepted inputs.
       - [x] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
+      - [x] Define a flat finite encoding of periodic CNF whose list structure
+        has linear overhead, with a verified decoder round trip.
       - [ ] Certify the resulting reduction as polynomial-time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
@@ -6986,6 +6988,12 @@ The representation choices for this target are:
   that source reduction chain: each finite clause refers to variables at
   integer-lattice offsets, and the finite conjunction is imposed at every
   translate of the plane.
+- [`LeanTrominoes/PeriodicCNFFlatEncoding.lean`](LeanTrominoes/PeriodicCNFFlatEncoding.lean)
+  replaces the recursively paired standard list code with a flat stream over
+  the finite alphabet of zero, one, and field delimiter.  Explicit clause and
+  literal counts make the executable decoder unambiguous, its round trip is
+  verified, and formula list structure contributes only linearly many fields
+  to the encoded output.
 - [`LeanTrominoes/PeriodicThreeCNF.lean`](LeanTrominoes/PeriodicThreeCNF.lean)
   implements the standard auxiliary-variable chain that splits arbitrary
   protoclauses into clauses of width at most three.  Auxiliary variables are
