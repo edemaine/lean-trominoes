@@ -59,6 +59,20 @@ theorem stack_ne_scratch (source : AtomSource) :
 
 end AtomSource
 
+/-- Delimited-field stacks consumed by the evaluator. -/
+inductive FieldSource
+  | input
+  | roots
+  deriving DecidableEq, Fintype
+
+namespace FieldSource
+
+def stack : FieldSource → Stack
+  | .input => .input
+  | .roots => .roots
+
+end FieldSource
+
 /-- Equality gates differ only by their source slice; negation uses the same
 two-clause emission skeleton with different desired input bits. -/
 inductive UnaryGateKind
@@ -139,6 +153,13 @@ inductive Label
   | copyAtom (source : AtomSource) (next : Phase)
   | restoreAtom (source : AtomSource) (next : Phase)
   | incrementFresh (next : Phase)
+  | copyInputField (next : Phase)
+  | readField (source : FieldSource) (target : AtomSource) (next : Phase)
+  | prepareFreshRoot (next : Phase)
+  | saveFreshRoot (next : Phase)
+  | restoreFreshRoot (next : Phase)
+  | clearAtom (source : AtomSource) (next : Phase)
+  | reverseOutput
   | phase (phase : Phase)
   deriving DecidableEq, Fintype
 
@@ -195,6 +216,55 @@ def program : Label → TM2.Stmt Alphabet Label State
             (.push .scratch (fun _ => .bit0)
               (.load (fun _ => none)
                 (.goto fun _ => .incrementFresh next)))))
+  | .copyInputField next =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch Option.isNone
+          .halt
+          (.branch (fun state => state = some .cons)
+            (.push .outputReverse (fun state => state.getD default)
+              (.load (fun _ => none) (.goto fun _ => .phase next)))
+            (.push .outputReverse (fun state => state.getD default)
+              (.load (fun _ => none)
+                (.goto fun _ => .copyInputField next)))))
+  | .readField source target next =>
+      .pop source.stack (fun _ symbol => symbol)
+        (.branch Option.isNone
+          .halt
+          (.branch (fun state => state = some .cons)
+            (.load (fun _ => none)
+              (.goto fun _ => .restoreAtom target next))
+            (.push .scratch (fun state => state.getD default)
+              (.load (fun _ => none)
+                (.goto fun _ => .readField source target next)))))
+  | .prepareFreshRoot next =>
+      .push .roots (fun _ => .cons)
+        (.load (fun _ => none) (.goto fun _ => .saveFreshRoot next))
+  | .saveFreshRoot next =>
+      .pop .fresh (fun _ symbol => symbol)
+        (.branch Option.isNone
+          (.load (fun _ => none) (.goto fun _ => .restoreFreshRoot next))
+          (.push .scratch (fun state => state.getD default)
+            (.load (fun _ => none)
+              (.goto fun _ => .saveFreshRoot next))))
+  | .restoreFreshRoot next =>
+      .pop .scratch (fun _ symbol => symbol)
+        (.branch Option.isNone
+          (.load (fun _ => none) (.goto fun _ => .phase next))
+          (.push .fresh (fun state => state.getD default)
+            (.push .roots (fun state => state.getD default)
+              (.load (fun _ => none)
+                (.goto fun _ => .restoreFreshRoot next)))))
+  | .clearAtom source next =>
+      .pop source.stack (fun _ symbol => symbol)
+        (.branch Option.isNone
+          (.load (fun _ => none) (.goto fun _ => .phase next))
+          (.load (fun _ => none) (.goto fun _ => .clearAtom source next)))
+  | .reverseOutput =>
+      .pop .outputReverse (fun _ symbol => symbol)
+        (.branch Option.isNone
+          (.load (fun _ => none) (.goto fun _ => .phase .done))
+          (.push .output (fun state => state.getD default)
+            (.load (fun _ => none) (.goto fun _ => .reverseOutput))))
   | .phase .done => .halt
   | .phase .gateDone => .halt
   | .phase (.constantStart value) =>
@@ -278,6 +348,14 @@ def setAtom (data : TapeData) : AtomSource → List Γ' → TapeData
   | .first, value => { data with first := value }
   | .second, value => { data with second := value }
 
+def field (data : TapeData) : FieldSource → List Γ'
+  | .input => data.input
+  | .roots => data.roots
+
+def setField (data : TapeData) : FieldSource → List Γ' → TapeData
+  | .input, value => { data with input := value }
+  | .roots, value => { data with roots := value }
+
 @[simp]
 theorem atom_setAtom (data : TapeData) (source : AtomSource)
     (value : List Γ') :
@@ -288,6 +366,12 @@ theorem atom_setAtom (data : TapeData) (source : AtomSource)
 theorem setAtom_atom (data : TapeData) (source : AtomSource) :
     data.setAtom source (data.atom source) = data := by
   cases data
+  cases source <;> rfl
+
+@[simp]
+theorem field_setField (data : TapeData) (source : FieldSource)
+    (value : List Γ') :
+    (data.setField source value).field source = value := by
   cases source <;> rfl
 
 end TapeData
@@ -318,6 +402,33 @@ def incrementCfg (next : Phase) (data : TapeData) :
     TM2.Cfg Alphabet Label State :=
   ⟨some (.incrementFresh next), none, tapes data⟩
 
+def copyInputFieldCfg (next : Phase) (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some (.copyInputField next), none, tapes data⟩
+
+def readFieldCfg (source : FieldSource) (target : AtomSource)
+    (next : Phase) (data : TapeData) : TM2.Cfg Alphabet Label State :=
+  ⟨some (.readField source target next), none, tapes data⟩
+
+def prepareFreshRootCfg (next : Phase) (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some (.prepareFreshRoot next), none, tapes data⟩
+
+def saveFreshRootCfg (next : Phase) (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some (.saveFreshRoot next), none, tapes data⟩
+
+def restoreFreshRootCfg (next : Phase) (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some (.restoreFreshRoot next), none, tapes data⟩
+
+def clearAtomCfg (source : AtomSource) (next : Phase) (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some (.clearAtom source next), none, tapes data⟩
+
+def reverseOutputCfg (data : TapeData) : TM2.Cfg Alphabet Label State :=
+  ⟨some .reverseOutput, none, tapes data⟩
+
 @[simp]
 theorem update_tapes_outputReverse (data : TapeData) (value : List Γ') :
     Function.update (tapes data) Stack.outputReverse value =
@@ -347,6 +458,19 @@ def oneStep {first last : TM2.Cfg Alphabet Label State}
     (step : TM2.step program first = some last) :
     EvalsToInTime (TM2.step program) first (some last) 1 :=
   FiniteBlockTransducer.oneStep step
+
+/-- Convenient composition for evaluator fragments whose intermediate result
+is a live configuration. -/
+def thenRun {first middle : TM2.Cfg Alphabet Label State}
+    {last : Option (TM2.Cfg Alphabet Label State)} {firstTime secondTime : Nat}
+    (firstRun : EvalsToInTime (TM2.step program)
+      first (some middle) firstTime)
+    (secondRun : EvalsToInTime (TM2.step program)
+      middle last secondTime) :
+    EvalsToInTime (TM2.step program)
+      first last (secondTime + firstTime) :=
+  EvalsToInTime.trans (TM2.step program)
+    firstTime secondTime first middle last firstRun secondRun
 
 theorem stepAux_pushOutputWord (word : List Γ')
     (next : TM2.Stmt Alphabet Label State) (state : State)
@@ -540,8 +664,559 @@ theorem step_binaryAfterSecond₂ (data : TapeData)
   rw [stepAux_pushOutputWord]
   simp [phaseCfg, emittedWordData, tapes]
 
+def copiedInputSymbolData (data : TapeData) (symbol : Γ')
+    (tail : List Γ') : TapeData :=
+  { data with
+    input := tail
+    outputReverse := symbol :: data.outputReverse }
+
+def readFieldSymbolData (data : TapeData) (source : FieldSource)
+    (symbol : Γ') (tail : List Γ') : TapeData :=
+  { data.setField source tail with
+    scratch := symbol :: data.scratch }
+
+theorem step_copyInputField_symbol (next : Phase) (data : TapeData)
+    (symbol : Γ') (tail : List Γ') (notDelimiter : symbol ≠ .cons)
+    (inputValue : data.input = symbol :: tail) :
+    TM2.step program (copyInputFieldCfg next data) =
+      some (copyInputFieldCfg next
+        (copiedInputSymbolData data symbol tail)) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change input = symbol :: tail at inputValue
+  subst input
+  cases symbol <;>
+    simp_all [TM2.step, program, copyInputFieldCfg,
+      copiedInputSymbolData, tapes, Function.update]
+  all_goals
+    funext stack
+    cases stack <;> simp [tapes, Function.update]
+
+theorem step_copyInputField_delimiter (next : Phase) (data : TapeData)
+    (tail : List Γ') (inputValue : data.input = .cons :: tail) :
+    TM2.step program (copyInputFieldCfg next data) =
+      some (phaseCfg next
+        { data with
+          input := tail
+          outputReverse := .cons :: data.outputReverse }) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change input = .cons :: tail at inputValue
+  subst input
+  simp [TM2.step, program, copyInputFieldCfg, phaseCfg, tapes,
+    Function.update]
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_readField_symbol (source : FieldSource)
+    (target : AtomSource) (next : Phase) (data : TapeData)
+    (symbol : Γ') (tail : List Γ') (notDelimiter : symbol ≠ .cons)
+    (sourceValue : data.field source = symbol :: tail) :
+    TM2.step program (readFieldCfg source target next data) =
+      some (readFieldCfg source target next
+        (readFieldSymbolData data source symbol tail)) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  cases source <;> cases target <;>
+    simp [TapeData.field] at sourceValue <;>
+    cases symbol <;>
+    simp_all [TM2.step, program, readFieldCfg, readFieldSymbolData,
+      tapes, TapeData.setField, FieldSource.stack, Function.update]
+  all_goals
+    funext stack
+    cases stack <;> simp [tapes, Function.update]
+
+theorem step_readField_delimiter (source : FieldSource)
+    (target : AtomSource) (next : Phase) (data : TapeData)
+    (tail : List Γ') (sourceValue : data.field source = .cons :: tail) :
+    TM2.step program (readFieldCfg source target next data) =
+      some (restoreCfg target next (data.setField source tail)) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  cases source <;> cases target <;>
+    simp [TapeData.field] at sourceValue <;>
+    simp [TM2.step, program, readFieldCfg, restoreCfg, tapes,
+      TapeData.setField, FieldSource.stack, AtomSource.stack, sourceValue,
+      Function.update]
+  all_goals
+    funext stack
+    cases stack <;> simp [tapes, Function.update]
+
+def preparedFreshRootData (data : TapeData) : TapeData :=
+  { data with roots := .cons :: data.roots }
+
+def savedFreshSymbolData (data : TapeData) (symbol : Γ')
+    (tail : List Γ') : TapeData :=
+  { data with
+    fresh := tail
+    scratch := symbol :: data.scratch }
+
+def restoredFreshRootSymbolData (data : TapeData) (symbol : Γ')
+    (tail : List Γ') : TapeData :=
+  { data with
+    fresh := symbol :: data.fresh
+    roots := symbol :: data.roots
+    scratch := tail }
+
+theorem step_prepareFreshRoot (next : Phase) (data : TapeData) :
+    TM2.step program (prepareFreshRootCfg next data) =
+      some (saveFreshRootCfg next (preparedFreshRootData data)) := by
+  simp [TM2.step, program, prepareFreshRootCfg, saveFreshRootCfg,
+    preparedFreshRootData, tapes, Function.update]
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_saveFreshRoot_cons (next : Phase) (data : TapeData)
+    (symbol : Γ') (tail : List Γ')
+    (freshValue : data.fresh = symbol :: tail) :
+    TM2.step program (saveFreshRootCfg next data) =
+      some (saveFreshRootCfg next
+        (savedFreshSymbolData data symbol tail)) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change fresh = symbol :: tail at freshValue
+  subst fresh
+  simp [TM2.step, program, saveFreshRootCfg, savedFreshSymbolData,
+    tapes, Function.update]
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_saveFreshRoot_nil (next : Phase) (data : TapeData)
+    (freshValue : data.fresh = []) :
+    TM2.step program (saveFreshRootCfg next data) =
+      some (restoreFreshRootCfg next data) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change fresh = [] at freshValue
+  subst fresh
+  simp [TM2.step, program, saveFreshRootCfg, restoreFreshRootCfg,
+    tapes, Function.update]
+
+theorem step_restoreFreshRoot_cons (next : Phase) (data : TapeData)
+    (symbol : Γ') (tail : List Γ')
+    (scratchValue : data.scratch = symbol :: tail) :
+    TM2.step program (restoreFreshRootCfg next data) =
+      some (restoreFreshRootCfg next
+        (restoredFreshRootSymbolData data symbol tail)) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change scratch = symbol :: tail at scratchValue
+  subst scratch
+  simp [TM2.step, program, restoreFreshRootCfg,
+    restoredFreshRootSymbolData, tapes, Function.update]
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_restoreFreshRoot_nil (next : Phase) (data : TapeData)
+    (scratchValue : data.scratch = []) :
+    TM2.step program (restoreFreshRootCfg next data) =
+      some (phaseCfg next data) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change scratch = [] at scratchValue
+  subst scratch
+  simp [TM2.step, program, restoreFreshRootCfg, phaseCfg, tapes,
+    Function.update]
+
+theorem step_clearAtom_cons (source : AtomSource) (next : Phase)
+    (data : TapeData) (symbol : Γ') (tail : List Γ')
+    (sourceValue : data.atom source = symbol :: tail) :
+    TM2.step program (clearAtomCfg source next data) =
+      some (clearAtomCfg source next (data.setAtom source tail)) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  cases source <;>
+    simp [TapeData.atom] at sourceValue <;>
+    simp [TM2.step, program, clearAtomCfg, tapes, TapeData.setAtom,
+      AtomSource.stack, sourceValue, Function.update]
+  all_goals
+    funext stack
+    cases stack <;> simp [tapes, Function.update]
+
+theorem step_clearAtom_nil (source : AtomSource) (next : Phase)
+    (data : TapeData) (sourceValue : data.atom source = []) :
+    TM2.step program (clearAtomCfg source next data) =
+      some (phaseCfg next data) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  cases source <;>
+    simp [TapeData.atom] at sourceValue <;>
+    simp [TM2.step, program, clearAtomCfg, phaseCfg, tapes,
+      AtomSource.stack, sourceValue, Function.update]
+
+def reversedOutputSymbolData (data : TapeData) (symbol : Γ')
+    (tail : List Γ') : TapeData :=
+  { data with
+    outputReverse := tail
+    output := symbol :: data.output }
+
+theorem step_reverseOutput_cons (data : TapeData) (symbol : Γ')
+    (tail : List Γ')
+    (reverseValue : data.outputReverse = symbol :: tail) :
+    TM2.step program (reverseOutputCfg data) =
+      some (reverseOutputCfg
+        (reversedOutputSymbolData data symbol tail)) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change outputReverse = symbol :: tail at reverseValue
+  subst outputReverse
+  simp [TM2.step, program, reverseOutputCfg, reversedOutputSymbolData,
+    tapes, Function.update]
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_reverseOutput_nil (data : TapeData)
+    (reverseValue : data.outputReverse = []) :
+    TM2.step program (reverseOutputCfg data) =
+      some (phaseCfg .done data) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change outputReverse = [] at reverseValue
+  subst outputReverse
+  simp [TM2.step, program, reverseOutputCfg, phaseCfg, tapes,
+    Function.update]
+
+/-- Copy one delimiter-terminated field directly from the request stream into
+the reverse-output accumulator. -/
+def copyInputField_to_phase (next : Phase) (data : TapeData)
+    (word rest : List Γ')
+    (noDelimiter : ∀ symbol ∈ word, symbol ≠ Γ'.cons)
+    (inputValue : data.input = word ++ .cons :: rest) :
+    EvalsToInTime (TM2.step program)
+      (copyInputFieldCfg next data)
+      (some (phaseCfg next
+        { data with
+          input := rest
+          outputReverse :=
+            (word ++ [Γ'.cons]).reverse ++ data.outputReverse }))
+      (word.length + 1) := by
+  induction word generalizing data with
+  | nil =>
+      have step := oneStep
+        (step_copyInputField_delimiter next data rest (by
+          simpa using inputValue))
+      simpa using step
+  | cons symbol word induction =>
+      have symbolNotDelimiter : symbol ≠ Γ'.cons :=
+        noDelimiter symbol (by simp)
+      have tailNoDelimiter : ∀ item ∈ word, item ≠ Γ'.cons := by
+        intro item membership
+        exact noDelimiter item (by simp [membership])
+      let nextData := copiedInputSymbolData data symbol
+        (word ++ .cons :: rest)
+      have first := oneStep
+        (step_copyInputField_symbol next data symbol
+          (word ++ .cons :: rest) symbolNotDelimiter (by
+            simpa using inputValue))
+      have tailInput : nextData.input = word ++ .cons :: rest := by
+        simp [nextData, copiedInputSymbolData]
+      have remaining := induction nextData tailNoDelimiter tailInput
+      have finalData :
+          { nextData with
+            input := rest
+            outputReverse :=
+              (word ++ [Γ'.cons]).reverse ++
+                nextData.outputReverse } =
+          { data with
+            input := rest
+            outputReverse :=
+              ((symbol :: word) ++ [Γ'.cons]).reverse ++
+                data.outputReverse } := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        simp [nextData, copiedInputSymbolData, List.reverse_cons,
+          List.append_assoc]
+      rw [finalData] at remaining
+      have composed := thenRun first remaining
+      convert composed using 1 <;> simp
+
+def readFieldScanData (data : TapeData) (source : FieldSource)
+    (word rest : List Γ') : TapeData :=
+  { data.setField source rest with
+    scratch := word.reverse ++ data.scratch }
+
+/-- Scan one delimiter-terminated field into scratch, leaving the source at
+the following field. -/
+def readField_to_restore (source : FieldSource) (target : AtomSource)
+    (next : Phase) (data : TapeData) (word rest : List Γ')
+    (noDelimiter : ∀ symbol ∈ word, symbol ≠ Γ'.cons)
+    (sourceValue : data.field source = word ++ .cons :: rest) :
+    EvalsToInTime (TM2.step program)
+      (readFieldCfg source target next data)
+      (some (restoreCfg target next
+        (readFieldScanData data source word rest)))
+      (word.length + 1) := by
+  induction word generalizing data with
+  | nil =>
+      have step := oneStep
+        (step_readField_delimiter source target next data rest (by
+          simpa using sourceValue))
+      convert step using 1
+      · rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        cases source <;>
+          simp [readFieldScanData, TapeData.setField]
+      · simp
+  | cons symbol word induction =>
+      have symbolNotDelimiter : symbol ≠ Γ'.cons :=
+        noDelimiter symbol (by simp)
+      have tailNoDelimiter : ∀ item ∈ word, item ≠ Γ'.cons := by
+        intro item membership
+        exact noDelimiter item (by simp [membership])
+      let nextData := readFieldSymbolData data source symbol
+        (word ++ .cons :: rest)
+      have first := oneStep
+        (step_readField_symbol source target next data symbol
+          (word ++ .cons :: rest) symbolNotDelimiter (by
+            simpa using sourceValue))
+      have tailSource :
+          nextData.field source = word ++ .cons :: rest := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        cases source <;>
+          rfl
+      have remaining := induction nextData tailNoDelimiter tailSource
+      have finalData :
+          readFieldScanData nextData source word rest =
+            readFieldScanData data source (symbol :: word) rest := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        cases source <;>
+          simp [nextData, readFieldSymbolData, readFieldScanData,
+            TapeData.setField, List.reverse_cons, List.append_assoc]
+      rw [finalData] at remaining
+      have composed := thenRun first remaining
+      convert composed using 1 <;> simp
+
+def saveFreshRootScanData (data : TapeData) (word : List Γ') : TapeData :=
+  { data with
+    fresh := []
+    scratch := word.reverse ++ data.scratch }
+
+def saveFreshRoot_to_restore (next : Phase) (data : TapeData)
+    (word : List Γ') (freshValue : data.fresh = word) :
+    EvalsToInTime (TM2.step program)
+      (saveFreshRootCfg next data)
+      (some (restoreFreshRootCfg next
+        (saveFreshRootScanData data word)))
+      (word.length + 1) := by
+  induction word generalizing data with
+  | nil =>
+      have step := oneStep (step_saveFreshRoot_nil next data freshValue)
+      convert step using 1
+      · rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        change fresh = [] at freshValue
+        subst fresh
+        rfl
+      · simp
+  | cons symbol word induction =>
+      let nextData := savedFreshSymbolData data symbol word
+      have first := oneStep
+        (step_saveFreshRoot_cons next data symbol word freshValue)
+      have remaining := induction nextData (by
+        simp [nextData, savedFreshSymbolData])
+      have finalData :
+          saveFreshRootScanData nextData word =
+            saveFreshRootScanData data (symbol :: word) := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        simp [nextData, savedFreshSymbolData, saveFreshRootScanData,
+          List.reverse_cons, List.append_assoc]
+      rw [finalData] at remaining
+      have composed := thenRun first remaining
+      convert composed using 1 <;> simp
+
+def restoredFreshRootData (data : TapeData) (word : List Γ') : TapeData :=
+  { data with
+    fresh := word.reverse ++ data.fresh
+    roots := word.reverse ++ data.roots
+    scratch := [] }
+
+def restoreFreshRoot_to_phase (next : Phase) (data : TapeData)
+    (word : List Γ') (scratchValue : data.scratch = word) :
+    EvalsToInTime (TM2.step program)
+      (restoreFreshRootCfg next data)
+      (some (phaseCfg next (restoredFreshRootData data word)))
+      (word.length + 1) := by
+  induction word generalizing data with
+  | nil =>
+      have step := oneStep
+        (step_restoreFreshRoot_nil next data scratchValue)
+      convert step using 1
+      · rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        change scratch = [] at scratchValue
+        subst scratch
+        rfl
+      · simp
+  | cons symbol word induction =>
+      let nextData := restoredFreshRootSymbolData data symbol word
+      have first := oneStep
+        (step_restoreFreshRoot_cons next data symbol word scratchValue)
+      have remaining := induction nextData (by
+        simp [nextData, restoredFreshRootSymbolData])
+      have finalData :
+          restoredFreshRootData nextData word =
+            restoredFreshRootData data (symbol :: word) := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        simp [nextData, restoredFreshRootSymbolData,
+          restoredFreshRootData, List.reverse_cons, List.append_assoc]
+      rw [finalData] at remaining
+      have composed := thenRun first remaining
+      convert composed using 1 <;> simp
+
+/-- Push the current fresh atom as one delimiter-terminated root field while
+restoring the fresh register and clearing scratch. -/
+def pushFreshRoot_to_phase (next : Phase) (data : TapeData)
+    (word : List Γ') (freshValue : data.fresh = word)
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (prepareFreshRootCfg next data)
+      (some (phaseCfg next
+        { data with roots := word ++ .cons :: data.roots }))
+      (2 * word.length + 3) := by
+  let prepared := preparedFreshRootData data
+  have first : EvalsToInTime (TM2.step program)
+      (prepareFreshRootCfg next data)
+      (some (saveFreshRootCfg next prepared)) 1 := by
+    simpa [prepared] using oneStep (step_prepareFreshRoot next data)
+  have saved := saveFreshRoot_to_restore next prepared word (by
+    simpa [prepared, preparedFreshRootData] using freshValue)
+  have restored := restoreFreshRoot_to_phase next
+    (saveFreshRootScanData prepared word) word.reverse (by
+      simp [saveFreshRootScanData, prepared, preparedFreshRootData,
+        scratchValue])
+  have finalData :
+      restoredFreshRootData (saveFreshRootScanData prepared word)
+          word.reverse =
+        { data with roots := word ++ .cons :: data.roots } := by
+    rcases data with
+      ⟨input, outputReverse, output, fresh, roots, firstRoot,
+        secondRoot, scratch⟩
+    change fresh = word at freshValue
+    change scratch = [] at scratchValue
+    subst fresh
+    subst scratch
+    simp [prepared, preparedFreshRootData, saveFreshRootScanData,
+      restoredFreshRootData, List.append_assoc]
+  rw [finalData] at restored
+  have composed := thenRun (thenRun first saved) restored
+  convert composed using 1 <;> simp <;> omega
+
+/-- Discard one complete atom register and reach its continuation. -/
+def clearAtom_to_phase (source : AtomSource) (next : Phase)
+    (data : TapeData) (word : List Γ')
+    (sourceValue : data.atom source = word) :
+    EvalsToInTime (TM2.step program)
+      (clearAtomCfg source next data)
+      (some (phaseCfg next (data.setAtom source [])))
+      (word.length + 1) := by
+  induction word generalizing data with
+  | nil =>
+      have step := oneStep (step_clearAtom_nil source next data sourceValue)
+      have cleared : data.setAtom source [] = data := by
+        rw [← sourceValue]
+        exact TapeData.setAtom_atom data source
+      rw [cleared]
+      exact step
+  | cons symbol word induction =>
+      have first := oneStep
+        (step_clearAtom_cons source next data symbol word sourceValue)
+      have remaining := induction (data.setAtom source word) (by simp)
+      have composed := thenRun first remaining
+      have collapsed :
+          (data.setAtom source word).setAtom source [] =
+            data.setAtom source [] := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        cases source <;> rfl
+      rw [collapsed] at composed
+      simpa using composed
+
+/-- Reverse the completed accumulator onto the designated output stack. -/
+def reverseOutput_to_done (data : TapeData) (word : List Γ')
+    (reverseValue : data.outputReverse = word) :
+    EvalsToInTime (TM2.step program)
+      (reverseOutputCfg data)
+      (some (phaseCfg .done
+        { data with
+          outputReverse := []
+          output := word.reverse ++ data.output }))
+      (word.length + 1) := by
+  induction word generalizing data with
+  | nil =>
+      have step := oneStep (step_reverseOutput_nil data reverseValue)
+      have finalData :
+          { data with
+            outputReverse := []
+            output := data.output } = data := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        change outputReverse = [] at reverseValue
+        subst outputReverse
+        rfl
+      simpa [finalData] using step
+  | cons symbol word induction =>
+      let nextData := reversedOutputSymbolData data symbol word
+      have first := oneStep
+        (step_reverseOutput_cons data symbol word reverseValue)
+      have remaining := induction nextData (by
+        simp [nextData, reversedOutputSymbolData])
+      have finalData :
+          { nextData with
+            outputReverse := []
+            output := word.reverse ++ nextData.output } =
+          { data with
+            outputReverse := []
+            output := (symbol :: word).reverse ++ data.output } := by
+        rcases data with
+          ⟨input, outputReverse, output, fresh, roots, firstRoot,
+            secondRoot, scratch⟩
+        simp [nextData, reversedOutputSymbolData, List.reverse_cons,
+          List.append_assoc]
+      rw [finalData] at remaining
+      have composed := thenRun first remaining
+      convert composed using 1 <;> simp
+
 /-- Little-endian binary successor on native words.  The evaluator only calls
 this function on canonical `trNat` words. -/
+theorem trPosNum_noDelimiter (number : PosNum) :
+    ∀ symbol ∈ trPosNum number, symbol ≠ Γ'.cons := by
+  induction number with
+  | one => simp [trPosNum]
+  | bit0 number induction =>
+      intro symbol membership
+      simp only [trPosNum, List.mem_cons] at membership
+      rcases membership with rfl | membership
+      · decide
+      · exact induction symbol membership
+  | bit1 number induction =>
+      intro symbol membership
+      simp only [trPosNum, List.mem_cons] at membership
+      rcases membership with rfl | membership
+      · decide
+      · exact induction symbol membership
+
+theorem trNat_noDelimiter (number : Nat) :
+    ∀ symbol ∈ trNat number, symbol ≠ Γ'.cons := by
+  unfold trNat
+  cases encoded : (number : Num) with
+  | zero => simp [trNum]
+  | pos positive =>
+      simpa [trNum] using trPosNum_noDelimiter positive
+
 def incrementNative : List Γ' → List Γ'
   | [] => [.bit1]
   | .bit0 :: rest => .bit1 :: rest
@@ -959,6 +1634,88 @@ def restoreAtom_to_phase (source : AtomSource) (next : Phase)
           (restoredAtomData data source (symbol :: word)))) first rest
       convert composed using 1 <;> simp
 
+/-- Read one complete native field from either input or the root stack into an
+empty atom register, restoring its original bit order. -/
+def readField_to_phase (source : FieldSource) (target : AtomSource)
+    (next : Phase) (data : TapeData) (word rest : List Γ')
+    (noDelimiter : ∀ symbol ∈ word, symbol ≠ Γ'.cons)
+    (sourceValue : data.field source = word ++ .cons :: rest)
+    (targetValue : data.atom target = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (readFieldCfg source target next data)
+      (some (phaseCfg next
+        { (data.setField source rest).setAtom target word with
+          scratch := [] }))
+      (2 * word.length + 2) := by
+  have scanned := readField_to_restore source target next data word rest
+    noDelimiter sourceValue
+  have restored := restoreAtom_to_phase target next
+    (readFieldScanData data source word rest) word.reverse (by
+      simp [readFieldScanData, scratchValue])
+  have finalData :
+      restoredAtomData (readFieldScanData data source word rest)
+          target word.reverse =
+        { (data.setField source rest).setAtom target word with
+          scratch := [] } := by
+    rcases data with
+      ⟨input, outputReverse, output, fresh, roots, firstRoot,
+        secondRoot, scratch⟩
+    cases source <;> cases target <;>
+      simp [TapeData.field, TapeData.atom] at sourceValue targetValue <;>
+      simp at scratchValue <;>
+      simp [readFieldScanData, restoredAtomData, TapeData.setField,
+        TapeData.setAtom, TapeData.atom, targetValue, scratchValue]
+  rw [finalData] at restored
+  have composed := thenRun scanned restored
+  convert composed using 1 <;> simp <;> omega
+
+/-- Native specialization of direct input-field copying. -/
+def copyInputField_trNat (next : Phase) (data : TapeData)
+    (atom : Nat) (rest : List Γ')
+    (inputValue : data.input = trList [atom] ++ rest) :
+    EvalsToInTime (TM2.step program)
+      (copyInputFieldCfg next data)
+      (some (phaseCfg next
+        { data with
+          input := rest
+          outputReverse :=
+            (trList [atom]).reverse ++ data.outputReverse }))
+      ((trNat atom).length + 1) := by
+  simpa [trList] using
+    copyInputField_to_phase next data (trNat atom) rest
+      (trNat_noDelimiter atom) (by simpa [trList] using inputValue)
+
+/-- Native specialization of field decoding into an atom register. -/
+def readField_trNat (source : FieldSource) (target : AtomSource)
+    (next : Phase) (data : TapeData) (atom : Nat) (rest : List Γ')
+    (sourceValue : data.field source = trList [atom] ++ rest)
+    (targetValue : data.atom target = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (readFieldCfg source target next data)
+      (some (phaseCfg next
+        { (data.setField source rest).setAtom target (trNat atom) with
+          scratch := [] }))
+      (2 * (trNat atom).length + 2) := by
+  simpa [trList] using
+    readField_to_phase source target next data (trNat atom) rest
+      (trNat_noDelimiter atom) (by simpa [trList] using sourceValue)
+      targetValue scratchValue
+
+/-- Native specialization of pushing the fresh atom onto the root stack. -/
+def pushFreshRoot_trNat (next : Phase) (data : TapeData) (atom : Nat)
+    (freshValue : data.fresh = trNat atom)
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (prepareFreshRootCfg next data)
+      (some (phaseCfg next
+        { data with roots := trList [atom] ++ data.roots }))
+      (2 * (trNat atom).length + 3) := by
+  simpa [trList] using
+    pushFreshRoot_to_phase next data (trNat atom)
+      freshValue scratchValue
+
 /-- Increment a canonical native fresh-atom counter in place.  The generous
 uniform bound covers the carry scan, reversal of the changed prefix, and the
 final empty-scratch transition. -/
@@ -1094,19 +1851,6 @@ def emitFixedThenAtom {start next : Phase} (source : AtomSource)
     (some (phaseCfg next
       (emittedWordData fixedData (trList [atom])))) first atomRun
   simpa [fixedData] using composed
-
-/-- Convenient composition for evaluator fragments whose intermediate result
-is a live configuration. -/
-def thenRun {first middle : TM2.Cfg Alphabet Label State}
-    {last : Option (TM2.Cfg Alphabet Label State)} {firstTime secondTime : Nat}
-    (firstRun : EvalsToInTime (TM2.step program)
-      first (some middle) firstTime)
-    (secondRun : EvalsToInTime (TM2.step program)
-      middle last secondTime) :
-    EvalsToInTime (TM2.step program)
-      first last (secondTime + firstTime) :=
-  EvalsToInTime.trans (TM2.step program)
-    firstTime secondTime first middle last firstRun secondRun
 
 @[simp]
 theorem constantGateFields_native (output : Nat) (value : Bool) :
