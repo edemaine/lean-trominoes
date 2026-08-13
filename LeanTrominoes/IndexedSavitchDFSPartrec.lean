@@ -229,6 +229,158 @@ theorem stepCode_eval
                                     divideBoolTag, divideOptionBoolTag,
                                     Part.bind_eq_bind]
 
+/-- The structural DFS step is parametric in an arbitrary native-list suffix.
+This permits a flat, variable-length read-only problem context to ride behind
+the evaluator stack without changing any of the stack-manipulation code. -/
+set_option maxHeartbeats 1000000 in
+theorem stepCode_eval_suffix
+    (baseBoolCode : Code) (context stateCount : Nat)
+    (relation : Nat → Nat → Bool) (state : DivideEvalState)
+    (suffix : List Nat)
+    (baseCorrect :
+      baseBoolCode.eval
+          (divideEvalProgramList context stateCount state ++ suffix) =
+        pure [divideBoolTag
+          (decide (state.query.first = state.query.last) ||
+            relation state.query.first state.query.last)]) :
+    (stepCode baseBoolCode).eval
+        (divideEvalProgramList context stateCount state ++ suffix) =
+      pure (divideEvalProgramList context stateCount
+        (divideEvalStep stateCount relation state) ++ suffix) := by
+  cases state with
+  | mk query stack answer =>
+      cases query with
+      | mk depth first last =>
+          cases answer with
+          | none =>
+              cases depth with
+              | zero =>
+                  cases baseValue :
+                      (decide (first = last) || relation first last)
+                  all_goals
+                    simp [divideEvalProgramList,
+                      DivideEvalState.toNatList, divideBoolTag,
+                      divideOptionBoolTag, baseValue,
+                      List.append_assoc] at baseCorrect
+                    have baseTag :
+                        (Code.someBoolTag baseBoolCode).eval
+                            ((context :: stateCount :: stack.length ::
+                              0 :: 0 :: first :: last ::
+                                divideStackToNatList stack) ++ suffix) =
+                          pure [if divideBoolTag
+                              (decide (first = last) || relation first last) = 0
+                            then 1 else 2] := by
+                      simp [Code.someBoolTag, Code.normalizeBool,
+                        Code.branchZero, baseCorrect, baseValue,
+                        divideBoolTag, Part.bind_eq_bind]
+                    simp [stepCode, answerNone, noneDepthZero,
+                      divideEvalProgramList, DivideEvalState.toNatList,
+                      fields, field, Code.branchZero, divideEvalStep,
+                      baseTag, baseValue, divideBoolTag,
+                      divideOptionBoolTag, Part.bind_eq_bind,
+                      List.append_assoc]
+              | succ depth =>
+                  cases stateCount with
+                  | zero =>
+                      simp [stepCode, answerNone, noneDepthSucc,
+                        noneCountZero, divideEvalProgramList,
+                        DivideEvalState.toNatList, fields, field,
+                        Code.branchZero, divideEvalStep,
+                        divideOptionBoolTag, Part.bind_eq_bind,
+                        List.append_assoc]
+                  | succ middle =>
+                      simp [stepCode, answerNone, noneDepthSucc,
+                        noneCountSucc, divideEvalProgramList,
+                        DivideEvalState.toNatList, divideStackToNatList,
+                        DivideFrame.toNatList, fields, field,
+                        predecessorField, Code.branchZero, divideEvalStep,
+                        divideBoolTag, divideOptionBoolTag,
+                        Part.bind_eq_bind, List.append_assoc]
+          | some answer =>
+              cases answer <;>
+                cases stack with
+                | nil =>
+                    simp [stepCode, answerSome, divideEvalProgramList,
+                      DivideEvalState.toNatList, field,
+                      Code.branchZero, divideEvalStep,
+                      divideOptionBoolTag, Part.bind_eq_bind,
+                      List.append_assoc]
+                | cons frame rest =>
+                    cases frame with
+                    | mk frameDepth frameFirst frameLast middle accumulated
+                        leftAnswer =>
+                        cases leftAnswer with
+                        | none =>
+                            simp [stepCode, answerSome, someFrame,
+                              someLeftNone, divideEvalProgramList,
+                              DivideEvalState.toNatList, divideStackToNatList,
+                              DivideFrame.toNatList, fields, field,
+                              Code.branchZero, divideEvalStep,
+                              divideOptionBoolTag, Part.bind_eq_bind,
+                              List.append_assoc]
+                        | some leftAnswer =>
+                            cases middle with
+                            | zero =>
+                                cases accumulated <;> cases leftAnswer <;>
+                                  simp [stepCode, answerSome, someFrame,
+                                    someLeftSome, someLeftSomeMiddleZero,
+                                    accumulatedCode, divideEvalProgramList,
+                                    DivideEvalState.toNatList,
+                                    divideStackToNatList,
+                                    DivideFrame.toNatList, fields, field,
+                                    predecessorField, Code.branchZero,
+                                    Code.someBoolTag, Code.normalizeBool,
+                                    Code.boolOr, Code.boolAnd, divideEvalStep,
+                                    divideBoolTag, divideOptionBoolTag,
+                                    Part.bind_eq_bind, List.append_assoc]
+                            | succ middle =>
+                                cases accumulated <;> cases leftAnswer <;>
+                                  simp [stepCode, answerSome, someFrame,
+                                    someLeftSome, someLeftSomeMiddleSucc,
+                                    accumulatedCode, divideEvalProgramList,
+                                    DivideEvalState.toNatList,
+                                    divideStackToNatList,
+                                    DivideFrame.toNatList, fields, field,
+                                    predecessorField, Code.branchZero,
+                                    Code.normalizeBool, Code.boolOr,
+                                    Code.boolAnd, divideEvalStep,
+                                    divideBoolTag, divideOptionBoolTag,
+                                    Part.bind_eq_bind, List.append_assoc]
+
+/-- Suffix-parametric form of the complete tail-recursive DFS iteration. -/
+theorem flatIterate_stepCode_eval_suffix
+    (baseBoolCode : Code) (context stateCount : Nat)
+    (relation : Nat → Nat → Bool)
+    (suffix : List Nat)
+    (baseCorrect : ∀ state,
+      baseBoolCode.eval
+          (divideEvalProgramList context stateCount state ++ suffix) =
+        pure [divideBoolTag
+          (decide (state.query.first = state.query.last) ||
+            relation state.query.first state.query.last)])
+    (steps : Nat) (state : DivideEvalState) :
+    (Code.flatIterate (stepCode baseBoolCode)).eval
+        (steps :: (divideEvalProgramList context stateCount state ++ suffix)) =
+      pure (divideEvalProgramList context stateCount
+        ((divideEvalStep stateCount relation)^[steps] state) ++ suffix) := by
+  rw [Code.flatIterate, Code.fix_eval]
+  apply Part.eq_some_iff.mpr
+  induction steps generalizing state with
+  | zero =>
+      apply PFun.mem_fix_iff.mpr
+      left
+      simp [Code.flatCountdownBody_zero_eval]
+  | succ steps induction =>
+      apply PFun.mem_fix_iff.mpr
+      right
+      refine ⟨steps ::
+        (divideEvalProgramList context stateCount
+          (divideEvalStep stateCount relation state) ++ suffix), ?_, ?_⟩
+      · simp [Code.flatCountdownBody,
+          stepCode_eval_suffix _ _ _ _ _ _ (baseCorrect state)]
+      · simpa [Function.iterate_succ_apply] using
+          induction (divideEvalStep stateCount relation state)
+
 /-- The tail-recursive flat iterator agrees with repeated semantic DFS steps
 on every machine-facing serialized evaluator state. -/
 theorem flatIterate_stepCode_eval

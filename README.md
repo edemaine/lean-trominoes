@@ -325,6 +325,10 @@ build; an imported proof counts when its statement matches the paper.
     - [x] Prove the flat well-formedness scan's evaluator-space certificate.
     - [ ] Port the cycle-search input/context assembly and its evaluator-space
       certificates to the target flat strip fields.
+      - [x] Prove the generic Savitch structural step and complete iteration
+        preserve an arbitrary variable-length context suffix exactly.
+      - [ ] Locate the suffix after the variable DFS stack and port the
+        depth-zero strip edge oracle to it.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
