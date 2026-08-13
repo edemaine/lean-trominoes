@@ -89,6 +89,50 @@ theorem stateAt_step {State : Type*}
   rw [successorValue, Function.iterate_succ_apply', current] at next
   exact next
 
+/-- A terminating deterministic run never repeats a configuration before its
+terminal endpoint. -/
+theorem stateAt_injective {State : Type*}
+    {transition : State → Option State} {first last : State}
+    (run : EvalsTo transition first (some last))
+    (terminal : transition last = none) :
+    Function.Injective (stateAt run) := by
+  intro firstIndex secondIndex stateEq
+  wlog order : firstIndex.val ≤ secondIndex.val generalizing firstIndex secondIndex
+  · exact (this (firstIndex := secondIndex) (secondIndex := firstIndex)
+      stateEq.symm (by omega)).symm
+  apply Fin.ext
+  by_contra valueNe
+  have firstLtSecond : firstIndex.val < secondIndex.val := by omega
+  let remaining := run.steps - secondIndex.val
+  have stepsEq : run.steps = remaining + secondIndex.val := by
+    dsimp only [remaining]
+    omega
+  have suffixFromSecond :
+      (flip bind transition)^[remaining]
+          (some (stateAt run secondIndex)) = some last := by
+    have final := run.evals_in_steps
+    rw [stepsEq, Function.iterate_add_apply,
+      stateAt_iterate run secondIndex] at final
+    exact final
+  have prefixAtRepeated :
+      (flip bind transition)^[remaining + firstIndex.val] (some first) =
+        some last := by
+    rw [Function.iterate_add_apply, stateAt_iterate run firstIndex,
+      stateEq, suffixFromSecond]
+  let beforeTerminal : Fin run.steps :=
+    ⟨remaining + firstIndex.val, by
+      dsimp only [remaining]
+      omega⟩
+  have represented := stateAt_iterate run beforeTerminal.castSucc
+  have representedValue : beforeTerminal.castSucc.val =
+      remaining + firstIndex.val := by rfl
+  rw [representedValue, prefixAtRepeated] at represented
+  have stateTerminal : stateAt run beforeTerminal.castSucc = last :=
+    Option.some.inj represented.symm
+  have nextStep := stateAt_step run beforeTerminal
+  rw [stateTerminal, terminal] at nextStep
+  cases nextStep
+
 /-- A terminating computation whose terminal state is accepting and whose
 accepting states cannot step yields the explicit bounded trace required by the
 reset-clock construction. -/

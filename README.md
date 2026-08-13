@@ -1306,6 +1306,11 @@ The representation choices for this target are:
   decoded fixed-width cell vectors.  Suffix-shaped vectors preserve every
   represented cell, and bounded canonical encodings reconstruct both the TM2
   configuration and reset-clock state exactly.
+- [`LeanTrominoes/PeriodicCNFMachineConfigurationCount.lean`](LeanTrominoes/PeriodicCNFMachineConfigurationCount.lean)
+  injects every width-bounded configuration into its finite canonical Boolean
+  slice.  A terminating deterministic run cannot repeat a configuration, so
+  its length is bounded by one less than the number of Boolean slices; this
+  supplies the reset clock without assuming a separate running-time bound.
 - [`LeanTrominoes/PeriodicCNFMachineFields.lean`](LeanTrominoes/PeriodicCNFMachineFields.lean)
   defines current/next tests for labels, finite control, and optional stack
   cells, together with field and whole-stack preservation expressions.  Their
@@ -1338,6 +1343,11 @@ The representation choices for this target are:
   width closes into a satisfying periodic model.  Soundness also covers
   noncanonical Boolean slices by proving that well-formed decoding and
   re-encoding preserves every source atom.
+- [`LeanTrominoes/PeriodicCNFMachineDesignatedFormula.lean`](LeanTrominoes/PeriodicCNFMachineDesignatedFormula.lean)
+  tightens the accepting reset to one designated terminal configuration.
+  This distinction is essential for total deciders, whose `true` and `false`
+  outputs are both halted: the designated formula cycles exactly through the
+  chosen output, while retaining the same forward-local 1D CNF guarantees.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.

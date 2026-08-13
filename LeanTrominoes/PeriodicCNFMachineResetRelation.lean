@@ -24,6 +24,127 @@ namespace BoundedMachineAtom
 variable {tm : FinTM2} {space clockBits : Nat}
 variable [stackFinite : ∀ stack, Fintype (tm.Γ stack)]
 
+/-- Require every represented cell of one current-slice stack to equal the
+corresponding cell of a fixed target configuration. -/
+def currentStackIs (target : tm.Cfg) (stack : tm.K) : TransitionExpr :=
+  TransitionExpr.all ((List.finRange space).map fun position =>
+    currentStackCellIs (tm := tm) (clockBits := clockBits) stack position
+      (target.stk stack)[position.val]?)
+
+/-- Require the bounded machine configuration in the current slice to equal
+a fixed target configuration. -/
+def currentConfigIs (target : tm.Cfg) : TransitionExpr :=
+  .and
+    (currentLabelIs (tm := tm) (space := space)
+      (clockBits := clockBits) target.l)
+    (.and
+      (currentControlIs (tm := tm) (space := space)
+        (clockBits := clockBits) target.var)
+      (TransitionExpr.all ((finiteValues tm.K).map fun stack =>
+        currentStackIs (tm := tm) (space := space)
+          (clockBits := clockBits) target stack)))
+
+theorem currentStackIs_encode_iff
+    (current next : PeriodicComputation.ResetClockState tm.Cfg)
+    (target : tm.Cfg) (stack : tm.K)
+    (currentFits : (current.config.stk stack).length ≤ space)
+    (targetFits : (target.stk stack).length ≤ space) :
+    (currentStackIs (tm := tm) (space := space) (clockBits := clockBits)
+      target stack).eval
+        (encode (space := space) (clockBits := clockBits) current)
+        (encode (space := space) (clockBits := clockBits) next) = true ↔
+      current.config.stk stack = target.stk stack := by
+  rw [currentStackIs, TransitionExpr.all_eval, List.all_eq_true]
+  constructor
+  · intro cells
+    apply List.ext_getElem?
+    intro index
+    by_cases indexInRange : index < space
+    · let position : Fin space := ⟨index, indexInRange⟩
+      have cell := cells
+        (currentStackCellIs (tm := tm) (clockBits := clockBits) stack position
+          (target.stk stack)[position.val]?)
+        (List.mem_map.mpr ⟨position, by simp, rfl⟩)
+      simpa [currentStackCellIs, TransitionExpr.current,
+        TransitionExpr.eval, TransitionWire.value, position] using cell
+    · have spaceLe : space ≤ index := Nat.not_lt.mp indexInRange
+      rw [List.getElem?_eq_none (le_trans currentFits spaceLe),
+        List.getElem?_eq_none (le_trans targetFits spaceLe)]
+  · intro stacksEq expression expressionMem
+    obtain ⟨position, _, rfl⟩ := List.mem_map.mp expressionMem
+    simpa [currentStackCellIs, TransitionExpr.current,
+      TransitionExpr.eval, TransitionWire.value, stacksEq]
+
+private theorem current_cfg_eq_of_fields {first second : tm.Cfg}
+    (labelEq : first.l = second.l)
+    (controlEq : first.var = second.var)
+    (stacksEq : ∀ stack, first.stk stack = second.stk stack) :
+    first = second := by
+  cases first with
+  | mk firstLabel firstControl firstStacks =>
+    cases second with
+    | mk secondLabel secondControl secondStacks =>
+      congr 1
+      funext stack
+      exact stacksEq stack
+
+theorem currentConfigIs_encode_iff
+    (current next : PeriodicComputation.ResetClockState tm.Cfg)
+    (target : tm.Cfg)
+    (currentFits : ∀ stack, (current.config.stk stack).length ≤ space)
+    (targetFits : ∀ stack, (target.stk stack).length ≤ space) :
+    (currentConfigIs (tm := tm) (space := space) (clockBits := clockBits)
+      target).eval
+        (encode (space := space) (clockBits := clockBits) current)
+        (encode (space := space) (clockBits := clockBits) next) = true ↔
+      current.config = target := by
+  simp only [currentConfigIs, TransitionExpr.eval, Bool.and_eq_true]
+  constructor
+  · rintro ⟨labelEq, controlEq, stacksTrue⟩
+    apply current_cfg_eq_of_fields
+    · simpa [currentLabelIs, TransitionExpr.current,
+        TransitionExpr.eval, TransitionWire.value] using labelEq
+    · simpa [currentControlIs, TransitionExpr.current,
+        TransitionExpr.eval, TransitionWire.value] using controlEq
+    · intro stack
+      apply (currentStackIs_encode_iff current next target stack
+        (currentFits stack) (targetFits stack)).mp
+      rw [TransitionExpr.all_eval, List.all_eq_true] at stacksTrue
+      exact stacksTrue _
+        (List.mem_map.mpr ⟨stack, mem_finiteValues stack, rfl⟩)
+  · intro configEq
+    subst target
+    refine ⟨?_, ?_, ?_⟩
+    · simp [currentLabelIs, TransitionExpr.current,
+        TransitionExpr.eval, TransitionWire.value]
+    · simp [currentControlIs, TransitionExpr.current,
+        TransitionExpr.eval, TransitionWire.value]
+    · rw [TransitionExpr.all_eval, List.all_eq_true]
+      intro expression expressionMem
+      obtain ⟨stack, _, rfl⟩ := List.mem_map.mp expressionMem
+      exact (currentStackIs_encode_iff current next current.config stack
+        (currentFits stack) (currentFits stack)).mpr rfl
+
+theorem currentStackIs_atomsBelow (target : tm.Cfg) (stack : tm.K) :
+    (currentStackIs (tm := tm) (space := space) (clockBits := clockBits)
+      target stack).AtomsBelow
+        (atomCount (tm := tm) (space := space) (clockBits := clockBits)) := by
+  apply TransitionExpr.all_atomsBelow
+  intro expression expressionMem
+  obtain ⟨position, _, rfl⟩ := List.mem_map.mp expressionMem
+  exact currentStackCellIs_atomsBelow stack position _
+
+theorem currentConfigIs_atomsBelow (target : tm.Cfg) :
+    (currentConfigIs (tm := tm) (space := space) (clockBits := clockBits)
+      target).AtomsBelow
+        (atomCount (tm := tm) (space := space) (clockBits := clockBits)) := by
+  refine ⟨currentLabelIs_atomsBelow target.l,
+    currentControlIs_atomsBelow target.var, ?_⟩
+  apply TransitionExpr.all_atomsBelow
+  intro expression expressionMem
+  obtain ⟨stack, _, rfl⟩ := List.mem_map.mp expressionMem
+  exact currentStackIs_atomsBelow target stack
+
 /-- Require every represented cell of one next-slice stack to equal the
 corresponding cell of a fixed target configuration. -/
 def nextStackIs (target : tm.Cfg) (stack : tm.K) : TransitionExpr :=
@@ -361,6 +482,157 @@ theorem machineResetClockExpression_atomsBelow (initial : tm.Cfg) :
     ⟨currentLabelIs_atomsBelow none,
       clockReset_atomsBelow, nextConfigIs_atomsBelow initial⟩,
     currentLabelIs_atomsBelow none,
+      clockSuccessor_atomsBelow, machineStepExpression_atomsBelow⟩
+
+/-- Acceptance at one designated terminal configuration.  This distinguishes
+the `true` output of a decider from its likewise-halted `false` output. -/
+def designatedMachineAccepts (accepting config : tm.Cfg) : Prop :=
+  config = accepting
+
+def designatedMachineAcceptsExpression (accepting : tm.Cfg) : TransitionExpr :=
+  currentConfigIs (tm := tm) (space := space)
+    (clockBits := clockBits) accepting
+
+def designatedMachineResetExpression (initial accepting : tm.Cfg) :
+    TransitionExpr :=
+  .and
+    (designatedMachineAcceptsExpression (tm := tm) (space := space)
+      (clockBits := clockBits) accepting)
+    (.and
+      (clockReset (tm := tm) (space := space) (clockBits := clockBits))
+      (nextConfigIs (tm := tm) (space := space)
+        (clockBits := clockBits) initial))
+
+def designatedMachineOrdinaryExpression (accepting : tm.Cfg) :
+    TransitionExpr :=
+  .and
+    (.not (designatedMachineAcceptsExpression (tm := tm) (space := space)
+      (clockBits := clockBits) accepting))
+    (.and
+      (clockSuccessor (tm := tm) (space := space)
+        (clockBits := clockBits))
+      (machineStepExpression (tm := tm) (space := space)
+        (clockBits := clockBits)))
+
+/-- Complete reset-clock relation whose sole accepting state is a designated
+bounded terminal configuration. -/
+def designatedMachineResetClockExpression (initial accepting : tm.Cfg) :
+    TransitionExpr :=
+  .and
+    (wellFormedFields (tm := tm) (space := space)
+      (clockBits := clockBits))
+    (.or
+      (designatedMachineResetExpression (tm := tm) (space := space)
+        (clockBits := clockBits) initial accepting)
+      (designatedMachineOrdinaryExpression (tm := tm) (space := space)
+        (clockBits := clockBits) accepting))
+
+/-- Canonical bounded encodings realize exactly the designated accepting
+reset-clock relation. -/
+theorem designatedMachineResetClockExpression_encode_iff
+    (initial accepting : tm.Cfg)
+    (current next : PeriodicComputation.ResetClockState tm.Cfg)
+    (initialStacksFit : ∀ stack, (initial.stk stack).length ≤ space)
+    (acceptingStacksFit : ∀ stack, (accepting.stk stack).length ≤ space)
+    (currentStacksFit :
+      ∀ stack, (current.config.stk stack).length ≤ space)
+    (nextStacksFit : ∀ stack, (next.config.stk stack).length ≤ space)
+    (currentClockFits : current.clock < 2 ^ clockBits)
+    (nextClockFits : next.clock < 2 ^ clockBits) :
+    (designatedMachineResetClockExpression (tm := tm) (space := space)
+      (clockBits := clockBits) initial accepting).eval
+        (encode (space := space) (clockBits := clockBits) current)
+        (encode (space := space) (clockBits := clockBits) next) = true ↔
+      PeriodicComputation.ResetClockRelation initial tm.step
+        (designatedMachineAccepts accepting) (2 ^ clockBits - 1)
+        current next := by
+  have acceptsIff :
+      (designatedMachineAcceptsExpression (tm := tm) (space := space)
+        (clockBits := clockBits) accepting).eval
+        (encode (space := space) (clockBits := clockBits) current)
+        (encode (space := space) (clockBits := clockBits) next) = true ↔
+      designatedMachineAccepts accepting current.config := by
+    exact currentConfigIs_encode_iff current next accepting
+      currentStacksFit acceptingStacksFit
+  have resetIff := clockReset_encode_iff
+    (space := space) (clockBits := clockBits) current next nextClockFits
+  have initialIff := nextConfigIs_encode_iff
+    (space := space) (clockBits := clockBits) current next initial
+    nextStacksFit initialStacksFit
+  have successorIff := clockSuccessor_encode_iff
+    (space := space) (clockBits := clockBits) current next
+    currentClockFits nextClockFits
+  have stepIff := machineStepExpression_encode_iff
+    (space := space) (clockBits := clockBits) current next
+    currentStacksFit nextStacksFit
+  have wellFormedTrue := wellFormedFields_encode_between
+    (space := space) (clockBits := clockBits) current next
+  rw [designatedMachineResetClockExpression, TransitionExpr.eval,
+    Bool.and_eq_true, wellFormedTrue]
+  simp only [true_and, Bool.or_eq_true]
+  rw [designatedMachineResetExpression,
+    designatedMachineOrdinaryExpression]
+  simp only [TransitionExpr.eval, Bool.or_eq_true, Bool.and_eq_true]
+  rw [acceptsIff, resetIff, initialIff, successorIff, stepIff]
+  have notAcceptsIff :
+      (designatedMachineAcceptsExpression (tm := tm) (space := space)
+        (clockBits := clockBits) accepting).eval
+        (encode (space := space) (clockBits := clockBits) current)
+        (encode (space := space) (clockBits := clockBits) next) = false ↔
+      ¬ designatedMachineAccepts accepting current.config := by
+    constructor
+    · intro expressionFalse accepted
+      have expressionTrue := acceptsIff.mpr accepted
+      rw [expressionFalse] at expressionTrue
+      contradiction
+    · intro notAccepted
+      cases expressionValue :
+          (designatedMachineAcceptsExpression (tm := tm) (space := space)
+            (clockBits := clockBits) accepting).eval
+          (encode (space := space) (clockBits := clockBits) current)
+          (encode (space := space) (clockBits := clockBits) next) with
+      | false => rfl
+      | true => exact (notAccepted (acceptsIff.mp expressionValue)).elim
+  have notAcceptsTrueIff :
+      (!(designatedMachineAcceptsExpression (tm := tm) (space := space)
+        (clockBits := clockBits) accepting).eval
+        (encode (space := space) (clockBits := clockBits) current)
+        (encode (space := space) (clockBits := clockBits) next)) = true ↔
+      ¬ designatedMachineAccepts accepting current.config := by
+    rw [Bool.not_eq_true_eq_eq_false, notAcceptsIff]
+  rw [notAcceptsTrueIff]
+  unfold PeriodicComputation.ResetClockRelation
+  constructor
+  · intro branch
+    have currentBound : current.clock ≤ 2 ^ clockBits - 1 := by omega
+    have nextBound : next.clock ≤ 2 ^ clockBits - 1 := by omega
+    refine ⟨currentBound, nextBound, ?_⟩
+    rcases branch with reset | ordinary
+    · left
+      refine ⟨reset.1, ?_⟩
+      cases current
+      cases next
+      simp_all
+    · right
+      refine ⟨ordinary.1, ?_, ordinary.2.1, ordinary.2.2⟩
+      omega
+  · rintro ⟨_, _, reset | ordinary⟩
+    · left
+      rcases reset with ⟨accepts, nextEq⟩
+      subst next
+      exact ⟨accepts, rfl, rfl⟩
+    · right
+      exact ⟨ordinary.1, ordinary.2.2.1, ordinary.2.2.2⟩
+
+theorem designatedMachineResetClockExpression_atomsBelow
+    (initial accepting : tm.Cfg) :
+    (designatedMachineResetClockExpression (tm := tm) (space := space)
+      (clockBits := clockBits) initial accepting).AtomsBelow
+        (atomCount (tm := tm) (space := space) (clockBits := clockBits)) := by
+  refine ⟨wellFormedFields_atomsBelow,
+    ⟨currentConfigIs_atomsBelow accepting,
+      clockReset_atomsBelow, nextConfigIs_atomsBelow initial⟩,
+    currentConfigIs_atomsBelow accepting,
       clockSuccessor_atomsBelow, machineStepExpression_atomsBelow⟩
 
 end BoundedMachineAtom
