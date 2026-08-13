@@ -883,6 +883,7 @@ import LeanTrominoes.PartrecFlatStripReach
 import LeanTrominoes.PartrecFlatStripReachSpace
 import LeanTrominoes.PartrecFlatStripCycle
 import LeanTrominoes.PartrecFlatStripCycleSpace
+import LeanTrominoes.PartrecFlatStripDecider
 import LeanTrominoes.PartrecFlatPackedAssignmentAt
 import LeanTrominoes.PartrecFlatPackedAssignmentPredicates
 import LeanTrominoes.PartrecFlatPackedAssignmentPredicatesSpace

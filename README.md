@@ -490,6 +490,13 @@ build; an imported proof counts when its statement matches the paper.
                 countdown.
             - [ ] Assemble the flat well-formedness guard, search parameters,
               and cycle scan into the final PSPACE decider.
+              - [x] Stream the exact target-encoding length and compute the
+                Savitch depth and padded state bound on native flat fields.
+              - [x] Compose the well-formedness guard and cycle scan, and
+                prove the resulting Boolean equivalent to strip tileability.
+              - [ ] Fit and polynomially bound the complete guarded evaluator.
+              - [ ] Package the evaluator certificate as flat-encoding PSPACE
+                membership.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
