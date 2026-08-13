@@ -350,6 +350,8 @@ build; an imported proof counts when its statement matches the paper.
           countdown for one complete frontier column.
         - [x] Conjoin the five flat normalization-column passes and recover
           the established packed-state normalization predicate.
+        - [x] Port canonical target-cell membership to flat motif fields and
+          connect it to center-source containment on well-formed strips.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
