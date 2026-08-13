@@ -436,6 +436,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Bound the fixed Boolean composition in the native
                 candidate footprint.
             - [ ] Fit and bound per-base center validity.
+              - [x] Lift containment through the eight square symmetries.
+              - [ ] Fit and bound exact-one covering placement counts.
+              - [ ] Combine phase, containment, and coverage at one base.
             - [ ] Lift bounded center validity across the motif.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
