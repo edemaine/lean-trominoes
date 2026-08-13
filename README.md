@@ -596,6 +596,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Verify in-place little-endian successor for the fresh-atom
               counter, including exact `trNat` semantics and a linear runtime
               bound.
+            - [x] Implement the reusable fixed-field phase emitter and verify
+              the complete constant-gate machine script against its native
+              field block with an exact linear runtime bound.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
@@ -1543,7 +1546,9 @@ The representation choices for this target are:
   output accumulator as one complete native field, restores the source stack
   exactly, and has an exact linear step count.  Its carry-and-restore routine
   also increments the canonical little-endian fresh-atom counter in linear
-  time, including the possible new high bit.
+  time, including the possible new high bit.  A finite-control fixed-field
+  emitter now combines with those primitives to produce the complete verified
+  constant-gate block in linear time.
 - [`LeanTrominoes/PeriodicCNFTransitionExprSize.lean`](LeanTrominoes/PeriodicCNFTransitionExprSize.lean)
   begins the quantitative hardness certificate.  It bounds Tseitin clauses
   by three per expression node, accounts for the forced root clause exactly,

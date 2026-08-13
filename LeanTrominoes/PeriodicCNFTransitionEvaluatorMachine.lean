@@ -64,6 +64,9 @@ the evaluator layer; `done` is enough to state and test the primitive in
 isolation. -/
 inductive Phase
   | done
+  | gateDone
+  | constantStart (value : Bool)
+  | constantTail (value : Bool)
   deriving DecidableEq, Fintype
 
 /-- Control labels for copying and restoring a binary atom. -/
@@ -77,6 +80,21 @@ inductive Label
 abbrev State := Option Γ'
 
 abbrev Alphabet (_ : Stack) := Γ'
+
+/-- Push a compile-time native word onto the reverse-output accumulator. -/
+def pushOutputWord (word : List Γ')
+    (next : TM2.Stmt Alphabet Label State) :
+    TM2.Stmt Alphabet Label State :=
+  word.foldr
+    (fun symbol continuation =>
+      .push .outputReverse (fun _ => symbol) continuation)
+    next
+
+/-- Emit compile-time natural fields in one finite-control transition. -/
+def emitFixedFields (fields : List Nat) (next : Label) :
+    TM2.Stmt Alphabet Label State :=
+  pushOutputWord (trList fields)
+    (.load (fun _ => none) (.goto fun _ => next))
 
 /-- One loop step of the verified atom-field emitter. -/
 def program : Label → TM2.Stmt Alphabet Label State
@@ -113,6 +131,11 @@ def program : Label → TM2.Stmt Alphabet Label State
               (.load (fun _ => none)
                 (.goto fun _ => .incrementFresh next)))))
   | .phase .done => .halt
+  | .phase .gateDone => .halt
+  | .phase (.constantStart value) =>
+      emitFixedFields [1] (.copyAtom .fresh (.constantTail value))
+  | .phase (.constantTail value) =>
+      emitFixedFields [0, 0, if value then 1 else 0] (.phase .gateDone)
 
 /-- The finite machine containing the atom-emission primitive.  Subsequent
 layers extend its phase language into the complete compiler evaluator. -/
@@ -220,6 +243,47 @@ def oneStep {first last : TM2.Cfg Alphabet Label State}
     (step : TM2.step program first = some last) :
     EvalsToInTime (TM2.step program) first (some last) 1 :=
   FiniteBlockTransducer.oneStep step
+
+theorem stepAux_pushOutputWord (word : List Γ')
+    (next : TM2.Stmt Alphabet Label State) (state : State)
+    (tapeStacks : ∀ stack, List (Alphabet stack)) :
+    TM2.stepAux (pushOutputWord word next) state tapeStacks =
+      TM2.stepAux next state
+        (Function.update tapeStacks .outputReverse
+          (word.reverse ++ tapeStacks .outputReverse)) := by
+  induction word generalizing tapeStacks with
+  | nil => simp [pushOutputWord]
+  | cons symbol word induction =>
+      simp only [pushOutputWord, List.foldr_cons, TM2.stepAux]
+      change TM2.stepAux (pushOutputWord word next) state
+          (Function.update tapeStacks .outputReverse
+            (symbol :: tapeStacks .outputReverse)) = _
+      rw [induction]
+      congr 1
+      funext stack
+      cases stack <;>
+        simp [Function.update, List.reverse_cons, List.append_assoc]
+
+/-- Add one native word to the semantic reverse-output invariant. -/
+def emittedWordData (data : TapeData) (word : List Γ') : TapeData :=
+  { data with outputReverse := word.reverse ++ data.outputReverse }
+
+theorem step_constantStart (data : TapeData) (value : Bool) :
+    TM2.step program (phaseCfg (.constantStart value) data) =
+      some (copyCfg .fresh (.constantTail value)
+        (emittedWordData data (trList [1]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [copyCfg, emittedWordData, tapes]
+
+theorem step_constantTail (data : TapeData) (value : Bool) :
+    TM2.step program (phaseCfg (.constantTail value) data) =
+      some (phaseCfg .gateDone
+        (emittedWordData data
+          (trList [0, 0, if value then 1 else 0]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [phaseCfg, emittedWordData, tapes]
 
 /-- Little-endian binary successor on native words.  The evaluator only calls
 this function on canonical `trNat` words. -/
@@ -741,6 +805,71 @@ def emitAtomField_trNat (source : AtomSource) (next : Phase)
       (2 * (trNat atom).length + 2) := by
   simpa using emitAtomField source next data (trNat atom)
     sourceValue scratchValue
+
+@[simp]
+theorem constantGateFields_native (output : Nat) (value : Bool) :
+    constantGateFields output value =
+      [1, output, 0, 0, if value then 1 else 0] := by
+  cases value <;> rfl
+
+/-- The complete finite-control script for a constant Tseitin gate emits its
+verified native field block in linear time in the output-atom width. -/
+def emitConstantGate (data : TapeData) (output : Nat) (value : Bool)
+    (freshValue : data.fresh = trNat output)
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg (.constantStart value) data)
+      (some (phaseCfg .gateDone
+        { data with
+          outputReverse :=
+            (trList (constantGateFields output value)).reverse ++
+              data.outputReverse }))
+      (2 * (trNat output).length + 4) := by
+  let firstData := emittedWordData data (trList [1])
+  have first := oneStep (step_constantStart data value)
+  have atom := emitAtomField_trNat .fresh (.constantTail value)
+    firstData output (by
+      simpa [firstData, emittedWordData, TapeData.atom] using freshValue)
+    (by simpa [firstData, emittedWordData] using scratchValue)
+  let secondData : TapeData :=
+    { firstData with
+      outputReverse :=
+        (trList [output]).reverse ++ firstData.outputReverse }
+  have atom' : EvalsToInTime (TM2.step program)
+      (copyCfg .fresh (.constantTail value) firstData)
+      (some (phaseCfg (.constantTail value) secondData))
+      (2 * (trNat output).length + 2) := by
+    simpa [secondData] using atom
+  have tail := oneStep (step_constantTail secondData value)
+  have firstTwo := EvalsToInTime.trans (TM2.step program)
+    1 (2 * (trNat output).length + 2)
+    (phaseCfg (.constantStart value) data)
+    (copyCfg .fresh (.constantTail value) firstData)
+    (some (phaseCfg (.constantTail value) secondData)) first atom'
+  have composed := EvalsToInTime.trans (TM2.step program)
+    (2 * (trNat output).length + 2 + 1) 1
+    (phaseCfg (.constantStart value) data)
+    (phaseCfg (.constantTail value) secondData)
+    (some (phaseCfg .gateDone
+      (emittedWordData secondData
+        (trList [0, 0, if value then 1 else 0]))))
+    firstTwo tail
+  have finalData :
+      emittedWordData secondData
+          (trList [0, 0, if value then 1 else 0]) =
+        { data with
+          outputReverse :=
+            (trList (constantGateFields output value)).reverse ++
+              data.outputReverse } := by
+    rw [constantGateFields_native]
+    rcases data with
+      ⟨input, outputReverse, finalOutput, fresh, roots, firstRoot,
+        secondRoot, scratch⟩
+    cases value <;>
+      simp [firstData, secondData, emittedWordData, trList,
+        List.reverse_append, List.append_assoc]
+  rw [finalData] at composed
+  convert composed using 1 <;> omega
 
 end TransitionEvaluatorMachine
 end PeriodicCNF
