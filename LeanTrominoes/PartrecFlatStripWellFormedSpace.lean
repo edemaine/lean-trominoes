@@ -280,6 +280,178 @@ theorem flatStripMotifBodySucc
       (values := (remainingCount + 1) :: payload)
       (predecessor := remainingCount) (by rfl) branch
 
+def flatStripMotifBodyZeroCost
+    (width period : Nat) (valid : Bool) : Nat :=
+  flatCountdownBodyCost Code.flatStripMotifNativeStep
+    (fun _ => 0) 0 (Code.flatStripMotifState width period valid [])
+
+theorem flatStripMotifBodyZero
+    (width period : Nat) (valid : Bool) :
+    EvaluatorCodeFits
+      (Code.flatCountdownBody Code.flatStripMotifStepCode)
+      (0 :: Code.flatStripMotifState width period valid [])
+      (flatCountdownOutput Code.flatStripMotifNativeStep 0
+        (Code.flatStripMotifState width period valid []))
+      (flatStripMotifBodyZeroCost width period valid) := by
+  simpa [Code.flatCountdownBody, flatCountdownOutput,
+    flatStripMotifBodyZeroCost, flatCountdownBodyCost,
+    zeroPrimeCost] using
+    EvaluatorCodeFits.case_zero
+      (successorBranch :=
+        .cons Code.one
+          (.cons Code.head
+            (Code.flatStripMotifStepCode.comp Code.tail)))
+      (values :=
+        0 :: Code.flatStripMotifState width period valid [])
+      (by rfl)
+      (zero'_named (Code.flatStripMotifState width period valid []))
+
+/-- Exact (deliberately additive) cost of scanning a typed flat motif.  This
+cost is later bounded quadratically in the original flat input length. -/
+def flatStripMotifFlatCost
+    (width period : Nat) : Bool → List Cell → Nat
+  | valid, [] => flatStripMotifBodyZeroCost width period valid
+  | valid, cell :: remaining =>
+      let nextValid :=
+        valid && decide (cell.InStripBounds width period)
+      flatStripMotifBodyCost (remaining.length + 1)
+          width period valid cell remaining +
+        flatStripMotifFlatCost width period nextValid remaining
+
+theorem flatStripMotifResultSpace_le_flatCost
+    (width period : Nat) (valid : Bool) (motif : List Cell) :
+    encodedListSpace
+        (Code.flatStripMotifState width period
+          (valid && motifInStripBounds width period motif) []) ≤
+      flatStripMotifFlatCost width period valid motif := by
+  induction motif generalizing valid with
+  | nil =>
+      have output :=
+        (flatStripMotifBodyZero width period valid).output_space
+      simp [flatCountdownOutput, flatStripMotifFlatCost,
+        Code.flatStripMotifState] at output ⊢
+      omega
+  | cons cell remaining induction =>
+      let nextValid :=
+        valid && decide (cell.InStripBounds width period)
+      have result := induction nextValid
+      simpa [flatStripMotifFlatCost, nextValid, Bool.and_assoc] using
+        result.trans (Nat.le_add_left _ _)
+
+theorem flatStripMotifFlat
+    (width period : Nat) (valid : Bool) (motif : List Cell) :
+    EvaluatorCodeFits
+      (Code.flatIterate Code.flatStripMotifStepCode)
+      (motif.length ::
+        Code.flatStripMotifState width period valid motif)
+      (Code.flatStripMotifState width period
+        (valid && motifInStripBounds width period motif) [])
+      (flatStripMotifFlatCost width period valid motif) where
+  input_space := by
+    cases motif with
+    | nil =>
+        exact (flatStripMotifBodyZero width period valid).input_space
+    | cons cell remaining =>
+        exact
+          (flatStripMotifBodySucc remaining.length width period valid
+            cell remaining).input_space.trans
+            (by simp [flatStripMotifFlatCost])
+  output_space :=
+    flatStripMotifResultSpace_le_flatCost width period valid motif
+  call continuation bound budget after := by
+    rw [Code.flatIterate]
+    apply EvaluatorCallFits.fix
+    induction motif generalizing valid with
+    | nil =>
+        let payload := Code.flatStripMotifState width period valid []
+        have body := flatStripMotifBodyZero width period valid
+        have fixedAfter :
+            EvaluatorExecutionFits bound
+              (.ret
+                (.fix
+                  (Code.flatCountdownBody Code.flatStripMotifStepCode)
+                  continuation)
+                (flatCountdownOutput Code.flatStripMotifNativeStep
+                  0 payload)) := by
+          apply EvaluatorExecutionFits.ret_fix_zero
+          · rfl
+          · simp only [continuationSpace_fix]
+            have output := body.output_space
+            simp only [flatStripMotifFlatCost] at budget
+            simp only [payload] at *
+            omega
+          · simpa [flatCountdownOutput, payload,
+              Code.flatStripMotifState] using after
+        exact body.call
+          (.fix
+            (Code.flatCountdownBody Code.flatStripMotifStepCode)
+            continuation)
+          bound
+          (by
+            simp only [continuationSpace_fix,
+              flatStripMotifFlatCost] at *
+            exact budget)
+          fixedAfter
+    | cons cell remaining induction =>
+        let nextValid :=
+          valid && decide (cell.InStripBounds width period)
+        let payload :=
+          Code.flatStripMotifState width period valid (cell :: remaining)
+        have body :=
+          flatStripMotifBodySucc remaining.length width period valid
+            cell remaining
+        have recursiveBudget :
+            flatStripMotifFlatCost width period nextValid remaining +
+                continuationSpace continuation ≤
+              bound := by
+          have raw :
+              flatStripMotifFlatCost width period
+                    (valid && decide (cell.InStripBounds width period))
+                    remaining +
+                  continuationSpace continuation ≤
+                bound := by
+            simp only [flatStripMotifFlatCost] at budget
+            omega
+          simpa only [nextValid] using raw
+        have recursiveAfter :
+            EvaluatorExecutionFits bound
+              (.ret continuation
+                (Code.flatStripMotifState width period
+                  (nextValid &&
+                    motifInStripBounds width period remaining) [])) := by
+          cases valid <;>
+            by_cases inBounds : cell.InStripBounds width period <;>
+            simpa [nextValid, inBounds] using after
+        have recursiveBody :=
+          induction nextValid recursiveBudget recursiveAfter
+        have fixedAfter :
+            EvaluatorExecutionFits bound
+              (.ret
+                (.fix
+                  (Code.flatCountdownBody Code.flatStripMotifStepCode)
+                  continuation)
+                (flatCountdownOutput Code.flatStripMotifNativeStep
+                  (remaining.length + 1) payload)) := by
+          apply EvaluatorExecutionFits.ret_fix_succ
+          · simp [flatCountdownOutput, payload]
+          · simp only [continuationSpace_fix]
+            have output := body.output_space
+            simp only [flatStripMotifFlatCost] at budget
+            simp only [payload, nextValid] at *
+            omega
+          · simpa [flatCountdownOutput, payload, nextValid] using
+              recursiveBody
+        exact body.call
+          (.fix
+            (Code.flatCountdownBody Code.flatStripMotifStepCode)
+            continuation)
+          bound
+          (by
+            simp only [continuationSpace_fix,
+              flatStripMotifFlatCost] at *
+            omega)
+          fixedAfter
+
 end EvaluatorCodeFits
 
 end PartrecToTM2

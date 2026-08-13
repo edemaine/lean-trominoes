@@ -321,7 +321,7 @@ build; an imported proof counts when its statement matches the paper.
       consuming one coordinate pair per iteration without recursive list
       packing.
       - [x] Fit one complete coordinate-pair scanner step compositionally.
-      - [ ] Lift the step certificate through the exact motif-length countdown.
+      - [x] Lift the step certificate through the exact motif-length countdown.
     - [ ] Prove the flat well-formedness scan's evaluator-space certificate.
     - [ ] Port the cycle-search input/context assembly and its evaluator-space
       certificates to the target flat strip fields.
