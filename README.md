@@ -484,7 +484,7 @@ build; an imported proof counts when its statement matches the paper.
             - [ ] Fit and polynomially bound both native-flat endpoint scans.
               - [x] Fit and uniformly bound one edge/reverse-reachability
                 candidate update.
-              - [ ] Lift that update through the second-endpoint countdown.
+              - [x] Lift that update through the second-endpoint countdown.
               - [ ] Fit one complete inner scan and lift it through the
                 first-endpoint countdown.
             - [ ] Assemble the flat well-formedness guard, search parameters,
