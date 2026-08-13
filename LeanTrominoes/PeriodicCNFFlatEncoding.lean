@@ -1,5 +1,7 @@
 import LeanTrominoes.PeriodicCNF
+import LeanTrominoes.Complexity
 import Mathlib.Computability.Encoding
+import Mathlib.Computability.TuringMachine.ToPartrec
 
 /-!
 # A flat finite encoding of periodic CNF formulas
@@ -10,7 +12,8 @@ appropriate output format for polynomial-time reductions: even a short list
 of small entries can acquire exponentially many bits.
 
 This file gives periodic CNF formulas a flat, self-delimiting representation.
-The alphabet consists of binary digits and one field delimiter.  The natural
+The evaluator alphabet supplies binary digits and two delimiters; this format
+uses one field delimiter and rejects the unused list delimiter.  The natural
 number fields begin with the number of clauses; each clause then begins with
 its number of literals; and every literal occupies four fields (atom, two
 signed coordinates, and Boolean value).  Thus list structure contributes only
@@ -23,18 +26,62 @@ open Computability
 
 namespace PeriodicCNFFlatEncoding
 
-/-- A binary digit, or the delimiter terminating one natural-number field. -/
-abbrev Symbol := Option Bool
+/-- Native finite alphabet of Mathlib's partial-recursive TM2 evaluator.  Flat
+encodings use `bit0`, `bit1`, and `cons`; `consₗ` is reserved as invalid input. -/
+abbrev Symbol := Turing.PartrecToTM2.Γ'
+
+private abbrev RawSymbol := Option Bool
+
+private def encodeSymbol : RawSymbol → Symbol
+  | some false => .bit0
+  | some true => .bit1
+  | none => .cons
+
+private def decodeSymbol : Symbol → Option RawSymbol
+  | .bit0 => some (some false)
+  | .bit1 => some (some true)
+  | .cons => some none
+  | .consₗ => none
+
+@[simp]
+private theorem decodeSymbol_encodeSymbol (symbol : RawSymbol) :
+    decodeSymbol (encodeSymbol symbol) = some symbol := by
+  rcases symbol with _ | bit
+  · rfl
+  · cases bit <;> rfl
+
+private def encodeNatFieldsRaw (fields : List Nat) : List RawSymbol :=
+  fields.flatMap fun field => (encodeNat field).map some ++ [none]
 
 /-- Encode a list of naturals as delimiter-terminated little-endian binary
 fields.  In particular, zero is represented by a delimiter with no preceding
 digits. -/
 def encodeNatFields (fields : List Nat) : List Symbol :=
-  fields.flatMap fun field => (encodeNat field).map some ++ [none]
+  (encodeNatFieldsRaw fields).map encodeSymbol
+
+/-- The flat field stream is exactly the native list-of-naturals convention
+used by Mathlib's partial-recursive TM2 evaluator. -/
+theorem encodeNatFields_eq_trList (fields : List Nat) :
+    encodeNatFields fields = Turing.PartrecToTM2.trList fields := by
+  induction fields with
+  | nil => rfl
+  | cons field fields ih =>
+      have bits :
+          (encodeNat field).map (encodeSymbol ∘ some) =
+            (encodeNat field).map Complexity.partrecBit := by
+        apply List.map_congr_left
+        intro bit bitMem
+        cases bit <;> rfl
+      rw [show encodeNatFields (field :: fields) =
+          (encodeNat field).map (encodeSymbol ∘ some) ++
+            Turing.PartrecToTM2.Γ'.cons :: encodeNatFields fields by
+        simp [encodeNatFields, encodeNatFieldsRaw, encodeSymbol,
+          List.map_append]]
+      simp [Complexity.partrec_trNat_eq_map_encodeNat, bits, ih]
 
 /-- Decode delimiter-terminated binary fields.  `reversedBits` is the portion
 of the current field already consumed, in reverse order. -/
-def decodeNatFieldsAux : List Bool → List Symbol → Option (List Nat)
+private def decodeNatFieldsAux : List Bool → List RawSymbol → Option (List Nat)
   | [], [] => some []
   | _ :: _, [] => none
   | reversedBits, some bit :: symbols =>
@@ -44,10 +91,10 @@ def decodeNatFieldsAux : List Bool → List Symbol → Option (List Nat)
 
 /-- Decode a complete stream of natural-number fields. -/
 def decodeNatFields (symbols : List Symbol) : Option (List Nat) :=
-  decodeNatFieldsAux [] symbols
+  (symbols.mapM decodeSymbol).bind (decodeNatFieldsAux [])
 
 theorem decodeNatFieldsAux_bits (reversedBits bits : List Bool)
-    (symbols : List Symbol) :
+    (symbols : List RawSymbol) :
     decodeNatFieldsAux reversedBits (bits.map some ++ symbols) =
       decodeNatFieldsAux (bits.reverse ++ reversedBits) symbols := by
   induction bits generalizing reversedBits with
@@ -58,28 +105,42 @@ theorem decodeNatFieldsAux_bits (reversedBits bits : List Bool)
       simp [List.reverse_cons, List.append_assoc]
 
 @[simp]
-theorem decodeNatFields_encodeNatFields (fields : List Nat) :
-    decodeNatFields (encodeNatFields fields) = some fields := by
+private theorem mapM_decodeSymbol_map_encodeSymbol (symbols : List RawSymbol) :
+    (symbols.map encodeSymbol).mapM decodeSymbol = some symbols := by
+  induction symbols with
+  | nil => rfl
+  | cons symbol symbols ih =>
+      simp [ih]
+
+@[simp]
+private theorem decodeNatFieldsAux_encodeNatFieldsRaw (fields : List Nat) :
+    decodeNatFieldsAux [] (encodeNatFieldsRaw fields) = some fields := by
   induction fields with
   | nil => rfl
   | cons field fields ih =>
-      have ih' : decodeNatFieldsAux [] (encodeNatFields fields) =
-          some fields := ih
-      rw [show encodeNatFields (field :: fields) =
-          (encodeNat field).map some ++ none :: encodeNatFields fields by
-        simp [encodeNatFields]]
-      unfold decodeNatFields
+      rw [show encodeNatFieldsRaw (field :: fields) =
+          (encodeNat field).map some ++ none :: encodeNatFieldsRaw fields by
+        simp [encodeNatFieldsRaw]]
       rw [decodeNatFieldsAux_bits]
-      simp [decodeNatFieldsAux, ih']
+      simp [decodeNatFieldsAux, ih]
+
+@[simp]
+theorem decodeNatFields_encodeNatFields (fields : List Nat) :
+    decodeNatFields (encodeNatFields fields) = some fields := by
+  unfold decodeNatFields encodeNatFields
+  rw [mapM_decodeSymbol_map_encodeSymbol]
+  exact decodeNatFieldsAux_encodeNatFieldsRaw fields
 
 @[simp]
 theorem encodeNatFields_length (fields : List Nat) :
     (encodeNatFields fields).length =
       (fields.map fun field => (encodeNat field).length + 1).sum := by
+  unfold encodeNatFields
+  rw [List.length_map]
   induction fields with
   | nil => rfl
   | cons field fields ih =>
-      simp [encodeNatFields]
+      simp [encodeNatFieldsRaw]
       omega
 
 /-- Decode one signed coordinate field.  Values outside the range of the

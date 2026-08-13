@@ -7021,10 +7021,11 @@ The representation choices for this target are:
   translate of the plane.
 - [`LeanTrominoes/PeriodicCNFFlatEncoding.lean`](LeanTrominoes/PeriodicCNFFlatEncoding.lean)
   replaces the recursively paired standard list code with a flat stream over
-  the finite alphabet of zero, one, and field delimiter.  Explicit clause and
-  literal counts make the executable decoder unambiguous, its round trip is
-  verified, and formula list structure contributes only linearly many fields
-  to the encoded output.
+  Mathlib's finite evaluator alphabet, using zero, one, and field delimiter
+  while rejecting its unused list delimiter.  Explicit clause and literal
+  counts make the executable decoder unambiguous, its round trip is verified,
+  and formula list structure contributes only linearly many fields to the
+  encoded output.
 - [`LeanTrominoes/PeriodicCNFFlatEncodingSize.lean`](LeanTrominoes/PeriodicCNFFlatEncodingSize.lean)
   converts clause width, atom range, and clause count into a bound on actual
   encoded symbols.  It proves the transition compiler has width at most three
