@@ -438,6 +438,8 @@ build; an imported proof counts when its statement matches the paper.
             - [ ] Fit and bound per-base center validity.
               - [x] Lift containment through the eight square symmetries.
               - [ ] Fit and bound exact-one covering placement counts.
+                - [x] Fit one reconstructed covering-placement query.
+                - [ ] Sum the fixed candidate list and compare with one.
               - [ ] Combine phase, containment, and coverage at one base.
             - [ ] Lift bounded center validity across the motif.
             - [x] Fit exact native-field target construction and membership.
