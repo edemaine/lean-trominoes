@@ -370,6 +370,8 @@ build; an imported proof counts when its statement matches the paper.
         has linear overhead, with a verified decoder round trip.
       - [x] Bound the complete flat encoding of the emitted machine formula by
         an explicit polynomial in encoded source-input length.
+      - [x] Factor the reduction through a raw source-symbol-list compiler and
+        prove agreement with the semantic reduction on valid encodings.
       - [ ] Certify the resulting reduction as polynomial-time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
@@ -1405,6 +1407,11 @@ The representation choices for this target are:
   also combines the flat-encoding estimates with a polynomial atom boundary
   to bound the complete output symbol stream by an explicit polynomial.  The
   polynomial-time machine certificate for emitting that stream remains.
+- [`LeanTrominoes/PeriodicCNFPolySpaceCompiler.lean`](LeanTrominoes/PeriodicCNFPolySpaceCompiler.lean)
+  factors the reduction through the raw finite list of source-encoding symbols
+  and returns the flat CNF symbol stream directly.  On every valid encoded
+  input it agrees exactly with the semantic formula, inherits its correctness,
+  and satisfies the same polynomial output-length bound.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
