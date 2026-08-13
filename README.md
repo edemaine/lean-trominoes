@@ -348,6 +348,8 @@ build; an imported proof counts when its statement matches the paper.
           indexed flat transition-scan state.
         - [x] Lift indexed normalization through the exact motif-length
           countdown for one complete frontier column.
+        - [x] Conjoin the five flat normalization-column passes and recover
+          the established packed-state normalization predicate.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
