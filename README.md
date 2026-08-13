@@ -364,6 +364,8 @@ build; an imported proof counts when its statement matches the paper.
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [x] Define a flat finite encoding of periodic CNF whose list structure
         has linear overhead, with a verified decoder round trip.
+      - [x] Bound the complete flat encoding of the emitted machine formula by
+        an explicit polynomial in encoded source-input length.
       - [ ] Certify the resulting reduction as polynomial-time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
@@ -1389,8 +1391,10 @@ The representation choices for this target are:
   composes those machine bounds with the source decider's polynomial space
   certificate.  The selected stack width and clock width are exact evaluations
   of explicit natural polynomials, and a final explicit polynomial bounds the
-  emitted horizontal CNF's clause count in encoded source input length.  The
-  polynomial-time machine certificate for emitting its binary encoding remains.
+  emitted horizontal CNF's clause count in encoded source input length.  It
+  also combines the flat-encoding estimates with a polynomial atom boundary
+  to bound the complete output symbol stream by an explicit polynomial.  The
+  polynomial-time machine certificate for emitting that stream remains.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
@@ -6994,6 +6998,10 @@ The representation choices for this target are:
   literal counts make the executable decoder unambiguous, its round trip is
   verified, and formula list structure contributes only linearly many fields
   to the encoded output.
+- [`LeanTrominoes/PeriodicCNFFlatEncodingSize.lean`](LeanTrominoes/PeriodicCNFFlatEncodingSize.lean)
+  converts clause width, atom range, and clause count into a bound on actual
+  encoded symbols.  It proves the transition compiler has width at most three
+  and bounds all generated atoms by its final fresh boundary.
 - [`LeanTrominoes/PeriodicThreeCNF.lean`](LeanTrominoes/PeriodicThreeCNF.lean)
   implements the standard auxiliary-variable chain that splits arbitrary
   protoclauses into clauses of width at most three.  Auxiliary variables are

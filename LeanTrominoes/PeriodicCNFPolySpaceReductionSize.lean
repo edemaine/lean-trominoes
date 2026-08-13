@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFMachineStepAffine
 import LeanTrominoes.PeriodicCNFPolySpaceReductionSemantics
+import LeanTrominoes.PeriodicCNFFlatEncodingSize
 
 /-!
 # Polynomial size of the local periodic-CNF reduction
@@ -169,6 +170,44 @@ theorem designatedMachineNodePolynomial_eval (input : Input) :
   rw [Polynomial.eval_add, designatedNonStepNodePolynomial_eval,
     machineStepNodePolynomial_eval]
 
+/-- Polynomial for the source-atom boundary at which Tseitin allocation
+begins. -/
+def sourceAtomPolynomial : Polynomial Nat :=
+  Polynomial.C (Fintype.card (Option decider.tm.Λ)) +
+    Polynomial.C (Fintype.card decider.tm.σ) +
+    reductionSpacePolynomial decider *
+      Polynomial.C
+        (BoundedMachineAtom.stackCellBitRate (tm := decider.tm)) +
+    reductionClockPolynomial decider
+
+theorem sourceAtomPolynomial_eval (input : Input) :
+    (sourceAtomPolynomial decider).eval (encoding.encode input).length =
+      BoundedMachineAtom.atomCount (tm := decider.tm)
+        (space := reductionSpace decider input)
+        (clockBits := reductionClockBits decider input) := by
+  unfold sourceAtomPolynomial
+  simp only [Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_C]
+  rw [← reductionSpace_eq_polynomial_eval,
+    ← reductionClockBits_eq_polynomial_eval,
+    BoundedMachineAtom.atomCount_eq]
+
+/-- Polynomial upper boundary for every source and generated atom occurring
+in the emitted formula. -/
+def formulaAtomPolynomial : Polynomial Nat :=
+  sourceAtomPolynomial decider + designatedMachineNodePolynomial decider
+
+theorem formulaAtomPolynomial_eval (input : Input) :
+    (formulaAtomPolynomial decider).eval (encoding.encode input).length =
+      BoundedMachineAtom.atomCount (tm := decider.tm)
+          (space := reductionSpace decider input)
+          (clockBits := reductionClockBits decider input) +
+        BoundedMachineAtom.designatedMachineNodeBudget (tm := decider.tm)
+          (space := reductionSpace decider input)
+          (clockBits := reductionClockBits decider input) := by
+  unfold formulaAtomPolynomial
+  rw [Polynomial.eval_add, sourceAtomPolynomial_eval,
+    designatedMachineNodePolynomial_eval]
+
 /-- Explicit polynomial clause budget for the local periodic-CNF reduction. -/
 def formulaClausePolynomial : Polynomial Nat :=
   Polynomial.C 3 * designatedMachineNodePolynomial decider + Polynomial.C 1
@@ -184,6 +223,69 @@ theorem formula_clause_length_le_polynomial_eval (input : Input) :
   unfold formulaClausePolynomial
   simp only [Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_C]
   rw [designatedMachineNodePolynomial_eval]
+
+/-- Explicit polynomial bound on the number of symbols in the flat output
+encoding, rather than merely on its number of clauses. -/
+def formulaEncodingPolynomial : Polynomial Nat :=
+  let clauses := formulaClausePolynomial decider
+  let atoms := formulaAtomPolynomial decider
+  Polynomial.C 1 + Polynomial.C 2 * clauses +
+    clauses * Polynomial.C 3 *
+      (atoms + Polynomial.C
+        (PeriodicCNFFlatEncoding.forwardLiteralFieldBudget + 5))
+
+/-- The complete emitted flat formula encoding has polynomial length in the
+encoded source input. -/
+theorem formula_encoding_length_le_polynomial_eval (input : Input) :
+    (PeriodicCNFFlatEncoding.finEncoding.encode
+      (formula decider input)).length ≤
+      (formulaEncodingPolynomial decider).eval
+        (encoding.encode input).length := by
+  let space := reductionSpace decider input
+  let clockBits := reductionClockBits decider input
+  let initial := initialConfiguration decider input
+  let accepting := acceptingConfiguration decider
+  let expression :=
+    BoundedMachineAtom.designatedMachineResetClockExpression
+      (tm := decider.tm) (space := space) (clockBits := clockBits)
+      initial accepting
+  let fresh := BoundedMachineAtom.atomCount (tm := decider.tm)
+    (space := space) (clockBits := clockBits)
+  let clauseBound :=
+    (formulaClausePolynomial decider).eval
+      (encoding.encode input).length
+  let atomBound :=
+    (formulaAtomPolynomial decider).eval
+      (encoding.encode input).length
+  have sourceAtoms : expression.AtomsBelow fresh := by
+    exact BoundedMachineAtom.designatedMachineResetClockExpression_atomsBelow
+      initial accepting
+  have gateBound : expression.gateCount ≤
+      BoundedMachineAtom.designatedMachineNodeBudget (tm := decider.tm)
+        (space := space) (clockBits := clockBits) := by
+    exact BoundedMachineAtom.designatedMachineResetClockExpression_gateCount_le_budget
+      initial accepting
+  have atoms : ClausesAtomsBelow
+      (requireTransitionExpr expression fresh).clauses atomBound := by
+    apply clausesAtomsBelow_mono
+      (requireTransitionExpr_atomsBelow expression fresh sourceAtoms)
+    dsimp [atomBound, fresh]
+    rw [formulaAtomPolynomial_eval]
+    exact Nat.add_le_add_left gateBound _
+  have clauses : (requireTransitionExpr expression fresh).clauses.length ≤
+      clauseBound := by
+    change (formula decider input).clauses.length ≤ clauseBound
+    exact formula_clause_length_le_polynomial_eval decider input
+  have encoded := PeriodicCNFFlatEncoding.finEncoding_encode_length_le
+    (requireTransitionExpr expression fresh) 3 atomBound clauseBound
+    (requireTransitionExpr_widthAtMost_three expression fresh)
+    (requireTransitionExpr_forward expression fresh) atoms clauses
+  change (PeriodicCNFFlatEncoding.finEncoding.encode
+    (requireTransitionExpr expression fresh)).length ≤ _
+  apply encoded.trans_eq
+  unfold formulaEncodingPolynomial
+  simp only [Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_C]
+  rfl
 
 end PolySpaceReduction
 

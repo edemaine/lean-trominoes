@@ -352,6 +352,7 @@ import LeanTrominoes.PeriodicOneInThreeNoUnitsComputability
 import LeanTrominoes.PeriodicOneInThreeReductionComputability
 import LeanTrominoes.PeriodicCNF
 import LeanTrominoes.PeriodicCNFFlatEncoding
+import LeanTrominoes.PeriodicCNFFlatEncodingSize
 import LeanTrominoes.PeriodicCNFPlanarIncidences
 import LeanTrominoes.PeriodicCNFPlanarVertexGadgets
 import LeanTrominoes.PeriodicCNFPlanarFormula
