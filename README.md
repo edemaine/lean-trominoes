@@ -423,7 +423,7 @@ build; an imported proof counts when its statement matches the paper.
               flat motif indexing.
             - [x] Fit exact offset construction and coordinate projection for
               dynamic flat motif indexing.
-            - [ ] Bound dynamic motif indexing on reachable transition scan
+            - [x] Bound dynamic motif indexing on reachable transition scan
               states.
             - [x] Fit the exact one-cell flat normalization predicate.
             - [ ] Bound one-cell normalization and lift it across the motif.
