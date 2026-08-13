@@ -435,12 +435,12 @@ build; an imported proof counts when its statement matches the paper.
                 implication.
               - [x] Bound the fixed Boolean composition in the native
                 candidate footprint.
-            - [ ] Fit and bound per-base center validity.
+            - [x] Fit and bound per-base center validity.
               - [x] Lift containment through the eight square symmetries.
               - [x] Fit and bound exact-one covering placement counts.
                 - [x] Fit one reconstructed covering-placement query.
                 - [x] Sum the fixed candidate list and compare with one.
-              - [ ] Combine phase, containment, and coverage at one base.
+              - [x] Combine phase, containment, and coverage at one base.
             - [ ] Lift bounded center validity across the motif.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
@@ -1968,6 +1968,12 @@ The representation choices for this target are:
   target queries have a uniform quadratic bound, which is lifted through the
   compile-time candidate list to a quadratic evaluator-space certificate for
   exact-one coverage.
+- [`LeanTrominoes/PartrecFlatPackedCenterBaseSpace.lean`](LeanTrominoes/PartrecFlatPackedCenterBaseSpace.lean)
+  fits the native phase guard and combines it with eight-way containment and
+  exact-one coverage at one flat motif base.  Its only compatibility adapter
+  pairs the two base-coordinate fields for an existing verified arithmetic
+  predicate; the complete one-base evaluator has a quadratic native-input
+  space certificate.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
