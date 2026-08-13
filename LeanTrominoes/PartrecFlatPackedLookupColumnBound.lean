@@ -298,6 +298,49 @@ theorem flatLookupDivisionNineCost_le_budget
     encodedListSpace_nil] at numberBound ⊢
   omega
 
+theorem flatLookupHeadBits_le_budget
+    (values : List Nat) (budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget) :
+    (Computability.encodeNat values.headI).length ≤ budget := by
+  have headSpace := listCodeEncodedListSpace_singleton_headI_le values
+  simp only [encodedListSpace_cons, encodedListSpace_nil] at headSpace
+  omega
+
+theorem flatLookupHeadSuccBits_le_budget
+    (values : List Nat) (budget : Nat)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (positive : 1 ≤ budget) :
+    (Computability.encodeNat (values.headI + 1)).length ≤ budget := by
+  cases values with
+  | nil =>
+      have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+      simpa [oneBits] using positive
+  | cons value values =>
+    have successor := listCodeEncodeNat_succ_length_le value
+    have successor' :
+        (Computability.encodeNat (value + 1)).length ≤
+          (Computability.encodeNat value).length + 1 := by
+      simpa [Nat.succ_eq_add_one] using successor
+    simp only [List.headI_cons, encodedListSpace_cons] at valuesBound ⊢
+    omega
+
+theorem flatLookupBoolAndCost_le_budget
+    (values : List Nat)
+    (leftValue rightValue leftCost rightCost budget : Nat)
+    (leftValueBound : leftValue ≤ 1)
+    (rightValueBound : rightValue ≤ 1)
+    (valuesBound : encodedListSpace values ≤ budget)
+    (leftCostBound : leftCost ≤ budget)
+    (rightCostBound : rightCost ≤ budget)
+    (positive : 1 ≤ budget) :
+    boolAndCost values leftValue rightValue leftCost rightCost ≤
+      1000 * (budget + 1) := by
+  exact boolAndCost_le_budget values leftValue rightValue
+    leftCost rightCost budget leftValueBound rightValueBound valuesBound
+    (flatLookupHeadBits_le_budget values budget valuesBound)
+    (flatLookupHeadSuccBits_le_budget values budget valuesBound positive)
+    leftCostBound rightCostBound positive
+
 /-- A positive flat-countdown body has a fixed linear overhead once its input,
 step output, and step cost share one workspace budget. -/
 theorem flatLookupCountdownSuccBranchCost_le_budget
@@ -625,6 +668,95 @@ theorem flatPackedLookupYEqualityCost_le_input
     found selected decomposition wordBound digitBound
   simp only [flatPackedLookupYEqualityCost]
   simp only [unit] at equality arguments
+  omega
+
+theorem flatPackedLookupCoordinateMatchCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupCoordinateMatchCost target cell word digit found
+        selected remaining ≤
+      10000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    found selected (cell :: remaining)
+  let budget := 2000000000000 * unit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit found selected
+        decomposition wordBound digitBound
+  have xCost := flatPackedLookupXEqualityCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    found selected decomposition wordBound digitBound
+  have yCost := flatPackedLookupYEqualityCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    found selected decomposition wordBound digitBound
+  have xValueBound : (decide (cell.1 = target.1)).toNat ≤ 1 := by
+    cases decide (cell.1 = target.1) <;> simp
+  have yValueBound : (decide (cell.2 = target.2)).toNat ≤ 1 := by
+    cases decide (cell.2 = target.2) <;> simp
+  have combined := flatLookupBoolAndCost_le_budget state
+    (decide (cell.1 = target.1)).toNat
+    (decide (cell.2 = target.2)).toNat
+    (flatPackedLookupXEqualityCost target cell word digit found selected
+      remaining)
+    (flatPackedLookupYEqualityCost target cell word digit found selected
+      remaining) budget xValueBound yValueBound
+    (stateBound.trans (by simp [budget]; omega))
+    (by simpa [budget, unit] using xCost)
+    (by simpa [budget, unit] using yCost)
+    (by simp [budget]; omega)
+  simp only [flatPackedLookupCoordinateMatchCost]
+  simp only [state, budget, unit] at combined
+  omega
+
+theorem flatPackedLookupMatchCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupMatchCost target cell word digit found selected
+        remaining ≤
+      100000000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    found selected (cell :: remaining)
+  let budget := 10000000000000000 * unit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit found selected
+        decomposition wordBound digitBound
+  have selectedCostRaw := listCodeGetCost_le_linear 5 state
+  have selectedCost : getCost 5 state ≤ budget := by
+    simp only [budget]
+    exact selectedCostRaw.trans (by
+      have : encodedListSpace state ≤ unit := stateBound
+      omega)
+  have coordinate := flatPackedLookupCoordinateMatchCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    found selected decomposition wordBound digitBound
+  have selectedValueBound : selected.toNat ≤ 1 := by
+    cases selected <;> simp
+  have coordinateValueBound : (decide (cell = target)).toNat ≤ 1 := by
+    cases decide (cell = target) <;> simp
+  have combined := flatLookupBoolAndCost_le_budget state selected.toNat
+    (decide (cell = target)).toNat (getCost 5 state)
+    (flatPackedLookupCoordinateMatchCost target cell word digit found
+      selected remaining) budget selectedValueBound coordinateValueBound
+    (stateBound.trans (by simp [budget]; omega)) selectedCost
+    (by simpa [budget, unit] using coordinate)
+    (by simp [budget]; omega)
+  simp only [flatPackedLookupMatchCost]
+  simp only [state, budget, unit] at combined
   omega
 
 end EvaluatorCodeFits
