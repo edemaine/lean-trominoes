@@ -395,8 +395,10 @@ build; an imported proof counts when its statement matches the paper.
                 and both enclosing step selectors.
               - [x] Lift positive, frozen-found, and zero steps through their
                 exact countdown bodies.
-              - [ ] Sum frozen and consuming countdown recurrences into the
+              - [x] Sum frozen and consuming countdown recurrences into the
                 complete one-pass bound.
+              - [ ] Convert the motif-length factor and affine accumulator
+                envelope to a quadratic bound in the actual flat input.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.
           - [ ] Bound the five-column assignment lookup and fit its predicate

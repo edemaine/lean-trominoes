@@ -1618,26 +1618,136 @@ theorem flatPackedLookupBodyFoundSuccCost_le_input
   omega
 
 theorem flatPackedLookupBodyZeroCost_le_input
-    (target : Cell) (motif leading : List Cell)
+    (target : Cell) (motif suffix leading : List Cell)
     (word digit wordLimit digitLimit : Nat) (found selected : Bool)
-    (decomposition : motif = leading ++ [])
+    (decomposition : motif = leading ++ suffix)
     (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
     flatPackedLookupBodyZeroCost
-        (Code.flatPackedLookupColumnState target word digit found selected []) ≤
+        (Code.flatPackedLookupColumnState target word digit found selected
+          suffix) ≤
       10 * flatPackedLookupInputUnit target motif wordLimit digitLimit := by
   let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
   let payload := Code.flatPackedLookupColumnState target word digit
-    found selected []
+    found selected suffix
   have unitPositive : 5 ≤ unit := by
     simp [unit, flatPackedLookupInputUnit]
   have inputBound : encodedListSpace (0 :: payload) ≤ unit := by
     simpa [payload, unit] using
-      flatPackedLookupCountdownStateSpace_le_unit 0 target motif [] leading
+      flatPackedLookupCountdownStateSpace_le_unit 0 target motif suffix leading
         word digit wordLimit digitLimit found selected decomposition
         (by omega) wordBound digitBound
   have body := flatLookupCountdownBodyZeroCost_le_budget payload unit inputBound
   simpa only [flatPackedLookupBodyZeroCost, payload, unit] using
     body.trans (by omega)
+
+/-- The exact frozen suffix pays one uniformly bounded body per remaining
+countdown step. -/
+theorem flatPackedLookupFoundFlatCost_le_input_mul
+    (steps : Nat) (target : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ remaining)
+    (stepsBound : steps ≤ remaining.length)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupFoundFlatCost steps target word digit selected remaining ≤
+      100000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit *
+        (steps + 1) := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  induction steps with
+  | zero =>
+      have body := flatPackedLookupBodyZeroCost_le_input target motif
+        remaining leading word digit wordLimit digitLimit true selected
+        decomposition wordBound digitBound
+      simp only [flatPackedLookupFoundFlatCost]
+      omega
+  | succ steps induction =>
+      have countBound : steps + 1 ≤ motif.length := by
+        have suffixLength : remaining.length ≤ motif.length := by
+          rw [decomposition]
+          simp
+        omega
+      have body := flatPackedLookupBodyFoundSuccCost_le_input steps target
+        motif remaining leading word digit wordLimit digitLimit selected
+        decomposition countBound wordBound digitBound
+      have tail := induction (by omega)
+      simp only [flatPackedLookupFoundFlatCost]
+      nlinarith
+
+/-- The exact consuming recurrence costs one bounded body per coordinate,
+switching to the frozen recurrence after the first selected hit. -/
+theorem flatPackedLookupFlatCost_false_le_input_mul
+    (target : Cell) (selected : Bool)
+    (motif suffix leading : List Cell)
+    (word digit wordLimit digitLimit : Nat)
+    (decomposition : motif = leading ++ suffix)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit)
+    (eightBound : 8 ≤ digitLimit) :
+    flatPackedLookupFlatCost target selected suffix word digit false ≤
+      100000000000000000000000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit *
+        (suffix.length + 1) := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  induction suffix generalizing leading word digit with
+  | nil =>
+      have body := flatPackedLookupBodyZeroCost_le_input target motif []
+        leading word digit wordLimit digitLimit false selected decomposition
+        wordBound digitBound
+      simp only [flatPackedLookupFlatCost, List.length_nil,
+        Nat.zero_add, Nat.mul_one]
+      omega
+  | cons cell remaining induction =>
+      have tailDecomposition :
+          motif = (leading ++ [cell]) ++ remaining := by
+        simpa [List.append_assoc] using decomposition
+      have quotientBound : word / 9 ≤ wordLimit :=
+        (Nat.div_le_self word 9).trans wordBound
+      have remainderSmall : word % 9 ≤ digitLimit := by
+        have remainderLt : word % 9 < 9 := Nat.mod_lt word (by omega)
+        omega
+      have body := flatPackedLookupBodyConsCost_le_input target cell motif
+        remaining leading word digit wordLimit digitLimit selected decomposition
+        wordBound digitBound eightBound
+      by_cases hit : selected && decide (cell = target)
+      · have frozen := flatPackedLookupFoundFlatCost_le_input_mul
+          remaining.length target motif remaining (leading ++ [cell])
+          (word / 9) (word % 9) wordLimit digitLimit selected
+          tailDecomposition (by rfl) quotientBound remainderSmall
+        simp [flatPackedLookupFlatCost, hit]
+        nlinarith
+      · have tail := induction (leading ++ [cell]) (word / 9) digit
+          tailDecomposition quotientBound digitBound
+        simp [flatPackedLookupFlatCost, hit]
+        nlinarith
+
+theorem flatPackedLookupFlatCost_le_input_mul
+    (target : Cell) (selected : Bool)
+    (motif suffix leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found : Bool)
+    (decomposition : motif = leading ++ suffix)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit)
+    (eightBound : 8 ≤ digitLimit) :
+    flatPackedLookupFlatCost target selected suffix word digit found ≤
+      100000000000000000000000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit *
+        (suffix.length + 1) := by
+  cases found with
+  | false =>
+      exact flatPackedLookupFlatCost_false_le_input_mul target selected motif
+        suffix leading word digit wordLimit digitLimit decomposition
+        wordBound digitBound eightBound
+  | true =>
+      have frozen := flatPackedLookupFoundFlatCost_le_input_mul suffix.length
+        target motif suffix leading word digit wordLimit digitLimit selected
+        decomposition (by rfl) wordBound digitBound
+      simpa only [flatPackedLookupFlatCost] using frozen.trans (by
+        have unitPositive : 1 ≤
+            flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+          simp [flatPackedLookupInputUnit]
+        nlinarith)
 
 end EvaluatorCodeFits
 end PartrecToTM2
