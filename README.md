@@ -672,6 +672,12 @@ build; an imported proof counts when its statement matches the paper.
                 lists, and prove exact agreement with expression postorder.
               - [ ] Normalize bounded-machine fields, configurations, clocks,
                 statement paths, and the designated reset relation.
+                - [x] Normalize affine label, control, stack-cell, complete
+                  configuration, and reset-clock programs.
+                - [x] Normalize one-hot and stack-suffix well-formedness.
+                - [x] Normalize bounded push/pop stack transformations.
+                - [ ] Normalize symbolic statement paths and assemble the
+                  designated accepting-reset program.
               - [ ] Implement the finite counter-driven instruction emitter.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
@@ -1680,11 +1686,26 @@ The representation choices for this target are:
   cells, together with field and whole-stack preservation expressions.  Their
   semantics are bidirectional for arbitrary one-hot valuations, and every
   expression retains the bounded source-atom invariant.
+- [`LeanTrominoes/PeriodicCNFMachineProgramFields.lean`](LeanTrominoes/PeriodicCNFMachineProgramFields.lean)
+  replaces those semantic field expressions by direct postorder programs.
+  Labels, controls, stack cells, full fixed configurations, preservation
+  fields, and clock reset/successor use the explicit affine atom layout, with
+  proofs that every instruction word is exactly the corresponding expression
+  traversal.
+- [`LeanTrominoes/PeriodicCNFMachineProgramWellFormed.lean`](LeanTrominoes/PeriodicCNFMachineProgramWellFormed.lean)
+  normalizes every one-hot field and adjacent occupied-prefix constraint into
+  flat instruction lists, then assembles the complete bounded-slice
+  well-formedness program and proves exact postorder agreement.
 - [`LeanTrominoes/PeriodicCNFMachineStackTransform.lean`](LeanTrominoes/PeriodicCNFMachineStackTransform.lean)
   normalizes any atomic sequence of pushes and pops to a known prefix followed
   by a fixed drop from the source stack.  Its linear-width expression checks
   overflow and every output cell; on suffix-shaped decoded vectors this is
   equivalent to the same transformation of ordinary TM2 stack lists.
+- [`LeanTrominoes/PeriodicCNFMachineProgramStackTransform.lean`](LeanTrominoes/PeriodicCNFMachineProgramStackTransform.lean)
+  gives the normalized stack transform a direct instruction-level interface.
+  Its fit check and each width-indexed output cell branch over only fixed
+  transform data and the runtime width, and the complete program is proved
+  identical to the semantic stack-transform expression postorder.
 - [`LeanTrominoes/PeriodicCNFMachineStatementPaths.lean`](LeanTrominoes/PeriodicCNFMachineStatementPaths.lean)
   symbolically executes an atomic TM2 statement after specializing its finite
   control value.  Unknown `peek` and `pop` observations branch only over one
