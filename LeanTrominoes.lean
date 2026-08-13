@@ -916,6 +916,7 @@ import LeanTrominoes.PartrecStripFrontierContext
 import LeanTrominoes.PartrecStripFrontierContextSpace
 import LeanTrominoes.PartrecStripWellFormed
 import LeanTrominoes.PartrecFlatStripWellFormed
+import LeanTrominoes.PartrecFlatStripWellFormedSpace
 import LeanTrominoes.PartrecStripWellFormedSpace
 import LeanTrominoes.PartrecSubtract
 import LeanTrominoes.PartrecSubtractSpace

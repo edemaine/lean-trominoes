@@ -148,6 +148,48 @@ theorem flatStripMotifStepCode_eval
   simp [flatStripMotifState,
     PeriodicStripFlatEncoding.cellFields]
 
+/-- Total list semantics used to state the reachable-state space invariant.
+Only the five-field case is reached from a valid flat strip presentation. -/
+def flatStripMotifNativeStep : List Nat → List Nat
+  | valid :: width :: period :: x :: y :: rest =>
+      let cell : Cell :=
+        (PeriodicCNFFlatEncoding.decodeIntField x,
+          PeriodicCNFFlatEncoding.decodeIntField y)
+      [(decide (valid ≠ 0) &&
+          decide (cell.InStripBounds width period)).toNat,
+        width, period] ++ rest
+  | values => values
+
+@[simp]
+theorem flatStripMotifNativeStep_state_cons
+    (width period : Nat) (valid : Bool)
+    (cell : Cell) (remaining : List Cell) :
+    flatStripMotifNativeStep
+        (flatStripMotifState width period valid (cell :: remaining)) =
+      flatStripMotifState width period
+        (valid && decide (cell.InStripBounds width period)) remaining := by
+  rcases cell with ⟨x, y⟩
+  cases valid <;>
+    by_cases inBounds : Cell.InStripBounds width period (x, y) <;>
+    simp [flatStripMotifNativeStep, flatStripMotifState,
+      PeriodicStripFlatEncoding.cellFields, inBounds]
+
+theorem flatStripMotifNativeStep_iterate
+    (width period : Nat) (valid : Bool) (motif : List Cell) :
+    ((flatStripMotifNativeStep)^[motif.length])
+        (flatStripMotifState width period valid motif) =
+      flatStripMotifState width period
+        (valid && motifInStripBounds width period motif) [] := by
+  induction motif generalizing valid with
+  | nil =>
+      simp [flatStripMotifState]
+  | cons cell remaining induction =>
+      simp only [List.length_cons]
+      rw [Function.iterate_succ_apply,
+        flatStripMotifNativeStep_state_cons]
+      simpa [Bool.and_assoc] using
+        induction (valid && decide (cell.InStripBounds width period))
+
 /-- Scanning exactly the explicit motif length consumes the entire coordinate
 tail and accumulates precisely the conjunction of all cell bounds. -/
 theorem flatStripMotifIterateCode_eval
