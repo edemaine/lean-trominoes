@@ -385,6 +385,10 @@ build; an imported proof counts when its statement matches the paper.
               operations, branches, and flat countdown bodies.
             - [ ] Bound each positive and zero countdown body by that
               envelope, then sum the exact additive cost.
+              - [x] Bound target/current coordinate projections and both
+                coordinate equalities.
+              - [ ] Bound Boolean coordinate matching, packed-word stepping,
+                and the found/continue branches.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.
           - [ ] Bound the five-column assignment lookup and fit its predicate

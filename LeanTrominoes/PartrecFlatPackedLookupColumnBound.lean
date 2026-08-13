@@ -381,6 +381,252 @@ theorem flatLookupCountdownBodySuccCost_le_budget
   simp only [flatCountdownBodyCost]
   omega
 
+/-! ## Lookup-component bounds -/
+
+/-- One positive native-field allowance for a complete lookup pass and all of
+its reachable suffix states. -/
+def flatPackedLookupInputUnit
+    (target : Cell) (motif : List Cell)
+    (wordLimit digitLimit : Nat) : Nat :=
+  encodedListSpace
+    (flatPackedLookupEnvelopeFields target motif wordLimit digitLimit) + 5
+
+theorem flatPackedLookupStateSpace_le_unit
+    (target : Cell) (motif suffix leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ suffix)
+    (wordBound : word ≤ wordLimit)
+    (digitBound : digit ≤ digitLimit) :
+    encodedListSpace
+        (Code.flatPackedLookupColumnState target word digit found selected
+          suffix) ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  have bound := flatPackedLookupStateSpace_le target motif suffix leading
+    word digit wordLimit digitLimit found selected decomposition
+    wordBound digitBound
+  change encodedListSpace
+      (Code.flatPackedLookupColumnState target word digit found selected
+        suffix) ≤
+    encodedListSpace
+      (flatPackedLookupEnvelopeFields target motif wordLimit digitLimit) + 5
+  omega
+
+theorem flatPackedLookupTargetXSpace_le_unit
+    (target : Cell) (motif : List Cell)
+    (wordLimit digitLimit : Nat) :
+    encodedListSpace [Encodable.encode target.1] ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let fields := flatPackedLookupEnvelopeFields target motif
+    wordLimit digitLimit
+  have member : Encodable.encode target.1 ∈ fields := by
+    simp [fields, flatPackedLookupEnvelopeFields]
+  have bound := flatLookupEncodedFieldSpace_le_of_mem
+    (Encodable.encode target.1) fields member
+  have widened :
+      (Computability.encodeNat (Encodable.encode target.1)).length + 1 ≤
+        encodedListSpace fields + 5 := by omega
+  simpa [flatPackedLookupInputUnit, fields,
+    encodedListSpace_cons, encodedListSpace_nil] using widened
+
+theorem flatPackedLookupTargetYSpace_le_unit
+    (target : Cell) (motif : List Cell)
+    (wordLimit digitLimit : Nat) :
+    encodedListSpace [Encodable.encode target.2] ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let fields := flatPackedLookupEnvelopeFields target motif
+    wordLimit digitLimit
+  have member : Encodable.encode target.2 ∈ fields := by
+    simp [fields, flatPackedLookupEnvelopeFields]
+  have bound := flatLookupEncodedFieldSpace_le_of_mem
+    (Encodable.encode target.2) fields member
+  have widened :
+      (Computability.encodeNat (Encodable.encode target.2)).length + 1 ≤
+        encodedListSpace fields + 5 := by omega
+  simpa [flatPackedLookupInputUnit, fields,
+    encodedListSpace_cons, encodedListSpace_nil] using widened
+
+theorem flatPackedLookupCellXSpace_le_unit
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (wordLimit digitLimit : Nat)
+    (decomposition : motif = leading ++ cell :: remaining) :
+    encodedListSpace [Encodable.encode cell.1] ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let fields := flatPackedLookupEnvelopeFields target motif
+    wordLimit digitLimit
+  have member : Encodable.encode cell.1 ∈ fields := by
+    simp [fields, flatPackedLookupEnvelopeFields, decomposition,
+      PeriodicStripFlatEncoding.cellFields]
+  have bound := flatLookupEncodedFieldSpace_le_of_mem
+    (Encodable.encode cell.1) fields member
+  have widened :
+      (Computability.encodeNat (Encodable.encode cell.1)).length + 1 ≤
+        encodedListSpace fields + 5 := by omega
+  simpa [flatPackedLookupInputUnit, fields,
+    encodedListSpace_cons, encodedListSpace_nil] using widened
+
+theorem flatPackedLookupCellYSpace_le_unit
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (wordLimit digitLimit : Nat)
+    (decomposition : motif = leading ++ cell :: remaining) :
+    encodedListSpace [Encodable.encode cell.2] ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let fields := flatPackedLookupEnvelopeFields target motif
+    wordLimit digitLimit
+  have member : Encodable.encode cell.2 ∈ fields := by
+    simp [fields, flatPackedLookupEnvelopeFields, decomposition,
+      PeriodicStripFlatEncoding.cellFields]
+  have bound := flatLookupEncodedFieldSpace_le_of_mem
+    (Encodable.encode cell.2) fields member
+  have widened :
+      (Computability.encodeNat (Encodable.encode cell.2)).length + 1 ≤
+        encodedListSpace fields + 5 := by omega
+  simpa [flatPackedLookupInputUnit, fields,
+    encodedListSpace_cons, encodedListSpace_nil] using widened
+
+theorem flatPackedLookupXEqualityArgumentsCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupXEqualityArgumentsCost target cell word digit found
+        selected remaining ≤
+      1000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    found selected (cell :: remaining)
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit found selected
+        decomposition wordBound digitBound
+  have cellXBound : encodedListSpace [Encodable.encode cell.1] ≤ unit := by
+    simpa [unit] using flatPackedLookupCellXSpace_le_unit
+      target cell motif remaining leading wordLimit digitLimit decomposition
+  have targetXBound : encodedListSpace [Encodable.encode target.1] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetXSpace_le_unit
+      target motif wordLimit digitLimit
+  have pairBound : encodedListSpace
+      [Encodable.encode cell.1, Encodable.encode target.1] ≤ 2 * unit :=
+    flatLookupConsSpace_le_of (Encodable.encode cell.1)
+      [Encodable.encode target.1] unit cellXBound targetXBound
+  have getCell := listCodeGetCost_le_linear 6 state
+  have getTarget := listCodeGetCost_le_linear 0 state
+  have getCellBound : getCost 6 state ≤ 70000 * (unit + 1) := by
+    exact getCell.trans (by gcongr)
+  have getTargetBound : getCost 0 state ≤ 10000 * (unit + 1) := by
+    exact getTarget.trans (by gcongr)
+  have estimate := listCodePrependCost_le_of state
+    [Encodable.encode cell.1] [Encodable.encode target.1]
+    (getCost 6 state) (getCost 0 state) (2 * unit)
+    (stateBound.trans (by omega)) (cellXBound.trans (by omega)) pairBound
+  change prependCost state [Encodable.encode cell.1]
+      [Encodable.encode target.1] (getCost 6 state) (getCost 0 state) ≤
+    1000000 * unit
+  omega
+
+theorem flatPackedLookupXEqualityCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupXEqualityCost target cell word digit found selected
+        remaining ≤
+      2000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have cellXBound : encodedListSpace [Encodable.encode cell.1] ≤ unit := by
+    simpa [unit] using flatPackedLookupCellXSpace_le_unit
+      target cell motif remaining leading wordLimit digitLimit decomposition
+  have targetXBound : encodedListSpace [Encodable.encode target.1] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetXSpace_le_unit
+      target motif wordLimit digitLimit
+  have equality := flatLookupNatEqCost_le_budget
+    (Encodable.encode cell.1) (Encodable.encode target.1) unit
+    cellXBound targetXBound
+  have arguments := flatPackedLookupXEqualityArgumentsCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    found selected decomposition wordBound digitBound
+  simp only [flatPackedLookupXEqualityCost]
+  simp only [unit] at equality arguments
+  omega
+
+theorem flatPackedLookupYEqualityArgumentsCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupYEqualityArgumentsCost target cell word digit found
+        selected remaining ≤
+      1000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    found selected (cell :: remaining)
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit found selected
+        decomposition wordBound digitBound
+  have cellYBound : encodedListSpace [Encodable.encode cell.2] ≤ unit := by
+    simpa [unit] using flatPackedLookupCellYSpace_le_unit
+      target cell motif remaining leading wordLimit digitLimit decomposition
+  have targetYBound : encodedListSpace [Encodable.encode target.2] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetYSpace_le_unit
+      target motif wordLimit digitLimit
+  have pairBound : encodedListSpace
+      [Encodable.encode cell.2, Encodable.encode target.2] ≤ 2 * unit :=
+    flatLookupConsSpace_le_of (Encodable.encode cell.2)
+      [Encodable.encode target.2] unit cellYBound targetYBound
+  have getCell := listCodeGetCost_le_linear 7 state
+  have getTarget := listCodeGetCost_le_linear 1 state
+  have getCellBound : getCost 7 state ≤ 80000 * (unit + 1) := by
+    exact getCell.trans (by gcongr)
+  have getTargetBound : getCost 1 state ≤ 20000 * (unit + 1) := by
+    exact getTarget.trans (by gcongr)
+  have estimate := listCodePrependCost_le_of state
+    [Encodable.encode cell.2] [Encodable.encode target.2]
+    (getCost 7 state) (getCost 1 state) (2 * unit)
+    (stateBound.trans (by omega)) (cellYBound.trans (by omega)) pairBound
+  change prependCost state [Encodable.encode cell.2]
+      [Encodable.encode target.2] (getCost 7 state) (getCost 1 state) ≤
+    1000000 * unit
+  omega
+
+theorem flatPackedLookupYEqualityCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupYEqualityCost target cell word digit found selected
+        remaining ≤
+      2000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have cellYBound : encodedListSpace [Encodable.encode cell.2] ≤ unit := by
+    simpa [unit] using flatPackedLookupCellYSpace_le_unit
+      target cell motif remaining leading wordLimit digitLimit decomposition
+  have targetYBound : encodedListSpace [Encodable.encode target.2] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetYSpace_le_unit
+      target motif wordLimit digitLimit
+  have equality := flatLookupNatEqCost_le_budget
+    (Encodable.encode cell.2) (Encodable.encode target.2) unit
+    cellYBound targetYBound
+  have arguments := flatPackedLookupYEqualityArgumentsCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    found selected decomposition wordBound digitBound
+  simp only [flatPackedLookupYEqualityCost]
+  simp only [unit] at equality arguments
+  omega
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing
