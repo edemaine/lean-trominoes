@@ -654,6 +654,9 @@ build; an imported proof counts when its statement matches the paper.
               marker block and compose both padding phases in polynomial time.
             - [x] Materialize the exact source-atom boundary used as the
               request's first fresh Tseitin atom as a third marker block.
+            - [x] Verify a quadratic finite machine that preserves a word and
+              converts any selected unary marker class to canonical native
+              binary.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1763,6 +1766,12 @@ The representation choices for this target are:
   by exactly the resulting number of unary markers.  Exact execution and
   runtime proofs package the construction as an explicit polynomial-time
   machine certificate.
+- [`LeanTrominoes/BinaryCountPaddingMachine.lean`](LeanTrominoes/BinaryCountPaddingMachine.lean)
+  converts a selected unary marker class into a canonical native binary
+  counter while preserving the complete source word.  Its verified carry
+  scan, counter restoration, source scan, and output reversal give exact
+  execution and output theorems, packaged with an explicit quadratic
+  polynomial-time certificate.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
