@@ -889,6 +889,7 @@ import LeanTrominoes.PartrecFlatPackedCenterBase
 import LeanTrominoes.PartrecFlatPackedCenterLoop
 import LeanTrominoes.PartrecFlatPackedOverlapAt
 import LeanTrominoes.PartrecFlatPackedOverlapLoop
+import LeanTrominoes.PartrecFlatPackedTransition
 import LeanTrominoes.PartrecFlatStripFrontierContext
 import LeanTrominoes.PartrecFrontierIndexDecode
 import LeanTrominoes.PartrecFrontierIndexDecodeSpace
