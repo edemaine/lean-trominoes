@@ -874,6 +874,7 @@ import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecDynamicDrop
 import LeanTrominoes.PartrecFlatSavitchContext
 import LeanTrominoes.PartrecFlatPackedAssignmentAt
+import LeanTrominoes.PartrecFlatPackedAssignmentPredicates
 import LeanTrominoes.PartrecFlatPackedLookupColumn
 import LeanTrominoes.PartrecFlatStripFrontierContext
 import LeanTrominoes.PartrecFrontierIndexDecode
