@@ -444,7 +444,7 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Lift bounded center validity across the motif.
             - [x] Fit and bound one-cell overlap using the two native flat
               assignment lookups.
-            - [ ] Lift bounded overlap across the motif and four shared
+            - [x] Lift bounded overlap across the motif and four shared
               columns.
             - [ ] Fit cyclic phase advance and combine normalization, center
               validity, and overlap into the complete flat transition.
@@ -1991,6 +1991,11 @@ The representation choices for this target are:
   for one shared-cell overlap comparison.  The final digit equality and all
   adapter overhead have a common quadratic bound in the seven-field flat
   overlap input, specialized to the semantic `overlapsAtBool` predicate.
+- [`LeanTrominoes/PartrecFlatPackedOverlapLoopSpace.lean`](LeanTrominoes/PartrecFlatPackedOverlapLoopSpace.lean)
+  reconstructs each indexed overlap query from the shared transition scan and
+  lifts the quadratic leaf through the exact motif countdown.  It then fits
+  and bounds the fixed conjunction of all four shared columns, including each
+  scan's initialization and result projection.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
