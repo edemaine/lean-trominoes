@@ -42,6 +42,7 @@ import LeanTrominoes.IndexedSavitchDFSComputability
 import LeanTrominoes.IndexedSavitchDFSListEncoding
 import LeanTrominoes.IndexedSavitchDFSPartrec
 import LeanTrominoes.IndexedSavitchDFSSpace
+import LeanTrominoes.TM2OutputLength
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.PlanarThreeSATGadgets
 import LeanTrominoes.EmbeddedCNFIncidenceDrawing

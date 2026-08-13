@@ -577,6 +577,10 @@ build; an imported proof counts when its statement matches the paper.
           evaluator runtime by an explicit polynomial.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
+          - [x] Bound the output length of every polynomial-time `FinTM2` by
+            an explicit polynomial using its fixed statement-push allowance.
+          - [ ] Construct and verify polynomial-time sequential composition
+            of two finite multi-stack machines.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1626,6 +1630,12 @@ The representation choices for this target are:
   emit canonical delimiter-terminated natural fields over the evaluator's
   native alphabet.  This supplies the polynomial-time input front end needed
   by the pending machine-to-periodic-CNF compiler certificate.
+- [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
+  counts primitive pushes along every finite statement path and sums those
+  counts into a uniform one-step allowance.  It proves total stack population
+  grows by at most that allowance per counted step, yielding an explicit
+  polynomial output-length bound for every `TM2ComputableInPolyTime` witness
+  and the quantitative intermediate-size fact needed for composition.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
