@@ -478,6 +478,12 @@ build; an imported proof counts when its statement matches the paper.
               normalization.
             - [x] Bound the complete reachability wrapper uniformly by the
               target flat input length.
+            - [x] Preserve the native strip suffix through both endpoint
+              countdowns and prove that the nested scan decides existence of
+              a directed frontier cycle.
+            - [ ] Fit and polynomially bound both native-flat endpoint scans.
+            - [ ] Assemble the flat well-formedness guard, search parameters,
+              and cycle scan into the final PSPACE decider.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
