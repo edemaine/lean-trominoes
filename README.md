@@ -361,6 +361,8 @@ build; an imported proof counts when its statement matches the paper.
           stream as the leaf of the exact-one coverage count.
         - [x] Count all 24 fixed covering candidates and decide exact-one
           coverage for one center target from flat motif fields.
+        - [x] Add the center-phase guard and combine containment with
+          exact-one coverage at one indexed flat motif base.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
