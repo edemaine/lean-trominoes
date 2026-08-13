@@ -2751,6 +2751,393 @@ def emitBinaryGate (kind : BinaryGateKind) (data : TapeData)
   rw [finalData] at composed
   convert composed using 1 <;> omega
 
+/-- Complete the common post-gate protocol: clear both operand registers,
+push the emitted gate's fresh atom onto the root stack, increment the fresh
+counter, and return to the instruction decoder. -/
+def finishGate (data : TapeData) (fresh : Nat)
+    (firstWord secondWord : List Γ')
+    (freshValue : data.fresh = trNat fresh)
+    (firstValue : data.first = firstWord)
+    (secondValue : data.second = secondWord)
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg .gateDone data)
+      (some (phaseCfg .decodeNext
+        { data with
+          fresh := trNat fresh.succ
+          roots := trList [fresh] ++ data.roots
+          first := []
+          second := [] }))
+      (firstWord.length + secondWord.length +
+        4 * (trNat fresh).length + 12) := by
+  let d₁ := data.setAtom .first []
+  let d₂ := d₁.setAtom .second []
+  let d₃ := { d₂ with roots := trList [fresh] ++ d₂.roots }
+  let d₄ := { d₃ with fresh := trNat fresh.succ }
+  have h₁ := oneStep (step_phase_gateDone data)
+  have h₂ : EvalsToInTime (TM2.step program)
+      (clearAtomCfg .first .afterClearFirst data)
+      (some (phaseCfg .afterClearFirst d₁))
+      (firstWord.length + 1) := by
+    simpa [d₁] using
+      clearAtom_to_phase .first .afterClearFirst data firstWord firstValue
+  have h₃ := oneStep (step_phase_afterClearFirst d₁)
+  have h₄ : EvalsToInTime (TM2.step program)
+      (clearAtomCfg .second .afterClearSecond d₁)
+      (some (phaseCfg .afterClearSecond d₂))
+      (secondWord.length + 1) := by
+    simpa [d₂, d₁, TapeData.setAtom, TapeData.atom] using
+      clearAtom_to_phase .second .afterClearSecond d₁ secondWord (by
+        simpa [d₁, TapeData.setAtom, TapeData.atom] using secondValue)
+  have h₅ := oneStep (step_phase_afterClearSecond d₂)
+  have h₆ : EvalsToInTime (TM2.step program)
+      (prepareFreshRootCfg .afterPushRoot d₂)
+      (some (phaseCfg .afterPushRoot d₃))
+      (2 * (trNat fresh).length + 3) := by
+    simpa [d₃, d₂, d₁, TapeData.setAtom] using
+      pushFreshRoot_trNat .afterPushRoot d₂ fresh
+        (by simpa [d₂, d₁, TapeData.setAtom] using freshValue)
+        (by simpa [d₂, d₁, TapeData.setAtom] using scratchValue)
+  have h₇ := oneStep (step_phase_afterPushRoot d₃)
+  have h₈ : EvalsToInTime (TM2.step program)
+      (incrementCfg .decodeNext d₃)
+      (some (phaseCfg .decodeNext d₄))
+      (2 * (trNat fresh).length + 3) := by
+    simpa [d₄, d₃, d₂, d₁, TapeData.setAtom] using
+      incrementFresh_trNat .decodeNext d₃ fresh
+        (by simpa [d₃, d₂, d₁, TapeData.setAtom] using freshValue)
+        (by simpa [d₃, d₂, d₁, TapeData.setAtom] using scratchValue)
+  have composed :=
+    thenRun (thenRun (thenRun (thenRun (thenRun (thenRun (thenRun h₁ h₂) h₃) h₄) h₅) h₆) h₇) h₈
+  have finalData :
+      d₄ =
+        { data with
+          fresh := trNat fresh.succ
+          roots := trList [fresh] ++ data.roots
+          first := []
+          second := [] } := by
+    rcases data with
+      ⟨input, outputReverse, output, freshWord, roots, first, second,
+        scratch⟩
+    simp [d₄, d₃, d₂, d₁, TapeData.setAtom]
+  rw [finalData] at composed
+  convert composed using 1 <;> omega
+
+/-- Execute one complete constant instruction from one decoder boundary to
+the next. -/
+def executeConstantInstruction (value : Bool) (data : TapeData)
+    (fresh : Nat) (rest : List Γ')
+    (inputValue :
+      data.input = trList (TransitionInstruction.fields (.constant value)) ++
+        rest)
+    (freshValue : data.fresh = trNat fresh)
+    (firstValue : data.first = [])
+    (secondValue : data.second = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext data)
+      (some (phaseCfg .decodeNext
+        { data with
+          input := rest
+          outputReverse :=
+            (trList (constantGateFields fresh value)).reverse ++
+              data.outputReverse
+          fresh := trNat fresh.succ
+          roots := trList [fresh] ++ data.roots
+          first := []
+          second := [] }))
+      (constantTagTime value + 6 * (trNat fresh).length + 17) := by
+  let d₁ := { data with input := rest }
+  let d₂ :=
+    { d₁ with
+      outputReverse :=
+        (trList (constantGateFields fresh value)).reverse ++
+          d₁.outputReverse }
+  have h₀ := oneStep (step_phase_decodeNext data)
+  have h₁ : EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (phaseCfg (.constantStart value) d₁))
+      (constantTagTime value) := by
+    simpa [d₁] using decodeConstantTag value data rest inputValue
+  have h₂ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.constantStart value) d₁)
+      (some (phaseCfg .gateDone d₂))
+      (2 * (trNat fresh).length + 4) := by
+    simpa [d₂] using emitConstantGate d₁ fresh value
+      (by simpa [d₁] using freshValue)
+      (by simpa [d₁] using scratchValue)
+  have h₃ := finishGate d₂ fresh [] []
+    (by simpa [d₂, d₁] using freshValue)
+    (by simpa [d₂, d₁] using firstValue)
+    (by simpa [d₂, d₁] using secondValue)
+    (by simpa [d₂, d₁] using scratchValue)
+  have composed := thenRun (thenRun (thenRun h₀ h₁) h₂) h₃
+  convert composed using 1 <;> simp [d₂, d₁] <;> omega
+
+def wireUnaryKind : TransitionSlice → UnaryGateKind
+  | .current => .equalityCurrent
+  | .next => .equalityNext
+
+@[simp]
+theorem unaryGateFields_wireUnaryKind (wire : TransitionWire)
+    (fresh : Nat) :
+    unaryGateFields (wireUnaryKind wire.slice) fresh wire.atom =
+      equalityGateFields fresh wire := by
+  rcases wire with ⟨slice, atom⟩
+  cases slice <;> rfl
+
+/-- Execute one complete source-wire instruction, including reading its
+variable-width atom payload from the instruction stream. -/
+def executeWireInstruction (wire : TransitionWire) (data : TapeData)
+    (fresh : Nat) (rest : List Γ')
+    (inputValue :
+      data.input = trList (TransitionInstruction.fields (.wire wire)) ++
+        rest)
+    (freshValue : data.fresh = trNat fresh)
+    (firstValue : data.first = [])
+    (secondValue : data.second = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext data)
+      (some (phaseCfg .decodeNext
+        { data with
+          input := rest
+          outputReverse :=
+            (trList (equalityGateFields fresh wire)).reverse ++
+              data.outputReverse
+          fresh := trNat fresh.succ
+          roots := trList [fresh] ++ data.roots
+          first := []
+          second := [] }))
+      (wireTagTime wire.slice + 8 * (trNat fresh).length +
+        7 * (trNat wire.atom).length + 28) := by
+  let kind := wireUnaryKind wire.slice
+  let d₁ := { data with input := trList [wire.atom] ++ rest }
+  let d₂ :=
+    { (d₁.setField .input rest).setAtom .first (trNat wire.atom) with
+      scratch := [] }
+  let d₃ :=
+    { d₂ with
+      outputReverse :=
+        (trList (equalityGateFields fresh wire)).reverse ++
+          d₂.outputReverse }
+  have h₀ := oneStep (step_phase_decodeNext data)
+  have h₁ : EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (readFieldCfg .input .first (.unaryStart kind) d₁))
+      (wireTagTime wire.slice) := by
+    simpa [kind, wireUnaryKind, d₁] using
+      decodeWireTag wire data rest inputValue
+  have h₂ : EvalsToInTime (TM2.step program)
+      (readFieldCfg .input .first (.unaryStart kind) d₁)
+      (some (phaseCfg (.unaryStart kind) d₂))
+      (2 * (trNat wire.atom).length + 2) := by
+    simpa [d₂] using
+      readField_trNat .input .first (.unaryStart kind) d₁ wire.atom rest
+        (by simp [d₁, TapeData.field, trList])
+        (by simpa [d₁, TapeData.atom] using firstValue)
+        (by simpa [d₁] using scratchValue)
+  have h₃ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryStart kind) d₂)
+      (some (phaseCfg .gateDone d₃))
+      (4 * (trNat fresh).length +
+        4 * (trNat wire.atom).length + 13) := by
+    have emitted := emitUnaryGate kind d₂ fresh wire.atom
+      (by simpa [d₂, d₁, TapeData.setField, TapeData.setAtom,
+        TapeData.atom] using freshValue)
+      (by simp [d₂, d₁, TapeData.setField, TapeData.setAtom])
+      (by simp [d₂])
+    have gateEq :
+        unaryGateFields kind fresh wire.atom =
+          equalityGateFields fresh wire := by
+      simpa [kind] using unaryGateFields_wireUnaryKind wire fresh
+    rw [gateEq] at emitted
+    simpa [d₃] using emitted
+  have h₄ := finishGate d₃ fresh (trNat wire.atom) []
+    (by simpa [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+      TapeData.atom] using freshValue)
+    (by simp [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom])
+    (by simpa [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+      TapeData.atom] using secondValue)
+    (by simp [d₃, d₂])
+  have composed := thenRun (thenRun (thenRun (thenRun h₀ h₁) h₂) h₃) h₄
+  convert composed using 1 <;>
+    simp [d₃, d₂, d₁, kind, TapeData.setField, TapeData.setAtom,
+      TapeData.atom, scratchValue, Nat.add_comm] <;>
+    ring
+
+/-- Execute one complete negation instruction, popping its unique operand
+root and replacing it by the fresh output root. -/
+def executeNegateInstruction (data : TapeData) (fresh input : Nat)
+    (remainingRoots : List Γ') (rest : List Γ')
+    (inputValue :
+      data.input = trList (TransitionInstruction.fields .negate) ++ rest)
+    (freshValue : data.fresh = trNat fresh)
+    (rootsValue : data.roots = trList [input] ++ remainingRoots)
+    (firstValue : data.first = [])
+    (secondValue : data.second = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext data)
+      (some (phaseCfg .decodeNext
+        { data with
+          input := rest
+          outputReverse :=
+            (trList (notGateFields fresh (gateOutput input))).reverse ++
+              data.outputReverse
+          fresh := trNat fresh.succ
+          roots := trList [fresh] ++ remainingRoots
+          first := []
+          second := [] }))
+      (8 * (trNat fresh).length + 7 * (trNat input).length + 31) := by
+  let d₁ := { data with input := rest }
+  let d₂ :=
+    { (d₁.setField .roots remainingRoots).setAtom .first (trNat input) with
+      scratch := [] }
+  let d₃ :=
+    { d₂ with
+      outputReverse :=
+        (trList (notGateFields fresh (gateOutput input))).reverse ++
+          d₂.outputReverse }
+  have h₀ := oneStep (step_phase_decodeNext data)
+  have h₁ : EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (readFieldCfg .roots .first (.unaryStart .negation) d₁)) 3 := by
+    simpa [d₁] using decodeNegateTag data rest inputValue
+  have h₂ : EvalsToInTime (TM2.step program)
+      (readFieldCfg .roots .first (.unaryStart .negation) d₁)
+      (some (phaseCfg (.unaryStart .negation) d₂))
+      (2 * (trNat input).length + 2) := by
+    simpa [d₂] using
+      readField_trNat .roots .first (.unaryStart .negation) d₁ input
+        remainingRoots
+        (by simpa [d₁, TapeData.field] using rootsValue)
+        (by simpa [d₁, TapeData.atom] using firstValue)
+        (by simpa [d₁] using scratchValue)
+  have h₃ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.unaryStart .negation) d₂)
+      (some (phaseCfg .gateDone d₃))
+      (4 * (trNat fresh).length + 4 * (trNat input).length + 13) := by
+    simpa [d₃, unaryGateFields] using
+      emitUnaryGate .negation d₂ fresh input
+        (by simpa [d₂, d₁, TapeData.setField, TapeData.setAtom,
+          TapeData.atom] using freshValue)
+        (by simp [d₂, d₁, TapeData.setField, TapeData.setAtom])
+        (by simp [d₂])
+  have h₄ := finishGate d₃ fresh (trNat input) []
+    (by simpa [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+      TapeData.atom] using freshValue)
+    (by simp [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom])
+    (by simpa [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+      TapeData.atom] using secondValue)
+    (by simp [d₃, d₂])
+  have composed := thenRun (thenRun (thenRun (thenRun h₀ h₁) h₂) h₃) h₄
+  convert composed using 1 <;>
+    simp [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+      TapeData.atom, scratchValue, Nat.add_comm] <;>
+    ring
+
+def binaryInstruction : BinaryGateKind → TransitionInstruction
+  | .conjunction => .conjoin
+  | .disjunction => .disjoin
+
+/-- Execute one complete binary instruction, popping its right operand and
+then its left operand before replacing both by the fresh output root. -/
+def executeBinaryInstruction (kind : BinaryGateKind) (data : TapeData)
+    (fresh first second : Nat) (remainingRoots rest : List Γ')
+    (inputValue :
+      data.input = trList (TransitionInstruction.fields
+        (binaryInstruction kind)) ++ rest)
+    (freshValue : data.fresh = trNat fresh)
+    (rootsValue :
+      data.roots = trList [second, first] ++ remainingRoots)
+    (firstValue : data.first = [])
+    (secondValue : data.second = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext data)
+      (some (phaseCfg .decodeNext
+        { data with
+          input := rest
+          outputReverse :=
+            (trList (binaryGateFields kind fresh first second)).reverse ++
+              data.outputReverse
+          fresh := trNat fresh.succ
+          roots := trList [fresh] ++ remainingRoots
+          first := []
+          second := [] }))
+      (binaryTagTime kind + 10 * (trNat fresh).length +
+        7 * (trNat first).length + 7 * (trNat second).length + 40) := by
+  let d₁ := { data with input := rest }
+  let d₂ :=
+    { (d₁.setField .roots
+        (trList [first] ++ remainingRoots)).setAtom .second
+          (trNat second) with
+      scratch := [] }
+  let d₃ :=
+    { (d₂.setField .roots remainingRoots).setAtom .first (trNat first) with
+      scratch := [] }
+  let d₄ :=
+    { d₃ with
+      outputReverse :=
+        (trList (binaryGateFields kind fresh first second)).reverse ++
+          d₃.outputReverse }
+  have h₀ := oneStep (step_phase_decodeNext data)
+  have h₁ : EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (readFieldCfg .roots .second (.binaryReadFirst kind) d₁))
+      (binaryTagTime kind) := by
+    simpa [d₁, binaryInstruction] using
+      decodeBinaryTag kind data rest (by
+        simpa [binaryInstruction] using inputValue)
+  have h₂ : EvalsToInTime (TM2.step program)
+      (readFieldCfg .roots .second (.binaryReadFirst kind) d₁)
+      (some (phaseCfg (.binaryReadFirst kind) d₂))
+      (2 * (trNat second).length + 2) := by
+    simpa [d₂] using
+      readField_trNat .roots .second (.binaryReadFirst kind) d₁ second
+        (trList [first] ++ remainingRoots)
+        (by simpa [d₁, TapeData.field, trList, List.append_assoc]
+          using rootsValue)
+        (by simpa [d₁, TapeData.atom] using secondValue)
+        (by simpa [d₁] using scratchValue)
+  have h₃ := oneStep (step_phase_binaryReadFirst kind d₂)
+  have h₄ : EvalsToInTime (TM2.step program)
+      (readFieldCfg .roots .first (.binaryStart kind) d₂)
+      (some (phaseCfg (.binaryStart kind) d₃))
+      (2 * (trNat first).length + 2) := by
+    simpa [d₃] using
+      readField_trNat .roots .first (.binaryStart kind) d₂ first
+        remainingRoots
+        (by simp [d₂, d₁, TapeData.setField, TapeData.setAtom,
+          TapeData.field])
+        (by simpa [d₂, d₁, TapeData.setField, TapeData.setAtom,
+          TapeData.atom] using firstValue)
+        (by simp [d₂])
+  have h₅ : EvalsToInTime (TM2.step program)
+      (phaseCfg (.binaryStart kind) d₃)
+      (some (phaseCfg .gateDone d₄))
+      (6 * (trNat fresh).length + 4 * (trNat first).length +
+        4 * (trNat second).length + 22) := by
+    simpa [d₄] using emitBinaryGate kind d₃ fresh first second
+      (by simpa [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+        TapeData.atom] using freshValue)
+      (by simp [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom])
+      (by simp [d₃, d₂, d₁, TapeData.setField, TapeData.setAtom])
+      (by simp [d₃, d₂])
+  have h₆ := finishGate d₄ fresh (trNat first) (trNat second)
+    (by simpa [d₄, d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+      TapeData.atom] using freshValue)
+    (by simp [d₄, d₃, d₂, d₁, TapeData.setField, TapeData.setAtom])
+    (by simp [d₄, d₃, d₂, d₁, TapeData.setField, TapeData.setAtom])
+    (by simp [d₄, d₃, d₂])
+  have composed :=
+    thenRun (thenRun (thenRun (thenRun (thenRun (thenRun h₀ h₁) h₂) h₃) h₄) h₅) h₆
+  convert composed using 1 <;>
+    simp [d₄, d₃, d₂, d₁, TapeData.setField, TapeData.setAtom,
+      TapeData.atom, scratchValue, Nat.add_comm] <;>
+    ring
+
 end TransitionEvaluatorMachine
 end PeriodicCNF
 end LeanTrominoes
