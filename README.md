@@ -406,6 +406,8 @@ build; an imported proof counts when its statement matches the paper.
             wrappers.
             - [x] Place every reachable one-column scanner call in one common
               five-pass quadratic envelope.
+            - [x] Bound selected-column testing, native scanner-input
+              reconstruction, and one complete scanner invocation.
             - [ ] Bound one complete numbered stage, unroll all five, and
               bound initialization/projection.
           - [ ] Fit normalization, center validity, overlap, and the complete
