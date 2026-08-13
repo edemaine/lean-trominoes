@@ -666,6 +666,13 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Append the exact unary and canonical binary space, clock,
                 and fresh values, and certify the complete pipeline in
                 polynomial time.
+            - [ ] Stream the normalized bounded-expression postorder program.
+              - [x] Mirror conjunction, disjunction, equality, exact-one,
+                vector equality, and binary successor directly on instruction
+                lists, and prove exact agreement with expression postorder.
+              - [ ] Normalize bounded-machine fields, configurations, clocks,
+                statement paths, and the designated reset relation.
+              - [ ] Implement the finite counter-driven instruction emitter.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1596,6 +1603,13 @@ The representation choices for this target are:
   stream.  Its one-pass stack interpreter emits exactly the direct structural
   compiler fields, with one instruction per expression node and at most three
   natural fields per instruction.
+- [`LeanTrominoes/PeriodicCNFTransitionProgramVectors.lean`](LeanTrominoes/PeriodicCNFTransitionProgramVectors.lean)
+  mirrors the reusable Boolean-vector expression combinators directly on flat
+  postorder instruction lists.  It covers finite conjunction and disjunction,
+  Boolean and vector equality, recursive exact-one constraints, and binary
+  succession, proving each list-level program exactly equals the ordinary
+  expression traversal.  This is the normalized instruction interface used
+  by the bounded request printer.
 - [`LeanTrominoes/PeriodicCNFTransitionProgramEncoding.lean`](LeanTrominoes/PeriodicCNFTransitionProgramEncoding.lean)
   fixes the native evaluator request format, proves exact decoder round trips,
   and identifies a total request evaluator with the verified formula-field
