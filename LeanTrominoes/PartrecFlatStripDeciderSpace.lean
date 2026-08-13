@@ -1466,6 +1466,139 @@ theorem flatStripWellFormed_fits (periodicStrip : PeriodicStrip) :
     inputSpace, Code.stripWellFormedAccumulator_eq,
     Code.flatStripMotifState] using final
 
+/-! ## Guarded cycle-search composition -/
+
+def flatStripCycleBranchCost (periodicStrip : PeriodicStrip) : Nat :=
+  FlatStripCyclePartrec.flatStripCycleSearchSpaceBound
+      (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length +
+    flatStripCycleParametersCost periodicStrip
+
+theorem flatStripCycleBranch_fits (tromino : Tromino)
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed) :
+    EvaluatorCodeFits
+      ((FlatStripCyclePartrec.flatStripCycleSearchCode tromino).comp
+        flatStripCycleParametersCode)
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [divideBoolTag
+        (cycleSearchIndexDFSBoolAtDepth
+          (flatStripStateBound periodicStrip)
+          (flatStripSearchDepth periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip))]
+      (flatStripCycleBranchCost periodicStrip) := by
+  simpa [flatStripCycleBranchCost] using EvaluatorCodeFits.comp
+    (FlatStripCyclePartrec.flatStripCycleSearch_fits_polynomial
+      tromino periodicStrip wellFormed)
+    (flatStripCycleParameters_fits periodicStrip)
+
+private theorem flatEncodeBool_eq_divideBoolTag (value : Bool) :
+    Encodable.encode value = divideBoolTag value := by
+  cases value <;> rfl
+
+def flatPeriodicStripTrominoTilingCost
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) : Nat :=
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let output := [Encodable.encode
+    (flatPeriodicStripTrominoTilingBool tromino periodicStrip)]
+  if _wellFormed : periodicStrip.IsWellFormed then
+    branchZeroSuccCost fields output periodicStrip.wellFormed.toNat
+      (flatStripWellFormedSpaceBound (encodedListSpace fields))
+      (flatStripCycleBranchCost periodicStrip)
+  else
+    branchZeroZeroCost fields output periodicStrip.wellFormed.toNat
+      (flatStripWellFormedSpaceBound (encodedListSpace fields))
+      (zeroCost fields)
+
+set_option maxHeartbeats 1000000 in
+/-- Exact evaluator certificate for the complete native-flat guarded
+cycle-search decider. -/
+theorem flatPeriodicStripTrominoTiling_fits
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits (flatPeriodicStripTrominoTilingCode tromino)
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [Encodable.encode
+        (flatPeriodicStripTrominoTilingBool tromino periodicStrip)]
+      (flatPeriodicStripTrominoTilingCost tromino periodicStrip) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  by_cases wellFormed : periodicStrip.IsWellFormed
+  · have wellFormedBool : periodicStrip.wellFormed = true :=
+      (periodicStrip.wellFormed_eq_true_iff).mpr wellFormed
+    let result := cycleSearchIndexDFSBoolAtDepth
+      (flatStripStateBound periodicStrip)
+      (flatStripSearchDepth periodicStrip)
+      (indexedTransitionRawBool tromino periodicStrip)
+    have selected := branchZero_succ
+      (whenZero := Code.zero)
+      (testValue := periodicStrip.wellFormed.toNat)
+      (show 0 < periodicStrip.wellFormed.toNat by
+        simp [wellFormedBool])
+      (flatStripWellFormed_fits periodicStrip)
+      (flatStripCycleBranch_fits tromino periodicStrip wellFormed)
+    have resultEq :
+        flatPeriodicStripTrominoTilingBool tromino periodicStrip =
+          result := by
+      simp [flatPeriodicStripTrominoTilingBool, wellFormed, result]
+      rfl
+    have costEq :
+        flatPeriodicStripTrominoTilingCost tromino periodicStrip =
+          branchZeroSuccCost fields [divideBoolTag result]
+            periodicStrip.wellFormed.toNat
+            (flatStripWellFormedSpaceBound (encodedListSpace fields))
+            (flatStripCycleBranchCost periodicStrip) := by
+      simp only [flatPeriodicStripTrominoTilingCost, fields,
+        dif_pos wellFormed, resultEq, flatEncodeBool_eq_divideBoolTag]
+    rw [resultEq]
+    rw [flatEncodeBool_eq_divideBoolTag]
+    rw [costEq]
+    change EvaluatorCodeFits
+      (Code.branchZero Code.flatStripWellFormedCode Code.zero
+        ((FlatStripCyclePartrec.flatStripCycleSearchCode tromino).comp
+          flatStripCycleParametersCode))
+      fields [divideBoolTag result]
+      (branchZeroSuccCost fields [divideBoolTag result]
+        periodicStrip.wellFormed.toNat
+        (flatStripWellFormedSpaceBound (encodedListSpace fields))
+        (flatStripCycleBranchCost periodicStrip))
+    exact selected
+  · have wellFormedBool : periodicStrip.wellFormed = false := by
+      apply Bool.eq_false_iff.mpr
+      intro true
+      exact wellFormed
+        ((periodicStrip.wellFormed_eq_true_iff).mp true)
+    have selected := branchZero_zero
+      (whenSucc :=
+        (FlatStripCyclePartrec.flatStripCycleSearchCode tromino).comp
+          flatStripCycleParametersCode)
+      (testValue := periodicStrip.wellFormed.toNat)
+      (show periodicStrip.wellFormed.toNat = 0 by
+        simp [wellFormedBool])
+      (flatStripWellFormed_fits periodicStrip)
+      (zero fields)
+    have resultEq :
+        flatPeriodicStripTrominoTilingBool tromino periodicStrip =
+          false := by
+      simp [flatPeriodicStripTrominoTilingBool, wellFormed]
+    have costEq :
+        flatPeriodicStripTrominoTilingCost tromino periodicStrip =
+          branchZeroZeroCost fields [divideBoolTag false]
+            periodicStrip.wellFormed.toNat
+            (flatStripWellFormedSpaceBound (encodedListSpace fields))
+            (zeroCost fields) := by
+      simp only [flatPeriodicStripTrominoTilingCost, fields,
+        dif_neg wellFormed, resultEq, flatEncodeBool_eq_divideBoolTag]
+    rw [resultEq, flatEncodeBool_eq_divideBoolTag]
+    rw [costEq]
+    change EvaluatorCodeFits
+      (Code.branchZero Code.flatStripWellFormedCode Code.zero
+        ((FlatStripCyclePartrec.flatStripCycleSearchCode tromino).comp
+          flatStripCycleParametersCode))
+      fields [divideBoolTag false]
+      (branchZeroZeroCost fields [divideBoolTag false]
+        periodicStrip.wellFormed.toNat
+        (flatStripWellFormedSpaceBound (encodedListSpace fields))
+        (zeroCost fields))
+    exact selected
+
 end FlatStripDeciderPartrec
 end RawWindowState
 end PeriodicStrip

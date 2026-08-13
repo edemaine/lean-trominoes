@@ -506,7 +506,10 @@ build; an imported proof counts when its statement matches the paper.
                     an exact reachable-suffix invariant.
                   - [x] Assemble and fit dimension checks, loop input, and
                     final projection into the complete well-formedness guard.
-                  - [ ] Compose the guarded cycle search.
+                  - [x] Compose the guard, parameter assembly, and native
+                    cycle search into one exact evaluator certificate.
+                  - [ ] Bound the combined exact cost by one explicit
+                    polynomial in the target encoding length.
               - [ ] Package the evaluator certificate as flat-encoding PSPACE
                 membership.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
