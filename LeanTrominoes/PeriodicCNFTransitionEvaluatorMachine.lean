@@ -70,6 +70,7 @@ inductive Phase
 inductive Label
   | copyAtom (source : AtomSource) (next : Phase)
   | restoreAtom (source : AtomSource) (next : Phase)
+  | incrementFresh (next : Phase)
   | phase (phase : Phase)
   deriving DecidableEq, Fintype
 
@@ -95,6 +96,22 @@ def program : Label → TM2.Stmt Alphabet Label State
           (.push source.stack (fun state => state.getD default)
             (.load (fun _ => none)
               (.goto fun _ => .restoreAtom source next))))
+  | .incrementFresh next =>
+      .pop .fresh (fun _ symbol => symbol)
+        (.branch Option.isNone
+          (.push .scratch (fun _ => .bit1)
+            (.load (fun _ => none)
+              (.goto fun _ => .restoreAtom .fresh next)))
+          (.branch (fun state =>
+              match state with
+              | some .bit0 => true
+              | _ => false)
+            (.push .scratch (fun _ => .bit1)
+              (.load (fun _ => none)
+                (.goto fun _ => .restoreAtom .fresh next)))
+            (.push .scratch (fun _ => .bit0)
+              (.load (fun _ => none)
+                (.goto fun _ => .incrementFresh next)))))
   | .phase .done => .halt
 
 /-- The finite machine containing the atom-emission primitive.  Subsequent
@@ -170,6 +187,10 @@ def phaseCfg (next : Phase) (data : TapeData) :
     TM2.Cfg Alphabet Label State :=
   ⟨some (.phase next), none, tapes data⟩
 
+def incrementCfg (next : Phase) (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some (.incrementFresh next), none, tapes data⟩
+
 @[simp]
 theorem update_tapes_outputReverse (data : TapeData) (value : List Γ') :
     Function.update (tapes data) Stack.outputReverse value =
@@ -199,6 +220,70 @@ def oneStep {first last : TM2.Cfg Alphabet Label State}
     (step : TM2.step program first = some last) :
     EvalsToInTime (TM2.step program) first (some last) 1 :=
   FiniteBlockTransducer.oneStep step
+
+/-- Little-endian binary successor on native words.  The evaluator only calls
+this function on canonical `trNat` words. -/
+def incrementNative : List Γ' → List Γ'
+  | [] => [.bit1]
+  | .bit0 :: rest => .bit1 :: rest
+  | _ :: rest => .bit0 :: incrementNative rest
+
+/-- The untouched high suffix and reversed changed low prefix produced by the
+carry scan. -/
+def incrementCarry : List Γ' → List Γ' × List Γ'
+  | [] => ([], [.bit1])
+  | .bit0 :: rest => (rest, [.bit1])
+  | _ :: rest =>
+      let result := incrementCarry rest
+      (result.1, result.2 ++ [.bit0])
+
+/-- Number of carry-scan transitions. -/
+def incrementCarrySteps : List Γ' → Nat
+  | [] => 1
+  | .bit0 :: _ => 1
+  | _ :: rest => incrementCarrySteps rest + 1
+
+theorem incrementCarry_spec (word : List Γ') :
+    (incrementCarry word).2.reverse ++ (incrementCarry word).1 =
+      incrementNative word := by
+  induction word with
+  | nil => rfl
+  | cons symbol word induction =>
+      cases symbol <;>
+        simp [incrementCarry, incrementNative, List.reverse_append,
+          induction, List.append_assoc]
+
+theorem incrementCarrySteps_le (word : List Γ') :
+    incrementCarrySteps word ≤ word.length + 1 := by
+  induction word with
+  | nil => simp [incrementCarrySteps]
+  | cons symbol word induction =>
+      cases symbol <;> simp [incrementCarrySteps] <;> omega
+
+theorem incrementCarry_reverse_length_le (word : List Γ') :
+    (incrementCarry word).2.length ≤ word.length + 1 := by
+  induction word with
+  | nil => simp [incrementCarry]
+  | cons symbol word induction =>
+      cases symbol <;> simp [incrementCarry] <;> omega
+
+theorem incrementNative_trPosNum (number : PosNum) :
+    incrementNative (trPosNum number) = trPosNum number.succ := by
+  induction number with
+  | one => rfl
+  | bit0 number induction => rfl
+  | bit1 number induction =>
+      simp [trPosNum, incrementNative, PosNum.succ, induction]
+
+@[simp]
+theorem incrementNative_trNat (number : Nat) :
+    incrementNative (trNat number) = trNat number.succ := by
+  simp only [trNat, Nat.cast_succ, Num.add_one]
+  cases encoded : (number : Num) with
+  | zero => rfl
+  | pos positive =>
+      simpa [Num.succ, Num.succ', trNum] using
+        incrementNative_trPosNum positive
 
 def copyBitData (data : TapeData) (source : AtomSource)
     (symbol : Γ') (tail : List Γ') : TapeData :=
@@ -307,6 +392,150 @@ theorem step_restoreAtom_nil (source : AtomSource) (next : Phase)
     simp [TM2.step, program, restoreCfg, phaseCfg, tapes,
       AtomSource.stack, scratchValue, Function.update]
 
+def incrementScanData (data : TapeData) (word : List Γ') : TapeData :=
+  { data with
+    fresh := (incrementCarry word).1
+    scratch := (incrementCarry word).2 ++ data.scratch }
+
+theorem step_incrementFresh_nil (next : Phase) (data : TapeData)
+    (freshValue : data.fresh = []) :
+    TM2.step program (incrementCfg next data) =
+      some (restoreCfg .fresh next
+        { data with
+          fresh := []
+          scratch := .bit1 :: data.scratch }) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change fresh = [] at freshValue
+  subst fresh
+  simp [TM2.step, program, incrementCfg, restoreCfg, tapes,
+    Function.update]
+  congr 1
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_incrementFresh_bit0 (next : Phase) (data : TapeData)
+    (tail : List Γ') (freshValue : data.fresh = .bit0 :: tail) :
+    TM2.step program (incrementCfg next data) =
+      some (restoreCfg .fresh next
+        { data with
+          fresh := tail
+          scratch := .bit1 :: data.scratch }) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change fresh = .bit0 :: tail at freshValue
+  subst fresh
+  simp [TM2.step, program, incrementCfg, restoreCfg, tapes,
+    Function.update]
+  congr 1
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+theorem step_incrementFresh_carry (next : Phase) (data : TapeData)
+    (symbol : Γ') (tail : List Γ') (notZero : symbol ≠ .bit0)
+    (freshValue : data.fresh = symbol :: tail) :
+    TM2.step program (incrementCfg next data) =
+      some (incrementCfg next
+        { data with
+          fresh := tail
+          scratch := .bit0 :: data.scratch }) := by
+  rcases data with
+    ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+  change fresh = symbol :: tail at freshValue
+  subst fresh
+  cases symbol <;> simp_all [TM2.step, program, incrementCfg, tapes,
+    Function.update]
+  all_goals
+    congr 1
+    funext stack
+    cases stack <;> simp [tapes, Function.update]
+
+/-- The carry scan reaches the restoration loop with the exact high suffix
+and reversed changed low prefix. -/
+def incrementFresh_to_restore (next : Phase) (data : TapeData)
+    (word : List Γ') (freshValue : data.fresh = word) :
+    EvalsToInTime (TM2.step program)
+      (incrementCfg next data)
+      (some (restoreCfg .fresh next (incrementScanData data word)))
+      (incrementCarrySteps word) := by
+  induction word generalizing data with
+  | nil =>
+      have step := oneStep (step_incrementFresh_nil next data freshValue)
+      convert step using 1
+      · simp [incrementScanData, incrementCarry, freshValue]
+      · simp [incrementCarrySteps]
+  | cons symbol word induction =>
+      cases symbol with
+      | bit0 =>
+          have step := oneStep
+            (step_incrementFresh_bit0 next data word freshValue)
+          convert step using 1
+          · simp [incrementScanData, incrementCarry, freshValue]
+          · simp [incrementCarrySteps]
+      | bit1 =>
+          let nextData : TapeData :=
+            { data with
+              fresh := word
+              scratch := .bit0 :: data.scratch }
+          have first := oneStep
+            (step_incrementFresh_carry next data .bit1 word (by decide)
+              freshValue)
+          have rest := induction nextData rfl
+          have target :
+              incrementScanData nextData word =
+                incrementScanData data (.bit1 :: word) := by
+            simp [nextData, incrementScanData, incrementCarry,
+              List.append_assoc]
+          rw [target] at rest
+          have composed := EvalsToInTime.trans (TM2.step program)
+            1 (incrementCarrySteps word)
+            (incrementCfg next data) (incrementCfg next nextData)
+            (some (restoreCfg .fresh next
+              (incrementScanData data (.bit1 :: word)))) first rest
+          convert composed using 1 <;> simp [incrementCarrySteps]
+      | cons =>
+          let nextData : TapeData :=
+            { data with
+              fresh := word
+              scratch := .bit0 :: data.scratch }
+          have first := oneStep
+            (step_incrementFresh_carry next data .cons word (by decide)
+              freshValue)
+          have rest := induction nextData rfl
+          have target :
+              incrementScanData nextData word =
+                incrementScanData data (.cons :: word) := by
+            simp [nextData, incrementScanData, incrementCarry,
+              List.append_assoc]
+          rw [target] at rest
+          have composed := EvalsToInTime.trans (TM2.step program)
+            1 (incrementCarrySteps word)
+            (incrementCfg next data) (incrementCfg next nextData)
+            (some (restoreCfg .fresh next
+              (incrementScanData data (.cons :: word)))) first rest
+          convert composed using 1 <;> simp [incrementCarrySteps]
+      | consₗ =>
+          let nextData : TapeData :=
+            { data with
+              fresh := word
+              scratch := .bit0 :: data.scratch }
+          have first := oneStep
+            (step_incrementFresh_carry next data .consₗ word (by decide)
+              freshValue)
+          have rest := induction nextData rfl
+          have target :
+              incrementScanData nextData word =
+                incrementScanData data (.consₗ :: word) := by
+            simp [nextData, incrementScanData, incrementCarry,
+              List.append_assoc]
+          rw [target] at rest
+          have composed := EvalsToInTime.trans (TM2.step program)
+            1 (incrementCarrySteps word)
+            (incrementCfg next data) (incrementCfg next nextData)
+            (some (restoreCfg .fresh next
+              (incrementScanData data (.consₗ :: word)))) first rest
+          convert composed using 1 <;> simp [incrementCarrySteps]
+
 /-- Tape state after consuming an atom into the reverse-output and scratch
 stacks. -/
 def copiedAtomData (data : TapeData) (source : AtomSource)
@@ -410,6 +639,50 @@ def restoreAtom_to_phase (source : AtomSource) (next : Phase)
         (some (phaseCfg next
           (restoredAtomData data source (symbol :: word)))) first rest
       convert composed using 1 <;> simp
+
+/-- Increment a canonical native fresh-atom counter in place.  The generous
+uniform bound covers the carry scan, reversal of the changed prefix, and the
+final empty-scratch transition. -/
+def incrementFresh_trNat (next : Phase) (data : TapeData) (number : Nat)
+    (freshValue : data.fresh = trNat number)
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (incrementCfg next data)
+      (some (phaseCfg next
+        { data with fresh := trNat number.succ }))
+      (2 * (trNat number).length + 3) := by
+  let word := trNat number
+  have scanned := incrementFresh_to_restore next data word (by
+    simpa [word] using freshValue)
+  have restored := restoreAtom_to_phase .fresh next
+    (incrementScanData data word) (incrementCarry word).2 (by
+      simp [incrementScanData, scratchValue])
+  have finalData :
+      restoredAtomData (incrementScanData data word) .fresh
+          (incrementCarry word).2 =
+        { data with fresh := trNat number.succ } := by
+    rcases data with
+      ⟨input, outputReverse, output, fresh, roots, first, second, scratch⟩
+    change fresh = trNat number at freshValue
+    change scratch = [] at scratchValue
+    subst fresh
+    subst scratch
+    simp [restoredAtomData, incrementScanData, TapeData.atom,
+      TapeData.setAtom, incrementCarry_spec, word]
+  rw [finalData] at restored
+  have composed := EvalsToInTime.trans (TM2.step program)
+    (incrementCarrySteps word) ((incrementCarry word).2.length + 1)
+    (incrementCfg next data)
+    (restoreCfg .fresh next (incrementScanData data word))
+    (some (phaseCfg next { data with fresh := trNat number.succ }))
+    scanned restored
+  refine
+    { toEvalsTo := composed.toEvalsTo
+      steps_le_m := composed.steps_le_m.trans ?_ }
+  have scanBound := incrementCarrySteps_le word
+  have reverseBound := incrementCarry_reverse_length_le word
+  dsimp only [word] at scanBound reverseBound ⊢
+  omega
 
 /-- Emit one delimiter-terminated atom field into the reverse accumulator and
 restore the atom register exactly. -/
