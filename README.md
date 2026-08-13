@@ -638,6 +638,15 @@ build; an imported proof counts when its statement matches the paper.
             generator, the quadratic formula evaluator, and semantic
             correctness into the final reduction and PSPACE-hardness theorem;
             isolate request generation as the sole remaining certificate.
+          - [ ] Generate the bounded compact request from native source
+            fields in polynomial time.
+            - [ ] Materialize the source decider's fixed space polynomial as
+              unary loop padding while preserving the native source stream.
+              - [x] Implement the finite Horner machine and prove exact
+                source scanning, restoration, and one complete
+                multiply-and-add phase.
+              - [ ] Lift execution across every coefficient, emit the padded
+                word, and package its polynomial-time certificate.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1739,6 +1748,12 @@ The representation choices for this target are:
   composes the finite source encoder and quadratic structural evaluator,
   presents the output as the semantic flat formula, and proves both the
   many-one reduction and uniform PSPACE-hardness statement.
+- [`LeanTrominoes/UnaryPolynomialPaddingMachine.lean`](LeanTrominoes/UnaryPolynomialPaddingMachine.lean)
+  starts the remaining request generator with a reusable finite Horner
+  machine.  It retains a native source word, counts selected delimiters,
+  multiplies a unary accumulator by that count, adds one fixed coefficient,
+  and proves the exact machine path and runtime for a complete phase while
+  restoring the source word unchanged.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population
