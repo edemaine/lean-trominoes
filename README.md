@@ -346,6 +346,8 @@ build; an imported proof counts when its statement matches the paper.
           retaining the complete coordinate stream for nested lookups.
         - [x] Port the one-cell packed normalization predicate to the shared
           indexed flat transition-scan state.
+        - [x] Lift indexed normalization through the exact motif-length
+          countdown for one complete frontier column.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
