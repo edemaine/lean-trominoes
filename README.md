@@ -408,8 +408,9 @@ build; an imported proof counts when its statement matches the paper.
               five-pass quadratic envelope.
             - [x] Bound selected-column testing, native scanner-input
               reconstruction, and one complete scanner invocation.
-            - [ ] Bound one complete numbered stage, unroll all five, and
-              bound initialization/projection.
+            - [x] Bound one complete numbered stage, including output-field
+              projection and state reconstruction.
+            - [ ] Unroll all five stages and bound initialization/projection.
           - [ ] Fit normalization, center validity, overlap, and the complete
             flat packed transition.
           - [ ] Fit context recovery and the suffix-preserving Savitch driver,
