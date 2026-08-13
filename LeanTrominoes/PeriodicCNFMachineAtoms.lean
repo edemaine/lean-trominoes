@@ -81,6 +81,16 @@ variable [stackFinite : ∀ stack, Fintype (tm.Γ stack)]
 def atomCount : Nat :=
   Fintype.card (BoundedMachineAtom tm space clockBits)
 
+/-- Cardinality formula underlying the finite source-atom allocation. -/
+theorem atomCount_eq_card_sum :
+    atomCount (tm := tm) (space := space) (clockBits := clockBits) =
+      Fintype.card
+        (Option tm.Λ ⊕ tm.σ ⊕
+          ((Σ stack : tm.K, Fin space × Option (tm.Γ stack)) ⊕
+            Fin clockBits)) := by
+  unfold atomCount
+  exact Fintype.card_congr (BoundedMachineAtom.sumEquiv tm space clockBits)
+
 /-- Injectively name every typed source atom by a natural below `atomCount`. -/
 def code (atom : BoundedMachineAtom tm space clockBits) : Nat :=
   (Fintype.equivFin (BoundedMachineAtom tm space clockBits) atom).val

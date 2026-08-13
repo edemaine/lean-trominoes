@@ -1356,6 +1356,12 @@ The representation choices for this target are:
   This distinction is essential for total deciders, whose `true` and `false`
   outputs are both halted: the designated formula cycles exactly through the
   chosen output, while retaining the same forward-local 1D CNF guarantees.
+- [`LeanTrominoes/PeriodicCNFMachineSize.lean`](LeanTrominoes/PeriodicCNFMachineSize.lean)
+  makes the bounded machine construction quantitative.  It gives an exact
+  affine count for source atoms and fixed-configuration tests, affine bounds
+  for one-hot and stack-shape constraints, and a quadratic bound for the reset
+  clock.  The resulting clause bound isolates the remaining finite-statement
+  expansion as a single `machineStepExpression` term.
 - [`LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean`](LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean)
   instantiates the clocked formula for an arbitrary certified polynomial-space
   decider.  The reset clock is sized by the finite bounded-configuration count,
