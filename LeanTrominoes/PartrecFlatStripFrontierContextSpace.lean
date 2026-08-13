@@ -442,7 +442,7 @@ private theorem flatStripContextPairOutputSpace_le
   simp only [encodedListSpace_cons, encodedListSpace_nil] at *
   omega
 
-private theorem flatStripContextOutputSpace_le
+theorem flatStripContextOutputSpace_le
     (context stateCount : Nat) (state : DivideEvalState)
     (periodicStrip : PeriodicStrip) :
     encodedListSpace

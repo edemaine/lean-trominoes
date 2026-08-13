@@ -8,7 +8,9 @@ The legacy strip driver chooses its recursion depth from a recursively paired
 encoding.  This module instead fixes the same sufficient linear depth from the
 target flat encoding, proves that its power-of-two ambient graph contains the
 sparse frontier graph, and bounds every reachable serialized DFS state while
-retaining the complete native strip suffix.
+retaining the complete native strip suffix.  It then absorbs context recovery,
+the reconstructed edge oracle, and every structural branch into one uniform
+input-polynomial step allowance.
 -/
 
 namespace LeanTrominoes
@@ -262,6 +264,399 @@ theorem flatStripReachCountdownSpace_le
     simp only [flatStripReachPayloadSpaceBound]
     omega
   simpa [state, inputLength, encodedListSpace_cons] using totalSpace
+
+/-! ## Uniform bound for one reachable flat Savitch step -/
+
+open Turing.PartrecToTM2.EvaluatorCodeFits
+
+theorem flatStripCounter_encodeNat_length_le
+    (periodicStrip : PeriodicStrip) (counter : Nat)
+    (counterBound : counter < flatStripStateBound periodicStrip) :
+    (Computability.encodeNat counter).length ≤
+      21 * (PeriodicStripFlatEncoding.finEncoding.encode
+        periodicStrip).length + 1 := by
+  have encoded := FiniteState.encodeNat_length_le_of_lt_pow
+    counter (flatStripSearchDepth periodicStrip) (by
+      simpa [flatStripStateBound] using counterBound)
+  simpa [flatStripSearchDepth] using encoded
+
+/-- Both bounded frontier indices and the native period fit in one linear
+arithmetic-decoding unit. -/
+theorem frontierPairPolynomialSpaceUnit_le_flat_input
+    (periodicStrip : PeriodicStrip) (first last : Nat)
+    (firstBound : first < flatStripStateBound periodicStrip)
+    (lastBound : last < flatStripStateBound periodicStrip) :
+    frontierPairPolynomialSpaceUnit periodicStrip.period first last ≤
+      100 * (PeriodicStripFlatEncoding.finEncoding.encode
+        periodicStrip).length + 100 := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let limit := frontierPairPolynomialSpaceLimit
+    periodicStrip.period first last
+  have periodBits :=
+    PeriodicStripFlatEncoding.period_encodeNat_length_le_encoding_length
+      periodicStrip
+  have firstBits := flatStripCounter_encodeNat_length_le
+    periodicStrip first firstBound
+  have lastBits := flatStripCounter_encodeNat_length_le
+    periodicStrip last lastBound
+  have sum1 := encodeNat_add_length_le_sum periodicStrip.period first
+  have sum2 := encodeNat_add_length_le_sum
+    (periodicStrip.period + first) last
+  have sum3 := encodeNat_add_length_le_sum
+    (periodicStrip.period + first + last) 20
+  have scaled := encodeNat_mul_length_le_sum 16
+    (periodicStrip.period + first + last + 20)
+  have final := encodeNat_add_length_le_sum
+    (16 * (periodicStrip.period + first + last + 20)) 100
+  have sixteenBits : (Computability.encodeNat 16).length = 5 := by
+    native_decide
+  have twentyBits : (Computability.encodeNat 20).length = 5 := by
+    native_decide
+  have hundredBits : (Computability.encodeNat 100).length = 7 := by
+    native_decide
+  have limitEq :
+      limit = 16 * (periodicStrip.period + first + last + 20) + 100 := by
+    simp [limit, frontierPairPolynomialSpaceLimit]
+  rw [← limitEq] at final
+  rw [sixteenBits] at scaled
+  rw [twentyBits] at sum3
+  rw [hundredBits] at final
+  have unitEq :
+      frontierPairPolynomialSpaceUnit periodicStrip.period first last =
+        (Computability.encodeNat limit).length + 2 := by
+    simp [limit, frontierPairPolynomialSpaceUnit,
+      encodedListSpace_cons, encodedListSpace_nil]
+  rw [unitEq]
+  change (Computability.encodeNat limit).length + 2 ≤
+    100 * inputLength + 100
+  dsimp only [inputLength] at periodBits firstBits lastBits ⊢
+  omega
+
+/-- Master local footprint for a reachable DFS payload and its two decoded
+frontier indices. -/
+def flatStripLeafSpaceUnit (inputLength : Nat) : Nat :=
+  flatStripReachStateSpaceBound inputLength + 100 * inputLength + 120
+
+theorem flatStripContextSpaceUnit_le_leaf
+    (periodicStrip : PeriodicStrip) (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (flatStripStateBound periodicStrip))
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList 0
+            (flatStripStateBound periodicStrip) state ++
+            PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound
+          (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) :
+    flatStripContextSpaceUnit 0 (flatStripStateBound periodicStrip)
+        state periodicStrip ≤
+      flatStripLeafSpaceUnit
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  have pair := frontierPairPolynomialSpaceUnit_le_flat_input periodicStrip
+    state.query.first state.query.last indices.1.1 indices.1.2
+  have stateSpace' :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList 0
+            (flatStripStateBound periodicStrip) state ++
+            PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound inputLength := by
+    simpa [inputLength] using stateSpace
+  have pair' : frontierPairPolynomialSpaceUnit periodicStrip.period
+      state.query.first state.query.last ≤ 100 * inputLength + 100 := by
+    simpa [inputLength] using pair
+  change _ ≤ flatStripLeafSpaceUnit inputLength
+  simp only [flatStripContextSpaceUnit, flatStripLeafSpaceUnit]
+  omega
+
+/-- Context-recovery and seven-field reconstruction allowance after replacing
+all state-dependent units by `flatStripLeafSpaceUnit`. -/
+def flatStripContextUniformSpaceBound (inputLength : Nat) : Nat :=
+  let unit := flatStripLeafSpaceUnit inputLength
+  1000000000000000000000000000000000000000000000000000000000000000 * unit +
+    1000000000000000000000000000000 * unit +
+    1000000000 * unit
+
+theorem flatStripContextBaseSpaceBound_le_uniform
+    (periodicStrip : PeriodicStrip) (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (flatStripStateBound periodicStrip))
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList 0
+            (flatStripStateBound periodicStrip) state ++
+            PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound
+          (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) :
+    flatStripContextBaseSpaceBound 0 (flatStripStateBound periodicStrip)
+        state periodicStrip ≤
+      flatStripContextUniformSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let unit := flatStripLeafSpaceUnit inputLength
+  have contextUnit := flatStripContextSpaceUnit_le_leaf periodicStrip state
+    indices stateSpace
+  have pair := frontierPairPolynomialSpaceUnit_le_flat_input periodicStrip
+    state.query.first state.query.last indices.1.1 indices.1.2
+  have pair' : frontierPairPolynomialSpaceUnit periodicStrip.period
+      state.query.first state.query.last ≤ 100 * inputLength + 100 := by
+    simpa [inputLength] using pair
+  have pairUnit : frontierPairPolynomialSpaceUnit periodicStrip.period
+      state.query.first state.query.last ≤ unit := by
+    simp only [unit, flatStripLeafSpaceUnit]
+    omega
+  have recoveryUnit :
+      flatContextSpaceUnit 0 (flatStripStateBound periodicStrip) state
+          (PeriodicStripFlatEncoding.stripFields periodicStrip) ≤ unit := by
+    simp only [flatContextSpaceUnit]
+    have localState : encodedListSpace
+        (FiniteState.divideEvalProgramList 0
+          (flatStripStateBound periodicStrip) state ++
+          PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound inputLength := by
+      simpa [inputLength] using stateSpace
+    simp only [unit, flatStripLeafSpaceUnit]
+    omega
+  simp only [flatStripContextBaseSpaceBound, flatContextSpaceBound,
+    flatStripContextUniformSpaceBound]
+  simpa [unit, inputLength] using (show
+    1000000000000000000000000000000000000000000000000000000000000000 *
+          flatContextSpaceUnit 0 (flatStripStateBound periodicStrip) state
+            (PeriodicStripFlatEncoding.stripFields periodicStrip) +
+        1000000000000000000000000000000 *
+          frontierPairPolynomialSpaceUnit periodicStrip.period
+            state.query.first state.query.last +
+        1000000000 *
+          flatStripContextSpaceUnit 0 (flatStripStateBound periodicStrip)
+            state periodicStrip ≤
+      1000000000000000000000000000000000000000000000000000000000000000 * unit +
+        1000000000000000000000000000000 * unit +
+        1000000000 * unit by
+    gcongr)
+
+def flatStripPackedTransitionUnitBound (inputLength : Nat) : Nat :=
+  8 * flatStripLeafSpaceUnit inputLength + 10
+
+def flatStripPackedTransitionUniformSpaceBound (inputLength : Nat) : Nat :=
+  flatPackedTransitionSpaceEnvelope
+    (flatStripPackedTransitionUnitBound inputLength)
+
+theorem flatPackedTransitionSpaceBound_le_flat_uniform
+    (periodicStrip : PeriodicStrip) (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (flatStripStateBound periodicStrip))
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList 0
+            (flatStripStateBound periodicStrip) state ++
+            PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound
+          (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) :
+    flatPackedTransitionSpaceBound periodicStrip
+        (PackedWindowState.ofIndex periodicStrip state.query.first)
+        (PackedWindowState.ofIndex periodicStrip state.query.last) ≤
+      flatStripPackedTransitionUniformSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let current := PackedWindowState.ofIndex periodicStrip state.query.first
+  let next := PackedWindowState.ofIndex periodicStrip state.query.last
+  have localUnit := flatStripContextSpaceUnit_le_leaf periodicStrip state
+    indices stateSpace
+  have localUnit' : flatStripContextSpaceUnit 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      flatStripLeafSpaceUnit inputLength := by
+    simpa [inputLength] using localUnit
+  have output := flatStripContextOutputSpace_le 0
+    (flatStripStateBound periodicStrip) state periodicStrip
+  have packedUnit : flatPackedTransitionContextUnit periodicStrip current next ≤
+      flatStripPackedTransitionUnitBound inputLength := by
+    simp only [flatPackedTransitionContextUnit,
+      flatStripPackedTransitionUnitBound]
+    have output' : encodedListSpace
+        (Turing.ToPartrec.Code.flatPackedTransitionContext periodicStrip
+          current next) ≤
+        8 * flatStripContextSpaceUnit 0
+          (flatStripStateBound periodicStrip) state periodicStrip := by
+      simpa [current, next, Turing.ToPartrec.Code.flatPackedTransitionContext,
+        PackedWindowState.ofIndex] using output
+    omega
+  rw [flatPackedTransitionSpaceBound_eq_envelope]
+  exact flatPackedTransitionSpaceEnvelope_mono packedUnit
+
+private theorem flatStripEqualityArgumentSpace_le_leaf
+    (periodicStrip : PeriodicStrip) (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (flatStripStateBound periodicStrip)) :
+    encodedListSpace
+        [2 * (state.query.first + state.query.last) + 4] + 1 ≤
+      flatStripLeafSpaceUnit
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  have pair := frontierPairPolynomialSpaceUnit_le_flat_input periodicStrip
+    state.query.first state.query.last indices.1.1 indices.1.2
+  have numeric : 2 * (state.query.first + state.query.last) + 4 ≤
+      frontierPairPolynomialSpaceLimit periodicStrip.period
+        state.query.first state.query.last := by
+    simp only [frontierPairPolynomialSpaceLimit]
+    omega
+  have bits := encodeNat_length_mono numeric
+  have toPair : encodedListSpace
+        [2 * (state.query.first + state.query.last) + 4] + 1 ≤
+      frontierPairPolynomialSpaceUnit periodicStrip.period
+        state.query.first state.query.last := by
+    simp only [frontierPairPolynomialSpaceUnit, encodedListSpace_cons,
+      encodedListSpace_nil] at bits ⊢
+    omega
+  exact toPair.trans (pair.trans (by
+    simp [flatStripLeafSpaceUnit]
+    omega))
+
+/-- Uniform complete depth-zero oracle allowance on every reachable native
+Savitch state. -/
+def flatStripBaseUniformSpaceBound (inputLength : Nat) : Nat :=
+  let unit := flatStripLeafSpaceUnit inputLength
+  let context := flatStripContextUniformSpaceBound inputLength
+  let equality := 10000000000 * unit + context
+  let transition :=
+    flatStripPackedTransitionUniformSpaceBound inputLength + 100 * context
+  1000 *
+    (equality + transition + flatStripReachStateSpaceBound inputLength +
+      12 + 1)
+
+theorem flatStripBaseSpaceBound_le_uniform
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (flatStripStateBound periodicStrip))
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList 0
+            (flatStripStateBound periodicStrip) state ++
+            PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound
+          (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) :
+    flatStripBaseSpaceBound tromino 0 (flatStripStateBound periodicStrip)
+        state periodicStrip ≤
+      flatStripBaseUniformSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  change flatStripBaseSpaceBound tromino 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+    flatStripBaseUniformSpaceBound inputLength
+  have contextBase : flatStripContextBaseSpaceBound 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      flatStripContextUniformSpaceBound inputLength := by
+    simpa only [inputLength] using
+      flatStripContextBaseSpaceBound_le_uniform
+        periodicStrip state indices stateSpace
+  have contextBound : flatStripContextSpaceBound 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      100 * flatStripContextUniformSpaceBound inputLength := by
+    simp only [flatStripContextSpaceBound]
+    exact Nat.mul_le_mul_left 100 contextBase
+  have packed : flatPackedTransitionSpaceBound periodicStrip
+      (PackedWindowState.ofIndex periodicStrip state.query.first)
+      (PackedWindowState.ofIndex periodicStrip state.query.last) ≤
+      flatStripPackedTransitionUniformSpaceBound inputLength := by
+    simpa only [inputLength] using
+      flatPackedTransitionSpaceBound_le_flat_uniform
+        periodicStrip state indices stateSpace
+  have equalityArgument : encodedListSpace
+      [2 * (state.query.first + state.query.last) + 4] + 1 ≤
+      flatStripLeafSpaceUnit inputLength := by
+    simpa only [inputLength] using
+      flatStripEqualityArgumentSpace_le_leaf periodicStrip state indices
+  have equality : flatStripEqualitySpaceBound 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      10000000000 * flatStripLeafSpaceUnit inputLength +
+        flatStripContextUniformSpaceBound inputLength := by
+    simp only [flatStripEqualitySpaceBound]
+    exact Nat.add_le_add
+      (Nat.mul_le_mul_left 10000000000 equalityArgument) contextBase
+  have transition : flatStripTransitionSpaceBound tromino 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      flatStripPackedTransitionUniformSpaceBound inputLength +
+        100 * flatStripContextUniformSpaceBound inputLength := by
+    simp only [flatStripTransitionSpaceBound]
+    simpa only [PackedWindowState.ofIndex] using
+      Nat.add_le_add packed contextBound
+  have stateSpace' : encodedListSpace
+      (FiniteState.divideEvalProgramList 0
+        (flatStripStateBound periodicStrip) state ++
+        PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+      flatStripReachStateSpaceBound inputLength := by
+    simpa [inputLength] using stateSpace
+  have headSuccessor : encodedListSpace
+      [(FiniteState.divideEvalProgramList 0
+          (flatStripStateBound periodicStrip) state ++
+          PeriodicStripFlatEncoding.stripFields periodicStrip).headI + 1] ≤
+      2 := by
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    simp [FiniteState.divideEvalProgramList, encodedListSpace_cons,
+      encodedListSpace_nil, oneBits]
+  have component : flatStripBaseComponentSpaceBound tromino 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      (10000000000 * flatStripLeafSpaceUnit inputLength +
+        flatStripContextUniformSpaceBound inputLength) +
+        (flatStripPackedTransitionUniformSpaceBound inputLength +
+          100 * flatStripContextUniformSpaceBound inputLength) +
+        flatStripReachStateSpaceBound inputLength + 12 := by
+    simp only [flatStripBaseComponentSpaceBound]
+    omega
+  change 1000 *
+      (flatStripBaseComponentSpaceBound tromino 0
+        (flatStripStateBound periodicStrip) state periodicStrip + 1) ≤
+    1000 *
+      ((10000000000 * flatStripLeafSpaceUnit inputLength +
+          flatStripContextUniformSpaceBound inputLength) +
+        (flatStripPackedTransitionUniformSpaceBound inputLength +
+          100 * flatStripContextUniformSpaceBound inputLength) +
+        flatStripReachStateSpaceBound inputLength + 12 + 1)
+  exact Nat.mul_le_mul_left 1000 (Nat.add_le_add_right component 1)
+
+/-- Input-polynomial exact-step allowance used by the invariant iterator. -/
+def flatStripSavitchStepSpaceBound (inputLength : Nat) : Nat :=
+  1000000000000000000000000000000 *
+    (flatStripReachStateSpaceBound inputLength +
+      flatStripBaseUniformSpaceBound inputLength + 1)
+
+theorem flatStripSavitchStepCost_le
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (state : FiniteState.DivideEvalState)
+    (indices : state.IndicesBelow (flatStripStateBound periodicStrip))
+    (stateSpace :
+      encodedListSpace
+          (FiniteState.divideEvalProgramList 0
+            (flatStripStateBound periodicStrip) state ++
+            PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+        flatStripReachStateSpaceBound
+          (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) :
+    FiniteState.FlatStripSavitchStep.stepCost tromino periodicStrip 0
+        (flatStripStateBound periodicStrip) state ≤
+      flatStripSavitchStepSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  have baseExact := flatStripBaseCost_le_bound tromino 0
+    (flatStripStateBound periodicStrip) state periodicStrip wellFormed
+  have baseUniform := flatStripBaseSpaceBound_le_uniform tromino periodicStrip
+    state indices stateSpace
+  have baseCost : flatStripBaseCost tromino 0
+      (flatStripStateBound periodicStrip) state periodicStrip ≤
+      flatStripBaseUniformSpaceBound inputLength :=
+    baseExact.trans (by simpa [inputLength] using baseUniform)
+  have stateSpace' : encodedListSpace
+      (FiniteState.FlatStripSavitchStep.flatProgramList
+        (PeriodicStripFlatEncoding.stripFields periodicStrip) 0
+        (flatStripStateBound periodicStrip) state) ≤
+      flatStripReachStateSpaceBound inputLength := by
+    simpa [FiniteState.FlatStripSavitchStep.flatProgramList, inputLength]
+      using stateSpace
+  simp only [FiniteState.FlatStripSavitchStep.stepCost,
+    FiniteState.FlatStripSavitchStep.stepSpaceUnit,
+    FiniteState.FlatStripSavitchStep.baseBoolCost,
+    flatStripSavitchStepSpaceBound]
+  gcongr
 
 end RawWindowState
 end PeriodicStrip

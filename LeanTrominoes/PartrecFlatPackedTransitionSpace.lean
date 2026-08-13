@@ -902,6 +902,50 @@ theorem flatPackedTransitionBounded
     (flatPackedTransitionCost_le_bound tromino periodicStrip wellFormed
       current next)
 
+/-! ## Context-unit-only envelope -/
+
+/-- The complete transition bound with its semantic context replaced by a
+single numeric footprint.  This exposes the fixed polynomial used by callers
+that have already bounded the reconstructed transition context. -/
+def flatPackedTransitionSpaceEnvelope (unit : Nat) : Nat :=
+  let normalizationBody :=
+    10000000000000000000000000000000000000000000000000000000000000000000000000000000000 *
+      unit ^ 2
+  let normalizationColumn :=
+    200000 * (normalizationBody * unit + unit + 1)
+  let normalizationLastTwo := 1000 * (normalizationColumn + 1)
+  let normalizationLastThree := 1000 * (normalizationLastTwo + 1)
+  let normalizationLastFour := 1000 * (normalizationLastThree + 1)
+  let normalizationAll := 1000 * (normalizationLastFour + 1)
+  let centerBody := (10 ^ 1100) * unit ^ 2
+  let centerValid := 200000 * (centerBody * unit + unit + 1)
+  let overlapBody := (10 ^ 1100) * unit ^ 2
+  let overlapColumn := 200000 * (overlapBody * unit + unit + 1)
+  let overlapLastTwo := 1000 * (overlapColumn + 1)
+  let overlapLastThree := 1000 * (overlapLastTwo + 1)
+  let overlapColumns := 1000 * (overlapLastThree + 1)
+  let phase := 100000000000000000000000000000000 * unit
+  let component :=
+    normalizationAll + centerValid + overlapColumns + phase + unit + 1
+  let overlap := 1000 * (component + 1)
+  let tail := 1000 * (overlap + 1)
+  1000 * (tail + 1)
+
+theorem flatPackedTransitionSpaceBound_eq_envelope
+    (periodicStrip : PeriodicStrip)
+    (current next : PackedWindowState) :
+    flatPackedTransitionSpaceBound periodicStrip current next =
+      flatPackedTransitionSpaceEnvelope
+        (flatPackedTransitionContextUnit periodicStrip current next) := by
+  rfl
+
+theorem flatPackedTransitionSpaceEnvelope_mono
+    {first second : Nat} (bounded : first ≤ second) :
+    flatPackedTransitionSpaceEnvelope first ≤
+      flatPackedTransitionSpaceEnvelope second := by
+  simp only [flatPackedTransitionSpaceEnvelope]
+  gcongr
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing

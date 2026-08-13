@@ -470,8 +470,9 @@ build; an imported proof counts when its statement matches the paper.
               Savitch depth from the target flat input length, then bound
               every reachable DFS state, retained strip suffix, and exact
               fuel counter in that representation.
-            - [ ] Bound that structural-step cost uniformly over reachable
-              states and lift it through the exact-fuel iteration.
+            - [x] Bound the structural-step cost uniformly over every
+              reachable native flat state.
+            - [ ] Lift that uniform bound through the exact-fuel iteration.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1990,7 +1991,9 @@ The representation choices for this target are:
   replaces the legacy paired-encoding search parameters by a sufficient
   power-of-two state bound and linear Savitch depth measured in the target
   flat input.  It bounds every reachable serialized DFS state together with
-  the unchanged strip suffix and any remaining exact-fuel counter.
+  the unchanged strip suffix and any remaining exact-fuel counter, then
+  absorbs context recovery and the complete depth-zero edge oracle into one
+  input-polynomial allowance for every reachable structural step.
 - [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
   fits the strip-suffix projections, decodes both queried frontier indices
   into word and phase, and assembles the native seven-field packed-transition
