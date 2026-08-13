@@ -454,6 +454,44 @@ theorem flatPackedLookupStateSpace_le_unit
       (flatPackedLookupEnvelopeFields target motif wordLimit digitLimit) + 5
   omega
 
+theorem flatPackedLookupCountSpace_le_unit
+    (steps : Nat) (target : Cell) (motif : List Cell)
+    (wordLimit digitLimit : Nat) (stepsBound : steps ≤ motif.length) :
+    encodedListSpace [steps] ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let fields := flatPackedLookupEnvelopeFields target motif
+    wordLimit digitLimit
+  have member : motif.length ∈ fields := by
+    simp [fields, flatPackedLookupEnvelopeFields]
+  have lengthSpace := flatLookupEncodedFieldSpace_le_of_mem
+    motif.length fields member
+  have stepsBits := encodeNat_length_mono stepsBound
+  simp only [fields] at lengthSpace
+  simp only [encodedListSpace_cons, encodedListSpace_nil,
+    flatPackedLookupInputUnit]
+  omega
+
+theorem flatPackedLookupCountdownStateSpace_le_unit
+    (steps : Nat) (target : Cell) (motif suffix leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ suffix)
+    (stepsBound : steps ≤ motif.length)
+    (wordBound : word ≤ wordLimit)
+    (digitBound : digit ≤ digitLimit) :
+    encodedListSpace
+        (steps :: Code.flatPackedLookupColumnState target word digit
+          found selected suffix) ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  have bound := flatPackedLookupCountdownStateSpace_le steps target motif
+    suffix leading word digit wordLimit digitLimit found selected
+    decomposition stepsBound wordBound digitBound
+  change encodedListSpace
+      (steps :: Code.flatPackedLookupColumnState target word digit
+        found selected suffix) ≤
+    encodedListSpace
+      (flatPackedLookupEnvelopeFields target motif wordLimit digitLimit) + 5
+  omega
+
 theorem flatPackedLookupTargetXSpace_le_unit
     (target : Cell) (motif : List Cell)
     (wordLimit digitLimit : Nat) :
@@ -1418,6 +1456,188 @@ theorem flatPackedLookupStepFoundCost_le_input
   simp only [flatPackedLookupStepFoundCost]
   simp only [state, budget, unit] at branch
   omega
+
+theorem flatPackedLookupBodyConsCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit)
+    (eightBound : 8 ≤ digitLimit) :
+    flatPackedLookupBodyConsCost remaining.length target cell word digit
+        selected remaining ≤
+      10000000000000000000000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let payload := Code.flatPackedLookupColumnState target word digit
+    false selected (cell :: remaining)
+  let output := if selected && decide (cell = target) then
+      Code.flatPackedLookupColumnState target (word / 9) (word % 9)
+        true selected remaining
+    else
+      Code.flatPackedLookupColumnState target (word / 9) digit
+        false selected remaining
+  let budget := 10000000000000000000000000000 * unit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have currentCountBound : remaining.length + 1 ≤ motif.length := by
+    rw [decomposition]
+    simp
+  have predecessorCountBound : remaining.length ≤ motif.length := by omega
+  have inputBound : encodedListSpace
+      ((remaining.length + 1) :: payload) ≤ unit := by
+    simpa [payload, unit] using
+      flatPackedLookupCountdownStateSpace_le_unit
+        (remaining.length + 1) target motif (cell :: remaining) leading
+        word digit wordLimit digitLimit false selected decomposition
+        currentCountBound wordBound digitBound
+  have predecessorInputBound : encodedListSpace
+      (remaining.length :: payload) ≤ unit := by
+    simpa [payload, unit] using
+      flatPackedLookupCountdownStateSpace_le_unit remaining.length target
+        motif (cell :: remaining) leading word digit wordLimit digitLimit
+        false selected decomposition predecessorCountBound wordBound digitBound
+  have countSpace : encodedListSpace [remaining.length] ≤ unit := by
+    simpa [unit] using flatPackedLookupCountSpace_le_unit remaining.length
+      target motif wordLimit digitLimit predecessorCountBound
+  have tailDecomposition :
+      motif = (leading ++ [cell]) ++ remaining := by
+    simpa [List.append_assoc] using decomposition
+  have quotientBound : word / 9 ≤ wordLimit :=
+    (Nat.div_le_self word 9).trans wordBound
+  have remainderSmall : word % 9 ≤ digitLimit := by
+    have remainderLt : word % 9 < 9 := Nat.mod_lt word (by omega)
+    omega
+  have outputStateBound : encodedListSpace output ≤ unit := by
+    by_cases hit : selected && decide (cell = target)
+    · simp only [output, hit, if_true]
+      exact flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) (word % 9) wordLimit digitLimit
+        true selected tailDecomposition quotientBound remainderSmall
+    · simp only [output, hit]
+      exact flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) digit wordLimit digitLimit
+        false selected tailDecomposition quotientBound digitBound
+  have payloadOutputBound : encodedListSpace
+      (remaining.length :: output) ≤ unit := by
+    by_cases hit : selected && decide (cell = target)
+    · simp only [output, hit, if_true]
+      exact flatPackedLookupCountdownStateSpace_le_unit remaining.length
+        target motif remaining (leading ++ [cell]) (word / 9) (word % 9)
+        wordLimit digitLimit true selected tailDecomposition
+        predecessorCountBound quotientBound remainderSmall
+    · simp only [output, hit]
+      exact flatPackedLookupCountdownStateSpace_le_unit remaining.length
+        target motif remaining (leading ++ [cell]) (word / 9) digit
+        wordLimit digitLimit false selected tailDecomposition
+        predecessorCountBound quotientBound digitBound
+  have oneSpace : encodedListSpace [1] ≤ unit := by
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil, oneBits]
+    omega
+  have taggedOutputBound : encodedListSpace
+      (1 :: remaining.length :: output) ≤ 2 * unit :=
+    flatLookupConsSpace_le_of 1 (remaining.length :: output) unit
+      oneSpace payloadOutputBound
+  have stepCost := flatPackedLookupStepConsCost_le_input target cell motif
+    remaining leading word digit wordLimit digitLimit selected decomposition
+    wordBound digitBound eightBound
+  have stepBudget : flatPackedLookupStepConsCost target cell word digit
+      selected remaining ≤ budget := by
+    simpa [budget, unit] using stepCost
+  have body := flatLookupCountdownBodySuccCost_le_budget remaining.length
+    payload output
+    (flatPackedLookupStepConsCost target cell word digit selected remaining)
+    budget
+    (inputBound.trans (by simp [budget]; omega))
+    (predecessorInputBound.trans (by simp [budget]; omega))
+    (countSpace.trans (by simp [budget]; omega))
+    (payloadOutputBound.trans (by simp [budget]; omega))
+    (taggedOutputBound.trans (by simp [budget]; omega)) stepBudget
+  simp only [flatPackedLookupBodyConsCost]
+  simp only [payload, output, budget, unit] at body
+  omega
+
+theorem flatPackedLookupBodyFoundSuccCost_le_input
+    (remainingCount : Nat) (target : Cell)
+    (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ remaining)
+    (countBound : remainingCount + 1 ≤ motif.length)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupBodyFoundSuccCost remainingCount target word digit
+        selected remaining ≤
+      100000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let payload := Code.flatPackedLookupColumnState target word digit
+    true selected remaining
+  let budget := 100000000 * unit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have predecessorCountBound : remainingCount ≤ motif.length := by omega
+  have inputBound : encodedListSpace
+      ((remainingCount + 1) :: payload) ≤ unit := by
+    simpa [payload, unit] using
+      flatPackedLookupCountdownStateSpace_le_unit (remainingCount + 1)
+        target motif remaining leading word digit wordLimit digitLimit
+        true selected decomposition countBound wordBound digitBound
+  have predecessorInputBound : encodedListSpace
+      (remainingCount :: payload) ≤ unit := by
+    simpa [payload, unit] using
+      flatPackedLookupCountdownStateSpace_le_unit remainingCount target motif
+        remaining leading word digit wordLimit digitLimit true selected
+        decomposition predecessorCountBound wordBound digitBound
+  have countSpace : encodedListSpace [remainingCount] ≤ unit := by
+    simpa [unit] using flatPackedLookupCountSpace_le_unit remainingCount
+      target motif wordLimit digitLimit predecessorCountBound
+  have oneSpace : encodedListSpace [1] ≤ unit := by
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil, oneBits]
+    omega
+  have taggedOutputBound : encodedListSpace
+      (1 :: remainingCount :: payload) ≤ 2 * unit :=
+    flatLookupConsSpace_le_of 1 (remainingCount :: payload) unit
+      oneSpace predecessorInputBound
+  have stepCost := flatPackedLookupStepFoundCost_le_input target motif
+    remaining leading word digit wordLimit digitLimit selected decomposition
+    wordBound digitBound
+  have stepBudget : flatPackedLookupStepFoundCost target word digit selected
+      remaining ≤ budget := by
+    simpa [budget, unit] using stepCost
+  have body := flatLookupCountdownBodySuccCost_le_budget remainingCount
+    payload payload
+    (flatPackedLookupStepFoundCost target word digit selected remaining)
+    budget
+    (inputBound.trans (by simp [budget]; omega))
+    (predecessorInputBound.trans (by simp [budget]; omega))
+    (countSpace.trans (by simp [budget]; omega))
+    (predecessorInputBound.trans (by simp [budget]; omega))
+    (taggedOutputBound.trans (by simp [budget]; omega)) stepBudget
+  simp only [flatPackedLookupBodyFoundSuccCost]
+  simp only [payload, budget, unit] at body
+  omega
+
+theorem flatPackedLookupBodyZeroCost_le_input
+    (target : Cell) (motif leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (decomposition : motif = leading ++ [])
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupBodyZeroCost
+        (Code.flatPackedLookupColumnState target word digit found selected []) ≤
+      10 * flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let payload := Code.flatPackedLookupColumnState target word digit
+    found selected []
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have inputBound : encodedListSpace (0 :: payload) ≤ unit := by
+    simpa [payload, unit] using
+      flatPackedLookupCountdownStateSpace_le_unit 0 target motif [] leading
+        word digit wordLimit digitLimit found selected decomposition
+        (by omega) wordBound digitBound
+  have body := flatLookupCountdownBodyZeroCost_le_budget payload unit inputBound
+  simpa only [flatPackedLookupBodyZeroCost, payload, unit] using
+    body.trans (by omega)
 
 end EvaluatorCodeFits
 end PartrecToTM2

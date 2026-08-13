@@ -393,8 +393,10 @@ build; an imported proof counts when its statement matches the paper.
                 certified division-by-nine evaluator.
               - [x] Bound the found/continue state-reconstruction branches
                 and both enclosing step selectors.
-              - [ ] Lift the positive/zero step bounds through each exact
-                countdown body and sum the pass.
+              - [x] Lift positive, frozen-found, and zero steps through their
+                exact countdown bodies.
+              - [ ] Sum frozen and consuming countdown recurrences into the
+                complete one-pass bound.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.
           - [ ] Bound the five-column assignment lookup and fit its predicate
