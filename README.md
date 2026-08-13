@@ -495,6 +495,11 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Compose the well-formedness guard and cycle scan, and
                 prove the resulting Boolean equivalent to strip tileability.
               - [ ] Fit and polynomially bound the complete guarded evaluator.
+                - [x] Fit the exact streamed target-encoding-length fold in a
+                  polynomial reserve over the native flat input footprint.
+                - [ ] Fit the depth and padded-state-bound parameter pipeline.
+                - [ ] Fit the well-formedness guard and final cycle-search
+                  composition.
               - [ ] Package the evaluator certificate as flat-encoding PSPACE
                 membership.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
