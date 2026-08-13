@@ -140,6 +140,43 @@ def nativeCompilerRequest (fields : List Nat) :
           (symbolsOfFields encoding.Γ fields))
         (PolySpaceReduction.acceptingConfiguration decider)
 
+/-- The same bounded compiler request presented directly on the source's
+finite encoding alphabet.  A concrete request printer can retain these
+symbols and therefore emit the initial bounded configuration without
+re-decoding native natural fields. -/
+def sourceCompilerRequest (symbols : List encoding.Γ) :
+    TransitionEvaluatorMachine.TransitionCompilerRequest :=
+  nativeCompilerRequest decider
+    (FiniteEncodingNativeFields.fields symbols)
+
+@[simp]
+theorem sourceCompilerRequest_expression (symbols : List encoding.Γ) :
+    (sourceCompilerRequest decider symbols).expression =
+      BoundedMachineAtom.designatedMachineResetClockExpression
+        (tm := decider.tm)
+        (space := PolySpaceCompiler.spaceOfSymbols decider symbols)
+        (clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols)
+        (PolySpaceCompiler.initialConfigurationOfSymbols decider symbols)
+        (PolySpaceReduction.acceptingConfiguration decider) := by
+  simp [sourceCompilerRequest, nativeCompilerRequest,
+    nativeCompilerExpression]
+
+@[simp]
+theorem sourceCompilerRequest_fresh (symbols : List encoding.Γ) :
+    (sourceCompilerRequest decider symbols).fresh =
+      BoundedMachineAtom.atomCount (tm := decider.tm)
+        (space := PolySpaceCompiler.spaceOfSymbols decider symbols)
+        (clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols) := by
+  simp [sourceCompilerRequest, nativeCompilerRequest, nativeCompilerFresh]
+
+@[simp]
+theorem sourceCompilerRequest_encode (symbols : List encoding.Γ) :
+    (sourceCompilerRequest decider symbols).encode =
+      PartrecToTM2.trList
+        (nativeCompilerProgramInput decider
+          (FiniteEncodingNativeFields.fields symbols)) := by
+  rfl
+
 @[simp]
 theorem nativeCompilerRequest_encode (fields : List Nat) :
     (nativeCompilerRequest decider fields).encode =
@@ -229,6 +266,15 @@ theorem nativeCompilerFields_sourceFields (symbols : List encoding.Γ) :
         (PolySpaceCompiler.formulaOfSymbols decider symbols) := by
   rw [nativeCompilerFields_eq_formulaFields]
   simp
+
+@[simp]
+theorem sourceCompilerRequest_compile (symbols : List encoding.Γ) :
+    (sourceCompilerRequest decider symbols).compile =
+      PeriodicCNFFlatEncoding.formulaFields
+        (PolySpaceCompiler.formulaOfSymbols decider symbols) := by
+  simp [sourceCompilerRequest,
+    nativeCompilerRequest_compile,
+    nativeCompilerFields_sourceFields]
 
 @[simp]
 theorem nativeCompilerFields_encode (input : Input) :

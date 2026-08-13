@@ -659,6 +659,13 @@ build; an imported proof counts when its statement matches the paper.
               binary.
             - [x] Specialize and compose that converter for the stack, clock,
               and fresh blocks, preserving their tagged separation.
+            - [x] Prepare direct finite-source input for the request printer.
+              - [x] Retain each original finite source symbol behind an
+                always-inhabited option tag, including for empty source
+                alphabets.
+              - [x] Append the exact unary and canonical binary space, clock,
+                and fresh values, and certify the complete pipeline in
+                polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1753,6 +1760,9 @@ The representation choices for this target are:
   and native output length.  It also packages every total decoded-field input
   as the evaluator's bounded semantic request, proving both encoding and
   compiled-output identities needed for machine composition.
+  It also exposes the identical compiler request directly on the original
+  finite source-symbol list, so the remaining printer need not decode its
+  initial configuration from native natural fields.
 - [`LeanTrominoes/PeriodicCNFPolySpaceHardness.lean`](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean)
   packages the complete complexity-theoretic endpoint around one explicit
   remaining contract: a polynomial-time machine from decoded native source
@@ -1786,6 +1796,14 @@ The representation choices for this target are:
   counters as distinct finite marker blocks.  Three subsequent verified
   binary-count passes append their exact canonical native encodings without
   allowing any later appendix to affect an earlier marker count.
+- [`LeanTrominoes/PeriodicCNFPolySpaceSourcePreparation.lean`](LeanTrominoes/PeriodicCNFPolySpaceSourcePreparation.lean)
+  prepares the simpler direct finite-source stream for the concrete request
+  printer.  It first embeds source symbols into an always-inhabited option
+  alphabet, then appends tagged unary space, clock, and fresh blocks and their
+  three canonical native binary counters.  Exact layout and marker-count
+  theorems connect the stream to the bounded compiler parameters, while
+  verified finite transduction, Horner, binary-count, and composition
+  certificates prove that the entire preparation is polynomial-time.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population
