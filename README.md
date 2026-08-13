@@ -618,6 +618,10 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Lift instruction execution over complete expression
               postorder programs and prove exact agreement with the direct
               structural compiler's fields, fresh boundary, and unique root.
+            - [x] Verify the complete finite-machine wrapper: copy the header,
+              read the initial fresh atom, run the postorder compiler, force
+              its root, clear internal stacks, reverse output, and halt with
+              the exact required-formula native encoding.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by

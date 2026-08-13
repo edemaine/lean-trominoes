@@ -377,7 +377,7 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .phase .finalConstantStart =>
       emitFixedFields [1] (.copyAtom .fresh .finalConstantTail)
   | .phase .finalConstantTail =>
-      emitFixedFields [0, 0, 1] (.phase .finalReverse)
+      emitFixedFields [0, 0, 1] (.clearAtom .fresh .finalReverse)
   | .phase .finalReverse =>
       jump .reverseOutput
   | .phase (.constantStart value) =>
@@ -839,11 +839,11 @@ theorem step_finalConstantStart (data : TapeData) :
 
 theorem step_finalConstantTail (data : TapeData) :
     TM2.step program (phaseCfg .finalConstantTail data) =
-      some (phaseCfg .finalReverse
+      some (clearAtomCfg .fresh .finalReverse
         (emittedWordData data (trList [0, 0, 1]))) := by
   simp only [TM2.step, program, phaseCfg, emitFixedFields]
   rw [stepAux_pushOutputWord]
-  simp [phaseCfg, emittedWordData, tapes]
+  simp [clearAtomCfg, emittedWordData, tapes]
 
 theorem step_phase_finalReverse (data : TapeData) :
     TM2.step program (phaseCfg .finalReverse data) =
@@ -3407,6 +3407,256 @@ noncomputable def executeExpressionProgram (expression : TransitionExpr)
           binaryTail, transitionExpressionTime, compileTransitionFields,
           trList, List.reverse_append, List.append_assoc, scratchValue] <;>
         ring
+
+/-- Once the instruction stream is empty, pop its unique root, emit the unit
+clause forcing that root true, clear the last live register, and reverse the
+complete output accumulator. -/
+def finalizeRoot (data : TapeData) (fresh root : Nat)
+    (accumulator : List Γ')
+    (inputValue : data.input = [])
+    (reverseValue : data.outputReverse = accumulator)
+    (freshValue : data.fresh = trNat fresh)
+    (rootsValue : data.roots = trList [root])
+    (firstValue : data.first = [])
+    (secondValue : data.second = [])
+    (scratchValue : data.scratch = []) :
+    EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext data)
+      (some (phaseCfg .done
+        { data with
+          input := []
+          outputReverse := []
+          output := accumulator.reverse ++
+            trList (constantGateFields root true) ++ data.output
+          fresh := []
+          roots := []
+          first := []
+          second := []
+          scratch := [] }))
+      ((trNat fresh).length + 5 * (trNat root).length +
+        (trList (constantGateFields root true)).length +
+        accumulator.length + 13) := by
+  let d₁ := data.setAtom .fresh []
+  let d₂ :=
+    { (d₁.setField .roots []).setAtom .fresh (trNat root) with
+      scratch := [] }
+  let d₃ :=
+    emittedWordData (emittedWordData d₂ (trList [1])) (trList [root])
+  let d₄ := emittedWordData d₃ (trList [0, 0, 1])
+  let d₅ := d₄.setAtom .fresh []
+  have h₀ := oneStep (step_phase_decodeNext data)
+  have consumedData : consumedInputData data [] = data := by
+    rcases data with
+      ⟨input, outputReverse, output, freshWord, roots, first, second,
+        scratch⟩
+    change input = [] at inputValue
+    subst input
+    rfl
+  have h₁ : EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (clearAtomCfg .fresh .finalReadRoot data)) 1 := by
+    have step := oneStep (step_decodeTag_nil data inputValue)
+    rw [consumedData] at step
+    simpa [controlCfg, clearAtomCfg] using step
+  have h₂ : EvalsToInTime (TM2.step program)
+      (clearAtomCfg .fresh .finalReadRoot data)
+      (some (phaseCfg .finalReadRoot d₁))
+      ((trNat fresh).length + 1) := by
+    simpa [d₁] using
+      clearAtom_to_phase .fresh .finalReadRoot data (trNat fresh) freshValue
+  have h₃ := oneStep (step_phase_finalReadRoot d₁)
+  have h₄ : EvalsToInTime (TM2.step program)
+      (readFieldCfg .roots .fresh .finalConstantStart d₁)
+      (some (phaseCfg .finalConstantStart d₂))
+      (2 * (trNat root).length + 2) := by
+    simpa [d₂] using
+      readField_trNat .roots .fresh .finalConstantStart d₁ root []
+        (by simpa [d₁, TapeData.setAtom, TapeData.field] using rootsValue)
+        (by simp [d₁, TapeData.setAtom, TapeData.atom])
+        (by simpa [d₁, TapeData.setAtom] using scratchValue)
+  have h₅ : EvalsToInTime (TM2.step program)
+      (phaseCfg .finalConstantStart d₂)
+      (some (phaseCfg .finalConstantTail d₃))
+      (2 * (trNat root).length + 3) := by
+    simpa [d₃] using
+      emitFixedThenAtom .fresh d₂ (trList [1]) root
+        (step_finalConstantStart d₂)
+        (by simp [d₂, d₁, TapeData.setField, TapeData.setAtom,
+          TapeData.atom])
+        (by simp [d₂])
+  have h₆ : EvalsToInTime (TM2.step program)
+      (phaseCfg .finalConstantTail d₃)
+      (some (clearAtomCfg .fresh .finalReverse d₄)) 1 := by
+    simpa [d₄] using oneStep (step_finalConstantTail d₃)
+  have h₇ : EvalsToInTime (TM2.step program)
+      (clearAtomCfg .fresh .finalReverse d₄)
+      (some (phaseCfg .finalReverse d₅))
+      ((trNat root).length + 1) := by
+    simpa [d₅] using
+      clearAtom_to_phase .fresh .finalReverse d₄ (trNat root) (by
+        simp [d₄, d₃, d₂, d₁, emittedWordData, TapeData.setField,
+          TapeData.setAtom, TapeData.atom])
+  have h₈ := oneStep (step_phase_finalReverse d₅)
+  have reverseAccumulator :
+      d₅.outputReverse =
+        (trList (constantGateFields root true)).reverse ++ accumulator := by
+    rw [constantGateFields_native]
+    simp [d₅, d₄, d₃, d₂, d₁, emittedWordData,
+      reverseValue, trList,
+      TapeData.setField, TapeData.setAtom, List.reverse_append,
+      List.append_assoc]
+  have h₉ := reverseOutput_to_done d₅
+    ((trList (constantGateFields root true)).reverse ++ accumulator)
+    reverseAccumulator
+  have composed :=
+    thenRun (thenRun (thenRun (thenRun (thenRun (thenRun (thenRun (thenRun (thenRun
+      h₀ h₁) h₂) h₃) h₄) h₅) h₆) h₇) h₈) h₉
+  convert composed using 1 <;>
+    simp [d₅, d₄, d₃, d₂, d₁, emittedWordData,
+      constantGateFields_native, inputValue, reverseValue, rootsValue,
+      firstValue, secondValue, scratchValue, TapeData.setField,
+      TapeData.setAtom, TapeData.atom, trList, List.reverse_append,
+      List.append_assoc, Nat.add_comm] <;>
+    ring
+
+def initialData (input : List Γ') : TapeData :=
+  ⟨input, [], [], [], [], [], [], []⟩
+
+def outputData (output : List Γ') : TapeData :=
+  ⟨[], [], output, [], [], [], [], []⟩
+
+theorem initList_machine (input : List Γ') :
+    initList machine input =
+      copyInputFieldCfg .readFresh (initialData input) := by
+  unfold initList machine copyInputFieldCfg initialData tapes
+  congr 1
+  funext stack
+  cases stack <;> rfl
+
+theorem phaseDone_outputData (output : List Γ') :
+    TM2.step program (phaseCfg .done (outputData output)) =
+      some (haltList machine output) := by
+  unfold phaseCfg outputData haltList machine tapes
+  simp [TM2.step, program]
+  congr 2
+  funext stack
+  cases stack <;> rfl
+
+/-- Exact end-to-end running time of the finite transition compiler on a
+generated expression request. -/
+def transitionMachineTime (expression : TransitionExpr) (fresh : Nat) : Nat :=
+  let compiled := compileTransitionFields expression fresh
+  let clauseCount := expression.clauseCount + 1
+  (trNat clauseCount).length + 1 + 1 +
+    (2 * (trNat fresh).length + 2) +
+    transitionExpressionTime expression fresh +
+    ((trNat compiled.nextFresh).length +
+      5 * (trNat compiled.root).length +
+      (trList (constantGateFields compiled.root true)).length +
+      ((trList compiled.fields).reverse ++
+        (trList [clauseCount]).reverse).length + 13) + 1
+
+/-- The finite machine consumes every generated native compiler request and
+halts with exactly the verified required-expression formula encoding. -/
+noncomputable def transitionMachine_outputs (expression : TransitionExpr)
+    (fresh : Nat) :
+    TM2OutputsInTime machine
+      (trList (transitionCompilerInputFields expression fresh))
+      (some (trList (requireTransitionExprFields expression fresh)))
+      (transitionMachineTime expression fresh) := by
+  let compiled := compileTransitionFields expression fresh
+  let clauseCount := expression.clauseCount + 1
+  let programInput :=
+    trList (transitionProgramFields expression.program)
+  let afterHeader :=
+    { initialData (trList (transitionCompilerInputFields expression fresh)) with
+      input := trList [fresh] ++ programInput
+      outputReverse := (trList [clauseCount]).reverse }
+  let afterFresh :=
+    { afterHeader with
+      input := programInput
+      fresh := trNat fresh
+      scratch := [] }
+  let afterProgram :=
+    { afterFresh with
+      input := []
+      outputReverse :=
+        (trList compiled.fields).reverse ++ afterFresh.outputReverse
+      fresh := trNat compiled.nextFresh
+      roots := trList [compiled.root]
+      first := []
+      second := [] }
+  have h₀ : EvalsToInTime (TM2.step program)
+      (copyInputFieldCfg .readFresh
+        (initialData
+          (trList (transitionCompilerInputFields expression fresh))))
+      (some (phaseCfg .readFresh afterHeader))
+      ((trNat clauseCount).length + 1) := by
+    simpa [afterHeader, clauseCount, programInput, initialData,
+      transitionCompilerInputFields, trList, List.append_assoc] using
+      copyInputField_trNat .readFresh
+        (initialData
+          (trList (transitionCompilerInputFields expression fresh)))
+        clauseCount (trList [fresh] ++ programInput) (by
+          simp [initialData, transitionCompilerInputFields, clauseCount,
+            programInput, trList, List.append_assoc])
+  have h₁ := oneStep (step_phase_readFresh afterHeader)
+  have h₂ : EvalsToInTime (TM2.step program)
+      (readFieldCfg .input .fresh .decodeNext afterHeader)
+      (some (phaseCfg .decodeNext afterFresh))
+      (2 * (trNat fresh).length + 2) := by
+    simpa [afterFresh, TapeData.setField, TapeData.setAtom] using
+      readField_trNat .input .fresh .decodeNext afterHeader fresh programInput
+        (by simp [afterHeader, TapeData.field])
+        (by simp [afterHeader, initialData, TapeData.atom])
+        (by simp [afterHeader, initialData])
+  have h₃ : EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext afterFresh)
+      (some (phaseCfg .decodeNext afterProgram))
+      (transitionExpressionTime expression fresh) := by
+    simpa [afterProgram, compiled] using
+      executeExpressionProgram expression afterFresh fresh [] []
+        (by simp [afterFresh, programInput])
+        (by simp [afterFresh])
+        (by simp [afterFresh, afterHeader, initialData])
+        (by simp [afterFresh, afterHeader, initialData])
+        (by simp [afterFresh, afterHeader, initialData])
+        (by simp [afterFresh])
+  have h₄ := finalizeRoot afterProgram compiled.nextFresh compiled.root
+    ((trList compiled.fields).reverse ++ (trList [clauseCount]).reverse)
+    (by simp [afterProgram])
+    (by simp [afterProgram, afterFresh, afterHeader])
+    (by simp [afterProgram])
+    (by simp [afterProgram, trList])
+    (by simp [afterProgram])
+    (by simp [afterProgram])
+    (by simp [afterProgram, afterFresh])
+  have h₄' : EvalsToInTime (TM2.step program)
+      (phaseCfg .decodeNext afterProgram)
+      (some (phaseCfg .done
+        (outputData
+          (trList (requireTransitionExprFields expression fresh)))))
+      ((trNat compiled.nextFresh).length +
+        5 * (trNat compiled.root).length +
+        (trList (constantGateFields compiled.root true)).length +
+        ((trList compiled.fields).reverse ++
+          (trList [clauseCount]).reverse).length + 13) := by
+    simpa [afterProgram, afterFresh, afterHeader, initialData, outputData,
+      compiled, clauseCount, requireTransitionExprFields, trList,
+      List.reverse_append, List.append_assoc] using h₄
+  have h₅ := oneStep
+    (phaseDone_outputData
+      (trList (requireTransitionExprFields expression fresh)))
+  unfold TM2OutputsInTime FinTM2.step
+  rw [initList_machine]
+  have composed :=
+    thenRun (thenRun (thenRun (thenRun (thenRun h₀ h₁) h₂) h₃) h₄') h₅
+  refine
+    { toEvalsTo := by
+        simpa only [machine, FinTM2.Cfg, Option.map] using composed.toEvalsTo
+      steps_le_m := ?_ }
+  simpa [transitionMachineTime, compiled, clauseCount, Nat.add_assoc,
+    Nat.add_comm, Nat.add_left_comm] using composed.steps_le_m
 
 end TransitionEvaluatorMachine
 end PeriodicCNF
