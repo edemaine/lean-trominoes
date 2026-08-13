@@ -430,10 +430,10 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Lift bounded normalization across the motif.
             - [x] Fit center assignment and translated source-membership
               leaves on the native flat motif.
-            - [ ] Fit and bound fixed-symmetry center candidates.
+            - [x] Fit and bound fixed-symmetry center candidates.
               - [x] Fit the three-source conjunction and containment
                 implication.
-              - [ ] Bound the fixed Boolean composition in the native
+              - [x] Bound the fixed Boolean composition in the native
                 candidate footprint.
             - [ ] Fit and bound per-base center validity.
             - [ ] Lift bounded center validity across the motif.
