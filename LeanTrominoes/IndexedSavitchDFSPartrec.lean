@@ -119,6 +119,8 @@ private theorem predecessorField_eval (index : Nat) (values : List Nat) :
       pure [(values[index]?.getD 0).pred] := by
   simp [predecessorField, field_eval, Part.bind_eq_bind]
 
+/- The original no-suffix proof is retained here temporarily as a reference
+while the generalized theorem below serves as the single compiled case proof.
 set_option maxHeartbeats 1000000 in
 theorem stepCode_eval
     (baseBoolCode : Code) (context stateCount : Nat)
@@ -228,11 +230,12 @@ theorem stepCode_eval
                                     Code.boolAnd, divideEvalStep,
                                     divideBoolTag, divideOptionBoolTag,
                                     Part.bind_eq_bind]
+-/
 
+set_option maxHeartbeats 1000000 in
 /-- The structural DFS step is parametric in an arbitrary native-list suffix.
 This permits a flat, variable-length read-only problem context to ride behind
 the evaluator stack without changing any of the stack-manipulation code. -/
-set_option maxHeartbeats 1000000 in
 theorem stepCode_eval_suffix
     (baseBoolCode : Code) (context stateCount : Nat)
     (relation : Nat → Nat → Bool) (state : DivideEvalState)
@@ -264,9 +267,9 @@ theorem stepCode_eval_suffix
                       List.append_assoc] at baseCorrect
                     have baseTag :
                         (Code.someBoolTag baseBoolCode).eval
-                            ((context :: stateCount :: stack.length ::
+                            (context :: stateCount :: stack.length ::
                               0 :: 0 :: first :: last ::
-                                divideStackToNatList stack) ++ suffix) =
+                                (divideStackToNatList stack ++ suffix)) =
                           pure [if divideBoolTag
                               (decide (first = last) || relation first last) = 0
                             then 1 else 2] := by
@@ -346,6 +349,23 @@ theorem stepCode_eval_suffix
                                     Code.boolAnd, divideEvalStep,
                                     divideBoolTag, divideOptionBoolTag,
                                     Part.bind_eq_bind, List.append_assoc]
+
+/-- The original fixed-context theorem is the empty-suffix specialization. -/
+theorem stepCode_eval
+    (baseBoolCode : Code) (context stateCount : Nat)
+    (relation : Nat → Nat → Bool) (state : DivideEvalState)
+    (baseCorrect :
+      baseBoolCode.eval (divideEvalProgramList context stateCount state) =
+        pure [divideBoolTag
+          (decide (state.query.first = state.query.last) ||
+            relation state.query.first state.query.last)]) :
+    (stepCode baseBoolCode).eval
+        (divideEvalProgramList context stateCount state) =
+      pure (divideEvalProgramList context stateCount
+        (divideEvalStep stateCount relation state)) := by
+  simpa using
+    stepCode_eval_suffix baseBoolCode context stateCount relation state []
+      (by simpa using baseCorrect)
 
 /-- Suffix-parametric form of the complete tail-recursive DFS iteration. -/
 theorem flatIterate_stepCode_eval_suffix

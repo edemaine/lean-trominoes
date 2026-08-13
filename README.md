@@ -327,8 +327,10 @@ build; an imported proof counts when its statement matches the paper.
       certificates to the target flat strip fields.
       - [x] Prove the generic Savitch structural step and complete iteration
         preserve an arbitrary variable-length context suffix exactly.
-      - [ ] Locate the suffix after the variable DFS stack and port the
-        depth-zero strip edge oracle to it.
+      - [x] Compute the variable DFS-stack field count at runtime and recover
+        the complete appended flat context by a tail-style dynamic drop.
+      - [ ] Port the depth-zero strip edge oracle to the recovered flat
+        context.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
