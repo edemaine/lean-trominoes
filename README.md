@@ -367,6 +367,8 @@ build; an imported proof counts when its statement matches the paper.
           countdown and recover the full packed center-validity predicate.
         - [x] Compare current and next assignment digits at one shared flat
           motif occurrence.
+        - [x] Lift indexed overlap through one exact motif countdown and
+          conjoin all four shared-column scans.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
