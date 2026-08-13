@@ -647,6 +647,9 @@ build; an imported proof counts when its statement matches the paper.
                 multiply-and-add phase.
               - [x] Lift execution across every coefficient, emit the padded
                 word, and package its polynomial-time certificate.
+              - [x] Specialize the coefficient list to the reduction's exact
+                stack-width polynomial and prove that native delimiter count
+                agrees with source-field count.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1756,6 +1759,13 @@ The representation choices for this target are:
   by exactly the resulting number of unary markers.  Exact execution and
   runtime proofs package the construction as an explicit polynomial-time
   machine certificate.
+- [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
+  specializes unary Horner padding to the exact stack-width polynomial of a
+  source decider.  It proves that the reversed native polynomial coefficient
+  list evaluates correctly, counts one delimiter per canonical source field,
+  identifies the resulting padding with the bounded compiler's selected
+  stack width, and exposes the phase as a polynomial-time machine on native
+  field encodings.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population
