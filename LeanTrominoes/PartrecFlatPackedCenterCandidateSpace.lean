@@ -244,6 +244,239 @@ theorem flatPackedCenterSourceInside
     comp membershipSemantic
       (flatPackedCenterSourceInput periodicStrip packed base)
 
+private def flatPackedBoolAndThreeCost
+    (values : List Nat)
+    (first second third : Bool)
+    (firstCost secondCost thirdCost : Nat) : Nat :=
+  let tailCost := boolAndCost values
+    second.toNat third.toNat secondCost thirdCost
+  boolAndCost values first.toNat (second && third).toNat
+    firstCost tailCost
+
+private theorem flatPackedBoolAndThree
+    (firstCode secondCode thirdCode : Code)
+    (values : List Nat)
+    (first second third : Bool)
+    (firstCost secondCost thirdCost : Nat)
+    (firstFit : EvaluatorCodeFits firstCode values
+      [first.toNat] firstCost)
+    (secondFit : EvaluatorCodeFits secondCode values
+      [second.toNat] secondCost)
+    (thirdFit : EvaluatorCodeFits thirdCode values
+      [third.toNat] thirdCost) :
+    EvaluatorCodeFits
+      (Code.boolAnd firstCode
+        (Code.boolAnd secondCode thirdCode))
+      values [(first && (second && third)).toNat]
+      (flatPackedBoolAndThreeCost values first second third
+        firstCost secondCost thirdCost) := by
+  have tailRaw := boolAnd secondFit thirdFit
+  have tailFit :
+      EvaluatorCodeFits (Code.boolAnd secondCode thirdCode)
+        values [(second && third).toNat]
+        (boolAndCost values second.toNat third.toNat
+          secondCost thirdCost) := by
+    cases second <;> cases third <;> simpa using tailRaw
+  have resultRaw := boolAnd firstFit tailFit
+  cases first <;> cases second <;> cases third <;>
+    simpa [flatPackedBoolAndThreeCost] using resultRaw
+
+def flatPackedCenterAllSourcesInsideCost
+    (tromino : Tromino) (symmetry : SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) : Nat :=
+  let values := Code.flatPackedCenterCandidateInput periodicStrip packed base
+  match tromino with
+  | .I =>
+      flatPackedBoolAndThreeCost values
+        (packed.centerSourceInsideBool periodicStrip
+          base symmetry (0, 0))
+        (packed.centerSourceInsideBool periodicStrip
+          base symmetry (1, 0))
+        (packed.centerSourceInsideBool periodicStrip
+          base symmetry (2, 0))
+        (flatPackedCenterSourceInsideCost symmetry (0, 0)
+          periodicStrip packed base)
+        (flatPackedCenterSourceInsideCost symmetry (1, 0)
+          periodicStrip packed base)
+        (flatPackedCenterSourceInsideCost symmetry (2, 0)
+          periodicStrip packed base)
+  | .L =>
+      flatPackedBoolAndThreeCost values
+        (packed.centerSourceInsideBool periodicStrip
+          base symmetry (0, 0))
+        (packed.centerSourceInsideBool periodicStrip
+          base symmetry (1, 0))
+        (packed.centerSourceInsideBool periodicStrip
+          base symmetry (0, 1))
+        (flatPackedCenterSourceInsideCost symmetry (0, 0)
+          periodicStrip packed base)
+        (flatPackedCenterSourceInsideCost symmetry (1, 0)
+          periodicStrip packed base)
+        (flatPackedCenterSourceInsideCost symmetry (0, 1)
+          periodicStrip packed base)
+
+theorem flatPackedCenterAllSourcesInside
+    (tromino : Tromino) (symmetry : SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (packed : PackedWindowState) (base : Cell) :
+    let inside :=
+      (TrominoAssignment.trominoCellList tromino).all fun source =>
+        packed.centerSourceInsideBool periodicStrip base symmetry source
+    EvaluatorCodeFits
+      (Code.flatPackedCenterAllSourcesInsideCode tromino symmetry)
+      (Code.flatPackedCenterCandidateInput periodicStrip packed base)
+      [inside.toNat]
+      (flatPackedCenterAllSourcesInsideCost tromino symmetry
+        periodicStrip packed base) := by
+  simp only
+  cases tromino with
+  | I =>
+      simpa [Code.flatPackedCenterAllSourcesInsideCode,
+        flatPackedCenterAllSourcesInsideCost,
+        TrominoAssignment.trominoCellList] using
+        flatPackedBoolAndThree
+          (Code.flatPackedCenterSourceInsideCode symmetry (0, 0))
+          (Code.flatPackedCenterSourceInsideCode symmetry (1, 0))
+          (Code.flatPackedCenterSourceInsideCode symmetry (2, 0))
+          (Code.flatPackedCenterCandidateInput periodicStrip packed base)
+          (packed.centerSourceInsideBool periodicStrip
+            base symmetry (0, 0))
+          (packed.centerSourceInsideBool periodicStrip
+            base symmetry (1, 0))
+          (packed.centerSourceInsideBool periodicStrip
+            base symmetry (2, 0))
+          (flatPackedCenterSourceInsideCost symmetry (0, 0)
+            periodicStrip packed base)
+          (flatPackedCenterSourceInsideCost symmetry (1, 0)
+            periodicStrip packed base)
+          (flatPackedCenterSourceInsideCost symmetry (2, 0)
+            periodicStrip packed base)
+          (flatPackedCenterSourceInside .I symmetry (0, 0)
+            (by simp [TrominoAssignment.trominoCellList])
+            periodicStrip wellFormed packed base)
+          (flatPackedCenterSourceInside .I symmetry (1, 0)
+            (by simp [TrominoAssignment.trominoCellList])
+            periodicStrip wellFormed packed base)
+          (flatPackedCenterSourceInside .I symmetry (2, 0)
+            (by simp [TrominoAssignment.trominoCellList])
+            periodicStrip wellFormed packed base)
+  | L =>
+      simpa [Code.flatPackedCenterAllSourcesInsideCode,
+        flatPackedCenterAllSourcesInsideCost,
+        TrominoAssignment.trominoCellList] using
+        flatPackedBoolAndThree
+          (Code.flatPackedCenterSourceInsideCode symmetry (0, 0))
+          (Code.flatPackedCenterSourceInsideCode symmetry (1, 0))
+          (Code.flatPackedCenterSourceInsideCode symmetry (0, 1))
+          (Code.flatPackedCenterCandidateInput periodicStrip packed base)
+          (packed.centerSourceInsideBool periodicStrip
+            base symmetry (0, 0))
+          (packed.centerSourceInsideBool periodicStrip
+            base symmetry (1, 0))
+          (packed.centerSourceInsideBool periodicStrip
+            base symmetry (0, 1))
+          (flatPackedCenterSourceInsideCost symmetry (0, 0)
+            periodicStrip packed base)
+          (flatPackedCenterSourceInsideCost symmetry (1, 0)
+            periodicStrip packed base)
+          (flatPackedCenterSourceInsideCost symmetry (0, 1)
+            periodicStrip packed base)
+          (flatPackedCenterSourceInside .L symmetry (0, 0)
+            (by simp [TrominoAssignment.trominoCellList])
+            periodicStrip wellFormed packed base)
+          (flatPackedCenterSourceInside .L symmetry (1, 0)
+            (by simp [TrominoAssignment.trominoCellList])
+            periodicStrip wellFormed packed base)
+          (flatPackedCenterSourceInside .L symmetry (0, 1)
+            (by simp [TrominoAssignment.trominoCellList])
+            periodicStrip wellFormed packed base)
+
+def flatPackedCenterCandidateInsideCost
+    (tromino : Tromino) (symmetry : SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell) : Nat :=
+  let values := Code.flatPackedCenterCandidateInput periodicStrip packed base
+  let selected := decide
+    (packed.assignmentAtCell periodicStrip
+      WindowState.center base = some symmetry)
+  let inside :=
+    (TrominoAssignment.trominoCellList tromino).all fun source =>
+      packed.centerSourceInsideBool periodicStrip base symmetry source
+  let selectedCost := flatPackedCenterAssignmentIsCost symmetry
+    periodicStrip packed base
+  let absentCost := isZeroCost values selected.toNat selectedCost
+  boolOrCost values (!selected).toNat inside.toNat absentCost
+    (flatPackedCenterAllSourcesInsideCost tromino symmetry
+      periodicStrip packed base)
+
+theorem flatPackedCenterCandidateInside
+    (tromino : Tromino) (symmetry : SquareSymmetry)
+    (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (packed : PackedWindowState) (base : Cell) :
+    EvaluatorCodeFits
+      (Code.flatPackedCenterCandidateInsideCode tromino symmetry)
+      (Code.flatPackedCenterCandidateInput periodicStrip packed base)
+      [(packed.centerSymmetryInsideBool tromino periodicStrip
+        base symmetry).toNat]
+      (flatPackedCenterCandidateInsideCost tromino symmetry
+        periodicStrip packed base) := by
+  let values := Code.flatPackedCenterCandidateInput periodicStrip packed base
+  let selected := decide
+    (packed.assignmentAtCell periodicStrip
+      WindowState.center base = some symmetry)
+  let inside :=
+    (TrominoAssignment.trominoCellList tromino).all fun source =>
+      packed.centerSourceInsideBool periodicStrip base symmetry source
+  let selectedCost := flatPackedCenterAssignmentIsCost symmetry
+    periodicStrip packed base
+  let absentCost := isZeroCost values selected.toNat selectedCost
+  have selectedFit : EvaluatorCodeFits
+      (Code.flatPackedCenterAssignmentIsCode symmetry)
+      values [selected.toNat] selectedCost := by
+    simpa [values, selected, selectedCost] using
+      flatPackedCenterAssignmentIs symmetry periodicStrip packed base
+  have absentRaw := isZero selectedFit
+  have absentFit : EvaluatorCodeFits
+      (Code.isZero (Code.flatPackedCenterAssignmentIsCode symmetry))
+      values [(!selected).toNat] absentCost := by
+    cases selectedEq : selected <;>
+      simpa [absentCost, selectedEq] using absentRaw
+  have insideFit : EvaluatorCodeFits
+      (Code.flatPackedCenterAllSourcesInsideCode tromino symmetry)
+      values [inside.toNat]
+      (flatPackedCenterAllSourcesInsideCost tromino symmetry
+        periodicStrip packed base) := by
+    simpa [values, inside] using
+      flatPackedCenterAllSourcesInside tromino symmetry
+        periodicStrip wellFormed packed base
+  have resultRaw := boolOr absentFit insideFit
+  have resultFit : EvaluatorCodeFits
+      (Code.boolOr
+        (Code.isZero (Code.flatPackedCenterAssignmentIsCode symmetry))
+        (Code.flatPackedCenterAllSourcesInsideCode tromino symmetry))
+      values [((!selected) || inside).toNat]
+      (boolOrCost values (!selected).toNat inside.toNat absentCost
+        (flatPackedCenterAllSourcesInsideCost tromino symmetry
+          periodicStrip packed base)) := by
+    cases selectedEq : selected <;> cases insideEq : inside <;>
+      simpa [selectedEq, insideEq] using resultRaw
+  have semanticEq :
+      packed.centerSymmetryInsideBool tromino periodicStrip
+          base symmetry = ((!selected) || inside) := by
+    unfold PackedWindowState.centerSymmetryInsideBool
+    change
+      (decide
+          (packed.assignmentAtCell periodicStrip
+            WindowState.center base ≠ some symmetry) || inside) =
+        ((!selected) || inside)
+    simp [selected]
+  simpa [Code.flatPackedCenterCandidateInsideCode,
+    flatPackedCenterCandidateInsideCost, values, selected,
+    inside, selectedCost, absentCost, semanticEq] using resultFit
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing
