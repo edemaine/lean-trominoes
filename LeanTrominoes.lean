@@ -877,6 +877,7 @@ import LeanTrominoes.PartrecDynamicDrop
 import LeanTrominoes.PartrecDynamicDropSpace
 import LeanTrominoes.PartrecFlatSavitchContext
 import LeanTrominoes.PartrecFlatSavitchContextSpace
+import LeanTrominoes.PartrecFlatSavitchReachSpace
 import LeanTrominoes.PartrecFlatSavitchStepSpace
 import LeanTrominoes.PartrecFlatPackedAssignmentAt
 import LeanTrominoes.PartrecFlatPackedAssignmentPredicates

@@ -466,6 +466,10 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Fit every control-flow branch of one complete
               suffix-preserving Savitch structural step against a common
               exact cost.
+            - [x] Instantiate a sufficient power-of-two state bound and
+              Savitch depth from the target flat input length, then bound
+              every reachable DFS state, retained strip suffix, and exact
+              fuel counter in that representation.
             - [ ] Bound that structural-step cost uniformly over reachable
               states and lift it through the exact-fuel iteration.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
@@ -1982,6 +1986,11 @@ The representation choices for this target are:
   flat Savitch DFS transition.  It retains the native strip fields after the
   variable DFS stack and substitutes the bounded recovered reflexive-or-edge
   oracle at recursion depth zero.
+- [`LeanTrominoes/PartrecFlatSavitchReachSpace.lean`](LeanTrominoes/PartrecFlatSavitchReachSpace.lean)
+  replaces the legacy paired-encoding search parameters by a sufficient
+  power-of-two state bound and linear Savitch depth measured in the target
+  flat input.  It bounds every reachable serialized DFS state together with
+  the unchanged strip suffix and any remaining exact-fuel counter.
 - [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
   fits the strip-suffix projections, decodes both queried frontier indices
   into word and phase, and assembles the native seven-field packed-transition
