@@ -2,8 +2,11 @@ import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLengthSpace
 import LeanTrominoes.PartrecPowerTwoSpace
 import LeanTrominoes.PartrecFlatFieldPolySpace
+import LeanTrominoes.PartrecPairSpace
+import LeanTrominoes.PartrecStripCellBoundsSpace
 import LeanTrominoes.PartrecFlatStripCycleSpace
 import LeanTrominoes.PartrecFlatStripDecider
+import LeanTrominoes.PeriodicStripFlatEncodingSize
 
 /-!
 # Polynomial-space certificate for the native-flat strip decider
@@ -527,6 +530,511 @@ theorem flatStripCycleParameters_fits (periodicStrip : PeriodicStrip) :
     (prepend (flatStripSearchDepth_fits periodicStrip) (id fields))
   simpa [flatStripCycleParametersCode, flatStripCycleParametersCost,
     fields, prependCost] using result
+
+/-! ## Structural guard -/
+
+private theorem guardEncodedFieldSpace_le_of_mem
+    (field : Nat) (fields : List Nat) (member : field ∈ fields) :
+    (Computability.encodeNat field).length + 1 ≤
+      encodedListSpace fields := by
+  induction fields with
+  | nil => simp at member
+  | cons value fields induction =>
+      rw [encodedListSpace_cons]
+      simp only [List.mem_cons] at member
+      rcases member with rfl | member
+      · omega
+      · exact (induction member).trans (by omega)
+
+private theorem guardEncodedListSpace_suffix_le
+    (leadingFields suffix : List Nat) :
+    encodedListSpace suffix ≤
+      encodedListSpace (leadingFields ++ suffix) := by
+  rw [LeanTrominoes.FiniteState.encodedListSpace_append]
+  omega
+
+def flatStripGuardStepCost
+    (width period : Nat) (valid : Bool)
+    (cell : Cell) (remaining : List Cell) : Nat :=
+  let state :=
+    Code.flatStripMotifState width period valid (cell :: remaining)
+  let xCode := Encodable.encode cell.1
+  let yCode := Encodable.encode cell.2
+  let cellCode := Encodable.encode cell
+  let rest := remaining.flatMap PeriodicStripFlatEncoding.cellFields
+  let pairArgumentsCost := prependCost state [xCode] [yCode]
+    (getCost 3 state) (getCost 4 state)
+  let cellCost := natPairCost xCode yCode + pairArgumentsCost
+  let periodAndCellCost := prependCost state [period] [cellCode]
+    (getCost 2 state) cellCost
+  let cellArgumentsCost := prependCost state [width] [period, cellCode]
+    (getCost 1 state) periodAndCellCost
+  let inBoundsCost := stripCellInBoundsCost width period cell +
+    cellArgumentsCost
+  let cellTag := if cell.InStripBounds width period then 1 else 0
+  let updatedValidCost := boolAndCost state valid.toNat cellTag
+    (getCost 0 state) inBoundsCost
+  let periodAndRestCost := prependCost state [period] rest
+    (getCost 2 state) (dropCost 5 state)
+  let dimensionsAndRestCost := prependCost state [width] (period :: rest)
+    (getCost 1 state) periodAndRestCost
+  let nextValid := valid && decide (cell.InStripBounds width period)
+  prependCost state [nextValid.toNat] (width :: period :: rest)
+    updatedValidCost dimensionsAndRestCost
+
+theorem flatStripGuardStep_fits
+    (width period : Nat) (valid : Bool)
+    (cell : Cell) (remaining : List Cell) :
+    EvaluatorCodeFits Code.flatStripMotifStepCode
+      (Code.flatStripMotifState width period valid (cell :: remaining))
+      (Code.flatStripMotifState width period
+        (valid && decide (cell.InStripBounds width period)) remaining)
+      (flatStripGuardStepCost width period valid cell remaining) := by
+  let state :=
+    Code.flatStripMotifState width period valid (cell :: remaining)
+  let xCode := Encodable.encode cell.1
+  let yCode := Encodable.encode cell.2
+  have pairArguments := prepend (get 3 state) (get 4 state)
+  have cellFit := EvaluatorCodeFits.comp (natPair xCode yCode) pairArguments
+  have periodAndCell := prepend (get 2 state) cellFit
+  have cellArguments := prepend (get 1 state) periodAndCell
+  have inBounds := EvaluatorCodeFits.comp
+    (stripCellInBounds width period cell) cellArguments
+  have updatedValid := boolAnd (get 0 state) inBounds
+  have periodAndRest := prepend (get 2 state) (drop 5 state)
+  have dimensionsAndRest := prepend (get 1 state) periodAndRest
+  have result := prepend updatedValid dimensionsAndRest
+  rcases cell with ⟨x, y⟩
+  cases valid <;>
+    by_cases inBoundsH : Cell.InStripBounds width period (x, y) <;>
+    simpa [Code.flatStripMotifStepCode,
+      Code.flatStripMotifUpdatedValidCode,
+      Code.flatStripMotifHeadInBoundsCode,
+      Code.flatStripMotifCellArgumentsCode,
+      Code.flatStripMotifCellCode,
+      Code.flatStripMotifCellPairArgumentsCode,
+      flatStripGuardStepCost, state, xCode, yCode,
+      Code.flatStripMotifState,
+      PeriodicStripFlatEncoding.cellFields,
+      inBoundsH, prependCost] using result
+
+def flatStripGuardBodyCost
+    (remainingCount width period : Nat)
+    (valid : Bool) (cell : Cell) (remaining : List Cell) : Nat :=
+  let nextState := Code.flatStripMotifState width period
+    (valid && decide (cell.InStripBounds width period)) remaining
+  flatCountdownBodyCost (fun _ => nextState)
+    (fun _ => flatStripGuardStepCost width period valid cell remaining)
+    remainingCount
+    (Code.flatStripMotifState width period valid (cell :: remaining))
+
+theorem flatStripGuardBodySucc_fits
+    (remainingCount width period : Nat)
+    (valid : Bool) (cell : Cell) (remaining : List Cell) :
+    EvaluatorCodeFits
+      (Code.flatCountdownBody Code.flatStripMotifStepCode)
+      ((remainingCount + 1) ::
+        Code.flatStripMotifState width period valid (cell :: remaining))
+      (flatCountdownOutput (fun _ => Code.flatStripMotifState width period
+          (valid && decide (cell.InStripBounds width period)) remaining)
+        (remainingCount + 1)
+        (Code.flatStripMotifState width period valid (cell :: remaining)))
+      (flatStripGuardBodyCost (remainingCount + 1)
+        width period valid cell remaining) := by
+  have body := flatCountdownBody_of_fit
+    (flatStripGuardStep_fits width period valid cell remaining)
+    (remainingCount + 1)
+  simpa [flatStripGuardBodyCost] using body
+
+def flatStripGuardBodyZeroCost
+    (width period : Nat) (valid : Bool) : Nat :=
+  flatCountdownBodyCost Code.flatStripMotifNativeStep
+    (fun _ => 0) 0 (Code.flatStripMotifState width period valid [])
+
+theorem flatStripGuardBodyZero_fits
+    (width period : Nat) (valid : Bool) :
+    EvaluatorCodeFits
+      (Code.flatCountdownBody Code.flatStripMotifStepCode)
+      (0 :: Code.flatStripMotifState width period valid [])
+      (flatCountdownOutput Code.flatStripMotifNativeStep 0
+        (Code.flatStripMotifState width period valid []))
+      (flatStripGuardBodyZeroCost width period valid) := by
+  simpa [Code.flatCountdownBody, flatCountdownOutput,
+    flatStripGuardBodyZeroCost, flatCountdownBodyCost,
+    zeroPrimeCost] using
+    EvaluatorCodeFits.case_zero
+      (successorBranch :=
+        .cons Code.one
+          (.cons Code.head
+            (Code.flatStripMotifStepCode.comp Code.tail)))
+      (values := 0 :: Code.flatStripMotifState width period valid [])
+      (by rfl)
+      (zero'_named (Code.flatStripMotifState width period valid []))
+
+def flatStripGuardLoopSpaceBound (inputSpace : Nat) : Nat :=
+  1000000000000000000000000000000000000000000000000000000000000 *
+    (inputSpace + 1)
+
+private theorem flatStripGuardUpdatedCost_le
+    (base : Nat) (positive : 1 ≤ base) :
+    1000 *
+        (500000000000000000000000000000000000000000000 * base + 1) ≤
+      1000000000000000000000000000000000000000000000000 * base := by
+  omega
+
+set_option maxHeartbeats 1500000 in
+theorem flatStripGuardBodyCost_le_input
+    (periodicStrip : PeriodicStrip)
+    (valid : Bool) (cell : Cell) (remaining leading : List Cell)
+    (decomposition :
+      periodicStrip.motif = leading ++ cell :: remaining) :
+    flatStripGuardBodyCost (remaining.length + 1)
+        periodicStrip.width periodicStrip.period valid cell remaining ≤
+      flatStripGuardLoopSpaceBound
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputSpace := encodedListSpace fields
+  let xCode := Encodable.encode cell.1
+  let yCode := Encodable.encode cell.2
+  let cellCode := Encodable.encode cell
+  let restFields :=
+    remaining.flatMap PeriodicStripFlatEncoding.cellFields
+  let state :=
+    Code.flatStripMotifState periodicStrip.width
+      periodicStrip.period valid (cell :: remaining)
+  change flatStripGuardBodyCost (remaining.length + 1)
+      periodicStrip.width periodicStrip.period valid cell remaining ≤
+    flatStripGuardLoopSpaceBound inputSpace
+  have fieldsEq :
+      fields =
+        [periodicStrip.width, periodicStrip.period,
+          periodicStrip.motif.length] ++
+        (leading.flatMap PeriodicStripFlatEncoding.cellFields ++
+          PeriodicStripFlatEncoding.cellFields cell ++ restFields) := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields,
+      decomposition, restFields, List.flatMap_append,
+      List.append_assoc]
+  have widthMember : periodicStrip.width ∈ fields := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have periodMember : periodicStrip.period ∈ fields := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have lengthMember : periodicStrip.motif.length ∈ fields := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have xMember : xCode ∈ fields := by
+    rw [fieldsEq]
+    simp [xCode, PeriodicStripFlatEncoding.cellFields]
+  have yMember : yCode ∈ fields := by
+    rw [fieldsEq]
+    simp [yCode, PeriodicStripFlatEncoding.cellFields]
+  have widthSpace := guardEncodedFieldSpace_le_of_mem
+    periodicStrip.width fields widthMember
+  have periodSpace := guardEncodedFieldSpace_le_of_mem
+    periodicStrip.period fields periodMember
+  have motifLengthSpace := guardEncodedFieldSpace_le_of_mem
+    periodicStrip.motif.length fields lengthMember
+  have xSpace := guardEncodedFieldSpace_le_of_mem xCode fields xMember
+  have ySpace := guardEncodedFieldSpace_le_of_mem yCode fields yMember
+  have inputExpanded :
+      inputSpace =
+        (Computability.encodeNat periodicStrip.width).length + 1 +
+        ((Computability.encodeNat periodicStrip.period).length + 1 +
+        ((Computability.encodeNat periodicStrip.motif.length).length + 1 +
+          (encodedListSpace
+            (leading.flatMap PeriodicStripFlatEncoding.cellFields) +
+          ((Computability.encodeNat xCode).length + 1 +
+          ((Computability.encodeNat yCode).length + 1 +
+            encodedListSpace restFields))))) := by
+    change encodedListSpace fields = _
+    rw [fieldsEq]
+    simp [LeanTrominoes.FiniteState.encodedListSpace_append,
+      PeriodicStripFlatEncoding.cellFields, xCode, yCode]
+  have restSpace : encodedListSpace restFields ≤ inputSpace := by
+    have suffix := guardEncodedListSpace_suffix_le
+      ([periodicStrip.width, periodicStrip.period,
+          periodicStrip.motif.length] ++
+        leading.flatMap PeriodicStripFlatEncoding.cellFields ++
+        PeriodicStripFlatEncoding.cellFields cell)
+      restFields
+    change encodedListSpace restFields ≤ encodedListSpace fields
+    rw [fieldsEq]
+    simpa [List.append_assoc] using suffix
+  have remainingCount :
+      remaining.length + 1 ≤ periodicStrip.motif.length := by
+    rw [decomposition]
+    simp
+  have remainingCountBits :=
+    listCodeEncodeNat_length_mono remainingCount
+  have pairBits := encodeNat_pair_length_le xCode yCode
+  have pairCost := natPairCost_le_linear xCode yCode
+  have pairUnit := natPairUnit_le_linear xCode yCode
+  have pairCostInput :
+      natPairCost xCode yCode ≤
+        100000000000000000000000000000000000000000000 *
+          (inputSpace + 1) := by
+    omega
+  have cellCodeEq : cellCode = Nat.pair xCode yCode := by
+    rcases cell with ⟨x, y⟩
+    rfl
+  have widthPeriodBits :=
+    encodeNat_add_length_le_sum periodicStrip.width periodicStrip.period
+  have withCellBits := encodeNat_add_length_le_sum
+    (periodicStrip.width + periodicStrip.period) cellCode
+  have doubledBits := encodeNat_mul_length_le_sum 2
+    (periodicStrip.width + periodicStrip.period + cellCode)
+  have localBits := encodeNat_add_length_le_sum
+    (2 * (periodicStrip.width + periodicStrip.period + cellCode)) 4
+  have twoBits : (Computability.encodeNat 2).length = 2 := rfl
+  have fourBits : (Computability.encodeNat 4).length = 3 := rfl
+  have cellPredicate := stripCellInBoundsCost_le_linear
+    periodicStrip.width periodicStrip.period cell
+  have cellPredicateInput :
+      stripCellInBoundsCost periodicStrip.width periodicStrip.period cell ≤
+        10000000000000 * (inputSpace + 1) := by
+    change stripCellInBoundsCost periodicStrip.width periodicStrip.period cell ≤
+      100000000000 *
+        (encodedListSpace
+          [2 * (periodicStrip.width + periodicStrip.period + cellCode) + 4] + 1)
+      at cellPredicate
+    rw [cellCodeEq] at cellPredicate withCellBits doubledBits localBits
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at cellPredicate
+    omega
+  have stateSpace : encodedListSpace state ≤ inputSpace + 2 := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    change encodedListSpace
+      ([valid.toNat, periodicStrip.width, periodicStrip.period,
+        xCode, yCode] ++ restFields) ≤ _
+    cases valid <;>
+      simp [LeanTrominoes.FiniteState.encodedListSpace_append,
+        encodedListSpace_cons, zeroBits, oneBits] at inputExpanded ⊢ <;>
+      omega
+  let base := inputSpace + 1
+  have get0Raw := listCodeGetCost_le_linear 0 state
+  have get1Raw := listCodeGetCost_le_linear 1 state
+  have get2Raw := listCodeGetCost_le_linear 2 state
+  have get3Raw := listCodeGetCost_le_linear 3 state
+  have get4Raw := listCodeGetCost_le_linear 4 state
+  have drop5Raw := StripSavitchStep.dropCost_le_linear 5 state
+  have get0Bound : getCost 0 state ≤ 1000000 * base := by omega
+  have get1Bound : getCost 1 state ≤ 1000000 * base := by omega
+  have get2Bound : getCost 2 state ≤ 1000000 * base := by omega
+  have get3Bound : getCost 3 state ≤ 1000000 * base := by omega
+  have get4Bound : getCost 4 state ≤ 1000000 * base := by omega
+  have drop5Bound : dropCost 5 state ≤ 1000000 * base := by omega
+  have xSingleton : encodedListSpace [xCode] ≤ base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at xSpace ⊢
+    simp only [base, inputSpace]
+    omega
+  have ySingleton : encodedListSpace [yCode] ≤ base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at ySpace ⊢
+    simp only [base, inputSpace]
+    omega
+  have cellSingleton : encodedListSpace [cellCode] ≤ 3 * base := by
+    simp only [cellCodeEq, encodedListSpace_cons, encodedListSpace_nil]
+    omega
+  have periodSingleton :
+      encodedListSpace [periodicStrip.period] ≤ base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at periodSpace ⊢
+    simp only [base, inputSpace]
+    omega
+  have widthSingleton :
+      encodedListSpace [periodicStrip.width] ≤ base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at widthSpace ⊢
+    simp only [base, inputSpace]
+    omega
+  have periodCellSpace :
+      encodedListSpace [periodicStrip.period, cellCode] ≤ 4 * base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at *
+    omega
+  have cellArgumentsSpace : encodedListSpace
+      [periodicStrip.width, periodicStrip.period, cellCode] ≤
+        5 * base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at *
+    omega
+  have periodRestSpace : encodedListSpace
+      (periodicStrip.period :: restFields) ≤ 2 * base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at *
+    omega
+  have dimensionsRestSpace : encodedListSpace
+      (periodicStrip.width :: periodicStrip.period :: restFields) ≤
+        3 * base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at *
+    omega
+  have pairArgumentsSpace : encodedListSpace [xCode, yCode] ≤
+      2 * base := by
+    simp only [encodedListSpace_cons, encodedListSpace_nil] at *
+    omega
+  let pairArgumentsCost := prependCost state [xCode] [yCode]
+    (getCost 3 state) (getCost 4 state)
+  have pairArgumentsCostBound : pairArgumentsCost ≤ 10000000 * base := by
+    simp only [pairArgumentsCost, prependCost, List.headI_cons]
+    omega
+  let cellCost := natPairCost xCode yCode + pairArgumentsCost
+  have cellCostBound :
+      cellCost ≤
+        200000000000000000000000000000000000000000000 * base := by
+    simp only [cellCost]
+    omega
+  let periodAndCellCost := prependCost state
+    [periodicStrip.period] [cellCode] (getCost 2 state) cellCost
+  have periodAndCellCostBound :
+      periodAndCellCost ≤
+        300000000000000000000000000000000000000000000 * base := by
+    simp only [periodAndCellCost, prependCost, List.headI_cons]
+    omega
+  let cellArgumentsCost := prependCost state [periodicStrip.width]
+    [periodicStrip.period, cellCode] (getCost 1 state) periodAndCellCost
+  have cellArgumentsCostBound :
+      cellArgumentsCost ≤
+        400000000000000000000000000000000000000000000 * base := by
+    simp only [cellArgumentsCost, prependCost, List.headI_cons]
+    omega
+  let inBoundsCost :=
+    stripCellInBoundsCost periodicStrip.width periodicStrip.period cell +
+      cellArgumentsCost
+  have inBoundsCostBound :
+      inBoundsCost ≤
+        500000000000000000000000000000000000000000000 * base := by
+    simp only [inBoundsCost]
+    omega
+  let cellTag :=
+    if cell.InStripBounds periodicStrip.width periodicStrip.period then 1 else 0
+  let boolBudget :=
+    500000000000000000000000000000000000000000000 * base
+  have boolBudgetPositive : 1 ≤ boolBudget := by
+    simp only [boolBudget, base]
+    omega
+  have stateBoolBound : encodedListSpace state ≤ boolBudget := by
+    simp only [boolBudget, base]
+    omega
+  have updatedRaw := flatLookupBoolAndCost_le_budget state valid.toNat
+    cellTag (getCost 0 state) inBoundsCost boolBudget
+    (by cases valid <;> simp) (by
+      simp only [cellTag]
+      split <;> omega) stateBoolBound (by
+      simp only [boolBudget]
+      omega) (by
+      simp only [boolBudget]
+      omega) boolBudgetPositive
+  let updatedValidCost := boolAndCost state valid.toNat cellTag
+    (getCost 0 state) inBoundsCost
+  have updatedValidCostBound :
+      updatedValidCost ≤
+        1000000000000000000000000000000000000000000000000 * base := by
+    change boolAndCost state valid.toNat cellTag
+      (getCost 0 state) inBoundsCost ≤ _
+    have raw := updatedRaw
+    simp only [boolBudget] at raw
+    exact raw.trans (flatStripGuardUpdatedCost_le base (by
+      simp only [base]
+      omega))
+  let periodAndRestCost := prependCost state [periodicStrip.period]
+    restFields (getCost 2 state) (dropCost 5 state)
+  have periodAndRestCostBound :
+      periodAndRestCost ≤ 10000000 * base := by
+    simp only [periodAndRestCost, prependCost, List.headI_cons]
+    omega
+  let dimensionsAndRestCost := prependCost state [periodicStrip.width]
+    (periodicStrip.period :: restFields) (getCost 1 state)
+    periodAndRestCost
+  have dimensionsAndRestCostBound :
+      dimensionsAndRestCost ≤ 100000000 * base := by
+    simp only [dimensionsAndRestCost, prependCost, List.headI_cons]
+    omega
+  let nextValid := valid &&
+    decide (cell.InStripBounds periodicStrip.width periodicStrip.period)
+  let nextState := Code.flatStripMotifState periodicStrip.width
+    periodicStrip.period nextValid remaining
+  have nextStateSpace : encodedListSpace nextState ≤ inputSpace + 2 := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    change encodedListSpace
+      ([nextValid.toNat, periodicStrip.width, periodicStrip.period] ++
+        restFields) ≤ _
+    cases nextValid <;>
+      simp [LeanTrominoes.FiniteState.encodedListSpace_append,
+        encodedListSpace_cons, zeroBits, oneBits] at inputExpanded ⊢ <;>
+      omega
+  have nextValidSpace : encodedListSpace [nextValid.toNat] ≤ 2 := by
+    cases nextValid <;> decide
+  have finalOutputSpace : encodedListSpace
+      (nextValid.toNat :: periodicStrip.width :: periodicStrip.period ::
+        restFields) ≤ inputSpace + 2 := by
+    change encodedListSpace nextState ≤ inputSpace + 2
+    exact nextStateSpace
+  have stepCostBound :
+      flatStripGuardStepCost periodicStrip.width periodicStrip.period
+          valid cell remaining ≤
+        2000000000000000000000000000000000000000000000000 * base := by
+    change prependCost state [nextValid.toNat]
+      (periodicStrip.width :: periodicStrip.period :: restFields)
+      updatedValidCost dimensionsAndRestCost ≤ _
+    simp only [prependCost, List.headI_cons]
+    omega
+  let countdownBudget :=
+    3000000000000000000000000000000000000000000000000 * base
+  have remainingBits := listCodeEncodeNat_length_mono
+    (show remaining.length ≤ remaining.length + 1 by omega)
+  have predecessorInput : encodedListSpace
+      (remaining.length :: state) ≤ countdownBudget := by
+    simp only [countdownBudget, base, encodedListSpace_cons]
+    omega
+  have successorInput : encodedListSpace
+      ((remaining.length + 1) :: state) ≤ countdownBudget := by
+    simp only [countdownBudget, base, encodedListSpace_cons]
+    omega
+  have remainingSingleton : encodedListSpace [remaining.length] ≤
+      countdownBudget := by
+    simp only [countdownBudget, base, encodedListSpace_cons,
+      encodedListSpace_nil]
+    omega
+  have payloadOutput : encodedListSpace
+      (remaining.length :: nextState) ≤ countdownBudget := by
+    simp only [countdownBudget, base, encodedListSpace_cons]
+    omega
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  have taggedOutput : encodedListSpace
+      (1 :: remaining.length :: nextState) ≤ countdownBudget := by
+    simp only [countdownBudget, base, encodedListSpace_cons, oneBits]
+    omega
+  have bodyBound := flatLookupCountdownBodySuccCost_le_budget
+    remaining.length state nextState
+    (flatStripGuardStepCost periodicStrip.width periodicStrip.period
+      valid cell remaining) countdownBudget successorInput predecessorInput
+    remainingSingleton payloadOutput taggedOutput (by
+      simp only [countdownBudget]
+      omega)
+  apply bodyBound.trans
+  simp only [flatStripGuardLoopSpaceBound, countdownBudget, base, inputSpace]
+  omega
+
+theorem flatStripGuardBodyZeroCost_le_input
+    (periodicStrip : PeriodicStrip) (valid : Bool) :
+    flatStripGuardBodyZeroCost periodicStrip.width
+        periodicStrip.period valid ≤
+      flatStripGuardLoopSpaceBound
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)) := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputSpace := encodedListSpace fields
+  have widthMember : periodicStrip.width ∈ fields := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have periodMember : periodicStrip.period ∈ fields := by
+    simp [fields, PeriodicStripFlatEncoding.stripFields]
+  have widthSpace := guardEncodedFieldSpace_le_of_mem
+    periodicStrip.width fields widthMember
+  have periodSpace := guardEncodedFieldSpace_le_of_mem
+    periodicStrip.period fields periodMember
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  cases valid <;>
+    simp [flatStripGuardBodyZeroCost, flatCountdownBodyCost,
+      zeroPrimeCost, Code.flatStripMotifState,
+      encodedListSpace_cons, encodedListSpace_nil,
+      flatStripGuardLoopSpaceBound,
+      fields, inputSpace, zeroBits, oneBits] at * <;>
+    omega
 
 end FlatStripDeciderPartrec
 end RawWindowState
