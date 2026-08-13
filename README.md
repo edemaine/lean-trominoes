@@ -579,7 +579,7 @@ build; an imported proof counts when its statement matches the paper.
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
             an explicit polynomial using its fixed statement-push allowance.
-          - [ ] Construct and verify polynomial-time sequential composition
+          - [x] Construct and verify polynomial-time sequential composition
             of two finite multi-stack machines.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
@@ -1636,6 +1636,13 @@ The representation choices for this target are:
   grows by at most that allowance per counted step, yielding an explicit
   polynomial output-length bound for every `TM2ComputableInPolyTime` witness
   and the quantitative intermediate-size fact needed for composition.
+- [`LeanTrominoes/TM2CompositionMachine.lean`](LeanTrominoes/TM2CompositionMachine.lean)
+  constructs polynomial-time sequential composition through a finite
+  intermediate alphabet.  It embeds both component machines step-for-step,
+  transfers the intermediate stream in order by two stack reversals in
+  exactly four steps per symbol plus two, and combines that run with the
+  first machine's output-length envelope into an explicit polynomial-time
+  certificate.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
