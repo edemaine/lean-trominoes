@@ -873,6 +873,7 @@ import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecDynamicDrop
 import LeanTrominoes.PartrecFlatSavitchContext
+import LeanTrominoes.PartrecFlatStripFrontierContext
 import LeanTrominoes.PartrecFrontierIndexDecode
 import LeanTrominoes.PartrecFrontierIndexDecodeSpace
 import LeanTrominoes.PartrecFuel

@@ -329,6 +329,9 @@ build; an imported proof counts when its statement matches the paper.
         preserve an arbitrary variable-length context suffix exactly.
       - [x] Compute the variable DFS-stack field count at runtime and recover
         the complete appended flat context by a tail-style dynamic drop.
+      - [x] Combine the recovered strip header and coordinate stream with the
+        fixed query endpoints, decoding both frontier indices without
+        reconstructing the recursively paired motif code.
       - [ ] Port the depth-zero strip edge oracle to the recovered flat
         context.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
