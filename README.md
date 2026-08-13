@@ -417,7 +417,7 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Fit exact digit, `none`, and fixed-state predicate wrappers.
             - [x] Bound the predicate wrappers in the same quadratic input
               footprint.
-          - [ ] Fit normalization, center validity, overlap, and the complete
+          - [x] Fit normalization, center validity, overlap, and the complete
             flat packed transition.
             - [x] Fit and linearly bound runtime suffix selection for dynamic
               flat motif indexing.
@@ -448,7 +448,7 @@ build; an imported proof counts when its statement matches the paper.
               assignment lookups.
             - [x] Lift bounded overlap across the motif and four shared
               columns.
-            - [ ] Fit cyclic phase advance and combine normalization, center
+            - [x] Fit cyclic phase advance and combine normalization, center
               validity, and overlap into the complete flat transition.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
@@ -2003,6 +2003,13 @@ The representation choices for this target are:
   exact nested Boolean conjunction.  Its public certificate evaluates
   `isNormalizedBool` on the native transition context within one explicit
   polynomial workspace bound.
+- [`LeanTrominoes/PartrecFlatPackedTransitionSpace.lean`](LeanTrominoes/PartrecFlatPackedTransitionSpace.lean)
+  fits cyclic phase advance directly on the flat fields, including the
+  quotient/remainder evaluator, and proves a native-context linear bound for
+  that computation.  It then combines the bounded normalization,
+  center-validity, phase, and four-column overlap components through all three
+  Boolean layers to certify the complete flat packed transition in polynomial
+  workspace.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
