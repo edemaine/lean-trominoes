@@ -502,8 +502,9 @@ build; an imported proof counts when its statement matches the paper.
                   composition.
                   - [x] Fit every reachable native guard step and countdown
                     body within one input-linear workspace reserve.
-                  - [ ] Lift the body bound through the full guard loop and
-                    compose the guarded cycle search.
+                  - [x] Lift the body bound through the full guard loop with
+                    an exact reachable-suffix invariant.
+                  - [ ] Compose the guarded cycle search.
               - [ ] Package the evaluator certificate as flat-encoding PSPACE
                 membership.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.

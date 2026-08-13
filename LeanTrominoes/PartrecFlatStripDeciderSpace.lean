@@ -1,6 +1,7 @@
 import LeanTrominoes.PartrecAddSpace
 import LeanTrominoes.PartrecBinaryLengthSpace
 import LeanTrominoes.PartrecPowerTwoSpace
+import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecFlatFieldPolySpace
 import LeanTrominoes.PartrecPairSpace
 import LeanTrominoes.PartrecStripCellBoundsSpace
@@ -1035,6 +1036,125 @@ theorem flatStripGuardBodyZeroCost_le_input
       flatStripGuardLoopSpaceBound,
       fields, inputSpace, zeroBits, oneBits] at * <;>
     omega
+
+/-! ## Uniform reachable-state guard loop -/
+
+/-- Reachable states of the native flat guard retain an exact typed suffix of
+the original motif, synchronized with the countdown. -/
+def FlatStripGuardReachable (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (values : List Nat) : Prop :=
+  ∃ valid motif leading,
+    values = Code.flatStripMotifState periodicStrip.width
+      periodicStrip.period valid motif ∧
+    remaining = motif.length ∧
+    periodicStrip.motif = leading ++ motif
+
+theorem flatStripGuardReachable_initial
+    (periodicStrip : PeriodicStrip) (valid : Bool) :
+    FlatStripGuardReachable periodicStrip periodicStrip.motif.length
+      (Code.flatStripMotifState periodicStrip.width
+        periodicStrip.period valid periodicStrip.motif) := by
+  exact ⟨valid, periodicStrip.motif, [], rfl, rfl, by simp⟩
+
+theorem flatStripGuardReachable_preserved
+    (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (values : List Nat)
+    (reachable :
+      FlatStripGuardReachable periodicStrip (remaining + 1) values) :
+    FlatStripGuardReachable periodicStrip remaining
+      (Code.flatStripMotifNativeStep values) := by
+  obtain ⟨valid, motif, leading, rfl, remainingEq, suffix⟩ := reachable
+  cases motif with
+  | nil => simp at remainingEq
+  | cons cell motif =>
+      have remainingEq' : remaining = motif.length := by
+        simpa using Nat.succ.inj remainingEq
+      subst remaining
+      refine ⟨valid && decide
+          (cell.InStripBounds periodicStrip.width periodicStrip.period),
+        motif, leading ++ [cell], ?_, rfl, ?_⟩
+      · exact Code.flatStripMotifNativeStep_state_cons
+          periodicStrip.width periodicStrip.period valid cell motif
+      · simpa [List.append_assoc] using suffix
+
+theorem flatStripGuardReachableBody_fits
+    (periodicStrip : PeriodicStrip)
+    (remaining : Nat) (values : List Nat)
+    (reachable : FlatStripGuardReachable periodicStrip remaining values) :
+    EvaluatorCodeFits
+      (Code.flatCountdownBody Code.flatStripMotifStepCode)
+      (remaining :: values)
+      (flatCountdownOutput Code.flatStripMotifNativeStep remaining values)
+      (flatStripGuardLoopSpaceBound
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip))) := by
+  obtain ⟨valid, motif, leading, rfl, remainingEq, suffix⟩ := reachable
+  cases motif with
+  | nil =>
+      simp only [List.length_nil] at remainingEq
+      subst remaining
+      simpa [flatCountdownOutput] using
+        (flatStripGuardBodyZero_fits periodicStrip.width
+          periodicStrip.period valid).mono
+          (flatStripGuardBodyZeroCost_le_input periodicStrip valid)
+  | cons cell motif =>
+      have remainingEq' : remaining = motif.length + 1 := by
+        simpa using remainingEq
+      subst remaining
+      simpa [flatCountdownOutput,
+        Code.flatStripMotifNativeStep_state_cons] using
+        (flatStripGuardBodySucc_fits motif.length periodicStrip.width
+          periodicStrip.period valid cell motif).mono
+          (flatStripGuardBodyCost_le_input periodicStrip valid cell motif
+            leading suffix)
+
+/-- The full native guard scan reuses one input-linear body reserve throughout
+the tail-recursive countdown. -/
+theorem flatStripGuardLoop_fits
+    (periodicStrip : PeriodicStrip) (valid : Bool) :
+    EvaluatorCodeFits
+      (Code.flatIterate Code.flatStripMotifStepCode)
+      (periodicStrip.motif.length ::
+        Code.flatStripMotifState periodicStrip.width
+          periodicStrip.period valid periodicStrip.motif)
+      (Code.flatStripMotifState periodicStrip.width periodicStrip.period
+        (valid && motifInStripBounds periodicStrip.width
+          periodicStrip.period periodicStrip.motif) [])
+      (flatStripGuardLoopSpaceBound
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip))) where
+  input_space :=
+    (flatStripGuardReachableBody_fits periodicStrip
+      periodicStrip.motif.length
+      (Code.flatStripMotifState periodicStrip.width
+        periodicStrip.period valid periodicStrip.motif)
+      (flatStripGuardReachable_initial periodicStrip valid)).input_space
+  output_space := by
+    let result := valid && motifInStripBounds periodicStrip.width
+      periodicStrip.period periodicStrip.motif
+    have zeroFit :=
+      (flatStripGuardBodyZero_fits periodicStrip.width
+        periodicStrip.period result).mono
+        (flatStripGuardBodyZeroCost_le_input periodicStrip result)
+    have tailSpace := listCodeEncodedListSpace_tail_le
+      (0 :: Code.flatStripMotifState periodicStrip.width
+        periodicStrip.period result [])
+    simp only [List.tail_cons] at tailSpace
+    exact tailSpace.trans zeroFit.input_space
+  call continuation bound budget after := by
+    apply EvaluatorCallFits.flatIterate_of_reachable_code_fits
+      (step := Code.flatStripMotifNativeStep)
+      (bodyCost := fun _ _ => flatStripGuardLoopSpaceBound
+        (encodedListSpace
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)))
+      (invariant := FlatStripGuardReachable periodicStrip)
+    · exact flatStripGuardReachableBody_fits periodicStrip
+    · exact flatStripGuardReachable_initial periodicStrip valid
+    · exact flatStripGuardReachable_preserved periodicStrip
+    · intro remaining values reachable
+      exact budget
+    · rw [Code.flatStripMotifNativeStep_iterate]
+      exact after
 
 end FlatStripDeciderPartrec
 end RawWindowState
