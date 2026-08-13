@@ -411,7 +411,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Bound one complete numbered stage, including output-field
               projection and state reconstruction.
             - [x] Unroll all five stages within the common quadratic envelope.
-            - [ ] Bound initialization and final projection.
+            - [x] Bound initialization and final projection, then relate the
+              complete lookup allowance quadratically to its public native
+              input footprint.
           - [ ] Fit normalization, center validity, overlap, and the complete
             flat packed transition.
           - [ ] Fit context recovery and the suffix-preserving Savitch driver,
