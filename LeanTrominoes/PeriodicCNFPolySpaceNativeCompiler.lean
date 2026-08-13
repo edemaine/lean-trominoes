@@ -1,4 +1,5 @@
 import LeanTrominoes.PeriodicCNFPolySpaceCompiler
+import LeanTrominoes.PeriodicCNFTransitionExprFields
 import LeanTrominoes.FiniteEncodingNativeFields
 import LeanTrominoes.TM2CompositionMachine
 
@@ -85,11 +86,42 @@ variable (decider : Complexity.DeciderInPolySpace encoding language)
 noncomputable local instance (stack : decider.tm.K) :
     Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
 
-/-- Flat CNF natural fields computed from evaluator-native source fields. -/
+/-- The bounded transition expression constructed from evaluator-native source
+fields.  The decider contributes only fixed finite data; all runtime widths are
+computed from the decoded source-symbol stream. -/
+def nativeCompilerExpression (fields : List Nat) : TransitionExpr :=
+  let symbols := symbolsOfFields encoding.Γ fields
+  let space := PolySpaceCompiler.spaceOfSymbols decider symbols
+  let clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols
+  BoundedMachineAtom.designatedMachineResetClockExpression
+    (tm := decider.tm) (space := space) (clockBits := clockBits)
+    (PolySpaceCompiler.initialConfigurationOfSymbols decider symbols)
+    (PolySpaceReduction.acceptingConfiguration decider)
+
+/-- First fresh Tseitin atom for the native-field expression. -/
+def nativeCompilerFresh (fields : List Nat) : Nat :=
+  let symbols := symbolsOfFields encoding.Γ fields
+  BoundedMachineAtom.atomCount (tm := decider.tm)
+    (space := PolySpaceCompiler.spaceOfSymbols decider symbols)
+    (clockBits := PolySpaceCompiler.clockBitsOfSymbols decider symbols)
+
+/-- Flat CNF natural fields computed directly from evaluator-native source
+fields.  This version streams gate fields structurally and never constructs an
+intermediate list of clauses. -/
 def nativeCompilerFields (fields : List Nat) : List Nat :=
-  PeriodicCNFFlatEncoding.formulaFields
-    (PolySpaceCompiler.formulaOfSymbols decider
-      (symbolsOfFields encoding.Γ fields))
+  requireTransitionExprFields
+    (nativeCompilerExpression decider fields)
+    (nativeCompilerFresh decider fields)
+
+/-- The direct field stream agrees exactly with the original semantic formula
+construction on every input, including malformed native field lists. -/
+theorem nativeCompilerFields_eq_formulaFields (fields : List Nat) :
+    nativeCompilerFields decider fields =
+      PeriodicCNFFlatEncoding.formulaFields
+        (PolySpaceCompiler.formulaOfSymbols decider
+          (symbolsOfFields encoding.Γ fields)) := by
+  rw [nativeCompilerFields, requireTransitionExprFields_eq_formulaFields]
+  rfl
 
 @[simp]
 theorem nativeCompilerFields_sourceFields (symbols : List encoding.Γ) :
@@ -97,7 +129,8 @@ theorem nativeCompilerFields_sourceFields (symbols : List encoding.Γ) :
         (FiniteEncodingNativeFields.fields symbols) =
       PeriodicCNFFlatEncoding.formulaFields
         (PolySpaceCompiler.formulaOfSymbols decider symbols) := by
-  simp [nativeCompilerFields]
+  rw [nativeCompilerFields_eq_formulaFields]
+  simp
 
 @[simp]
 theorem nativeCompilerFields_encode (input : Input) :
@@ -105,7 +138,8 @@ theorem nativeCompilerFields_encode (input : Input) :
         (FiniteEncodingNativeFields.fields (encoding.encode input)) =
       PeriodicCNFFlatEncoding.formulaFields
         (PolySpaceReduction.formula decider input) := by
-  simp [nativeCompilerFields]
+  rw [nativeCompilerFields_sourceFields,
+    PolySpaceCompiler.formulaOfSymbols_encode]
 
 /-- On generated source fields, encoding the compiler's natural-field output
 is definitionally the verified flat formula symbol stream. -/

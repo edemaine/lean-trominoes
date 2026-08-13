@@ -581,6 +581,9 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Expose a total natural-field compiler interface, prove that
             generated source fields recover the original symbols, and identify
             its native output with the verified flat formula encoding.
+          - [x] Compile every Tseitin gate directly to native clause fields and
+            prove the streaming field compiler exactly equals the nested CNF
+            construction on all inputs.
           - [ ] Implement the field-to-formula evaluator and certify its
             polynomial running time.
         - [ ] Compose source preprocessing with formula generation into the
@@ -1509,6 +1512,11 @@ The representation choices for this target are:
   gates remain edge-local: the next endpoint is read only through source
   atoms, which yields an exact equivalence between line satisfiability and
   bi-infinite paths through the direct Boolean expression relation.
+- [`LeanTrominoes/PeriodicCNFTransitionExprFields.lean`](LeanTrominoes/PeriodicCNFTransitionExprFields.lean)
+  removes nested clause construction from the executable path.  It gives each
+  constant, wire, and Boolean gate an exact native natural-field block, streams
+  those blocks during structural Tseitin recursion, and proves the complete
+  clause-count-prefixed result identical to the verified flat formula fields.
 - [`LeanTrominoes/PeriodicCNFTransitionExprSize.lean`](LeanTrominoes/PeriodicCNFTransitionExprSize.lean)
   begins the quantitative hardness certificate.  It bounds Tseitin clauses
   by three per expression node, accounts for the forced root clause exactly,
@@ -1647,8 +1655,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFPolySpaceNativeCompiler.lean`](LeanTrominoes/PeriodicCNFPolySpaceNativeCompiler.lean)
   gives the formula generator a total evaluator-native natural-field
   interface.  It proves generated fields recover the original finite-alphabet
-  stream, identifies the re-encoded output with the verified flat formula,
-  and transfers its polynomial output-size bound to native input length.
+  stream, now generates the Tseitin field stream directly without an
+  intermediate clause list, identifies that output with the verified flat
+  formula, and transfers its polynomial output-size bound to native input
+  length.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population
