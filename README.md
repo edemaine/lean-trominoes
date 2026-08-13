@@ -1362,6 +1362,11 @@ The representation choices for this target are:
   for one-hot and stack-shape constraints, and a quadratic bound for the reset
   clock.  The resulting clause bound isolates the remaining finite-statement
   expansion as a single `machineStepExpression` term.
+- [`LeanTrominoes/PeriodicCNFMachineStatementSize.lean`](LeanTrominoes/PeriodicCNFMachineStatementSize.lean)
+  bounds that finite-statement expansion by syntax-directed machine constants.
+  Structural induction verifies a fixed upper bound on terminal symbolic paths
+  and a fixed observation-depth bound on every generated guard, independent of
+  stack and clock widths.
 - [`LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean`](LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean)
   instantiates the clocked formula for an arbitrary certified polynomial-space
   decider.  The reset clock is sized by the finite bounded-configuration count,
