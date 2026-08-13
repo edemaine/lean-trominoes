@@ -342,6 +342,8 @@ build; an imported proof counts when its statement matches the paper.
           established packed frontier lookup.
         - [x] Derive flat lookup predicates for absent and fixed assignment
           values, with semantic theorems against packed frontier states.
+        - [x] Implement dynamic indexed access to a flat motif cell while
+          retaining the complete coordinate stream for nested lookups.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.

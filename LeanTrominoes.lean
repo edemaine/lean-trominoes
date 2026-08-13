@@ -871,6 +871,7 @@ import LeanTrominoes.PartrecDivision
 import LeanTrominoes.PartrecDivisionSpace
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
+import LeanTrominoes.PartrecFlatMotifIndex
 import LeanTrominoes.PartrecDynamicDrop
 import LeanTrominoes.PartrecFlatSavitchContext
 import LeanTrominoes.PartrecFlatPackedAssignmentAt
