@@ -219,6 +219,208 @@ theorem flatPackedTargetMembership
       (flatPackedTargetMembershipLookup column verticalOffset period phase
         motif row word)
 
+/-! ## Native-field bounds -/
+
+/-- The public input footprint, augmented only by the two fixed program
+constants (column and vertical offset). -/
+def flatPackedTargetMembershipNativeInputSpace
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) : Nat :=
+  encodedListSpace
+      (flatPackedTargetMembershipValues period phase motif row word) +
+    encodedListSpace [column.val] +
+    encodedListSpace [intOffsetAmount verticalOffset] + 10
+
+def flatPackedTargetConstructorBudget
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) : Nat :=
+  1000000000000000000000000000000000000000000000000000000000000 *
+    (intOffsetAmount verticalOffset + 1) *
+    flatPackedTargetMembershipNativeInputSpace column verticalOffset period
+      phase motif row word
+
+theorem flatPackedTargetMembershipNativeInputSpacePositive
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) :
+    10 ≤ flatPackedTargetMembershipNativeInputSpace column verticalOffset
+      period phase motif row word := by
+  simp [flatPackedTargetMembershipNativeInputSpace]
+
+set_option maxRecDepth 10000 in
+theorem flatPackedTargetArgumentsCost_le_native
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) :
+    flatPackedTargetArgumentsCost column period phase motif row word ≤
+      1000000 * flatPackedTargetMembershipNativeInputSpace column
+        verticalOffset period phase motif row word := by
+  let values := flatPackedTargetMembershipValues period phase motif row word
+  let unit := flatPackedTargetMembershipNativeInputSpace column verticalOffset
+    period phase motif row word
+  let localBudget := 100000 * unit
+  have unitPositive : 10 ≤ unit := by
+    simpa [unit] using flatPackedTargetMembershipNativeInputSpacePositive
+      column verticalOffset period phase motif row word
+  have valuesBound : encodedListSpace values ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace, values]
+    omega
+  have columnSpace : encodedListSpace [column.val] ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace]
+    omega
+  have periodSpace : encodedListSpace [period] ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace,
+      flatPackedTargetMembershipValues, encodedListSpace_cons]
+    omega
+  have phaseSpace : encodedListSpace [phase] ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace,
+      flatPackedTargetMembershipValues, encodedListSpace_cons]
+    omega
+  have rowSpace : encodedListSpace [Encodable.encode row] ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace,
+      flatPackedTargetMembershipValues, encodedListSpace_cons]
+    omega
+  have out3Space :
+      encodedListSpace [column.val, Encodable.encode row] ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace,
+      flatPackedTargetMembershipValues, encodedListSpace_cons]
+    omega
+  have out1Space :
+      encodedListSpace [phase, column.val, Encodable.encode row] ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace,
+      flatPackedTargetMembershipValues, encodedListSpace_cons]
+    omega
+  have finalSpace :
+      encodedListSpace [period, phase, column.val, Encodable.encode row] ≤
+        unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace,
+      flatPackedTargetMembershipValues, encodedListSpace_cons]
+    omega
+  have get0Raw := listCodeGetCost_le_linear 0 values
+  have get1Raw := listCodeGetCost_le_linear 1 values
+  have get3Raw := listCodeGetCost_le_linear 3 values
+  have get0 : getCost 0 values ≤ localBudget :=
+    get0Raw.trans (by simp [localBudget]; omega)
+  have get1 : getCost 1 values ≤ localBudget :=
+    get1Raw.trans (by simp [localBudget]; omega)
+  have get3 : getCost 3 values ≤ localBudget :=
+    get3Raw.trans (by simp [localBudget]; omega)
+  have zeroRaw := listCodeZeroCost_le_linear values
+  have addSmall : addConstCost column.val [0] ≤ 1000000 := by
+    fin_cases column <;> native_decide
+  have numeral : numeralCost column.val values ≤ 2 * localBudget := by
+    simp only [numeralCost]
+    have zero : zeroCost values ≤ localBudget :=
+      zeroRaw.trans (by simp [localBudget]; omega)
+    omega
+  let cost3 := prependCost values [column.val] [Encodable.encode row]
+    (numeralCost column.val values) (getCost 3 values)
+  let cost1 := prependCost values [phase]
+    [column.val, Encodable.encode row] (getCost 1 values) cost3
+  let cost0 := prependCost values [period]
+    [phase, column.val, Encodable.encode row] (getCost 0 values) cost1
+  have estimate3 := listCodePrependCost_le_of values [column.val]
+    [Encodable.encode row] (numeralCost column.val values) (getCost 3 values)
+    unit valuesBound columnSpace out3Space
+  have bound3 : cost3 ≤ 4 * localBudget := by
+    simp only [cost3]
+    simp [localBudget]
+    omega
+  have estimate1 := listCodePrependCost_le_of values [phase]
+    [column.val, Encodable.encode row] (getCost 1 values) cost3 unit
+    valuesBound phaseSpace out1Space
+  have bound1 : cost1 ≤ 6 * localBudget := by
+    simp only [cost1]
+    simp [localBudget]
+    omega
+  have estimate0 := listCodePrependCost_le_of values [period]
+    [phase, column.val, Encodable.encode row] (getCost 0 values) cost1 unit
+    valuesBound periodSpace finalSpace
+  have bound0 : cost0 ≤ 10 * localBudget := by
+    simp only [cost0]
+    simp [localBudget]
+    omega
+  change cost0 ≤ 1000000 * unit
+  calc
+    cost0 ≤ 10 * localBudget := bound0
+    _ = 1000000 * unit := by simp only [localBudget]; ring
+
+theorem flatPackedTargetCoordinateCosts_le_constructor
+    (column : WindowColumn) (verticalOffset : Int)
+    (period phase : Nat) (motif : List Cell)
+    (row : Int) (word : Nat) :
+    flatPackedTargetXCost column period phase motif row word ≤
+        flatPackedTargetConstructorBudget column verticalOffset period phase
+          motif row word ∧
+      flatPackedTargetYCost column verticalOffset period phase motif row word ≤
+        flatPackedTargetConstructorBudget column verticalOffset period phase
+          motif row word := by
+  let rowCode := Encodable.encode row
+  let unit := flatPackedTargetMembershipNativeInputSpace column verticalOffset
+    period phase motif row word
+  let constructorBudget := flatPackedTargetConstructorBudget column verticalOffset
+    period phase motif row word
+  have unitPositive : 10 ≤ unit := by
+    simpa [unit] using flatPackedTargetMembershipNativeInputSpacePositive
+      column verticalOffset period phase motif row word
+  have bitsToUnit :
+      (Computability.encodeNat period).length +
+          (Computability.encodeNat phase).length +
+          (Computability.encodeNat column.val).length +
+          (Computability.encodeNat rowCode).length +
+          (Computability.encodeNat
+            (intOffsetAmount verticalOffset)).length + 1 ≤ unit := by
+    simp [unit, flatPackedTargetMembershipNativeInputSpace,
+      flatPackedTargetMembershipValues, rowCode, encodedListSpace_cons]
+    omega
+  have cellUnit := packedTargetCellUnit_le_linear verticalOffset period phase
+    column.val rowCode
+  have cellUnitBound :
+      packedTargetCellUnit verticalOffset period phase column.val rowCode ≤
+        100000 * unit := cellUnit.trans (Nat.mul_le_mul_left _ bitsToUnit)
+  have whole := packedTargetCellCost_le_linear verticalOffset period phase
+    column.val rowCode
+  have wholeBound :
+      packedTargetCellCost verticalOffset period phase column.val rowCode ≤
+        100000000000000000000000000000000000000000000000000 *
+          (intOffsetAmount verticalOffset + 1) * unit := by
+    calc
+      packedTargetCellCost verticalOffset period phase column.val rowCode ≤
+          1000000000000000000000000000000000000000000000 *
+            (intOffsetAmount verticalOffset + 1) *
+            packedTargetCellUnit verticalOffset period phase column.val
+              rowCode := whole
+      _ ≤ 1000000000000000000000000000000000000000000000 *
+            (intOffsetAmount verticalOffset + 1) * (100000 * unit) := by
+          gcongr
+      _ = 100000000000000000000000000000000000000000000000000 *
+            (intOffsetAmount verticalOffset + 1) * unit := by ring
+  have xPart :
+      packedTargetXCost period phase column.val rowCode ≤
+        packedTargetCellCost verticalOffset period phase column.val rowCode := by
+    simp [packedTargetCellCost, packedTargetCellArgumentsCost, prependCost]
+    omega
+  have yPart :
+      packedTargetYCost verticalOffset period phase column.val rowCode ≤
+        packedTargetCellCost verticalOffset period phase column.val rowCode := by
+    simp [packedTargetCellCost, packedTargetCellArgumentsCost, prependCost]
+    omega
+  have adapter := flatPackedTargetArgumentsCost_le_native column verticalOffset
+    period phase motif row word
+  constructor
+  · change packedTargetXCost period phase column.val rowCode +
+        flatPackedTargetArgumentsCost column period phase motif row word ≤
+      constructorBudget
+    simp [constructorBudget, flatPackedTargetConstructorBudget]
+    nlinarith
+  · change packedTargetYCost verticalOffset period phase column.val rowCode +
+        flatPackedTargetArgumentsCost column period phase motif row word ≤
+      constructorBudget
+    simp [constructorBudget, flatPackedTargetConstructorBudget]
+    nlinarith
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing
