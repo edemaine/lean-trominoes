@@ -125,12 +125,33 @@ def longInputDesired : BinaryGateKind → Nat
 
 end BinaryGateKind
 
+/-- Actions selected after the finite decoder consumes a tag or payload
+delimiter. -/
+inductive DelimiterAction
+  | wire
+  | negate
+  | conjunction
+  | disjunction
+  | constantTrue
+  | wireNext
+  deriving DecidableEq, Fintype
+
 /-- Continuations of variable-atom emission.  More gate phases are added by
 the evaluator layer; `done` is enough to state and test the primitive in
 isolation. -/
 inductive Phase
   | done
   | gateDone
+  | readFresh
+  | decodeNext
+  | binaryReadFirst (kind : BinaryGateKind)
+  | afterClearFirst
+  | afterClearSecond
+  | afterPushRoot
+  | finalReadRoot
+  | finalConstantStart
+  | finalConstantTail
+  | finalReverse
   | constantStart (value : Bool)
   | constantTail (value : Bool)
   | unaryStart (kind : UnaryGateKind)
@@ -160,6 +181,13 @@ inductive Label
   | restoreFreshRoot (next : Phase)
   | clearAtom (source : AtomSource) (next : Phase)
   | reverseOutput
+  | decodeTag
+  | tagAfterBit₁
+  | tagAfterBit₀
+  | tagAfterBit₀₀
+  | expectDelimiter (action : DelimiterAction)
+  | readConstantValue
+  | readWireSlice
   | phase (phase : Phase)
   deriving DecidableEq, Fintype
 
@@ -181,6 +209,20 @@ def emitFixedFields (fields : List Nat) (next : Label) :
     TM2.Stmt Alphabet Label State :=
   pushOutputWord (trList fields)
     (.load (fun _ => none) (.goto fun _ => next))
+
+def jump (next : Label) : TM2.Stmt Alphabet Label State :=
+  .load (fun _ => none) (.goto fun _ => next)
+
+def afterDelimiterLabel : DelimiterAction → Label
+  | .wire => .readWireSlice
+  | .negate => .readField .roots .first (.unaryStart .negation)
+  | .conjunction =>
+      .readField .roots .second (.binaryReadFirst .conjunction)
+  | .disjunction =>
+      .readField .roots .second (.binaryReadFirst .disjunction)
+  | .constantTrue => .phase (.constantStart true)
+  | .wireNext =>
+      .readField .input .first (.unaryStart .equalityNext)
 
 /-- One loop step of the verified atom-field emitter. -/
 def program : Label → TM2.Stmt Alphabet Label State
@@ -265,8 +307,79 @@ def program : Label → TM2.Stmt Alphabet Label State
           (.load (fun _ => none) (.goto fun _ => .phase .done))
           (.push .output (fun state => state.getD default)
             (.load (fun _ => none) (.goto fun _ => .reverseOutput))))
+  | .decodeTag =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch Option.isNone
+          (jump (.clearAtom .fresh .finalReadRoot))
+          (.branch (fun state => state = some .cons)
+            (jump .readConstantValue)
+            (.branch (fun state => state = some .bit1)
+              (jump .tagAfterBit₁)
+              (.branch (fun state => state = some .bit0)
+                (jump .tagAfterBit₀)
+                .halt))))
+  | .tagAfterBit₁ =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch (fun state => state = some .cons)
+          (jump .readWireSlice)
+          (.branch (fun state => state = some .bit1)
+            (jump (.expectDelimiter .conjunction))
+            .halt))
+  | .tagAfterBit₀ =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch (fun state => state = some .bit1)
+          (jump (.expectDelimiter .negate))
+          (.branch (fun state => state = some .bit0)
+            (jump .tagAfterBit₀₀)
+            .halt))
+  | .tagAfterBit₀₀ =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch (fun state => state = some .bit1)
+          (jump (.expectDelimiter .disjunction))
+          .halt)
+  | .expectDelimiter action =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch (fun state => state = some .cons)
+          (jump (afterDelimiterLabel action))
+          .halt)
+  | .readConstantValue =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch (fun state => state = some .cons)
+          (jump (.phase (.constantStart false)))
+          (.branch (fun state => state = some .bit1)
+            (jump (.expectDelimiter .constantTrue))
+            .halt))
+  | .readWireSlice =>
+      .pop .input (fun _ symbol => symbol)
+        (.branch (fun state => state = some .cons)
+          (jump (.readField .input .first
+            (.unaryStart .equalityCurrent)))
+          (.branch (fun state => state = some .bit1)
+            (jump (.expectDelimiter .wireNext))
+            .halt))
   | .phase .done => .halt
-  | .phase .gateDone => .halt
+  | .phase .gateDone =>
+      jump (.clearAtom .first .afterClearFirst)
+  | .phase .readFresh =>
+      jump (.readField .input .fresh .decodeNext)
+  | .phase .decodeNext =>
+      jump .decodeTag
+  | .phase (.binaryReadFirst kind) =>
+      jump (.readField .roots .first (.binaryStart kind))
+  | .phase .afterClearFirst =>
+      jump (.clearAtom .second .afterClearSecond)
+  | .phase .afterClearSecond =>
+      jump (.prepareFreshRoot .afterPushRoot)
+  | .phase .afterPushRoot =>
+      jump (.incrementFresh .decodeNext)
+  | .phase .finalReadRoot =>
+      jump (.readField .roots .fresh .finalConstantStart)
+  | .phase .finalConstantStart =>
+      emitFixedFields [1] (.copyAtom .fresh .finalConstantTail)
+  | .phase .finalConstantTail =>
+      emitFixedFields [0, 0, 1] (.phase .finalReverse)
+  | .phase .finalReverse =>
+      jump .reverseOutput
   | .phase (.constantStart value) =>
       emitFixedFields [1] (.copyAtom .fresh (.constantTail value))
   | .phase (.constantTail value) =>
@@ -319,7 +432,7 @@ abbrev machine : FinTM2 where
   k₁ := .output
   Γ := Alphabet
   Λ := Label
-  main := .phase .done
+  main := .copyInputField .readFresh
   σ := State
   initialState := none
   m := program
@@ -429,6 +542,10 @@ def clearAtomCfg (source : AtomSource) (next : Phase) (data : TapeData) :
 def reverseOutputCfg (data : TapeData) : TM2.Cfg Alphabet Label State :=
   ⟨some .reverseOutput, none, tapes data⟩
 
+def controlCfg (label : Label) (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨some label, none, tapes data⟩
+
 @[simp]
 theorem update_tapes_outputReverse (data : TapeData) (value : List Γ') :
     Function.update (tapes data) Stack.outputReverse value =
@@ -440,6 +557,13 @@ theorem update_tapes_outputReverse (data : TapeData) (value : List Γ') :
 theorem update_tapes_scratch (data : TapeData) (value : List Γ') :
     Function.update (tapes data) Stack.scratch value =
       tapes { data with scratch := value } := by
+  funext stack
+  cases stack <;> simp [tapes, Function.update]
+
+@[simp]
+theorem update_tapes_input (data : TapeData) (value : List Γ') :
+    Function.update (tapes data) Stack.input value =
+      tapes { data with input := value } := by
   funext stack
   cases stack <;> simp [tapes, Function.update]
 
@@ -664,6 +788,370 @@ theorem step_binaryAfterSecond₂ (data : TapeData)
   rw [stepAux_pushOutputWord]
   simp [phaseCfg, emittedWordData, tapes]
 
+theorem step_phase_readFresh (data : TapeData) :
+    TM2.step program (phaseCfg .readFresh data) =
+      some (readFieldCfg .input .fresh .decodeNext data) := by
+  simp [TM2.step, program, phaseCfg, readFieldCfg, jump]
+
+theorem step_phase_decodeNext (data : TapeData) :
+    TM2.step program (phaseCfg .decodeNext data) =
+      some (controlCfg .decodeTag data) := by
+  simp [TM2.step, program, phaseCfg, controlCfg, jump]
+
+theorem step_phase_binaryReadFirst (kind : BinaryGateKind)
+    (data : TapeData) :
+    TM2.step program (phaseCfg (.binaryReadFirst kind) data) =
+      some (readFieldCfg .roots .first (.binaryStart kind) data) := by
+  simp [TM2.step, program, phaseCfg, readFieldCfg, jump]
+
+theorem step_phase_gateDone (data : TapeData) :
+    TM2.step program (phaseCfg .gateDone data) =
+      some (clearAtomCfg .first .afterClearFirst data) := by
+  simp [TM2.step, program, phaseCfg, clearAtomCfg, jump]
+
+theorem step_phase_afterClearFirst (data : TapeData) :
+    TM2.step program (phaseCfg .afterClearFirst data) =
+      some (clearAtomCfg .second .afterClearSecond data) := by
+  simp [TM2.step, program, phaseCfg, clearAtomCfg, jump]
+
+theorem step_phase_afterClearSecond (data : TapeData) :
+    TM2.step program (phaseCfg .afterClearSecond data) =
+      some (prepareFreshRootCfg .afterPushRoot data) := by
+  simp [TM2.step, program, phaseCfg, prepareFreshRootCfg, jump]
+
+theorem step_phase_afterPushRoot (data : TapeData) :
+    TM2.step program (phaseCfg .afterPushRoot data) =
+      some (incrementCfg .decodeNext data) := by
+  simp [TM2.step, program, phaseCfg, incrementCfg, jump]
+
+theorem step_phase_finalReadRoot (data : TapeData) :
+    TM2.step program (phaseCfg .finalReadRoot data) =
+      some (readFieldCfg .roots .fresh .finalConstantStart data) := by
+  simp [TM2.step, program, phaseCfg, readFieldCfg, jump]
+
+theorem step_finalConstantStart (data : TapeData) :
+    TM2.step program (phaseCfg .finalConstantStart data) =
+      some (copyCfg .fresh .finalConstantTail
+        (emittedWordData data (trList [1]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [copyCfg, emittedWordData, tapes]
+
+theorem step_finalConstantTail (data : TapeData) :
+    TM2.step program (phaseCfg .finalConstantTail data) =
+      some (phaseCfg .finalReverse
+        (emittedWordData data (trList [0, 0, 1]))) := by
+  simp only [TM2.step, program, phaseCfg, emitFixedFields]
+  rw [stepAux_pushOutputWord]
+  simp [phaseCfg, emittedWordData, tapes]
+
+theorem step_phase_finalReverse (data : TapeData) :
+    TM2.step program (phaseCfg .finalReverse data) =
+      some (reverseOutputCfg data) := by
+  simp [TM2.step, program, phaseCfg, reverseOutputCfg, jump]
+
+def consumedInputData (data : TapeData) (tail : List Γ') : TapeData :=
+  { data with input := tail }
+
+theorem step_decodeTag_nil (data : TapeData) (inputValue : data.input = []) :
+    TM2.step program (controlCfg .decodeTag data) =
+      some (controlCfg (.clearAtom .fresh .finalReadRoot)
+        (consumedInputData data [])) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_decodeTag_cons (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .cons :: tail) :
+    TM2.step program (controlCfg .decodeTag data) =
+      some (controlCfg .readConstantValue
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_decodeTag_bit₁ (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .bit1 :: tail) :
+    TM2.step program (controlCfg .decodeTag data) =
+      some (controlCfg .tagAfterBit₁
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_decodeTag_bit₀ (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .bit0 :: tail) :
+    TM2.step program (controlCfg .decodeTag data) =
+      some (controlCfg .tagAfterBit₀
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_tagAfterBit₁_wire (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .cons :: tail) :
+    TM2.step program (controlCfg .tagAfterBit₁ data) =
+      some (controlCfg .readWireSlice
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_tagAfterBit₁_conjunction (data : TapeData)
+    (tail : List Γ') (inputValue : data.input = .bit1 :: tail) :
+    TM2.step program (controlCfg .tagAfterBit₁ data) =
+      some (controlCfg (.expectDelimiter .conjunction)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_tagAfterBit₀_negate (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .bit1 :: tail) :
+    TM2.step program (controlCfg .tagAfterBit₀ data) =
+      some (controlCfg (.expectDelimiter .negate)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_tagAfterBit₀_disjunction (data : TapeData)
+    (tail : List Γ') (inputValue : data.input = .bit0 :: tail) :
+    TM2.step program (controlCfg .tagAfterBit₀ data) =
+      some (controlCfg .tagAfterBit₀₀
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_tagAfterBit₀₀_disjunction (data : TapeData)
+    (tail : List Γ') (inputValue : data.input = .bit1 :: tail) :
+    TM2.step program (controlCfg .tagAfterBit₀₀ data) =
+      some (controlCfg (.expectDelimiter .disjunction)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_expectDelimiter (action : DelimiterAction) (data : TapeData)
+    (tail : List Γ') (inputValue : data.input = .cons :: tail) :
+    TM2.step program (controlCfg (.expectDelimiter action) data) =
+      some (controlCfg (afterDelimiterLabel action)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_readConstantValue_false (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .cons :: tail) :
+    TM2.step program (controlCfg .readConstantValue data) =
+      some (phaseCfg (.constantStart false)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, phaseCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_readConstantValue_true (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .bit1 :: tail) :
+    TM2.step program (controlCfg .readConstantValue data) =
+      some (controlCfg (.expectDelimiter .constantTrue)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+theorem step_readWireSlice_current (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .cons :: tail) :
+    TM2.step program (controlCfg .readWireSlice data) =
+      some (readFieldCfg .input .first (.unaryStart .equalityCurrent)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, readFieldCfg, consumedInputData,
+    jump, inputValue, tapes]
+
+theorem step_readWireSlice_next (data : TapeData) (tail : List Γ')
+    (inputValue : data.input = .bit1 :: tail) :
+    TM2.step program (controlCfg .readWireSlice data) =
+      some (controlCfg (.expectDelimiter .wireNext)
+        (consumedInputData data tail)) := by
+  simp [TM2.step, program, controlCfg, consumedInputData, jump,
+    inputValue, tapes]
+
+def constantTagTime (value : Bool) : Nat :=
+  if value then 3 else 2
+
+@[simp] theorem trNat_one : trNat 1 = [Γ'.bit1] := by native_decide
+@[simp] theorem trNat_two : trNat 2 = [Γ'.bit0, Γ'.bit1] := by native_decide
+@[simp] theorem trNat_three : trNat 3 = [Γ'.bit1, Γ'.bit1] := by native_decide
+@[simp] theorem trNat_four : trNat 4 = [Γ'.bit0, Γ'.bit0, Γ'.bit1] := by
+  native_decide
+
+/-- The generated constant-instruction tag and Boolean payload select the
+matching constant-gate routine. -/
+def decodeConstantTag (value : Bool) (data : TapeData) (rest : List Γ')
+    (inputValue :
+      data.input = trList (TransitionInstruction.fields (.constant value)) ++
+        rest) :
+    EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (phaseCfg (.constantStart value)
+        { data with input := rest }))
+      (constantTagTime value) := by
+  cases value with
+  | false =>
+      let d₁ := consumedInputData data (.cons :: rest)
+      have h₁ := oneStep (step_decodeTag_cons data (.cons :: rest) (by
+        simpa [TransitionInstruction.fields, trList] using inputValue))
+      have h₂ := oneStep (step_readConstantValue_false d₁ rest (by
+        simp [d₁, consumedInputData]))
+      have composed := thenRun h₁ h₂
+      simpa [constantTagTime, d₁, consumedInputData] using composed
+  | true =>
+      let d₁ := consumedInputData data (.bit1 :: .cons :: rest)
+      let d₂ := consumedInputData d₁ (.cons :: rest)
+      have h₁ := oneStep
+        (step_decodeTag_cons data (.bit1 :: .cons :: rest) (by
+          simpa [TransitionInstruction.fields, trList] using inputValue))
+      have h₂ := oneStep (step_readConstantValue_true d₁
+        (.cons :: rest) (by simp [d₁, consumedInputData]))
+      have h₃ := oneStep
+        (step_expectDelimiter .constantTrue d₂ rest (by
+          simp [d₂, d₁, consumedInputData]))
+      have composed := thenRun (thenRun h₁ h₂) h₃
+      simpa [constantTagTime, d₂, d₁, consumedInputData,
+        afterDelimiterLabel, controlCfg, phaseCfg] using composed
+
+def wireTagTime (slice : TransitionSlice) : Nat :=
+  match slice with
+  | .current => 3
+  | .next => 4
+
+/-- A generated wire tag and slice payload select the right equality-gate
+routine and leave the atom field ready for the native field reader. -/
+def decodeWireTag (wire : TransitionWire) (data : TapeData)
+    (rest : List Γ')
+    (inputValue :
+      data.input = trList (TransitionInstruction.fields (.wire wire)) ++
+        rest) :
+    EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (readFieldCfg .input .first
+        (.unaryStart (match wire.slice with
+          | .current => .equalityCurrent
+          | .next => .equalityNext))
+        { data with input := trList [wire.atom] ++ rest }))
+      (wireTagTime wire.slice) := by
+  rcases wire with ⟨slice, atom⟩
+  cases slice with
+  | current =>
+      let d₁ := consumedInputData data (.cons :: .cons :: trList [atom] ++ rest)
+      let d₂ := consumedInputData d₁ (.cons :: trList [atom] ++ rest)
+      have h₁ := oneStep
+        (step_decodeTag_bit₁ data
+          (.cons :: .cons :: trList [atom] ++ rest) (by
+            simpa [TransitionInstruction.fields, trList] using inputValue))
+      have h₂ := oneStep
+        (step_tagAfterBit₁_wire d₁
+          (.cons :: trList [atom] ++ rest) (by
+            simp [d₁, consumedInputData]))
+      have h₃ := oneStep
+        (step_readWireSlice_current d₂ (trList [atom] ++ rest) (by
+          simp [d₂, d₁, consumedInputData]))
+      have composed := thenRun (thenRun h₁ h₂) h₃
+      simpa [wireTagTime, d₂, d₁, consumedInputData] using composed
+  | next =>
+      let d₁ := consumedInputData data
+        (.cons :: .bit1 :: .cons :: trList [atom] ++ rest)
+      let d₂ := consumedInputData d₁
+        (.bit1 :: .cons :: trList [atom] ++ rest)
+      let d₃ := consumedInputData d₂
+        (.cons :: trList [atom] ++ rest)
+      have h₁ := oneStep
+        (step_decodeTag_bit₁ data
+          (.cons :: .bit1 :: .cons :: trList [atom] ++ rest) (by
+            simpa [TransitionInstruction.fields, trList] using inputValue))
+      have h₂ := oneStep
+        (step_tagAfterBit₁_wire d₁
+          (.bit1 :: .cons :: trList [atom] ++ rest) (by
+            simp [d₁, consumedInputData]))
+      have h₃ := oneStep
+        (step_readWireSlice_next d₂
+          (.cons :: trList [atom] ++ rest) (by
+            simp [d₂, d₁, consumedInputData]))
+      have h₄ := oneStep
+        (step_expectDelimiter .wireNext d₃ (trList [atom] ++ rest) (by
+          simp [d₃, d₂, d₁, consumedInputData]))
+      have composed := thenRun (thenRun (thenRun h₁ h₂) h₃) h₄
+      simpa [wireTagTime, d₃, d₂, d₁, consumedInputData,
+        afterDelimiterLabel, controlCfg, readFieldCfg] using composed
+
+/-- The generated negation tag selects root-pop followed by the negation
+gate. -/
+def decodeNegateTag (data : TapeData) (rest : List Γ')
+    (inputValue :
+      data.input = trList (TransitionInstruction.fields .negate) ++ rest) :
+    EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (readFieldCfg .roots .first (.unaryStart .negation)
+        { data with input := rest })) 3 := by
+  let d₁ := consumedInputData data (.bit1 :: .cons :: rest)
+  let d₂ := consumedInputData d₁ (.cons :: rest)
+  have h₁ := oneStep
+    (step_decodeTag_bit₀ data (.bit1 :: .cons :: rest) (by
+      simpa [TransitionInstruction.fields, trList] using inputValue))
+  have h₂ := oneStep
+    (step_tagAfterBit₀_negate d₁ (.cons :: rest) (by
+      simp [d₁, consumedInputData]))
+  have h₃ := oneStep
+    (step_expectDelimiter .negate d₂ rest (by
+      simp [d₂, d₁, consumedInputData]))
+  have composed := thenRun (thenRun h₁ h₂) h₃
+  simpa [d₂, d₁, consumedInputData, afterDelimiterLabel,
+    controlCfg, readFieldCfg] using composed
+
+def binaryTagTime (kind : BinaryGateKind) : Nat :=
+  match kind with
+  | .conjunction => 3
+  | .disjunction => 4
+
+/-- Generated binary tags select the matching first root-pop phase. -/
+def decodeBinaryTag (kind : BinaryGateKind) (data : TapeData)
+    (rest : List Γ')
+    (inputValue : data.input = trList
+      (TransitionInstruction.fields (match kind with
+        | .conjunction => .conjoin
+        | .disjunction => .disjoin)) ++ rest) :
+    EvalsToInTime (TM2.step program)
+      (controlCfg .decodeTag data)
+      (some (readFieldCfg .roots .second (.binaryReadFirst kind)
+        { data with input := rest }))
+      (binaryTagTime kind) := by
+  cases kind with
+  | conjunction =>
+      let d₁ := consumedInputData data (.bit1 :: .cons :: rest)
+      let d₂ := consumedInputData d₁ (.cons :: rest)
+      have h₁ := oneStep
+        (step_decodeTag_bit₁ data (.bit1 :: .cons :: rest) (by
+          simpa [TransitionInstruction.fields, trList] using inputValue))
+      have h₂ := oneStep
+        (step_tagAfterBit₁_conjunction d₁ (.cons :: rest) (by
+          simp [d₁, consumedInputData]))
+      have h₃ := oneStep
+        (step_expectDelimiter .conjunction d₂ rest (by
+          simp [d₂, d₁, consumedInputData]))
+      have composed := thenRun (thenRun h₁ h₂) h₃
+      simpa [binaryTagTime, d₂, d₁, consumedInputData,
+        afterDelimiterLabel, controlCfg, readFieldCfg] using composed
+  | disjunction =>
+      let d₁ := consumedInputData data
+        (.bit0 :: .bit1 :: .cons :: rest)
+      let d₂ := consumedInputData d₁ (.bit1 :: .cons :: rest)
+      let d₃ := consumedInputData d₂ (.cons :: rest)
+      have h₁ := oneStep
+        (step_decodeTag_bit₀ data
+          (.bit0 :: .bit1 :: .cons :: rest) (by
+            simpa [TransitionInstruction.fields, trList] using inputValue))
+      have h₂ := oneStep
+        (step_tagAfterBit₀_disjunction d₁
+          (.bit1 :: .cons :: rest) (by
+            simp [d₁, consumedInputData]))
+      have h₃ := oneStep
+        (step_tagAfterBit₀₀_disjunction d₂ (.cons :: rest) (by
+          simp [d₂, d₁, consumedInputData]))
+      have h₄ := oneStep
+        (step_expectDelimiter .disjunction d₃ rest (by
+          simp [d₃, d₂, d₁, consumedInputData]))
+      have composed := thenRun (thenRun (thenRun h₁ h₂) h₃) h₄
+      simpa [binaryTagTime, d₃, d₂, d₁, consumedInputData,
+        afterDelimiterLabel, controlCfg, readFieldCfg] using composed
+
 def copiedInputSymbolData (data : TapeData) (symbol : Γ')
     (tail : List Γ') : TapeData :=
   { data with
@@ -705,8 +1193,6 @@ theorem step_copyInputField_delimiter (next : Phase) (data : TapeData)
   subst input
   simp [TM2.step, program, copyInputFieldCfg, phaseCfg, tapes,
     Function.update]
-  funext stack
-  cases stack <;> simp [tapes, Function.update]
 
 theorem step_readField_symbol (source : FieldSource)
     (target : AtomSource) (next : Phase) (data : TapeData)

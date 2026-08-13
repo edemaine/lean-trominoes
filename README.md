@@ -609,6 +609,9 @@ build; an imported proof counts when its statement matches the paper.
               input/root field transfer, fresh-root pushing, register
               clearing, and final output reversal, all with exact linear
               runtime bounds.
+            - [x] Implement the finite compact-instruction decoder and prove
+              the exact machine path for every legal constant, wire,
+              negation, conjunction, and disjunction tag and payload.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
