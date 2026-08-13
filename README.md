@@ -360,7 +360,7 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Instantiate the construction for any certified polynomial-space
         decider and prove that its designated-output formula is satisfiable
         exactly on accepted inputs.
-      - [ ] Encode polynomial-space machine configurations and their local
+      - [x] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
@@ -1367,6 +1367,12 @@ The representation choices for this target are:
   Structural induction verifies a fixed upper bound on terminal symbolic paths
   and a fixed observation-depth bound on every generated guard, independent of
   stack and clock widths.
+- [`LeanTrominoes/PeriodicCNFMachineStepSize.lean`](LeanTrominoes/PeriodicCNFMachineStepSize.lean)
+  finishes the local machine-formula size proof.  Normalized stack transforms
+  are affine in represented width; finite control, label, and symbolic-path
+  enumeration contribute only fixed machine constants.  Combining this with
+  the structural and reset-clock estimates gives a complete explicit clause
+  bound for the designated horizontal CNF, with no residual expression term.
 - [`LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean`](LeanTrominoes/PeriodicCNFPolySpaceReductionSemantics.lean)
   instantiates the clocked formula for an arbitrary certified polynomial-space
   decider.  The reset clock is sized by the finite bounded-configuration count,
