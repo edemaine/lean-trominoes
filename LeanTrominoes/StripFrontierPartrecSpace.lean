@@ -1988,7 +1988,7 @@ theorem someBoolTag
       zero] at incremented ⊢ <;>
     exact incremented
 
-private theorem idCost_le_linear (values : List Nat) :
+theorem idCost_le_linear (values : List Nat) :
     idCost values ≤ 10 * (encodedListSpace values + 1) := by
   have tailSpace := listCodeEncodedListSpace_tail_le (0 :: values)
   have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
@@ -1996,7 +1996,7 @@ private theorem idCost_le_linear (values : List Nat) :
     encodedListSpace_cons, zeroBits] at tailSpace ⊢
   omega
 
-private theorem encodedListSpace_cons_le_of
+theorem encodedListSpace_cons_le_of
     (value : Nat) (values : List Nat) (budget : Nat)
     (valueBound : encodedListSpace [value] ≤ budget)
     (valuesBound : encodedListSpace values ≤ budget) :
@@ -2005,13 +2005,13 @@ private theorem encodedListSpace_cons_le_of
     FiniteState.encodedListSpace_append]
   omega
 
-private theorem predecessorSingletonSpace_le (value : Nat) :
+theorem predecessorSingletonSpace_le (value : Nat) :
     encodedListSpace [value.pred] ≤ encodedListSpace [value] := by
   simp only [encodedListSpace_cons, encodedListSpace_nil]
   exact Nat.add_le_add_right
     (listCodeEncodeNat_length_mono (Nat.pred_le value)) 1
 
-private theorem singletonGetDSpace_le
+theorem singletonGetDSpace_le
     (index : Nat) (values : List Nat) :
     encodedListSpace [values[index]?.getD 0] ≤
       encodedListSpace values + 1 := by
@@ -2032,7 +2032,7 @@ private theorem singletonGetDSpace_le
           exact tail.trans (Nat.add_le_add_right
             (listCodeEncodedListSpace_tail_le (value :: values)) 1)
 
-private theorem dropCost_le_linear (index : Nat) (values : List Nat) :
+theorem dropCost_le_linear (index : Nat) (values : List Nat) :
     dropCost index values ≤
       (10000 * (index + 1)) * (encodedListSpace values + 1) := by
   have whole := listCodeGetCost_le_linear index values
@@ -2041,7 +2041,7 @@ private theorem dropCost_le_linear (index : Nat) (values : List Nat) :
     omega
   exact part.trans whole
 
-private theorem nilCost_le_linear (values : List Nat) :
+theorem nilCost_le_linear (values : List Nat) :
     nilCost values ≤ 1000 * (encodedListSpace values + 1) := by
   have headSpace := encodedListSpace_singleton_headI_le values
   have successorBits := encodeNat_succ_length_le values.headI
@@ -2050,7 +2050,7 @@ private theorem nilCost_le_linear (values : List Nat) :
     zeroBits] at headSpace successorBits ⊢
   omega
 
-private theorem oneCost_le_linear (values : List Nat) :
+theorem oneCost_le_linear (values : List Nat) :
     oneCost values ≤ 20000 * (encodedListSpace values + 1) := by
   have zeroBound := listCodeZeroCost_le_linear values
   have successor := succCost_le [0]
@@ -2059,7 +2059,7 @@ private theorem oneCost_le_linear (values : List Nat) :
   simp [encodedListSpace_cons, zeroBits] at successor
   omega
 
-private theorem getCost_le_budget
+theorem getCost_le_budget
     (index : Nat) (values : List Nat) (budget : Nat)
     (indexBound : index ≤ 12)
     (valuesBound : encodedListSpace values ≤ budget) :
@@ -2073,7 +2073,7 @@ private theorem getCost_le_budget
       omega
     _ = 130000 * (budget + 1) := by ring
 
-private theorem dropCost_le_budget
+theorem dropCost_le_budget
     (index : Nat) (values : List Nat) (budget : Nat)
     (indexBound : index ≤ 12)
     (valuesBound : encodedListSpace values ≤ budget) :
@@ -2082,25 +2082,25 @@ private theorem dropCost_le_budget
     gcongr
     omega)
 
-private theorem idCost_le_budget
+theorem idCost_le_budget
     (values : List Nat) (budget : Nat)
     (valuesBound : encodedListSpace values ≤ budget) :
     idCost values ≤ 10 * (budget + 1) :=
   (idCost_le_linear values).trans (by gcongr)
 
-private theorem zeroCost_le_budget
+theorem zeroCost_le_budget
     (values : List Nat) (budget : Nat)
     (valuesBound : encodedListSpace values ≤ budget) :
     zeroCost values ≤ 10000 * (budget + 1) :=
   (listCodeZeroCost_le_linear values).trans (by gcongr)
 
-private theorem oneCost_le_budget
+theorem oneCost_le_budget
     (values : List Nat) (budget : Nat)
     (valuesBound : encodedListSpace values ≤ budget) :
     oneCost values ≤ 20000 * (budget + 1) :=
   (oneCost_le_linear values).trans (by gcongr)
 
-private theorem scaledFieldSpace_le
+theorem scaledFieldSpace_le
     (value : Nat) :
     encodedListSpace [2 * value + 4] ≤
       10 * (encodedListSpace [value] + 1) := by
@@ -2113,7 +2113,7 @@ private theorem scaledFieldSpace_le
   rw [fourBits] at sum
   omega
 
-private theorem branchZeroZeroCost_le_budget
+theorem branchZeroZeroCost_le_budget
     (values output : List Nat) (testValue testCost branchCost budget : Nat)
     (valuesBound : encodedListSpace values ≤ budget)
     (outputBound : encodedListSpace output ≤ budget)
@@ -2130,7 +2130,7 @@ private theorem branchZeroZeroCost_le_budget
   rw [testHead]
   omega
 
-private theorem branchZeroSuccCost_le_budget
+theorem branchZeroSuccCost_le_budget
     (values output : List Nat) (testValue testCost branchCost budget : Nat)
     (valuesBound : encodedListSpace values ≤ budget)
     (outputBound : encodedListSpace output ≤ budget)
@@ -2153,7 +2153,7 @@ private theorem branchZeroSuccCost_le_budget
   omega
 
 set_option maxRecDepth 100000 in
-private theorem normalizeBoolCost_le_budget
+theorem normalizeBoolCost_le_budget
     (values : List Nat) (result valueCost budget : Nat)
     (resultBound : result ≤ 1)
     (valuesBound : encodedListSpace values ≤ budget)
@@ -2196,7 +2196,7 @@ private theorem normalizeBoolCost_le_budget
       (by omega) (by omega) (by omega) (by omega) oneCostLarge).trans
         (by omega)
 
-private theorem someBoolTagCost_le_budget
+theorem someBoolTagCost_le_budget
     (values : List Nat) (result valueCost budget : Nat)
     (resultBound : result ≤ 1)
     (valuesBound : encodedListSpace values ≤ budget)
@@ -2355,7 +2355,7 @@ def someBoolField
   cost := someBoolTagCost values result valueCost
   fits := someBoolTag valueFits
 
-private theorem successorFieldCost_le_budget
+theorem successorFieldCost_le_budget
     (index : Nat) (values : List Nat) (budget : Nat)
     (indexBound : index ≤ 12)
     (valuesBound : encodedListSpace values ≤ budget) :
@@ -2366,7 +2366,7 @@ private theorem successorFieldCost_le_budget
   simp only [succField]
   omega
 
-private theorem predecessorFieldCost_le_budget
+theorem predecessorFieldCost_le_budget
     (index : Nat) (values : List Nat) (budget : Nat)
     (indexBound : index ≤ 12)
     (valuesBound : encodedListSpace values ≤ budget) :
@@ -2407,15 +2407,15 @@ theorem baseArgumentsCost_le_linear
     at get0 get5 get6 nil field0 field5 field6 ⊢
   omega
 
-private def accumulatedRawBudget (budget : Nat) : Nat :=
+def accumulatedRawBudget (budget : Nat) : Nat :=
   1000 * (1000 * (60000000 * (budget + 1) + 1) + 1)
 
-private def accumulatedTagBudget (budget : Nat) : Nat :=
+def accumulatedTagBudget (budget : Nat) : Nat :=
   100000000 * (accumulatedRawBudget budget + 1)
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 2000000 in
-private theorem accumulatedRawCost_le_budget
+theorem accumulatedRawCost_le_budget
     (values : List Nat)
     (accumulatedValue leftValue rightValue : Nat)
     (accumulatedCost leftCost rightCost budget : Nat)
@@ -2498,7 +2498,7 @@ private theorem accumulatedRawCost_le_budget
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 2000000 in
-private theorem accumulatedTagCost_le_budget
+theorem accumulatedTagCost_le_budget
     (values : List Nat)
     (result accumulatedValue leftValue rightValue : Nat)
     (accumulatedCost leftCost rightCost budget : Nat)

@@ -332,7 +332,7 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Combine the recovered strip header and coordinate stream with the
         fixed query endpoints, decoding both frontier indices without
         reconstructing the recursively paired motif code.
-      - [ ] Port the depth-zero strip edge oracle to the recovered flat
+      - [x] Port the depth-zero strip edge oracle to the recovered flat
         context.
         - [x] Implement one flat coordinate-stream packed-assignment lookup
           pass and prove that it preserves the legacy first-occurrence
@@ -373,7 +373,7 @@ build; an imported proof counts when its statement matches the paper.
           advance, and overlap into the complete packed transition predicate.
         - [x] Connect the flat transition and reflexive equality test to the
           recovered Savitch context, preserving the native strip suffix.
-        - [ ] Prove evaluator-space certificates for the flat edge oracle.
+        - [x] Prove evaluator-space certificates for the flat edge oracle.
           - [x] Fit one coordinate-pair assignment-lookup step
             compositionally.
           - [x] Fit the complete one-column countdown with an exact additive
@@ -384,7 +384,7 @@ build; an imported proof counts when its statement matches the paper.
               countdown input by one original native-field envelope.
             - [x] Establish compositional budget lemmas for primitive list
               operations, branches, and flat countdown bodies.
-            - [ ] Bound each positive and zero countdown body by that
+            - [x] Bound each positive and zero countdown body by that
               envelope, then sum the exact additive cost.
               - [x] Bound target/current coordinate projections and both
                 coordinate equalities.
@@ -463,6 +463,11 @@ build; an imported proof counts when its statement matches the paper.
               seven-field transition context from that recovered suffix.
             - [x] Fit and polynomially bound the recovered indexed edge and
               reflexive-or-edge Savitch base oracle.
+            - [x] Fit every control-flow branch of one complete
+              suffix-preserving Savitch structural step against a common
+              exact cost.
+            - [ ] Bound that structural-step cost uniformly over reachable
+              states and lift it through the exact-fuel iteration.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1972,6 +1977,11 @@ The representation choices for this target are:
   per continuation frame, preserves the complete evaluator payload, and
   bounds the ensuing dynamic suffix drop linearly in the native-list input
   footprint.
+- [`LeanTrominoes/PartrecFlatSavitchStepSpace.lean`](LeanTrominoes/PartrecFlatSavitchStepSpace.lean)
+  gives a compositional evaluator-space certificate for every branch of one
+  flat Savitch DFS transition.  It retains the native strip fields after the
+  variable DFS stack and substitutes the bounded recovered reflexive-or-edge
+  oracle at recursion depth zero.
 - [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
   fits the strip-suffix projections, decodes both queried frontier indices
   into word and phase, and assembles the native seven-field packed-transition
