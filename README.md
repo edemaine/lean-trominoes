@@ -373,6 +373,17 @@ build; an imported proof counts when its statement matches the paper.
           advance, and overlap into the complete packed transition predicate.
         - [x] Connect the flat transition and reflexive equality test to the
           recovered Savitch context, preserving the native strip suffix.
+        - [ ] Prove evaluator-space certificates for the flat edge oracle.
+          - [x] Fit one coordinate-pair assignment-lookup step
+            compositionally.
+          - [ ] Fit the complete one-column countdown and bound it by the
+            original flat motif stream.
+          - [ ] Fit the five-column assignment lookup and its predicate
+            wrappers.
+          - [ ] Fit normalization, center validity, overlap, and the complete
+            flat packed transition.
+          - [ ] Fit context recovery and the suffix-preserving Savitch driver,
+            then package the flat evaluator as a PSPACE decider.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
