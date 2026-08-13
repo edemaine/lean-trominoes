@@ -389,8 +389,9 @@ build; an imported proof counts when its statement matches the paper.
                 coordinate equalities.
               - [x] Bound Boolean coordinate matching and the selected-column
                 conjunction.
-              - [ ] Bound packed-word stepping and the found/continue
-                branches.
+              - [x] Bound packed-word quotient/remainder stepping through the
+                certified division-by-nine evaluator.
+              - [ ] Bound the found/continue state-reconstruction branches.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.
           - [ ] Bound the five-column assignment lookup and fit its predicate

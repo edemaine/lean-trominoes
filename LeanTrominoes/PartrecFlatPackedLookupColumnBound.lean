@@ -526,6 +526,40 @@ theorem flatPackedLookupCellYSpace_le_unit
   simpa [flatPackedLookupInputUnit, fields,
     encodedListSpace_cons, encodedListSpace_nil] using widened
 
+theorem flatPackedLookupWordSpace_le_unit
+    (target : Cell) (motif : List Cell)
+    (word wordLimit digitLimit : Nat) (wordBound : word ≤ wordLimit) :
+    encodedListSpace [word] ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let fields := flatPackedLookupEnvelopeFields target motif
+    wordLimit digitLimit
+  have member : wordLimit ∈ fields := by
+    simp [fields, flatPackedLookupEnvelopeFields]
+  have limitSpace := flatLookupEncodedFieldSpace_le_of_mem
+    wordLimit fields member
+  have wordBits := encodeNat_length_mono wordBound
+  simp only [fields] at limitSpace
+  simp only [encodedListSpace_cons, encodedListSpace_nil,
+    flatPackedLookupInputUnit]
+  omega
+
+theorem flatPackedLookupDigitSpace_le_unit
+    (target : Cell) (motif : List Cell)
+    (wordLimit digit digitLimit : Nat) (digitBound : digit ≤ digitLimit) :
+    encodedListSpace [digit] ≤
+      flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let fields := flatPackedLookupEnvelopeFields target motif
+    wordLimit digitLimit
+  have member : digitLimit ∈ fields := by
+    simp [fields, flatPackedLookupEnvelopeFields]
+  have limitSpace := flatLookupEncodedFieldSpace_le_of_mem
+    digitLimit fields member
+  have digitBits := encodeNat_length_mono digitBound
+  simp only [fields] at limitSpace
+  simp only [encodedListSpace_cons, encodedListSpace_nil,
+    flatPackedLookupInputUnit]
+  omega
+
 theorem flatPackedLookupXEqualityArgumentsCost_le_input
     (target cell : Cell) (motif remaining leading : List Cell)
     (word digit wordLimit digitLimit : Nat) (found selected : Bool)
@@ -757,6 +791,88 @@ theorem flatPackedLookupMatchCost_le_input
     (by simp [budget]; omega)
   simp only [flatPackedLookupMatchCost]
   simp only [state, budget, unit] at combined
+  omega
+
+theorem flatPackedLookupWordStepFieldCost_le_input
+    (outputField : Nat) (target cell : Cell)
+    (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (found selected : Bool)
+    (outputFieldBound : outputField ≤ 1)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    assignmentWordStepFieldAtCost 2 outputField
+        (Code.flatPackedLookupColumnState target word digit found selected
+          (cell :: remaining)) ≤
+      10000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    found selected (cell :: remaining)
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit found selected
+        decomposition wordBound digitBound
+  have wordSpace : encodedListSpace [word] ≤ unit := by
+    simpa [unit] using flatPackedLookupWordSpace_le_unit
+      target motif word wordLimit digitLimit wordBound
+  have quotientBound : word / 9 ≤ wordLimit :=
+    (Nat.div_le_self word 9).trans wordBound
+  have remainderBound : word % 9 ≤ wordLimit :=
+    (Nat.mod_le word 9).trans wordBound
+  have quotientSpace : encodedListSpace [word / 9] ≤ unit := by
+    simpa [unit] using flatPackedLookupWordSpace_le_unit
+      target motif (word / 9) wordLimit digitLimit quotientBound
+  have remainderSpace : encodedListSpace [word % 9] ≤ unit := by
+    simpa [unit] using flatPackedLookupWordSpace_le_unit
+      target motif (word % 9) wordLimit digitLimit remainderBound
+  have pairSpace : encodedListSpace [word / 9, word % 9] ≤ 2 * unit :=
+    flatLookupConsSpace_le_of (word / 9) [word % 9] unit
+      quotientSpace remainderSpace
+  have nineSpace : encodedListSpace [9] ≤ unit := by
+    have nineBits : (Computability.encodeNat 9).length = 4 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil, nineBits]
+    omega
+  have argumentOutput : encodedListSpace [word, 9] ≤ 2 * unit :=
+    flatLookupConsSpace_le_of word [9] unit wordSpace nineSpace
+  have getWordRaw := listCodeGetCost_le_linear 2 state
+  have getWord : getCost 2 state ≤ 30000 * (unit + 1) :=
+    getWordRaw.trans (by gcongr)
+  have zeroState := listCodeZeroCost_le_linear state
+  have constantNine := addConstCost_le 9 [0]
+  have numeralNine : numeralCost 9 state ≤ 1000000 * (unit + 1) := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    simp only [numeralCost]
+    simp [encodedListSpace_cons, encodedListSpace_nil, zeroBits] at constantNine
+    omega
+  have arguments := listCodePrependCost_le_of state [word] [9]
+    (getCost 2 state) (numeralCost 9 state) (2 * unit)
+    (stateBound.trans (by omega)) (wordSpace.trans (by omega)) argumentOutput
+  have stateWord : state[2]?.getD 0 = word := by
+    simp [state, Code.flatPackedLookupColumnState]
+  have argumentsBound :
+      assignmentWordStepArgumentsAtCost 2 state ≤
+        2000000 * (unit + 1) := by
+    rw [assignmentWordStepArgumentsAtCost, stateWord]
+    omega
+  have division := flatLookupDivisionNineCost_le_budget word unit wordSpace
+  have stepBound : assignmentWordStepAtCost 2 state ≤
+      2000000000000000 * (unit + 1) := by
+    rw [assignmentWordStepAtCost, stateWord]
+    omega
+  have projectedRaw := listCodeGetCost_le_linear outputField
+    [word / 9, word % 9]
+  have projected : getCost outputField [word / 9, word % 9] ≤
+      20000 * (2 * unit + 1) := by
+    have coefficient : 10000 * (outputField + 1) ≤ 20000 := by omega
+    have space : encodedListSpace [word / 9, word % 9] + 1 ≤
+        2 * unit + 1 := by omega
+    exact projectedRaw.trans (Nat.mul_le_mul coefficient space)
+  change getCost outputField [word / 9, word % 9] +
+      assignmentWordStepAtCost 2 state ≤
+    10000000000000000 * unit
   omega
 
 end EvaluatorCodeFits
