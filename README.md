@@ -365,6 +365,8 @@ build; an imported proof counts when its statement matches the paper.
           exact-one coverage at one indexed flat motif base.
         - [x] Lift one-base center validity through the exact motif-length
           countdown and recover the full packed center-validity predicate.
+        - [x] Compare current and next assignment digits at one shared flat
+          motif occurrence.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
