@@ -337,6 +337,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Implement one flat coordinate-stream packed-assignment lookup
           pass and prove that it preserves the legacy first-occurrence
           semantics for repeated motif cells.
+        - [x] Restore the coordinate stream across all five assignment-column
+          passes and prove the resulting `[digit, found]` output matches the
+          established packed frontier lookup.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
