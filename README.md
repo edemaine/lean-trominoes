@@ -457,6 +457,8 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Bound reconstructed lookup input, lookup, and projection.
           - [ ] Fit context recovery and the suffix-preserving Savitch driver,
             then package the flat evaluator as a PSPACE decider.
+            - [x] Fit and linearly bound variable-stack offset computation and
+              dynamic recovery of the complete flat context suffix.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1961,6 +1963,11 @@ The representation choices for this target are:
   representation as the project's explicit finite-machine PSPACE certificate.
   The native `trList` input identity avoids constructing a nested code or an
   alphabet-conversion machine.
+- [`LeanTrominoes/PartrecFlatSavitchContextSpace.lean`](LeanTrominoes/PartrecFlatSavitchContextSpace.lean)
+  fits runtime computation of the seven fixed Savitch fields plus six fields
+  per continuation frame, preserves the complete evaluator payload, and
+  bounds the ensuing dynamic suffix drop linearly in the native-list input
+  footprint.
 - [`LeanTrominoes/PartrecFlatStripWellFormed.lean`](LeanTrominoes/PartrecFlatStripWellFormed.lean)
   ports periodic-strip structural validation to those native flat fields.  Its
   exact motif-length countdown consumes two coordinate fields per cell,
