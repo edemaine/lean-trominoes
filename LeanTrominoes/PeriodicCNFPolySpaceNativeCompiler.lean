@@ -1,5 +1,6 @@
 import LeanTrominoes.PeriodicCNFPolySpaceCompiler
 import LeanTrominoes.PeriodicCNFTransitionExprFields
+import LeanTrominoes.PeriodicCNFTransitionProgramEncoding
 import LeanTrominoes.FiniteEncodingNativeFields
 import LeanTrominoes.TM2CompositionMachine
 
@@ -112,6 +113,72 @@ def nativeCompilerFields (fields : List Nat) : List Nat :=
   requireTransitionExprFields
     (nativeCompilerExpression decider fields)
     (nativeCompilerFresh decider fields)
+
+/-- Compact postorder request consumed by the fixed structural compiler
+evaluator. -/
+def nativeCompilerProgramInput (fields : List Nat) : List Nat :=
+  transitionCompilerInputFields
+    (nativeCompilerExpression decider fields)
+    (nativeCompilerFresh decider fields)
+
+/-- The fixed field evaluator maps the compact postorder request to the direct
+native compiler stream on every input. -/
+@[simp]
+theorem transitionCompilerEvaluatorFields_nativeProgramInput
+    (fields : List Nat) :
+    transitionCompilerEvaluatorFields
+        (nativeCompilerProgramInput decider fields) =
+      nativeCompilerFields decider fields := by
+  simp [nativeCompilerProgramInput, nativeCompilerFields]
+
+/-- Explicit polynomial field-count bound for the compact postorder compiler
+request.  This is the input-size contract for the fixed structural evaluator. -/
+def nativeProgramFieldPolynomial : Polynomial Nat :=
+  Polynomial.C 3 *
+      PolySpaceReduction.designatedMachineNodePolynomial decider +
+    Polynomial.C 2
+
+/-- On an encoded source input, the compact compiler request has polynomially
+many natural fields, measured against the source's native-field encoding. -/
+theorem nativeCompilerProgramInput_length_le_polynomial_eval (input : Input) :
+    (nativeCompilerProgramInput decider
+      (FiniteEncodingNativeFields.fields (encoding.encode input))).length ≤
+      (nativeProgramFieldPolynomial decider).eval
+        (FiniteEncodingNativeFields.encode
+          (encoding.encode input)).length := by
+  let expression := nativeCompilerExpression decider
+    (FiniteEncodingNativeFields.fields (encoding.encode input))
+  have expressionBound : expression.gateCount ≤
+      BoundedMachineAtom.designatedMachineNodeBudget (tm := decider.tm)
+        (space := PolySpaceReduction.reductionSpace decider input)
+        (clockBits := PolySpaceReduction.reductionClockBits decider input) := by
+    simpa [expression, nativeCompilerExpression] using
+      (BoundedMachineAtom.designatedMachineResetClockExpression_gateCount_le_budget
+          (tm := decider.tm)
+          (space := PolySpaceReduction.reductionSpace decider input)
+          (clockBits := PolySpaceReduction.reductionClockBits decider input)
+          (PolySpaceReduction.initialConfiguration decider input)
+          (PolySpaceReduction.acceptingConfiguration decider))
+  have sourceBound :
+      (nativeCompilerProgramInput decider
+        (FiniteEncodingNativeFields.fields
+          (encoding.encode input))).length ≤
+        (nativeProgramFieldPolynomial decider).eval
+          (encoding.encode input).length := by
+    apply (transitionCompilerInputFields_length_le expression
+      (nativeCompilerFresh decider
+        (FiniteEncodingNativeFields.fields
+          (encoding.encode input)))).trans
+    unfold nativeProgramFieldPolynomial
+    simp only [Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_C]
+    rw [PolySpaceReduction.designatedMachineNodePolynomial_eval]
+    exact Nat.add_le_add_right
+      (Nat.mul_le_mul_left 3 expressionBound) 2
+  apply sourceBound.trans
+  apply TM2CompositionMachine.polynomial_eval_monotone
+  simpa only [FiniteEncodingNativeFields.fields_length] using
+    (FiniteEncodingNativeFields.fields_length_le_encode_length
+      (encoding.encode input))
 
 /-- The direct field stream agrees exactly with the original semantic formula
 construction on every input, including malformed native field lists. -/

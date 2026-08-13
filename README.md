@@ -584,6 +584,10 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Compile every Tseitin gate directly to native clause fields and
             prove the streaming field compiler exactly equals the nested CNF
             construction on all inputs.
+          - [x] Flatten transition expressions to compact postorder programs,
+            verify the one-pass stack interpreter against structural
+            compilation, and bound generated requests by an explicit
+            polynomial number of native fields.
           - [ ] Implement the field-to-formula evaluator and certify its
             polynomial running time.
         - [ ] Compose source preprocessing with formula generation into the
@@ -1517,6 +1521,16 @@ The representation choices for this target are:
   constant, wire, and Boolean gate an exact native natural-field block, streams
   those blocks during structural Tseitin recursion, and proves the complete
   clause-count-prefixed result identical to the verified flat formula fields.
+- [`LeanTrominoes/PeriodicCNFTransitionProgram.lean`](LeanTrominoes/PeriodicCNFTransitionProgram.lean)
+  flattens every transition expression to a compact postorder instruction
+  stream.  Its one-pass stack interpreter emits exactly the direct structural
+  compiler fields, with one instruction per expression node and at most three
+  natural fields per instruction.
+- [`LeanTrominoes/PeriodicCNFTransitionProgramEncoding.lean`](LeanTrominoes/PeriodicCNFTransitionProgramEncoding.lean)
+  fixes the native evaluator request format, proves exact decoder round trips,
+  and identifies a total request evaluator with the verified formula-field
+  stream.  A request carries the clause header and fresh-atom boundary before
+  the compact postorder program.
 - [`LeanTrominoes/PeriodicCNFTransitionExprSize.lean`](LeanTrominoes/PeriodicCNFTransitionExprSize.lean)
   begins the quantitative hardness certificate.  It bounds Tseitin clauses
   by three per expression node, accounts for the forced root clause exactly,
@@ -1656,9 +1670,10 @@ The representation choices for this target are:
   gives the formula generator a total evaluator-native natural-field
   interface.  It proves generated fields recover the original finite-alphabet
   stream, now generates the Tseitin field stream directly without an
-  intermediate clause list, identifies that output with the verified flat
-  formula, and transfers its polynomial output-size bound to native input
-  length.
+  intermediate clause list, factors generation through the compact postorder
+  request and fixed evaluator, identifies that output with the verified flat
+  formula, and gives explicit polynomial bounds for both request field count
+  and native output length.
 - [`LeanTrominoes/TM2OutputLength.lean`](LeanTrominoes/TM2OutputLength.lean)
   counts primitive pushes along every finite statement path and sums those
   counts into a uniform one-step allowance.  It proves total stack population
