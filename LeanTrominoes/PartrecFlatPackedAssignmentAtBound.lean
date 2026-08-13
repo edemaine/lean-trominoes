@@ -715,6 +715,107 @@ theorem flatPackedAssignmentColumnStageCost_le_budget
     coordinates, out7, out6, out5, out3, out2, out1,
     cost7, cost6, cost5, cost3, cost2, cost1, cost0, budget] using bound0
 
+set_option maxHeartbeats 800000 in
+theorem flatPackedAssignmentLookupStagesCost_le_budget
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    flatPackedAssignmentLookupStagesCost motif queriedColumn target word ≤
+      50000000 * flatPackedAssignmentScannerBudget motif queriedColumn target
+        word := by
+  let initial : Nat × Nat × Bool := (word, 0, false)
+  let first := Code.packedAssignmentLookupApplyColumn
+    0 motif queriedColumn target initial
+  let second := Code.packedAssignmentLookupApplyColumn
+    1 motif queriedColumn target first
+  let third := Code.packedAssignmentLookupApplyColumn
+    2 motif queriedColumn target second
+  let fourth := Code.packedAssignmentLookupApplyColumn
+    3 motif queriedColumn target third
+  let budget := flatPackedAssignmentScannerBudget motif queriedColumn target
+    word
+  have firstWord : first.1 ≤ word := by
+    simpa [first, initial, Code.packedAssignmentLookupApplyColumn] using
+      Code.packedLookupColumnOutcome_word_le target
+        (decide (queriedColumn = 0)) motif word 0 false
+  have firstDigit : first.2.1 ≤ 8 := by
+    simpa [first, initial, Code.packedAssignmentLookupApplyColumn] using
+      Code.packedLookupColumnOutcome_digit_le target
+        (decide (queriedColumn = 0)) motif word 0 false
+  have secondWord : second.1 ≤ word := by
+    have step := Code.packedLookupColumnOutcome_word_le target
+      (decide (queriedColumn = 1)) motif first.1 first.2.1 first.2.2
+    have applied : second.1 ≤ first.1 := by
+      simpa [second, Code.packedAssignmentLookupApplyColumn] using step
+    exact applied.trans firstWord
+  have secondDigit : second.2.1 ≤ 16 := by
+    have step := Code.packedLookupColumnOutcome_digit_le target
+      (decide (queriedColumn = 1)) motif first.1 first.2.1 first.2.2
+    have applied : second.2.1 ≤ first.2.1 + 8 := by
+      simpa [second, Code.packedAssignmentLookupApplyColumn] using step
+    omega
+  have thirdWord : third.1 ≤ word := by
+    have step := Code.packedLookupColumnOutcome_word_le target
+      (decide (queriedColumn = 2)) motif second.1 second.2.1 second.2.2
+    have applied : third.1 ≤ second.1 := by
+      simpa [third, Code.packedAssignmentLookupApplyColumn] using step
+    exact applied.trans secondWord
+  have thirdDigit : third.2.1 ≤ 24 := by
+    have step := Code.packedLookupColumnOutcome_digit_le target
+      (decide (queriedColumn = 2)) motif second.1 second.2.1 second.2.2
+    have applied : third.2.1 ≤ second.2.1 + 8 := by
+      simpa [third, Code.packedAssignmentLookupApplyColumn] using step
+    omega
+  have fourthWord : fourth.1 ≤ word := by
+    have step := Code.packedLookupColumnOutcome_word_le target
+      (decide (queriedColumn = 3)) motif third.1 third.2.1 third.2.2
+    have applied : fourth.1 ≤ third.1 := by
+      simpa [fourth, Code.packedAssignmentLookupApplyColumn] using step
+    exact applied.trans thirdWord
+  have fourthDigit : fourth.2.1 ≤ 32 := by
+    have step := Code.packedLookupColumnOutcome_digit_le target
+      (decide (queriedColumn = 3)) motif third.1 third.2.1 third.2.2
+    have applied : fourth.2.1 ≤ third.2.1 + 8 := by
+      simpa [fourth, Code.packedAssignmentLookupApplyColumn] using step
+    omega
+  have stage0 :
+      flatPackedAssignmentColumnStageCost 0 motif queriedColumn target
+          initial ≤ 10000000 * budget := by
+    simpa [budget] using flatPackedAssignmentColumnStageCost_le_budget
+      0 motif queriedColumn target initial word (by omega)
+      (by simp [initial]) (by simp [initial])
+  have stage1 :
+      flatPackedAssignmentColumnStageCost 1 motif queriedColumn target
+          first ≤ 10000000 * budget := by
+    simpa [budget] using flatPackedAssignmentColumnStageCost_le_budget
+      1 motif queriedColumn target first word (by omega) firstWord (by omega)
+  have stage2 :
+      flatPackedAssignmentColumnStageCost 2 motif queriedColumn target
+          second ≤ 10000000 * budget := by
+    simpa [budget] using flatPackedAssignmentColumnStageCost_le_budget
+      2 motif queriedColumn target second word (by omega) secondWord (by omega)
+  have stage3 :
+      flatPackedAssignmentColumnStageCost 3 motif queriedColumn target
+          third ≤ 10000000 * budget := by
+    simpa [budget] using flatPackedAssignmentColumnStageCost_le_budget
+      3 motif queriedColumn target third word (by omega) thirdWord (by omega)
+  have stage4 :
+      flatPackedAssignmentColumnStageCost 4 motif queriedColumn target
+          fourth ≤ 10000000 * budget := by
+    simpa [budget] using flatPackedAssignmentColumnStageCost_le_budget
+      4 motif queriedColumn target fourth word (by omega) fourthWord (by omega)
+  have sumBound :
+      flatPackedAssignmentColumnStageCost 4 motif queriedColumn target fourth +
+        (flatPackedAssignmentColumnStageCost 3 motif queriedColumn target third +
+          (flatPackedAssignmentColumnStageCost 2 motif queriedColumn target
+              second +
+            (flatPackedAssignmentColumnStageCost 1 motif queriedColumn target
+                first +
+              flatPackedAssignmentColumnStageCost 0 motif queriedColumn target
+                initial))) ≤ 50000000 * budget := by
+    omega
+  simpa only [flatPackedAssignmentLookupStagesCost, initial, first, second,
+    third, fourth, budget] using sumBound
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing
