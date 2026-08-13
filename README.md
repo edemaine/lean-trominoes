@@ -353,6 +353,8 @@ build; an imported proof counts when its statement matches the paper.
         enumerating stacks, and assemble their bounded step expression.
       - [x] Prove the bounded ordinary-step expression equivalent to Mathlib's
         TM2 step semantics on decoded and canonically encoded configurations.
+      - [x] Assemble structural, ordinary-step, clock-successor, and accepting
+        reset expressions and prove their reset-clock relation semantics.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1311,6 +1313,11 @@ The representation choices for this target are:
   exactly Mathlib's `TM2.stepAux`.  Consequently the complete bounded step
   expression is equivalent to `FinTM2.step` on every well-formed decoded slice
   and on canonical encodings whose stacks fit the selected width.
+- [`LeanTrominoes/PeriodicCNFMachineResetRelation.lean`](LeanTrominoes/PeriodicCNFMachineResetRelation.lean)
+  combines the ordinary machine step with structural well-formedness, a
+  no-overflow successor clock, and a halted-label reset to a fixed initial
+  configuration.  Canonical bounded encodings satisfy the resulting local
+  expression exactly when their semantic states satisfy `ResetClockRelation`.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
