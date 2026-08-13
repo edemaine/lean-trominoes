@@ -40,6 +40,17 @@ theorem flatLookupEncodedListSpace_suffix_le
       rw [List.cons_append, encodedListSpace_cons]
       exact induction.trans (by omega)
 
+theorem flatLookupEncodedListSpace_prefix_le
+    (prefixFields suffix : List Nat) :
+    encodedListSpace prefixFields ≤
+      encodedListSpace (prefixFields ++ suffix) := by
+  induction prefixFields with
+  | nil => simp
+  | cons value prefixFields induction =>
+      rw [List.cons_append, encodedListSpace_cons,
+        encodedListSpace_cons]
+      omega
+
 /-- Original native fields against which a complete lookup pass is charged. -/
 def flatPackedLookupEnvelopeFields
     (target : Cell) (motif : List Cell)
@@ -244,6 +255,47 @@ theorem flatLookupBranchZeroSuccCost_le_budget
   have testHead : [testValue].headI = testValue := by simp
   simp only [branchZeroSuccCost, branchZeroTestCost, prependCost]
   rw [testHead]
+  omega
+
+/-- Natural equality remains linear when both operands fit in a shared native
+field budget. -/
+theorem flatLookupNatEqCost_le_budget
+    (left right budget : Nat)
+    (leftBound : encodedListSpace [left] ≤ budget)
+    (rightBound : encodedListSpace [right] ≤ budget) :
+    natEqCost left right ≤
+      1000000000000 * (budget + 1) := by
+  have equality := natEqCost_le_linear left right
+  have sumBits := encodeNat_add_length_le_sum left right
+  have scaledBits := encodeNat_mul_length_le_sum 2 (left + right)
+  have finalBits := encodeNat_add_length_le_sum
+    (2 * (left + right)) 4
+  have twoBits : (Computability.encodeNat 2).length = 2 := rfl
+  have fourBits : (Computability.encodeNat 4).length = 3 := rfl
+  rw [twoBits] at scaledBits
+  rw [fourBits] at finalBits
+  simp only [encodedListSpace_cons, encodedListSpace_nil] at equality leftBound rightBound
+  omega
+
+/-- Division by nine, as used to consume one packed assignment digit, remains
+linear in any budget containing the dividend. -/
+theorem flatLookupDivisionNineCost_le_budget
+    (number budget : Nat)
+    (numberBound : encodedListSpace [number] ≤ budget) :
+    divisionSpaceBound number 9 ≤
+      1000000000000000 * (budget + 1) := by
+  have sumBits := encodeNat_add_length_le_sum number 9
+  have scaledBits := encodeNat_mul_length_le_sum 8 (number + 9)
+  have finalBits := encodeNat_add_length_le_sum
+    (8 * (number + 9)) 16
+  have eightBits : (Computability.encodeNat 8).length = 4 := rfl
+  have nineBits : (Computability.encodeNat 9).length = 4 := rfl
+  have sixteenBits : (Computability.encodeNat 16).length = 5 := rfl
+  rw [eightBits] at scaledBits
+  rw [nineBits] at sumBits
+  rw [sixteenBits] at finalBits
+  simp only [divisionSpaceBound, encodedListSpace_cons,
+    encodedListSpace_nil] at numberBound ⊢
   omega
 
 /-- A positive flat-countdown body has a fixed linear overhead once its input,
