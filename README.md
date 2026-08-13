@@ -428,6 +428,8 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Fit the exact one-cell flat normalization predicate.
             - [x] Bound one-cell normalization in the native scan footprint.
             - [x] Lift bounded normalization across the motif.
+            - [x] Bound the fixed conjunction of all five normalization
+              columns.
             - [x] Fit center assignment and translated source-membership
               leaves on the native flat motif.
             - [x] Fit and bound fixed-symmetry center candidates.
@@ -1996,6 +1998,11 @@ The representation choices for this target are:
   lifts the quadratic leaf through the exact motif countdown.  It then fits
   and bounds the fixed conjunction of all four shared columns, including each
   scan's initialization and result projection.
+- [`LeanTrominoes/PartrecFlatPackedNormalizationAllSpace.lean`](LeanTrominoes/PartrecFlatPackedNormalizationAllSpace.lean)
+  combines the five individually bounded flat normalization scans with their
+  exact nested Boolean conjunction.  Its public certificate evaluates
+  `isNormalizedBool` on the native transition context within one explicit
+  polynomial workspace bound.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
