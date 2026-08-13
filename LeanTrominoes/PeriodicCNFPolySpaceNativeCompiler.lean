@@ -24,6 +24,19 @@ open Computability Turing
 namespace PeriodicCNF
 namespace PolySpaceNativeCompiler
 
+/-- The field-level and finite-encoding views of a flat formula agree without
+unfolding the formula that produced those fields. -/
+theorem trList_formulaFields_eq_finEncoding_encode
+    (formula : PeriodicCNF Nat) :
+    PartrecToTM2.trList
+        (PeriodicCNFFlatEncoding.formulaFields formula) =
+      PeriodicCNFFlatEncoding.finEncoding.encode formula := by
+  change PartrecToTM2.trList
+      (PeriodicCNFFlatEncoding.formulaFields formula) =
+    PeriodicCNFFlatEncoding.encodeNatFields
+      (PeriodicCNFFlatEncoding.formulaFields formula)
+  exact PeriodicCNFFlatEncoding.encodeNatFields_eq_trList _ |>.symm
+
 /-- Decode one bounded index in an arbitrary finite alphabet.  Invalid fields
 are rejected; generated source fields are always valid. -/
 def decodeSymbolField (Symbol : Type) [Fintype Symbol]
@@ -103,9 +116,7 @@ theorem trList_nativeCompilerFields_sourceFields
           (FiniteEncodingNativeFields.fields symbols)) =
       PolySpaceCompiler.compiler decider symbols := by
   rw [nativeCompilerFields_sourceFields]
-  unfold PolySpaceCompiler.compiler PeriodicCNFFlatEncoding.finEncoding
-    PeriodicCNFFlatEncoding.finEncodingOfFields
-  exact PeriodicCNFFlatEncoding.encodeNatFields_eq_trList _ |>.symm
+  exact trList_formulaFields_eq_finEncoding_encode _
 
 theorem trList_nativeCompilerFields_encode (input : Input) :
     PartrecToTM2.trList
@@ -114,9 +125,7 @@ theorem trList_nativeCompilerFields_encode (input : Input) :
       PeriodicCNFFlatEncoding.finEncoding.encode
         (PolySpaceReduction.formula decider input) := by
   rw [nativeCompilerFields_encode]
-  unfold PeriodicCNFFlatEncoding.finEncoding
-    PeriodicCNFFlatEncoding.finEncodingOfFields
-  exact PeriodicCNFFlatEncoding.encodeNatFields_eq_trList _ |>.symm
+  exact trList_formulaFields_eq_finEncoding_encode _
 
 /-- The native output stream retains the already-proved polynomial length
 bound, now measured against the (at least as long) native source stream. -/
@@ -130,10 +139,16 @@ theorem native_output_length_le_polynomial_eval (input : Input) :
   rw [trList_nativeCompilerFields_encode]
   apply (PolySpaceReduction.formula_encoding_length_le_polynomial_eval
     decider input).trans
+  have inputLength :
+      (encoding.encode input).length ≤
+        (FiniteEncodingNativeFields.encode
+          (encoding.encode input)).length := by
+    simpa only [FiniteEncodingNativeFields.fields_length] using
+      (FiniteEncodingNativeFields.fields_length_le_encode_length
+        (encoding.encode input))
   exact TM2CompositionMachine.polynomial_eval_monotone
     (PolySpaceReduction.formulaEncodingPolynomial decider)
-    (FiniteEncodingNativeFields.fields_length_le_encode_length
-      (encoding.encode input))
+    inputLength
 
 end PolySpaceNativeCompiler
 end PeriodicCNF

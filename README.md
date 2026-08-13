@@ -536,6 +536,8 @@ build; an imported proof counts when its statement matches the paper.
         fields, current/next equality, and no-overflow binary succession.
       - [x] Allocate a collision-free finite atom vocabulary for bounded
         labels, states, stack cells, and reset-clock bits.
+        - [x] Replace width-dependent atom enumeration by an explicit affine
+          layout whose only chosen finite codes are fixed by the decider.
       - [x] Define the canonical Boolean valuation of a bounded clocked
         configuration and verify all label/state/stack exact-one fields.
       - [x] Enforce that every bounded stack is an occupied prefix followed by
@@ -1514,9 +1516,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFMachineAtoms.lean`](LeanTrominoes/PeriodicCNFMachineAtoms.lean)
   defines the finite atom vocabulary of a bounded machine slice: optional
   control labels, internal states, optional symbols in every bounded stack
-  cell, and little-endian clock bits.  A finite equivalence allocates these
-  constructors injectively below one `atomCount` fresh boundary, with
-  field-specific vectors and bounds.
+  cell, and little-endian clock bits.  Its explicit affine equivalence uses
+  fixed machine-alphabet codes plus arithmetic runtime positions, allocating
+  every constructor injectively below one `atomCount` fresh boundary with
+  field-specific vectors and bounds.  This makes the width-dependent layout
+  suitable for the pending executable formula compiler.
 - [`LeanTrominoes/PeriodicCNFMachineValuation.lean`](LeanTrominoes/PeriodicCNFMachineValuation.lean)
   maps a bounded clocked TM2 configuration to its canonical Boolean slice.
   Labels, finite control states, and optional values in every bounded stack

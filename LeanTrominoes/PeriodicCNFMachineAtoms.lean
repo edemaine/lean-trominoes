@@ -1,6 +1,7 @@
 import LeanTrominoes.Complexity
 import LeanTrominoes.PeriodicCNFTransitionExprVectors
 import Mathlib.Data.Fintype.EquivFin
+import Mathlib.Logic.Equiv.Fin.Basic
 
 /-!
 # Atoms for bounded machine configurations
@@ -77,9 +78,68 @@ namespace BoundedMachineAtom
 variable {tm : FinTM2} {space clockBits : Nat}
 variable [stackFinite : ∀ stack, Fintype (tm.Γ stack)]
 
+/-- Number of possible `(stack, optional symbol)` cell values.  This is a
+machine-dependent constant, independent of the runtime width. -/
+def stackSymbolCount : Nat :=
+  Fintype.card (Σ stack : tm.K, Option (tm.Γ stack))
+
 /-- Number of source atoms in one Boolean slice. -/
 def atomCount : Nat :=
-  Fintype.card (BoundedMachineAtom tm space clockBits)
+  Fintype.card (Option tm.Λ) +
+    (Fintype.card tm.σ +
+      (space * stackSymbolCount (tm := tm) + clockBits))
+
+/-- Reassociate one dependently typed stack cell into a runtime position and
+a value from the fixed finite machine alphabet. -/
+def stackCellPositionEquiv :
+    (Σ stack : tm.K, Fin space × Option (tm.Γ stack)) ≃
+      Fin space × (Σ stack : tm.K, Option (tm.Γ stack)) where
+  toFun cell := ⟨cell.2.1, ⟨cell.1, cell.2.2⟩⟩
+  invFun cell := ⟨cell.2.1, cell.1, cell.2.2⟩
+  left_inv cell := by rcases cell with ⟨stack, position, symbol⟩; rfl
+  right_inv cell := by rcases cell with ⟨position, stack, symbol⟩; rfl
+
+/-- Explicit position-major code for a bounded stack cell.  The only chosen
+finite equivalence concerns the fixed machine alphabet; runtime positions are
+combined by `finProdFinEquiv`'s arithmetic code. -/
+def stackCellEquivFin :
+    (Σ stack : tm.K, Fin space × Option (tm.Γ stack)) ≃
+      Fin (space * stackSymbolCount (tm := tm)) :=
+  stackCellPositionEquiv.trans
+    (((Equiv.refl (Fin space)).prodCongr
+      (Fintype.equivFin (Σ stack : tm.K, Option (tm.Γ stack)))).trans
+        finProdFinEquiv)
+
+/-- Collision-free affine layout of labels, controls, bounded cells, and
+clock bits.  Unlike `Fintype.equivFin` on the whole width-dependent atom type,
+this layout exposes all runtime dependence as addition and multiplication. -/
+def atomEquivFin :
+    BoundedMachineAtom tm space clockBits ≃
+      Fin (atomCount (tm := tm) (space := space)
+        (clockBits := clockBits)) := by
+  let cellsAndClock :
+      Fin (space * stackSymbolCount (tm := tm)) ⊕ Fin clockBits ≃
+        Fin (space * stackSymbolCount (tm := tm) + clockBits) :=
+    finSumFinEquiv
+  let statesCellsClock :
+      Fin (Fintype.card tm.σ) ⊕
+          (Fin (space * stackSymbolCount (tm := tm)) ⊕ Fin clockBits) ≃
+        Fin (Fintype.card tm.σ +
+          (space * stackSymbolCount (tm := tm) + clockBits)) :=
+    ((Equiv.refl (Fin (Fintype.card tm.σ))).sumCongr
+      cellsAndClock).trans finSumFinEquiv
+  let all :
+      Fin (Fintype.card (Option tm.Λ)) ⊕
+          (Fin (Fintype.card tm.σ) ⊕
+            (Fin (space * stackSymbolCount (tm := tm)) ⊕ Fin clockBits)) ≃
+        Fin (atomCount (tm := tm) (space := space)
+          (clockBits := clockBits)) :=
+    ((Equiv.refl (Fin (Fintype.card (Option tm.Λ)))).sumCongr
+      statesCellsClock).trans finSumFinEquiv
+  exact (BoundedMachineAtom.sumEquiv tm space clockBits).trans
+    (((Fintype.equivFin (Option tm.Λ)).sumCongr
+      ((Fintype.equivFin tm.σ).sumCongr
+        (stackCellEquivFin.sumCongr (Equiv.refl (Fin clockBits))))).trans all)
 
 /-- Cardinality formula underlying the finite source-atom allocation. -/
 theorem atomCount_eq_card_sum :
@@ -88,26 +148,35 @@ theorem atomCount_eq_card_sum :
         (Option tm.Λ ⊕ tm.σ ⊕
           ((Σ stack : tm.K, Fin space × Option (tm.Γ stack)) ⊕
             Fin clockBits)) := by
-  unfold atomCount
-  exact Fintype.card_congr (BoundedMachineAtom.sumEquiv tm space clockBits)
+  calc
+    atomCount (tm := tm) (space := space) (clockBits := clockBits) =
+        Fintype.card (BoundedMachineAtom tm space clockBits) := by
+      simpa using (Fintype.card_congr
+        (atomEquivFin (tm := tm) (space := space)
+          (clockBits := clockBits))).symm
+    _ = Fintype.card
+        (Option tm.Λ ⊕ tm.σ ⊕
+          ((Σ stack : tm.K, Fin space × Option (tm.Γ stack)) ⊕
+            Fin clockBits)) :=
+      Fintype.card_congr (BoundedMachineAtom.sumEquiv tm space clockBits)
 
 /-- Injectively name every typed source atom by a natural below `atomCount`. -/
 def code (atom : BoundedMachineAtom tm space clockBits) : Nat :=
-  (Fintype.equivFin (BoundedMachineAtom tm space clockBits) atom).val
+  (atomEquivFin atom).val
 
 @[simp]
 theorem code_lt_atomCount
     (atom : BoundedMachineAtom tm space clockBits) :
     code atom < atomCount (tm := tm) (space := space)
       (clockBits := clockBits) :=
-  (Fintype.equivFin (BoundedMachineAtom tm space clockBits) atom).isLt
+  (atomEquivFin atom).isLt
 
 theorem code_injective :
     Function.Injective
       (code (tm := tm) (space := space) (clockBits := clockBits)) := by
   intro first second equality
-  apply (Fintype.equivFin
-    (BoundedMachineAtom tm space clockBits)).injective
+  apply (atomEquivFin (tm := tm) (space := space)
+    (clockBits := clockBits)).injective
   apply Fin.ext
   exact equality
 

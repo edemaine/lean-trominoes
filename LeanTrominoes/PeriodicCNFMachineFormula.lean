@@ -155,10 +155,11 @@ theorem encode_toResetClockState_decode_below
             valuation).toResetClockState) atom = valuation atom := by
   intro atom atomLt
   let typed : BoundedMachineAtom tm space clockBits :=
-    (Fintype.equivFin (BoundedMachineAtom tm space clockBits)).symm
+    (atomEquivFin (tm := tm) (space := space)
+      (clockBits := clockBits)).symm
       ⟨atom, atomLt⟩
   have codeTyped : code typed = atom := by
-    simp [typed, code, atomCount]
+    simp [typed, code]
   rw [← codeTyped]
   exact encode_toResetClockState_decode_code wellFormed typed
 

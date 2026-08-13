@@ -74,8 +74,8 @@ Names beyond the finite source interval are false. -/
 def encode (state : ResetClockState tm.Cfg) (atom : Nat) : Bool :=
   if atomLt : atom < atomCount (tm := tm) (space := space)
       (clockBits := clockBits) then
-    value state ((Fintype.equivFin
-      (BoundedMachineAtom tm space clockBits)).symm ⟨atom, atomLt⟩)
+    value state ((atomEquivFin (tm := tm) (space := space)
+      (clockBits := clockBits)).symm ⟨atom, atomLt⟩)
   else
     false
 
