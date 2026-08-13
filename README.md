@@ -419,6 +419,8 @@ build; an imported proof counts when its statement matches the paper.
               footprint.
           - [ ] Fit normalization, center validity, overlap, and the complete
             flat packed transition.
+            - [x] Fit exact native-field target construction and membership.
+            - [ ] Bound target membership in its native input footprint.
           - [ ] Fit context recovery and the suffix-preserving Savitch driver,
             then package the flat evaluator as a PSPACE decider.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
