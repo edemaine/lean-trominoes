@@ -289,7 +289,7 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove the concrete normalized-drawing compiler computable.
       - [x] Assemble the final many-one reductions for both trominoes and
         derive the complete 2D `planeStatement` of Theorem 5.2.
-  - [ ] Prove PSPACE membership of the 1.5D problem for each tromino under the
+  - [x] Prove PSPACE membership of the 1.5D problem for each tromino under the
     target flat strip encoding.
     - [x] Characterize tilings by directed cycles in the finite strip-frontier
       graph and compile its indexed transition predicate.
@@ -323,7 +323,7 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Fit one complete coordinate-pair scanner step compositionally.
       - [x] Lift the step certificate through the exact motif-length countdown.
     - [x] Prove the flat well-formedness scan's evaluator-space certificate.
-    - [ ] Port the cycle-search input/context assembly and its evaluator-space
+    - [x] Port the cycle-search input/context assembly and its evaluator-space
       certificates to the target flat strip fields.
       - [x] Prove the generic Savitch structural step and complete iteration
         preserve an arbitrary variable-length context suffix exactly.
@@ -488,17 +488,17 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Fit one complete inner scan.
               - [x] Lift complete row scans through the first-endpoint
                 countdown.
-            - [ ] Assemble the flat well-formedness guard, search parameters,
+            - [x] Assemble the flat well-formedness guard, search parameters,
               and cycle scan into the final PSPACE decider.
               - [x] Stream the exact target-encoding length and compute the
                 Savitch depth and padded state bound on native flat fields.
               - [x] Compose the well-formedness guard and cycle scan, and
                 prove the resulting Boolean equivalent to strip tileability.
-              - [ ] Fit and polynomially bound the complete guarded evaluator.
+              - [x] Fit and polynomially bound the complete guarded evaluator.
                 - [x] Fit the exact streamed target-encoding-length fold in a
                   polynomial reserve over the native flat input footprint.
                 - [x] Fit the depth and padded-state-bound parameter pipeline.
-                - [ ] Fit the well-formedness guard and final cycle-search
+                - [x] Fit the well-formedness guard and final cycle-search
                   composition.
                   - [x] Fit every reachable native guard step and countdown
                     body within one input-linear workspace reserve.
@@ -508,9 +508,9 @@ build; an imported proof counts when its statement matches the paper.
                     final projection into the complete well-formedness guard.
                   - [x] Compose the guard, parameter assembly, and native
                     cycle search into one exact evaluator certificate.
-                  - [ ] Bound the combined exact cost by one explicit
+                  - [x] Bound the combined exact cost by one explicit
                     polynomial in the target encoding length.
-              - [ ] Package the evaluator certificate as flat-encoding PSPACE
+              - [x] Package the evaluator certificate as flat-encoding PSPACE
                 membership.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
@@ -627,10 +627,10 @@ the exact fetched dependency revision in the committed `lake-manifest.json`.
 The definition layer needed to state Theorem 5.2 is complete.  Its entire 2D
 conjunct is now proved: `periodicTrominoTiling_coRE` supplies the upper bound,
 and `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` supplies the
-matching Wang-tiling hardness reductions for both trominoes.  A complete 1.5D
-membership proof exists for the legacy recursively paired encoding; its input
-layer and bounds must now be ported to the flat target encoding while the
-PSPACE-hardness proof is completed.  The complete formal target remains
+matching Wang-tiling hardness reductions for both trominoes.  The 1.5D upper
+bound is now proved directly for the target flat encoding by
+`flatPeriodicStripTrominoTiling_inPSPACE`; the remaining 1.5D work is the
+PSPACE-hardness proof.  The complete formal target remains
 `LeanTrominoes.Theorem52.statement`, the conjunction of:
 
 - `planeStatement`: co-r.e.-completeness in 2D for each of the I and L
@@ -2045,6 +2045,19 @@ The representation choices for this target are:
   answer projection, and Boolean normalization.  Its final theorem absorbs
   all of these costs into one polynomial bound in the target flat encoding
   length.
+- [`LeanTrominoes/PartrecFlatStripCycle.lean`](LeanTrominoes/PartrecFlatStripCycle.lean)
+  and [`LeanTrominoes/PartrecFlatStripCycleSpace.lean`](LeanTrominoes/PartrecFlatStripCycleSpace.lean)
+  scan both frontier endpoints over the padded state space, preserve the
+  native strip suffix through every countdown, and decide whether the finite
+  strip-frontier graph contains a directed cycle within a polynomial
+  evaluator-space reserve.
+- [`LeanTrominoes/PartrecFlatStripDecider.lean`](LeanTrominoes/PartrecFlatStripDecider.lean)
+  and [`LeanTrominoes/PartrecFlatStripDeciderSpace.lean`](LeanTrominoes/PartrecFlatStripDeciderSpace.lean)
+  assemble the streamed target length, Savitch parameters, structural guard,
+  and cycle scan into the final native-flat Boolean evaluator.  The latter
+  mirrors the complete exact cost by an explicit polynomial and packages
+  `flatPeriodicStripTrominoTiling_inPSPACE` for
+  `PeriodicStripFlatEncoding.finEncoding`.
 - [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
   fits the strip-suffix projections, decodes both queried frontier indices
   into word and phase, and assembles the native seven-field packed-transition

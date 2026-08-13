@@ -1599,6 +1599,620 @@ theorem flatPeriodicStripTrominoTiling_fits
         (zeroCost fields))
     exact selected
 
+/-! ## Polynomial form of the cycle-search reserve -/
+
+set_option maxRecDepth 10000
+
+noncomputable def flatStripReachStateSpacePolynomial : Polynomial Nat :=
+  stripDFSPartrecSpacePolynomial + 43 * Polynomial.X + 10
+
+@[simp] theorem flatStripReachStateSpacePolynomial_eval (inputLength : Nat) :
+    flatStripReachStateSpacePolynomial.eval inputLength =
+      flatStripReachStateSpaceBound inputLength := by
+  simp [flatStripReachStateSpacePolynomial,
+    flatStripReachStateSpaceBound]
+
+noncomputable def flatStripFuelBitsPolynomial : Polynomial Nat :=
+  (21 * Polynomial.X + 2) * (21 * Polynomial.X + 5) + 1
+
+@[simp] theorem flatStripFuelBitsPolynomial_eval (inputLength : Nat) :
+    flatStripFuelBitsPolynomial.eval inputLength =
+      flatStripFuelBits inputLength := by
+  simp [flatStripFuelBitsPolynomial, flatStripFuelBits]
+
+noncomputable def flatStripReachPayloadSpacePolynomial : Polynomial Nat :=
+  flatStripReachStateSpacePolynomial + flatStripFuelBitsPolynomial + 2
+
+@[simp] theorem flatStripReachPayloadSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripReachPayloadSpacePolynomial.eval inputLength =
+      flatStripReachPayloadSpaceBound inputLength := by
+  simp [flatStripReachPayloadSpacePolynomial,
+    flatStripReachPayloadSpaceBound]
+
+noncomputable def flatStripLeafSpacePolynomial : Polynomial Nat :=
+  flatStripReachStateSpacePolynomial + 100 * Polynomial.X + 120
+
+@[simp] theorem flatStripLeafSpacePolynomial_eval (inputLength : Nat) :
+    flatStripLeafSpacePolynomial.eval inputLength =
+      flatStripLeafSpaceUnit inputLength := by
+  simp [flatStripLeafSpacePolynomial, flatStripLeafSpaceUnit]
+
+noncomputable def flatStripContextUniformSpacePolynomial : Polynomial Nat :=
+  1000000000000000000000000000000000000000000000000000000000000000 *
+      flatStripLeafSpacePolynomial +
+    1000000000000000000000000000000 * flatStripLeafSpacePolynomial +
+    1000000000 * flatStripLeafSpacePolynomial
+
+@[simp] theorem flatStripContextUniformSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripContextUniformSpacePolynomial.eval inputLength =
+      flatStripContextUniformSpaceBound inputLength := by
+  simp [flatStripContextUniformSpacePolynomial,
+    flatStripContextUniformSpaceBound]
+
+noncomputable def flatStripPackedTransitionUnitPolynomial : Polynomial Nat :=
+  8 * flatStripLeafSpacePolynomial + 10
+
+@[simp] theorem flatStripPackedTransitionUnitPolynomial_eval
+    (inputLength : Nat) :
+    flatStripPackedTransitionUnitPolynomial.eval inputLength =
+      flatStripPackedTransitionUnitBound inputLength := by
+  simp [flatStripPackedTransitionUnitPolynomial,
+    flatStripPackedTransitionUnitBound]
+
+noncomputable def flatPackedTransitionEnvelopePolynomial
+    (unit : Polynomial Nat) : Polynomial Nat :=
+  let normalizationBody :=
+    10000000000000000000000000000000000000000000000000000000000000000000000000000000000 *
+      unit ^ 2
+  let normalizationColumn :=
+    200000 * (normalizationBody * unit + unit + 1)
+  let normalizationLastTwo := 1000 * (normalizationColumn + 1)
+  let normalizationLastThree := 1000 * (normalizationLastTwo + 1)
+  let normalizationLastFour := 1000 * (normalizationLastThree + 1)
+  let normalizationAll := 1000 * (normalizationLastFour + 1)
+  let centerBody := (10 ^ 1100) * unit ^ 2
+  let centerValid := 200000 * (centerBody * unit + unit + 1)
+  let overlapBody := (10 ^ 1100) * unit ^ 2
+  let overlapColumn := 200000 * (overlapBody * unit + unit + 1)
+  let overlapLastTwo := 1000 * (overlapColumn + 1)
+  let overlapLastThree := 1000 * (overlapLastTwo + 1)
+  let overlapColumns := 1000 * (overlapLastThree + 1)
+  let phase := 100000000000000000000000000000000 * unit
+  let component :=
+    normalizationAll + centerValid + overlapColumns + phase + unit + 1
+  let overlap := 1000 * (component + 1)
+  let tail := 1000 * (overlap + 1)
+  1000 * (tail + 1)
+
+@[simp] theorem flatPackedTransitionEnvelopePolynomial_eval
+    (unit : Polynomial Nat) (inputLength : Nat) :
+    (flatPackedTransitionEnvelopePolynomial unit).eval inputLength =
+      flatPackedTransitionSpaceEnvelope (unit.eval inputLength) := by
+  simp [flatPackedTransitionEnvelopePolynomial,
+    flatPackedTransitionSpaceEnvelope]
+
+noncomputable def flatStripPackedTransitionUniformSpacePolynomial :
+    Polynomial Nat :=
+  flatPackedTransitionEnvelopePolynomial
+    flatStripPackedTransitionUnitPolynomial
+
+@[simp] theorem flatStripPackedTransitionUniformSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripPackedTransitionUniformSpacePolynomial.eval inputLength =
+      flatStripPackedTransitionUniformSpaceBound inputLength := by
+  simp [flatStripPackedTransitionUniformSpacePolynomial,
+    flatStripPackedTransitionUniformSpaceBound]
+
+noncomputable def flatStripTransitionUniformSpacePolynomial : Polynomial Nat :=
+  flatStripPackedTransitionUniformSpacePolynomial +
+    100 * flatStripContextUniformSpacePolynomial
+
+@[simp] theorem flatStripTransitionUniformSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripTransitionUniformSpacePolynomial.eval inputLength =
+      flatStripTransitionUniformSpaceBound inputLength := by
+  simp [flatStripTransitionUniformSpacePolynomial,
+    flatStripTransitionUniformSpaceBound]
+
+noncomputable def flatStripBaseUniformSpacePolynomial : Polynomial Nat :=
+  let unit := flatStripLeafSpacePolynomial
+  let context := flatStripContextUniformSpacePolynomial
+  let equality := 10000000000 * unit + context
+  let transition := flatStripPackedTransitionUniformSpacePolynomial +
+    100 * context
+  1000 *
+    (equality + transition + flatStripReachStateSpacePolynomial + 12 + 1)
+
+@[simp] theorem flatStripBaseUniformSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripBaseUniformSpacePolynomial.eval inputLength =
+      flatStripBaseUniformSpaceBound inputLength := by
+  simp [flatStripBaseUniformSpacePolynomial,
+    flatStripBaseUniformSpaceBound]
+
+noncomputable def flatStripSavitchStepSpacePolynomial : Polynomial Nat :=
+  1000000000000000000000000000000 *
+    (flatStripReachStateSpacePolynomial +
+      flatStripBaseUniformSpacePolynomial + 1)
+
+@[simp] theorem flatStripSavitchStepSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripSavitchStepSpacePolynomial.eval inputLength =
+      flatStripSavitchStepSpaceBound inputLength := by
+  simp [flatStripSavitchStepSpacePolynomial,
+    flatStripSavitchStepSpaceBound]
+
+noncomputable def flatStripSavitchBodySpacePolynomial : Polynomial Nat :=
+  100000 * (flatStripSavitchStepSpacePolynomial +
+    flatStripReachPayloadSpacePolynomial + 1)
+
+@[simp] theorem flatStripSavitchBodySpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripSavitchBodySpacePolynomial.eval inputLength =
+      flatStripSavitchBodySpaceBound inputLength := by
+  simp [flatStripSavitchBodySpacePolynomial,
+    flatStripSavitchBodySpaceBound]
+
+noncomputable def flatStripReachQuerySpacePolynomial : Polynomial Nat :=
+  100 * Polynomial.X + 100
+
+@[simp] theorem flatStripReachQuerySpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripReachQuerySpacePolynomial.eval inputLength =
+      flatStripReachQuerySpaceBound inputLength := by
+  simp [flatStripReachQuerySpacePolynomial,
+    flatStripReachQuerySpaceBound]
+
+noncomputable def flatStripFuelComputationSpacePolynomial : Polynomial Nat :=
+  1000000000000000000000000000000000000000000000000000000000000 *
+    (flatStripFuelBitsPolynomial + 100 * Polynomial.X + 100)
+
+@[simp] theorem flatStripFuelComputationSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripFuelComputationSpacePolynomial.eval inputLength =
+      flatStripFuelComputationSpaceBound inputLength := by
+  simp [flatStripFuelComputationSpacePolynomial,
+    flatStripFuelComputationSpaceBound]
+
+noncomputable def flatStripReachCallSpacePolynomial : Polynomial Nat :=
+  1000000000 *
+    (flatStripFuelComputationSpacePolynomial +
+      flatStripReachQuerySpacePolynomial +
+      flatStripReachPayloadSpacePolynomial +
+      flatStripSavitchBodySpacePolynomial + 1)
+
+@[simp] theorem flatStripReachCallSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripReachCallSpacePolynomial.eval inputLength =
+      flatStripReachCallSpaceBound inputLength := by
+  simp [flatStripReachCallSpacePolynomial,
+    flatStripReachCallSpaceBound]
+
+noncomputable def flatStripCycleListSpacePolynomial : Polynomial Nat :=
+  100 * (flatStripReachQuerySpacePolynomial +
+    flatStripReachStateSpacePolynomial + 1)
+
+@[simp] theorem flatStripCycleListSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleListSpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleListSpaceBound inputLength := by
+  simp [flatStripCycleListSpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleListSpaceBound]
+
+noncomputable def flatStripCycleAdapterSpacePolynomial : Polynomial Nat :=
+  1000000000 * (flatStripCycleListSpacePolynomial + 1)
+
+@[simp] theorem flatStripCycleAdapterSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleAdapterSpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleAdapterSpaceBound inputLength := by
+  simp [flatStripCycleAdapterSpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleAdapterSpaceBound]
+
+noncomputable def flatStripCycleCandidateComponentPolynomial : Polynomial Nat :=
+  flatStripTransitionUniformSpacePolynomial +
+    flatStripReachCallSpacePolynomial +
+    2 * flatStripCycleAdapterSpacePolynomial +
+    flatStripCycleListSpacePolynomial + 10
+
+@[simp] theorem flatStripCycleCandidateComponentPolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleCandidateComponentPolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleCandidateComponentBound
+        inputLength := by
+  simp [flatStripCycleCandidateComponentPolynomial,
+    FlatStripCyclePartrec.flatStripCycleCandidateComponentBound]
+
+noncomputable def flatStripCycleCandidateSpacePolynomial : Polynomial Nat :=
+  1000000000000 * (flatStripCycleCandidateComponentPolynomial + 1)
+
+@[simp] theorem flatStripCycleCandidateSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleCandidateSpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleCandidateSpaceBound inputLength := by
+  simp [flatStripCycleCandidateSpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleCandidateSpaceBound]
+
+noncomputable def flatStripCycleLoopSpacePolynomial : Polynomial Nat :=
+  4 * (flatStripCycleListSpacePolynomial + 1)
+
+@[simp] theorem flatStripCycleLoopSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleLoopSpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleLoopSpaceBound inputLength := by
+  simp [flatStripCycleLoopSpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleLoopSpaceBound]
+
+noncomputable def flatStripCycleCandidateBodySpacePolynomial : Polynomial Nat :=
+  100000 * (flatStripCycleCandidateSpacePolynomial +
+    flatStripCycleLoopSpacePolynomial + 1)
+
+@[simp] theorem flatStripCycleCandidateBodySpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleCandidateBodySpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleCandidateBodySpaceBound
+        inputLength := by
+  simp [flatStripCycleCandidateBodySpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleCandidateBodySpaceBound]
+
+noncomputable def flatStripCycleInnerScanSpacePolynomial : Polynomial Nat :=
+  1000 * (flatStripCycleCandidateBodySpacePolynomial +
+    2 * flatStripCycleAdapterSpacePolynomial + 1)
+
+@[simp] theorem flatStripCycleInnerScanSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleInnerScanSpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleInnerScanSpaceBound inputLength := by
+  simp [flatStripCycleInnerScanSpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleInnerScanSpaceBound]
+
+noncomputable def flatStripCycleOuterBodySpacePolynomial : Polynomial Nat :=
+  100000 * (flatStripCycleInnerScanSpacePolynomial +
+    flatStripCycleLoopSpacePolynomial + 1)
+
+@[simp] theorem flatStripCycleOuterBodySpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleOuterBodySpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleOuterBodySpaceBound inputLength := by
+  simp [flatStripCycleOuterBodySpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleOuterBodySpaceBound]
+
+noncomputable def flatStripCycleSearchSpacePolynomial : Polynomial Nat :=
+  100000 * (flatStripCycleOuterBodySpacePolynomial +
+    flatStripCycleAdapterSpacePolynomial +
+    flatStripCycleListSpacePolynomial + 1)
+
+@[simp] theorem flatStripCycleSearchSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatStripCycleSearchSpacePolynomial.eval inputLength =
+      FlatStripCyclePartrec.flatStripCycleSearchSpaceBound inputLength := by
+  simp [flatStripCycleSearchSpacePolynomial,
+    FlatStripCyclePartrec.flatStripCycleSearchSpaceBound]
+
+/-! ## Polynomial bound for parameter preparation and guarding -/
+
+def flatStripParameterComponentBound (inputLength : Nat) : Nat :=
+  1000000000000000000000000000000000000000000000000000000000000 *
+    (inputLength + 1)
+
+def flatStripParameterSpaceBound (inputLength : Nat) : Nat :=
+  1000000000 * flatStripParameterComponentBound inputLength
+
+set_option maxHeartbeats 1000000 in
+theorem flatStripEncodedListSpaceInputCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    flatStripEncodedListSpaceInputCost
+        (PeriodicStripFlatEncoding.stripFields periodicStrip) ≤
+      flatStripParameterComponentBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let motifLength := periodicStrip.motif.length
+  have inputSpace : encodedListSpace fields = inputLength := by
+    simp [fields, inputLength,
+      PeriodicStripFlatEncoding.finEncoding_encode_length,
+      encodedListSpace_eq_sum]
+  have motifLengthBound :=
+    PeriodicStripFlatEncoding.motif_length_le_encoding_length periodicStrip
+  have get2 := listCodeGetCost_le_linear 2 fields
+  have zero := listCodeZeroCost_le_linear fields
+  have identity := StripSavitchStep.idCost_le_linear fields
+  have addition := natAddCost_le_linear motifLength motifLength
+  have addConstant := addConstCost_le 3 [motifLength + motifLength]
+  have motifBits := encodeNat_length_le_self motifLength
+  have doubledBits := encodeNat_length_le_self (motifLength + motifLength)
+  have countBits := encodeNat_length_le_self
+    (motifLength + motifLength + 3)
+  have additionLimitBits := encodeNat_length_le_self
+    (2 * (motifLength + motifLength) + 4)
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  change flatStripEncodedListSpaceInputCost fields ≤ _
+  have fieldTwo : fields[2]?.getD 0 = motifLength := by
+    simp [fields, motifLength, PeriodicStripFlatEncoding.stripFields]
+  simp only [flatStripEncodedListSpaceInputCost,
+    flatStripFieldCountCost, fieldTwo, prependCost, List.headI_cons]
+  simp [flatStripParameterComponentBound,
+    inputLength, motifLength,
+    fields, PeriodicStripFlatEncoding.stripFields,
+    encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+    at inputSpace motifLengthBound get2 zero identity addition addConstant
+      motifBits doubledBits countBits additionLimitBits ⊢
+  simp only [fields, PeriodicStripFlatEncoding.stripFields] at fieldTwo
+  rw [fieldTwo] at *
+  omega
+
+set_option maxHeartbeats 1000000 in
+theorem flatStripEncodedListSpaceCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    flatStripEncodedListSpaceCost periodicStrip ≤
+      2 * flatStripParameterComponentBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  have input := flatStripEncodedListSpaceInputCost_le_input periodicStrip
+  have fieldsSpace : encodedListSpace
+      (PeriodicStripFlatEncoding.stripFields periodicStrip) =
+      (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+    simp [PeriodicStripFlatEncoding.finEncoding_encode_length,
+      encodedListSpace_eq_sum]
+  simp only [flatStripEncodedListSpaceCost,
+    encodedListSpaceLoopSpaceBound, encodedListSpaceStepSpaceBound,
+    flatStripParameterComponentBound] at input ⊢
+  rw [fieldsSpace]
+  omega
+
+theorem flatStripSearchDepthCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    flatStripSearchDepthCost periodicStrip ≤
+      10 * flatStripParameterComponentBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  have fieldsSpace : encodedListSpace fields = inputLength := by
+    simp [fields, inputLength,
+      PeriodicStripFlatEncoding.finEncoding_encode_length,
+      encodedListSpace_eq_sum]
+  have encodedCost := flatStripEncodedListSpaceCost_le_input periodicStrip
+  have oneCostBound := StripSavitchStep.oneCost_le_linear fields
+  have inputLengthBits := encodeNat_length_le_self inputLength
+  have inputLengthDef :
+      (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length =
+        inputLength := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  change flatStripSearchDepthLoopCost inputLength +
+      flatStripSearchDepthInputCost periodicStrip ≤ _
+  simp only [flatStripSearchDepthLoopCost,
+    flatStripSearchDepthInputCost, prependCost, List.headI_cons]
+  simp [fields, inputLength, encodedListSpace_cons,
+    encodedListSpace_nil, oneBits] at fieldsSpace encodedCost oneCostBound ⊢
+  simp only [flatStripParameterComponentBound] at encodedCost ⊢
+  rw [inputLengthDef] at *
+  omega
+
+theorem flatStripPowerTwoCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    powerTwoCost (flatStripSearchDepth periodicStrip) ≤
+      flatStripParameterComponentBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let depth := flatStripSearchDepth periodicStrip
+  have depthEq : depth = 21 * inputLength + 1 := by
+    rfl
+  have depthBits := encodeNat_length_le_self depth
+  have depthSuccessorBits := encodeNat_succ_length_le depth
+  have stateBoundPow : 2 ^ depth < 2 ^ (depth + 1) :=
+    Nat.pow_lt_pow_right (by omega) (by omega)
+  have stateBoundBits := Turing.PartrecToTM2.encodeNat_length_le_of_lt_pow
+    (2 ^ depth) (depth + 1) stateBoundPow
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  change powerTwoCost depth ≤ flatStripParameterComponentBound inputLength
+  simp [powerTwoCost, powerTwoInputCost, powerTwoLoopCost,
+    prependCost, idCost, headCost, nilCost, oneCost,
+    zeroCost, zeroPrimeCost, tailCost, succCost,
+    flatStripParameterComponentBound,
+    encodedListSpace_cons, encodedListSpace_nil,
+    zeroBits, oneBits] at depthBits depthSuccessorBits stateBoundBits ⊢
+  omega
+
+theorem flatStripStateBoundCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    flatStripStateBoundCost periodicStrip ≤
+      11 * flatStripParameterComponentBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  have power := flatStripPowerTwoCost_le_input periodicStrip
+  have depth := flatStripSearchDepthCost_le_input periodicStrip
+  simp only [flatStripStateBoundCost]
+  omega
+
+theorem flatStripCycleParametersCost_le_input
+    (periodicStrip : PeriodicStrip) :
+    flatStripCycleParametersCost periodicStrip ≤
+      flatStripParameterSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  let depth := flatStripSearchDepth periodicStrip
+  let stateBound := flatStripStateBound periodicStrip
+  have fieldsSpace : encodedListSpace fields = inputLength := by
+    simp [fields, inputLength,
+      PeriodicStripFlatEncoding.finEncoding_encode_length,
+      encodedListSpace_eq_sum]
+  have depthCost := flatStripSearchDepthCost_le_input periodicStrip
+  have stateCost := flatStripStateBoundCost_le_input periodicStrip
+  have identity := StripSavitchStep.idCost_le_linear fields
+  have depthEq : depth = 21 * inputLength + 1 := by rfl
+  have depthBits := encodeNat_length_le_self depth
+  have stateBoundPow : stateBound < 2 ^ (depth + 1) := by
+    simp only [stateBound, flatStripStateBound]
+    exact Nat.pow_lt_pow_right (by omega) (by omega)
+  have stateBoundBits := Turing.PartrecToTM2.encodeNat_length_le_of_lt_pow
+    stateBound (depth + 1) stateBoundPow
+  change flatStripCycleParametersCost periodicStrip ≤ _
+  simp only [flatStripCycleParametersCost, prependCost, List.headI_cons]
+  simp [fields, inputLength, depth, stateBound,
+    encodedListSpace_cons, encodedListSpace_nil]
+    at fieldsSpace depthCost stateCost identity depthBits stateBoundBits ⊢
+  simp only [flatStripParameterSpaceBound,
+    flatStripParameterComponentBound] at depthCost stateCost ⊢
+  omega
+
+def flatPeriodicStripTrominoTilingSpaceBound (inputLength : Nat) : Nat :=
+  1000000 *
+    (FlatStripCyclePartrec.flatStripCycleSearchSpaceBound inputLength +
+      flatStripParameterSpaceBound inputLength +
+      flatStripWellFormedSpaceBound inputLength + inputLength + 1)
+
+noncomputable def flatPeriodicStripTrominoTilingSpacePolynomial :
+    Polynomial Nat :=
+  1000000 *
+    (flatStripCycleSearchSpacePolynomial +
+      1000000000 *
+        (1000000000000000000000000000000000000000000000000000000000000 *
+          (Polynomial.X + 1)) +
+      3 *
+        (1000000000000000000000000000000000000000000000000000000000000 *
+          (Polynomial.X + 1)) +
+      Polynomial.X + 1)
+
+@[simp] theorem flatPeriodicStripTrominoTilingSpacePolynomial_eval
+    (inputLength : Nat) :
+    flatPeriodicStripTrominoTilingSpacePolynomial.eval inputLength =
+      flatPeriodicStripTrominoTilingSpaceBound inputLength := by
+  simp [flatPeriodicStripTrominoTilingSpacePolynomial,
+    flatPeriodicStripTrominoTilingSpaceBound,
+    flatStripParameterSpaceBound, flatStripParameterComponentBound,
+    flatStripWellFormedSpaceBound, flatStripGuardLoopSpaceBound]
+
+set_option maxHeartbeats 1000000 in
+theorem flatPeriodicStripTrominoTilingCost_le_spaceBound
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    flatPeriodicStripTrominoTilingCost tromino periodicStrip ≤
+      flatPeriodicStripTrominoTilingSpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length := by
+  let fields := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let inputLength :=
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  have fieldsSpace : encodedListSpace fields = inputLength := by
+    simp [fields, inputLength,
+      PeriodicStripFlatEncoding.finEncoding_encode_length,
+      encodedListSpace_eq_sum]
+  have guardSpace := congrArg flatStripWellFormedSpaceBound fieldsSpace
+  have parameterCost := flatStripCycleParametersCost_le_input periodicStrip
+  have identity := StripSavitchStep.idCost_le_linear fields
+  have zeroBranch := listCodeZeroCost_le_linear fields
+  have testZeroTail := listCodeTailCost_le_linear (0 :: fields)
+  have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+  have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+  by_cases wellFormed : periodicStrip.IsWellFormed
+  · have wellFormedBool : periodicStrip.wellFormed = true :=
+      (periodicStrip.wellFormed_eq_true_iff).mpr wellFormed
+    let result := flatPeriodicStripTrominoTilingBool tromino periodicStrip
+    have outputSpace : encodedListSpace [Encodable.encode result] ≤ 2 := by
+      cases result <;> decide
+    change flatPeriodicStripTrominoTilingCost tromino periodicStrip ≤ _
+    simp only [flatPeriodicStripTrominoTilingCost, dif_pos wellFormed,
+      flatStripCycleBranchCost, branchZeroSuccCost,
+      branchZeroZeroCost, branchZeroTestCost, prependCost,
+      List.headI_cons]
+    simp [fields, inputLength, result, wellFormedBool,
+      encodedListSpace_cons, encodedListSpace_nil, zeroBits, oneBits]
+      at fieldsSpace parameterCost identity zeroBranch testZeroTail
+        guardSpace outputSpace ⊢
+    simp only [flatPeriodicStripTrominoTilingSpaceBound] at ⊢
+    omega
+  · have wellFormedBool : periodicStrip.wellFormed = false := by
+      apply Bool.eq_false_iff.mpr
+      intro true
+      exact wellFormed
+        ((periodicStrip.wellFormed_eq_true_iff).mp true)
+    have outputSpace : encodedListSpace
+        [Encodable.encode
+          (flatPeriodicStripTrominoTilingBool tromino periodicStrip)] ≤ 2 := by
+      simpa [flatPeriodicStripTrominoTilingBool, wellFormed,
+        encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+    change flatPeriodicStripTrominoTilingCost tromino periodicStrip ≤ _
+    simp only [flatPeriodicStripTrominoTilingCost, dif_neg wellFormed,
+      branchZeroZeroCost, branchZeroTestCost, prependCost,
+      List.headI_cons]
+    simp [fields, inputLength, wellFormedBool,
+      flatPeriodicStripTrominoTilingBool, wellFormed,
+      encodedListSpace_cons, encodedListSpace_nil, zeroBits, oneBits]
+      at fieldsSpace parameterCost identity zeroBranch testZeroTail
+        guardSpace outputSpace ⊢
+    simp only [flatPeriodicStripTrominoTilingSpaceBound] at ⊢
+    omega
+
+/-- Complete native-flat decider under its explicit polynomial reserve. -/
+theorem flatPeriodicStripTrominoTiling_fits_polynomial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    EvaluatorCodeFits (flatPeriodicStripTrominoTilingCode tromino)
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      [Encodable.encode
+        (flatPeriodicStripTrominoTilingBool tromino periodicStrip)]
+      (flatPeriodicStripTrominoTilingSpacePolynomial.eval
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) := by
+  rw [flatPeriodicStripTrominoTilingSpacePolynomial_eval]
+  exact (flatPeriodicStripTrominoTiling_fits tromino periodicStrip).mono
+    (flatPeriodicStripTrominoTilingCost_le_spaceBound
+      tromino periodicStrip)
+
+/-- Complete run-level certificate for the native-flat evaluator. -/
+theorem flatPeriodicStripTrominoTiling_run_fits
+    (tromino : Tromino) (periodicStrip : PeriodicStrip) :
+    EvaluatorRunFits (flatPeriodicStripTrominoTilingCode tromino)
+      (PeriodicStripFlatEncoding.stripFields periodicStrip)
+      (flatPeriodicStripTrominoTilingSpacePolynomial.eval
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) := by
+  have fit := flatPeriodicStripTrominoTiling_fits_polynomial
+    tromino periodicStrip
+  let bound := flatPeriodicStripTrominoTilingSpacePolynomial.eval
+    (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+  have after : EvaluatorExecutionFits bound
+      (.ret Turing.ToPartrec.Cont.halt
+        [Encodable.encode
+          (flatPeriodicStripTrominoTilingBool tromino periodicStrip)]) :=
+    EvaluatorExecutionFits.ret_halt (by
+      simpa [bound] using fit.output_space)
+  have call := fit.call Turing.ToPartrec.Cont.halt bound (by
+    simp [bound, continuationSpace, trContStack]) after
+  exact EvaluatorRunFits.of_call call
+
+/-- Explicit polynomial-space decider for periodic strip tiling under the
+target native flat encoding. -/
+noncomputable def flatPeriodicStripTrominoTiling_deciderInPolySpace
+    (tromino : Tromino) :
+    Complexity.DeciderInPolySpace PeriodicStripFlatEncoding.finEncoding
+      (PeriodicStripTrominoTiling tromino) := by
+  simpa [PeriodicStripFlatEncoding.finEncoding] using
+    Turing.PartrecToTM2.deciderInPolySpace_of_flatEvaluatorRunFits
+      PeriodicStripFlatEncoding.stripFields
+      PeriodicStripFlatEncoding.decodeStripFields
+      PeriodicStripFlatEncoding.decodeStripFields_stripFields
+      (flatPeriodicStripTrominoTilingCode tromino)
+      (flatPeriodicStripTrominoTilingBool tromino)
+      (flatPeriodicStripTrominoTilingBool_eq_true_iff tromino)
+      (fun periodicStrip => by
+        simpa using congrArg (fun result =>
+          [Encodable.encode
+            (flatPeriodicStripTrominoTilingBool tromino periodicStrip)] ∈
+              result)
+          (flatPeriodicStripTrominoTilingCode_eval
+            tromino periodicStrip))
+      flatPeriodicStripTrominoTilingSpacePolynomial
+      (flatPeriodicStripTrominoTiling_run_fits tromino)
+
+/-- The 1.5D periodic tromino tiling problem belongs to PSPACE for every
+tromino, measured in the target flat presentation encoding. -/
+theorem flatPeriodicStripTrominoTiling_inPSPACE (tromino : Tromino) :
+    Complexity.InPSPACE PeriodicStripFlatEncoding.finEncoding
+      (PeriodicStripTrominoTiling tromino) :=
+  ⟨flatPeriodicStripTrominoTiling_deciderInPolySpace tromino⟩
+
 end FlatStripDeciderPartrec
 end RawWindowState
 end PeriodicStrip
