@@ -355,6 +355,8 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Port one fixed center-placement candidate to flat motif fields,
           retaining the coordinate stream across assignment and containment
           scans.
+        - [x] Conjoin all eight fixed center-placement candidates into the
+          complete containment predicate for one motif base.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
