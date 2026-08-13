@@ -437,9 +437,9 @@ build; an imported proof counts when its statement matches the paper.
                 candidate footprint.
             - [ ] Fit and bound per-base center validity.
               - [x] Lift containment through the eight square symmetries.
-              - [ ] Fit and bound exact-one covering placement counts.
+              - [x] Fit and bound exact-one covering placement counts.
                 - [x] Fit one reconstructed covering-placement query.
-                - [ ] Sum the fixed candidate list and compare with one.
+                - [x] Sum the fixed candidate list and compare with one.
               - [ ] Combine phase, containment, and coverage at one base.
             - [ ] Lift bounded center validity across the motif.
             - [x] Fit exact native-field target construction and membership.
@@ -1962,6 +1962,12 @@ The representation choices for this target are:
   fits every coordinate-pair step, lifts the fits through the exact flat
   countdown, and bounds header preparation, the complete scan, and result
   projection quadratically in the target flat input length.
+- [`LeanTrominoes/PartrecFlatPackedCenterCoverageSpace.lean`](LeanTrominoes/PartrecFlatPackedCenterCoverageSpace.lean)
+  fits the 24 fixed center-covering candidate tests, their exact sum, and the
+  final comparison with one over the native flat motif fields.  Reconstructed
+  target queries have a uniform quadratic bound, which is lifted through the
+  compile-time candidate list to a quadratic evaluator-space certificate for
+  exact-one coverage.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to

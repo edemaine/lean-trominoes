@@ -146,6 +146,154 @@ theorem flatPackedCenterCoveringCandidateCost_le_bound
       packed.assignmentWord)
     _
 
+/-! ## Native quadratic bound -/
+
+/-- A uniform linear allowance for constructing any center-covering target
+whose compile-time vertical offset has magnitude at most four. -/
+def flatPackedCenterCoveringConstructorLinearCoefficient : Nat := 10 ^ 62
+
+/-- A deliberately coarse uniform coefficient for a center-covering
+candidate.  The candidate list is compile-time data, so this coefficient is
+independent of the input motif. -/
+def flatPackedCenterCoveringCandidateQuadraticCoefficient : Nat := 10 ^ 500
+
+set_option maxRecDepth 1000000 in
+set_option maxHeartbeats 2000000 in
+theorem flatPackedCenterCoveringCandidateSpaceBound_le_quadratic
+    (symmetry : SquareSymmetry) (source : Cell)
+    (periodicStrip : PeriodicStrip)
+    (packed : PackedWindowState) (base : Cell)
+    (offsetSmall : intOffsetAmount (-(symmetry.act source).2) ≤ 4) :
+    flatPackedCenterCoveringCandidateSpaceBound symmetry source
+        periodicStrip packed base ≤
+      flatPackedCenterCoveringCandidateQuadraticCoefficient *
+        (flatPackedCenterCandidateInputUnit periodicStrip packed base) ^ 2 := by
+  let column := Code.packedCoveringColumn symmetry source
+  let offset := -(symmetry.act source).2
+  let unit := flatPackedCenterCandidateInputUnit periodicStrip packed base
+  let native := flatPackedTargetMembershipNativeInputSpace column offset
+    periodicStrip.period packed.phase periodicStrip.motif base.2
+    packed.assignmentWord
+  let constructorBudget := flatPackedTargetConstructorBudget column offset
+    periodicStrip.period packed.phase periodicStrip.motif base.2
+    packed.assignmentWord
+  have unitPositive : 1 ≤ unit := by
+    simp [unit, flatPackedCenterCandidateInputUnit]
+  have unitQuadratic : unit ≤ unit ^ 2 := by nlinarith
+  have amountBound : intOffsetAmount offset + 1 ≤ 5 := by
+    simp only [offset]
+    omega
+  have nativeBound : native ≤ 2 * unit := by
+    simpa [native, column, offset, unit] using
+      flatPackedCenterTargetNativeInput_le_candidate column offset
+        periodicStrip packed base (by simpa [offset] using offsetSmall)
+  have constructorCoefficientBound :
+      10 *
+          1000000000000000000000000000000000000000000000000000000000000 ≤
+        flatPackedCenterCoveringConstructorLinearCoefficient := by
+    native_decide
+  have constructorBound : constructorBudget ≤
+      flatPackedCenterCoveringConstructorLinearCoefficient * unit := by
+    calc
+      constructorBudget =
+          1000000000000000000000000000000000000000000000000000000000000 *
+            (intOffsetAmount offset + 1) * native := by
+        rfl
+      _ ≤ 1000000000000000000000000000000000000000000000000000000000000 *
+            5 * (2 * unit) := by gcongr
+      _ = (10 *
+          1000000000000000000000000000000000000000000000000000000000000) *
+            unit := by ring
+      _ ≤ flatPackedCenterCoveringConstructorLinearCoefficient * unit :=
+        Nat.mul_le_mul_right unit constructorCoefficientBound
+  have assignmentNative :
+      flatPackedAssignmentLookupNativeInputSpace periodicStrip.motif column.val
+          (Code.packedCenterCoveringTarget periodicStrip packed base
+            symmetry source) packed.assignmentWord ≤
+        3 * constructorBudget := by
+    have raw := flatPackedTargetAssignmentInputSpace_le_constructor column
+      offset periodicStrip.period packed.phase periodicStrip.motif base.2
+      packed.assignmentWord
+    simp only at raw
+    rw [← flatPackedCenterCoveringTarget_eq_targetMembership symmetry source
+      periodicStrip packed base] at raw
+    simpa [column, offset, constructorBudget] using raw
+  have predicate :=
+    flatPackedAssignmentPredicateSpaceBound_le_native_quadratic
+      periodicStrip.motif column.val
+      (Code.packedCenterCoveringTarget periodicStrip packed base
+        symmetry source) packed.assignmentWord
+  have predicateGlobal :
+      flatPackedAssignmentPredicateSpaceBound periodicStrip.motif column.val
+          (Code.packedCenterCoveringTarget periodicStrip packed base
+            symmetry source) packed.assignmentWord ≤
+        (10000000000000000000000000000000000000000000000000000000000 *
+          (3 * flatPackedCenterCoveringConstructorLinearCoefficient) ^ 2) *
+            unit ^ 2 := by
+    calc
+      _ ≤ 10000000000000000000000000000000000000000000000000000000000 *
+          (flatPackedAssignmentLookupNativeInputSpace periodicStrip.motif
+            column.val
+            (Code.packedCenterCoveringTarget periodicStrip packed base
+              symmetry source) packed.assignmentWord) ^ 2 := predicate
+      _ ≤ 10000000000000000000000000000000000000000000000000000000000 *
+          (3 * constructorBudget) ^ 2 := by gcongr
+      _ ≤ 10000000000000000000000000000000000000000000000000000000000 *
+          (3 * (flatPackedCenterCoveringConstructorLinearCoefficient *
+            unit)) ^ 2 := by gcongr
+      _ = (10000000000000000000000000000000000000000000000000000000000 *
+          (3 * flatPackedCenterCoveringConstructorLinearCoefficient) ^ 2) *
+            unit ^ 2 := by ring
+  have lookupArguments :=
+    flatPackedTargetMembershipLookupArgumentsCost_le_constructor column offset
+      periodicStrip.period packed.phase periodicStrip.motif base.2
+      packed.assignmentWord
+  have sourceArguments := flatPackedCenterSourceInputCost_le_linear
+    periodicStrip packed base
+  have argumentsGlobal :
+      flatPackedCenterCoveringAssignmentArgumentsCost symmetry source
+          periodicStrip packed base ≤
+        (100 * flatPackedCenterCoveringConstructorLinearCoefficient +
+          1000000000) * unit ^ 2 := by
+    simp only [flatPackedCenterCoveringAssignmentArgumentsCost,
+      column, offset] at lookupArguments ⊢
+    calc
+      _ ≤ 100 * constructorBudget + 1000000000 * unit :=
+        Nat.add_le_add lookupArguments sourceArguments
+      _ ≤ (100 * flatPackedCenterCoveringConstructorLinearCoefficient +
+            1000000000) * unit := by
+        calc
+          _ ≤ 100 *
+                (flatPackedCenterCoveringConstructorLinearCoefficient * unit) +
+              1000000000 * unit := by gcongr
+          _ = (100 * flatPackedCenterCoveringConstructorLinearCoefficient +
+                1000000000) * unit := by ring
+      _ ≤ (100 * flatPackedCenterCoveringConstructorLinearCoefficient +
+            1000000000) * unit ^ 2 :=
+        Nat.mul_le_mul_left _ unitQuadratic
+  have coefficientBound :
+      10000000000000000000000000000000000000000000000000000000000 *
+            (3 * flatPackedCenterCoveringConstructorLinearCoefficient) ^ 2 +
+          (100 * flatPackedCenterCoveringConstructorLinearCoefficient +
+            1000000000) ≤
+        flatPackedCenterCoveringCandidateQuadraticCoefficient := by
+    native_decide
+  change flatPackedAssignmentPredicateSpaceBound periodicStrip.motif
+        column.val
+        (Code.packedCenterCoveringTarget periodicStrip packed base
+          symmetry source) packed.assignmentWord +
+      flatPackedCenterCoveringAssignmentArgumentsCost symmetry source
+        periodicStrip packed base ≤
+    flatPackedCenterCoveringCandidateQuadraticCoefficient * unit ^ 2
+  calc
+    _ ≤ (10000000000000000000000000000000000000000000000000000000000 *
+            (3 * flatPackedCenterCoveringConstructorLinearCoefficient) ^ 2 +
+          (100 * flatPackedCenterCoveringConstructorLinearCoefficient +
+            1000000000)) * unit ^ 2 := by
+      nlinarith
+    _ ≤ flatPackedCenterCoveringCandidateQuadraticCoefficient * unit ^ 2 :=
+      Nat.mul_le_mul_right (unit ^ 2) coefficientBound
+
 /-- Exact fitted execution of one active covering-placement test. -/
 theorem flatPackedCenterCoveringCandidate
     (tromino : Tromino) (symmetry : SquareSymmetry)
