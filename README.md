@@ -404,6 +404,10 @@ build; an imported proof counts when its statement matches the paper.
             additive evaluator cost over native motif fields.
           - [ ] Bound the five-column assignment lookup and fit its predicate
             wrappers.
+            - [x] Place every reachable one-column scanner call in one common
+              five-pass quadratic envelope.
+            - [ ] Bound one complete numbered stage, unroll all five, and
+              bound initialization/projection.
           - [ ] Fit normalization, center validity, overlap, and the complete
             flat packed transition.
           - [ ] Fit context recovery and the suffix-preserving Savitch driver,
