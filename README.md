@@ -379,7 +379,9 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Fit the complete one-column countdown with an exact additive
             evaluator cost.
           - [ ] Bound that countdown cost by the original flat motif stream.
-          - [ ] Fit the five-column assignment lookup and its predicate
+          - [x] Fit the complete five-column assignment lookup with an exact
+            additive evaluator cost over native motif fields.
+          - [ ] Bound the five-column assignment lookup and fit its predicate
             wrappers.
           - [ ] Fit normalization, center validity, overlap, and the complete
             flat packed transition.

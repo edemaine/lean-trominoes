@@ -568,8 +568,6 @@ theorem flatPackedLookupFlatFoundBodyCall
           continuation) bound
         (by
           simp only [continuationSpace_fix]
-          change flatPackedLookupBodyZeroCost state +
-              continuationSpace continuation ≤ bound
           exact budget)
         fixedAfter
   | succ steps induction =>
@@ -790,8 +788,6 @@ theorem flatPackedLookupFlatBodyCall
               continuation) bound
             (by
               simp only [continuationSpace_fix]
-              change flatPackedLookupBodyZeroCost state +
-                  continuationSpace continuation ≤ bound
               exact budget)
             fixedAfter
       | cons cell remaining induction =>
