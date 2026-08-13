@@ -872,6 +872,7 @@ import LeanTrominoes.PartrecDivisionSpace
 import LeanTrominoes.PartrecFlatIteration
 import LeanTrominoes.PartrecFlatIterationSpace
 import LeanTrominoes.PartrecFlatMotifIndex
+import LeanTrominoes.PartrecFlatMotifIndexSpace
 import LeanTrominoes.PartrecDynamicDrop
 import LeanTrominoes.PartrecDynamicDropSpace
 import LeanTrominoes.PartrecFlatSavitchContext

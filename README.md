@@ -421,6 +421,10 @@ build; an imported proof counts when its statement matches the paper.
             flat packed transition.
             - [x] Fit and linearly bound runtime suffix selection for dynamic
               flat motif indexing.
+            - [x] Fit exact offset construction and coordinate projection for
+              dynamic flat motif indexing.
+            - [ ] Bound dynamic motif indexing on reachable transition scan
+              states.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
               - [x] Bound target-header reconstruction and both coordinate
