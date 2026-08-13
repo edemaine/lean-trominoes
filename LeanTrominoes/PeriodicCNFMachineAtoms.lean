@@ -141,6 +141,35 @@ def atomEquivFin :
       ((Fintype.equivFin tm.σ).sumCongr
         (stackCellEquivFin.sumCongr (Equiv.refl (Fin clockBits))))).trans all)
 
+/-- Fixed machine-dependent code for an optional control label. -/
+def labelCode (value : Option tm.Λ) : Nat :=
+  (Fintype.equivFin (Option tm.Λ) value).val
+
+/-- Fixed machine-dependent code for an internal control state. -/
+def stateCode (value : tm.σ) : Nat :=
+  (Fintype.equivFin tm.σ value).val
+
+/-- Fixed machine-dependent code for a stack and optional stack symbol. -/
+def stackSymbolCode (value : Σ stack : tm.K, Option (tm.Γ stack)) : Nat :=
+  (Fintype.equivFin (Σ stack : tm.K, Option (tm.Γ stack)) value).val
+
+@[simp]
+theorem labelCode_lt (value : Option tm.Λ) :
+    labelCode value < Fintype.card (Option tm.Λ) :=
+  (Fintype.equivFin (Option tm.Λ) value).isLt
+
+@[simp]
+theorem stateCode_lt (value : tm.σ) :
+    stateCode value < Fintype.card tm.σ :=
+  (Fintype.equivFin tm.σ value).isLt
+
+@[simp]
+theorem stackSymbolCode_lt
+    (value : Σ stack : tm.K, Option (tm.Γ stack)) :
+    stackSymbolCode value < stackSymbolCount (tm := tm) :=
+  (Fintype.equivFin
+    (Σ stack : tm.K, Option (tm.Γ stack)) value).isLt
+
 /-- Cardinality formula underlying the finite source-atom allocation. -/
 theorem atomCount_eq_card_sum :
     atomCount (tm := tm) (space := space) (clockBits := clockBits) =
@@ -163,6 +192,33 @@ theorem atomCount_eq_card_sum :
 /-- Injectively name every typed source atom by a natural below `atomCount`. -/
 def code (atom : BoundedMachineAtom tm space clockBits) : Nat :=
   (atomEquivFin atom).val
+
+theorem code_label (value : Option tm.Λ) :
+    code (.label value : BoundedMachineAtom tm space clockBits) =
+      labelCode value := by
+  rfl
+
+theorem code_state (value : tm.σ) :
+    code (.state value : BoundedMachineAtom tm space clockBits) =
+      Fintype.card (Option tm.Λ) + stateCode value := by
+  rfl
+
+theorem code_stack (stack : tm.K) (position : Fin space)
+    (symbol : Option (tm.Γ stack)) :
+    code (.stack ⟨stack, position, symbol⟩ :
+        BoundedMachineAtom tm space clockBits) =
+      Fintype.card (Option tm.Λ) +
+        (Fintype.card tm.σ +
+          (stackSymbolCode ⟨stack, symbol⟩ +
+            stackSymbolCount (tm := tm) * position.val)) := by
+  rfl
+
+theorem code_clock (position : Fin clockBits) :
+    code (.clock position : BoundedMachineAtom tm space clockBits) =
+      Fintype.card (Option tm.Λ) +
+        (Fintype.card tm.σ +
+          (space * stackSymbolCount (tm := tm) + position.val)) := by
+  rfl
 
 @[simp]
 theorem code_lt_atomCount
@@ -228,6 +284,35 @@ def stackCellAtoms (stack : tm.K) (position : Fin space) : List Nat :=
 def clockAtoms : List Nat :=
   (List.finRange clockBits).map fun position =>
     code (.clock position : BoundedMachineAtom tm space clockBits)
+
+theorem labelAtoms_eq_fixed_codes :
+    labelAtoms (tm := tm) (space := space) (clockBits := clockBits) =
+      (finiteValues (Option tm.Λ)).map labelCode := by
+  simp [labelAtoms, code_label]
+
+theorem stateAtoms_eq_affine_codes :
+    stateAtoms (tm := tm) (space := space) (clockBits := clockBits) =
+      (finiteValues tm.σ).map fun value =>
+        Fintype.card (Option tm.Λ) + stateCode value := by
+  simp [stateAtoms, code_state]
+
+theorem stackCellAtoms_eq_affine_codes
+    (stack : tm.K) (position : Fin space) :
+    stackCellAtoms (clockBits := clockBits) stack position =
+      (finiteValues (Option (tm.Γ stack))).map fun symbol =>
+        Fintype.card (Option tm.Λ) +
+          (Fintype.card tm.σ +
+            (stackSymbolCode ⟨stack, symbol⟩ +
+              stackSymbolCount (tm := tm) * position.val)) := by
+  simp [stackCellAtoms, code_stack]
+
+theorem clockAtoms_eq_affine_codes :
+    clockAtoms (tm := tm) (space := space) (clockBits := clockBits) =
+      (List.finRange clockBits).map fun position =>
+        Fintype.card (Option tm.Λ) +
+          (Fintype.card tm.σ +
+            (space * stackSymbolCount (tm := tm) + position.val)) := by
+  simp [clockAtoms, code_clock]
 
 @[simp]
 theorem labelAtoms_length :
