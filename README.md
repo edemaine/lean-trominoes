@@ -670,13 +670,13 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Mirror conjunction, disjunction, equality, exact-one,
                 vector equality, and binary successor directly on instruction
                 lists, and prove exact agreement with expression postorder.
-              - [ ] Normalize bounded-machine fields, configurations, clocks,
+              - [x] Normalize bounded-machine fields, configurations, clocks,
                 statement paths, and the designated reset relation.
                 - [x] Normalize affine label, control, stack-cell, complete
                   configuration, and reset-clock programs.
                 - [x] Normalize one-hot and stack-suffix well-formedness.
                 - [x] Normalize bounded push/pop stack transformations.
-                - [ ] Normalize symbolic statement paths and assemble the
+                - [x] Normalize symbolic statement paths and assemble the
                   designated accepting-reset program.
               - [ ] Implement the finite counter-driven instruction emitter.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
@@ -1706,6 +1706,17 @@ The representation choices for this target are:
   Its fit check and each width-indexed output cell branch over only fixed
   transform data and the runtime width, and the complete program is proved
   identical to the semantic stack-transform expression postorder.
+- [`LeanTrominoes/PeriodicCNFMachineProgramStatementPaths.lean`](LeanTrominoes/PeriodicCNFMachineProgramStatementPaths.lean)
+  mirrors the finite symbolic TM2 executor with postorder programs in place of
+  semantic expression guards.  Push, pop, peek, load, branch, goto, and halt
+  paths agree exactly with the original executor, and their stack transforms,
+  finite control branches, and label branches assemble the exact ordinary-step
+  instruction word.
+- [`LeanTrominoes/PeriodicCNFMachineProgramResetRelation.lean`](LeanTrominoes/PeriodicCNFMachineProgramResetRelation.lean)
+  combines normalized structural well-formedness, ordinary steps, reset-clock
+  arithmetic, and fixed initial/designated accepting configurations into the
+  complete bounded relation program, proved equal to the semantic expression
+  postorder.
 - [`LeanTrominoes/PeriodicCNFMachineStatementPaths.lean`](LeanTrominoes/PeriodicCNFMachineStatementPaths.lean)
   symbolically executes an atomic TM2 statement after specializing its finite
   control value.  Unknown `peek` and `pop` observations branch only over one
@@ -1798,6 +1809,12 @@ The representation choices for this target are:
   It also exposes the identical compiler request directly on the original
   finite source-symbol list, so the remaining printer need not decode its
   initial configuration from native natural fields.
+- [`LeanTrominoes/PeriodicCNFPolySpaceProgramSpec.lean`](LeanTrominoes/PeriodicCNFPolySpaceProgramSpec.lean)
+  instantiates the expression-free bounded program for one polynomial-space
+  decider and direct source-symbol list.  It prefixes the instruction-derived
+  exact clause count and affine fresh boundary, then proves the resulting
+  natural fields and native encoding are exactly the compact request already
+  consumed by the verified structural evaluator.
 - [`LeanTrominoes/PeriodicCNFPolySpaceHardness.lean`](LeanTrominoes/PeriodicCNFPolySpaceHardness.lean)
   packages the complete complexity-theoretic endpoint around one explicit
   remaining contract: a polynomial-time machine from decoded native source
