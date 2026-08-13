@@ -381,6 +381,8 @@ build; an imported proof counts when its statement matches the paper.
           - [ ] Bound that countdown cost by the original flat motif stream.
             - [x] Bound every reachable motif suffix, scanner payload, and
               countdown input by one original native-field envelope.
+            - [x] Establish compositional budget lemmas for primitive list
+              operations, branches, and flat countdown bodies.
             - [ ] Bound each positive and zero countdown body by that
               envelope, then sum the exact additive cost.
           - [x] Fit the complete five-column assignment lookup with an exact
