@@ -875,6 +875,550 @@ theorem flatPackedLookupWordStepFieldCost_le_input
     10000000000000000 * unit
   omega
 
+theorem flatPackedLookupContinueCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupContinueCost target cell word digit selected remaining ≤
+      100000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    false selected (cell :: remaining)
+  let restFields := remaining.flatMap PeriodicStripFlatEncoding.cellFields
+  let output := Code.flatPackedLookupColumnState target (word / 9) digit
+    false selected remaining
+  let out5 := selected.toNat :: restFields
+  let out4 := 0 :: out5
+  let out3 := digit :: out4
+  let out2 := word / 9 :: out3
+  let out1 := Encodable.encode target.2 :: out2
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit false selected
+        decomposition wordBound digitBound
+  have tailDecomposition :
+      motif = (leading ++ [cell]) ++ remaining := by
+    simpa [List.append_assoc] using decomposition
+  have quotientBound : word / 9 ≤ wordLimit :=
+    (Nat.div_le_self word 9).trans wordBound
+  have outputBound : encodedListSpace output ≤ unit := by
+    simpa [output, unit] using
+      flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) digit wordLimit digitLimit
+        false selected tailDecomposition quotientBound digitBound
+  have out5Bound : encodedListSpace out5 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2,
+        word / 9, digit, 0] out5
+    exact suffix.trans (by
+      simpa [output, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out4Bound : encodedListSpace out4 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2,
+        word / 9, digit] out4
+    exact suffix.trans (by
+      simpa [output, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out3Bound : encodedListSpace out3 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2,
+        word / 9] out3
+    exact suffix.trans (by
+      simpa [output, out3, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out2Bound : encodedListSpace out2 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2] out2
+    exact suffix.trans (by
+      simpa [output, out2, out3, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out1Bound : encodedListSpace out1 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1] out1
+    exact suffix.trans (by
+      simpa [output, out1, out2, out3, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have selectedSpace : encodedListSpace [selected.toNat] ≤ unit := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    cases selected <;>
+      simp [encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits] <;> omega
+  have zeroSpace : encodedListSpace [0] ≤ unit := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+    omega
+  have digitSpace : encodedListSpace [digit] ≤ unit := by
+    simpa [unit] using flatPackedLookupDigitSpace_le_unit
+      target motif wordLimit digit digitLimit digitBound
+  have quotientSpace : encodedListSpace [word / 9] ≤ unit := by
+    simpa [unit] using flatPackedLookupWordSpace_le_unit
+      target motif (word / 9) wordLimit digitLimit quotientBound
+  have targetXSpace : encodedListSpace [Encodable.encode target.1] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetXSpace_le_unit
+      target motif wordLimit digitLimit
+  have targetYSpace : encodedListSpace [Encodable.encode target.2] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetYSpace_le_unit
+      target motif wordLimit digitLimit
+  have get0Raw := listCodeGetCost_le_linear 0 state
+  have get1Raw := listCodeGetCost_le_linear 1 state
+  have get3Raw := listCodeGetCost_le_linear 3 state
+  have get4Raw := listCodeGetCost_le_linear 4 state
+  have get5Raw := listCodeGetCost_le_linear 5 state
+  have drop8Raw := flatLookupDropCost_le_linear 8 state
+  have get0 : getCost 0 state ≤ 10000 * (unit + 1) :=
+    get0Raw.trans (by gcongr)
+  have get1 : getCost 1 state ≤ 20000 * (unit + 1) :=
+    get1Raw.trans (by gcongr)
+  have get3 : getCost 3 state ≤ 40000 * (unit + 1) :=
+    get3Raw.trans (by gcongr)
+  have get4 : getCost 4 state ≤ 50000 * (unit + 1) :=
+    get4Raw.trans (by gcongr)
+  have get5 : getCost 5 state ≤ 60000 * (unit + 1) :=
+    get5Raw.trans (by gcongr)
+  have drop8 : dropCost 8 state ≤ 90000 * (unit + 1) :=
+    drop8Raw.trans (by gcongr)
+  have wordStep := flatPackedLookupWordStepFieldCost_le_input
+    0 target cell motif remaining leading word digit wordLimit digitLimit
+    false selected (by omega) decomposition wordBound digitBound
+  have wordStepBound : assignmentWordStepFieldAtCost 2 0 state ≤
+      10000000000000000 * unit := by
+    simpa only [state, unit] using wordStep
+  let cost5 := prependCost state [selected.toNat] restFields
+    (getCost 5 state) (dropCost 8 state)
+  let cost4 := prependCost state [0] out5 (getCost 4 state) cost5
+  let cost3 := prependCost state [digit] out4 (getCost 3 state) cost4
+  let cost2 := prependCost state [word / 9] out3
+    (assignmentWordStepFieldAtCost 2 0 state) cost3
+  let cost1 := prependCost state [Encodable.encode target.2] out2
+    (getCost 1 state) cost2
+  let cost0 := prependCost state [Encodable.encode target.1] out1
+    (getCost 0 state) cost1
+  have estimate5 := listCodePrependCost_le_of state [selected.toNat]
+    restFields (getCost 5 state) (dropCost 8 state) unit
+    stateBound selectedSpace out5Bound
+  have bound5 : cost5 ≤ 200000 * (unit + 1) := by
+    simp only [cost5]
+    omega
+  have estimate4 := listCodePrependCost_le_of state [0] out5
+    (getCost 4 state) cost5 unit stateBound zeroSpace out4Bound
+  have bound4 : cost4 ≤ 300000 * (unit + 1) := by
+    simp only [cost4]
+    omega
+  have estimate3 := listCodePrependCost_le_of state [digit] out4
+    (getCost 3 state) cost4 unit stateBound digitSpace out3Bound
+  have bound3 : cost3 ≤ 400000 * (unit + 1) := by
+    simp only [cost3]
+    omega
+  have estimate2 := listCodePrependCost_le_of state [word / 9] out3
+    (assignmentWordStepFieldAtCost 2 0 state) cost3 unit
+    stateBound quotientSpace out2Bound
+  have bound2 : cost2 ≤ 20000000000000000 * unit := by
+    simp only [cost2]
+    omega
+  have estimate1 := listCodePrependCost_le_of state
+    [Encodable.encode target.2] out2 (getCost 1 state) cost2 unit
+    stateBound targetYSpace out1Bound
+  have bound1 : cost1 ≤ 30000000000000000 * unit := by
+    simp only [cost1]
+    omega
+  have estimate0 := listCodePrependCost_le_of state
+    [Encodable.encode target.1] out1 (getCost 0 state) cost1 unit
+    stateBound targetXSpace outputBound
+  have bound0 : cost0 ≤ 100000000000000000 * unit := by
+    simp only [cost0]
+    omega
+  simpa only [flatPackedLookupContinueCost, state, restFields,
+    out5, out4, out3, out2, out1, cost5, cost4, cost3, cost2,
+    cost1, cost0, unit] using bound0
+
+theorem flatPackedLookupFoundCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit)
+    (eightBound : 8 ≤ digitLimit) :
+    flatPackedLookupFoundCost target cell word digit selected remaining ≤
+      1000000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    false selected (cell :: remaining)
+  let restFields := remaining.flatMap PeriodicStripFlatEncoding.cellFields
+  let output := Code.flatPackedLookupColumnState target
+    (word / 9) (word % 9) true selected remaining
+  let out5 := selected.toNat :: restFields
+  let out4 := 1 :: out5
+  let out3 := word % 9 :: out4
+  let out2 := word / 9 :: out3
+  let out1 := Encodable.encode target.2 :: out2
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit false selected
+        decomposition wordBound digitBound
+  have tailDecomposition :
+      motif = (leading ++ [cell]) ++ remaining := by
+    simpa [List.append_assoc] using decomposition
+  have quotientBound : word / 9 ≤ wordLimit :=
+    (Nat.div_le_self word 9).trans wordBound
+  have remainderSmall : word % 9 ≤ digitLimit := by
+    have remainderLt : word % 9 < 9 := Nat.mod_lt word (by omega)
+    omega
+  have outputBound : encodedListSpace output ≤ unit := by
+    simpa [output, unit] using
+      flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) (word % 9) wordLimit digitLimit
+        true selected tailDecomposition quotientBound remainderSmall
+  have out5Bound : encodedListSpace out5 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2,
+        word / 9, word % 9, 1] out5
+    exact suffix.trans (by
+      simpa [output, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out4Bound : encodedListSpace out4 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2,
+        word / 9, word % 9] out4
+    exact suffix.trans (by
+      simpa [output, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out3Bound : encodedListSpace out3 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2,
+        word / 9] out3
+    exact suffix.trans (by
+      simpa [output, out3, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out2Bound : encodedListSpace out2 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1, Encodable.encode target.2] out2
+    exact suffix.trans (by
+      simpa [output, out2, out3, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have out1Bound : encodedListSpace out1 ≤ unit := by
+    have suffix := flatLookupEncodedListSpace_suffix_le
+      [Encodable.encode target.1] out1
+    exact suffix.trans (by
+      simpa [output, out1, out2, out3, out4, out5, restFields,
+        Code.flatPackedLookupColumnState] using outputBound)
+  have selectedSpace : encodedListSpace [selected.toNat] ≤ unit := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    cases selected <;>
+      simp [encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits] <;> omega
+  have oneSpace : encodedListSpace [1] ≤ unit := by
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil, oneBits]
+    omega
+  have remainderSpace : encodedListSpace [word % 9] ≤ unit := by
+    simpa [unit] using flatPackedLookupDigitSpace_le_unit
+      target motif wordLimit (word % 9) digitLimit remainderSmall
+  have quotientSpace : encodedListSpace [word / 9] ≤ unit := by
+    simpa [unit] using flatPackedLookupWordSpace_le_unit
+      target motif (word / 9) wordLimit digitLimit quotientBound
+  have targetXSpace : encodedListSpace [Encodable.encode target.1] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetXSpace_le_unit
+      target motif wordLimit digitLimit
+  have targetYSpace : encodedListSpace [Encodable.encode target.2] ≤ unit := by
+    simpa [unit] using flatPackedLookupTargetYSpace_le_unit
+      target motif wordLimit digitLimit
+  have get0Raw := listCodeGetCost_le_linear 0 state
+  have get1Raw := listCodeGetCost_le_linear 1 state
+  have get5Raw := listCodeGetCost_le_linear 5 state
+  have drop8Raw := flatLookupDropCost_le_linear 8 state
+  have get0 : getCost 0 state ≤ 10000 * (unit + 1) :=
+    get0Raw.trans (by gcongr)
+  have get1 : getCost 1 state ≤ 20000 * (unit + 1) :=
+    get1Raw.trans (by gcongr)
+  have get5 : getCost 5 state ≤ 60000 * (unit + 1) :=
+    get5Raw.trans (by gcongr)
+  have drop8 : dropCost 8 state ≤ 90000 * (unit + 1) :=
+    drop8Raw.trans (by gcongr)
+  have oneRaw := flatLookupOneCost_le_linear state
+  have one : oneCost state ≤ 20000 * (unit + 1) :=
+    oneRaw.trans (by gcongr)
+  have wordStep0 := flatPackedLookupWordStepFieldCost_le_input
+    0 target cell motif remaining leading word digit wordLimit digitLimit
+    false selected (by omega) decomposition wordBound digitBound
+  have wordStep1 := flatPackedLookupWordStepFieldCost_le_input
+    1 target cell motif remaining leading word digit wordLimit digitLimit
+    false selected (by omega) decomposition wordBound digitBound
+  have wordStep0Bound : assignmentWordStepFieldAtCost 2 0 state ≤
+      10000000000000000 * unit := by
+    simpa only [state, unit] using wordStep0
+  have wordStep1Bound : assignmentWordStepFieldAtCost 2 1 state ≤
+      10000000000000000 * unit := by
+    simpa only [state, unit] using wordStep1
+  let cost5 := prependCost state [selected.toNat] restFields
+    (getCost 5 state) (dropCost 8 state)
+  let cost4 := prependCost state [1] out5 (oneCost state) cost5
+  let cost3 := prependCost state [word % 9] out4
+    (assignmentWordStepFieldAtCost 2 1 state) cost4
+  let cost2 := prependCost state [word / 9] out3
+    (assignmentWordStepFieldAtCost 2 0 state) cost3
+  let cost1 := prependCost state [Encodable.encode target.2] out2
+    (getCost 1 state) cost2
+  let cost0 := prependCost state [Encodable.encode target.1] out1
+    (getCost 0 state) cost1
+  have estimate5 := listCodePrependCost_le_of state [selected.toNat]
+    restFields (getCost 5 state) (dropCost 8 state) unit
+    stateBound selectedSpace out5Bound
+  have bound5 : cost5 ≤ 200000 * (unit + 1) := by
+    simp only [cost5]
+    omega
+  have estimate4 := listCodePrependCost_le_of state [1] out5
+    (oneCost state) cost5 unit stateBound oneSpace out4Bound
+  have bound4 : cost4 ≤ 300000 * (unit + 1) := by
+    simp only [cost4]
+    omega
+  have estimate3 := listCodePrependCost_le_of state [word % 9] out4
+    (assignmentWordStepFieldAtCost 2 1 state) cost4 unit
+    stateBound remainderSpace out3Bound
+  have bound3 : cost3 ≤ 20000000000000000 * unit := by
+    simp only [cost3]
+    omega
+  have estimate2 := listCodePrependCost_le_of state [word / 9] out3
+    (assignmentWordStepFieldAtCost 2 0 state) cost3 unit
+    stateBound quotientSpace out2Bound
+  have bound2 : cost2 ≤ 40000000000000000 * unit := by
+    simp only [cost2]
+    omega
+  have estimate1 := listCodePrependCost_le_of state
+    [Encodable.encode target.2] out2 (getCost 1 state) cost2 unit
+    stateBound targetYSpace out1Bound
+  have bound1 : cost1 ≤ 50000000000000000 * unit := by
+    simp only [cost1]
+    omega
+  have estimate0 := listCodePrependCost_le_of state
+    [Encodable.encode target.1] out1 (getCost 0 state) cost1 unit
+    stateBound targetXSpace outputBound
+  have bound0 : cost0 ≤ 1000000000000000000 * unit := by
+    simp only [cost0]
+    omega
+  simpa only [flatPackedLookupFoundCost, state, restFields,
+    out5, out4, out3, out2, out1, cost5, cost4, cost3, cost2,
+    cost1, cost0, unit] using bound0
+
+theorem flatPackedLookupConsStepCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit)
+    (eightBound : 8 ≤ digitLimit) :
+    flatPackedLookupConsStepCost target cell word digit selected remaining ≤
+      100000000000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    false selected (cell :: remaining)
+  let continueOutput := Code.flatPackedLookupColumnState target
+    (word / 9) digit false selected remaining
+  let foundOutput := Code.flatPackedLookupColumnState target
+    (word / 9) (word % 9) true selected remaining
+  let budget := 100000000000000000000 * unit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit false selected
+        decomposition wordBound digitBound
+  have tailDecomposition :
+      motif = (leading ++ [cell]) ++ remaining := by
+    simpa [List.append_assoc] using decomposition
+  have quotientBound : word / 9 ≤ wordLimit :=
+    (Nat.div_le_self word 9).trans wordBound
+  have remainderSmall : word % 9 ≤ digitLimit := by
+    have remainderLt : word % 9 < 9 := Nat.mod_lt word (by omega)
+    omega
+  have continueOutputBound : encodedListSpace continueOutput ≤ unit := by
+    simpa [continueOutput, unit] using
+      flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) digit wordLimit digitLimit
+        false selected tailDecomposition quotientBound digitBound
+  have foundOutputBound : encodedListSpace foundOutput ≤ unit := by
+    simpa [foundOutput, unit] using
+      flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) (word % 9) wordLimit digitLimit
+        true selected tailDecomposition quotientBound remainderSmall
+  have testSpace : encodedListSpace
+      [(selected && decide (cell = target)).toNat] ≤ unit := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    cases selected && decide (cell = target) <;>
+      simp [encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits] <;> omega
+  have matchCost := flatPackedLookupMatchCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    false selected decomposition wordBound digitBound
+  have found := flatPackedLookupFoundCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    selected decomposition wordBound digitBound eightBound
+  have continuing := flatPackedLookupContinueCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    selected decomposition wordBound digitBound
+  have matchBudget : flatPackedLookupMatchCost target cell word digit false
+      selected remaining ≤ budget := by
+    simpa [budget, unit] using matchCost
+  have foundBudget : flatPackedLookupFoundCost target cell word digit selected
+      remaining ≤ budget := by
+    simp only [budget]
+    have := found
+    omega
+  have continueBudget : flatPackedLookupContinueCost target cell word digit
+      selected remaining ≤ budget := by
+    simp only [budget]
+    have := continuing
+    omega
+  by_cases hit : selected && decide (cell = target)
+  · have branch := flatLookupBranchZeroSuccCost_le_budget state foundOutput
+      (selected && decide (cell = target)).toNat
+      (flatPackedLookupMatchCost target cell word digit false selected
+        remaining)
+      (flatPackedLookupFoundCost target cell word digit selected remaining)
+      budget (stateBound.trans (by simp [budget]; omega))
+      (foundOutputBound.trans (by simp [budget]; omega))
+      (testSpace.trans (by simp [budget]; omega)) matchBudget foundBudget
+    simp [flatPackedLookupConsStepCost, hit]
+    simp [state, foundOutput, budget, unit, hit] at branch
+    omega
+  · have branch := flatLookupBranchZeroZeroCost_le_budget state continueOutput
+      (selected && decide (cell = target)).toNat
+      (flatPackedLookupMatchCost target cell word digit false selected
+        remaining)
+      (flatPackedLookupContinueCost target cell word digit selected remaining)
+      budget (stateBound.trans (by simp [budget]; omega))
+      (continueOutputBound.trans (by simp [budget]; omega))
+      (testSpace.trans (by simp [budget]; omega)) matchBudget continueBudget
+    simp [flatPackedLookupConsStepCost, hit]
+    simp [state, continueOutput, budget, unit, hit] at branch
+    omega
+
+theorem flatPackedLookupStepConsCost_le_input
+    (target cell : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ cell :: remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit)
+    (eightBound : 8 ≤ digitLimit) :
+    flatPackedLookupStepConsCost target cell word digit selected remaining ≤
+      10000000000000000000000000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    false selected (cell :: remaining)
+  let output := if selected && decide (cell = target) then
+      Code.flatPackedLookupColumnState target (word / 9) (word % 9)
+        true selected remaining
+    else
+      Code.flatPackedLookupColumnState target (word / 9) digit
+        false selected remaining
+  let budget := 100000000000000000000000 * unit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif (cell :: remaining)
+        leading word digit wordLimit digitLimit false selected
+        decomposition wordBound digitBound
+  have tailDecomposition :
+      motif = (leading ++ [cell]) ++ remaining := by
+    simpa [List.append_assoc] using decomposition
+  have quotientBound : word / 9 ≤ wordLimit :=
+    (Nat.div_le_self word 9).trans wordBound
+  have remainderSmall : word % 9 ≤ digitLimit := by
+    have remainderLt : word % 9 < 9 := Nat.mod_lt word (by omega)
+    omega
+  have outputBound : encodedListSpace output ≤ unit := by
+    by_cases hit : selected && decide (cell = target)
+    · simp only [output, hit, if_true]
+      exact flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) (word % 9) wordLimit digitLimit
+        true selected tailDecomposition quotientBound remainderSmall
+    · simp only [output, hit]
+      exact flatPackedLookupStateSpace_le_unit target motif remaining
+        (leading ++ [cell]) (word / 9) digit wordLimit digitLimit
+        false selected tailDecomposition quotientBound digitBound
+  have zeroSpace : encodedListSpace [0] ≤ unit := by
+    have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil, zeroBits]
+    omega
+  have get4Raw := listCodeGetCost_le_linear 4 state
+  have get4 : getCost 4 state ≤ budget := by
+    simp only [budget]
+    exact get4Raw.trans (by
+      have := stateBound
+      omega)
+  have branchCost := flatPackedLookupConsStepCost_le_input
+    target cell motif remaining leading word digit wordLimit digitLimit
+    selected decomposition wordBound digitBound eightBound
+  have branchBudget : flatPackedLookupConsStepCost target cell word digit
+      selected remaining ≤ budget := by
+    simpa [budget, unit] using branchCost
+  have outer := flatLookupBranchZeroZeroCost_le_budget state output 0
+    (getCost 4 state)
+    (flatPackedLookupConsStepCost target cell word digit selected remaining)
+    budget (stateBound.trans (by simp [budget]; omega))
+    (outputBound.trans (by simp [budget]; omega))
+    (zeroSpace.trans (by simp [budget]; omega)) get4 branchBudget
+  simp only [flatPackedLookupStepConsCost]
+  simp only [state, output, budget, unit] at outer
+  omega
+
+theorem flatPackedLookupStepFoundCost_le_input
+    (target : Cell) (motif remaining leading : List Cell)
+    (word digit wordLimit digitLimit : Nat) (selected : Bool)
+    (decomposition : motif = leading ++ remaining)
+    (wordBound : word ≤ wordLimit) (digitBound : digit ≤ digitLimit) :
+    flatPackedLookupStepFoundCost target word digit selected remaining ≤
+      100000000 *
+        flatPackedLookupInputUnit target motif wordLimit digitLimit := by
+  let unit := flatPackedLookupInputUnit target motif wordLimit digitLimit
+  let state := Code.flatPackedLookupColumnState target word digit
+    true selected remaining
+  let budget := 100000 * unit
+  have unitPositive : 5 ≤ unit := by
+    simp [unit, flatPackedLookupInputUnit]
+  have stateBound : encodedListSpace state ≤ unit := by
+    simpa [state, unit] using
+      flatPackedLookupStateSpace_le_unit target motif remaining leading
+        word digit wordLimit digitLimit true selected decomposition
+        wordBound digitBound
+  have oneSpace : encodedListSpace [1] ≤ unit := by
+    have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+    simp [encodedListSpace_cons, encodedListSpace_nil, oneBits]
+    omega
+  have get4Raw := listCodeGetCost_le_linear 4 state
+  have get4 : getCost 4 state ≤ budget := by
+    simp only [budget]
+    exact get4Raw.trans (by
+      have := stateBound
+      omega)
+  have identityRaw := flatLookupIdCost_le_linear state
+  have identity : idCost state ≤ budget := by
+    simp only [budget]
+    exact identityRaw.trans (by
+      have := stateBound
+      omega)
+  have branch := flatLookupBranchZeroSuccCost_le_budget state state 1
+    (getCost 4 state) (idCost state) budget
+    (stateBound.trans (by simp [budget]; omega))
+    (stateBound.trans (by simp [budget]; omega))
+    (oneSpace.trans (by simp [budget]; omega)) get4 identity
+  simp only [flatPackedLookupStepFoundCost]
+  simp only [state, budget, unit] at branch
+  omega
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing

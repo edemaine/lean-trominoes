@@ -391,7 +391,10 @@ build; an imported proof counts when its statement matches the paper.
                 conjunction.
               - [x] Bound packed-word quotient/remainder stepping through the
                 certified division-by-nine evaluator.
-              - [ ] Bound the found/continue state-reconstruction branches.
+              - [x] Bound the found/continue state-reconstruction branches
+                and both enclosing step selectors.
+              - [ ] Lift the positive/zero step bounds through each exact
+                countdown body and sum the pass.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.
           - [ ] Bound the five-column assignment lookup and fit its predicate
