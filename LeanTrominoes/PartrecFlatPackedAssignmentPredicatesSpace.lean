@@ -180,6 +180,331 @@ theorem flatPackedAssignmentIs_semantic
     target packed.assignmentWord
   simpa [digit, outputEq] using fitted
 
+/-! ## Common polynomial bound -/
+
+/-- A generous common budget for the constant-size adapters surrounding the
+quadratic five-column lookup. -/
+def flatPackedAssignmentPredicateBudget
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) : Nat :=
+  1000000 *
+    (flatPackedAssignmentLookupSpaceBound motif queriedColumn target word +
+      flatPackedAssignmentLookupNativeInputSpace motif queriedColumn target
+        word + 1)
+
+def flatPackedAssignmentPredicateSpaceBound
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) : Nat :=
+  1000000 *
+    (flatPackedAssignmentPredicateBudget motif queriedColumn target word + 1)
+
+theorem flatPackedAssignmentPredicateBudgetPositive
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    1 ≤ flatPackedAssignmentPredicateBudget motif queriedColumn target word := by
+  simp [flatPackedAssignmentPredicateBudget]
+  omega
+
+theorem flatPackedAssignmentLookupDigitCost_le_budget
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    flatPackedAssignmentLookupDigitCost motif queriedColumn target word ≤
+      flatPackedAssignmentPredicateBudget motif queriedColumn target word := by
+  let outcome := Code.packedAssignmentLookupOutcome motif queriedColumn target
+    word
+  let output := [outcome.2.1, outcome.2.2.toNat]
+  let lookupBound := flatPackedAssignmentLookupSpaceBound motif queriedColumn
+    target word
+  let budget := flatPackedAssignmentPredicateBudget motif queriedColumn target
+    word
+  have lookupCost := flatPackedAssignmentLookupCost_le_quadratic motif
+    queriedColumn target word
+  have lookupFit := flatPackedAssignmentLookup motif queriedColumn target word
+  have outputSpace : encodedListSpace output ≤ lookupBound := by
+    have fittedSpace := lookupFit.output_space
+    exact fittedSpace.trans (by simpa [lookupBound] using lookupCost)
+  have projectedRaw := listCodeGetCost_le_linear 0 output
+  have projected : getCost 0 output ≤ 10000 * (lookupBound + 1) :=
+    projectedRaw.trans (by gcongr)
+  have budgetForm :
+      budget = 1000000 *
+        (lookupBound + flatPackedAssignmentLookupNativeInputSpace motif
+          queriedColumn target word + 1) := by
+    rfl
+  change getCost 0 output +
+      flatPackedAssignmentLookupCost motif queriedColumn target word ≤ budget
+  omega
+
+theorem flatPackedAssignmentIsNoneCost_le_bound
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    flatPackedAssignmentIsNoneCost motif queriedColumn target word ≤
+      flatPackedAssignmentPredicateSpaceBound motif queriedColumn target
+        word := by
+  let values :=
+    [motif.length, queriedColumn,
+        Encodable.encode target.1, Encodable.encode target.2, word] ++
+      motif.flatMap PeriodicStripFlatEncoding.cellFields
+  let outcome := Code.packedAssignmentLookupOutcome motif queriedColumn target
+    word
+  let digit := outcome.2.1
+  let output := [digit, outcome.2.2.toNat]
+  let lookupBound := flatPackedAssignmentLookupSpaceBound motif queriedColumn
+    target word
+  let budget := flatPackedAssignmentPredicateBudget motif queriedColumn target
+    word
+  have positive : 1 ≤ budget := by
+    simpa [budget] using flatPackedAssignmentPredicateBudgetPositive motif
+      queriedColumn target word
+  have lookupCost := flatPackedAssignmentLookupCost_le_quadratic motif
+    queriedColumn target word
+  have lookupFit := flatPackedAssignmentLookup motif queriedColumn target word
+  have outputSpace : encodedListSpace output ≤ lookupBound := by
+    exact lookupFit.output_space.trans (by
+      simpa [lookupBound] using lookupCost)
+  have digitSpace : encodedListSpace [digit] ≤ budget := by
+    have localBound := flatLookupEncodedListSpace_prefix_le [digit]
+      [outcome.2.2.toNat]
+    have lookupToBudget : lookupBound ≤ budget := by
+      simp [budget, flatPackedAssignmentPredicateBudget]
+      omega
+    exact localBound.trans (outputSpace.trans lookupToBudget)
+  have predecessorSpace : encodedListSpace [digit.pred] ≤ budget :=
+    (flatLookupSingletonPredSpace_le digit).trans digitSpace
+  have nativeForm :
+      flatPackedAssignmentLookupNativeInputSpace motif queriedColumn target
+        word = encodedListSpace values + 1 := by
+    rfl
+  have valuesBound : encodedListSpace values ≤ budget := by
+    simp [budget, flatPackedAssignmentPredicateBudget, nativeForm]
+    omega
+  have headSpace := listCodeEncodedListSpace_singleton_headI_le values
+  have headBound :
+      (Computability.encodeNat values.headI).length ≤ budget := by
+    have localBound :
+        (Computability.encodeNat values.headI).length ≤
+          encodedListSpace values := by
+      simpa [encodedListSpace_cons] using headSpace
+    exact localBound.trans valuesBound
+  have headSuccessor := listCodeEncodeNat_succ_length_le values.headI
+  have headSuccessorBound :
+      (Computability.encodeNat (values.headI + 1)).length ≤ budget := by
+    have localBound :
+        (Computability.encodeNat (values.headI + 1)).length ≤
+          (Computability.encodeNat values.headI).length + 1 := by
+      simpa [Nat.succ_eq_add_one] using headSuccessor
+    have headPlusSpace :
+        (Computability.encodeNat values.headI).length + 1 ≤
+          encodedListSpace values := by
+      simp [values, encodedListSpace_cons]
+    exact localBound.trans (headPlusSpace.trans valuesBound)
+  have digitCost := flatPackedAssignmentLookupDigitCost_le_budget motif
+    queriedColumn target word
+  have wrapped := isZeroCost_le_budget values digit
+    (flatPackedAssignmentLookupDigitCost motif queriedColumn target word)
+    budget valuesBound digitSpace predecessorSpace headBound
+    headSuccessorBound (by simpa [budget] using digitCost) positive
+  change isZeroCost values digit
+      (flatPackedAssignmentLookupDigitCost motif queriedColumn target word) ≤
+    1000000 * (budget + 1)
+  omega
+
+set_option maxHeartbeats 1000000 in
+theorem flatPackedAssignmentIsCost_le_bound
+    (state : Option SquareSymmetry)
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    flatPackedAssignmentIsCost state motif queriedColumn target word ≤
+      flatPackedAssignmentPredicateSpaceBound motif queriedColumn target
+        word := by
+  let values :=
+    [motif.length, queriedColumn,
+        Encodable.encode target.1, Encodable.encode target.2, word] ++
+      motif.flatMap PeriodicStripFlatEncoding.cellFields
+  let outcome := Code.packedAssignmentLookupOutcome motif queriedColumn target
+    word
+  let digit := outcome.2.1
+  let selected := RawWindowState.assignmentDigit state
+  let output := [digit, outcome.2.2.toNat]
+  let lookupBound := flatPackedAssignmentLookupSpaceBound motif queriedColumn
+    target word
+  let budget := flatPackedAssignmentPredicateBudget motif queriedColumn target
+    word
+  have positive : 1 ≤ budget := by
+    simpa [budget] using flatPackedAssignmentPredicateBudgetPositive motif
+      queriedColumn target word
+  have large : 100000000000 ≤ budget := by
+    have unitPositive := flatPackedAssignmentUnitPositive motif queriedColumn
+      target word
+    simp [budget, flatPackedAssignmentPredicateBudget,
+      flatPackedAssignmentLookupSpaceBound,
+      flatPackedAssignmentScannerBudget]
+    nlinarith
+  have lookupCost := flatPackedAssignmentLookupCost_le_quadratic motif
+    queriedColumn target word
+  have lookupFit := flatPackedAssignmentLookup motif queriedColumn target word
+  have outputSpace : encodedListSpace output ≤ lookupBound := by
+    exact lookupFit.output_space.trans (by
+      simpa [lookupBound] using lookupCost)
+  have lookupToBudget : lookupBound ≤ budget := by
+    simp [budget, flatPackedAssignmentPredicateBudget]
+    omega
+  have digitSpace : encodedListSpace [digit] ≤ budget :=
+    (flatLookupEncodedListSpace_prefix_le [digit]
+      [outcome.2.2.toNat]).trans (outputSpace.trans lookupToBudget)
+  have nativeForm :
+      flatPackedAssignmentLookupNativeInputSpace motif queriedColumn target
+        word = encodedListSpace values + 1 := by
+    rfl
+  have valuesBound : encodedListSpace values ≤ budget := by
+    simp [budget, flatPackedAssignmentPredicateBudget, nativeForm]
+    omega
+  have digitCost := flatPackedAssignmentLookupDigitCost_le_budget motif
+    queriedColumn target word
+  have digitCostBound :
+      flatPackedAssignmentLookupDigitCost motif queriedColumn target word ≤
+        budget := by simpa [budget] using digitCost
+  have selectedSmall : selected < 9 := by
+    simpa [selected] using RawWindowState.assignmentDigit_lt state
+  have selectedSpace : encodedListSpace [selected] ≤ budget := by
+    have selectedBits := encodeNat_length_mono (show selected ≤ 8 by omega)
+    have eightBits : (Computability.encodeNat 8).length = 4 := rfl
+    rw [eightBits] at selectedBits
+    simp only [encodedListSpace_cons, encodedListSpace_nil]
+    omega
+  have pairSpace : encodedListSpace [digit, selected] ≤ budget := by
+    have digitToLookup : encodedListSpace [digit] ≤ lookupBound :=
+      (flatLookupEncodedListSpace_prefix_le [digit]
+        [outcome.2.2.toNat]).trans outputSpace
+    have selectedConstant : encodedListSpace [selected] ≤ 5 := by
+      have selectedBits := encodeNat_length_mono (show selected ≤ 8 by omega)
+      have eightBits : (Computability.encodeNat 8).length = 4 := rfl
+      rw [eightBits] at selectedBits
+      simp only [encodedListSpace_cons, encodedListSpace_nil]
+      omega
+    calc
+      encodedListSpace [digit, selected] =
+          encodedListSpace [digit] + encodedListSpace [selected] := by
+        simp [encodedListSpace_cons]
+      _ ≤ lookupBound + 5 := Nat.add_le_add digitToLookup selectedConstant
+      _ ≤ budget := by
+        simp [budget, flatPackedAssignmentPredicateBudget]
+        omega
+  have zeroRaw := listCodeZeroCost_le_linear values
+  have zeroBound : zeroCost values ≤ budget :=
+    zeroRaw.trans (by
+      simp [budget, flatPackedAssignmentPredicateBudget, nativeForm]
+      omega)
+  have addSmall : addConstCost selected [0] ≤ 1000000 := by
+    cases state with
+    | none => native_decide
+    | some symmetry => fin_cases symmetry <;> native_decide
+  have numeralBound : numeralCost selected values ≤ 2 * budget := by
+    simp only [numeralCost]
+    omega
+  have argumentsEstimate := listCodePrependCost_le_of values [digit]
+    [selected]
+    (flatPackedAssignmentLookupDigitCost motif queriedColumn target word)
+    (numeralCost selected values) budget valuesBound digitSpace pairSpace
+  have argumentsBound :
+      flatPackedAssignmentIsArgumentsCost state motif queriedColumn target
+          word ≤ 7 * budget := by
+    change prependCost values [digit] [selected]
+        (flatPackedAssignmentLookupDigitCost motif queriedColumn target word)
+        (numeralCost selected values) ≤ 7 * budget
+    omega
+  have digitSmall : digit < 9 := by
+    simpa [digit, outcome] using Code.packedAssignmentLookupOutcome_digit_lt
+      motif queriedColumn target word
+  have equalityRaw := natEqCost_le_linear digit selected
+  have equalityArgument : 2 * (digit + selected) + 4 ≤ 36 := by omega
+  have equalityBits := encodeNat_length_mono equalityArgument
+  have thirtySixBits : (Computability.encodeNat 36).length = 6 := by
+    native_decide
+  rw [thirtySixBits] at equalityBits
+  have equalityBound : natEqCost digit selected ≤ budget :=
+    equalityRaw.trans (by
+      simp only [encodedListSpace_cons, encodedListSpace_nil]
+      omega)
+  change natEqCost digit selected +
+      flatPackedAssignmentIsArgumentsCost state motif queriedColumn target
+        word ≤ 1000000 * (budget + 1)
+  omega
+
+/-- The common predicate allowance remains quadratic in the actual native
+query footprint. -/
+theorem flatPackedAssignmentPredicateSpaceBound_le_native_quadratic
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    flatPackedAssignmentPredicateSpaceBound motif queriedColumn target word ≤
+      10000000000000000000000000000000000000000000000000000000000 *
+        (flatPackedAssignmentLookupNativeInputSpace motif queriedColumn
+          target word) ^ 2 := by
+  let native := flatPackedAssignmentLookupNativeInputSpace motif
+    queriedColumn target word
+  let lookupBound := flatPackedAssignmentLookupSpaceBound motif queriedColumn
+    target word
+  have nativePositive : 1 ≤ native := by
+    simp [native, flatPackedAssignmentLookupNativeInputSpace]
+  have lookup := flatPackedAssignmentLookupSpaceBound_le_native_quadratic
+    motif queriedColumn target word
+  have lookupLocal : lookupBound ≤
+      100000000000000000000000000000000000000000000 * native ^ 2 := by
+    simpa [lookupBound, native] using lookup
+  have nativeLinear : native ≤ native ^ 2 := by nlinarith
+  have oneQuadratic : 1 ≤ native ^ 2 := by nlinarith
+  change 1000000 * (1000000 * (lookupBound + native + 1) + 1) ≤
+    10000000000000000000000000000000000000000000000000000000000 *
+      native ^ 2
+  nlinarith
+
+theorem flatPackedAssignmentLookupDigitBounded
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    EvaluatorCodeFits Code.flatPackedAssignmentLookupDigitCode
+      ([motif.length, queriedColumn,
+          Encodable.encode target.1, Encodable.encode target.2, word] ++
+        motif.flatMap PeriodicStripFlatEncoding.cellFields)
+      [(Code.packedAssignmentLookupOutcome motif queriedColumn target word).2.1]
+      (flatPackedAssignmentPredicateSpaceBound motif queriedColumn target
+        word) :=
+  (flatPackedAssignmentLookupDigit motif queriedColumn target word).mono
+    ((flatPackedAssignmentLookupDigitCost_le_budget motif queriedColumn target
+      word).trans (by
+        simp [flatPackedAssignmentPredicateSpaceBound]
+        omega))
+
+theorem flatPackedAssignmentIsNoneBounded
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    EvaluatorCodeFits Code.flatPackedAssignmentIsNoneCode
+      ([motif.length, queriedColumn,
+          Encodable.encode target.1, Encodable.encode target.2, word] ++
+        motif.flatMap PeriodicStripFlatEncoding.cellFields)
+      [if (Code.packedAssignmentLookupOutcome motif queriedColumn
+        target word).2.1 = 0 then 1 else 0]
+      (flatPackedAssignmentPredicateSpaceBound motif queriedColumn target
+        word) :=
+  (flatPackedAssignmentIsNone motif queriedColumn target word).mono
+    (flatPackedAssignmentIsNoneCost_le_bound motif queriedColumn target word)
+
+theorem flatPackedAssignmentIsBounded
+    (state : Option SquareSymmetry)
+    (motif : List Cell) (queriedColumn : Nat)
+    (target : Cell) (word : Nat) :
+    let digit := (Code.packedAssignmentLookupOutcome motif queriedColumn
+      target word).2.1
+    EvaluatorCodeFits (Code.flatPackedAssignmentIsCode state)
+      ([motif.length, queriedColumn,
+          Encodable.encode target.1, Encodable.encode target.2, word] ++
+        motif.flatMap PeriodicStripFlatEncoding.cellFields)
+      [if digit = RawWindowState.assignmentDigit state then 1 else 0]
+      (flatPackedAssignmentPredicateSpaceBound motif queriedColumn target
+        word) := by
+  simp only
+  exact (flatPackedAssignmentIs state motif queriedColumn target word).mono
+    (flatPackedAssignmentIsCost_le_bound state motif queriedColumn target word)
+
 end EvaluatorCodeFits
 end PartrecToTM2
 end Turing

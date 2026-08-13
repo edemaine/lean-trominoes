@@ -402,7 +402,7 @@ build; an imported proof counts when its statement matches the paper.
                 envelope to a quadratic bound in the actual flat input.
           - [x] Fit the complete five-column assignment lookup with an exact
             additive evaluator cost over native motif fields.
-          - [ ] Bound the five-column assignment lookup and fit its predicate
+          - [x] Bound the five-column assignment lookup and fit its predicate
             wrappers.
             - [x] Place every reachable one-column scanner call in one common
               five-pass quadratic envelope.
@@ -415,7 +415,7 @@ build; an imported proof counts when its statement matches the paper.
               complete lookup allowance quadratically to its public native
               input footprint.
             - [x] Fit exact digit, `none`, and fixed-state predicate wrappers.
-            - [ ] Bound the predicate wrappers in the same quadratic input
+            - [x] Bound the predicate wrappers in the same quadratic input
               footprint.
           - [ ] Fit normalization, center validity, overlap, and the complete
             flat packed transition.
