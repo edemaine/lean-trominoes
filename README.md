@@ -428,6 +428,11 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Fit the exact one-cell flat normalization predicate.
             - [x] Bound one-cell normalization in the native scan footprint.
             - [x] Lift bounded normalization across the motif.
+            - [x] Fit center assignment and translated source-membership
+              leaves on the native flat motif.
+            - [ ] Fit and bound fixed-symmetry center candidates.
+            - [ ] Fit and bound per-base center validity.
+            - [ ] Lift bounded center validity across the motif.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
               - [x] Bound target-header reconstruction and both coordinate
