@@ -322,7 +322,7 @@ build; an imported proof counts when its statement matches the paper.
       packing.
       - [x] Fit one complete coordinate-pair scanner step compositionally.
       - [x] Lift the step certificate through the exact motif-length countdown.
-    - [ ] Prove the flat well-formedness scan's evaluator-space certificate.
+    - [x] Prove the flat well-formedness scan's evaluator-space certificate.
     - [ ] Port the cycle-search input/context assembly and its evaluator-space
       certificates to the target flat strip fields.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
@@ -1834,6 +1834,10 @@ The representation choices for this target are:
   exact motif-length countdown consumes two coordinate fields per cell,
   reuses the verified cell-bounds predicate, and never constructs the legacy
   recursively paired motif code.
+- [`LeanTrominoes/PartrecFlatStripWellFormedSpace.lean`](LeanTrominoes/PartrecFlatStripWellFormedSpace.lean)
+  fits every coordinate-pair step, lifts the fits through the exact flat
+  countdown, and bounds header preparation, the complete scan, and result
+  projection quadratically in the target flat input length.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
