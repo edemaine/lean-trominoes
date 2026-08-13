@@ -363,6 +363,8 @@ build; an imported proof counts when its statement matches the paper.
           coverage for one center target from flat motif fields.
         - [x] Add the center-phase guard and combine containment with
           exact-one coverage at one indexed flat motif base.
+        - [x] Lift one-base center validity through the exact motif-length
+          countdown and recover the full packed center-validity predicate.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
