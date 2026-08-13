@@ -355,6 +355,8 @@ build; an imported proof counts when its statement matches the paper.
         TM2 step semantics on decoded and canonically encoded configurations.
       - [x] Assemble structural, ordinary-step, clock-successor, and accepting
         reset expressions and prove their reset-clock relation semantics.
+      - [x] Force a compiled transition-expression root and identify the
+        resulting horizontal CNF models with direct bi-infinite paths.
       - [ ] Encode polynomial-space machine configurations and their local
         clocked transitions as a polynomial-size horizontal CNF formula.
       - [ ] Certify the resulting reduction as polynomial-time.
@@ -1261,6 +1263,11 @@ The representation choices for this target are:
   finite conjunction and disjunction, exact-one fields, equality between
   adjacent slices, and a little-endian no-overflow successor relation.  It
   also proves the source-atom bounds needed by constructive CNF compilation.
+- [`LeanTrominoes/PeriodicCNFTransitionExprFormula.lean`](LeanTrominoes/PeriodicCNFTransitionExprFormula.lean)
+  appends the unit clause requiring a compiled root to be true.  Generated
+  gates remain edge-local: the next endpoint is read only through source
+  atoms, which yields an exact equivalence between line satisfiability and
+  bi-infinite paths through the direct Boolean expression relation.
 - [`LeanTrominoes/PeriodicCNFMachineAtoms.lean`](LeanTrominoes/PeriodicCNFMachineAtoms.lean)
   defines the finite atom vocabulary of a bounded machine slice: optional
   control labels, internal states, optional symbols in every bounded stack
