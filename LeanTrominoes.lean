@@ -12,6 +12,8 @@ import LeanTrominoes.FiniteStateCycleSearch
 import LeanTrominoes.FiniteStateReachability
 import LeanTrominoes.FiniteStateSearch
 import LeanTrominoes.FiniteTMCompiler
+import LeanTrominoes.FiniteBlockTransducer
+import LeanTrominoes.FiniteEncodingNativeFields
 import LeanTrominoes.FootprintTiling
 import LeanTrominoes.Gadget
 import LeanTrominoes.GadgetAssembly

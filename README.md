@@ -570,6 +570,13 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Factor the reduction through a raw source-symbol-list compiler and
         prove agreement with the semantic reduction on valid encodings.
       - [ ] Certify the resulting reduction as polynomial-time.
+        - [x] Build an exact linear-time finite block transducer and use it to
+          encode every arbitrary finite source alphabet as evaluator-native
+          delimiter-terminated natural fields.
+        - [ ] Implement the native-field formula compiler and bound its
+          evaluator runtime by an explicit polynomial.
+        - [ ] Compose source preprocessing with formula generation into the
+          final `TM2ComputableInPolyTime` reduction certificate.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1609,6 +1616,16 @@ The representation choices for this target are:
   and returns the flat CNF symbol stream directly.  On every valid encoded
   input it agrees exactly with the semantic formula, inherits its correctness,
   and satisfies the same polynomial output-length bound.
+- [`LeanTrominoes/FiniteBlockTransducer.lean`](LeanTrominoes/FiniteBlockTransducer.lean)
+  constructs a three-stack finite machine for fixed finite-alphabet block
+  substitution.  It proves an exact run length of twice the input length plus
+  the output length and two, then packages the finite block-size bound as an
+  explicit linear `TM2ComputableInPolyTime` certificate.
+- [`LeanTrominoes/FiniteEncodingNativeFields.lean`](LeanTrominoes/FiniteEncodingNativeFields.lean)
+  numbers any finite source alphabet and specializes the block transducer to
+  emit canonical delimiter-terminated natural fields over the evaluator's
+  native alphabet.  This supplies the polynomial-time input front end needed
+  by the pending machine-to-periodic-CNF compiler certificate.
 - [`LeanTrominoes/FiniteStateSearch.lean`](LeanTrominoes/FiniteStateSearch.lean)
   shortens every such cycle to at most the number of states and packages this
   bounded witness as a decidable finite-search predicate.
