@@ -117,6 +117,9 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
+noncomputable local instance (stack : decider.tm.K) :
+    Fintype (decider.tm.Γ stack) := decider.stackAlphabetFinite stack
+
 /-- Fixed coefficient list for the exact stack-width polynomial used by the
 bounded-machine reduction. -/
 def spaceCoefficients : List Nat :=
@@ -175,6 +178,153 @@ def computableInPolyTime :
       outputsFun := ?_ }
   intro fields
   exact certificate.outputsFun (PartrecToTM2.trList fields)
+
+/-- Alphabet after appending the unary stack width. -/
+abbrev SpacePaddedSymbol := PartrecToTM2.Γ' ⊕ Unit
+
+/-- Alphabet after appending both the unary stack and reset-clock widths. -/
+abbrev WidthPaddedSymbol := SpacePaddedSymbol ⊕ Unit
+
+/-- Delimiters remain recognizable after the first padding phase. -/
+def isSourceDelimiter : SpacePaddedSymbol → Bool
+  | .inl symbol => isDelimiter symbol
+  | .inr _ => false
+
+theorem selectedCount_map_inl {Source Extra : Type}
+    (selected : Source → Bool) (sources : List Source) :
+    selectedCount (fun symbol : Source ⊕ Extra =>
+        match symbol with
+        | .inl source => selected source
+        | .inr _ => false)
+      (sources.map Sum.inl) =
+      selectedCount selected sources := by
+  induction sources with
+  | nil => rfl
+  | cons source sources induction =>
+      simp [selectedCount, induction]
+
+theorem selectedCount_replicate_of_false {Source : Type}
+    (selected : Source → Bool) (source : Source)
+    (notSelected : selected source = false) (count : Nat) :
+    selectedCount selected (List.replicate count source) = 0 := by
+  induction count with
+  | zero => rfl
+  | succ count induction =>
+      rw [List.replicate_succ, selectedCount_cons, notSelected]
+      simpa using induction
+
+@[simp]
+theorem selectedCount_spacePaddedNativeFields (fields : List Nat) :
+    selectedCount isSourceDelimiter
+      (spacePaddedNativeFields decider fields) = fields.length := by
+  unfold spacePaddedNativeFields paddedOutput
+  rw [selectedCount_append]
+  change selectedCount isSourceDelimiter
+        ((PartrecToTM2.trList fields).map Sum.inl) +
+      selectedCount isSourceDelimiter
+        (List.replicate
+          (evalCoefficients (spaceCoefficients decider)
+            (selectedCount isDelimiter (PartrecToTM2.trList fields)))
+          (Sum.inr ())) = fields.length
+  change selectedCount
+        (fun symbol : PartrecToTM2.Γ' ⊕ Unit =>
+          match symbol with
+          | .inl source => isDelimiter source
+          | .inr _ => false)
+        ((PartrecToTM2.trList fields).map Sum.inl) +
+      selectedCount isSourceDelimiter
+        (List.replicate
+          (evalCoefficients (spaceCoefficients decider)
+            (selectedCount isDelimiter (PartrecToTM2.trList fields)))
+          (Sum.inr ())) = fields.length
+  have sourceCount :
+      selectedCount
+          (fun symbol : PartrecToTM2.Γ' ⊕ Unit =>
+            match symbol with
+            | .inl source => isDelimiter source
+            | .inr _ => false)
+          ((PartrecToTM2.trList fields).map Sum.inl) =
+        selectedCount isDelimiter (PartrecToTM2.trList fields) :=
+    by
+      induction PartrecToTM2.trList fields with
+      | nil => rfl
+      | cons symbol symbols induction =>
+          simp [selectedCount, induction]
+  rw [sourceCount, selectedCount_trList,
+    selectedCount_replicate_of_false isSourceDelimiter (Sum.inr ()) rfl]
+  omega
+
+/-- Fixed coefficient list for the exact reset-clock width polynomial. -/
+def clockCoefficients : List Nat :=
+  polynomialCoefficients
+    (PolySpaceReduction.reductionClockPolynomial decider)
+
+/-- Physical output after materializing both dynamic widths. -/
+def widthsPaddedNativeFields (fields : List Nat) :
+    List WidthPaddedSymbol :=
+  paddedOutput isSourceDelimiter (clockCoefficients decider)
+    (spacePaddedNativeFields decider fields)
+
+@[simp]
+theorem evalCoefficients_clockCoefficients (fieldCount : Nat) :
+    evalCoefficients (clockCoefficients decider) fieldCount =
+      (PolySpaceReduction.reductionClockPolynomial decider).eval
+        fieldCount := by
+  simp [clockCoefficients]
+
+theorem clockBitsOfSymbols_eq_polynomial_eval
+    (symbols : List encoding.Γ) :
+    PolySpaceCompiler.clockBitsOfSymbols decider symbols =
+      (PolySpaceReduction.reductionClockPolynomial decider).eval
+        symbols.length := by
+  rw [PolySpaceCompiler.clockBitsOfSymbols,
+    BoundedMachineAtom.configurationBitCount_eq,
+    spaceOfSymbols_eq_polynomial_eval]
+  simp [PolySpaceReduction.reductionClockPolynomial,
+    Polynomial.eval_add, Polynomial.eval_mul]
+
+/-- On canonical source fields, the two marker blocks are exactly the stack
+and reset-clock widths consumed by the bounded expression printer. -/
+@[simp]
+theorem widthsPaddedNativeFields_fields (symbols : List encoding.Γ) :
+    widthsPaddedNativeFields decider
+        (FiniteEncodingNativeFields.fields symbols) =
+      (FiniteEncodingNativeFields.encode symbols).map
+          (fun symbol => Sum.inl (Sum.inl symbol)) ++
+        List.replicate (PolySpaceCompiler.spaceOfSymbols decider symbols)
+          (Sum.inl (Sum.inr ())) ++
+        List.replicate (PolySpaceCompiler.clockBitsOfSymbols decider symbols)
+          (Sum.inr ()) := by
+  unfold widthsPaddedNativeFields paddedOutput
+  rw [selectedCount_spacePaddedNativeFields,
+    FiniteEncodingNativeFields.fields_length,
+    evalCoefficients_clockCoefficients,
+    ← clockBitsOfSymbols_eq_polynomial_eval,
+    spacePaddedNativeFields_fields]
+  simp only [List.map_append, List.map_map, List.map_replicate,
+    List.append_assoc]
+  rfl
+
+/-- The second Horner phase, viewed as a transformation of a word already
+carrying unary stack-width padding. -/
+def appendClockComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List SpacePaddedSymbol) (List WidthPaddedSymbol)
+      SpacePaddedSymbol WidthPaddedSymbol id id
+      (paddedOutput isSourceDelimiter (clockCoefficients decider)) :=
+  UnaryPolynomialPaddingMachine.computableInPolyTime
+    isSourceDelimiter (clockCoefficients decider)
+
+/-- Sequentially materializing both widths remains polynomial-time. -/
+def widthsComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List Nat) (List WidthPaddedSymbol)
+      PartrecToTM2.Γ' WidthPaddedSymbol PartrecToTM2.trList id
+      (widthsPaddedNativeFields decider) := by
+  let composed := TM2CompositionMachine.computableInPolyTime
+    (computableInPolyTime decider)
+    (appendClockComputableInPolyTime decider)
+  exact composed
 
 end PolySpaceRequestPadding
 end PeriodicCNF
