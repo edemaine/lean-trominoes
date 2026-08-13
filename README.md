@@ -602,6 +602,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Verify the shared equality/negation machine script against
               its native two-clause field block, restoring both source
               registers with an exact linear runtime bound.
+            - [x] Verify the shared conjunction/disjunction machine script
+              against its native three-clause field block, restoring all
+              source registers with an exact linear runtime bound.
         - [ ] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Bound the output length of every polynomial-time `FinTM2` by
