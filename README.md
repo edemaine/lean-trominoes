@@ -441,7 +441,7 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Fit one reconstructed covering-placement query.
                 - [x] Sum the fixed candidate list and compare with one.
               - [x] Combine phase, containment, and coverage at one base.
-            - [ ] Lift bounded center validity across the motif.
+            - [x] Lift bounded center validity across the motif.
             - [x] Fit exact native-field target construction and membership.
             - [x] Bound target membership in its native input footprint.
               - [x] Bound target-header reconstruction and both coordinate
@@ -1974,6 +1974,12 @@ The representation choices for this target are:
   pairs the two base-coordinate fields for an existing verified arithmetic
   predicate; the complete one-base evaluator has a quadratic native-input
   space certificate.
+- [`LeanTrominoes/PartrecFlatPackedCenterLoopSpace.lean`](LeanTrominoes/PartrecFlatPackedCenterLoopSpace.lean)
+  reconstructs each one-base center input from the indexed transition scan,
+  fits the exact motif-length countdown, and proves a uniform polynomial-space
+  bound for checking center validity over the complete flat motif.  The public
+  wrapper computes `isCenterValidBool` directly and includes initialization,
+  the full scan, and final result projection in its workspace certificate.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to
