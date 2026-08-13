@@ -354,6 +354,36 @@ theorem machinePeriodicCNF_satisfiableOnLine_of_acceptingTrace
     (machineResetClockExpression_atomsBelow initial)).mpr
   exact FiniteState.hasBiInfinitePath_of_hasCycle directCycle
 
+/-- The machine compiler lands in the concrete one-dimensional local CNF
+source language whenever the source machine has a width-bounded accepting
+trace. -/
+theorem localPeriodicCNF1DSAT_of_acceptingTrace
+    (initial : tm.Cfg)
+    (trace : PeriodicComputation.AcceptingTrace tm.Cfg initial tm.step
+      (machineAccepts (tm := tm)) (2 ^ clockBits - 1))
+    (stacksFit : ∀ index : Fin (trace.length + 1), ∀ stack,
+      ((trace.states index).stk stack).length ≤ space) :
+    LocalPeriodicCNF1DSAT
+      (machinePeriodicCNF (tm := tm) (space := space)
+        (clockBits := clockBits) initial) :=
+  ⟨machinePeriodicCNF_oneDimensional initial,
+    machinePeriodicCNF_localOnLine initial,
+    machinePeriodicCNF_satisfiableOnLine_of_acceptingTrace
+      initial trace stacksFit⟩
+
+/-- Conversely, membership of the compiled formula in the local 1D SAT
+language yields an accepting source-machine trace. -/
+theorem acceptingTrace_of_machinePeriodicCNF_localPeriodicCNF1DSAT
+    (initial : tm.Cfg)
+    (initialStacksFit : ∀ stack, (initial.stk stack).length ≤ space)
+    (holds : LocalPeriodicCNF1DSAT
+      (machinePeriodicCNF (tm := tm) (space := space)
+        (clockBits := clockBits) initial)) :
+    Nonempty (PeriodicComputation.AcceptingTrace tm.Cfg initial tm.step
+      (machineAccepts (tm := tm)) (2 ^ clockBits - 1)) :=
+  acceptingTrace_of_machinePeriodicCNF_satisfiableOnLine
+    initial initialStacksFit holds.2.2
+
 end BoundedMachineAtom
 
 end PeriodicCNF
