@@ -131,6 +131,19 @@ theorem decodeNatFields_encodeNatFields (fields : List Nat) :
   rw [mapM_decodeSymbol_map_encodeSymbol]
   exact decodeNatFieldsAux_encodeNatFieldsRaw fields
 
+/-- Build a finite encoding from any verified flat natural-field
+representation.  This common constructor lets evaluator-based machines consume
+the field list natively. -/
+def finEncodingOfFields {α : Type*}
+    (fields : α → List Nat) (decodeFields : List Nat → Option α)
+    (decode_encode : ∀ value, decodeFields (fields value) = some value) :
+    FinEncoding α where
+  Γ := Symbol
+  encode value := encodeNatFields (fields value)
+  decode symbols := (decodeNatFields symbols).bind decodeFields
+  decode_encode value := by simp [decode_encode]
+  ΓFin := inferInstance
+
 @[simp]
 theorem encodeNatFields_length (fields : List Nat) :
     (encodeNatFields fields).length =
@@ -260,10 +273,8 @@ theorem decodeFormulaFields_formulaFields (formula : PeriodicCNF Nat) :
 
 /-- A flat finite encoding for natural-variable periodic CNF formulas. -/
 def finEncoding : FinEncoding (PeriodicCNF Nat) where
-  Γ := Symbol
-  encode formula := encodeNatFields (formulaFields formula)
-  decode symbols := (decodeNatFields symbols).bind decodeFormulaFields
-  decode_encode formula := by simp
+  toEncoding := (finEncodingOfFields formulaFields decodeFormulaFields
+    decodeFormulaFields_formulaFields).toEncoding
   ΓFin := inferInstance
 
 @[simp]

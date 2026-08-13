@@ -829,6 +829,7 @@ import LeanTrominoes.PeriodicThreeSATThreeAngularOrderComputability
 import LeanTrominoes.PeriodicThreeSATThreeNonempty
 import LeanTrominoes.PartrecFiniteEvaluator
 import LeanTrominoes.PartrecEvaluatorSpaceRefinement
+import LeanTrominoes.PartrecFlatFieldPolySpace
 import LeanTrominoes.PartrecEncodedListDecode
 import LeanTrominoes.PartrecEncodedListDecodeSpace
 import LeanTrominoes.PartrecAdd
