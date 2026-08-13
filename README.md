@@ -472,7 +472,7 @@ build; an imported proof counts when its statement matches the paper.
               fuel counter in that representation.
             - [x] Bound the structural-step cost uniformly over every
               reachable native flat state.
-            - [ ] Lift that uniform bound through the exact-fuel iteration.
+            - [x] Lift that uniform bound through the exact-fuel iteration.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -1993,7 +1993,9 @@ The representation choices for this target are:
   flat input.  It bounds every reachable serialized DFS state together with
   the unchanged strip suffix and any remaining exact-fuel counter, then
   absorbs context recovery and the complete depth-zero edge oracle into one
-  input-polynomial allowance for every reachable structural step.
+  input-polynomial allowance for every reachable structural step.  A
+  suffix-aware invariant lifts that allowance through the entire exact-fuel
+  tail iteration without parsing motif fields as continuation frames.
 - [`LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean`](LeanTrominoes/PartrecFlatStripFrontierContextSpace.lean)
   fits the strip-suffix projections, decodes both queried frontier indices
   into word and phase, and assembles the native seven-field packed-transition

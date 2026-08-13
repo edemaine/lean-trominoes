@@ -10,7 +10,8 @@ target flat encoding, proves that its power-of-two ambient graph contains the
 sparse frontier graph, and bounds every reachable serialized DFS state while
 retaining the complete native strip suffix.  It then absorbs context recovery,
 the reconstructed edge oracle, and every structural branch into one uniform
-input-polynomial step allowance.
+input-polynomial step allowance and carries it through the complete exact-fuel
+tail iteration.
 -/
 
 namespace LeanTrominoes
@@ -657,6 +658,359 @@ theorem flatStripSavitchStepCost_le
     FiniteState.FlatStripSavitchStep.baseBoolCost,
     flatStripSavitchStepSpaceBound]
   gcongr
+
+/-! ## Uniform exact-fuel iteration -/
+
+/-- Total list transformer used by the flat iterator invariant.  It removes
+the known strip suffix before parsing the DFS state, performs one semantic
+step, and restores that suffix unchanged. -/
+def flatStripSavitchProgramStep
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (values : List Nat) : List Nat :=
+  let suffix := PeriodicStripFlatEncoding.stripFields periodicStrip
+  let stateFields := values.take (7 + 6 * values[2]?.getD 0)
+  let state := FiniteState.DivideEvalState.ofNatList (stateFields.drop 3)
+  FiniteState.FlatStripSavitchStep.flatProgramList suffix 0 stateCount
+    (FiniteState.divideEvalStep stateCount
+      (indexedTransitionRawBool tromino periodicStrip) state)
+
+@[simp]
+theorem flatStripSavitchProgramStep_programList
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount : Nat) (state : FiniteState.DivideEvalState) :
+    flatStripSavitchProgramStep tromino periodicStrip stateCount
+        (FiniteState.FlatStripSavitchStep.flatProgramList
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)
+          0 stateCount state) =
+      FiniteState.FlatStripSavitchStep.flatProgramList
+        (PeriodicStripFlatEncoding.stripFields periodicStrip)
+        0 stateCount
+        (FiniteState.divideEvalStep stateCount
+          (indexedTransitionRawBool tromino periodicStrip) state) := by
+  let suffix := PeriodicStripFlatEncoding.stripFields periodicStrip
+  have prefixLength :=
+    FiniteState.divideEvalProgramList_length 0 stateCount state
+  have takePrefix :
+      (FiniteState.divideEvalProgramList 0 stateCount state ++ suffix).take
+          (7 + 6 * state.stack.length) =
+        FiniteState.divideEvalProgramList 0 stateCount state := by
+    rw [← prefixLength]
+    simp
+  have fieldTwo :
+      (FiniteState.divideEvalProgramList 0 stateCount state ++ suffix)[2]?.getD 0 =
+        state.stack.length := by
+    simp [FiniteState.divideEvalProgramList]
+  change flatStripSavitchProgramStep tromino periodicStrip stateCount
+      (FiniteState.divideEvalProgramList 0 stateCount state ++ suffix) = _
+  simp only [flatStripSavitchProgramStep]
+  rw [fieldTwo]
+  rw [takePrefix]
+  simp [FiniteState.divideEvalProgramList]
+
+theorem flatStripSavitchProgramStep_iterate
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (stateCount steps : Nat) (state : FiniteState.DivideEvalState) :
+    ((flatStripSavitchProgramStep tromino periodicStrip stateCount)^[steps])
+        (FiniteState.FlatStripSavitchStep.flatProgramList
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)
+          0 stateCount state) =
+      FiniteState.FlatStripSavitchStep.flatProgramList
+        (PeriodicStripFlatEncoding.stripFields periodicStrip)
+        0 stateCount
+        (((FiniteState.divideEvalStep stateCount
+          (indexedTransitionRawBool tromino periodicStrip))^[steps]) state) := by
+  induction steps with
+  | zero => rfl
+  | succ steps induction =>
+      rw [Function.iterate_succ_apply', Function.iterate_succ_apply',
+        induction, flatStripSavitchProgramStep_programList]
+
+/-- Uniform reserve for the countdown wrapper around one native flat Savitch
+step. -/
+def flatStripSavitchBodySpaceBound (inputLength : Nat) : Nat :=
+  100000 *
+    (flatStripSavitchStepSpaceBound inputLength +
+      flatStripReachPayloadSpaceBound inputLength + 1)
+
+private theorem flatStripSavitchBodyCost_le
+    (inputLength remaining : Nat) (payload output : List Nat)
+    (stepCost : Nat)
+    (inputBound : encodedListSpace (remaining :: payload) ≤
+      flatStripReachPayloadSpaceBound inputLength)
+    (outputBound : encodedListSpace output ≤
+      flatStripReachPayloadSpaceBound inputLength)
+    (stepBound : stepCost ≤ flatStripSavitchStepSpaceBound inputLength) :
+    flatCountdownBodyCost (fun _ => output) (fun _ => stepCost)
+        remaining payload ≤
+      flatStripSavitchBodySpaceBound inputLength := by
+  cases remaining with
+  | zero =>
+      have payloadBound := listCodeEncodedListSpace_tail_le (0 :: payload)
+      simp [flatCountdownBodyCost, zeroPrimeCost,
+        flatStripSavitchBodySpaceBound, encodedListSpace_cons] at *
+      omega
+  | succ remaining =>
+      let values := remaining :: payload
+      have predecessorBits := listCodeEncodeNat_length_mono
+        (show remaining ≤ remaining + 1 by omega)
+      have valuesBound : encodedListSpace values ≤
+          flatStripReachPayloadSpaceBound inputLength := by
+        simp [values, encodedListSpace_cons] at inputBound ⊢
+        omega
+      have tailBound := listCodeTailCost_le_linear values
+      have headBound := headCost_le values
+      have zeroBound := listCodeZeroCost_le_linear values
+      have successorZero := succCost_le [0]
+      have remainingField :
+          (Computability.encodeNat remaining).length + 1 ≤
+            encodedListSpace values := by
+        simp [values, encodedListSpace_cons]
+      have outputWithCounter :
+          encodedListSpace (remaining :: output) ≤
+            2 * (flatStripReachPayloadSpaceBound inputLength + 1) := by
+        simp [encodedListSpace_cons] at outputBound ⊢
+        omega
+      have oneBits : (Computability.encodeNat 1).length = 1 := rfl
+      have zeroBits : (Computability.encodeNat 0).length = 0 := rfl
+      simp [flatCountdownBodyCost, flatCountdownSuccBranchCost,
+        prependCost, oneCost, values, flatStripSavitchBodySpaceBound,
+        encodedListSpace_cons, encodedListSpace_nil,
+        zeroBits, oneBits] at inputBound outputBound stepBound tailBound headBound zeroBound successorZero outputWithCounter ⊢
+      omega
+
+/-- Reachable configurations of the native-flat exact-fuel reachability
+countdown. -/
+def FlatStripSavitchReachable
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last remaining : Nat) (values : List Nat) : Prop :=
+  ∃ taken,
+    remaining + taken =
+      FiniteState.divideEvalFuel
+        (flatStripStateBound periodicStrip)
+        (flatStripSearchDepth periodicStrip) ∧
+    values =
+      FiniteState.FlatStripSavitchStep.flatProgramList
+        (PeriodicStripFlatEncoding.stripFields periodicStrip)
+        0 (flatStripStateBound periodicStrip)
+        (((FiniteState.divideEvalStep (flatStripStateBound periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip))^[taken])
+            (FiniteState.divideEvalInitial
+              (flatStripSearchDepth periodicStrip) first last))
+
+theorem flatStripSavitchReachable_initial
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last : Nat) :
+    FlatStripSavitchReachable tromino periodicStrip first last
+      (FiniteState.divideEvalFuel
+        (flatStripStateBound periodicStrip)
+        (flatStripSearchDepth periodicStrip))
+      (FiniteState.FlatStripSavitchStep.flatProgramList
+        (PeriodicStripFlatEncoding.stripFields periodicStrip)
+        0 (flatStripStateBound periodicStrip)
+        (FiniteState.divideEvalInitial
+          (flatStripSearchDepth periodicStrip) first last)) := by
+  exact ⟨0, by omega, rfl⟩
+
+theorem flatStripSavitchReachable_step
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (first last remaining : Nat) (values : List Nat)
+    (reachable : FlatStripSavitchReachable tromino periodicStrip first last
+      (remaining + 1) values) :
+    FlatStripSavitchReachable tromino periodicStrip first last remaining
+      (flatStripSavitchProgramStep tromino periodicStrip
+        (flatStripStateBound periodicStrip) values) := by
+  obtain ⟨taken, total, rfl⟩ := reachable
+  refine ⟨taken + 1, by omega, ?_⟩
+  rw [flatStripSavitchProgramStep_programList,
+    Function.iterate_succ_apply']
+
+set_option maxHeartbeats 1000000 in
+/-- The complete exact-fuel native-flat Savitch countdown reuses one
+input-polynomial workspace reserve at every tail-recursive iteration. -/
+theorem flatStripSavitchFlatUniform
+    (tromino : Tromino) (periodicStrip : PeriodicStrip)
+    (wellFormed : periodicStrip.IsWellFormed)
+    (first last : Nat)
+    (firstBelow : first < flatStripStateBound periodicStrip)
+    (lastBelow : last < flatStripStateBound periodicStrip) :
+    Turing.PartrecToTM2.EvaluatorCodeFits
+      (Turing.ToPartrec.Code.flatIterate
+        (FiniteState.DivideEvalPartrec.stepCode
+          (FiniteState.FlatStripEdgePartrec.baseCode tromino)))
+      (FiniteState.divideEvalFuel
+          (flatStripStateBound periodicStrip)
+          (flatStripSearchDepth periodicStrip) ::
+        FiniteState.FlatStripSavitchStep.flatProgramList
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)
+          0 (flatStripStateBound periodicStrip)
+          (FiniteState.divideEvalInitial
+            (flatStripSearchDepth periodicStrip) first last))
+      (FiniteState.FlatStripSavitchStep.flatProgramList
+        (PeriodicStripFlatEncoding.stripFields periodicStrip)
+        0 (flatStripStateBound periodicStrip)
+        (((FiniteState.divideEvalStep (flatStripStateBound periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip))^[
+            FiniteState.divideEvalFuel
+              (flatStripStateBound periodicStrip)
+              (flatStripSearchDepth periodicStrip)])
+          (FiniteState.divideEvalInitial
+            (flatStripSearchDepth periodicStrip) first last)))
+      (flatStripSavitchBodySpaceBound
+        (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length) where
+  input_space := by
+    have input := flatStripReachCountdownSpace_le tromino periodicStrip
+      first last 0
+      (FiniteState.divideEvalFuel
+        (flatStripStateBound periodicStrip)
+        (flatStripSearchDepth periodicStrip))
+      firstBelow lastBelow (Nat.le_refl _)
+    exact input.trans (by
+      simp [flatStripSavitchBodySpaceBound,
+        flatStripSavitchStepSpaceBound]
+      omega)
+  output_space := by
+    have output := flatStripReachStateSpace_le tromino periodicStrip
+      first last
+      (FiniteState.divideEvalFuel
+        (flatStripStateBound periodicStrip)
+        (flatStripSearchDepth periodicStrip))
+      firstBelow lastBelow
+    exact output.trans (by
+      simp [flatStripSavitchBodySpaceBound,
+        flatStripSavitchStepSpaceBound,
+        flatStripReachPayloadSpaceBound]
+      omega)
+  call continuation bound budget after := by
+    let inputLength :=
+      (PeriodicStripFlatEncoding.finEncoding.encode periodicStrip).length
+    apply Turing.PartrecToTM2.EvaluatorCallFits.flatIterate_of_reachable_code_fits
+      (step := flatStripSavitchProgramStep tromino periodicStrip
+        (flatStripStateBound periodicStrip))
+      (bodyCost := fun _ _ => flatStripSavitchBodySpaceBound inputLength)
+      (invariant := FlatStripSavitchReachable
+        tromino periodicStrip first last)
+    · intro remaining values reachable
+      obtain ⟨taken, total, rfl⟩ := reachable
+      let state :=
+        ((FiniteState.divideEvalStep (flatStripStateBound periodicStrip)
+          (indexedTransitionRawBool tromino periodicStrip))^[taken])
+            (FiniteState.divideEvalInitial
+              (flatStripSearchDepth periodicStrip) first last)
+      have indices : state.IndicesBelow
+          (flatStripStateBound periodicStrip) := by
+        dsimp only [state]
+        exact FiniteState.divideEvalIterate_initial_indicesBelow
+          (flatStripStateBound periodicStrip)
+          (flatStripSearchDepth periodicStrip)
+          first last taken
+          (indexedTransitionRawBool tromino periodicStrip)
+          firstBelow lastBelow
+      have stateSpace : encodedListSpace
+          (FiniteState.FlatStripSavitchStep.flatProgramList
+            (PeriodicStripFlatEncoding.stripFields periodicStrip)
+            0 (flatStripStateBound periodicStrip) state) ≤
+          flatStripReachStateSpaceBound inputLength := by
+        simpa [state, inputLength,
+          FiniteState.FlatStripSavitchStep.flatProgramList] using
+          flatStripReachStateSpace_le tromino periodicStrip
+            first last taken firstBelow lastBelow
+      have stepFit := FiniteState.FlatStripSavitchStep.exactStep
+        tromino periodicStrip wellFormed 0
+        (flatStripStateBound periodicStrip) state
+      have stepBound := flatStripSavitchStepCost_le tromino periodicStrip
+        wellFormed state indices (by
+          simpa [FiniteState.FlatStripSavitchStep.flatProgramList,
+            inputLength] using stateSpace)
+      have body := flatCountdownBody_of_fit stepFit remaining
+      have body' :
+          Turing.PartrecToTM2.EvaluatorCodeFits
+            (Turing.ToPartrec.Code.flatCountdownBody
+              (FiniteState.DivideEvalPartrec.stepCode
+                (FiniteState.FlatStripEdgePartrec.baseCode tromino)))
+            (remaining ::
+              FiniteState.FlatStripSavitchStep.flatProgramList
+                (PeriodicStripFlatEncoding.stripFields periodicStrip)
+                0 (flatStripStateBound periodicStrip) state)
+            (Turing.PartrecToTM2.flatCountdownOutput
+              (flatStripSavitchProgramStep tromino periodicStrip
+                (flatStripStateBound periodicStrip)) remaining
+              (FiniteState.FlatStripSavitchStep.flatProgramList
+                (PeriodicStripFlatEncoding.stripFields periodicStrip)
+                0 (flatStripStateBound periodicStrip) state))
+            (flatCountdownBodyCost
+              (fun _ =>
+                FiniteState.FlatStripSavitchStep.flatProgramList
+                  (PeriodicStripFlatEncoding.stripFields periodicStrip)
+                  0 (flatStripStateBound periodicStrip)
+                  (FiniteState.divideEvalStep
+                    (flatStripStateBound periodicStrip)
+                    (indexedTransitionRawBool tromino periodicStrip) state))
+              (fun _ => FiniteState.FlatStripSavitchStep.stepCost
+                tromino periodicStrip 0
+                (flatStripStateBound periodicStrip) state)
+              remaining
+              (FiniteState.FlatStripSavitchStep.flatProgramList
+                (PeriodicStripFlatEncoding.stripFields periodicStrip)
+                0 (flatStripStateBound periodicStrip) state)) := by
+        cases remaining with
+        | zero =>
+            simpa [Turing.PartrecToTM2.flatCountdownOutput] using body
+        | succ remaining =>
+            simp only [Turing.PartrecToTM2.flatCountdownOutput]
+            rw [flatStripSavitchProgramStep_programList]
+            simpa [Turing.PartrecToTM2.flatCountdownOutput] using body
+      apply body'.mono
+      have remainingBound :
+          remaining ≤ FiniteState.divideEvalFuel
+            (flatStripStateBound periodicStrip)
+            (flatStripSearchDepth periodicStrip) := by
+        omega
+      have inputBound := flatStripReachCountdownSpace_le tromino periodicStrip
+        first last taken remaining firstBelow lastBelow remainingBound
+      have outputBound := flatStripReachStateSpace_le tromino periodicStrip
+        first last (taken + 1) firstBelow lastBelow
+      have outputBound' : encodedListSpace
+          (FiniteState.FlatStripSavitchStep.flatProgramList
+            (PeriodicStripFlatEncoding.stripFields periodicStrip)
+            0 (flatStripStateBound periodicStrip)
+            (FiniteState.divideEvalStep (flatStripStateBound periodicStrip)
+              (indexedTransitionRawBool tromino periodicStrip) state)) ≤
+          flatStripReachPayloadSpaceBound inputLength := by
+        have outputBoundLocal : encodedListSpace
+            (FiniteState.FlatStripSavitchStep.flatProgramList
+              (PeriodicStripFlatEncoding.stripFields periodicStrip)
+              0 (flatStripStateBound periodicStrip)
+              (FiniteState.divideEvalStep (flatStripStateBound periodicStrip)
+                (indexedTransitionRawBool tromino periodicStrip) state)) ≤
+            flatStripReachStateSpaceBound inputLength := by
+          simpa [state, inputLength, Function.iterate_succ_apply',
+            FiniteState.FlatStripSavitchStep.flatProgramList] using outputBound
+        exact outputBoundLocal.trans (by
+          simp only [flatStripReachPayloadSpaceBound]
+          omega)
+      exact flatStripSavitchBodyCost_le inputLength remaining
+        (FiniteState.FlatStripSavitchStep.flatProgramList
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)
+          0 (flatStripStateBound periodicStrip) state)
+        (FiniteState.FlatStripSavitchStep.flatProgramList
+          (PeriodicStripFlatEncoding.stripFields periodicStrip)
+          0 (flatStripStateBound periodicStrip)
+          (FiniteState.divideEvalStep (flatStripStateBound periodicStrip)
+            (indexedTransitionRawBool tromino periodicStrip) state))
+        (FiniteState.FlatStripSavitchStep.stepCost tromino periodicStrip
+          0 (flatStripStateBound periodicStrip) state)
+        (by simpa [state, inputLength,
+          FiniteState.FlatStripSavitchStep.flatProgramList] using inputBound)
+        outputBound'
+        (by simpa [inputLength] using stepBound)
+    · exact flatStripSavitchReachable_initial
+        tromino periodicStrip first last
+    · exact flatStripSavitchReachable_step
+        tromino periodicStrip first last
+    · intro remaining values reachable
+      simpa [inputLength] using budget
+    · rw [flatStripSavitchProgramStep_iterate]
+      exact after
 
 end RawWindowState
 end PeriodicStrip
