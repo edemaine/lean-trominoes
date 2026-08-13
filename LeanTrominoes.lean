@@ -840,6 +840,7 @@ import LeanTrominoes.PartrecIntOffsetSpace
 import LeanTrominoes.PartrecPackedTargetCell
 import LeanTrominoes.PartrecPackedTargetCellSpace
 import LeanTrominoes.PeriodicStripCanonicalMembership
+import LeanTrominoes.PeriodicStripFlatEncoding
 import LeanTrominoes.PartrecPackedTargetMembership
 import LeanTrominoes.PartrecPackedTargetMembershipSpace
 import LeanTrominoes.PartrecPackedCenterCandidate

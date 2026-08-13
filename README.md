@@ -289,7 +289,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove the concrete normalized-drawing compiler computable.
       - [x] Assemble the final many-one reductions for both trominoes and
         derive the complete 2D `planeStatement` of Theorem 5.2.
-  - [x] Prove PSPACE membership of the 1.5D problem for each tromino.
+  - [ ] Prove PSPACE membership of the 1.5D problem for each tromino under the
+    target flat strip encoding.
     - [x] Characterize tilings by directed cycles in the finite strip-frontier
       graph and compile its indexed transition predicate.
     - [x] Compute a polynomial-bit state bound and a sufficient Savitch search
@@ -310,7 +311,10 @@ build; an imported proof counts when its statement matches the paper.
       power-of-two state bound used by the compiled unary driver.
     - [x] Fit parameter assembly and the guarded cycle-search driver.
     - [x] Fit the unary input wrapper and package the verified evaluator as a
-      PSPACE decision procedure for each tromino.
+      PSPACE decision procedure for each tromino under the legacy standard
+      `Primcodable` encoding.
+    - [ ] Port the input decoder and input-size certificates to the target flat
+      strip encoding.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
     - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
@@ -424,9 +428,10 @@ the exact fetched dependency revision in the committed `lake-manifest.json`.
 The definition layer needed to state Theorem 5.2 is complete.  Its entire 2D
 conjunct is now proved: `periodicTrominoTiling_coRE` supplies the upper bound,
 and `PeriodicWangPlanarThreeDMReduction.theorem52_planeStatement` supplies the
-matching Wang-tiling hardness reductions for both trominoes.  The 1.5D
-membership half is also proved by `periodicStripTrominoTiling_inPSPACE`; only
-its PSPACE-hardness half remains.  The complete formal target remains
+matching Wang-tiling hardness reductions for both trominoes.  A complete 1.5D
+membership proof exists for the legacy recursively paired encoding; its input
+layer and bounds must now be ported to the flat target encoding while the
+PSPACE-hardness proof is completed.  The complete formal target remains
 `LeanTrominoes.Theorem52.statement`, the conjunction of:
 
 - `planeStatement`: co-r.e.-completeness in 2D for each of the I and L
@@ -448,6 +453,11 @@ The representation choices for this target are:
   `PeriodicRegion` by a finite motif and two full-rank period vectors.  Its
   1.5D analogue, `PeriodicStrip`, uses a finite motif in
   $\mathbb Z \times \{0,\ldots,W-1\}$ and one positive horizontal period.
+- [`LeanTrominoes/PeriodicStripFlatEncoding.lean`](LeanTrominoes/PeriodicStripFlatEncoding.lean)
+  gives the 1.5D target a delimiter-based binary encoding with explicit motif
+  length and two signed-coordinate fields per motif cell.  Its decoder round
+  trip is verified, and motif-list structure has linear rather than recursively
+  paired overhead.
   Malformed finite presentations are no-instances of the decision predicates.
 - [`LeanTrominoes/PeriodicGraph.lean`](LeanTrominoes/PeriodicGraph.lean)
   represents an infinite periodic graph by finite protovertices and
@@ -1789,6 +1799,10 @@ The representation choices for this target are:
   proves that well-formed strip carrier membership is exactly finite motif
   membership at the unique fundamental-domain representative, and specializes
   this bridge to the physical and canonical coordinates of packed columns.
+- [`LeanTrominoes/PeriodicStripFlatEncoding.lean`](LeanTrominoes/PeriodicStripFlatEncoding.lean)
+  serializes width, period, motif length, and motif coordinates as one flat
+  delimiter-separated binary stream and proves its executable decoder is a
+  left inverse.  This is the finite encoding now used by `Theorem52.stripStatement`.
 - [`LeanTrominoes/PartrecPackedTargetMembership.lean`](LeanTrominoes/PartrecPackedTargetMembership.lean)
   composes canonical-cell construction with the five-column motif scanner and
   projects its `found` bit.  The resulting explicit program is proved equal to

@@ -1,5 +1,6 @@
 import LeanTrominoes.Complexity
 import LeanTrominoes.Periodic
+import LeanTrominoes.PeriodicStripFlatEncoding
 import LeanWang.Final
 
 /-!
@@ -19,7 +20,7 @@ def planeStatement : Prop :=
 def stripStatement : Prop :=
   ∀ tromino : Tromino,
     Complexity.PSPACEComplete
-      (Complexity.primcodableFinEncoding PeriodicStrip)
+      PeriodicStripFlatEncoding.finEncoding
       (PeriodicStripTrominoTiling tromino)
 
 /-- The complete formal target corresponding to Theorem 5.2. -/
