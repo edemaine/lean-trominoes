@@ -1094,6 +1094,8 @@ build; an imported proof counts when its statement matches the paper.
         and endpoint splicing preserve the enlarged open vertical halo.
       - [x] Apply the Figure 2 splice to every contracted edge and prove the
         complete first normalization-round drawing stays in the halo.
+      - [x] Apply the first cyclic splice to every round-1 edge and prove the
+        complete second normalization-round drawing stays in the halo.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
