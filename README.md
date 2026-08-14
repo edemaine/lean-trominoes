@@ -882,6 +882,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify a reusable two-pass affine empty-stack emitter:
                   all `none` cell operands, the constant-true base, and every
                   conjunction closer, preserving an arbitrary mixed workspace.
+                - [x] Split the fixed finite stack enumeration exactly as
+                  `before ++ [k₀] ++ after`, proving both side lists exclude
+                  `k₀` and stack-token flat maps preserve this order.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
