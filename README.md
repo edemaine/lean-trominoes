@@ -855,6 +855,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift indexed recipe execution across one selected item's
                   complete template, append exact `positionTokens`, and advance
                   the selected-position counter once.
+                - [x] Lift indexed item execution across the complete input,
+                  retaining exact input order and accumulating the exact
+                  data-indexed token word and selected-position count.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
