@@ -1111,6 +1111,8 @@ build; an imported proof counts when its statement matches the paper.
         with reflected geometric unit steps and cannot wrap across a seam.
       - [x] Prove strip lookup recovers every displayed route triple and that
         consecutive routing cells expose matching colored ports.
+      - [x] Match each normalized source vertex to its first strip routing
+        cell with the correct endpoint color.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
