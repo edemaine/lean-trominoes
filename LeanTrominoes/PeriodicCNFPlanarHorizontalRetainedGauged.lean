@@ -8,6 +8,7 @@ import LeanTrominoes.PeriodicCNFOneDimensionalWrapping
 import LeanTrominoes.PeriodicCNFPlanarDeduplicationWrapping
 import LeanTrominoes.PeriodicCNFPlanarHorizontalRetainedFormula
 import LeanTrominoes.PeriodicCNFPlanarHorizontalRetainedGaugeOccurrences
+import LeanTrominoes.PositionedPeriodicCNFOneDimensionalDeduplication
 
 /-!
 # One-dimensional gauged retained planar-SAT normalization
@@ -60,6 +61,25 @@ theorem
     PositionedPeriodicCNF.erase_variableGauge,
     retainedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase]
     using gaugedNormalizedHorizontal
+
+/-- Final literal-list deduplication preserves the horizontal retained
+positioned formula. -/
+theorem
+    retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase_isOneDimensional
+    {Variable : Type*} [DecidableEq Variable]
+    {formula : PeriodicCNF Variable}
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (horizontal : formula.incidenceGraph.HasZeroVerticalOffsets) :
+    (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+      formula).erase.IsOneDimensional := by
+  rw [
+    retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_eq]
+  exact PositionedPeriodicCNF.deduplicateByLiterals_erase_isOneDimensional
+    _
+    (retainedAnchorNormalizedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_erase_isOneDimensional
+      wellFormed degree isLocal horizontal)
 
 end PeriodicOrthocrossing
 end LeanTrominoes
