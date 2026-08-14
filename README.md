@@ -873,6 +873,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose polynomial initial-tail materialization with the
                   indexed decoded-source emitter, flattening the workspace
                   while preserving every earlier token and exact source word.
+                - [x] Define the two-counter affine empty-cell template for the
+                  input stack and prove its complete range equals the exact
+                  `sourceLength + offset` initial-tail schedule.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
