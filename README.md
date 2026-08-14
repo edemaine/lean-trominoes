@@ -1159,6 +1159,10 @@ build; an imported proof counts when its statement matches the paper.
         reconstruction to every exposed port of the infinite strip drawing.
       - [x] Package the induced strip assignment as a valid global drawing
         orientation whenever the suppressed 3DM orientation is valid.
+      - [x] Read contracted endpoint values from any valid strip orientation
+        and prove all endpoint ports at a translated triple agree.
+      - [x] Prove the graph assignment extracted from a valid strip
+        orientation is coherent at every translated triple.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
