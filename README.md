@@ -1141,6 +1141,8 @@ build; an imported proof counts when its statement matches the paper.
         orientation provenance values despite using different location keys.
       - [x] Define the suppressed-orientation-induced infinite strip
         orientation and prove every local cell constraint.
+      - [x] Evaluate that orientation at explicit strip-block occurrences and
+        commute geometric unit steps with rectangular block translations.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
