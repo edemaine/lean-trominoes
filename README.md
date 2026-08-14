@@ -933,6 +933,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Append the source-out-of-range `none` tail with marked
                   bivariate interval counts, completing a polynomial-time
                   emitter for all transformed stack-cell operands.
+                - [x] Split the represented stack range at the pushed-prefix
+                  and source-validity boundaries, proving the three emitted
+                  cell blocks exactly equal normalized `stackTransformCell`.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
