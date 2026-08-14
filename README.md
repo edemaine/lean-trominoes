@@ -834,6 +834,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Specify data-indexed affine emission, where each selected
                   input item chooses its finite recipe and advances one exact
                   selected-position counter.
+                - [x] Specialize indexed recipes to decoded input-stack cells
+                  and recover the exact source-prefix tokens while ignoring all
+                  prepared markers, earlier tokens, and tail padding.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
