@@ -1143,6 +1143,8 @@ build; an imported proof counts when its statement matches the paper.
         orientation and prove every local cell constraint.
       - [x] Evaluate that orientation at explicit strip-block occurrences and
         commute geometric unit steps with rectangular block translations.
+      - [x] Prove membership constructors for every listed strip vertex site
+        and every displayed route-triple site.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
