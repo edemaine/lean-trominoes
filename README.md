@@ -1051,6 +1051,8 @@ build; an imported proof counts when its statement matches the paper.
         one-dimensionality for every compass-port assignment.
       - [x] Prove Figure 9 exact-one conversion preserves
         one-dimensionality through inherited offsets and clause anchors.
+      - [x] Prove exact-one unit elimination preserves one-dimensionality for
+        empty, unit, and nonunit source clauses.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
