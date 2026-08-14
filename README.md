@@ -754,6 +754,8 @@ build; an imported proof counts when its statement matches the paper.
                   recover the normalized reset-clock token word.
                 - [x] Compose bivariate reset operands with affine conjunction
                   closers into an exact polynomial-time clock-reset emitter.
+                - [x] Flatten normalized binary succession into outer frames,
+                  triangular equality operands, and its exact unwind suffix.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1984,6 +1986,11 @@ The representation choices for this target are:
   emits one conjunction closer per unary clock marker.  Both retain the
   four-block prepared input, and the composed polynomial-time TM2 certificate
   extracts exactly the normalized reset-clock program at the reduction widths.
+- [`LeanTrominoes/PeriodicCNFBinarySuccessorSchedule.lean`](LeanTrominoes/PeriodicCNFBinarySuccessorSchedule.lean)
+  flattens the recursive no-overflow binary-successor program into explicit
+  outer frames.  Each frame exposes its triangular higher-bit equality stream
+  and fold ending, while one final suffix closes every carry branch, giving the
+  next counter machine an exact postorder target.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
