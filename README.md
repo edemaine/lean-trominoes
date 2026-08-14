@@ -1147,6 +1147,8 @@ build; an imported proof counts when its statement matches the paper.
         and every displayed route-triple site.
       - [x] Prove the forward strip orientation assigns complementary values
         across every source-vertex/first-route-cell boundary.
+      - [x] Reconcile horizontal contracted target offsets with strip-block
+        translations and orient every target boundary compatibly.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
