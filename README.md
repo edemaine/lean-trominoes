@@ -685,6 +685,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Mark every emitted instruction by its exact Tseitin
                   clause weight and materialize the total clause count in
                   canonical binary with the verified padding machine.
+                - [x] Rotate the counted suffix into the native request
+                  header, insert its delimiter, expand every finite token,
+                  and verify the finalizer in linear time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
