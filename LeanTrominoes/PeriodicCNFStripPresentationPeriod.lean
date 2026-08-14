@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripHorizontalProblem
 import LeanTrominoes.PeriodicCNFStripHorizontalPeriodSize
+import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMPeriodBridge
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDMPeriod
 
 /-!
@@ -34,6 +35,26 @@ theorem presentation_drawing_gridSize_eq (source : PeriodicCNF Nat) :
       (sourceFormula_widthAtMostThree source)
       (sourceFormula_occurrencesAtMostThree_canonicalBEq source)
       (sourceFormula_clausesNonempty source)
+
+/-- The proof-free scalar computation is the exact physical period of the
+semantic 3DM presentation. -/
+theorem horizontalThreeDMPeriodComputed_eq_presentation
+    (source : PeriodicCNF Nat) :
+    horizontalThreeDMPeriodComputed source =
+      (presentation source).drawing.gridSize := by
+  rw [horizontalThreeDMPeriodComputed_eq_semantic,
+    presentation_drawing_gridSize_eq]
+  rfl
+
+/-- The executable predecessor is the exact field stored by the semantic
+3DM grid drawing. -/
+theorem horizontalThreeDMGridSizePredComputed_eq_presentation
+    (source : PeriodicCNF Nat) :
+    horizontalThreeDMGridSizePredComputed source =
+      (presentation source).drawing.gridSizePred := by
+  unfold horizontalThreeDMGridSizePredComputed
+  rw [horizontalThreeDMPeriodComputed_eq_presentation]
+  simp [PeriodicGridDrawing.gridSize]
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
