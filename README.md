@@ -1137,6 +1137,8 @@ build; an imported proof counts when its statement matches the paper.
         translations through the positive strip width and height.
       - [x] Reconstruct the unique rectangular block occurrence behind every
         successful infinite-lift provenance lookup.
+      - [x] Prove the square and rectangular rasterizers enumerate identical
+        orientation provenance values despite using different location keys.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
