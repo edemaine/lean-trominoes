@@ -1165,6 +1165,12 @@ build; an imported proof counts when its statement matches the paper.
         orientation is coherent at every translated triple.
       - [x] Prove reverse orientation transport preserves the forward-facing
         value across one internal strip route cell.
+      - [x] Iterate reverse value transport from any displayed strip route
+        pair through the fixed final pair.
+      - [x] Identify strip route values with their source endpoint and the
+        complement of their translated target endpoint.
+      - [x] Prove every complete contracted strip route gives unequal inward
+        values at its two endpoint occurrences.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
