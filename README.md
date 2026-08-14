@@ -891,6 +891,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify a reusable polynomial-time `all`-fold ending pass
                   that appends the true base followed by one conjunction
                   closer per selected operand.
+                - [x] Identify the prepared `space` count across the workspace
+                  type change and prove every input and non-input emitted word
+                  equals its exact initial `stackSchedule`.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
