@@ -1107,6 +1107,8 @@ build; an imported proof counts when its statement matches the paper.
         endpoint-contact certificate.
       - [x] Prove exact strip lookup for every listed normalized vertex and
         route-interior assignment under that collision certificate.
+      - [x] Prove finite strip neighbors of strict-interior assignments agree
+        with reflected geometric unit steps and cannot wrap across a seam.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
