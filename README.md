@@ -1021,6 +1021,8 @@ build; an imported proof counts when its statement matches the paper.
         exact parallel with the generated positioned clauses.
       - [x] Compute the retained, shortened, and two translated split-route
         branches selected by each generated incidence's origin metadata.
+      - [x] Compute the complete metadata-indexed raw incidence-route family
+        and its final whole-period transport through the fresh-variable gauge.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
