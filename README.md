@@ -767,6 +767,8 @@ build; an imported proof counts when its statement matches the paper.
                   recover the normalized reset-clock token word.
                 - [x] Compose bivariate reset operands with affine conjunction
                   closers into an exact polynomial-time clock-reset emitter.
+                - [x] Prove both clock-reset passes preserve the shared
+                  prepared workspace and every earlier token prefix.
                 - [x] Flatten normalized binary succession into outer frames,
                   triangular equality operands, and its exact unwind suffix.
                 - [x] Specialize rise, fall, and equality frames to runtime

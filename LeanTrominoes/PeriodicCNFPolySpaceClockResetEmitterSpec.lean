@@ -77,6 +77,21 @@ theorem bivariateSelectedCount_embedData
     UnaryPolynomialPaddingMachine.selectedCount selected data
   exact AffineEmitterPipeline.selectedCount_embedData selected data
 
+theorem bivariateSelectedCount_embed_append_tokens
+    (selected : Symbol (encoding := encoding) → Bool)
+    (data : List (Symbol (encoding := encoding))) (tokens : List Token) :
+    BivariateTemplateEmitterMachine.selectedCount selected
+        (embedData data ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      UnaryPolynomialPaddingMachine.selectedCount selected data := by
+  change AffineTemplateEmitterMachine.selectedCount selected
+      (embedData data ++
+        tokens.map fun token =>
+          (Sum.inr token : Workspace (encoding := encoding))) = _
+  exact AffineEmitterPipeline.selectedCount_embed_append_tokens
+    selected data tokens
+
 theorem operandRun_embedData
     (data : List (Symbol (encoding := encoding))) :
     operandRun decider (embedData data) =
@@ -89,6 +104,26 @@ theorem operandRun_embedData
   unfold operandRun BivariateTemplateEmitterMachine.appendedOutput
   rw [bivariateSelectedCount_embedData,
     bivariateSelectedCount_embedData]
+  rfl
+
+theorem operandRun_embed_append_tokens
+    (data : List (Symbol (encoding := encoding))) (tokens : List Token) :
+    operandRun decider
+        (embedData data ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      embedData data ++
+        (tokens ++
+          BivariateTemplateEmitterMachine.positionRangeTokens
+              (resetBit (tm := decider.tm)).recipes
+              (PolySpaceUnaryPreparedLayout.space data) 0
+              (PolySpaceUnaryPreparedLayout.clockWidth data) ++
+            allEnding 0).map fun token =>
+          (Sum.inr token : Workspace (encoding := encoding)) := by
+  unfold operandRun BivariateTemplateEmitterMachine.appendedOutput
+  rw [bivariateSelectedCount_embed_append_tokens,
+    bivariateSelectedCount_embed_append_tokens]
+  simp [List.map_append, List.append_assoc]
   rfl
 
 theorem closingPhase_emitted
@@ -117,6 +152,25 @@ theorem runWorkspace_embedData
         (emitted decider data).map Sum.inr := by
   unfold runWorkspace
   rw [operandRun_embedData]
+  rw [AffineEmitterPipeline.Phase.run_embed_append_tokens]
+  rw [closingPhase_emitted]
+  unfold emitted clockResetTokens
+  rw [allEnding_eq_base_append_closers
+    (PolySpaceUnaryPreparedLayout.clockWidth data)]
+  simp [List.map_append, List.append_assoc]
+
+/-- Reset emission preserves prepared data and every earlier token. -/
+theorem runWorkspace_embed_append_tokens
+    (data : List (Symbol (encoding := encoding))) (tokens : List Token) :
+    runWorkspace decider
+        (embedData data ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      embedData data ++
+        (tokens ++ emitted decider data).map fun token =>
+          (Sum.inr token : Workspace (encoding := encoding)) := by
+  unfold runWorkspace
+  rw [operandRun_embed_append_tokens]
   rw [AffineEmitterPipeline.Phase.run_embed_append_tokens]
   rw [closingPhase_emitted]
   unfold emitted clockResetTokens
