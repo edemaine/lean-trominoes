@@ -803,6 +803,8 @@ build; an imported proof counts when its statement matches the paper.
                   frame-range output and runtime by fixed cubic-scale forms.
                 - [x] Bound exact total execution by a fixed cubic polynomial
                   and package the emitter as polynomial-time TM2 computation.
+                - [x] Specialize the triangular machine to the clock templates
+                  and recover the exact normalized successor program.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2153,6 +2155,11 @@ The representation choices for this target are:
   fixed cubic bound for exact output and total execution, and packages the
   finite machine as a `TM2ComputableInPolyTime` implementation of the complete
   triangular semantic emitter.
+- [`LeanTrominoes/PeriodicCNFPolySpaceClockSuccessorEmitterSpec.lean`](LeanTrominoes/PeriodicCNFPolySpaceClockSuccessorEmitterSpec.lean)
+  specializes that machine to the fixed rise, equality, and fall clock recipes.
+  Its input-preserving pass and embedding/extraction wrapper are polynomial-time,
+  and on prepared sources the exact emitted suffix is the normalized bounded-
+  machine clock-successor program.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
