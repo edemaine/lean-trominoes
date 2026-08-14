@@ -1015,6 +1015,8 @@ build; an imported proof counts when its statement matches the paper.
         embedded normalized planar-SAT clause family.
       - [x] Prove every anchor-normalized crossover template literal has zero
         offset after removing its physical site's common periodic shift.
+      - [x] Relate each retained carrier node's normalization shift to its
+        supporting segment translate and equate both endpoints of every link.
       - [x] Prove anchor normalization sends every routed original-clause
         literal to its explicit zero-offset terminal prototype.
       - [x] Prove every normalized routed variable arm retains exactly its
