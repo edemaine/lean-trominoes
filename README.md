@@ -1117,6 +1117,8 @@ build; an imported proof counts when its statement matches the paper.
         cell at the routed periodic target occurrence.
       - [x] Prove one-dimensional contracted offsets identify each routed
         target occurrence with its base target in the rectangular raster.
+      - [x] Recover the unique displayed route triple and owning contracted
+        edge behind every emitted strip route assignment.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
