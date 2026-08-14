@@ -666,6 +666,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Append the exact unary and canonical binary space, clock,
                 and fresh values, and certify the complete pipeline in
                 polynomial time.
+              - [x] Flatten the prepared nested-sum word into seven tagged
+                blocks and prove exact recovery of the source, unary counters,
+                binary fields, and normalized token-request specification.
             - [ ] Stream the normalized bounded-expression postorder program.
               - [x] Mirror conjunction, disjunction, equality, exact-one,
                 vector equality, and binary successor directly on instruction
