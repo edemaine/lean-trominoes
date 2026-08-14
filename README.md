@@ -1123,6 +1123,8 @@ build; an imported proof counts when its statement matches the paper.
         predecessor or successor, including both endpoint boundary windows.
       - [x] Classify every nonblank strip lookup result and prove each exposed
         colored port matches the opposite port of its finite neighbor.
+      - [x] Lift lookup-level port matching and vertex isolation to the
+        packaged rectangular drawing interfaces.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
