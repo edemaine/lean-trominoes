@@ -1017,6 +1017,8 @@ build; an imported proof counts when its statement matches the paper.
         offset after removing its physical site's common periodic shift.
       - [x] Relate each retained carrier node's normalization shift to its
         supporting segment translate and equate both endpoints of every link.
+      - [x] Lift equal retained-carrier endpoint shifts through the complete
+        anchor-normalized equality-clause family.
       - [x] Prove anchor normalization sends every routed original-clause
         literal to its explicit zero-offset terminal prototype.
       - [x] Prove every normalized routed variable arm retains exactly its
