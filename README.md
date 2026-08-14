@@ -921,6 +921,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify a prefix-marked bivariate wrapper that exposes
                   two tagged interval counts to affine templates while
                   preserving and untagging the shared workspace.
+                - [x] Instantiate bivariate stack-cell and optional-cell
+                  equality templates at `fixedOffset + first + position`,
+                  with exact normalized token-range identities.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
