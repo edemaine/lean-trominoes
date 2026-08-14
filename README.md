@@ -918,6 +918,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove exact selected counts for fixed prefixes and
                   half-open intervals in prefix-marked unary data, enabling
                   runtime-width boundary and tail schedules.
+                - [x] Specialize marked intervals to a fixed occurrence,
+                  proving its selector count is exactly the corresponding
+                  runtime-bound comparison bit.
                 - [x] Verify a prefix-marked bivariate wrapper that exposes
                   two tagged interval counts to affine templates while
                   preserving and untagging the shared workspace.

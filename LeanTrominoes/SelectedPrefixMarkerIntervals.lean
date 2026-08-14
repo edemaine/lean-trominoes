@@ -30,6 +30,12 @@ def betweenPrefixes {Data : Type} {cutoff : Nat}
   | (data, count) =>
       selected data && decide (start ≤ count.val ∧ count.val < stop)
 
+/-- Select the single selected occurrence at zero-based index `position`, if
+that occurrence exists. -/
+def atPrefix {Data : Type} {cutoff : Nat}
+    (selected : Data → Bool) (position : Nat) : Tagged cutoff Data → Bool :=
+  betweenPrefixes selected position (position + 1)
+
 theorem selectedCount_fst_markAux {Data : Type} {cutoff : Nat}
     (selected : Data → Bool) (count : Count cutoff) (data : List Data) :
     UnaryPolynomialPaddingMachine.selectedCount
@@ -144,6 +150,20 @@ theorem selectedCount_betweenPrefixes_mark {Data : Type}
   rw [selectedCount_afterPrefix_mark selected stopLe,
     selectedCount_afterPrefix_mark selected startCutoff] at partition
   omega
+
+/-- A fixed marked occurrence contributes one selected item exactly when its
+index is below the original selected count. -/
+theorem selectedCount_atPrefix_mark {Data : Type}
+    (selected : Data → Bool) {cutoff position : Nat}
+    (positionLe : position + 1 ≤ cutoff) (data : List Data) :
+    UnaryPolynomialPaddingMachine.selectedCount
+        (atPrefix selected position) (mark selected cutoff data) =
+      if position < UnaryPolynomialPaddingMachine.selectedCount selected data
+      then 1 else 0 := by
+  unfold atPrefix
+  rw [selectedCount_betweenPrefixes_mark selected (Nat.le_succ position)
+    positionLe]
+  split <;> omega
 
 end SelectedPrefixMarkerMachine
 end LeanTrominoes
