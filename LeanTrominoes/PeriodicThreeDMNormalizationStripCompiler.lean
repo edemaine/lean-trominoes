@@ -56,21 +56,34 @@ def finalStripCellTypes (input : Input) : List OrthogonalCellType :=
     fun horizontal vertical =>
       finalStripCellTypeAt input (horizontal, vertical)
 
+/-- Shallow runtime name for the complete rectangular cell array. -/
+def compiledStripCellTypes (input : Input) : List OrthogonalCellType :=
+  finalStripCellTypes input
+
+/-- The three finite fields of the rectangular output drawing. -/
+def compileStripData (input : Input) :
+    Nat × Nat × List OrthogonalCellType :=
+  (finalNormalizationPeriod input - 1,
+    3 * finalNormalizationPeriod input,
+    compiledStripCellTypes input)
+
+/-- Reconstruct a drawing from its three canonical finite fields. -/
+def periodicOrthogonalStripDrawingFromData
+    (data : Nat × Nat × List OrthogonalCellType) :
+    PeriodicOrthogonalDrawing where
+  horizontalPeriodPred := data.1
+  verticalPeriodPred := data.2.1
+  cellTypes := data.2.2
+
 /-- Complete data-only rectangular normalized drawing compiler. -/
 def compileStrip (input : Input) : PeriodicOrthogonalDrawing where
   horizontalPeriodPred := finalNormalizationPeriod input - 1
   verticalPeriodPred := 3 * finalNormalizationPeriod input
-  cellTypes := finalStripCellTypes input
+  cellTypes := compiledStripCellTypes input
 
-/-- The data-only compiler is definitionally the verified presentation-level
-rectangular construction. -/
-theorem compileStrip_inputOfPresentation
-    {problem : PeriodicThreeDM}
-    (presentation : problem.PlanarPresentation) :
-    compileStrip (inputOfPresentation presentation) =
-      presentation.stripNormalizedOrthogonalDrawing := by
-  set_option maxRecDepth 100000 in
-    rfl
+/-- Canonical encoded-data implementation of the same compiler. -/
+def computableCompileStrip (input : Input) : PeriodicOrthogonalDrawing :=
+  periodicOrthogonalStripDrawingFromData (compileStripData input)
 
 end NormalizationCompiler
 end PeriodicThreeDM

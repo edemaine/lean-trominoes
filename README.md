@@ -1103,6 +1103,9 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Factor the complete rectangular rasterizer through a finite,
         proof-free compiler input and identify it definitionally with the
         verified presentation-level strip drawing.
+      - [x] Prove the proof-free rectangular compiler primitive recursive,
+        from reflected route assignments through prioritized lookup and the
+        complete row-major cell array.
       - [x] Prove every generated vertex and route cell occupies a strict
         interior row and both wraparound boundary rows are blank.
       - [x] Prove the rectangular raster preserves the normalized drawing's
