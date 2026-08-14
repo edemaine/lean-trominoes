@@ -870,6 +870,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Package indexed data-dependent template emission as a
                   quadratic polynomial-time TM2 computation with exact
                   retained-input-plus-token output.
+                - [x] Compose polynomial initial-tail materialization with the
+                  indexed decoded-source emitter, flattening the workspace
+                  while preserving every earlier token and exact source word.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
