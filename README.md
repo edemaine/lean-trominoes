@@ -900,6 +900,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose well-formedness, accepting-current, clock reset,
                   and next-initial emission, then close both conjunctions to
                   obtain the complete polynomial-time designated reset prefix.
+                - [x] Lift accepting-current and clock-successor emission to
+                  the expanded post-reset workspace, with exact selected-count
+                  interfaces and polynomial-time certificates.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
