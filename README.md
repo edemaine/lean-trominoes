@@ -927,6 +927,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Instantiate bivariate stack-cell and optional-cell
                   equality templates at `fixedOffset + first + position`,
                   with exact normalized token-range identities.
+                - [x] Emit every represented pushed cell and every shifted
+                  source/target equality in one stack transform using marked
+                  zero-or-one prefix phases and an affine interior phase.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
