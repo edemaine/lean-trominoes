@@ -1013,6 +1013,8 @@ build; an imported proof counts when its statement matches the paper.
         whenever each physical link's endpoints have equal vertical shifts.
       - [x] Prove clausewise literal maps preserve one-dimensionality whenever
         they preserve each literal's vertical offset.
+      - [x] Prove concatenation and clause deduplication preserve the
+        one-dimensional fragment.
       - [x] Apply the equality invariant to every route-bend link and its
         embedded normalized planar-SAT clause family.
       - [x] Prove every anchor-normalized crossover template literal has zero
