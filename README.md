@@ -746,6 +746,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify the finite two-counter template emitter, including
                   exact context/position rescans, counter restoration, work
                   stack cleanup, output reversal, and genuine halting.
+                - [x] Bound two-counter output and execution quadratically and
+                  package the emitter as a polynomial-time TM2 computation.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1957,6 +1959,11 @@ The representation choices for this target are:
   restores both unary counters for every affine atom, retains the full input,
   clears every work stack, reverses the exact appended token stream, and proves
   the final configuration genuinely halted.
+- [`LeanTrominoes/PeriodicCNFBivariateTemplateEmitterTime.lean`](LeanTrominoes/PeriodicCNFBivariateTemplateEmitterTime.lean)
+  bounds every two-counter recipe, position template, complete emitted range,
+  and verified execution.  Both counters are bounded by retained input length,
+  yielding one explicit quadratic polynomial and a reusable
+  `TM2ComputableInPolyTime` certificate.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
