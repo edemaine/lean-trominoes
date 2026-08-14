@@ -773,6 +773,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify the processed-inner counter scan/restoration and
                   exact advancement of inner recipes.
                 - [x] Verify fixed-token and affine-atom recipe entry steps.
+                - [x] Compose complete outer-stage recipe execution with exact
+                  token output, counter restoration, and runtime.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2050,6 +2052,11 @@ The representation choices for this target are:
   closes the one-step interface around those counter subroutines: fixed recipes
   append their literal token and advance, while atom recipes append their base
   unary run and enter the verified counter pipeline.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterRecipe.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterRecipe.lean)
+  composes entry, persistent-width, and outer-position phases for a complete
+  non-inner recipe.  It proves exact bivariate recipe-token output, restores
+  both counters and scratch stacks, enters the correct continuation, and gives
+  the closed runtime `2·first + 2·position + 5` for atom recipes.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
