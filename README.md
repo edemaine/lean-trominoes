@@ -1192,6 +1192,9 @@ build; an imported proof counts when its statement matches the paper.
         boundary, and exact source-orientation semantics.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
+      - [x] Identify the concrete verified strip drawing with the proof-free
+        rectangular compiler, define the actual gadget-substituted target
+        instance, and prove its exact tiling semantics for either tromino.
       - [x] Package any finite normalized drawing domain as a horizontally
         periodic expanded tromino strip, prove its presentation well formed,
         characterize its carrier exactly, and prove the construction
