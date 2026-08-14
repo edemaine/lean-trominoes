@@ -1041,6 +1041,8 @@ build; an imported proof counts when its statement matches the paper.
         cycle, fixed-red, and clause-core tables.
       - [x] Compute every concrete assembled green-element position, including
         source-kind- and polarity-selected ordinary internals.
+      - [x] Compute every concrete assembled blue-element position, including
+        ordinary, fixed-red, clause-core, and clause-terminal branches.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
