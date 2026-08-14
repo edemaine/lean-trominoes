@@ -954,6 +954,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Iterate complete normalized transforms over any fixed
                   dependent stack list, preserving the runtime width and exact
                   stack order in polynomial time.
+                - [x] Close the canonical finite stack family with its fixed
+                  `all` ending, yielding the exact stack program of a terminal
+                  symbolic statement path.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
