@@ -1047,6 +1047,8 @@ build; an imported proof counts when its statement matches the paper.
         one-dimensionality after erasing positions.
       - [x] Apply positioned deduplication to the final wrapped, gauged, and
         anchor-normalized retained planar-SAT formula.
+      - [x] Prove fixed-eight occurrence splitting preserves
+        one-dimensionality for every compass-port assignment.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
