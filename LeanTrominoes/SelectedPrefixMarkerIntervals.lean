@@ -18,6 +18,49 @@ namespace LeanTrominoes
 
 namespace SelectedPrefixMarkerMachine
 
+/-- The marker's final control count is the initial count plus all selected
+items, capped at the fixed cutoff. -/
+theorem countAfter_val {Data : Type} {cutoff : Nat}
+    (selected : Data → Bool) (count : Count cutoff) (data : List Data) :
+    (countAfter selected count data).val =
+      min cutoff
+        (count.val + UnaryPolynomialPaddingMachine.selectedCount selected data) := by
+  induction data generalizing count with
+  | nil =>
+      simp [countAfter, UnaryPolynomialPaddingMachine.selectedCount,
+        Nat.min_eq_right (Nat.le_of_lt_succ count.isLt)]
+  | cons item data induction =>
+      cases selectedEq : selected item with
+      | false =>
+          simp [countAfter, nextCount, selectedEq,
+            UnaryPolynomialPaddingMachine.selectedCount, induction]
+      | true =>
+          by_cases below : count.val < cutoff
+          · rw [countAfter,
+              UnaryPolynomialPaddingMachine.selectedCount_cons,
+              induction]
+            rw [nextCount_val_of_selected_lt selected item count
+              selectedEq below]
+            simp [selectedEq]
+            congr 1
+            omega
+          · have countEq : count.val = cutoff := by
+              have countLe : count.val ≤ cutoff :=
+                Nat.le_of_lt_succ count.isLt
+              omega
+            rw [countAfter,
+              UnaryPolynomialPaddingMachine.selectedCount_cons,
+              induction]
+            simp [nextCount, selectedEq, capSucc, countEq]
+
+@[simp]
+theorem countAfter_zeroCount_val {Data : Type} (selected : Data → Bool)
+    (cutoff : Nat) (data : List Data) :
+    (countAfter selected (zeroCount cutoff) data).val =
+      min cutoff (UnaryPolynomialPaddingMachine.selectedCount selected data) := by
+  simpa [zeroCount] using
+    countAfter_val selected (zeroCount cutoff) data
+
 /-- Select original items among the first `stop` selected occurrences. -/
 def beforePrefix {Data : Type} {cutoff : Nat}
     (selected : Data → Bool) (stop : Nat) : Tagged cutoff Data → Bool

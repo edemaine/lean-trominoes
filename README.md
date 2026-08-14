@@ -921,6 +921,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Specialize marked intervals to a fixed occurrence,
                   proving its selector count is exactly the corresponding
                   runtime-bound comparison bit.
+                - [x] Prove the prefix marker's final capped control count is
+                  exactly `min(selectedCount, cutoff)`, enabling one-sentinel
+                  branching on fixed runtime-width thresholds.
                 - [x] Verify a prefix-marked bivariate wrapper that exposes
                   two tagged interval counts to affine templates while
                   preserving and untagging the shared workspace.
