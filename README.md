@@ -1090,6 +1090,8 @@ build; an imported proof counts when its statement matches the paper.
         vertical halo for every stored route point.
       - [x] Prove the common affine magnification, center translation, and
         unit-subdivision stage preserves the open vertical halo.
+      - [x] Prove Figure 2 and cyclic endpoint templates, trimming, reversal,
+        and endpoint splicing preserve the enlarged open vertical halo.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
