@@ -781,6 +781,8 @@ build; an imported proof counts when its statement matches the paper.
                   template lists, preserving counters and exact token order.
                 - [x] Lift the three-counter recipe execution over the full
                   inner template at every triangular equality position.
+                - [x] Execute one complete higher inner position, including
+                  empty templates and exact marker transfer between counters.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2077,6 +2079,11 @@ The representation choices for this target are:
   Every recipe is evaluated at the same exact triangular position
   `outer + 1 + inner`, invariant stacks are restored between recipes, and the
   final continuation records that the higher position has been completed.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterInnerPosition.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterInnerPosition.lean)
+  verifies one full higher-position iteration, including both empty and
+  nonempty inner templates.  It removes exactly one `remaining` marker, emits
+  the template at `outer + 1 + inner`, transfers that marker to
+  `innerProcessed`, and returns to the common inner-loop invariant.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
