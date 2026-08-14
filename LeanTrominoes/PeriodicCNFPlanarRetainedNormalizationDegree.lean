@@ -42,6 +42,7 @@ theorem
   cases target with
   | terminal indexed endpoint =>
       unfold embeddedNormalizedRetainedCompleteCarrierClauses
+        normalizedRetainedCompleteCarrierClauseList
       simp only [periodicCarrierNodeToPlanarSATVariable]
       rw [embeddedPeriodicCarrierClauses_dedup_terminal_count]
       exact
@@ -49,6 +50,7 @@ theorem
           wellFormed degree isLocal (.terminal indexed endpoint)
   | boundary boundary =>
       unfold embeddedNormalizedRetainedCompleteCarrierClauses
+        normalizedRetainedCompleteCarrierClauseList
       simp only [periodicCarrierNodeToPlanarSATVariable]
       rw [embeddedPeriodicCarrierClauses_dedup_boundary_count]
       exact
@@ -180,6 +182,7 @@ theorem
             ⟨(embeddedNormalizedRetainedCompleteCarrierClauses
               formula).dedup⟩).count (.atom atom) = 0 := by
         unfold embeddedNormalizedRetainedCompleteCarrierClauses
+          normalizedRetainedCompleteCarrierClauseList
         exact
           embeddedPeriodicCarrierClauses_dedup_atom_count_eq_zero
             _ atom
@@ -218,6 +221,7 @@ theorem
               formula).dedup⟩).count
                 (.crossoverInternal internal) = 0 := by
         unfold embeddedNormalizedRetainedCompleteCarrierClauses
+          normalizedRetainedCompleteCarrierClauseList
         exact
           embeddedPeriodicCarrierClauses_dedup_crossoverInternal_count_eq_zero
             _ internal

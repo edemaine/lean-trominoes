@@ -24,18 +24,28 @@ open PlanarThreeSAT
 
 set_option maxHeartbeats 800000
 
+/-- Retained straight-carrier clauses after periodic normalization, before
+embedding into the combined planar-SAT variable type.  Naming this typed
+intermediate keeps later statements from inferring its atom type by unfolding
+the complete retained-link enumeration. -/
+def normalizedRetainedCompleteCarrierClauseList
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    List (PeriodicClause PeriodicCarrierNode) :=
+  PeriodicEquality.normalizedFormulaClauses
+    (normalizeCarrierNode
+      (PeriodicCNF.incidenceGraph formula))
+    (retainedDrawingCompleteCarrierLinks
+      (PeriodicCNF.incidenceGraph formula))
+
 /-- Retained straight-carrier clauses after periodic normalization, embedded
 in the complete planar-SAT variable type. -/
 def embeddedNormalizedRetainedCompleteCarrierClauses
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     List (PeriodicClause (PeriodicPlanarSATVariable Variable)) :=
-  (PeriodicEquality.normalizedFormulaClauses
-    (normalizeCarrierNode
-      (PeriodicCNF.incidenceGraph formula))
-    (retainedDrawingCompleteCarrierLinks
-      (PeriodicCNF.incidenceGraph formula))).map
-        (@embedPeriodicCarrierClause Variable)
+  (normalizedRetainedCompleteCarrierClauseList formula).map
+    (@embedPeriodicCarrierClause Variable)
 
 /-- Normalized retained straight carriers followed by the unchanged
 normalized bend family. -/
@@ -65,6 +75,7 @@ theorem normalizedRetainedScopedDrawingRouteWireFormula_eq
     drawingRouteBendFormula
     normalizedEmbeddedRetainedRouteWireClauses
     embeddedNormalizedRetainedCompleteCarrierClauses
+    normalizedRetainedCompleteCarrierClauseList
     embeddedNormalizedRouteBendClauses
     PeriodicEquality.normalizedFormulaClauses
   simp only [List.map_append, List.map_map]
