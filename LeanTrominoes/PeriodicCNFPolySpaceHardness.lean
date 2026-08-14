@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFPolySpaceNativeCompiler
+import LeanTrominoes.PeriodicCNFPolySpaceRequestEmitter
 
 /-!
 # Polynomial-time packaging of periodic-CNF PSPACE hardness
@@ -79,9 +79,10 @@ def sourceFormulaComputableInPolyTime
       outputsFun := ?_ }
   intro symbols
   have run := fields.outputsFun symbols
-  convert run using 1 <;>
+  convert run using 1
+  all_goals
     simp only [PolySpaceNativeCompiler.nativeCompilerFields_sourceFields,
-      PolySpaceNativeCompiler.trList_formulaFields_eq_finEncoding_encode] <;>
+      PolySpaceNativeCompiler.trList_formulaFields_eq_finEncoding_encode]
     rfl
 
 /-- Specialize the raw-symbol compiler to values of the source encoding. -/
@@ -130,6 +131,73 @@ theorem localPeriodicCNF1DSAT_PSPACEHard_of_nativeRequestGenerators
   obtain ⟨generator⟩ :=
     generators sourceEncoding source sourceDecider
   exact polyTimeManyOneReducible sourceDecider generator
+
+/-- Compose the concrete source-uniform request generator with the verified
+quadratic transition evaluator. -/
+def directSourceFieldsComputableInPolyTime :
+    TM2ComputableInPolyTime id PartrecToTM2.trList
+      (fun symbols : List encoding.Γ =>
+        (PolySpaceNativeCompiler.sourceCompilerRequest decider symbols).compile) := by
+  let composed := TM2CompositionMachine.computableInPolyTime
+    (PolySpaceRequestEmitter.sourceRequestComputableInPolyTime decider)
+    TransitionEvaluatorMachine.computableInPolyTime
+  exact composed
+
+/-- Present the concrete composed machine at the semantic periodic-CNF
+codomain. -/
+def directSourceFormulaComputableInPolyTime :
+    TM2ComputableInPolyTime id PeriodicCNFFlatEncoding.finEncoding.encode
+      (PolySpaceCompiler.formulaOfSymbols decider) := by
+  let fields := directSourceFieldsComputableInPolyTime decider
+  refine
+    { tm := fields.tm
+      inputAlphabet := fields.inputAlphabet
+      outputAlphabet := fields.outputAlphabet
+      time := fields.time
+      outputsFun := ?_ }
+  intro symbols
+  have run := fields.outputsFun symbols
+  convert run using 1
+  all_goals
+    simp only [PolySpaceNativeCompiler.sourceCompilerRequest_compile,
+      PolySpaceNativeCompiler.trList_formulaFields_eq_finEncoding_encode]
+    rfl
+
+/-- Specialize the concrete raw-symbol compiler to encoded source values. -/
+def directReductionComputableInPolyTime :
+    TM2ComputableInPolyTime encoding.encode
+      PeriodicCNFFlatEncoding.finEncoding.encode
+      (PolySpaceReduction.formula decider) := by
+  let compiler := directSourceFormulaComputableInPolyTime decider
+  refine
+    { tm := compiler.tm
+      inputAlphabet := compiler.inputAlphabet
+      outputAlphabet := compiler.outputAlphabet
+      time := compiler.time
+      outputsFun := ?_ }
+  intro input
+  simpa only [id_eq, PolySpaceCompiler.formulaOfSymbols_encode] using
+    compiler.outputsFun (encoding.encode input)
+
+/-- The concrete request printer closes the polynomial-time many-one
+reduction for every polynomial-space source decider. -/
+theorem directPolyTimeManyOneReducible :
+    Complexity.DeciderInPolySpace encoding language →
+    Complexity.PolyTimeManyOneReducible encoding
+      PeriodicCNFFlatEncoding.finEncoding language LocalPeriodicCNF1DSAT := by
+  intro decider
+  refine ⟨PolySpaceReduction.formula decider, ?_, ?_⟩
+  · exact ⟨directReductionComputableInPolyTime decider⟩
+  · intro input
+    exact PolySpaceReduction.mem_iff_localPeriodicCNF1DSAT decider input
+
+/-- Local one-dimensional periodic CNF satisfiability is PSPACE-hard. -/
+theorem localPeriodicCNF1DSAT_PSPACEHard :
+    Complexity.PSPACEHard PeriodicCNFFlatEncoding.finEncoding
+      LocalPeriodicCNF1DSAT := by
+  intro Input sourceEncoding source sourceInPSPACE
+  obtain ⟨sourceDecider⟩ := sourceInPSPACE
+  exact directPolyTimeManyOneReducible sourceDecider
 
 end PolySpaceHardness
 end PeriodicCNF

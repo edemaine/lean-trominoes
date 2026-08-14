@@ -572,7 +572,7 @@ build; an imported proof counts when its statement matches the paper.
         an explicit polynomial in encoded source-input length.
       - [x] Factor the reduction through a raw source-symbol-list compiler and
         prove agreement with the semantic reduction on valid encodings.
-      - [ ] Certify the resulting reduction as polynomial-time.
+      - [x] Certify the resulting reduction as polynomial-time.
         - [x] Build an exact linear-time finite block transducer and use it to
           encode every arbitrary finite source alphabet as evaluator-native
           delimiter-terminated natural fields.
@@ -625,7 +625,7 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Bound complete evaluator execution quadratically in its
               bounded native request length and package the machine as a
               `TM2ComputableInPolyTime` compiler.
-        - [ ] Compose source preprocessing with formula generation into the
+        - [x] Compose source preprocessing with formula generation into the
           final `TM2ComputableInPolyTime` reduction certificate.
           - [x] Package every decoded source-field list as a bounded compiler
             request and identify its encoded request and compiled output with
@@ -638,8 +638,8 @@ build; an imported proof counts when its statement matches the paper.
             generator, the quadratic formula evaluator, and semantic
             correctness into the final reduction and PSPACE-hardness theorem;
             isolate request generation as the sole remaining certificate.
-          - [ ] Generate the bounded compact request from native source
-            fields in polynomial time.
+          - [x] Generate the bounded compact request directly from finite
+            source symbols in polynomial time.
             - [x] Materialize the source decider's fixed space polynomial as
               unary loop padding while preserving the native source stream.
               - [x] Implement the finite Horner machine and prove exact
