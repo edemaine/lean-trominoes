@@ -876,6 +876,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Define the two-counter affine empty-cell template for the
                   input stack and prove its complete range equals the exact
                   `sourceLength + offset` initial-tail schedule.
+                - [x] Verify exact source and tail counts on the mixed retained
+                  workspace, run the bivariate input-tail emitter, and compose
+                  it polynomially after source-prefix emission.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
