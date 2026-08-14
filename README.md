@@ -909,6 +909,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose accepting-current, negation, and clock-successor
                   emission into the exact polynomial-time ordinary-branch
                   prefix immediately before the machine-step program.
+                - [x] Build a generic polynomial-time padding pass that adds
+                  and later removes constant-many temporary data markers while
+                  preserving every retained symbol and formula token exactly.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
