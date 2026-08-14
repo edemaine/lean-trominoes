@@ -963,6 +963,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Iterate any fixed terminal-path list and append its
                   `any` ending, obtaining the exact normalized path
                   disjunction in polynomial time.
+                - [x] Prove program-valued symbolic statement paths stabilize
+                  above the fixed observation-depth cutoff, and equal their
+                  construction at the runtime width capped by that cutoff.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
