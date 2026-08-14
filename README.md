@@ -719,6 +719,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose any fixed list of affine appenders over one
                   stable prepared-symbol/token alphabet, preserving selector
                   counts and extracting the exact token suffix in polynomial time.
+                - [x] Prove token append/fold identities for normalized finite
+                  conjunctions and disjunctions and identify affine ranges
+                  with their per-position ordinary program streams.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1929,6 +1932,11 @@ The representation choices for this target are:
   Earlier token suffixes provably leave every later selector count unchanged;
   exact phase-order semantics, one-time input embedding, final token extraction,
   and a polynomial-time certificate are supplied for arbitrary fixed phase lists.
+- [`LeanTrominoes/PeriodicCNFUnaryProgramTokenAlgebra.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokenAlgebra.lean)
+  supplies the exact append laws and closing token suffixes for normalized
+  finite conjunctions and disjunctions.  It also identifies a recursive affine
+  position range with the flat unary-token stream of the corresponding
+  evaluated ordinary postorder programs.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
