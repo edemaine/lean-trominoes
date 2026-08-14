@@ -1063,6 +1063,8 @@ build; an imported proof counts when its statement matches the paper.
         formula's anchor normalization, physical refinement, and fresh gauge.
       - [x] Define one-dimensional periodic 3DM and prove typed Figure 10
         construction plus finite-index encoding preserve it.
+      - [x] Prove the richer planar Figure 10 assembly's ordinary, fixed-red,
+        clause-core, and encoded references remain horizontal.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
