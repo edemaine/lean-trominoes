@@ -1149,6 +1149,8 @@ build; an imported proof counts when its statement matches the paper.
         across every source-vertex/first-route-cell boundary.
       - [x] Reconcile horizontal contracted target offsets with strip-block
         translations and orient every target boundary compatibly.
+      - [x] Prove consecutive internal strip route cells receive
+        complementary values on their shared port in every block occurrence.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
