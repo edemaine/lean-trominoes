@@ -1135,6 +1135,8 @@ build; an imported proof counts when its statement matches the paper.
         rectangular drawing and identify successful and blank lookups.
       - [x] Characterize equality of finite strip representatives by unique
         translations through the positive strip width and height.
+      - [x] Reconstruct the unique rectangular block occurrence behind every
+        successful infinite-lift provenance lookup.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
