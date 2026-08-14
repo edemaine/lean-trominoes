@@ -719,6 +719,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose any fixed list of affine appenders over one
                   stable prepared-symbol/token alphabet, preserving selector
                   counts and extracting the exact token suffix in polynomial time.
+                - [x] Lift capped-prefix affine phase lists to input-preserving
+                  marked workspace passes, retaining every earlier token and
+                  removing the temporary tags in polynomial time.
                 - [x] Prove token append/fold identities for normalized finite
                   conjunctions and disjunctions and identify affine ranges
                   with their per-position ordinary program streams.
