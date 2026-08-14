@@ -1041,6 +1041,8 @@ build; an imported proof counts when its statement matches the paper.
         opaque wrapping of the raw retained formula.
       - [x] Prove a zero-vertical variable gauge preserves
         one-dimensionality after clause-anchor normalization.
+      - [x] Prove ordinary clause-anchor normalization and zero-vertical
+        variable gauging each preserve one-dimensionality directly.
       - [x] Transport the retained formula's one-dimensionality through
         opaque wrapping, canonical variable gauging, and anchor normalization.
       - [x] Prove positioned literal-list deduplication preserves

@@ -18,6 +18,55 @@ so anchoring after the gauge again yields a one-dimensional formula.
 namespace LeanTrominoes
 namespace PeriodicCNF
 
+/-- Clause-anchor normalization preserves the one-dimensional fragment. -/
+theorem anchorNormalize_isOneDimensional
+    {Variable : Type*}
+    {source : PeriodicCNF Variable}
+    (horizontal : source.IsOneDimensional) :
+    source.anchorNormalize.IsOneDimensional := by
+  intro outputClause outputClauseMember outputLiteral outputLiteralMember
+  simp only [PeriodicCNF.anchorNormalize, List.mem_map] at outputClauseMember
+  obtain ⟨sourceClause, sourceClauseMember, rfl⟩ := outputClauseMember
+  simp only [PeriodicClause.anchorNormalize, List.mem_map]
+    at outputLiteralMember
+  obtain ⟨sourceLiteral, sourceLiteralMember, rfl⟩ := outputLiteralMember
+  cases sourceClause with
+  | nil => simp at sourceLiteralMember
+  | cons first rest =>
+      have sourceZero := horizontal (first :: rest) sourceClauseMember
+        sourceLiteral sourceLiteralMember
+      have firstZero := horizontal (first :: rest) sourceClauseMember
+        first (by simp)
+      simp [PeriodicLiteral.anchorNormalize, PeriodicCNF.clauseAnchor,
+        Cell.sub, sourceZero, firstZero]
+
+/-- A variable gauge that is vertically zero on every occurring atom
+preserves a one-dimensional formula. -/
+theorem variableGauge_isOneDimensional
+    {Variable : Type*}
+    (source : PeriodicCNF Variable)
+    (gauge : Variable → Cell)
+    (horizontal : source.IsOneDimensional)
+    (gaugeVertical :
+      ∀ atom ∈ source.variableOccurrences, (gauge atom).2 = 0) :
+    (source.variableGauge gauge).IsOneDimensional := by
+  intro outputClause outputClauseMember outputLiteral outputLiteralMember
+  simp only [PeriodicCNF.variableGauge, List.mem_map] at outputClauseMember
+  obtain ⟨sourceClause, sourceClauseMember, rfl⟩ := outputClauseMember
+  simp only [PeriodicClause.variableGauge, List.mem_map]
+    at outputLiteralMember
+  obtain ⟨sourceLiteral, sourceLiteralMember, rfl⟩ := outputLiteralMember
+  have sourceZero := horizontal sourceClause sourceClauseMember
+    sourceLiteral sourceLiteralMember
+  have sourceAtomMember :
+      sourceLiteral.atom ∈ source.variableOccurrences := by
+    unfold PeriodicCNF.variableOccurrences
+    apply List.mem_flatMap.mpr
+    exact ⟨sourceClause, sourceClauseMember,
+      List.mem_map.mpr ⟨sourceLiteral, sourceLiteralMember, rfl⟩⟩
+  have gaugeZero := gaugeVertical sourceLiteral.atom sourceAtomMember
+  simp [PeriodicLiteral.variableGauge, Cell.add, sourceZero, gaugeZero]
+
 /-- A zero-vertical variable gauge preserves one-dimensionality after clause
 anchor normalization. -/
 theorem variableGauge_anchorNormalize_isOneDimensional
