@@ -1003,6 +1003,8 @@ build; an imported proof counts when its statement matches the paper.
         source-formula normalization primitive recursive.
       - [x] Compute the resulting finite planar 3DM problem without proof
         arguments and identify it with the semantic reduction endpoint.
+      - [x] Prove route refinement, unit subdivision, and selection of the
+        inserted polarity-normalization vertices primitive recursive.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
