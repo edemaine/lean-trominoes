@@ -78,6 +78,21 @@ theorem selectedCount_embedData
     UnaryPolynomialPaddingMachine.selectedCount selected data
   exact AffineEmitterPipeline.selectedCount_embedData selected data
 
+theorem selectedCount_embed_append_tokens
+    (selected : Symbol (encoding := encoding) → Bool)
+    (data : List (Symbol (encoding := encoding))) (tokens : List Token) :
+    TriangularTemplateEmitterMachine.selectedCount selected
+        (embedData data ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      UnaryPolynomialPaddingMachine.selectedCount selected data := by
+  change AffineTemplateEmitterMachine.selectedCount selected
+      (embedData data ++
+        tokens.map fun token =>
+          (Sum.inr token : Workspace (encoding := encoding))) = _
+  exact AffineEmitterPipeline.selectedCount_embed_append_tokens
+    selected data tokens
+
 /-- Exact clock-successor suffix for an arbitrary prepared-shape word. -/
 def emitted (data : List (Symbol (encoding := encoding))) : List Token :=
   clockSuccessorTokens (tm := decider.tm)
@@ -103,6 +118,35 @@ theorem runWorkspace_embedData
         (PolySpaceUnaryPreparedLayout.clockWidth data)).map Sum.inr = _
   rw [TriangularTemplateEmitter.emitted_clockSuccessor]
   rfl
+
+/-- Successor emission preserves prepared data and every earlier token. -/
+theorem runWorkspace_embed_append_tokens
+    (data : List (Symbol (encoding := encoding))) (tokens : List Token) :
+    runWorkspace decider
+        (embedData data ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      embedData data ++
+        (tokens ++ emitted decider data).map fun token =>
+          (Sum.inr token : Workspace (encoding := encoding)) := by
+  unfold runWorkspace TriangularTemplateEmitterMachine.appendedOutput
+  rw [selectedCount_embed_append_tokens,
+    selectedCount_embed_append_tokens]
+  change (embedData data ++
+        tokens.map fun token =>
+          (Sum.inr token : Workspace (encoding := encoding))) ++
+      (TriangularTemplateEmitter.emitted
+        (rise (tm := decider.tm)).recipes
+        (equalBit (tm := decider.tm)).recipes
+        (fall (tm := decider.tm)).recipes
+        (ofProgram (TransitionProgram.constant true))
+        (ofProgram [.conjoin]) (ofProgram [.conjoin])
+        (ofProgram (TransitionProgram.constant false))
+        (ofProgram [.conjoin, .disjoin])
+        (PolySpaceUnaryPreparedLayout.space data)
+        (PolySpaceUnaryPreparedLayout.clockWidth data)).map Sum.inr = _
+  rw [TriangularTemplateEmitter.emitted_clockSuccessor]
+  simp [emitted, List.map_append, List.append_assoc]
 
 @[simp]
 theorem extractTokens_runWorkspace_embedData

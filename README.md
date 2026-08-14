@@ -818,6 +818,8 @@ build; an imported proof counts when its statement matches the paper.
                   and package the emitter as polynomial-time TM2 computation.
                 - [x] Specialize the triangular machine to the clock templates
                   and recover the exact normalized successor program.
+                - [x] Prove triangular clock-successor emission preserves the
+                  shared prepared workspace and every earlier token prefix.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
