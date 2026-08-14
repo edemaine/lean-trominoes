@@ -743,6 +743,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose accepting-prefix marking with the fixed affine
                   phases and certify exact current/next endpoint emission in
                   polynomial time.
+                - [x] Specialize one-symbol prefix marking to the prepared
+                  space block and certify exact polynomial-time emission of
+                  the complete structural well-formedness program.
                 - [x] Define bivariate affine atom recipes and normalized
                   Boolean programs for fields depending on both a runtime
                   width and an iteration position.
