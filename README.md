@@ -1017,6 +1017,8 @@ build; an imported proof counts when its statement matches the paper.
         compatible local gadget states tile the compiled strip.
       - [x] Prove exact strip-substitution correctness for normalized,
         vertex-separated drawings with blank vertical boundary rows.
+      - [x] Package the remaining local-CNF drawing compiler contract and
+        prove it composes with 1D PSPACE-hardness and both tromino gadgets.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
