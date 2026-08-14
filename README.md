@@ -1119,6 +1119,8 @@ build; an imported proof counts when its statement matches the paper.
         target occurrence with its base target in the rectangular raster.
       - [x] Recover the unique displayed route triple and owning contracted
         edge behind every emitted strip route assignment.
+      - [x] Prove every exposed port of a strip route cell matches its
+        predecessor or successor, including both endpoint boundary windows.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
