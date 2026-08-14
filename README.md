@@ -867,6 +867,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Bound indexed-family recipe size, emitted token length,
                   and exact scan runtime by fixed quadratic-scale forms over
                   the complete input length.
+                - [x] Package indexed data-dependent template emission as a
+                  quadratic polynomial-time TM2 computation with exact
+                  retained-input-plus-token output.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
