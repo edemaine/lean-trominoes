@@ -1113,6 +1113,8 @@ build; an imported proof counts when its statement matches the paper.
         consecutive routing cells expose matching colored ports.
       - [x] Match each normalized source vertex to its first strip routing
         cell with the correct endpoint color.
+      - [x] Match each normalized target vertex to its last strip routing
+        cell at the routed periodic target occurrence.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
