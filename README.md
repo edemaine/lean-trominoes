@@ -740,6 +740,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Fix the prefix cutoff to the canonical accepting
                   configuration and connect its endpoint phases to the actual
                   prepared unary space block.
+                - [x] Compose accepting-prefix marking with the fixed affine
+                  phases and certify exact current/next endpoint emission in
+                  polynomial time.
                 - [x] Define bivariate affine atom recipes and normalized
                   Boolean programs for fields depending on both a runtime
                   width and an iteration position.
