@@ -1102,6 +1102,9 @@ build; an imported proof counts when its statement matches the paper.
         `3P + 1`, with geometric row map `y ↦ 2P - y`.
       - [x] Prove every generated vertex and route cell occupies a strict
         interior row and both wraparound boundary rows are blank.
+      - [x] Prove the rectangular raster preserves the normalized drawing's
+        assignment collision freedom, and instantiate it from the final
+        endpoint-contact certificate.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
