@@ -1065,6 +1065,8 @@ build; an imported proof counts when its statement matches the paper.
         construction plus finite-index encoding preserve it.
       - [x] Prove the richer planar Figure 10 assembly's ordinary, fixed-red,
         clause-core, and encoded references remain horizontal.
+      - [x] Apply planar 3DM horizontality to the exact anchor-normalized
+        positioned source consumed by the geometric assembly.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
