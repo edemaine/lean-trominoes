@@ -801,6 +801,8 @@ build; an imported proof counts when its statement matches the paper.
                   cleanup, and reversal into exact whole-machine semantics.
                 - [x] Bound template, inner-range, frame, and complete
                   frame-range output and runtime by fixed cubic-scale forms.
+                - [x] Bound exact total execution by a fixed cubic polynomial
+                  and package the emitter as polynomial-time TM2 computation.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2146,6 +2148,11 @@ The representation choices for this target are:
   ranges, individual frames, and complete frame ranges.  Both emitted token
   length and runtime are bounded by cubic-scale expressions in the two runtime
   selector counts, ready for the workspace polynomial certificate.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterTime.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterTime.lean)
+  bounds both selector counts by the retained workspace length, derives a
+  fixed cubic bound for exact output and total execution, and packages the
+  finite machine as a `TM2ComputableInPolyTime` implementation of the complete
+  triangular semantic emitter.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
