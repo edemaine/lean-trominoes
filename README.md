@@ -1112,7 +1112,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Bound the guarded 3CNF and occurrence-splitting presentation
         sizes, trace every fixed geometric period multiplier, and thereby
         bound the complete target flat encoding by an explicit polynomial
-        in the source flat-encoding length.
+        in the source flat-encoding length, packaged as a concrete
+        `Polynomial Nat`.
       - [x] Prove every generated vertex and route cell occupies a strict
         interior row and both wraparound boundary rows are blank.
       - [x] Prove the rectangular raster preserves the normalized drawing's
