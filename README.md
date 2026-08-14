@@ -762,6 +762,8 @@ build; an imported proof counts when its statement matches the paper.
                   recipe contract for the successor emitter machine.
                 - [x] Define the finite triangular emitter's counters, control
                   states, and complete transition program.
+                - [x] Isolate its invariant configurations, stack-update
+                  algebra, and generic token-push execution identities.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2011,6 +2013,10 @@ The representation choices for this target are:
   current, inner, and scratch counters drive the three fixed recipe blocks;
   higher-position markers are restored while emitting fold closers, and final
   carry closures are emitted while clearing the outer counter.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterConfigurations.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterConfigurations.lean)
+  names every invariant control configuration, supplies exact update lemmas
+  for all ten machine stacks, and proves the generic token/atom-unit push
+  identities shared by scan, recipe, frame, cleanup, and reversal proofs.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
