@@ -1007,6 +1007,8 @@ build; an imported proof counts when its statement matches the paper.
         inserted polarity-normalization vertices primitive recursive.
       - [x] Prove the refined placement, raw inserted positions, and final
         fresh-variable gauge primitive recursive.
+      - [x] Lift polarity normalization to a primitive-recursive positioned
+        formula from its complement-clause position query.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
