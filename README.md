@@ -885,6 +885,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Split the fixed finite stack enumeration exactly as
                   `before ++ [k₀] ++ after`, proving both side lists exclude
                   `k₀` and stack-token flat maps preserve this order.
+                - [x] Lift empty-stack emission over any fixed stack list,
+                  preserving the selected width and appending the exact
+                  stack-order flat map in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
