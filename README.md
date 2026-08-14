@@ -966,6 +966,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove program-valued symbolic statement paths stabilize
                   above the fixed observation-depth cutoff, and equal their
                   construction at the runtime width capped by that cutoff.
+                - [x] Build a generic polynomial-time capped-regime wrapper
+                  that makes an arbitrary input-preserving token emitter an
+                  exact conditional no-op outside one selected width regime.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
