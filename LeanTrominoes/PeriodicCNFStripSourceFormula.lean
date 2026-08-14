@@ -214,6 +214,17 @@ theorem sourceFormula_occurrencesAtMostThree (source : PeriodicCNF Nat) :
   · simpa [sourceFormula, admissible] using
       fallbackFormula_occurrencesAtMostThree
 
+/-- The same bound under the canonical equality implementation expected by
+generic downstream constructions carrying only a `DecidableEq` instance. -/
+theorem sourceFormula_occurrencesAtMostThree_canonicalBEq
+    (source : PeriodicCNF Nat) :
+    @PeriodicCNF.OccurrencesAtMost Variable instBEqOfDecidableEq
+      (by infer_instance) 3 (sourceFormula source) := by
+  exact PeriodicCNF.occurrencesAtMost_congr_beq
+    _ _ (by infer_instance) (by infer_instance) 3
+    (sourceFormula source)
+    (sourceFormula_occurrencesAtMostThree source)
+
 theorem sourceFormula_clausesNonempty (source : PeriodicCNF Nat) :
     ∀ clause ∈ (sourceFormula source).clauses, clause ≠ [] := by
   by_cases admissible : SourceAdmissible source

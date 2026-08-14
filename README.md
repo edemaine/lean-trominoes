@@ -999,6 +999,9 @@ build; an imported proof counts when its statement matches the paper.
       trichromatic-orientation reductions.
       - [x] Guard arbitrary source presentations and normalize valid local 1D
         CNF to nonempty local 3SAT-3 with exactly preserved semantics.
+      - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
+        orthogonal-normalization pipeline, proving the output drawing is
+        well formed, vertex separated, and semantically exact.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
       strip drawing.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
