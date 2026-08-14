@@ -1039,6 +1039,8 @@ build; an imported proof counts when its statement matches the paper.
         compute every concrete typed-triple position.
       - [x] Compute every concrete assembled red-element position from finite
         cycle, fixed-red, and clause-core tables.
+      - [x] Compute every concrete assembled green-element position, including
+        source-kind- and polarity-selected ordinary internals.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
