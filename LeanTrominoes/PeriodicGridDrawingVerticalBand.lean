@@ -24,6 +24,12 @@ def PositionInExpandedVerticalBand
   -(drawing.gridSize : Int) < position.2 ∧
     position.2 < 2 * drawing.gridSize
 
+/-- Every listed point of one polyline lies in the drawing's open vertical
+halo. -/
+def PolylineInExpandedVerticalBand
+    (drawing : PeriodicGridDrawing) (route : List Cell) : Prop :=
+  ∀ point ∈ route, drawing.PositionInExpandedVerticalBand point
+
 /-- Every listed point of every stored route lies in the open vertical
 halo. -/
 def RoutePointsInExpandedVerticalBand

@@ -19,12 +19,6 @@ open PeriodicOrthocrossing
 
 namespace PeriodicGridDrawing
 
-/-- Every listed point of one polyline lies in the drawing's open vertical
-halo. -/
-def PolylineInExpandedVerticalBand
-    (drawing : PeriodicGridDrawing) (route : List Cell) : Prop :=
-  ∀ point ∈ route, drawing.PositionInExpandedVerticalBand point
-
 /-- Translating a band point by a horizontal lattice period keeps it in the
 same vertical band. -/
 theorem positionInExpandedVerticalBand_add_periodTranslation_of_horizontal

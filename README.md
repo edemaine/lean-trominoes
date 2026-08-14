@@ -1088,6 +1088,8 @@ build; an imported proof counts when its statement matches the paper.
         edge has zero vertical period offset for a one-dimensional instance.
       - [x] Prove horizontal degree-two contraction preserves the open
         vertical halo for every stored route point.
+      - [x] Prove the common affine magnification, center translation, and
+        unit-subdivision stage preserves the open vertical halo.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
