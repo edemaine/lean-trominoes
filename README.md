@@ -1037,6 +1037,8 @@ build; an imported proof counts when its statement matches the paper.
         clause-macrocell origins used by the three-strand assembly.
       - [x] Factor assembled vertex positions through proof-free origins and
         compute every concrete typed-triple position.
+      - [x] Compute every concrete assembled red-element position from finite
+        cycle, fixed-red, and clause-core tables.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
