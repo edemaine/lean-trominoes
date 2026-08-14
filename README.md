@@ -846,6 +846,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify indexed-emitter input retention and optional recipe
                   dispatch, including selected empty recipes and exact position
                   advancement.
+                - [x] Verify indexed fixed-token and affine-atom recipe entry,
+                  including arbitrary reverse-token pushes and base atom runs.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
