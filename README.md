@@ -1145,6 +1145,8 @@ build; an imported proof counts when its statement matches the paper.
         commute geometric unit steps with rectangular block translations.
       - [x] Prove membership constructors for every listed strip vertex site
         and every displayed route-triple site.
+      - [x] Prove the forward strip orientation assigns complementary values
+        across every source-vertex/first-route-cell boundary.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
