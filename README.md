@@ -1031,6 +1031,8 @@ build; an imported proof counts when its statement matches the paper.
         corresponding retained semantic terms used by the 3DM encoder.
       - [x] Compute the padded three-strand drawing period and stored grid
         predecessor, and identify both with the semantic presentation.
+      - [x] Compute the doubled, clause-anchor-normalized positioned formula
+        that indexes the typed 3DM drawing assembly.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
