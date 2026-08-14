@@ -1049,6 +1049,8 @@ build; an imported proof counts when its statement matches the paper.
         anchor-normalized retained planar-SAT formula.
       - [x] Prove fixed-eight occurrence splitting preserves
         one-dimensionality for every compass-port assignment.
+      - [x] Prove Figure 9 exact-one conversion preserves
+        one-dimensionality through inherited offsets and clause anchors.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
