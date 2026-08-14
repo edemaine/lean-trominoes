@@ -997,6 +997,8 @@ build; an imported proof counts when its statement matches the paper.
                   the normalized finite-token compact request.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
+      - [x] Guard arbitrary source presentations and normalize valid local 1D
+        CNF to nonempty local 3SAT-3 with exactly preserved semantics.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
       strip drawing.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
