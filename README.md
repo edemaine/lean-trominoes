@@ -1053,6 +1053,8 @@ build; an imported proof counts when its statement matches the paper.
         one-dimensionality through inherited offsets and clause anchors.
       - [x] Prove exact-one unit elimination preserves one-dimensionality for
         empty, unit, and nonunit source clauses.
+      - [x] Prove logical polarity normalization preserves every source
+        occurrence's periodic offset.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
