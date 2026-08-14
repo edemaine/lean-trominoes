@@ -1025,6 +1025,8 @@ build; an imported proof counts when its statement matches the paper.
         anchor-normalized equality-clause family.
       - [x] Prove the carrier-to-planar-SAT atom embedding preserves every
         normalized clause's one-dimensionality.
+      - [x] Apply the embedding invariant to the typed retained-carrier
+        component without unfolding its physical link enumeration.
       - [x] Prove anchor normalization sends every routed original-clause
         literal to its explicit zero-offset terminal prototype.
       - [x] Prove every normalized routed variable arm retains exactly its
