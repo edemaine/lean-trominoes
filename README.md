@@ -906,6 +906,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Decompose the stable workspace after complete reset
                   emission and prove it preserves the exact unary space and
                   clock widths required by the ordinary branch.
+                - [x] Compose accepting-current, negation, and clock-successor
+                  emission into the exact polynomial-time ordinary-branch
+                  prefix immediately before the machine-step program.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
