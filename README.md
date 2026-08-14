@@ -704,6 +704,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Reduce the concrete printer input from seven prepared
                   blocks to source symbols plus unary space, clock, and fresh
                   blocks, with exact recovery and polynomial-time preparation.
+                - [x] Verify the reusable finite-control position loop that
+                  retains its input and emits fixed templates whose unary atom
+                  fields have length `base + stride × position`.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1885,6 +1888,14 @@ The representation choices for this target are:
   the three unary counters; exact projection theorems recover the normalized
   unary-token request, and the existing source-preparation machine supplies
   its polynomial-time certificate.
+- [`LeanTrominoes/PeriodicCNFAffineTemplateEmitterMachine.lean`](LeanTrominoes/PeriodicCNFAffineTemplateEmitterMachine.lean)
+  verifies the reusable finite-control core of the counter-driven printer.  It
+  retains an arbitrary finite workspace, counts selected symbols, and appends
+  one fixed recipe template at every selected position; fixed tokens are
+  copied literally and affine atoms become unary runs of exact length
+  `base + stride × position`.  Its exact execution proof includes restoration
+  of the position counter, cleanup of every work stack, output reversal, and a
+  genuinely halted final configuration.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
