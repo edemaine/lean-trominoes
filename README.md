@@ -737,6 +737,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Split every fixed stack into its literal occupied prefix
                   and affine `none` tail, and emit exact current/next complete
                   configuration tests whenever the fixed endpoint fits.
+                - [x] Fix the prefix cutoff to the canonical accepting
+                  configuration and connect its endpoint phases to the actual
+                  prepared unary space block.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1977,6 +1980,11 @@ The representation choices for this target are:
   an affine unused-cell tail selected by its capped prefix tag.  Exact range and
   fold identities prove the resulting fixed phase schedule emits the complete
   normalized current- or next-configuration test at every fitting runtime width.
+- [`LeanTrominoes/PeriodicCNFPolySpaceAcceptingEmitterSpec.lean`](LeanTrominoes/PeriodicCNFPolySpaceAcceptingEmitterSpec.lean)
+  chooses the designated accepting configuration's fixed configuration-space
+  size as its prefix-marker cutoff.  It proves every accepting stack fits both
+  that cutoff and the runtime reduction width, then identifies the phase output
+  on the concrete prepared unary word with the exact current/next endpoint test.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
