@@ -1035,6 +1035,8 @@ build; an imported proof counts when its statement matches the paper.
         that indexes the typed 3DM drawing assembly.
       - [x] Compute the doubled variable-macrocell origins and normalized
         clause-macrocell origins used by the three-strand assembly.
+      - [x] Factor assembled vertex positions through proof-free origins and
+        compute every concrete typed-triple position.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
