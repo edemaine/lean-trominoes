@@ -912,6 +912,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Build a generic polynomial-time padding pass that adds
                   and later removes constant-many temporary data markers while
                   preserving every retained symbol and formula token exactly.
+                - [x] Wrap fixed-marker padding around the bivariate emitter,
+                  yielding a polynomial-time pass for fixed-many templates
+                  whose atoms depend affinely on the runtime stack width.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
