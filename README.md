@@ -960,6 +960,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Surround a terminal path's stack program with its guard,
                   next label/control operands, and four-input `all` ending to
                   emit the exact complete path program in polynomial time.
+                - [x] Iterate any fixed terminal-path list and append its
+                  `any` ending, obtaining the exact normalized path
+                  disjunction in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
