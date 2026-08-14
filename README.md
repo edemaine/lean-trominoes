@@ -828,6 +828,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Decompose the source-dependent next-initial endpoint into
                   its ordered decoded-source prefix, indexed empty tails, and
                   exact nested postorder conjunction schedule.
+                - [x] Materialize the input stack's polynomial-length empty
+                  tail as an exact unary marker block while preserving the
+                  shared workspace and earlier tokens.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
