@@ -1031,6 +1031,8 @@ build; an imported proof counts when its statement matches the paper.
         literal to its explicit zero-offset terminal prototype.
       - [x] Prove every normalized routed variable arm retains exactly its
         source incidence edge offset, hence is horizontal for a 1D source.
+      - [x] Assemble the five retained anchor-normalized planar-SAT clause
+        families and prove the complete formula remains one dimensional.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
