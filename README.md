@@ -825,6 +825,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose structural well-formedness, the current accepting
                   endpoint, and clock reset into the exact polynomial-time
                   normalized-program prefix before the next-initial endpoint.
+                - [x] Decompose the source-dependent next-initial endpoint into
+                  its ordered decoded-source prefix, indexed empty tails, and
+                  exact nested postorder conjunction schedule.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
