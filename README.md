@@ -1133,6 +1133,8 @@ build; an imported proof counts when its statement matches the paper.
         and prove collision-free provenance lookup erases to its cell type.
       - [x] Lift finite strip provenance to arbitrary cells of the infinite
         rectangular drawing and identify successful and blank lookups.
+      - [x] Characterize equality of finite strip representatives by unique
+        translations through the positive strip width and height.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
