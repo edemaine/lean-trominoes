@@ -978,6 +978,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Fold exact statement programs over every fixed live
                   label with current-label guards and an `any` ending, yielding
                   the complete normalized `machineStep` program.
+                - [x] Append the exact machine-step program and both fixed
+                  conjunction closers to the ordinary prefix, yielding the
+                  complete normalized ordinary branch in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
