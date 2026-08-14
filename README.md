@@ -1061,6 +1061,8 @@ build; an imported proof counts when its statement matches the paper.
         while retaining horizontal embedded-original offsets.
       - [x] Transport one-dimensionality through the actual routed polarity
         formula's anchor normalization, physical refinement, and fresh gauge.
+      - [x] Define one-dimensional periodic 3DM and prove typed Figure 10
+        construction plus finite-index encoding preserve it.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
