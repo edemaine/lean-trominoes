@@ -750,6 +750,8 @@ build; an imported proof counts when its statement matches the paper.
                   package the emitter as a polynomial-time TM2 computation.
                 - [x] Identify every bivariate emitted position range with the
                   exact evaluated postorder-program token stream.
+                - [x] Instantiate the exact bivariate clock-atom layout and
+                  recover the normalized reset-clock token word.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1970,6 +1972,11 @@ The representation choices for this target are:
   identifies the two-counter emitter's recursive position range with the flat
   unary-token stream of the corresponding evaluated ordinary postorder
   programs, supplying the exact semantic bridge needed by clock phases.
+- [`LeanTrominoes/PeriodicCNFMachineBivariateClockTemplates.lean`](LeanTrominoes/PeriodicCNFMachineBivariateClockTemplates.lean)
+  instantiates bivariate atoms with the bounded machine's exact reset-clock
+  layout.  One fixed bit-zero template over the runtime clock-marker range,
+  followed by the precise finite-conjunction ending, recovers the complete
+  normalized clock-reset token word.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
