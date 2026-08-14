@@ -746,6 +746,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose accepting-prefix marking with the fixed affine
                   phases and certify exact current/next endpoint emission in
                   polynomial time.
+                - [x] Lift accepting-endpoint emission to the shared workspace,
+                  preserving prepared data and every earlier token exactly.
                 - [x] Specialize one-symbol prefix marking to the prepared
                   space block and certify exact polynomial-time emission of
                   the complete structural well-formedness program.

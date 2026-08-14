@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFPolySpaceAcceptingEmitterSpec
+import LeanTrominoes.PeriodicCNFMarkedAffineEmitterPipeline
 import LeanTrominoes.SelectedPrefixMarkerTime
 import LeanTrominoes.TM2CompositionMachine
 
@@ -42,9 +43,90 @@ abbrev MarkedSymbol :=
   BoundedMachineFixedConfigurationEmitter.Marked
     (acceptingCutoff decider) (Symbol (encoding := encoding))
 
+abbrev Workspace :=
+  AffineEmitterPipeline.Workspace (Symbol (encoding := encoding))
+
 local instance symbolInhabited :
     Inhabited (Symbol (encoding := encoding)) :=
   ⟨PolySpaceUnaryPreparedLayout.embedSpace⟩
+
+def workspaceSpace : Workspace (encoding := encoding) → Bool :=
+  AffineTemplateEmitterMachine.dataSelected
+    PolySpaceUnaryPreparedLayout.isSpace
+
+def workspacePhases (slice : TransitionSlice) :
+    List (Phase
+      (BoundedMachineFixedConfigurationEmitter.Marked
+        (acceptingCutoff decider) (Workspace (encoding := encoding)))) :=
+  BoundedMachineFixedConfigurationEmitter.phases
+    (tm := decider.tm) (workspaceSpace (encoding := encoding)) slice
+    (PolySpaceReduction.acceptingConfiguration decider)
+
+/-- Input-preserving accepting-endpoint pass on the shared token workspace. -/
+def runWorkspace (slice : TransitionSlice)
+    (workspace : List (Workspace (encoding := encoding))) :
+    List (Workspace (encoding := encoding)) :=
+  MarkedAffineEmitterPipeline.run
+    (workspaceSpace (encoding := encoding)) (acceptingCutoff decider)
+    (workspacePhases decider slice) workspace
+
+/-- The accepting pass is polynomial-time without consuming prepared data or
+earlier tokens. -/
+noncomputable def runWorkspaceComputableInPolyTime
+    (slice : TransitionSlice) :
+    @TM2ComputableInPolyTime
+      (List (Workspace (encoding := encoding)))
+      (List (Workspace (encoding := encoding)))
+      (Workspace (encoding := encoding)) (Workspace (encoding := encoding))
+      id id (runWorkspace decider slice) :=
+  MarkedAffineEmitterPipeline.computableInPolyTime
+    (workspaceSpace (encoding := encoding)) (acceptingCutoff decider)
+    (workspacePhases decider slice)
+
+theorem workspaceSpace_count
+    (data : List (Symbol (encoding := encoding))) (tokens : List Token) :
+    UnaryPolynomialPaddingMachine.selectedCount
+        (workspaceSpace (encoding := encoding))
+        (embedData data ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      UnaryPolynomialPaddingMachine.selectedCount
+        PolySpaceUnaryPreparedLayout.isSpace data := by
+  exact selectedCount_embed_append_tokens
+    PolySpaceUnaryPreparedLayout.isSpace data tokens
+
+/-- Exact input-preserving behavior on a genuine prepared word with any
+previous token prefix. -/
+theorem runWorkspace_embed_append_tokens (slice : TransitionSlice)
+    (symbols : List encoding.Γ) (tokens : List Token) :
+    runWorkspace decider slice
+        (embedData
+            (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      embedData
+          (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+        (tokens ++
+          ofProgram
+            (BoundedMachineFixedConfigurationEmitter.configurationIs
+              (tm := decider.tm) slice
+              (PolySpaceReduction.acceptingConfiguration decider)
+              (PolySpaceCompiler.spaceOfSymbols decider symbols))).map
+          fun token =>
+            (Sum.inr token : Workspace (encoding := encoding)) := by
+  unfold runWorkspace
+  rw [MarkedAffineEmitterPipeline.run_eq_append]
+  simp only [List.map_append, ← List.append_assoc]
+  congr 1
+  apply congrArg (List.map fun token =>
+    (Sum.inr token : Workspace (encoding := encoding)))
+  apply BoundedMachineFixedConfigurationEmitter.emittedAll_phases
+  · exact acceptingStackFitsCutoff decider
+  · exact acceptingStackFitsSpace decider symbols
+  · rw [workspaceSpace_count]
+    change PolySpaceUnaryPreparedLayout.space
+      (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) = _
+    exact PolySpaceUnaryPreparedLayout.space_preparedSources decider symbols
 
 /-- Mark the prepared word and emit one fixed accepting-endpoint test. -/
 def emitted (slice : TransitionSlice)
