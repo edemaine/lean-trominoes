@@ -1017,6 +1017,8 @@ build; an imported proof counts when its statement matches the paper.
         prove its final gauged period and positions primitive recursive.
       - [x] Give flattened positioned polarity-normalization clause origins
         and source metadata canonical primitive-recursive encodings.
+      - [x] Compute the complete flattened source/origin metadata list in
+        exact parallel with the generated positioned clauses.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
