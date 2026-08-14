@@ -1013,6 +1013,8 @@ build; an imported proof counts when its statement matches the paper.
         whenever each physical link's endpoints have equal vertical shifts.
       - [x] Apply the equality invariant to every route-bend link and its
         embedded normalized planar-SAT clause family.
+      - [x] Prove every anchor-normalized crossover template literal has zero
+        offset after removing its physical site's common periodic shift.
       - [x] Prove anchor normalization sends every routed original-clause
         literal to its explicit zero-offset terminal prototype.
       - [x] Prove every normalized routed variable arm retains exactly its
