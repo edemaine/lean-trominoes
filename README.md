@@ -795,6 +795,8 @@ build; an imported proof counts when its statement matches the paper.
                   with the exact triangular frame-prefix token stream.
                 - [x] Emit the final base and unwind every completed frame with
                   one exact final-closer block per outer position.
+                - [x] Clear the persistent counter, reverse the accumulated
+                  workspace exactly, and prove genuine machine halting.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2125,6 +2127,11 @@ The representation choices for this target are:
   handles that suffix: it emits `finalBase`, removes every completed outer
   marker while emitting one `finalCloser`, and reaches `clearFirst` with both
   outer counters empty.  The emitted suffix order and linear runtime are exact.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterCleanup.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterCleanup.lean)
+  clears the persistent first counter and reverses an arbitrary accumulated
+  workspace onto the output stack.  The generic execution theorems give exact
+  runtimes, exact forward output, empty work stacks, and a genuinely halted
+  configuration.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
