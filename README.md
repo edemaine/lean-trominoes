@@ -1059,6 +1059,8 @@ build; an imported proof counts when its statement matches the paper.
         occurrence's periodic offset.
       - [x] Prove the routed fresh-complement gauge makes fresh offsets zero
         while retaining horizontal embedded-original offsets.
+      - [x] Transport one-dimensionality through the actual routed polarity
+        formula's anchor normalization, physical refinement, and fresh gauge.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.

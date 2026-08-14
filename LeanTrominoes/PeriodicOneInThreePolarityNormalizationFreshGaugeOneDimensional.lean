@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicCNFOneDimensionalGauge
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationOneDimensional
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivision
 
@@ -135,6 +136,21 @@ theorem formula_variableGauge_freshGauge_isOneDimensional
     (horizontal taggedClause.1
       (List.fst_mem_of_mem_zipIdx taggedClauseMember))
     rawClause rawClauseMember rawLiteral rawLiteralMember
+
+/-- The erased routed polarity-normalization formula is one dimensional
+whenever the erased positioned source is one dimensional. -/
+theorem formula_erase_isOneDimensional
+    {Variable : Type*}
+    {source : PositionedPeriodicCNF Variable}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (horizontal : source.erase.IsOneDimensional) :
+    (formula source sourcePlacement routes).erase.IsOneDimensional := by
+  rw [erase_formula]
+  apply formula_variableGauge_freshGauge_isOneDimensional
+  rw [refinedSource, PositionedPeriodicCNF.erase_scale,
+    PositionedPeriodicCNF.erase_anchorNormalize]
+  exact PeriodicCNF.anchorNormalize_isOneDimensional horizontal
 
 end PeriodicOneInThreePolarityNormalizationRouteSubdivision
 end LeanTrominoes
