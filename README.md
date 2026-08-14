@@ -903,6 +903,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift accepting-current and clock-successor emission to
                   the expanded post-reset workspace, with exact selected-count
                   interfaces and polynomial-time certificates.
+                - [x] Decompose the stable workspace after complete reset
+                  emission and prove it preserves the exact unary space and
+                  clock widths required by the ordinary branch.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
