@@ -1015,6 +1015,8 @@ build; an imported proof counts when its statement matches the paper.
         pointwise variable positions primitive recursive.
       - [x] Specialize that placement to route-selected fresh vertices and
         prove its final gauged period and positions primitive recursive.
+      - [x] Give flattened positioned polarity-normalization clause origins
+        and source metadata canonical primitive-recursive encodings.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
