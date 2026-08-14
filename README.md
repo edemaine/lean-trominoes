@@ -1109,6 +1109,8 @@ build; an imported proof counts when its statement matches the paper.
         route-interior assignment under that collision certificate.
       - [x] Prove finite strip neighbors of strict-interior assignments agree
         with reflected geometric unit steps and cannot wrap across a seam.
+      - [x] Prove strip lookup recovers every displayed route triple and that
+        consecutive routing cells expose matching colored ports.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
