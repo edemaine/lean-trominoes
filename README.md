@@ -752,6 +752,8 @@ build; an imported proof counts when its statement matches the paper.
                   exact evaluated postorder-program token stream.
                 - [x] Instantiate the exact bivariate clock-atom layout and
                   recover the normalized reset-clock token word.
+                - [x] Compose bivariate reset operands with affine conjunction
+                  closers into an exact polynomial-time clock-reset emitter.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1977,6 +1979,11 @@ The representation choices for this target are:
   layout.  One fixed bit-zero template over the runtime clock-marker range,
   followed by the precise finite-conjunction ending, recovers the complete
   normalized clock-reset token word.
+- [`LeanTrominoes/PeriodicCNFPolySpaceClockResetEmitterSpec.lean`](LeanTrominoes/PeriodicCNFPolySpaceClockResetEmitterSpec.lean)
+  composes the bivariate clock-reset operand pass with an affine pass that
+  emits one conjunction closer per unary clock marker.  Both retain the
+  four-block prepared input, and the composed polynomial-time TM2 certificate
+  extracts exactly the normalized reset-clock program at the reduction widths.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
