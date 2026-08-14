@@ -837,6 +837,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Specialize indexed recipes to decoded input-stack cells
                   and recover the exact source-prefix tokens while ignoring all
                   prepared markers, earlier tokens, and tail padding.
+                - [x] Define the finite indexed-template emitter's stacks and
+                  control flow for online data-dependent recipes, unary position
+                  rescans, and input-before-token output reversal.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
