@@ -22,7 +22,8 @@ namespace SelectedPrefixMarkerMachine
 
 /-- Select original items whose zero-based selected-occurrence index is at
 least `skip`. -/
-def afterPrefix {Data : Type} (selected : Data → Bool) (skip : Nat) :
+def afterPrefix {Data : Type} {cutoff : Nat}
+    (selected : Data → Bool) (skip : Nat) :
     Tagged cutoff Data → Bool
   | (data, count) => selected data && decide (skip ≤ count.val)
 
