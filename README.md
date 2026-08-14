@@ -760,6 +760,8 @@ build; an imported proof counts when its statement matches the paper.
                   clock atoms and state the exact triangular token recursion.
                 - [x] Factor that recursion into a finite generic triangular
                   recipe contract for the successor emitter machine.
+                - [x] Define the finite triangular emitter's counters, control
+                  states, and complete transition program.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2004,6 +2006,11 @@ The representation choices for this target are:
   outer templates, a strictly-higher inner range and fold, and fixed frame/base
   closers.  Its clock specialization is exactly the normalized successor token
   target, separating the future machine proof from clock semantics.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterMachine.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterMachine.lean)
+  defines the finite triangular emitter core.  Separate persistent, outer,
+  current, inner, and scratch counters drive the three fixed recipe blocks;
+  higher-position markers are restored while emitting fold closers, and final
+  carry closures are emitted while clearing the outer counter.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
