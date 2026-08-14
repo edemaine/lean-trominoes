@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicGridDrawingComputability
 import LeanTrominoes.PeriodicThreeDMNormalizationRasterization
+import LeanTrominoes.AxisDirectionComputability
 
 /-!
 # Computability encodings for periodic 3DM normalization
@@ -136,14 +137,6 @@ theorem equivData_symm_primrec : Primrec equivData.symm :=
 end ContractedEndpoint
 
 end PeriodicThreeDM
-
-namespace AxisDirection
-
-noncomputable instance : Primcodable AxisDirection :=
-  Primcodable.ofEquiv (Fin (Fintype.card AxisDirection))
-    (Fintype.equivFin AxisDirection)
-
-end AxisDirection
 
 namespace DegreeThreeVertexNormalization
 

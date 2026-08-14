@@ -66,7 +66,8 @@ private def bendRouteGeometryData
 private def bendRouteData
     {Variable : Type*} [DecidableEq Variable]
     (input : BendRouteInput Variable) : TranslatedCornerRouteInput :=
-  ((bendRouteGeometryData input.1.1, input.1.2), input.2)
+  ((bendRouteGeometryData input.1.1).1,
+    (((bendRouteGeometryData input.1.1).2, input.1.2), input.2))
 
 def bendRoute
     {Variable : Type*} [DecidableEq Variable]
@@ -132,13 +133,18 @@ private theorem bendRouteData_primrec
     {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
     Primrec (bendRouteData (Variable := Variable)) := by
   change Primrec fun input : BendRouteInput Variable =>
-    ((bendRouteGeometryData input.1.1, input.1.2), input.2)
+    ((bendRouteGeometryData input.1.1).1,
+      (((bendRouteGeometryData input.1.1).2, input.1.2), input.2))
+  have geometry : Primrec fun input : BendRouteInput Variable =>
+      bendRouteGeometryData input.1.1 :=
+    bendRouteGeometryData_primrec.comp
+      (Primrec.fst.comp Primrec.fst)
   exact Primrec.pair
+    (Primrec.fst.comp geometry)
     (Primrec.pair
-      (bendRouteGeometryData_primrec.comp
-        (Primrec.fst.comp Primrec.fst))
-      (Primrec.snd.comp Primrec.fst))
-    Primrec.snd
+      (Primrec.pair (Primrec.snd.comp geometry)
+        (Primrec.snd.comp Primrec.fst))
+      Primrec.snd)
 
 theorem bendRoute_primrec
     {Variable : Type*} [Primcodable Variable] [DecidableEq Variable] :
