@@ -783,6 +783,8 @@ build; an imported proof counts when its statement matches the paper.
                   inner template at every triangular equality position.
                 - [x] Execute one complete higher inner position, including
                   empty templates and exact marker transfer between counters.
+                - [x] Lift that iteration over the complete strictly-higher
+                  range with exact consecutive-position token output.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2084,6 +2086,11 @@ The representation choices for this target are:
   nonempty inner templates.  It removes exactly one `remaining` marker, emits
   the template at `outer + 1 + inner`, transfers that marker to
   `innerProcessed`, and returns to the common inner-loop invariant.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterInnerRange.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterInnerRange.lean)
+  lifts the one-position theorem over every strictly higher marker.  Its exact
+  output is the consecutive bivariate position range used by the semantic
+  contract, all markers move from `remaining` to `innerProcessed`, and its
+  recursive runtime has a genuine zero-step empty-range base case.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
