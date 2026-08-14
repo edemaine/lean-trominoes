@@ -1073,6 +1073,8 @@ build; an imported proof counts when its statement matches the paper.
         clockwise clause ordering, and Figure 9 clearance scaling.
       - [x] Carry the concrete Figure 9 output through unit elimination and
         its final stable clause-direction ordering.
+      - [x] Prove every occurring final canonical position gauge has zero
+        vertical component and preserve one-dimensionality through it.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
