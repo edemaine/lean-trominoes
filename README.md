@@ -799,6 +799,8 @@ build; an imported proof counts when its statement matches the paper.
                   workspace exactly, and prove genuine machine halting.
                 - [x] Compose scanning, all triangular frames, final folding,
                   cleanup, and reversal into exact whole-machine semantics.
+                - [x] Bound template, inner-range, frame, and complete
+                  frame-range output and runtime by fixed cubic-scale forms.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2139,6 +2141,11 @@ The representation choices for this target are:
   semantic contract, then composes every verified phase from `initList` to
   `haltList`.  The resulting `TM2OutputsInTime` theorem emits exactly
   `TriangularTemplateEmitter.emitted` after the retained input workspace.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterBounds.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterBounds.lean)
+  supplies fixed-coefficient bounds for recipe templates, inner-position
+  ranges, individual frames, and complete frame ranges.  Both emitted token
+  length and runtime are bounded by cubic-scale expressions in the two runtime
+  selector counts, ready for the workspace polynomial certificate.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
