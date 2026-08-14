@@ -728,6 +728,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove that every fixed tagged-prefix selector has count
                   `selectedCount − skip` and certify the marker's linear
                   polynomial-time execution.
+                - [x] Assemble fixed and affine phases whose exact output is
+                  the complete normalized one-hot program for every bounded
+                  stack and represented position.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1953,6 +1956,11 @@ The representation choices for this target are:
   selecting tagged occurrences at or after `skip` has count exactly the
   original selected count minus `skip`.  Projection recovers the original word,
   and the exact two-pass execution receives a linear polynomial-time certificate.
+- [`LeanTrominoes/PeriodicCNFMachineOneHotEmitterSpec.lean`](LeanTrominoes/PeriodicCNFMachineOneHotEmitterSpec.lean)
+  gives the first complete concrete emitter schedule.  Two literal finite
+  fields, one affine cell phase per machine stack, and fixed/dynamic closing
+  phases emit exactly the normalized `oneHotFields` postorder program for any
+  runtime stack width, including its precise right-associated conjunction suffix.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
