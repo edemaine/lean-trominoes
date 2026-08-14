@@ -1035,6 +1035,8 @@ build; an imported proof counts when its statement matches the paper.
         source incidence edge offset, hence is horizontal for a 1D source.
       - [x] Assemble the five retained anchor-normalized planar-SAT clause
         families and prove the complete formula remains one dimensional.
+      - [x] Prove every valid retained planar-SAT variable has zero vertical
+        canonical-position gauge for a horizontal source incidence graph.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
