@@ -797,6 +797,8 @@ build; an imported proof counts when its statement matches the paper.
                   one exact final-closer block per outer position.
                 - [x] Clear the persistent counter, reverse the accumulated
                   workspace exactly, and prove genuine machine halting.
+                - [x] Compose scanning, all triangular frames, final folding,
+                  cleanup, and reversal into exact whole-machine semantics.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2132,6 +2134,11 @@ The representation choices for this target are:
   workspace onto the output stack.  The generic execution theorems give exact
   runtimes, exact forward output, empty work stacks, and a genuinely halted
   configuration.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterSemantics.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterSemantics.lean)
+  identifies the iterative frame prefix plus final unwind with the recursive
+  semantic contract, then composes every verified phase from `initList` to
+  `haltList`.  The resulting `TM2OutputsInTime` theorem emits exactly
+  `TriangularTemplateEmitter.emitted` after the retained input workspace.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
