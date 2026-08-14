@@ -1071,6 +1071,8 @@ build; an imported proof counts when its statement matches the paper.
         vertical offset in a positioned periodic CNF.
       - [x] Carry the concrete retained formula through fixed-eight splitting,
         clockwise clause ordering, and Figure 9 clearance scaling.
+      - [x] Carry the concrete Figure 9 output through unit elimination and
+        its final stable clause-direction ordering.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
