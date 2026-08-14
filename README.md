@@ -945,6 +945,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Split the represented stack range at the pushed-prefix
                   and source-validity boundaries, proving the three emitted
                   cell blocks exactly equal normalized `stackTransformCell`.
+                - [x] Emit the normalized stack-transform fit operand by
+                  complementary width-threshold branches, including the exact
+                  first omitted-cell test, in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
