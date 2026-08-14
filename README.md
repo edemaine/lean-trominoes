@@ -948,6 +948,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Emit the normalized stack-transform fit operand by
                   complementary width-threshold branches, including the exact
                   first omitted-cell test, in polynomial time.
+                - [x] Compose the fit operand, represented-cell schedule,
+                  `all` ending, and final conjunction into the exact complete
+                  normalized stack-transform program in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
