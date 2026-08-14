@@ -1003,6 +1003,8 @@ build; an imported proof counts when its statement matches the paper.
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
         every clause-anchored graph edge has zero vertical lattice offset.
+      - [x] Prove every route point in the canonical track drawing of a local
+        zero-vertical-offset graph lies strictly inside its vertical period.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
