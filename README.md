@@ -513,7 +513,7 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Package the evaluator certificate as flat-encoding PSPACE
                 membership.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
-    - [ ] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
+    - [x] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
       - [x] Define the horizontal CNF fragment and prove its line semantics
         equivalent to the existing plane semantics.
@@ -1011,6 +1011,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Restrict the footprint atlas to the finite vertical block band and
         prove locally tiled, port-compatible, vertically closed assignments
         glue to an exact tiling of the compiled strip.
+      - [x] Prove blank first and last drawing rows force vertical closure, so
+        compatible local gadget states tile the compiled strip.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either

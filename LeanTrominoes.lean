@@ -42,6 +42,7 @@ import LeanTrominoes.GadgetSubstitution
 import LeanTrominoes.GadgetStripSubstitution
 import LeanTrominoes.GadgetStripStacking
 import LeanTrominoes.GadgetStripAtlas
+import LeanTrominoes.GadgetStripBoundary
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.IndexedSavitch
 import LeanTrominoes.IndexedSavitchComputability
