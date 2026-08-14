@@ -1082,6 +1082,8 @@ build; an imported proof counts when its statement matches the paper.
         well formed, vertex separated, and semantically exact.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
       strip drawing.
+      - [x] Define the open three-period vertical halo and prove that a
+        shift/reflection maps it strictly between blank raster boundaries.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
