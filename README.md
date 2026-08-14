@@ -924,6 +924,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove the prefix marker's final capped control count is
                   exactly `min(selectedCount, cutoff)`, enabling one-sentinel
                   branching on fixed runtime-width thresholds.
+                - [x] Verify complementary one-sentinel selectors whose exact
+                  counts distinguish widths below a fixed cutoff from widths
+                  at or above it.
                 - [x] Verify a prefix-marked bivariate wrapper that exposes
                   two tagged interval counts to affine templates while
                   preserving and untagging the shared workspace.
