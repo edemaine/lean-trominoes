@@ -793,6 +793,8 @@ build; an imported proof counts when its statement matches the paper.
                   selection through both templates and the full inner fold.
                 - [x] Lift complete frames over every selected outer position,
                   with the exact triangular frame-prefix token stream.
+                - [x] Emit the final base and unwind every completed frame with
+                  one exact final-closer block per outer position.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2119,6 +2121,10 @@ The representation choices for this target are:
   triangular frame prefix, empties `remaining`, accumulates every completed
   position in `processed`, and stops immediately before the final base and
   unwind suffix with a zero-step empty-range case.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterFinalFold.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterFinalFold.lean)
+  handles that suffix: it emits `finalBase`, removes every completed outer
+  marker while emitting one `finalCloser`, and reaches `clearFirst` with both
+  outer counters empty.  The emitted suffix order and linear runtime are exact.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
