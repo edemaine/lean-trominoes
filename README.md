@@ -1013,6 +1013,8 @@ build; an imported proof counts when its statement matches the paper.
         glue to an exact tiling of the compiled strip.
       - [x] Prove blank first and last drawing rows force vertical closure, so
         compatible local gadget states tile the compiled strip.
+      - [x] Prove exact strip-substitution correctness for normalized,
+        vertex-separated drawings with blank vertical boundary rows.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
