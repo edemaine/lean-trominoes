@@ -743,6 +743,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Define bivariate affine atom recipes and normalized
                   Boolean programs for fields depending on both a runtime
                   width and an iteration position.
+                - [x] Verify the finite two-counter template emitter, including
+                  exact context/position rescans, counter restoration, work
+                  stack cleanup, output reversal, and genuine halting.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1948,6 +1951,12 @@ The representation choices for this target are:
   runtime counters.  Its compositional postorder interface proves exact token
   agreement for wires, Boolean folds, equality, vector equality, and binary
   succession, providing the precise target for the clock emitter.
+- [`LeanTrominoes/PeriodicCNFBivariateTemplateEmitterMachine.lean`](LeanTrominoes/PeriodicCNFBivariateTemplateEmitterMachine.lean)
+  realizes those recipes with a finite two-counter machine.  It independently
+  counts a persistent context class and a position-loop class, rescans and
+  restores both unary counters for every affine atom, retains the full input,
+  clears every work stack, reverses the exact appended token stream, and proves
+  the final configuration genuinely halted.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
