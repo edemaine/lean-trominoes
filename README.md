@@ -1008,6 +1008,9 @@ build; an imported proof counts when its statement matches the paper.
         plane tiling, giving the unconditional soundness direction.
         - [x] Identify the base strip carrier exactly with the plane carrier
           intersected by one half-open expanded vertical-period band.
+      - [x] Restrict the footprint atlas to the finite vertical block band and
+        prove locally tiled, port-compatible, vertically closed assignments
+        glue to an exact tiling of the compiled strip.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
