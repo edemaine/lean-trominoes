@@ -701,6 +701,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Rotate that unary clause-count suffix to the request
                   header, expand the retained tokens, and compose both passes
                   into one verified polynomial-time postprocessor.
+                - [x] Reduce the concrete printer input from seven prepared
+                  blocks to source symbols plus unary space, clock, and fresh
+                  blocks, with exact recovery and polynomial-time preparation.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1876,6 +1879,12 @@ The representation choices for this target are:
   bound certify the four-stack finalizer; composition with clause counting
   maps the emitter source directly to the normalized unary request fields in
   polynomial time.
+- [`LeanTrominoes/PeriodicCNFPolySpaceUnaryPreparedLayout.lean`](LeanTrominoes/PeriodicCNFPolySpaceUnaryPreparedLayout.lean)
+  removes the binary space, clock, and fresh blocks from the concrete printer
+  input.  The resulting four-block word retains only finite source symbols and
+  the three unary counters; exact projection theorems recover the normalized
+  unary-token request, and the existing source-preparation machine supplies
+  its polynomial-time certificate.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
