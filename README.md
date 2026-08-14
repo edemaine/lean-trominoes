@@ -787,6 +787,8 @@ build; an imported proof counts when its statement matches the paper.
                   range with exact consecutive-position token output.
                 - [x] Restore the higher range while emitting the exact inner
                   base, per-position closers, and frame closer.
+                - [x] Package both possibly empty outer templates behind one
+                  exact full-stage execution theorem.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2098,6 +2100,11 @@ The representation choices for this target are:
   closer, appends the frame closer, and enters the possibly empty outer-second
   template.  The proof gives the exact semantic token order and restores the
   full higher range to `remaining`.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterStage.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterStage.lean)
+  packages the common entry convention for both non-inner templates.  Empty
+  templates take a genuine zero-step run; nonempty templates use the verified
+  recipe-list induction, and both paths reach the same continuation with exact
+  full-template tokens and runtime.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
