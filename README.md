@@ -957,6 +957,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Close the canonical finite stack family with its fixed
                   `all` ending, yielding the exact stack program of a terminal
                   symbolic statement path.
+                - [x] Surround a terminal path's stack program with its guard,
+                  next label/control operands, and four-input `all` ending to
+                  emit the exact complete path program in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
