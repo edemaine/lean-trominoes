@@ -789,6 +789,8 @@ build; an imported proof counts when its statement matches the paper.
                   base, per-position closers, and frame closer.
                 - [x] Package both possibly empty outer templates behind one
                   exact full-stage execution theorem.
+                - [x] Compose one complete triangular outer frame from marker
+                  selection through both templates and the full inner fold.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2105,6 +2107,11 @@ The representation choices for this target are:
   templates take a genuine zero-step run; nonempty templates use the verified
   recipe-list induction, and both paths reach the same continuation with exact
   full-template tokens and runtime.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterFrame.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterFrame.lean)
+  composes one complete triangular frame: current-marker selection, the first
+  outer template, every higher inner position, the full inner fold, the second
+  outer template, and transfer to `processed`.  Its output is exactly the
+  semantic `frameTokens` block and every scratch invariant is restored.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
