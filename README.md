@@ -858,6 +858,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift indexed item execution across the complete input,
                   retaining exact input order and accumulating the exact
                   data-indexed token word and selected-position count.
+                - [x] Clear the indexed position counter, reverse tokens and
+                  retained input in the required order, and prove genuine
+                  halted cleanup with exact output.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height

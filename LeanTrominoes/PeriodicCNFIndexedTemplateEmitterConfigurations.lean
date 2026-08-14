@@ -79,6 +79,11 @@ def haltCfg {Data : Type} {family : Family Data}
     TM2.Cfg (Alphabet Data) (Label Data family) (State Data) :=
   ⟨none, none, tapes ⟨[], [], [], [], [], output⟩⟩
 
+def haltDataCfg {Data : Type} {family : Family Data}
+    (data : TapeData Data) :
+    TM2.Cfg (Alphabet Data) (Label Data family) (State Data) :=
+  ⟨none, none, tapes data⟩
+
 def afterRecipeCfg {Data : Type} (family : Family Data) (item : Data)
     (index : Fin (recipesFor family item).length) (data : TapeData Data) :
     TM2.Cfg (Alphabet Data) (Label Data family) (State Data) :=
