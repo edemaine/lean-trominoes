@@ -852,6 +852,9 @@ build; an imported proof counts when its statement matches the paper.
                   of the indexed emitter's unary processed-position counter.
                 - [x] Compose one complete indexed fixed or affine recipe with
                   exact semantic token output, restored counters, and runtime.
+                - [x] Lift indexed recipe execution across one selected item's
+                  complete template, append exact `positionTokens`, and advance
+                  the selected-position counter once.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
