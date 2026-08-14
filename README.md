@@ -740,6 +740,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Fix the prefix cutoff to the canonical accepting
                   configuration and connect its endpoint phases to the actual
                   prepared unary space block.
+                - [x] Define bivariate affine atom recipes and normalized
+                  Boolean programs for fields depending on both a runtime
+                  width and an iteration position.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1940,6 +1943,11 @@ The representation choices for this target are:
   finite conjunction/disjunction, equality, exactly-one vectors, and binary
   succession, so concrete bounded-machine phases can be specified by their
   ordinary normalized programs rather than by raw token arithmetic.
+- [`LeanTrominoes/PeriodicCNFBivariateProgramTemplates.lean`](LeanTrominoes/PeriodicCNFBivariateProgramTemplates.lean)
+  extends the semantic recipe language to atom runs affine in two independent
+  runtime counters.  Its compositional postorder interface proves exact token
+  agreement for wires, Boolean folds, equality, vector equality, and binary
+  succession, providing the precise target for the clock emitter.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
