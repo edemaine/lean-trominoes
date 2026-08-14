@@ -969,6 +969,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Build a generic polynomial-time capped-regime wrapper
                   that makes an arbitrary input-preserving token emitter an
                   exact conditional no-op outside one selected width regime.
+                - [x] Dispatch over all fixed capped-width regimes and retain
+                  the unique active terminal-path disjunction, proving exact
+                  runtime `statementPathsProgram` emission in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
