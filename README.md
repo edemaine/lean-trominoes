@@ -722,6 +722,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove token append/fold identities for normalized finite
                   conjunctions and disjunctions and identify affine ranges
                   with their per-position ordinary program streams.
+                - [x] Verify a finite-state prefix marker that retains the
+                  prepared word and tags each symbol by its capped number of
+                  earlier selected symbols, enabling fixed boundary skips.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1937,6 +1940,11 @@ The representation choices for this target are:
   finite conjunctions and disjunctions.  It also identifies a recursive affine
   position range with the flat unary-token stream of the corresponding
   evaluated ordinary postorder programs.
+- [`LeanTrominoes/SelectedPrefixMarkerMachine.lean`](LeanTrominoes/SelectedPrefixMarkerMachine.lean)
+  verifies the stateful preprocessing needed by boundary-sensitive phases.
+  For a fixed finite cutoff it retains every input symbol, tags it by the
+  number of earlier selected symbols capped at that cutoff, restores order,
+  resets its finite state, and halts with exactly the tagged output.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
