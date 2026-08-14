@@ -915,6 +915,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Wrap fixed-marker padding around the bivariate emitter,
                   yielding a polynomial-time pass for fixed-many templates
                   whose atoms depend affinely on the runtime stack width.
+                - [x] Prove exact selected counts for fixed prefixes and
+                  half-open intervals in prefix-marked unary data, enabling
+                  runtime-width boundary and tail schedules.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
