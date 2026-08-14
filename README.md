@@ -1177,6 +1177,8 @@ build; an imported proof counts when its statement matches the paper.
         among the three retained endpoint values.
       - [x] Prove degree-two and degree-three element constraints and package
         strip-orientation readback as a valid suppressed 3DM orientation.
+      - [x] Conclude the normalized rectangular strip drawing is orientable
+        exactly when the original periodic 3DM instance is satisfiable.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
