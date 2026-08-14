@@ -975,6 +975,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Fold runtime path disjunctions over every fixed control
                   value with current-control guards and an `any` ending,
                   yielding exact `statementProgram` emission.
+                - [x] Fold exact statement programs over every fixed live
+                  label with current-label guards and an `any` ending, yielding
+                  the complete normalized `machineStep` program.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
