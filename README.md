@@ -918,6 +918,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove exact selected counts for fixed prefixes and
                   half-open intervals in prefix-marked unary data, enabling
                   runtime-width boundary and tail schedules.
+                - [x] Verify a prefix-marked bivariate wrapper that exposes
+                  two tagged interval counts to affine templates while
+                  preserving and untagging the shared workspace.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
