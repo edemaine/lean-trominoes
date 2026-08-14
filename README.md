@@ -1155,6 +1155,10 @@ build; an imported proof counts when its statement matches the paper.
         source or translated-target endpoint compatibility theorem.
       - [x] Classify every exposed strip route port and dispatch its source,
         internal-window, or target-boundary compatibility theorem.
+      - [x] Lift finite strip-site port compatibility through provenance
+        reconstruction to every exposed port of the infinite strip drawing.
+      - [x] Package the induced strip assignment as a valid global drawing
+        orientation whenever the suppressed 3DM orientation is valid.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
