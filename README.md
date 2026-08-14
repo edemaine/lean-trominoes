@@ -1127,6 +1127,8 @@ build; an imported proof counts when its statement matches the paper.
         packaged rectangular drawing interfaces.
       - [x] Prove the concrete normalized rectangular strip drawing is well
         formed, including equality of unused ports in both directions.
+      - [x] Prove degree-three vertex cells remain nonadjacent in the
+        rectangular strip by transfer to the coarse-lattice torus theorem.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
