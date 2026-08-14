@@ -840,6 +840,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Define the finite indexed-template emitter's stacks and
                   control flow for online data-dependent recipes, unary position
                   rescans, and input-before-token output reversal.
+                - [x] Name every indexed-emitter invariant configuration and
+                  prove exact dependent-stack update identities for its later
+                  small-step verification.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
