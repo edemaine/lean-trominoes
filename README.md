@@ -1019,6 +1019,8 @@ build; an imported proof counts when its statement matches the paper.
         and source metadata canonical primitive-recursive encodings.
       - [x] Compute the complete flattened source/origin metadata list in
         exact parallel with the generated positioned clauses.
+      - [x] Compute the retained, shortened, and two translated split-route
+        branches selected by each generated incidence's origin metadata.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
