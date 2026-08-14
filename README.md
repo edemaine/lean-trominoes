@@ -1105,6 +1105,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove the rectangular raster preserves the normalized drawing's
         assignment collision freedom, and instantiate it from the final
         endpoint-contact certificate.
+      - [x] Prove exact strip lookup for every listed normalized vertex and
+        route-interior assignment under that collision certificate.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
