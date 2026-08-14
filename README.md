@@ -989,6 +989,10 @@ build; an imported proof counts when its statement matches the paper.
                   polynomial-time emitter for all prepared inputs.
                 - [x] Emit the exact unary fresh-atom header and forced-root
                   clause marker while preserving the prepared source word.
+                - [x] Compose the fresh header, complete reset and ordinary
+                  branches, and outer Boolean closers into one source-uniform
+                  polynomial-time machine whose extracted output is exactly
+                  the normalized finite-token compact request.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
