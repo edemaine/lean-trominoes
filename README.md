@@ -758,6 +758,8 @@ build; an imported proof counts when its statement matches the paper.
                   triangular equality operands, and its exact unwind suffix.
                 - [x] Specialize rise, fall, and equality frames to runtime
                   clock atoms and state the exact triangular token recursion.
+                - [x] Factor that recursion into a finite generic triangular
+                  recipe contract for the successor emitter machine.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1997,6 +1999,11 @@ The representation choices for this target are:
   specializes rise, fall, and bit-equality frames to the exact bivariate clock
   atom layout.  Its recursive triangular unary-token stream is proved equal to
   the complete normalized bounded-machine clock-successor program.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterSpec.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterSpec.lean)
+  factors the successor recursion into a generic finite-recipe contract:
+  outer templates, a strictly-higher inner range and fold, and fixed frame/base
+  closers.  Its clock specialization is exactly the normalized successor token
+  target, separating the future machine proof from clock semantics.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
