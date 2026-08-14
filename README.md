@@ -1106,6 +1106,9 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove the proof-free rectangular compiler primitive recursive,
         from reflected route assignments through prioritized lookup and the
         complete row-major cell array.
+      - [x] Prove the exact rectangular cell count and bound the compiled
+        target's complete flat encoding by an explicit polynomial in the
+        final normalization period.
       - [x] Prove every generated vertex and route cell occupies a strict
         interior row and both wraparound boundary rows are blank.
       - [x] Prove the rectangular raster preserves the normalized drawing's
