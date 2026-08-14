@@ -39,6 +39,7 @@ import LeanTrominoes.GadgetPorts
 import LeanTrominoes.GadgetReduction
 import LeanTrominoes.GadgetReductionComputability
 import LeanTrominoes.GadgetSubstitution
+import LeanTrominoes.GadgetStripSubstitution
 import LeanTrominoes.GadgetWire
 import LeanTrominoes.IndexedSavitch
 import LeanTrominoes.IndexedSavitchComputability

@@ -999,6 +999,10 @@ build; an imported proof counts when its statement matches the paper.
       strip drawing.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
+      - [x] Package any finite normalized drawing domain as a horizontally
+        periodic expanded tromino strip, prove its presentation well formed,
+        characterize its carrier exactly, and prove the construction
+        computable.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
