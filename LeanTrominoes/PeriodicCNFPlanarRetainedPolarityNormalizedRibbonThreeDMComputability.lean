@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRibbonThreeDMComputability
 import LeanTrominoes.PeriodicCNFPlanarRetainedPolarityNormalizedRibbonThreeDM
 import LeanTrominoes.PeriodicOneInThreePolarityNormalizationComputability
+import LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivisionPositionComputability
 
 /-!
 # Computability of the corrected polarity-normalized planar 3DM endpoint
@@ -20,27 +21,6 @@ with the proof-backed routed endpoint.
 noncomputable section
 
 namespace LeanTrominoes
-
-namespace PeriodicOneInThreePolarityNormalizationRouteSubdivision
-
-/-- The fixed gauge that sends fresh complement literals to offset zero is
-primitive recursive. -/
-theorem freshGauge_primrec
-    {Variable : Type*} [Primcodable Variable] :
-    Primrec (freshGauge : PolarityNormalizedVariable Variable → Cell) := by
-  have freshOffset : Primrec fun fresh : FreshOccurrence Variable =>
-      fresh.2.offset :=
-    PeriodicThreeCNF.literal_offset_primrec.comp Primrec.snd
-  have fresh : Primrec fun occurrence : FreshOccurrence Variable =>
-      Cell.sub (0, 0) occurrence.2.offset :=
-    Computability.cell_sub_primrec.comp
-      (Primrec.const ((0, 0) : Cell)) freshOffset
-  exact (Primrec.sumCasesOn Primrec.id
-    (Primrec.const ((0, 0) : Cell)).to₂
-    (fresh.comp Primrec.snd).to₂).of_eq fun atom => by
-      cases atom <;> rfl
-
-end PeriodicOneInThreePolarityNormalizationRouteSubdivision
 
 namespace PeriodicOrthocrossing
 
