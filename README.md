@@ -691,6 +691,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Rotate the counted suffix into the native request
                   header, insert its delimiter, expand every finite token,
                   and verify the finalizer in linear time.
+                - [x] Verify a finite polynomial-time machine that converts
+                  delimiter-terminated unary fields into the evaluator's
+                  canonical native natural-number fields.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1848,6 +1851,12 @@ The representation choices for this target are:
   scan, counter restoration, source scan, and output reversal give exact
   execution and output theorems, packaged with an explicit quadratic
   polynomial-time certificate.
+- [`LeanTrominoes/UnaryFieldEncoderMachine.lean`](LeanTrominoes/UnaryFieldEncoderMachine.lean)
+  converts any sequence of delimiter-terminated unary natural-number fields
+  into the evaluator's canonical binary-list representation.  Its finite
+  scanner, increment, field emission, and output reversal are proved exact,
+  and the complete conversion has an explicit quadratic polynomial-time
+  certificate.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
