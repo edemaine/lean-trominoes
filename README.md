@@ -1179,6 +1179,11 @@ build; an imported proof counts when its statement matches the paper.
         strip-orientation readback as a valid suppressed 3DM orientation.
       - [x] Conclude the normalized rectangular strip drawing is orientable
         exactly when the original periodic 3DM instance is satisfiable.
+      - [x] Prove the concrete retained polarity-normalized 3DM target remains
+        one dimensional and its presentation stays inside the raster halo.
+      - [x] Instantiate the rectangular compiler for guarded local periodic
+        CNF, proving well-formedness, vertex separation, blank vertical
+        boundary, and exact source-orientation semantics.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
