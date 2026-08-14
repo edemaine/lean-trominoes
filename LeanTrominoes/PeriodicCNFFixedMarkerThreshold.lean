@@ -40,6 +40,20 @@ def workspaceSelected {Data : Type} (selected : Data → Bool) :
     ExpandedWorkspace Data → Bool :=
   AffineTemplateEmitterMachine.dataSelected (liftedSelected selected)
 
+@[simp]
+theorem selectedCount_workspaceSelected_padded {Data : Type}
+    (selected : Data → Bool) (markerCount : Nat)
+    (workspace : List (Workspace Data)) :
+    UnaryPolynomialPaddingMachine.selectedCount (workspaceSelected selected)
+        (FixedMarkerPadding.padded markerCount workspace) =
+      AffineTemplateEmitterMachine.selectedCount selected workspace := by
+  change BivariateTemplateEmitterMachine.selectedCount
+      (FixedMarkerBivariatePipeline.liftedFirst selected)
+        (FixedMarkerPadding.padded markerCount workspace) =
+    BivariateTemplateEmitterMachine.selectedCount selected workspace
+  exact FixedMarkerBivariatePipeline.firstCount_padded
+    selected markerCount workspace
+
 def isSentinelItem {Data : Type} : ExpandedWorkspace Data → Bool
   | .inl (.inr _) => true
   | _ => false

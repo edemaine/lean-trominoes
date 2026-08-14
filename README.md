@@ -927,6 +927,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify complementary one-sentinel selectors whose exact
                   counts distinguish widths below a fixed cutoff from widths
                   at or above it.
+                - [x] Turn either sentinel comparison bit into an exact
+                  zero-or-one bivariate program emission, returning to the
+                  original workspace in polynomial time.
                 - [x] Verify a prefix-marked bivariate wrapper that exposes
                   two tagged interval counts to affine templates while
                   preserving and untagging the shared workspace.
