@@ -713,6 +713,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift affine atom recipes to a compositional postorder
                   language and prove exact unary-token agreement for Boolean
                   operators, vector equality, exactly-one, and succession.
+                - [x] Instantiate affine programs for shifted bounded-stack
+                  cells, exact-one fields, vector equality, and every
+                  nonterminal occupied-prefix constraint.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1913,6 +1916,11 @@ The representation choices for this target are:
   finite conjunction/disjunction, equality, exactly-one vectors, and binary
   succession, so concrete bounded-machine phases can be specified by their
   ordinary normalized programs rather than by raw token arithmetic.
+- [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
+  instantiates the affine language for the bounded machine's explicit stack
+  atom layout.  It recovers shifted current and next cell tests, exact-one
+  fields, cell-vector equality, and every interior occupied-prefix formula
+  token for token, leaving the terminal constant-true suffix case explicit.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
