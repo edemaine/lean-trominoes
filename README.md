@@ -848,6 +848,8 @@ build; an imported proof counts when its statement matches the paper.
                   advancement.
                 - [x] Verify indexed fixed-token and affine-atom recipe entry,
                   including arbitrary reverse-token pushes and base atom runs.
+                - [x] Verify affine-atom position rescanning and exact restoration
+                  of the indexed emitter's unary processed-position counter.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
