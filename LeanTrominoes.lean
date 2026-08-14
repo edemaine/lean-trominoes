@@ -7,6 +7,7 @@ import LeanTrominoes.Assignment
 import LeanTrominoes.BinaryCountPaddingMachine
 import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
+import LeanTrominoes.ComplexityReductions
 import LeanTrominoes.DegreeThreeVertexNormalizationTemplates
 import LeanTrominoes.DegreeThreeVertexNormalizationPorts
 import LeanTrominoes.DegreeThreeVertexNormalizationFans

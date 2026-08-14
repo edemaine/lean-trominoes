@@ -513,6 +513,8 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Package the evaluator certificate as flat-encoding PSPACE
                 membership.
   - [ ] Prove PSPACE-hardness of the 1.5D problem for each tromino.
+    - [x] Prove encoded polynomial-time many-one reductions compose through
+      their finite intermediate alphabet.
     - [x] Prove 1D local Periodic CNF SAT PSPACE-hard using cyclic
       polynomial-space computation histories.
       - [x] Define the horizontal CNF fragment and prove its line semantics
