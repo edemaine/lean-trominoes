@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFMachineWellFormedEmitterSpec
+import LeanTrominoes.PeriodicCNFMarkedAffineEmitterPipeline
 import LeanTrominoes.PeriodicCNFPolySpaceUnaryPreparedLayout
 import LeanTrominoes.TM2CompositionMachine
 
@@ -42,9 +43,53 @@ noncomputable local instance (stack : decider.tm.K) :
 
 abbrev Symbol := PolySpaceUnaryPreparedLayout.Symbol encoding
 
+abbrev Workspace :=
+  AffineEmitterPipeline.Workspace (Symbol (encoding := encoding))
+
 local instance symbolInhabited :
     Inhabited (Symbol (encoding := encoding)) :=
   ⟨PolySpaceUnaryPreparedLayout.embedSpace⟩
+
+def workspaceSpace : Workspace (encoding := encoding) → Bool :=
+  AffineTemplateEmitterMachine.dataSelected
+    PolySpaceUnaryPreparedLayout.isSpace
+
+def workspacePhases :
+    List (Phase
+      (BoundedMachineWellFormedEmitter.Marked 1
+        (Workspace (encoding := encoding)))) :=
+  BoundedMachineWellFormedEmitter.phases
+    (tm := decider.tm) (cutoff := 1)
+    (workspaceSpace (encoding := encoding))
+
+/-- Input-preserving structural well-formedness pass on the shared token
+workspace. -/
+def runWorkspace (workspace : List (Workspace (encoding := encoding))) :
+    List (Workspace (encoding := encoding)) :=
+  MarkedAffineEmitterPipeline.run
+    (workspaceSpace (encoding := encoding)) 1
+    (workspacePhases decider) workspace
+
+noncomputable def runWorkspaceComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List (Workspace (encoding := encoding)))
+      (List (Workspace (encoding := encoding)))
+      (Workspace (encoding := encoding)) (Workspace (encoding := encoding))
+      id id (runWorkspace decider) :=
+  MarkedAffineEmitterPipeline.computableInPolyTime
+    (workspaceSpace (encoding := encoding)) 1 (workspacePhases decider)
+
+theorem workspaceSpace_count
+    (data : List (Symbol (encoding := encoding))) (tokens : List Token) :
+    UnaryPolynomialPaddingMachine.selectedCount
+        (workspaceSpace (encoding := encoding))
+        (embedData data ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      UnaryPolynomialPaddingMachine.selectedCount
+        PolySpaceUnaryPreparedLayout.isSpace data := by
+  exact selectedCount_embed_append_tokens
+    PolySpaceUnaryPreparedLayout.isSpace data tokens
 
 /-- Mark the first space boundary and emit all bounded well-formedness
 constraints. -/
@@ -104,6 +149,38 @@ theorem spaceOfSymbols_positive (symbols : List encoding.Γ) :
       [Encodable.encode true]).length
     simp [Turing.PartrecToTM2.trList]
   omega
+
+/-- Exact input-preserving behavior on a genuine prepared word with any
+previous token prefix. -/
+theorem runWorkspace_embed_append_tokens (symbols : List encoding.Γ)
+    (tokens : List Token) :
+    runWorkspace decider
+        (embedData
+            (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+          tokens.map fun token =>
+            (Sum.inr token : Workspace (encoding := encoding))) =
+      embedData
+          (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+        (tokens ++
+          ofProgram
+            (BoundedMachineProgram.wellFormedFields (tm := decider.tm)
+              (space :=
+                PolySpaceCompiler.spaceOfSymbols decider symbols))).map
+          fun token =>
+            (Sum.inr token : Workspace (encoding := encoding)) := by
+  unfold runWorkspace
+  rw [MarkedAffineEmitterPipeline.run_eq_append]
+  simp only [List.map_append, ← List.append_assoc]
+  congr 1
+  apply congrArg (List.map fun token =>
+    (Sum.inr token : Workspace (encoding := encoding)))
+  apply BoundedMachineWellFormedEmitter.emittedAll_phases
+  · omega
+  · exact spaceOfSymbols_positive decider symbols
+  · rw [workspaceSpace_count]
+    change PolySpaceUnaryPreparedLayout.space
+      (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) = _
+    exact PolySpaceUnaryPreparedLayout.space_preparedSources decider symbols
 
 /-- The actual prepared source word emits exactly the normalized structural
 well-formedness prefix at its runtime stack width. -/

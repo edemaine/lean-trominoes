@@ -751,6 +751,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Specialize one-symbol prefix marking to the prepared
                   space block and certify exact polynomial-time emission of
                   the complete structural well-formedness program.
+                - [x] Lift structural well-formedness emission to the shared
+                  workspace while preserving prepared data and prior tokens.
                 - [x] Define bivariate affine atom recipes and normalized
                   Boolean programs for fields depending on both a runtime
                   width and an iteration position.
