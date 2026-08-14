@@ -669,7 +669,7 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Flatten the prepared nested-sum word into seven tagged
                 blocks and prove exact recovery of the source, unary counters,
                 binary fields, and normalized token-request specification.
-            - [ ] Stream the normalized bounded-expression postorder program.
+            - [x] Stream the normalized bounded-expression postorder program.
               - [x] Mirror conjunction, disjunction, equality, exact-one,
                 vector equality, and binary successor directly on instruction
                 lists, and prove exact agreement with expression postorder.
@@ -681,7 +681,7 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Normalize bounded push/pop stack transformations.
                 - [x] Normalize symbolic statement paths and assemble the
                   designated accepting-reset program.
-              - [ ] Implement the finite counter-driven instruction emitter.
+              - [x] Implement the finite counter-driven instruction emitter.
                 - [x] Factor compact instructions, arbitrary wire atoms, and
                   the fresh header into a finite token alphabet whose fixed
                   block expansion is exactly the evaluator-native request.
