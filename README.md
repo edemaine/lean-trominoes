@@ -716,6 +716,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Instantiate affine programs for shifted bounded-stack
                   cells, exact-one fields, vector equality, and every
                   nonterminal occupied-prefix constraint.
+                - [x] Compose any fixed list of affine appenders over one
+                  stable prepared-symbol/token alphabet, preserving selector
+                  counts and extracting the exact token suffix in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1921,6 +1924,11 @@ The representation choices for this target are:
   atom layout.  It recovers shifted current and next cell tests, exact-one
   fields, cell-vector equality, and every interior occupied-prefix formula
   token for token, leaving the terminal constant-true suffix case explicit.
+- [`LeanTrominoes/PeriodicCNFAffineEmitterPipeline.lean`](LeanTrominoes/PeriodicCNFAffineEmitterPipeline.lean)
+  composes fixed affine phases over one stable `Data ⊕ Token` alphabet.
+  Earlier token suffixes provably leave every later selector count unchanged;
+  exact phase-order semantics, one-time input embedding, final token extraction,
+  and a polynomial-time certificate are supplied for arbitrary fixed phase lists.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
