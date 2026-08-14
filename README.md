@@ -861,6 +861,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Clear the indexed position counter, reverse tokens and
                   retained input in the required order, and prove genuine
                   halted cleanup with exact output.
+                - [x] Compose indexed scanning, data-dependent template
+                  execution, and cleanup from initialized input to genuine
+                  halting with exact appended output and runtime.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
