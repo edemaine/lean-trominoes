@@ -1037,6 +1037,8 @@ build; an imported proof counts when its statement matches the paper.
         families and prove the complete formula remains one dimensional.
       - [x] Prove every valid retained planar-SAT variable has zero vertical
         canonical-position gauge for a horizontal source incidence graph.
+      - [x] Apply that gauge certificate to every variable occurrence after
+        opaque wrapping of the raw retained formula.
       - [x] Prove a zero-vertical variable gauge preserves
         one-dimensionality after clause-anchor normalization.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
