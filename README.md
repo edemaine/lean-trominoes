@@ -1041,6 +1041,8 @@ build; an imported proof counts when its statement matches the paper.
         opaque wrapping of the raw retained formula.
       - [x] Prove a zero-vertical variable gauge preserves
         one-dimensionality after clause-anchor normalization.
+      - [x] Transport the retained formula's one-dimensionality through
+        opaque wrapping, canonical variable gauging, and anchor normalization.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
