@@ -52,6 +52,7 @@ import LeanTrominoes.TM2OutputLength
 import LeanTrominoes.TM2CompositionMachine
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.UnaryFieldEncoderMachine
+import LeanTrominoes.PeriodicCNFUnaryProgramTokens
 import LeanTrominoes.PlanarThreeSATGadgets
 import LeanTrominoes.EmbeddedCNFIncidenceDrawing
 import LeanTrominoes.EmbeddedCNFIncidenceDrawingPlanarity

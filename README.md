@@ -694,6 +694,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify a finite polynomial-time machine that converts
                   delimiter-terminated unary fields into the evaluator's
                   canonical native natural-number fields.
+                - [x] Factor the concrete emitter target through an all-unary
+                  finite token stream, prove its exact expansion to normalized
+                  fields, and append its exact unary clause count in
+                  polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1857,6 +1861,12 @@ The representation choices for this target are:
   scanner, increment, field emission, and output reversal are proved exact,
   and the complete conversion has an explicit quadratic polynomial-time
   certificate.
+- [`LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean)
+  gives the concrete request emitter an entirely finite output alphabet:
+  runtime atoms and the fresh boundary become unary runs, while fixed tokens
+  carry instruction tags and exact clause weights.  Fixed expansion is proved
+  to produce precisely the normalized unary fields, and a verified unary
+  Horner pass appends their exact clause count in polynomial time.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
