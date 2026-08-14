@@ -150,6 +150,60 @@ noncomputable def computableInPolyTime (symbols : List encoding.Γ) :
           (PolySpaceOrdinaryPrefixEmitter.run decider symbols workspace)))
   exact complete
 
+/-- One fixed complete ordinary-branch emitter for every prepared source
+word. -/
+def uniformRun
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    List (Workspace (encoding := encoding)) :=
+  PolySpaceInitialStackScheduleEmitter.appendTokens
+    PolySpaceResetEmitter.branchEnding
+    (BoundedMachineStepEmitter.run (tm := decider.tm)
+      (PolySpaceExpandedOrdinaryOperands.spaceSelected (encoding := encoding))
+      (PolySpaceOrdinaryPrefixEmitter.uniformRun decider workspace))
+
+theorem uniformRun_eq_run (symbols : List encoding.Γ)
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    uniformRun decider workspace = run decider symbols workspace := by
+  unfold uniformRun run
+  rw [PolySpaceOrdinaryPrefixEmitter.uniformRun_eq_run decider symbols]
+
+theorem run_source_independent (first second : List encoding.Γ)
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    run decider first workspace = run decider second workspace := by
+  rw [← uniformRun_eq_run decider first,
+    ← uniformRun_eq_run decider second]
+
+@[simp]
+theorem extractTokens_uniformRun_embed_append_tokens
+    (symbols : List encoding.Γ) (tokens : List Token) :
+    AffineEmitterPipeline.extractTokens
+        (uniformRun decider
+          (embedData
+              (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+            tokens.map fun token =>
+              (Sum.inr token : InputWorkspace (encoding := encoding)))) =
+      tokens ++ emitted decider symbols := by
+  rw [uniformRun_eq_run decider symbols,
+    extractTokens_run_embed_append_tokens]
+
+noncomputable def uniformComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List (InputWorkspace (encoding := encoding)))
+      (List (Workspace (encoding := encoding)))
+      (InputWorkspace (encoding := encoding))
+      (Workspace (encoding := encoding)) id id
+      (uniformRun decider) := by
+  let throughStep := TM2CompositionMachine.computableInPolyTime
+    (PolySpaceOrdinaryPrefixEmitter.uniformComputableInPolyTime decider)
+    (BoundedMachineStepEmitter.computableInPolyTime (tm := decider.tm)
+      (PolySpaceExpandedOrdinaryOperands.spaceSelected
+        (encoding := encoding)))
+  let complete := TM2CompositionMachine.computableInPolyTime throughStep
+    (PolySpaceInitialStackScheduleEmitter.appendTokensComputableInPolyTime
+      (Item := Data (encoding := encoding))
+      PolySpaceResetEmitter.branchEnding)
+  exact complete
+
 /-- The emitted ordinary suffix is exactly the normalized ordinary branch. -/
 theorem ordinaryTokens_eq_program (symbols : List encoding.Γ) :
     ordinaryTokens decider symbols =

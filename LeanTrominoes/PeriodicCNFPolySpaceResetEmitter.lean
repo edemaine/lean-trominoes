@@ -105,6 +105,41 @@ noncomputable def computableInPolyTime (symbols : List encoding.Γ) :
           (PolySpaceResetPrefixEmitter.runWorkspace decider workspace)))
   exact complete
 
+/-- One fixed reset-branch emitter for all prepared source words. -/
+def uniformRun
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    List (Workspace (encoding := encoding)) :=
+  PolySpaceInitialStackScheduleEmitter.appendTokens branchEnding
+    (PolySpaceInitialStackScheduleEmitter.uniformRun decider
+      (PolySpaceResetPrefixEmitter.runWorkspace decider workspace))
+
+theorem uniformRun_eq_run (symbols : List encoding.Γ)
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    uniformRun decider workspace = run decider symbols workspace := by
+  unfold uniformRun run
+  rw [PolySpaceInitialStackScheduleEmitter.uniformRun_eq_run decider symbols]
+
+theorem run_source_independent (first second : List encoding.Γ)
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    run decider first workspace = run decider second workspace := by
+  rw [← uniformRun_eq_run decider first,
+    ← uniformRun_eq_run decider second]
+
+noncomputable def uniformComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List (InputWorkspace (encoding := encoding)))
+      (List (Workspace (encoding := encoding)))
+      (InputWorkspace (encoding := encoding))
+      (Workspace (encoding := encoding)) id id
+      (uniformRun decider) := by
+  let throughInitial := TM2CompositionMachine.computableInPolyTime
+    (PolySpaceResetPrefixEmitter.runWorkspaceComputableInPolyTime decider)
+    (PolySpaceInitialStackScheduleEmitter.uniformComputableInPolyTime decider)
+  let complete := TM2CompositionMachine.computableInPolyTime throughInitial
+    (PolySpaceInitialStackScheduleEmitter.appendTokensComputableInPolyTime
+      (Item := Data (encoding := encoding)) branchEnding)
+  exact complete
+
 /-- The complete pass preserves any earlier token prefix and appends exactly
 well-formedness followed by the designated reset branch. -/
 @[simp]
@@ -125,6 +160,19 @@ theorem extractTokens_run_embed_append_tokens (symbols : List encoding.Γ)
     PolySpaceInitialStackScheduleEmitter.extractTokens_run_embed_append_tokens,
     emitted_eq_components]
   ac_rfl
+
+@[simp]
+theorem extractTokens_uniformRun_embed_append_tokens
+    (symbols : List encoding.Γ) (tokens : List Token) :
+    AffineEmitterPipeline.extractTokens
+        (uniformRun decider
+          (embedData
+              (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+            tokens.map fun token =>
+              (Sum.inr token : InputWorkspace (encoding := encoding)))) =
+      tokens ++ emitted decider symbols := by
+  rw [uniformRun_eq_run decider symbols,
+    extractTokens_run_embed_append_tokens]
 
 end PolySpaceResetEmitter
 end PeriodicCNF

@@ -984,6 +984,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Append the exact machine-step program and both fixed
                   conjunction closers to the ordinary prefix, yielding the
                   complete normalized ordinary branch in polynomial time.
+                - [x] Propagate the fixed initial-stack interface through the
+                  reset and ordinary branches, obtaining one source-uniform
+                  polynomial-time emitter for all prepared inputs.
                 - [x] Emit the exact unary fresh-atom header and forced-root
                   clause marker while preserving the prepared source word.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar

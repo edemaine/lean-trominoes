@@ -215,6 +215,59 @@ noncomputable def computableInPolyTime (symbols : List encoding.Γ) :
             (PolySpaceResetEmitter.run decider symbols workspace))))
   exact complete
 
+/-- One fixed ordinary-prefix emitter for all prepared source words. -/
+def uniformRun
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    List (Workspace (encoding := encoding)) :=
+  PolySpaceExpandedOrdinaryOperands.runClock decider
+    (PolySpaceInitialStackScheduleEmitter.appendTokens
+      (instructionTokens .negate)
+      (PolySpaceExpandedOrdinaryOperands.runAccepting decider
+        (PolySpaceResetEmitter.uniformRun decider workspace)))
+
+theorem uniformRun_eq_run (symbols : List encoding.Γ)
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    uniformRun decider workspace = run decider symbols workspace := by
+  unfold uniformRun run
+  rw [PolySpaceResetEmitter.uniformRun_eq_run decider symbols]
+
+theorem run_source_independent (first second : List encoding.Γ)
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    run decider first workspace = run decider second workspace := by
+  rw [← uniformRun_eq_run decider first,
+    ← uniformRun_eq_run decider second]
+
+@[simp]
+theorem extractTokens_uniformRun_embed_append_tokens
+    (symbols : List encoding.Γ) (tokens : List Token) :
+    AffineEmitterPipeline.extractTokens
+        (uniformRun decider
+          (embedData
+              (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+            tokens.map fun token =>
+              (Sum.inr token : InputWorkspace (encoding := encoding)))) =
+      tokens ++ emitted decider symbols := by
+  rw [uniformRun_eq_run decider symbols,
+    extractTokens_run_embed_append_tokens]
+
+noncomputable def uniformComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List (InputWorkspace (encoding := encoding)))
+      (List (Workspace (encoding := encoding)))
+      (InputWorkspace (encoding := encoding))
+      (Workspace (encoding := encoding)) id id
+      (uniformRun decider) := by
+  let throughAccepting := TM2CompositionMachine.computableInPolyTime
+    (PolySpaceResetEmitter.uniformComputableInPolyTime decider)
+    (PolySpaceExpandedOrdinaryOperands.runAcceptingComputableInPolyTime decider)
+  let throughNegate := TM2CompositionMachine.computableInPolyTime
+    throughAccepting
+    (PolySpaceInitialStackScheduleEmitter.appendTokensComputableInPolyTime
+      (Item := Data (encoding := encoding)) (instructionTokens .negate))
+  let complete := TM2CompositionMachine.computableInPolyTime throughNegate
+    (PolySpaceExpandedOrdinaryOperands.runClockComputableInPolyTime decider)
+  exact complete
+
 end PolySpaceOrdinaryPrefixEmitter
 end PeriodicCNF
 end LeanTrominoes
