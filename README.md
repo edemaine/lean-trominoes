@@ -1121,6 +1121,8 @@ build; an imported proof counts when its statement matches the paper.
         edge behind every emitted strip route assignment.
       - [x] Prove every exposed port of a strip route cell matches its
         predecessor or successor, including both endpoint boundary windows.
+      - [x] Classify every nonblank strip lookup result and prove each exposed
+        colored port matches the opposite port of its finite neighbor.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
