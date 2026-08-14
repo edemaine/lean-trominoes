@@ -1171,6 +1171,12 @@ build; an imported proof counts when its statement matches the paper.
         complement of their translated target endpoint.
       - [x] Prove every complete contracted strip route gives unequal inward
         values at its two endpoint occurrences.
+      - [x] Identify extracted strip tag values at retained and through edges
+        with the corresponding contracted endpoint values.
+      - [x] Transfer the local monochromatic strip vertex rule to exact-one
+        among the three retained endpoint values.
+      - [x] Prove degree-two and degree-three element constraints and package
+        strip-orientation readback as a valid suppressed 3DM orientation.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
