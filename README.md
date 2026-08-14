@@ -1139,6 +1139,8 @@ build; an imported proof counts when its statement matches the paper.
         successful infinite-lift provenance lookup.
       - [x] Prove the square and rectangular rasterizers enumerate identical
         orientation provenance values despite using different location keys.
+      - [x] Define the suppressed-orientation-induced infinite strip
+        orientation and prove every local cell constraint.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
