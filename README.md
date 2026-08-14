@@ -768,6 +768,8 @@ build; an imported proof counts when its statement matches the paper.
                   the complete linear scan phase.
                 - [x] Verify every atom's persistent-counter scan/restoration
                   and the held-current offset of inner templates.
+                - [x] Verify the completed-outer counter scan/restoration and
+                  its stage-specific continuation.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2031,6 +2033,11 @@ The representation choices for this target are:
   counter is scanned and restored exactly, emitting one first-stride block per
   marker.  Inner templates also emit precisely one second-stride block for the
   held current marker before position scanning begins.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterCounter.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterOuterCounter.lean)
+  verifies scanning and restoration of the completed-outer-position counter,
+  including its exact second-stride output.  Outer stages advance to their next
+  recipe or frame phase, while inner stages enter the additional inner-counter
+  scan without changing any restored invariant stack.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
