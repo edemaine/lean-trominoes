@@ -930,6 +930,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Emit every represented pushed cell and every shifted
                   source/target equality in one stack transform using marked
                   zero-or-one prefix phases and an affine interior phase.
+                - [x] Append the source-out-of-range `none` tail with marked
+                  bivariate interval counts, completing a polynomial-time
+                  emitter for all transformed stack-cell operands.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
