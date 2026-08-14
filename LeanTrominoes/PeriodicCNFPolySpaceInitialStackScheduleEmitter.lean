@@ -59,6 +59,21 @@ def prefixTokens (symbols : List encoding.Γ) : List Token :=
       (BoundedMachineFixedConfigurationEmitter.controlIs (tm := decider.tm)
         .next (PolySpaceInitialEmitter.target decider symbols).var)
 
+/-- The initial label and control are fixed by the decider; only the input
+stack depends on the source word. -/
+def fixedPrefixTokens : List Token :=
+  ofProgram
+      (BoundedMachineFixedConfigurationEmitter.labelIs (tm := decider.tm)
+        .next (some decider.tm.main)) ++
+    ofProgram
+      (BoundedMachineFixedConfigurationEmitter.controlIs (tm := decider.tm)
+        .next decider.tm.initialState)
+
+@[simp]
+theorem prefixTokens_eq_fixed (symbols : List encoding.Γ) :
+    prefixTokens decider symbols = fixedPrefixTokens decider := by
+  rfl
+
 def finalTokens : List Token :=
   allEnding (Fintype.card decider.tm.K) ++
     instructionTokens .conjoin ++ instructionTokens .conjoin
@@ -494,6 +509,42 @@ noncomputable def computableInPolyTime (symbols : List encoding.Γ) :
           (PolySpaceInitialStackOrder.afterInput decider)
           (runInput decider symbols workspace)))
   exact complete
+
+/-- One fixed machine implements the initial-stack schedule for every source
+word.  The former source parameter affected only the now-normalized fixed
+label/control prefix. -/
+def uniformRun :
+    List (InputWorkspace (encoding := encoding)) →
+      List (Workspace (encoding := encoding)) :=
+  run decider []
+
+theorem uniformRun_eq_run (symbols : List encoding.Γ)
+    (workspace : List (InputWorkspace (encoding := encoding))) :
+    uniformRun decider workspace = run decider symbols workspace := by
+  unfold uniformRun run runInput runBefore
+  rw [prefixTokens_eq_fixed, prefixTokens_eq_fixed]
+
+@[simp]
+theorem extractTokens_uniformRun_embed_append_tokens
+    (symbols : List encoding.Γ) (tokens : List Token) :
+    AffineEmitterPipeline.extractTokens
+        (uniformRun decider
+          (embedData
+              (PolySpaceUnaryPreparedLayout.preparedSources decider symbols) ++
+            tokens.map fun token =>
+              (Sum.inr token : InputWorkspace (encoding := encoding)))) =
+      tokens ++ PolySpaceInitialEmitter.schedule decider symbols := by
+  rw [uniformRun_eq_run decider symbols,
+    extractTokens_run_embed_append_tokens]
+
+noncomputable def uniformComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List (InputWorkspace (encoding := encoding)))
+      (List (Workspace (encoding := encoding)))
+      (InputWorkspace (encoding := encoding))
+      (Workspace (encoding := encoding)) id id
+      (uniformRun decider) :=
+  computableInPolyTime decider []
 
 end PolySpaceInitialStackScheduleEmitter
 end PeriodicCNF

@@ -897,6 +897,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assemble label/control fields, all stacks in exact finite
                   order, and configuration closers into a polynomial-time pass
                   whose extracted suffix is exactly the full initial schedule.
+                - [x] Prove the initial label/control prefix is source
+                  independent and expose one fixed initial-stack schedule
+                  machine valid for every prepared source word.
                 - [x] Compose well-formedness, accepting-current, clock reset,
                   and next-initial emission, then close both conjunctions to
                   obtain the complete polynomial-time designated reset prefix.
