@@ -1001,6 +1001,8 @@ build; an imported proof counts when its statement matches the paper.
         CNF to nonempty local 3SAT-3 with exactly preserved semantics.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
+      - [x] Lift one-dimensionality to the source incidence graph by proving
+        every clause-anchored graph edge has zero vertical lattice offset.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
