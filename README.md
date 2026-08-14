@@ -1011,6 +1011,8 @@ build; an imported proof counts when its statement matches the paper.
         formula from its complement-clause position query.
       - [x] Compose source refinement, route-selected complement positions,
         and fresh-variable gauging into the exact positioned routed formula.
+      - [x] Prove the positioned polarity-normalization placement period and
+        pointwise variable positions primitive recursive.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
