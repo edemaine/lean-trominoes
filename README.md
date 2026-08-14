@@ -888,6 +888,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Lift empty-stack emission over any fixed stack list,
                   preserving the selected width and appending the exact
                   stack-order flat map in polynomial time.
+                - [x] Verify a reusable polynomial-time `all`-fold ending pass
+                  that appends the true base followed by one conjunction
+                  closer per selected operand.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
