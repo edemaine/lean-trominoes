@@ -1151,6 +1151,8 @@ build; an imported proof counts when its statement matches the paper.
         translations and orient every target boundary compatibly.
       - [x] Prove consecutive internal strip route cells receive
         complementary values on their shared port in every block occurrence.
+      - [x] Dispatch every exposed strip vertex port through its unique
+        source or translated-target endpoint compatibility theorem.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
