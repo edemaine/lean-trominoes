@@ -1025,8 +1025,8 @@ build; an imported proof counts when its statement matches the paper.
         and its final whole-period transport through the fresh-variable gauge.
       - [x] Specialize route computability through the retained final clause
         sort, canonical gauge, and routed-polarity formula/placement/routes.
-      - [x] Compose the proof-free routed formula and complete routed
-        placement with the guarded concrete strip source.
+      - [x] Compose the proof-free routed formula, complete placement, and
+        routed incidence family with the guarded concrete strip source.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
