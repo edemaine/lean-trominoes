@@ -999,6 +999,8 @@ build; an imported proof counts when its statement matches the paper.
       trichromatic-orientation reductions.
       - [x] Guard arbitrary source presentations and normalize valid local 1D
         CNF to nonempty local 3SAT-3 with exactly preserved semantics.
+      - [x] Prove the executable admissibility guard and complete guarded
+        source-formula normalization primitive recursive.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
