@@ -679,6 +679,12 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Normalize symbolic statement paths and assemble the
                   designated accepting-reset program.
               - [ ] Implement the finite counter-driven instruction emitter.
+                - [x] Factor compact instructions, arbitrary wire atoms, and
+                  the fresh header into a finite token alphabet whose fixed
+                  block expansion is exactly the evaluator-native request.
+                - [x] Mark every emitted instruction by its exact Tseitin
+                  clause weight and materialize the total clause count in
+                  canonical binary with the verified padding machine.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
