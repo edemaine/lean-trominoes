@@ -1131,6 +1131,8 @@ build; an imported proof counts when its statement matches the paper.
         rectangular strip by transfer to the coarse-lattice torus theorem.
       - [x] Attach exact vertex/route provenance to every nonblank strip cell
         and prove collision-free provenance lookup erases to its cell type.
+      - [x] Lift finite strip provenance to arbitrary cells of the infinite
+        rectangular drawing and identify successful and blank lookups.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
