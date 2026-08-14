@@ -1100,6 +1100,9 @@ build; an imported proof counts when its statement matches the paper.
         proving every final normalized route point stays in the halo.
       - [x] Define the rectangular strip rasterizer of width `P` and height
         `3P + 1`, with geometric row map `y ↦ 2P - y`.
+      - [x] Factor the complete rectangular rasterizer through a finite,
+        proof-free compiler input and identify it definitionally with the
+        verified presentation-level strip drawing.
       - [x] Prove every generated vertex and route cell occupies a strict
         interior row and both wraparound boundary rows are blank.
       - [x] Prove the rectangular raster preserves the normalized drawing's
