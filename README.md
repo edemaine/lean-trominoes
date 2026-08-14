@@ -822,6 +822,9 @@ build; an imported proof counts when its statement matches the paper.
                   and recover the exact normalized successor program.
                 - [x] Prove triangular clock-successor emission preserves the
                   shared prepared workspace and every earlier token prefix.
+                - [x] Compose structural well-formedness, the current accepting
+                  endpoint, and clock reset into the exact polynomial-time
+                  normalized-program prefix before the next-initial endpoint.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
