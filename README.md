@@ -1009,6 +1009,8 @@ build; an imported proof counts when its statement matches the paper.
         fresh-variable gauge primitive recursive.
       - [x] Lift polarity normalization to a primitive-recursive positioned
         formula from its complement-clause position query.
+      - [x] Compose source refinement, route-selected complement positions,
+        and fresh-variable gauging into the exact positioned routed formula.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
