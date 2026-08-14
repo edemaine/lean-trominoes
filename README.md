@@ -1027,6 +1027,8 @@ build; an imported proof counts when its statement matches the paper.
         sort, canonical gauge, and routed-polarity formula/placement/routes.
       - [x] Compose the proof-free routed formula, complete placement, and
         routed incidence family with the guarded concrete strip source.
+      - [x] Identify all three concrete executable routed objects with the
+        corresponding retained semantic terms used by the 3DM encoder.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
