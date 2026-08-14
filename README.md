@@ -879,6 +879,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify exact source and tail counts on the mixed retained
                   workspace, run the bivariate input-tail emitter, and compose
                   it polynomially after source-prefix emission.
+                - [x] Verify a reusable two-pass affine empty-stack emitter:
+                  all `none` cell operands, the constant-true base, and every
+                  conjunction closer, preserving an arbitrary mixed workspace.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
