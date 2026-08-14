@@ -1100,6 +1100,8 @@ build; an imported proof counts when its statement matches the paper.
         proving every final normalized route point stays in the halo.
       - [x] Define the rectangular strip rasterizer of width `P` and height
         `3P + 1`, with geometric row map `y ↦ 2P - y`.
+      - [x] Prove every generated vertex and route cell occupies a strict
+        interior row and both wraparound boundary rows are blank.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
