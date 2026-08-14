@@ -698,6 +698,9 @@ build; an imported proof counts when its statement matches the paper.
                   finite token stream, prove its exact expansion to normalized
                   fields, and append its exact unary clause count in
                   polynomial time.
+                - [x] Rotate that unary clause-count suffix to the request
+                  header, expand the retained tokens, and compose both passes
+                  into one verified polynomial-time postprocessor.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1867,6 +1870,12 @@ The representation choices for this target are:
   carry instruction tags and exact clause weights.  Fixed expansion is proved
   to produce precisely the normalized unary fields, and a verified unary
   Horner pass appends their exact clause count in polynomial time.
+- [`LeanTrominoes/PeriodicCNFUnaryProgramTokenFinalizer.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokenFinalizer.lean)
+  rotates the appended unary clause-count suffix to the request header and
+  expands the retained finite token body.  Exact execution and a linear time
+  bound certify the four-stack finalizer; composition with clause counting
+  maps the emitter source directly to the normalized unary request fields in
+  polynomial time.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
