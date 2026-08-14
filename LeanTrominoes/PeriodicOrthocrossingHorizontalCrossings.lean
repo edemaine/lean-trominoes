@@ -124,5 +124,32 @@ theorem orientedCrossing_verticalTranslations_eq_zero
     PeriodicGridDrawing.verticalTranslate_eq_zero_of_interiorContains
       secondBounds.1 secondBounds.2 pointBounds canonical.2.2.2.1⟩
 
+/-- In the larger physical crossing halo, both participating occurrences
+have the same vertical translate as the crossing point's extracted common
+period shift. -/
+theorem orientedCrossingHalo_verticalTranslations_eq_shift
+    {Vertex : Type*} [DecidableEq Vertex]
+    {graph : PeriodicGraph Vertex}
+    (wellFormed : graph.IsWellFormed)
+    (degree : graph.DegreeAtMost 3)
+    (isLocal : graph.IsLocal)
+    (horizontal : graph.HasZeroVerticalOffsets)
+    {record : CrossingRecord}
+    (recordMember : record ∈ orientedCrossingHalo graph) :
+    record.firstTranslate.2 = (crossingPeriodShift graph record).2 ∧
+      record.secondTranslate.2 = (crossingPeriodShift graph record).2 := by
+  have normalizedMember :=
+    periodNormalize_mem_orientedCrossings
+      wellFormed degree isLocal recordMember
+  have normalizedZero :=
+    orientedCrossing_verticalTranslations_eq_zero
+      isLocal horizontal normalizedMember
+  have firstReconstruction := congrArg Prod.snd
+    (periodNormalize_firstTranslate_add_shift graph record)
+  have secondReconstruction := congrArg Prod.snd
+    (periodNormalize_secondTranslate_add_shift graph record)
+  simp only [Cell.add] at firstReconstruction secondReconstruction
+  constructor <;> omega
+
 end PeriodicOrthocrossing
 end LeanTrominoes

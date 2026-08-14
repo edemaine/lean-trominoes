@@ -1007,6 +1007,8 @@ build; an imported proof counts when its statement matches the paper.
         zero-vertical-offset graph lies strictly inside its vertical period.
       - [x] Deduce that both segment occurrences at every canonical crossing
         of that drawing have zero vertical period translation.
+      - [x] Extend the crossing invariant to the physical halo: both segment
+        translations equal the crossing point's common vertical period shift.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
