@@ -764,6 +764,8 @@ build; an imported proof counts when its statement matches the paper.
                   states, and complete transition program.
                 - [x] Isolate its invariant configurations, stack-update
                   algebra, and generic token-push execution identities.
+                - [x] Verify input retention and both selector counts through
+                  the complete linear scan phase.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2017,6 +2019,11 @@ The representation choices for this target are:
   names every invariant control configuration, supplies exact update lemmas
   for all ten machine stacks, and proves the generic token/atom-unit push
   identities shared by scan, recipe, frame, cleanup, and reversal proofs.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterScan.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterScan.lean)
+  bundles one machine instance's fixed selectors, recipes, and token blocks,
+  proves all four selector cases, and lifts them across the complete input.
+  The exact `length + 1` execution retains every workspace symbol and
+  materializes both unary counts at the first outer-frame configuration.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
