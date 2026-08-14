@@ -734,6 +734,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Use the `space − 1` prefix selector and terminal boundary
                   phases to emit the exact occupied-prefix program and complete
                   normalized structural well-formedness block.
+                - [x] Split every fixed stack into its literal occupied prefix
+                  and affine `none` tail, and emit exact current/next complete
+                  configuration tests whenever the fixed endpoint fits.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1969,6 +1972,11 @@ The representation choices for this target are:
   times, adds the terminal constant-true boundary per stack, and emits the exact
   dynamic conjunction suffix.  Concatenating this schedule with the one-hot
   phases recovers the complete normalized `wellFormedFields` token stream.
+- [`LeanTrominoes/PeriodicCNFMachineFixedConfigurationEmitterSpec.lean`](LeanTrominoes/PeriodicCNFMachineFixedConfigurationEmitterSpec.lean)
+  splits every stack of a fixed endpoint into literal occupied-prefix tests and
+  an affine unused-cell tail selected by its capped prefix tag.  Exact range and
+  fold identities prove the resulting fixed phase schedule emits the complete
+  normalized current- or next-configuration test at every fitting runtime width.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
