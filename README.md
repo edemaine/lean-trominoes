@@ -1015,6 +1015,8 @@ build; an imported proof counts when its statement matches the paper.
         they preserve each literal's vertical offset.
       - [x] Prove concatenation and clause deduplication preserve the
         one-dimensional fragment.
+      - [x] Prove opaque planar-SAT variable wrapping preserves every literal
+        offset and hence one-dimensionality.
       - [x] Apply the equality invariant to every route-bend link and its
         embedded normalized planar-SAT clause family.
       - [x] Prove every anchor-normalized crossover template literal has zero
