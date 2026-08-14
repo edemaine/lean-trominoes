@@ -831,6 +831,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Materialize the input stack's polynomial-length empty
                   tail as an exact unary marker block while preserving the
                   shared workspace and earlier tokens.
+                - [x] Specify data-indexed affine emission, where each selected
+                  input item chooses its finite recipe and advances one exact
+                  selected-position counter.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
