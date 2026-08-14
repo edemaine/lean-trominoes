@@ -3,8 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivision
-import LeanTrominoes.PeriodicThreeDMNormalizationGeometryComputability
+import LeanTrominoes.PeriodicOneInThreePolarityNormalizationRouteSubdivisionRefinedComputability
 
 /-!
 # Basic computability for routed polarity normalization
@@ -17,33 +16,6 @@ noncomputable section
 
 namespace LeanTrominoes
 namespace PeriodicOneInThreePolarityNormalizationRouteSubdivision
-
-/-- Uniform scaling of a finite polyline is primitive recursive. -/
-theorem scalePolyline_primrec : Primrec₂ scalePolyline := by
-  change Primrec fun input : Int × List Cell =>
-    scalePolyline input.1 input.2
-  exact (Primrec.list_map Primrec.snd
-    (Computability.cell_scale_primrec.comp
-      (Primrec.fst.comp Primrec.fst) Primrec.snd).to₂).of_eq
-        fun _ => rfl
-
-/-- Refinement and unit subdivision preserve primitive recursiveness of a
-source route query. -/
-theorem refinedRoute_primrec
-    {Input : Type*} [Primcodable Input]
-    (routes : Input → Nat → Nat → List Cell)
-    (routesPrimrec : Primrec fun input : (Input × Nat) × Nat =>
-      routes input.1.1 input.1.2 input.2) :
-    Primrec fun input : (Input × Nat) × Nat =>
-      refinedRoute (routes input.1.1) input.1.2 input.2 := by
-  have scaled : Primrec fun input : (Input × Nat) × Nat =>
-      scalePolyline refinementFactor
-        (routes input.1.1 input.1.2 input.2) :=
-    scalePolyline_primrec.comp
-      (Primrec.const (refinementFactor : Int)) routesPrimrec
-  exact
-    PeriodicThreeDM.NormalizationCompiler.unitSubdividePolyline_primrec.comp
-      scaled
 
 /-- Selecting either inserted vertex from a refined route is primitive
 recursive whenever the underlying route lookup is. -/
