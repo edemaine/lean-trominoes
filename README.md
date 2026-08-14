@@ -951,6 +951,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose the fit operand, represented-cell schedule,
                   `all` ending, and final conjunction into the exact complete
                   normalized stack-transform program in polynomial time.
+                - [x] Iterate complete normalized transforms over any fixed
+                  dependent stack list, preserving the runtime width and exact
+                  stack order in polynomial time.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
