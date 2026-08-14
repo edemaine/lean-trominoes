@@ -897,6 +897,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Assemble label/control fields, all stacks in exact finite
                   order, and configuration closers into a polynomial-time pass
                   whose extracted suffix is exactly the full initial schedule.
+                - [x] Compose well-formedness, accepting-current, clock reset,
+                  and next-initial emission, then close both conjunctions to
+                  obtain the complete polynomial-time designated reset prefix.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
