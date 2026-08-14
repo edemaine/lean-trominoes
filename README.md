@@ -710,6 +710,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Bound that affine emitter's output and complete halted
                   execution quadratically and package its polynomial-time
                   certificate for later machine composition.
+                - [x] Lift affine atom recipes to a compositional postorder
+                  language and prove exact unary-token agreement for Boolean
+                  operators, vector equality, exactly-one, and succession.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1904,6 +1907,12 @@ The representation choices for this target are:
   final output length.  The resulting fixed quadratic polynomial bounds the
   exact halted execution and packages the emitter for polynomial-time TM2
   composition without enlarging the machine-proof module.
+- [`LeanTrominoes/PeriodicCNFAffineProgramTemplates.lean`](LeanTrominoes/PeriodicCNFAffineProgramTemplates.lean)
+  lifts those recipes to affine postorder instructions and programs.  Exact
+  evaluation and token theorems cover constants, wires, Boolean operators,
+  finite conjunction/disjunction, equality, exactly-one vectors, and binary
+  succession, so concrete bounded-machine phases can be specified by their
+  ordinary normalized programs rather than by raw token arithmetic.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
