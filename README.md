@@ -894,6 +894,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Identify the prepared `space` count across the workspace
                   type change and prove every input and non-input emitted word
                   equals its exact initial `stackSchedule`.
+                - [x] Assemble label/control fields, all stacks in exact finite
+                  order, and configuration closers into a polynomial-time pass
+                  whose extracted suffix is exactly the full initial schedule.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
