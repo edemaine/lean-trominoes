@@ -1003,6 +1003,9 @@ build; an imported proof counts when its statement matches the paper.
         periodic expanded tromino strip, prove its presentation well formed,
         characterize its carrier exactly, and prove the construction
         computable.
+      - [x] Prove the doubly periodic gadget carrier is the disjoint vertical
+        stack of its strip carriers and that any strip tiling repeats to a
+        plane tiling, giving the unconditional soundness direction.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
