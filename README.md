@@ -748,6 +748,8 @@ build; an imported proof counts when its statement matches the paper.
                   stack cleanup, output reversal, and genuine halting.
                 - [x] Bound two-counter output and execution quadratically and
                   package the emitter as a polynomial-time TM2 computation.
+                - [x] Identify every bivariate emitted position range with the
+                  exact evaluated postorder-program token stream.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1964,6 +1966,10 @@ The representation choices for this target are:
   and verified execution.  Both counters are bounded by retained input length,
   yielding one explicit quadratic polynomial and a reusable
   `TM2ComputableInPolyTime` certificate.
+- [`LeanTrominoes/PeriodicCNFBivariateProgramTokenAlgebra.lean`](LeanTrominoes/PeriodicCNFBivariateProgramTokenAlgebra.lean)
+  identifies the two-counter emitter's recursive position range with the flat
+  unary-token stream of the corresponding evaluated ordinary postorder
+  programs, supplying the exact semantic bridge needed by clock phases.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
