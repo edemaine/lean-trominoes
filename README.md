@@ -1011,6 +1011,8 @@ build; an imported proof counts when its statement matches the paper.
         translations equal the crossing point's common vertical period shift.
       - [x] Prove an anchor-normalized equality family is one dimensional
         whenever each physical link's endpoints have equal vertical shifts.
+      - [x] Prove clausewise literal maps preserve one-dimensionality whenever
+        they preserve each literal's vertical offset.
       - [x] Apply the equality invariant to every route-bend link and its
         embedded normalized planar-SAT clause family.
       - [x] Prove every anchor-normalized crossover template literal has zero
