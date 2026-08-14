@@ -725,6 +725,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify a finite-state prefix marker that retains the
                   prepared word and tags each symbol by its capped number of
                   earlier selected symbols, enabling fixed boundary skips.
+                - [x] Prove that every fixed tagged-prefix selector has count
+                  `selectedCount − skip` and certify the marker's linear
+                  polynomial-time execution.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1945,6 +1948,11 @@ The representation choices for this target are:
   For a fixed finite cutoff it retains every input symbol, tags it by the
   number of earlier selected symbols capped at that cutoff, restores order,
   resets its finite state, and halts with exactly the tagged output.
+- [`LeanTrominoes/SelectedPrefixMarkerTime.lean`](LeanTrominoes/SelectedPrefixMarkerTime.lean)
+  proves the tag's boundary semantics: for every fixed `skip ≤ cutoff`,
+  selecting tagged occurrences at or after `skip` has count exactly the
+  original selected count minus `skip`.  Projection recovers the original word,
+  and the exact two-pass execution receives a linear polynomial-time certificate.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
