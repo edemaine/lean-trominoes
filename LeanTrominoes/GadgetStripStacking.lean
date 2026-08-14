@@ -85,6 +85,44 @@ theorem mem_periodicRegion_carrier_iff_verticalStrip
       simp [verticalOffset, verticalPixelPeriod, Cell.add, Cell.scale]
     all_goals ring
 
+/-- The base strip is exactly the part of the plane carrier in one half-open
+vertical period band. -/
+theorem mem_periodicStrip_carrier_iff_region_and_verticalBounds
+    (tromino : Tromino) (drawing : PeriodicOrthogonalDrawing) (cell : Cell) :
+    cell ∈ (drawing.periodicStrip tromino).carrier ↔
+      cell ∈ (drawing.periodicRegion tromino).carrier ∧
+        0 ≤ cell.2 ∧ cell.2 < drawing.verticalPixelPeriod := by
+  constructor
+  · intro membership
+    refine ⟨(mem_periodicRegion_carrier_iff_verticalStrip
+      tromino drawing cell).mpr ⟨0, cell, membership, ?_⟩,
+      membership.1, ?_⟩
+    · simp [verticalOffset, verticalPixelPeriod, Cell.add]
+    · simpa [periodicStrip, verticalPixelPeriod] using membership.2.1
+  · rintro ⟨planeMembership, cellNonnegative, cellBelow⟩
+    obtain ⟨index, source, sourceMembership, equality⟩ :=
+      (mem_periodicRegion_carrier_iff_verticalStrip
+        tromino drawing cell).mp planeMembership
+    have sourceBelow : source.2 < drawing.verticalPixelPeriod := by
+      simpa [periodicStrip, verticalPixelPeriod] using sourceMembership.2.1
+    have verticalEquality :
+        cell.2 + 0 * drawing.verticalPixelPeriod =
+          source.2 + index * drawing.verticalPixelPeriod := by
+      have projected := congrArg Prod.snd equality
+      simp [verticalOffset, Cell.add] at projected ⊢
+      rw [projected]
+      ring
+    have indexZero : (0 : Int) = index :=
+      verticalBandIndex_unique
+        drawing.verticalPixelPeriod_pos
+        cellNonnegative cellBelow sourceMembership.1 sourceBelow
+        verticalEquality
+    subst index
+    have cellEquality : cell = source := by
+      simpa [verticalOffset, verticalPixelPeriod, Cell.add] using equality
+    rw [cellEquality]
+    exact sourceMembership
+
 /-- Translate every placement of one strip tiling into every vertical copy. -/
 def stackedPlacements (drawing : PeriodicOrthogonalDrawing)
     (placements : Set (Placement Unit)) : Set (Placement Unit) :=

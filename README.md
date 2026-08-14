@@ -1006,6 +1006,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Prove the doubly periodic gadget carrier is the disjoint vertical
         stack of its strip carriers and that any strip tiling repeats to a
         plane tiling, giving the unconditional soundness direction.
+        - [x] Identify the base strip carrier exactly with the plane carrier
+          intersected by one half-open expanded vertical-period band.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
