@@ -766,6 +766,8 @@ build; an imported proof counts when its statement matches the paper.
                   algebra, and generic token-push execution identities.
                 - [x] Verify input retention and both selector counts through
                   the complete linear scan phase.
+                - [x] Verify every atom's persistent-counter scan/restoration
+                  and the held-current offset of inner templates.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -2024,6 +2026,11 @@ The representation choices for this target are:
   proves all four selector cases, and lifts them across the complete input.
   The exact `length + 1` execution retains every workspace symbol and
   materializes both unary counts at the first outer-frame configuration.
+- [`LeanTrominoes/PeriodicCNFTriangularTemplateEmitterFirstCounter.lean`](LeanTrominoes/PeriodicCNFTriangularTemplateEmitterFirstCounter.lean)
+  verifies the first half of atom emission: the persistent runtime-width
+  counter is scanned and restored exactly, emitting one first-stride block per
+  marker.  Inner templates also emit precisely one second-stride block for the
+  held current marker before position scanning begins.
 - [`LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean`](LeanTrominoes/PeriodicCNFMachineAffineStackTemplates.lean)
   instantiates the affine language for the bounded machine's explicit stack
   atom layout.  It recovers shifted current and next cell tests, exact-one
