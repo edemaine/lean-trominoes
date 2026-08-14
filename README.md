@@ -1115,6 +1115,8 @@ build; an imported proof counts when its statement matches the paper.
         cell with the correct endpoint color.
       - [x] Match each normalized target vertex to its last strip routing
         cell at the routed periodic target occurrence.
+      - [x] Prove one-dimensional contracted offsets identify each routed
+        target occurrence with its base target in the rectangular raster.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
