@@ -1163,6 +1163,8 @@ build; an imported proof counts when its statement matches the paper.
         and prove all endpoint ports at a translated triple agree.
       - [x] Prove the graph assignment extracted from a valid strip
         orientation is coherent at every translated triple.
+      - [x] Prove reverse orientation transport preserves the forward-facing
+        value across one internal strip route cell.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
