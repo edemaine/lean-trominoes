@@ -707,6 +707,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify the reusable finite-control position loop that
                   retains its input and emits fixed templates whose unary atom
                   fields have length `base + stride × position`.
+                - [x] Bound that affine emitter's output and complete halted
+                  execution quadratically and package its polynomial-time
+                  certificate for later machine composition.
     - [ ] Transport 1D PSPACE-hardness through the bounded-occurrence planar
       trichromatic-orientation reductions.
     - [ ] Compile the normalized periodic drawing into a polynomial-height
@@ -1896,6 +1899,11 @@ The representation choices for this target are:
   `base + stride × position`.  Its exact execution proof includes restoration
   of the position counter, cleanup of every work stack, output reversal, and a
   genuinely halted final configuration.
+- [`LeanTrominoes/PeriodicCNFAffineTemplateEmitterTime.lean`](LeanTrominoes/PeriodicCNFAffineTemplateEmitterTime.lean)
+  bounds each recipe, complete position template, selected-position range, and
+  final output length.  The resulting fixed quadratic polynomial bounds the
+  exact halted execution and packages the emitter for polynomial-time TM2
+  composition without enlarging the machine-proof module.
 - [`LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean`](LeanTrominoes/PeriodicCNFPolySpaceRequestPadding.lean)
   specializes unary Horner padding to the exact stack-width polynomial of a
   source decider.  It proves that the reversed native polynomial coefficient
