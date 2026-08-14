@@ -1125,6 +1125,8 @@ build; an imported proof counts when its statement matches the paper.
         colored port matches the opposite port of its finite neighbor.
       - [x] Lift lookup-level port matching and vertex isolation to the
         packaged rectangular drawing interfaces.
+      - [x] Prove the concrete normalized rectangular strip drawing is well
+        formed, including equality of unused ports in both directions.
     - [ ] Specialize the tromino gadget substitution to that strip drawing and
       assemble the polynomial-time reductions for both trominoes.
       - [x] Package any finite normalized drawing domain as a horizontally
