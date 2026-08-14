@@ -1075,6 +1075,8 @@ build; an imported proof counts when its statement matches the paper.
         its final stable clause-direction ordering.
       - [x] Prove every occurring final canonical position gauge has zero
         vertical component and preserve one-dimensionality through it.
+      - [x] Instantiate normalized planar Figure 10 on the twice-scaled final
+        gauged source and prove all colored references remain horizontal.
       - [x] Instantiate the retained planar-SAT, exact-one, planar-3DM, and
         orthogonal-normalization pipeline, proving the output drawing is
         well formed, vertex separated, and semantically exact.
