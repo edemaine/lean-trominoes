@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.IndexedListScan
+import LeanTrominoes.IndexedListMappedScan
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTripleRequestBlocks
 
 /-! # Explicit fixed-width clause scan for affine triple requests -/
@@ -61,14 +61,15 @@ def directSparseComputedAffineExplicitClauseTripleRequests
   (List.range
       (horizontalNormalizedRoutedFormulaComputed source).erase.clauses.length).flatMap
     fun clauseIndex =>
-      (horizontalThreeDMClauseTriplePositionBlockComputed
-          source clauseIndex).zipIdx
-          ((horizontalThreeDMVariableTriplePositionsComputed source).length +
-            9 * clauseIndex) |>.flatMap fun tagged =>
+      allClauseSets.zipIdx.flatMap fun taggedSet =>
         directSparseComputedAffinePositionRequestRecord
-          input.drawing.gridSize tagged.1
+          input.drawing.gridSize
+          (Cell.add (horizontalThreeDMClauseOriginComputed source clauseIndex)
+            (X3CClauseOrthogonal.setPosition taggedSet.1))
           (PeriodicThreeDM.NormalizationCompiler.finalVertexCellType
-            input (.triple tagged.2))
+            input (.triple
+              ((horizontalThreeDMVariableTriplePositionsComputed source).length +
+                9 * clauseIndex + taggedSet.2)))
 
 theorem directSparseComputedAffineClauseTripleRequests_eq_explicit
     (source : PeriodicCNF Nat)
@@ -85,7 +86,9 @@ theorem directSparseComputedAffineClauseTripleRequests_eq_explicit
     9
     (horizontalThreeDMVariableTriplePositionsComputed source).length
     (horizontalThreeDMClauseTriplePositionBlockComputed_length source)]
+  unfold horizontalThreeDMClauseTriplePositionBlockComputed
   rw [List.flatMap_assoc]
+  rw [IndexedListScan.range_flatMap_map_zipIdx_from_flatMap]
 
 /-- The original indexed triple scan now consists of its variable-module
 prefix followed by explicit fixed nine-request clause blocks. -/
