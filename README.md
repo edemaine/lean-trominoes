@@ -9859,6 +9859,11 @@ The representation choices for this target are:
   record for each contracted vertex and one canonical record list for each
   contracted edge.  This exposes the granularity needed by indexed emitters
   without unfolding the complete normalized assignment stream.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteRecordData.lean)
+  rewrites every edge block as a flat map over consecutive triples of final
+  route points.  Each triple independently determines exactly one rasterized
+  coordinate and routing-cell record, exposing the route suffix as an
+  edge-major, local-triple-minor stream.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
