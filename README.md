@@ -1352,6 +1352,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Bridge each numeric color-list degree test to the incidence
           degree of the typed element at the same stable list index, in
           independently compiled red, green, and blue leaves.
+        - [x] Classify degree-three typed elements by constructor and rewrite
+          the red indexed request block as a typed-element scan, with its
+          data, predicate transport, and list algebra compiled separately.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
