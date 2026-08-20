@@ -1376,6 +1376,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Prove contraction preserves the original incidence's first
           direction at both the source and suppressed-edge target forms of a
           contracted triple endpoint.
+        - [x] Reduce every genuine triple's final normalized cell type to the
+          finite side/color data obtained from the first directions of its
+          three original tagged incidence routes.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
