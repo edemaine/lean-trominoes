@@ -1373,6 +1373,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Rewrite every variable-triple position as its computed variable
           origin plus a finite local table selected only by occurrence slot,
           polarity, connector kind, and local triple.
+        - [x] Prove contraction preserves the original incidence's first
+          direction at both the source and suppressed-edge target forms of a
+          contracted triple endpoint.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
