@@ -1321,9 +1321,9 @@ build; an imported proof counts when its statement matches the paper.
           reversal phases on arbitrary unary streams.
         - [x] Prove the header-rotation machine's complete exact run and
           linear polynomial-time certificate.
-        - [x] Count one finite marker per motif cell, expand width, period,
-          and coordinate tokens, and compose the verified postprocessors to
-          obtain the exact executable unary field stream.
+        - [x] Stream one counted finite block per motif cell, interleaving its
+          marker with its coordinate fields, then compose the verified
+          postprocessors to obtain the exact executable unary field stream.
         - [ ] Implement the polynomial-time finite-token emitter for the
           proof-free normalization raster and fixed gadget-pixel loop.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -9718,9 +9718,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripDirectCountedTokens.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokens.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenFinalization.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenFinalization.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenSemantics.lean)
-  encode one finite marker per motif cell and unary tokens for the remaining
-  fields, then prove that counting, finalization, and rotation produce exactly
-  the executable strip field stream.
+  encode the width and period header followed by one streamable finite block
+  per motif cell, interleaving its count marker with its coordinate fields.
+  They prove that counting, finalization, and rotation produce exactly the
+  executable strip field stream.
 - [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenMachineBridge.lean)
   and [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenCompiler.lean)
   compose those fixed postprocessors with any polynomial-time geometric token

@@ -36,7 +36,10 @@ theorem countAndFinalize_directCompiledTrominoStripCountedTokens
           directCompiledTrominoStripBodyFieldsOfSymbols
             decider tromino symbols) := by
   unfold directCompiledTrominoStripCountedTokensOfSymbols
-  exact CountedUnaryFieldTokens.countAndFinalize_clauseTokens_fields _ _
+  rw [CountedUnaryFieldTokens.countAndFinalize_fields_countedFieldBlocks]
+  simp only [List.length_map]
+  unfold directCompiledTrominoStripBodyFieldsOfSymbols
+  rfl
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

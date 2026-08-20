@@ -36,14 +36,16 @@ def directCompiledTrominoStripBodyFieldsOfSymbols
   [6 * drawing.verticalPeriod, 6 * drawing.horizontalPeriod] ++
     motif.flatMap PeriodicStripFlatEncoding.cellFields
 
-/-- One marker per motif cell, followed by finite unary tokens for width,
-period, and every coordinate field. -/
+/-- Finite unary width and period fields followed by a streamable counted
+block for each motif cell. -/
 def directCompiledTrominoStripCountedTokensOfSymbols
     (tromino : Tromino) (symbols : List encoding.Γ) : List Token :=
+  let drawing := directCompiledStripDrawingOfSymbols decider symbols
   let motif := directCompiledTrominoMotifOfSymbols decider tromino symbols
-  clauseTokens motif.length ++
-    CountedUnaryFieldTokens.fields
-      (directCompiledTrominoStripBodyFieldsOfSymbols decider tromino symbols)
+  CountedUnaryFieldTokens.fields
+      [6 * drawing.verticalPeriod, 6 * drawing.horizontalPeriod] ++
+    CountedUnaryFieldTokens.countedFieldBlocks
+      (motif.map PeriodicStripFlatEncoding.cellFields)
 
 end PeriodicCNFStripReduction
 end LeanTrominoes

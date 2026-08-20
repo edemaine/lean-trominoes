@@ -76,5 +76,63 @@ theorem countAndFinalize_clauseTokens_fields
   rw [PeriodicCNF.UnaryProgramTokens.selectedCount_append]
   simp
 
+/-- One counted payload block: a marker ignored by unary expansion followed
+by any finite sequence of unary fields. -/
+def countedFieldBlock (numbers : List Nat) : List Token :=
+  .clauseMarker :: fields numbers
+
+/-- A streamable sequence of counted payload blocks. -/
+def countedFieldBlocks (blocks : List (List Nat)) : List Token :=
+  blocks.flatMap countedFieldBlock
+
+@[simp] theorem unaryEncode_countedFieldBlock (numbers : List Nat) :
+    unaryEncode (countedFieldBlock numbers) = unaryFields numbers := by
+  simp [countedFieldBlock, unaryBlock]
+
+@[simp] theorem selectedCount_countedFieldBlock (numbers : List Nat) :
+    UnaryPolynomialPaddingMachine.selectedCount isClauseMarker
+      (countedFieldBlock numbers) = 1 := by
+  simp [countedFieldBlock, isClauseMarker]
+
+@[simp] theorem unaryEncode_countedFieldBlocks
+    (blocks : List (List Nat)) :
+    unaryEncode (countedFieldBlocks blocks) =
+      unaryFields blocks.flatten := by
+  induction blocks with
+  | nil => rfl
+  | cons numbers blocks induction =>
+      unfold countedFieldBlocks at induction ⊢
+      rw [List.flatMap_cons, unaryEncode_append,
+        unaryEncode_countedFieldBlock, induction]
+      change unaryFields numbers ++ unaryFields blocks.flatten =
+        unaryFields (numbers ++ blocks.flatten)
+      exact (PeriodicCNF.UnaryProgramTokens.unaryFields_append
+        numbers blocks.flatten).symm
+
+@[simp] theorem selectedCount_countedFieldBlocks
+    (blocks : List (List Nat)) :
+    UnaryPolynomialPaddingMachine.selectedCount isClauseMarker
+      (countedFieldBlocks blocks) = blocks.length := by
+  induction blocks with
+  | nil => rfl
+  | cons numbers blocks induction =>
+      unfold countedFieldBlocks at induction ⊢
+      rw [List.flatMap_cons,
+        PeriodicCNF.UnaryProgramTokens.selectedCount_append,
+        selectedCount_countedFieldBlock, induction]
+      simp [Nat.add_comm]
+
+/-- Arbitrary uncounted header fields followed by streamable counted blocks
+finalize to the block count followed by the flattened field payload. -/
+theorem countAndFinalize_fields_countedFieldBlocks
+    (header : List Nat) (blocks : List (List Nat)) :
+    PeriodicCNF.UnaryProgramTokenFinalizer.countAndFinalize
+        (fields header ++ countedFieldBlocks blocks) =
+      unaryFields (blocks.length :: header ++ blocks.flatten) := by
+  rw [countAndFinalize_eq_count_unaryEncode]
+  rw [PeriodicCNF.UnaryProgramTokens.selectedCount_append,
+    PeriodicCNF.UnaryProgramTokens.unaryEncode_append]
+  simp
+
 end CountedUnaryFieldTokens
 end LeanTrominoes
