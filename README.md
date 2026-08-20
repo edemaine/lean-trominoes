@@ -1485,6 +1485,9 @@ build; an imported proof counts when its statement matches the paper.
           emitter for it composes with the two-pass fixed-eight expander.  This
           separates the remaining planar component scan from the already
           compiled fixed-eight phase expansion.
+        - [x] Express the final retained planar clause list exactly as ordinary
+          deduplication of the five-family retained metadata after wrapping,
+          canonical variable gauging, and clause-anchor normalization.
         - [ ] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
@@ -10101,6 +10104,11 @@ The representation choices for this target are:
   occurrence splitting, specialize it to direct PSPACE source words, and
   compose any emitter for that stream with the verified exact two-pass
   fixed-eight descriptor expansion.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDirectionData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDirectionData.lean)
+  and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDirectionClauses.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDirectionClauses.lean)
+  remove positioned-formula bookkeeping from that boundary: the final erased
+  retained clauses are exactly the deduplicated normalized clauses projected
+  from the existing five-family finite metadata list.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
