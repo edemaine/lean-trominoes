@@ -50,6 +50,7 @@ import LeanTrominoes.GadgetPixelFiniteTokens
 import LeanTrominoes.GadgetExpandedMotifFiniteTokens
 import LeanTrominoes.GadgetSparseExpandedMotif
 import LeanTrominoes.GadgetSparseExpandedMotifFiniteTokens
+import LeanTrominoes.GadgetSparseAssignmentTokens
 import LeanTrominoes.GadgetPixelFiniteTokenCompiler
 import LeanTrominoes.GadgetPreparedHeaderData
 import LeanTrominoes.GadgetPreparedHeaderSemantics

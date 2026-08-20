@@ -9819,6 +9819,11 @@ The representation choices for this target are:
   emits affine prepared coordinate blocks for the pixels of each sparse
   assignment.  Nonnegative strip-coordinate bounds prove that fixed expansion
   recovers exactly the assignment-order motif's counted natural fields.
+- [`LeanTrominoes/GadgetSparseAssignmentTokens.lean`](LeanTrominoes/GadgetSparseAssignmentTokens.lean)
+  encodes each sparse drawing-cell assignment as two unary coordinates and one
+  symbol from a finite cell-type alphabet.  Its total parser expands every
+  canonical record to exactly the previously verified prepared pixel stream,
+  reducing repetitive gadget-pixel emission to a fixed transducer.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean),
