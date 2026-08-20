@@ -1064,6 +1064,9 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Instantiate the finite coordinated variable-fan route table from
         each computed fan record and identify every colored local route with
         its semantic counterpart.
+      - [x] Enumerate each normalized clause orbit's active occurrences,
+        compute its finite terminal activity and endpoint directions, decode
+        the complete clause-fan record, and identify it with the semantic fan.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
