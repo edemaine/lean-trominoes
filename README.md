@@ -1058,6 +1058,9 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Unit-subdivide each executable occurrence route, compute its two
         endpoint directions, and identify all three values with the semantic
         coordinated-ribbon inputs.
+      - [x] Compute each normalized source variable's finite ribbon-fan count,
+        connector kinds, polarities, and endpoint directions, decode the
+        complete fan record, and identify it with the semantic fan data.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
