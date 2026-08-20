@@ -1051,6 +1051,8 @@ build; an imported proof counts when its statement matches the paper.
         primitive recursive.
       - [x] Prove the reusable macrocell ribbon-corridor assembler primitive
         recursive via a proof-free right fold.
+      - [x] Compute each horizontal occurrence's normalized, doubled, reversed,
+        and periodically rebased source route primitive recursively.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
