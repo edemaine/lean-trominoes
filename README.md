@@ -9630,6 +9630,11 @@ The representation choices for this target are:
   reduction.  Together with the existing polynomial output-size theorem, it
   isolates the remaining 1.5D hardness obligation to a machine-level
   `TM2ComputableInPolyTime` certificate for `compiledTrominoStrip`.
+- [`LeanTrominoes/PeriodicCNFStripFlatCompiler.lean`](LeanTrominoes/PeriodicCNFStripFlatCompiler.lean)
+  expresses that last machine obligation as a raw finite-alphabet stream
+  transducer with identity input and output encodings.  Its verified wrapper
+  transports any such polynomial-time machine to the canonical flat CNF and
+  strip encodings and hence to the strip statement of Theorem 5.2.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
