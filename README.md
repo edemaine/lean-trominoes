@@ -1412,6 +1412,10 @@ build; an imported proof counts when its statement matches the paper.
           append exactly one fixed implication profile per literal for
           occurrence splitting, and identify the resulting polynomial-time
           stream with the guarded geometric `sourceFormula`.
+        - [x] Enrich the guarded profile stream with one finite unary marker
+          per distinct occurrence variable, proving the marker count exact
+          and compiling the combined formula shape directly from source
+          symbols in polynomial time.
         - [x] Expand each guarded clause profile through the Figure 9
           exact-one gadget and unit-clause elimination, proving that the
           finite lookup gives the exact final binary/ternary clause order and
