@@ -9621,6 +9621,15 @@ The representation choices for this target are:
   `normalizationInput`.  Consequently the proof-backed normalization input
   itself is computable, without re-elaborating its large geometric
   certificates.
+- [`LeanTrominoes/PeriodicCNFStripCompiledTrominoComputability.lean`](LeanTrominoes/PeriodicCNFStripCompiledTrominoComputability.lean)
+  composes normalization, rectangular strip compilation, and tromino gadget
+  substitution to prove ordinary computability of the exact target function
+  `compiledTrominoStrip` for either tromino.
+- [`LeanTrominoes/PeriodicCNFStripReductionPackaging.lean`](LeanTrominoes/PeriodicCNFStripReductionPackaging.lean)
+  fills every geometric and semantic field of the concrete local-CNF strip
+  reduction.  Together with the existing polynomial output-size theorem, it
+  isolates the remaining 1.5D hardness obligation to a machine-level
+  `TM2ComputableInPolyTime` certificate for `compiledTrominoStrip`.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
