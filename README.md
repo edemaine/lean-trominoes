@@ -1364,6 +1364,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Split the indexed triple scan into variable-module and clause-core
           blocks, and reduce the clause suffix to nine fixed requests with
           stable index `variableCount + 9 * clauseIndex + localIndex`.
+        - [x] Reduce the variable triple prefix to the stable used-occurrence
+          scan, carrying the next triple index through fixed three- and
+          seven-request connector blocks.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.

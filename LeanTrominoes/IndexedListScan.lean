@@ -115,5 +115,36 @@ theorem range_flatMap_zipIdx_eq_flatMap_zipIdx_fixed
       simp
   rw [zipEq, List.flatMap_map]
 
+/-- Stable indexing of variable-width blocks, carrying the next free index
+from one block to the next. -/
+def zipIdxFlatMapFrom {Value Output : Type}
+    (block : Value → List Output) : Nat → List Value → List (Output × Nat)
+  | _, [] => []
+  | start, value :: values =>
+      (block value).zipIdx start ++
+        zipIdxFlatMapFrom block (start + (block value).length) values
+
+theorem flatMap_zipIdx_eq_zipIdxFlatMapFrom
+    {Value Output : Type}
+    (values : List Value) (block : Value → List Output) (start : Nat) :
+    (values.flatMap block).zipIdx start =
+      zipIdxFlatMapFrom block start values := by
+  induction values generalizing start with
+  | nil => rfl
+  | cons value values induction =>
+      rw [List.flatMap_cons, List.zipIdx_append]
+      unfold zipIdxFlatMapFrom
+      rw [induction]
+
+/-- Any output scan over the indexed flattened word can therefore be executed
+one variable-width block at a time while carrying the next free index. -/
+theorem flatMap_zipIdx_flatMap_eq_zipIdxFlatMapFrom_flatMap
+    {Value Output Token : Type}
+    (values : List Value) (block : Value → List Output)
+    (start : Nat) (emit : Output × Nat → List Token) :
+    ((values.flatMap block).zipIdx start).flatMap emit =
+      (zipIdxFlatMapFrom block start values).flatMap emit := by
+  rw [flatMap_zipIdx_eq_zipIdxFlatMapFrom]
+
 end IndexedListScan
 end LeanTrominoes
