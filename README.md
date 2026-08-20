@@ -9911,6 +9911,17 @@ The representation choices for this target are:
   splits the compact request stream into its stable triple, red, green, and
   blue blocks.  Each colored block scans only degree-three atom indices and
   emits a constant monochromatic cell tag.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtData.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtLengths.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtLengths.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtAlignment.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtAlignment.lean),
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtComputed.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMVertexPositionAtComputed.lean)
+  expose the four computed position lists as one proof-free pointwise table.
+  Length and order alignment prove that executable drawing lookup agrees with
+  this table on every listed incidence vertex.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestPositionData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestPositionData.lean)
+  rewrites the entire compact direct request stream to traverse that explicit
+  pointwise table, removing drawing lookup and certificate structure from the
+  remaining request-emitter boundary.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse
