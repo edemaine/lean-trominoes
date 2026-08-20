@@ -1452,6 +1452,12 @@ build; an imported proof counts when its statement matches the paper.
           retained planar formula through fixed-eight for any port assignment,
           so the actual angular route-induced assignment remains composable
           without unfolding the geometry in one Lean leaf.
+        - [x] Package the actual clockwise, Figure 9-clearance-scaled source
+          as an exact formula shape, with width and erased-clause nonemptiness
+          discharged in separate resource-bounded leaves.
+        - [x] Transport named exact-shape contracts through the complete
+          Figure 9, unit-elimination, and polarity-normalization transform,
+          and define the resulting retained final exact-one shape.
         - [ ] Compile the exact retained-planar formula shape from the uniform
           source stream in polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
