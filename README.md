@@ -1315,6 +1315,10 @@ build; an imported proof counts when its statement matches the paper.
         generator using natural-range raster and fixed-gadget pixel loops.
       - [ ] Implement and verify the direct unary field emitter for the
         bounded PSPACE-generated formula templates.
+        - [x] Specify the counted-header permutation and verify every
+          transition of its fixed four-stack finite machine.
+        - [ ] Prove the header-rotation machine's complete exact run and
+          linear polynomial-time certificate.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -2476,6 +2480,10 @@ The representation choices for this target are:
   specifies the total unary-stream permutation that moves a counted first
   field behind width and period, with an exact theorem on canonical field
   lists.  This is the final ordering step needed by counted strip emitters.
+- [`LeanTrominoes/UnaryFieldHeaderRotationMachine.lean`](LeanTrominoes/UnaryFieldHeaderRotationMachine.lean)
+  implements that permutation as a fixed four-stack `FinTM2` and proves every
+  transition case, including total behavior on prematurely terminated unary
+  streams.
 - [`LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean)
   gives the concrete request emitter an entirely finite output alphabet:
   runtime atoms and the fresh boundary become unary runs, while fixed tokens
