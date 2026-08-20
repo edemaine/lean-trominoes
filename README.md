@@ -1324,8 +1324,13 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Stream one counted finite block per motif cell, interleaving its
           marker with its coordinate fields, then compose the verified
           postprocessors to obtain the exact executable unary field stream.
-        - [ ] Implement the polynomial-time finite-token emitter for the
-          proof-free normalization raster and fixed gadget-pixel loop.
+        - [x] Replace gadget-coordinate arithmetic by a finite prepared-token
+          alphabet: fixed block expansion turns each horizontal or vertical
+          index unit and bounded local offset into the exact encoded pixel
+          coordinate, with a polynomial-time transducer certificate.
+        - [ ] Implement the polynomial-time prepared-token emitter for the
+          proof-free normalization raster; the fixed gadget-pixel expansion
+          and every downstream postprocessor are now verified.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -9727,6 +9732,22 @@ The representation choices for this target are:
   compose those fixed postprocessors with any polynomial-time geometric token
   emitter and carry the resulting certificate through to
   `Theorem52.stripStatement`.
+- [`LeanTrominoes/GadgetPixelFiniteTokens.lean`](LeanTrominoes/GadgetPixelFiniteTokens.lean),
+  [`LeanTrominoes/GadgetExpandedMotifFiniteTokens.lean`](LeanTrominoes/GadgetExpandedMotifFiniteTokens.lean),
+  and [`LeanTrominoes/GadgetPixelFiniteTokenCompiler.lean`](LeanTrominoes/GadgetPixelFiniteTokenCompiler.lean)
+  replace all unbounded gadget-coordinate arithmetic by a finite prepared
+  alphabet.  Header units expand by six, block-coordinate units by twelve,
+  and bounded local offsets by twice their value, exactly matching Lean's
+  encoding of each nonnegative translated pixel.  The natural-range loop
+  theorem and fixed block-transducer certificate recover the complete counted
+  motif stream in polynomial time.
+- [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
+  specialize that finite expansion to the direct PSPACE-source drawing and
+  transport any prepared-raster emitter through the complete counted-token
+  compiler.  Thus the remaining hardness obligation is only the prepared
+  normalized-raster stream, not unary coordinate generation or finalization.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
