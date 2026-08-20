@@ -1404,6 +1404,10 @@ build; an imported proof counts when its statement matches the paper.
           from that unary program with a finite block scan, prove agreement
           with the source formula's clause lengths, and certify the complete
           source-symbol scan polynomial time.
+        - [x] Refine that scan to a finite clause-profile stream retaining
+          every literal's polarity and current/next-slice offset, prove exact
+          formula-order agreement, and certify its source compiler polynomial
+          time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
