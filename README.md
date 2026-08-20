@@ -1438,12 +1438,18 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Prove those appended markers equal the actual distinct-variable
           count of the fully normalized exact-one formula, while the same
           shape theorem retains the exact final clause-profile order.
+        - [x] Package the final retained, wrapped, gauged, and deduplicated
+          planar-SAT presentation as a canonical formula shape, and prove it
+          records the exact ordered clause profiles and distinct-variable
+          count under the retained planarization certificate.
         - [x] Compile fixed-eight formula shapes by retaining all source
           profiles and appending one nine-clause implication ring plus nine
           distinct-variable markers per incoming variable marker.
         - [x] Prove the fixed-eight shape agrees with the semantic formula's
           exact clause profiles and exact nine-copies-per-source-variable
           distinct-variable count.
+        - [ ] Compile the exact retained-planar formula shape from the uniform
+          source stream in polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
