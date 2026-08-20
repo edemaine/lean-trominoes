@@ -41,6 +41,7 @@ theorem horizontalAssembledRouteAtTagComputed_primrec :
     horizontalAssembledRouteTriple?Computed_primrec none some).of_eq
       fun input => by
         unfold horizontalAssembledRouteAtTagComputed
+          PeriodicPlanarOneInThreeToThreeDM.typedRouteFromOptionData
         cases horizontalAssembledRouteTriple?Computed input <;> rfl
 
 end PeriodicCNFStripReduction

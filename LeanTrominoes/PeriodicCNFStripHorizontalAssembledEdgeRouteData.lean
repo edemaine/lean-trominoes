@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripHorizontalAssembledRouteData
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRouteAtTagDataBridge
 
 /-! # Proof-free stored edge routes for the horizontal source -/
 
@@ -32,11 +33,11 @@ def horizontalAssembledRouteTriple?Computed
 /-- Complete proof-free route selected by one encoded incidence tag. -/
 def horizontalAssembledRouteAtTagComputed
     (input : PeriodicCNF Nat × PeriodicThreeDM.IncidenceTag) : List Cell :=
-  match horizontalAssembledRouteTriple?Computed input with
-  | none => []
-  | some triple =>
-      horizontalTypedIncidenceRouteComputed
-        ((input.1, triple), input.2.color)
+  typedRouteFromOptionData
+    (fun triple color =>
+      horizontalTypedIncidenceRouteComputed ((input.1, triple), color))
+    input.2.color
+    (horizontalAssembledRouteTriple?Computed input)
 
 /-- Encoded periodic 3DM problem of the normalized horizontal source. -/
 def horizontalThreeDMProblemComputed

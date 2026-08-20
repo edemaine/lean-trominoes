@@ -9600,6 +9600,11 @@ The representation choices for this target are:
   proves the resulting complete stored edge-route list primitive recursive,
   through separately checked leaves for typed-triple lookup, route selection,
   problem encoding, tag enumeration, and the final list map.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMEdgeRoutesSemanticBridge.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMEdgeRoutesSemanticBridge.lean)
+  identifies that executable edge-route list with the certified assembled
+  route family in the same incidence-tag order.  The proof transports an
+  already-certified optional triple lookup through a shallow route selector,
+  avoiding normalization of the full horizontal formula.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
