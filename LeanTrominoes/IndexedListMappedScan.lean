@@ -43,5 +43,14 @@ theorem range_flatMap_map_zipIdx_from_flatMap
   exact map_zipIdx_from_flatMap values (position index)
     (start index) (emit index)
 
+/-- A tagged prefix member remains at the same optional-lookup index after
+an arbitrary suffix is appended. -/
+theorem append_getElem?_of_mem_zipIdx
+    {Value : Type} (head tail : List Value)
+    (tagged : Value × Nat) (member : tagged ∈ head.zipIdx) :
+    (head ++ tail)[tagged.2]? = some tagged.1 := by
+  rw [List.getElem?_append_left (List.snd_lt_of_mem_zipIdx member)]
+  exact (List.mem_zipIdx_iff_getElem?).mp member
+
 end IndexedListScan
 end LeanTrominoes

@@ -28,6 +28,27 @@ theorem variableTriples_length_decidableEq_irrel
   subst second
   rfl
 
+/-- The variable position prefix is the pointwise position map of the same
+typed variable prefix used by stable triple lookup. -/
+theorem horizontalThreeDMVariableTriplePositionsComputed_eq_map_typed
+    (source : PeriodicCNF Nat) :
+    horizontalThreeDMVariableTriplePositionsComputed source =
+      (horizontalThreeDMVariableTriplesComputed source).map
+        (horizontalThreeDMTriplePositionComputed source) := by
+  have decidableEqCoherence :
+      horizontalThreeDMTripleVariableDecidableEq =
+        horizontalRibbonRoutedVariableDecidableEq :=
+    Subsingleton.elim _ _
+  unfold horizontalThreeDMVariableTriplePositionsComputed
+    horizontalThreeDMVariableTriplesComputed
+  exact congrArg
+    (fun decEq : DecidableEq RoutedVariable =>
+      (@PeriodicPlanarOneInThreeToThreeDM.variableTriples
+          RoutedVariable decEq
+          (horizontalNormalizedRoutedFormulaComputed source).erase).map
+        (horizontalThreeDMTriplePositionComputed source))
+    decidableEqCoherence
+
 /-- Mapping the variable typed triples to their positions preserves the
 length of the variable prefix. -/
 @[simp] theorem horizontalThreeDMVariableTriplePositionsComputed_length
