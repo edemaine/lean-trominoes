@@ -1328,6 +1328,12 @@ build; an imported proof counts when its statement matches the paper.
           alphabet: fixed block expansion turns each horizontal or vertical
           index unit and bounded local offset into the exact encoded pixel
           coordinate, with a polynomial-time transducer certificate.
+        - [x] Derive exact clause, literal, variable, and incidence-drawing
+          sizes for the bounded PSPACE source, reducing its orthocrossing grid
+          size to a fixed weighted count of transition-program instructions.
+        - [x] Expand the existing finite request-token stream into exactly one
+          unary marker per orthocrossing grid unit with a fixed block
+          transducer and polynomial-time certificate.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           proof-free normalization raster; the fixed gadget-pixel expansion
           and every downstream postprocessor are now verified.
@@ -9750,6 +9756,30 @@ The representation choices for this target are:
   prepared fields for height `3P+1` and width `P`, where `P = factor * g`.
   Thus neither header field requires binary arithmetic or an unbounded
   intermediate alphabet.
+- [`LeanTrominoes/PeriodicCNFTransitionProgramLiteralCount.lean`](LeanTrominoes/PeriodicCNFTransitionProgramLiteralCount.lean),
+  [`LeanTrominoes/PeriodicThreeCNFExactSize.lean`](LeanTrominoes/PeriodicThreeCNFExactSize.lean),
+  [`LeanTrominoes/PeriodicThreeSATThreeExactSize.lean`](LeanTrominoes/PeriodicThreeSATThreeExactSize.lean),
+  [`LeanTrominoes/PeriodicThreeSATThreeExactVariableCount.lean`](LeanTrominoes/PeriodicThreeSATThreeExactVariableCount.lean),
+  and [`LeanTrominoes/PeriodicThreeSATThreeExactDrawingSize.lean`](LeanTrominoes/PeriodicThreeSATThreeExactDrawingSize.lean)
+  compute the exact source sizes needed by the raster emitter.  On the
+  already-width-three PSPACE formulas, clause splitting is inert; the
+  bounded-occurrence conversion has exactly one output variable per source
+  literal occurrence, and its incidence drawing has grid size
+  `16 * (clauses + 5 * literals + 1)`.
+- [`LeanTrominoes/PeriodicCNFTransitionExprNonempty.lean`](LeanTrominoes/PeriodicCNFTransitionExprNonempty.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSourceFormulaFacts.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceFormulaFacts.lean),
+  [`LeanTrominoes/PeriodicCNFStripSourceExactGridSize.lean`](LeanTrominoes/PeriodicCNFStripSourceExactGridSize.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectGridSize.lean`](LeanTrominoes/PeriodicCNFStripDirectGridSize.lean)
+  specialize those counts to the generated transition program.  They prove
+  every generated clause nonempty and obtain the exact direct-source grid
+  size `16 * (program clauses + 5 * program literals + 7)`.
+- [`LeanTrominoes/PeriodicCNFStripGridUnitTokens.lean`](LeanTrominoes/PeriodicCNFStripGridUnitTokens.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectGridUnitData.lean`](LeanTrominoes/PeriodicCNFStripDirectGridUnitData.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectGridUnitEmitter.lean`](LeanTrominoes/PeriodicCNFStripDirectGridUnitEmitter.lean)
+  exploit the fixed clause/literal contribution of each transition
+  instruction.  A finite block transducer maps the existing request-token
+  stream to exactly one unary marker per orthocrossing grid unit and carries
+  the source emitter's polynomial-time certificate through unchanged.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
