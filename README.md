@@ -1317,6 +1317,8 @@ build; an imported proof counts when its statement matches the paper.
         bounded PSPACE-generated formula templates.
         - [x] Specify the counted-header permutation and verify every
           transition of its fixed four-stack finite machine.
+        - [x] Prove exact executions for all six scan, emit, copy, and output
+          reversal phases on arbitrary unary streams.
         - [ ] Prove the header-rotation machine's complete exact run and
           linear polynomial-time certificate.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -2484,6 +2486,10 @@ The representation choices for this target are:
   implements that permutation as a fixed four-stack `FinTM2` and proves every
   transition case, including total behavior on prematurely terminated unary
   streams.
+- [`LeanTrominoes/UnaryFieldHeaderRotationMachineExecution.lean`](LeanTrominoes/UnaryFieldHeaderRotationMachineExecution.lean)
+  lifts those transitions through exact inductive executions for all six
+  machine phases and identifies the parsed field prefixes with the total
+  semantic rotation specification.
 - [`LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean)
   gives the concrete request emitter an entirely finite output alphabet:
   runtime atoms and the fresh boundary become unary runs, while fixed tokens
