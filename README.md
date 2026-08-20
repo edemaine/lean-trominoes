@@ -1477,9 +1477,9 @@ build; an imported proof counts when its statement matches the paper.
           postprocessor, leaving one explicit finite-stream compiler boundary.
         - [x] Isolate fixed-eight occurrence splitting as a finite direction-
           descriptor expansion.  Its closed nine-clause ring is checked
-          exactly, its one-pass stream preserves the required ordered profiles
-          and variable count on canonical inputs, and its transducer runs in
-          polynomial time.
+          exactly, its one-pass stream preserves the required semantics, and
+          a two-pass retained-source emitter produces the exact phase-major
+          descriptor list in polynomial time.
         - [ ] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
