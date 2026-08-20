@@ -1495,6 +1495,10 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Split that source-symbol stream definitionally into a
           deduplicated clause-descriptor prefix and an exact distinct-variable
           marker suffix, with a verified two-pass retained-input compiler.
+        - [x] Prove clause deduplication preserves the exact distinct-variable
+          count and reduce the metadata marker suffix past wrapping, gauging,
+          normalization, and deduplication to the finite retained planar-SAT
+          variable count.
         - [ ] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
@@ -10154,6 +10158,11 @@ The representation choices for this target are:
   passes: the deduplicated clause records and the distinct-variable marker
   suffix.  Their standard composition recovers the exact metadata and
   fixed-eight streams.
+- [`LeanTrominoes/PeriodicCNFDeduplicationExactVariableCount.lean`](LeanTrominoes/PeriodicCNFDeduplicationExactVariableCount.lean)
+  proves that removing duplicate clauses preserves the number of distinct
+  variables, and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataVariableCount.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataVariableCount.lean)
+  uses it to identify the exact marker suffix length with the finite retained
+  planar-SAT variable count before wrapping and geometric gauges.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
