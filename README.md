@@ -1361,6 +1361,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Reduce each surviving colored clause scan to the exact fixed
           block consisting of internal, top, and left requests, plus a right
           request exactly for ternary clauses.
+        - [x] Split the indexed triple scan into variable-module and clause-core
+          blocks, and reduce the clause suffix to nine fixed requests with
+          stable index `variableCount + 9 * clauseIndex + localIndex`.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.

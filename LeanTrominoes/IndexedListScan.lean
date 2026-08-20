@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import Batteries.Data.List.Lemmas
+import Mathlib.Data.List.Basic
 
 /-! # Generic identities for indexed list scans -/
 
@@ -58,6 +59,61 @@ theorem zipIdx_filter_fst_flatMap
       (List.filter (selected ∘ Prod.fst) values.zipIdx) =
     List.filter selected values
   rw [← List.filter_map, List.zipIdx_map_fst]
+
+/-- Indexing a flat map of fixed-width blocks is the same as indexing every
+block at the affine offset determined by its outer stable index. -/
+theorem flatMap_zipIdx_eq_zipIdx_flatMap_fixed
+    {Value Output : Type}
+    (values : List Value) (block : Value → List Output)
+    (width start outerStart : Nat)
+    (blockLength : ∀ value, (block value).length = width) :
+    (values.flatMap block).zipIdx (start + width * outerStart) =
+      (values.zipIdx outerStart).flatMap fun tagged =>
+        (block tagged.1).zipIdx (start + width * tagged.2) := by
+  induction values generalizing outerStart with
+  | nil => simp
+  | cons value values induction =>
+      rw [List.flatMap_cons, List.zipIdx_append,
+        List.zipIdx_cons, List.flatMap_cons]
+      rw [blockLength value]
+      have tail := induction (outerStart := outerStart + 1)
+      rw [show start + width * outerStart + width =
+          start + width * (outerStart + 1) by
+            rw [Nat.mul_add, Nat.mul_one]
+            omega,
+        tail]
+
+/-- Default-zero specialization of the fixed-width indexed flat-map law. -/
+theorem flatMap_zipIdx_eq_zipIdx_flatMap_fixed_zero
+    {Value Output : Type}
+    (values : List Value) (block : Value → List Output)
+    (width start : Nat)
+    (blockLength : ∀ value, (block value).length = width) :
+    (values.flatMap block).zipIdx start =
+      values.zipIdx.flatMap fun tagged =>
+        (block tagged.1).zipIdx (start + width * tagged.2) := by
+  simpa using flatMap_zipIdx_eq_zipIdx_flatMap_fixed
+    values block width start 0 blockLength
+
+/-- On a natural range, the outer value is already its stable index. -/
+theorem range_flatMap_zipIdx_eq_flatMap_zipIdx_fixed
+    {Output : Type}
+    (count : Nat) (block : Nat → List Output)
+    (width start : Nat)
+    (blockLength : ∀ index, (block index).length = width) :
+    ((List.range count).flatMap block).zipIdx start =
+      (List.range count).flatMap fun index =>
+        (block index).zipIdx (start + width * index) := by
+  rw [flatMap_zipIdx_eq_zipIdx_flatMap_fixed_zero
+    (List.range count) block width start blockLength]
+  have zipEq :
+      (List.range count).zipIdx =
+        (List.range count).map fun index => (index, index) := by
+    apply List.ext_getElem
+    · simp
+    · intro index leftBound rightBound
+      simp
+  rw [zipEq, List.flatMap_map]
 
 end IndexedListScan
 end LeanTrominoes
