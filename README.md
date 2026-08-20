@@ -1061,6 +1061,9 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Compute each normalized source variable's finite ribbon-fan count,
         connector kinds, polarities, and endpoint directions, decode the
         complete fan record, and identify it with the semantic fan data.
+      - [x] Instantiate the finite coordinated variable-fan route table from
+        each computed fan record and identify every colored local route with
+        its semantic counterpart.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
