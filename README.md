@@ -1337,9 +1337,12 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Feed that exact unary scale through the prepared-header machine,
           proving that it emits the compiled strip's precise `3P+1` height and
           `P` width fields in polynomial time.
+        - [x] Replace the blank-heavy complete normalization raster by the
+          collision-free assignment-order motif, proving identical carrier,
+          well-formedness, and tiling semantics for both trominoes.
         - [ ] Implement the polynomial-time prepared-token emitter for the
-          proof-free normalization raster; the fixed gadget-pixel expansion
-          and every downstream postprocessor are now verified.
+          sparse normalization assignments; the fixed gadget-pixel expansion,
+          exact header, and every downstream postprocessor are now verified.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -9790,6 +9793,21 @@ The representation choices for this target are:
   drawing's height and width fields, with horizontal period
   `normalizationPeriodFactor * gridSize` and vertical period one more than
   three times that value.
+- [`LeanTrominoes/GadgetSparseExpandedMotif.lean`](LeanTrominoes/GadgetSparseExpandedMotif.lean),
+  [`LeanTrominoes/GadgetSparseStripData.lean`](LeanTrominoes/GadgetSparseStripData.lean),
+  [`LeanTrominoes/GadgetSparseStripMotif.lean`](LeanTrominoes/GadgetSparseStripMotif.lean),
+  and [`LeanTrominoes/GadgetSparseStripSemantics.lean`](LeanTrominoes/GadgetSparseStripSemantics.lean)
+  eliminate the unnecessary scan over every blank cell of the rectangular
+  normalization raster.  Collision-free vertex and route assignments can be
+  substituted directly in their existing order; the resulting motif has
+  exactly the same membership, infinite carrier, well-formedness, and tiling
+  predicate as the complete-raster strip.
+- [`LeanTrominoes/PeriodicCNFStripSparseCompiledTromino.lean`](LeanTrominoes/PeriodicCNFStripSparseCompiledTromino.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseHardnessPackaging.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseHardnessPackaging.lean)
+  specialize that sparse presentation to the guarded local-CNF pipeline and
+  the direct PSPACE source.  They preserve exact reduction correctness for
+  both trominoes and reduce the remaining hardness certificate to a uniform
+  polynomial-time compiler for the sparse assignment list.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
