@@ -1464,8 +1464,10 @@ build; an imported proof counts when its statement matches the paper.
           single missing retained Figure 9 source-shape compiler.
         - [x] Encode every width-three clause profile together with its finite
           route-first directions and compile stable clockwise profile sorting
-          as a fixed finite block transduction, reducing ordering data to a
-          finite per-literal descriptor.
+          as a fixed finite block transduction.  Prove that canonical route
+          descriptors recover the exact ordered formula shape and reduce the
+          remaining ordering machine to a finite per-literal descriptor
+          emitter.
         - [ ] Compile the exact retained-planar formula shape from the uniform
           source stream in polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the

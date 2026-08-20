@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingData
+import LeanTrominoes.TM2CompositionMachine
 
 /-! # Polynomial-time finite direction-aware shape ordering -/
 
@@ -25,7 +26,22 @@ noncomputable def shapeComputableInPolyTime :
       Token FormulaShape.Token id id shape :=
   FiniteBlockTransducer.computableInPolyTime tokenBlock
 
+/-- Any polynomial-time producer of finite direction descriptors composes
+directly with the fixed clockwise lookup. -/
+noncomputable def shapeComputableInPolyTimeOf
+    {Source InputSymbol : Type}
+    (encodeInput : Source → List InputSymbol)
+    (descriptors : Source → List Token)
+    (compiler : @TM2ComputableInPolyTime
+      Source (List Token) InputSymbol Token
+      encodeInput id descriptors) :
+    @TM2ComputableInPolyTime
+      Source (List FormulaShape.Token)
+      InputSymbol FormulaShape.Token encodeInput id
+      (fun input => shape (descriptors input)) :=
+  TM2CompositionMachine.computableInPolyTime compiler
+    shapeComputableInPolyTime
+
 end FormulaShapeDirectionOrdering
 end PeriodicCNF
 end LeanTrominoes
-
