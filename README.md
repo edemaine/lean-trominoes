@@ -10120,6 +10120,11 @@ The representation choices for this target are:
   direction stream.  Each final first direction is now exactly the direction
   of the first normalized source route whose metadata clause has the retained
   literal list.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRawRouteData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRawRouteData.lean)
+  and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRawRoutes.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRawRoutes.lean)
+  then erase the remaining inner anchor normalization.  Thus every retained
+  first direction is the first direction of a raw local component route
+  selected by `idxOf` in the normalized five-family metadata list.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
