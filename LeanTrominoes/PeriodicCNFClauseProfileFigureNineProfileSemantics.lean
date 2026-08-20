@@ -194,6 +194,33 @@ private theorem noUnit_blocks_literalProfiles
             induction sourceProfiles (start + 1) profilesEq.2]
           simp [List.map_append]
 
+/-- Exact source profiles become the exact semantic profile stream after the
+Figure 9 exact-one gadget alone. -/
+theorem oneInThree_profiles_literals_eq_formula
+    {Variable : Type} (source : PeriodicCNF Variable)
+    (sourceProfiles : List ClauseProfile)
+    (sourceCorrect : sourceProfiles.map ClauseProfile.literals =
+      source.clauses.map literalProfiles) :
+    (sourceProfiles.flatMap oneInThreeProfiles).map
+        ClauseProfile.literals =
+      (PeriodicOneInThree.formula source).clauses.map literalProfiles := by
+  exact (oneInThree_blocks_literalProfiles
+    source.clauses sourceProfiles 0 sourceCorrect).symm
+
+/-- Exact source profiles become the exact semantic profile stream after
+unit-clause elimination alone. -/
+theorem noUnit_profiles_literals_eq_formula
+    {Variable : Type} (source : PeriodicCNF Variable)
+    (sourceProfiles : List ClauseProfile)
+    (sourceCorrect : sourceProfiles.map ClauseProfile.literals =
+      source.clauses.map literalProfiles) :
+    (sourceProfiles.flatMap noUnitProfiles).map
+        ClauseProfile.literals =
+      (PeriodicOneInThreeNoUnits.formula source).clauses.map
+        literalProfiles := by
+  exact (noUnit_blocks_literalProfiles
+    source.clauses sourceProfiles 0 sourceCorrect).symm
+
 /-- Any exact source profile stream is transformed into the exact semantic
 profile stream after Figure 9 and unit elimination. -/
 theorem profiles_literals_eq_formula
