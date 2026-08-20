@@ -1431,6 +1431,12 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Compose Figure 9, unit elimination, and polarity normalization
           into one exact polynomial-time finite-profile compiler for the
           final exact-one endpoint.
+        - [x] Lift that finite transformation to formula-shape streams,
+          preserving every incoming distinct-variable marker and appending
+          the Figure 9, unit-removal, and polarity-complement markers with a
+          verified polynomial-time block transducer.
+        - [ ] Prove those appended markers equal the actual distinct-variable
+          count of the fully normalized exact-one formula.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
