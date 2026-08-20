@@ -1420,6 +1420,10 @@ build; an imported proof counts when its statement matches the paper.
           literal's polarity and current/next-slice offset, including padding
           and unit-removal auxiliaries, with exact formula-order semantics and
           a finite polynomial-time compiler.
+        - [x] Apply the fixed terminal-polarity convention to an exact clause
+          profile stream, emitting precisely the required binary complement
+          clauses in occurrence order and certifying the transformation
+          polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
