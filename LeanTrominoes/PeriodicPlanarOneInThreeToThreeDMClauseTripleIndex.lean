@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.IndexedListScan
-import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMTyped
+import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMEncode
 
 /-! # Stable indices in the typed clause-triple suffix -/
 
@@ -12,6 +12,13 @@ namespace LeanTrominoes
 namespace PeriodicPlanarOneInThreeToThreeDM
 
 open PlanarThreeDM
+
+/-- Numbering typed triples preserves the triple-list length. -/
+@[simp] theorem encodedProblem_triples_length
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    (encodedProblem source).triples.length = (triples source).length := by
+  simp [encodedProblem, TypedProblem.encode, problem]
 
 /-- Rebase a zero-based `zipIdx` member at an arbitrary start. -/
 private theorem mem_zipIdx_from
