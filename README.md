@@ -1492,6 +1492,9 @@ build; an imported proof counts when its statement matches the paper.
           representative metadata lookup to its raw finite component route,
           prove the resulting position-free descriptor stream exact, and
           specialize the corresponding compiler boundary to source symbols.
+        - [x] Split that source-symbol stream definitionally into a
+          deduplicated clause-descriptor prefix and an exact distinct-variable
+          marker suffix, with a verified two-pass retained-input compiler.
         - [ ] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
@@ -10142,6 +10145,15 @@ The representation choices for this target are:
   specialize that equality to direct PSPACE source-symbol words.  Any
   polynomial-time metadata emitter now supplies both the canonical pre-split
   compiler and the already verified fixed-eight descriptor compiler.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorBlockData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorBlockData.lean),
+  [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorBlocks.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorBlocks.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockData.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockData.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlocks.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlocks.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockCompiler.lean)
+  split the remaining emitter into two independently bounded retained-input
+  passes: the deduplicated clause records and the distinct-variable marker
+  suffix.  Their standard composition recovers the exact metadata and
+  fixed-eight streams.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
