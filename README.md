@@ -1387,6 +1387,12 @@ build; an imported proof counts when its statement matches the paper.
           routed occurrence suffix.
         - [x] Rewrite the final cell type of every clause, ordinary, and
           fixed-red triple as a finite local RGB direction-table lookup.
+        - [x] Lift those cell tables over the stable variable and clause
+          triple scans, eliminating normalized-route queries from the complete
+          triple request block.
+        - [x] Expose exact source-symbol contracts for four table-driven
+          retained-input appenders and transport them to the existing compact
+          affine vertex-request pipeline.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
