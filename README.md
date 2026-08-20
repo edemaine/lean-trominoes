@@ -1435,8 +1435,9 @@ build; an imported proof counts when its statement matches the paper.
           preserving every incoming distinct-variable marker and appending
           the Figure 9, unit-removal, and polarity-complement markers with a
           verified polynomial-time block transducer.
-        - [ ] Prove those appended markers equal the actual distinct-variable
-          count of the fully normalized exact-one formula.
+        - [x] Prove those appended markers equal the actual distinct-variable
+          count of the fully normalized exact-one formula, while the same
+          shape theorem retains the exact final clause-profile order.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
