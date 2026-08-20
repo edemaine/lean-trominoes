@@ -9869,6 +9869,11 @@ The representation choices for this target are:
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
   original contracted position, the input drawing period, and a finite cell
   type, with no normalized route data involved.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexInputData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexInputData.lean)
+  proves that every listed stage-zero contracted position is the matching
+  lookup in the original input drawing.  The direct vertex-record stream is
+  consequently expressed without constructing the contracted drawing's
+  derived position list.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
