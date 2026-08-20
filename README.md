@@ -1412,6 +1412,10 @@ build; an imported proof counts when its statement matches the paper.
           append exactly one fixed implication profile per literal for
           occurrence splitting, and identify the resulting polynomial-time
           stream with the guarded geometric `sourceFormula`.
+        - [x] Expand each guarded clause profile through the Figure 9
+          exact-one gadget and unit-clause elimination, proving that the
+          finite lookup gives the exact final binary/ternary clause order and
+          certifying the lookup scan polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
