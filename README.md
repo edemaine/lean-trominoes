@@ -10109,6 +10109,11 @@ The representation choices for this target are:
   remove positioned-formula bookkeeping from that boundary: the final erased
   retained clauses are exactly the deduplicated normalized clauses projected
   from the existing five-family finite metadata list.
+- [`LeanTrominoes/PositionedPeriodicCNFRouteFirstDirections.lean`](LeanTrominoes/PositionedPeriodicCNFRouteFirstDirections.lean)
+  isolates the cheap geometric fact needed by the metadata bridge: subtracting
+  one common clause-period translation preserves a route's first direction.
+  Keeping this lemma independent of retained-planarity certificates also keeps
+  its leaf compilation within the project's low-memory build boundary.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
