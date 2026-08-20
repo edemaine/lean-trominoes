@@ -15,17 +15,25 @@ namespace LeanTrominoes
 namespace PeriodicCNFStripReduction
 
 open PeriodicPlanarOneInThreeToThreeDM
+open Gadget
 
 attribute [local instance]
   horizontalRoutedRoutesSourceVariableDecidableEq
   horizontalRibbonRoutedVariableDecidableEq
 
+/-- Proof-free lane and unit-route input to the corridor assembler. -/
+def horizontalOccurrenceRibbonCorridorInputComputed
+    (input : HorizontalOccurrenceColoredRouteInput) :
+    WireColor × List Cell :=
+  (horizontalOccurrenceRibbonLaneComputed input,
+    horizontalOccurrenceUnitSourceRouteComputed input.1)
+
 /-- Central macrocell corridor on the occurrence's computed physical lane. -/
 def horizontalOccurrenceRibbonCorridorCoreComputed
     (input : HorizontalOccurrenceColoredRouteInput) : List Cell :=
   ribbonCorridorCore
-    (horizontalOccurrenceRibbonLaneComputed input)
-    (horizontalOccurrenceUnitSourceRouteComputed input.1)
+    (horizontalOccurrenceRibbonCorridorInputComputed input).1
+    (horizontalOccurrenceRibbonCorridorInputComputed input).2
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
