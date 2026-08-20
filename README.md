@@ -1070,6 +1070,10 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Compute each occurrence's clause orbit, terminal group, and
         group-dependent physical lane, instantiate the coordinated clause-fan
         route table, and identify the local route with its semantic counterpart.
+      - [x] Translate both endpoint fans to their computed macrocells, assemble
+        the central ribbon corridor and complete colored occurrence route
+        primitive recursively, and identify it with the certified coordinated
+        routing field.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
