@@ -1055,6 +1055,9 @@ build; an imported proof counts when its statement matches the paper.
         and periodically rebased source route primitive recursively.
       - [x] Identify proof-free occurrence rebasing with the choice-backed
         semantic source route on every active occurrence.
+      - [x] Unit-subdivide each executable occurrence route, compute its two
+        endpoint directions, and identify all three values with the semantic
+        coordinated-ribbon inputs.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
