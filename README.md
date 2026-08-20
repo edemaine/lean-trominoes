@@ -9907,6 +9907,10 @@ The representation choices for this target are:
   appender contract.  Composing any implementation with the fixed workspace
   expander automatically satisfies the canonical vertex-record appender
   required by the split direct hardness pipeline.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestSplit.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestSplit.lean)
+  splits the compact request stream into its stable triple, red, green, and
+  blue blocks.  Each colored block scans only degree-three atom indices and
+  emits a constant monochromatic cell tag.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse
