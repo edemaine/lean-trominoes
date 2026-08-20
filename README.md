@@ -9585,6 +9585,13 @@ The representation choices for this target are:
   ordinary, fixed-red, and clause constructor inputs are deliberately split
   into small computability leaves, as are the variable prefix, normalized
   routed-triple query, occurrence extension, and clause route.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMTypedTriplesSemanticBridge.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMTypedTriplesSemanticBridge.lean)
+  identifies the proof-free typed-triple enumeration with the certified
+  semantic enumeration used by the assembled 3DM reduction.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRouteSemanticBridge.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRouteSemanticBridge.lean)
+  proves pointwise that every computed ordinary, fixed-red, and clause RGB
+  incidence route is the corresponding certified assembled route, including
+  the optional coordinated occurrence-corridor splice.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalAssembledEdgeRouteData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalAssembledEdgeRouteData.lean)
   performs total tag-indexed lookup in the proof-free typed triple list and
   maps the complete route dispatcher over the encoded problem's stable
