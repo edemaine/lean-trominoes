@@ -1311,6 +1311,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Reduce the remaining direct machine certificate to a raw-symbol
         emitter of unary natural-number fields, followed by the verified
         unary-to-native binary field encoder.
+      - [x] Identify the semantic target fields with a shallow proof-free
+        generator using natural-range raster and fixed-gadget pixel loops.
       - [ ] Implement and verify the direct unary field emitter for the
         bounded PSPACE-generated formula templates.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -9671,6 +9673,11 @@ The representation choices for this target are:
   strip's natural-number fields in unary form.  Sequential composition with
   the verified unary-field encoder supplies the exact canonical binary strip
   output required by `Theorem52.stripStatement`.
+- [`LeanTrominoes/PeriodicCNFStripDirectExecutableFields.lean`](LeanTrominoes/PeriodicCNFStripDirectExecutableFields.lean)
+  exposes those target fields as a proof-free natural-range computation: two
+  arithmetic header fields and the fixed-gadget pixels of the row-major
+  normalized raster.  A verified equality transports any machine for this
+  shallow generator back to the exact semantic strip reduction.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
