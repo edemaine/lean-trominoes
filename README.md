@@ -1349,6 +1349,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Materialize the assembled 3DM drawing's exact grid size as a
           unary stream by fixed expansion of the direct source-grid markers,
           with a polynomial-time machine certificate.
+        - [x] Bridge each numeric color-list degree test to the incidence
+          degree of the typed element at the same stable list index, in
+          independently compiled red, green, and blue leaves.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
