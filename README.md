@@ -1319,7 +1319,7 @@ build; an imported proof counts when its statement matches the paper.
           transition of its fixed four-stack finite machine.
         - [x] Prove exact executions for all six scan, emit, copy, and output
           reversal phases on arbitrary unary streams.
-        - [ ] Prove the header-rotation machine's complete exact run and
+        - [x] Prove the header-rotation machine's complete exact run and
           linear polynomial-time certificate.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
@@ -2490,6 +2490,10 @@ The representation choices for this target are:
   lifts those transitions through exact inductive executions for all six
   machine phases and identifies the parsed field prefixes with the total
   semantic rotation specification.
+- [`LeanTrominoes/UnaryFieldHeaderRotationMachineTime.lean`](LeanTrominoes/UnaryFieldHeaderRotationMachineTime.lean)
+  composes the phases into the exact total rotation, proves the coarse linear
+  bound `9n + 9`, and packages the result as an explicit
+  `TM2ComputableInPolyTime` certificate.
 - [`LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean)
   gives the concrete request emitter an entirely finite output alphabet:
   runtime atoms and the fresh boundary become unary runs, while fixed tokens
