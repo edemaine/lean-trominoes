@@ -1400,6 +1400,10 @@ build; an imported proof counts when its statement matches the paper.
           blockwise record-family equalities over the uniform unary-program
           stream, behind a certified opaque output boundary that keeps each
           Lean compiler leaf below the resource cap.
+        - [x] Extract the exact unary, binary, and ternary clause-arity stream
+          from that unary program with a finite block scan, prove agreement
+          with the source formula's clause lengths, and certify the complete
+          source-symbol scan polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
