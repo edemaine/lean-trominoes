@@ -9824,6 +9824,16 @@ The representation choices for this target are:
   symbol from a finite cell-type alphabet.  Its total parser expands every
   canonical record to exactly the previously verified prepared pixel stream,
   reducing repetitive gadget-pixel emission to a fixed transducer.
+- [`LeanTrominoes/GadgetSparseAssignmentTokenMachine.lean`](LeanTrominoes/GadgetSparseAssignmentTokenMachine.lean),
+  [`LeanTrominoes/GadgetSparseAssignmentTokenMachineExecution.lean`](LeanTrominoes/GadgetSparseAssignmentTokenMachineExecution.lean),
+  [`LeanTrominoes/GadgetSparseAssignmentTokenMachineTime.lean`](LeanTrominoes/GadgetSparseAssignmentTokenMachineTime.lean),
+  and [`LeanTrominoes/GadgetSparseAssignmentTokenCompiler.lean`](LeanTrominoes/GadgetSparseAssignmentTokenCompiler.lean)
+  implement that transducer as a fixed finite multi-stack machine.  Small
+  intermediate leaves verify every transition, coordinate-copy phase, pixel
+  cursor, cleanup, and total parser execution.  The resulting machine agrees
+  with the parser on arbitrary words, runs in at most `513 * (n + 1)^2`
+  steps, and transports any polynomial-time canonical-record emitter to the
+  exact prepared sparse motif.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean),
@@ -9838,9 +9848,10 @@ The representation choices for this target are:
   and [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean)
   connect the verified direct header and sparse pixel stream to every existing
   fixed postprocessor.  Consequently the sole remaining strip-hardness
-  obligation is a polynomial-time emitter for the prepared sparse assignment
-  stream itself; satisfying it yields the exact flat target and the complete
-  `Theorem52.stripStatement`.
+  obligation is a polynomial-time emitter for the canonical unary records of
+  the direct sparse assignment list; the verified fixed parser now supplies
+  the prepared motif stream.  Satisfying that obligation yields the exact flat
+  target and the complete `Theorem52.stripStatement`.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
