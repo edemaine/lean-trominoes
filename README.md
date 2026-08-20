@@ -9834,6 +9834,13 @@ The representation choices for this target are:
   with the parser on arbitrary words, runs in at most `513 * (n + 1)^2`
   steps, and transports any polynomial-time canonical-record emitter to the
   exact prepared sparse motif.
+- [`LeanTrominoes/GadgetSparseAffineVertexTokens.lean`](LeanTrominoes/GadgetSparseAffineVertexTokens.lean)
+  factors normalized vertex-coordinate emission into three fixed factor-12
+  block transducers.  A compact record containing the original horizontal
+  coordinate, reflected vertical complement, and finite cell type expands to
+  the exact canonical unary record with coordinates `1728·x+471` and
+  `1728·(2·gridSize−y−1)+1257`, without any single transition
+  constructing a 1728-symbol block.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordData.lean),
