@@ -9836,11 +9836,15 @@ The representation choices for this target are:
   exact prepared sparse motif.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordData.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectSparseTargetMotif.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseTargetMotif.lean)
   expose the direct source's proof-free assignment list, prove its coordinates
-  nonnegative, and identify its exact dimensions and motif with the semantic
-  sparse target.
+  nonnegative, encode it as canonical finite unary records, and identify its
+  exact dimensions and motif with the semantic sparse target.  The record
+  compiler proves that this finite geometry-emitter boundary composes with
+  the fixed quadratic parser to recover the exact prepared motif.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
