@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectUnaryEmitter
+import LeanTrominoes.GadgetStripFlatFields
 
 /-! # Proof-free target fields for direct strip hardness -/
 
@@ -35,13 +36,19 @@ def directCompiledTrominoMotifOfSymbols
   (directCompiledStripDrawingOfSymbols decider symbols)
     |>.computableExpandedMotif tromino
 
+theorem directCompiledTrominoMotifOfSymbols_eq
+    (tromino : Tromino) (symbols : List encoding.Γ) :
+    directCompiledTrominoMotifOfSymbols decider tromino symbols =
+      Gadget.PeriodicOrthogonalDrawing.computableExpandedMotif tromino
+        (directCompiledStripDrawingOfSymbols decider symbols) := by
+  rfl
+
 /-- Shallow proof-free target field generator.  It consists of two arithmetic
 header fields followed by the row-major natural-range gadget-pixel loop. -/
 def directExecutableTrominoStripFieldsOfSymbols
     (tromino : Tromino) (symbols : List encoding.Γ) : List Nat :=
-  PeriodicStripFlatEncoding.stripFields
-    ((directCompiledStripDrawingOfSymbols decider symbols)
-      |>.computablePeriodicStrip tromino)
+  (directCompiledStripDrawingOfSymbols decider symbols)
+    |>.computablePeriodicStripFields tromino
 
 /-- The proof-free loop nest emits exactly the fields of the semantic strip
 used by the correctness reduction. -/
@@ -50,6 +57,7 @@ theorem directExecutableTrominoStripFieldsOfSymbols_eq
     directExecutableTrominoStripFieldsOfSymbols decider tromino symbols =
       directCompiledTrominoStripFieldsOfSymbols decider tromino symbols := by
   unfold directExecutableTrominoStripFieldsOfSymbols
+  rw [← Gadget.PeriodicOrthogonalDrawing.stripFields_computablePeriodicStrip]
   rw [Gadget.PeriodicOrthogonalDrawing.computablePeriodicStrip_eq]
   unfold directCompiledTrominoStripFieldsOfSymbols
   unfold directCompiledTrominoStripOfSymbols compiledTrominoStrip

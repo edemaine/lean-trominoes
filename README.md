@@ -1321,6 +1321,11 @@ build; an imported proof counts when its statement matches the paper.
           reversal phases on arbitrary unary streams.
         - [x] Prove the header-rotation machine's complete exact run and
           linear polynomial-time certificate.
+        - [x] Count one finite marker per motif cell, expand width, period,
+          and coordinate tokens, and compose the verified postprocessors to
+          obtain the exact executable unary field stream.
+        - [ ] Implement the polynomial-time finite-token emitter for the
+          proof-free normalization raster and fixed gadget-pixel loop.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -2494,6 +2499,13 @@ The representation choices for this target are:
   composes the phases into the exact total rotation, proves the coarse linear
   bound `9n + 9`, and packages the result as an explicit
   `TM2ComputableInPolyTime` certificate.
+- [`LeanTrominoes/CountedUnaryFieldTokens.lean`](LeanTrominoes/CountedUnaryFieldTokens.lean)
+  packages arbitrary unary natural fields as finite tokens and proves that
+  the existing marker counter/finalizer prepends their exact counted header.
+- [`LeanTrominoes/CountedUnaryFieldTokenCompiler.lean`](LeanTrominoes/CountedUnaryFieldTokenCompiler.lean)
+  precomposes marker counting, token expansion, and header rotation once in a
+  low-dependency environment, exposing a reusable polynomial-time compiler
+  bridge for counted-token emitters.
 - [`LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean)
   gives the concrete request emitter an entirely finite output alphabet:
   runtime atoms and the fresh boundary become unary runs, while fixed tokens
@@ -9700,6 +9712,20 @@ The representation choices for this target are:
   arithmetic header fields and the fixed-gadget pixels of the row-major
   normalized raster.  A verified equality transports any machine for this
   shallow generator back to the exact semantic strip reduction.
+- [`LeanTrominoes/GadgetStripFlatFields.lean`](LeanTrominoes/GadgetStripFlatFields.lean)
+  states the explicit three-field header and coordinate payload of any
+  natural-range gadget strip without unfolding its input drawing.
+- [`LeanTrominoes/PeriodicCNFStripDirectCountedTokens.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokens.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenFinalization.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenFinalization.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenSemantics.lean)
+  encode one finite marker per motif cell and unary tokens for the remaining
+  fields, then prove that counting, finalization, and rotation produce exactly
+  the executable strip field stream.
+- [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenMachineBridge.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectCountedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectCountedTokenCompiler.lean)
+  compose those fixed postprocessors with any polynomial-time geometric token
+  emitter and carry the resulting certificate through to
+  `Theorem52.stripStatement`.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
