@@ -1346,6 +1346,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Rewrite compact affine vertex requests as one indexed triple
           scan and three degree-filtered color scans, and prove that four
           retained-input appenders compose into the exact request appender.
+        - [x] Materialize the assembled 3DM drawing's exact grid size as a
+          unary stream by fixed expansion of the direct source-grid markers,
+          with a polynomial-time machine certificate.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
