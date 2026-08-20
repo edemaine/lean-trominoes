@@ -248,7 +248,8 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Compute every complete typed RGB incidence route of the explicit
         horizontal 3DM drawing primitive recursively, including finite
         variable-site prefixes, the unique coordinated occurrence extension,
-        and translated clause-core routes.
+        and translated clause-core routes; enumerate those routes in the
+        encoded problem's stable incidence-tag order.
     - [x] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
@@ -9584,6 +9585,14 @@ The representation choices for this target are:
   ordinary, fixed-red, and clause constructor inputs are deliberately split
   into small computability leaves, as are the variable prefix, normalized
   routed-triple query, occurrence extension, and clause route.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalAssembledEdgeRouteData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalAssembledEdgeRouteData.lean)
+  performs total tag-indexed lookup in the proof-free typed triple list and
+  maps the complete route dispatcher over the encoded problem's stable
+  incidence tags.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMEdgeRoutesComputability.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMEdgeRoutesComputability.lean)
+  proves the resulting complete stored edge-route list primitive recursive,
+  through separately checked leaves for typed-triple lookup, route selection,
+  problem encoding, tag enumeration, and the final list map.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
