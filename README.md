@@ -9841,6 +9841,11 @@ The representation choices for this target are:
   the exact canonical unary record with coordinates `1728·x+471` and
   `1728·(2·gridSize−y−1)+1257`, without any single transition
   constructing a 1728-symbol block.
+- [`LeanTrominoes/GadgetSparseAffineVertexWorkspace.lean`](LeanTrominoes/GadgetSparseAffineVertexWorkspace.lean)
+  and [`LeanTrominoes/GadgetSparseAffineVertexWorkspaceCompiler.lean`](LeanTrominoes/GadgetSparseAffineVertexWorkspaceCompiler.lean)
+  lift those three fixed passes to a sum workspace.  Source symbols remain
+  unchanged on the left while only appended affine requests expand into
+  canonical assignment tokens on the right.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentRecordData.lean),
@@ -9897,6 +9902,11 @@ The representation choices for this target are:
   reflected vertical complement, and finite cell type.  Coordinate arithmetic
   proves that fixed affine expansion of the whole compact request stream is
   exactly the previously verified canonical direct vertex-record stream.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestAppender.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestAppender.lean)
+  packages the remaining compact request generator as a retained-input
+  appender contract.  Composing any implementation with the fixed workspace
+  expander automatically satisfies the canonical vertex-record appender
+  required by the split direct hardness pipeline.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse
