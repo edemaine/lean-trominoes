@@ -1367,6 +1367,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Reduce the variable triple prefix to the stable used-occurrence
           scan, carrying the next triple index through fixed three- and
           seven-request connector blocks.
+        - [x] Rewrite every variable-triple position as its computed variable
+          origin plus a finite local table selected only by occurrence slot,
+          polarity, connector kind, and local triple.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
