@@ -24,8 +24,30 @@ noncomputable local instance directSparseVertexDirectBoundsStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- The executable direct input inherits the semantic presentation's
+/-- The executable direct input inherits the semantic presentation's full
 fundamental-square bounds. -/
+theorem directSparseComputedInput_vertexPosition_bounds
+    (symbols : List encoding.Γ)
+    {vertex : PeriodicThreeDMVertex}
+    (member : vertex ∈ (directSparseComputedNormalizationInputOfSymbols
+      decider symbols).problem.contractedGraph.vertices) :
+    let input := directSparseComputedNormalizationInputOfSymbols
+      decider symbols
+    let position := input.drawing.vertexPosition
+      input.problem.incidenceGraph vertex
+    0 ≤ position.1 ∧ position.1 < (input.drawing.gridSize : Int) ∧
+      0 ≤ position.2 ∧ position.2 < (input.drawing.gridSize : Int) := by
+  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols
+  have inputEq :
+      directSparseComputedNormalizationInputOfSymbols decider symbols =
+        normalizationInput source := by
+    exact directSparseComputedNormalizationInputOfSymbols_eq decider symbols
+  rw [inputEq] at member ⊢
+  exact
+    normalizationCompiler_inputOfPresentation_vertexPosition_bounds
+      ((presentation source).toPlanarPresentation) member
+
+/-- Horizontal projection of the direct input's full coordinate bounds. -/
 theorem directSparseComputedInput_vertexPosition_horizontal_bounds
     (symbols : List encoding.Γ)
     {vertex : PeriodicThreeDMVertex}
@@ -38,15 +60,9 @@ theorem directSparseComputedInput_vertexPosition_horizontal_bounds
       (input.drawing.vertexPosition
           input.problem.incidenceGraph vertex).1 <
         (input.drawing.gridSize : Int) := by
-  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols
-  have inputEq :
-      directSparseComputedNormalizationInputOfSymbols decider symbols =
-        normalizationInput source := by
-    exact directSparseComputedNormalizationInputOfSymbols_eq decider symbols
-  rw [inputEq] at member ⊢
-  exact
-    normalizationCompiler_inputOfPresentation_vertexPosition_horizontal_bounds
-      ((presentation source).toPlanarPresentation) member
+  have bounds :=
+    directSparseComputedInput_vertexPosition_bounds decider symbols member
+  exact ⟨bounds.1, bounds.2.1⟩
 
 /-- Every direct vertex record therefore uses modulus-free affine coordinate
 fields. -/

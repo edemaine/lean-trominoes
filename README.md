@@ -9888,10 +9888,15 @@ The representation choices for this target are:
   direction-order query.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordAffineBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordAffineBounds.lean)
   and [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordDirectBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordDirectBounds.lean)
-  use the certified fundamental-square bounds to eliminate the horizontal
-  remainder operation from every direct vertex record.  Its two coordinates
-  are now the fixed affine expressions `1728·x+471` and
+  expose all four certified fundamental-square inequalities and eliminate the
+  horizontal remainder operation from every direct vertex record.  Its two
+  coordinates are now the fixed affine expressions `1728·x+471` and
   `3456·gridSize−(1728·y+471)`.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestData.lean)
+  encodes each direct contracted vertex by the original horizontal coordinate,
+  reflected vertical complement, and finite cell type.  Coordinate arithmetic
+  proves that fixed affine expansion of the whole compact request stream is
+  exactly the previously verified canonical direct vertex-record stream.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse

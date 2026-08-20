@@ -12,20 +12,18 @@ namespace LeanTrominoes
 namespace PeriodicCNFStripReduction
 
 /-- A compiler input obtained from a certified planar presentation reads each
-contracted vertex from the original drawing's horizontal fundamental
-interval. -/
-theorem normalizationCompiler_inputOfPresentation_vertexPosition_horizontal_bounds
+contracted vertex from the original drawing's fundamental square. -/
+theorem normalizationCompiler_inputOfPresentation_vertexPosition_bounds
     {problem : PeriodicThreeDM}
     (planar : problem.PlanarPresentation)
     {vertex : PeriodicThreeDMVertex}
     (member : vertex ∈ problem.contractedGraph.vertices) :
     let input :=
       PeriodicThreeDM.NormalizationCompiler.inputOfPresentation planar
-    0 ≤ (input.drawing.vertexPosition
-        input.problem.incidenceGraph vertex).1 ∧
-      (input.drawing.vertexPosition
-          input.problem.incidenceGraph vertex).1 <
-        (input.drawing.gridSize : Int) := by
+    let position := input.drawing.vertexPosition
+      input.problem.incidenceGraph vertex
+    0 ≤ position.1 ∧ position.1 < (input.drawing.gridSize : Int) ∧
+      0 ≤ position.2 ∧ position.2 < (input.drawing.gridSize : Int) := by
   let input :=
     PeriodicThreeDM.NormalizationCompiler.inputOfPresentation planar
   have compilerMember : vertex ∈ input.problem.contractedGraph.vertices :=
@@ -48,7 +46,26 @@ theorem normalizationCompiler_inputOfPresentation_vertexPosition_horizontal_boun
     rfl
   simp only [PeriodicGridDrawing.PositionInFundamentalSquare] at bounds
   rw [positionEq, gridEq] at bounds
-  exact ⟨le_of_lt bounds.1, bounds.2.1⟩
+  exact ⟨le_of_lt bounds.1, bounds.2.1,
+    le_of_lt bounds.2.2.1, bounds.2.2.2⟩
+
+/-- Horizontal projection of the full fundamental-square bounds. -/
+theorem normalizationCompiler_inputOfPresentation_vertexPosition_horizontal_bounds
+    {problem : PeriodicThreeDM}
+    (planar : problem.PlanarPresentation)
+    {vertex : PeriodicThreeDMVertex}
+    (member : vertex ∈ problem.contractedGraph.vertices) :
+    let input :=
+      PeriodicThreeDM.NormalizationCompiler.inputOfPresentation planar
+    0 ≤ (input.drawing.vertexPosition
+        input.problem.incidenceGraph vertex).1 ∧
+      (input.drawing.vertexPosition
+          input.problem.incidenceGraph vertex).1 <
+        (input.drawing.gridSize : Int) := by
+  have bounds :=
+    normalizationCompiler_inputOfPresentation_vertexPosition_bounds
+      planar member
+  exact ⟨bounds.1, bounds.2.1⟩
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
