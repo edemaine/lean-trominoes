@@ -1340,6 +1340,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Replace the blank-heavy complete normalization raster by the
           collision-free assignment-order motif, proving identical carrier,
           well-formedness, and tiling semantics for both trominoes.
+        - [x] Define the sparse motif's finite prepared-pixel stream and prove
+          that fixed expansion, marker counting, header rotation, and binary
+          field encoding recover the exact sparse flat strip.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
@@ -9808,6 +9811,31 @@ The representation choices for this target are:
   the direct PSPACE source.  They preserve exact reduction correctness for
   both trominoes and reduce the remaining hardness certificate to a uniform
   polynomial-time compiler for the sparse assignment list.
+- [`LeanTrominoes/GadgetSparseStripCompiler.lean`](LeanTrominoes/GadgetSparseStripCompiler.lean)
+  makes that target proof-free: its width, period, and motif are computed
+  directly from `NormalizationCompiler.Input`, with exact bridges to the
+  proof-backed assignment list and sparse presentation.
+- [`LeanTrominoes/GadgetSparseExpandedMotifFiniteTokens.lean`](LeanTrominoes/GadgetSparseExpandedMotifFiniteTokens.lean)
+  emits affine prepared coordinate blocks for the pixels of each sparse
+  assignment.  Nonnegative strip-coordinate bounds prove that fixed expansion
+  recovers exactly the assignment-order motif's counted natural fields.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentData.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAssignmentBounds.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseTargetPeriods.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseTargetMotif.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseTargetMotif.lean)
+  expose the direct source's proof-free assignment list, prove its coordinates
+  nonnegative, and identify its exact dimensions and motif with the semantic
+  sparse target.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenMachineBridge.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean)
+  connect the verified direct header and sparse pixel stream to every existing
+  fixed postprocessor.  Consequently the sole remaining strip-hardness
+  obligation is a polynomial-time emitter for the prepared sparse assignment
+  stream itself; satisfying it yields the exact flat target and the complete
+  `Theorem52.stripStatement`.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)

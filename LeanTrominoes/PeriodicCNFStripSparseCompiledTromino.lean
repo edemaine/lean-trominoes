@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.GadgetSparseStripCompiler
 import LeanTrominoes.GadgetSparseStripSemantics
 import LeanTrominoes.PeriodicCNFStripCompiledTromino
 import LeanTrominoes.PeriodicCNFStripHorizontalProblem
@@ -20,7 +21,8 @@ open Gadget
 from nonblank normalization assignments rather than a complete raster scan. -/
 def sparseCompiledTrominoStrip (tromino : Tromino)
     (source : PeriodicCNF Nat) : PeriodicStrip :=
-  (presentation source).sparsePeriodicStrip tromino
+  PeriodicThreeDM.NormalizationCompiler.compileSparseStrip tromino
+    (normalizationInput source)
 
 /-- Sparse assignment order preserves the exact local-CNF tiling semantics. -/
 theorem sparseCompiledTrominoStrip_correct
@@ -30,6 +32,8 @@ theorem sparseCompiledTrominoStrip_correct
     PeriodicCNF.LocalPeriodicCNF1DSAT source ↔
       PeriodicStripTrominoTiling tromino
         (sparseCompiledTrominoStrip tromino source) := by
+  unfold sparseCompiledTrominoStrip normalizationInput
+  rw [PeriodicThreeDM.NormalizationCompiler.compileSparseStrip_inputOfPresentation]
   have sparseDense :=
     (presentation source).sparsePeriodicStrip_tiling_iff
       (presentation source).problemWellFormed
