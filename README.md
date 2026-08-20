@@ -1424,6 +1424,9 @@ build; an imported proof counts when its statement matches the paper.
           profile stream, emitting precisely the required binary complement
           clauses in occurrence order and certifying the transformation
           polynomial time.
+        - [x] Compose Figure 9, unit elimination, and polarity normalization
+          into one exact polynomial-time finite-profile compiler for the
+          final exact-one endpoint.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
