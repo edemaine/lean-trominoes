@@ -1468,8 +1468,16 @@ build; an imported proof counts when its statement matches the paper.
           descriptors recover the exact ordered formula shape and reduce the
           remaining ordering machine to a finite per-literal descriptor
           emitter.
-        - [ ] Compile the exact retained-planar formula shape from the uniform
-          source stream in polynomial time.
+        - [x] Prove canonical formula-shape streams are uniquely determined by
+          their exact semantics, then identify the retained direction-sorted
+          descriptor output with the actual Figure 9 source shape after its
+          coordinate-only clearance scale.
+        - [x] Compose any polynomial-time retained direction-descriptor emitter
+          with the fixed clockwise lookup and the complete finite exact-one
+          postprocessor, leaving one explicit finite-stream compiler boundary.
+        - [ ] Implement the polynomial-time retained direction-descriptor
+          emitter from the uniform source stream: one finite profile/direction
+          record per retained clause followed by the exact variable markers.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
