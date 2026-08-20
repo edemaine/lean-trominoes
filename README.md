@@ -1355,6 +1355,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Classify degree-three typed elements by constructor and rewrite
           every color's indexed request block as a typed-element scan, with
           data, predicate transport, and list algebra compiled separately.
+        - [x] Erase stable color indices after selection and prove every
+          degree-three colored request comes from the clause-element suffix;
+          every variable-module colored element is discarded.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.

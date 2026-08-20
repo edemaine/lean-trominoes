@@ -43,5 +43,21 @@ theorem map_zipIdx_filter_flatMap_congr
   intro tagged member
   exact selectedEq tagged member
 
+/-- If selection and output inspect only the value, stable indices can be
+erased from the scan. -/
+theorem zipIdx_filter_fst_flatMap
+    {Value Output : Type}
+    (values : List Value) (selected : Value → Bool)
+    (output : Value → List Output) :
+    ((values.zipIdx.filter fun tagged => selected tagged.1).flatMap
+        fun tagged => output tagged.1) =
+      (values.filter selected).flatMap output := by
+  rw [← List.flatMap_map]
+  congr 1
+  change List.map Prod.fst
+      (List.filter (selected ∘ Prod.fst) values.zipIdx) =
+    List.filter selected values
+  rw [← List.filter_map, List.zipIdx_map_fst]
+
 end IndexedListScan
 end LeanTrominoes
