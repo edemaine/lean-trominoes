@@ -10125,6 +10125,13 @@ The representation choices for this target are:
   then erase the remaining inner anchor normalization.  Thus every retained
   first direction is the first direction of a raw local component route
   selected by `idxOf` in the normalized five-family metadata list.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean`](LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean),
+  [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean),
+  and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean)
+  package those clauses and raw routes as a position-free descriptor stream
+  and prove it exactly equals the canonical retained-planar stream.  The
+  pre-split compiler obligation is therefore reduced to a finite emitter over
+  the five explicit metadata families.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
