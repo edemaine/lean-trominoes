@@ -1343,6 +1343,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Define the sparse motif's finite prepared-pixel stream and prove
           that fixed expansion, marker counting, header rotation, and binary
           field encoding recover the exact sparse flat strip.
+        - [x] Rewrite compact affine vertex requests as one indexed triple
+          scan and three degree-filtered color scans, and prove that four
+          retained-input appenders compose into the exact request appender.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
