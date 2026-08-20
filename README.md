@@ -9874,6 +9874,12 @@ The representation choices for this target are:
   lookup in the original input drawing.  The direct vertex-record stream is
   consequently expressed without constructing the contracted drawing's
   derived position list.
+- [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
+  provides a generic polynomial-time composition pattern for passes that
+  retain source symbols while appending output symbols.  Its direct sparse
+  specializations split the remaining geometry machine into a vertex pass
+  and a route pass, compose them sequentially, extract their concatenated
+  record word, and discharge the existing whole-record emitter contract.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
