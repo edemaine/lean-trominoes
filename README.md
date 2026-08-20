@@ -1358,6 +1358,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Erase stable color indices after selection and prove every
           degree-three colored request comes from the clause-element suffix;
           every variable-module colored element is discarded.
+        - [x] Reduce each surviving colored clause scan to the exact fixed
+          block consisting of internal, top, and left requests, plus a right
+          request exactly for ternary clauses.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
