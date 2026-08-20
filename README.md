@@ -1480,6 +1480,11 @@ build; an imported proof counts when its statement matches the paper.
           exactly, its one-pass stream preserves the required semantics, and
           a two-pass retained-source emitter produces the exact phase-major
           descriptor list in polynomial time.
+        - [x] Name the exact pre-split retained-planar descriptor stream on
+          direct PSPACE source symbols and prove that any polynomial-time
+          emitter for it composes with the two-pass fixed-eight expander.  This
+          separates the remaining planar component scan from the already
+          compiled fixed-eight phase expansion.
         - [ ] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
@@ -10089,6 +10094,13 @@ The representation choices for this target are:
   the direct sparse assignment list; the verified fixed parser now supplies
   the prepared motif stream.  Satisfying that obligation yields the exact flat
   target and the complete `Theorem52.stripStatement`.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarDirectionData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarDirectionData.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorData.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorData.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorCompiler.lean)
+  expose the exact retained planar clause-profile/first-direction stream before
+  occurrence splitting, specialize it to direct PSPACE source words, and
+  compose any emitter for that stream with the verified exact two-pass
+  fixed-eight descriptor expansion.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
