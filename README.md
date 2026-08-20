@@ -9635,6 +9635,12 @@ The representation choices for this target are:
   transducer with identity input and output encodings.  Its verified wrapper
   transports any such polynomial-time machine to the canonical flat CNF and
   strip encodings and hence to the strip statement of Theorem 5.2.
+- [`LeanTrominoes/PeriodicCNFStripFieldCompiler.lean`](LeanTrominoes/PeriodicCNFStripFieldCompiler.lean)
+  tightens the machine boundary further: both canonical flat encodings are
+  proved to be Mathlib's native `trList` encoding of natural-number fields.
+  Thus the remaining machine can operate directly as a
+  `List Nat → List Nat` transformer, while a small verified wrapper handles
+  both semantic encoding round trips.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
