@@ -9605,6 +9605,13 @@ The representation choices for this target are:
   route family in the same incidence-tag order.  The proof transports an
   already-certified optional triple lookup through a shallow route selector,
   avoiding normalization of the full horizontal formula.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMDrawingData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMDrawingData.lean)
+  packages the executable period, vertex positions, and complete stored edge
+  routes as the finite horizontal 3DM drawing and pairs it with its encoded
+  problem for rectangular normalization.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalNormalizationInputComputability.lean`](LeanTrominoes/PeriodicCNFStripHorizontalNormalizationInputComputability.lean)
+  proves that complete problem-and-drawing normalization input primitive
+  recursive through its canonical product encoding.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
