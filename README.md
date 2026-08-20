@@ -9854,6 +9854,11 @@ The representation choices for this target are:
   splits that executable word exactly into normalized contracted-vertex
   records followed by flattened route-interior records.  The two remaining
   geometry generators can therefore be constructed and bounded separately.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseComputedRecordBlocks.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseComputedRecordBlocks.lean)
+  refines both halves into independent per-object blocks: one canonical unary
+  record for each contracted vertex and one canonical record list for each
+  contracted edge.  This exposes the granularity needed by indexed emitters
+  without unfolding the complete normalized assignment stream.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),

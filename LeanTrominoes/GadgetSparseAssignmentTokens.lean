@@ -43,6 +43,21 @@ def assignmentsTokens
       assignmentsTokens first ++ assignmentsTokens second := by
   simp [assignmentsTokens]
 
+@[simp] theorem assignmentsTokens_map {Value : Type}
+    (values : List Value) (assignment : Value → Cell × OrthogonalCellType) :
+    assignmentsTokens (values.map assignment) =
+      values.flatMap (fun value => assignmentTokens (assignment value)) := by
+  unfold assignmentsTokens
+  exact List.flatMap_map assignment assignmentTokens values
+
+@[simp] theorem assignmentsTokens_flatMap {Value : Type}
+    (values : List Value)
+    (assignments : Value → List (Cell × OrthogonalCellType)) :
+    assignmentsTokens (values.flatMap assignments) =
+      values.flatMap (fun value => assignmentsTokens (assignments value)) := by
+  unfold assignmentsTokens
+  exact List.flatMap_assoc
+
 /-- Prepared pixel stream associated with natural block coordinates and one
 finite drawing cell type. -/
 def preparedNatAssignmentPixels (tromino : Tromino)
