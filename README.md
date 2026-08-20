@@ -9879,6 +9879,12 @@ The representation choices for this target are:
   degree-three element blocks.  Each element block now carries a constant
   monochromatic cell type; only the triple block retains a normalized
   direction-order query.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordAffineBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordAffineBounds.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordDirectBounds.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordDirectBounds.lean)
+  use the certified fundamental-square bounds to eliminate the horizontal
+  remainder operation from every direct vertex record.  Its two coordinates
+  are now the fixed affine expressions `1728·x+471` and
+  `3456·gridSize−(1728·y+471)`.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse
