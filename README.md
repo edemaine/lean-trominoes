@@ -9845,6 +9845,11 @@ The representation choices for this target are:
   exact dimensions and motif with the semantic sparse target.  The record
   compiler proves that this finite geometry-emitter boundary composes with
   the fixed quadratic parser to recover the exact prepared motif.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseComputedAssignmentData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseComputedAssignmentData.lean)
+  replaces the proof-backed presentation at that boundary by the established
+  executable horizontal problem-and-drawing constructor.  Its canonical
+  record word is proved exactly equal to the semantic direct record word, so
+  the remaining machine never inspects planarity certificates.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
