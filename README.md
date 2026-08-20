@@ -1045,6 +1045,10 @@ build; an imported proof counts when its statement matches the paper.
         ordinary, fixed-red, clause-core, and clause-terminal branches.
       - [x] Enumerate the complete assembled vertex-position list, prove it
         primitive recursive, and identify it with the generic data assembly.
+      - [x] Give the finite variable- and clause-fan configurations canonical
+        encodings, totalize the proof-indexed variable-site route, and prove
+        the local clause-core and both coordinated endpoint-fan route tables
+        primitive recursive.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
