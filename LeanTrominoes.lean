@@ -45,6 +45,9 @@ import LeanTrominoes.GadgetStripFlatFields
 import LeanTrominoes.GadgetPixelFiniteTokens
 import LeanTrominoes.GadgetExpandedMotifFiniteTokens
 import LeanTrominoes.GadgetPixelFiniteTokenCompiler
+import LeanTrominoes.GadgetPreparedHeaderData
+import LeanTrominoes.GadgetPreparedHeaderSemantics
+import LeanTrominoes.GadgetPreparedHeaderEmitter
 import LeanTrominoes.GadgetStripStacking
 import LeanTrominoes.GadgetStripAtlas
 import LeanTrominoes.GadgetStripBoundary

@@ -9741,6 +9741,15 @@ The representation choices for this target are:
   encoding of each nonnegative translated pixel.  The natural-range loop
   theorem and fixed block-transducer certificate recover the complete counted
   motif stream in polynomial time.
+- [`LeanTrominoes/GadgetPreparedHeaderData.lean`](LeanTrominoes/GadgetPreparedHeaderData.lean),
+  [`LeanTrominoes/GadgetPreparedHeaderSemantics.lean`](LeanTrominoes/GadgetPreparedHeaderSemantics.lean),
+  and [`LeanTrominoes/GadgetPreparedHeaderEmitter.lean`](LeanTrominoes/GadgetPreparedHeaderEmitter.lean)
+  construct the rectangular strip header directly from a unary geometric
+  scale.  For a fixed refinement factor and scale length `g`, three verified
+  unary-padding passes and one finite block transducer emit exactly the two
+  prepared fields for height `3P+1` and width `P`, where `P = factor * g`.
+  Thus neither header field requires binary arithmetic or an unbounded
+  intermediate alphabet.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
