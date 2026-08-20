@@ -26,11 +26,8 @@ theorem shape_correct
     (sourceOccurrences : source.OccurrencesAtMost 3)
     (sourceClausesNonempty :
       ∀ clause ∈ source.clauses, clause ≠ []) :
-    (FormulaShape.clauseProfiles (shape source)).map
-          ClauseProfile.literals =
-        (retainedPlanarSATFormula source).clauses.map literalProfiles ∧
-      FormulaShape.variableCount (shape source) =
-        (retainedPlanarSATFormula source).variableOccurrences.dedup.length := by
+    FormulaShapeOfFormula.CorrectFor
+      (shape source) (retainedPlanarSATFormula source) := by
   let certificate := retainedPlanarSATCertificate source sourceLocal
     sourceWidth sourceOccurrences sourceClausesNonempty
   simpa only [shape] using

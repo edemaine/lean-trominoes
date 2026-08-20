@@ -38,6 +38,17 @@ def shape {Variable : Type} [DecidableEq Variable]
   (profiles formula).map .clause ++
     List.replicate formula.variableOccurrences.dedup.length .variable
 
+/-- Exact semantic contract shared by formula-shape compilers.  Keeping this
+boundary named prevents downstream specialization from unfolding large
+concrete formulas merely to elaborate its theorem statement. -/
+def CorrectFor {Variable : Type} [DecidableEq Variable]
+    (candidate : List FormulaShape.Token)
+    (formula : PeriodicCNF Variable) : Prop :=
+  (FormulaShape.clauseProfiles candidate).map ClauseProfile.literals =
+      formula.clauses.map literalProfiles ∧
+    FormulaShape.variableCount candidate =
+      formula.variableOccurrences.dedup.length
+
 @[simp] theorem clauseProfiles_shape
     {Variable : Type} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :

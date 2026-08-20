@@ -41,11 +41,8 @@ theorem shape_correct
     (formula : PeriodicCNF Variable)
     (width : formula.WidthAtMost 3)
     (nonempty : ∀ clause ∈ formula.clauses, clause ≠ []) :
-    (FormulaShape.clauseProfiles (shape formula)).map
-          ClauseProfile.literals =
-        formula.clauses.map literalProfiles ∧
-      FormulaShape.variableCount (shape formula) =
-        formula.variableOccurrences.dedup.length := by
+    CorrectFor (shape formula) formula := by
+  unfold CorrectFor
   constructor
   · rw [clauseProfiles_shape]
     unfold profiles

@@ -1448,6 +1448,10 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Prove the fixed-eight shape agrees with the semantic formula's
           exact clause profiles and exact nine-copies-per-source-variable
           distinct-variable count.
+        - [x] Transport the named exact-shape contract from the certified
+          retained planar formula through fixed-eight for any port assignment,
+          so the actual angular route-induced assignment remains composable
+          without unfolding the geometry in one Lean leaf.
         - [ ] Compile the exact retained-planar formula shape from the uniform
           source stream in polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
