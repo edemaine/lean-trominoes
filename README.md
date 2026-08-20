@@ -1438,6 +1438,11 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Prove those appended markers equal the actual distinct-variable
           count of the fully normalized exact-one formula, while the same
           shape theorem retains the exact final clause-profile order.
+        - [x] Compile fixed-eight formula shapes by retaining all source
+          profiles and appending one nine-clause implication ring plus nine
+          distinct-variable markers per incoming variable marker.
+        - [ ] Prove the fixed-eight shape agrees with the semantic formula's
+          exact clause profiles and distinct-variable count.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
