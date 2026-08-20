@@ -9926,6 +9926,12 @@ The representation choices for this target are:
   carries the triple/red/green/blue decomposition across the lookup-free
   equality.  The three element scans now expose both their degree-three index
   filter and constant finite cell tag over the computed position table.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestTripleIndexed.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestTripleIndexed.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestElementIndexed.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestElementIndexed.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestIndexedData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestIndexedData.lean)
+  eliminate in-range `getD` calls by converting every block to a `zipIdx`
+  traversal.  The resulting exact stream consists of one indexed triple scan
+  and three degree-filtered monochromatic position scans.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse
