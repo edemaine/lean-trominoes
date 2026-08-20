@@ -105,11 +105,50 @@ def extractRecords {Data : Type}
     List GadgetSparseAffineVertexTokens.Token :=
   RetainedInputAppendPipeline.extract workspace
 
+/-- Concatenated record word specified independently by every phase. -/
+def phaseOutputs {Data : Type}
+    (families : List (RecordFamily Data)) (data : List Data) :
+    List GadgetSparseAffineVertexTokens.Token :=
+  families.flatMap fun family => recordsEmitted family data
+
+theorem runPhases_appended {Data : Type}
+    (families : List (RecordFamily Data))
+    (output : List Data → List GadgetSparseAffineVertexTokens.Token)
+    (data : List Data) :
+    runPhases families
+        (RetainedInputAppendPipeline.appended output data) =
+      RetainedInputAppendPipeline.appended
+        (fun source => output source ++ phaseOutputs families source)
+        data := by
+  induction families generalizing output with
+  | nil =>
+      simp [runPhases, phaseOutputs,
+        RetainedInputAppendPipeline.appended]
+  | cons family families induction =>
+      rw [runPhases, show phaseRun family
+          (RetainedInputAppendPipeline.appended output data) =
+        RetainedInputAppendPipeline.appended
+          (fun source => output source ++ recordsEmitted family source)
+          data by
+        exact RetainedInputAppendPipeline.appendFromWorkspace_appended
+          output (recordsEmitted family) data]
+      rw [induction]
+      simp only [phaseOutputs, List.flatMap_cons, List.append_assoc]
+
 /-- Final record word emitted by a fixed sequence of indexed phases. -/
 def emittedPhases {Data : Type}
     (families : List (RecordFamily Data)) (data : List Data) :
     List GadgetSparseAffineVertexTokens.Token :=
   extractRecords (runPhases families (embedData data))
+
+@[simp] theorem emittedPhases_eq_phaseOutputs {Data : Type}
+    (families : List (RecordFamily Data)) (data : List Data) :
+    emittedPhases families data = phaseOutputs families data := by
+  unfold emittedPhases embedData extractRecords
+  have run := runPhases_appended families
+    (fun _ : List Data => []) data
+  simpa [RetainedInputAppendPipeline.appended] using congrArg
+    RetainedInputAppendPipeline.extract run
 
 end GadgetSparseAffineIndexedEmitter
 end LeanTrominoes

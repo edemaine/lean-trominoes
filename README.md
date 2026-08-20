@@ -1396,6 +1396,10 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Build a polynomial-time shared-scan pipeline for any fixed
           sequence of data-indexed affine record families, preserving the
           triple/red/green/blue phase order without duplicating the raw source.
+        - [x] Reduce the complete compact vertex compiler to four exact
+          blockwise record-family equalities over the uniform unary-program
+          stream, behind a certified opaque output boundary that keeps each
+          Lean compiler leaf below the resource cap.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
