@@ -245,6 +245,10 @@ build; an imported proof counts when its statement matches the paper.
         accepted certificate by total unbounded search, prove the selector
         computable from a computable source, and instantiate search
         termination for every Wang input.
+      - [x] Compute every complete typed RGB incidence route of the explicit
+        horizontal 3DM drawing primitive recursively, including finite
+        variable-site prefixes, the unique coordinated occurrence extension,
+        and translated clause-core routes.
     - [x] Rasterize the planar 3DM drawing to the normalized orthogonal-cell
       interface and compose the I- and L-tromino gadget reductions.
       - [x] Prove that every compiled vertex cell comes from the coarse
@@ -9569,6 +9573,17 @@ The representation choices for this target are:
   encoded edge count, every assembled route is proved rectilinear, and
   tag-indexed lookup proves its endpoints are exactly the corresponding
   global typed triple and periodically translated colored element.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteData.lean)
+  gives the explicit horizontal source a proof-free version of every complete
+  typed RGB incidence route.  Variable incidences start with their translated
+  checked finite-site route and extend exactly the selected routed triple by
+  its coordinated occurrence corridor; clause incidences use the translated
+  finite clause-core route.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRouteComputability.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRouteComputability.lean)
+  proves that complete typed-route dispatcher primitive recursive.  Its
+  ordinary, fixed-red, and clause constructor inputs are deliberately split
+  into small computability leaves, as are the variable prefix, normalized
+  routed-triple query, occurrence extension, and clause route.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
