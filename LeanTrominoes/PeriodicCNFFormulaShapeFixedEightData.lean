@@ -54,6 +54,31 @@ def cycleProfiles (source : List FormulaShape.Token) : List ClauseProfile :=
     List.replicate copiesPerVariable
       ClauseProfileOccurrenceSplit.implicationProfile
 
+private theorem flatMap_replicate_eq_replicate
+    {Item : Type*} (items : List Item) (profile : ClauseProfile) :
+    (items.flatMap fun _ =>
+      List.replicate copiesPerVariable profile) =
+      List.replicate (copiesPerVariable * items.length) profile := by
+  induction items with
+  | nil => rfl
+  | cons item items induction =>
+      rw [List.flatMap_cons, induction, ← List.replicate_add]
+      congr 1
+      simp only [List.length_cons]
+      unfold copiesPerVariable
+      omega
+
+@[simp] theorem cycleProfiles_eq_replicate
+    (source : List FormulaShape.Token) :
+    cycleProfiles source =
+      List.replicate
+        (copiesPerVariable * FormulaShape.variableCount source)
+        ClauseProfileOccurrenceSplit.implicationProfile := by
+  unfold cycleProfiles FormulaShape.variableCount
+  exact flatMap_replicate_eq_replicate
+    (FormulaShape.variableMarkers source)
+    ClauseProfileOccurrenceSplit.implicationProfile
+
 private theorem clauseProfiles_cycles
     (source : List FormulaShape.Token) :
     FormulaShape.clauseProfiles

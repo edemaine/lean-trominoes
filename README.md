@@ -1441,8 +1441,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Compile fixed-eight formula shapes by retaining all source
           profiles and appending one nine-clause implication ring plus nine
           distinct-variable markers per incoming variable marker.
-        - [ ] Prove the fixed-eight shape agrees with the semantic formula's
-          exact clause profiles and distinct-variable count.
+        - [x] Prove the fixed-eight shape agrees with the semantic formula's
+          exact clause profiles and exact nine-copies-per-source-variable
+          distinct-variable count.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
