@@ -1067,6 +1067,9 @@ build; an imported proof counts when its statement matches the paper.
       - [x] Enumerate each normalized clause orbit's active occurrences,
         compute its finite terminal activity and endpoint directions, decode
         the complete clause-fan record, and identify it with the semantic fan.
+      - [x] Compute each occurrence's clause orbit, terminal group, and
+        group-dependent physical lane, instantiate the coordinated clause-fan
+        route table, and identify the local route with its semantic counterpart.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
