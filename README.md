@@ -1393,6 +1393,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Expose exact source-symbol contracts for four table-driven
           retained-input appenders and transport them to the existing compact
           affine vertex-request pipeline.
+        - [x] Build a polynomial-time shared-scan pipeline for any fixed
+          sequence of data-indexed affine record families, preserving the
+          triple/red/green/blue phase order without duplicating the raw source.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
