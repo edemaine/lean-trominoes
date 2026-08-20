@@ -1458,6 +1458,10 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Transport named exact-shape contracts through the complete
           Figure 9, unit-elimination, and polarity-normalization transform,
           and define the resulting retained final exact-one shape.
+        - [x] Name the exact direct source-symbol Figure 9 and final exact-one
+          shapes, certify the former against the actual ordered retained
+          formula, and reduce the latter's polynomial-time compiler to the
+          single missing retained Figure 9 source-shape compiler.
         - [ ] Compile the exact retained-planar formula shape from the uniform
           source stream in polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
