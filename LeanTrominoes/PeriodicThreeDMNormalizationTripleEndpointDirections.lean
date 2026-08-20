@@ -61,6 +61,30 @@ theorem ContractedEndpoint.mem_contractedTripleEndpoints_of_vertex_triple
   | source edge => cases edge <;> rfl
   | target edge => cases edge <;> rfl
 
+/-- At a triple vertex the endpoint's stored tag consists exactly of that
+triple index and the endpoint's edge color. -/
+theorem ContractedEndpoint.incidenceTag_eq_of_vertex_triple
+    (endpoint : ContractedEndpoint) (tripleIndex : Nat)
+    (vertexEq : endpoint.vertex = .triple tripleIndex) :
+    endpoint.incidenceTag = ⟨tripleIndex, endpoint.color⟩ := by
+  cases endpoint with
+  | source edge =>
+      cases edge <;>
+        simp_all [ContractedEndpoint.vertex,
+          ContractedEndpoint.incidenceTag,
+          ContractedEndpoint.color, ContractedEndpoint.edge,
+          ContractedEdge.color,
+          ContractedEdge.toPeriodicEdge,
+          ContractedEdge.sourceTag]
+  | target edge =>
+      cases edge <;>
+        simp_all [ContractedEndpoint.vertex,
+          ContractedEndpoint.incidenceTag,
+          ContractedEndpoint.color, ContractedEndpoint.edge,
+          ContractedEdge.color,
+          ContractedEdge.toPeriodicEdge,
+          ContractedEdge.targetTag]
+
 /-- Uniform form of the two endpoint lemmas: every listed contracted triple
 endpoint points along the first segment of its represented original
 incidence route. -/

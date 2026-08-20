@@ -1379,6 +1379,8 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Reduce every genuine triple's final normalized cell type to the
           finite side/color data obtained from the first directions of its
           three original tagged incidence routes.
+        - [x] Prove endpoint enumeration order is irrelevant and rewrite that
+          data in the fixed red/green/blue incidence order.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
