@@ -7,6 +7,7 @@ import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMPeriodComputability
 import LeanTrominoes.PeriodicCNFStripHorizontalThreeDMVertexPositionsComputability
 import LeanTrominoes.PeriodicCNFStripHorizontalAssembledEdgeRouteData
 import LeanTrominoes.PeriodicThreeDMNormalizationCompiler
+import LeanTrominoes.PeriodicGridDrawingDataBridge
 
 /-! # Executable horizontal 3DM drawing and normalization input -/
 
@@ -22,6 +23,24 @@ def horizontalThreeDMDrawingComputed
     (horizontalThreeDMGridSizePredComputed source,
       horizontalThreeDMVertexPositionsComputed source,
       horizontalThreeDMEdgeRoutesComputed source)
+
+@[simp] theorem horizontalThreeDMDrawingComputed_gridSizePred
+    (source : PeriodicCNF Nat) :
+    (horizontalThreeDMDrawingComputed source).gridSizePred =
+      horizontalThreeDMGridSizePredComputed source := by
+  exact PeriodicGridDrawing.equivData_symm_gridSizePred _ _ _
+
+@[simp] theorem horizontalThreeDMDrawingComputed_vertexPositions
+    (source : PeriodicCNF Nat) :
+    (horizontalThreeDMDrawingComputed source).vertexPositions =
+      horizontalThreeDMVertexPositionsComputed source := by
+  exact PeriodicGridDrawing.equivData_symm_vertexPositions _ _ _
+
+@[simp] theorem horizontalThreeDMDrawingComputed_edgeRoutes
+    (source : PeriodicCNF Nat) :
+    (horizontalThreeDMDrawingComputed source).edgeRoutes =
+      horizontalThreeDMEdgeRoutesComputed source := by
+  exact PeriodicGridDrawing.equivData_symm_edgeRoutes _ _ _
 
 /-- The finite problem-and-drawing pair consumed by rectangular
 normalization. -/

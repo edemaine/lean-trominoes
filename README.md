@@ -9610,8 +9610,17 @@ The representation choices for this target are:
   routes as the finite horizontal 3DM drawing and pairs it with its encoded
   problem for rectangular normalization.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalNormalizationInputComputability.lean`](LeanTrominoes/PeriodicCNFStripHorizontalNormalizationInputComputability.lean)
-  proves that complete problem-and-drawing normalization input primitive
-  recursive through its canonical product encoding.
+  proves that the complete problem-and-drawing normalization input is
+  primitive recursive through its canonical product encoding.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalThreeDMDrawingPresentationBridge.lean`](LeanTrominoes/PeriodicCNFStripHorizontalThreeDMDrawingPresentationBridge.lean)
+  extracts the already-certified coordinated-routing witnesses opaquely and
+  proves that the fully executable grid drawing is exactly the drawing stored
+  by the established continuous planar presentation.
+- [`LeanTrominoes/PeriodicCNFStripNormalizationInputComputability.lean`](LeanTrominoes/PeriodicCNFStripNormalizationInputComputability.lean)
+  identifies the executable problem-and-drawing pair with the semantic
+  `normalizationInput`.  Consequently the proof-backed normalization input
+  itself is computable, without re-elaborating its large geometric
+  certificates.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and

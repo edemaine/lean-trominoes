@@ -20,49 +20,41 @@ attribute [local instance]
   horizontalRibbonInnerVariableDecidableEq
   horizontalRibbonRoutedVariableDecidableEq
 
+/-- The shared final-gauged presentation before routed polarity
+normalization. -/
+def horizontalSemanticFinalGaugedPresentation
+    (source : PeriodicCNF Nat) :=
+  PeriodicOrthocrossing.retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedClockwiseOrderedPresentation
+    (sourceFormula source)
+    (sourceFormula_isLocal source)
+    (sourceFormula_widthAtMostThree source)
+    (sourceFormula_occurrencesAtMostThree_canonicalBEq source)
+    (sourceFormula_clausesNonempty source)
+
 /-- Positioned formula after routed polarity normalization, before padding. -/
 def horizontalSemanticRoutedFormula (source : PeriodicCNF Nat) :=
   PeriodicOneInThreePolarityNormalizationRouteSubdivision.formula
-    (PeriodicOrthocrossing.retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
-      (sourceFormula source)
-      (sourceFormula_isLocal source)
-      (sourceFormula_widthAtMostThree source)
-      (sourceFormula_occurrencesAtMostThree_canonicalBEq source)
-      (sourceFormula_clausesNonempty source))
-    (PeriodicOrthocrossing.retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
-      (sourceFormula source))
+    (horizontalFormula source)
+    (horizontalPlacement source)
     (horizontalRoutes source)
 
 /-- Matching routed placement before padding. -/
 def horizontalSemanticRoutedPlacement (source : PeriodicCNF Nat) :=
   PeriodicOneInThreePolarityNormalizationRouteSubdivision.placement
-    (PeriodicOrthocrossing.retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
-      (sourceFormula source))
+    (horizontalPlacement source)
     (horizontalRoutes source)
 
 /-- Matching routed incidence family before padding. -/
 def horizontalSemanticRoutedRoutes (source : PeriodicCNF Nat) :=
   PeriodicOneInThreePolarityNormalizationRouteSubdivision.incidenceRoutes
-    (PeriodicOrthocrossing.retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormula
-      (sourceFormula source)
-      (sourceFormula_isLocal source)
-      (sourceFormula_widthAtMostThree source)
-      (sourceFormula_occurrencesAtMostThree_canonicalBEq source)
-      (sourceFormula_clausesNonempty source))
-    (PeriodicOrthocrossing.retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedPlacement
-      (sourceFormula source))
+    (horizontalFormula source)
+    (horizontalPlacement source)
     (horizontalRoutes source)
 
 /-- Ribbon-ready presentation after routed polarity normalization. -/
 def horizontalSemanticRoutedRibbonReadyPresentation
     (source : PeriodicCNF Nat) :=
-  let base :=
-    PeriodicOrthocrossing.retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedClockwiseOrderedPresentation
-      (sourceFormula source)
-      (sourceFormula_isLocal source)
-      (sourceFormula_widthAtMostThree source)
-      (sourceFormula_occurrencesAtMostThree_canonicalBEq source)
-      (sourceFormula_clausesNonempty source)
+  let base := horizontalSemanticFinalGaugedPresentation source
   PeriodicOneInThreePolarityNormalizationRouteSubdivision.haloBoundedRibbonReadyPresentation
     base.toHaloBoundedRibbonReadyIncidencePresentation base.unitSteps
 

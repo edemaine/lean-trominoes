@@ -37,7 +37,10 @@ theorem horizontalSemanticNormalizedPlanarPresentation_routes
     PeriodicOneInThreePolarityNormalizationRouteSubdivision.haloBoundedRibbonReadyPresentation,
     PeriodicOneInThreePolarityNormalizationRouteSubdivision.haloBoundedContinuousPlanarPresentation,
     PeriodicOneInThreePolarityNormalizationRouteSubdivision.continuousPlanarPresentation,
+    horizontalSemanticFinalGaugedPresentation,
     horizontalSemanticRoutedRoutes,
+    horizontalFormula,
+    horizontalPlacement,
     horizontalRoutes]
 
 end PeriodicCNFStripReduction
