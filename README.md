@@ -1074,6 +1074,9 @@ build; an imported proof counts when its statement matches the paper.
         the central ribbon corridor and complete colored occurrence route
         primitive recursively, and identify it with the certified coordinated
         routing field.
+      - [x] Enumerate every normalized active occurrence in stable RGB order,
+        compute the complete finite occurrence-route table primitive
+        recursively, and identify it with the certified routing enumeration.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
