@@ -43,25 +43,24 @@ def phaseExpand (tromino : Tromino) (phase : Phase)
 expansion are included; final output reversal is accounted for separately. -/
 def scanTime (tromino : Tromino) :
     Phase → Nat → Nat → List InputToken → Nat
-  | .horizontal, horizontal, _, [] => 1 + (horizontal + 2)
+  | .horizontal, horizontal, _, [] => horizontal + 2 + 1
   | .horizontal, horizontal, _, .coordinateUnit :: tokens =>
-      1 + scanTime tromino .horizontal (horizontal + 1) 0 tokens
+      scanTime tromino .horizontal (horizontal + 1) 0 tokens + 1
   | .horizontal, horizontal, _, .fieldEnd :: tokens =>
-      1 + scanTime tromino .vertical horizontal 0 tokens
+      scanTime tromino .vertical horizontal 0 tokens + 1
   | .horizontal, horizontal, _, .cellType _ :: tokens =>
-      1 + (horizontal + 2) + scanTime tromino .horizontal 0 0 tokens
+      scanTime tromino .horizontal 0 0 tokens + (horizontal + 2 + 1)
   | .vertical, horizontal, vertical, [] =>
-      1 + (horizontal + vertical + 2)
+      horizontal + vertical + 2 + 1
   | .vertical, horizontal, vertical, .coordinateUnit :: tokens =>
-      1 + scanTime tromino .vertical horizontal (vertical + 1) tokens
+      scanTime tromino .vertical horizontal (vertical + 1) tokens + 1
   | .vertical, horizontal, vertical, .fieldEnd :: tokens =>
-      1 + (horizontal + vertical + 2) +
-        scanTime tromino .horizontal 0 0 tokens
+      scanTime tromino .horizontal 0 0 tokens +
+        (horizontal + vertical + 2 + 1)
   | .vertical, horizontal, vertical, .cellType cellType :: tokens =>
-      1 + 1 +
-        pixelsTime horizontal vertical (boundedPixels tromino cellType) +
-          (horizontal + vertical + 2) +
-            scanTime tromino .horizontal 0 0 tokens
+      scanTime tromino .horizontal 0 0 tokens +
+        (1 + pixelsTime horizontal vertical (boundedPixels tromino cellType) +
+          (horizontal + vertical + 2) + 1)
 
 end GadgetSparseAssignmentTokenMachine
 end LeanTrominoes
