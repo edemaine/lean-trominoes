@@ -1408,6 +1408,10 @@ build; an imported proof counts when its statement matches the paper.
           every literal's polarity and current/next-slice offset, prove exact
           formula-order agreement, and certify its source compiler polynomial
           time.
+        - [x] Preserve those profiles through vacuous width-three conversion,
+          append exactly one fixed implication profile per literal for
+          occurrence splitting, and identify the resulting polynomial-time
+          stream with the guarded geometric `sourceFormula`.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
