@@ -9850,6 +9850,10 @@ The representation choices for this target are:
   executable horizontal problem-and-drawing constructor.  Its canonical
   record word is proved exactly equal to the semantic direct record word, so
   the remaining machine never inspects planarity certificates.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseComputedRecordSplit.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseComputedRecordSplit.lean)
+  splits that executable word exactly into normalized contracted-vertex
+  records followed by flattened route-interior records.  The two remaining
+  geometry generators can therefore be constructed and bounded separately.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
