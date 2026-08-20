@@ -1334,6 +1334,9 @@ build; an imported proof counts when its statement matches the paper.
         - [x] Expand the existing finite request-token stream into exactly one
           unary marker per orthocrossing grid unit with a fixed block
           transducer and polynomial-time certificate.
+        - [x] Feed that exact unary scale through the prepared-header machine,
+          proving that it emits the compiled strip's precise `3P+1` height and
+          `P` width fields in polynomial time.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           proof-free normalization raster; the fixed gadget-pixel expansion
           and every downstream postprocessor are now verified.
@@ -9780,6 +9783,13 @@ The representation choices for this target are:
   instruction.  A finite block transducer maps the existing request-token
   stream to exactly one unary marker per orthocrossing grid unit and carries
   the source emitter's polynomial-time certificate through unchanged.
+- [`LeanTrominoes/PeriodicCNFStripDirectPreparedHeaderData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedHeaderData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectPreparedHeaderEmitter.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedHeaderEmitter.lean)
+  specialize the generic prepared-header machine to that exact grid stream.
+  The resulting polynomial-time emitter produces precisely the compiled
+  drawing's height and width fields, with horizontal period
+  `normalizationPeriodFactor * gridSize` and vertical period one more than
+  three times that value.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
