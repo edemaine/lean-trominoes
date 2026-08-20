@@ -9874,6 +9874,11 @@ The representation choices for this target are:
   lookup in the original input drawing.  The direct vertex-record stream is
   consequently expressed without constructing the contracted drawing's
   derived position list.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordSplit.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordSplit.lean)
+  splits that stream into its triple prefix and stable red, green, and blue
+  degree-three element blocks.  Each element block now carries a constant
+  monochromatic cell type; only the triple block retains a normalized
+  direction-order query.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse
