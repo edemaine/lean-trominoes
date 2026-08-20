@@ -9641,6 +9641,11 @@ The representation choices for this target are:
   Thus the remaining machine can operate directly as a
   `List Nat → List Nat` transformer, while a small verified wrapper handles
   both semantic encoding round trips.
+- [`LeanTrominoes/PeriodicCNFStripFieldMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripFieldMachineBridge.lean)
+  removes malformed-input parsing from the time obligation.  A native-field
+  machine may have arbitrary behavior off the canonical `formulaFields`
+  image; pointwise agreement on encoded source formulas is sufficient to
+  obtain the exact semantic polynomial-time reduction.
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMGlobalDrawing.lean)
   packages those typed positions and routes as the numeric periodic grid
   drawing of the encoded 3DM incidence graph.  Four-block vertex lookup and
