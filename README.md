@@ -10114,6 +10114,12 @@ The representation choices for this target are:
   one common clause-period translation preserves a route's first direction.
   Keeping this lemma independent of retained-planarity certificates also keeps
   its leaf compilation within the project's low-memory build boundary.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRepresentativeRouteData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRepresentativeRouteData.lean)
+  and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRepresentativeRoutes.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataRepresentativeRoutes.lean)
+  remove final clause deduplication and outer anchor normalization from the
+  direction stream.  Each final first direction is now exactly the direction
+  of the first normalized source route whose metadata clause has the retained
+  literal list.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
