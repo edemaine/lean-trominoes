@@ -17,7 +17,7 @@ open PeriodicPlanarOneInThreeToThreeDM
 
 attribute [local instance]
   horizontalRoutedRoutesSourceVariableDecidableEq
-  horizontalRoutedPlacementVariableDecidableEq
+  horizontalRibbonRoutedVariableDecidableEq
 
 /-- The factored horizontal computation is definitionally the generic
 proof-free rebasing algorithm on the exact normalized source data. -/

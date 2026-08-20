@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripHorizontalNormalizedRoutedFormulaComputability
 import LeanTrominoes.PeriodicCNFStripHorizontalRoutedRoutesComputability
+import LeanTrominoes.PeriodicCNFStripHorizontalRibbonInstances
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonCorridors
 
 /-! # Proof-free occurrence source routes for the horizontal reduction -/
@@ -19,7 +20,7 @@ open PeriodicPlanarOneInThreeToThreeDM
 
 attribute [local instance]
   horizontalRoutedRoutesSourceVariableDecidableEq
-  horizontalRoutedPlacementVariableDecidableEq
+  horizontalRibbonRoutedVariableDecidableEq
 
 /-- An occurrence slot in the final normalized exact-one source. -/
 abbrev HorizontalOccurrenceRouteInput :=

@@ -14,7 +14,7 @@ namespace PeriodicCNFStripReduction
 
 attribute [local instance]
   horizontalRoutedRoutesSourceVariableDecidableEq
-  horizontalRoutedPlacementVariableDecidableEq
+  horizontalRibbonRoutedVariableDecidableEq
 
 theorem horizontalOccurrenceReversedRouteComputed_eq_data
     (input : HorizontalOccurrenceRouteSomeInput) :

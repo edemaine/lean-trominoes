@@ -14,7 +14,7 @@ namespace PeriodicCNFStripReduction
 
 attribute [local instance]
   horizontalRoutedRoutesSourceVariableDecidableEq
-  horizontalRoutedPlacementVariableDecidableEq
+  horizontalRibbonRoutedVariableDecidableEq
 
 theorem horizontalOccurrenceStoredRouteComputed_primrec :
     Primrec horizontalOccurrenceStoredRouteComputed := by

@@ -17,7 +17,7 @@ open PeriodicPlanarOneInThreeToThreeDM
 
 attribute [local instance]
   horizontalRoutedRoutesSourceVariableDecidableEq
-  horizontalRoutedPlacementVariableDecidableEq
+  horizontalRibbonRoutedVariableDecidableEq
 
 theorem horizontalOccurrenceSourceRouteComputed_primrec :
     Primrec horizontalOccurrenceSourceRouteComputed := by
