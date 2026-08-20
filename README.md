@@ -1416,6 +1416,10 @@ build; an imported proof counts when its statement matches the paper.
           exact-one gadget and unit-clause elimination, proving that the
           finite lookup gives the exact final binary/ternary clause order and
           certifying the lookup scan polynomial time.
+        - [x] Refine that Figure 9 expansion to preserve every generated
+          literal's polarity and current/next-slice offset, including padding
+          and unit-removal auxiliaries, with exact formula-order semantics and
+          a finite polynomial-time compiler.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
