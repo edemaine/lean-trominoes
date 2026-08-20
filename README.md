@@ -9922,6 +9922,10 @@ The representation choices for this target are:
   rewrites the entire compact direct request stream to traverse that explicit
   pointwise table, removing drawing lookup and certificate structure from the
   remaining request-emitter boundary.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestPositionSplit.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineVertexRequestPositionSplit.lean)
+  carries the triple/red/green/blue decomposition across the lookup-free
+  equality.  The three element scans now expose both their degree-three index
+  filter and constant finite cell tag over the computed position table.
 - [`LeanTrominoes/RetainedInputAppendPipeline.lean`](LeanTrominoes/RetainedInputAppendPipeline.lean)
   provides a generic polynomial-time composition pattern for passes that
   retain source symbols while appending output symbols.  Its direct sparse
