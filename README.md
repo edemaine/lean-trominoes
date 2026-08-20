@@ -1049,6 +1049,8 @@ build; an imported proof counts when its statement matches the paper.
         encodings, totalize the proof-indexed variable-site route, and prove
         the local clause-core and both coordinated endpoint-fan route tables
         primitive recursive.
+      - [x] Prove the reusable macrocell ribbon-corridor assembler primitive
+        recursive via a proof-free right fold.
       - [x] Prove width splitting, occurrence splitting, and the guarded
         fallback preserve zero vertical literal offsets.
       - [x] Lift one-dimensionality to the source incidence graph by proving
