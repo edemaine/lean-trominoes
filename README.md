@@ -9864,6 +9864,11 @@ The representation choices for this target are:
   route points.  Each triple independently determines exactly one rasterized
   coordinate and routing-cell record, exposing the route suffix as an
   edge-major, local-triple-minor stream.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
+  expands all three vertex-normalization rounds to the exact affine formula
+  `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
+  original contracted position, the input drawing period, and a finite cell
+  type, with no normalized route data involved.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
