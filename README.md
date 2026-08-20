@@ -1381,6 +1381,12 @@ build; an imported proof counts when its statement matches the paper.
           three original tagged incidence routes.
         - [x] Prove endpoint enumeration order is irrelevant and rewrite that
           data in the fixed red/green/blue incidence order.
+        - [x] Resolve each source-specific incidence direction: clause triples
+          use the fixed clause-route table, while variable triples use their
+          nondegenerate finite local prefix and are unchanged by the optional
+          routed occurrence suffix.
+        - [x] Rewrite the final cell type of every clause, ordinary, and
+          fixed-red triple as a finite local RGB direction-table lookup.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
