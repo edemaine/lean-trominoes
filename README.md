@@ -2472,6 +2472,10 @@ The representation choices for this target are:
   scanner, increment, field emission, and output reversal are proved exact,
   and the complete conversion has an explicit quadratic polynomial-time
   certificate.
+- [`LeanTrominoes/UnaryFieldHeaderRotation.lean`](LeanTrominoes/UnaryFieldHeaderRotation.lean)
+  specifies the total unary-stream permutation that moves a counted first
+  field behind width and period, with an exact theorem on canonical field
+  lists.  This is the final ordering step needed by counted strip emitters.
 - [`LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean`](LeanTrominoes/PeriodicCNFUnaryProgramTokens.lean)
   gives the concrete request emitter an entirely finite output alphabet:
   runtime atoms and the fresh boundary become unary runs, while fixed tokens

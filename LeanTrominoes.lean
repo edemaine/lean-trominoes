@@ -59,6 +59,7 @@ import LeanTrominoes.TM2OutputLength
 import LeanTrominoes.TM2CompositionMachine
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.UnaryFieldEncoderMachine
+import LeanTrominoes.UnaryFieldHeaderRotation
 import LeanTrominoes.PeriodicCNFUnaryProgramTokens
 import LeanTrominoes.PeriodicCNFUnaryProgramTokenFinalizer
 import LeanTrominoes.PeriodicCNFPolySpaceUnaryPreparedLayout
