@@ -33,6 +33,7 @@ import LeanTrominoes.BoolSquareRowsTimeArithmetic
 import LeanTrominoes.BoolSquareRowsTimeBound
 import LeanTrominoes.BoolSquareRowsTime
 import LeanTrominoes.DelimitedBinaryWords
+import LeanTrominoes.DelimitedBinaryWordTrueCountCompiler
 import LeanTrominoes.DelimitedBinaryWordPairs
 import LeanTrominoes.DelimitedBinaryWordPairProductMachine
 import LeanTrominoes.DelimitedBinaryWordPairProductTapeUpdates
