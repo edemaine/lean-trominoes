@@ -115,17 +115,19 @@ def program : Label → TM2.Stmt Alphabet Label State
             (.load clearPresent (.goto fun _ => .restoreIndex)))
           (.load clearPresent (.goto fun _ => .scanPrefix)))
   | .scanPrefix =>
-      .pop .input setToken
-        (.branch tokenIsNone
-          (.load clearToken (.goto fun _ => .clearPrefix))
-          (.branch tokenIsEnd
-            (.push .rowReverse tokenFromState
-              (.load clearToken (.goto fun _ => .clearPrefix)))
-            (.push .rowReverse tokenFromState
-              (.pop .prefixCountdown setPresent
-                (.branch isPresent
-                  (.load inspectPrefixToken (.goto fun _ => .scanPrefix))
-                  (.load inspectPrefixToken (.goto fun _ => .scanSuffix)))))))
+      .pop .prefixCountdown setPresent
+        (.branch isPresent
+          (.pop .input setToken
+            (.branch tokenIsNone
+              (.load clearToken
+                (.load clearPresent (.goto fun _ => .clearPrefix)))
+              (.branch tokenIsEnd
+                (.push .rowReverse tokenFromState
+                  (.load clearToken
+                    (.load clearPresent (.goto fun _ => .clearPrefix))))
+                (.push .rowReverse tokenFromState
+                  (.load inspectPrefixToken (.goto fun _ => .scanPrefix))))))
+          (.load clearPresent (.goto fun _ => .scanSuffix)))
   | .scanSuffix =>
       .pop .input setToken
         (.branch tokenIsNone

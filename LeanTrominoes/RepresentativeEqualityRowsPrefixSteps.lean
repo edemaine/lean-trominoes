@@ -13,54 +13,57 @@ open Computability StateTransition Turing
 
 namespace RepresentativeEqualityRowsMachine
 
-theorem step_scanPrefix_input_nil (representative : Bool) (data : TapeData)
-    (inputEq : data.input = []) :
+theorem step_scanPrefix_countdown_nil (representative : Bool)
+    (data : TapeData) (countdownEq : data.prefixCountdown = []) :
     TM2.step program (scanPrefixCfg representative data) =
-      some (clearPrefixCfg representative { data with input := [] }) := by
+      some (scanSuffixCfg representative
+        { data with prefixCountdown := [] }) := by
+  rcases data with
+    ⟨input, rowIndex, indexRestore, prefixCountdown, rowReverse,
+      rowForward, outputReverse, output⟩
+  change prefixCountdown = [] at countdownEq
+  subst prefixCountdown
+  simp [TM2.step, program, scanPrefixCfg, scanSuffixCfg, cfg, tapes,
+    setPresent, isPresent, clearPresent]
+
+theorem step_scanPrefix_input_nil (representative : Bool) (data : TapeData)
+    (countdown : List Unit) (inputEq : data.input = [])
+    (countdownEq : data.prefixCountdown = () :: countdown) :
+    TM2.step program (scanPrefixCfg representative data) =
+      some (clearPrefixCfg representative
+        { data with
+          input := []
+          prefixCountdown := countdown }) := by
   rcases data with
     ⟨input, rowIndex, indexRestore, prefixCountdown, rowReverse,
       rowForward, outputReverse, output⟩
   change input = [] at inputEq
+  change prefixCountdown = () :: countdown at countdownEq
   subst input
+  subst prefixCountdown
   simp [TM2.step, program, scanPrefixCfg, clearPrefixCfg, cfg, tapes,
-    setToken, tokenIsNone, clearToken]
+    setPresent, isPresent, setToken, tokenIsNone, clearToken, clearPresent]
 
 theorem step_scanPrefix_wordEnd (representative : Bool) (data : TapeData)
-    (tail : List Token) (inputEq : data.input = .wordEnd :: tail) :
+    (tail : List Token) (countdown : List Unit)
+    (inputEq : data.input = .wordEnd :: tail)
+    (countdownEq : data.prefixCountdown = () :: countdown) :
     TM2.step program (scanPrefixCfg representative data) =
       some (clearPrefixCfg representative
         { data with
           input := tail
+          prefixCountdown := countdown
           rowReverse := .wordEnd :: data.rowReverse }) := by
   rcases data with
     ⟨input, rowIndex, indexRestore, prefixCountdown, rowReverse,
       rowForward, outputReverse, output⟩
   change input = .wordEnd :: tail at inputEq
-  subst input
-  simp [TM2.step, program, scanPrefixCfg, clearPrefixCfg, cfg, tapes,
-    setToken, tokenIsNone, tokenIsEnd, tokenFromState, clearToken]
-
-theorem step_scanPrefix_bit_countdown_nil (representative bit : Bool)
-    (data : TapeData) (tail : List Token)
-    (inputEq : data.input = .bit bit :: tail)
-    (countdownEq : data.prefixCountdown = []) :
-    TM2.step program (scanPrefixCfg representative data) =
-      some (scanSuffixCfg (if bit then false else representative)
-        { data with
-          input := tail
-          prefixCountdown := []
-          rowReverse := .bit bit :: data.rowReverse }) := by
-  rcases data with
-    ⟨input, rowIndex, indexRestore, prefixCountdown, rowReverse,
-      rowForward, outputReverse, output⟩
-  change input = .bit bit :: tail at inputEq
-  change prefixCountdown = [] at countdownEq
+  change prefixCountdown = () :: countdown at countdownEq
   subst input
   subst prefixCountdown
-  cases bit <;>
-    simp [TM2.step, program, scanPrefixCfg, scanSuffixCfg, cfg, tapes,
-      setToken, tokenIsNone, tokenIsEnd, tokenFromState, setPresent,
-      isPresent, inspectPrefixToken]
+  simp [TM2.step, program, scanPrefixCfg, clearPrefixCfg, cfg, tapes,
+    setPresent, isPresent, setToken, tokenIsNone, tokenIsEnd,
+    tokenFromState, clearToken, clearPresent]
 
 theorem step_scanPrefix_bit_countdown_cons (representative bit : Bool)
     (data : TapeData) (tail : List Token) (countdown : List Unit)
