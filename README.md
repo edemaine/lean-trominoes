@@ -10163,6 +10163,12 @@ The representation choices for this target are:
   variables, and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataVariableCount.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataVariableCount.lean)
   uses it to identify the exact marker suffix length with the finite retained
   planar-SAT variable count before wrapping and geometric gauges.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableEnumeration.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableEnumeration.lean)
+  gives that marker pass a canonical finite target: the two terminal variables
+  on every indexed segment, every canonical crossing boundary, every
+  represented translation-zero source atom, and all nine internals at every
+  canonical crossing.  Membership in this four-block list is exactly the
+  retained periodic variable-validity predicate.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
