@@ -203,5 +203,9 @@ def haltCfg (output : List OutputSymbol) :
     TM2.Cfg Alphabet Label State :=
   ⟨none, initialState, tapes ⟨[], [], [], [], [], output⟩⟩
 
+def haltDataCfg (data : TapeData) :
+    TM2.Cfg Alphabet Label State :=
+  ⟨none, initialState, tapes data⟩
+
 end DelimitedBinaryWordPrefixTrueCountMachine
 end LeanTrominoes
