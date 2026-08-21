@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFSourceOccurrenceAtomPerOccurrenceGroupSizeSemantics
+import LeanTrominoes.LastOccurrenceContributions
 import LeanTrominoes.StableOccurrenceRanksBounds
 
 /-! # Last-occurrence source atom-group contributions -/
@@ -45,6 +46,17 @@ def contributions (source : SourceSplitRouteDescriptorTokens.Source) :
     UnarySuccessorEqualityFilterMachine.selectedValues
         (filterInput source).ranks (filterInput source).sizes =
       contributions source := rfl
+
+theorem contributions_eq_lastOccurrenceContributions
+    (source : SourceSplitRouteDescriptorTokens.Source) :
+    contributions source =
+      LastOccurrenceContributions.contributions
+        (SourceOccurrenceAtomRanks.occurrenceAtoms source.formula) := by
+  unfold contributions
+  rw [SourceOccurrenceAtomRanks.ranks_eq_stableRanks,
+    SourceOccurrenceAtomPerOccurrenceGroupSizes.sizes_eq_occurrenceAtomCounts]
+  exact LastOccurrenceContributions.selectedValues_stableRanks
+    (SourceOccurrenceAtomRanks.occurrenceAtoms source.formula)
 
 end SourceOccurrenceAtomLastContributions
 end PeriodicCNF
