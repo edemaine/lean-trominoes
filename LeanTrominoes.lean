@@ -145,6 +145,7 @@ import LeanTrominoes.TM2CompositionMachine
 import LeanTrominoes.OrthogonalDrawing
 import LeanTrominoes.UnaryFieldEncoderMachine
 import LeanTrominoes.UnaryPrefixSumsMachine
+import LeanTrominoes.UnaryPrefixSumsTapeUpdates
 import LeanTrominoes.UnaryFieldHeaderRotation
 import LeanTrominoes.UnaryFieldHeaderRotationMachine
 import LeanTrominoes.UnaryFieldHeaderRotationMachineExecution
