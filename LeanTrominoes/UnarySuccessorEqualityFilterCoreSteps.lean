@@ -17,6 +17,7 @@ def pushMatchedUnitCfg (data : TapeData) := emptyCfg .pushMatchedUnit data
 def checkExtraSizeCfg (data : TapeData) := emptyCfg .checkExtraSize data
 def pushExtraUnitCfg (data : TapeData) := emptyCfg .pushExtraUnit data
 def checkSizeDelimiterCfg (data : TapeData) := emptyCfg .checkSizeDelimiter data
+def rejectDrainRankCfg (data : TapeData) := emptyCfg .rejectDrainRank data
 def rejectDrainSizeCfg (data : TapeData) := emptyCfg .rejectDrainSize data
 def clearCandidateCfg (data : TapeData) := emptyCfg .clearCandidate data
 def drainCandidateCfg (data : TapeData) := emptyCfg .drainCandidate data
@@ -110,6 +111,41 @@ theorem step_checkSizeDelimiter_unit (data : TapeData)
   subst sizes
   simp [TM2.step, program, checkSizeDelimiterCfg, rejectDrainSizeCfg,
     emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
+
+theorem step_rejectDrainRank_unit (data : TapeData)
+    (remaining : List UnarySymbol)
+    (ranksEq : data.ranks = .unit :: remaining) :
+    TM2.step program (rejectDrainRankCfg data) =
+      some (rejectDrainRankCfg { data with ranks := remaining }) := by
+  rcases data with ⟨input, rankReverse, ranks, sizeReverse, sizes,
+    candidate, outputReverse, output⟩
+  change ranks = _ at ranksEq
+  subst ranks
+  simp [TM2.step, program, rejectDrainRankCfg, emptyCfg, cfg, tapes,
+    unaryIsNone, unaryIsUnit, unarySymbol, clear]
+
+theorem step_rejectDrainRank_delimiter (data : TapeData)
+    (remaining : List UnarySymbol)
+    (ranksEq : data.ranks = .delimiter :: remaining) :
+    TM2.step program (rejectDrainRankCfg data) =
+      some (clearCandidateCfg { data with ranks := remaining }) := by
+  rcases data with ⟨input, rankReverse, ranks, sizeReverse, sizes,
+    candidate, outputReverse, output⟩
+  change ranks = _ at ranksEq
+  subst ranks
+  simp [TM2.step, program, rejectDrainRankCfg, clearCandidateCfg,
+    emptyCfg, cfg, tapes, unaryIsNone, unaryIsUnit, unarySymbol, clear]
+
+theorem step_rejectDrainRank_nil (data : TapeData)
+    (ranksEq : data.ranks = []) :
+    TM2.step program (rejectDrainRankCfg data) =
+      some (clearCandidateCfg { data with ranks := [] }) := by
+  rcases data with ⟨input, rankReverse, ranks, sizeReverse, sizes,
+    candidate, outputReverse, output⟩
+  change ranks = [] at ranksEq
+  subst ranks
+  simp [TM2.step, program, rejectDrainRankCfg, clearCandidateCfg,
+    emptyCfg, cfg, tapes, unaryIsNone, unarySymbol, clear]
 
 theorem step_rejectDrainSize_unit (data : TapeData)
     (remaining : List UnarySymbol)

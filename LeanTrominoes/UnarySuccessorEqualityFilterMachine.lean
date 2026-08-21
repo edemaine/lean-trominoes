@@ -23,8 +23,12 @@ abbrev InputSymbol :=
 def selectedValue (rank size : Nat) : Nat :=
   if size = rank + 1 then size else 0
 
-def selectedValues (ranks sizes : List Nat) : List Nat :=
-  List.zipWith selectedValue ranks sizes
+def selectedValues : List Nat → List Nat → List Nat
+  | [], _ => []
+  | rank :: ranks, [] =>
+      selectedValue rank 0 :: selectedValues ranks []
+  | rank :: ranks, size :: sizes =>
+      selectedValue rank size :: selectedValues ranks sizes
 
 inductive Stack
   | input
@@ -191,10 +195,10 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .rejectDrainRank =>
       .pop .ranks (fun _ symbol => .unary symbol)
         (.branch unaryIsNone
-          (.load clear (.goto fun _ => .rejectDrainSize))
+          (.load clear (.goto fun _ => .clearCandidate))
           (.branch unaryIsUnit
             (.load clear (.goto fun _ => .rejectDrainRank))
-            (.load clear (.goto fun _ => .rejectDrainSize))))
+            (.load clear (.goto fun _ => .clearCandidate))))
   | .rejectDrainSize =>
       .pop .sizes (fun _ symbol => .unary symbol)
         (.branch unaryIsNone
