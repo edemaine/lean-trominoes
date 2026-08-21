@@ -138,4 +138,26 @@ theorem retainedDrawingPlanarSATFormula_crossoverInternal_core_occurrence
     (retainedDrawingRoutePlanarCoreFormula_crossover_occurrence
       (PeriodicCNF.incidenceGraph formula) atomMem)
 
+/-- A boundary occurrence in the crossover-family block embeds as that exact
+finite planar-SAT carrier boundary in the retained formula. -/
+theorem retainedDrawingPlanarSATFormula_boundary_crossover_occurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (boundary : CrossingBoundary)
+    (atomMem :
+      (Sum.inl (CarrierNode.boundary boundary) :
+          Sum CarrierNode (CrossingRecord × CrossoverInternal)) ∈
+        embeddedVariableOccurrences
+          (drawingCarrierNodeCrossoverFormula
+            (PeriodicCNF.incidenceGraph formula))) :
+    (Sum.inl (PlanarSATNode.carrier (.boundary boundary)) :
+        PlanarSATVariable Variable) ∈
+      embeddedVariableOccurrences
+        (retainedDrawingPlanarSATFormula formula) := by
+  change planarSATCoreVariableMap
+      (Sum.inl (CarrierNode.boundary boundary)) ∈
+    embeddedVariableOccurrences (retainedDrawingPlanarSATFormula formula)
+  exact retainedDrawingPlanarSATFormula_core_occurrence formula
+    (retainedDrawingRoutePlanarCoreFormula_crossover_occurrence
+      (PeriodicCNF.incidenceGraph formula) atomMem)
+
 end LeanTrominoes.PeriodicOrthocrossing

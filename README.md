@@ -10189,6 +10189,14 @@ The representation choices for this target are:
   link whose center occurs in the routed-variable formula; retained embedding
   and zero-translation periodicization preserve that center as the original
   source atom.
+- [`LeanTrominoes/PlanarThreeSATCrossoverVariableOccurrences.lean`](LeanTrominoes/PlanarThreeSATCrossoverVariableOccurrences.lean),
+  [`LeanTrominoes/PeriodicOrthocrossingCrossoverBoundaryOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingCrossoverBoundaryOccurrences.lean),
+  [`LeanTrominoes/PeriodicOrthocrossingRetainedBoundaryOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedBoundaryOccurrences.lean),
+  and [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATBoundaryOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATBoundaryOccurrences.lean)
+  prove the third converse coverage block.  Each of the four fixed crossover
+  ports occurs in Figure 8, every canonical drawing boundary therefore occurs
+  in the retained finite formula, and canonical boundary normalization fixes
+  its periodic protovariable.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
