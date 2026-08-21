@@ -28,6 +28,7 @@ import LeanTrominoes.BoolSquareRowsToHaltExecution
 import LeanTrominoes.BoolSquareRowsInput
 import LeanTrominoes.BoolSquareRowsZeroExecution
 import LeanTrominoes.BoolSquareRowsPositiveExecution
+import LeanTrominoes.BoolSquareRowsExecution
 import LeanTrominoes.DelimitedBinaryWords
 import LeanTrominoes.DelimitedBinaryWordPairs
 import LeanTrominoes.DelimitedBinaryWordPairProductMachine
