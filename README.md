@@ -10217,6 +10217,15 @@ The representation choices for this target are:
   membership in the retained periodic formula is exactly membership in the
   canonical enumeration, and their deduplicated lengths are equal.  Thus the
   marker suffix no longer depends on the expanded clause occurrence list.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariablesNodup.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariablesNodup.lean),
+  [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableExactCount.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableExactCount.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataVariableMarkers.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataVariableMarkers.lean)
+  prove that presentation indices, crossing-side names, translation-zero
+  source sites, and the nine internal names make the four canonical blocks
+  individually duplicate-free and constructor-disjoint.  The exact marker
+  count is therefore their ordinary combined length, and this equality is
+  specialized to the guarded direct PSPACE source with all drawing hypotheses
+  discharged.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
