@@ -16,11 +16,11 @@ namespace UnaryPrefixSumsMachine
 
 theorem step_readField_nil (data : TapeData) (inputEq : data.input = []) :
     TM2.step program (readFieldCfg data) =
-      some (reverseOutputCfg { data with input := [] }) := by
+      some (clearSumCfg { data with input := [] }) := by
   rcases data with ⟨input, sum, sumRestore, outputReverse, output⟩
   change input = [] at inputEq
   subst input
-  simp [TM2.step, program, readFieldCfg, reverseOutputCfg, cfg, tapes,
+  simp [TM2.step, program, readFieldCfg, clearSumCfg, cfg, tapes,
     setSaved, savedIsNone]
 
 theorem step_readField_cons (data : TapeData) (symbol : Symbol)

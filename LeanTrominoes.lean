@@ -147,6 +147,8 @@ import LeanTrominoes.UnaryFieldEncoderMachine
 import LeanTrominoes.UnaryPrefixSumsMachine
 import LeanTrominoes.UnaryPrefixSumsTapeUpdates
 import LeanTrominoes.UnaryPrefixSumsCoreSteps
+import LeanTrominoes.UnaryPrefixSumsCleanupSteps
+import LeanTrominoes.UnaryPrefixSumsCleanupExecution
 import LeanTrominoes.UnaryPrefixSumsCopyExecution
 import LeanTrominoes.UnaryPrefixSumsEmitStartExecution
 import LeanTrominoes.UnaryPrefixSumsExecution

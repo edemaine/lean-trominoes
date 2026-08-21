@@ -30,6 +30,7 @@ inductive Label
   | restoreSum
   | consumeSaved
   | scanField
+  | clearSum
   | reverseOutput
   deriving Fintype
 
@@ -69,7 +70,7 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .readField =>
       .pop .input setSaved
         (.branch savedIsNone
-          (.goto fun _ => .reverseOutput)
+          (.goto fun _ => .clearSum)
           (.goto fun _ => .copySum))
   | .copySum =>
       .pop .sum setPresence
@@ -93,11 +94,16 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .scanField =>
       .pop .input setSaved
         (.branch savedIsNone
-          (.goto fun _ => .reverseOutput)
+          (.goto fun _ => .clearSum)
           (.branch savedIsUnit
             (.push .sum (fun _ => .unit)
               (.load clearState (.goto fun _ => .scanField)))
             (.load clearState (.goto fun _ => .readField))))
+  | .clearSum =>
+      .pop .sum setSaved
+        (.branch savedIsNone
+          (.goto fun _ => .reverseOutput)
+          (.load clearState (.goto fun _ => .clearSum)))
   | .reverseOutput =>
       .pop .outputReverse setSaved
         (.branch savedIsNone
@@ -146,6 +152,8 @@ def consumeSavedCfg (saved : Symbol) (data : TapeData) :=
   cfg .consumeSaved (some saved, false) data
 
 def scanFieldCfg (data : TapeData) := cfg .scanField (none, false) data
+
+def clearSumCfg (data : TapeData) := cfg .clearSum (none, false) data
 
 def reverseOutputCfg (data : TapeData) :=
   cfg .reverseOutput (none, false) data
