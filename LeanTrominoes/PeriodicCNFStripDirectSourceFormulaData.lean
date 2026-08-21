@@ -29,5 +29,18 @@ def directSourceFormula (symbols : List encoding.Γ) :
     PeriodicCNF Variable :=
   sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols)
 
+/-- Shared canonical equality implementation for direct source variables.
+Naming it keeps independently compiled semantic leaves definitionally aligned. -/
+noncomputable def directSourceVariableDecidableEq : DecidableEq Variable :=
+  Classical.decEq _
+
+@[reducible] noncomputable def directSourceVariableBEq : BEq Variable :=
+  @instBEqOfDecidableEq Variable directSourceVariableDecidableEq
+
+theorem directSourceVariableLawfulBEq :
+    @LawfulBEq Variable directSourceVariableBEq := by
+  unfold directSourceVariableBEq directSourceVariableDecidableEq
+  infer_instance
+
 end PeriodicCNFStripReduction
 end LeanTrominoes
