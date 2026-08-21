@@ -1499,6 +1499,13 @@ build; an imported proof counts when its statement matches the paper.
           count and reduce the metadata marker suffix past wrapping, gauging,
           normalization, and deduplication to the finite retained planar-SAT
           variable count.
+        - [x] Factor every semantic incidence route through a compact numeric
+          metadata descriptor, then reconstruct the exact edge-route and
+          indexed-segment streams in presentation order.
+        - [x] Replace crossing-record allocation by one graph-free Boolean
+          filter over the ordered product of neighboring numeric segment
+          occurrences, and expose the already compiled unary grid-unit stream
+          as its exact drawing period.
         - [ ] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
