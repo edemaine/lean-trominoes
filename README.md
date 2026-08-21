@@ -10235,6 +10235,11 @@ The representation choices for this target are:
   internal names give the closed formula `2·segments + variables +
   13·crossings`.  The variable term can therefore reuse the already compiled
   formula-shape marker stream; only segment and crossing scans remain new.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataAtomMarkerCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataAtomMarkerCompiler.lean)
+  implements that reuse.  It composes the polynomial-time guarded
+  formula-shape compiler with a fixed token filter, and its separate semantic
+  leaf proves that the output is exactly one retained metadata marker per
+  distinct source-formula variable.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
