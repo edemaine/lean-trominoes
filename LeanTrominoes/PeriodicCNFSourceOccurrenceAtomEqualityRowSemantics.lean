@@ -42,6 +42,15 @@ theorem rows_words
     (PeriodicThreeSATThree.taggedLiterals source.formula).length
     (by intro; simp)
 
+theorem rows_eq_semanticRows
+    (source : SourceSplitRouteDescriptorTokens.Source) :
+    rows source = ⟨semanticRows source.formula⟩ := by
+  have wordEq := rows_words source
+  rcases rowEq : rows source with ⟨words⟩
+  rw [rowEq] at wordEq
+  cases wordEq
+  rfl
+
 end SourceOccurrenceAtomEqualityRows
 end PeriodicCNF
 end LeanTrominoes
