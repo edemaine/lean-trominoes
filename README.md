@@ -10226,6 +10226,15 @@ The representation choices for this target are:
   count is therefore their ordinary combined length, and this equality is
   specialized to the guarded direct PSPACE source with all drawing hypotheses
   discharged.
+- [`LeanTrominoes/PeriodicCNFPlanarZeroVariableRouteSites.lean`](LeanTrominoes/PeriodicCNFPlanarZeroVariableRouteSites.lean),
+  [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableLengthFormula.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableLengthFormula.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataVariableMarkerCounts.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarMetadataVariableMarkerCounts.lean)
+  reduce that direct marker length to three streamable counts.  Locality makes
+  the translation-zero route sites exactly the source formula's distinct
+  variables, while the two terminal names and the four boundary plus nine
+  internal names give the closed formula `2·segments + variables +
+  13·crossings`.  The variable term can therefore reuse the already compiled
+  formula-shape marker stream; only segment and crossing scans remain new.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
