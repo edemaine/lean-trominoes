@@ -4,8 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import Mathlib.Tactic.DeriveFintype
+import Mathlib.Data.Fintype.Sum
 
 /-! # A finite separated encoding for pairs -/
+
+noncomputable section
 
 namespace LeanTrominoes
 namespace SeparatedProductEncoding
@@ -15,6 +18,25 @@ inductive Token (α β : Type*)
   | separator
   | right (symbol : β)
   deriving DecidableEq
+
+def sumEquiv (α β : Type*) :
+    (α ⊕ (Unit ⊕ β)) ≃ Token α β where
+  toFun
+    | .inl symbol => .left symbol
+    | .inr (.inl _) => .separator
+    | .inr (.inr symbol) => .right symbol
+  invFun
+    | .left symbol => .inl symbol
+    | .separator => .inr (.inl ())
+    | .right symbol => .inr (.inr symbol)
+  left_inv symbol := by cases symbol with
+    | inl _ => rfl
+    | inr symbol => cases symbol <;> rfl
+  right_inv symbol := by cases symbol <;> rfl
+
+noncomputable instance [Fintype α] [Fintype β] :
+    Fintype (Token α β) :=
+  Fintype.ofEquiv (α ⊕ (Unit ⊕ β)) (sumEquiv α β)
 
 def encode {α β LeftSymbol RightSymbol : Type*}
     (encodeLeft : α → List LeftSymbol)
