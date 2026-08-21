@@ -18,12 +18,12 @@ attribute [local simp] initialState setRow setUnary setCandidate clearRow
 
 theorem step_scanRows_nil (data : TapeData) (rowsEq : data.rows = []) :
     machine.step (scanRowsCfg data) =
-      some (reverseOutputCfg { data with rows := [] }) := by
+      some (clearValuesCfg { data with rows := [] }) := by
   rcases data with ⟨input, rowsReverse, rows, valuesReverse, values,
     valuesRestore, candidate, outputReverse, output⟩
   change rows = [] at rowsEq
   subst rows
-  simp [TM2.step, program, scanRowsCfg, reverseOutputCfg,
+  simp [TM2.step, program, scanRowsCfg, clearValuesCfg,
     emptyCfg, cfg, tapes]
   rfl
 

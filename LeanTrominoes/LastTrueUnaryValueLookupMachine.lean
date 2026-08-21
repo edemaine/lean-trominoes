@@ -70,6 +70,7 @@ inductive Label
   | emitDelimiter
   | restoreValues
   | pushRestoredValue
+  | clearValues
   | reverseOutput
   | pushOutput
   deriving Fintype
@@ -213,7 +214,7 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .scanRows =>
       .pop .rows setRow
         (.branch rowIsNone
-          (.load clearRow (.goto fun _ => .reverseOutput))
+          (.load clearRow (.goto fun _ => .clearValues))
           (.branch rowIsStart
             (.load clearRow (.goto fun _ => .nextBit))
             (.load clearRow (.goto fun _ => .scanRows))))
@@ -267,6 +268,11 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .pushRestoredValue =>
       .push .values storedUnary
         (.load clearUnary (.goto fun _ => .restoreValues))
+  | .clearValues =>
+      .pop .values setUnary
+        (.branch unaryIsNone
+          (.load clearUnary (.goto fun _ => .reverseOutput))
+          (.load clearUnary (.goto fun _ => .clearValues)))
   | .reverseOutput =>
       .pop .outputReverse setUnary
         (.branch unaryIsNone

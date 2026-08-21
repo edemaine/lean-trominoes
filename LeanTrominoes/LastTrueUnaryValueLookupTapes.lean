@@ -104,6 +104,7 @@ def emitDelimiterCfg := emptyCfg .emitDelimiter
 def restoreValuesCfg := emptyCfg .restoreValues
 def pushRestoredValueCfg (symbol : UnarySymbol) :=
   unaryCfg .pushRestoredValue symbol
+def clearValuesCfg := emptyCfg .clearValues
 def reverseOutputCfg := emptyCfg .reverseOutput
 def pushOutputCfg (symbol : UnarySymbol) := unaryCfg .pushOutput symbol
 
