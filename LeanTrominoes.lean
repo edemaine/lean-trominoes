@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.Assignment
 import LeanTrominoes.BinaryCountPaddingMachine
+import LeanTrominoes.BoolSquareRowsMachine
 import LeanTrominoes.DelimitedBinaryWords
 import LeanTrominoes.DelimitedBinaryWordPairs
 import LeanTrominoes.DelimitedBinaryWordPairProductMachine
