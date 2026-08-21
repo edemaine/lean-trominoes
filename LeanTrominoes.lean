@@ -162,6 +162,7 @@ import LeanTrominoes.UnaryPrefixSumsScanSteps
 import LeanTrominoes.UnaryPrefixSumsRestoreExecution
 import LeanTrominoes.UnaryPrefixSumsReverseExecution
 import LeanTrominoes.UnaryPrefixSumsTimeBound
+import LeanTrominoes.UnaryPrefixSumsTime
 import LeanTrominoes.UnaryFieldHeaderRotation
 import LeanTrominoes.UnaryFieldHeaderRotationMachine
 import LeanTrominoes.UnaryFieldHeaderRotationMachineExecution
