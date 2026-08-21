@@ -5,7 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeDirectionOrderingData
 import LeanTrominoes.PeriodicCNFStripDirectSourceFormulaData
-import LeanTrominoes.PeriodicOrthocrossingCanonicalPairScan
+import LeanTrominoes.PeriodicOrthocrossingCanonicalPairScanNodup
 
 /-! # Direct retained metadata crossing-marker data -/
 
@@ -48,6 +48,16 @@ def directRetainedPlanarMetadataCrossingPairMarkers
       (directSourceFormula decider symbols).incidenceGraph).length)
     .variable
 
+/-- Dedup-free filtered occurrence-pair presentation of the same marker
+count. -/
+def directRetainedPlanarMetadataCrossingFilteredPairMarkers
+    (symbols : List encoding.Γ) :
+    List FormulaShapeDirectionOrdering.Token :=
+  List.replicate
+    (13 * (orientedCrossingPairFilter
+      (directSourceFormula decider symbols).incidenceGraph).length)
+    .variable
+
 /-- The precise remaining crossing-emission compiler boundary. -/
 abbrev DirectRetainedPlanarMetadataCrossingMarkerCompiler :=
   @TM2ComputableInPolyTime
@@ -63,5 +73,14 @@ abbrev DirectRetainedPlanarMetadataCrossingPairMarkerCompiler :=
     (List FormulaShapeDirectionOrdering.Token)
     encoding.Γ FormulaShapeDirectionOrdering.Token
     id id (directRetainedPlanarMetadataCrossingPairMarkers decider)
+
+/-- Reduced compiler boundary using only two filters over the quadratic
+occurrence-pair stream. -/
+abbrev DirectRetainedPlanarMetadataCrossingFilteredPairMarkerCompiler :=
+  @TM2ComputableInPolyTime
+    (List encoding.Γ)
+    (List FormulaShapeDirectionOrdering.Token)
+    encoding.Γ FormulaShapeDirectionOrdering.Token
+    id id (directRetainedPlanarMetadataCrossingFilteredPairMarkers decider)
 
 end LeanTrominoes.PeriodicCNFStripReduction
