@@ -10,11 +10,20 @@ import LeanTrominoes.UnarySuccessorEqualityFilterMachine
 namespace LeanTrominoes
 namespace UnarySuccessorEqualityFilterMachine
 
+/-- Informative evidence that two lists are aligned and every rank is below
+its corresponding size.  Living in `Type` allows exact execution certificates
+to recurse over this evidence. -/
+inductive Valid : List Nat → List Nat → Type
+  | nil : Valid [] []
+  | cons {rank size : Nat} {ranks sizes : List Nat}
+      (rank_lt_size : rank < size) (rest : Valid ranks sizes) :
+      Valid (rank :: ranks) (size :: sizes)
+
 /-- Paired unary values for which every rank is strictly below its group size. -/
 structure Input where
   ranks : List Nat
   sizes : List Nat
-  ranks_lt_sizes : List.Forall₂ (fun rank size => rank < size) ranks sizes
+  valid : Valid ranks sizes
 
 /-- The separated physical representation consumed by `machine`. -/
 def encode (input : Input) : List InputSymbol :=
@@ -63,9 +72,15 @@ def fieldsTime : List Nat → List Nat → Nat
     fieldsTime (rank :: ranks) (size :: sizes) =
       fieldTime rank size + fieldsTime ranks sizes := rfl
 
+theorem Valid.length_eq {ranks sizes : List Nat}
+    (valid : Valid ranks sizes) : ranks.length = sizes.length := by
+  induction valid with
+  | nil => rfl
+  | cons _ _ induction => simp [induction]
+
 theorem Input.length_eq (input : Input) :
     input.ranks.length = input.sizes.length :=
-  input.ranks_lt_sizes.length_eq
+  input.valid.length_eq
 
 end UnarySuccessorEqualityFilterMachine
 end LeanTrominoes
