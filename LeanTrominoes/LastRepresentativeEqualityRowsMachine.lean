@@ -69,6 +69,9 @@ def clearToken (state : State) : State :=
 def clearPresent (state : State) : State :=
   { state with present := false }
 
+def clearTokenPresent (state : State) : State :=
+  { state with token := none, present := false }
+
 def beginRow (state : State) : State :=
   { state with token := none, present := false, representative := true }
 
@@ -118,12 +121,12 @@ def program : Label → TM2.Stmt Alphabet Label State
         (.branch isPresent
           (.pop .input setToken
             (.branch tokenIsNone
-              (.load clearToken (.goto fun _ => .clearPrefix))
+              (.load clearTokenPresent (.goto fun _ => .clearPrefix))
               (.branch tokenIsEnd
                 (.push .rowReverse tokenFromState
-                  (.load clearToken (.goto fun _ => .clearPrefix)))
+                  (.load clearTokenPresent (.goto fun _ => .clearPrefix)))
                 (.push .rowReverse tokenFromState
-                  (.load clearToken (.goto fun _ => .skipPrefix))))))
+                  (.load clearTokenPresent (.goto fun _ => .skipPrefix))))))
           (.load clearPresent (.goto fun _ => .skipDiagonal)))
   | .skipDiagonal =>
       .pop .input setToken
