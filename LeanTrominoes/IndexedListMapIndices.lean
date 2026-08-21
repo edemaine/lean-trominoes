@@ -41,5 +41,40 @@ theorem take_zipIdx
           simp only [List.zipIdx_cons, List.take_succ_cons]
           rw [induction count (start + 1)]
 
+/-- General-start form of affine indexing for fixed-width flat-map blocks. -/
+theorem flatMap_zipIdx_fixed_from
+    {α : Type u} {β : Type v}
+    (values : List α) (block : α → List β)
+    (width start outerStart : Nat)
+    (blockLength : ∀ value, (block value).length = width) :
+    (values.flatMap block).zipIdx (start + width * outerStart) =
+      (values.zipIdx outerStart).flatMap fun tagged =>
+        (block tagged.1).zipIdx (start + width * tagged.2) := by
+  induction values generalizing outerStart with
+  | nil => simp
+  | cons value values induction =>
+      rw [List.flatMap_cons, List.zipIdx_append,
+        List.zipIdx_cons, List.flatMap_cons]
+      rw [blockLength value]
+      have tail := induction (outerStart := outerStart + 1)
+      rw [show start + width * outerStart + width =
+          start + width * (outerStart + 1) by
+        rw [Nat.mul_add, Nat.mul_one]
+        omega,
+        tail]
+
+/-- Indexing a flat map of fixed-width blocks assigns affine indices to each
+block, universe-polymorphically. -/
+theorem flatMap_zipIdx_fixed
+    {α : Type u} {β : Type v}
+    (values : List α) (block : α → List β)
+    (width start : Nat)
+    (blockLength : ∀ value, (block value).length = width) :
+    (values.flatMap block).zipIdx start =
+      values.zipIdx.flatMap fun tagged =>
+        (block tagged.1).zipIdx (start + width * tagged.2) := by
+  simpa using flatMap_zipIdx_fixed_from
+    values block width start 0 blockLength
+
 end List
 end LeanTrominoes

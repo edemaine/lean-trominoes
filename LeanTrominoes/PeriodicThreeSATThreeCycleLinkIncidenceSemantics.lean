@@ -29,6 +29,7 @@ theorem cycleLinkIncidences_eq_cycleIncidences
       cases link with
       | mk first second =>
           simp [cycleLinkIncidenceBlock,
+            cycleLinkSourceIncidence, cycleLinkTargetIncidence,
             PeriodicCNF.incidenceMetadataBlock, implicationClause]
 
 /-- The explicit link-incidence stream has exactly two records per source

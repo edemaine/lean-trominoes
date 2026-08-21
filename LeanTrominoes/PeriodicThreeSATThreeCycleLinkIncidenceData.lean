@@ -11,6 +11,26 @@ import LeanTrominoes.PeriodicCNFPlanarIncidences
 namespace LeanTrominoes
 namespace PeriodicThreeSATThree
 
+/-- Negative-source incidence of one globally indexed implication link. -/
+def cycleLinkSourceIncidence {Variable : Type*}
+    (taggedLink :
+      (ThreeOccurrenceVariable Variable ×
+        ThreeOccurrenceVariable Variable) × Nat) :
+    CNFIncidence (ThreeOccurrenceVariable Variable) :=
+  let clause := implicationClause taggedLink.1.1 taggedLink.1.2
+  ⟨taggedLink.2, clause, 0,
+    ⟨taggedLink.1.1, (0, 0), false⟩⟩
+
+/-- Positive-target incidence of one globally indexed implication link. -/
+def cycleLinkTargetIncidence {Variable : Type*}
+    (taggedLink :
+      (ThreeOccurrenceVariable Variable ×
+        ThreeOccurrenceVariable Variable) × Nat) :
+    CNFIncidence (ThreeOccurrenceVariable Variable) :=
+  let clause := implicationClause taggedLink.1.1 taggedLink.1.2
+  ⟨taggedLink.2, clause, 1,
+    ⟨taggedLink.1.2, (0, 0), true⟩⟩
+
 /-- The negative-source and positive-target incidence records of one globally
 indexed implication-cycle link. -/
 def cycleLinkIncidenceBlock {Variable : Type*}
@@ -18,11 +38,8 @@ def cycleLinkIncidenceBlock {Variable : Type*}
       (ThreeOccurrenceVariable Variable ×
         ThreeOccurrenceVariable Variable) × Nat) :
     List (CNFIncidence (ThreeOccurrenceVariable Variable)) :=
-  let clause := implicationClause taggedLink.1.1 taggedLink.1.2
-  [⟨taggedLink.2, clause, 0,
-      ⟨taggedLink.1.1, (0, 0), false⟩⟩,
-    ⟨taggedLink.2, clause, 1,
-      ⟨taggedLink.1.2, (0, 0), true⟩⟩]
+  [cycleLinkSourceIncidence taggedLink,
+    cycleLinkTargetIncidence taggedLink]
 
 /-- All fixed two-incidence blocks, with clause indices beginning after the
 copied source clauses. -/
