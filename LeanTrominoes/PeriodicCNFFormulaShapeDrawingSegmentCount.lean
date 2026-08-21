@@ -14,6 +14,13 @@ namespace PeriodicCNF
 open UnaryProgramClauseProfile
 open PeriodicOrthocrossing
 
+/-- Segment count read entirely from a finite formula shape. -/
+def FormulaShape.routedSegmentCount
+    (shape : List FormulaShape.Token) : Nat :=
+  ((FormulaShape.clauseProfiles shape).map
+    ClauseProfile.routeSegmentCount).sum +
+    2 * FormulaShape.variableCount shape
+
 /-- The exact drawing-segment statement associated with a finite formula
 shape.  Naming the proposition lets large direct compilers reuse it without
 re-elaborating the equality at every specialization boundary. -/
@@ -22,9 +29,7 @@ def FormulaShape.DrawingSegmentCountStatement
     (shape : List FormulaShape.Token)
     (formula : PeriodicCNF Variable) : Prop :=
   (drawing formula.incidenceGraph).indexedSegments.length =
-    ((FormulaShape.clauseProfiles shape).map
-      ClauseProfile.routeSegmentCount).sum +
-      2 * FormulaShape.variableCount shape
+    FormulaShape.routedSegmentCount shape
 
 /-- A finite shape that records the exact clause profiles and distinct-variable
 count determines the exact number of routed incidence-drawing segments. -/
@@ -43,9 +48,8 @@ theorem incidenceDrawing_indexedSegments_length_of_shape
     (exact : ∀ atom ∈ formula.variableOccurrences.dedup,
       formula.variableOccurrences.count atom = 3) :
     (drawing formula.incidenceGraph).indexedSegments.length =
-      ((FormulaShape.clauseProfiles shape).map
-        ClauseProfile.routeSegmentCount).sum +
-        2 * FormulaShape.variableCount shape := by
+      FormulaShape.routedSegmentCount shape := by
+  unfold FormulaShape.routedSegmentCount
   rw [incidenceDrawing_indexedSegments_length_of_profiles
     (FormulaShape.clauseProfiles shape) formula
     correct.1 forward degree exact]
