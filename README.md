@@ -10180,6 +10180,15 @@ The representation choices for this target are:
   canonical protovariable.  Occurrence-list renaming and periodicization are
   factored into small reusable leaves so this chain remains within the
   low-memory build boundary.
+- [`LeanTrominoes/PeriodicCNFPlanarRoutedVariableLinkExistence.lean`](LeanTrominoes/PeriodicCNFPlanarRoutedVariableLinkExistence.lean),
+  [`LeanTrominoes/PeriodicCNFPlanarRoutedVariableCenterOccurrence.lean`](LeanTrominoes/PeriodicCNFPlanarRoutedVariableCenterOccurrence.lean),
+  [`LeanTrominoes/PeriodicCNFPlanarRoutedVariableOccurrences.lean`](LeanTrominoes/PeriodicCNFPlanarRoutedVariableOccurrences.lean),
+  and [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATAtomOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATAtomOccurrences.lean)
+  prove the second converse coverage block.  A represented variable-route
+  site comes from an actual route occurrence, so it has an active equality
+  link whose center occurs in the routed-variable formula; retained embedding
+  and zero-translation periodicization preserve that center as the original
+  source atom.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
