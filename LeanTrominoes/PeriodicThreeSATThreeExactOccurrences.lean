@@ -11,6 +11,35 @@ import LeanTrominoes.PeriodicThreeSATThreeExactVariableCount
 namespace LeanTrominoes
 namespace PeriodicThreeSATThree
 
+private theorem count_congr_beq
+    {Variable : Type*}
+    (first second : BEq Variable)
+    (firstLawful : @LawfulBEq Variable first)
+    (secondLawful : @LawfulBEq Variable second)
+    (atom : Variable) (values : List Variable) :
+    @List.count Variable first atom values =
+      @List.count Variable second atom values := by
+  have beq_eq (left right : Variable) :
+      @BEq.beq Variable first left right =
+        @BEq.beq Variable second left right := by
+    rw [Bool.eq_iff_iff]
+    constructor
+    · intro equal
+      have : left = right :=
+        @eq_of_beq Variable first firstLawful left right equal
+      subst right
+      exact secondLawful.rfl
+    · intro equal
+      have : left = right :=
+        @eq_of_beq Variable second secondLawful left right equal
+      subst right
+      exact firstLawful.rfl
+  induction values with
+  | nil => rfl
+  | cons head tail induction =>
+      simp only [List.count_cons]
+      rw [beq_eq head atom, induction]
+
 /-- Every variable retained by occurrence splitting appears exactly once in
 the copied source clauses and twice in its implication cycle. -/
 theorem formula_variableOccurrences_count_eq_three_of_mem
@@ -48,6 +77,35 @@ theorem formula_variableOccurrences_count_eq_three_of_mem
     allCycleClauses_count_eq_two_of_mem_allOccurrenceVariables
       source copy copyOriginal
   rw [formulaOccurrences, List.count_append, sourceCount, cycleCount]
+
+/-- The exact occurrence count is independent of the lawful Boolean equality
+implementation used by a downstream construction. -/
+theorem formula_variableOccurrences_count_eq_three_of_mem_with_beq
+    {Variable : Type*} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
+    (beq : BEq (ThreeOccurrenceVariable Variable))
+    (lawful : @LawfulBEq (ThreeOccurrenceVariable Variable) beq)
+    (source : PeriodicCNF Variable)
+    (copy : ThreeOccurrenceVariable Variable)
+    (copyMember :
+      copy ∈ (PeriodicCNF.variableOccurrences (formula source)).dedup) :
+    @List.count (ThreeOccurrenceVariable Variable) beq copy
+      (PeriodicCNF.variableOccurrences (formula source)) = 3 := by
+  let canonicalBEq : BEq (ThreeOccurrenceVariable Variable) :=
+    instBEqProd
+  have canonicalLawful :
+      @LawfulBEq (ThreeOccurrenceVariable Variable) canonicalBEq := by
+    infer_instance
+  calc
+    @List.count (ThreeOccurrenceVariable Variable) beq copy
+        (PeriodicCNF.variableOccurrences (formula source)) =
+      @List.count (ThreeOccurrenceVariable Variable) canonicalBEq copy
+        (PeriodicCNF.variableOccurrences (formula source)) :=
+      count_congr_beq beq canonicalBEq lawful canonicalLawful _ _
+    _ = 3 := by
+      simpa [canonicalBEq] using
+        formula_variableOccurrences_count_eq_three_of_mem
+          source copy copyMember
 
 end PeriodicThreeSATThree
 end LeanTrominoes
