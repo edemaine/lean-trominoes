@@ -149,6 +149,7 @@ import LeanTrominoes.UnaryPrefixSumsTapeUpdates
 import LeanTrominoes.UnaryPrefixSumsCoreSteps
 import LeanTrominoes.UnaryPrefixSumsCopyExecution
 import LeanTrominoes.UnaryPrefixSumsEmitStartExecution
+import LeanTrominoes.UnaryPrefixSumsExecution
 import LeanTrominoes.UnaryPrefixSumsFieldScanExecution
 import LeanTrominoes.UnaryPrefixSumsFieldExecution
 import LeanTrominoes.UnaryPrefixSumsListExecution
