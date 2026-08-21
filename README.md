@@ -10197,6 +10197,18 @@ The representation choices for this target are:
   ports occurs in Figure 8, every canonical drawing boundary therefore occurs
   in the retained finite formula, and canonical boundary normalization fixes
   its periodic protovariable.
+- [`LeanTrominoes/PeriodicOrthocrossingTerminalClassification.lean`](LeanTrominoes/PeriodicOrthocrossingTerminalClassification.lean),
+  [`LeanTrominoes/PeriodicCNFPlanarRouteEndpointMetadata.lean`](LeanTrominoes/PeriodicCNFPlanarRouteEndpointMetadata.lean),
+  and [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATTerminalOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATTerminalOccurrences.lean)
+  prove the fourth converse coverage block.  Every neighboring segment
+  terminal is either attached to an enumerated route bend or is the source or
+  target endpoint of a metadata-rich CNF route occurrence.  Bend equality
+  links, routed-clause sources, and the at-most-three routed-variable arms
+  therefore retain every finite terminal; the translation-zero occurrence of
+  each indexed segment periodicizes to its canonical terminal protovariable.
+  The classification, endpoint metadata, finite retention, and periodic lift
+  are separate leaf modules so each check stays within the low-memory build
+  boundary.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)

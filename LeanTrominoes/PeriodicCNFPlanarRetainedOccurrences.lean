@@ -39,6 +39,19 @@ variable embedding. -/
   rw [scopedDrawingRoutedVariableFormula,
     embeddedVariableOccurrences_rename]
 
+/-- Scoping the routed-clause block maps its occurrence list by the external
+variable embedding. -/
+@[simp] theorem embeddedVariableOccurrences_scopedDrawingRoutedClauseFormula
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) :
+    embeddedVariableOccurrences
+        (scopedDrawingRoutedClauseFormula formula) =
+      (embeddedVariableOccurrences
+        (drawingRoutedClauseFormula formula)).map
+          planarSATExternalVariableMap := by
+  rw [scopedDrawingRoutedClauseFormula,
+    embeddedVariableOccurrences_rename]
+
 /-- The retained planar-SAT occurrence list is the concatenation of its core,
 routed-clause, and routed-variable occurrence blocks. -/
 theorem embeddedVariableOccurrences_retainedDrawingPlanarSATFormula
@@ -88,6 +101,22 @@ theorem retainedDrawingPlanarSATFormula_routedVariable_occurrence
   rw [embeddedVariableOccurrences_scopedDrawingRoutedVariableFormula]
   exact List.mem_map.mpr ⟨atom, atomMem, rfl⟩
 
+/-- Every routed-clause occurrence remains present after scoping that block
+and appending the routed-variable suffix. -/
+theorem retainedDrawingPlanarSATFormula_routedClause_occurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    {atom : PlanarSATNode Variable}
+    (atomMem : atom ∈ embeddedVariableOccurrences
+      (drawingRoutedClauseFormula formula)) :
+    planarSATExternalVariableMap atom ∈ embeddedVariableOccurrences
+      (retainedDrawingPlanarSATFormula formula) := by
+  rw [embeddedVariableOccurrences_retainedDrawingPlanarSATFormula]
+  apply List.mem_append_left
+  apply List.mem_append_right
+  rw [embeddedVariableOccurrences_scopedDrawingRoutedClauseFormula]
+  exact List.mem_map.mpr ⟨atom, atomMem, rfl⟩
+
 /-- A routed central-atom occurrence embeds as that exact finite planar-SAT
 atom in the retained formula. -/
 theorem retainedDrawingPlanarSATFormula_atom_routedVariable_occurrence
@@ -99,6 +128,40 @@ theorem retainedDrawingPlanarSATFormula_atom_routedVariable_occurrence
       embeddedVariableOccurrences
         (retainedDrawingPlanarSATFormula formula) := by
   change planarSATExternalVariableMap (PlanarSATNode.atom site) ∈
+    embeddedVariableOccurrences (retainedDrawingPlanarSATFormula formula)
+  exact retainedDrawingPlanarSATFormula_routedVariable_occurrence
+    formula atomMem
+
+/-- A routed-clause carrier terminal embeds as that exact finite planar-SAT
+terminal in the retained formula. -/
+theorem retainedDrawingPlanarSATFormula_terminal_routedClause_occurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (terminal : SegmentTerminal)
+    (atomMem : PlanarSATNode.carrier (.terminal terminal) ∈
+      embeddedVariableOccurrences (drawingRoutedClauseFormula formula)) :
+    (Sum.inl (PlanarSATNode.carrier (.terminal terminal)) :
+        PlanarSATVariable Variable) ∈
+      embeddedVariableOccurrences
+        (retainedDrawingPlanarSATFormula formula) := by
+  change planarSATExternalVariableMap
+      (PlanarSATNode.carrier (.terminal terminal)) ∈
+    embeddedVariableOccurrences (retainedDrawingPlanarSATFormula formula)
+  exact retainedDrawingPlanarSATFormula_routedClause_occurrence
+    formula atomMem
+
+/-- A routed-variable carrier terminal embeds as that exact finite planar-SAT
+terminal in the retained formula. -/
+theorem retainedDrawingPlanarSATFormula_terminal_routedVariable_occurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (terminal : SegmentTerminal)
+    (atomMem : PlanarSATNode.carrier (.terminal terminal) ∈
+      embeddedVariableOccurrences (drawingRoutedVariableFormula formula)) :
+    (Sum.inl (PlanarSATNode.carrier (.terminal terminal)) :
+        PlanarSATVariable Variable) ∈
+      embeddedVariableOccurrences
+        (retainedDrawingPlanarSATFormula formula) := by
+  change planarSATExternalVariableMap
+      (PlanarSATNode.carrier (.terminal terminal)) ∈
     embeddedVariableOccurrences (retainedDrawingPlanarSATFormula formula)
   exact retainedDrawingPlanarSATFormula_routedVariable_occurrence
     formula atomMem
@@ -116,6 +179,70 @@ theorem retainedDrawingRoutePlanarCoreFormula_crossover_occurrence
   rw [retainedDrawingRoutePlanarCoreFormula,
     embeddedVariableOccurrences_append]
   exact List.mem_append_left _ atomMem
+
+/-- Scoping the retained route-wire block maps its occurrence list into the
+external summand of the route core. -/
+@[simp] theorem embeddedVariableOccurrences_retainedScopedDrawingRouteWireFormula
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) :
+    embeddedVariableOccurrences
+        (retainedScopedDrawingRouteWireFormula graph) =
+      (embeddedVariableOccurrences
+        (retainedDrawingRouteWireFormula graph)).map Sum.inl := by
+  rw [retainedScopedDrawingRouteWireFormula,
+    embeddedVariableOccurrences_rename]
+
+/-- Every bend-formula occurrence remains present after prepending the
+retained straight-carrier formula. -/
+theorem retainedDrawingRouteWireFormula_bend_occurrence
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) {atom : CarrierNode}
+    (atomMem : atom ∈ embeddedVariableOccurrences
+      (drawingRouteBendFormula graph)) :
+    atom ∈ embeddedVariableOccurrences
+      (retainedDrawingRouteWireFormula graph) := by
+  rw [retainedDrawingRouteWireFormula,
+    embeddedVariableOccurrences_append]
+  exact List.mem_append_right _ atomMem
+
+/-- Every retained route-wire occurrence remains present after scoping the
+wire block and appending it to the crossover family. -/
+theorem retainedDrawingRoutePlanarCoreFormula_wire_occurrence
+    {Vertex : Type*} [DecidableEq Vertex]
+    (graph : PeriodicGraph Vertex) {atom : CarrierNode}
+    (atomMem : atom ∈ embeddedVariableOccurrences
+      (retainedDrawingRouteWireFormula graph)) :
+    (Sum.inl atom : Sum CarrierNode
+      (CrossingRecord × CrossoverInternal)) ∈
+        embeddedVariableOccurrences
+          (retainedDrawingRoutePlanarCoreFormula graph) := by
+  rw [retainedDrawingRoutePlanarCoreFormula,
+    embeddedVariableOccurrences_append]
+  apply List.mem_append_right
+  rw [embeddedVariableOccurrences_retainedScopedDrawingRouteWireFormula]
+  exact List.mem_map.mpr ⟨atom, atomMem, rfl⟩
+
+/-- A bend-terminal occurrence embeds as that exact finite planar-SAT carrier
+terminal in the retained formula. -/
+theorem retainedDrawingPlanarSATFormula_terminal_bend_occurrence
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (terminal : SegmentTerminal)
+    (atomMem : CarrierNode.terminal terminal ∈
+      embeddedVariableOccurrences
+        (drawingRouteBendFormula
+          (PeriodicCNF.incidenceGraph formula))) :
+    (Sum.inl (PlanarSATNode.carrier (.terminal terminal)) :
+        PlanarSATVariable Variable) ∈
+      embeddedVariableOccurrences
+        (retainedDrawingPlanarSATFormula formula) := by
+  change planarSATCoreVariableMap
+      (Sum.inl (CarrierNode.terminal terminal)) ∈
+    embeddedVariableOccurrences (retainedDrawingPlanarSATFormula formula)
+  exact retainedDrawingPlanarSATFormula_core_occurrence formula
+    (retainedDrawingRoutePlanarCoreFormula_wire_occurrence
+      (PeriodicCNF.incidenceGraph formula)
+      (retainedDrawingRouteWireFormula_bend_occurrence
+        (PeriodicCNF.incidenceGraph formula) atomMem))
 
 /-- A crossover-internal occurrence in the crossover-family block embeds as
 that exact internal variable in the retained planar-SAT formula. -/
