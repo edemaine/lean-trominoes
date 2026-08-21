@@ -906,6 +906,7 @@ import LeanTrominoes.PeriodicCNF
 import LeanTrominoes.PeriodicCNFFlatEncoding
 import LeanTrominoes.PeriodicCNFFlatEncodingSize
 import LeanTrominoes.PeriodicCNFPlanarIncidences
+import LeanTrominoes.PeriodicCNFIncidenceMetadataPortRanks
 import LeanTrominoes.PeriodicCNFPlanarVertexGadgets
 import LeanTrominoes.PeriodicCNFPlanarFormula
 import LeanTrominoes.PeriodicCNFPlanarAssignment
