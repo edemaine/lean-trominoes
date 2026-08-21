@@ -10169,6 +10169,17 @@ The representation choices for this target are:
   represented translation-zero source atom, and all nine internals at every
   canonical crossing.  Membership in this four-block list is exactly the
   retained periodic variable-validity predicate.
+- [`LeanTrominoes/PlanarThreeSATCrossoverInternalOccurrenceData.lean`](LeanTrominoes/PlanarThreeSATCrossoverInternalOccurrenceData.lean),
+  [`LeanTrominoes/PlanarThreeSATCrossoverInternalOccurrences.lean`](LeanTrominoes/PlanarThreeSATCrossoverInternalOccurrences.lean),
+  [`LeanTrominoes/PeriodicCNFPlanarRetainedOccurrences.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedOccurrences.lean),
+  and [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATCrossoverInternalOccurrences.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATCrossoverInternalOccurrences.lean)
+  prove the first converse coverage block needed for that enumeration.  Every
+  one of the nine fixed Figure 8 internal names has an explicit clause
+  witness; every such variable at a canonical crossing survives the retained
+  core, the complete finite planar formula, and periodicization as the same
+  canonical protovariable.  Occurrence-list renaming and periodicization are
+  factored into small reusable leaves so this chain remains within the
+  low-memory build boundary.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
