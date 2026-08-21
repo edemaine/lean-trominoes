@@ -236,8 +236,8 @@ def finishRowCfg (representative : Bool) (data : TapeData) :=
   cfg .finishRow ⟨none, false, representative⟩ data
 def moveSelectedToForwardCfg := idleCfg .moveSelectedToForward
 def moveSelectedToOutputCfg := idleCfg .moveSelectedToOutput
-def clearRejectedRowCfg (data : TapeData) :=
-  idleCfg .clearRejectedRow data
+def clearRejectedRowCfg (representative : Bool) (data : TapeData) :=
+  cfg .clearRejectedRow ⟨none, false, representative⟩ data
 def clearRowIndexCfg := idleCfg .clearRowIndex
 def reverseOutputCfg := idleCfg .reverseOutput
 
