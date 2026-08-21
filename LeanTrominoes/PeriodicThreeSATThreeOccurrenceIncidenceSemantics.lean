@@ -3,28 +3,12 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.IndexedListMapIndices
 import LeanTrominoes.PeriodicThreeSATThreeOccurrenceIncidenceData
 
 /-! # Correctness of copied occurrence incidences -/
 
 namespace LeanTrominoes
-
-namespace List
-
-private theorem indexedMap_zipIdx
-    {α β : Type*} (values : List α)
-    (mapAt : α → Nat → β) (start : Nat) :
-    (((values.zipIdx start).map fun tagged =>
-        mapAt tagged.1 tagged.2).zipIdx start) =
-      (values.zipIdx start).map fun tagged =>
-        (mapAt tagged.1 tagged.2, tagged.2) := by
-  induction values generalizing start with
-  | nil => rfl
-  | cons value values induction =>
-      simp only [List.zipIdx_cons, List.map_cons]
-      rw [induction (start + 1)]
-
-end List
 
 namespace PeriodicThreeSATThree
 
