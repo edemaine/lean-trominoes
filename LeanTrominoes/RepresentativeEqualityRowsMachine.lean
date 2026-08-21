@@ -161,7 +161,7 @@ def program : Label → TM2.Stmt Alphabet Label State
       .pop .rowReverse setToken
         (.branch tokenIsNone
           (.push .rowIndex (fun _ => ())
-            (.load clearToken (.goto fun _ => .scanStart)))
+            (.load beginRow (.goto fun _ => .scanStart)))
           (.load clearToken (.goto fun _ => .clearRejectedRow)))
   | .clearRowIndex =>
       .pop .rowIndex setPresent
