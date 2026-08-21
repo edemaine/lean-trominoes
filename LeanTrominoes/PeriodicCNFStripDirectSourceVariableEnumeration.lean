@@ -28,15 +28,21 @@ noncomputable local instance directSourceVariableEnumerationDecidableEq :
     DecidableEq Variable :=
   directSourceVariableDecidableEq
 
+/-- Exact source-level presentation of the occurrence-copy vertex prefix. -/
+def directRotatedOccurrenceVariables (symbols : List encoding.Γ) :
+    List Variable :=
+  PeriodicThreeSATThree.rotatedOccurrenceVariables
+    (PeriodicThreeCNF.formula
+      (PolySpaceCompiler.formulaOfSymbols decider symbols))
+
 /-- The direct guarded source's distinct variables are exactly the positional
 copies of the width-three formula's literals, in presentation order. -/
 theorem directSourceVariableOccurrences_dedup_eq_rotatedOccurrenceVariables
     (symbols : List encoding.Γ) :
     (PeriodicCNF.variableOccurrences
         (directSourceFormula decider symbols)).dedup =
-      PeriodicThreeSATThree.rotatedOccurrenceVariables
-        (PeriodicThreeCNF.formula
-          (PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+      directRotatedOccurrenceVariables decider symbols := by
+  unfold directRotatedOccurrenceVariables
   unfold directSourceFormula
   rw [sourceFormula_formulaOfSymbols]
   exact
@@ -48,10 +54,8 @@ variables first, followed by its clause indices. -/
 theorem directSourceIncidenceVertices_eq_rotatedOccurrences_append_clauses
     (symbols : List encoding.Γ) :
     (directSourceFormula decider symbols).incidenceGraph.vertices =
-      (PeriodicThreeSATThree.rotatedOccurrenceVariables
-          (PeriodicThreeCNF.formula
-            (PolySpaceCompiler.formulaOfSymbols decider symbols))).map
-          CNFVertex.variable ++
+      (directRotatedOccurrenceVariables decider symbols).map
+        CNFVertex.variable ++
         (List.range
           (directSourceFormula decider symbols).clauses.length).map
             CNFVertex.clause := by
