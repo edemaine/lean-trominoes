@@ -107,6 +107,8 @@ def setCandidate (state : State) (symbol : Option Unit) : State :=
 def clearInput (state : State) : State := { state with input := none }
 def clearRow (state : State) : State := { state with row := none }
 def clearUnary (state : State) : State := { state with unary := none }
+def clearRowUnary (state : State) : State :=
+  { state with row := none, unary := none }
 def clearCandidateState (state : State) : State :=
   { state with candidate := none }
 
@@ -234,7 +236,7 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .readValue =>
       .pop .values setUnary
         (.branch unaryIsNone
-          (.load clearUnary (.goto fun _ => .nextBit))
+          (.load clearRowUnary (.goto fun _ => .nextBit))
           (.goto fun _ => .pushValueRestore))
   | .pushValueRestore =>
       .push .valuesRestore storedUnary
@@ -242,7 +244,7 @@ def program : Label → TM2.Stmt Alphabet Label State
           (.branch rowBitIsTrue
             (.goto fun _ => .pushCandidateUnit)
             (.load clearUnary (.goto fun _ => .readValue)))
-          (.load clearUnary (.goto fun _ => .nextBit)))
+          (.load clearRowUnary (.goto fun _ => .nextBit)))
   | .pushCandidateUnit =>
       .push .candidate (fun _ => ())
         (.load clearUnary (.goto fun _ => .readValue))
