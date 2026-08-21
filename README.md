@@ -10209,6 +10209,14 @@ The representation choices for this target are:
   The classification, endpoint metadata, finite retention, and periodic lift
   are separate leaf modules so each check stays within the low-memory build
   boundary.
+- [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableCompleteness.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableCompleteness.lean),
+  [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableCoverage.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableCoverage.lean),
+  and [`LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableCount.lean`](LeanTrominoes/PeriodicOrthocrossingRetainedPeriodicPlanarSATVariableCount.lean)
+  combine all four converse blocks with the existing occurrence-validity
+  direction.  Under the occurrence-three and standard drawing hypotheses,
+  membership in the retained periodic formula is exactly membership in the
+  canonical enumeration, and their deduplicated lengths are equal.  Thus the
+  marker suffix no longer depends on the expanded clause occurrence list.
 - [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenMachineBridge.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectPreparedTokenCompiler.lean)
