@@ -15,6 +15,9 @@ import LeanTrominoes.EncodingBounds
 import LeanTrominoes.EncodingLengthComputability
 import LeanTrominoes.FiniteSearch
 import LeanTrominoes.FiniteState
+import LeanTrominoes.FiniteStateTransducerData
+import LeanTrominoes.FiniteStateTransducerExecution
+import LeanTrominoes.FiniteStateTransducerTime
 import LeanTrominoes.FiniteStateCycleSearch
 import LeanTrominoes.FiniteStateReachability
 import LeanTrominoes.FiniteStateSearch
