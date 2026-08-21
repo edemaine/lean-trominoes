@@ -17,9 +17,9 @@ namespace SourceOccurrenceAtomGroupSizes
 
 open Computability Turing
 
-/-- Occurrence count of every distinct source atom, in stable first-occurrence
-order.  Each representative equality row contributes its number of `true`
-entries. -/
+/-- Occurrence count of every distinct source atom, in the last-occurrence
+order used by `PeriodicThreeSATThree.sourceVariables`.  Each representative
+equality row contributes its number of `true` entries. -/
 def sizes (source : SourceSplitRouteDescriptorTokens.Source) : List Nat :=
   DelimitedBinaryWordTrueCounts.counts
     (SourceOccurrenceAtomRepresentativeRows.rows source)

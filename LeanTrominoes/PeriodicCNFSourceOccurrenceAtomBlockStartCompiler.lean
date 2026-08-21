@@ -18,7 +18,8 @@ namespace SourceOccurrenceAtomBlockStarts
 
 open Computability Turing
 
-/-- Starting vertex index of every source atom's stable occurrence block. -/
+/-- Starting vertex index of every source atom's `sourceVariables`-ordered
+occurrence block. -/
 def starts (source : SourceSplitRouteDescriptorTokens.Source) : List Nat :=
   PrefixSums.starts (SourceOccurrenceAtomGroupSizes.sizes source)
 
