@@ -15,6 +15,10 @@ namespace PeriodicCNFStripReduction
 
 open PeriodicCNF
 
+noncomputable local instance directSourceExactOccurrencesVariableDecidableEq :
+    DecidableEq Variable :=
+  Classical.decEq _
+
 local instance directSourceExactOccurrencesVariableBEq : BEq Variable :=
   instBEqOfDecidableEq
 

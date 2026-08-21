@@ -11,7 +11,11 @@ import LeanTrominoes.PeriodicThreeSATThreeExactOccurrences
 namespace LeanTrominoes
 namespace PeriodicCNFStripReduction
 
-local instance sourceFormulaExactOccurrencesVariableBEq : BEq Variable :=
+noncomputable local instance sourceFormulaExactOccurrencesVariableDecidableEq :
+    DecidableEq Variable :=
+  Classical.decEq _
+
+noncomputable local instance sourceFormulaExactOccurrencesVariableBEq : BEq Variable :=
   instBEqOfDecidableEq
 
 /-- Every variable retained by the occurrence-split normalized formula occurs
