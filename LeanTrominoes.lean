@@ -147,6 +147,7 @@ import LeanTrominoes.UnaryFieldEncoderMachine
 import LeanTrominoes.UnaryPrefixSumsMachine
 import LeanTrominoes.UnaryPrefixSumsTapeUpdates
 import LeanTrominoes.UnaryPrefixSumsCoreSteps
+import LeanTrominoes.UnaryPrefixSumsScanSteps
 import LeanTrominoes.UnaryFieldHeaderRotation
 import LeanTrominoes.UnaryFieldHeaderRotationMachine
 import LeanTrominoes.UnaryFieldHeaderRotationMachineExecution
