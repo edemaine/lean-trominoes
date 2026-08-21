@@ -7,6 +7,7 @@ import LeanTrominoes.Assignment
 import LeanTrominoes.BinaryCountPaddingMachine
 import LeanTrominoes.DelimitedBinaryWordPairs
 import LeanTrominoes.DelimitedBinaryWordPairEqualityMachine
+import LeanTrominoes.DelimitedBinaryWordPairEqualitySteps
 import LeanTrominoes.Computability
 import LeanTrominoes.ComputableSearch
 import LeanTrominoes.ComplexityReductions
