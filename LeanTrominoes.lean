@@ -6,6 +6,8 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.Assignment
 import LeanTrominoes.BinaryCountPaddingMachine
 import LeanTrominoes.BoolSquareRowsMachine
+import LeanTrominoes.BoolSquareRowsTapeUpdates
+import LeanTrominoes.BoolSquareRowsCountSteps
 import LeanTrominoes.DelimitedBinaryWords
 import LeanTrominoes.DelimitedBinaryWordPairs
 import LeanTrominoes.DelimitedBinaryWordPairProductMachine
