@@ -76,5 +76,21 @@ theorem flatMap_zipIdx_fixed
   simpa using flatMap_zipIdx_fixed_from
     values block width start 0 blockLength
 
+/-- Taking the length of a prefix plus `count` from an append retains the
+whole prefix and takes `count` elements from the suffix. -/
+theorem take_length_add_append
+    {α : Type u} (first second : List α) (count : Nat) :
+    (first ++ second).take (first.length + count) =
+      first ++ second.take count := by
+  induction first with
+  | nil => simp
+  | cons value first induction =>
+      change List.take (first.length + 1 + count)
+          (value :: (first ++ second)) =
+        value :: (first ++ second.take count)
+      rw [show first.length + 1 + count =
+          (first.length + count) + 1 by omega,
+        List.take_succ_cons, induction]
+
 end List
 end LeanTrominoes
