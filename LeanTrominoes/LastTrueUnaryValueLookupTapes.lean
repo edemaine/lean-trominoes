@@ -111,6 +111,9 @@ def pushOutputCfg (symbol : UnarySymbol) := unaryCfg .pushOutput symbol
 def haltCfg (output : List UnarySymbol) : machine.Cfg :=
   ⟨none, initialState, tapes ⟨[], [], [], [], [], [], [], [], output⟩⟩
 
+def haltDataCfg (data : TapeData) : machine.Cfg :=
+  ⟨none, initialState, tapes data⟩
+
 @[simp] theorem update_tapes_input (data : TapeData)
     (value : List InputSymbol) :
     Function.update (tapes data) .input value =
