@@ -24,16 +24,24 @@ def numericNeighborOccurrences
       (indexed, translate)
 
 /-- Ordered occurrence pairs retained by the graph-free canonical crossing
-predicate. -/
+predicate at a supplied numeric period. -/
+def numericOrientedCrossingOccurrencePairsAtPeriod
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable) (period : Nat) :
+    List ((IndexedGridSegment × Cell) ×
+      (IndexedGridSegment × Cell)) :=
+  (numericNeighborOccurrences formula ×ˢ
+      numericNeighborOccurrences formula).filter
+    (canonicalOrientedOccurrencePairAtPeriod period)
+
+/-- Numeric crossing-pair scan at the formula's exact orthocrossing period. -/
 def numericOrientedCrossingOccurrencePairs
     {Variable : Type*} [DecidableEq Variable]
     (formula : PeriodicCNF Variable) :
     List ((IndexedGridSegment × Cell) ×
       (IndexedGridSegment × Cell)) :=
-  (numericNeighborOccurrences formula ×ˢ
-      numericNeighborOccurrences formula).filter
-    (canonicalOrientedOccurrencePairAtPeriod
-      (drawingGridSize formula.incidenceGraph))
+  numericOrientedCrossingOccurrencePairsAtPeriod formula
+    (drawingGridSize formula.incidenceGraph)
 
 end PeriodicCNF
 end LeanTrominoes

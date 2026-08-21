@@ -33,6 +33,7 @@ theorem incidenceGraph_orientedCrossingOccurrencePairs_eq_numeric
       numericOrientedCrossingOccurrencePairs formula := by
   unfold orientedCrossingOccurrencePairs
     numericOrientedCrossingOccurrencePairs
+    numericOrientedCrossingOccurrencePairsAtPeriod
   rw [incidenceGraph_neighborOccurrences_eq_numeric]
   apply List.filter_congr
   intro pair pairMember
