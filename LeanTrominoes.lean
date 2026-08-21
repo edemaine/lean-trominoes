@@ -9,6 +9,7 @@ import LeanTrominoes.BoolSquareRowsMachine
 import LeanTrominoes.BoolSquareRowsTapeUpdates
 import LeanTrominoes.BoolSquareRowsCountSteps
 import LeanTrominoes.BoolSquareRowsOutputSteps
+import LeanTrominoes.BoolSquareRowsCopyExecution
 import LeanTrominoes.DelimitedBinaryWords
 import LeanTrominoes.DelimitedBinaryWordPairs
 import LeanTrominoes.DelimitedBinaryWordPairProductMachine
