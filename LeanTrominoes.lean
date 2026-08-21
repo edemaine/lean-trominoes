@@ -155,6 +155,7 @@ import LeanTrominoes.UnaryPrefixSumsExecution
 import LeanTrominoes.UnaryPrefixSumsFieldScanExecution
 import LeanTrominoes.UnaryPrefixSumsFieldExecution
 import LeanTrominoes.UnaryPrefixSumsInterface
+import LeanTrominoes.UnaryPrefixSumsLengthBounds
 import LeanTrominoes.UnaryPrefixSumsListExecution
 import LeanTrominoes.UnaryPrefixSumsScanSteps
 import LeanTrominoes.UnaryPrefixSumsRestoreExecution
