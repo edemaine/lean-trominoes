@@ -24,6 +24,7 @@ structure Source where
   formula : PeriodicCNF Nat
   oneDimensional : formula.IsOneDimensional
   isLocal : formula.IsLocal
+  isForwardLocal : formula.IsForwardLocal
   widthAtMostThree : formula.WidthAtMost 3
 
 /-- The promised source uses exactly its underlying flat formula word as its
@@ -40,15 +41,19 @@ noncomputable def finEncoding :
         let formula ← PeriodicCNFFlatEncoding.finEncoding.decode symbols
         if oneDimensional : formula.IsOneDimensional then
           if isLocal : formula.IsLocal then
-            if widthAtMostThree : formula.WidthAtMost 3 then
-              some ⟨formula, oneDimensional, isLocal, widthAtMostThree⟩
+            if isForwardLocal : formula.IsForwardLocal then
+              if widthAtMostThree : formula.WidthAtMost 3 then
+                some ⟨formula, oneDimensional, isLocal, isForwardLocal,
+                  widthAtMostThree⟩
+              else none
             else none
           else none
         else none
       decode_encode source := by
         rcases source with
-          ⟨formula, oneDimensional, isLocal, widthAtMostThree⟩
-        simp [oneDimensional, isLocal, widthAtMostThree] }
+          ⟨formula, oneDimensional, isLocal, isForwardLocal,
+            widthAtMostThree⟩
+        simp [oneDimensional, isLocal, isForwardLocal, widthAtMostThree] }
      ΓFin := inferInstance }
 
 @[simp] theorem finEncoding_encode (source : Source) :

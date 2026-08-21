@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFSourceSplitRouteDescriptorTokenData
-import LeanTrominoes.PeriodicCNFStripDirectSourceFormulaFacts
+import LeanTrominoes.PeriodicCNFStripDirectSourceFormulaForwardLocal
 
 /-! # Promised route-emitter sources from direct PSPACE inputs -/
 
@@ -32,6 +32,8 @@ def directSourceRouteTokenSource (symbols : List encoding.Γ) :
     (formulaOfSymbols_sourceAdmissible decider symbols).1
   isLocal :=
     (formulaOfSymbols_sourceAdmissible decider symbols).2.1
+  isForwardLocal :=
+    formulaOfSymbols_isForwardLocal decider symbols
   widthAtMostThree :=
     formulaOfSymbols_widthAtMostThree decider symbols
 
