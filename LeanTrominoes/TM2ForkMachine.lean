@@ -298,7 +298,10 @@ def program
           (.goto fun _ => .drainSecondOutput))
   | .drainSecondOutput =>
       .pop (.second second.tm.k₁) (fun _ symbol =>
-        .secondOutput (symbol.map second.outputAlphabet))
+        match symbol with
+        | none => .output none
+        | some symbol =>
+            .secondOutput (some (second.outputAlphabet symbol)))
         (.goto fun state =>
           match secondOutputSymbol first.tm second.tm
               InputSymbol FirstSymbol SecondSymbol state with
