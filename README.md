@@ -1518,6 +1518,9 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Normalize the compiled stream by a fixed finite transducer to
             explicit record starts and delimiter-terminated unary fields,
             erasing all irrelevant token constructors.
+          - [x] Verify a total eleven-field decoder for the normalized stream
+            and package its exact round trip as a finite encoding of route-
+            descriptor lists.
           - [ ] Implement the finite descriptor segment-pair filter and emit
             thirteen variable markers per retained crossing.
           - [ ] Compose the crossing markers with the compiled segment and
