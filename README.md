@@ -1586,6 +1586,9 @@ build; an imported proof counts when its statement matches the paper.
                   axis tests, and two strict interval tests as one fixed
                   affine Boolean formula per occurrence pair, and prove its
                   tagged evaluation equals the canonical linear predicate.
+                - [x] Define the fixed twenty-eight-squared guarded shape scan
+                  over tagged fields and prove every enabled shape pair's
+                  at-most-eighty-one-squared occurrence count exact.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
