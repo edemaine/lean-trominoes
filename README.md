@@ -1509,6 +1509,17 @@ build; an imported proof counts when its statement matches the paper.
         - [ ] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
+          - [x] Compile the complete counted unary route-descriptor stream,
+            including copied incidences and occurrence-cycle links, directly
+            from the guarded source symbols.
+          - [x] Factor the canonical crossing scan through that compact route
+            stream and recover its drawing period from the repeated descriptor
+            header.
+          - [ ] Implement the finite descriptor segment-pair filter and emit
+            thirteen variable markers per retained crossing.
+          - [ ] Compose the crossing markers with the compiled segment and
+            source-atom markers, and implement the retained clause-descriptor
+            prefix.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
