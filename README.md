@@ -1610,8 +1610,9 @@ build; an imported proof counts when its statement matches the paper.
                     phases with exact step counts.
                   - [x] Assemble exact one-pair, pair-list, and output-reversal
                     executions for the length comparator.
-                  - [ ] Prove its complete execution and polynomial runtime,
-                    then feed it signed affine unary totals.
+                  - [x] Prove its complete execution and package the exact
+                    `3n+2` linear runtime as a polynomial-time compiler.
+                  - [ ] Feed the comparator signed affine unary totals.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
