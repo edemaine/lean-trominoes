@@ -27,6 +27,18 @@ def afterVertexCounters (data : TapeData) : TapeData :=
     (afterVertexCounters data).targets = data.targets := by
   rfl
 
+theorem afterVertexCounters_eq (data : TapeData) :
+    afterVertexCounters data =
+      { data with
+        scratch := []
+        outputReverse :=
+          .atomEnd :: (copiedOutput data.literalCount ++
+            copiedOutput data.literalCount ++
+              copiedOutput data.clauseCount ++ data.outputReverse) } := by
+  simp only [afterVertexCounters, closeOutputField, afterCounterData,
+    afterVertexLiteralFirstCounter, afterVertexClauseCounter,
+    List.append_assoc]
+
 def afterEdgeLiteralFirstCounter (data : TapeData) : TapeData :=
   afterCounterData data data.literalCount
 
@@ -42,11 +54,32 @@ def afterEdgeCounters (data : TapeData) : TapeData :=
     (afterEdgeCounters data).targets = data.targets := by
   rfl
 
+theorem afterEdgeCounters_eq (data : TapeData) :
+    afterEdgeCounters data =
+      { data with
+        scratch := []
+        outputReverse :=
+          .atomEnd :: (copiedOutput data.literalCount ++
+            copiedOutput data.literalCount ++
+              copiedOutput data.literalCount ++ data.outputReverse) } := by
+  simp only [afterEdgeCounters, closeOutputField, afterCounterData,
+    afterEdgeLiteralSecondCounter, afterEdgeLiteralFirstCounter,
+    List.append_assoc]
+
 def afterEdgeIndexCounter (data : TapeData) : TapeData :=
   closeOutputField (afterCounterData data data.edgeIndex)
 
 @[simp] theorem afterEdgeIndexCounter_targets (data : TapeData) :
     (afterEdgeIndexCounter data).targets = data.targets := by
+  rfl
+
+theorem afterEdgeIndexCounter_eq (data : TapeData) :
+    afterEdgeIndexCounter data =
+      { data with
+        scratch := []
+        outputReverse :=
+          .atomEnd ::
+            (copiedOutput data.edgeIndex ++ data.outputReverse) } := by
   rfl
 
 def afterSourceLiteralCounter (data : TapeData) : TapeData :=
@@ -59,6 +92,16 @@ def afterSourceCounters (data : TapeData) : TapeData :=
 @[simp] theorem afterSourceCounters_targets (data : TapeData) :
     (afterSourceCounters data).targets = data.targets := by
   rfl
+
+theorem afterSourceCounters_eq (data : TapeData) :
+    afterSourceCounters data =
+      { data with
+        scratch := []
+        outputReverse :=
+          .atomEnd :: (copiedOutput data.clauseIndex ++
+            copiedOutput data.literalCount ++ data.outputReverse) } := by
+  simp only [afterSourceCounters, closeOutputField, afterCounterData,
+    afterSourceLiteralCounter, List.append_assoc]
 
 def vertexCountersTime (data : TapeData) : Nat :=
   counterTime data.literalCount +
