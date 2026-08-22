@@ -1589,6 +1589,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Define the fixed twenty-eight-squared guarded shape scan
                   over tagged fields and prove every enabled shape pair's
                   at-most-eighty-one-squared occurrence count exact.
+                - [x] Prove uniqueness collapses that complete finite scan to
+                  one matching shape pair and hence emits exactly the canonical
+                  thirteen-marker block for every local descriptor pair.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
