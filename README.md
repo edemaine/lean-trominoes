@@ -1536,6 +1536,12 @@ build; an imported proof counts when its statement matches the paper.
               the verified generic quadratic-time pair machine.
             - [ ] Evaluate the bounded segment-occurrence crossing predicate
               on each descriptor pair.
+              - [x] Replace external route positions by the edge indices
+                stored in canonical descriptors, factor the exact global
+                count into pair-local counts, and prove the fixed bounds of
+                6,561 tests and 85,293 markers per pair.
+              - [ ] Compile the pair-local predicate and marker output from
+                the two eleven-field words.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
