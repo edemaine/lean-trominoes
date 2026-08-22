@@ -1532,8 +1532,10 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Re-encode each normalized eleven-field descriptor as one
               delimiter-framed binary word using a verified eleven-state
               finite transducer.
-            - [ ] Form the ordered product of descriptor words and evaluate
-              the bounded segment-occurrence crossing predicate on each pair.
+            - [x] Form the row-major ordered product of descriptor words with
+              the verified generic quadratic-time pair machine.
+            - [ ] Evaluate the bounded segment-occurrence crossing predicate
+              on each descriptor pair.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
