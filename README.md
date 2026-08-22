@@ -1543,6 +1543,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Verify total single-word and pair decoders, and prove that
                 interpreting the compiled canonical word pairs yields exactly
                 the direct crossing-marker target.
+              - [x] Prove the evaluator output linear in the encoded pair
+                stream and compose its single fixed compiler boundary with
+                the direct ordered-pair producer.
               - [ ] Compile the pair-local predicate and marker output from
                 the two decoded eleven-field words.
           - [ ] Compose the crossing markers with the compiled segment and
