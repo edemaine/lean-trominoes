@@ -22,11 +22,17 @@ theorem routedClauseMetadataClauseDescriptors_eq_sourceClauses
     (source : PeriodicCNF Variable)
     (wellFormed : source.incidenceGraph.IsWellFormed) :
     routedClauseMetadataClauseDescriptors source =
-      source.clauses.zipIdx.flatMap fun taggedClause =>
+      source.clauses.flatMap fun clause =>
         neighborTranslations.map fun _ =>
           routedClauseDescriptor
-            (taggedClause.1.map fun literal =>
+            (clause.map fun literal =>
               (⟨false, literal.value⟩ : LiteralProfile)) := by
+  rw [← PeriodicCNF.zipIdx_flatMap_fst
+    (fun clause => neighborTranslations.map fun _ =>
+      routedClauseDescriptor
+        (clause.map fun literal =>
+          (⟨false, literal.value⟩ : LiteralProfile)))
+    source.clauses 0]
   rw [routedClauseMetadataClauseDescriptors_eq_canonicalDescriptors]
   unfold drawingClauseRouteSites
   rw [List.map_flatMap]
