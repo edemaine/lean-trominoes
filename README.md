@@ -1579,6 +1579,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Expand each finite shape to exact self-indexed affine
                   neighboring occurrences, verify first-period translated
                   geometry, and retain the eighty-one-occurrence bound.
+                - [x] Instantiate the four bounds, occurrence-key inequality,
+                  axis tests, and two strict interval tests as one fixed
+                  affine Boolean formula per occurrence pair, and prove its
+                  tagged evaluation equals the canonical linear predicate.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
