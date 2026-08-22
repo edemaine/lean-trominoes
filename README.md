@@ -1524,6 +1524,9 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Decompose reconstructed geometry into per-descriptor segment
             blocks and prove the fixed bounds of nine segments and eighty-one
             neighboring occurrences per route record.
+          - [x] Rewrite the canonical quadratic crossing count as the exact
+            descriptor/first-occurrence/descriptor/second-occurrence nested
+            scan and flatten its per-route thirteen-marker blocks.
           - [ ] Implement the finite descriptor segment-pair filter and emit
             thirteen variable markers per retained crossing.
           - [ ] Compose the crossing markers with the compiled segment and
