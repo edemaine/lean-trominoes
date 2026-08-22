@@ -400,22 +400,24 @@ def program : Label → TM2.Stmt Alphabet Label State
   | .scanTarget =>
       .pop .targets (fun state symbol => .unary (cursorTag state) symbol)
         (.branch unaryIsNone
-          (.goto fun state => .finishSourceTarget (cursorTag state))
+          (.load clear
+            (.goto fun state => .finishSourceTarget (cursorTag state)))
           (.branch unaryIsUnit
             (.push .outputReverse (fun _ => .atomUnit)
               (.load clear (.goto fun _ => .scanTarget)))
-            (.goto fun state => .finishSourceTarget (cursorTag state))))
+            (.load clear
+              (.goto fun state => .finishSourceTarget (cursorTag state)))))
   | .finishSourceTarget tag =>
       .push .outputReverse (fun _ => .atomEnd)
         (pushTokens (sourceSuffix tag)
-          (.goto fun _ => .beginTargetRecord))
+          (.load clear (.goto fun _ => .beginTargetRecord)))
   | .beginTargetRecord =>
       .push .outputReverse (fun _ => .clauseMarker)
         (.goto fun _ => .copyCounter .targetVertexClause)
   | .finishTargetRecord tag =>
       .push .outputReverse (fun _ => .atomEnd)
         (pushTokens (targetSuffix tag)
-          (.goto fun _ => .incrementLink))
+          (.load clear (.goto fun _ => .incrementLink)))
   | .incrementLink =>
       .push .linkIndex (fun _ => ())
         (.load clear (.goto fun _ => .scanLinks))
