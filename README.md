@@ -1556,6 +1556,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Express the period, port columns, track rows, gate
                   column, and signed offsets as fixed affine forms, and prove
                   their tagged-token evaluations exact.
+                - [x] Package signed affine equality, disequality, strict and
+                  nonstrict comparisons into fixed Boolean formulas whose
+                  tagged-token and semantic pair evaluations agree exactly.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
