@@ -1658,7 +1658,7 @@ build; an imported proof counts when its statement matches the paper.
             tokens whose geometric directions are uniformly invalid.
           - [ ] Compile and assemble the remaining ordered descriptor scans.
             - [ ] Compile retained carrier-link descriptors.
-            - [ ] Compile retained route-bend descriptors.
+            - [x] Compile retained route-bend descriptors.
             - [ ] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
               exact finite source clause-profile stream.
