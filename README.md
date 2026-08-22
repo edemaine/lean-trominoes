@@ -1636,6 +1636,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Interpret the batched ordering word back into any
                     fixed predicate list, proving exact left-to-right atom
                     consumption and tagged-field Boolean semantics.
+                  - [x] Compose batched comparison with fixed-length finite
+                    control and emit exactly thirteen markers for every true
+                    predicate in any fixed predicate list.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
