@@ -1559,6 +1559,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Package signed affine equality, disequality, strict and
                   nonstrict comparisons into fixed Boolean formulas whose
                   tagged-token and semantic pair evaluations agree exactly.
+                - [x] Verify fixed affine addition, scaling, subtraction, and
+                  two-dimensional point evaluation, including both vertex-
+                  center columns needed by the route templates.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
