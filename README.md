@@ -1630,6 +1630,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Certify a compact finite-control evaluator for an
                     arbitrary fixed-length result word, avoiding expansion of
                     the millions of fixed occurrence tests into fork trees.
+                  - [x] Batch any fixed atom list into one affine phase
+                    pipeline and one length-comparator run, with exact ordered
+                    comparison-pair and ordering semantics.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
