@@ -22,12 +22,16 @@ inductive LengthOrdering
   | greater
   deriving DecidableEq, Fintype, Inhabited
 
+/-- Compare two natural numbers. -/
+def compareNats : Nat → Nat → LengthOrdering
+  | 0, 0 => .equal
+  | _ + 1, 0 => .greater
+  | 0, _ + 1 => .less
+  | first + 1, second + 1 => compareNats first second
+
 /-- Compare two list lengths without inspecting their elements. -/
-def compareLengths : List α → List β → LengthOrdering
-  | [], [] => .equal
-  | _ :: _, [] => .greater
-  | [], _ :: _ => .less
-  | _ :: first, _ :: second => compareLengths first second
+def compareLengths (first : List α) (second : List β) : LengthOrdering :=
+  compareNats first.length second.length
 
 /-- Preserve an earlier strict result when the remaining suffix lengths are
 equal, and otherwise use the strict suffix result. -/
