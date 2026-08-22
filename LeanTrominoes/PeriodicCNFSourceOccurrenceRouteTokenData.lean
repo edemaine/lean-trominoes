@@ -26,6 +26,16 @@ inductive Token
   | literalEnd
   deriving DecidableEq, Fintype, Inhabited
 
+/-- Select the unique header of each source clause. -/
+def isClause : Token → Bool
+  | .clause _ => true
+  | _ => false
+
+/-- Select the unique header of each literal occurrence. -/
+def isLiteral : Token → Bool
+  | .literal _ => true
+  | _ => false
+
 /-- The Boolean state records whether the current binary offset word contains
 a one bit. -/
 def transition : Bool → SourceOccurrenceTokens.Token → Bool × List Token
