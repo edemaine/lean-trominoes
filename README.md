@@ -1521,6 +1521,9 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Verify a total eleven-field decoder for the normalized stream
             and package its exact round trip as a finite encoding of route-
             descriptor lists.
+          - [x] Decompose reconstructed geometry into per-descriptor segment
+            blocks and prove the fixed bounds of nine segments and eighty-one
+            neighboring occurrences per route record.
           - [ ] Implement the finite descriptor segment-pair filter and emit
             thirteen variable markers per retained crossing.
           - [ ] Compose the crossing markers with the compiled segment and
