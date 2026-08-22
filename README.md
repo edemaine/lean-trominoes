@@ -1621,6 +1621,9 @@ build; an imported proof counts when its statement matches the paper.
                       canonical delimiter-encoded comparison pair.
                     - [x] Certify that emitter as a polynomial-time compiler
                       and compose it with length comparison.
+                    - [x] Interpret the singleton comparison ordering by its
+                      fixed relation and prove the compiled Boolean equals
+                      the affine atom's tagged-field truth value.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
