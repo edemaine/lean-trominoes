@@ -1551,6 +1551,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile pair tokens through a fixed finite-state pass
                   to exact pair boundaries and unary units tagged by first or
                   second descriptor and field position `0` through `10`.
+                - [x] Prove that counting those tagged unary units recovers
+                  every numeric field of each descriptor in the pair exactly.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
