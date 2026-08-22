@@ -1608,6 +1608,8 @@ build; an imported proof counts when its statement matches the paper.
                     word lengths and verify all of its one-step transitions.
                   - [x] Verify the complete word-reading and length-comparison
                     phases with exact step counts.
+                  - [x] Assemble exact one-pair, pair-list, and output-reversal
+                    executions for the length comparator.
                   - [ ] Prove its complete execution and polynomial runtime,
                     then feed it signed affine unary totals.
           - [ ] Compose the crossing markers with the compiled segment and
