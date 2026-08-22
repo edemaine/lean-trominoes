@@ -1527,14 +1527,14 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Rewrite the canonical quadratic crossing count as the exact
             descriptor/first-occurrence/descriptor/second-occurrence nested
             scan and flatten its per-route thirteen-marker blocks.
-          - [ ] Implement the finite descriptor segment-pair filter and emit
+          - [x] Implement the finite descriptor segment-pair filter and emit
             thirteen variable markers per retained crossing.
             - [x] Re-encode each normalized eleven-field descriptor as one
               delimiter-framed binary word using a verified eleven-state
               finite transducer.
             - [x] Form the row-major ordered product of descriptor words with
               the verified generic quadratic-time pair machine.
-            - [ ] Evaluate the bounded segment-occurrence crossing predicate
+            - [x] Evaluate the bounded segment-occurrence crossing predicate
               on each descriptor pair.
               - [x] Replace external route positions by the edge indices
                 stored in canonical descriptors, factor the exact global
@@ -1646,9 +1646,19 @@ build; an imported proof counts when its statement matches the paper.
                   output, clears every inner stack, and repeats.
                 - [x] Verify the block-map execution and polynomial runtime,
                   then instantiate it with the affine crossing compiler.
-          - [ ] Compose the crossing markers with the compiled segment and
-            source-atom markers, and implement the retained clause-descriptor
-            prefix.
+          - [x] Compose the crossing markers with the compiled segment and
+            source-atom markers to obtain the exact retained variable-marker
+            suffix.
+          - [x] Convert those crossing markers to the fixed Figure 8(b)
+            crossover descriptor blocks and identify their exact public
+            descriptor prefix.
+          - [x] Reduce every remaining retained metadata family to compact
+            canonical data: two-token straight-carrier, bend-corner, and
+            routed-variable equality templates, plus routed source-clause
+            tokens whose geometric directions are uniformly invalid.
+          - [ ] Compile the ordered retained carrier-link, route-bend,
+            routed-variable-link, and gauged routed-clause scans, then append
+            them to the compiled crossover prefix.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
