@@ -1529,6 +1529,11 @@ build; an imported proof counts when its statement matches the paper.
             scan and flatten its per-route thirteen-marker blocks.
           - [ ] Implement the finite descriptor segment-pair filter and emit
             thirteen variable markers per retained crossing.
+            - [x] Re-encode each normalized eleven-field descriptor as one
+              delimiter-framed binary word using a verified eleven-state
+              finite transducer.
+            - [ ] Form the ordered product of descriptor words and evaluate
+              the bounded segment-occurrence crossing predicate on each pair.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
