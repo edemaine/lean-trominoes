@@ -1595,6 +1595,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove every numeric incidence descriptor emitted from a
                   forward-local CNF has one of those twenty-eight shapes, so
                   the exact finite scan applies to the complete source stream.
+                - [x] Lift the exact pair evaluator across the ordered route-
+                  descriptor square and recover the global thirteen-markers-
+                  per-crossing stream from self-index and common-period data.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
