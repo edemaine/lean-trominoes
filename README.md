@@ -1551,6 +1551,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile pair tokens through a fixed finite-state pass
                   to exact pair boundaries and unary units tagged by first or
                   second descriptor and field position `0` through `10`.
+                - [x] Reduce the canonical proper-crossing predicate to its
+                  unique oriented intersection, four fundamental-square
+                  bounds, distinct keys, fixed axes, and two strict linear
+                  interval tests.
                 - [ ] Evaluate the fixed linear coordinate and proper-
                   crossing tests over the tagged unary fields.
           - [ ] Compose the crossing markers with the compiled segment and
