@@ -58,6 +58,41 @@ def clearPosition_evalsInTime (count : Nat) (data : TapeData)
         1 (count + 1) _ _ _ first rest
       simpa [whole, nextData, Nat.add_assoc] using whole
 
+def blockCleanupTime (blockStart position : Nat) : Nat :=
+  blockStart + position + 2
+
+def blockCleanup_evalsInTime (blockStart position : Nat)
+    (data : TapeData)
+    (startEq : data.start = List.replicate blockStart ())
+    (positionEq : data.position = List.replicate position ()) :
+    EvalsToInTime machine.step (clearStartCfg data)
+      (some (scanSizeFieldCfg
+        { data with
+          start := []
+          position := [] }))
+      (blockCleanupTime blockStart position) := by
+  let afterStart : TapeData := { data with start := [] }
+  have startRun := clearStart_evalsInTime blockStart data startEq
+  have startRun' : EvalsToInTime machine.step (clearStartCfg data)
+      (some (clearPositionCfg afterStart)) (blockStart + 1) := by
+    simpa [afterStart] using startRun
+  have positionRun := clearPosition_evalsInTime position afterStart
+    (by simpa [afterStart] using positionEq)
+  have positionRun' : EvalsToInTime machine.step
+      (clearPositionCfg afterStart)
+      (some (scanSizeFieldCfg
+        { data with
+          start := []
+          position := [] }))
+      (position + 1) := by
+    simpa [afterStart] using positionRun
+  have whole := EvalsToInTime.trans machine.step
+    (blockStart + 1) (position + 1)
+    _ _ _ startRun' positionRun'
+  convert whole using 1
+  simp only [blockCleanupTime]
+  omega
+
 end LeanTrominoes.UnaryBlockRightRotationMachine
 
 end
