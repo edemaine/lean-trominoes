@@ -1515,6 +1515,9 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Factor the canonical crossing scan through that compact route
             stream and recover its drawing period from the repeated descriptor
             header.
+          - [x] Normalize the compiled stream by a fixed finite transducer to
+            explicit record starts and delimiter-terminated unary fields,
+            erasing all irrelevant token constructors.
           - [ ] Implement the finite descriptor segment-pair filter and emit
             thirteen variable markers per retained crossing.
           - [ ] Compose the crossing markers with the compiled segment and
