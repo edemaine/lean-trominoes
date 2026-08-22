@@ -30,15 +30,17 @@ def cleanupMeasure (inner : FinTM2)
 
 theorem innerPopulation_update_cons
     (inner : FinTM2)
+    (decEq : DecidableEq inner.K)
     (innerContents : ∀ target, List (inner.Γ target))
     (stack : inner.K) (symbol : inner.Γ stack)
     (tail : List (inner.Γ stack))
     (contentsEq : innerContents stack = symbol :: tail) :
-    innerPopulation inner (Function.update innerContents stack tail) + 1 =
+    innerPopulation inner
+        (@Function.update _ _ decEq innerContents stack tail) + 1 =
       innerPopulation inner innerContents := by
   classical
   unfold innerPopulation
-  let updated := Function.update innerContents stack tail
+  let updated := @Function.update _ _ decEq innerContents stack tail
   calc
     (∑ target, (updated target).length) + 1 =
         ((∑ target ∈ Finset.univ.erase stack,
@@ -61,19 +63,47 @@ theorem innerPopulation_update_cons
       rw [← contentsEq]
       exact Finset.sum_erase_add _ _ (Finset.mem_univ stack)
 
-theorem cleanupMeasure_update_lt
+theorem cleanupMeasure_update_add_one
     (inner : FinTM2)
+    (decEq : DecidableEq inner.K)
     (position : Fin (Fintype.card inner.K + 1))
     (innerContents : ∀ target, List (inner.Γ target))
     (stack : inner.K) (symbol : inner.Γ stack)
     (tail : List (inner.Γ stack))
     (contentsEq : innerContents stack = symbol :: tail) :
     cleanupMeasure inner position
-        (Function.update innerContents stack tail) <
+        (@Function.update _ _ decEq innerContents stack tail) + 1 =
       cleanupMeasure inner position innerContents := by
-  have population := innerPopulation_update_cons inner innerContents
+  have population := innerPopulation_update_cons inner decEq innerContents
     stack symbol tail contentsEq
   unfold cleanupMeasure
+  omega
+
+theorem cleanupMeasure_update_lt
+    (inner : FinTM2)
+    (decEq : DecidableEq inner.K)
+    (position : Fin (Fintype.card inner.K + 1))
+    (innerContents : ∀ target, List (inner.Γ target))
+    (stack : inner.K) (symbol : inner.Γ stack)
+    (tail : List (inner.Γ stack))
+    (contentsEq : innerContents stack = symbol :: tail) :
+    cleanupMeasure inner position
+        (@Function.update _ _ decEq innerContents stack tail) <
+      cleanupMeasure inner position innerContents := by
+  rw [← cleanupMeasure_update_add_one inner decEq position innerContents
+    stack symbol tail contentsEq]
+  omega
+
+theorem cleanupMeasure_next_add_one
+    (inner : FinTM2)
+    (position : Fin (Fintype.card inner.K + 1))
+    (innerContents : ∀ stack, List (inner.Γ stack))
+    (fits : position.val < Fintype.card inner.K) :
+    cleanupMeasure inner (nextCleanupPosition inner position)
+        innerContents + 1 =
+      cleanupMeasure inner position innerContents := by
+  rw [cleanupMeasure, cleanupMeasure,
+    nextCleanupPosition_val_of_lt inner position fits]
   omega
 
 theorem cleanupMeasure_next_lt
@@ -84,8 +114,7 @@ theorem cleanupMeasure_next_lt
     cleanupMeasure inner (nextCleanupPosition inner position)
         innerContents <
       cleanupMeasure inner position innerContents := by
-  rw [cleanupMeasure, cleanupMeasure,
-    nextCleanupPosition_val_of_lt inner position fits]
+  rw [← cleanupMeasure_next_add_one inner position innerContents fits]
   omega
 
 end TM2EndDelimitedBlockMap
