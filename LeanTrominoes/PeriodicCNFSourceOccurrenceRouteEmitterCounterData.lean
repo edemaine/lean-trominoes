@@ -32,6 +32,27 @@ def TapeData.setCounter (data : TapeData)
     (data.setCounter stage value).counter stage = value := by
   cases stage <;> rfl
 
+@[simp] theorem TapeData.scratch_setCounter (data : TapeData)
+    (stage : CounterStage) (value : List Unit) :
+    (data.setCounter stage value).scratch = data.scratch := by
+  cases stage <;> rfl
+
+@[simp] theorem TapeData.outputReverse_setCounter (data : TapeData)
+    (stage : CounterStage) (value : List Unit) :
+    (data.setCounter stage value).outputReverse = data.outputReverse := by
+  cases stage <;> rfl
+
+@[simp] theorem TapeData.counter_setScratch (data : TapeData)
+    (stage : CounterStage) (value : List Unit) :
+    ({ data with scratch := value }).counter stage = data.counter stage := by
+  cases stage <;> rfl
+
+theorem TapeData.setCounter_setScratch (data : TapeData)
+    (stage : CounterStage) (counter scratch : List Unit) :
+    ({ data with scratch := scratch }).setCounter stage counter =
+      { data.setCounter stage counter with scratch := scratch } := by
+  cases stage <;> rfl
+
 def CounterStage.units (stage : CounterStage)
     (value : List Unit) : List (Alphabet stage.stack) := by
   cases stage <;> exact value

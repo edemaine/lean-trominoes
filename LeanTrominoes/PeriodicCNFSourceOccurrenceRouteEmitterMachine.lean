@@ -351,7 +351,7 @@ def program : Label → TM2.Stmt Alphabet Label State
       .pop .scratch
         (fun state symbol => .unit (cursorFromState state) symbol)
         (.branch unitIsNone
-          (afterCounter stage)
+          (.load clear (afterCounter stage))
           (.push stage.stack (fun _ => stage.unit)
             (.load clear (.goto fun _ => .restoreCounter stage))))
   | .scanTarget =>
