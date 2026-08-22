@@ -1639,6 +1639,13 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Compose batched comparison with fixed-length finite
                     control and emit exactly thirteen markers for every true
                     predicate in any fixed predicate list.
+              - [ ] Map the compiled evaluator independently over the
+                pair-delimited tagged-field stream.
+                - [x] Define a generic end-delimited block-map TM2 that
+                  collects one block, runs an inner compiler, appends its
+                  output, clears every inner stack, and repeats.
+                - [ ] Verify the block-map execution and polynomial runtime,
+                  then instantiate it with the affine crossing compiler.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
