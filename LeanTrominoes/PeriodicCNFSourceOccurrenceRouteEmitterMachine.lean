@@ -359,18 +359,20 @@ def program : Label → TM2.Stmt Alphabet Label State
         (fun state symbol => .unary (cursorFromState state) symbol)
         (.branch unaryIsNone
           (.push .outputReverse (fun _ => .atomEnd)
-            (.goto fun state =>
-              let cursor := cursorFromState state
-              .finishRecord cursor.literalIndex cursor.currentNext
-                cursor.anchorValue))
+            (.load clear
+              (.goto fun state =>
+                let cursor := cursorFromState state
+                .finishRecord cursor.literalIndex cursor.currentNext
+                  cursor.anchorValue)))
           (.branch unaryIsUnit
             (.push .outputReverse (fun _ => .atomUnit)
               (.load clear (.goto fun _ => .scanTarget)))
             (.push .outputReverse (fun _ => .atomEnd)
-              (.goto fun state =>
-                let cursor := cursorFromState state
-                .finishRecord cursor.literalIndex cursor.currentNext
-                  cursor.anchorValue))))
+              (.load clear
+                (.goto fun state =>
+                  let cursor := cursorFromState state
+                  .finishRecord cursor.literalIndex cursor.currentNext
+                    cursor.anchorValue)))))
   | .finishRecord literalIndex currentNext anchorNext =>
       pushTokens (fixedSuffix literalIndex currentNext anchorNext)
         (.push .edgeIndex (fun _ => ())
