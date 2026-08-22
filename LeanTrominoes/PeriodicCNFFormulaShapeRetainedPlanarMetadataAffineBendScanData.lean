@@ -43,20 +43,30 @@ def BendTemplate.descriptorPredicate
       shape.guard .first,
       template.portPredicate ports.1 ports.2]
 
+/-- All sixteen port predicates for one fixed bend position. -/
+def BendTemplate.descriptorPredicates
+    (shape : RouteShape) (template : BendTemplate) : List Predicate :=
+  allCornerPortPairs.map fun ports =>
+    template.descriptorPredicate shape ports
+
+/-- The sixteen aligned canonical output blocks for one bend position. -/
+def bendTemplateDescriptorBlocks :
+    List (List PeriodicCNF.FormulaShapeDirectionOrdering.Token) :=
+  allCornerPortPairs.map fun ports =>
+    canonicalBendDescriptorBlock ports.1 ports.2 false
+
 /-- Predicates classifying every bend of one selected route shape. -/
 def RouteShape.bendDescriptorPredicates
     (shape : RouteShape) : List Predicate :=
   shape.baseBendTemplates.flatMap fun template =>
-    allCornerPortPairs.map fun ports =>
-      template.descriptorPredicate shape ports
+    template.descriptorPredicates shape
 
 /-- Corresponding fixed two-token canonical bend descriptor blocks. -/
 def RouteShape.bendDescriptorBlocks
     (shape : RouteShape) :
     List (List PeriodicCNF.FormulaShapeDirectionOrdering.Token) :=
   shape.baseBendTemplates.flatMap fun _ =>
-    allCornerPortPairs.map fun ports =>
-      canonicalBendDescriptorBlock ports.1 ports.2 false
+    bendTemplateDescriptorBlocks
 
 /-- Complete fixed predicate list for one untranslated route occurrence. -/
 def bendDescriptorPredicates : List Predicate :=
