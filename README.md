@@ -1602,7 +1602,7 @@ build; an imported proof counts when its statement matches the paper.
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
                   interval tests.
-                - [ ] Evaluate the fixed linear coordinate and proper-
+                - [x] Evaluate the fixed linear coordinate and proper-
                   crossing tests over the tagged unary fields.
                   - [x] Define a finite TM2 machine comparing two delimited
                     word lengths and verify all of its one-step transitions.
@@ -1612,7 +1612,7 @@ build; an imported proof counts when its statement matches the paper.
                     executions for the length comparator.
                   - [x] Prove its complete execution and package the exact
                     `3n+2` linear runtime as a polynomial-time compiler.
-                  - [ ] Feed the comparator signed affine unary totals.
+                  - [x] Feed the comparator signed affine unary totals.
                     - [x] Split every signed affine difference into natural
                       positive and negative totals and prove all four relation
                       interpretations exact.
@@ -1624,6 +1624,9 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Interpret the singleton comparison ordering by its
                       fixed relation and prove the compiled Boolean equals
                       the affine atom's tagged-field truth value.
+                  - [x] Compile every fixed affine Boolean predicate by
+                    structural composition of constants, atoms, same-input
+                    forks for conjunction/disjunction, and negation.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
