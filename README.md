@@ -1570,6 +1570,9 @@ build; an imported proof counts when its statement matches the paper.
                   prove local period translation of target fanouts, and
                   assemble each guarded affine template into the complete
                   semantic descriptor route.
+                - [x] Convert affine route points to exact consecutive segment
+                  templates and verify fixed neighboring-period translation
+                  of every affine endpoint and segment.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
