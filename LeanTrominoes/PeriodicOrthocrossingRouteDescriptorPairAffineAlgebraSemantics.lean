@@ -62,6 +62,44 @@ open RouteDescriptorPairFieldTags
   simp [Expression.addConstant, Expression.eval]
   ring
 
+@[simp] theorem Expression.evalPair_add
+    (first second : Expression) (pair : RouteDescriptor × RouteDescriptor) :
+    (first.add second).evalPair pair =
+      first.evalPair pair + second.evalPair pair :=
+  Expression.eval_add (pairFieldValue pair) first second
+
+@[simp] theorem Expression.evalPair_scale
+    (coefficient : Int) (expression : Expression)
+    (pair : RouteDescriptor × RouteDescriptor) :
+    (expression.scale coefficient).evalPair pair =
+      coefficient * expression.evalPair pair :=
+  Expression.eval_scale (pairFieldValue pair) coefficient expression
+
+@[simp] theorem Expression.evalPair_negate
+    (expression : Expression) (pair : RouteDescriptor × RouteDescriptor) :
+    expression.negate.evalPair pair = -expression.evalPair pair :=
+  Expression.eval_negate (pairFieldValue pair) expression
+
+@[simp] theorem Expression.evalPair_subtract
+    (first second : Expression) (pair : RouteDescriptor × RouteDescriptor) :
+    (first.subtract second).evalPair pair =
+      first.evalPair pair - second.evalPair pair :=
+  Expression.eval_subtract (pairFieldValue pair) first second
+
+@[simp] theorem Expression.evalPair_addConstant
+    (expression : Expression) (value : Int)
+    (pair : RouteDescriptor × RouteDescriptor) :
+    (expression.addConstant value).evalPair pair =
+      expression.evalPair pair + value :=
+  Expression.eval_addConstant (pairFieldValue pair) expression value
+
+@[simp] theorem Point.evalPair_point
+    (horizontal vertical : Expression)
+    (pair : RouteDescriptor × RouteDescriptor) :
+    (point horizontal vertical).evalPair pair =
+      (horizontal.evalPair pair, vertical.evalPair pair) :=
+  rfl
+
 /-- Affine point evaluation is preserved exactly by canonical pair tagging. -/
 theorem Point.evalTokens_descriptorPairTokens
     (affinePoint : Point) (pair : RouteDescriptor × RouteDescriptor) :

@@ -59,6 +59,62 @@ theorem Predicate.evalTokens_descriptorPairTokens
     (field side position).eval valuation = valuation side position := by
   simp [field, Expression.eval, Term.eval, term]
 
+@[simp] theorem Expression.evalPair_constant
+    (value : Int) (pair : RouteDescriptor × RouteDescriptor) :
+    (RouteDescriptorPairAffine.constant value).evalPair pair = value :=
+  eval_constant (pairFieldValue pair) value
+
+@[simp] theorem Predicate.evalPair_truth
+    (pair : RouteDescriptor × RouteDescriptor) :
+    Predicate.truth.evalPair pair = true :=
+  rfl
+
+@[simp] theorem Predicate.evalPair_falsity
+    (pair : RouteDescriptor × RouteDescriptor) :
+    Predicate.falsity.evalPair pair = false :=
+  rfl
+
+@[simp] theorem Predicate.evalPair_conjunction
+    (first second : Predicate) (pair : RouteDescriptor × RouteDescriptor) :
+    (Predicate.conjunction first second).evalPair pair =
+      (first.evalPair pair && second.evalPair pair) :=
+  rfl
+
+@[simp] theorem Predicate.evalPair_disjunction
+    (first second : Predicate) (pair : RouteDescriptor × RouteDescriptor) :
+    (Predicate.disjunction first second).evalPair pair =
+      (first.evalPair pair || second.evalPair pair) :=
+  rfl
+
+@[simp] theorem Predicate.evalPair_negation
+    (input : Predicate) (pair : RouteDescriptor × RouteDescriptor) :
+    (Predicate.negation input).evalPair pair = !input.evalPair pair :=
+  rfl
+
+@[simp] theorem evalPair_equal
+    (first second : Expression) (pair : RouteDescriptor × RouteDescriptor) :
+    (equal first second).evalPair pair =
+      decide (first.evalPair pair = second.evalPair pair) :=
+  rfl
+
+@[simp] theorem evalPair_notEqual
+    (first second : Expression) (pair : RouteDescriptor × RouteDescriptor) :
+    (notEqual first second).evalPair pair =
+      decide (first.evalPair pair ≠ second.evalPair pair) :=
+  rfl
+
+@[simp] theorem evalPair_less
+    (first second : Expression) (pair : RouteDescriptor × RouteDescriptor) :
+    (less first second).evalPair pair =
+      decide (first.evalPair pair < second.evalPair pair) :=
+  rfl
+
+@[simp] theorem evalPair_lessEqual
+    (first second : Expression) (pair : RouteDescriptor × RouteDescriptor) :
+    (lessEqual first second).evalPair pair =
+      decide (first.evalPair pair ≤ second.evalPair pair) :=
+  rfl
+
 @[simp] theorem eval_all
     (valuation : Side → Fin 11 → Nat) (predicates : List Predicate) :
     (all predicates).eval valuation =
@@ -68,6 +124,12 @@ theorem Predicate.evalTokens_descriptorPairTokens
   | cons predicate predicates induction =>
       simp [all, Predicate.eval, induction]
 
+@[simp] theorem evalPair_all
+    (predicates : List Predicate) (pair : RouteDescriptor × RouteDescriptor) :
+    (all predicates).evalPair pair =
+      predicates.all (fun predicate => predicate.evalPair pair) := by
+  exact eval_all (pairFieldValue pair) predicates
+
 @[simp] theorem eval_any
     (valuation : Side → Fin 11 → Nat) (predicates : List Predicate) :
     (any predicates).eval valuation =
@@ -76,6 +138,12 @@ theorem Predicate.evalTokens_descriptorPairTokens
   | nil => rfl
   | cons predicate predicates induction =>
       simp [any, Predicate.eval, induction]
+
+@[simp] theorem evalPair_any
+    (predicates : List Predicate) (pair : RouteDescriptor × RouteDescriptor) :
+    (any predicates).evalPair pair =
+      predicates.any (fun predicate => predicate.evalPair pair) := by
+  exact eval_any (pairFieldValue pair) predicates
 
 end RouteDescriptorPairAffine
 end PeriodicOrthocrossing

@@ -1562,6 +1562,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Verify fixed affine addition, scaling, subtraction, and
                   two-dimensional point evaluation, including both vertex-
                   center columns needed by the route templates.
+                - [x] Give all seven local route-core branches exact affine
+                  point templates, with exact tagged-field guards for offset
+                  and port order, and prove each template equals the semantic
+                  descriptor core under its guard.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
