@@ -65,5 +65,15 @@ theorem transferredContents_reverse_empty_eq_initList
       (emptyInnerStacks inner) stack equal]
     simp [emptyInnerStacks, initList, equal]
 
+theorem transferredCfg_reverse_empty_eq_initList
+    {Source : Type} (inner : FinTM2)
+    (decode : Source → inner.Γ inner.k₀) (block : List Source) :
+    (⟨some inner.main, inner.initialState,
+      transferredContents inner decode block.reverse
+        (emptyInnerStacks inner)⟩ : inner.Cfg) =
+      initList inner (block.map decode) := by
+  rw [transferredContents_reverse_empty_eq_initList inner decode block]
+  rfl
+
 end TM2EndDelimitedBlockMap
 end LeanTrominoes
