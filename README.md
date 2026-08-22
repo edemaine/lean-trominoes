@@ -1546,7 +1546,7 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Prove the evaluator output linear in the encoded pair
                 stream and compose its single fixed compiler boundary with
                 the direct ordered-pair producer.
-              - [ ] Compile the pair-local predicate and marker output from
+              - [x] Compile the pair-local predicate and marker output from
                 the two decoded eleven-field words.
                 - [x] Compile pair tokens through a fixed finite-state pass
                   to exact pair boundaries and unary units tagged by first or
