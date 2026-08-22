@@ -1553,6 +1553,9 @@ build; an imported proof counts when its statement matches the paper.
                   second descriptor and field position `0` through `10`.
                 - [x] Prove that counting those tagged unary units recovers
                   every numeric field of each descriptor in the pair exactly.
+                - [x] Express the period, port columns, track rows, gate
+                  column, and signed offsets as fixed affine forms, and prove
+                  their tagged-token evaluations exact.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
