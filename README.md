@@ -1576,6 +1576,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Package the twenty-eight local route shapes, prove each
                   combined guard and affine segment list exact, and check the
                   nine-segment bound for every finite shape/side case.
+                - [x] Expand each finite shape to exact self-indexed affine
+                  neighboring occurrences, verify first-period translated
+                  geometry, and retain the eighty-one-occurrence bound.
                 - [x] Reduce the canonical proper-crossing predicate to its
                   unique oriented intersection, four fundamental-square
                   bounds, distinct keys, fixed axes, and two strict linear
