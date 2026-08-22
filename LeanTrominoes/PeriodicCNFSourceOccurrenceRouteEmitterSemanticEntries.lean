@@ -34,6 +34,19 @@ def formulaEntriesFrom :
         formulaEntriesFrom clauses (clauseIndex + 1)
           (edgeIndex + clause.length)
 
+/-- Literal-index register after scanning a suffix of literal blocks. -/
+def literalIndexAfter (oldLiteralIndex : Fin 3) (literalIndex : Nat) :
+    List (PeriodicLiteral Nat) → Fin 3
+  | [] => oldLiteralIndex
+  | _ :: literals =>
+      literalIndexAfter (SourceOccurrenceTokens.literalIndex literalIndex)
+        (literalIndex + 1) literals
+
+/-- Anchor bit retained after a clause header and all of its literals. -/
+def clauseAnchorState : List (PeriodicLiteral Nat) → Option Bool
+  | [] => none
+  | literal :: _ => some (SourceForwardOffset.isNext literal)
+
 /-- Target indices consumed while emitting a semantic entry list. -/
 def entryTargets (source : PeriodicCNF Nat)
     (entries : List SemanticEntry) : List Nat :=
