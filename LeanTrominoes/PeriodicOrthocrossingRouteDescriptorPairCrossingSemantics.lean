@@ -85,5 +85,36 @@ theorem routeDescriptorPairCrossingMarkerBlocksAtPeriod_flatten
   rw [routeDescriptorOrientedCrossingCountAtPeriod_eq_pairCounts
     period descriptors selfIndexed]
 
+/-- On a common-grid stream, reading the period from each first descriptor
+produces the same blocks as using the recovered stream period explicitly. -/
+theorem routeDescriptorPairCrossingMarkerBlocks_eq_atPeriod
+    (marker : α) (descriptors : List RouteDescriptor)
+    (commonGrid : RouteDescriptorList.CommonGridSize descriptors) :
+    routeDescriptorPairCrossingMarkerBlocks marker descriptors =
+      routeDescriptorPairCrossingMarkerBlocksAtPeriod marker
+        (routeDescriptorStreamGridSize descriptors) descriptors := by
+  unfold routeDescriptorPairCrossingMarkerBlocks
+    routeDescriptorPairCrossingMarkers
+    routeDescriptorPairCrossingMarkerBlocksAtPeriod
+  apply List.map_congr_left
+  intro pair pairMember
+  rw [commonGrid pair.1 (List.mem_product.mp pairMember).1]
+
+/-- The self-period blocks flatten to the exact global marker count whenever
+the stream is self-indexed and repeats a common grid header. -/
+theorem routeDescriptorPairCrossingMarkerBlocks_flatten
+    (marker : α) (descriptors : List RouteDescriptor)
+    (selfIndexed : RouteDescriptorList.SelfIndexed descriptors)
+    (commonGrid : RouteDescriptorList.CommonGridSize descriptors) :
+    (routeDescriptorPairCrossingMarkerBlocks
+      marker descriptors).flatten =
+      List.replicate
+        (13 * routeDescriptorOrientedCrossingCount descriptors) marker := by
+  rw [routeDescriptorPairCrossingMarkerBlocks_eq_atPeriod
+    marker descriptors commonGrid]
+  exact routeDescriptorPairCrossingMarkerBlocksAtPeriod_flatten
+    marker (routeDescriptorStreamGridSize descriptors)
+    descriptors selfIndexed
+
 end PeriodicOrthocrossing
 end LeanTrominoes

@@ -1540,8 +1540,11 @@ build; an imported proof counts when its statement matches the paper.
                 stored in canonical descriptors, factor the exact global
                 count into pair-local counts, and prove the fixed bounds of
                 6,561 tests and 85,293 markers per pair.
+              - [x] Verify total single-word and pair decoders, and prove that
+                interpreting the compiled canonical word pairs yields exactly
+                the direct crossing-marker target.
               - [ ] Compile the pair-local predicate and marker output from
-                the two eleven-field words.
+                the two decoded eleven-field words.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.

@@ -17,6 +17,13 @@ def RouteDescriptorList.SelfIndexed
   ∀ tagged ∈ descriptors.zipIdx,
     tagged.1.edgeIndex = tagged.2
 
+/-- Every descriptor repeats the common grid size recovered from the stream
+header. -/
+def RouteDescriptorList.CommonGridSize
+    (descriptors : List RouteDescriptor) : Prop :=
+  ∀ descriptor ∈ descriptors,
+    descriptor.gridSize = routeDescriptorStreamGridSize descriptors
+
 /-- Neighboring segment occurrences of a descriptor indexed by the edge index
 stored in that same descriptor record. -/
 def RouteDescriptor.selfIndexedNeighborOccurrences
@@ -53,6 +60,19 @@ def routeDescriptorPairCrossingMarkerBlocksAtPeriod
     (descriptors : List RouteDescriptor) : List (List α) :=
   (descriptors ×ˢ descriptors).map
     (routeDescriptorPairCrossingMarkersAtPeriod marker period)
+
+/-- Pair-local markers using the common period repeated in the first
+descriptor's header. -/
+def routeDescriptorPairCrossingMarkers
+    (marker : α) (pair : RouteDescriptor × RouteDescriptor) : List α :=
+  routeDescriptorPairCrossingMarkersAtPeriod
+    marker pair.1.gridSize pair
+
+/-- Self-period marker blocks in row-major descriptor-pair order. -/
+def routeDescriptorPairCrossingMarkerBlocks
+    (marker : α) (descriptors : List RouteDescriptor) : List (List α) :=
+  (descriptors ×ˢ descriptors).map
+    (routeDescriptorPairCrossingMarkers marker)
 
 end PeriodicOrthocrossing
 end LeanTrominoes
