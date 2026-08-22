@@ -32,7 +32,7 @@ noncomputable def reverseOutput_evalsInTime (cursor : Cursor)
     (outputReverseEq : data.outputReverse = tokens) :
     EvalsToInTime machine.step
       (reverseOutputCfg cursor data)
-      (some (haltDataCfg cursor
+      (some (cleanupCfg .input cursor
         { data with
           outputReverse := []
           output := tokens.reverse ++ data.output }))
@@ -60,7 +60,7 @@ noncomputable def reverseOutput_evalsInTime (cursor : Cursor)
         (reverseTime tokens)
         (reverseOutputCfg cursor data)
         (reverseOutputCfg cursor pushed)
-        (some (haltDataCfg cursor
+        (some (cleanupCfg .input cursor
           { pushed with
             outputReverse := []
             output := tokens.reverse ++ pushed.output }))

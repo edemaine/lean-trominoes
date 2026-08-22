@@ -14,14 +14,14 @@ open Turing
 theorem step_reverseOutput_nil (cursor : Cursor) (data : TapeData)
     (outputReverseEq : data.outputReverse = []) :
     machine.step (reverseOutputCfg cursor data) =
-      some (haltDataCfg cursor { data with outputReverse := [] }) := by
+      some (cleanupCfg .input cursor { data with outputReverse := [] }) := by
   rcases data with ⟨input, occurrenceReverse, occurrences, targetReverse,
     targets, clauseCount, literalCount, clauseIndex, edgeIndex, scratch,
     outputReverse, output⟩
   change outputReverse = [] at outputReverseEq
   subst outputReverse
   simp only [FinTM2.step, TM2.step, machine, reverseOutputCfg,
-    haltDataCfg, cursorCfg, cfg, program, TM2.stepAux, tapes,
+    cleanupCfg, cursorCfg, cfg, program, TM2.stepAux, tapes,
     List.head?_nil, List.tail_nil, outputIsNone, cursorFromState,
     clear, update_tapes_outputReverse]
   rfl

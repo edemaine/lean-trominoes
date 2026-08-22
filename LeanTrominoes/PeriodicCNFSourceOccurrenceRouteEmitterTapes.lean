@@ -86,6 +86,7 @@ def finishRecordCfg (literalIndex : Fin 3)
   cursorCfg (.finishRecord literalIndex currentNext anchorNext)
 def reverseOutputCfg := cursorCfg .reverseOutput
 def pushOutputCfg := outputCfg .pushOutput
+def cleanupCfg (stage : CleanupStage) := cursorCfg (.cleanup stage)
 
 def haltDataCfg (cursor : Cursor) (data : TapeData) : machine.Cfg :=
   ⟨none, .cursor cursor, tapes data⟩

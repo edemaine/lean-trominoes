@@ -78,6 +78,34 @@ def CounterStage.stack : CounterStage → Stack
   | .edgeIndex => .edgeIndex
   | .sourceClauses => .clauseIndex
 
+/-- Work tapes cleared after the output has been restored. -/
+inductive CleanupStage
+  | input
+  | occurrenceReverse
+  | occurrences
+  | targetReverse
+  | targets
+  | clauseCount
+  | literalCount
+  | clauseIndex
+  | edgeIndex
+  | scratch
+  | outputReverse
+  deriving DecidableEq, Fintype
+
+def CleanupStage.stack : CleanupStage → Stack
+  | .input => .input
+  | .occurrenceReverse => .occurrenceReverse
+  | .occurrences => .occurrences
+  | .targetReverse => .targetReverse
+  | .targets => .targets
+  | .clauseCount => .clauseCount
+  | .literalCount => .literalCount
+  | .clauseIndex => .clauseIndex
+  | .edgeIndex => .edgeIndex
+  | .scratch => .scratch
+  | .outputReverse => .outputReverse
+
 inductive Label
   | scanLeft
   | pushOccurrence
@@ -95,6 +123,7 @@ inductive Label
   | finishRecord (literalIndex : Fin 3) (currentNext anchorNext : Bool)
   | reverseOutput
   | pushOutput
+  | cleanup (stage : CleanupStage)
   deriving Fintype
 
 /-- Transitions temporarily hold one typed tape symbol together with the
@@ -202,6 +231,24 @@ def outputIsNone : State → Bool
   | .output _ none => true
   | _ => false
 
+def CleanupStage.read (stage : CleanupStage) (state : State) :
+    Option (Alphabet stage.stack) → State :=
+  match stage with
+  | .input => fun symbol => .input (cursorFromState state) symbol
+  | .occurrenceReverse | .occurrences =>
+      fun symbol => .occurrence (cursorFromState state) symbol
+  | .targetReverse | .targets =>
+      fun symbol => .unary (cursorFromState state) symbol
+  | .clauseCount | .literalCount | .clauseIndex | .edgeIndex | .scratch =>
+      fun symbol => .unit (cursorFromState state) symbol
+  | .outputReverse =>
+      fun symbol => .output (cursorFromState state) symbol
+
+def cleanupIsNone : State → Bool
+  | .input _ none | .occurrence _ none | .unary _ none |
+      .unit _ none | .output _ none => true
+  | _ => false
+
 def startClause : State → State
   | state =>
       let cursor := cursorFromState state
@@ -272,6 +319,21 @@ def afterCounter : CounterStage → TM2.Stmt Alphabet Label State
   | .sourceClauses =>
       .push .outputReverse (fun _ => .atomEnd)
         (.goto fun _ => .scanTarget)
+
+def afterCleanup : CleanupStage → TM2.Stmt Alphabet Label State
+  | .input => .load clear (.goto fun _ => .cleanup .occurrenceReverse)
+  | .occurrenceReverse =>
+      .load clear (.goto fun _ => .cleanup .occurrences)
+  | .occurrences =>
+      .load clear (.goto fun _ => .cleanup .targetReverse)
+  | .targetReverse => .load clear (.goto fun _ => .cleanup .targets)
+  | .targets => .load clear (.goto fun _ => .cleanup .clauseCount)
+  | .clauseCount => .load clear (.goto fun _ => .cleanup .literalCount)
+  | .literalCount => .load clear (.goto fun _ => .cleanup .clauseIndex)
+  | .clauseIndex => .load clear (.goto fun _ => .cleanup .edgeIndex)
+  | .edgeIndex => .load clear (.goto fun _ => .cleanup .scratch)
+  | .scratch => .load clear (.goto fun _ => .cleanup .outputReverse)
+  | .outputReverse => .load (fun _ => .cursor initialCursor) .halt
 
 def program : Label → TM2.Stmt Alphabet Label State
   | .scanLeft =>
@@ -381,11 +443,16 @@ def program : Label → TM2.Stmt Alphabet Label State
       .pop .outputReverse
         (fun state symbol => .output (cursorFromState state) symbol)
         (.branch outputIsNone
-          (.load clear .halt)
+          (.load clear (.goto fun _ => .cleanup .input))
           (.goto fun _ => .pushOutput))
   | .pushOutput =>
       .push .output outputFromState
         (.load clear (.goto fun _ => .reverseOutput))
+  | .cleanup stage =>
+      .pop stage.stack stage.read
+        (.branch cleanupIsNone
+          (afterCleanup stage)
+          (.load clear (.goto fun _ => .cleanup stage)))
 
 abbrev machine : FinTM2 where
   K := Stack
