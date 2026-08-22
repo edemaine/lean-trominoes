@@ -185,7 +185,7 @@ def program : Label → TM2.Stmt Alphabet Label State
         (.branch unaryIsNone
           (.load clear (.goto fun _ => .reverseOutput))
           (.branch unaryIsUnit
-            (.goto fun _ => .pushGroupUnit)
+            (.load clear (.goto fun _ => .pushGroupUnit))
             (.load clear (.goto fun _ => .scanStartField))))
   | .pushGroupUnit =>
       .push .group (fun _ => ())
@@ -195,7 +195,7 @@ def program : Label → TM2.Stmt Alphabet Label State
         (.branch unaryIsNone
           (.load clear (.goto fun _ => .beginGroup))
           (.branch unaryIsUnit
-            (.goto fun _ => .pushStartUnit)
+            (.load clear (.goto fun _ => .pushStartUnit))
             (.load clear (.goto fun _ => .beginGroup))))
   | .pushStartUnit =>
       .push .start (fun _ => ())
