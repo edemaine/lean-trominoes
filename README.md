@@ -1616,8 +1616,11 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Split every signed affine difference into natural
                       positive and negative totals and prove all four relation
                       interpretations exact.
-                    - [ ] Compile the two unary totals from each tagged block
-                      and compose them with length comparison.
+                    - [x] Emit the two unary totals from each tagged block by
+                      fixed affine phases and prove the result is exactly one
+                      canonical delimiter-encoded comparison pair.
+                    - [ ] Certify that emitter as a polynomial-time compiler
+                      and compose it with length comparison.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
