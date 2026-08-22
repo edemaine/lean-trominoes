@@ -1627,6 +1627,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Compile every fixed affine Boolean predicate by
                     structural composition of constants, atoms, same-input
                     forks for conjunction/disjunction, and negation.
+                  - [x] Certify a compact finite-control evaluator for an
+                    arbitrary fixed-length result word, avoiding expansion of
+                    the millions of fixed occurrence tests into fork trees.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
