@@ -1633,6 +1633,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Batch any fixed atom list into one affine phase
                     pipeline and one length-comparator run, with exact ordered
                     comparison-pair and ordering semantics.
+                  - [x] Interpret the batched ordering word back into any
+                    fixed predicate list, proving exact left-to-right atom
+                    consumption and tagged-field Boolean semantics.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
