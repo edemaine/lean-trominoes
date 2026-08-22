@@ -1604,6 +1604,10 @@ build; an imported proof counts when its statement matches the paper.
                   interval tests.
                 - [ ] Evaluate the fixed linear coordinate and proper-
                   crossing tests over the tagged unary fields.
+                  - [x] Define a finite TM2 machine comparing two delimited
+                    word lengths and verify all of its one-step transitions.
+                  - [ ] Prove its complete execution and polynomial runtime,
+                    then feed it signed affine unary totals.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
