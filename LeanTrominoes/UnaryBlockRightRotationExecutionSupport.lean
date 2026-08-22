@@ -30,4 +30,14 @@ theorem replicate_unit_cons_comm (count : Nat) (tail : List UnarySymbol) :
         List.cons.injEq, true_and]
       exact induction
 
+theorem replicate_value_cons_comm (count : Nat) (tail : List Unit) :
+    List.replicate count () ++ () :: tail =
+      () :: (List.replicate count () ++ tail) := by
+  induction count with
+  | zero => rfl
+  | succ count induction =>
+      simp only [List.replicate_succ, List.cons_append,
+        List.cons.injEq, true_and]
+      exact induction
+
 end LeanTrominoes.UnaryBlockRightRotationMachine
