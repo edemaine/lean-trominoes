@@ -1619,7 +1619,7 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Emit the two unary totals from each tagged block by
                       fixed affine phases and prove the result is exactly one
                       canonical delimiter-encoded comparison pair.
-                    - [ ] Certify that emitter as a polynomial-time compiler
+                    - [x] Certify that emitter as a polynomial-time compiler
                       and compose it with length comparison.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
