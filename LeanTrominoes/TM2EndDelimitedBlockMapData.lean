@@ -222,7 +222,8 @@ def program
           setTarget inner.tm Source Target state
             (symbol.map inner.outputAlphabet))
         (.branch (targetIsNone inner.tm Source Target)
-          (.goto fun _ => .cleanup ⟨0, by omega⟩)
+          (.load (fun _ => initialState inner.tm Source Target)
+            (.goto fun _ => .cleanup ⟨0, by omega⟩))
           (.goto fun state => .pushOutput
             (.inr (targetValue inner.tm Source state))))
   | .pushOutput (.inr symbol) =>
@@ -242,14 +243,16 @@ def program
             (.branch (fun state => state.empty)
               (.goto fun _ => .cleanup
                 (nextCleanupPosition inner.tm position))
-              (.goto fun _ => .cleanup position))
+              (.load (fun _ => initialState inner.tm Source Target)
+                (.goto fun _ => .cleanup position)))
   | .discardPartial =>
       .pop .blockReverse
         (fun state symbol =>
           setEmpty inner.tm Source Target state symbol.isNone)
         (.branch (fun state => state.empty)
           (.goto fun _ => .reverseOutput)
-          (.goto fun _ => .discardPartial))
+          (.load (fun _ => initialState inner.tm Source Target)
+            (.goto fun _ => .discardPartial)))
   | .reverseOutput =>
       .pop .outputReverse (setTarget inner.tm Source Target)
         (.branch (targetIsNone inner.tm Source Target)

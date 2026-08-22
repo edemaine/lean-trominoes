@@ -117,10 +117,11 @@ def haltCfg (inner : FinTM2) (Source Target : Type)
 
 @[simp] theorem update_stacks_input
     (inner : FinTM2) (Source Target : Type)
+    (decEq : DecidableEq (Stack inner.K))
     (input blockReverse : List Source)
     (innerContents : ∀ stack, List (inner.Γ stack))
     (outputReverse output : List Target) (value : List Source) :
-    Function.update
+    @Function.update _ _ decEq
         (stackContents inner Source Target input blockReverse innerContents
           outputReverse output)
         Stack.input value =
@@ -131,10 +132,11 @@ def haltCfg (inner : FinTM2) (Source Target : Type)
 
 @[simp] theorem update_stacks_blockReverse
     (inner : FinTM2) (Source Target : Type)
+    (decEq : DecidableEq (Stack inner.K))
     (input blockReverse : List Source)
     (innerContents : ∀ stack, List (inner.Γ stack))
     (outputReverse output : List Target) (value : List Source) :
-    Function.update
+    @Function.update _ _ decEq
         (stackContents inner Source Target input blockReverse innerContents
           outputReverse output)
         Stack.blockReverse value =
@@ -145,16 +147,18 @@ def haltCfg (inner : FinTM2) (Source Target : Type)
 
 @[simp] theorem update_stacks_inner
     (inner : FinTM2) (Source Target : Type)
+    (decEq : DecidableEq (Stack inner.K))
+    (innerDecEq : DecidableEq inner.K)
     (input blockReverse : List Source)
     (innerContents : ∀ stack, List (inner.Γ stack))
     (outputReverse output : List Target)
     (target : inner.K) (value : List (inner.Γ target)) :
-    Function.update
+    @Function.update _ _ decEq
         (stackContents inner Source Target input blockReverse innerContents
           outputReverse output)
         (.inner target) value =
       stackContents inner Source Target input blockReverse
-        (Function.update innerContents target value)
+        (@Function.update _ _ innerDecEq innerContents target value)
         outputReverse output := by
   funext stack
   cases stack with
@@ -172,10 +176,11 @@ def haltCfg (inner : FinTM2) (Source Target : Type)
 
 @[simp] theorem update_stacks_outputReverse
     (inner : FinTM2) (Source Target : Type)
+    (decEq : DecidableEq (Stack inner.K))
     (input blockReverse : List Source)
     (innerContents : ∀ stack, List (inner.Γ stack))
     (outputReverse output : List Target) (value : List Target) :
-    Function.update
+    @Function.update _ _ decEq
         (stackContents inner Source Target input blockReverse innerContents
           outputReverse output)
         Stack.outputReverse value =
@@ -186,10 +191,11 @@ def haltCfg (inner : FinTM2) (Source Target : Type)
 
 @[simp] theorem update_stacks_output
     (inner : FinTM2) (Source Target : Type)
+    (decEq : DecidableEq (Stack inner.K))
     (input blockReverse : List Source)
     (innerContents : ∀ stack, List (inner.Γ stack))
     (outputReverse output : List Target) (value : List Target) :
-    Function.update
+    @Function.update _ _ decEq
         (stackContents inner Source Target input blockReverse innerContents
           outputReverse output)
         Stack.output value =
