@@ -33,6 +33,16 @@ theorem replicate_unit_cons_comm (count : Nat) (tail : List UnarySymbol) :
         List.cons.injEq, true_and]
       exact induction
 
+theorem replicate_candidate_cons_comm (count : Nat) (tail : List Unit) :
+    List.replicate count () ++ () :: tail =
+      () :: (List.replicate count () ++ tail) := by
+  induction count with
+  | zero => rfl
+  | succ count induction =>
+      simp only [List.replicate_succ, List.cons_append,
+        List.cons.injEq, true_and]
+      exact induction
+
 def clearCandidate_evalsInTime (selected : Bool) (candidate : List Unit)
     (data : TapeData) (candidateEq : data.candidate = candidate) :
     EvalsToInTime machine.step (clearCandidateCfg selected data)
