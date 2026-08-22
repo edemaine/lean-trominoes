@@ -1548,6 +1548,11 @@ build; an imported proof counts when its statement matches the paper.
                 the direct ordered-pair producer.
               - [ ] Compile the pair-local predicate and marker output from
                 the two decoded eleven-field words.
+                - [x] Compile pair tokens through a fixed finite-state pass
+                  to exact pair boundaries and unary units tagged by first or
+                  second descriptor and field position `0` through `10`.
+                - [ ] Evaluate the fixed linear coordinate and proper-
+                  crossing tests over the tagged unary fields.
           - [ ] Compose the crossing markers with the compiled segment and
             source-atom markers, and implement the retained clause-descriptor
             prefix.
