@@ -3,8 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PlanarThreeSATDuplicatorArm
 import LeanTrominoes.PlanarThreeSATIncidencePlanarity
+import LeanTrominoes.PlanarThreeSATDuplicatorArmIncidenceDrawingData
 
 /-!
 # Incidence drawings for one active duplicator arm
@@ -21,21 +21,6 @@ They need not be orthogonal before that split.
 
 namespace LeanTrominoes
 namespace PlanarThreeSAT
-
-/-- The two implication clauses of one active duplicator arm. -/
-def duplicatorArmFormula
-    (arm : DuplicatorArm) :
-    List (EmbeddedClause DuplicatorArmVariable) :=
-  equalityInstance .port .center
-    (duplicatorArmEqualityPositions arm)
-
-/-- Direct incidences for one active duplicator arm. -/
-def duplicatorArmStraightIncidenceDrawing
-    (arm : DuplicatorArm) :
-    EmbeddedCNFIncidenceDrawing DuplicatorArmVariable :=
-  straightIncidenceDrawing
-    (duplicatorArmFormula arm)
-    (DuplicatorArmVariable.position arm)
 
 /-- Every direct arm incidence has its advertised clause and variable
 endpoints. -/

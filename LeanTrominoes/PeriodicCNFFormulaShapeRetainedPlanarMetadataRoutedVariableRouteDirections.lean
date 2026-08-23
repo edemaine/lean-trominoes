@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataRoutedVariableClauseNormalizationAt
-import LeanTrominoes.OrthogonalPolylineEndpointDirections
+import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataRoutedVariableRouteDirectionTableSemantics
+import LeanTrominoes.OrthogonalPolylineEndpointDirectionTranslation
 
 /-! # First directions of retained routed-variable routes -/
 
@@ -13,15 +14,6 @@ namespace PeriodicCNF
 namespace FormulaShapeRetainedPlanarMetadataDirection
 
 open PeriodicOrthocrossing PlanarThreeSAT
-
-/-- The first compass direction of one route in a fixed duplicator-arm
-drawing. -/
-def routedVariableRouteFirstDirection
-    (arm : DuplicatorArm)
-    (localClauseIndex literalIndex : Nat) : AxisDirection :=
-  AxisDirection.polylineFirstDirection
-    ((duplicatorArmStraightIncidenceDrawing arm).routes
-      localClauseIndex literalIndex)
 
 /-- Placing and scoping a fixed duplicator-arm drawing translates every
 route but leaves its first compass direction unchanged. -/
@@ -48,7 +40,9 @@ theorem routedVariable_routeFirstDirection_eq
         (routedVariableOrigin source site)
         ((duplicatorArmStraightIncidenceDrawing arm).routes
           localClauseIndex literalIndex)) = _
-  exact AxisDirection.polylineFirstDirection_translatePolyline _ _
+  exact AxisDirection.polylineFirstDirection_translatePolyline_static _ _
+    |>.trans (duplicatorArm_routeFirstDirection_eq
+      arm localClauseIndex literalIndex)
 
 end FormulaShapeRetainedPlanarMetadataDirection
 end PeriodicCNF

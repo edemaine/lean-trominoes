@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.AxisDirectionClockwiseRankData
 import LeanTrominoes.PeriodicPlanarOneInThreeToThreeDMRibbonClauseOuterFans
 
 /-!
@@ -20,15 +21,6 @@ order matters only when all three endpoint bundles are active.
 namespace LeanTrominoes
 
 namespace AxisDirection
-
-/-- Clockwise rank beginning at east.  The invalid fallback lies outside the
-four genuine ranks. -/
-def clockwiseRank : AxisDirection → Nat
-  | .east => 0
-  | .south => 1
-  | .west => 2
-  | .north => 3
-  | .invalid => 4
 
 /-- Three directions occur in clockwise cyclic order when some cyclic
 rotation of their ranks is strictly increasing. -/
