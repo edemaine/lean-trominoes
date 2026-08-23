@@ -27,6 +27,28 @@ theorem cycleLinkIncidences_atoms_eq_cycleVariableOccurrences
     occurrenceClauses_variableOccurrences] at combined
   exact (List.append_cancel_left combined).symm
 
+/-- The cycle-link suffix mentions exactly the positional copies introduced
+by the copied source prefix. -/
+@[simp] theorem mem_cycleLinkIncidenceAtoms_iff
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (copy : ThreeOccurrenceVariable Variable) :
+    copy ∈ (cycleLinkIncidences source).map
+        (fun incidence => incidence.literal.atom) ↔
+      copy ∈ allOccurrenceVariables source := by
+  constructor
+  · intro copyMember
+    rcases List.mem_map.mp copyMember with
+      ⟨incidence, incidenceMember, rfl⟩
+    exact cycleLinkIncidence_atom_mem_allOccurrenceVariables
+      source incidence incidenceMember
+  · intro copyMember
+    rw [cycleLinkIncidences_atoms_eq_cycleVariableOccurrences]
+    rw [← List.count_pos_iff]
+    rw [allCycleClauses_count_eq_two_of_mem_allOccurrenceVariables
+      source copy copyMember]
+    omega
+
 /-- Last-occurrence deduplication of the fixed cycle-link incidence stream
 recovers the grouped one-step rotation of all occurrence copies. -/
 theorem cycleLinkIncidences_atoms_dedup_eq_rotatedOccurrenceVariables
