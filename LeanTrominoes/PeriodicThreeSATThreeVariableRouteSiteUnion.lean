@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.ListUnionFilter
 import LeanTrominoes.PeriodicThreeSATThreeVariableRouteSiteSplit
 
 /-! # Union form of occurrence-split routed-variable sites -/
@@ -11,12 +12,6 @@ namespace LeanTrominoes
 namespace PeriodicThreeSATThree
 
 open PeriodicOrthocrossing
-
-/-- List union using the `BEq` canonically induced by a chosen
-`DecidableEq`, matching Mathlib's last-occurrence deduplication lemmas. -/
-def decidableListUnion {Value : Type*} [DecidableEq Value]
-    (first second : List Value) : List Value :=
-  @List.union Value instBEqOfDecidableEq first second
 
 /-- Last-occurrence deduplication of the split formula retains the copied
 source-site stream union the rotated full cycle-site blocks. -/
