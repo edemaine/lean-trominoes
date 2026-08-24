@@ -1754,10 +1754,12 @@ build; an imported proof counts when its statement matches the paper.
                       - [x] Identify the compacted terminal descriptor-square
                         prefix with the two semantic endpoint nodes of every
                         neighboring indexed segment occurrence.
-                      - [ ] Identify the compacted occurrence-slot crossing
+                      - [x] Identify the compacted occurrence-slot crossing
                         suffix with all retained crossing-boundary nodes.
-                      - [ ] Append the two exact streams and project every
-                        active padded slot to its compiler-facing rank datum.
+                      - [x] Append the two exact streams and identify the
+                        result with the complete retained carrier-node stream.
+                      - [ ] Project every active padded slot to its
+                        compiler-facing rank datum.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
