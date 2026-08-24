@@ -17,7 +17,12 @@ open RouteDescriptorPairCarrierKeyWordRecipes
     crossingCarrierKeyRecipeAxes.length =
       crossingCarrierKeyRecipeBlocks.flatten.length := by
   unfold crossingCarrierKeyRecipeAxes
-  rw [List.length_map]
+    crossingCarrierKeyRecipeAxisBlocks
+  induction crossingCarrierKeyRecipeBlocks with
+  | nil => rfl
+  | cons block blocks induction =>
+      simp only [List.map_cons, List.flatten_cons,
+        List.length_append, List.length_map, induction]
 
 @[simp] theorem crossingCarrierKeyRecipeBlocks_length :
     crossingCarrierKeyRecipeBlocks.length = crossingSlots.length := by

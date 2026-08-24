@@ -13,11 +13,15 @@ namespace RouteDescriptorOccurrenceSlotCrossing
 
 open RouteDescriptorPairCarrierKeyWordRecipes
 
-/-- The first occurrence of every oriented crossing slot is horizontal and
-the second is vertical, so each flattened recipe carries a fixed axis bit. -/
+/-- Fixed axis bits for one block of oriented-crossing recipes.  Recipes on
+the first side are horizontal and recipes on the second side are vertical. -/
+def crossingCarrierKeyRecipeAxisBlocks : List (List Bool) :=
+  crossingCarrierKeyRecipeBlocks.map fun block =>
+    block.map fun recipe => decide (recipe.side = .first)
+
+/-- The blockwise crossing axes in their physical flattened order. -/
 def crossingCarrierKeyRecipeAxes : List Bool :=
-  crossingCarrierKeyRecipeBlocks.flatten.map fun recipe =>
-    decide (recipe.side = .first)
+  crossingCarrierKeyRecipeAxisBlocks.flatten
 
 /-- One zero-or-one axis value for every padded crossing candidate slot. -/
 def crossingCarrierKeyAxisValues
