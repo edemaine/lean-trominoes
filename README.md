@@ -1690,6 +1690,10 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Reproduce each retained key's exact deduplicated,
                     filtered, stably sorted node chain and adjacent
                     non-crossover link-endpoint order from that event stream.
+                  - [x] Compute link-orbit ownership from the explicit period,
+                    filter to zero-shift representatives, and identify the
+                    resulting per-key endpoint blocks with the semantic
+                    representative links in exact order.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
