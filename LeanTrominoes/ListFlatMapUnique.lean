@@ -3,15 +3,15 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import Mathlib.Data.List.Defs
+import Mathlib.Data.List.Basic
 
-/-! # Flat maps with one potentially nonempty entry -/
+/-! # Flat maps with one nonempty branch -/
 
 namespace List
 
-/-- A flat map with one potentially nonempty value reduces to that uniquely
-indexed value. -/
-theorem flatMap_eq_selected_of_unique
+/-- A flat map whose branches other than one listed index are empty reduces
+to that selected branch. -/
+theorem flatMap_eq_of_unique
     {Index Output : Type*}
     (indices : List Index) (function : Index → List Output)
     (selected : Index)
@@ -39,7 +39,8 @@ theorem flatMap_eq_selected_of_unique
         rw [List.flatMap_cons,
           othersEmpty index (by simp) headNe,
           List.nil_append]
-        exact induction nodup.2 selectedTail fun other otherMember otherNe =>
-          othersEmpty other (by simp [otherMember]) otherNe
+        exact induction nodup.2 selectedTail
+          fun other otherMember otherNe =>
+            othersEmpty other (by simp [otherMember]) otherNe
 
 end List
