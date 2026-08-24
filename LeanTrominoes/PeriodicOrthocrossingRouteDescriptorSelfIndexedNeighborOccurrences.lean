@@ -37,4 +37,29 @@ theorem routeDescriptorNeighborOccurrences_eq_selfIndexedFlatMap
         descriptor.neighborOccurrences descriptor.edgeIndex) := by
       rw [List.zipIdx_map_fst]
 
+/-- The segment underlying a local neighboring occurrence of a presented
+self-indexed descriptor belongs to the reconstructed global segment list. -/
+theorem indexed_mem_of_selfIndexed_neighbor
+    (descriptors : List RouteDescriptor)
+    (selfIndexed : ∀ tagged ∈ descriptors.zipIdx,
+      tagged.1.edgeIndex = tagged.2)
+    (descriptor : RouteDescriptor) (descriptorMember : descriptor ∈ descriptors)
+    (occurrence : IndexedGridSegment × Cell)
+    (occurrenceMember : occurrence ∈
+      descriptor.neighborOccurrences descriptor.edgeIndex) :
+    occurrence.1 ∈ routeDescriptorIndexedSegments descriptors := by
+  have globalMember :
+      occurrence ∈ routeDescriptorNeighborOccurrences descriptors := by
+    rw [routeDescriptorNeighborOccurrences_eq_selfIndexedFlatMap
+      descriptors selfIndexed]
+    rw [List.mem_flatMap]
+    exact ⟨descriptor, descriptorMember, occurrenceMember⟩
+  unfold routeDescriptorNeighborOccurrences at globalMember
+  rcases List.mem_flatMap.mp globalMember with
+    ⟨indexed, indexedMember, translatedMember⟩
+  rcases List.mem_map.mp translatedMember with
+    ⟨translate, _translateMember, occurrenceEq⟩
+  cases occurrenceEq
+  exact indexedMember
+
 end LeanTrominoes.PeriodicOrthocrossing
