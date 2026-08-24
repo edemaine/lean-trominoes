@@ -78,19 +78,22 @@ theorem indexed_eq_of_occurrenceKey_eq
   · exact congrArg Prod.fst keyEq
   · exact congrArg (fun key => key.2.1) keyEq
 
-/-- Zero for an absent candidate; otherwise the horizontal-axis bit of any
-neighboring occurrence carrying the key, with zero as an irrelevant default
-for keys absent from the neighboring window. -/
+/-- Zero for an absent candidate; otherwise the horizontal-axis bit of the
+indexed segment named by the key's route and segment coordinates, with zero
+as an irrelevant default for malformed keys.  Looking up the indexed segment
+rather than a neighboring occurrence makes the datum independent of the
+translation coordinate, including padded crossing candidates outside the
+neighboring translation window. -/
 noncomputable def value (descriptors : List RouteDescriptor) :
     Option CarrierKey → Nat
   | none => 0
   | some key =>
-      if witness : ∃ occurrence ∈
-          routeDescriptorNeighborOccurrences descriptors,
-          occurrenceKey occurrence = key then
-        let occurrence := Classical.choose witness
+      if witness : ∃ indexed ∈ routeDescriptorIndexedSegments descriptors,
+          indexed.routeIndex = key.1 ∧
+            indexed.segmentIndex = key.2.1 then
+        let indexed := Classical.choose witness
         FixedAxisUnaryFields.value true
-          (decide occurrence.1.segment.IsHorizontal)
+          (decide indexed.segment.IsHorizontal)
       else
         0
 
@@ -106,19 +109,33 @@ theorem value_some_occurrenceKey
     value descriptors (some (occurrenceKey occurrence)) =
       FixedAxisUnaryFields.value true
         (decide occurrence.1.segment.IsHorizontal) := by
+  have indexedMember :=
+    indexed_mem_of_neighbor_mem descriptors member
   rw [value]
   split
   · rename_i witness
     let chosen := Classical.choose witness
     have chosenSpec := Classical.choose_spec witness
-    have indexedEq : chosen.1 = occurrence.1 :=
-      indexed_eq_of_occurrenceKey_eq descriptors
-        chosenSpec.1 member chosenSpec.2
+    have chosenSpec' :
+        chosen ∈ routeDescriptorIndexedSegments descriptors ∧
+          chosen.routeIndex = (occurrenceKey occurrence).1 ∧
+          chosen.segmentIndex = (occurrenceKey occurrence).2.1 := by
+      simpa [chosen] using chosenSpec
+    have indexedEq : chosen = occurrence.1 :=
+      indexedSegment_eq_of_indices_eq descriptors
+        chosenSpec'.1 indexedMember
+        (by simpa [occurrenceKey,
+          PeriodicGridDrawing.SegmentOccurrenceKey] using chosenSpec'.2.1)
+        (by simpa [occurrenceKey,
+          PeriodicGridDrawing.SegmentOccurrenceKey] using chosenSpec'.2.2)
     change FixedAxisUnaryFields.value true
-        (decide chosen.1.segment.IsHorizontal) = _
+        (decide chosen.segment.IsHorizontal) = _
     rw [indexedEq]
   · rename_i notWitness
-    exact False.elim (notWitness ⟨occurrence, member, rfl⟩)
+    exact False.elim (notWitness
+      ⟨occurrence.1, indexedMember, by
+        simp [occurrenceKey,
+          PeriodicGridDrawing.SegmentOccurrenceKey]⟩)
 
 end RouteDescriptorCarrierKeyAxisDatum
 end LeanTrominoes.PeriodicOrthocrossing
