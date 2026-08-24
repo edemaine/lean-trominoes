@@ -83,5 +83,54 @@ theorem filter_routeShapePairCrossingSlots_evalTokens_of_matches
             enabled, Bool.true_and]
           rw [evalTokens_crossingPredicate]
 
+/-- An active slot in a selected shape-pair scan carries occurrence
+templates from those shapes, horizontal first and vertical second. -/
+theorem Slot.occurrence_members_axes_of_active
+    (shapes : RouteShape × RouteShape)
+    (pair : TaggedDescriptor × TaggedDescriptor)
+    (firstMatches : shapes.1.Matches pair.1.1)
+    (secondMatches : shapes.2.Matches pair.2.1)
+    (slot : Slot)
+    (slotMember : slot ∈ routeShapePairCrossingSlots shapes)
+    (active : slot.evalTokens (descriptorSlotPairTokens pair) = true) :
+    (slot.occurrences.1 ∈ shapes.1.occurrences .first ∧
+      slot.occurrences.2 ∈ shapes.2.occurrences .second) ∧
+    ((slot.occurrences.1.evalPair .first
+        (pair.1.1, pair.2.1)).1.segment.IsHorizontal ∧
+      (slot.occurrences.2.evalPair .second
+        (pair.1.1, pair.2.1)).1.segment.IsVertical) := by
+  unfold routeShapePairCrossingSlots at slotMember
+  rcases List.mem_map.mp slotMember with
+    ⟨tagged, taggedMember, slotEq⟩
+  subst slot
+  have occurrenceMembers := List.mem_product.mp taggedMember
+  have descriptorActive :
+      (guardedCrossingPredicate shapes
+        (tagged.1.1, tagged.2.1)).evalTokens
+          (descriptorTokens (descriptorSlotPairTokens pair)) = true := by
+    simp only [Slot.evalTokens, Bool.and_eq_true] at active
+    exact active.1.1
+  have enabled :
+      routeShapePairEnabled
+          (RouteDescriptorPairFieldTags.descriptorPairTokens
+            (pair.1.1, pair.2.1)) shapes = true :=
+    (routeShapePairEnabled_descriptorPairTokens
+      shapes (pair.1.1, pair.2.1)).2
+        ⟨firstMatches, secondMatches⟩
+  rw [descriptorTokens_descriptorSlotPairTokens,
+    guardedCrossingPredicate_evalTokens, enabled, Bool.true_and,
+    evalTokens_crossingPredicate] at descriptorActive
+  have canonicalActive :
+      canonicalOrientedOccurrencePairAtPeriod pair.1.1.gridSize
+          (tagged.1.1.evalPair .first (pair.1.1, pair.2.1),
+            tagged.2.1.evalPair .second (pair.1.1, pair.2.1)) = true := by
+    rw [canonicalOrientedOccurrencePairAtPeriod_eq_linear]
+    exact descriptorActive
+  exact ⟨
+    ⟨List.fst_mem_of_mem_zipIdx occurrenceMembers.1,
+      List.fst_mem_of_mem_zipIdx occurrenceMembers.2⟩,
+    axes_of_canonicalOrientedOccurrencePairAtPeriod
+      pair.1.1.gridSize _ canonicalActive⟩
+
 end RouteDescriptorOccurrenceSlotCrossing
 end LeanTrominoes.PeriodicOrthocrossing
