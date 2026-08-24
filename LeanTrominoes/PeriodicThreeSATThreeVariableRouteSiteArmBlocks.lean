@@ -14,6 +14,31 @@ namespace LeanTrominoes.PeriodicThreeSATThree
 open PeriodicOrthocrossing PlanarThreeSAT
 open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 
+/-- Find the unique copied incidence belonging to one positional occurrence
+atom. -/
+def occurrenceIncidenceAtAtom
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : ThreeOccurrenceVariable Variable) :
+    Option (CNFIncidence (ThreeOccurrenceVariable Variable) × Nat) :=
+  (occurrenceIncidences source).zipIdx.find? fun taggedIncidence =>
+    decide (taggedIncidence.1.literal.atom = atom)
+
+/-- Current- or next-slice cycle arms determined by the copied incidence of
+one positional occurrence atom. -/
+def routedVariableCycleSiteArmBlocksAtAtom
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : ThreeOccurrenceVariable Variable) :
+    List (List DuplicatorArm) :=
+  match occurrenceIncidenceAtAtom source atom with
+  | some selected =>
+      (if selected.1.edge.offset = ((0, 0) : Cell) then
+          routedVariableCurrentCycleSiteArmBlocks else []) ++
+        (if selected.1.edge.offset = ((1, 0) : Cell) then
+          routedVariableNextCycleSiteArmBlocks else [])
+  | none => []
+
 /-- A current-slice copied occurrence contributes nine full three-arm sites. -/
 theorem currentOccurrenceVariableRouteSiteArmBlock_eq
     {Variable : Type*} [DecidableEq Variable]
