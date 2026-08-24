@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierDescriptorBlocks
+import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierVariableNormalizationData
 import LeanTrominoes.PeriodicEqualityNormalization
 
 /-! # Normalized retained carrier clauses -/
@@ -13,24 +14,6 @@ namespace PeriodicCNF
 namespace FormulaShapeRetainedPlanarMetadataDirection
 
 open PeriodicOrthocrossing PlanarThreeSAT
-
-/-- Periodicize a physical carrier node, wrap its prototype, and incorporate
-the canonical variable gauge.  This is the single endpoint normalization
-whose generic equality-link normal form describes both carrier clauses. -/
-def carrierWrappedVariableNormalization
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable)
-    (node : CarrierNode) :
-    WrappedPeriodicPlanarSATVariable Variable × Cell :=
-  let normalized :=
-    normalizePlanarSATVariable source
-      (@planarSATCarrierVariableMap Variable node)
-  let wrapped : WrappedPeriodicPlanarSATVariable Variable :=
-    ⟨normalized.1⟩
-  (wrapped,
-    Cell.add normalized.2
-      (retainedDrawingWrappedPeriodicPlanarSATVariableGauge
-        source wrapped))
 
 /-- Mapping one physical carrier equality through periodicization, wrapping,
 the canonical variable gauge, and clause anchoring gives the generic pair of

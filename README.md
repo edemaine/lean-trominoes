@@ -1670,7 +1670,7 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Recover the exact last-occurrence retained carrier-key
                   order from duplicated neighboring terminal keys and fixed
                   retention shifts of the exact ordered crossing-pair scan.
-                - [ ] Filter and expand those candidates to the exact ordered
+                - [x] Filter and expand those candidates to the exact ordered
                   representative carrier links, including their next-slice
                   ownership bits.
                   - [x] Decompose the exact global retained-link bit order into
@@ -1694,6 +1694,12 @@ build; an imported proof counts when its statement matches the paper.
                     filter to zero-shift representatives, and identify the
                     resulting per-key endpoint blocks with the semantic
                     representative links in exact order.
+                  - [x] Compute each representative pair's periodically
+                    normalized endpoint offsets and prove its graph-free
+                    next-slice bit equals the retained metadata bit.
+                  - [x] Map the axis and next-slice bits over every exact
+                    representative pair block and preserve the established
+                    per-key link order.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
