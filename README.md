@@ -1760,7 +1760,7 @@ build; an imported proof counts when its statement matches the paper.
                         result with the complete retained carrier-node stream.
                       - [x] Project every active padded slot to its
                         compiler-facing rank datum.
-                    - [ ] Compile duplicate removal for the padded rank-data
+                    - [x] Compile duplicate removal for the padded rank-data
                       stream by comparing reversible carrier-node identities.
                       - [x] Define a constructor-tagged, self-delimiting
                         binary word for every carrier-node identity.
@@ -1772,7 +1772,7 @@ build; an imported proof counts when its statement matches the paper.
                         alignment with the padded rank-data candidates and
                         prove its guarded representative rows select the last
                         active occurrence of every distinct identity.
-                      - [ ] Compile the aligned guarded identity-word emitter
+                      - [x] Compile the aligned guarded identity-word emitter
                         from the numeric route-descriptor stream.
                         - [x] Reduce full node identity, on the exact retained
                           stream, to an injective pair of carrier keys whose
@@ -1784,9 +1784,14 @@ build; an imported proof counts when its statement matches the paper.
                         - [x] Compile two guarded key components per padded
                           terminal and crossing node slot, concatenate the
                           streams, and pass them through the merger.
-                        - [ ] Identify the merged physical output with the
+                        - [x] Identify the merged physical output with the
                           compact source-identity words in exact padded-slot
                           order.
+                        - [x] Prove compact source-key equality equivalent to
+                          reversible carrier-node-code equality on the exact
+                          retained stream, and hence identify the compiled
+                          compact representative rows with the full identity
+                          representative rows on valid numeric routes.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
