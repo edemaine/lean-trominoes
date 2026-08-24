@@ -3,8 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PaddedSupportedCandidateWordData
-import LeanTrominoes.PeriodicOrthocrossingCarrierKeyRecipeStreamOutputSemantics
+import LeanTrominoes.PeriodicOrthocrossingCarrierKeyRecipeStreamOutput
 import LeanTrominoes.TM2CompositionMachine
 import LeanTrominoes.TM2ListAppendFixedCompiler
 import LeanTrominoes.TM2PolyTimeOutputEncodingTransport
@@ -18,24 +17,17 @@ namespace CarrierKeyRecipeStream
 
 open Computability Turing
 
+def rejectionSentinel : List Bool := [false]
+
 def outputWithSentinel (input : DelimitedBinaryWords.Input) :
     DelimitedBinaryWords.Input :=
-  ⟨(output input).words ++ [PaddedSupportedCandidateWords.sentinelWord]⟩
-
-@[simp] theorem outputWithSentinel_descriptorWords
-    (descriptors : List RouteDescriptor) :
-    outputWithSentinel (RouteDescriptorBinaryWords.words descriptors) =
-      PaddedSupportedCandidateWords.wordsWithSentinel CarrierKeyWords.word
-        (paddedCarrierKeyCandidateStream descriptors) := by
-  unfold outputWithSentinel
-    PaddedSupportedCandidateWords.wordsWithSentinel
-  rw [output_descriptorWords, guardedWords_eq_paddedCandidateStream]
+  ⟨(output input).words ++ [rejectionSentinel]⟩
 
 theorem appendedTokens_eq_encode_outputWithSentinel
     (input : DelimitedBinaryWords.Input) :
     TM2ListAppend.appendFixedWords
         (DelimitedBinaryWords.wordTokens
-          PaddedSupportedCandidateWords.sentinelWord)
+          rejectionSentinel)
         (emittedTokens input) =
       DelimitedBinaryWords.encode (outputWithSentinel input) := by
   rw [emittedTokens_eq_encode_output]
@@ -49,7 +41,7 @@ noncomputable def outputWithSentinelComputableInPolyTime :
     emittedTokensComputableInPolyTime
     (TM2ListAppend.appendFixedComputableInPolyTime
       (DelimitedBinaryWords.wordTokens
-        PaddedSupportedCandidateWords.sentinelWord))
+        rejectionSentinel))
   exact TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq appended
     appendedTokens_eq_encode_outputWithSentinel
 
