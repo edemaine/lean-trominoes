@@ -40,4 +40,22 @@ theorem filterMap_value_candidates
           rw [candidates, activeValues, List.filterMap_append,
             filterMap_value_map_activate, induction]
 
+/-- Removing inactive padded slots distributes through an outer family of
+fixed candidate blocks. -/
+theorem filterMap_value_flatMap_candidates
+    {Index : Type*} (indices : List Index)
+    (actives : Index → List Bool)
+    (blocks : Index → List (List (Template Value))) :
+    (indices.flatMap fun index =>
+        candidates (actives index) (blocks index)).filterMap
+          Candidate.value =
+      indices.flatMap fun index =>
+        activeValues (actives index) (blocks index) := by
+  induction indices with
+  | nil => rfl
+  | cons index indices induction =>
+      rw [List.flatMap_cons, List.filterMap_append,
+        filterMap_value_candidates, induction]
+      rfl
+
 end LeanTrominoes.PaddedSupportedCandidateBlocks
