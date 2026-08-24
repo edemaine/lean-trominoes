@@ -3,7 +3,6 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.ListMapGetCast
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPaddedOccurrenceSlotIndexData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairOccurrenceTemplateEvaluationSemantics
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairPaddedOccurrenceTemplateSlots
@@ -42,14 +41,7 @@ theorem RouteShape.paddedOccurrenceAtSlot_evalPair
       (descriptorAt pair side).paddedNeighborOccurrenceAtSlot slot := by
   unfold RouteShape.paddedOccurrenceAtSlot
     RouteDescriptor.paddedNeighborOccurrenceAtSlot
-  exact List.map_get_cast_eq
-    (shape.paddedOccurrences side)
-    ((descriptorAt pair side).paddedNeighborOccurrenceSlots)
-    (Option.map fun occurrence => occurrence.evalPair side pair)
-    81
-    (shape.paddedOccurrences_length side)
-    (descriptorAt pair side).paddedNeighborOccurrenceSlots_length
-    (shape.map_paddedOccurrences side pair shapeMatches)
-    slot
+  rw [← shape.map_evalPair_occurrences side pair shapeMatches]
+  rw [List.getElem?_map]
 
 end LeanTrominoes.PeriodicOrthocrossing.RouteDescriptorPairAffine

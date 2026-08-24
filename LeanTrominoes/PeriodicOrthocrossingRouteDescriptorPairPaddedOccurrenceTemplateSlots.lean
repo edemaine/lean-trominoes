@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.ListFinRangeGetElemPad
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairOccurrenceTemplateEvaluationSemantics
 
 /-! # Fixed affine occurrence-template slots -/
@@ -30,7 +31,17 @@ slots. -/
 def RouteShape.paddedOccurrenceAtSlot
     (shape : RouteShape) (side : RouteDescriptorPairFieldTags.Side)
     (slot : Fin 81) : Option Occurrence :=
-  (shape.paddedOccurrences side).get
-    (Fin.cast (shape.paddedOccurrences_length side).symm slot)
+  (shape.occurrences side)[slot.val]?
+
+/-- Increasing fixed indices enumerate exactly the padded affine occurrence
+template block. -/
+theorem RouteShape.map_paddedOccurrenceAtSlot
+    (shape : RouteShape) (side : RouteDescriptorPairFieldTags.Side) :
+    (List.finRange 81).map (shape.paddedOccurrenceAtSlot side) =
+      shape.paddedOccurrences side := by
+  unfold RouteShape.paddedOccurrenceAtSlot RouteShape.paddedOccurrences
+  exact List.map_finRange_getElem?_eq_pad
+    (shape.occurrences side) 81
+    (shape.occurrences_length_le_eightyOne side)
 
 end LeanTrominoes.PeriodicOrthocrossing.RouteDescriptorPairAffine

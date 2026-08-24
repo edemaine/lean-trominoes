@@ -13,8 +13,6 @@ namespace LeanTrominoes.PeriodicOrthocrossing
 def RouteDescriptor.paddedNeighborOccurrenceAtSlot
     (descriptor : RouteDescriptor) (slot : Fin 81) :
     Option (IndexedGridSegment × Cell) :=
-  descriptor.paddedNeighborOccurrenceSlots.get
-    (Fin.cast
-      descriptor.paddedNeighborOccurrenceSlots_length.symm slot)
+  descriptor.selfIndexedNeighborOccurrences[slot.val]?
 
 end LeanTrominoes.PeriodicOrthocrossing
