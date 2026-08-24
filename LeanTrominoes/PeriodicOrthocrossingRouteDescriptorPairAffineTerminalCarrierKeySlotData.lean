@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PaddedSupportedCandidateBlocks
-import LeanTrominoes.PeriodicOrthocrossingOccurrencePairCarrierKeyData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineCarrierSegmentScanData
 
 /-! # Fixed terminal carrier-key slots for route-descriptor pairs -/
@@ -21,12 +20,12 @@ abbrev CarrierKey := Nat × Nat × Cell
 evaluated affine segment.  Every active terminal key is supported. -/
 def Segment.terminalCarrierKeyTemplateBlock
     (pair : RouteDescriptor × RouteDescriptor)
-    (segmentIndex : Nat) (segment : Segment) :
+    (segmentIndex : Nat) (_segment : Segment) :
     List (Template CarrierKey) :=
   neighborTranslations.flatMap fun translate =>
-    let occurrence : IndexedGridSegment × Cell :=
-      (⟨pair.1.edgeIndex, segmentIndex, segment.evalPair pair⟩, translate)
-    List.replicate 2 ⟨occurrenceCarrierKey occurrence, true⟩
+    let key : CarrierKey :=
+      (pair.1.edgeIndex, segmentIndex, translate)
+    List.replicate 2 ⟨key, true⟩
 
 /-- Identical terminal-key blocks aligned with one segment's horizontal and
 vertical classification predicates. -/
