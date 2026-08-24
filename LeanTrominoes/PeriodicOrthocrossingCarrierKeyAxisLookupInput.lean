@@ -5,8 +5,8 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.LastTrueUnaryValueLookupValidity
 import LeanTrominoes.PaddedSupportedCandidateRepresentativeRowLength
+import LeanTrominoes.PeriodicOrthocrossingCarrierKeyAxisLookupData
 import LeanTrominoes.PeriodicOrthocrossingCarrierKeyAxisStreamSentinelLength
-import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorCarrierKeyRepresentativeRowData
 
 /-! # Retained carrier-key axis lookup input -/
 
@@ -32,11 +32,6 @@ def input (descriptors : List RouteDescriptor) :
   values := CarrierKeyAxisStream.valuesWithSentinel descriptors
   valid := LastTrueUnaryValueLookupMachine.RowsValid.of_forall_length
     (representativeRows_forall_values_length descriptors)
-
-/-- One selected unary axis value for every carrier-key representative row. -/
-def values (descriptors : List RouteDescriptor) : List Nat :=
-  LastTrueUnaryValueLookupMachine.lookups
-    (input descriptors).rows (input descriptors).values
 
 end CarrierKeyAxisLookup
 end LeanTrominoes.PeriodicOrthocrossing

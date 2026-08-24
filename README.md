@@ -1699,6 +1699,11 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Fork the representative rows with those sentinel
                     values, prove the dependent lookup input is length-valid,
                     and compile one selected unary axis per representative.
+                  - [x] Prove that the aligned zero sentinel preserves
+                    support-aware lookup and that any key-derived padded axis
+                    stream is returned in exact retained carrier-key order.
+                  - [ ] Prove the compiled terminal/crossing padded axis stream
+                    is a function of its active carrier key.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
