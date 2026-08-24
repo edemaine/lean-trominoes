@@ -1768,8 +1768,12 @@ build; an imported proof counts when its statement matches the paper.
                         identity fields.
                       - [x] Prove the decoder is a left inverse and the word
                         encoding is injective.
-                      - [ ] Emit the identity words in exact alignment with
-                        the padded rank-data candidates.
+                      - [x] Define the active-support identity stream in exact
+                        alignment with the padded rank-data candidates and
+                        prove its guarded representative rows select the last
+                        active occurrence of every distinct identity.
+                      - [ ] Compile the aligned guarded identity-word emitter
+                        from the numeric route-descriptor stream.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
