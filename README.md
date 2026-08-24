@@ -1679,6 +1679,10 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Prove that the descriptor-derived unary axis selected
                     for each retained key is exactly the physical axis of
                     every representative carrier link in that key's block.
+                  - [x] Reconstruct the exact retained terminal-and-crossing
+                    carrier-node event stream from ordered neighboring
+                    occurrences and canonical crossing pairs, preserving full
+                    crossing records and retained period translations.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
