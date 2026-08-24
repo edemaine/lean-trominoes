@@ -1710,6 +1710,9 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Expose the terminal recipe axes as explicit
                       segment/shape blocks and prove key-derived alignment
                       for one selected diagonal segment.
+                    - [x] Lift terminal key-derived alignment through route
+                      shapes, diagonal and off-diagonal numeric descriptor
+                      pairs, and the complete descriptor square.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
