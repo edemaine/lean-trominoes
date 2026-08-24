@@ -1683,6 +1683,10 @@ build; an imported proof counts when its statement matches the paper.
                     carrier-node event stream from ordered neighboring
                     occurrences and canonical crossing pairs, preserving full
                     crossing records and retained period translations.
+                  - [x] Compute every reconstructed carrier node's physical
+                    macro position and axis-order coordinate from the numeric
+                    drawing period, and identify them with the semantic sort
+                    coordinates.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
