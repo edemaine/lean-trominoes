@@ -1665,6 +1665,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Emit the affine axis candidates in selected segment and
                   neighboring-translation order without importing the
                   crossing-enumeration proof stack.
+                - [x] Recover the exact last-occurrence retained carrier-key
+                  order from duplicated neighboring terminal keys and fixed
+                  retention shifts of the exact ordered crossing-pair scan.
                 - [ ] Filter and expand those candidates to the exact ordered
                   representative carrier links, including their next-slice
                   ownership bits.
