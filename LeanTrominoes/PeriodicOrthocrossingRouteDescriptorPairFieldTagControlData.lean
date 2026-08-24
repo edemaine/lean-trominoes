@@ -3,21 +3,18 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.DelimitedBinaryWordPairs
+import LeanTrominoes.DelimitedBinaryWordPairData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairFieldTagAlphabetData
 
 /-! # Finite controls for route-descriptor pair tags -/
 
 namespace LeanTrominoes.PeriodicOrthocrossing.RouteDescriptorPairFieldTags
 
-deriving instance Fintype for Side
-deriving instance Fintype for Token
-
 inductive Control
   | between
   | first (field : Fin 11)
   | second (field : Fin 11)
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
 
 def sideControl : Side → Fin 11 → Control
   | .first, field => .first field

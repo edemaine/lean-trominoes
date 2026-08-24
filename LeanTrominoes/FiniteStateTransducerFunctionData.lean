@@ -6,7 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 
 /-! # Pure output functions for finite-state word transducers -/
 
-namespace LeanTrominoes.FiniteStateTransducer
+namespace LeanTrominoes.LightweightFiniteStateTransducer
 
 universe u v w
 
@@ -30,4 +30,21 @@ def output {Control : Type u} {Source : Type v} {Target : Type w}
   let scanned := scan transition initial input
   scanned.2 ++ finish scanned.1
 
-end LeanTrominoes.FiniteStateTransducer
+/-- Scanning an append first scans the prefix, then the suffix from the
+resulting control, concatenating both emitted words. -/
+theorem scan_append {Control : Type u} {Source : Type v} {Target : Type w}
+    (transition : Control → Source → Control × List Target)
+    (control : Control) (first second : List Source) :
+    scan transition control (first ++ second) =
+      let firstResult := scan transition control first
+      let secondResult := scan transition firstResult.1 second
+      (secondResult.1, firstResult.2 ++ secondResult.2) := by
+  induction first generalizing control with
+  | nil => rfl
+  | cons symbol first induction =>
+      simp only [List.cons_append, scan]
+      let current := transition control symbol
+      rw [induction current.1]
+      simp [current, List.append_assoc]
+
+end LeanTrominoes.LightweightFiniteStateTransducer

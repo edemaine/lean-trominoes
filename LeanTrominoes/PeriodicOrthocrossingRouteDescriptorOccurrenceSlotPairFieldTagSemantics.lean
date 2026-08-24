@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.FiniteStateTransducerSemantics
+import LeanTrominoes.FiniteStateTransducerFunctionData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotBinaryWordPairSemantics
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairFieldTags
 
@@ -27,7 +27,7 @@ open RouteDescriptorOccurrenceSlotBinaryWords
   cases side <;> rfl
 
 theorem scan_units (side : Side) (field : Fin 12) (number : Nat) :
-    FiniteStateTransducer.scan transition (sideControl side field)
+    LightweightFiniteStateTransducer.scan transition (sideControl side field)
         (List.replicate number (sideBit side false)) =
       (sideControl side field,
         List.replicate number (.unit side field)) := by
@@ -35,13 +35,14 @@ theorem scan_units (side : Side) (field : Fin 12) (number : Nat) :
   | zero => rfl
   | succ number induction =>
       rw [List.replicate_succ, List.replicate_succ]
-      simp only [FiniteStateTransducer.scan, transition_sideBit_false]
+      simp only [LightweightFiniteStateTransducer.scan,
+        transition_sideBit_false]
       rw [induction]
       rfl
 
 theorem scan_fieldWord
     (side : Side) (field : Fin 12) (number : Nat) :
-    FiniteStateTransducer.scan transition (sideControl side field)
+    LightweightFiniteStateTransducer.scan transition (sideControl side field)
         ((RouteDescriptorBinaryWords.fieldWord number).map
           (sideBit side)) =
       (sideControl side (nextField field),
@@ -51,14 +52,15 @@ theorem scan_fieldWord
         List.replicate number (sideBit side false) ++
           [sideBit side true] by
     simp [RouteDescriptorBinaryWords.fieldWord]]
-  rw [FiniteStateTransducer.scan_append, scan_units]
+  rw [LightweightFiniteStateTransducer.scan_append, scan_units]
   dsimp
-  simp only [FiniteStateTransducer.scan, transition_sideBit_true,
+  simp only [LightweightFiniteStateTransducer.scan,
+    transition_sideBit_true,
     List.append_nil]
 
 theorem scan_fields
     (side : Side) (field : Fin 12) (numbers : List Nat) :
-    FiniteStateTransducer.scan transition (sideControl side field)
+    LightweightFiniteStateTransducer.scan transition (sideControl side field)
         ((numbers.flatMap
           RouteDescriptorBinaryWords.fieldWord).map (sideBit side)) =
       (sideControl side (advanceFields field numbers.length),
@@ -67,7 +69,7 @@ theorem scan_fields
   | nil => rfl
   | cons number numbers induction =>
       simp only [List.flatMap_cons, List.map_append]
-      rw [FiniteStateTransducer.scan_append, scan_fieldWord]
+      rw [LightweightFiniteStateTransducer.scan_append, scan_fieldWord]
       dsimp
       rw [induction]
       rfl
@@ -86,7 +88,7 @@ theorem descriptorSlotWord_eq_fields
 
 theorem scan_descriptorSlotWord
     (side : Side) (tagged : TaggedDescriptor) :
-    FiniteStateTransducer.scan transition (sideControl side 0)
+    LightweightFiniteStateTransducer.scan transition (sideControl side 0)
         ((descriptorSlotWord tagged).map (sideBit side)) =
       (sideControl side 0, descriptorSlotUnits side tagged) := by
   rw [descriptorSlotWord_eq_fields, scan_fields]
@@ -97,11 +99,11 @@ theorem scan_descriptorSlotWord
   rfl
 
 theorem scan_firstDescriptorSlotWord (tagged : TaggedDescriptor) :
-    FiniteStateTransducer.scan transition (.first 0)
+    LightweightFiniteStateTransducer.scan transition (.first 0)
         ((descriptorSlotWord tagged).map
           DelimitedBinaryWordPairs.Token.firstBit) =
       (.first 0, descriptorSlotUnits .first tagged) := by
-  change FiniteStateTransducer.scan transition
+  change LightweightFiniteStateTransducer.scan transition
       (sideControl RouteDescriptorPairFieldTags.Side.first 0)
       ((descriptorSlotWord tagged).map
         (sideBit RouteDescriptorPairFieldTags.Side.first)) = _
@@ -109,11 +111,11 @@ theorem scan_firstDescriptorSlotWord (tagged : TaggedDescriptor) :
     RouteDescriptorPairFieldTags.Side.first tagged
 
 theorem scan_secondDescriptorSlotWord (tagged : TaggedDescriptor) :
-    FiniteStateTransducer.scan transition (.second 0)
+    LightweightFiniteStateTransducer.scan transition (.second 0)
         ((descriptorSlotWord tagged).map
           DelimitedBinaryWordPairs.Token.secondBit) =
       (.second 0, descriptorSlotUnits .second tagged) := by
-  change FiniteStateTransducer.scan transition
+  change LightweightFiniteStateTransducer.scan transition
       (sideControl RouteDescriptorPairFieldTags.Side.second 0)
       ((descriptorSlotWord tagged).map
         (sideBit RouteDescriptorPairFieldTags.Side.second)) = _
@@ -122,28 +124,29 @@ theorem scan_secondDescriptorSlotWord (tagged : TaggedDescriptor) :
 
 theorem scan_descriptorSlotPairTokens
     (pair : TaggedDescriptor × TaggedDescriptor) :
-    FiniteStateTransducer.scan transition .between
+    LightweightFiniteStateTransducer.scan transition .between
         (DelimitedBinaryWordPairs.pairTokens
           (descriptorSlotWord pair.1, descriptorSlotWord pair.2)) =
       (.between, descriptorSlotPairTokens pair) := by
   rcases pair with ⟨first, second⟩
   unfold DelimitedBinaryWordPairs.pairTokens descriptorSlotPairTokens
-  simp only [FiniteStateTransducer.scan, transition]
+  simp only [LightweightFiniteStateTransducer.scan, transition]
   dsimp
-  rw [FiniteStateTransducer.scan_append,
+  rw [LightweightFiniteStateTransducer.scan_append,
     scan_firstDescriptorSlotWord first]
   dsimp
-  simp only [FiniteStateTransducer.scan, transition]
+  simp only [LightweightFiniteStateTransducer.scan, transition]
   dsimp
-  rw [FiniteStateTransducer.scan_append,
+  rw [LightweightFiniteStateTransducer.scan_append,
     scan_secondDescriptorSlotWord second]
   dsimp
-  simp only [FiniteStateTransducer.scan, transition, List.append_assoc,
+  simp only [LightweightFiniteStateTransducer.scan, transition,
+    List.append_assoc,
     List.append_nil]
 
 theorem scan_descriptorSlotPairs
     (pairs : List (TaggedDescriptor × TaggedDescriptor)) :
-    FiniteStateTransducer.scan transition .between
+    LightweightFiniteStateTransducer.scan transition .between
         (pairs.flatMap fun pair =>
           DelimitedBinaryWordPairs.pairTokens
             (descriptorSlotWord pair.1, descriptorSlotWord pair.2)) =
@@ -151,7 +154,7 @@ theorem scan_descriptorSlotPairs
   induction pairs with
   | nil => rfl
   | cons pair pairs induction =>
-      rw [List.flatMap_cons, FiniteStateTransducer.scan_append,
+      rw [List.flatMap_cons, LightweightFiniteStateTransducer.scan_append,
         scan_descriptorSlotPairTokens]
       dsimp
       rw [induction]
@@ -164,7 +167,7 @@ theorem tokens_wordPairs (descriptors : List RouteDescriptor) :
       encodeDescriptorSlotPairs
         (taggedDescriptors descriptors ×ˢ
           taggedDescriptors descriptors) := by
-  unfold tokens FiniteStateTransducer.output
+  unfold tokens LightweightFiniteStateTransducer.output
     DelimitedBinaryWordPairs.encode wordPairs
   rw [List.flatMap_map, scan_descriptorSlotPairs]
   simp only [finish, List.append_nil]

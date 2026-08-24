@@ -3,6 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.DelimitedBinaryWordPairFinEncoding
+import LeanTrominoes.FiniteStateTransducerFunctionSemantics
 import LeanTrominoes.FiniteStateTransducerTime
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairFieldTags
 import LeanTrominoes.TM2PolyTimeInputEncodingTransport
@@ -20,8 +22,13 @@ open Computability Turing
 finite-state transduction. -/
 noncomputable def tokensComputableInPolyTime :
     TM2ComputableInPolyTime id id tokens := by
-  change TM2ComputableInPolyTime id id
-    (FiniteStateTransducer.output Control.between transition finish)
+  have tokensEq : tokens =
+      FiniteStateTransducer.output
+        Control.between transition finish := by
+    funext input
+    exact LightweightFiniteStateTransducer.output_eq_finiteState
+      Control.between transition finish input
+  rw [tokensEq]
   exact FiniteStateTransducer.computableInPolyTime
     Control.between transition finish
 

@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.DelimitedBinaryWordPairs
+import LeanTrominoes.DelimitedBinaryWordPairData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairFieldTagAlphabetData
 
 /-! # Finite controls for occurrence-slot pair tags -/
@@ -11,14 +11,11 @@ import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotPairField
 namespace LeanTrominoes.PeriodicOrthocrossing
 namespace RouteDescriptorOccurrenceSlotPairFieldTags
 
-deriving instance Fintype for RouteDescriptorPairFieldTags.Side
-deriving instance Fintype for Token
-
 inductive Control
   | between
   | first (field : Fin 12)
   | second (field : Fin 12)
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
 
 def sideControl : Side → Fin 12 → Control
   | .first, field => .first field
