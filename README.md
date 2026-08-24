@@ -1719,6 +1719,9 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Apply zero-owner representative filtering and the
                       axis/next-slice projection to that rank-major stream,
                       recovering the exact per-key target bit block.
+                    - [x] Factor ranking, crossover suppression, orbit
+                      ownership, and next-slice projection through a compact
+                      compiler-facing numeric datum for each carrier node.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
