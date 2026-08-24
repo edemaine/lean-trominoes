@@ -1700,6 +1700,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Map the axis and next-slice bits over every exact
                     representative pair block and preserve the established
                     per-key link order.
+                  - [x] Factor the full retained carrier-node scan and every
+                    per-key representative bit block through the compact
+                    numeric route descriptors at the explicit drawing period.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
