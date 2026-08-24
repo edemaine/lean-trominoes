@@ -1685,6 +1685,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Compile an activation-aligned unary axis value for
                     every padded terminal and crossing candidate slot,
                     assigning zero to inactive slots.
+                  - [x] Map those fields over the complete descriptor and
+                    occurrence-slot pair products and compose the terminal
+                    prefix with the crossing suffix in polynomial time.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
