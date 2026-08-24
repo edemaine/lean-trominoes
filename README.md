@@ -1660,6 +1660,8 @@ build; an imported proof counts when its statement matches the paper.
             - [ ] Compile retained carrier-link descriptors.
               - [x] Compile the fixed two-bit carrier descriptor-block
                 expansion.
+              - [x] Name the exact presentation-order carrier-link axis and
+                next-slice bit target independently of formula normalization.
               - [ ] Emit the exact ordered carrier-link axis/next-slice bit
                 stream.
                 - [x] Emit the affine axis candidates in selected segment and
