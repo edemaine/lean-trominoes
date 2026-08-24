@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.Complexity
+import LeanTrominoes.FiniteStateTransducerFunctionData
 
 /-! # Finite-state word transducers -/
 
@@ -12,26 +13,6 @@ namespace LeanTrominoes
 open Computability StateTransition Turing
 
 namespace FiniteStateTransducer
-
-/-- Scan a word from left to right, carrying finite control and concatenating
-the finite word emitted at each transition. -/
-def scan {Control Source Target : Type*}
-    (transition : Control → Source → Control × List Target) :
-    Control → List Source → Control × List Target
-  | control, [] => (control, [])
-  | control, symbol :: input =>
-      let current := transition control symbol
-      let rest := scan transition current.1 input
-      (rest.1, current.2 ++ rest.2)
-
-/-- Complete output, including the terminal word selected by the final
-control state. -/
-def output {Control Source Target : Type*}
-    (initial : Control)
-    (transition : Control → Source → Control × List Target)
-    (finish : Control → List Target) (input : List Source) : List Target :=
-  let scanned := scan transition initial input
-  scanned.2 ++ finish scanned.1
 
 inductive Stack
   | input

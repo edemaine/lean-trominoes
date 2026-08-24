@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.DelimitedBinaryWordOccurrenceSlotTags
 import LeanTrominoes.DelimitedBinaryWordPairProductMachine
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorBinaryWordData
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorOccurrenceSlotTagData
 
 /-! # Binary words indexed by fixed route-descriptor occurrence slots -/
 
@@ -13,17 +14,6 @@ namespace LeanTrominoes.PeriodicOrthocrossing
 namespace RouteDescriptorOccurrenceSlotBinaryWords
 
 open DelimitedBinaryWordOccurrenceSlotTags
-
-/-- A descriptor paired with one of its eighty-one fixed occurrence slots. -/
-abbrev TaggedDescriptor :=
-  RouteDescriptor × DelimitedBinaryWordOccurrenceSlotTags.Slot
-
-/-- Descriptor-major enumeration with increasing slot index inside every
-descriptor block. -/
-def taggedDescriptors (descriptors : List RouteDescriptor) :
-    List TaggedDescriptor :=
-  descriptors.flatMap fun descriptor =>
-    (List.finRange 81).map fun slot => (descriptor, slot)
 
 /-- Canonical descriptor word with its twelfth unary slot field. -/
 def descriptorSlotWord (tagged : TaggedDescriptor) : List Bool :=
