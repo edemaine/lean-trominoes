@@ -12,7 +12,7 @@ namespace LeanTrominoes.PeriodicOrthocrossing.RouteDescriptorPairAffine
 open RouteDescriptorPairFieldTags
 
 /-- Block selection distributes across an aligned prefix append. -/
-private theorem carrierSelectTruthBlocks_append
+theorem carrierSelectTruthBlocks_append
     {Output : Type}
     (firstBlocks secondBlocks : List (List Output))
     (firstTruths secondTruths : List Bool)
@@ -38,7 +38,7 @@ private theorem carrierSelectTruthBlocks_append
           cases truth <;> simp [List.append_assoc]
 
 /-- Block selection distributes over an aligned fixed flat-map family. -/
-private theorem carrierSelectTruthBlocks_flatMap
+theorem carrierSelectTruthBlocks_flatMap
     {Index Output : Type}
     (indices : List Index)
     (blocks : Index → List (List Output))
