@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorCarrierKeyOrderData
-import LeanTrominoes.LastRepresentativeEqualityRowsPrefixFilterSemantics
+import LeanTrominoes.SupportedLastRepresentativeEqualityRows
 
 /-! # Retained carrier-key equality rows over route descriptors -/
 
@@ -27,14 +27,13 @@ def routeDescriptorCarrierKeyCandidatesAtPeriod
       (routeDescriptorOrientedCrossingOccurrencePairsAtPeriod
         period descriptors)
 
-/-- Last-representative carrier-key equality rows, restricted to classes
-that occur in the neighboring terminal-key prefix. -/
+/-- Guarded last-representative carrier-key equality rows, restricted to
+classes that occur among the neighboring terminal keys. -/
 def routeDescriptorRetainedCarrierKeyRowsAtPeriod
     (period : Nat) (descriptors : List RouteDescriptor) :
     DelimitedBinaryWords.Input :=
-  LastRepresentativeEqualityRows.prefixSupportedRows
-    (routeDescriptorTerminalCarrierKeys descriptors).length
-    ⟨LastRepresentativeEqualityRows.equalityRows
-      (routeDescriptorCarrierKeyCandidatesAtPeriod period descriptors)⟩
+  SupportedLastRepresentativeEqualityRows.selectedRows
+    (routeDescriptorTerminalCarrierKeys descriptors)
+    (routeDescriptorCarrierKeyCandidatesAtPeriod period descriptors)
 
 end LeanTrominoes.PeriodicOrthocrossing
