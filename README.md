@@ -1673,6 +1673,10 @@ build; an imported proof counts when its statement matches the paper.
                 - [ ] Filter and expand those candidates to the exact ordered
                   representative carrier links, including their next-slice
                   ownership bits.
+                  - [x] Compile the retained representative rows to one unary
+                    active-node multiplicity per retained carrier key, and
+                    prove generically that padded rejection guards do not
+                    affect those counts.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
