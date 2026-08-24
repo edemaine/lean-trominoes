@@ -1704,6 +1704,9 @@ build; an imported proof counts when its statement matches the paper.
                     stream is returned in exact retained carrier-key order.
                   - [ ] Prove the compiled terminal/crossing padded axis stream
                     is a function of its active carrier key.
+                    - [x] Prove generic activated axis/template block
+                      semantics and define a well-defined descriptor-level
+                      axis datum for neighboring carrier keys.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
