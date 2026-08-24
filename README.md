@@ -1792,6 +1792,15 @@ build; an imported proof counts when its statement matches the paper.
                           retained stream, and hence identify the compiled
                           compact representative rows with the full identity
                           representative rows on valid numeric routes.
+                    - [ ] Compile all fifty identity-free carrier rank-datum
+                      columns selected by those compact representative rows.
+                      - [x] Project the complete padded carrier-node stream to
+                        carrier keys, align the existing sentinel-completed
+                        axis stream with source-key rows, and compile its
+                        selected horizontal bit.  Prove numeric-route equality
+                        with zero-indexed rank-scan field eight.
+                      - [ ] Compile the remaining forty-nine aligned rank
+                        fields and assemble the column-major scan.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
