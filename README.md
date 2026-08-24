@@ -1688,6 +1688,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Map those fields over the complete descriptor and
                     occurrence-slot pair products and compose the terminal
                     prefix with the crossing suffix in polynomial time.
+                  - [x] Prove that the complete axis-value stream has exactly
+                    one entry per padded carrier-key candidate, pairwise and
+                    after terminal/crossing stream composition.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
