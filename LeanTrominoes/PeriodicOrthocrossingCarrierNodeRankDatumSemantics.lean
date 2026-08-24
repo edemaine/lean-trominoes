@@ -9,6 +9,13 @@ import LeanTrominoes.PeriodicOrthocrossingCarrierNodeRankDatumData
 
 namespace LeanTrominoes.PeriodicOrthocrossing
 
+/-- The compiler-facing datum projection is globally injective because it
+retains the finite source-node identity used by deduplication. -/
+theorem carrierNodeRankDatumAtPeriod_injective (period : Nat) :
+    Function.Injective (carrierNodeRankDatumAtPeriod period) := by
+  intro first second equal
+  exact congrArg CarrierNodeRankDatum.identity equal
+
 @[simp] theorem carrierNodeRankDatumAtPeriod_sameCrossoverSite
     (period : Nat) (first second : CarrierNode) :
     (carrierNodeRankDatumAtPeriod period first).sameCrossoverSite

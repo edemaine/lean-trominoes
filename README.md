@@ -1728,6 +1728,10 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Prove that target equals the exact route-descriptor
                       bit block from duplicate-free physical and projected
                       node streams with strict per-key coordinate order.
+                    - [x] Retain finite source identity in each numeric datum,
+                      prove projection injectivity and deduplication-through-
+                      map, and reduce the semantic obligation to strict
+                      per-key coordinate order alone.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those

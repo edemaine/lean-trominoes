@@ -12,6 +12,8 @@ namespace LeanTrominoes.PeriodicOrthocrossing
 /-- The proof-free fields needed to rank a carrier node and decide the
 metadata bits of a consecutive node pair. -/
 structure CarrierNodeRankDatum where
+  /-- Finite source identity used only to make datum deduplication exact. -/
+  identity : CarrierNode
   key : Nat × Nat × Cell
   orderCoordinate : Int
   horizontal : Bool
@@ -24,6 +26,7 @@ structure CarrierNodeRankDatum where
 an explicit drawing period. -/
 def carrierNodeRankDatumAtPeriod
     (period : Nat) (node : CarrierNode) : CarrierNodeRankDatum where
+  identity := node
   key := node.carrierKey
   orderCoordinate := carrierNodeOrderCoordinateAtPeriod period node
   horizontal := node.isHorizontal
