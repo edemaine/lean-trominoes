@@ -1707,6 +1707,9 @@ build; an imported proof counts when its statement matches the paper.
                     ordered carrier chains: counting lower coordinates in the
                     original presentation recovers each exact sorted index,
                     so the compiler need not materialize an encoded sort.
+                    - [x] Specialize that lower-rank scan to the graph-free
+                      deduplicated same-key carrier-node candidates and its
+                      exact semantic chain lookup.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
