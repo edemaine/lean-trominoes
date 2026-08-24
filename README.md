@@ -1687,6 +1687,9 @@ build; an imported proof counts when its statement matches the paper.
                     macro position and axis-order coordinate from the numeric
                     drawing period, and identify them with the semantic sort
                     coordinates.
+                  - [x] Reproduce each retained key's exact deduplicated,
+                    filtered, stably sorted node chain and adjacent
+                    non-crossover link-endpoint order from that event stream.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
