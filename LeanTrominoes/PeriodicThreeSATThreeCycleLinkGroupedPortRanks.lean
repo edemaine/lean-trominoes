@@ -3,52 +3,14 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicThreeSATThreeCycleLinkGroupedTargetIndices
+import LeanTrominoes.PeriodicThreeSATThreeCycleLinkAtomCycleSemantics
+import LeanTrominoes.PeriodicThreeSATThreeCycleLinkPrefixRankData
 
 /-! # Prefix ranks in duplicate-free occurrence cycles -/
 
 namespace LeanTrominoes
 namespace PeriodicThreeSATThree
 namespace CycleLinkGroupedPortRanks
-
-def linkAtoms {Value : Type*} : List (Value × Value) → List Value
-  | [] => []
-  | link :: links => link.1 :: link.2 :: linkAtoms links
-
-def cycleLinkAtoms {Variable : Type*}
-    (values : List (ThreeOccurrenceVariable Variable)) :
-    List (ThreeOccurrenceVariable Variable) :=
-  linkAtoms (cycleLinks values)
-
-theorem linkAtoms_cycleLinksFrom
-    {Variable : Type*}
-    (first current : ThreeOccurrenceVariable Variable)
-    (rest : List (ThreeOccurrenceVariable Variable)) :
-    linkAtoms (cycleLinksFrom first current rest) =
-      current :: (rest.flatMap fun value => [value, value]) ++ [first] := by
-  induction rest generalizing current with
-  | nil => rfl
-  | cons next rest induction =>
-      simp [linkAtoms, cycleLinksFrom, induction]
-
-theorem cycleLinkAtoms_cons
-    {Variable : Type*}
-    (first : ThreeOccurrenceVariable Variable)
-    (rest : List (ThreeOccurrenceVariable Variable)) :
-    cycleLinkAtoms (first :: rest) =
-      first :: (rest.flatMap fun value => [value, value]) ++ [first] := by
-  exact linkAtoms_cycleLinksFrom first first rest
-
-/-- Prefix multiplicity ranks, carrying the already scanned word. -/
-def prefixRanksFrom {Value : Type*} [BEq Value] :
-    List Value → List Value → List Nat
-  | _, [] => []
-  | seen, value :: values =>
-      (1 + seen.count value) :: prefixRanksFrom (seen ++ [value]) values
-
-def prefixRanks {Value : Type*} [BEq Value]
-    (values : List Value) : List Nat :=
-  prefixRanksFrom [] values
 
 theorem prefixRanksFrom_duplicate_then_final
     {Value : Type*} [BEq Value] [LawfulBEq Value]

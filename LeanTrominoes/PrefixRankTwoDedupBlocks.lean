@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicThreeSATThreeCycleLinkGroupedPortRanks
+import LeanTrominoes.PeriodicThreeSATThreeCycleLinkPrefixRankData
 import Mathlib.Data.List.Dedup
 
 /-! # Selecting doubled keys at their second occurrence -/
@@ -16,7 +16,8 @@ namespace CycleLinkGroupedPortRanks
 selecting rank two from the prefix-rank stream retains exactly the final
 representative of each key. -/
 theorem prefixRanksFrom_rankTwo_flatMap_eq_dedup
-    {Value Output : Type*} [DecidableEq Value]
+    {Value Output : Type*} [BEq Value] [LawfulBEq Value]
+    [DecidableEq Value]
     (seen remaining : List Value)
     (twice : ∀ value ∈ remaining,
       (seen ++ remaining).count value = 2)
@@ -59,7 +60,8 @@ theorem prefixRanksFrom_rankTwo_flatMap_eq_dedup
 /-- For a word in which every key occurs exactly twice, its rank-two blocks
 are its deduplicated blocks in Lean's last-occurrence order. -/
 theorem prefixRanks_rankTwo_flatMap_eq_dedup
-    {Value Output : Type*} [DecidableEq Value]
+    {Value Output : Type*} [BEq Value] [LawfulBEq Value]
+    [DecidableEq Value]
     (values : List Value)
     (twice : ∀ value ∈ values, values.count value = 2)
     (block : Value → List Output) :
