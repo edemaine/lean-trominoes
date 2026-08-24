@@ -1696,6 +1696,9 @@ build; an imported proof counts when its statement matches the paper.
                     guard.
                   - [x] Compile the sentinel-completed axis stream by appending
                     one fixed delimiter to the existing physical pipeline.
+                  - [x] Fork the representative rows with those sentinel
+                    values, prove the dependent lookup input is length-valid,
+                    and compile one selected unary axis per representative.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
