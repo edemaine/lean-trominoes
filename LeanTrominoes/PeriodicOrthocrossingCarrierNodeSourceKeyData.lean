@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingCarrierKeyWordData
 import LeanTrominoes.PeriodicOrthocrossingCarrierNodeRankDatumData
+import LeanTrominoes.PeriodicOrthocrossingCarrierNodeSourceKeyTagData
 
 /-! # Compact source keys for carrier-node identities -/
 
@@ -12,16 +13,6 @@ namespace LeanTrominoes.PeriodicOrthocrossing.CarrierNodeSourceKeys
 
 abbrev CarrierKey := CarrierKeyWords.CarrierKey
 abbrev SourceKeyPair := CarrierKey × CarrierKey
-
-def segmentEndTag : SegmentEnd → Nat
-  | .start => 0
-  | .finish => 1
-
-def crossingSideTag : CrossingSide → Nat
-  | .left => 2
-  | .right => 3
-  | .top => 4
-  | .bottom => 5
 
 /-- Reserve the low three bits of the segment-index field for the node kind
 and endpoint/side tag. -/
