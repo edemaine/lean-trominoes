@@ -1760,6 +1760,14 @@ build; an imported proof counts when its statement matches the paper.
                         result with the complete retained carrier-node stream.
                       - [x] Project every active padded slot to its
                         compiler-facing rank datum.
+                    - [ ] Compile duplicate removal for the padded rank-data
+                      stream by comparing reversible carrier-node identities.
+                      - [x] Define a constructor-tagged, self-delimiting
+                        binary word for every carrier-node identity.
+                      - [ ] Define its decoder and prove the word encoding is
+                        injective.
+                      - [ ] Emit the identity words in exact alignment with
+                        the padded rank-data candidates.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
