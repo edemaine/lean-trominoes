@@ -3,8 +3,9 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPaddedOccurrenceSlots
-import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairOccurrenceTemplateSemantics
+import LeanTrominoes.ListMapGetCast
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPaddedOccurrenceSlotIndexData
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairOccurrenceTemplateEvaluationSemantics
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairPaddedOccurrenceTemplateSlots
 
 /-! # Semantics of padded affine occurrence-template slots -/
@@ -28,5 +29,27 @@ theorem RouteShape.map_paddedOccurrences
   simp only [List.map_append, List.map_map, List.map_replicate,
     Option.map_none, List.length_map]
   congr 1
+
+/-- Evaluating one fixed affine occurrence-template slot gives the semantic
+occurrence occupying the same descriptor slot. -/
+theorem RouteShape.paddedOccurrenceAtSlot_evalPair
+    (shape : RouteShape) (side : Side)
+    (pair : RouteDescriptor × RouteDescriptor)
+    (shapeMatches : shape.Matches (descriptorAt pair side))
+    (slot : Fin 81) :
+    (shape.paddedOccurrenceAtSlot side slot).map
+        (fun occurrence => occurrence.evalPair side pair) =
+      (descriptorAt pair side).paddedNeighborOccurrenceAtSlot slot := by
+  unfold RouteShape.paddedOccurrenceAtSlot
+    RouteDescriptor.paddedNeighborOccurrenceAtSlot
+  exact List.map_get_cast_eq
+    (shape.paddedOccurrences side)
+    ((descriptorAt pair side).paddedNeighborOccurrenceSlots)
+    (Option.map fun occurrence => occurrence.evalPair side pair)
+    81
+    (shape.paddedOccurrences_length side)
+    (descriptorAt pair side).paddedNeighborOccurrenceSlots_length
+    (shape.map_paddedOccurrences side pair shapeMatches)
+    slot
 
 end LeanTrominoes.PeriodicOrthocrossing.RouteDescriptorPairAffine
