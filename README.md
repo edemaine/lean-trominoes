@@ -1732,6 +1732,14 @@ build; an imported proof counts when its statement matches the paper.
                       prove projection injectivity and deduplication-through-
                       map, and reduce the semantic obligation to strict
                       per-key coordinate order alone.
+                    - [x] Remove that final obligation generically: tag every
+                      candidate with its presentation index, rank by the
+                      lexicographic pair `(coordinate, index)`, and prove that
+                      erasing the tags recovers Lean's stable insertion sort
+                      even when coordinates tie.
+                    - [ ] Specialize indexed stable ranks to retained carrier
+                      datums and replace the strict-order target theorem by an
+                      unconditional equality.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
