@@ -1658,8 +1658,12 @@ build; an imported proof counts when its statement matches the paper.
             tokens whose geometric directions are uniformly invalid.
           - [ ] Compile and assemble the remaining ordered descriptor scans.
             - [ ] Compile retained carrier-link descriptors.
+              - [x] Compile the fixed two-bit carrier descriptor-block
+                expansion.
+              - [ ] Emit the exact ordered carrier-link axis/next-slice bit
+                stream.
             - [x] Compile retained route-bend descriptors.
-            - [ ] Compile retained routed-variable-link descriptors.
+            - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
               exact finite source clause-profile stream.
             - [ ] Append all four scans to the compiled crossover prefix.
