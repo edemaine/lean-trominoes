@@ -1682,6 +1682,9 @@ build; an imported proof counts when its statement matches the paper.
                     datum determined by the retained key, so later carrier
                     metadata can be broadcast without rebuilding the key
                     selector.
+                  - [x] Compile an activation-aligned unary axis value for
+                    every padded terminal and crossing candidate slot,
+                    assigning zero to inactive slots.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
