@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicGraphCoreData
 import LeanTrominoes.PeriodicOccurrences
 import Mathlib.Computability.Primrec.List
 import Mathlib.Data.List.Dedup
@@ -24,14 +25,6 @@ to the first literal, which does not change the infinite translated formula.
 -/
 
 namespace LeanTrominoes
-
-/-- One undirected protoedge.  At lattice translate `z`, it joins
-`(source, z)` to `(target, z + offset)`. -/
-structure PeriodicEdge (Vertex : Type*) where
-  source : Vertex
-  target : Vertex
-  offset : Cell
-  deriving DecidableEq, Repr
 
 namespace PeriodicEdge
 
@@ -133,12 +126,6 @@ end PeriodicGraph
 
 /-! ## Incidence graph of periodic CNF -/
 
-/-- The two colors of vertices in a CNF incidence graph. -/
-inductive CNFVertex (Variable : Type*)
-  | variable (atom : Variable)
-  | clause (index : Nat)
-  deriving DecidableEq, Repr
-
 namespace CNFVertex
 
 /-- Sum representation used by the computability encoding. -/
@@ -160,21 +147,6 @@ noncomputable instance {Variable : Type*} [Primcodable Variable] :
 end CNFVertex
 
 namespace PeriodicCNF
-
-/-- A clause orbit is placed at the first literal's offset.  Empty clauses
-have no incidence edges, so their arbitrary anchor is irrelevant. -/
-def clauseAnchor {Variable : Type*}
-    (clause : PeriodicClause Variable) : Cell :=
-  (clause.head?.map PeriodicLiteral.offset).getD (0, 0)
-
-/-- The incidence edge belonging to one literal occurrence. -/
-def incidenceEdge {Variable : Type*}
-    (clauseIndex : Nat) (anchor : Cell)
-    (literal : PeriodicLiteral Variable) :
-    PeriodicEdge (CNFVertex Variable) where
-  source := .clause clauseIndex
-  target := .variable literal.atom
-  offset := Cell.sub literal.offset anchor
 
 /-- All incidence edges of one protoclauses. -/
 def clauseIncidenceEdges {Variable : Type*}

@@ -90,6 +90,39 @@ structure EqualityLink (Variable : Type*) where
   positions : EqualityPositions
   deriving DecidableEq, Repr
 
+/-- Equality links from the first three endpoints to one center. -/
+def equalityTakeThreeLinks {Variable : Type*}
+    (endpoints : List Variable) (center : Variable)
+    (positions : Variable → Nat → EqualityPositions) :
+    List (EqualityLink Variable) :=
+  (endpoints.take 3).zipIdx.map fun tagged =>
+    ⟨tagged.1, center, positions tagged.1 tagged.2⟩
+
+/-- Equality links from the first three listed endpoints to one center impose
+exactly the three corresponding total `getD` equalities. -/
+theorem equalityLinkTakeThree_holds_iff
+    {Variable Value : Type*}
+    (endpoints : List Variable) (center : Variable)
+    (positions : Variable → Nat → EqualityPositions)
+    (assignment : Variable → Value) :
+    (∀ link ∈
+        (endpoints.take 3).zipIdx.map fun tagged =>
+          (⟨tagged.1, center, positions tagged.1 tagged.2⟩ :
+            EqualityLink Variable),
+      assignment link.first = assignment link.second) ↔
+      assignment (endpoints.getD 0 center) = assignment center ∧
+        assignment (endpoints.getD 1 center) = assignment center ∧
+        assignment (endpoints.getD 2 center) = assignment center := by
+  cases endpoints with
+  | nil => simp
+  | cons first rest =>
+      cases rest with
+      | nil => simp
+      | cons second rest =>
+          cases rest with
+          | nil => simp
+          | cons third rest => simp
+
 /-- Concatenate the two implication clauses of every listed equality link. -/
 def equalityFamily {Variable : Type*}
     (links : List (EqualityLink Variable)) :
@@ -116,6 +149,23 @@ theorem equalityFamily_holds_iff
     exact (equalityInstance_holds_iff assignment
       link.first link.second link.positions).mpr
         (equal link linkMem)
+
+/-- The equality family on the first three endpoints holds exactly when all
+three total selections agree with the center. -/
+theorem equalityTakeThreeFamily_holds_iff
+    {Variable : Type*}
+    (endpoints : List Variable) (center : Variable)
+    (positions : Variable → Nat → EqualityPositions)
+    (assignment : Variable → Bool) :
+    FormulaHolds assignment
+        (equalityFamily
+          (equalityTakeThreeLinks endpoints center positions)) ↔
+      assignment (endpoints.getD 0 center) = assignment center ∧
+        assignment (endpoints.getD 1 center) = assignment center ∧
+        assignment (endpoints.getD 2 center) = assignment center := by
+  rw [equalityFamily_holds_iff]
+  exact equalityLinkTakeThree_holds_iff
+    endpoints center positions assignment
 
 /-- Any endpoint labeling that factors through a common carrier key satisfies
 all links whose endpoints have the same key. -/

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingBounds
+import LeanTrominoes.PeriodicOrthocrossingNeighborTranslationsData
 
 /-!
 # Finite enumeration of canonical crossings
@@ -16,15 +17,6 @@ between distinct occurrence keys.
 
 namespace LeanTrominoes
 namespace PeriodicOrthocrossing
-
-/-- The three neighboring cell coordinates. -/
-def neighborCoordinates : List Int := [-1, 0, 1]
-
-/-- The nine neighboring lattice-cell translations. -/
-def neighborTranslations : List Cell :=
-  neighborCoordinates.flatMap fun horizontal =>
-    neighborCoordinates.map fun vertical =>
-      (horizontal, vertical)
 
 @[simp]
 theorem mem_neighborCoordinates_iff (coordinate : Int) :
