@@ -1774,6 +1774,13 @@ build; an imported proof counts when its statement matches the paper.
                         active occurrence of every distinct identity.
                       - [ ] Compile the aligned guarded identity-word emitter
                         from the numeric route-descriptor stream.
+                        - [x] Reduce full node identity, on the exact retained
+                          stream, to an injective pair of carrier keys whose
+                          first segment index carries a terminal/boundary-side
+                          tag.
+                        - [ ] Emit the two guarded key components per padded
+                          node slot and merge each adjacent pair into one
+                          self-delimiting source-identity word.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
