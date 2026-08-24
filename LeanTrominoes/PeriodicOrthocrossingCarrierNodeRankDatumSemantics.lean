@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicOrthocrossingCarrierNodeCodeSemantics
 import LeanTrominoes.PeriodicOrthocrossingCarrierNodeRankDatumData
 
 /-! # Semantics of compiler-facing carrier-node rank data -/
@@ -14,7 +15,8 @@ retains the finite source-node identity used by deduplication. -/
 theorem carrierNodeRankDatumAtPeriod_injective (period : Nat) :
     Function.Injective (carrierNodeRankDatumAtPeriod period) := by
   intro first second equal
-  exact congrArg CarrierNodeRankDatum.identity equal
+  exact CarrierNode.code_injective
+    (congrArg CarrierNodeRankDatum.identity equal)
 
 @[simp] theorem carrierNodeRankDatumAtPeriod_sameCrossoverSite
     (period : Nat) (first second : CarrierNode) :
@@ -24,7 +26,11 @@ theorem carrierNodeRankDatumAtPeriod_injective (period : Nat) :
   cases first with
   | boundary firstBoundary =>
       cases second with
-      | boundary secondBoundary => rfl
+      | boundary secondBoundary =>
+          simp [carrierNodeRankDatumAtPeriod,
+            CarrierNodeRankDatum.sameCrossoverSite,
+            CarrierNode.sameCrossoverSite,
+            CrossingRecord.code_injective.eq_iff]
       | terminal secondTerminal => rfl
   | terminal firstTerminal =>
       cases second <;> rfl

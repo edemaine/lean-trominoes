@@ -1728,10 +1728,13 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Prove that target equals the exact route-descriptor
                       bit block from duplicate-free physical and projected
                       node streams with strict per-key coordinate order.
-                    - [x] Retain finite source identity in each numeric datum,
-                      prove projection injectivity and deduplication-through-
-                      map, and reduce the semantic obligation to strict
-                      per-key coordinate order alone.
+                    - [x] Retain a reversible proof-free code for finite
+                      source identity in each numeric datum, prove projection
+                      injectivity and deduplication-through-map, and reduce
+                      the semantic obligation to strict per-key coordinate
+                      order alone.  The code flattens indexed segments,
+                      terminals, crossing records, and boundary sides to
+                      finite natural/integer data suitable for unary emission.
                     - [x] Remove that final obligation generically: tag every
                       candidate with its presentation index, rank by the
                       lexicographic pair `(coordinate, index)`, and prove that

@@ -3,6 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.PeriodicOrthocrossingCarrierNodeCodeData
 import LeanTrominoes.PeriodicOrthocrossingOccurrencePairCarrierNormalizationData
 
 /-! # Numeric data needed by rank-major carrier-node compilation -/
@@ -12,13 +13,14 @@ namespace LeanTrominoes.PeriodicOrthocrossing
 /-- The proof-free fields needed to rank a carrier node and decide the
 metadata bits of a consecutive node pair. -/
 structure CarrierNodeRankDatum where
-  /-- Finite source identity used only to make datum deduplication exact. -/
-  identity : CarrierNode
+  /-- Reversible proof-free source identity used to make datum deduplication
+  exact. -/
+  identity : CarrierNodeCode
   key : Nat × Nat × Cell
   orderCoordinate : Int
   horizontal : Bool
   normalizationOffset : Cell
-  boundaryCrossing : Option CrossingRecord
+  boundaryCrossing : Option CrossingRecordCode
   ownershipShift : Cell
   deriving DecidableEq, Repr
 
@@ -26,7 +28,7 @@ structure CarrierNodeRankDatum where
 an explicit drawing period. -/
 def carrierNodeRankDatumAtPeriod
     (period : Nat) (node : CarrierNode) : CarrierNodeRankDatum where
-  identity := node
+  identity := node.code
   key := node.carrierKey
   orderCoordinate := carrierNodeOrderCoordinateAtPeriod period node
   horizontal := node.isHorizontal
@@ -34,7 +36,7 @@ def carrierNodeRankDatumAtPeriod
     carrierNodeNormalizationOffsetAtPeriod period node
   boundaryCrossing :=
     match node with
-    | .boundary boundary => some boundary.crossing
+    | .boundary boundary => some boundary.crossing.code
     | .terminal _ => none
   ownershipShift :=
     match node with
