@@ -100,6 +100,43 @@ noncomputable def value (descriptors : List RouteDescriptor) :
 @[simp] theorem value_none (descriptors : List RouteDescriptor) :
     value descriptors none = 0 := rfl
 
+/-- Every reconstructed indexed segment recovers its own orientation from
+the datum at any translation coordinate. -/
+theorem value_some_segmentOccurrenceKey
+    (descriptors : List RouteDescriptor)
+    (indexed : IndexedGridSegment) (translate : Cell)
+    (member : indexed ∈ routeDescriptorIndexedSegments descriptors) :
+    value descriptors
+        (some (PeriodicGridDrawing.SegmentOccurrenceKey indexed translate)) =
+      FixedAxisUnaryFields.value true
+        (decide indexed.segment.IsHorizontal) := by
+  rw [value]
+  split
+  · rename_i witness
+    let chosen := Classical.choose witness
+    have chosenSpec := Classical.choose_spec witness
+    have chosenSpec' :
+        chosen ∈ routeDescriptorIndexedSegments descriptors ∧
+          chosen.routeIndex =
+            (PeriodicGridDrawing.SegmentOccurrenceKey indexed translate).1 ∧
+          chosen.segmentIndex =
+            (PeriodicGridDrawing.SegmentOccurrenceKey indexed translate).2.1 := by
+      simpa [chosen] using chosenSpec
+    have indexedEq : chosen = indexed :=
+      indexedSegment_eq_of_indices_eq descriptors
+        chosenSpec'.1 member
+        (by simpa [
+          PeriodicGridDrawing.SegmentOccurrenceKey] using chosenSpec'.2.1)
+        (by simpa [
+          PeriodicGridDrawing.SegmentOccurrenceKey] using chosenSpec'.2.2)
+    change FixedAxisUnaryFields.value true
+        (decide chosen.segment.IsHorizontal) = _
+    rw [indexedEq]
+  · rename_i notWitness
+    exact False.elim (notWitness
+      ⟨indexed, member, by
+        simp [PeriodicGridDrawing.SegmentOccurrenceKey]⟩)
+
 /-- Every listed neighboring occurrence recovers its own orientation from
 the key datum. -/
 theorem value_some_occurrenceKey
@@ -109,33 +146,9 @@ theorem value_some_occurrenceKey
     value descriptors (some (occurrenceKey occurrence)) =
       FixedAxisUnaryFields.value true
         (decide occurrence.1.segment.IsHorizontal) := by
-  have indexedMember :=
-    indexed_mem_of_neighbor_mem descriptors member
-  rw [value]
-  split
-  · rename_i witness
-    let chosen := Classical.choose witness
-    have chosenSpec := Classical.choose_spec witness
-    have chosenSpec' :
-        chosen ∈ routeDescriptorIndexedSegments descriptors ∧
-          chosen.routeIndex = (occurrenceKey occurrence).1 ∧
-          chosen.segmentIndex = (occurrenceKey occurrence).2.1 := by
-      simpa [chosen] using chosenSpec
-    have indexedEq : chosen = occurrence.1 :=
-      indexedSegment_eq_of_indices_eq descriptors
-        chosenSpec'.1 indexedMember
-        (by simpa [occurrenceKey,
-          PeriodicGridDrawing.SegmentOccurrenceKey] using chosenSpec'.2.1)
-        (by simpa [occurrenceKey,
-          PeriodicGridDrawing.SegmentOccurrenceKey] using chosenSpec'.2.2)
-    change FixedAxisUnaryFields.value true
-        (decide chosen.segment.IsHorizontal) = _
-    rw [indexedEq]
-  · rename_i notWitness
-    exact False.elim (notWitness
-      ⟨occurrence.1, indexedMember, by
-        simp [occurrenceKey,
-          PeriodicGridDrawing.SegmentOccurrenceKey]⟩)
+  exact value_some_segmentOccurrenceKey descriptors
+    occurrence.1 occurrence.2
+    (indexed_mem_of_neighbor_mem descriptors member)
 
 end RouteDescriptorCarrierKeyAxisDatum
 end LeanTrominoes.PeriodicOrthocrossing
