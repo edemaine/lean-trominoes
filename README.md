@@ -1722,6 +1722,9 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Factor ranking, crossover suppression, orbit
                       ownership, and next-slice projection through a compact
                       compiler-facing numeric datum for each carrier node.
+                    - [x] Name the complete datum-only rank scan and its
+                      specialization to the retained route-descriptor node
+                      stream as the explicit machine-compilation target.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
