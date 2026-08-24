@@ -1702,17 +1702,23 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Prove that the aligned zero sentinel preserves
                     support-aware lookup and that any key-derived padded axis
                     stream is returned in exact retained carrier-key order.
-                  - [ ] Prove the compiled terminal/crossing padded axis stream
+                  - [x] Prove the compiled terminal/crossing padded axis stream
                     is a function of its active carrier key.
                     - [x] Prove generic activated axis/template block
                       semantics and define a well-defined descriptor-level
-                      axis datum for neighboring carrier keys.
+                      axis datum for every padded carrier key.
                     - [x] Expose the terminal recipe axes as explicit
                       segment/shape blocks and prove key-derived alignment
                       for one selected diagonal segment.
                     - [x] Lift terminal key-derived alignment through route
                       shapes, diagonal and off-diagonal numeric descriptor
                       pairs, and the complete descriptor square.
+                    - [x] Lift crossing key-derived alignment through retained
+                      shifts, active and inactive slots, tagged descriptor-slot
+                      pairs, and the complete numeric crossing suffix.
+                    - [x] Combine both numeric streams and prove the compiled
+                      lookup returns exact descriptor-derived axes in retained
+                      carrier-key order.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
