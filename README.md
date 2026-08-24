@@ -1713,6 +1713,9 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Recover the unique node at any exact carrier rank by
                       scanning the original candidates, with pointwise
                       equality to sorted-chain lookup.
+                    - [x] Enumerate the complete rank-major carrier chain and
+                      its adjacent non-crossover pairs, proving exact equality
+                      to the established sorted endpoint-pair list.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
