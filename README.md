@@ -1673,6 +1673,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [ ] Filter and expand those candidates to the exact ordered
                   representative carrier links, including their next-slice
                   ownership bits.
+                  - [x] Decompose the exact global retained-link bit order into
+                    presentation-order representative-link blocks indexed by
+                    the retained neighboring carrier keys.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
