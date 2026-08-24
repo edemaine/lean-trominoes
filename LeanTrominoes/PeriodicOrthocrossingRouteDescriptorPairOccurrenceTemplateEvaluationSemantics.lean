@@ -6,6 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairOccurrenceTemplates
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairCrossingData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairRouteShapeSegmentSemantics
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorSelfIndexedNeighborOccurrences
 
 /-! # Evaluation semantics of affine neighboring-occurrence templates -/
 
@@ -54,6 +55,28 @@ theorem RouteShape.map_evalPair_occurrences
   apply List.map_congr_left
   intro translate translateMem
   rfl
+
+/-- A matched affine occurrence template in a presented self-indexed
+descriptor evaluates to a segment in the global reconstructed stream. -/
+theorem Occurrence.evalPair_indexed_mem
+    (descriptors : List RouteDescriptor)
+    (selfIndexed : ∀ tagged ∈ descriptors.zipIdx,
+      tagged.1.edgeIndex = tagged.2)
+    (shape : RouteShape) (side : Side)
+    (pair : RouteDescriptor × RouteDescriptor)
+    (shapeMatches : shape.Matches (descriptorAt pair side))
+    (descriptorMember : descriptorAt pair side ∈ descriptors)
+    (occurrence : Occurrence)
+    (occurrenceMember : occurrence ∈ shape.occurrences side) :
+    (occurrence.evalPair side pair).1 ∈
+      routeDescriptorIndexedSegments descriptors := by
+  apply indexed_mem_of_selfIndexed_neighbor descriptors selfIndexed
+    (descriptorAt pair side) descriptorMember
+    (occurrence.evalPair side pair)
+  change occurrence.evalPair side pair ∈
+    (descriptorAt pair side).selfIndexedNeighborOccurrences
+  rw [← shape.map_evalPair_occurrences side pair shapeMatches]
+  exact List.mem_map.mpr ⟨occurrence, occurrenceMember, rfl⟩
 
 /-- Every finite route shape contributes at most eighty-one occurrence
 templates after the fixed nine neighboring translations. -/
