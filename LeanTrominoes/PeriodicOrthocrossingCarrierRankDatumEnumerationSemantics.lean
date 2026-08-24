@@ -5,7 +5,8 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingCarrierRankDatumCandidateSemantics
 import LeanTrominoes.PeriodicOrthocrossingOccurrencePairCarrierNodeRankEnumerationData
-import LeanTrominoes.StrictListRankEnumerationSemantics
+import LeanTrominoes.PeriodicOrthocrossingCarrierRankDatumStableEnumerationSemantics
+import LeanTrominoes.PeriodicOrthocrossingOccurrencePairCarrierNodeRankEnumerationSemantics
 
 /-! # Physical-node semantics of datum-only rank enumeration -/
 
@@ -17,8 +18,8 @@ enumeration. -/
 theorem retainedCarrierRankDatumsByLowerRank_map_eq
     (period : Nat) (nodes : List CarrierNode)
     (key : Nat × Nat × Cell)
-    (nodesNodup : nodes.Nodup)
-    (datumsNodup :
+    (_nodesNodup : nodes.Nodup)
+    (_datumsNodup :
       (nodes.map (carrierNodeRankDatumAtPeriod period)).Nodup)
     (ordered :
       (retainedCompleteCarrierNodesAtPeriod period nodes key).Pairwise
@@ -29,42 +30,8 @@ theorem retainedCarrierRankDatumsByLowerRank_map_eq
         (nodes.map (carrierNodeRankDatumAtPeriod period)) key =
       (retainedCarrierNodesByLowerRankAtPeriod period nodes key).map
         (carrierNodeRankDatumAtPeriod period) := by
-  let project := carrierNodeRankDatumAtPeriod period
-  let candidates := retainedCarrierNodeCandidatesAtPeriod nodes key
-  have candidateEq := retainedCarrierRankDatumCandidates_map_eq
-    period nodes key nodesNodup datumsNodup
-  have nodeOrdered :
-      (candidates.insertionSort fun first second =>
-        carrierNodeOrderCoordinateAtPeriod period first ≤
-          carrierNodeOrderCoordinateAtPeriod period second).Pairwise
-        fun first second =>
-          carrierNodeOrderCoordinateAtPeriod period first <
-            carrierNodeOrderCoordinateAtPeriod period second := by
-    simpa [candidates, retainedCarrierNodeCandidatesAtPeriod,
-      retainedCompleteCarrierNodesAtPeriod] using ordered
-  have mappedSort := List.map_insertionSort
-    (r := fun first second : CarrierNode =>
-      carrierNodeOrderCoordinateAtPeriod period first ≤
-        carrierNodeOrderCoordinateAtPeriod period second)
-    (s := fun first second : CarrierNodeRankDatum =>
-      first.orderCoordinate ≤ second.orderCoordinate)
-    project candidates (by
-      intro first firstMember second secondMember
-      rfl)
-  have datumOrdered :
-      ((candidates.map project).insertionSort fun first second =>
-        first.orderCoordinate ≤ second.orderCoordinate).Pairwise
-        fun first second =>
-          first.orderCoordinate < second.orderCoordinate := by
-    rw [← mappedSort, List.pairwise_map]
-    exact nodeOrdered
-  unfold retainedCarrierRankDatumsByLowerRank
-    retainedCarrierNodesByLowerRankAtPeriod
-  rw [candidateEq]
-  rw [StrictListRanks.valuesByLowerRank_eq_insertionSort
-    _ _ datumOrdered]
-  rw [StrictListRanks.valuesByLowerRank_eq_insertionSort
-    _ _ nodeOrdered]
-  exact mappedSort.symm
+  rw [retainedCarrierRankDatumsByLowerRank_map_eq_complete]
+  rw [retainedCarrierNodesByLowerRankAtPeriod_eq
+    period nodes key ordered]
 
 end LeanTrominoes.PeriodicOrthocrossing

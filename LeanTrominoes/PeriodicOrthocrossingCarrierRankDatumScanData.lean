@@ -5,7 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.IndexedConsecutivePairsData
 import LeanTrominoes.PeriodicOrthocrossingCarrierNodeRankDatumData
-import LeanTrominoes.StrictListRankEnumerationData
+import LeanTrominoes.StableListRankEnumerationData
 
 /-! # Datum-only rank-major retained carrier scans -/
 
@@ -17,12 +17,12 @@ def retainedCarrierRankDatumCandidates
     (key : Nat × Nat × Cell) : List CarrierNodeRankDatum :=
   datums.dedup.filter fun datum => datum.key = key
 
-/-- Reconstruct one carrier's numeric node data in axial order by repeated
-lower-coordinate rank lookup. -/
+/-- Reconstruct one carrier's numeric node data in stable axial order by
+repeated coordinate-and-presentation-index rank lookup. -/
 def retainedCarrierRankDatumsByLowerRank
     (datums : List CarrierNodeRankDatum)
     (key : Nat × Nat × Cell) : List CarrierNodeRankDatum :=
-  StrictListRanks.valuesByLowerRank
+  StableListRanks.valuesByStableLowerRank
     CarrierNodeRankDatum.orderCoordinate
     (retainedCarrierRankDatumCandidates datums key)
 

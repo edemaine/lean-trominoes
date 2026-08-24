@@ -1737,9 +1737,10 @@ build; an imported proof counts when its statement matches the paper.
                       lexicographic pair `(coordinate, index)`, and prove that
                       erasing the tags recovers Lean's stable insertion sort
                       even when coordinates tie.
-                    - [ ] Specialize indexed stable ranks to retained carrier
+                    - [x] Specialize indexed stable ranks to retained carrier
                       datums and replace the strict-order target theorem by an
-                      unconditional equality.
+                      unconditional equality, while preserving the older
+                      hypothesis-bearing compatibility theorems.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
