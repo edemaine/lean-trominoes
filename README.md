@@ -1748,7 +1748,7 @@ build; an imported proof counts when its statement matches the paper.
                       carrier-node candidate blocks aligned with the affine
                       route predicates, and concatenate them in exact
                       descriptor-square then occurrence-slot-square order.
-                    - [ ] Prove that compacting those active padded candidates
+                    - [x] Prove that compacting those active padded candidates
                       recovers the complete retained route-descriptor carrier
                       node stream, then project the active slots to rank data.
                       - [x] Identify the compacted terminal descriptor-square
@@ -1758,7 +1758,7 @@ build; an imported proof counts when its statement matches the paper.
                         suffix with all retained crossing-boundary nodes.
                       - [x] Append the two exact streams and identify the
                         result with the complete retained carrier-node stream.
-                      - [ ] Project every active padded slot to its
+                      - [x] Project every active padded slot to its
                         compiler-facing rank datum.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
