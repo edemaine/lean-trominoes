@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairOccurrenceTemplateSemantics
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairOccurrenceTemplates
 
 /-! # Fixed affine occurrence-template slots -/
 
@@ -24,7 +24,17 @@ slots. -/
     (shape.paddedOccurrences side).length = 81 := by
   unfold RouteShape.paddedOccurrences
   rw [List.length_append, List.length_map, List.length_replicate]
-  exact Nat.add_sub_of_le (shape.occurrences_length_le_eightyOne side)
+  have segmentBound : (shape.segments side).length ≤ 9 := by
+    rcases shape with ⟨source, core, target⟩
+    cases source <;> cases core <;> cases target <;> cases side <;>
+      decide
+  have occurrenceBound : (shape.occurrences side).length ≤ 81 := by
+    unfold RouteShape.occurrences
+    rw [List.length_flatMap]
+    simp only [List.length_map]
+    simp [neighborTranslations, neighborCoordinates]
+    omega
+  exact Nat.add_sub_of_le occurrenceBound
 
 /-- Read the padded affine occurrence template occupying one fixed slot. -/
 def RouteShape.paddedOccurrenceAtSlot
