@@ -45,6 +45,30 @@ def occurrencePairCrossingCarrierKeyShiftTemplateBlock
       occurrences.2.carrierKeyAtShiftSupported shift⟩
   [first, first, second, second]
 
+/-- For one retained crossing shift, the two first-side templates carry the
+horizontal axis and the two second-side templates carry the vertical axis. -/
+theorem occurrencePairCrossingCarrierKeyShiftTemplateBlock_axisDatum
+    (axisValue : Bool → Nat)
+    (datum : Option (Nat × Nat × Cell) → Nat)
+    (pair : RouteDescriptor × RouteDescriptor)
+    (occurrences : Occurrence × Occurrence) (shift : Cell)
+    (firstDatum : axisValue true =
+      datum (some (occurrences.1.carrierKeyAtShift .first pair shift)))
+    (secondDatum : axisValue false =
+      datum (some (occurrences.2.carrierKeyAtShift .second pair shift))) :
+    List.Forall₂
+      (fun axis template =>
+        axisValue axis = datum (some template.value))
+      [true, true, false, false]
+      (occurrencePairCrossingCarrierKeyShiftTemplateBlock
+        pair occurrences shift) := by
+  unfold occurrencePairCrossingCarrierKeyShiftTemplateBlock
+  dsimp only
+  exact List.Forall₂.cons firstDatum
+    (List.Forall₂.cons firstDatum
+      (List.Forall₂.cons secondDatum
+        (List.Forall₂.cons secondDatum List.Forall₂.nil)))
+
 /-- Complete retained-orbit key template block for one fixed affine
 occurrence-pair crossing predicate. -/
 def occurrencePairCrossingCarrierKeyTemplateBlock
