@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.DelimitedBinaryWordsDropLastExecution
+import LeanTrominoes.DelimitedBinaryWordsDropLastData
 import LeanTrominoes.FiniteBlockTransducer
 
 /-! # Polynomial time for final delimited-binary-word removal -/
@@ -15,11 +16,6 @@ namespace LeanTrominoes
 open Computability Turing
 
 namespace DelimitedBinaryWordsDropLastMachine
-
-/-- Semantic removal of the final delimited binary word. -/
-def dropLast (input : DelimitedBinaryWords.Input) :
-    DelimitedBinaryWords.Input :=
-  ⟨input.words.dropLast⟩
 
 noncomputable def timePolynomial : Polynomial Nat :=
   Polynomial.C 2 * Polynomial.X + Polynomial.C 2
