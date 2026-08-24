@@ -1764,8 +1764,10 @@ build; an imported proof counts when its statement matches the paper.
                       stream by comparing reversible carrier-node identities.
                       - [x] Define a constructor-tagged, self-delimiting
                         binary word for every carrier-node identity.
-                      - [ ] Define its decoder and prove the word encoding is
-                        injective.
+                      - [x] Define a suffix-retaining decoder for the nested
+                        identity fields.
+                      - [ ] Prove the decoder is a left inverse and the word
+                        encoding is injective.
                       - [ ] Emit the identity words in exact alignment with
                         the padded rank-data candidates.
                   - [x] Compile the retained representative rows to one unary
