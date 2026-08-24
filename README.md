@@ -1675,8 +1675,9 @@ build; an imported proof counts when its statement matches the paper.
                   ownership bits.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
-                    prove generically that padded rejection guards do not
-                    affect those counts.
+                    prove that padded rejection guards do not affect those
+                    counts and that numeric CNF routes retain their exact
+                    stable key order.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
