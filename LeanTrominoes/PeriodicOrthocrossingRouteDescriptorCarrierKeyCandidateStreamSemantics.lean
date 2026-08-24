@@ -39,7 +39,7 @@ theorem paddedCarrierKeyCandidateStream_numericRouteDescriptors
     RouteDescriptorOccurrenceSlotCrossing.paddedCrossingCarrierKeyCandidateStream_numericRouteDescriptors
       formula forward nonempty
   unfold paddedCarrierKeyCandidateStream
-    paddedTerminalCarrierKeyCandidateStream
+    RouteDescriptorPairAffine.paddedTerminalCarrierKeyCandidateStream
   rw [List.filterMap_append, terminalEq, crossingEq]
   rfl
 
