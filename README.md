@@ -1744,6 +1744,13 @@ build; an imported proof counts when its statement matches the paper.
                       datums and replace the strict-order target theorem by an
                       unconditional equality, while preserving the older
                       hypothesis-bearing compatibility theorems.
+                    - [x] Construct fixed padded terminal and crossing
+                      carrier-node candidate blocks aligned with the affine
+                      route predicates, and concatenate them in exact
+                      descriptor-square then occurrence-slot-square order.
+                    - [ ] Prove that compacting those active padded candidates
+                      recovers the complete retained route-descriptor carrier
+                      node stream, then project the active slots to rank data.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
