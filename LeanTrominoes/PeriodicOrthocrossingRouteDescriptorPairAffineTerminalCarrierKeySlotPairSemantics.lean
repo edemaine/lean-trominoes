@@ -37,7 +37,7 @@ theorem terminalCarrierKeyActiveValues_eq_of_matches
   unfold terminalCarrierKeyActivations carrierSegmentPredicates
     terminalCarrierKeyTemplateBlocks
   rw [List.map_flatMap, activeValues_flatMap]
-  · rw [List.flatMap_eq_of_unique
+  · rw [List.flatMap_eq_selected_of_unique
       allRouteShapes
       (fun shape =>
         activeValues
