@@ -1678,6 +1678,10 @@ build; an imported proof counts when its statement matches the paper.
                     prove that padded rejection guards do not affect those
                     counts and that numeric CNF routes retain their exact
                     stable key order.
+                  - [x] Prove that the same selected rows recover any unary
+                    datum determined by the retained key, so later carrier
+                    metadata can be broadcast without rebuilding the key
+                    selector.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
