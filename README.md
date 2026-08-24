@@ -1716,6 +1716,9 @@ build; an imported proof counts when its statement matches the paper.
                     - [x] Enumerate the complete rank-major carrier chain and
                       its adjacent non-crossover pairs, proving exact equality
                       to the established sorted endpoint-pair list.
+                    - [x] Apply zero-owner representative filtering and the
+                      axis/next-slice projection to that rank-major stream,
+                      recovering the exact per-key target bit block.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
