@@ -1781,9 +1781,12 @@ build; an imported proof counts when its statement matches the paper.
                         - [x] Define, verify, and compile the finite-state pass
                           that merges adjacent guarded key words, suppressing
                           the second component of inactive pairs.
-                        - [ ] Emit two guarded key components per padded node
-                          slot and identify their merged words with the compact
-                          source identities.
+                        - [x] Compile two guarded key components per padded
+                          terminal and crossing node slot, concatenate the
+                          streams, and pass them through the merger.
+                        - [ ] Identify the merged physical output with the
+                          compact source-identity words in exact padded-slot
+                          order.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
