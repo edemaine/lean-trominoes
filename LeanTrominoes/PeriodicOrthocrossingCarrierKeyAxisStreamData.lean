@@ -31,5 +31,10 @@ complete padded carrier-key candidate stream. -/
 def values (descriptors : List RouteDescriptor) : List Nat :=
   terminalValues descriptors ++ crossingValues descriptors
 
+/-- Sentinel-completed axis values aligned with the rejection-guard column
+of every selected last-representative row. -/
+def valuesWithSentinel (descriptors : List RouteDescriptor) : List Nat :=
+  values descriptors ++ [0]
+
 end CarrierKeyAxisStream
 end LeanTrominoes.PeriodicOrthocrossing

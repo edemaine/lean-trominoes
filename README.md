@@ -1691,6 +1691,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Prove that the complete axis-value stream has exactly
                     one entry per padded carrier-key candidate, pairwise and
                     after terminal/crossing stream composition.
+                  - [x] Append a unary-zero semantic sentinel and prove its
+                    length matches the representative rows' final rejection
+                    guard.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
