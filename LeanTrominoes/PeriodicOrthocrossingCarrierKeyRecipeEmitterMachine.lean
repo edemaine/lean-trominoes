@@ -27,7 +27,7 @@ def beginEmission (recipes : List Recipe) :
   if nonempty : 0 < recipes.length then
     .goto fun _ => .emit ⟨0, nonempty⟩
   else
-    .goto fun _ => .reverseOutput
+    .goto fun _ => .clearFirstRoute
 
 def afterRecipe (recipes : List Recipe)
     (index : Fin recipes.length) :
@@ -35,7 +35,7 @@ def afterRecipe (recipes : List Recipe)
   if nextExists : index.val + 1 < recipes.length then
     .goto fun _ => .emit ⟨index.val + 1, nextExists⟩
   else
-    .goto fun _ => .reverseOutput
+    .goto fun _ => .clearFirstRoute
 
 def program (recipes : List Recipe) :
     Label recipes → TM2.Stmt Alphabet (Label recipes)
@@ -96,12 +96,22 @@ def program (recipes : List Recipe) :
                   (.goto fun _ => .restoreRoute index)))
               (pushTokens (activeSuffixTokens (recipes.get index))
                 (afterRecipe recipes index)))
+  | .clearFirstRoute =>
+      .pop .firstRoute readUnit
+        (.branch payloadPresent
+          (.load clearPayload (.goto fun _ => .clearFirstRoute))
+          (.goto fun _ => .clearSecondRoute))
+  | .clearSecondRoute =>
+      .pop .secondRoute readUnit
+        (.branch payloadPresent
+          (.load clearPayload (.goto fun _ => .clearSecondRoute))
+          (.goto fun _ => .reverseOutput))
   | .reverseOutput =>
       .pop .outputReverse readOutput
         (.branch payloadPresent
           (.push .output outputFromState
             (.load clearPayload (.goto fun _ => .reverseOutput)))
-          .halt)
+          (.load (fun _ => initialState recipes.length) .halt))
 
 abbrev machine (recipes : List Recipe) : FinTM2 where
   K := Stack

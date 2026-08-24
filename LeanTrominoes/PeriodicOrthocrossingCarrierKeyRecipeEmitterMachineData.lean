@@ -71,6 +71,8 @@ inductive Label (recipes : List Recipe)
   | emit (index : Fin recipes.length)
   | scanRoute (index : Fin recipes.length)
   | restoreRoute (index : Fin recipes.length)
+  | clearFirstRoute
+  | clearSecondRoute
   | reverseOutput
   deriving Fintype
 
