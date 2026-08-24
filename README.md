@@ -1703,6 +1703,10 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Factor the full retained carrier-node scan and every
                     per-key representative bit block through the compact
                     numeric route descriptors at the explicit drawing period.
+                  - [x] Establish rank-major reconstruction for strictly
+                    ordered carrier chains: counting lower coordinates in the
+                    original presentation recovers each exact sorted index,
+                    so the compiler need not materialize an encoded sort.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
