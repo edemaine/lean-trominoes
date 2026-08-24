@@ -16,14 +16,26 @@ namespace CarrierSourceKeyMergedStream
 
 open Computability Turing
 
-noncomputable def tokensComputableInPolyTime :
-    TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
-      tokens := by
-  change TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
-    (fun input => DelimitedBinaryWordGuardedPairMerge.tokens
-      (CarrierSourceKeyComponentStream.tokens input))
+/-- Reinterpret the physical merger on canonical descriptor words without
+adding another compiler-heavy wrapper module. -/
+noncomputable def descriptorTokensComputableInPolyTime :
+    TM2ComputableInPolyTime
+      (fun descriptors : List RouteDescriptor =>
+        DelimitedBinaryWords.encode
+          (RouteDescriptorBinaryWords.words descriptors))
+      id
+      (fun descriptors =>
+        tokens (RouteDescriptorBinaryWords.words descriptors)) := by
+  change TM2ComputableInPolyTime
+    (fun descriptors : List RouteDescriptor =>
+      DelimitedBinaryWords.encode
+        (RouteDescriptorBinaryWords.words descriptors))
+    id
+    (fun descriptors => DelimitedBinaryWordGuardedPairMerge.tokens
+      (CarrierSourceKeyComponentStream.tokens
+        (RouteDescriptorBinaryWords.words descriptors)))
   exact TM2CompositionMachine.computableInPolyTime
-    CarrierSourceKeyComponentStream.tokensComputableInPolyTime
+    CarrierSourceKeyComponentStream.descriptorTokensComputableInPolyTime
     DelimitedBinaryWordGuardedPairMerge.tokensComputableInPolyTime
 
 end CarrierSourceKeyMergedStream
