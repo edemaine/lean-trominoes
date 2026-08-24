@@ -1662,6 +1662,12 @@ build; an imported proof counts when its statement matches the paper.
                 expansion.
               - [ ] Emit the exact ordered carrier-link axis/next-slice bit
                 stream.
+                - [x] Emit the affine axis candidates in selected segment and
+                  neighboring-translation order without importing the
+                  crossing-enumeration proof stack.
+                - [ ] Filter and expand those candidates to the exact ordered
+                  representative carrier links, including their next-slice
+                  ownership bits.
             - [x] Compile retained route-bend descriptors.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
