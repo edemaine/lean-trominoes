@@ -69,5 +69,21 @@ theorem equalityBits_magnitudes (values : List Int) :
   intro second _secondMember
   exact magnitudeEquality_eq first second
 
+/-- Pointwise signed-magnitude equality commutes with an arbitrary integer
+projection. -/
+theorem equalityBits_mapped_magnitudes
+    {Value : Type*} (values : List Value) (coordinate : Value → Int) :
+    equalityBits
+        (values.map fun value =>
+          SignedUnaryStrictLower.positiveMagnitude (coordinate value))
+        (values.map fun value =>
+          SignedUnaryStrictLower.negativeMagnitude (coordinate value)) =
+      SignedUnaryStrictLower.matrix values fun first second =>
+        decide (coordinate first = coordinate second) := by
+  simpa [List.map_map, List.flatMap_map, Function.comp_def,
+      SignedUnaryStrictLower.matrix,
+      SignedUnaryStrictLower.matrixRows] using
+    equalityBits_magnitudes (values.map coordinate)
+
 end SignedUnaryEquality
 end LeanTrominoes
