@@ -1802,7 +1802,10 @@ build; an imported proof counts when its statement matches the paper.
                       - [x] Compile the active carrier-key route index and prove
                         that its representative-selected values are exactly
                         zero-indexed rank-scan field zero at every period.
-                      - [ ] Compile the remaining forty-eight aligned rank
+                      - [x] Compile the carrier-key segment index through a
+                        reusable six-column key-field selector and prove that
+                        it is zero-indexed rank-scan field one at every period.
+                      - [ ] Compile the remaining forty-seven aligned rank
                         fields and assemble the column-major scan.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
