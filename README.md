@@ -1814,8 +1814,14 @@ build; an imported proof counts when its statement matches the paper.
                         source identities, and prove representative lookup
                         gives the positive and negative signed magnitudes in
                         zero-indexed rank-scan fields six and seven.
-                      - [ ] Compile the remaining four aligned rank
-                        fields and assemble the column-major scan.
+                      - [ ] Assemble all fifty compiled fields into the
+                        column-major scan.
+                        - [x] Compile the signed horizontal and vertical
+                          normalization offsets of terminal and crossing
+                          carrier nodes.  Prove the affine point-gauge and
+                          crossing-boundary normalization laws, align compact
+                          representative lookup, and identify the results with
+                          rank-scan fields nine through twelve.
                         - [x] Compile terminal-zero/crossing-one guarded streams,
                           append one rejection sentinel, and perform compact
                           representative lookup for boundary presence.
