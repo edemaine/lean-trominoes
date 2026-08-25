@@ -1814,7 +1814,7 @@ build; an imported proof counts when its statement matches the paper.
                         source identities, and prove representative lookup
                         gives the positive and negative signed magnitudes in
                         zero-indexed rank-scan fields six and seven.
-                      - [ ] Compile the remaining twenty-nine aligned rank
+                      - [ ] Compile the remaining twenty-five aligned rank
                         fields and assemble the column-major scan.
                         - [x] Compile terminal-zero/crossing-one guarded streams,
                           append one rejection sentinel, and perform compact
@@ -1831,6 +1831,12 @@ build; an imported proof counts when its statement matches the paper.
                           segment fields twenty-eight and twenty-nine, and
                           second-translation fields thirty-eight through
                           forty-one.
+                        - [x] Compile the crossing point's positive and
+                          negative horizontal and vertical affine coordinates,
+                          align active candidates through compact
+                          representative lookup, and prove numeric-route
+                          equality with rank-scan fields forty-two through
+                          forty-five.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
