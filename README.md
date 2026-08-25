@@ -1792,7 +1792,7 @@ build; an imported proof counts when its statement matches the paper.
                           retained stream, and hence identify the compiled
                           compact representative rows with the full identity
                           representative rows on valid numeric routes.
-                    - [ ] Compile all fifty identity-free carrier rank-datum
+                    - [x] Compile all fifty identity-free carrier rank-datum
                       columns selected by those compact representative rows.
                       - [x] Project the complete padded carrier-node stream to
                         carrier keys, align the existing sentinel-completed
@@ -1814,7 +1814,7 @@ build; an imported proof counts when its statement matches the paper.
                         source identities, and prove representative lookup
                         gives the positive and negative signed magnitudes in
                         zero-indexed rank-scan fields six and seven.
-                      - [ ] Assemble all fifty compiled fields into the
+                      - [x] Assemble all fifty compiled fields into the
                         column-major scan.
                         - [x] Compile the signed horizontal and vertical
                           normalization offsets of terminal and crossing
