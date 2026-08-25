@@ -1854,6 +1854,10 @@ build; an imported proof counts when its statement matches the paper.
                           active retained crossing's period quotient equals
                           its fixed retention shift, then identify the results
                           with rank-scan fields forty-six through forty-nine.
+                    - [x] Compile arbitrary unary natural columns to
+                      unary-length binary words and then to their exact
+                      row-major strict-lower comparison rows, providing the
+                      unsigned comparison primitive for stable carrier ranks.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
