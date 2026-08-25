@@ -1863,6 +1863,10 @@ build; an imported proof counts when its statement matches the paper.
                       order-coordinate columns, and prove that fields six and
                       seven yield the exact signed strict-lower matrix on
                       numeric routes.
+                    - [x] Compile unary natural and canonical signed-integer
+                      equality matrices, then prove that carrier-rank fields
+                      six and seven yield exact order-coordinate equality for
+                      stable tie breaking.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
