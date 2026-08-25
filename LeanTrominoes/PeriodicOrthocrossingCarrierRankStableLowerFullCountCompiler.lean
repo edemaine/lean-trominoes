@@ -27,7 +27,9 @@ opaque lowerCountsComputableInPolyTime :
     DelimitedBinaryWordTrueCounts.computableInPolyTime
   exact TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (encodeOutput₂ := UnaryFieldEncoderMachine.unaryFields)
-    (function₂ := lowerCounts) counted (fun _ => rfl)
+    (function₂ := lowerCounts) counted (fun descriptors => by
+      unfold lowerCounts
+      rw [lowerSquareInput_delimitedRows])
 
 end CarrierRankStableLower
 end LeanTrominoes.PeriodicOrthocrossing

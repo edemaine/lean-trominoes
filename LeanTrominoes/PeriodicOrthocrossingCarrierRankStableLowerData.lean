@@ -98,11 +98,27 @@ def tieSquareInput (descriptors : List RouteDescriptor) :
 
 def lowerRows (descriptors : List RouteDescriptor) :
     DelimitedBinaryWords.Input :=
-  (lowerSquareInput descriptors).delimitedRows
+  ⟨(List.replicate (side descriptors) (side descriptors)).splitLengths
+    (lowerBits descriptors)⟩
 
 def tieRows (descriptors : List RouteDescriptor) :
     DelimitedBinaryWords.Input :=
-  (tieSquareInput descriptors).delimitedRows
+  ⟨(List.replicate (side descriptors) (side descriptors)).splitLengths
+    (tieBits descriptors)⟩
+
+theorem lowerSquareInput_delimitedRows (descriptors : List RouteDescriptor) :
+    (lowerSquareInput descriptors).delimitedRows = lowerRows descriptors := by
+  apply congrArg DelimitedBinaryWords.Input.mk
+  unfold BoolSquareRows.Input.rows BoolSquareRows.Input.sizes
+  rw [lowerSquareInput_side]
+  simp only [lowerSquareInput]
+
+theorem tieSquareInput_delimitedRows (descriptors : List RouteDescriptor) :
+    (tieSquareInput descriptors).delimitedRows = tieRows descriptors := by
+  apply congrArg DelimitedBinaryWords.Input.mk
+  unfold BoolSquareRows.Input.rows BoolSquareRows.Input.sizes
+  rw [tieSquareInput_side]
+  simp only [tieSquareInput]
 
 def lowerCounts (descriptors : List RouteDescriptor) : List Nat :=
   DelimitedBinaryWordTrueCounts.counts (lowerRows descriptors)
@@ -112,14 +128,18 @@ def tieCounts (descriptors : List RouteDescriptor) : List Nat :=
 
 @[simp] theorem lowerCounts_length (descriptors : List RouteDescriptor) :
     (lowerCounts descriptors).length = side descriptors := by
-  unfold lowerCounts DelimitedBinaryWordTrueCounts.counts lowerRows
+  unfold lowerCounts
+  rw [← lowerSquareInput_delimitedRows]
+  unfold DelimitedBinaryWordTrueCounts.counts
     BoolSquareRows.Input.delimitedRows
   rw [List.length_map, BoolSquareRows.rows_length,
     lowerSquareInput_side]
 
 @[simp] theorem tieCounts_length (descriptors : List RouteDescriptor) :
     (tieCounts descriptors).length = side descriptors := by
-  unfold tieCounts tieRows BoolSquareRows.Input.delimitedRows
+  unfold tieCounts
+  rw [← tieSquareInput_delimitedRows]
+  unfold BoolSquareRows.Input.delimitedRows
   rw [DelimitedBinaryWordPrefixTrueCounts.counts_length,
     BoolSquareRows.rows_length, tieSquareInput_side]
 

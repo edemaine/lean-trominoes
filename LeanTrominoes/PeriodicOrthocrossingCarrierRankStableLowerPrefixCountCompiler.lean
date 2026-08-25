@@ -27,7 +27,9 @@ opaque tieCountsComputableInPolyTime :
     DelimitedBinaryWordPrefixTrueCountMachine.computableInPolyTime
   exact TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
     (encodeOutput₂ := UnaryFieldEncoderMachine.unaryFields)
-    (function₂ := tieCounts) counted (fun _ => rfl)
+    (function₂ := tieCounts) counted (fun descriptors => by
+      unfold tieCounts
+      rw [tieSquareInput_delimitedRows])
 
 end CarrierRankStableLower
 end LeanTrominoes.PeriodicOrthocrossing

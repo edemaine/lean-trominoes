@@ -1876,6 +1876,9 @@ build; an imported proof counts when its statement matches the paper.
                       compile same-key strict-lower row counts and equal-key,
                       equal-coordinate presentation-prefix counts into one
                       unary stable-rank candidate per compact datum.
+                      - [x] Prove on numeric routes that the compiled matrices,
+                        reconstructed rows, full and prefix counts, and their
+                        sum are exactly those stable-rank counts.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
