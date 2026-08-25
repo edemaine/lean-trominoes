@@ -1871,6 +1871,11 @@ build; an imported proof counts when its statement matches the paper.
                       indices and both signed translation coordinates, and
                       prove that fields zero through five yield the exact
                       same-carrier matrix on numeric routes.
+                    - [x] Prove unconditional row-count alignment between the
+                      key and order-coordinate representative pipelines, then
+                      compile same-key strict-lower row counts and equal-key,
+                      equal-coordinate presentation-prefix counts into one
+                      unary stable-rank candidate per compact datum.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
