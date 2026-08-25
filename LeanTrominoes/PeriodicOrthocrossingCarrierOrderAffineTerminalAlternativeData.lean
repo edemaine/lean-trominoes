@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingCarrierOrderAffineCandidateExpressionData
+import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineTerminalSourceKeyRecipeData
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineTerminalCarrierKeyWordRecipeData
 
 /-! # Direction-split terminal order-coordinate candidates -/
@@ -52,6 +53,14 @@ def Segment.terminalDirectionalCarrierKeyRecipeBlocks
   let block := segment.terminalCarrierKeyRecipeBlock segmentIndex
   [block, block, block, block]
 
+/-- Repeat the doubled compact source-identity recipe block for all four
+axis/direction alternatives.  The adjacent component recipes will later be
+merged back to one source-identity word per order-coordinate candidate. -/
+def Segment.terminalDirectionalSourceKeyRecipeBlocks
+    (segmentIndex : Nat) (segment : Segment) : List (List Recipe) :=
+  let block := segment.terminalSourceKeyRecipeBlock segmentIndex
+  [block, block, block, block]
+
 def RouteShape.terminalDirectionalOrderExpressionBlocks
     (shape : RouteShape) : List (List Expression) :=
   (shape.segments .first).flatMap
@@ -67,6 +76,11 @@ def RouteShape.terminalDirectionalCarrierKeyRecipeBlocks
   (shape.segments .first).zipIdx.flatMap fun tagged =>
     tagged.1.terminalDirectionalCarrierKeyRecipeBlocks tagged.2
 
+def RouteShape.terminalDirectionalSourceKeyRecipeBlocks
+    (shape : RouteShape) : List (List Recipe) :=
+  (shape.segments .first).zipIdx.flatMap fun tagged =>
+    tagged.1.terminalDirectionalSourceKeyRecipeBlocks tagged.2
+
 /-- Complete direction-split terminal candidate families in one shared
 fixed order. -/
 def terminalDirectionalOrderExpressionBlocks : List (List Expression) :=
@@ -80,6 +94,10 @@ def terminalDirectionalCarrierKeyRecipeBlocks : List (List Recipe) :=
   allRouteShapes.flatMap
     RouteShape.terminalDirectionalCarrierKeyRecipeBlocks
 
+def terminalDirectionalSourceKeyRecipeBlocks : List (List Recipe) :=
+  allRouteShapes.flatMap
+    RouteShape.terminalDirectionalSourceKeyRecipeBlocks
+
 def terminalDirectionalOrderExpressions : List Expression :=
   terminalDirectionalOrderExpressionBlocks.flatten
 
@@ -91,6 +109,15 @@ def terminalDirectionalCarrierKeyGuardedWords
     (terminalDirectionalPredicates.map
       fun predicate => predicate.evalTokens tokens)
     terminalDirectionalCarrierKeyRecipeBlocks
+
+/-- Guarded adjacent source-key components in the same direction-split order
+as the affine coordinate expressions. -/
+def terminalDirectionalSourceKeyGuardedComponentWords
+    (tokens : List RouteDescriptorPairFieldTags.Token) : List (List Bool) :=
+  words tokens
+    (terminalDirectionalPredicates.map
+      fun predicate => predicate.evalTokens tokens)
+    terminalDirectionalSourceKeyRecipeBlocks
 
 end RouteDescriptorPairAffine
 end LeanTrominoes.PeriodicOrthocrossing

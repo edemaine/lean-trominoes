@@ -33,7 +33,7 @@ noncomputable def inputComputableInPolyTime (keepPositive : Bool) :
     (CarrierOrderCandidateFieldStream.valuesWithSentinelComputableInPolyTime
       keepPositive)
   exact TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq paired
-    (fun _ => by rfl)
+    (fun descriptors => (encode_input keepPositive descriptors).symm)
 
 end CarrierOrderRepresentativeLookup
 end LeanTrominoes.PeriodicOrthocrossing

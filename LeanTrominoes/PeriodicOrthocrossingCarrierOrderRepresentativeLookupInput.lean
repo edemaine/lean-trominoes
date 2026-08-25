@@ -24,5 +24,19 @@ def input (keepPositive : Bool)
     (CarrierOrderRepresentativeRows.rows_forall_values_length
       keepPositive descriptors)
 
+/-- The promised lookup input has exactly the separated row/value encoding
+produced by the physical fork compiler. -/
+@[simp] theorem encode_input (keepPositive : Bool)
+    (descriptors : List RouteDescriptor) :
+    LastTrueUnaryValueLookupMachine.encode
+        (input keepPositive descriptors) =
+      SeparatedProductEncoding.encode
+        DelimitedBinaryWords.finEncoding.encode
+        UnaryFieldEncoderMachine.unaryFields
+        (CarrierOrderRepresentativeRows.rows descriptors,
+          CarrierOrderCandidateFieldStream.valuesWithSentinel
+            keepPositive descriptors) := by
+  rfl
+
 end CarrierOrderRepresentativeLookup
 end LeanTrominoes.PeriodicOrthocrossing

@@ -3,50 +3,68 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.DelimitedBinaryWordGuardedPairMergeOutputSemantics
 import LeanTrominoes.PeriodicOrthocrossingCarrierKeyRecipeStreamSemantics
-import LeanTrominoes.PeriodicOrthocrossingCarrierOrderAffineTerminalKeyStreamSemantics
+import LeanTrominoes.PeriodicOrthocrossingCarrierOrderAffineTerminalSourceKeyStreamSemantics
 import LeanTrominoes.PeriodicOrthocrossingCarrierOrderCandidateKeyStreamCompiler
+import LeanTrominoes.PeriodicOrthocrossingCrossingSourceKeyRecipeStreamSemantics
 
-/-! # Semantics of the carrier order-coordinate candidate-key stream -/
+/-! # Semantics of carrier order-coordinate source-identity keys -/
 
 namespace LeanTrominoes.PeriodicOrthocrossing
 namespace CarrierOrderCandidateKeyStream
 
 open RouteDescriptorOccurrenceSlotBinaryWords
 
-def guardedWords (descriptors : List RouteDescriptor) : List (List Bool) :=
-  TerminalDirectionalCarrierKeyStream.guardedWords
+def componentWords (descriptors : List RouteDescriptor) : List (List Bool) :=
+  TerminalDirectionalSourceKeyStream.guardedComponentWords
       (descriptors ×ˢ descriptors) ++
-    CrossingCarrierKeyRecipeStream.guardedWords
+    CrossingSourceKeyRecipeStream.guardedWords
       (taggedDescriptors descriptors ×ˢ taggedDescriptors descriptors)
 
-@[simp] theorem terminalTokens_descriptorWords
-    (descriptors : List RouteDescriptor) :
-    terminalTokens (RouteDescriptorBinaryWords.words descriptors) =
-      DelimitedBinaryWords.encode
-        ⟨TerminalDirectionalCarrierKeyStream.guardedWords
-          (descriptors ×ˢ descriptors)⟩ := by
-  unfold terminalTokens
-  rw [CarrierKeyRecipeStream.terminalTags_descriptorWords,
-    TerminalDirectionalCarrierKeyStream.emittedStream_encodeDescriptorPairs]
+def guardedWords (descriptors : List RouteDescriptor) : List (List Bool) :=
+  DelimitedBinaryWordGuardedPairMerge.mergeWords
+    (componentWords descriptors)
 
-@[simp] theorem crossingTokens_descriptorWords
+@[simp] theorem terminalComponentTokens_descriptorWords
     (descriptors : List RouteDescriptor) :
-    crossingTokens (RouteDescriptorBinaryWords.words descriptors) =
+    terminalComponentTokens
+        (RouteDescriptorBinaryWords.words descriptors) =
       DelimitedBinaryWords.encode
-        ⟨CrossingCarrierKeyRecipeStream.guardedWords
+        ⟨TerminalDirectionalSourceKeyStream.guardedComponentWords
+          (descriptors ×ˢ descriptors)⟩ := by
+  unfold terminalComponentTokens
+  rw [CarrierKeyRecipeStream.terminalTags_descriptorWords,
+    TerminalDirectionalSourceKeyStream.emittedStream_encodeDescriptorPairs]
+
+@[simp] theorem crossingComponentTokens_descriptorWords
+    (descriptors : List RouteDescriptor) :
+    crossingComponentTokens
+        (RouteDescriptorBinaryWords.words descriptors) =
+      DelimitedBinaryWords.encode
+        ⟨CrossingSourceKeyRecipeStream.guardedWords
           (taggedDescriptors descriptors ×ˢ
             taggedDescriptors descriptors)⟩ := by
-  exact CarrierKeyRecipeStream.crossingTokens_descriptorWords descriptors
+  unfold crossingComponentTokens
+  rw [CarrierKeyRecipeStream.crossingTags_descriptorWords,
+    CrossingSourceKeyRecipeStream.emittedStream_encodeDescriptorSlotPairs]
+
+@[simp] theorem componentTokens_descriptorWords
+    (descriptors : List RouteDescriptor) :
+    componentTokens (RouteDescriptorBinaryWords.words descriptors) =
+      DelimitedBinaryWords.encode ⟨componentWords descriptors⟩ := by
+  rw [componentTokens, terminalComponentTokens_descriptorWords,
+    crossingComponentTokens_descriptorWords]
+  simp [componentWords, DelimitedBinaryWords.encode,
+    List.flatMap_append]
 
 @[simp] theorem emittedTokens_descriptorWords
     (descriptors : List RouteDescriptor) :
     emittedTokens (RouteDescriptorBinaryWords.words descriptors) =
       DelimitedBinaryWords.encode ⟨guardedWords descriptors⟩ := by
-  rw [emittedTokens, terminalTokens_descriptorWords,
-    crossingTokens_descriptorWords]
-  simp [guardedWords, DelimitedBinaryWords.encode,
-    List.flatMap_append]
+  rw [emittedTokens, componentTokens_descriptorWords,
+    DelimitedBinaryWordGuardedPairMerge.tokens_encode_words]
+  rfl
 
 end CarrierOrderCandidateKeyStream
 end LeanTrominoes.PeriodicOrthocrossing

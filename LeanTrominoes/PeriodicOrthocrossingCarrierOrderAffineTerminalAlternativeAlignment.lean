@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicOrthocrossingCarrierOrderAffineTerminalCandidateCompiler
+import LeanTrominoes.PeriodicOrthocrossingCarrierOrderAffineTerminalSourceKeyCandidateCompiler
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineTerminalCarrierKeyWordRecipeActivationSemantics
 
 /-! # Alignment of direction-split terminal candidate families -/
@@ -26,6 +27,12 @@ open RouteDescriptorPairCarrierKeyWordRecipes
 @[simp] theorem Segment.terminalDirectionalCarrierKeyRecipeBlocks_length
     (segmentIndex : Nat) (segment : Segment) :
     (segment.terminalDirectionalCarrierKeyRecipeBlocks
+      segmentIndex).length = 4 := by
+  rfl
+
+@[simp] theorem Segment.terminalDirectionalSourceKeyRecipeBlocks_length
+    (segmentIndex : Nat) (segment : Segment) :
+    (segment.terminalDirectionalSourceKeyRecipeBlocks
       segmentIndex).length = 4 := by
   rfl
 
@@ -90,6 +97,14 @@ theorem terminalDirectionalOrderExpressionBlockLengths_eq_recipes :
     RouteShape.terminalDirectionalCarrierKeyRecipeBlocks
   simp
 
+@[simp] theorem RouteShape.terminalDirectionalSourceKeyRecipeBlocks_length
+    (shape : RouteShape) :
+    shape.terminalDirectionalSourceKeyRecipeBlocks.length =
+      shape.terminalDirectionalPredicates.length := by
+  unfold RouteShape.terminalDirectionalSourceKeyRecipeBlocks
+    RouteShape.terminalDirectionalPredicates
+  simp
+
 @[simp] theorem terminalDirectionalPredicates_length :
     terminalDirectionalPredicates.length =
       terminalDirectionalCarrierKeyRecipeBlocks.length := by
@@ -102,6 +117,13 @@ theorem terminalDirectionalOrderExpressionBlockLengths_eq_recipes :
       terminalDirectionalCarrierKeyRecipeBlocks.length := by
   unfold terminalDirectionalOrderExpressionBlocks
     terminalDirectionalCarrierKeyRecipeBlocks
+  simp
+
+@[simp] theorem terminalDirectionalSourceKeyRecipeBlocks_length :
+    terminalDirectionalSourceKeyRecipeBlocks.length =
+      terminalDirectionalPredicates.length := by
+  unfold terminalDirectionalSourceKeyRecipeBlocks
+    terminalDirectionalPredicates
   simp
 
 /-- Flattened affine fields and flattened guarded keys have exactly the same
@@ -126,6 +148,22 @@ candidate count. -/
   apply compiledExpandedActives_eq
   rw [List.length_map]
   exact terminalDirectionalPredicates_length
+
+/-- Compiled source-key component activity repeats each direction predicate
+over its doubled recipe block. -/
+@[simp] theorem terminalDirectionalSourceKeyExpandedActives_eq
+    (tokens : List RouteDescriptorPairFieldTags.Token) :
+    terminalDirectionalSourceKeyExpandedActives tokens =
+      expandedActives
+        (terminalDirectionalPredicates.map
+          fun predicate => predicate.evalTokens tokens)
+        terminalDirectionalSourceKeyRecipeBlocks := by
+  unfold terminalDirectionalSourceKeyExpandedActives
+    predicateListExpandedActives
+  rw [predicateListTruthValues_eq]
+  apply compiledExpandedActives_eq
+  rw [List.length_map]
+  exact terminalDirectionalSourceKeyRecipeBlocks_length.symm
 
 end RouteDescriptorPairAffine
 end LeanTrominoes.PeriodicOrthocrossing

@@ -3,11 +3,13 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
+import LeanTrominoes.DelimitedBinaryWordGuardedPairMergeCompiler
 import LeanTrominoes.PeriodicOrthocrossingCarrierKeyRecipeStreamCompiler
-import LeanTrominoes.PeriodicOrthocrossingCarrierOrderAffineTerminalKeyStreamCompiler
+import LeanTrominoes.PeriodicOrthocrossingCarrierOrderAffineTerminalSourceKeyStreamCompiler
+import LeanTrominoes.PeriodicOrthocrossingCrossingSourceKeyRecipeStreamCompiler
 import LeanTrominoes.TM2ListAppendClosure
 
-/-! # Combined candidate-key stream for carrier order coordinates -/
+/-! # Full source-identity keys for carrier order coordinates -/
 
 noncomputable section
 
@@ -19,40 +21,60 @@ open Computability Turing
 local instance : Inhabited DelimitedBinaryWords.finEncoding.Γ :=
   ⟨DelimitedBinaryWords.Token.wordStart⟩
 
-def terminalTokens (input : DelimitedBinaryWords.Input) :
+def terminalComponentTokens (input : DelimitedBinaryWords.Input) :
     List DelimitedBinaryWords.Token :=
-  TerminalDirectionalCarrierKeyStream.emittedStream
+  TerminalDirectionalSourceKeyStream.emittedStream
     (CarrierKeyRecipeStream.terminalTags input)
 
-def crossingTokens (input : DelimitedBinaryWords.Input) :
+def crossingComponentTokens (input : DelimitedBinaryWords.Input) :
     List DelimitedBinaryWords.Token :=
-  CarrierKeyRecipeStream.crossingTokens input
+  CrossingSourceKeyRecipeStream.emittedStream
+    (CarrierKeyRecipeStream.crossingTags input)
+
+def componentTokens (input : DelimitedBinaryWords.Input) :
+    List DelimitedBinaryWords.Token :=
+  terminalComponentTokens input ++ crossingComponentTokens input
 
 def emittedTokens (input : DelimitedBinaryWords.Input) :
     List DelimitedBinaryWords.Token :=
-  terminalTokens input ++ crossingTokens input
+  DelimitedBinaryWordGuardedPairMerge.tokens (componentTokens input)
 
-def terminalTokensComputableInPolyTime :
+def terminalComponentTokensComputableInPolyTime :
     TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
-      terminalTokens := by
+      terminalComponentTokens := by
   change TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
-    (fun input => TerminalDirectionalCarrierKeyStream.emittedStream
+    (fun input => TerminalDirectionalSourceKeyStream.emittedStream
       (CarrierKeyRecipeStream.terminalTags input))
   exact TM2CompositionMachine.computableInPolyTime
     CarrierKeyRecipeStream.terminalTagsComputableInPolyTime
-    TerminalDirectionalCarrierKeyStream.emittedStreamComputableInPolyTime
+    TerminalDirectionalSourceKeyStream.emittedStreamComputableInPolyTime
 
-def crossingTokensComputableInPolyTime :
+def crossingComponentTokensComputableInPolyTime :
     TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
-      crossingTokens :=
-  CarrierKeyRecipeStream.crossingTokensComputableInPolyTime
+      crossingComponentTokens := by
+  change TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
+    (fun input => CrossingSourceKeyRecipeStream.emittedStream
+      (CarrierKeyRecipeStream.crossingTags input))
+  exact TM2CompositionMachine.computableInPolyTime
+    CarrierKeyRecipeStream.crossingTagsComputableInPolyTime
+    CrossingSourceKeyRecipeStream.emittedStreamComputableInPolyTime
+
+def componentTokensComputableInPolyTime :
+    TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
+      componentTokens :=
+  TM2ListAppend.computableInPolyTime
+    terminalComponentTokensComputableInPolyTime
+    crossingComponentTokensComputableInPolyTime
 
 def emittedTokensComputableInPolyTime :
     TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
-      emittedTokens :=
-  TM2ListAppend.computableInPolyTime
-    terminalTokensComputableInPolyTime
-    crossingTokensComputableInPolyTime
+      emittedTokens := by
+  change TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
+    (fun input => DelimitedBinaryWordGuardedPairMerge.tokens
+      (componentTokens input))
+  exact TM2CompositionMachine.computableInPolyTime
+    componentTokensComputableInPolyTime
+    DelimitedBinaryWordGuardedPairMerge.tokensComputableInPolyTime
 
 end CarrierOrderCandidateKeyStream
 end LeanTrominoes.PeriodicOrthocrossing
