@@ -1805,7 +1805,11 @@ build; an imported proof counts when its statement matches the paper.
                       - [x] Compile the carrier-key segment index through a
                         reusable six-column key-field selector and prove that
                         it is zero-indexed rank-scan field one at every period.
-                      - [ ] Compile the remaining forty-seven aligned rank
+                      - [x] Compile the positive and negative horizontal and
+                        vertical carrier-key translation coordinates, including
+                        the `Int.negSucc` magnitude adjustment, and prove that
+                        they are zero-indexed rank-scan fields two through five.
+                      - [ ] Compile the remaining forty-three aligned rank
                         fields and assemble the column-major scan.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and

@@ -33,12 +33,18 @@ inductive Coordinate
   | vertical
   deriving DecidableEq, Fintype
 
+inductive IntMode
+  | skip
+  | zero
+  | units
+  deriving DecidableEq, Fintype
+
 inductive Control
   | outside
   | guard
   | nat (part : NatPart)
   | intSign (coordinate : Coordinate)
-  | intBody (coordinate : Coordinate) (selected : Bool)
+  | intBody (coordinate : Coordinate) (mode : IntMode)
   | skip
   | inactive
   deriving DecidableEq, Fintype
@@ -54,6 +60,22 @@ def selectsSigned : Field → Coordinate → Bool → Bool
   | .verticalPositive, .vertical, false => true
   | .verticalNegative, .vertical, true => true
   | _, _, _ => false
+
+def selectsCoordinate : Field → Coordinate → Bool
+  | .horizontalPositive, .horizontal => true
+  | .horizontalNegative, .horizontal => true
+  | .verticalPositive, .vertical => true
+  | .verticalNegative, .vertical => true
+  | _, _ => false
+
+def intMode (field : Field) (coordinate : Coordinate)
+    (sign : Bool) : IntMode :=
+  if selectsSigned field coordinate sign then
+    .units
+  else if selectsCoordinate field coordinate then
+    .zero
+  else
+    .skip
 
 def transition (field : Field) : Control → DelimitedBinaryWords.Token →
     Control × List UnaryFieldEncoderMachine.Symbol
@@ -73,23 +95,29 @@ def transition (field : Field) : Control → DelimitedBinaryWords.Token →
       else
         (.intSign .horizontal, [])
   | .intSign coordinate, .bit sign =>
-      let selected := selectsSigned field coordinate sign
-      (.intBody coordinate selected,
-        if selected && sign then [.unit] else [])
-  | .intBody coordinate true, .bit false =>
-      (.intBody coordinate true, [.unit])
-  | .intBody coordinate false, .bit false =>
-      (.intBody coordinate false, [])
-  | .intBody .horizontal selected, .bit true =>
-      if selected then
-        (.skip, [.delimiter])
-      else
-        (.intSign .vertical, [])
-  | .intBody .vertical selected, .bit true =>
-      if selected then
-        (.skip, [.delimiter])
-      else
-        (.skip, [])
+      match intMode field coordinate sign with
+      | .units =>
+          (.intBody coordinate .units, if sign then [.unit] else [])
+      | .zero => (.intBody coordinate .zero, [])
+      | .skip => (.intBody coordinate .skip, [])
+  | .intBody coordinate .units, .bit false =>
+      (.intBody coordinate .units, [.unit])
+  | .intBody coordinate .zero, .bit false =>
+      (.intBody coordinate .zero, [])
+  | .intBody coordinate .skip, .bit false =>
+      (.intBody coordinate .skip, [])
+  | .intBody .horizontal .skip, .bit true =>
+      (.intSign .vertical, [])
+  | .intBody .horizontal .zero, .bit true =>
+      (.skip, [.delimiter])
+  | .intBody .horizontal .units, .bit true =>
+      (.skip, [.delimiter])
+  | .intBody .vertical .skip, .bit true =>
+      (.skip, [])
+  | .intBody .vertical .zero, .bit true =>
+      (.skip, [.delimiter])
+  | .intBody .vertical .units, .bit true =>
+      (.skip, [.delimiter])
   | .skip, .bit _ => (.skip, [])
   | .skip, .wordEnd => (.outside, [])
   | .inactive, .bit _ => (.inactive, [])
