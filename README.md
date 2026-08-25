@@ -1871,6 +1871,10 @@ build; an imported proof counts when its statement matches the paper.
                       indices and both signed translation coordinates, and
                       prove that fields zero through five yield the exact
                       same-carrier matrix on numeric routes.
+                      - [x] Bundle those six proof-free compiler columns at
+                        their common indices and prove, for arbitrary
+                        descriptor inputs, that the flat compiled square is
+                        exactly equality on the resulting aggregate keys.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
