@@ -12,6 +12,24 @@ namespace LeanTrominoes.DelimitedBinaryWordGuardedPairMerge
 open DelimitedBinaryWords
 open LightweightFiniteStateTransducer
 
+/-- Semantic adjacent-word merging is exactly pairwise merging on a flattened
+list of explicit word pairs. -/
+@[simp] theorem mergeWords_componentWords
+    (pairs : List (List Bool × List Bool)) :
+    mergeWords (componentWords pairs).words = (mergedWords pairs).words := by
+  induction pairs with
+  | nil => rfl
+  | cons pair pairs induction =>
+      rcases pair with ⟨first, second⟩
+      simp only [componentWords, mergedWords, List.flatMap_cons,
+        List.map_cons]
+      rw [show [first, second] ++
+          pairs.flatMap (fun pair => [pair.1, pair.2]) =
+            first :: second ::
+              pairs.flatMap (fun pair => [pair.1, pair.2]) by rfl]
+      simp only [mergeWords, List.cons.injEq, true_and]
+      exact induction
+
 /-- The physical transducer implements semantic adjacent-word merging on
 every delimiter-encoded word list, including an odd final word. -/
 @[simp] theorem tokens_encode_words : ∀ words : List (List Bool),

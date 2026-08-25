@@ -1809,7 +1809,12 @@ build; an imported proof counts when its statement matches the paper.
                         vertical carrier-key translation coordinates, including
                         the `Int.negSucc` magnitude adjustment, and prove that
                         they are zero-indexed rank-scan fields two through five.
-                      - [ ] Compile the remaining forty-two aligned rank
+                      - [x] Compile direction-split affine terminal and
+                        crossing order coordinates, merge their full compact
+                        source identities, and prove representative lookup
+                        gives the positive and negative signed magnitudes in
+                        zero-indexed rank-scan fields six and seven.
+                      - [ ] Compile the remaining forty aligned rank
                         fields and assemble the column-major scan.
                         - [x] Compile terminal-zero/crossing-one guarded streams,
                           append one rejection sentinel, and perform compact
