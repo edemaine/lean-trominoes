@@ -1799,7 +1799,10 @@ build; an imported proof counts when its statement matches the paper.
                         axis stream with source-key rows, and compile its
                         selected horizontal bit.  Prove numeric-route equality
                         with zero-indexed rank-scan field eight.
-                      - [ ] Compile the remaining forty-nine aligned rank
+                      - [x] Compile the active carrier-key route index and prove
+                        that its representative-selected values are exactly
+                        zero-indexed rank-scan field zero at every period.
+                      - [ ] Compile the remaining forty-eight aligned rank
                         fields and assemble the column-major scan.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
