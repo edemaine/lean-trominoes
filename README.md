@@ -1811,6 +1811,12 @@ build; an imported proof counts when its statement matches the paper.
                         they are zero-indexed rank-scan fields two through five.
                       - [ ] Compile the remaining forty-three aligned rank
                         fields and assemble the column-major scan.
+                        - [x] Compile terminal-zero/crossing-one guarded streams,
+                          append one rejection sentinel, and perform compact
+                          representative lookup for boundary presence.
+                        - [ ] Prove terminal/crossing candidate-kind alignment
+                          and identify that compiler with rank-scan field
+                          thirteen.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
