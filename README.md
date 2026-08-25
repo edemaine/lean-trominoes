@@ -1858,6 +1858,11 @@ build; an imported proof counts when its statement matches the paper.
                       unary-length binary words and then to their exact
                       row-major strict-lower comparison rows, providing the
                       unsigned comparison primitive for stable carrier ranks.
+                    - [x] Compile aligned Boolean negation, conjunction, and
+                      disjunction, combine the positive and negative unary
+                      order-coordinate columns, and prove that fields six and
+                      seven yield the exact signed strict-lower matrix on
+                      numeric routes.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those
