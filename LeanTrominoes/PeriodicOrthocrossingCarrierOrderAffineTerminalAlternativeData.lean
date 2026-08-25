@@ -83,5 +83,14 @@ def terminalDirectionalCarrierKeyRecipeBlocks : List (List Recipe) :=
 def terminalDirectionalOrderExpressions : List Expression :=
   terminalDirectionalOrderExpressionBlocks.flatten
 
+/-- Guarded key words in the same direction-split order as the affine
+coordinate expressions. -/
+def terminalDirectionalCarrierKeyGuardedWords
+    (tokens : List RouteDescriptorPairFieldTags.Token) : List (List Bool) :=
+  words tokens
+    (terminalDirectionalPredicates.map
+      fun predicate => predicate.evalTokens tokens)
+    terminalDirectionalCarrierKeyRecipeBlocks
+
 end RouteDescriptorPairAffine
 end LeanTrominoes.PeriodicOrthocrossing
