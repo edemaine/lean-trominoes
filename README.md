@@ -1879,6 +1879,9 @@ build; an imported proof counts when its statement matches the paper.
                       - [x] Prove on numeric routes that the compiled matrices,
                         reconstructed rows, full and prefix counts, and their
                         sum are exactly those stable-rank counts.
+                      - [x] Identify each such sum with the strict lower rank
+                        in its same-key fiber under lexicographic coordinate
+                        and original-presentation-index order.
                   - [x] Compile the retained representative rows to one unary
                     active-node multiplicity per retained carrier key, and
                     prove that padded rejection guards do not affect those

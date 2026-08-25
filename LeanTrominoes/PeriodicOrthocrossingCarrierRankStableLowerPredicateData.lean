@@ -19,4 +19,10 @@ def tiePredicate
   decide (first.key = second.key) &&
     decide (first.orderCoordinate = second.orderCoordinate)
 
+/-- Presentation-tie-broken lower count within one carrier key. -/
+def rankAt (datums : List CarrierNodeRankDatum)
+    (entry : CarrierNodeRankDatum × Nat) : Nat :=
+  (datums.map (lowerPredicate entry.1)).count true +
+    ((datums.map (tiePredicate entry.1)).take entry.2).count true
+
 end LeanTrominoes.PeriodicOrthocrossing.CarrierRankStableLower

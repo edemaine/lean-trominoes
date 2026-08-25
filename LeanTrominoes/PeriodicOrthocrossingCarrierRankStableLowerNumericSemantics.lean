@@ -13,11 +13,6 @@ import LeanTrominoes.UnaryAlignedAddSemantics
 namespace LeanTrominoes.PeriodicOrthocrossing
 namespace CarrierRankStableLower
 
-def rankAt (datums : List CarrierNodeRankDatum)
-    (entry : CarrierNodeRankDatum × Nat) : Nat :=
-  (datums.map (lowerPredicate entry.1)).count true +
-    ((datums.map (tiePredicate entry.1)).take entry.2).count true
-
 /-- On valid numeric routes, the compiled unary column is exactly the stable
 same-key lower count, with presentation index breaking coordinate ties. -/
 theorem ranks_numericRouteDescriptors
