@@ -21,6 +21,29 @@ open Computability Turing
 local instance : Inhabited DelimitedBinaryWords.finEncoding.Γ :=
   ⟨DelimitedBinaryWords.Token.wordStart⟩
 
+/-- The crossing-only half of the doubled component stream is available as
+a reusable compiler before the terminal/crossing append. -/
+noncomputable def crossingTokensComputableInPolyTime :
+    TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
+      crossingTokens := by
+  let crossingTagsCompiler :
+      TM2ComputableInPolyTime DelimitedBinaryWords.finEncoding.encode id
+        crossingTags := by
+    change TM2ComputableInPolyTime
+      DelimitedBinaryWords.finEncoding.encode id
+      (fun input => RouteDescriptorOccurrenceSlotPairFieldTags.inputTokens
+        (DelimitedBinaryWordOccurrenceSlotTags.expandedPairs input))
+    exact TM2CompositionMachine.computableInPolyTime
+      DelimitedBinaryWordOccurrenceSlotTags.expandedPairsComputableInPolyTime
+      RouteDescriptorOccurrenceSlotPairFieldTags.inputTokensComputableInPolyTime
+  change TM2ComputableInPolyTime
+    DelimitedBinaryWords.finEncoding.encode id
+    (fun input => CrossingSourceKeyRecipeStream.emittedStream
+      (crossingTags input))
+  exact TM2CompositionMachine.computableInPolyTime
+    crossingTagsCompiler
+    CrossingSourceKeyRecipeStream.emittedStreamComputableInPolyTime
+
 noncomputable def descriptorTokensComputableInPolyTime :
     TM2ComputableInPolyTime
       (fun descriptors : List RouteDescriptor =>
