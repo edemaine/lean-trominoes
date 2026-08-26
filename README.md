@@ -10818,6 +10818,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorData.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorData.lean)
   splits the remaining source target exactly into separately streamable copied
   clause descriptors and retained-variable markers.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorBlockCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorBlockCompiler.lean)
+  composes those two retained-input appenders with the existing fixed-eight
+  expander to obtain the actual final normalized descriptor compiler.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
