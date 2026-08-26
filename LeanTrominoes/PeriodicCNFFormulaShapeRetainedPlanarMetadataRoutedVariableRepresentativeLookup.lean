@@ -40,6 +40,9 @@ theorem exists_routedVariableMetadata_global_lookup_of_normalized_mem
           (arm : DuplicatorArm)
           (link : EqualityLink (PlanarSATNode Variable))
           (forward : Bool),
+        site ∈ drawingVariableRouteSites source ∧
+        (link, armIndex) ∈ (routedVariableLinksAt source site).zipIdx ∧
+        arm = link.first.duplicatorArm ∧
         metadata = routedVariableClauseMetadataAt
           site armIndex arm link forward := by
   have mappedMember : clause ∈
@@ -55,22 +58,25 @@ theorem exists_routedVariableMetadata_global_lookup_of_normalized_mem
           (arm : DuplicatorArm)
           (link : EqualityLink (PlanarSATNode Variable))
           (forward : Bool),
+        site ∈ drawingVariableRouteSites source ∧
+        (link, armIndex) ∈ (routedVariableLinksAt source site).zipIdx ∧
+        arm = link.first.duplicatorArm ∧
         metadata = routedVariableClauseMetadataAt
           site armIndex arm link forward := by
     unfold drawingPlanarSATRoutedVariableClauseMetadata at metadataMember
     rcases List.mem_flatMap.mp metadataMember with
-      ⟨site, _siteMember, metadataMember⟩
+      ⟨site, siteMember, metadataMember⟩
     rcases List.mem_flatMap.mp metadataMember with
-      ⟨taggedLink, _taggedLinkMember, metadataMember⟩
+      ⟨taggedLink, taggedLinkMember, metadataMember⟩
     rw [drawingPlanarSATRoutedVariableClauseMetadataFor_eq_pair]
       at metadataMember
     simp only [List.mem_cons, List.not_mem_nil, or_false]
       at metadataMember
     rcases metadataMember with metadataEq | metadataEq
     · exact ⟨site, taggedLink.2, taggedLink.1.first.duplicatorArm,
-        taggedLink.1, true, metadataEq⟩
+        taggedLink.1, true, siteMember, taggedLinkMember, rfl, metadataEq⟩
     · exact ⟨site, taggedLink.2, taggedLink.1.first.duplicatorArm,
-        taggedLink.1, false, metadataEq⟩
+        taggedLink.1, false, siteMember, taggedLinkMember, rfl, metadataEq⟩
   let prefixValues :=
     crossoverMetadataNormalizedClauses source ++
       carrierMetadataNormalizedClauses source ++

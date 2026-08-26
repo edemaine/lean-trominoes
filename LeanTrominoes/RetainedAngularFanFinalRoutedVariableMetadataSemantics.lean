@@ -39,6 +39,9 @@ theorem exists_finalRoutedVariableMetadata_of_clause_lookup
           (arm : DuplicatorArm)
           (link : EqualityLink (PlanarSATNode Variable))
           (forward : Bool),
+        site ∈ drawingVariableRouteSites formula ∧
+        (link, armIndex) ∈ (routedVariableLinksAt formula site).zipIdx ∧
+        arm = link.first.duplicatorArm ∧
         metadata = routedVariableClauseMetadataAt
           site armIndex arm link forward := by
   rcases exists_routedVariableMetadata_global_lookup_of_normalized_mem
