@@ -2065,6 +2065,8 @@ build; an imported proof counts when its statement matches the paper.
               its scaled source head out of its outer fan and Figure 7 spoke.
             - [x] Compose the ordinary prefix, outer fan, and matching spoke
               while preserving source-head isolation under unit subdivision.
+            - [x] Specialize that isolation to every genuine final positioned
+              non-singleton ordinary fallback occurrence.
             - [ ] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
@@ -10737,6 +10739,10 @@ The representation choices for this target are:
   composes those two exclusions with a simple refined source prefix.  The
   complete ordinary prefix/fan/spoke splice therefore keeps its head isolated
   after unit subdivision.
+- [`LeanTrominoes/RetainedAngularFanFinalOrdinaryFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanFinalOrdinaryFigure7HeadIsolation.lean)
+  identifies the generic spoke with the actual positioned Figure 7 suffix and
+  specializes source-head isolation to every genuine final non-singleton
+  failed-direct route.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean)
   [`LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean),
