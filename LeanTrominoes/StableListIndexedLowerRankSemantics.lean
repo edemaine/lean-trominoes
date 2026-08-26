@@ -3,7 +3,8 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.StableListRankEnumerationData
+import LeanTrominoes.StableListRankEnumerationSemantics
+import LeanTrominoes.StrictListRankEnumerationNodupSemantics
 
 /-! # Lower ranks of selected, presentation-indexed values -/
 
@@ -144,5 +145,30 @@ theorem selectedIndexedLowerRank_eq
   unfold selectedIndexedLowerRank
   simpa using selectedIndexedLowerRankFrom_eq
     coordinate selected values 0 index value lookup
+
+/-- A selected indexed value's stable lower rank is its exact index in the
+strict-rank enumeration of the selected, globally indexed presentation. -/
+theorem selectedIndexedLowerRank_eq_idxOf_rankEnumeration
+    [DecidableEq Value]
+    (coordinate : Value → Coordinate) (selected : Value → Bool)
+    (values : List Value) (entry : Value × Nat)
+    (member : entry ∈ values.zipIdx)
+    (selectedEntry : selected entry.1 = true) :
+    selectedIndexedLowerRank coordinate selected values entry =
+      @List.idxOf (Value × Nat) instBEqOfDecidableEq entry
+        (StrictListRanks.valuesByLowerRank
+          (indexedCoordinate coordinate)
+          (values.zipIdx.filter fun other => selected other.1)) := by
+  let tagged := values.zipIdx.filter fun other => selected other.1
+  have coordinateNodup :
+      (tagged.map (indexedCoordinate coordinate)).Nodup := by
+    exact (indexedCoordinate_zipIdx_nodup coordinate values).sublist
+      (List.filter_sublist.map (indexedCoordinate coordinate))
+  have taggedMember : entry ∈ tagged := by
+    simp [tagged, member, selectedEntry]
+  unfold selectedIndexedLowerRank
+  exact
+    StrictListRanks.lowerRank_eq_idxOf_valuesByLowerRank_of_coordinate_nodup
+      (indexedCoordinate coordinate) tagged coordinateNodup entry taggedMember
 
 end LeanTrominoes.StableListRanks

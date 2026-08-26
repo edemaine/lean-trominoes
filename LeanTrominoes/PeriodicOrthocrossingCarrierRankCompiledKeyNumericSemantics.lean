@@ -11,14 +11,18 @@ import LeanTrominoes.PeriodicOrthocrossingCarrierRankKeyEqualityFieldNumericSema
 namespace LeanTrominoes.PeriodicOrthocrossing
 namespace CarrierRankCompiledKey
 
+/-- Bundle the six compiler-facing fields of one semantic carrier key. -/
+def ofKey (key : Nat × Nat × Cell) : CarrierRankCompiledKey where
+  route := key.1
+  segment := key.2.1
+  horizontalPositive := key.2.2.1.toNat
+  horizontalNegative := (-key.2.2.1).toNat
+  verticalPositive := key.2.2.2.toNat
+  verticalNegative := (-key.2.2.2).toNat
+
 /-- Bundle the six compiler-facing key fields of one semantic rank datum. -/
-def ofDatum (datum : CarrierNodeRankDatum) : CarrierRankCompiledKey where
-  route := datum.key.1
-  segment := datum.key.2.1
-  horizontalPositive := datum.key.2.2.1.toNat
-  horizontalNegative := (-datum.key.2.2.1).toNat
-  verticalPositive := datum.key.2.2.2.toNat
-  verticalNegative := (-datum.key.2.2.2).toNat
+def ofDatum (datum : CarrierNodeRankDatum) : CarrierRankCompiledKey :=
+  ofKey datum.key
 
 /-- On valid numeric routes, pointwise bundling of the six compiled columns
 recovers the corresponding aggregate key of every deduplicated rank datum. -/
@@ -58,7 +62,7 @@ theorem values_numericRouteDescriptors
     have indexLt : index < datums.length := by
       simpa using rightBound
     simp only [List.getElem_map, List.getElem_range]
-    simp [indexLt, ofDatum,
+    simp [indexLt, ofDatum, ofKey,
       CarrierRankKeyField.rankValue]
 
 end CarrierRankCompiledKey

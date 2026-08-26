@@ -1886,6 +1886,10 @@ build; an imported proof counts when its statement matches the paper.
                           global unary rank column, and identify it exactly on
                           numeric routes with key-block start plus same-key
                           stable coordinate rank.
+                          - [x] Define the corresponding indexed global
+                            enumeration and prove every presented datum's
+                            semantic global rank is its exact list index in
+                            that dedup-last-key-major, stable-coordinate order.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
