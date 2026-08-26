@@ -10794,6 +10794,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockStartFixed.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockStartFixed.lean)
   proves every implication ring has nine clauses and converts the recursive
   cycle block origin to nine times the atom's stable index.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionBlocks.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionBlocks.lean)
+  decomposes the complete global routed cycle suffix into the corresponding
+  fixed-width local descriptor block at each stable source-variable index.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
