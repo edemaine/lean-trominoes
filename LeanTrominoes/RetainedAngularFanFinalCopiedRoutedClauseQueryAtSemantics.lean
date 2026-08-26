@@ -62,7 +62,7 @@ theorem retainedFinalCopiedClauseQueryOfLiterals_eq_routedClause_of_mem
       .routedClause (by
         intro literalIndex rawChoice rawLookup
         exact
-          retainedDirectSourceRouteChoice?_routedClause_eq_some_shape
+          retainedDirectSourceRouteChoice?_routedClause_eq_some_presentation_shape
             formula sourceWidth taggedClause taggedClauseMember
             translate literalIndex rawChoice rawLookup)
   have normalizedRoutedEq :

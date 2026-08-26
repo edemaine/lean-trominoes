@@ -97,7 +97,7 @@ private theorem routedClausePortArms_eq_range
 /-- A successful raw routed-clause selector for a represented width-three
 source clause has routed-clause kind and the exact literal presentation
 index required by the stable final query template. -/
-theorem retainedDirectSourceRouteChoice?_routedClause_eq_some_shape
+theorem retainedDirectSourceRouteChoice?_routedClause_eq_some_presentation_shape
     {Variable : Type} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (sourceWidth : formula.WidthAtMost 3)
