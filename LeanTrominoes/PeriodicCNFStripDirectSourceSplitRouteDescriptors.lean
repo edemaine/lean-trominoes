@@ -23,6 +23,15 @@ noncomputable local instance directSourceSplitRouteDescriptorsStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
+private noncomputable def
+    directSourceSplitRouteDescriptorsStructuralVariableDecidableEq :
+    DecidableEq Variable :=
+  inferInstance
+
+noncomputable local instance directSourceSplitRouteDescriptorsVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
 /-- The semantic numeric route stream of a direct source is the explicit
 copied-incidence prefix followed by the two cycle incidences per occurrence. -/
 theorem directSource_numericRouteDescriptors_eq_splitRouteDescriptors
@@ -32,6 +41,11 @@ theorem directSource_numericRouteDescriptors_eq_splitRouteDescriptors
         (PeriodicThreeCNF.formula
           (PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
   rw [directSourceFormula_eq_threeSATThree]
+  have instanceEq :
+      directSourceSplitRouteDescriptorsVariableDecidableEq =
+        directSourceSplitRouteDescriptorsStructuralVariableDecidableEq :=
+    Subsingleton.elim _ _
+  rw [instanceEq]
   exact PeriodicThreeSATThree.numericRouteDescriptors_formula_eq_splitRouteDescriptors _
 
 end LeanTrominoes.PeriodicCNFStripReduction

@@ -24,6 +24,10 @@ noncomputable local instance directSourceRoutedVariablePairScanStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
+noncomputable local instance directSourceRoutedVariablePairScanVariableDecidableEq :
+    DecidableEq Variable :=
+  directSourceVariableDecidableEq
+
 /-- Replacing the semantic numeric route stream by its explicit split stream
 preserves the pure routed-variable descriptor-pair scan. -/
 theorem directSource_routedVariablePairDescriptorScan_eq_split
