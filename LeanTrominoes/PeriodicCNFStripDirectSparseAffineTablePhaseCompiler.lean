@@ -6,7 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTablePhaseGeneratedCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTablePhaseSemantics
 
-/-! # Complete compact vertex compiler from four indexed table phases -/
+/-! # Complete compact vertex compiler from five indexed table phases -/
 
 noncomputable section
 
@@ -25,7 +25,7 @@ noncomputable local instance directSparseAffineTablePhaseCompilerStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- Four verified indexed families over the uniform unary program stream
+/-- Five verified indexed families over the uniform unary program stream
 compile a certified opaque name for the exact canonical compact
 vertex-request word in polynomial time. -/
 noncomputable def directSparseAffineVertexRequestsComputableInPolyTimeOfTablePhases

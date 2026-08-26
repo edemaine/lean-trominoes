@@ -26,14 +26,31 @@ noncomputable local instance directSparseAffineTableAppenderDataStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- Table-driven triple requests generated from raw source symbols. -/
-def directSparseComputedAffineTableTripleRequestsOfSymbols
+/-- Table-driven variable-triple requests generated from raw source symbols. -/
+def directSparseComputedAffineTableVariableTripleRequestsOfSymbols
     (symbols : List encoding.Γ) :
     List GadgetSparseAffineVertexTokens.Token :=
   let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
     decider symbols
-  directSparseComputedAffineTypedTableVariableTripleRequests source ++
-    directSparseComputedAffineTableClauseTripleRequests source
+  directSparseComputedAffineTypedTableVariableTripleRequests source
+
+/-- Table-driven clause-triple requests generated from raw source symbols. -/
+def directSparseComputedAffineTableClauseTripleRequestsOfSymbols
+    (symbols : List encoding.Γ) :
+    List GadgetSparseAffineVertexTokens.Token :=
+  let source := PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+    decider symbols
+  directSparseComputedAffineTableClauseTripleRequests source
+
+/-- Complete table-driven triple requests in canonical variable-prefix,
+clause-suffix order. -/
+def directSparseComputedAffineTableTripleRequestsOfSymbols
+    (symbols : List encoding.Γ) :
+    List GadgetSparseAffineVertexTokens.Token :=
+  directSparseComputedAffineTableVariableTripleRequestsOfSymbols
+      decider symbols ++
+    directSparseComputedAffineTableClauseTripleRequestsOfSymbols
+      decider symbols
 
 /-- The table-driven triple word is exactly the indexed triple-appender
 target. -/
@@ -45,6 +62,8 @@ theorem directSparseComputedAffineIndexedTripleRequestsOfSymbols_eq_table
         decider symbols := by
   unfold directSparseComputedAffineIndexedTripleRequestsOfSymbols
     directSparseComputedAffineTableTripleRequestsOfSymbols
+    directSparseComputedAffineTableVariableTripleRequestsOfSymbols
+    directSparseComputedAffineTableClauseTripleRequestsOfSymbols
   exact directSparseComputedAffineIndexedTripleRequests_eq_cellTables
     (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
 

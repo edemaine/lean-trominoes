@@ -6,7 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.GadgetSparseAffineIndexedEmitterPipelineCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTablePhaseData
 
-/-! # Generated four-phase affine table compiler -/
+/-! # Generated five-phase affine table compiler -/
 
 noncomputable section
 
@@ -26,7 +26,7 @@ noncomputable local instance directSparseAffineTableGeneratedStackFintype
   decider.stackAlphabetFinite stack
 
 /-- Compose the verified uniform unary-program generator with the shared
-four-phase indexed affine-record pipeline. -/
+five-phase indexed affine-record pipeline. -/
 noncomputable def directSparseAffineTablePhaseOutputComputableInPolyTime
     (phases : DirectSparseAffineTablePhaseFamilies decider) :
     @TM2ComputableInPolyTime

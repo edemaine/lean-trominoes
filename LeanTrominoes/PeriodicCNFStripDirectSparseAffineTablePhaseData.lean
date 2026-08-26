@@ -7,7 +7,7 @@ import LeanTrominoes.GadgetSparseAffineIndexedEmitterPipelineData
 import LeanTrominoes.PeriodicCNFPolySpaceRequestEmitter
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTableAppenderData
 
-/-! # Indexed phase boundary for all four affine vertex tables -/
+/-! # Indexed phase boundary for all five affine vertex tables -/
 
 noncomputable section
 
@@ -53,17 +53,26 @@ theorem directSparseComputedAffineVertexRequestsOfSymbols_eq_table
     directSparseComputedAffineIndexedElementRequestsOfSymbols_eq_table]
   rfl
 
-/-- Four fixed indexed record families over the already generated unary
-program stream, together with exact blockwise table specifications. -/
+/-- Five fixed indexed record families over the already generated unary
+program stream, together with exact blockwise table specifications.  The
+variable-triple prefix and clause-triple suffix are separate passes because
+their concatenation is phase-major, not source-token-major. -/
 structure DirectSparseAffineTablePhaseFamilies where
-  triples : RecordFamily PeriodicCNF.UnaryProgramTokens.Token
+  variableTriples : RecordFamily PeriodicCNF.UnaryProgramTokens.Token
+  clauseTriples : RecordFamily PeriodicCNF.UnaryProgramTokens.Token
   red : RecordFamily PeriodicCNF.UnaryProgramTokens.Token
   green : RecordFamily PeriodicCNF.UnaryProgramTokens.Token
   blue : RecordFamily PeriodicCNF.UnaryProgramTokens.Token
-  triples_correct : ∀ symbols,
-    recordsEmitted triples
+  variableTriples_correct : ∀ symbols,
+    recordsEmitted variableTriples
         (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
-      directSparseComputedAffineTableTripleRequestsOfSymbols decider symbols
+      directSparseComputedAffineTableVariableTripleRequestsOfSymbols
+        decider symbols
+  clauseTriples_correct : ∀ symbols,
+    recordsEmitted clauseTriples
+        (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
+      directSparseComputedAffineTableClauseTripleRequestsOfSymbols
+        decider symbols
   red_correct : ∀ symbols,
     recordsEmitted red
         (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols) =
@@ -84,7 +93,8 @@ namespace DirectSparseAffineTablePhaseFamilies
 
 def families (phases : DirectSparseAffineTablePhaseFamilies decider) :
     List (RecordFamily PeriodicCNF.UnaryProgramTokens.Token) :=
-  [phases.triples, phases.red, phases.green, phases.blue]
+  [phases.variableTriples, phases.clauseTriples,
+    phases.red, phases.green, phases.blue]
 
 /-- Named output function of the shared phase pipeline on the uniform source
 token stream. -/
@@ -94,7 +104,7 @@ def output (phases : DirectSparseAffineTablePhaseFamilies decider)
   emittedPhases phases.families
     (PeriodicCNF.PolySpaceRequestEmitter.sourceTokens decider symbols)
 
-/-- The shared four-phase scan emits the complete combined table word. -/
+/-- The shared five-phase scan emits the complete combined table word. -/
 theorem emitted_eq_table
     (phases : DirectSparseAffineTablePhaseFamilies decider)
     (symbols : List encoding.Γ) :
@@ -105,9 +115,11 @@ theorem emitted_eq_table
   rw [emittedPhases_eq_phaseOutputs]
   simp only [families, phaseOutputs, List.flatMap_cons,
     List.flatMap_nil, List.append_nil]
-  rw [phases.triples_correct, phases.red_correct,
-    phases.green_correct, phases.blue_correct]
-  rfl
+  rw [phases.variableTriples_correct, phases.clauseTriples_correct,
+    phases.red_correct, phases.green_correct, phases.blue_correct]
+  unfold directSparseComputedAffineTableVertexRequestsOfSymbols
+    directSparseComputedAffineTableTripleRequestsOfSymbols
+  simp only [List.append_assoc]
 
 end DirectSparseAffineTablePhaseFamilies
 
