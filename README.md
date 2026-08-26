@@ -2078,6 +2078,8 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
+              - [x] Name the exact edge-major local-triple record word and
+                reduce the retained-workspace appender to its native compiler.
               - [x] Reuse the retained-planar variable-marker compiler for
                 the finite Figure 9 source-marker suffix.
               - [x] Compile the finite normalized copied-clause descriptor
@@ -10629,6 +10631,10 @@ The representation choices for this target are:
   route points.  Each triple independently determines exactly one rasterized
   coordinate and routing-cell record, exposing the route suffix as an
   edge-major, local-triple-minor stream.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteRecordCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteRecordCompiler.lean)
+  gives that exact canonical route word a native polynomial-time compiler
+  boundary and turns any implementation into the retained-workspace route
+  appender required by the final two-pass sparse pipeline.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its

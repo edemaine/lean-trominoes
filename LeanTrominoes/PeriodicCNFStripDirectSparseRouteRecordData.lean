@@ -109,6 +109,23 @@ noncomputable local instance directSparseRouteRecordDataStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
+/-- Named proof-free target for the route compiler: contracted edges in their
+canonical order, with one canonical record block for each consecutive triple
+of the edge's final normalized route. -/
+noncomputable def directSparseComputedRouteTripleRecordsOfSymbols
+    (symbols : List encoding.Γ) :
+    List GadgetSparseAssignmentTokens.Token :=
+  let input := directSparseComputedNormalizationInputOfSymbols
+    decider symbols
+  input.problem.contractedEdges.flatMap fun edge =>
+    (sparseRouteTriples
+      (PeriodicThreeDM.NormalizationCompiler.finalNormalizationRoute
+        input edge)).flatMap
+      (sparseRouteTripleRecordBlock
+        (PeriodicThreeDM.NormalizationCompiler.finalNormalizationPeriod
+          input)
+        edge.color)
+
 /-- The direct route-record suffix is an edge-major, route-triple-minor flat
 map of local canonical record blocks. -/
 theorem directSparseComputedRouteRecordsOfSymbols_eq_tripleBlocks
@@ -126,6 +143,15 @@ theorem directSparseComputedRouteRecordsOfSymbols_eq_tripleBlocks
             edge.color) := by
   rw [directSparseComputedRouteRecordsOfSymbols_eq_blocks]
   exact sparseRouteRecordBlocks_eq_tripleBlocks _ _
+
+/-- The named local-triple target is exactly the canonical route-record
+suffix required by the sparse assignment compiler. -/
+theorem directSparseComputedRouteRecordsOfSymbols_eq_tripleRecords
+    (symbols : List encoding.Γ) :
+    directSparseComputedRouteRecordsOfSymbols decider symbols =
+      directSparseComputedRouteTripleRecordsOfSymbols decider symbols := by
+  rw [directSparseComputedRouteRecordsOfSymbols_eq_tripleBlocks]
+  rfl
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
