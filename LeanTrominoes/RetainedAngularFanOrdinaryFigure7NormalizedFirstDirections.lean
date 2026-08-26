@@ -43,11 +43,11 @@ private theorem polylineFirstDirection_isGenuine_of_orthogonal
           exact AxisDirection.between_isGenuine_of_axisAligned
             (List.isChain_cons_cons.mp orthogonal).1
 
-/-- Normalizing a complete ordinary source splice, including its matching
-Figure 7 spoke, preserves the original source-edge direction whenever its
-twice-refined source head is absent from both appended pieces. -/
+/-- A source-head isolation certificate is the exact extra hypothesis needed
+to preserve an ordinary Figure 7 splice's first direction through loop
+erasure. -/
 theorem
-    retainedAngularFanSplicedOwnFigure7Route_normalized_firstDirection
+    retainedAngularFanSplicedOwnFigure7Route_normalized_firstDirection_of_headNotInTail
     (route : List Cell)
     (terminal : RetainedTerminalData)
     (slot : RetainedTerminalSlot)
@@ -57,24 +57,14 @@ theorem
       retainedTerminalDirectionClassify
           (PeriodicThreeSATThree.routeTerminalVector route) =
         some terminal)
-    (simple : LocalIncidenceDrawing.RouteIsSimple route)
     (routeHead : route.head? = some source)
     (routeOrthogonal : OrthogonalPolyline route)
     (retained : RetainedRayPolyline route)
-    (headNotInOuter :
-      Cell.scale retainedTerminalFanTotalRefinement source ∉
-        AxisDirection.unitSubdividePolyline
-          (retainedTerminalFanOuterCompleteRoute
-            (Cell.scale retainedTerminalFanTotalRefinement
-              (route.getLastD (0, 0)))
-            terminal slot))
-    (headNotInSpoke :
-      Cell.scale retainedTerminalFanTotalRefinement source ∉
-        AxisDirection.unitSubdividePolyline
-          (retainedTerminalFanFigure7SpokeRouteAt
-            (Cell.scale retainedTerminalFanTotalRefinement
-              (route.getLastD (0, 0)))
-            slot)) :
+    (fresh :
+      AxisDirection.HeadNotInTail
+        (AxisDirection.unitSubdividePolyline
+          (retainedAngularFanSplicedOwnFigure7Route
+            route terminal slot (route.getLastD (0, 0))))) :
     AxisDirection.polylineFirstDirection
         (AxisDirection.normalizeOrthogonalPolyline
           (retainedAngularFanSplicedOwnFigure7Route
@@ -119,7 +109,7 @@ theorem
     exact routeGenuine
   have completeLength : 2 ≤ complete.length :=
     two_le_length_of_firstDirection_isGenuine completeGenuine
-  have fresh :
+  have completeFresh :
       AxisDirection.HeadNotInTail
         (AxisDirection.unitSubdividePolyline complete) := by
     change
@@ -127,9 +117,7 @@ theorem
         (AxisDirection.unitSubdividePolyline
           (retainedAngularFanSplicedOwnFigure7Route
             route terminal slot (route.getLastD (0, 0))))
-    exact retainedAngularFanSplicedOwnFigure7Route_headNotInTail
-      route terminal slot source routeLength classified simple
-      routeHead routeOrthogonal headNotInOuter headNotInSpoke
+    exact fresh
   change
     AxisDirection.polylineFirstDirection
         (AxisDirection.normalizeOrthogonalPolyline complete) =
@@ -141,8 +129,53 @@ theorem
         AxisDirection.polylineFirstDirection_normalizeOrthogonalPolyline_of_headNotInTail
           (AxisDirection.unitSubdividePolyline_length_ge_two_of_length_ge_two
             completeLength completeOrthogonal)
-          completeOrthogonal fresh
+          completeOrthogonal completeFresh
     _ = AxisDirection.polylineFirstDirection route := completeDirection
+
+/-- Normalizing a complete ordinary source splice, including its matching
+Figure 7 spoke, preserves the original source-edge direction whenever its
+twice-refined source head is absent from both appended pieces. -/
+theorem
+    retainedAngularFanSplicedOwnFigure7Route_normalized_firstDirection
+    (route : List Cell)
+    (terminal : RetainedTerminalData)
+    (slot : RetainedTerminalSlot)
+    (source : Cell)
+    (routeLength : 3 ≤ route.length)
+    (classified :
+      retainedTerminalDirectionClassify
+          (PeriodicThreeSATThree.routeTerminalVector route) =
+        some terminal)
+    (simple : LocalIncidenceDrawing.RouteIsSimple route)
+    (routeHead : route.head? = some source)
+    (routeOrthogonal : OrthogonalPolyline route)
+    (retained : RetainedRayPolyline route)
+    (headNotInOuter :
+      Cell.scale retainedTerminalFanTotalRefinement source ∉
+        AxisDirection.unitSubdividePolyline
+          (retainedTerminalFanOuterCompleteRoute
+            (Cell.scale retainedTerminalFanTotalRefinement
+              (route.getLastD (0, 0)))
+            terminal slot))
+    (headNotInSpoke :
+      Cell.scale retainedTerminalFanTotalRefinement source ∉
+        AxisDirection.unitSubdividePolyline
+          (retainedTerminalFanFigure7SpokeRouteAt
+            (Cell.scale retainedTerminalFanTotalRefinement
+              (route.getLastD (0, 0)))
+            slot)) :
+    AxisDirection.polylineFirstDirection
+        (AxisDirection.normalizeOrthogonalPolyline
+          (retainedAngularFanSplicedOwnFigure7Route
+            route terminal slot (route.getLastD (0, 0)))) =
+      AxisDirection.polylineFirstDirection route := by
+  apply
+    retainedAngularFanSplicedOwnFigure7Route_normalized_firstDirection_of_headNotInTail
+      route terminal slot source routeLength classified routeHead
+      routeOrthogonal retained
+  exact retainedAngularFanSplicedOwnFigure7Route_headNotInTail
+    route terminal slot source routeLength classified simple
+    routeHead routeOrthogonal headNotInOuter headNotInSpoke
 
 end PeriodicOrthocrossing
 end LeanTrominoes
