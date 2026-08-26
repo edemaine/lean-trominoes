@@ -10776,7 +10776,8 @@ The representation choices for this target are:
   global route-based implication-cycle descriptor suffix, and the resulting
   phase-major routed descriptor stream.  It also names the finite target:
   copied lookup descriptors followed by one fixed local cycle block per
-  retained variable and the exact output-variable markers.
+  retained variable and the exact output-variable markers, together with the
+  local routed cycle block viewed by either atom or stable variable index.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutedDescriptorBlocks.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutedDescriptorBlocks.lean)
   splits the actual final positioned formula exactly into the copied-clause
   prefix and positioned implication-cycle suffix used by those descriptors.

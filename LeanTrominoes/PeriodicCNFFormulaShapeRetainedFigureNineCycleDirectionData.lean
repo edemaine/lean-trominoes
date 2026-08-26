@@ -60,6 +60,21 @@ def routedCycleRoutesFor
           atom + localClauseIndex))
       literalIndex
 
+/-- Final global route lookup viewed in the local clause coordinates of the
+Figure 7 implication ring at a stable source-variable index. -/
+def routedCycleRoutesAt
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atomIndex : Nat) :
+    PositionedPeriodicCNF.IncidenceRoutes :=
+  fun localClauseIndex literalIndex =>
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      source
+      (copiedClauseCount source +
+        (FormulaShapeFixedEight.copiesPerVariable * atomIndex +
+          localClauseIndex))
+      literalIndex
+
 /-- Route-based descriptor block of one source atom's implication ring,
 presented against the common local Figure 7 clauses. -/
 def routedCycleClauseDescriptorsFor
@@ -72,6 +87,20 @@ def routedCycleClauseDescriptorsFor
       .clause
         (FormulaShapeDirectionOrdering.DirectedClauseProfile.ofClause
           (routedCycleRoutesFor source atom)
+          taggedClause.2 taggedClause.1)
+
+/-- Route-based descriptor block of the implication ring at a stable
+source-variable index, presented against the common local Figure 7 clauses. -/
+def routedCycleClauseDescriptorsAt
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atomIndex : Nat) :
+    List FormulaShapeDirectionOrdering.Token :=
+  FormulaShapeFixedEightDirection.localCycleFormula.clauses.zipIdx.map
+    fun taggedClause =>
+      .clause
+        (FormulaShapeDirectionOrdering.DirectedClauseProfile.ofClause
+          (routedCycleRoutesAt source atomIndex)
           taggedClause.2 taggedClause.1)
 
 /-- Finite local Figure 7 descriptor block repeated once per retained source
