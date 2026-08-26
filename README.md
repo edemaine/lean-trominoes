@@ -10771,6 +10771,10 @@ The representation choices for this target are:
   finite lookup without re-expanding the direct/fallback selector.  It then
   lifts the pointwise equality to each copied clause and the complete copied
   descriptor prefix.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionData.lean)
+  names the exact scaled source and port assignment used by Figure 7, the
+  global route-based implication-cycle descriptor suffix, and the resulting
+  phase-major routed descriptor stream.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
