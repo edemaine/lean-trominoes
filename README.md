@@ -1912,6 +1912,9 @@ build; an imported proof counts when its statement matches the paper.
                               and prove that any aligned field column is
                               emitted in exact increasing-rank order whenever
                               its ranks permute the canonical range.
+                              - [x] Prove that the compiled global carrier-rank
+                                column satisfies that permutation promise on
+                                numeric route descriptors.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
