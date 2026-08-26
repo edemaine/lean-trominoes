@@ -5,7 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierRankOrderedDescriptorCompiler
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataCarrierClauseDescriptorData
-import LeanTrominoes.PeriodicCNFStripDirectSourceRouteDescriptorBinaryWordCompiler
+import LeanTrominoes.PeriodicCNFStripDirectSourceNumericRouteDescriptorCompiler
 
 /-! # Compiling direct retained carrier descriptors -/
 
@@ -27,19 +27,6 @@ noncomputable local instance directRetainedCarrierCompiledStackFintype
 local instance directRetainedCarrierCompiledVariableDecidableEq :
     DecidableEq Variable :=
   directSourceVariableDecidableEq
-
-/-- Reinterpret the exact direct binary-word output as its semantic numeric
-route-descriptor list under the carrier compiler's canonical encoding. -/
-private noncomputable def directSourceNumericRouteDescriptorsComputableInPolyTime :
-    @TM2ComputableInPolyTime
-      (List encoding.Γ) (List RouteDescriptor)
-      encoding.Γ DelimitedBinaryWords.Token id
-      CarrierRankOrderedPairs.InputEncoding
-      (fun symbols =>
-        numericRouteDescriptors (directSourceFormula decider symbols)) :=
-  TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq
-    (directSourceRouteDescriptorBinaryWordsComputableInPolyTime decider)
-    (directSourceRouteDescriptorBinaryWords_encode_eq_carrierInput decider)
 
 /-- Compile exact direct-source routes, then execute the complete
 rank-ordered retained carrier descriptor scan. -/
