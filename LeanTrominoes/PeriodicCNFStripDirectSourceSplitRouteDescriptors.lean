@@ -48,4 +48,23 @@ theorem directSource_numericRouteDescriptors_eq_splitRouteDescriptors
   rw [instanceEq]
   exact PeriodicThreeSATThree.numericRouteDescriptors_formula_eq_splitRouteDescriptors _
 
+/-- Replace the direct source's named equality implementation in the split
+descriptor stream by the structural implementation used by generic
+occurrence-splitting theorems. -/
+theorem directSource_splitRouteDescriptors_eq_structural
+    (symbols : List encoding.Γ) :
+    PeriodicThreeSATThree.splitRouteDescriptors
+        (PeriodicThreeCNF.formula
+          (PolySpaceCompiler.formulaOfSymbols decider symbols)) =
+      @PeriodicThreeSATThree.splitRouteDescriptors
+        (ThreeCNFVariable Nat) inferInstance
+        directSourceSplitRouteDescriptorsStructuralVariableDecidableEq
+        (PeriodicThreeCNF.formula
+          (PolySpaceCompiler.formulaOfSymbols decider symbols)) := by
+  have instanceEq :
+      directSourceSplitRouteDescriptorsVariableDecidableEq =
+        directSourceSplitRouteDescriptorsStructuralVariableDecidableEq :=
+    Subsingleton.elim _ _
+  rw [instanceEq]
+
 end LeanTrominoes.PeriodicCNFStripReduction
