@@ -2052,6 +2052,14 @@ build; an imported proof counts when its statement matches the paper.
             passes.
           - [ ] Construct the five concrete affine vertex table families.
           - [ ] Implement the canonical route-record appender.
+            - [x] Prove retained-ray rasterization exposes a genuine first
+              direction and preserves it for orthogonal retained routes.
+            - [x] Identify every public ordinary non-singleton fallback's
+              first direction with its scaled source route.
+            - [ ] Identify the singleton escaped fallback's first direction.
+            - [ ] Combine direct, fallback, and implication-cycle directions
+              into the actual final route-descriptor stream.
+            - [ ] Compile the canonical route records from that stream.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -10692,6 +10700,14 @@ The representation choices for this target are:
   then erase the remaining inner anchor normalization.  Thus every retained
   first direction is the first direction of a raw local component route
   selected by `idxOf` in the normalized five-family metadata list.
+- [`LeanTrominoes/RetainedRayRasterizationFirstDirections.lean`](LeanTrominoes/RetainedRayRasterizationFirstDirections.lean),
+  [`LeanTrominoes/RetainedAngularFanFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFallbackFirstDirections.lean),
+  [`LeanTrominoes/RetainedAngularFanFinalFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackFirstDirections.lean),
+  and [`LeanTrominoes/RetainedAngularFanFinalCoordinatedFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedFallbackFirstDirections.lean)
+  prove that retained-ray rasterization preserves the first direction of an
+  orthogonal retained route, carry that edge through ordinary fan-tail
+  replacement and suffix joining, and expose the result at the public final
+  route boundary for every non-singleton failed-direct incidence.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean`](LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean),
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean),
   and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean)
