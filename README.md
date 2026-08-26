@@ -10706,6 +10706,7 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedRayRasterizationFirstDirections.lean`](LeanTrominoes/RetainedRayRasterizationFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFallbackFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanEscapedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanEscapedFirstDirections.lean),
+  [`LeanTrominoes/RetainedAngularFanEscapedCardinalClassification.lean`](LeanTrominoes/RetainedAngularFanEscapedCardinalClassification.lean),
   [`LeanTrominoes/RetainedAngularFanFinalFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanFinalEscapedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalEscapedFirstDirections.lean),
   and [`LeanTrominoes/RetainedAngularFanFinalCoordinatedFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedFallbackFirstDirections.lean)
@@ -10713,6 +10714,8 @@ The representation choices for this target are:
   orthogonal retained route, carry that edge through both ordinary and
   singleton-escaped fan-tail replacement and suffix joining, and expose the
   result at the public final route boundary for every failed-direct incidence.
+  The singleton classifier also rules out every diagonal and routed-clause
+  terminal for an axis-aligned two-point source route.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean)
   [`LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean),
