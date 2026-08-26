@@ -4,7 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.OrthogonalPolylineEndpointDirectionTranslation
+import LeanTrominoes.OrthogonalPolylineLoopErasureTranslation
 import LeanTrominoes.RetainedAngularFanDirectSourceRouteChoice
+import LeanTrominoes.RetainedAngularFanDirectSourceCompleteCycleSeparation
+import LeanTrominoes.RetainedAngularFanDirectSourceCrossClauseOtherTargetSeparation
 import LeanTrominoes.RetainedAngularFanFinalCoordinatedRoutes
 
 /-! # Clause-side ordering of coordinated direct-source routes -/
@@ -42,6 +45,81 @@ theorem retainedDirectSourceCoordinatedFirstDirection_isGenuine :
       (index : Fin (retainedDirectSourcePrefixChoices kind).length),
       (retainedDirectSourceCoordinatedFirstDirection kind index).IsGenuine := by
   native_decide
+
+/-- Canonical origin-zero representative of one direct-source atlas entry. -/
+def retainedDirectSourceZeroChoice
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length) :
+    RetainedDirectSourceRouteChoice where
+  origin := (0, 0)
+  kind := kind
+  index := index
+
+/-- Finite lookup table for the clause-side direction after the direct
+Figure 7 occurrence route has been normalized. -/
+def retainedDirectSourceNormalizedFirstDirection
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (slot : RetainedTerminalSlot) : AxisDirection :=
+  AxisDirection.polylineFirstDirection
+    (AxisDirection.normalizeOrthogonalPolyline
+      ((retainedDirectSourceZeroChoice kind index).completeFigure7Route
+        slot))
+
+/-- Every origin-zero complete direct Figure 7 occurrence is nonempty and
+orthogonal, the hypotheses needed to transport normalization through a
+component translation. -/
+theorem retainedDirectSourceZeroCompleteFigure7Route_valid :
+    ∀ (kind : RetainedDirectClauseKind)
+      (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+      (slot : RetainedTerminalSlot),
+      (retainedDirectSourceZeroChoice kind index).completeFigure7Route slot ≠
+          [] ∧
+        PeriodicOrthocrossing.OrthogonalPolyline
+          ((retainedDirectSourceZeroChoice kind index).completeFigure7Route
+            slot) := by
+  native_decide
+
+/-- Translation to an arbitrary component origin commutes with normalization,
+so the finite origin-zero table gives the exact normalized first direction. -/
+theorem RetainedDirectSourceRouteChoice.normalizedCompleteFigure7Route_firstDirection
+    (choice : RetainedDirectSourceRouteChoice)
+    (slot : RetainedTerminalSlot) :
+    AxisDirection.polylineFirstDirection
+        (AxisDirection.normalizeOrthogonalPolyline
+          (choice.completeFigure7Route slot)) =
+      retainedDirectSourceNormalizedFirstDirection
+        choice.kind choice.index slot := by
+  rcases choice with ⟨origin, kind, index⟩
+  let zeroChoice := retainedDirectSourceZeroChoice kind index
+  have choiceEq :
+      ({ origin := origin, kind := kind, index := index } :
+          RetainedDirectSourceRouteChoice) =
+        zeroChoice.translateOrigin origin := by
+    simp [zeroChoice, retainedDirectSourceZeroChoice,
+      RetainedDirectSourceRouteChoice.translateOrigin, Cell.add]
+  rw [choiceEq,
+    RetainedDirectSourceRouteChoice.translateOrigin_completeFigure7Route]
+  change
+    AxisDirection.polylineFirstDirection
+        (AxisDirection.normalizeOrthogonalPolyline
+          ((zeroChoice.completeFigure7Route slot).map
+            (Cell.add (retainedDirectSourceFanPositioningOffset origin)))) =
+      retainedDirectSourceNormalizedFirstDirection kind index slot
+  rw [AxisDirection.normalizeOrthogonalPolyline_map_add
+    (retainedDirectSourceZeroCompleteFigure7Route_valid
+      kind index slot).1
+    (retainedDirectSourceZeroCompleteFigure7Route_valid
+      kind index slot).2]
+  change
+    AxisDirection.polylineFirstDirection
+        (PeriodicOrthocrossing.translatePolyline
+          (retainedDirectSourceFanPositioningOffset origin)
+          (AxisDirection.normalizeOrthogonalPolyline
+            ((retainedDirectSourceZeroChoice kind index).completeFigure7Route
+              slot))) = _
+  rw [AxisDirection.polylineFirstDirection_translatePolyline_static]
+  rfl
 
 /-- Translating a selected atlas route into its final component coordinates
 does not change its tabulated first direction. -/
