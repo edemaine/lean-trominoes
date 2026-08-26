@@ -10766,6 +10766,9 @@ The representation choices for this target are:
   packages that case split as one finite direction lookup and one canonical
   descriptor per copied retained clause, ready for the list-level semantic
   bridge to the actual descriptor stream.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionSemantics.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionSemantics.lean)
+  identifies every genuine copied route's semantic first direction with that
+  finite lookup without re-expanding the direct/fallback selector.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
