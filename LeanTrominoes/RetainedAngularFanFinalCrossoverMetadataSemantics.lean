@@ -15,6 +15,7 @@ namespace PeriodicEightOccurrenceSplit
 open PeriodicCNF
 open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 open PeriodicOrthocrossing
+open PlanarThreeSAT
 
 /-- A crossover clause occupying its declared final quotient index selects
 a crossover metadata representative in the final direct-source selector. -/
@@ -32,8 +33,13 @@ theorem exists_finalCrossoverMetadata_of_clause_lookup
       retainedFinalDirectSourceMetadata? formula clauseIndex =
         some metadata ∧
       normalizedClause formula metadata = clause ∧
-      ∃ crossing localClauseIndex,
-        metadata.source = .crossover crossing localClauseIndex := by
+      ∃ (crossing : CrossingRecord)
+          (taggedClause : EmbeddedClause CrossoverVariable × Nat),
+        crossing ∈ orientedCrossingHalo formula.incidenceGraph ∧
+        taggedClause ∈ crossoverFormula.zipIdx ∧
+        metadata =
+          ⟨crossoverClauseAt crossing taggedClause.1,
+            .crossover crossing taggedClause.2⟩ := by
   have rawCrossoverMember :
       clause ∈ crossoverMetadataNormalizedClauses formula := by
     simpa [crossoverMetadataNormalizedClausesDedup] using crossoverMember

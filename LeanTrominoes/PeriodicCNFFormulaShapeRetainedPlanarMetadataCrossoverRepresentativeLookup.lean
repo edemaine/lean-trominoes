@@ -12,7 +12,7 @@ import LeanTrominoes.PeriodicCNFFormulaShapeCrossoverNormalizedPrefix
 namespace LeanTrominoes.PeriodicCNF
 namespace FormulaShapeRetainedPlanarMetadataDirection
 
-open PeriodicOrthocrossing
+open PeriodicOrthocrossing PlanarThreeSAT
 
 /-- The first crossover-metadata record normalizing to a crossover clause
 records the physical crossing and local clause index that generated it. -/
@@ -28,8 +28,13 @@ theorem exists_crossoverMetadata_lookup_of_normalized_mem
           (crossoverMetadataNormalizedClauses source).idxOf clause]? =
         some metadata ∧
       normalizedClause source metadata = clause ∧
-      ∃ crossing localClauseIndex,
-        metadata.source = .crossover crossing localClauseIndex := by
+      ∃ (crossing : CrossingRecord)
+          (taggedClause : EmbeddedClause CrossoverVariable × Nat),
+        crossing ∈ orientedCrossingHalo source.incidenceGraph ∧
+        taggedClause ∈ crossoverFormula.zipIdx ∧
+        metadata =
+          ⟨crossoverClauseAt crossing taggedClause.1,
+            .crossover crossing taggedClause.2⟩ := by
   rcases IndexedListScan.exists_getElem?_idxOf_map
       (drawingPlanarSATCrossoverClauseMetadata
         (Variable := Variable) source.incidenceGraph)
@@ -38,12 +43,20 @@ theorem exists_crossoverMetadata_lookup_of_normalized_mem
   refine ⟨metadata, metadataLookup, normalizedEq, ?_⟩
   unfold drawingPlanarSATCrossoverClauseMetadata at metadataMember
   rcases List.mem_flatMap.mp metadataMember with
-    ⟨crossing, _crossingMember, metadataMember⟩
+    ⟨crossing, crossingMember, metadataMember⟩
   unfold drawingPlanarSATCrossoverClauseMetadataFor at metadataMember
   rcases List.mem_map.mp metadataMember with
     ⟨taggedClause, _taggedClauseMember, metadataEq⟩
   subst metadata
-  exact ⟨crossing, taggedClause.2, rfl⟩
+  have taggedClauseMember := _taggedClauseMember
+  unfold drawingPlanarSATCrossoverFormulaAt scopedCrossoverInstance
+    instantiateFormula at taggedClauseMember
+  rw [List.map_map, List.zipIdx_map] at taggedClauseMember
+  rcases List.mem_map.mp taggedClauseMember with
+    ⟨fixedTaggedClause, fixedTaggedClauseMember, taggedClauseEq⟩
+  subst taggedClause
+  exact ⟨crossing, fixedTaggedClause, crossingMember,
+    fixedTaggedClauseMember, rfl⟩
 
 /-- A normalized crossover clause selects crossover metadata at its first
 occurrence in the complete five-family metadata presentation. -/
@@ -57,8 +70,13 @@ theorem exists_crossoverMetadata_global_lookup_of_normalized_mem
       (retainedDrawingPlanarSATClauseMetadata source)[
           (normalizedClauses source).idxOf clause]? = some metadata ∧
       normalizedClause source metadata = clause ∧
-      ∃ crossing localClauseIndex,
-        metadata.source = .crossover crossing localClauseIndex := by
+      ∃ (crossing : CrossingRecord)
+          (taggedClause : EmbeddedClause CrossoverVariable × Nat),
+        crossing ∈ orientedCrossingHalo source.incidenceGraph ∧
+        taggedClause ∈ crossoverFormula.zipIdx ∧
+        metadata =
+          ⟨crossoverClauseAt crossing taggedClause.1,
+            .crossover crossing taggedClause.2⟩ := by
   rcases exists_crossoverMetadata_lookup_of_normalized_mem
       source clause clauseMember with
     ⟨metadata, crossoverLookup, normalizedEq, crossoverSource⟩
