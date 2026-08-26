@@ -1927,6 +1927,10 @@ build; an imported proof counts when its statement matches the paper.
                                   successor square and the six-field same-key
                                   square, and conjunct them into the candidate
                                   adjacent-carrier-pair matrix.
+                                  - [x] Prove on numeric routes that this matrix
+                                    marks exactly consecutive entries of the
+                                    global enumeration within one carrier-key
+                                    block.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
