@@ -10762,6 +10762,10 @@ The representation choices for this target are:
   combines all genuine copied-source cases at that boundary.  Successful
   direct choices use their finite normalized atlas direction, while ordinary
   and singleton-escaped fallbacks retain the scaled source-route direction.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionData.lean)
+  packages that case split as one finite direction lookup and one canonical
+  descriptor per copied retained clause, ready for the list-level semantic
+  bridge to the actual descriptor stream.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
