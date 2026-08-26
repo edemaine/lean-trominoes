@@ -25,18 +25,8 @@ def copiedFirstDirection
     (literal :
       PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)) :
     AxisDirection :=
-  match retainedFinalDirectSourceRouteChoice?
-      source clauseIndex literalIndex with
-  | some choice =>
-      retainedDirectSourceNormalizedFirstDirection
-        choice.kind choice.index
-        (retainedFinalCoordinatedOccurrenceSlot
-          source literal clauseIndex literalIndex)
-  | none =>
-      AxisDirection.polylineFirstDirection
-        (scalePolyline retainedAngularFanSourceClearanceFactor
-          (finalCoordinatedSourceRoutes
-            source clauseIndex literalIndex))
+  retainedFinalCopiedSourceFirstDirection
+    source clauseIndex literalIndex literal
 
 /-- Finite final descriptor of one copied retained source clause. -/
 def copiedClauseProfile

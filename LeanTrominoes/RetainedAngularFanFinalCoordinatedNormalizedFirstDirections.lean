@@ -14,6 +14,29 @@ namespace PeriodicOrthocrossing
 
 open PeriodicEightOccurrenceSplit
 
+/-- Finite final direction selected for one copied retained source incidence.
+Successful direct choices use the normalized atlas table; failed choices use
+the direction of the scaled retained source route. -/
+def retainedFinalCopiedSourceFirstDirection
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex literalIndex : Nat)
+    (literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)) :
+    AxisDirection :=
+  match retainedFinalDirectSourceRouteChoice?
+      formula clauseIndex literalIndex with
+  | some choice =>
+      retainedDirectSourceNormalizedFirstDirection
+        choice.kind choice.index
+        (retainedFinalCoordinatedOccurrenceSlot
+          formula literal clauseIndex literalIndex)
+  | none =>
+      AxisDirection.polylineFirstDirection
+        (scalePolyline retainedAngularFanSourceClearanceFactor
+          (finalCoordinatedSourceRoutes
+            formula clauseIndex literalIndex))
+
 /-- Every genuine copied-source incidence exposes its exact final direction:
 a successful direct choice uses the finite normalized atlas table, while a
 failed choice preserves the direction of the scaled retained source route. -/
@@ -41,18 +64,9 @@ theorem
     AxisDirection.polylineFirstDirection
         (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
           formula clauseIndex literalIndex) =
-      match retainedFinalDirectSourceRouteChoice?
-          formula clauseIndex literalIndex with
-      | some choice =>
-          retainedDirectSourceNormalizedFirstDirection
-            choice.kind choice.index
-            (retainedFinalCoordinatedOccurrenceSlot
-              formula literal clauseIndex literalIndex)
-      | none =>
-          AxisDirection.polylineFirstDirection
-            (scalePolyline retainedAngularFanSourceClearanceFactor
-              (finalCoordinatedSourceRoutes
-                formula clauseIndex literalIndex)) := by
+      retainedFinalCopiedSourceFirstDirection
+        formula clauseIndex literalIndex literal := by
+  unfold retainedFinalCopiedSourceFirstDirection
   cases choiceLookup :
       retainedFinalDirectSourceRouteChoice?
         formula clauseIndex literalIndex with
