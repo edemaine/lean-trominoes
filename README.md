@@ -10812,6 +10812,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionFixedEight.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionFixedEight.lean)
   packages the copied lookup prefix and retained-source markers as a canonical
   input whose existing fixed-eight expansion is the complete finite stream.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorCompiler.lean)
+  reduces the actual final descriptor compiler to that copied lookup prefix
+  and marker stream, reusing the verified fixed-eight cycle/variable machine.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
