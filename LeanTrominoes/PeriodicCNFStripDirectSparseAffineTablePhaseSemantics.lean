@@ -5,7 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTablePhaseData
 
-/-! # Canonical semantics of the four affine table phases -/
+/-! # Canonical semantics of the five affine table phases -/
 
 noncomputable section
 
@@ -23,7 +23,7 @@ noncomputable local instance directSparseAffineTablePhaseSemanticsStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
-/-- The four phase specifications jointly identify their output with the
+/-- The five phase specifications jointly identify their output with the
 canonical compact vertex-request stream. -/
 theorem DirectSparseAffineTablePhaseFamilies.emitted_eq_vertexRequests
     (phases : DirectSparseAffineTablePhaseFamilies decider)

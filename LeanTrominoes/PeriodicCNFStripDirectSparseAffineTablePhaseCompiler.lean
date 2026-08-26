@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTablePhaseGeneratedCompiler
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineTablePhaseSemantics
+import LeanTrominoes.PeriodicCNFStripDirectSparseAffineVertexRequestAppender
 
 /-! # Complete compact vertex compiler from five indexed table phases -/
 
@@ -47,6 +48,34 @@ noncomputable def directSparseAffineVertexRequestsComputableInPolyTimeOfTablePha
       Input encoding language decider phases)
     (@DirectSparseAffineTablePhaseFamilies.emitted_eq_output
       Input encoding language decider phases)
+
+/-- Retain the original source beside the compact request stream produced by
+the five table phases. -/
+noncomputable def directSparseAffineVertexRequestAppenderOfTablePhases
+    (phases : DirectSparseAffineTablePhaseFamilies decider) :
+    DirectSparseAffineVertexRequestAppender decider := by
+  let opaqueAppender :=
+    RetainedInputAppendPipeline.appendedComputableInPolyTimeOfCompiler
+      (directSparseAffineVertexRequestOutput decider)
+      (directSparseAffineVertexRequestsComputableInPolyTimeOfTablePhases
+        decider phases)
+  exact RetainedInputAppendPipeline.computableInPolyTimeOfEq
+    (RetainedInputAppendPipeline.appended
+      (directSparseAffineVertexRequestOutput decider))
+    (RetainedInputAppendPipeline.appended
+      (directSparseComputedAffineVertexRequestsOfSymbols decider))
+    (fun symbols => by
+      unfold RetainedInputAppendPipeline.appended
+      rw [directSparseAffineVertexRequestOutput_eq])
+    opaqueAppender
+
+/-- Five exact table families therefore discharge the complete canonical
+vertex-record appender after the fixed affine workspace expansion. -/
+noncomputable def directSparseVertexRecordAppenderOfTablePhases
+    (phases : DirectSparseAffineTablePhaseFamilies decider) :
+    DirectSparseVertexRecordAppender decider :=
+  directSparseVertexRecordAppenderOfAffineRequests decider
+    (directSparseAffineVertexRequestAppenderOfTablePhases decider phases)
 
 end PeriodicCNFStripReduction
 end LeanTrominoes
