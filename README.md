@@ -1941,6 +1941,10 @@ build; an imported proof counts when its statement matches the paper.
                                     by boundary priority, and prove the result
                                     is exactly the representative-pair
                                     predicate.
+                                  - [x] Give the thirty-two-field crossing
+                                    payload a verified inverse, proving it
+                                    retains the complete crossing-record
+                                    identity needed for crossover suppression.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
