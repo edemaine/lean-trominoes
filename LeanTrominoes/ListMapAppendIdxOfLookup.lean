@@ -83,5 +83,28 @@ theorem append_getElem?_idxOf_append_of_not_mem
   rw [headLength, Nat.add_sub_cancel_left]
   exact suffixLookup
 
+/-- An element present in a value prefix uses an already established
+first-occurrence lookup in the corresponding output prefix, independently
+of both suffixes. -/
+theorem append_getElem?_idxOf_append_of_mem
+    {Value Output : Type} [BEq Value] [LawfulBEq Value]
+    (headValues suffixValues : List Value)
+    (headOutputs suffixOutputs : List Output)
+    (value : Value)
+    (selectedOutput : Output)
+    (headLength : headOutputs.length = headValues.length)
+    (valueMember : value ∈ headValues)
+    (headLookup :
+      headOutputs[headValues.idxOf value]? = some selectedOutput) :
+    (headOutputs ++ suffixOutputs)[
+        (headValues ++ suffixValues).idxOf value]? =
+      some selectedOutput := by
+  rw [List.idxOf_append_of_mem valueMember]
+  have indexLeft : headValues.idxOf value < headOutputs.length := by
+    rw [headLength]
+    exact List.idxOf_lt_length_iff.mpr valueMember
+  rw [List.getElem?_append_left indexLeft]
+  exact headLookup
+
 end IndexedListScan
 end LeanTrominoes
