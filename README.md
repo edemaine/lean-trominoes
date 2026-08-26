@@ -1949,6 +1949,10 @@ build; an imported proof counts when its statement matches the paper.
                                     ordered crossing-payload fields together
                                     with both boundary guards, and prove its
                                     negation is exactly crossover suppression.
+                                  - [x] Compile a reusable signed-unary
+                                    successor matrix and prove that canonical
+                                    positive/negative magnitudes mark exactly
+                                    pairs satisfying `second = first + 1`.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
