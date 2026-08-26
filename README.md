@@ -2086,6 +2086,9 @@ build; an imported proof counts when its statement matches the paper.
                   - [x] Define the presentation-ordered mixed direct/fallback
                     query stream and prove its evaluator returns the public
                     copied-source direction lookup.
+                  - [x] Package those incidence queries with literal profiles
+                    into finite clause queries and compile their evaluator to
+                    the exact copied descriptor prefix.
                   - [ ] Compile that exact mixed query stream from direct
                     source symbols.
                 - [ ] Merge normalized direct directions with the compiled
@@ -10857,6 +10860,13 @@ The representation choices for this target are:
   lookup.
 - [`LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionCompiler.lean)
   compiles the mixed direct/fallback evaluator as a fixed finite transducer.
+- [`LeanTrominoes/RetainedAngularFanFinalCopiedClauseQuery.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedClauseQuery.lean)
+  packages up to three literal profiles and mixed direction queries into one
+  finite clause query, and proves that evaluating the full semantic query
+  stream is exactly the copied descriptor prefix.
+- [`LeanTrominoes/RetainedAngularFanFinalCopiedClauseQueryCompiler.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedClauseQueryCompiler.lean)
+  compiles finite clause queries directly to direction-aware descriptor
+  tokens.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
