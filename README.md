@@ -1656,7 +1656,7 @@ build; an imported proof counts when its statement matches the paper.
             canonical data: two-token straight-carrier, bend-corner, and
             routed-variable equality templates, plus routed source-clause
             tokens whose geometric directions are uniformly invalid.
-          - [ ] Compile and assemble the remaining ordered descriptor scans.
+          - [x] Compile and assemble the remaining ordered descriptor scans.
             - [x] Compile retained carrier-link descriptors.
               - [x] Compile the fixed two-bit carrier descriptor-block
                 expansion.
@@ -2035,7 +2035,7 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Compile retained routed-variable-link descriptors.
             - [x] Compile retained gauged routed-clause descriptors from the
               exact finite source clause-profile stream.
-            - [ ] Append all four scans to the compiled crossover prefix.
+            - [x] Append all four scans to the compiled crossover prefix.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
