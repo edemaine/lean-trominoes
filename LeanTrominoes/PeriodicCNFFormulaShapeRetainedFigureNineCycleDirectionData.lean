@@ -16,49 +16,6 @@ open PeriodicEightOccurrenceSplitPositioned
 open PeriodicOrthocrossing
 open PeriodicThreeSATThree
 
-/-- Retained planar source after the clearance scale used before inserting
-the fixed Figure 7 neighborhoods. -/
-def sourceScaledForFigureSeven
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable) :=
-  (finalCoordinatedSource source).scale
-    retainedAngularFanSourceClearanceFactor
-
-/-- Matching scaled placement of the retained source variables. -/
-def placementScaledForFigureSeven
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable) :=
-  (finalCoordinatedPlacement source).scale
-    retainedAngularFanSourceClearanceFactor
-
-/-- Matching scaled route family used to choose the eight compass ports. -/
-def routesScaledForFigureSeven
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable) :
-    PositionedPeriodicCNF.IncidenceRoutes :=
-  PositionedPeriodicCNF.scaleIncidenceRoutes
-    retainedAngularFanSourceClearanceFactor
-    (finalCoordinatedSourceRoutes source)
-
-/-- Exact route-induced port assignment used by the final scaled Figure 7
-formula. -/
-def occurrencePortsForFigureSeven
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable) : OccurrencePorts :=
-  occurrencePortsOfAngularOrder
-    (sourceScaledForFigureSeven source).erase
-    (angularOccurrenceOrder
-      (sourceScaledForFigureSeven source).erase
-      (routesScaledForFigureSeven source))
-
-/-- Number of copied clauses preceding the implication-cycle suffix. -/
-def copiedClauseCount
-    {Variable : Type} [DecidableEq Variable]
-    (source : PeriodicCNF Variable) : Nat :=
-  (occurrenceClauses
-    (sourceScaledForFigureSeven source)
-    (occurrencePortsForFigureSeven source)).length
-
 /-- Route-based descriptor suffix of all positioned implication-cycle
 clauses, using their actual global final-route indices. -/
 def routedCycleClauseDescriptors
