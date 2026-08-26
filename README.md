@@ -2055,7 +2055,8 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Prove retained-ray rasterization exposes a genuine first
               direction and preserves it for orthogonal retained routes.
             - [x] Identify every public ordinary non-singleton fallback's
-              first direction with its scaled source route.
+              first direction with its scaled source route at both the
+              coordinated and normalized route boundaries.
             - [x] Identify the singleton escaped fallback's first direction
               with its scaled source route at both the coordinated and
               normalized public route boundaries.
@@ -10754,6 +10755,9 @@ The representation choices for this target are:
   combines the exact model, final source-head isolation, and the reusable
   normalization interface.  Every genuine final non-singleton failed-direct
   occurrence therefore normalizes to its scaled source-route direction.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedOrdinaryNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedOrdinaryNormalizedFirstDirections.lean)
+  exposes that equality at the public normalized fixed-eight route-family
+  boundary.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
