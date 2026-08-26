@@ -2061,6 +2061,8 @@ build; an imported proof counts when its statement matches the paper.
               normalized public route boundaries.
             - [x] Prove the unit-subdivided cardinal escaped fan keeps its
               source gate isolated, so loop erasure preserves that direction.
+            - [x] Prove every genuine non-singleton ordinary fallback keeps
+              its scaled source head out of its outer fan and Figure 7 spoke.
             - [ ] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
@@ -10721,6 +10723,14 @@ The representation choices for this target are:
   exposes the unscaled geometry needed by ordinary-fallback normalization:
   every genuine copied-source route is simple, and failed direct selection
   makes that raw route orthogonal before either refinement scale is applied.
+- [`LeanTrominoes/RetainedAngularFanFinalSourceHeadSeparationSupport.lean`](LeanTrominoes/RetainedAngularFanFinalSourceHeadSeparationSupport.lean),
+  [`LeanTrominoes/RetainedAngularFanFinalOrdinaryFallbackRawHeadSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalOrdinaryFallbackRawHeadSeparation.lean),
+  [`LeanTrominoes/RetainedAngularFanFinalOuterSpokeSourceHeadSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalOuterSpokeSourceHeadSeparation.lean),
+  and [`LeanTrominoes/RetainedAngularFanFinalOrdinaryFallbackHeadSeparation.lean`](LeanTrominoes/RetainedAngularFanFinalOrdinaryFallbackHeadSeparation.lean)
+  turn that raw simplicity into the source-head isolation needed for ordinary
+  normalization.  A non-singleton fallback's head is separated from its final
+  segment; both refinement scales then keep the scaled head outside the
+  unit-subdivided outer fan and matching Figure 7 spoke.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean)
   [`LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean),
