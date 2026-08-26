@@ -1915,6 +1915,9 @@ build; an imported proof counts when its statement matches the paper.
                               - [x] Prove that the compiled global carrier-rank
                                 column satisfies that permutation promise on
                                 numeric route descriptors.
+                              - [x] Prove unconditional alignment for all
+                                fifty compiled carrier-datum fields and compile
+                                each field into increasing global-rank order.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
