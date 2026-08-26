@@ -39,6 +39,21 @@ theorem formula_incidencesWithMetadata_offsets_zero_or_one
     exact Or.inl
       (cycleLinkIncidence_edge_offset_eq_zero source cycleLinkMember)
 
+/-- The split formula's three-occurrence bound under the decidable-equality
+implementation used by routed metadata. -/
+theorem formula_occurrencesAtMostThree_decidableEq
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    @PeriodicCNF.OccurrencesAtMost
+      (ThreeOccurrenceVariable Variable)
+      (@instBEqOfDecidableEq
+        (ThreeOccurrenceVariable Variable)
+        (inferInstance : DecidableEq
+          (ThreeOccurrenceVariable Variable)))
+      (by infer_instance) 3 (formula source) := by
+  apply PeriodicCNF.occurrencesAtMost_congr_beq
+  exact formula_occurrencesAtMostThree source
+
 /-- Canonical route-index representatives: the complete final-site fiber
 of each occurrence atom in rotated target order. -/
 def canonicalRoutedVariableEdgeIndexScan
@@ -73,23 +88,13 @@ theorem rotatedVariableRouteSiteBlocks_edgeIndices_dedup_eq_canonical
   change ((rotatedOccurrenceVariables source).flatMap
       (routedVariableSiteEdgeIndexBlock (formula source))).dedup = _
   rw [List.dedup_flatMap_pairwise_disjoint _ _ blocksDisjoint]
-  have splitOccurrences :
-      @PeriodicCNF.OccurrencesAtMost
-        (ThreeOccurrenceVariable Variable)
-        (@instBEqOfDecidableEq
-          (ThreeOccurrenceVariable Variable)
-          (inferInstance : DecidableEq
-            (ThreeOccurrenceVariable Variable)))
-        (by infer_instance) 3 (formula source) := by
-    apply PeriodicCNF.occurrencesAtMost_congr_beq
-    exact formula_occurrencesAtMostThree source
   apply List.flatMap_congr
   intro atom _atomMember
   exact routedVariableSiteEdgeIndexBlock_dedup_eq_final
     (formula source)
     (formula_incidencesWithMetadata_offsets_zero_or_one
       source positiveOffsets)
-    splitOccurrences
+    (formula_occurrencesAtMostThree_decidableEq source)
     atom
 
 end PeriodicThreeSATThree
