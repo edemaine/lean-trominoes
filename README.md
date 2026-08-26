@@ -1936,6 +1936,11 @@ build; an imported proof counts when its statement matches the paper.
                                     them to the first endpoint's axis and both
                                     boundary-presence bits, and prove their
                                     exact numeric semantics.
+                                  - [x] Compile all four ownership-shift zero
+                                    tests at either endpoint, select the owner
+                                    by boundary priority, and prove the result
+                                    is exactly the representative-pair
+                                    predicate.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,

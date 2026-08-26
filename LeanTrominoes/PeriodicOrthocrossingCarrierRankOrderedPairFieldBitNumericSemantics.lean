@@ -56,6 +56,50 @@ private theorem fieldPresenceBits_numericRouteDescriptors
   rw [List.map_map]
   rfl
 
+/-- Negating endpoint-field presence tests exactly whether the corresponding
+unary natural is zero. -/
+theorem fieldZeroBits_numericRouteDescriptors
+    {Variable : Type} [DecidableEq Variable]
+    (side : UnaryFieldPairPresence.Side) (field : Field)
+    (formula : PeriodicCNF Variable)
+    (wellFormed : formula.incidenceGraph.IsWellFormed)
+    (degree : formula.incidenceGraph.DegreeAtMost 3)
+    (isLocal : formula.incidenceGraph.IsLocal)
+    (forward : formula.IsForwardLocal)
+    (nonempty : PeriodicCNF.incidencesWithMetadata formula ≠ []) :
+    fieldZeroBits side field
+        (PeriodicCNF.numericRouteDescriptors formula) =
+      let descriptors := PeriodicCNF.numericRouteDescriptors formula
+      let datums :=
+        (routeDescriptorCarrierRankDatumsAtPeriod
+          (routeDescriptorStreamGridSize descriptors) descriptors).dedup
+      let entries := CarrierRankGlobal.enumeration datums
+      matrix entries fun first second =>
+        decide ((match side with
+          | .first => first.1.scanUnaryFields.getD field.index 0
+          | .second => second.1.scanUnaryFields.getD field.index 0) = 0) := by
+  unfold fieldZeroBits
+  rw [fieldPresenceBits_numericRouteDescriptors side field
+    formula wellFormed degree isLocal forward nonempty]
+  rw [negated_matrix]
+  unfold matrix matrixRows
+  apply List.flatMap_congr
+  intro first _firstMember
+  apply List.map_congr_left
+  intro second _secondMember
+  have notPositiveIffZero (value : Nat) :
+      (!decide (0 < value)) = decide (value = 0) := by
+    cases value <;> simp
+  cases side with
+  | first =>
+      simpa only [UnaryFieldPairPresence.valuePresent] using
+        notPositiveIffZero
+          (first.1.scanUnaryFields.getD field.index 0)
+  | second =>
+      simpa only [UnaryFieldPairPresence.valuePresent] using
+        notPositiveIffZero
+          (second.1.scanUnaryFields.getD field.index 0)
+
 /-- The compiled first-endpoint presence bit of field eight is exactly the
 horizontal-axis bit. -/
 theorem axisBits_numericRouteDescriptors
