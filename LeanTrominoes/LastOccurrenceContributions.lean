@@ -22,6 +22,17 @@ def contributionsAux (all : List Value) : List Value → List Nat
 def contributions (values : List Value) : List Nat :=
   contributionsAux values values
 
+@[simp] theorem contributionsAux_length (all remaining : List Value) :
+    (contributionsAux all remaining).length = remaining.length := by
+  induction remaining with
+  | nil => rfl
+  | cons value remaining induction =>
+      simp [contributionsAux, induction]
+
+@[simp] theorem contributions_length (values : List Value) :
+    (contributions values).length = values.length := by
+  simp [contributions]
+
 theorem selectedValue_count_append (seen : List Value) (value : Value)
     (remaining : List Value) :
     UnarySuccessorEqualityFilterMachine.selectedValue

@@ -1875,6 +1875,12 @@ build; an imported proof counts when its statement matches the paper.
                         their common indices and prove, for arbitrary
                         descriptor inputs, that the flat compiled square is
                         exactly equality on the resulting aggregate keys.
+                        - [x] Reconstruct exact equality rows, compile stable
+                          within-key occurrence ranks and full key
+                          multiplicities, retain each multiplicity only at
+                          its final occurrence, prefix-sum those contributions,
+                          and broadcast the resulting dedup-last-ordered block
+                          start to every aggregate-key occurrence.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
