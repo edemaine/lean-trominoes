@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicEightOccurrenceSplitCycleBlockIndex
 import LeanTrominoes.RetainedAngularFanCompleteRoutes
+import LeanTrominoes.RetainedAngularFanSourceScaling
 
 /-! # Clause-side directions of retained angular-fan cycle routes -/
 
@@ -46,6 +47,43 @@ theorem retainedAngularFanSplicedIncidenceRoutes_cycleBlockStart_firstDirection
   exact allCycleRoutes_cycleBlockStart_firstDirection
     source placement atom atomMember
     localClauseIndex literalIndex localIndex
+
+/-- The source-first scaling wrapper exposes the same local cycle direction
+at the corresponding scaled-source block index. -/
+theorem
+    retainedAngularFanSourceScaledSplicedIncidenceRoutes_cycleBlockStart_firstDirection
+    {Variable : Type*} [DecidableEq Variable]
+    (factor : Nat)
+    (source : PositionedPeriodicCNF Variable)
+    (placement : PeriodicVariablePlacement Variable)
+    (routes : PositionedPeriodicCNF.IncidenceRoutes)
+    (atom : Variable)
+    (atomMember : atom ∈ sourceVariables (source.scale factor).erase)
+    (localClauseIndex literalIndex : Nat)
+    (localIndex :
+      localClauseIndex <
+        (PeriodicEightOccurrenceSplit.cycleClausesFor atom).length) :
+    AxisDirection.polylineFirstDirection
+        (retainedAngularFanSourceScaledSplicedIncidenceRoutes
+          factor source placement routes
+          ((PeriodicEightOccurrenceSplitPositioned.occurrenceClauses
+              (source.scale factor)
+              (occurrencePortsOfAngularOrder (source.scale factor).erase
+                (angularOccurrenceOrder (source.scale factor).erase
+                  (PositionedPeriodicCNF.scaleIncidenceRoutes
+                    factor routes)))).length +
+            (cycleBlockStart
+              (sourceVariables (source.scale factor).erase) atom +
+              localClauseIndex))
+          literalIndex) =
+      AxisDirection.polylineFirstDirection
+        (OccurrenceSplitRing.cycleRoutes
+          localClauseIndex literalIndex) := by
+  exact
+    retainedAngularFanSplicedIncidenceRoutes_cycleBlockStart_firstDirection
+      (source.scale factor) (placement.scale factor)
+      (PositionedPeriodicCNF.scaleIncidenceRoutes factor routes)
+      atom atomMember localClauseIndex literalIndex localIndex
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
