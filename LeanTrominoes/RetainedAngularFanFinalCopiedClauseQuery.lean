@@ -32,6 +32,8 @@ private theorem retainedFinalCopiedSourceFirstDirection_eq_copiedFirstDirection
 /-- A width-three copied clause whose directions remain as finite mixed
 direct/fallback queries. -/
 inductive RetainedFinalCopiedClauseQuery
+  | precomputed
+      (token : FormulaShapeDirectionOrdering.Token)
   | unary
       (first : LiteralProfile)
       (firstDirection : RetainedFinalCopiedSourceDirectionQuery)
@@ -72,6 +74,7 @@ token. -/
 def retainedFinalCopiedClauseDescriptorOfQuery :
     RetainedFinalCopiedClauseQuery →
       FormulaShapeDirectionOrdering.Token
+  | .precomputed token => token
   | .unary first firstDirection =>
       .clause (.unary first
         (retainedFinalCopiedSourceDirectionOfQuery firstDirection))
