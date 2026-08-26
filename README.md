@@ -1902,6 +1902,11 @@ build; an imported proof counts when its statement matches the paper.
                               result with aggregate-key equality, and prove that
                               it selects exactly adjacent pairs within global
                               carrier-key blocks on numeric routes.
+                            - [x] Compile aligned unary zero, one, and
+                              consecutive-index streams, together with a
+                              finite-state pass that keeps only the first true
+                              bit of every equality row, preparing exact
+                              global-rank-order field lookup.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
