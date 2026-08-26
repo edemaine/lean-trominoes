@@ -2058,6 +2058,8 @@ build; an imported proof counts when its statement matches the paper.
               first direction with its scaled source route.
             - [x] Identify the singleton escaped fallback's first direction
               with its scaled source route.
+            - [x] Prove the unit-subdivided cardinal escaped fan keeps its
+              source gate isolated, so loop erasure preserves that direction.
             - [ ] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
@@ -10711,6 +10713,12 @@ The representation choices for this target are:
   orthogonal retained route, carry that edge through both ordinary and
   singleton-escaped fan-tail replacement and suffix joining, and expose the
   result at the public final route boundary for every failed-direct incidence.
+- [`LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean)
+  proves that unit subdivision of a cardinal escaped fan never revisits its
+  source gate.  The initial 64-block escape is duplicate-free, while every
+  point of the remaining fan stays strictly inward of the gate, supplying the
+  endpoint-isolation premise needed to preserve first direction through loop
+  erasure.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean`](LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean),
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean),
   and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean)
