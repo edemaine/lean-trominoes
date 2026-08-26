@@ -30,6 +30,35 @@ theorem deduplicatedClauses_eq_crossover_append_nonCrossover
     (crossoverMetadataNormalizedClauses_disjoint_nonCrossover
       source wellFormed degree isLocal).dedup_append
 
+/-- Duplicate-free normalized crossover prefix with its equality
+implementation fixed at the metadata boundary. -/
+def crossoverMetadataNormalizedClausesDedup
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :=
+  (crossoverMetadataNormalizedClauses source).dedup
+
+/-- Duplicate-free normalized non-crossover suffix with its equality
+implementation fixed at the metadata boundary. -/
+def nonCrossoverMetadataNormalizedClausesDedup
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :=
+  (nonCrossoverMetadataNormalizedClauses source).dedup
+
+/-- Named form of the global crossover/non-crossover clause split. -/
+theorem deduplicatedClauses_eq_named_crossover_append_nonCrossover
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (wellFormed : source.incidenceGraph.IsWellFormed)
+    (degree : source.incidenceGraph.DegreeAtMost 3)
+    (isLocal : source.incidenceGraph.IsLocal) :
+    deduplicatedClauses source =
+      crossoverMetadataNormalizedClausesDedup source ++
+        nonCrossoverMetadataNormalizedClausesDedup source := by
+  unfold crossoverMetadataNormalizedClausesDedup
+    nonCrossoverMetadataNormalizedClausesDedup
+  exact deduplicatedClauses_eq_crossover_append_nonCrossover
+    source wellFormed degree isLocal
+
 end FormulaShapeRetainedPlanarMetadataDirection
 end PeriodicCNF
 end LeanTrominoes
