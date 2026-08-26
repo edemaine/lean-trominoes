@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataNonCrossoverNormalizedDeduplication
+import LeanTrominoes.PeriodicCNFFormulaShapeCrossoverGlobalDeduplication
 import LeanTrominoes.PeriodicThreeSATThreeGraph
 import LeanTrominoes.PeriodicThreeSATThreeNonempty
 import LeanTrominoes.PeriodicThreeSATThreeRoutedVariableCanonicalNormalizedClauses
@@ -52,7 +53,7 @@ formula, fixing its equality implementation at this semantic boundary. -/
 def formulaNonCrossoverMetadataNormalizedClausesDedup
     {Variable : Type} [DecidableEq Variable]
     (source : PeriodicCNF Variable) :=
-  (nonCrossoverMetadataNormalizedClauses (formula source)).dedup
+  nonCrossoverMetadataNormalizedClausesDedup (formula source)
 
 /-- Retained carrier family of the occurrence-split formula. -/
 def formulaCarrierMetadataNormalizedClauses
@@ -95,6 +96,7 @@ theorem formulaNonCrossoverMetadataNormalizedClausesDedup_eq_families
           formulaBaseRoutedClauseNormalizedClauses source ++
             formulaCanonicalWrappedNormalizedRoutedVariableClauses source := by
   unfold formulaNonCrossoverMetadataNormalizedClausesDedup
+    nonCrossoverMetadataNormalizedClausesDedup
     formulaCarrierMetadataNormalizedClauses
     formulaBaseBendNormalizedClauses
     formulaBaseRoutedClauseNormalizedClauses

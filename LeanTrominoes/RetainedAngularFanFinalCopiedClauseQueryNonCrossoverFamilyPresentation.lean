@@ -15,6 +15,11 @@ open PeriodicCNF
 open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 open PeriodicOrthocrossing
 
+local instance retainedFinalNonCrossoverFamilyThreeOccurrenceDecidableEq
+    {Variable : Type} [DecidableEq Variable] :
+    DecidableEq (ThreeOccurrenceVariable Variable) :=
+  fun first second => instDecidableEqProd first second
+
 /-- For an occurrence-split formula, the exact indexed non-crossover query
 suffix separates into carrier, bend, routed-clause, and routed-variable
 families with their accumulated global index offsets. -/
