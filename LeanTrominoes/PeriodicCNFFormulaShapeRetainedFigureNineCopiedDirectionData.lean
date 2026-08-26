@@ -52,6 +52,49 @@ def copiedClauseDescriptors
     .clause
       (copiedClauseProfile source taggedClause.2 taggedClause.1)
 
+/-- Zero-positioned occurrence-renamed view of one copied source clause.
+Displayed coordinates are irrelevant to direction descriptors. -/
+def copiedOccurrenceClause
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)) :
+    PositionedPeriodicClause
+      (ThreeOccurrenceVariable
+        (WrappedPeriodicPlanarSATVariable Variable)) where
+  position := (0, 0)
+  literals :=
+    PeriodicEightOccurrenceSplit.occurrenceClause
+      (retainedDrawingAngularOccurrencePorts source)
+      clauseIndex clause.literals
+
+/-- Semantic route-based descriptor of one copied retained clause before the
+finite direct/fallback direction lookup is substituted. -/
+def routedCopiedClauseProfile
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (clause :
+      PositionedPeriodicClause
+        (WrappedPeriodicPlanarSATVariable Variable)) :
+    FormulaShapeDirectionOrdering.DirectedClauseProfile :=
+  FormulaShapeDirectionOrdering.DirectedClauseProfile.ofClause
+    (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      source)
+    clauseIndex
+    (copiedOccurrenceClause source clauseIndex clause)
+
+/-- Route-based descriptor prefix of all copied retained clauses. -/
+def routedCopiedClauseDescriptors
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    List FormulaShapeDirectionOrdering.Token :=
+  (finalCoordinatedSource source).clauses.zipIdx.map fun taggedClause =>
+    .clause
+      (routedCopiedClauseProfile source taggedClause.2 taggedClause.1)
+
 end FormulaShapeRetainedFigureNineDirection
 end PeriodicCNF
 end LeanTrominoes

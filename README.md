@@ -10768,7 +10768,9 @@ The representation choices for this target are:
   bridge to the actual descriptor stream.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionSemantics.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionSemantics.lean)
   identifies every genuine copied route's semantic first direction with that
-  finite lookup without re-expanding the direct/fallback selector.
+  finite lookup without re-expanding the direct/fallback selector.  It then
+  lifts the pointwise equality to each copied clause and the complete copied
+  descriptor prefix.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
