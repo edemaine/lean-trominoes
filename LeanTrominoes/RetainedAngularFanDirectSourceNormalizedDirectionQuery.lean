@@ -19,6 +19,26 @@ structure RetainedDirectSourceNormalizedDirectionQuery where
   slot : RetainedTerminalSlot
   deriving DecidableEq, Fintype
 
+/-- Every direct atlas clause has at most three literal choices. -/
+theorem retainedDirectSourcePrefixChoices_length_le_three :
+    ∀ kind : RetainedDirectClauseKind,
+      (retainedDirectSourcePrefixChoices kind).length ≤ 3 := by
+  native_decide
+
+/-- Embed a genuine dependent atlas index into the fixed-width query
+alphabet. -/
+def retainedDirectSourceNormalizedDirectionQueryOfIndex
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (slot : RetainedTerminalSlot) :
+    RetainedDirectSourceNormalizedDirectionQuery := {
+  kind := kind
+  literalIndex := ⟨index.val,
+    Nat.lt_of_lt_of_le index.isLt
+      (retainedDirectSourcePrefixChoices_length_le_three kind)⟩
+  slot := slot
+}
+
 /-- Total finite normalized-direction lookup. -/
 def retainedDirectSourceNormalizedDirectionOfQuery
     (query : RetainedDirectSourceNormalizedDirectionQuery) :
@@ -45,6 +65,24 @@ theorem retainedDirectSourceNormalizedDirectionOfQuery_eq
       retainedDirectSourceNormalizedFirstDirection
         kind ⟨literalIndex.val, indexLt⟩ slot := by
   simp only [retainedDirectSourceNormalizedDirectionOfQuery, indexLt, dite_true]
+
+/-- Evaluating the fixed-width embedding of a genuine dependent atlas index
+recovers that exact public normalized lookup. -/
+theorem retainedDirectSourceNormalizedDirectionOfQuery_index
+    (kind : RetainedDirectClauseKind)
+    (index : Fin (retainedDirectSourcePrefixChoices kind).length)
+    (slot : RetainedTerminalSlot) :
+    retainedDirectSourceNormalizedDirectionOfQuery
+        (retainedDirectSourceNormalizedDirectionQueryOfIndex
+          kind index slot) =
+      retainedDirectSourceNormalizedFirstDirection kind index slot := by
+  unfold retainedDirectSourceNormalizedDirectionQueryOfIndex
+  exact retainedDirectSourceNormalizedDirectionOfQuery_eq
+    kind
+    ⟨index.val,
+      Nat.lt_of_lt_of_le index.isLt
+        (retainedDirectSourcePrefixChoices_length_le_three kind)⟩
+    slot index.isLt
 
 /-- Elementwise lookup stream used by the fixed finite transducer. -/
 def retainedDirectSourceNormalizedDirections

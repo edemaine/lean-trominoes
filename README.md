@@ -2083,6 +2083,11 @@ build; an imported proof counts when its statement matches the paper.
                   lookup from finite direct-atlas queries.
                 - [ ] Compile the exact direct-atlas query stream, including
                   each occurrence's angular slot.
+                  - [x] Define the presentation-ordered mixed direct/fallback
+                    query stream and prove its evaluator returns the public
+                    copied-source direction lookup.
+                  - [ ] Compile that exact mixed query stream from direct
+                    source symbols.
                 - [ ] Merge normalized direct directions with the compiled
                   carrier/bend fallback descriptors.
               - [ ] Compose both appenders with the fixed-eight descriptor
@@ -10845,6 +10850,13 @@ The representation choices for this target are:
   `(clause kind, literal index, occurrence slot)` query.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionCompiler.lean)
   compiles that finite lookup as a one-pass polynomial-time transducer.
+- [`LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionQuery.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionQuery.lean)
+  gives every final copied incidence an exact mixed query: a normalized atlas
+  key and angular slot for direct routes, or the scaled source direction for
+  carrier/bend fallbacks.  Evaluating it is the public copied-direction
+  lookup.
+- [`LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionCompiler.lean)
+  compiles the mixed direct/fallback evaluator as a fixed finite transducer.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
