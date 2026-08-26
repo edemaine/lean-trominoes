@@ -2075,6 +2075,12 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
+              - [x] Reuse the retained-planar variable-marker compiler for
+                the finite Figure 9 source-marker suffix.
+              - [ ] Compile the finite normalized copied-clause descriptor
+                prefix.
+              - [ ] Compose both appenders with the fixed-eight descriptor
+                expander.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -10821,6 +10827,13 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorBlockCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorBlockCompiler.lean)
   composes those two retained-input appenders with the existing fixed-eight
   expander to obtain the actual final normalized descriptor compiler.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteSourceVariableMarkers.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteSourceVariableMarkers.lean)
+  identifies the fixed-eight source-marker input with the established
+  retained-planar metadata marker suffix, independently of equality-decider
+  choices.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceVariableMarkerCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceVariableMarkerCompiler.lean)
+  transports the existing polynomial-time metadata marker machine to that
+  exact finite-source suffix and packages the retained-workspace appender.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
