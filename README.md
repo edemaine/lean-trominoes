@@ -10790,6 +10790,9 @@ The representation choices for this target are:
   uses that global-index invariant and the normalized cycle first-direction
   theorem to identify each retained variable's routed implication block with
   the common finite local Figure 7 descriptor block.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockStartFixed.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockStartFixed.lean)
+  proves every implication ring has nine clauses and converts the recursive
+  cycle block origin to nine times the atom's stable index.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
