@@ -16,6 +16,13 @@ open PeriodicCNF
 open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 open PeriodicOrthocrossing
 
+local instance finalMetadataLookupWrappedDecidableEq
+    {Variable : Type} [variableDecEq : DecidableEq Variable] :
+    DecidableEq (WrappedPeriodicPlanarSATVariable Variable) :=
+  @instDecidableEqWrappedPeriodicVariable
+    (PeriodicPlanarSATVariable Variable)
+    (@instDecidableEqPeriodicPlanarSATVariable Variable variableDecEq)
+
 /-- A duplicate-free normalized-clause lookup and its first raw metadata
 representative compose to the metadata record used by the final direct
 selector. -/
@@ -47,17 +54,6 @@ theorem retainedFinalDirectSourceMetadata_eq_some_of_clause_lookup
   | none => simp at mappedClauseLookup
   | some finalClause =>
       simp only [Option.map_some, Option.some.injEq] at mappedClauseLookup
-      have wrappedDecidableEqEq :
-          (@instDecidableEqWrappedPeriodicVariable
-              (PeriodicPlanarSATVariable Variable)
-              (@instDecidableEqPeriodicPlanarSATVariable
-                Variable variableDecEq)) =
-            (@drawingOrderedWrappedPeriodicPlanarSATVariableInstDecidableEq
-              Variable variableDecEq) := by
-        funext first second
-        exact Subsingleton.elim _ _
-      have metadataLookupGeneric := metadataLookup
-      rw [← wrappedDecidableEqEq] at metadataLookupGeneric
       unfold retainedFinalDirectSourceMetadata?
       apply retainedRepresentativeItem?_eq_some_of_lookups
         formula (retainedDrawingPlanarSATClauseMetadata formula)
@@ -65,7 +61,7 @@ theorem retainedFinalDirectSourceMetadata_eq_some_of_clause_lookup
       · exact finalClauseLookup
       · rw [representativeClauseIndex_eq formula,
           mappedClauseLookup]
-        exact metadataLookupGeneric
+        exact metadataLookup
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
