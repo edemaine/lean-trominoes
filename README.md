@@ -1506,7 +1506,7 @@ build; an imported proof counts when its statement matches the paper.
           filter over the ordered product of neighboring numeric segment
           occurrences, and expose the already compiled unary grid-unit stream
           as its exact drawing period.
-        - [ ] Implement the polynomial-time retained direction-descriptor
+        - [x] Implement the polynomial-time retained direction-descriptor
           emitter from the uniform source stream: one finite profile/direction
           record per retained clause followed by the exact variable markers.
           - [x] Compile the complete counted unary route-descriptor stream,
