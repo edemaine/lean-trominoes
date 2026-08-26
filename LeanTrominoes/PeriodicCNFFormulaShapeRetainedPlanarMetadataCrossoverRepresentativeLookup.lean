@@ -27,14 +27,15 @@ theorem exists_crossoverMetadata_lookup_of_normalized_mem
           (Variable := Variable) source.incidenceGraph)[
           (crossoverMetadataNormalizedClauses source).idxOf clause]? =
         some metadata ∧
+      normalizedClause source metadata = clause ∧
       ∃ crossing localClauseIndex,
         metadata.source = .crossover crossing localClauseIndex := by
   rcases IndexedListScan.exists_getElem?_idxOf_map
       (drawingPlanarSATCrossoverClauseMetadata
         (Variable := Variable) source.incidenceGraph)
       (normalizedClause source) clause clauseMember with
-    ⟨metadata, metadataLookup, _normalizedEq, metadataMember⟩
-  refine ⟨metadata, metadataLookup, ?_⟩
+    ⟨metadata, metadataLookup, normalizedEq, metadataMember⟩
+  refine ⟨metadata, metadataLookup, normalizedEq, ?_⟩
   unfold drawingPlanarSATCrossoverClauseMetadata at metadataMember
   rcases List.mem_flatMap.mp metadataMember with
     ⟨crossing, _crossingMember, metadataMember⟩
@@ -55,11 +56,12 @@ theorem exists_crossoverMetadata_global_lookup_of_normalized_mem
     ∃ metadata : DrawingPlanarSATClauseMetadata Variable,
       (retainedDrawingPlanarSATClauseMetadata source)[
           (normalizedClauses source).idxOf clause]? = some metadata ∧
+      normalizedClause source metadata = clause ∧
       ∃ crossing localClauseIndex,
         metadata.source = .crossover crossing localClauseIndex := by
   rcases exists_crossoverMetadata_lookup_of_normalized_mem
       source clause clauseMember with
-    ⟨metadata, crossoverLookup, crossoverSource⟩
+    ⟨metadata, crossoverLookup, normalizedEq, crossoverSource⟩
   let suffixMetadata :=
     retainedDrawingPlanarSATCarrierClauseMetadata
         (Variable := Variable) source.incidenceGraph ++
@@ -89,7 +91,7 @@ theorem exists_crossoverMetadata_global_lookup_of_normalized_mem
     simp [retainedDrawingPlanarSATClauseMetadata,
       suffixMetadata, List.append_assoc]
   rw [← metadataEq] at globalLookup
-  exact ⟨metadata, globalLookup, crossoverSource⟩
+  exact ⟨metadata, globalLookup, normalizedEq, crossoverSource⟩
 
 end FormulaShapeRetainedPlanarMetadataDirection
 end LeanTrominoes.PeriodicCNF

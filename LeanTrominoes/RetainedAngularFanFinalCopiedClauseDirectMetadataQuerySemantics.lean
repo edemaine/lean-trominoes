@@ -34,8 +34,6 @@ theorem retainedFinalCopiedClauseQueryOfLiterals_eq_directOfMetadataDescriptor
       PeriodicClause (WrappedPeriodicPlanarSATVariable Variable))
     (clauseLookup :
       (deduplicatedClauses formula)[clauseIndex]? = some clause)
-    (clauseNonempty : clause ≠ [])
-    (clauseWidth : clause.length ≤ 3)
     (metadata : DrawingPlanarSATClauseMetadata Variable)
     (metadataLookup :
       retainedFinalDirectSourceMetadata? formula clauseIndex =
@@ -61,6 +59,18 @@ theorem retainedFinalCopiedClauseQueryOfLiterals_eq_directOfMetadataDescriptor
         formula clauseIndex clause =
       RetainedFinalCopiedClauseQuery.directOfToken kind
         (metadataClauseDescriptor formula metadata) := by
+  have clauseMember :
+      clause ∈
+        (retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula
+          formula).erase.clauses := by
+    rw [positionedSource_erase_clauses_eq]
+    exact List.mem_of_getElem? clauseLookup
+  have clauseNonempty : clause ≠ [] :=
+    retainedDeduplicatedGaugedWrappedDrawingPeriodicPlanarSATFormula_clausesNonempty_of_source
+      formula sourceClausesNonempty clause clauseMember
+  have clauseWidth : clause.length ≤ 3 :=
+    retainedDeduplicatedGaugedWrappedDrawingPositionedPeriodicPlanarSATFormula_widthAtMostThree
+      formula sourceWidth clause clauseMember
   unfold metadataClauseDescriptor
   simp only [RetainedFinalCopiedClauseQuery.directOfToken]
   apply retainedFinalCopiedClauseQueryOfLiterals_eq_directOfProfile

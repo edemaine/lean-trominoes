@@ -31,6 +31,7 @@ theorem exists_finalCrossoverMetadata_of_clause_lookup
     ∃ metadata : DrawingPlanarSATClauseMetadata Variable,
       retainedFinalDirectSourceMetadata? formula clauseIndex =
         some metadata ∧
+      normalizedClause formula metadata = clause ∧
       ∃ crossing localClauseIndex,
         metadata.source = .crossover crossing localClauseIndex := by
   have rawCrossoverMember :
@@ -38,11 +39,11 @@ theorem exists_finalCrossoverMetadata_of_clause_lookup
     simpa [crossoverMetadataNormalizedClausesDedup] using crossoverMember
   rcases exists_crossoverMetadata_global_lookup_of_normalized_mem
       formula clause rawCrossoverMember with
-    ⟨metadata, metadataLookup, crossoverSource⟩
+    ⟨metadata, metadataLookup, normalizedEq, crossoverSource⟩
   exact ⟨metadata,
     retainedFinalDirectSourceMetadata_eq_some_of_clause_lookup
       formula clauseIndex clause metadata clauseLookup metadataLookup,
-    crossoverSource⟩
+    normalizedEq, crossoverSource⟩
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
