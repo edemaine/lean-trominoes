@@ -113,6 +113,20 @@ theorem retainedFinalCopiedClauseDescriptorOfQuery_ofList
       | nil => rfl
       | cons third rest => rfl
 
+/-- Exact finite clause query associated with one final copied literal list. -/
+def retainedFinalCopiedClauseQueryOfLiterals
+    {Variable : Type} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (clauseIndex : Nat)
+    (literals :
+      PeriodicClause (WrappedPeriodicPlanarSATVariable Variable)) :
+    RetainedFinalCopiedClauseQuery :=
+  RetainedFinalCopiedClauseQuery.ofList
+    (literals.zipIdx.map fun taggedLiteral =>
+      (FormulaShapeDirectionOrdering.literalProfile taggedLiteral.1,
+        retainedFinalCopiedSourceDirectionQuery
+          formula clauseIndex taggedLiteral.2 taggedLiteral.1))
+
 /-- Exact finite clause query associated with one final copied clause. -/
 def retainedFinalCopiedClauseQuery
     {Variable : Type} [DecidableEq Variable]
@@ -121,11 +135,8 @@ def retainedFinalCopiedClauseQuery
     (clause :
       PositionedPeriodicClause (WrappedPeriodicPlanarSATVariable Variable)) :
     RetainedFinalCopiedClauseQuery :=
-  RetainedFinalCopiedClauseQuery.ofList
-    (clause.literals.zipIdx.map fun taggedLiteral =>
-      (FormulaShapeDirectionOrdering.literalProfile taggedLiteral.1,
-        retainedFinalCopiedSourceDirectionQuery
-          formula clauseIndex taggedLiteral.2 taggedLiteral.1))
+  retainedFinalCopiedClauseQueryOfLiterals
+    formula clauseIndex clause.literals
 
 /-- Evaluating a finite clause query is exactly the public copied-clause
 descriptor. -/
@@ -141,6 +152,7 @@ theorem retainedFinalCopiedClauseDescriptorOfQuery_eq
         (FormulaShapeRetainedFigureNineDirection.copiedClauseProfile
           formula clauseIndex clause) := by
   unfold retainedFinalCopiedClauseQuery
+    retainedFinalCopiedClauseQueryOfLiterals
   rw [retainedFinalCopiedClauseDescriptorOfQuery_ofList]
   apply congrArg FormulaShapeDirectionOrdering.Token.clause
   apply congrArg
