@@ -1893,6 +1893,15 @@ build; an imported proof counts when its statement matches the paper.
                             - [x] Prove that the global enumeration neither
                               drops nor duplicates indexed datums, and hence is
                               a permutation of the complete indexed input.
+                            - [x] Prove that projecting one global key block
+                              recovers the established stable per-carrier datum
+                              enumeration, its adjacent pairs, and its filtered
+                              representative axis/next-slice bit block.
+                            - [x] Compile the row-major unary rank-difference
+                              square, test `second - first = 1`, conjoin the
+                              result with aggregate-key equality, and prove that
+                              it selects exactly adjacent pairs within global
+                              carrier-key blocks on numeric routes.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
