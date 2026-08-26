@@ -1395,8 +1395,9 @@ build; an imported proof counts when its statement matches the paper.
           affine vertex-request pipeline.
         - [x] Build a polynomial-time shared-scan pipeline for any fixed
           sequence of data-indexed affine record families, preserving the
-          triple/red/green/blue phase order without duplicating the raw source.
-        - [x] Reduce the complete compact vertex compiler to four exact
+          variable-triple/clause-triple/red/green/blue phase order without
+          duplicating the raw source.
+        - [x] Reduce the complete compact vertex compiler to five exact
           blockwise record-family equalities over the uniform unary-program
           stream, behind a certified opaque output boundary that keeps each
           Lean compiler leaf below the resource cap.
@@ -2039,6 +2040,18 @@ build; an imported proof counts when its statement matches the paper.
         - [ ] Implement the polynomial-time prepared-token emitter for the
           sparse normalization assignments; the fixed gadget-pixel expansion,
           exact header, and every downstream postprocessor are now verified.
+          - [x] Compose any canonical assignment-record emitter with the exact
+            prepared header, fixed record expander, and prepared-token
+            interface.
+          - [x] Split the compact vertex boundary into exact variable-triple,
+            clause-triple, red, green, and blue scans, and carry any verified
+            five-family instance through affine expansion to the canonical
+            vertex-record appender.
+          - [x] Expose the existing polynomial-time numeric incidence-route
+            descriptor compiler as a shared input to the remaining geometry
+            passes.
+          - [ ] Construct the five concrete affine vertex table families.
+          - [ ] Implement the canonical route-record appender.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -10635,13 +10648,22 @@ The representation choices for this target are:
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseCountedTokenSemantics.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenMachineBridge.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenMachineBridge.lean),
-  and [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean)
+  [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenCompiler.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenEmitterCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparsePreparedTokenEmitterCompiler.lean)
   connect the verified direct header and sparse pixel stream to every existing
-  fixed postprocessor.  Consequently the sole remaining strip-hardness
-  obligation is a polynomial-time emitter for the canonical unary records of
-  the direct sparse assignment list; the verified fixed parser now supplies
-  the prepared motif stream.  Satisfying that obligation yields the exact flat
-  target and the complete `Theorem52.stripStatement`.
+  fixed postprocessor.  Any polynomial-time emitter for the canonical unary
+  assignment records now supplies the exact prepared stream, flat target, and
+  complete `Theorem52.stripStatement`.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean)
+  split the phase-major compact vertex stream into variable triples, clause
+  triples, red, green, and blue.  Any five exact finite families now compile
+  through retained-source wrapping and fixed affine expansion to the canonical
+  vertex-record appender.
+- [`LeanTrominoes/PeriodicCNFStripDirectSourceNumericRouteDescriptorCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSourceNumericRouteDescriptorCompiler.lean)
+  exposes the already verified polynomial-time numeric incidence-route stream
+  as a reusable geometry compiler instead of keeping it private to the carrier
+  descriptor pass.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarDirectionData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarDirectionData.lean),
   [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorData.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorData.lean),
   and [`LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedPlanarDirectionDescriptorCompiler.lean)
