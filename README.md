@@ -10745,6 +10745,9 @@ The representation choices for this target are:
   identifies the generic spoke with the actual positioned Figure 7 suffix and
   specializes source-head isolation to every genuine final non-singleton
   failed-direct route.
+- [`LeanTrominoes/RetainedAngularFanFinalOrdinaryFigure7Identification.lean`](LeanTrominoes/RetainedAngularFanFinalOrdinaryFigure7Identification.lean)
+  records the exact equality between that generic prefix/fan/spoke model and
+  the explicit final ordinary occurrence route.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
