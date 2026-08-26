@@ -81,4 +81,27 @@ theorem deduplicatedClauses_formula_eq_bendFamily
     deduplicatedClauses_formula_eq_fiveFamilies
       source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
 
+/-- Routed-clause-focused reassociation of the five-family presentation,
+exposing the crossover/carrier/bend prefix and routed-variable suffix. -/
+theorem deduplicatedClauses_formula_eq_routedClauseFamily
+    {Variable : Type} [DecidableEq Variable]
+    [DecidableEq (ThreeOccurrenceVariable Variable)]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceClausesNonempty : ∀ clause ∈ source.clauses, clause ≠ [])
+    (positiveOffsets : ∀ incidence ∈ occurrenceIncidences source,
+      incidence.edge.offset = (0, 0) ∨
+        incidence.edge.offset = (1, 0)) :
+    let retained := formula source
+    deduplicatedClauses retained =
+      (((crossoverMetadataNormalizedClausesDedup retained ++
+        formulaCarrierMetadataNormalizedClauses source) ++
+        formulaBaseBendNormalizedClauses source) ++
+        formulaBaseRoutedClauseNormalizedClauses source) ++
+      formulaCanonicalWrappedNormalizedRoutedVariableClauses source := by
+  simpa only [List.append_assoc] using
+    deduplicatedClauses_formula_eq_fiveFamilies
+      source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets
+
 end LeanTrominoes.PeriodicThreeSATThree
