@@ -10720,14 +10720,16 @@ The representation choices for this target are:
   [`LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7NormalizedFirstDirections.lean),
-  and [`LeanTrominoes/RetainedAngularFanEscapedOwnFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanEscapedOwnFigure7NormalizedFirstDirections.lean)
+  [`LeanTrominoes/RetainedAngularFanEscapedOwnFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanEscapedOwnFigure7NormalizedFirstDirections.lean),
+  and [`LeanTrominoes/RetainedAngularFanFinalEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalEscapedNormalizedFirstDirections.lean)
   prove that unit subdivision of a cardinal escaped fan never revisits its
   source gate and that loop erasure therefore preserves its first direction.
   The initial 64-block escape is duplicate-free, while every point of the
   remaining fan stays strictly inward of the gate.  Appending the matching
   radius-96 Figure 7 spoke preserves the same source-head isolation and hence
   the first direction through normalization.  The complete generic singleton
-  splice therefore normalizes to the direction of its original source edge.
+  splice and its genuine final positioned specialization therefore normalize
+  to the direction of their original source edge.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean`](LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean),
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean),
   and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean)
