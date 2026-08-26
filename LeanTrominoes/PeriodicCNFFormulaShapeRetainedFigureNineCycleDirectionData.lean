@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionData
 import LeanTrominoes.PeriodicCNFFormulaShapeFixedEightDirectionData
+import LeanTrominoes.PeriodicEightOccurrenceSplitCycleBlockIndex
 
 /-! # Route-based implication-cycle descriptors at retained Figure 9 -/
 
@@ -41,6 +42,37 @@ def routedCycleClauseDescriptors
           source)
         (copiedClauseCount source + taggedClause.2)
         taggedClause.1)
+
+/-- Final global route lookup viewed in the local clause coordinates of one
+source atom's Figure 7 implication ring. -/
+def routedCycleRoutesFor
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : WrappedPeriodicPlanarSATVariable Variable) :
+    PositionedPeriodicCNF.IncidenceRoutes :=
+  fun localClauseIndex literalIndex =>
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+      source
+      (copiedClauseCount source +
+        (cycleBlockStart
+          (sourceVariables
+            (sourceScaledForFigureSeven source).erase)
+          atom + localClauseIndex))
+      literalIndex
+
+/-- Route-based descriptor block of one source atom's implication ring,
+presented against the common local Figure 7 clauses. -/
+def routedCycleClauseDescriptorsFor
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (atom : WrappedPeriodicPlanarSATVariable Variable) :
+    List FormulaShapeDirectionOrdering.Token :=
+  FormulaShapeFixedEightDirection.localCycleFormula.clauses.zipIdx.map
+    fun taggedClause =>
+      .clause
+        (FormulaShapeDirectionOrdering.DirectedClauseProfile.ofClause
+          (routedCycleRoutesFor source atom)
+          taggedClause.2 taggedClause.1)
 
 /-- Finite local Figure 7 descriptor block repeated once per retained source
 variable, in the same phase-major order as the positioned cycle suffix. -/
