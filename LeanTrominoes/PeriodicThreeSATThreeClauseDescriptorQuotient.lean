@@ -33,7 +33,7 @@ def clauseDescriptorQuotientWith
   (List.replicate
       (orientedCrossings (formula source).incidenceGraph).length
       PeriodicCNF.FormulaShapeCrossoverDirection.descriptors).flatten ++
-    nonCrossoverDescriptorQuotient source
+    nonCrossoverDescriptorQuotientWith source outputDecidableEq
 
 /-- Complete canonical descriptor stream of the occurrence-split retained
 drawing: fixed crossover blocks followed by the four non-crossover
@@ -78,6 +78,7 @@ theorem clauseDescriptors_formula_eq_quotient
       (formula_incidenceGraph_isLocal sourceLocal),
     nonCrossoverMetadataNormalizedClauses_formula_dedup_map_representative
       source sourceLocal sourceWidth sourceClausesNonempty positiveOffsets]
+  rw [nonCrossoverDescriptorQuotient_eq_with source]
 
 end LeanTrominoes.PeriodicThreeSATThree
 
