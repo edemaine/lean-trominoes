@@ -2093,8 +2093,9 @@ build; an imported proof counts when its statement matches the paper.
                     source symbols.
                 - [ ] Merge normalized direct directions with the compiled
                   carrier/bend fallback descriptors.
-              - [ ] Compose both appenders with the fixed-eight descriptor
-                expander.
+              - [x] Compose any exact copied-clause query compiler with the
+                clause evaluator, concrete marker appender, and fixed-eight
+                descriptor expander.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
   of the I tromino has the same complexity bounds.
 - [ ] **Corollary 5.4:** Tiling a finite subset of $\mathbb Z^2$ by either
@@ -10867,6 +10868,19 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFinalCopiedClauseQueryCompiler.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedClauseQueryCompiler.lean)
   compiles finite clause queries directly to direction-aware descriptor
   tokens.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedCopiedClauseQueryData.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedCopiedClauseQueryData.lean)
+  specializes the exact semantic clause-query stream to direct PSPACE source
+  symbols and names its evaluated descriptor output.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedCopiedClauseQuerySemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedCopiedClauseQuerySemantics.lean)
+  identifies that evaluated direct query stream with the public finite copied
+  descriptor prefix.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedCopiedClauseQueryCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedCopiedClauseQueryCompiler.lean)
+  turns any exact direct clause-query compiler into the copied descriptor
+  compiler and retained-source appender.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorConcreteCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorConcreteCompiler.lean)
+  composes that sole remaining compiler with the concrete marker pass and
+  fixed-eight expander to produce the actual final normalized descriptor
+  stream.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
