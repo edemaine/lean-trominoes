@@ -1918,6 +1918,10 @@ build; an imported proof counts when its statement matches the paper.
                               - [x] Prove unconditional alignment for all
                                 fifty compiled carrier-datum fields and compile
                                 each field into increasing global-rank order.
+                                - [x] Prove on numeric routes that every
+                                  rank-ordered field is exactly its projection
+                                  from the global key-major, stable-coordinate
+                                  datum enumeration.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
