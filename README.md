@@ -10758,6 +10758,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFinalCoordinatedOrdinaryNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedOrdinaryNormalizedFirstDirections.lean)
   exposes that equality at the public normalized fixed-eight route-family
   boundary.
+- [`LeanTrominoes/RetainedAngularFanFinalCoordinatedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedNormalizedFirstDirections.lean)
+  combines all genuine copied-source cases at that boundary.  Successful
+  direct choices use their finite normalized atlas direction, while ordinary
+  and singleton-escaped fallbacks retain the scaled source-route direction.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
