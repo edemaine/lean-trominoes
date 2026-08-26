@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSourceNormalizedFormula
+import LeanTrominoes.PeriodicCNFStripDirectSourceFormulaForwardLocal
+import LeanTrominoes.PeriodicCNFStripDirectThreeCNFSourceZeroAnchors
+import LeanTrominoes.PeriodicThreeSATThreeNormalizedRoutedVariablePairScan
 import LeanTrominoes.PeriodicThreeSATThreeSplitRouteDescriptorEnumerationSemantics
 
 /-! # Explicit route descriptors for direct strip sources -/
@@ -13,6 +16,7 @@ noncomputable section
 namespace LeanTrominoes.PeriodicCNFStripReduction
 
 open PeriodicCNF
+open PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection
 
 variable {Input : Type}
 variable {encoding : _root_.Computability.FinEncoding Input}
@@ -66,5 +70,30 @@ theorem directSource_splitRouteDescriptors_eq_structural
         directSourceSplitRouteDescriptorsStructuralVariableDecidableEq :=
     Subsingleton.elim _ _
   rw [instanceEq]
+
+/-- The direct split descriptor square retains one normalized complete
+routed-variable site per literal occurrence of the width-three source. -/
+theorem directSource_normalizedRoutedVariablePairDescriptorScan_eq_fullSites
+    (symbols : List encoding.Γ) :
+    normalizedRoutedVariablePairDescriptorScan
+        (PeriodicThreeSATThree.splitRouteDescriptors
+          (PeriodicThreeCNF.formula
+            (PolySpaceCompiler.formulaOfSymbols decider symbols))) =
+      (List.range (PeriodicCNF.presentationLiteralCount
+          (PeriodicThreeCNF.formula
+            (PolySpaceCompiler.formulaOfSymbols decider symbols)))).flatMap
+        (fun _targetIndex => routedVariableFullSiteBlock) := by
+  have instanceEq :
+      directSourceSplitRouteDescriptorsVariableDecidableEq =
+        directSourceSplitRouteDescriptorsStructuralVariableDecidableEq :=
+    Subsingleton.elim _ _
+  rw [instanceEq]
+  exact
+    PeriodicThreeSATThree.normalizedRoutedVariablePairDescriptorScan_splitRouteDescriptors
+      (PeriodicThreeCNF.formula
+        (PolySpaceCompiler.formulaOfSymbols decider symbols))
+      (PeriodicThreeCNF.formula_isForwardLocal
+        (formulaOfSymbols_isForwardLocal decider symbols))
+      (directThreeCNFSource_zeroAnchored decider symbols)
 
 end LeanTrominoes.PeriodicCNFStripReduction
