@@ -213,6 +213,29 @@ theorem positionedCycleRoutes_lastDirection
     AxisDirection.polylineLastDirection_translatePolyline
       _ _
 
+/-- Positioning a certified implication route in an atom's macrocell also
+preserves its clause-side first direction. -/
+@[simp]
+theorem positionedCycleRoutes_firstDirection
+    {Variable : Type*}
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable)
+    (clauseIndex literalIndex : Nat) :
+    AxisDirection.polylineFirstDirection
+        (positionedCycleRoutes sourcePlacement atom
+          clauseIndex literalIndex) =
+      AxisDirection.polylineFirstDirection
+        (cycleRoutes clauseIndex literalIndex) := by
+  change
+    AxisDirection.polylineFirstDirection
+        (PeriodicOrthocrossing.translatePolyline
+          (macroOrigin sourcePlacement atom)
+          (cycleRoutes clauseIndex literalIndex)) =
+      _
+  exact
+    AxisDirection.polylineFirstDirection_translatePolyline
+      _ _
+
 /-- A genuine flattened implication clause retrieves a positioned route
 whose terminal direction is that of its recorded local Figure 7 route. -/
 theorem allCycleRoutes_lastDirection

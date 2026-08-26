@@ -537,5 +537,32 @@ theorem allCycleRoutes_cycleBlockStart_lastDirection
     localClauseIndex literalIndex localIndex,
     positionedCycleRoutes_lastDirection]
 
+/-- A route selected by a semantic block/local index pair also has exactly
+the corresponding local Figure 7 clause-side first direction. -/
+theorem allCycleRoutes_cycleBlockStart_firstDirection
+    {Variable : Type*} [DecidableEq Variable]
+    (source : PositionedPeriodicCNF Variable)
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (atom : Variable)
+    (atomMember : atom ∈ sourceVariables source.erase)
+    (localClauseIndex literalIndex : Nat)
+    (localIndex :
+      localClauseIndex <
+        (PeriodicEightOccurrenceSplit.cycleClausesFor
+          atom).length) :
+    AxisDirection.polylineFirstDirection
+        (allCycleRoutes source sourcePlacement
+          (cycleBlockStart
+            (sourceVariables source.erase) atom +
+            localClauseIndex)
+          literalIndex) =
+      AxisDirection.polylineFirstDirection
+        (OccurrenceSplitRing.cycleRoutes
+          localClauseIndex literalIndex) := by
+  rw [allCycleRoutes_cycleBlockStart
+    source sourcePlacement atom atomMember
+    localClauseIndex literalIndex localIndex,
+    positionedCycleRoutes_firstDirection]
+
 end PeriodicEightOccurrenceSplitPositioned
 end LeanTrominoes
