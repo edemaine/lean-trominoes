@@ -2077,21 +2077,21 @@ build; an imported proof counts when its statement matches the paper.
             - [ ] Compile the canonical route records from that stream.
               - [x] Reuse the retained-planar variable-marker compiler for
                 the finite Figure 9 source-marker suffix.
-              - [ ] Compile the finite normalized copied-clause descriptor
+              - [x] Compile the finite normalized copied-clause descriptor
                 prefix.
                 - [x] Compile the fixed slot-sensitive normalized-direction
                   lookup from finite direct-atlas queries.
-                - [ ] Compile the exact direct-atlas query stream, including
-                  each occurrence's angular slot.
+                - [x] Compile the exact direct-atlas query stream, using the
+                  proved slot-independent normalized direction lookup.
                   - [x] Define the presentation-ordered mixed direct/fallback
                     query stream and prove its evaluator returns the public
                     copied-source direction lookup.
                   - [x] Package those incidence queries with literal profiles
                     into finite clause queries and compile their evaluator to
                     the exact copied descriptor prefix.
-                  - [ ] Compile that exact mixed query stream from direct
+                  - [x] Compile that exact mixed query stream from direct
                     source symbols.
-                - [ ] Merge normalized direct directions with the compiled
+                - [x] Merge normalized direct directions with the compiled
                   carrier/bend fallback descriptors.
               - [x] Compose any exact copied-clause query compiler with the
                 clause evaluator, concrete marker appender, and fixed-eight
@@ -10851,14 +10851,14 @@ The representation choices for this target are:
   exact finite-source suffix and packages the retained-workspace appender.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionQuery.lean`](LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionQuery.lean)
   reduces every slot-sensitive direct normalized direction to a fixed finite
-  `(clause kind, literal index, occurrence slot)` query.
+  `(clause kind, literal index)` query, using the proved independence from
+  the occurrence slot.
 - [`LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionCompiler.lean)
   compiles that finite lookup as a one-pass polynomial-time transducer.
 - [`LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionQuery.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionQuery.lean)
   gives every final copied incidence an exact mixed query: a normalized atlas
-  key and angular slot for direct routes, or the scaled source direction for
-  carrier/bend fallbacks.  Evaluating it is the public copied-direction
-  lookup.
+  key for direct routes, or the scaled source direction for carrier/bend
+  fallbacks.  Evaluating it is the public copied-direction lookup.
 - [`LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedSourceDirectionCompiler.lean)
   compiles the mixed direct/fallback evaluator as a fixed finite transducer.
 - [`LeanTrominoes/RetainedAngularFanFinalCopiedClauseQuery.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedClauseQuery.lean)
@@ -10881,6 +10881,21 @@ The representation choices for this target are:
   composes that sole remaining compiler with the concrete marker pass and
   fixed-eight expander to produce the actual final normalized descriptor
   stream.
+- [`LeanTrominoes/RetainedAngularFanFinalCopiedClauseDescriptorFiveFamilySemantics.lean`](LeanTrominoes/RetainedAngularFanFinalCopiedClauseDescriptorFiveFamilySemantics.lean)
+  evaluates the exact indexed final query stream family by family: stable
+  crossover queries, carrier and bend fallbacks, routed clauses, and one
+  routed-variable site block per source literal.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFinalClauseDescriptorAssemblyCorrectness.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFinalClauseDescriptorAssemblyCorrectness.lean)
+  specializes that five-family equality to direct PSPACE source symbols and
+  identifies the evaluated query assembly with the actual final copied-clause
+  descriptors.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFinalCopiedClauseDescriptorCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFinalCopiedClauseDescriptorCompiler.lean)
+  transports the polynomial-time five-family query compiler to the public
+  copied-clause descriptor prefix and its retained-source appender.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFinalDirectionDescriptorConcreteCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFinalDirectionDescriptorConcreteCompiler.lean)
+  combines that concrete clause appender with the existing variable-marker
+  pass and fixed-eight expander, yielding the final direction-descriptor and
+  exact-one shape compilers.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
