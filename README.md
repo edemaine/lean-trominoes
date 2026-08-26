@@ -1953,6 +1953,10 @@ build; an imported proof counts when its statement matches the paper.
                                     successor matrix and prove that canonical
                                     positive/negative magnitudes mark exactly
                                     pairs satisfying `second = first + 1`.
+                                  - [x] Apply signed succession horizontally
+                                    and signed equality vertically to ordered
+                                    normalization fields nine through twelve,
+                                    recovering the exact next-slice bit.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
