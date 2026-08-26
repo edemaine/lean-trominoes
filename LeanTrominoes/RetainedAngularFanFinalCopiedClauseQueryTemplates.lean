@@ -42,11 +42,17 @@ def RetainedFinalCopiedClauseQuery.directOfToken
   | .clause profile => .directOfProfile kind profile
   | .variable => default
 
-/-- Preserve any already-final finite descriptor as a query. -/
+/-- Singleton query block preserving one already-final finite descriptor. -/
+def retainedFinalPrecomputedClauseQueryBlock
+    (token : FormulaShapeDirectionOrdering.Token) :
+    List RetainedFinalCopiedClauseQuery :=
+  [.precomputed token]
+
+/-- Preserve any already-final finite descriptor stream as queries. -/
 def retainedFinalPrecomputedClauseQueries
     (tokens : List FormulaShapeDirectionOrdering.Token) :
     List RetainedFinalCopiedClauseQuery :=
-  tokens.map RetainedFinalCopiedClauseQuery.precomputed
+  tokens.flatMap retainedFinalPrecomputedClauseQueryBlock
 
 /-- Evaluating precomputed queries is exactly the original token stream. -/
 @[simp] theorem retainedFinalCopiedClauseDescriptors_precomputed
