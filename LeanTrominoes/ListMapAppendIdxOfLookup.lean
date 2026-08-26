@@ -32,5 +32,30 @@ theorem map_append_getElem?_idxOf_append_of_mem
   rw [List.getElem?_map, List.getElem?_idxOf valueMember]
   simp only [Option.map_some]
 
+/-- An element absent from a value prefix but present in the suffix selects
+its mapped suffix output, provided the output prefix has matching length. -/
+theorem append_map_getElem?_idxOf_append_of_not_mem
+    {Value Output : Type} [BEq Value] [LawfulBEq Value]
+    (headValues suffixValues : List Value)
+    (headOutputs : List Output)
+    (output : Value → Output)
+    (value : Value)
+    (headLength : headOutputs.length = headValues.length)
+    (valueNotMember : value ∉ headValues)
+    (valueMember : value ∈ suffixValues) :
+    (headOutputs ++ suffixValues.map output)[
+        (headValues ++ suffixValues).idxOf value]? =
+      some (output value) := by
+  rw [List.idxOf_append_of_notMem valueNotMember]
+  have indexRight :
+      headOutputs.length ≤
+        headValues.length + suffixValues.idxOf value := by
+    rw [headLength]
+    exact Nat.le_add_right _ _
+  rw [List.getElem?_append_right indexRight]
+  rw [headLength, Nat.add_sub_cancel_left]
+  rw [List.getElem?_map, List.getElem?_idxOf valueMember]
+  rfl
+
 end IndexedListScan
 end LeanTrominoes
