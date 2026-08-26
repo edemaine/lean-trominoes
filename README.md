@@ -1945,6 +1945,10 @@ build; an imported proof counts when its statement matches the paper.
                                     payload a verified inverse, proving it
                                     retains the complete crossing-record
                                     identity needed for crossover suppression.
+                                  - [x] Compile equality of all thirty-two
+                                    ordered crossing-payload fields together
+                                    with both boundary guards, and prove its
+                                    negation is exactly crossover suppression.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
