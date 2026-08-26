@@ -57,5 +57,31 @@ theorem append_map_getElem?_idxOf_append_of_not_mem
   rw [List.getElem?_map, List.getElem?_idxOf valueMember]
   rfl
 
+/-- An element absent from a value prefix uses an already established
+first-occurrence lookup in the suffix, provided both prefixes have matching
+length. -/
+theorem append_getElem?_idxOf_append_of_not_mem
+    {Value Output : Type} [BEq Value] [LawfulBEq Value]
+    (headValues suffixValues : List Value)
+    (headOutputs suffixOutputs : List Output)
+    (value : Value)
+    (selectedOutput : Output)
+    (headLength : headOutputs.length = headValues.length)
+    (valueNotMember : value ∉ headValues)
+    (suffixLookup :
+      suffixOutputs[suffixValues.idxOf value]? = some selectedOutput) :
+    (headOutputs ++ suffixOutputs)[
+        (headValues ++ suffixValues).idxOf value]? =
+      some selectedOutput := by
+  rw [List.idxOf_append_of_notMem valueNotMember]
+  have indexRight :
+      headOutputs.length ≤
+        headValues.length + suffixValues.idxOf value := by
+    rw [headLength]
+    exact Nat.le_add_right _ _
+  rw [List.getElem?_append_right indexRight]
+  rw [headLength, Nat.add_sub_cancel_left]
+  exact suffixLookup
+
 end IndexedListScan
 end LeanTrominoes
