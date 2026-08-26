@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionData
 import LeanTrominoes.PeriodicEightOccurrenceSplitCycleBlockClause
+import LeanTrominoes.PeriodicEightOccurrenceSplitCycleBlockStartFixed
 import LeanTrominoes.RetainedAngularFanFinalCycleFirstDirections
 
 /-! # Finite semantics of retained Figure 9 implication-cycle directions -/
@@ -19,6 +20,36 @@ open PeriodicOrthocrossing
 open PeriodicThreeSATThree
 open PlanarThreeSAT
 open OccurrenceSplitRing
+
+/-- At a genuine stable source-variable index, the index-based and atom-based
+views of the final routed Figure 7 block are identical. -/
+theorem routedCycleClauseDescriptorsAt_eq_for
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    {atom : WrappedPeriodicPlanarSATVariable Variable}
+    {atomIndex : Nat}
+    (atomMember :
+      (atom, atomIndex) ∈
+        (sourceVariables
+          (sourceScaledForFigureSeven source).erase).zipIdx) :
+    routedCycleClauseDescriptorsAt source atomIndex =
+      routedCycleClauseDescriptorsFor source atom := by
+  let atoms :=
+    sourceVariables (sourceScaledForFigureSeven source).erase
+  have atomsNodup : atoms.Nodup := by
+    unfold atoms PeriodicThreeSATThree.sourceVariables
+    exact List.nodup_dedup _
+  have blockStartEq :=
+    cycleBlockStart_eq_copiesPerVariable_mul_index
+      atoms atomsNodup atomMember
+  have routesEq :
+      routedCycleRoutesAt source atomIndex =
+        routedCycleRoutesFor source atom := by
+    funext localClauseIndex literalIndex
+    simp [routedCycleRoutesAt, routedCycleRoutesFor, atoms, blockStartEq]
+  unfold routedCycleClauseDescriptorsAt
+    routedCycleClauseDescriptorsFor
+  rw [routesEq]
 
 /-- One genuine source atom's globally indexed final cycle descriptor block
 is exactly the common finite local Figure 7 descriptor block. -/

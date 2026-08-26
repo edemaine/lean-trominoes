@@ -10788,9 +10788,9 @@ The representation choices for this target are:
   index selects the same positioned clause globally and within its atom's
   fixed Figure 7 block.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionSemantics.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionSemantics.lean)
-  uses that global-index invariant and the normalized cycle first-direction
-  theorem to identify each retained variable's routed implication block with
-  the common finite local Figure 7 descriptor block.
+  equates the stable-index and atom views of every genuine cycle block, then
+  uses the global-index invariant and normalized first directions to identify
+  the block with the common finite local Figure 7 descriptors.
 - [`LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockStartFixed.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockStartFixed.lean)
   proves every implication ring has nine clauses and converts the recursive
   cycle block origin to nine times the atom's stable index.
