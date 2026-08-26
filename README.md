@@ -2072,7 +2072,7 @@ build; an imported proof counts when its statement matches the paper.
               prefix/fan/spoke splice's first direction.
             - [x] Identify the final positioned ordinary fallback's normalized
               first direction with its scaled source route.
-            - [ ] Combine direct, fallback, and implication-cycle directions
+            - [x] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -10800,6 +10800,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionFinite.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionFinite.lean)
   identifies that complete routed suffix with one copy of the finite local
   Figure 7 descriptor table per retained source variable.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionSemantics.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionSemantics.lean)
+  combines copied direct/fallback lookups and implication-cycle lookups to
+  identify the actual final normalized route descriptors with a finite stream.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
