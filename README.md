@@ -2063,6 +2063,8 @@ build; an imported proof counts when its statement matches the paper.
               source gate isolated, so loop erasure preserves that direction.
             - [x] Prove every genuine non-singleton ordinary fallback keeps
               its scaled source head out of its outer fan and Figure 7 spoke.
+            - [x] Compose the ordinary prefix, outer fan, and matching spoke
+              while preserving source-head isolation under unit subdivision.
             - [ ] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
@@ -10731,6 +10733,10 @@ The representation choices for this target are:
   normalization.  A non-singleton fallback's head is separated from its final
   segment; both refinement scales then keep the scaled head outside the
   unit-subdivided outer fan and matching Figure 7 spoke.
+- [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7HeadIsolation.lean)
+  composes those two exclusions with a simple refined source prefix.  The
+  complete ordinary prefix/fan/spoke splice therefore keeps its head isolated
+  after unit subdivision.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean)
   [`LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean),
