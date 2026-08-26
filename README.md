@@ -10775,6 +10775,9 @@ The representation choices for this target are:
   names the exact scaled source and port assignment used by Figure 7, the
   global route-based implication-cycle descriptor suffix, and the resulting
   phase-major routed descriptor stream.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutedDescriptorBlocks.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutedDescriptorBlocks.lean)
+  splits the actual final positioned formula exactly into the copied-clause
+  prefix and positioned implication-cycle suffix used by those descriptors.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge

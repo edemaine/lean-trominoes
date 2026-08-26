@@ -16,15 +16,24 @@ open PeriodicEightOccurrenceSplitPositioned
 open PeriodicOrthocrossing
 open PeriodicThreeSATThree
 
+/-- Exact final positioned implication-cycle suffix, including the outer
+Figure 7 routing refinement. -/
+def finalCycleClauses
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :=
+  (allCycleClauses
+      (sourceScaledForFigureSeven source)
+      (placementScaledForFigureSeven source)).map
+    (PositionedPeriodicClause.scale
+      retainedTerminalFanRoutingRefinement)
+
 /-- Route-based descriptor suffix of all positioned implication-cycle
 clauses, using their actual global final-route indices. -/
 def routedCycleClauseDescriptors
     {Variable : Type} [DecidableEq Variable]
     (source : PeriodicCNF Variable) :
     List FormulaShapeDirectionOrdering.Token :=
-  (allCycleClauses
-      (sourceScaledForFigureSeven source)
-      (placementScaledForFigureSeven source)).zipIdx.map fun taggedClause =>
+  (finalCycleClauses source).zipIdx.map fun taggedClause =>
     .clause
       (FormulaShapeDirectionOrdering.DirectedClauseProfile.ofClause
         (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes

@@ -119,6 +119,14 @@ def copiedOccurrenceClause
       (occurrencePortsForFigureSeven source)
       clauseIndex clause.literals
 
+/-- Exact final positioned copied-clause prefix in source presentation
+order. -/
+def copiedOccurrenceClauses
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :=
+  (finalCoordinatedSource source).clauses.zipIdx.map fun taggedClause =>
+    copiedOccurrenceClause source taggedClause.2 taggedClause.1
+
 /-- Semantic route-based descriptor of one copied retained clause before the
 finite direct/fallback direction lookup is substituted. -/
 def routedCopiedClauseProfile
