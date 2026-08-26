@@ -2043,6 +2043,9 @@ build; an imported proof counts when its statement matches the paper.
           - [x] Compose any canonical assignment-record emitter with the exact
             prepared header, fixed record expander, and prepared-token
             interface.
+          - [x] Assemble any exact vertex-prefix and route-suffix appenders
+            with the verified plane reduction and strip membership decider,
+            leaving no further work after those two geometry machines.
           - [x] Split the compact vertex boundary into exact variable-triple,
             clause-triple, red, green, and blue scans, and carry any verified
             five-family instance through affine expansion to the canonical
@@ -10698,6 +10701,10 @@ The representation choices for this target are:
   fixed postprocessor.  Any polynomial-time emitter for the canonical unary
   assignment records now supplies the exact prepared stream, flat target, and
   complete `Theorem52.stripStatement`.
+- [`LeanTrominoes/Theorem52DirectSparseClosure.lean`](LeanTrominoes/Theorem52DirectSparseClosure.lean)
+  combines the plane theorem, strip PSPACE membership, and the complete sparse
+  postprocessing chain.  Uniform vertex-record and route-record appenders now
+  imply the full `Theorem52.statement` directly.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseData.lean)
   and [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean)
   split the phase-major compact vertex stream into variable triples, clause
