@@ -2079,6 +2079,12 @@ build; an imported proof counts when its statement matches the paper.
                 the finite Figure 9 source-marker suffix.
               - [ ] Compile the finite normalized copied-clause descriptor
                 prefix.
+                - [x] Compile the fixed slot-sensitive normalized-direction
+                  lookup from finite direct-atlas queries.
+                - [ ] Compile the exact direct-atlas query stream, including
+                  each occurrence's angular slot.
+                - [ ] Merge normalized direct directions with the compiled
+                  carrier/bend fallback descriptors.
               - [ ] Compose both appenders with the fixed-eight descriptor
                 expander.
 - [ ] **Corollary 5.3:** The translation-only variant with the two orientations
@@ -10834,6 +10840,11 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceVariableMarkerCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceVariableMarkerCompiler.lean)
   transports the existing polynomial-time metadata marker machine to that
   exact finite-source suffix and packages the retained-workspace appender.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionQuery.lean`](LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionQuery.lean)
+  reduces every slot-sensitive direct normalized direction to a fixed finite
+  `(clause kind, literal index, occurrence slot)` query.
+- [`LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionCompiler.lean`](LeanTrominoes/RetainedAngularFanDirectSourceNormalizedDirectionCompiler.lean)
+  compiles that finite lookup as a one-pass polynomial-time transducer.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
