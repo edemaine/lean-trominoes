@@ -104,5 +104,88 @@ theorem
         retainedTerminalFanRoutingRefinement
         (by simp [retainedTerminalFanRoutingRefinement]) route
 
+/-- At the explicit block/local index of one source atom, the final
+normalized route exposes exactly the first direction of the corresponding
+local Figure 7 incidence. -/
+theorem
+    retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_cycleBlockStart_firstDirection
+    {Variable : Type*} [DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (atom : WrappedPeriodicPlanarSATVariable Variable)
+    (atomMember :
+      atom ∈
+        sourceVariables
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor).erase)
+    (localClauseIndex literalIndex : Nat)
+    (localIndex :
+      localClauseIndex <
+        (PeriodicEightOccurrenceSplit.cycleClausesFor atom).length)
+    {clause :
+      PositionedPeriodicClause
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    (clauseMember :
+      (clause,
+        cycleBlockStart
+            (sourceVariables
+              ((finalCoordinatedSource formula).scale
+                retainedAngularFanSourceClearanceFactor).erase)
+            atom +
+          localClauseIndex) ∈
+        (allCycleClauses
+          ((finalCoordinatedSource formula).scale
+            retainedAngularFanSourceClearanceFactor)
+          ((finalCoordinatedPlacement formula).scale
+            retainedAngularFanSourceClearanceFactor)).zipIdx)
+    {literal :
+      PeriodicLiteral
+        (ThreeOccurrenceVariable
+          (WrappedPeriodicPlanarSATVariable Variable))}
+    (literalMember :
+      (literal, literalIndex) ∈ clause.literals.zipIdx) :
+    let source :=
+      (finalCoordinatedSource formula).scale
+        retainedAngularFanSourceClearanceFactor
+    let routes :=
+      PositionedPeriodicCNF.scaleIncidenceRoutes
+        retainedAngularFanSourceClearanceFactor
+        (finalCoordinatedSourceRoutes formula)
+    let occurrencePorts :=
+      occurrencePortsOfAngularOrder
+        source.erase
+        (angularOccurrenceOrder source.erase routes)
+    AxisDirection.polylineFirstDirection
+        (retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes
+          formula
+          ((occurrenceClauses source occurrencePorts).length +
+            (cycleBlockStart (sourceVariables source.erase) atom +
+              localClauseIndex))
+          literalIndex) =
+      AxisDirection.polylineFirstDirection
+        (OccurrenceSplitRing.cycleRoutes
+          localClauseIndex literalIndex) := by
+  dsimp only
+  let source :=
+    (finalCoordinatedSource formula).scale
+      retainedAngularFanSourceClearanceFactor
+  let placement :=
+    (finalCoordinatedPlacement formula).scale
+      retainedAngularFanSourceClearanceFactor
+  calc
+    _ = AxisDirection.polylineFirstDirection
+          (allCycleRoutes source placement
+            (cycleBlockStart (sourceVariables source.erase) atom +
+              localClauseIndex)
+            literalIndex) :=
+      retainedDrawingSourceScaledNormalizedEightOccurrenceSplitIncidenceRoutes_cycle_firstDirection
+        formula clauseMember literalMember
+    _ = AxisDirection.polylineFirstDirection
+          (OccurrenceSplitRing.cycleRoutes
+            localClauseIndex literalIndex) :=
+      allCycleRoutes_cycleBlockStart_firstDirection
+        source placement atom atomMember
+        localClauseIndex literalIndex localIndex
+
 end PeriodicOrthocrossing
 end LeanTrominoes
