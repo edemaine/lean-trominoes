@@ -10806,6 +10806,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteDirectionDescriptorData.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteDirectionDescriptorData.lean)
   specializes that equality to guarded PSPACE source words, yielding the exact
   proof-free finite target for the remaining direct descriptor compiler.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionCount.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionCount.lean)
+  identifies the finite stream's final suffix as exactly nine variable markers
+  per stable retained source variable.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
