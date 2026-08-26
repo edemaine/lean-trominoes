@@ -10717,6 +10717,10 @@ The representation choices for this target are:
   result at the public final route boundary for every failed-direct incidence.
   The singleton classifier also rules out every diagonal and routed-clause
   terminal for an axis-aligned two-point source route.
+- [`LeanTrominoes/RetainedAngularFanFinalSourceRouteGeometry.lean`](LeanTrominoes/RetainedAngularFanFinalSourceRouteGeometry.lean)
+  exposes the unscaled geometry needed by ordinary-fallback normalization:
+  every genuine copied-source route is simple, and failed direct selection
+  makes that raw route orthogonal before either refinement scale is applied.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean)
   [`LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean),
