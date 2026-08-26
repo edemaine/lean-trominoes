@@ -22,6 +22,27 @@ def clauseDescriptors {Variable : Type} [DecidableEq Variable]
         (rawRepresentativeRoute source) taggedClause.2
         taggedClause.1)
 
+/-- Clause descriptors do not depend on the implementation of decidable
+equality used while deduplicating the finite metadata presentation. -/
+theorem clauseDescriptors_decidableEq_irrel {Variable : Type}
+    (source : PeriodicCNF Variable)
+    (first second : DecidableEq Variable) :
+    @clauseDescriptors Variable first source =
+      @clauseDescriptors Variable second source := by
+  have implementationEq : first = second := Subsingleton.elim _ _
+  subst second
+  rfl
+
+/-- Retarget an existing descriptor equality without reconstructing or
+normalizing its decidable-equality implementation. -/
+theorem eq_clauseDescriptors_of_decidableEq_irrel {Variable : Type}
+    {tokens : List FormulaShapeDirectionOrdering.Token}
+    (source : PeriodicCNF Variable)
+    {first : DecidableEq Variable} (second : DecidableEq Variable)
+    (equal : tokens = @clauseDescriptors Variable first source) :
+    tokens = @clauseDescriptors Variable second source :=
+  equal.trans (clauseDescriptors_decidableEq_irrel source first second)
+
 /-- One finite marker for every distinct variable in the deduplicated
 normalized metadata clause list. -/
 def variableMarkers {Variable : Type} [DecidableEq Variable]

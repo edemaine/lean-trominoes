@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataQuotientClauseDescriptorAssemblySemantics
+import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataDirectionDescriptorBlockData
 import LeanTrominoes.PeriodicCNFStripDirectThreeCNFOccurrencePositiveOffsets
 
 /-! # Correctness of direct quotiented clause descriptors -/
@@ -30,7 +31,7 @@ theorem directRetainedPlanarMetadataQuotientClauseDescriptorAssembly_eq_clauseDe
     (symbols : List encoding.Γ) :
     directRetainedPlanarMetadataQuotientClauseDescriptorAssembly
         decider symbols =
-      clauseDescriptors (directSourceFormula decider symbols) := by
+      directRetainedPlanarMetadataClauseDescriptors decider symbols := by
   let original := PolySpaceCompiler.formulaOfSymbols decider symbols
   let source := PeriodicThreeCNF.formula original
   have sourceLocal : source.IsLocal := by
@@ -66,6 +67,9 @@ theorem directRetainedPlanarMetadataQuotientClauseDescriptorAssembly_eq_clauseDe
           positiveOffsets).symm
     _ = clauseDescriptors (directSourceFormula decider symbols) :=
       congrArg clauseDescriptors sourceEq.symm
+    _ = directRetainedPlanarMetadataClauseDescriptors decider symbols :=
+      eq_directRetainedPlanarMetadataClauseDescriptors_of_eq
+        decider symbols rfl
 
 end LeanTrominoes.PeriodicCNFStripReduction
 
