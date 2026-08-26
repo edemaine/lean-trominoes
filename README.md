@@ -1907,6 +1907,11 @@ build; an imported proof counts when its statement matches the paper.
                               finite-state pass that keeps only the first true
                               bit of every equality row, preparing exact
                               global-rank-order field lookup.
+                            - [x] Compose those primitives with last-
+                              representative equality rows and unary lookup,
+                              and prove that any aligned field column is
+                              emitted in exact increasing-rank order whenever
+                              its ranks permute the canonical range.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
