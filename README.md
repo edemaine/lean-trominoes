@@ -2056,7 +2056,8 @@ build; an imported proof counts when its statement matches the paper.
               direction and preserves it for orthogonal retained routes.
             - [x] Identify every public ordinary non-singleton fallback's
               first direction with its scaled source route.
-            - [ ] Identify the singleton escaped fallback's first direction.
+            - [x] Identify the singleton escaped fallback's first direction
+              with its scaled source route.
             - [ ] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
@@ -10702,12 +10703,14 @@ The representation choices for this target are:
   selected by `idxOf` in the normalized five-family metadata list.
 - [`LeanTrominoes/RetainedRayRasterizationFirstDirections.lean`](LeanTrominoes/RetainedRayRasterizationFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFallbackFirstDirections.lean),
+  [`LeanTrominoes/RetainedAngularFanEscapedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanEscapedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanFinalFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalFallbackFirstDirections.lean),
+  [`LeanTrominoes/RetainedAngularFanFinalEscapedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalEscapedFirstDirections.lean),
   and [`LeanTrominoes/RetainedAngularFanFinalCoordinatedFallbackFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedFallbackFirstDirections.lean)
   prove that retained-ray rasterization preserves the first direction of an
-  orthogonal retained route, carry that edge through ordinary fan-tail
-  replacement and suffix joining, and expose the result at the public final
-  route boundary for every non-singleton failed-direct incidence.
+  orthogonal retained route, carry that edge through both ordinary and
+  singleton-escaped fan-tail replacement and suffix joining, and expose the
+  result at the public final route boundary for every failed-direct incidence.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean`](LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean),
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean),
   and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean)
