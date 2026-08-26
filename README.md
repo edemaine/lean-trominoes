@@ -1890,6 +1890,9 @@ build; an imported proof counts when its statement matches the paper.
                             enumeration and prove every presented datum's
                             semantic global rank is its exact list index in
                             that dedup-last-key-major, stable-coordinate order.
+                            - [x] Prove that the global enumeration neither
+                              drops nor duplicates indexed datums, and hence is
+                              a permutation of the complete indexed input.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
