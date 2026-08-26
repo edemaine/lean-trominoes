@@ -3,8 +3,9 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierDescriptorBlocks
+import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataDirectionData
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedPlanarMetadataCarrierVariableNormalizationData
+import LeanTrominoes.PeriodicCNFPlanarSATClauseIndex
 import LeanTrominoes.PeriodicEqualityNormalization
 
 /-! # Normalized retained carrier clauses -/
@@ -30,18 +31,7 @@ theorem carrierLink_normalizedClauses_eq
         [true, false]).map PeriodicEquality.normalizedClause) := by
   rw [← PeriodicEquality.equalityInstance_normalized
     (carrierWrappedVariableNormalization source) link]
-  simp [drawingPlanarSATCarrierClauseMetadataFor,
-    drawingPlanarSATCarrierFormulaAt, equalityInstance,
-    normalizedClause, carrierWrappedVariableNormalization,
-    periodicizePlanarSATClause, periodicizePlanarSATLiteral,
-    planarSATCarrierVariableMap, planarSATCoreVariableMap,
-    EmbeddedClause.rename, EmbeddedClause.map,
-    wrapPeriodicPlanarSATClause, wrapPeriodicPlanarSATLiteral,
-    PeriodicEquality.periodicizeClause,
-    PeriodicEquality.periodicizeLiteral,
-    PeriodicClause.variableGauge,
-    PeriodicLiteral.variableGauge,
-    List.map_map, Function.comp_def]
+  rfl
 
 end FormulaShapeRetainedPlanarMetadataDirection
 end PeriodicCNF
