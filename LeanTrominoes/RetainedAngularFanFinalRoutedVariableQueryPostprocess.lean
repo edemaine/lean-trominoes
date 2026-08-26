@@ -46,6 +46,15 @@ def retainedFinalDirectRoutedVariableQueryBlock
     List RetainedFinalCopiedClauseQuery :=
   [retainedFinalDirectRoutedVariableQueryOfToken token]
 
+/-- The finite postprocess sends each current-slice routed-variable
+descriptor to its matching stable direct query. -/
+theorem retainedFinalDirectRoutedVariableQueryBlock_descriptor_eq
+    (arm : DuplicatorArm) (forward : Bool) :
+    retainedFinalDirectRoutedVariableQueryBlock
+        (routedVariableClauseDescriptor arm false forward) =
+      [retainedFinalDirectRoutedVariableClauseQuery arm false forward] := by
+  cases arm <;> cases forward <;> native_decide
+
 /-- Elementwise replacement sends one normalized metadata site block to the
 six stable direct queries in the same clause order. -/
 theorem routedVariableFullSiteBlock_finalQueryBlock_eq :
