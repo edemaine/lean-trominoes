@@ -1957,6 +1957,11 @@ build; an imported proof counts when its statement matches the paper.
                                     and signed equality vertically to ordered
                                     normalization fields nine through twelve,
                                     recovering the exact next-slice bit.
+                                  - [x] Conjoin adjacency, crossover
+                                    suppression, ownership, axis, and
+                                    next-slice matrices; encode each selected
+                                    pair sparsely and prove that decoding emits
+                                    the exact row-major selected-pair stream.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
