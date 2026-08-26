@@ -10782,6 +10782,10 @@ The representation choices for this target are:
   prefix and positioned implication-cycle suffix used by those descriptors.
   Stable copied indices and the shifted cycle indices then identify the
   complete actual `ofFormula` output with the named phase-major routed stream.
+- [`LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockClause.lean`](LeanTrominoes/PeriodicEightOccurrenceSplitCycleBlockClause.lean)
+  exposes the cycle metadata's global-index invariant: a block-start/local
+  index selects the same positioned clause globally and within its atom's
+  fixed Figure 7 block.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
