@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeFixedEightDirectionGeneratedCompiler
-import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionFixedEight
 import LeanTrominoes.PeriodicCNFStripDirectRetainedDirectionDescriptorCompiler
 import LeanTrominoes.PeriodicCNFStripDirectRetainedFiniteDirectionDescriptorData
+import LeanTrominoes.PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorData
 
 /-! # Direct compiler boundary for finite copied-source descriptors -/
 
@@ -32,14 +32,6 @@ noncomputable local instance directRetainedFiniteSourceDirectionCompilerStackFin
 local instance directRetainedFiniteSourceDirectionCompilerVariableDecidableEq :
     DecidableEq Variable :=
   Classical.decEq _
-
-/-- Direct source-symbol specialization of the copied lookup prefix followed
-by one marker per stable retained source variable. -/
-def directRetainedFigureNineFiniteSourceDescriptors
-    (symbols : List encoding.Γ) :
-    List FormulaShapeDirectionOrdering.Token :=
-  FormulaShapeRetainedFigureNineDirection.finiteSourceDescriptors
-    (sourceFormula (PolySpaceCompiler.formulaOfSymbols decider symbols))
 
 /-- The sole remaining finite direction boundary after reusing the existing
 fixed-eight cycle and marker phases. -/

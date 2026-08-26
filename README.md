@@ -10815,6 +10815,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorCompiler.lean)
   reduces the actual final descriptor compiler to that copied lookup prefix
   and marker stream, reusing the verified fixed-eight cycle/variable machine.
+- [`LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorData.lean`](LeanTrominoes/PeriodicCNFStripDirectRetainedFiniteSourceDirectionDescriptorData.lean)
+  splits the remaining source target exactly into separately streamable copied
+  clause descriptors and retained-variable markers.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
