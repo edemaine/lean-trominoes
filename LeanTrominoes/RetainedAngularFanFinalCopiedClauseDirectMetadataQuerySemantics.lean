@@ -51,13 +51,12 @@ theorem retainedFinalCopiedClauseQueryOfLiterals_eq_directOfMetadataDescriptor
             .routedVariable
               site armIndex arm link localClauseIndex))
     (kind : RetainedDirectClauseKind)
-    (rawChoices :
-      ∀ taggedLiteral ∈ clause.zipIdx,
-        ∃ rawChoice : RetainedDirectSourceRouteChoice,
-          retainedDirectSourceRouteChoice?
-              formula metadata.source taggedLiteral.2 = some rawChoice ∧
+    (rawChoiceShape :
+      ∀ literalIndex rawChoice,
+        retainedDirectSourceRouteChoice?
+            formula metadata.source literalIndex = some rawChoice →
           rawChoice.kind = kind ∧
-          rawChoice.index.val = taggedLiteral.2) :
+            rawChoice.index.val = literalIndex) :
     retainedFinalCopiedClauseQueryOfLiterals
         formula clauseIndex clause =
       RetainedFinalCopiedClauseQuery.directOfToken kind
@@ -87,18 +86,24 @@ theorem retainedFinalCopiedClauseQueryOfLiterals_eq_directOfMetadataDescriptor
       _ = _ := by
           rw [List.zipIdx_map_fst, normalizedEq]
   · intro taggedLiteral taggedLiteralMember
-    rcases rawChoices taggedLiteral taggedLiteralMember with
-      ⟨rawChoice, rawLookup, rawKind, rawIndex⟩
-    let query := rawChoice.normalizedDirectionQuery
-    refine ⟨query, ?_, ?_, ?_⟩
-    · exact
-        retainedFinalCopiedSourceDirectionQuery_eq_direct_of_metadata_raw
+    rcases
+        exists_finalDirectChoiceRaw_of_clause_lookup_metadata_direct
           formula sourceLocal sourceWidth sourceOccurrences
           sourceClausesNonempty clauseIndex clause clauseLookup
           taggedLiteral.1 taggedLiteral.2 taggedLiteralMember
-          metadata metadataLookup directCases rawChoice rawLookup
-    · exact rawKind
-    · exact rawIndex
+          metadata metadataLookup directCases with
+      ⟨choice, rawChoice, choiceLookup, rawLookup, choiceEq⟩
+    have rawShape :=
+      rawChoiceShape taggedLiteral.2 rawChoice rawLookup
+    let query := rawChoice.normalizedDirectionQuery
+    refine ⟨query, ?_, ?_, ?_⟩
+    · unfold retainedFinalCopiedSourceDirectionQuery
+      rw [choiceLookup]
+      simp only
+      rw [choiceEq]
+      rfl
+    · exact rawShape.1
+    · exact rawShape.2
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes

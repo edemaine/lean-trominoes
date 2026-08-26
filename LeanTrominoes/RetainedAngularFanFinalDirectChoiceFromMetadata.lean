@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.RetainedAngularFanFinalDirectSourceChoiceUniformity
+import LeanTrominoes.RetainedAngularFanFinalCoordinatedSourceClauses
 
 /-! # Recovering a raw direct choice from final metadata
 
@@ -139,6 +140,78 @@ theorem exists_finalDirectChoiceRaw_of_metadata_direct
       (selectedMetadataLookup.symm.trans metadataLookup)
   subst selectedMetadata
   exact ⟨choice, rawChoice, choiceLookup, rawLookup, choiceEq⟩
+
+/-- Clause-list lookup form of
+`exists_finalDirectChoiceRaw_of_metadata_direct`, avoiding repeated
+reconstruction of the positioned final clause at downstream query sites. -/
+theorem exists_finalDirectChoiceRaw_of_clause_lookup_metadata_direct
+    {Variable : Type} [variableDecEq : DecidableEq Variable]
+    (formula : PeriodicCNF Variable)
+    (sourceLocal : formula.IsLocal)
+    (sourceWidth : formula.WidthAtMost 3)
+    (sourceOccurrences : formula.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ sourceClause ∈ formula.clauses, sourceClause ≠ [])
+    (clauseIndex : Nat)
+    (clause :
+      PeriodicClause (WrappedPeriodicPlanarSATVariable Variable))
+    (clauseLookup :
+      (PeriodicCNF.FormulaShapeRetainedPlanarMetadataDirection.deduplicatedClauses
+        formula)[clauseIndex]? = some clause)
+    (literal :
+      PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable))
+    (literalIndex : Nat)
+    (literalMember : (literal, literalIndex) ∈ clause.zipIdx)
+    (metadata : DrawingPlanarSATClauseMetadata Variable)
+    (metadataLookup :
+      retainedFinalDirectSourceMetadata? formula clauseIndex =
+        some metadata)
+    (directCases :
+      (∃ crossing localClauseIndex,
+          metadata.source = .crossover crossing localClauseIndex) ∨
+        (∃ site,
+          metadata.source = .routedClause site) ∨
+        (∃ site armIndex arm link localClauseIndex,
+          metadata.source =
+            .routedVariable
+              site armIndex arm link localClauseIndex)) :
+    ∃ choice rawChoice,
+      retainedFinalDirectSourceRouteChoice?
+          formula clauseIndex literalIndex = some choice ∧
+      retainedDirectSourceRouteChoice?
+          formula metadata.source literalIndex = some rawChoice ∧
+      choice =
+        rawChoice.translateOrigin
+          (retainedFinalDirectSourceMetadataTranslation
+            formula metadata) := by
+  have mappedClauseLookup :
+      ((finalCoordinatedSource formula).clauses.map
+          PositionedPeriodicClause.literals)[clauseIndex]? =
+        some clause := by
+    rw [finalCoordinatedSource_clauseLiterals_eq]
+    exact clauseLookup
+  rw [List.getElem?_map] at mappedClauseLookup
+  generalize finalClauseLookup :
+      (finalCoordinatedSource formula).clauses[clauseIndex]? =
+        finalClauseOption at mappedClauseLookup
+  cases finalClauseOption with
+  | none => simp at mappedClauseLookup
+  | some finalClause =>
+      simp only [Option.map_some, Option.some.injEq]
+        at mappedClauseLookup
+      have finalClauseMember :
+          (finalClause, clauseIndex) ∈
+            (finalCoordinatedSource formula).clauses.zipIdx :=
+        (List.mem_zipIdx_iff_getElem?).mpr finalClauseLookup
+      have finalLiteralMember :
+          (literal, literalIndex) ∈ finalClause.literals.zipIdx := by
+        rw [mappedClauseLookup]
+        exact literalMember
+      exact
+        exists_finalDirectChoiceRaw_of_metadata_direct
+          formula sourceLocal sourceWidth sourceOccurrences
+          sourceClausesNonempty finalClauseMember finalLiteralMember
+          metadata metadataLookup directCases
 
 end PeriodicEightOccurrenceSplit
 end LeanTrominoes
