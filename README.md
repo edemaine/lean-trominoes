@@ -1881,6 +1881,11 @@ build; an imported proof counts when its statement matches the paper.
                           its final occurrence, prefix-sum those contributions,
                           and broadcast the resulting dedup-last-ordered block
                           start to every aggregate-key occurrence.
+                        - [x] Add each broadcast block start to the compiled
+                          stable geometric rank, yielding a polynomial-time
+                          global unary rank column, and identify it exactly on
+                          numeric routes with key-block start plus same-key
+                          stable coordinate rank.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
