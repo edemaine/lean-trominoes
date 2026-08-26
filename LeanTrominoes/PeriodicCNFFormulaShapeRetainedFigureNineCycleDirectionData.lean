@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFFormulaShapeRetainedFigureNineCopiedDirectionData
+import LeanTrominoes.PeriodicCNFFormulaShapeFixedEightDirectionData
 
 /-! # Route-based implication-cycle descriptors at retained Figure 9 -/
 
@@ -41,6 +42,16 @@ def routedCycleClauseDescriptors
         (copiedClauseCount source + taggedClause.2)
         taggedClause.1)
 
+/-- Finite local Figure 7 descriptor block repeated once per retained source
+variable, in the same phase-major order as the positioned cycle suffix. -/
+def finiteCycleClauseDescriptors
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    List FormulaShapeDirectionOrdering.Token :=
+  (sourceVariables
+      (sourceScaledForFigureSeven source).erase).flatMap fun _ =>
+    FormulaShapeFixedEightDirection.cycleClauseDescriptors
+
 /-- Route-based, phase-major descriptor stream: copied source clauses,
 implication-cycle clauses, then the actual distinct-variable markers. -/
 def routedDescriptors
@@ -49,6 +60,20 @@ def routedDescriptors
     List FormulaShapeDirectionOrdering.Token :=
   routedCopiedClauseDescriptors source ++
     routedCycleClauseDescriptors source ++
+      List.replicate
+        (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
+          source).erase.variableOccurrences.dedup.length
+        .variable
+
+/-- Fully finite phase-major descriptor stream: finite copied-clause lookups,
+one fixed local Figure 7 block per retained variable, and the exact output
+variable markers. -/
+def finiteDescriptors
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable) :
+    List FormulaShapeDirectionOrdering.Token :=
+  copiedClauseDescriptors source ++
+    finiteCycleClauseDescriptors source ++
       List.replicate
         (retainedDrawingSourceScaledRefinedEightOccurrenceSplitPositionedFormula
           source).erase.variableOccurrences.dedup.length

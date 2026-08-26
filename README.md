@@ -10774,7 +10774,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionData.lean)
   names the exact scaled source and port assignment used by Figure 7, the
   global route-based implication-cycle descriptor suffix, and the resulting
-  phase-major routed descriptor stream.
+  phase-major routed descriptor stream.  It also names the finite target:
+  copied lookup descriptors followed by one fixed local cycle block per
+  retained variable and the exact output-variable markers.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutedDescriptorBlocks.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineRoutedDescriptorBlocks.lean)
   splits the actual final positioned formula exactly into the copied-clause
   prefix and positioned implication-cycle suffix used by those descriptors.
