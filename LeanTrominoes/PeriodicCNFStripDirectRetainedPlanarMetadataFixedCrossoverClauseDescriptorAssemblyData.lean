@@ -6,7 +6,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataClauseDescriptorFamilyData
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataCrossoverClauseDescriptorData
 
-/-! # Fixed-crossover assembly of direct public clause descriptors -/
+/-! # Fixed-crossover assembly of direct clause-descriptor candidates -/
 
 noncomputable section
 
@@ -19,24 +19,24 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
-noncomputable local instance directRetainedPublicAssemblyDataStackFintype
+noncomputable local instance directRetainedFixedCrossoverAssemblyDataStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
 /-- The already-deduplicated fixed crossover prefix followed by the carrier,
 bend, routed-clause, and routed-variable descriptor scans. -/
-def directRetainedPlanarMetadataAssembledPublicClauseDescriptors
+def directRetainedPlanarMetadataFixedCrossoverClauseDescriptorAssembly
     (symbols : List encoding.Γ) :
     List FormulaShapeDirectionOrdering.Token :=
   directRetainedPlanarMetadataFixedCrossoverClauseDescriptors
       decider symbols ++
     directRetainedPlanarMetadataCarrierClauseDescriptorSuffix decider symbols
 
-abbrev DirectRetainedPlanarMetadataAssembledPublicClauseDescriptorCompiler :=
+abbrev DirectRetainedPlanarMetadataFixedCrossoverClauseDescriptorAssemblyCompiler :=
   @TM2ComputableInPolyTime
     (List encoding.Γ) (List FormulaShapeDirectionOrdering.Token)
     encoding.Γ FormulaShapeDirectionOrdering.Token id id
-    (directRetainedPlanarMetadataAssembledPublicClauseDescriptors decider)
+    (directRetainedPlanarMetadataFixedCrossoverClauseDescriptorAssembly decider)
 
 end LeanTrominoes.PeriodicCNFStripReduction
 

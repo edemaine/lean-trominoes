@@ -7,11 +7,11 @@ import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataBendClauseDescr
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataCarrierClauseDescriptorCompiler
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataClauseDescriptorCarrierSuffixCompiler
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataCrossoverClauseDescriptorFixedCompiler
-import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataPublicClauseDescriptorAssemblyData
+import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataFixedCrossoverClauseDescriptorAssemblyData
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataRoutedClauseDescriptorCompiler
 import LeanTrominoes.PeriodicCNFStripDirectRetainedPlanarMetadataRoutedVariableDescriptorCompiler
 
-/-! # Compiling the fixed-crossover public descriptor assembly -/
+/-! # Compiling the fixed-crossover descriptor assembly -/
 
 noncomputable section
 
@@ -24,15 +24,15 @@ variable {encoding : _root_.Computability.FinEncoding Input}
 variable {language : Input → Prop}
 variable (decider : Complexity.DeciderInPolySpace encoding language)
 
-noncomputable local instance directRetainedPublicAssemblyCompilerStackFintype
+noncomputable local instance directRetainedFixedCrossoverAssemblyCompilerStackFintype
     (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
   decider.stackAlphabetFinite stack
 
 /-- Compile the fixed crossover prefix and all four ordered non-crossover
 descriptor scans, then append the two outputs. -/
 noncomputable def
-    directRetainedPlanarMetadataAssembledPublicClauseDescriptorsComputableInPolyTime :
-    DirectRetainedPlanarMetadataAssembledPublicClauseDescriptorCompiler
+    directRetainedPlanarMetadataFixedCrossoverClauseDescriptorAssemblyComputableInPolyTime :
+    DirectRetainedPlanarMetadataFixedCrossoverClauseDescriptorAssemblyCompiler
       decider := by
   let routed :=
     directRetainedPlanarMetadataRoutedClauseDescriptorSuffixComputableInPolyTime
