@@ -1922,6 +1922,11 @@ build; an imported proof counts when its statement matches the paper.
                                   rank-ordered field is exactly its projection
                                   from the global key-major, stable-coordinate
                                   datum enumeration.
+                                - [x] Reconstruct canonical positions from the
+                                  rank-ordered fields, compile their immediate-
+                                  successor square and the six-field same-key
+                                  square, and conjunct them into the candidate
+                                  adjacent-carrier-pair matrix.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
