@@ -2057,7 +2057,8 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Identify every public ordinary non-singleton fallback's
               first direction with its scaled source route.
             - [x] Identify the singleton escaped fallback's first direction
-              with its scaled source route.
+              with its scaled source route at both the coordinated and
+              normalized public route boundaries.
             - [x] Prove the unit-subdivided cardinal escaped fan keeps its
               source gate isolated, so loop erasure preserves that direction.
             - [ ] Combine direct, fallback, and implication-cycle directions
@@ -10721,7 +10722,8 @@ The representation choices for this target are:
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7HeadIsolation.lean),
   [`LeanTrominoes/RetainedAngularFanOuterEscapedFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedFigure7NormalizedFirstDirections.lean),
   [`LeanTrominoes/RetainedAngularFanEscapedOwnFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanEscapedOwnFigure7NormalizedFirstDirections.lean),
-  and [`LeanTrominoes/RetainedAngularFanFinalEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalEscapedNormalizedFirstDirections.lean)
+  [`LeanTrominoes/RetainedAngularFanFinalEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalEscapedNormalizedFirstDirections.lean),
+  and [`LeanTrominoes/RetainedAngularFanFinalCoordinatedEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalCoordinatedEscapedNormalizedFirstDirections.lean)
   prove that unit subdivision of a cardinal escaped fan never revisits its
   source gate and that loop erasure therefore preserves its first direction.
   The initial 64-block escape is duplicate-free, while every point of the
@@ -10729,7 +10731,8 @@ The representation choices for this target are:
   radius-96 Figure 7 spoke preserves the same source-head isolation and hence
   the first direction through normalization.  The complete generic singleton
   splice and its genuine final positioned specialization therefore normalize
-  to the direction of their original source edge.
+  to the direction of their original source edge, including at the public
+  normalized route-family boundary.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean`](LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean),
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean),
   and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean)
