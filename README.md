@@ -1657,7 +1657,7 @@ build; an imported proof counts when its statement matches the paper.
             routed-variable equality templates, plus routed source-clause
             tokens whose geometric directions are uniformly invalid.
           - [ ] Compile and assemble the remaining ordered descriptor scans.
-            - [ ] Compile retained carrier-link descriptors.
+            - [x] Compile retained carrier-link descriptors.
               - [x] Compile the fixed two-bit carrier descriptor-block
                 expansion.
               - [x] Name the exact presentation-order carrier-link axis and
@@ -1967,6 +1967,9 @@ build; an imported proof counts when its statement matches the paper.
                                     established per-key bit block, and identify
                                     the result with the exact semantic global
                                     carrier-link bit stream.
+                                  - [x] Compose the exact sparse bit compiler
+                                    with the fixed two-token descriptor-block
+                                    expansion and prove its semantic output.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
