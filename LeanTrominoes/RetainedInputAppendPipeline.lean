@@ -52,6 +52,22 @@ def appendFromWorkspace {Source Target : Type}
     List (Workspace Source Target) :=
   workspace ++ (output (source workspace)).map Sum.inr
 
+/-- Native list identity is polynomial time over any inhabited finite
+alphabet. -/
+def identityComputableInPolyTime {Alphabet : Type}
+    [Fintype Alphabet] [Inhabited Alphabet] :
+    TM2ComputableInPolyTime id id (id : List Alphabet → List Alphabet) := by
+  let machine := FiniteBlockTransducer.computableInPolyTime
+    (fun symbol : Alphabet => [symbol])
+  refine
+    { tm := machine.tm
+      inputAlphabet := machine.inputAlphabet
+      outputAlphabet := machine.outputAlphabet
+      time := machine.time
+      outputsFun := ?_ }
+  intro input
+  simpa using machine.outputsFun input
+
 @[simp] theorem source_embed {Source Target : Type}
     (input : List Source) :
     source (Target := Target) (embed input) = input := by
@@ -137,6 +153,15 @@ def embedComputableInPolyTime {Source Target : Type}
   rw [outputEq] at run
   exact run
 
+/-- Recovering the retained source is polynomial time. -/
+def sourceComputableInPolyTime {Source Target : Type}
+    [Fintype Source] [Fintype Target] [Inhabited Source] :
+    TM2ComputableInPolyTime id id
+      (source : List (Workspace Source Target) → List Source) :=
+  FiniteBlockTransducer.computableInPolyTime fun
+    | (Sum.inl symbol : Workspace Source Target) => [symbol]
+    | .inr _ => []
+
 /-- Fixed target extraction is polynomial time. -/
 def extractComputableInPolyTime {Source Target : Type}
     [Fintype Source] [Fintype Target] [Inhabited Target] :
@@ -163,6 +188,67 @@ def appendedComputableInPolyTimeOfCompiler
     (fun input => by
       unfold appended
       rw [← List.map_eq_flatMap])
+
+/-- Append the output of a native source compiler to an existing retained
+workspace. -/
+def appendFromWorkspaceComputableInPolyTimeOfCompilerOfInhabitedSource
+    {Source Target : Type}
+    [Fintype Source] [Fintype Target] [Inhabited Source]
+    [Inhabited (Workspace Source Target)]
+    (output : List Source → List Target)
+    (compiler : TM2ComputableInPolyTime id id output) :
+    TM2ComputableInPolyTime id id (appendFromWorkspace output) := by
+  let recovered := TM2CompositionMachine.computableInPolyTime
+    (sourceComputableInPolyTime (Source := Source) (Target := Target))
+    compiler
+  let liftedRaw := TM2CompositionMachine.computableInPolyTime recovered
+    (FiniteBlockTransducer.computableInPolyTime fun token : Target =>
+      [(Sum.inr token : Workspace Source Target)])
+  let lifted : TM2ComputableInPolyTime id id
+      (fun workspace : List (Workspace Source Target) =>
+        (output (source workspace)).map Sum.inr) :=
+    TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq liftedRaw
+      (fun workspace => by
+        rw [← List.map_eq_flatMap])
+  let complete := TM2ListAppend.nativeComputableInPolyTime
+    (identityComputableInPolyTime
+      (Alphabet := Workspace Source Target)) lifted
+  exact TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq complete
+    (fun workspace => rfl)
+
+/-- Append a native source compiler's output even when the finite source
+alphabet is empty. -/
+noncomputable def appendFromWorkspaceComputableInPolyTimeOfCompiler
+    {Source Target : Type}
+    [Fintype Source] [Fintype Target]
+    [Inhabited (Workspace Source Target)]
+    (output : List Source → List Target)
+    (compiler : TM2ComputableInPolyTime id id output) :
+    TM2ComputableInPolyTime id id (appendFromWorkspace output) := by
+  classical
+  apply Classical.choice
+  rcases isEmpty_or_nonempty Source with empty | nonempty
+  · letI : IsEmpty Source := empty
+    let fixed := TM2ListAppend.appendFixedComputableInPolyTime
+      ((output []).map fun token =>
+        (Sum.inr token : Workspace Source Target))
+    exact ⟨TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq fixed
+      (fun workspace => by
+        have sourceEq : source workspace = [] := by
+          unfold source
+          induction workspace with
+          | nil => rfl
+          | cons item workspace induction =>
+              cases item with
+              | inl symbol => exact isEmptyElim symbol
+              | inr token =>
+                  simp only [List.flatMap_cons, List.nil_append]
+                  exact induction
+        simp only [TM2ListAppend.appendFixedWords, id_eq,
+          appendFromWorkspace, sourceEq])⟩
+  · letI : Inhabited Source := ⟨Classical.choice nonempty⟩
+    exact ⟨appendFromWorkspaceComputableInPolyTimeOfCompilerOfInhabitedSource
+      output compiler⟩
 
 /-- Compose two retained-input appenders and remove the retained source. -/
 def computableInPolyTimeOfAppenders
