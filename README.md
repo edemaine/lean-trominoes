@@ -1662,7 +1662,7 @@ build; an imported proof counts when its statement matches the paper.
                 expansion.
               - [x] Name the exact presentation-order carrier-link axis and
                 next-slice bit target independently of formula normalization.
-              - [ ] Emit the exact ordered carrier-link axis/next-slice bit
+              - [x] Emit the exact ordered carrier-link axis/next-slice bit
                 stream.
                 - [x] Emit the affine axis candidates in selected segment and
                   neighboring-translation order without importing the
@@ -1962,6 +1962,11 @@ build; an imported proof counts when its statement matches the paper.
                                     next-slice matrices; encode each selected
                                     pair sparsely and prove that decoding emits
                                     the exact row-major selected-pair stream.
+                                  - [x] Group row-major successors into the
+                                    dedup-last carrier-key blocks, recover every
+                                    established per-key bit block, and identify
+                                    the result with the exact semantic global
+                                    carrier-link bit stream.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
