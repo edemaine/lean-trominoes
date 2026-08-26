@@ -14,7 +14,7 @@ namespace PeriodicEightOccurrenceSplit
 open PeriodicOrthocrossing
 
 /-- One finite query for a final copied incidence.  Direct incidences retain
-the normalized atlas key and occurrence slot; fallback incidences retain the
+only the stable normalized atlas key; fallback incidences retain the
 already-computed scaled source direction. -/
 inductive RetainedFinalCopiedSourceDirectionQuery
   | direct (query : RetainedDirectSourceNormalizedDirectionQuery)
@@ -29,27 +29,23 @@ def retainedFinalCopiedSourceDirectionOfQuery :
 
 /-- Turn a successful direct choice into its fixed finite normalized query. -/
 def RetainedDirectSourceRouteChoice.normalizedDirectionQuery
-    (choice : RetainedDirectSourceRouteChoice)
-    (slot : RetainedTerminalSlot) :
+    (choice : RetainedDirectSourceRouteChoice) :
     RetainedDirectSourceNormalizedDirectionQuery :=
   retainedDirectSourceNormalizedDirectionQueryOfIndex
-    choice.kind choice.index slot
+    choice.kind choice.index
 
 /-- Exact finite query associated with one final copied-source incidence. -/
 def retainedFinalCopiedSourceDirectionQuery
     {Variable : Type} [DecidableEq Variable]
     (formula : PeriodicCNF Variable)
     (clauseIndex literalIndex : Nat)
-    (literal :
+    (_literal :
       PeriodicLiteral (WrappedPeriodicPlanarSATVariable Variable)) :
     RetainedFinalCopiedSourceDirectionQuery :=
   match retainedFinalDirectSourceRouteChoice?
       formula clauseIndex literalIndex with
   | some choice =>
-      .direct
-        (choice.normalizedDirectionQuery
-          (retainedFinalCoordinatedOccurrenceSlot
-            formula literal clauseIndex literalIndex))
+      .direct choice.normalizedDirectionQuery
   | none =>
       .fallback
         (AxisDirection.polylineFirstDirection
