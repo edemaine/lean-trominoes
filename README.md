@@ -1970,6 +1970,10 @@ build; an imported proof counts when its statement matches the paper.
                                   - [x] Compose the exact sparse bit compiler
                                     with the fixed two-token descriptor-block
                                     expansion and prove its semantic output.
+                                  - [x] Reinterpret the direct source's exact
+                                    binary route words as numeric descriptors
+                                    and compose them with the complete retained
+                                    carrier descriptor compiler.
                     - [x] Prove unconditional row-count alignment between the
                       key and order-coordinate representative pipelines, then
                       compile same-key strict-lower row counts and equal-key,
