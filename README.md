@@ -10809,6 +10809,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionCount.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionCount.lean)
   identifies the finite stream's final suffix as exactly nine variable markers
   per stable retained source variable.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionFixedEight.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineFiniteDirectionFixedEight.lean)
+  packages the copied lookup prefix and retained-source markers as a canonical
+  input whose existing fixed-eight expansion is the complete finite stream.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
