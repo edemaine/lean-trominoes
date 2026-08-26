@@ -2069,6 +2069,8 @@ build; an imported proof counts when its statement matches the paper.
               non-singleton ordinary fallback occurrence.
             - [x] Prove loop erasure preserves an isolated ordinary
               prefix/fan/spoke splice's first direction.
+            - [x] Identify the final positioned ordinary fallback's normalized
+              first direction with its scaled source route.
             - [ ] Combine direct, fallback, and implication-cycle directions
               into the actual final route-descriptor stream.
             - [ ] Compile the canonical route records from that stream.
@@ -10748,6 +10750,10 @@ The representation choices for this target are:
 - [`LeanTrominoes/RetainedAngularFanFinalOrdinaryFigure7Identification.lean`](LeanTrominoes/RetainedAngularFanFinalOrdinaryFigure7Identification.lean)
   records the exact equality between that generic prefix/fan/spoke model and
   the explicit final ordinary occurrence route.
+- [`LeanTrominoes/RetainedAngularFanFinalOrdinaryNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanFinalOrdinaryNormalizedFirstDirections.lean)
+  combines the exact model, final source-head isolation, and the reusable
+  normalization interface.  Every genuine final non-singleton failed-direct
+  occurrence therefore normalizes to its scaled source-route direction.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
