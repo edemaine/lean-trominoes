@@ -10714,11 +10714,11 @@ The representation choices for this target are:
   singleton-escaped fan-tail replacement and suffix joining, and expose the
   result at the public final route boundary for every failed-direct incidence.
 - [`LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedHeadIsolation.lean)
-  proves that unit subdivision of a cardinal escaped fan never revisits its
-  source gate.  The initial 64-block escape is duplicate-free, while every
-  point of the remaining fan stays strictly inward of the gate, supplying the
-  endpoint-isolation premise needed to preserve first direction through loop
-  erasure.
+  and [`LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOuterEscapedNormalizedFirstDirections.lean)
+  prove that unit subdivision of a cardinal escaped fan never revisits its
+  source gate and that loop erasure therefore preserves its first direction.
+  The initial 64-block escape is duplicate-free, while every point of the
+  remaining fan stays strictly inward of the gate.
 - [`LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean`](LeanTrominoes/PeriodicCNFFormulaShapeDirectionOrderingExtensionality.lean),
   [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptorData.lean),
   and [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedPlanarMetadataDescriptors.lean)
