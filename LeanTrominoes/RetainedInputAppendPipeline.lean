@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.FiniteBlockTransducer
 import LeanTrominoes.TM2CompositionMachine
+import LeanTrominoes.TM2NativeListAppendClosure
 import LeanTrominoes.TM2PolyTimeOutputEncodingTransport
 
 /-! # Polynomial-time pipelines that retain their original input -/
@@ -144,6 +145,24 @@ def extractComputableInPolyTime {Source Target : Type}
   FiniteBlockTransducer.computableInPolyTime fun
     | (Sum.inl _ : Workspace Source Target) => []
     | .inr token => [token]
+
+/-- Retain the input beside the output of any native list compiler. -/
+def appendedComputableInPolyTimeOfCompiler
+    {Source Target : Type}
+    [Fintype Source] [Fintype Target]
+    [Inhabited Target] [Inhabited (Workspace Source Target)]
+    (output : List Source → List Target)
+    (compiler : TM2ComputableInPolyTime id id output) :
+    TM2ComputableInPolyTime id id (appended output) := by
+  let lifted := TM2CompositionMachine.computableInPolyTime compiler
+    (FiniteBlockTransducer.computableInPolyTime fun token : Target =>
+      [(Sum.inr token : Workspace Source Target)])
+  let complete := TM2ListAppend.nativeComputableInPolyTime
+    (embedComputableInPolyTime (Source := Source) (Target := Target)) lifted
+  exact TM2PolyTimeOutputEncodingTransport.of_encoded_output_eq complete
+    (fun input => by
+      unfold appended
+      rw [← List.map_eq_flatMap])
 
 /-- Compose two retained-input appenders and remove the retained source. -/
 def computableInPolyTimeOfAppenders
