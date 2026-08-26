@@ -10786,6 +10786,10 @@ The representation choices for this target are:
   exposes the cycle metadata's global-index invariant: a block-start/local
   index selects the same positioned clause globally and within its atom's
   fixed Figure 7 block.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionSemantics.lean`](LeanTrominoes/PeriodicCNFFormulaShapeRetainedFigureNineCycleDirectionSemantics.lean)
+  uses that global-index invariant and the normalized cycle first-direction
+  theorem to identify each retained variable's routed implication block with
+  the common finite local Figure 7 descriptor block.
 - [`LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean`](LeanTrominoes/RetainedAngularFanOrdinaryFigure7NormalizedFirstDirections.lean)
   combines that isolation with orthogonality and exact endpoint joins, proving
   that loop erasure preserves the complete ordinary splice's source-edge
