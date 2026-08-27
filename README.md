@@ -11735,6 +11735,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlock.lean)
   identifies every genuine assembled raster request with exact compact
   metadata, six-field header, contracted direction block, and terminator tokens.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlockList.lean`](LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlockList.lean)
+  lifts that classification to the complete direct raster-request stream,
+  preserving the contracted-edge order exactly.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
