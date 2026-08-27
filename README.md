@@ -2144,6 +2144,14 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compose both doubled-reversed selectors with the direct
                   PSPACE source tagger, yielding exact delimited and
                   undelimited transformed raw-route compilers.
+                - [x] Package variable-site prefixes, clause-core routes, and
+                  both occurrence endpoint stubs as finite direction queries,
+                  and compile delimited or undelimited query streams by fixed
+                  block transduction.
+                - [x] Compile a complete coordinated occurrence word from its
+                  leading endpoint query, physical ribbon lane, dynamic source
+                  directions, and trailing endpoint query with one fixed
+                  finite-state transducer.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
@@ -11770,6 +11778,17 @@ The representation choices for this target are:
   maps the verified inner compiler independently over incidence-delimited
   streams and proves exact output on canonical retained and through edge
   blocks.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalFiniteIncidenceDirectionQueryData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalFiniteIncidenceDirectionQueryData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalFiniteIncidenceDirectionQueryCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalFiniteIncidenceDirectionQueryCompiler.lean)
+  turn every variable-site prefix, clause-core route, and occurrence endpoint
+  stub into a finite query with exact delimited and undelimited direction-word
+  compilers.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestData.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestCompiler.lean),
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestSemantics.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceDirectionRequestSemantics.lean)
+  surround a dynamic source-direction word by its two finite endpoint queries
+  and lane selector.  A fixed finite-state scan emits the exact complete
+  coordinated horizontal occurrence word.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged
