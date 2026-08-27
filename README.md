@@ -2092,6 +2092,9 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Reduce every successful direct-atlas copied-source tail to
               a finite clause-kind, literal-index, and occurrence-slot query,
               and compile its exact normalized tail word.
+            - [x] Prove clause-anchor translation, deduplication, and stable
+              representative selection preserve every fallback source
+              route's complete raw metadata direction word.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
