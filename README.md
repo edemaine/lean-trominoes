@@ -2083,6 +2083,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Re-express every final route by a proof-free exact
                 first-cell/coordinate-offset cursor and prove that it emits
                 the same canonical local-triple records.
+              - [x] Reduce the retained canonical route appender directly to
+                that exact offset-cursor target through an opaque machine
+                boundary.
               - [x] Reuse the retained-planar variable-marker compiler for
                 the finite Figure 9 source-marker suffix.
               - [x] Compile the finite normalized copied-clause descriptor
