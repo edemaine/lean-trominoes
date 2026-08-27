@@ -11801,6 +11801,16 @@ The representation choices for this target are:
   request interface and map that compiler over explicit incidence boundaries.
   Every classified incidence emits its exact direction word followed by one
   route delimiter.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoleRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoleRequestData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoleRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoleRequestCompiler.lean)
+  wrap a compact typed-incidence request with a retained, through-first, or
+  through-second role.  One fixed finite-state compiler emits the exact
+  role-tagged direction word and incidence boundary required by contracted
+  assembly.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalContractedDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedDirectionRequestCompiler.lean)
+  maps the role compiler independently over incidence boundaries and composes
+  it with contracted assembly.  Retained and through blocks compile to their
+  exact contracted direction words, with one final route boundary per edge.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged
