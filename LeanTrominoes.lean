@@ -110,6 +110,7 @@ import LeanTrominoes.FiniteStateReachability
 import LeanTrominoes.FiniteStateSearch
 import LeanTrominoes.FiniteTMCompiler
 import LeanTrominoes.FiniteBlockTransducer
+import LeanTrominoes.FiniteReverseBlockTransducer
 import LeanTrominoes.FiniteEncodingNativeFields
 import LeanTrominoes.FootprintTiling
 import LeanTrominoes.Gadget
@@ -2598,6 +2599,7 @@ import LeanTrominoes.WangPeriodicCNFComputability
 import LeanTrominoes.GadgetSparseRouteDirectionNormalization
 import LeanTrominoes.GadgetSparseRouteNormalizedJoinDirection
 import LeanTrominoes.GadgetSparseRouteDirectionReversal
+import LeanTrominoes.GadgetSparseRouteDirectionReversalCompiler
 import LeanTrominoes.GadgetSparseRouteDirectionSlices
 import LeanTrominoes.GadgetSparseRouteDirectionScalingCompiler
 import LeanTrominoes.GadgetSparseRouteSegmentDirectionBlock

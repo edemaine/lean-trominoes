@@ -3280,6 +3280,9 @@ The representation choices for this target are:
   substitution.  It proves an exact run length of twice the input length plus
   the output length and two, then packages the finite block-size bound as an
   explicit linear `TM2ComputableInPolyTime` certificate.
+- [`LeanTrominoes/FiniteReverseBlockTransducer.lean`](LeanTrominoes/FiniteReverseBlockTransducer.lean)
+  gives the reverse-order analogue: a two-stack machine emits the reverse of
+  a fixed block substitution in exactly `2n+1` steps.
 - [`LeanTrominoes/FiniteEncodingNativeFields.lean`](LeanTrominoes/FiniteEncodingNativeFields.lean)
   numbers any finite source alphabet and specializes the block transducer to
   emit canonical delimiter-terminated natural fields over the evaluator's
@@ -11767,6 +11770,9 @@ The representation choices for this target are:
   every direction by its opposite.  This covers both the reversed middle edge
   of polarity normalization and the reversed second incidence of every
   contracted through-edge.
+- [`LeanTrominoes/GadgetSparseRouteDirectionReversalCompiler.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversalCompiler.lean)
+  instantiates the reverse block machine to compile that dynamic opposite-
+  direction reversal in certified linear time.
 - [`LeanTrominoes/PositionedPeriodicCNFVariableGaugeDirectionData.lean`](LeanTrominoes/PositionedPeriodicCNFVariableGaugeDirectionData.lean)
   removes canonical variable gauges from valid incidence direction words.
   The final polarity layer now uses this general translation-invariance
