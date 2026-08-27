@@ -2198,6 +2198,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Prove a generic polynomial-time compiler boundary from
                   any two exact comparison-square producers to the semantic
                   global stable-rank stream.
+                - [x] Factor those squares into aligned atom-equality,
+                  terminal-key strict-order, and terminal-key equality
+                  streams, and compile their conjunctions generically.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
