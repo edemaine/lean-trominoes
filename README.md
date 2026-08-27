@@ -2102,6 +2102,8 @@ build; an imported proof counts when its statement matches the paper.
                 them with exact order-coordinate differences.
               - [x] Mask those spans into exact horizontal and vertical
                 retained streams, suppressing every rejected pair.
+              - [x] Decode each positive `span + 2` field into the four exact
+                route-delimited carrier-lens direction words.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
