@@ -11693,6 +11693,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PositionedPeriodicCNFTaggedOccurrenceMembership.lean`](LeanTrominoes/PositionedPeriodicCNFTaggedOccurrenceMembership.lean)
   recovers positioned clause/literal members from tagged indices and carries
   those indices backward through padding scale and anchor normalization.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceStoredRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceStoredRouteDirectionBlock.lean)
+  applies that bridge to every successful horizontal occurrence lookup,
+  identifying its stored route with one compact retained-polarity block.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
