@@ -11708,6 +11708,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalNormalizedRibbonRoutingFacts.lean`](LeanTrominoes/PeriodicCNFStripHorizontalNormalizedRibbonRoutingFacts.lean)
   projects width three and clockwise endpoint-fan compatibility from the
   opaque semantic drawing certificate for the concrete normalized source.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceCoordinatedRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceCoordinatedRouteDirectionBlock.lean)
+  joins the finite variable stub, compact ribbon corridor, and finite clause
+  stub into the exact complete colored occurrence-route direction word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
