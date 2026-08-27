@@ -2127,6 +2127,8 @@ build; an imported proof counts when its statement matches the paper.
                   selector to compile all direct-source raw route directions.
                 - [x] Preserve raw route boundaries by emitting exactly one
                   trailing delimiter for every selected diagonal descriptor.
+                - [x] Compile the direct-source specialization of that
+                  route-delimited raw direction stream.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
