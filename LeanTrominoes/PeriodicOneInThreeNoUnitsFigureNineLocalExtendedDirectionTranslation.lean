@@ -15,6 +15,54 @@ namespace PlanarOneInThreeNoUnitsFigureNine
 
 open Gadget PeriodicOrthocrossing
 
+/-- Translating a selected local template route leaves its normalized finite
+direction block unchanged. -/
+theorem normalizedTranslatedLocalRoute_directionWord
+    (profile :
+      PeriodicCNF.UnaryProgramClauseProfile.ClauseProfile)
+    (templateIndex :
+      Fin (templateDrawingOfClauseProfile profile).incidences.length)
+    (origin : Cell)
+    (actualLocalRoute : List Cell)
+    (localRouteEq :
+      actualLocalRoute =
+        translatePolyline origin
+          ((templateDrawingOfClauseProfile profile).routeAt
+            ((templateDrawingOfClauseProfile profile).incidenceAt
+              templateIndex)))
+    (actualLocalRouteNonempty : actualLocalRoute ≠ [])
+    (actualLocalRouteOrthogonal : OrthogonalPolyline actualLocalRoute) :
+    unitSubdivisionDirections
+        (AxisDirection.normalizeOrthogonalPolyline actualLocalRoute) =
+      normalizedLocalDirectionBlock ⟨profile, templateIndex⟩ := by
+  let templateLocalRoute :=
+    (templateDrawingOfClauseProfile profile).routeAt
+      ((templateDrawingOfClauseProfile profile).incidenceAt templateIndex)
+  have templateLocalRouteNonempty : templateLocalRoute ≠ [] := by
+    intro empty
+    apply actualLocalRouteNonempty
+    rw [localRouteEq]
+    change translatePolyline origin templateLocalRoute = []
+    rw [empty]
+    rfl
+  have translatedTemplateLocalRouteOrthogonal :
+      OrthogonalPolyline
+        (translatePolyline origin templateLocalRoute) := by
+    rw [← localRouteEq]
+    exact actualLocalRouteOrthogonal
+  have templateLocalRouteOrthogonal :
+      OrthogonalPolyline templateLocalRoute :=
+    translatedTemplateLocalRouteOrthogonal.of_translate origin
+  rw [localRouteEq]
+  unfold translatePolyline
+  rw [AxisDirection.normalizeOrthogonalPolyline_map_add
+    templateLocalRouteNonempty templateLocalRouteOrthogonal origin]
+  change unitSubdivisionDirections
+      (translatePolyline origin
+        (AxisDirection.normalizeOrthogonalPolyline templateLocalRoute)) = _
+  rw [unitSubdivisionDirections_translatePolyline]
+  rfl
+
 /-- A translated local template route joined to the equally translated
 extended connector has exactly its finite normalized profile block. -/
 theorem normalizedTranslatedLocalExtendedRoute_directionWord

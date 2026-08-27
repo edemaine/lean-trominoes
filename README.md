@@ -11622,15 +11622,16 @@ The representation choices for this target are:
   fan/slot block followed by factor-`144` repetition of the original route
   word after its first vertex.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionCompiler.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionCompiler.lean)
-  broadens the finite block to the complete local-plus-extended prefix.  Its
-  dependent finite query stores exactly a width-three clause profile, a valid
-  template incidence, fan metadata, and a fan slot.
+  compiles both normalized local template routes and complete
+  local-plus-extended prefixes.  Its dependent finite queries store a
+  width-three clause profile and valid template incidence, adding fan
+  metadata and a fan slot only for inherited prefixes.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean)
   proves that the canonical finite profile of every nonempty width-three
   positioned clause selects exactly its concrete Figure 9 template.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionTranslation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionTranslation.lean)
-  proves that translating a selected local template and its extended
-  connector into a common clause gauge leaves their normalized finite block
+  proves that translating a selected local template, alone or joined to its
+  extended connector, into a clause gauge leaves its normalized finite block
   unchanged.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineFinitePrefixDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineFinitePrefixDirectionBlock.lean)
   identifies every actual retained inherited route prefix with the finite

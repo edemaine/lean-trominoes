@@ -39,6 +39,19 @@ def templateDrawingOfClauseProfile :
   | .ternary first second third =>
       fullDrawingFor first.value second.value third.value
 
+/-- Finite selection data for one normalized local Figure 9 route. -/
+abbrev LocalDirectionQuery :=
+  Σ profile : ClauseProfile,
+    Fin (templateDrawingOfClauseProfile profile).incidences.length
+
+/-- The exact normalized direction block selected by one local query. -/
+def normalizedLocalDirectionBlock
+    (query : LocalDirectionQuery) : List AxisDirection :=
+  let drawing := templateDrawingOfClauseProfile query.1
+  let localRoute := drawing.routeAt (drawing.incidenceAt query.2)
+  unitSubdivisionDirections
+    (AxisDirection.normalizeOrthogonalPolyline localRoute)
+
 /-- Finite selection data for one complete local-plus-extended prefix. -/
 abbrev LocalExtendedDirectionQuery :=
   Σ profile : ClauseProfile,
@@ -58,6 +71,19 @@ def normalizedLocalExtendedDirectionBlock
 
 local instance localExtendedDirectionAxisDirectionInhabited :
     Inhabited AxisDirection := ⟨.invalid⟩
+
+/-- A fixed finite block transducer emits any stream of selected normalized
+local Figure 9 route words in linear time. -/
+noncomputable def normalizedLocalDirectionsComputableInPolyTime :
+    @TM2ComputableInPolyTime
+      (List LocalDirectionQuery)
+      (List AxisDirection)
+      LocalDirectionQuery AxisDirection
+      id id
+      (fun queries =>
+        queries.flatMap normalizedLocalDirectionBlock) :=
+  FiniteBlockTransducer.computableInPolyTime
+    normalizedLocalDirectionBlock
 
 /-- A fixed finite block transducer emits any stream of selected normalized
 local-plus-extended prefix words in linear time. -/
