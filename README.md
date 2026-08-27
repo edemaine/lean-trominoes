@@ -11936,6 +11936,12 @@ The representation choices for this target are:
   query and stable source slot.  The reconstructed clause profile and every
   active extended connector are proved equal to their semantic counterparts,
   leaving only the matching source-tail words.
+- [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderData.lean)
+  and [`LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean`](LeanTrominoes/PeriodicCNFFormulaShapeFigureNinePolarityRouteHeaderCompiler.lean)
+  combine those prefixes with the exact per-clause polarity schedule.  Each
+  final routed incidence now has an explicit finite polarity operation and
+  selected Figure 9 prefix; the projection theorem recovers the complete
+  polarity descriptor stream in order.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
