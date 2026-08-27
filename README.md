@@ -2160,6 +2160,10 @@ build; an imported proof counts when its statement matches the paper.
                   Figure 9 request, compile the dynamic route independently,
                   and rejoin both streams as the exact coordinated occurrence
                   word.
+                - [x] Lift compact routed occurrences through local/routed/
+                  clause typed incidences, retained/through role tagging, and
+                  contracted-edge assembly without expanding source geometry
+                  in the emitter.
                 - [x] Add each finite variable-site prefix to its optional
                   compiled occurrence word, handle clause-core incidences by
                   the same request interface, restore one direction boundary,
@@ -11816,6 +11820,14 @@ The representation choices for this target are:
   fork the finite occurrence frame from a compact routed Figure 9 request,
   compile its dynamic source word, and rejoin both streams in request order.
   The composed compiler emits the exact coordinated occurrence direction word.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoutedRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoutedRequestData.lean),
+  [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoutedRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceRoutedRequestCompiler.lean),
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalContractedRoutedRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalContractedRoutedRequestCompiler.lean)
+  add finite variable or clause prefixes, map the resulting incidence words
+  through retained/through roles and explicit boundaries, and assemble exact
+  contracted-edge direction blocks.  The framed source interface now carries
+  compact Figure 9 queries and optional raw tails instead of expanded
+  occurrence directions.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatch.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatch.lean),

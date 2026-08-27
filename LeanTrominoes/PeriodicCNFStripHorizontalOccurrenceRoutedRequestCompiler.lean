@@ -98,30 +98,35 @@ noncomputable def routeDirectionsComputableInPolyTime :
 /-- Finite control stores the complete frame while scanning the separated
 frame/direction pair. -/
 structure State where
+  active : Bool
   leading : HorizontalFiniteIncidenceDirectionQuery
   lane : Gadget.WireColor
   trailing : HorizontalFiniteIncidenceDirectionQuery
   deriving DecidableEq, Fintype
 
-instance : Inhabited State := ⟨⟨default, .red, default⟩⟩
+instance : Inhabited State := ⟨⟨false, default, .red, default⟩⟩
 
-def initial : State := ⟨default, .red, default⟩
+def initial : State := ⟨false, default, .red, default⟩
 
 abbrev SeparatedToken :=
   SeparatedProductEncoding.Token FrameToken AxisDirection
 
 def transition (state : State) : SeparatedToken →
     State × List HorizontalOccurrenceDirectionRequest.Token
-  | .left (.leading query) => (⟨query, state.lane, state.trailing⟩, [])
-  | .left (.lane color) => (⟨state.leading, color, state.trailing⟩, [])
-  | .left (.trailing query) => (⟨state.leading, state.lane, query⟩, [])
+  | .left (.leading query) =>
+      (⟨true, query, state.lane, state.trailing⟩, [])
+  | .left (.lane color) =>
+      (⟨state.active, state.leading, color, state.trailing⟩, [])
+  | .left (.trailing query) =>
+      (⟨state.active, state.leading, state.lane, query⟩, [])
   | .separator =>
-      (state, [.finite state.leading, .lane state.lane])
+      (state, if state.active then
+        [.finite state.leading, .lane state.lane] else [])
   | .right direction => (state, [.direction direction])
 
 def finish (state : State) :
     List HorizontalOccurrenceDirectionRequest.Token :=
-  [.finite state.trailing]
+  if state.active then [.finite state.trailing] else []
 
 def preparedOutput (input : List SeparatedToken) :
     List HorizontalOccurrenceDirectionRequest.Token :=
@@ -186,6 +191,9 @@ noncomputable def preparedComputableInPolyTime :
 
 def output (input : List Token) : List AxisDirection :=
   HorizontalOccurrenceDirectionRequest.output (prepared input)
+
+@[simp] theorem output_nil : output [] = [] := by
+  rfl
 
 @[simp] theorem output_tokens
     (leading : HorizontalFiniteIncidenceDirectionQuery)

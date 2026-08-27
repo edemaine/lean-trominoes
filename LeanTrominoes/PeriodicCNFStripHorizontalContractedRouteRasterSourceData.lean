@@ -3,7 +3,7 @@ Copyright (c) 2026 lean-trominoes contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
-import LeanTrominoes.PeriodicCNFStripHorizontalContractedDirectionRequestCompiler
+import LeanTrominoes.PeriodicCNFStripHorizontalContractedRoutedRequestCompiler
 import LeanTrominoes.PeriodicThreeDMContractedRouteRasterSourceData
 
 /-! # Framed compact horizontal contracted raster sources -/
@@ -15,7 +15,7 @@ namespace HorizontalContractedRouteRasterSource
 open PeriodicThreeDM
 
 abbrev RasterToken := ContractedRouteRasterSource.RasterToken
-abbrev RequestToken := HorizontalContractedDirectionRequest.RoleRequest.Token
+abbrev RequestToken := HorizontalContractedRoutedRequest.Token
 
 /-- A framed payload contributes either one already compiled raster-prefix
 token or one compact role-request token. -/
@@ -53,7 +53,7 @@ def requestTokens (tokens : List Token) : List RequestToken :=
 def requestOutput (tokens : List Token) : List RasterToken :=
   prefixTokens tokens ++
     ContractedRouteRasterSource.rasterizeDirections
-      (HorizontalContractedDirectionRequest.output
+      (HorizontalContractedRoutedRequest.contractedOutput
         (requestTokens tokens))
 
 /-- One framed source entry stores an already-materialized finite raster
@@ -72,7 +72,7 @@ def Entry.tokens (entry : Entry) : List Token :=
 def Entry.output (entry : Entry) : List RasterToken :=
   entry.leading ++
     ContractedRouteRasterSource.rasterizeDirections
-      (HorizontalContractedDirectionRequest.output entry.requests)
+      (HorizontalContractedRoutedRequest.contractedOutput entry.requests)
 
 def tokens (entries : List Entry) : List Token :=
   entries.flatMap Entry.tokens

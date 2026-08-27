@@ -35,11 +35,11 @@ noncomputable def requestTokensComputableInPolyTime :
 
 noncomputable def assembledDirectionsComputableInPolyTime :
     TM2ComputableInPolyTime id id fun tokens : List Token =>
-      HorizontalContractedDirectionRequest.output
+      HorizontalContractedRoutedRequest.contractedOutput
         (requestTokens tokens) :=
   TM2CompositionMachine.computableInPolyTime
     requestTokensComputableInPolyTime
-    HorizontalContractedDirectionRequest.computableInPolyTime
+    HorizontalContractedRoutedRequest.contractedOutputComputableInPolyTime
 
 /-- Prefix extraction and compact contracted assembly reuse the generic
 finite rasterizing concatenation bridge. -/
