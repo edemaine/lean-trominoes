@@ -11977,6 +11977,14 @@ The representation choices for this target are:
   consume one delimited source-tail record per finite header.  Fixed control
   suppresses tails for local Figure 9 routes and streams every inherited tail
   into the exact established routed request in linear time.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordData.lean)
+  flattens one clockwise clause tail table by tagging each direction with its
+  source slot.  Forty-three fixed indexed scans suffice for every finite
+  profile; their combined output is proved to reconstruct exactly the
+  established header/tail record list without buffering a dynamic route.
+  [`LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalRoutedRouteTailRecordCompiler.lean)
+  realizes the scans by fixed finite-state machines and maps the resulting
+  polynomial-time expansion independently over complete clause records.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
