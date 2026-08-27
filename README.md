@@ -2149,6 +2149,11 @@ build; an imported proof counts when its statement matches the paper.
                   words into one assembled incidence word or a first word
                   followed by the reversed second, eliminating contracted
                   joins and periodic translations from the emitter target.
+                - [x] Compile role-tagged retained, through-first, and
+                  through-second incidence words in linear time, map the
+                  compiler over incidence delimiters, and prove that each
+                  canonical edge block emits its exact contracted direction
+                  word with one route boundary.
                 - [x] Compile fixed affine expansion and batched three-round
                   direction normalization to canonical unary request blocks.
                 - [x] Verify the complement-counter record machine, including
@@ -11744,6 +11749,21 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlockList.lean`](LeanTrominoes/PeriodicCNFStripHorizontalAssembledRouteRasterRequestDirectionBlockList.lean)
   lifts that classification to the complete direct raster-request stream,
   preserving the contracted-edge order exactly.
+- [`LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerData.lean`](LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerData.lean)
+  gives retained, through-first, and through-second incidence words a fixed
+  finite token alphabet.  Their semantics concatenate the first through word
+  with the reversed and direction-flipped second word, producing one final
+  normalized route block per contracted edge.
+- [`LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerMachine.lean`](LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerMachine.lean)
+  defines the fixed three-stack machine that preserves forward words and
+  reverses through-second words while emitting normalized direction tokens.
+- [`LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerCompiler.lean)
+  verifies every transition and complete execution of that machine on
+  arbitrary token lists, with the linear time bound `2n + 4`.
+- [`LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerBatchCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedDirectionAssemblerBatchCompiler.lean)
+  maps the verified inner compiler independently over incidence-delimited
+  streams and proves exact output on canonical retained and through edge
+  blocks.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
