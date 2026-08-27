@@ -2116,8 +2116,10 @@ build; an imported proof counts when its statement matches the paper.
                 geometry to every selected numeric rank pair.
                 - [x] Recover every selected matrix entry as an adjacent
                   pair in its stable semantic carrier-key block.
-                - [ ] Identify that datum pair with its physical retained
-                  carrier nodes and apply their certified clearance.
+                - [x] Identify that datum pair with adjacent physical nodes
+                  in the reconstructed retained carrier chain.
+                - [ ] Transport those nodes to the semantic drawing and
+                  apply their certified clearance.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
