@@ -2594,6 +2594,7 @@ import LeanTrominoes.WangPeriodicCNF
 import LeanTrominoes.WangPeriodicCNFComputability
 import LeanTrominoes.GadgetSparseRouteSegmentDirectionBlock
 import LeanTrominoes.PeriodicOrthocrossingRouteDescriptorPairAffineDirectionBlocks
+import LeanTrominoes.UnaryFourFieldDirectionCompiler
 
 /-!
 # LeanTrominoes
