@@ -201,6 +201,66 @@ theorem radialJoinFarTail_isSimple
   simpa [transformed, refined, doubled, sourceRoute] using
     transformedTailSimple
 
+/-- The inherited far tail alone remains simple through doubling,
+subdivision, positive scaling, and translation. -/
+theorem farTail_isSimple
+    {Variable : Type*}
+    (outputPlacement :
+      PeriodicVariablePlacement
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (sourcePlacement : PeriodicVariablePlacement Variable)
+    (sourceClause : PositionedPeriodicClause Variable)
+    (generatedClause :
+      PositionedPeriodicClause
+        (OneInThreeNoUnitVariable
+          (OneInThreeVariable Variable)))
+    (first second : Cell)
+    (rest : List Cell)
+    (sourceOrthogonal :
+      OrthogonalPolyline (first :: second :: rest))
+    (sourceSimple :
+      LocalIncidenceDrawing.RouteIsSimple
+        (first :: second :: rest)) :
+    LocalIncidenceDrawing.RouteIsSimple
+      (translatePolyline
+        (inheritedSourceRouteShift
+          outputPlacement sourcePlacement sourceClause generatedClause)
+        (scalePolyline composedGadgetScale
+          (AxisDirection.unitSubdividePolyline
+            (scalePolyline 2 (second :: rest))))) := by
+  let sourceTail := second :: rest
+  let doubledTail := scalePolyline 2 sourceTail
+  have sourceTailOrthogonal : OrthogonalPolyline sourceTail :=
+    (List.isChain_cons_cons.mp sourceOrthogonal).2
+  have sourceTailSimple :
+      LocalIncidenceDrawing.RouteIsSimple sourceTail := by
+    simpa [sourceTail] using sourceSimple.tail
+  have doubledTailNonempty : doubledTail ≠ [] := by
+    simp [doubledTail, sourceTail, scalePolyline]
+  have doubledTailOrthogonal : OrthogonalPolyline doubledTail :=
+    sourceTailOrthogonal.scalePolyline (by norm_num)
+  have doubledTailSimple :
+      LocalIncidenceDrawing.RouteIsSimple doubledTail :=
+    sourceTailSimple.scalePolyline (by norm_num)
+  have refinedTailSimple :
+      LocalIncidenceDrawing.RouteIsSimple
+        (AxisDirection.unitSubdividePolyline doubledTail) := by
+    have normalizedSimple :=
+      AxisDirection.normalizeOrthogonalPolyline_isSimple
+        doubledTailNonempty doubledTailOrthogonal
+    rw [AxisDirection.normalizeOrthogonalPolyline_eq_unitSubdividePolyline_of_simple
+      doubledTailNonempty doubledTailOrthogonal doubledTailSimple]
+      at normalizedSimple
+    exact normalizedSimple
+  unfold translatePolyline
+  exact routeIsSimple_translate
+    (refinedTailSimple.scalePolyline (by
+      norm_num [composedGadgetScale, PlanarOneInThree.gadgetScale,
+        PeriodicOneInThreeNoUnitsPositioned.gadgetScale]))
+    (inheritedSourceRouteShift
+      outputPlacement sourcePlacement sourceClause generatedClause)
+
 /-- After unit subdivision, an extended connector and its inherited far tail
 share only their advertised outer splice cell. -/
 theorem translatedExtendedRoute_farTail_onlyCommon
