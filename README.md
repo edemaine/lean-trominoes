@@ -2156,6 +2156,10 @@ build; an imported proof counts when its statement matches the paper.
                   leading endpoint query, physical ribbon lane, dynamic source
                   directions, and trailing endpoint query with one fixed
                   finite-state transducer.
+                - [x] Fork that occurrence frame from a compact routed
+                  Figure 9 request, compile the dynamic route independently,
+                  and rejoin both streams as the exact coordinated occurrence
+                  word.
                 - [x] Add each finite variable-site prefix to its optional
                   compiled occurrence word, handle clause-core incidences by
                   the same request interface, restore one direction boundary,
@@ -11807,6 +11811,11 @@ The representation choices for this target are:
   surround a dynamic source-direction word by its two finite endpoint queries
   and lane selector.  A fixed finite-state scan emits the exact complete
   coordinated horizontal occurrence word.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRoutedRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRoutedRequestData.lean)
+  and [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRoutedRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceRoutedRequestCompiler.lean)
+  fork the finite occurrence frame from a compact routed Figure 9 request,
+  compile its dynamic source word, and rejoin both streams in request order.
+  The composed compiler emits the exact coordinated occurrence direction word.
 - [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestData.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestCompiler.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestCompiler.lean),
   [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatch.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceDirectionRequestBatch.lean),
