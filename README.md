@@ -11672,6 +11672,15 @@ The representation choices for this target are:
   transports that compact classification through final clockwise clause
   ordering and the final variable gauge without changing the direction word,
   including direct lookup from the proof-free gauged formula.
+- [`LeanTrominoes/PositionedPeriodicCNFIncidenceRouteMembership.lean`](LeanTrominoes/PositionedPeriodicCNFIncidenceRouteMembership.lean)
+  exposes the general fact that every genuine pointwise incidence route
+  occurs in the assembled drawing's flat edge-route list.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteGeometry.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteGeometry.lean)
+  gives every route selected from the proof-free final gauged formula a
+  segment and orthogonality by transport to the certified presentation.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedPolarityRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedPolarityRouteDirectionBlock.lean)
+  composes the final gauged Figure 9 blocks with the four polarity stream
+  operations, classifying every routed-polarity occurrence by a compact word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
