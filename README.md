@@ -2177,6 +2177,8 @@ build; an imported proof counts when its statement matches the paper.
                   presentation order across radial ties.
                 - [x] Identify every genuine angular occurrence's list index
                   with its stable numeric terminal rank.
+                - [x] Prove that bounding either the angular index or its
+                  stable numeric rank selects the same Figure 7 slot.
                 - [x] Lift semantic slot attachment to indexed direct-clause
                   families and expose composition from any exact slot-input
                   producer through complete Figure 9 record emission.
