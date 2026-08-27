@@ -2192,6 +2192,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Express the complete stream as same-atom strict-lower
                   comparison-row counts plus same-atom equal-key prefix
                   counts, matching the polynomial rank pipeline.
+                - [x] Feed the two flat comparison squares through the
+                  existing square reshaper, row counters, prefix counters,
+                  and unary adder, proving exact stable-rank output.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
