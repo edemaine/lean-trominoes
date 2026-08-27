@@ -2100,6 +2100,8 @@ build; an imported proof counts when its statement matches the paper.
               axis and carrier span.
               - [x] Compile the row-major signed carrier spans and identify
                 them with exact order-coordinate differences.
+              - [x] Mask those spans into exact horizontal and vertical
+                retained streams, suppressing every rejected pair.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
