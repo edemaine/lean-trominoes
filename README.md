@@ -10782,6 +10782,11 @@ The representation choices for this target are:
   combines the plane theorem, strip PSPACE membership, and the complete sparse
   postprocessing chain.  Uniform vertex-record and route-record appenders now
   imply the full `Theorem52.statement` directly.
+- [`LeanTrominoes/Theorem52DirectSparseSourceEmitterClosure.lean`](LeanTrominoes/Theorem52DirectSparseSourceEmitterClosure.lean)
+  specializes that endpoint to the two exact remaining source obligations:
+  five finite affine vertex families and one compact raster-route request
+  emitter.  Instances of those emitters imply the full theorem with no
+  additional theorem-level assumptions.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseData.lean)
   and [`LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseAffineTablePhaseCompiler.lean)
   split the phase-major compact vertex stream into variable triples, clause
