@@ -2132,7 +2132,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Compile every fixed affine route shape after the
                   horizontal construction's doubling and reversal directly
                   from signed coordinate differences, without buffering and
-                  reversing a dynamically sized emitted word.
+                  reversing a dynamically sized emitted word, and prove that
+                  output is the actual scaled reversed semantic route word.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
