@@ -11717,6 +11717,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalVariableTypedIncidenceDirectionBlockData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalVariableTypedIncidenceDirectionBlockData.lean)
   packages a variable incidence as either its finite local word or that word
   extended by one compact occurrence block, and recovers active-slot lookups.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalOrdinaryTypedIncidenceDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOrdinaryTypedIncidenceDirectionBlock.lean)
+  classifies every genuine ordinary variable incidence by one such compact
+  block and verifies its exact subdivided direction word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
