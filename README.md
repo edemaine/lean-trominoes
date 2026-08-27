@@ -11632,6 +11632,10 @@ The representation choices for this target are:
   combines local/far separation with connector/far boundary contact to
   normalize only the complete finite local-plus-extended prefix of an
   inherited route, reattaching its simple far tail unchanged.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineOwnRouteDirectionData.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineOwnRouteDirectionData.lean)
+  converts that route equality into the exact emitter word: one normalized
+  finite local-plus-connector block followed by factor-`144` repetition of
+  the original source-tail directions.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
