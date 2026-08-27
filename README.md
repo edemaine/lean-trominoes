@@ -10728,6 +10728,13 @@ The representation choices for this target are:
   likewise replace retained monochromatic fans by the last directions of
   their three original incidence routes and combine both endpoint cases into
   the exact six-field header of every contracted edge.
+- [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteIncidenceHeaderSemantics.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteIncidenceHeaderSemantics.lean),
+  [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteAssembledRequestData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteAssembledRequestData.lean),
+  and [`LeanTrominoes/PeriodicCNFStripDirectSparseRouteAssembledRasterRequestData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseRouteAssembledRasterRequestData.lean)
+  remove the normalization-input lookups entirely: each exact compact request
+  is now a direct map over contracted edge metadata, proof-free assembled
+  incidence words, the source route head, and the already emitted unary
+  drawing scale.
 - [`LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean`](LeanTrominoes/PeriodicCNFStripDirectSparseVertexRecordData.lean)
   expands all three vertex-normalization rounds to the exact affine formula
   `1728 · p + (471, 471)`.  Each vertex block is thereby reduced to its
