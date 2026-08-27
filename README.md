@@ -11600,6 +11600,10 @@ The representation choices for this target are:
   applies the localization theorem to an inherited suffix: normalization is
   exactly finite extended-connector normalization followed by the unchanged
   unit-subdivided far tail.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnSuffixDirectionData.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineOwnSuffixDirectionData.lean)
+  transports that route equality to the emitter boundary: the normalized
+  suffix direction word is the finite normalized connector word concatenated
+  with the original far-tail word.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
