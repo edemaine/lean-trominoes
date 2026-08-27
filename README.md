@@ -11711,6 +11711,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceCoordinatedRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFStripHorizontalOccurrenceCoordinatedRouteDirectionBlock.lean)
   joins the finite variable stub, compact ribbon corridor, and finite clause
   stub into the exact complete colored occurrence-route direction word.
+- [`LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceFiniteDirectionData.lean`](LeanTrominoes/PeriodicCNFStripHorizontalTypedIncidenceFiniteDirectionData.lean)
+  removes global translations from finite variable-site prefixes and
+  clause-core incidences, exposing their exact finite table words.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
