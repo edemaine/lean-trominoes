@@ -2206,6 +2206,8 @@ build; an imported proof counts when its statement matches the paper.
                   coordinates, then lift the result to both complete
                   target-major comparison streams, reducing the final
                   comparison producers to the unscaled coordinated routes.
+                - [x] Specialize that reduction to the exact source-scaled
+                  final coordinated formula and its Figure 7 slot routes.
                 - [x] Identify each genuine final copied clause's complete
                   semantic slot tuple with its presentation-ordered bounded
                   stable-rank tuple.
