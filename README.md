@@ -11571,6 +11571,12 @@ The representation choices for this target are:
   corresponding direction-word prefixes and suffixes.  In particular, the
   polarity-normalization split can now be compiled by fixed `take`/`drop`
   operations on the threefold-expanded incoming word.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionData.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionData.lean)
+  applies those stream laws to the actual final polarity subdivision.
+  Compatible incidences emit the full threefold-expanded source word,
+  incompatible incidences emit its first direction, and original-variable
+  complement incidences emit the word after its first two directions; all
+  route translations vanish from these equalities.
 
 ## Build
 
