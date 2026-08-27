@@ -11687,6 +11687,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionData.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionData.lean)
   identifies an assembled colored ribbon corridor with the fixed finite
   macrocell table applied to every adjacent pair of source directions.
+- [`LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionCompiler.lean`](LeanTrominoes/PeriodicPlanarOneInThreeToThreeDMRibbonCorridorDirectionCompiler.lean)
+  implements that adjacent-pair expansion as a finite-state polynomial-time
+  transducer carrying only the preceding source direction.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
