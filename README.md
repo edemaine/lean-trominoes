@@ -11616,6 +11616,10 @@ The representation choices for this target are:
   combines the two halves into the exact source-emitter form: a finite
   fan/slot block followed by factor-`144` repetition of the original route
   word after its first vertex.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionCompiler.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionCompiler.lean)
+  broadens the finite block to the complete local-plus-extended prefix.  Its
+  dependent finite query stores exactly a width-three clause profile, a valid
+  template incidence, fan metadata, and a fan slot.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
