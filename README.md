@@ -11587,6 +11587,10 @@ The representation choices for this target are:
   removes canonical variable gauges from valid incidence direction words.
   The final polarity layer now uses this general translation-invariance
   theorem, and the preceding fixed-eight gauge can use the same boundary.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections.lean)
+  applies that boundary to the computed retained construction, identifying
+  every valid final-gauged direction word with its pre-gauge final clockwise
+  route word.
 
 ## Build
 
