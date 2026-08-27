@@ -84,6 +84,22 @@ def repeatDirections
       congr 1
       simp [Nat.mul_succ, Nat.add_comm]
 
+/-- Consecutive fixed-copy expansions multiply their repetition factors. -/
+@[simp] theorem repeatDirections_repeatDirections
+    (outer inner : Nat) (directions : List AxisDirection) :
+    repeatDirections outer (repeatDirections inner directions) =
+      repeatDirections (outer * inner) directions := by
+  induction directions with
+  | nil => rfl
+  | cons direction directions induction =>
+      change repeatDirections outer
+          (List.replicate inner direction ++
+            repeatDirections inner directions) =
+        List.replicate (outer * inner) direction ++
+          repeatDirections (outer * inner) directions
+      rw [repeatDirections_append, repeatDirections_replicate,
+        induction]
+
 /-- The direction word of a positively scaled polyline is the fixed-copy
 expansion of its original direction word. -/
 theorem unitSubdivisionDirections_scalePolyline

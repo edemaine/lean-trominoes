@@ -11559,7 +11559,8 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetSparseRouteDirectionScalingCompiler.lean`](LeanTrominoes/GadgetSparseRouteDirectionScalingCompiler.lean)
   turns every positive fixed polyline scale into a finite direction-stream
   transducer: scaling by `k` is exactly repetition of each cardinal direction
-  `k` times.  This lets the remaining Theorem 5.2 route emitter compile the
+  `k` times, and consecutive expansions multiply their repetition factors.
+  This lets the remaining Theorem 5.2 route emitter compile the
   retained construction's several fixed refinement layers without rebuilding
   scaled route coordinates.
 - [`LeanTrominoes/GadgetSparseRouteDirectionNormalization.lean`](LeanTrominoes/GadgetSparseRouteDirectionNormalization.lean)
