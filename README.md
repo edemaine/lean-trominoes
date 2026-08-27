@@ -2138,6 +2138,8 @@ build; an imported proof counts when its statement matches the paper.
                   map the unique selector over the descriptor-pair stream,
                   and identify its output with every numeric raw route after
                   the horizontal construction's scale and reversal.
+                - [x] Preserve those doubled-reversed route boundaries with
+                  one delimiter per diagonal numeric descriptor.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
