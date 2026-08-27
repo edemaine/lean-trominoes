@@ -11565,7 +11565,14 @@ The representation choices for this target are:
 - [`LeanTrominoes/GadgetSparseRouteDirectionNormalization.lean`](LeanTrominoes/GadgetSparseRouteDirectionNormalization.lean)
   proves that ordered unit subdivision preserves the complete direction word,
   and therefore that loop-erasing normalization is direction-invisible on the
-  simple orthogonal routes used by the retained construction.
+  simple orthogonal route layers of the retained construction.  The composed
+  Figure 9 splice itself has finite radial reversals and therefore still needs
+  explicit loop erasure.
+- [`LeanTrominoes/ListLoopEraseAppend.lean`](LeanTrominoes/ListLoopEraseAppend.lean)
+  localizes that remaining work: right-to-left loop erasure commutes with
+  appending a duplicate-free disjoint suffix.  Thus the finite Figure 9 splice
+  can be normalized independently of its already-separated inherited source
+  tail.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
