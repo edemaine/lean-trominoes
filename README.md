@@ -2130,6 +2130,8 @@ build; an imported proof counts when its statement matches the paper.
               route direction stream directly from source symbols.
             - [x] Combine retained carrier and base-bend direction streams at
               the canonical numeric route-descriptor boundary.
+            - [x] Compose that combined stream with the direct-source numeric
+              route-descriptor compiler.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
