@@ -11629,14 +11629,23 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineClauseProfileTemplate.lean)
   proves that the canonical finite profile of every nonempty width-three
   positioned clause selects exactly its concrete Figure 9 template.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalDirectionProfile.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalDirectionProfile.lean)
+  selects the exact translated local template route of every genuine
+  incidence from its finite clause profile and template index.
 - [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionTranslation.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalExtendedDirectionTranslation.lean)
   proves that translating a selected local template, alone or joined to its
   extended connector, into a clause gauge leaves its normalized finite block
   unchanged.
+- [`LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalDirectionBlock.lean`](LeanTrominoes/PeriodicOneInThreeNoUnitsFigureNineLocalDirectionBlock.lean)
+  combines profile selection, endpoints, and orthogonality to identify every
+  genuine normalized local route with one finite query block.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineFinitePrefixDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineFinitePrefixDirectionBlock.lean)
   identifies every actual retained inherited route prefix with the finite
   block selected by its canonical clause profile, template incidence, fan,
   and slot.
+- [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineAuxiliaryRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineAuxiliaryRouteDirectionBlock.lean)
+  specializes the local query block to every actual non-inherited retained
+  Figure 9 incidence.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineLocalFarTailSeparation.lean)
   proves that a retained normalized local route avoids its own factor-`144`
   inherited far tail, even when its endpoint is the near connector's splice
