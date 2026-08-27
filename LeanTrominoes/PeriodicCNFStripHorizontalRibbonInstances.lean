@@ -14,7 +14,7 @@ namespace PeriodicCNFStripReduction
 
 noncomputable section
 
-attribute [local instance] sourceVariableDecidableEq
+attribute [local instance] variableDecidableEq
 
 /-- Equality used by the final gauged finite-gadget presentation. -/
 @[reducible] def horizontalRibbonInnerVariableDecidableEq :
@@ -22,9 +22,9 @@ attribute [local instance] sourceVariableDecidableEq
       (OneInThreeNoUnitVariable
         (PeriodicOrthocrossing.PeriodicPlanarOneInThreeThreeRawVariable
           Variable)) :=
-  PlanarOneInThreeNoUnitsFigureNine.nestedVariableDecidableEq
+  PeriodicOrthocrossing.finalGaugedRibbonFansVariableDecidableEq
 
-local instance horizontalRibbonInnerVariableInstance :
+@[reducible] local instance horizontalRibbonInnerVariableInstance :
     DecidableEq
       (OneInThreeNoUnitVariable
         (PeriodicOrthocrossing.PeriodicPlanarOneInThreeThreeRawVariable
@@ -35,7 +35,30 @@ local instance horizontalRibbonInnerVariableInstance :
 same inner decision procedure as the semantic ribbon presentation. -/
 @[reducible] def horizontalRibbonRoutedVariableDecidableEq :
     DecidableEq RoutedVariable :=
-  inferInstance
+  fun first second =>
+  @instDecidableEqSum
+    (OneInThreeNoUnitVariable
+      (PeriodicOrthocrossing.PeriodicPlanarOneInThreeThreeRawVariable
+        Variable))
+    ((Nat × Nat) ×
+      PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (PeriodicOrthocrossing.PeriodicPlanarOneInThreeThreeRawVariable
+            Variable)))
+    PeriodicOrthocrossing.finalGaugedRibbonFansVariableDecidableEq
+    (@instDecidableEqProd
+      (Nat × Nat)
+      (PeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (PeriodicOrthocrossing.PeriodicPlanarOneInThreeThreeRawVariable
+            Variable)))
+      (@instDecidableEqProd Nat Nat instDecidableEqNat instDecidableEqNat)
+      (@instDecidableEqPeriodicLiteral
+        (OneInThreeNoUnitVariable
+          (PeriodicOrthocrossing.PeriodicPlanarOneInThreeThreeRawVariable
+            Variable))
+        PeriodicOrthocrossing.finalGaugedRibbonFansVariableDecidableEq))
+    first second
 
 end
 end PeriodicCNFStripReduction
