@@ -2163,6 +2163,9 @@ build; an imported proof counts when its statement matches the paper.
                   block with its exact semantic Figure 9 clause record.
                 - [x] Lift the exact clause theorem to arbitrary indexed
                   direct-clause families while preserving global order.
+                - [x] Attach bounded occurrence-slot tuples to the existing
+                  finite direct-direction query alphabet, prove lossless
+                  round-trip semantics, and compile through record emission.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
