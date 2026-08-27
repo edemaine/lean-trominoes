@@ -2098,6 +2098,8 @@ build; an imported proof counts when its statement matches the paper.
             - [x] Identify all four retained carrier-lens route direction
               words as explicit finite/unary tables parameterized only by
               axis and carrier span.
+              - [x] Compile the row-major signed carrier spans and identify
+                them with exact order-coordinate differences.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
