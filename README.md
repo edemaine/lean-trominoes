@@ -2118,6 +2118,9 @@ build; an imported proof counts when its statement matches the paper.
                   exact direction-word output for each fixed route shape.
                 - [x] Gate every dynamic shape word by the diagonal-pair and
                   exact-shape predicates using a finite Boolean word guard.
+                - [x] Concatenate all 28 guarded candidates and map the unique
+                  diagonal-shape selector over complete descriptor-pair
+                  streams.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction
