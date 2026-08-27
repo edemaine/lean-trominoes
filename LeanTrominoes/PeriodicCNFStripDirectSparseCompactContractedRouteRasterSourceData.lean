@@ -59,6 +59,130 @@ theorem directSparseCompactContractedRouteEntry_output
   simp only [List.map_append, List.map_cons, List.map_nil, List.map_map,
     Function.comp_def, List.cons_append, List.nil_append, List.append_assoc]
 
+/-- One edge paired with its compact assembled incidence block. -/
+abbrev DirectSparseCompactContractedEdgeBlock :=
+  ContractedEdge × HorizontalAssembledContractedDirectionBlock
+
+/-- Framed entries obtained from an ordered list of compact edge blocks. -/
+def directSparseCompactContractedRouteEntries
+    (source : PeriodicCNF Nat)
+    (metadata : ContractedEdge → RouteRasterRequest.Metadata)
+    (blocks : List DirectSparseCompactContractedEdgeBlock) :
+    List HorizontalContractedRouteRasterSource.Entry :=
+  blocks.map fun tagged =>
+    directSparseCompactContractedRouteEntry
+      source (metadata tagged.1) tagged.1 tagged.2
+
+/-- Canonical raster requests represented by the same ordered edge blocks. -/
+def directSparseCompactContractedRouteRequests
+    (source : PeriodicCNF Nat)
+    (metadata : ContractedEdge → RouteRasterRequest.Metadata)
+    (blocks : List DirectSparseCompactContractedEdgeBlock) :
+    List RouteRasterRequest.Request :=
+  blocks.map fun tagged =>
+    { metadata := metadata tagged.1
+      normalization := horizontalAssembledNormalizationRequest
+        source tagged.1 }
+
+/-- Pointwise direction correctness lifts to the exact edge-major compact
+raster-request word. -/
+theorem directSparseCompactContractedRouteEntries_outputTokens
+    (source : PeriodicCNF Nat)
+    (metadata : ContractedEdge → RouteRasterRequest.Metadata)
+    (blocks : List DirectSparseCompactContractedEdgeBlock)
+    (directions : ∀ tagged ∈ blocks,
+      tagged.2.directions =
+        horizontalAssembledContractedDirections source tagged.1) :
+    HorizontalContractedRouteRasterSource.outputTokens
+        (directSparseCompactContractedRouteEntries
+          source metadata blocks) =
+      GadgetSparseRouteRasterRequestTokens.tokens
+        (directSparseCompactContractedRouteRequests
+          source metadata blocks) := by
+  unfold HorizontalContractedRouteRasterSource.outputTokens
+    directSparseCompactContractedRouteEntries
+    directSparseCompactContractedRouteRequests
+    GadgetSparseRouteRasterRequestTokens.tokens
+  rw [List.flatMap_map, List.flatMap_map]
+  apply List.flatMap_congr
+  intro tagged member
+  exact directSparseCompactContractedRouteEntry_output
+    source (metadata tagged.1) tagged.1 tagged.2
+      (directions tagged member)
+
+/-- Framing the ordered entries and running the fixed outer block map gives
+the same exact edge-major compact raster-request word. -/
+theorem directSparseCompactContractedRouteEntries_mappedOutput
+    (source : PeriodicCNF Nat)
+    (metadata : ContractedEdge → RouteRasterRequest.Metadata)
+    (blocks : List DirectSparseCompactContractedEdgeBlock)
+    (directions : ∀ tagged ∈ blocks,
+      tagged.2.directions =
+        horizontalAssembledContractedDirections source tagged.1) :
+    TM2EndDelimitedBlockMap.mappedOutput
+        HorizontalContractedRouteRasterSource.isEnd
+        HorizontalContractedRouteRasterSource.requestOutput
+        (HorizontalContractedRouteRasterSource.tokens
+          (directSparseCompactContractedRouteEntries
+            source metadata blocks)) =
+      GadgetSparseRouteRasterRequestTokens.tokens
+        (directSparseCompactContractedRouteRequests
+          source metadata blocks) := by
+  rw [HorizontalContractedRouteRasterSource.mappedOutput_tokens]
+  exact directSparseCompactContractedRouteEntries_outputTokens
+    source metadata blocks directions
+
+variable {Input : Type}
+variable {encoding : _root_.Computability.FinEncoding Input}
+variable {language : Input → Prop}
+variable (decider : Complexity.DeciderInPolySpace encoding language)
+
+noncomputable local instance
+    directSparseCompactContractedRouteSourceDataStackFintype
+    (stack : decider.tm.K) : Fintype (decider.tm.Γ stack) :=
+  decider.stackAlphabetFinite stack
+
+/-- Ordered block projection and pointwise direction correctness are the only
+semantic obligations needed for a complete direct compact source word. -/
+theorem directSparseCompactContractedRouteEntries_mappedOutput_of_blocks
+    (symbols : List encoding.Γ)
+    (blocks : List DirectSparseCompactContractedEdgeBlock)
+    (edges : blocks.map Prod.fst =
+      (directSparseComputedNormalizationInputOfSymbols
+        decider symbols).problem.contractedEdges)
+    (directions : ∀ tagged ∈ blocks,
+      tagged.2.directions =
+        horizontalAssembledContractedDirections
+          (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols
+            decider symbols) tagged.1) :
+    TM2EndDelimitedBlockMap.mappedOutput
+        HorizontalContractedRouteRasterSource.isEnd
+        HorizontalContractedRouteRasterSource.requestOutput
+        (HorizontalContractedRouteRasterSource.tokens
+          (directSparseCompactContractedRouteEntries
+            (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+            (directSparseAssembledRouteMetadata decider symbols)
+            blocks)) =
+      GadgetSparseRouteRasterRequestTokens.tokens
+        (RouteRasterRequest.directSparseRouteRasterRequestsOfSymbols
+          decider symbols) := by
+  rw [directSparseCompactContractedRouteEntries_mappedOutput
+    (PeriodicCNF.PolySpaceCompiler.formulaOfSymbols decider symbols)
+    (directSparseAssembledRouteMetadata decider symbols)
+    blocks directions]
+  apply congrArg GadgetSparseRouteRasterRequestTokens.tokens
+  have edges' := edges
+  unfold directSparseComputedNormalizationInputOfSymbols at edges'
+  rw [horizontalNormalizationInputComputed_problem] at edges'
+  rw [directSparseRouteRasterRequestsOfSymbols_eq_assembled]
+  unfold directSparseComputedNormalizationInputOfSymbols
+  dsimp only
+  rw [horizontalNormalizationInputComputed_problem, ← edges']
+  unfold directSparseCompactContractedRouteRequests
+    directSparseAssembledRouteRasterRequest
+  rw [List.map_map]
+  rfl
+
 end PeriodicCNFStripReduction
 end LeanTrominoes
 

@@ -2186,6 +2186,9 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Package one compact routed edge with its metadata and
                   six finite header fields, and prove the framed pipeline
                   emits its exact canonical raster-request block.
+                - [x] Lift the edge bridge to ordered compact block lists, so
+                  whole-stream correctness needs only exact edge projection
+                  and pointwise assembled-direction correctness.
                 - [x] Fork framed request blocks into metadata/header and
                   incidence streams, compose contracted assembly with finite
                   rasterization, and prove that this fixed bridge emits the
@@ -11856,10 +11859,11 @@ The representation choices for this target are:
   frame explicit finite role requests beside each raster prefix, run compact
   incidence and contracted-edge assembly, and rasterize the result.  The
   direct per-edge bridge packages metadata, all six header fields, role
-  assembly, and the outer delimiter into the exact canonical request block.
-  Any polynomial-time direct emitter satisfying this explicit source
-  interface now supplies the canonical compact raster-request compiler
-  automatically.
+  assembly, and the outer delimiter into the exact canonical request block;
+  its list lift reduces whole-stream correctness to ordered projection onto
+  `contractedEdges` and pointwise direction correctness.  Any polynomial-time
+  direct emitter satisfying this explicit source interface now supplies the
+  canonical compact raster-request compiler automatically.
 - [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceData.lean)
   and [`LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean`](LeanTrominoes/PeriodicThreeDMContractedRouteRasterSourceCompiler.lean)
   split each framed request into its retained raster prefix and role-tagged
