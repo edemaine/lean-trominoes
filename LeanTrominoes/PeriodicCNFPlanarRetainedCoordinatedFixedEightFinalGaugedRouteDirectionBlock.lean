@@ -5,6 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightOrderedFigureNineCompleteRouteDirectionBlock
 import LeanTrominoes.PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirections
+import LeanTrominoes.PositionedPeriodicCNFVariableGaugeClauseMembership
 
 /-! # Compact direction blocks after final clockwise ordering and gauging -/
 
@@ -70,6 +71,70 @@ theorem
     retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsComposedRawNormalizedIncidenceRoutes,
     PositionedPeriodicCNF.normalizeOrthogonalIncidenceRoutes] using
     blockDirections
+
+/-- The same classification can be selected directly from the proof-free
+gauged formula consumed by polarity normalization. -/
+theorem
+    retainedOrderedFixedEightFinalGaugedComputedRoute_directionBlock_of_members
+    {Variable : Type} [DecidableEq Variable]
+    (source : PeriodicCNF Variable)
+    (sourceLocal : source.IsLocal)
+    (sourceWidth : source.WidthAtMost 3)
+    (sourceOccurrences : source.OccurrencesAtMost 3)
+    (sourceClausesNonempty :
+      ∀ clause ∈ source.clauses, clause ≠ [])
+    {gaugedClause : PositionedPeriodicClause
+      (OneInThreeNoUnitVariable
+        (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {clauseIndex : Nat}
+    (clauseMember :
+      (gaugedClause, clauseIndex) ∈
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormulaComputed
+          source).clauses.zipIdx)
+    {gaugedLiteral : PeriodicLiteral
+      (OneInThreeNoUnitVariable
+        (PeriodicPlanarOneInThreeThreeRawVariable Variable))}
+    {literalIndex : Nat}
+    (literalMember :
+      (gaugedLiteral, literalIndex) ∈ gaugedClause.literals.zipIdx) :
+    ∃ block : RetainedFigureNineRouteDirectionBlock,
+      unitSubdivisionDirections
+          (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGaugedIncidenceRoutesComputed
+            source clauseIndex literalIndex) =
+        block.directions := by
+  have gaugedMember :
+      (gaugedClause, clauseIndex) ∈
+        ((retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormulaComputed
+          source).variableGauge
+            (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+              source)).clauses.zipIdx := by
+    simpa only [
+      retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalGaugedFormulaComputed]
+      using clauseMember
+  rcases
+      PositionedPeriodicCNF.exists_sourceClause_of_variableGaugeClause_mem
+        (retainedOrderedFixedEightPositionedPeriodicPlanarOneInThreeNoUnitsFinalClockwiseFormulaComputed
+          source)
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+          source)
+        gaugedMember with
+    ⟨sourceClause, sourceClauseMember, gaugedClauseEq⟩
+  have gaugedLiteralLookup :
+      (sourceClause.literals.variableGauge
+        (retainedOrderedFixedEightPeriodicPlanarOneInThreeNoUnitsFinalGauge
+          source))[literalIndex]? = some gaugedLiteral := by
+    rw [gaugedClauseEq] at literalMember
+    exact (List.mem_zipIdx_iff_getElem?).mp literalMember
+  rw [PeriodicClause.variableGauge, List.getElem?_map] at gaugedLiteralLookup
+  rcases Option.map_eq_some_iff.mp gaugedLiteralLookup with
+    ⟨sourceLiteral, sourceLiteralLookup, _gaugedLiteralEq⟩
+  have sourceLiteralMember :
+      (sourceLiteral, literalIndex) ∈ sourceClause.literals.zipIdx :=
+    (List.mem_zipIdx_iff_getElem?).mpr sourceLiteralLookup
+  exact
+    retainedOrderedFixedEightFinalGaugedRoute_directionBlock_of_members
+      source sourceLocal sourceWidth sourceOccurrences
+      sourceClausesNonempty sourceClauseMember sourceLiteralMember
 
 end PeriodicOrthocrossing
 end LeanTrominoes

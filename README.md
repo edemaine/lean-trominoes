@@ -11670,7 +11670,8 @@ The representation choices for this target are:
   block or a finite connector block followed by its repeated source tail.
 - [`LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirectionBlock.lean`](LeanTrominoes/PeriodicCNFPlanarRetainedCoordinatedFixedEightFinalGaugedRouteDirectionBlock.lean)
   transports that compact classification through final clockwise clause
-  ordering and the final variable gauge without changing the direction word.
+  ordering and the final variable gauge without changing the direction word,
+  including direct lookup from the proof-free gauged formula.
 - [`LeanTrominoes/GadgetSparseRouteDirectionSlices.lean`](LeanTrominoes/GadgetSparseRouteDirectionSlices.lean)
   identifies point-list prefixes and suffixes of a unit route with the
   corresponding direction-word prefixes and suffixes.  In particular, the
