@@ -56,7 +56,7 @@ noncomputable instance :
     Primcodable RetainedDirectSourceAtlasIndexData :=
   Primcodable.subtype retainedDirectSourceAtlasIndexData_valid_primrec
 
-theorem retainedDirectSourcePrefixChoices_length_le_three :
+private theorem retainedDirectSourcePrefixChoices_length_le_three_computability :
     ∀ kind : RetainedDirectClauseKind,
       (retainedDirectSourcePrefixChoices kind).length ≤ 3 := by
   native_decide
@@ -66,7 +66,8 @@ noncomputable instance : Finite RetainedDirectSourceAtlasIndexData := by
     ((data.1.1,
       ⟨data.1.2,
         lt_of_lt_of_le data.2
-          (retainedDirectSourcePrefixChoices_length_le_three data.1.1)⟩) :
+          (retainedDirectSourcePrefixChoices_length_le_three_computability
+            data.1.1)⟩) :
       RetainedDirectClauseKind × Fin 3))
   intro first second equality
   apply Subtype.ext

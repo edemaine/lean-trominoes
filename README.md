@@ -2155,6 +2155,9 @@ build; an imported proof counts when its statement matches the paper.
               - [x] Combine retained carrier and base-bend Figure 9 record
                 streams at the numeric descriptor boundary and compose the
                 result with the direct source.
+              - [x] Package each successful direct-atlas literal as a finite
+                profile/key/occurrence-slot query and compile exact direct
+                clause-record expansion through a fixed lookup table.
             - [ ] Compile the canonical route records from that stream.
               - [x] Name the exact edge-major local-triple record word and
                 reduce the retained-workspace appender to its native compiler.
