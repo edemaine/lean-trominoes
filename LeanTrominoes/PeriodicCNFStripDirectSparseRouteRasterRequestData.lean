@@ -5,7 +5,7 @@ Authors: Erik Demaine, Stefan Langerman, GPT 5.6
 -/
 import LeanTrominoes.PeriodicCNFStripDirectSparseAffineVertexRequestData
 import LeanTrominoes.PeriodicCNFStripDirectSparseRouteRasterDirectionData
-import LeanTrominoes.PeriodicThreeDMNormalizationDirectionRequests
+import LeanTrominoes.GadgetSparseRouteRasterRequestData
 
 /-! # Compact raster requests for direct sparse routes
 
@@ -23,40 +23,6 @@ namespace RouteRasterRequest
 
 open Gadget
 open PeriodicThreeDM.NormalizationDirectionRequest
-
-/-- Compact raster metadata retained while one direction request is
-normalized. -/
-structure Metadata where
-  gridSize : Nat
-  horizontal : Nat
-  verticalComplement : Nat
-  color : WireColor
-  deriving DecidableEq, Repr
-
-/-- Final strip period represented by compact metadata. -/
-def Metadata.period (metadata : Metadata) : Nat :=
-  1728 * metadata.gridSize
-
-/-- Final raster source location represented by compact metadata. -/
-def Metadata.location (metadata : Metadata) : Cell :=
-  ((1728 * metadata.horizontal + 471 : Nat),
-    (1728 * metadata.verticalComplement + 1257 : Nat))
-
-/-- Compact raster metadata together with the existing finite three-round
-normalization request. -/
-structure Request where
-  metadata : Metadata
-  normalization : PeriodicThreeDM.NormalizationDirectionRequest.Request
-  deriving DecidableEq, Repr
-
-/-- Interpret a completely normalized compact request as canonical sparse
-route records. -/
-def normalizedRecordBlock (request : Request) :
-    List GadgetSparseAssignmentTokens.Token :=
-  sparseRouteRecordBlocksFromRasterDirections
-    request.metadata.period request.metadata.color
-    request.metadata.location
-    (normalizeThreeRounds request.normalization).directions
 
 /-- Compact request extracted from one executable normalization edge. -/
 def ofEdge (input : PeriodicThreeDM.NormalizationCompiler.Input)
