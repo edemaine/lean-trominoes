@@ -2182,6 +2182,8 @@ build; an imported proof counts when its statement matches the paper.
                 - [x] Define that numeric rank on the exact source-scaled
                   final construction and identify its bounded value with the
                   final coordinated occurrence slot.
+                - [x] Rewrite every genuine stable terminal rank as the sum
+                  of its strict-lower-key count and earlier-equal-key count.
                 - [x] Lift semantic slot attachment to indexed direct-clause
                   families and expose composition from any exact slot-input
                   producer through complete Figure 9 record emission.
