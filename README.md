@@ -2105,6 +2105,9 @@ build; an imported proof counts when its statement matches the paper.
               - [ ] Emit each contracted edge's initial unit directions and
                 six finite endpoint-template choices.  This compact source
                 emitter is now the only missing route-appender component.
+                - [x] Express every axis-aligned segment's complete unary
+                  direction run by its four signed coordinate differences,
+                  and lift the equality over whole orthogonal polylines.
                 - [x] Package affine source metadata and normalization data as
                   one cursor-valid compact request per contracted edge.
                 - [x] Decompose retained and suppressed-edge initial direction

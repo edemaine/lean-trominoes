@@ -2592,6 +2592,7 @@ import LeanTrominoes.Theorem52
 import LeanTrominoes.TilingCompactness
 import LeanTrominoes.WangPeriodicCNF
 import LeanTrominoes.WangPeriodicCNFComputability
+import LeanTrominoes.GadgetSparseRouteSegmentDirectionBlock
 
 /-!
 # LeanTrominoes
