@@ -11693,6 +11693,9 @@ The representation choices for this target are:
 - [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRefinedSourceMembership.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRefinedSourceMembership.lean)
   recovers the original positioned clause and literal at the same indices
   from every anchor-normalized, threefold-scaled source occurrence.
+- [`LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionBlock.lean`](LeanTrominoes/PeriodicOneInThreePolarityNormalizationRouteDirectionBlock.lean)
+  packages all four polarity route cases as fixed repeat, prefix, suffix, and
+  reversed-middle operations on an arbitrary compact source direction block.
 - [`LeanTrominoes/GadgetSparseRouteDirectionReversal.lean`](LeanTrominoes/GadgetSparseRouteDirectionReversal.lean)
   proves the full route-reversal law: reverse the direction list and replace
   every direction by its opposite.  This covers both the reversed middle edge
