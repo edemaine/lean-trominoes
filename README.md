@@ -2120,6 +2120,8 @@ build; an imported proof counts when its statement matches the paper.
                   in the reconstructed retained carrier chain.
                 - [x] Transport those nodes to the semantic drawing and
                   apply their certified clearance.
+              - [x] Conclude that the compiled global stream is exactly the
+                canonical four-route block for every retained carrier lens.
             - [x] Identify every retained bend route's complete direction
               word with its fixed finite corner-table entry.
             - [x] Select, delimit, and compile the exact complete base-bend
