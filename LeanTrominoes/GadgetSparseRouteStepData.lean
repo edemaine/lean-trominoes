@@ -70,5 +70,77 @@ theorem rebuildRoute_routeStepDirections
       rw [← AxisDirection.add_between_step_eq_of_unitAxisStep firstUnit]
       rw [induction second remainingUnitSteps]
 
+/-- The coordinate offset of every consecutive route edge.  Unlike the
+cardinal-direction representation above, this representation is lossless for
+arbitrary route data and therefore needs no validity hypothesis. -/
+def routeStepOffsets : List Cell → List Cell
+  | first :: second :: rest =>
+      Cell.sub second first :: routeStepOffsets (second :: rest)
+  | _ => []
+termination_by points => points.length
+
+/-- Reconstruct a route from its first cell and successive coordinate
+offsets. -/
+def rebuildRouteFromOffsets : Cell → List Cell → List Cell
+  | first, [] => [first]
+  | first, offset :: offsets =>
+      first :: rebuildRouteFromOffsets (Cell.add first offset) offsets
+
+/-- Adding the exact offset from `first` to `second` reaches `second`. -/
+@[simp]
+theorem add_stepOffset (first second : Cell) :
+    Cell.add first (Cell.sub second first) = second := by
+  rcases first with ⟨firstX, firstY⟩
+  rcases second with ⟨secondX, secondY⟩
+  simp [Cell.add, Cell.sub]
+
+@[simp]
+theorem routeStepOffsets_length (first : Cell) (rest : List Cell) :
+    (routeStepOffsets (first :: rest)).length = rest.length := by
+  induction rest generalizing first with
+  | nil => simp [routeStepOffsets]
+  | cons second rest induction =>
+      simp only [routeStepOffsets, List.length_cons]
+      rw [induction]
+
+@[simp]
+theorem rebuildRouteFromOffsets_length (first : Cell)
+    (offsets : List Cell) :
+    (rebuildRouteFromOffsets first offsets).length = offsets.length + 1 := by
+  induction offsets generalizing first with
+  | nil => rfl
+  | cons offset offsets induction =>
+      simp only [rebuildRouteFromOffsets, List.length_cons]
+      rw [induction]
+
+/-- Every nonempty route is recovered exactly from its coordinate offsets. -/
+theorem rebuildRouteFromOffsets_routeStepOffsets
+    (first : Cell) (rest : List Cell) :
+    rebuildRouteFromOffsets first (routeStepOffsets (first :: rest)) =
+      first :: rest := by
+  induction rest generalizing first with
+  | nil => simp [routeStepOffsets, rebuildRouteFromOffsets]
+  | cons second rest induction =>
+      simp only [routeStepOffsets, rebuildRouteFromOffsets]
+      rw [add_stepOffset]
+      rw [induction]
+
+/-- Total first-cell projection used by proof-free route compilers. -/
+def routeStart : List Cell → Cell
+  | first :: _ => first
+  | [] => (0, 0)
+
+/-- The total start/offset representation also reconstructs the empty route
+up to the irrelevant singleton fallback; both have no internal triples. -/
+theorem rebuildRouteFromOffsets_routeStart
+    (route : List Cell) :
+    route = [] ∨
+      rebuildRouteFromOffsets (routeStart route) (routeStepOffsets route) =
+        route := by
+  cases route with
+  | nil => exact Or.inl rfl
+  | cons first rest =>
+      exact Or.inr (rebuildRouteFromOffsets_routeStepOffsets first rest)
+
 end Gadget
 end LeanTrominoes
